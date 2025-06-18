@@ -250,27 +250,23 @@ CHIP_ERROR AclStorage::DecodableEntry::Unstage()
 
     if (!mStagingEntry.subjects.IsNull())
     {
-        auto iterator = mStagingEntry.subjects.Value().begin();
-        while (iterator.Next())
-        {
-            StagingSubject tmp = { .nodeId = iterator.GetValue(), .authMode = mStagingEntry.authMode };
+        auto iterateStatus = mStagingEntry.subjects.Value().Iterate([&](auto & value, bool &) -> CHIP_ERROR {
+            StagingSubject tmp = { .nodeId = value, .authMode = mStagingEntry.authMode };
             NodeId subject;
             ReturnErrorOnFailure(Convert(tmp, subject));
-            ReturnErrorOnFailure(mEntry.AddSubject(nullptr, subject));
-        }
-        ReturnErrorOnFailure(iterator.GetStatus());
+            return mEntry.AddSubject(nullptr, subject);
+        });
+        ReturnErrorOnFailure(iterateStatus);
     }
 
     if (!mStagingEntry.targets.IsNull())
     {
-        auto iterator = mStagingEntry.targets.Value().begin();
-        while (iterator.Next())
-        {
+        auto iterateStatus = mStagingEntry.targets.Value().Iterate([&](auto & value, bool &) -> CHIP_ERROR {
             Target target;
-            ReturnErrorOnFailure(Convert(iterator.GetValue(), target));
-            ReturnErrorOnFailure(mEntry.AddTarget(nullptr, target));
-        }
-        ReturnErrorOnFailure(iterator.GetStatus());
+            ReturnErrorOnFailure(Convert(value, target));
+            return mEntry.AddTarget(nullptr, target);
+        });
+        ReturnErrorOnFailure(iterateStatus);
     }
 
     return CHIP_NO_ERROR;

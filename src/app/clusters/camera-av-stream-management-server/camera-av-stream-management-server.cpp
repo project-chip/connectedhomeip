@@ -2024,21 +2024,14 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
 {
 
     auto & streamPriorities = commandData.streamPriorities;
-    std::vector<Globals::StreamUsageEnum> streamUsagePriorities;
-    auto iter = streamPriorities.begin();
+    std::vector<Globals::StreamUsageEnum> rankedStreamPriorities;
 
     // If any video, audio or snapshot streams exist fail the command.
     VerifyOrReturn(mAllocatedVideoStreams.empty() && mAllocatedAudioStreams.empty() && mAllocatedSnapshotStreams.empty(),
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
 
-    while (iter.Next())
-    {
-        auto & streamUsage = iter.GetValue();
-        if (streamUsage == Globals::StreamUsageEnum::kUnknownEnumValue)
-        {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-            return;
-        }
+    auto iterateStatus = streamPriorities.Iterate([&](auto & streamUsage, bool &) -> CHIP_ERROR {
+        VerifyOrReturnError(streamUsage == Globals::StreamUsageEnum::kUnknownEnumValue, CHIP_IM_GLOBAL_STATUS(InvalidCommand));
         // If any requested value is not found in SupportedStreamUsages,
         // return DynamicConstraintError.
         auto it = std::find(mSupportedStreamUsages.begin(), mSupportedStreamUsages.end(), streamUsage);
@@ -2050,7 +2043,7 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
 
     if (iter.GetStatus() != CHIP_NO_ERROR)
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, IMGlobalStatusFromError(iterateStatus, Status::InvalidCommand));
         return;
     }
 

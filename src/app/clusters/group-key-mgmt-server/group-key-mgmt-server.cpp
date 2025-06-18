@@ -211,25 +211,22 @@ private:
 
             VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
             ReturnErrorOnFailure(aDecoder.Decode(list));
-            ReturnErrorOnFailure(list.ComputeSize(&new_count));
+            ReturnErrorOnFailure(list.ComputeSize(new_count));
 
             // Remove existing keys, ignore errors
             provider->RemoveGroupKeys(fabric_index);
 
             // Add the new keys
-            auto iter = list.begin();
-            size_t i  = 0;
-            while (iter.Next())
-            {
-                const auto & value = iter.GetValue();
+            size_t i           = 0;
+            auto iterateStatus = list.Iterate([&](auto & value, bool &) -> CHIP_ERROR {
                 VerifyOrReturnError(fabric_index == value.fabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
                 // Cannot map to IPK, see `GroupKeyMapStruct` in Group Key Management cluster spec
                 VerifyOrReturnError(value.groupKeySetID != 0, CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-                ReturnErrorOnFailure(provider->SetGroupKeyAt(value.fabricIndex, i++,
-                                                             GroupDataProvider::GroupKey(value.groupId, value.groupKeySetID)));
-            }
-            ReturnErrorOnFailure(iter.GetStatus());
+                return provider->SetGroupKeyAt(value.fabricIndex, i++,
+                                               GroupDataProvider::GroupKey(value.groupId, value.groupKeySetID));
+            });
+            ReturnErrorOnFailure(iterateStatus);
         }
         else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
         {

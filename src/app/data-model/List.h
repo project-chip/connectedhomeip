@@ -21,6 +21,7 @@
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/FabricScoped.h>
+#include <functional>
 #include <lib/core/TLV.h>
 
 namespace chip {
@@ -50,6 +51,11 @@ struct List : public Span<T>
     //
     using Span<T>::Span;
 
+    // Function to iterate through elements; iteration aborts if function
+    // returns something other than CHIP_NO_ERROR or if breakLoop is true
+    using IterateConstFnType = std::function<CHIP_ERROR(const T & element, bool & breakLoop)>;
+    using IterateFnType      = std::function<CHIP_ERROR(T & element, bool & breakLoop)>;
+
     // Inherited copy constructors are _not_ imported by the using statement
     // above, though, so we need to implement that ourselves.  This is templated
     // on the span's type to allow us to init a List<const Foo> from Span<Foo>.
@@ -69,6 +75,34 @@ struct List : public Span<T>
     // A list is deemed fabric scoped if the type of its elements is as well.
     //
     static constexpr bool kIsFabricScoped = DataModel::IsFabricScoped<T>::value;
+
+    CHIP_ERROR Iterate(IterateConstFnType iterateFn) const
+    {
+        for (const auto & item : *this)
+        {
+            bool breakLoop = false;
+            ReturnErrorOnFailure(iterateFn(item, breakLoop));
+            if (breakLoop)
+            {
+                break;
+            }
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Iterate(IterateFnType iterateFn)
+    {
+        for (const auto & item : *this)
+        {
+            bool breakLoop = false;
+            ReturnErrorOnFailure(iterateFn(item, breakLoop));
+            if (breakLoop)
+            {
+                break;
+            }
+        }
+        return CHIP_NO_ERROR;
+    }
 };
 
 // Template deduction guides to allow construction of List from a pointer or

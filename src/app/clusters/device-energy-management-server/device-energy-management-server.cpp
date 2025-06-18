@@ -661,25 +661,19 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
     }
 
     // Check the various values in the slot structures
-    auto iterator = slotAdjustments.begin();
-    while (iterator.Next())
-    {
-        const Structs::SlotAdjustmentStruct::Type & slotAdjustment = iterator.GetValue();
-
+    auto iterateStatus = slotAdjustments.Iterate([&](auto & slotAdjustment, bool &) -> CHIP_ERROR {
         // Check for an invalid slotIndex
         if (slotAdjustment.slotIndex >= forecast.Value().slots.size())
         {
             ChipLogError(Zcl, "DEM: Bad slot index %d", slotAdjustment.slotIndex);
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
-            return;
+            return CHIP_IM_GLOBAL_STATUS(Failure);
         }
 
         // Check to see if trying to modify a slot which has already been run
         if (!forecast.Value().activeSlotNumber.IsNull() && slotAdjustment.slotIndex < forecast.Value().activeSlotNumber.Value())
         {
             ChipLogError(Zcl, "DEM: Modifying already run slot index %d", slotAdjustment.slotIndex);
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-            return;
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
 
         const Structs::SlotStruct::Type & slot = forecast.Value().slots[slotAdjustment.slotIndex];
@@ -692,8 +686,7 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
                 slotAdjustment.nominalPower.Value() > slot.maxPowerAdjustment.Value())
             {
                 ChipLogError(Zcl, "DEM: Bad nominalPower");
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-                return;
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
             }
         }
 
@@ -702,14 +695,14 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
             slotAdjustment.duration > slot.maxDurationAdjustment.Value())
         {
             ChipLogError(Zcl, "DEM: Bad min/max duration");
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-            return;
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
-    }
+        return CHIP_NO_ERROR;
+    });
 
-    if (iterator.GetStatus() != CHIP_NO_ERROR)
+    if (iterateStatus != CHIP_NO_ERROR)
     {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, IMGlobalStatusFromError(iterateStatus, Status::InvalidCommand));
         return;
     }
 
@@ -756,103 +749,87 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
     }
 
     // Check for invalid power levels and whether the constraint time/duration is in the past
+    auto iterateStatus = constraints.Iterate([&](auto & constraint, bool & breakLoop) -> CHIP_ERROR {
+        // Check to see if this constraint is in the past
+        if (constraint.startTime < currentUtcTime)
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+
+        if (HasFeature(Feature::kPowerForecastReporting))
+        {
+            if (!constraint.nominalPower.HasValue())
+            {
+                ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast no nominalPower");
+                return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
+            }
+
+            if (constraint.nominalPower.Value() < mDelegate.GetAbsMinPower() ||
+                constraint.nominalPower.Value() > mDelegate.GetAbsMaxPower())
+            {
+                ChipLogError(Zcl,
+                             "DEM: RequestConstraintBasedForecast nominalPower " ChipLogFormatX64 " out of range [" ChipLogFormatX64
+                             ", " ChipLogFormatX64 "]",
+                             ChipLogValueX64(constraint.nominalPower.Value()), ChipLogValueX64(mDelegate.GetAbsMinPower()),
+                             ChipLogValueX64(mDelegate.GetAbsMaxPower()));
+
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            }
+
+            if (!constraint.maximumEnergy.HasValue())
+            {
+                ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast no value for maximumEnergy");
+                return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
+            }
+        }
+
+        if (HasFeature(Feature::kStateForecastReporting))
+        {
+            if (!constraint.loadControl.HasValue())
+            {
+                ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast no loadControl");
+                return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
+            }
+
+            if (constraint.loadControl.Value() < -100 || constraint.loadControl.Value() > 100)
+            {
+                ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast bad loadControl %d", constraint.loadControl.Value());
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            }
+        }
+        breakLoop = true;
+        return CHIP_NO_ERROR;
+    });
+
+    if (iterateStatus != CHIP_NO_ERROR)
     {
-        auto iterator = constraints.begin();
-        if (iterator.Next())
-        {
-            const Structs::ConstraintsStruct::DecodableType & constraint = iterator.GetValue();
-
-            // Check to see if this constraint is in the past
-            if (constraint.startTime < currentUtcTime)
-            {
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-                return;
-            }
-
-            if (HasFeature(Feature::kPowerForecastReporting))
-            {
-                if (!constraint.nominalPower.HasValue())
-                {
-                    ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast no nominalPower");
-                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-                    return;
-                }
-
-                if (constraint.nominalPower.Value() < mDelegate.GetAbsMinPower() ||
-                    constraint.nominalPower.Value() > mDelegate.GetAbsMaxPower())
-                {
-                    ChipLogError(Zcl,
-                                 "DEM: RequestConstraintBasedForecast nominalPower " ChipLogFormatX64
-                                 " out of range [" ChipLogFormatX64 ", " ChipLogFormatX64 "]",
-                                 ChipLogValueX64(constraint.nominalPower.Value()), ChipLogValueX64(mDelegate.GetAbsMinPower()),
-                                 ChipLogValueX64(mDelegate.GetAbsMaxPower()));
-
-                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-                    return;
-                }
-
-                if (!constraint.maximumEnergy.HasValue())
-                {
-                    ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast no value for maximumEnergy");
-                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-                    return;
-                }
-            }
-
-            if (HasFeature(Feature::kStateForecastReporting))
-            {
-                if (!constraint.loadControl.HasValue())
-                {
-                    ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast no loadControl");
-                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-                    return;
-                }
-
-                if (constraint.loadControl.Value() < -100 || constraint.loadControl.Value() > 100)
-                {
-                    ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast bad loadControl %d", constraint.loadControl.Value());
-                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-                    return;
-                }
-            }
-        }
-
-        if (iterator.GetStatus() != CHIP_NO_ERROR)
-        {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-            return;
-        }
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, IMGlobalStatusFromError(iterateStatus, Status::InvalidCommand));
+        return;
     }
 
     // Check for overlappping elements
-    {
-        auto iterator = constraints.begin();
-        if (iterator.Next())
+    Structs::ConstraintsStruct::DecodableType prevConstraint;
+    bool first    = true;
+    iterateStatus = constraints.Iterate([&](auto & constraint, bool &) -> CHIP_ERROR {
+        if (first)
         {
             // Get the first constraint
-            Structs::ConstraintsStruct::DecodableType prevConstraint = iterator.GetValue();
-
-            // Start comparing next vs prev constraints
-            while (iterator.Next())
-            {
-                const Structs::ConstraintsStruct::DecodableType & constraint = iterator.GetValue();
-                if (constraint.startTime < prevConstraint.startTime ||
-                    prevConstraint.startTime + prevConstraint.duration >= constraint.startTime)
-                {
-                    ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast overlapping constraint times");
-                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
-                    return;
-                }
-
-                prevConstraint = constraint;
-            }
+            first = false;
         }
-
-        if (iterator.GetStatus() != CHIP_NO_ERROR)
+        else if (constraint.startTime < prevConstraint.startTime ||
+                 prevConstraint.startTime + prevConstraint.duration >= constraint.startTime)
         {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-            return;
+            ChipLogError(Zcl, "DEM: RequestConstraintBasedForecast overlapping constraint times");
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
+
+        prevConstraint = constraint;
+        return CHIP_NO_ERROR;
+    });
+    if (iterateStatus != CHIP_NO_ERROR)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, IMGlobalStatusFromError(iterateStatus, Status::InvalidCommand));
+        return;
     }
 
     status = mDelegate.RequestConstraintBasedForecast(constraints, adjustmentCause);

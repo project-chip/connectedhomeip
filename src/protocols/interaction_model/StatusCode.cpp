@@ -47,19 +47,20 @@ ClusterStatusCode::ClusterStatusCode(CHIP_ERROR err)
         return;
     }
 
-    if (err == CHIP_NO_ERROR)
-    {
-        mStatus = Status::Success;
-        return;
-    }
+    mStatus = IMGlobalStatusFromError(err);
+}
 
-    if (err.IsPart(ChipError::SdkPart::kIMGlobalStatus))
+Status IMGlobalStatusFromError(CHIP_ERROR error, Status defaultNotStatus)
+{
+    if (error.IsPart(ChipError::SdkPart::kIMGlobalStatus))
     {
-        mStatus = static_cast<Status>(err.GetSdkCode());
-        return;
+        return static_cast<Status>(error.GetSdkCode());
     }
-
-    mStatus = Status::Failure;
+    else if (error != CHIP_NO_ERROR)
+    {
+        return defaultNotStatus;
+    }
+    return Status::Success;
 }
 
 } // namespace InteractionModel

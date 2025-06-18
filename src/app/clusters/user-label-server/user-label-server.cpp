@@ -67,15 +67,13 @@ bool IsValidLabelEntry(const Structs::LabelStruct::Type & entry)
 
 bool IsValidLabelEntryList(const LabelList::TypeInfo::DecodableType & list)
 {
-    auto iter = list.begin();
-    while (iter.Next())
-    {
-        if (!IsValidLabelEntry(iter.GetValue()))
+    return list.Iterate([&](auto & value, bool &) -> CHIP_ERROR {
+        if (!IsValidLabelEntry(value))
         {
-            return false;
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
-    }
-    return true;
+        return CHIP_NO_ERROR;
+    }) == CHIP_NO_ERROR;
 }
 
 UserLabelAttrAccess gAttrAccess;
@@ -133,13 +131,8 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(const ConcreteDataAttributePath &
         ReturnErrorOnFailure(aDecoder.Decode(decodablelist));
         VerifyOrReturnError(IsValidLabelEntryList(decodablelist), CHIP_IM_GLOBAL_STATUS(ConstraintError));
 
-        auto iter = decodablelist.begin();
-        while (iter.Next())
-        {
-            auto & entry = iter.GetValue();
-            ReturnErrorOnFailure(labelList.add(entry));
-        }
-        ReturnErrorOnFailure(iter.GetStatus());
+        auto iterateStatus = decodablelist.Iterate([&](auto & entry, bool &) -> CHIP_ERROR { return labelList.add(entry); });
+        ReturnErrorOnFailure(iterateStatus);
 
         return provider->SetUserLabelList(endpoint, labelList);
     }

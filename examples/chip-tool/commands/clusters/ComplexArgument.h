@@ -34,6 +34,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
 #include <commands/common/HexConversion.h>
@@ -190,6 +191,15 @@ public:
         }
 
         request = chip::app::DataModel::List<T>(content, value.size());
+        return CHIP_NO_ERROR;
+    }
+
+    template <typename T>
+    static CHIP_ERROR Setup(const char * label, chip::app::DataModel::DecodableList<T> & request, Json::Value & value)
+    {
+        chip::app::DataModel::List<T> temp;
+        ReturnErrorOnFailure(Setup(label, temp, value));
+        request = temp;
         return CHIP_NO_ERROR;
     }
 

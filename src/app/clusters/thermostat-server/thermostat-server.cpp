@@ -683,13 +683,8 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
             ReturnErrorOnFailure(aDecoder.Decode(newPresetsList));
 
             // Iterate over the presets and call the delegate to append to the list of pending presets.
-            auto iter = newPresetsList.begin();
-            while (iter.Next())
-            {
-                const PresetStruct::Type & preset = iter.GetValue();
-                ReturnErrorOnFailure(AppendPendingPreset(delegate, preset));
-            }
-            return iter.GetStatus();
+            return newPresetsList.Iterate(
+                [&](auto & preset, bool &) -> CHIP_ERROR { return AppendPendingPreset(delegate, preset); });
         }
 
         // If the list operation is AppendItem, call the delegate to append the item to the list of pending presets.

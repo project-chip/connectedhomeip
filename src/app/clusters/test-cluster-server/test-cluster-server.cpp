@@ -335,21 +335,20 @@ CHIP_ERROR TestAttrAccess::WriteListInt8uAttribute(const ConcreteDataAttributePa
         ReturnErrorOnFailure(aDecoder.Decode(list));
 
         size_t size;
-        ReturnErrorOnFailure(list.ComputeSize(&size));
+        ReturnErrorOnFailure(list.ComputeSize(size));
 
-        uint8_t index = 0;
-        auto iter     = list.begin();
-        while (iter.Next())
-        {
-            auto & entry = iter.GetValue();
-
+        uint8_t index      = 0;
+        gListUint8DataLen  = 0;
+        auto iterateStatus = list.Iterate([&](auto & entry, bool &) -> CHIP_ERROR {
             VerifyOrReturnError(index < kAttributeListLength, CHIP_ERROR_BUFFER_TOO_SMALL);
             gListUint8Data[index++] = entry;
-        }
+            return CHIP_NO_ERROR;
+        });
+        ReturnErrorOnFailure(iterateStatus);
 
-        gListUint8DataLen = size;
+        gListUint8DataLen = index;
 
-        return iter.GetStatus();
+        return CHIP_NO_ERROR;
     }
     if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
@@ -381,22 +380,21 @@ CHIP_ERROR TestAttrAccess::WriteListOctetStringAttribute(const ConcreteDataAttri
 
         ReturnErrorOnFailure(aDecoder.Decode(list));
 
-        uint8_t index = 0;
-        auto iter     = list.begin();
-        while (iter.Next())
-        {
-            const auto & entry = iter.GetValue();
-
+        uint8_t index           = 0;
+        gListOctetStringDataLen = 0;
+        auto iterateStatus      = list.Iterate([&](auto & entry, bool &) -> CHIP_ERROR {
             VerifyOrReturnError(index < kAttributeListLength, CHIP_ERROR_BUFFER_TOO_SMALL);
             VerifyOrReturnError(entry.size() <= kAttributeEntryLength, CHIP_ERROR_BUFFER_TOO_SMALL);
             memcpy(gListOctetStringData[index].Data(), entry.data(), entry.size());
             gListOctetStringData[index].SetLength(entry.size());
             index++;
-        }
+            return CHIP_NO_ERROR;
+        });
+        ReturnErrorOnFailure(iterateStatus);
 
         gListOctetStringDataLen = index;
 
-        return iter.GetStatus();
+        return CHIP_NO_ERROR;
     }
     if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
@@ -436,17 +434,13 @@ CHIP_ERROR TestAttrAccess::WriteListLongOctetStringAttribute(const ConcreteDataA
 
         ReturnErrorOnFailure(aDecoder.Decode(list));
 
-        auto iter               = list.begin();
         gListLongOctetStringLen = 0;
-        while (iter.Next())
-        {
-            const auto & entry = iter.GetValue();
+        return list.Iterate([&](auto & entry, bool &) -> CHIP_ERROR {
             VerifyOrReturnError(entry.size() == sizeof(sLongOctetStringBuf) - 1, CHIP_ERROR_BUFFER_TOO_SMALL);
             VerifyOrReturnError(memcmp(entry.data(), sLongOctetStringBuf, entry.size()) == 0, CHIP_ERROR_INVALID_ARGUMENT);
             gListLongOctetStringLen++;
-        }
-
-        return iter.GetStatus();
+            return CHIP_NO_ERROR;
+        });
     }
     if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
@@ -486,12 +480,8 @@ CHIP_ERROR TestAttrAccess::WriteListStructOctetStringAttribute(const ConcreteDat
 
         ReturnErrorOnFailure(aDecoder.Decode(list));
 
-        uint8_t index = 0;
-        auto iter     = list.begin();
-        while (iter.Next())
-        {
-            const auto & entry = iter.GetValue();
-
+        uint8_t index      = 0;
+        auto iterateStatus = list.Iterate([&](auto & entry, bool &) -> CHIP_ERROR {
             VerifyOrReturnError(index < kAttributeListLength, CHIP_ERROR_BUFFER_TOO_SMALL);
             VerifyOrReturnError(entry.member2.size() <= kAttributeEntryLength, CHIP_ERROR_BUFFER_TOO_SMALL);
             memcpy(gListOperationalCert[index].Data(), entry.member2.data(), entry.member2.size());
@@ -501,14 +491,11 @@ CHIP_ERROR TestAttrAccess::WriteListStructOctetStringAttribute(const ConcreteDat
             listStructOctetStringData[index].member2 = gListOperationalCert[index].AsSpan();
 
             index++;
-        }
+            return CHIP_NO_ERROR;
+        });
+        ReturnErrorOnFailure(iterateStatus);
 
         gListOperationalCertLen = index;
-
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            return CHIP_ERROR_INVALID_DATA_LIST;
-        }
 
         return CHIP_NO_ERROR;
     }
@@ -551,7 +538,7 @@ CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(const C
         DataModel::DecodableList<Structs::NullablesAndOptionalsStruct::DecodableType> list;
         ReturnErrorOnFailure(aDecoder.Decode(list));
 
-        ReturnErrorOnFailure(list.ComputeSize(&count));
+        ReturnErrorOnFailure(list.ComputeSize(count));
         // We are assuming we are using list chunking feature for attribute writes.
         VerifyOrReturnError(count == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -582,17 +569,15 @@ CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(const C
         gNullablesAndOptionalsStruct.nullableList.SetNull();
         if (!value.nullableList.IsNull())
         {
-            ReturnErrorOnFailure(value.nullableList.Value().ComputeSize(&count));
+            ReturnErrorOnFailure(value.nullableList.Value().ComputeSize(count));
             VerifyOrReturnError(count <= MATTER_ARRAY_SIZE(gSimpleEnums), CHIP_ERROR_INVALID_ARGUMENT);
-            auto iter2       = value.nullableList.Value().begin();
-            gSimpleEnumCount = 0;
-            while (iter2.Next())
-            {
-                gSimpleEnums[gSimpleEnumCount] = iter2.GetValue();
-                ++gSimpleEnumCount;
-            }
-            ReturnErrorOnFailure(iter2.GetStatus());
-            gNullablesAndOptionalsStruct.nullableList.SetNonNull(Span<SimpleEnum>(gSimpleEnums, gSimpleEnumCount));
+            gSimpleEnumCount   = 0;
+            auto iterateStatus = value.nullableList.Value().Iterate([&](auto & value, bool &) -> CHIP_ERROR {
+                gSimpleEnums[gSimpleEnumCount++] = value;
+                return CHIP_NO_ERROR;
+            });
+            ReturnErrorOnFailure(iterateStatus);
+            gNullablesAndOptionalsStruct.nullableList.SetNonNull(Span<const SimpleEnum>(gSimpleEnums, gSimpleEnumCount));
         }
         gNullablesAndOptionalsStruct.nullableInt         = value.nullableInt;
         gNullablesAndOptionalsStruct.optionalInt         = value.optionalInt;
@@ -686,14 +671,13 @@ CHIP_ERROR TestAttrAccess::WriteListFabricScopedListEntry(const Structs::TestFab
     gListFabricScopedAttributeValue[index].fabricSensitiveStruct = entry.fabricSensitiveStruct;
     gListFabricScopedAttributeValue[index].fabricSensitiveInt8u  = entry.fabricSensitiveInt8u;
 
-    auto intIter = entry.fabricSensitiveInt8uList.begin();
-    size_t i     = 0;
-    while (intIter.Next())
-    {
+    size_t i           = 0;
+    auto iterateStatus = entry.fabricSensitiveInt8uList.Iterate([&](auto & intValue, bool &) -> CHIP_ERROR {
         VerifyOrReturnError(i < kFabricSensitiveIntListLength, CHIP_ERROR_BUFFER_TOO_SMALL);
-        gListFabricScoped_fabricSensitiveInt8uList[index][i++] = intIter.GetValue();
-    }
-    ReturnErrorOnFailure(intIter.GetStatus());
+        gListFabricScoped_fabricSensitiveInt8uList[index][i++] = intValue;
+        return CHIP_NO_ERROR;
+    });
+    ReturnErrorOnFailure(iterateStatus);
 
     gListFabricScopedAttributeValue[index].fabricSensitiveInt8uList =
         DataModel::List<uint8_t>(gListFabricScoped_fabricSensitiveInt8uList[index], i);
@@ -743,17 +727,14 @@ CHIP_ERROR TestAttrAccess::WriteListFabricScopedAttribute(const ConcreteDataAttr
         }
 
         size_t size;
-        ReturnErrorOnFailure(list.ComputeSize(&size));
+        ReturnErrorOnFailure(list.ComputeSize(size));
 
-        auto iter = list.begin();
-        while (iter.Next())
-        {
-            auto & entry = iter.GetValue();
-            ReturnErrorOnFailure(WriteListFabricScopedListEntry(entry, dstIndex++));
-        }
+        auto iterateStatus =
+            list.Iterate([&](auto & entry, bool &) -> CHIP_ERROR { return WriteListFabricScopedListEntry(entry, dstIndex++); });
+        ReturnErrorOnFailure(iterateStatus);
 
         gListFabricScopedAttributeLen = dstIndex;
-        return iter.GetStatus();
+        return CHIP_NO_ERROR;
     }
     if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
@@ -876,15 +857,12 @@ bool emberAfUnitTestingClusterTestListStructArgumentRequestCallback(
     Commands::TestListStructArgumentRequest::DecodableType const & commandData)
 {
     bool shouldReturnTrue = true;
+    auto iterateStatus    = commandData.arg1.Iterate([&](auto & structValue, bool &) -> CHIP_ERROR {
+        shouldReturnTrue = shouldReturnTrue && structValue.b;
+        return CHIP_NO_ERROR;
+    });
 
-    auto structIterator = commandData.arg1.begin();
-    while (structIterator.Next())
-    {
-        auto & structValue = structIterator.GetValue();
-        shouldReturnTrue   = shouldReturnTrue && structValue.b;
-    }
-
-    if (CHIP_NO_ERROR != structIterator.GetStatus())
+    if (CHIP_NO_ERROR != iterateStatus)
     {
         commandObj->AddStatus(commandPath, Status::Failure);
         return true;
@@ -937,14 +915,12 @@ bool emberAfUnitTestingClusterTestListInt8UArgumentRequestCallback(
 {
     bool shouldReturnTrue = true;
 
-    auto uint8Iterator = commandData.arg1.begin();
-    while (uint8Iterator.Next())
-    {
-        auto & value     = uint8Iterator.GetValue();
+    auto iterateStatus = commandData.arg1.Iterate([&](auto & value, bool &) -> CHIP_ERROR {
         shouldReturnTrue = shouldReturnTrue && (value != 0);
-    }
+        return CHIP_NO_ERROR;
+    });
 
-    if (CHIP_NO_ERROR != uint8Iterator.GetStatus())
+    if (CHIP_NO_ERROR != iterateStatus)
     {
         commandObj->AddStatus(commandPath, Status::Failure);
         return true;
@@ -959,14 +935,12 @@ bool emberAfUnitTestingClusterTestNestedStructListArgumentRequestCallback(
 {
     bool shouldReturnTrue = commandData.arg1.c.b;
 
-    auto structIterator = commandData.arg1.d.begin();
-    while (structIterator.Next())
-    {
-        auto & structValue = structIterator.GetValue();
-        shouldReturnTrue   = shouldReturnTrue && structValue.b;
-    }
+    auto iterateStatus = commandData.arg1.d.Iterate([&](auto & structValue, bool &) -> CHIP_ERROR {
+        shouldReturnTrue = shouldReturnTrue && structValue.b;
+        return CHIP_NO_ERROR;
+    });
 
-    if (CHIP_NO_ERROR != structIterator.GetStatus())
+    if (CHIP_NO_ERROR != iterateStatus)
     {
         commandObj->AddStatus(commandPath, Status::Failure);
         return true;
@@ -981,27 +955,16 @@ bool emberAfUnitTestingClusterTestListNestedStructListArgumentRequestCallback(
 {
     bool shouldReturnTrue = true;
 
-    auto structIterator = commandData.arg1.begin();
-    while (structIterator.Next())
-    {
-        auto & structValue = structIterator.GetValue();
-        shouldReturnTrue   = shouldReturnTrue && structValue.c.b;
+    auto iterateStatus = commandData.arg1.Iterate([&](auto & structValue, bool &) -> CHIP_ERROR {
+        shouldReturnTrue = shouldReturnTrue && structValue.c.b;
 
-        auto subStructIterator = structValue.d.begin();
-        while (subStructIterator.Next())
-        {
-            auto & subStructValue = subStructIterator.GetValue();
-            shouldReturnTrue      = shouldReturnTrue && subStructValue.b;
-        }
+        return structValue.d.Iterate([&](auto & subStructValue, bool &) -> CHIP_ERROR {
+            shouldReturnTrue = shouldReturnTrue && subStructValue.b;
+            return CHIP_NO_ERROR;
+        });
+    });
 
-        if (CHIP_NO_ERROR != subStructIterator.GetStatus())
-        {
-            commandObj->AddStatus(commandPath, Status::Failure);
-            return true;
-        }
-    }
-
-    if (CHIP_NO_ERROR != structIterator.GetStatus())
+    if (CHIP_NO_ERROR != iterateStatus)
     {
         commandObj->AddStatus(commandPath, Status::Failure);
         return true;
@@ -1015,11 +978,10 @@ bool emberAfUnitTestingClusterTestListInt8UReverseRequestCallback(
     Commands::TestListInt8UReverseRequest::DecodableType const & commandData)
 {
     size_t count   = 0;
-    CHIP_ERROR err = commandData.arg1.ComputeSize(&count);
+    CHIP_ERROR err = commandData.arg1.ComputeSize(count);
     VerifyOrExit(err == CHIP_NO_ERROR, );
 
     {
-        auto iter = commandData.arg1.begin();
         Commands::TestListInt8UReverseResponse::Type responseData;
         if (count == 0)
         {
@@ -1029,13 +991,16 @@ bool emberAfUnitTestingClusterTestListInt8UReverseRequestCallback(
         size_t cur = count;
         Platform::ScopedMemoryBuffer<uint8_t> responseBuf;
         VerifyOrExit(responseBuf.Calloc(count), );
-        while (iter.Next() && cur > 0)
-        {
-            responseBuf[cur - 1] = iter.GetValue();
-            --cur;
-        }
+        auto iterateStatus = commandData.arg1.Iterate([&](auto & value, bool & breakLoop) -> CHIP_ERROR {
+            responseBuf[cur - 1] = value;
+            if (--cur <= 0)
+            {
+                breakLoop = true;
+            }
+            return CHIP_NO_ERROR;
+        });
         VerifyOrExit(cur == 0, );
-        VerifyOrExit(iter.GetStatus() == CHIP_NO_ERROR, );
+        VerifyOrExit(iterateStatus == CHIP_NO_ERROR, );
         responseData.arg1 = DataModel::List<uint8_t>(responseBuf.Get(), count);
         commandObj->AddResponse(commandPath, responseData);
         return true;

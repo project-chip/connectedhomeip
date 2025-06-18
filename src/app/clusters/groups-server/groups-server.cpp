@@ -225,7 +225,7 @@ struct GroupMembershipResponse
             {
                 GroupDataProvider::GroupEndpoint mapping;
                 size_t requestedCount = 0;
-                ReturnErrorOnFailure(mCommandData.groupList.ComputeSize(&requestedCount));
+                ReturnErrorOnFailure(mCommandData.groupList.ComputeSize(requestedCount));
 
                 if (0 == requestedCount)
                 {
@@ -244,17 +244,16 @@ struct GroupMembershipResponse
                 {
                     while (mIterator && mIterator->Next(mapping))
                     {
-                        auto iter = mCommandData.groupList.begin();
-                        while (iter.Next())
-                        {
-                            if (mapping.endpoint_id == mEndpoint && mapping.group_id == iter.GetValue())
+                        auto iterateStatus = mCommandData.groupList.Iterate([&](auto & groupId, bool & breakLoop) -> CHIP_ERROR {
+                            if (mapping.endpoint_id == mEndpoint && mapping.group_id == groupId)
                             {
                                 ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag(), mapping.group_id));
                                 ChipLogDetail(Zcl, " 0x%02x", mapping.group_id);
-                                break;
+                                breakLoop = true;
                             }
-                        }
-                        ReturnErrorOnFailure(iter.GetStatus());
+                            return CHIP_NO_ERROR;
+                        });
+                        ReturnErrorOnFailure(iterateStatus);
                     }
                 }
                 ChipLogDetail(Zcl, "]");
