@@ -198,7 +198,7 @@ public:
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
-    CHIP_ERROR SetOverallTarget(const DataModel::Nullable<GenericOverallTarget> & overallTarget);
+    CHIP_ERROR SetOverallTarget(const DataModel::Nullable<GenericOverallTargetState> & overallTarget);
 
     /**
      * @brief Sets the main state of the cluster.
