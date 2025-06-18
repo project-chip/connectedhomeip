@@ -21,7 +21,6 @@
  *          Platform-specific key value storage implementation for SILABS
  */
 
-#include "MigrationManager.h"
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
@@ -48,8 +47,6 @@ CHIP_ERROR KeyValueStoreManagerImpl::Init(void)
     CHIP_ERROR err;
     err = SilabsConfig::Init();
     SuccessOrExit(err);
-
-    Silabs::MigrationManager::GetMigrationInstance().applyMigrations();
 
     memset(mKvsKeyMap, 0, sizeof(mKvsKeyMap));
     size_t outLen;
