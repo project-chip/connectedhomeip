@@ -1374,6 +1374,12 @@ class MatterBaseTest(base_test.BaseTestClass):
             # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
             self.runner_hook.step_failure(logger=None, logs=None, duration=step_duration, request=None, received=None)
             # Convert the exception to a simple Exception with the same message
+            # to avoid serialization issues when sending it through multiprocessing.
+            # This prevents errors like "ModuleNotFoundError: No module named 'chip'",
+            # which occur when the original exception type is not picklable.
+            # 
+            # TODO: Improve this by logging the full traceback before conversion,
+            # or by implementing a serializable wrapper to preserve more context.
             exception_test_stop = Exception(str(exception))
             self.runner_hook.test_stop(exception=exception_test_stop, duration=test_duration)
 
