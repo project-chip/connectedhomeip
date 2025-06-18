@@ -995,7 +995,7 @@ cluster LocalizationConfiguration = 43 {
       or audibly convey time information need a mechanism by which they can be configured to use a
       user’s preferred format. */
 cluster TimeFormatLocalization = 44 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum CalendarTypeEnum : enum8 {
     kBuddhist = 0;
@@ -3204,7 +3204,7 @@ endpoint 0 {
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
     handle command OpenBasicCommissioningWindow;
