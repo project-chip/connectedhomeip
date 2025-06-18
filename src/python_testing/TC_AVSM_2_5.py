@@ -74,7 +74,6 @@ class TC_AVSM_2_5(MatterBaseTest):
                 "TH selects a value for BitRate based on the codec in aMicrophoneCapabilities.supportedCodes.",
                 "Store this value as aBitrate",
             ),
-
             TestStep(
                 5,
                 "TH reads StreamUsagePriorities attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
