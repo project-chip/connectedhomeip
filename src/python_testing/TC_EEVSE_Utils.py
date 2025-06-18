@@ -229,3 +229,50 @@ class EEVSEBaseTestHelper:
                              f"Fault event faultStatePreviousState was {event_data.faultStatePreviousState}, expected {previous_fault}")
         asserts.assert_equal(event_data.faultStateCurrentState, current_fault,
                              f"Fault event faultStateCurrentState was {event_data.faultStateCurrentState}, expected {current_fault}")
+
+    def log_get_targets_response(self, get_targets_response):
+        logger.info(f" Rx'd: {get_targets_response}")
+        for index, entry in enumerate(get_targets_response.chargingTargetSchedules):
+            logger.info(
+                f"   [{index}] DayOfWeekForSequence: {entry.dayOfWeekForSequence:02x}")
+            for sub_index, sub_entry in enumerate(entry.chargingTargets):
+                logger.info(
+                    f"    - [{sub_index}] TargetTime: {sub_entry.targetTimeMinutesPastMidnight} TargetSoC: {sub_entry.targetSoC} AddedEnergy: {sub_entry.addedEnergy}")
+
+    def convert_epoch_s_to_time(self, epoch_s, tz=timezone.utc):
+        delta_from_epoch = timedelta(seconds=epoch_s)
+        matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, tz)
+
+        return matter_epoch + delta_from_epoch
+
+    def compute_expected_target_time_as_epoch_s(self, minutes_past_midnight):
+        """Takes minutes past midnight and assumes local timezone, returns the value in Matter Epoch_S"""
+        # Matter epoch is 0 hours, 0 minutes, 0 seconds on Jan 1, 2000 UTC
+        # Get the current midnight + minutesPastMidnight as epoch_s
+        # NOTE that MinutesPastMidnight is in LOCAL time not UTC so it reflects
+        # the charging time based on where the consumer is.
+        target_time = datetime.now()     # Get time in local time
+        target_time = target_time.replace(hour=int(minutes_past_midnight / 60),
+                                          minute=(minutes_past_midnight % 60), second=0,
+                                          microsecond=0)  # Align to minutes past midnight
+
+        if (target_time < datetime.now()):
+            # This is in the past - so we need to add 1 day
+            # We can get away with this in this test scenario - but should
+            # really look at the next target on this day to see if that is in the future
+            target_time = target_time + timedelta(days=1)
+
+        # Shift to UTC so we can use timezone aware subtraction from Matter epoch in UTC
+        target_time = target_time.astimezone(timezone.utc)
+
+        logger.info(
+            f"minutesPastMidnight = {minutes_past_midnight} => "
+            f"{int(minutes_past_midnight/60)}:{int(minutes_past_midnight%60)}"
+            f" Expected target_time = {target_time}")
+
+        matter_base_time = datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=timezone.utc)
+
+        target_time_delta = target_time - matter_base_time
+
+        expected_target_time_epoch_s = int(target_time_delta.total_seconds())
+        return expected_target_time_epoch_s
