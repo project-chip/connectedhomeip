@@ -264,6 +264,9 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             logging.info("Test completed successfully")
 
     if exit_code != 0:
+        logging.error("SUBPROCESS failure: ")
+        logging.error("  TEST SCRIPT: %d (%r)", test_script_exit_code, final_script_command)
+        logging.error("  APP:         %d (%r)", app_exit_code, [app] + shlex.split(app_args))
         sys.exit(exit_code)
 
 

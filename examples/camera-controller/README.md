@@ -108,7 +108,7 @@ dependencies are correct.
 1. Pull the Cross-Compilation Docker Image
 
 ```
-docker pull ghcr.io/project-chip/chip-build-crosscompile:138
+docker pull ghcr.io/project-chip/chip-build-crosscompile:140
 ```
 
 2. Run the Docker Container This command starts an interactive shell inside the
@@ -116,7 +116,7 @@ docker pull ghcr.io/project-chip/chip-build-crosscompile:138
    container's /var/connectedhomeip directory.
 
 ```
-docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:138 /bin/bash
+docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:140 /bin/bash
 ```
 
 3. Build Inside the Container From within the Docker container's shell, execute
