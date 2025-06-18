@@ -638,6 +638,16 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
+    case Clusters::ThreadBorderRouterManagement::Id: {
+        switch (aCommand)
+        {
+        case Clusters::ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::Id:
+        case Clusters::ThreadBorderRouterManagement::Commands::SetPendingDatasetRequest::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
     case Clusters::ThreadNetworkDirectory::Id: {
         switch (aCommand)
         {

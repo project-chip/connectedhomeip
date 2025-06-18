@@ -41014,6 +41014,10 @@ class ThreadBorderRouterManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=typing.Optional[uint]),
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
             activeDataset: bytes = b""
             breadcrumb: typing.Optional[uint] = None
 
@@ -41030,6 +41034,10 @@ class ThreadBorderRouterManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="pendingDataset", Tag=0, Type=bytes),
                     ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
 
             pendingDataset: bytes = b""
 
