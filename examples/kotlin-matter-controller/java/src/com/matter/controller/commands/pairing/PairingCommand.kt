@@ -92,6 +92,7 @@ abstract class PairingCommand(
       }
       PairingModeType.NFC -> {
         addArgument("setup-pin-code", 0, 134217727, setupPINCode, null, false)
+        addArgument("discriminator", 0.toShort(), 4096.toShort(), discriminator, null, false)
       }
       PairingModeType.ALREADY_DISCOVERED -> {
         addArgument("setup-pin-code", 0, 134217727, setupPINCode, null, false)
