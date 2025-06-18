@@ -104,11 +104,11 @@ class TC_CLDIM_2_1(MatterBaseTest):
                 asserts.assert_is_instance(current_state, Clusters.ClosureDimension.Structs.DimensionStateStruct,
                                            "CurrentState is not of expected type")
                 if is_positioning_supported:
-                    asserts.assert_true(0 <= current_state.position <= 10000, "Position is not in the expected range")
+                    asserts.assert_true(0 <= current_state.position <= 10000, "Position is not in the expected range [0:10000]")
                 if is_latching_supported:
                     asserts.assert_is_instance(current_state.latch, bool, "Latch is not a boolean")
                 if is_speed_supported:
-                    asserts.assert_true(0 <= current_state.speed <= 3, "Speed is not in the expected range")
+                    asserts.assert_true(0 <= current_state.speed <= 3, "Speed is not in the expected range [0:3]")
         else:
             logging.info("Test step skipped")
             self.mark_current_step_skipped()
@@ -122,13 +122,13 @@ class TC_CLDIM_2_1(MatterBaseTest):
                                            "TargetState is not of expected type")
                 if is_positioning_supported:
                     asserts.assert_true(target_state.position is NullValue or (0 <= target_state.position <= 10000),
-                                        "Position is not NullValue or not in the expected range")
+                                        "Position is not NullValue or not in the expected range [0:10000]")
                 if is_latching_supported:
                     asserts.assert_true(isinstance(target_state.latch, bool) or target_state.latch is NullValue,
                                         "Latch is not a boolean or NullValue")
                 if is_speed_supported:
                     asserts.assert_true(target_state.speed is NullValue or (0 <= target_state.speed <= 3),
-                                        "Speed is not NullValue or in the expected range")
+                                        "Speed is not NullValue or in the expected range [0:3]")
         else:
             logging.info("Test step skipped")
             self.mark_current_step_skipped()
@@ -138,7 +138,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
         if attributes.Resolution.attribute_id in attribute_list:
             resolution = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Resolution)
             asserts.assert_is_instance(resolution, uint, "Resolution is not of expected type")
-            asserts.assert_true(1 <= resolution <= 10000, "Resolution is not in the expected range")
+            asserts.assert_true(1 <= resolution <= 10000, "Resolution is not in the expected range [1:10000]")
         else:
             logging.info("Test step skipped")
             self.mark_current_step_skipped()
@@ -148,7 +148,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
         if attributes.StepValue.attribute_id in attribute_list:
             step_value = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.StepValue)
             asserts.assert_is_instance(step_value, uint, "StepValue is not of expected type")
-            asserts.assert_true(0 <= step_value <= 10000, "StepValue is not in the expected range")
+            asserts.assert_true(0 <= step_value <= 10000, "StepValue is not in the expected range [0:10000]")
             asserts.assert_true(step_value % resolution == 0, "StepValue is not a multiple of Resolution")
         else:
             logging.info("Test step skipped")
@@ -160,7 +160,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
         if attributes.Unit.attribute_id in attribute_list:
             unit = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Unit)
             asserts.assert_is_instance(unit, Clusters.ClosureDimension.Enums.ClosureUnitEnum, "Unit is not of expected type")
-            asserts.assert_true(0 <= unit <= 1, "Unit is not in the expected range")
+            asserts.assert_true(0 <= unit <= 1, "Unit is not in the expected range [0:1]")
         else:
             logging.info("Test step skipped")
             self.mark_current_step_skipped()
@@ -175,14 +175,16 @@ class TC_CLDIM_2_1(MatterBaseTest):
                 asserts.assert_true(unit >= 0, "Unit is unknown - cannot check UnitRange")
 
                 if unit == 0:
-                    asserts.assert_true(0 <= unit_range.min, "UnitRange.min is not in the expected range")
-                    asserts.assert_true(unit_range.min <= unit_range.max <= 32767, "UnitRange.max is not in the expected range")
+                    asserts.assert_true(0 <= unit_range.min, "UnitRange.min is not in the expected range [0:32767]")
+                    asserts.assert_true(unit_range.min <= unit_range.max <= 32767,
+                                        "UnitRange.max is not in the expected range [UnitRange.Min:32767]")
 
                 if unit == 1:
-                    asserts.assert_true(-360 <= unit_range.min <= 359, "UnitRange.min is not in the expected range")
-                    asserts.assert_true(unit_range.min <= unit_range.max <= 360, "UnitRange.max is not in the expected range")
+                    asserts.assert_true(-360 <= unit_range.min <= 359, "UnitRange.min is not in the expected range [-360:359]")
+                    asserts.assert_true(unit_range.min <= unit_range.max <= 360,
+                                        "UnitRange.max is not in the expected range [UnitRange.Min:360]")
                     asserts.assert_true(1 <= unit_range.max - unit_range.min <= 360,
-                                        "UnitRange.max - UnitRange.min is not in the expected range")
+                                        "UnitRange.max - UnitRange.min is not in the expected range [1:360]")
         else:
             logging.info("Test step skipped")
             self.mark_current_step_skipped()
@@ -193,9 +195,10 @@ class TC_CLDIM_2_1(MatterBaseTest):
             limit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LimitRange)
             asserts.assert_is_instance(limit_range, Clusters.ClosureDimension.Structs.RangePercent100thsStruct,
                                        "LimitRange is not of expected type")
-            asserts.assert_true(0 <= limit_range.min <= 10000, "LimitRange.min is not in the expected range")
+            asserts.assert_true(0 <= limit_range.min <= 10000, "LimitRange.min is not in the expected range [0:10000]")
             asserts.assert_true(limit_range.min % resolution == 0, "LimitRange.min is not a multiple of Resolution")
-            asserts.assert_true(limit_range.min <= limit_range.max <= 10000, "LimitRange.max is not in the expected range")
+            asserts.assert_true(limit_range.min <= limit_range.max <= 10000,
+                                "LimitRange.max is not in the expected range [LimitRange.Min:10000]")
             asserts.assert_true(limit_range.max % resolution == 0, "LimitRange.max is not a multiple of Resolution")
         else:
             logging.info("Test step skipped")
@@ -207,7 +210,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             translation_direction = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TranslationDirection)
             asserts.assert_is_instance(translation_direction, Clusters.ClosureDimension.Enums.TranslationDirectionEnum,
                                        "TranslationDirection is not of expected type")
-            asserts.assert_true(0 <= translation_direction <= 15, "TranslationDirection is not in the expected range")
+            asserts.assert_true(0 <= translation_direction <= 15, "TranslationDirection is not in the expected range [0:15]")
         else:
             logging.info("Test step skipped")
             self.mark_current_step_skipped()
@@ -218,7 +221,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             rotation_axis = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.RotationAxis)
             asserts.assert_is_instance(rotation_axis, Clusters.ClosureDimension.Enums.RotationAxisEnum,
                                        "RotationAxis is not of expected type")
-            asserts.assert_true(0 <= rotation_axis <= 10, "RotationAxis is not in the expected range")
+            asserts.assert_true(0 <= rotation_axis <= 10, "RotationAxis is not in the expected range [0:10]")
         else:
             logging.info("Test step skipped")
             self.mark_current_step_skipped()
@@ -228,7 +231,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
         if attributes.Overflow.attribute_id in attribute_list:
             overflow = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Overflow)
             asserts.assert_is_instance(overflow, Clusters.ClosureDimension.Enums.OverflowEnum, "Overflow is not of expected type")
-            asserts.assert_true(0 <= overflow <= 10, "Overflow is not in the expected range")
+            asserts.assert_true(0 <= overflow <= 10, "Overflow is not in the expected range [0:10]")
         else:
             logging.info("Test step skipped")
             self.mark_current_step_skipped()
@@ -239,7 +242,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             modulation_type = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.ModulationType)
             asserts.assert_is_instance(modulation_type, Clusters.ClosureDimension.Enums.ModulationTypeEnum,
                                        "ModulationType is not of expected type")
-            asserts.assert_true(0 <= modulation_type <= 4, "ModulationType is not in the expected range")
+            asserts.assert_true(0 <= modulation_type <= 4, "ModulationType is not in the expected range [0:4]")
         else:
             logging.info("Test step skipped")
             self.mark_current_step_skipped()
@@ -250,7 +253,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             latch_control_modes = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
             asserts.assert_is_instance(latch_control_modes, Clusters.ClosureDimension.Enums.LatchControlModesEnum,
                                        "LatchControlModes is not of expected type")
-            asserts.assert_true(0 <= latch_control_modes <= 3, "LatchControlModes is not in the expected range")
+            asserts.assert_true(0 <= latch_control_modes <= 3, "LatchControlModes is not in the expected range [0:3]")
         else:
             logging.info("Test step skipped")
             self.mark_current_step_skipped()
