@@ -1604,7 +1604,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand)
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
     DataModel::Nullable<GenericDimensionStateStruct> target;
     GenericDimensionStateStruct testTargetStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                          Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+                                                  Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
     DataModel::Nullable<GenericDimensionStateStruct> testTarget(testTargetStruct);
     EXPECT_EQ(logic->SetTarget(testTarget), CHIP_NO_ERROR);
     // Validating SetTarget with no arguments
@@ -1689,7 +1689,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommandWithLimitatio
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
     DataModel::Nullable<GenericDimensionStateStruct> target;
     GenericDimensionStateStruct testTargetStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                          Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+                                                  Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
     DataModel::Nullable<GenericDimensionStateStruct> testTarget(testTargetStruct);
 
     EXPECT_EQ(logic->SetTarget(testTarget), CHIP_NO_ERROR);
@@ -1744,7 +1744,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
     DataModel::Nullable<GenericDimensionStateStruct> target;
 
     GenericDimensionStateStruct testTargetStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                          Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+                                                  Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
     DataModel::Nullable<GenericDimensionStateStruct> testTarget(testTargetStruct);
     EXPECT_EQ(logic->SetTarget(testTarget), CHIP_NO_ERROR);
 
@@ -1868,7 +1868,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommandWithLimitation)
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
     DataModel::Nullable<GenericDimensionStateStruct> target;
     GenericDimensionStateStruct testTargetStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                          Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+                                                  Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
     DataModel::Nullable<GenericDimensionStateStruct> testTarget(testTargetStruct);
 
     EXPECT_EQ(logic->SetTarget(testTarget), CHIP_NO_ERROR);
