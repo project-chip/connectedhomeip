@@ -132,8 +132,7 @@ public:
             return (mIPAddress == other.mIPAddress && mPort == other.mPort && mInterface == other.mInterface);
 
         case Type::kWiFiPAF:
-            return (mIPAddress == other.mIPAddress && mPort == other.mPort && mInterface == other.mInterface &&
-                    mId.mRemoteId == other.mId.mRemoteId);
+            return (mId.mRemoteId == other.mId.mRemoteId);
 
         case Type::kBle:
         default:
