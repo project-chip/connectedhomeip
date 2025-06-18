@@ -678,3 +678,9 @@ config("link_as_needed") {
     ldflags = [ "-Wl,--as-needed" ]
   }
 }
+
+config("arc_default") {
+  if (current_os == "mac" || current_os == "ios") {
+    cflags = [ "-fobjc-arc" ]
+  }
+}

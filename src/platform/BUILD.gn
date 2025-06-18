@@ -75,8 +75,20 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     # Device vendor id as a decimal integer. Configurable vendor ids allowed are 65521 (0xFFF1), 65522 (0xFFF2), 655223 (0xFFF3).
     chip_device_config_device_vendor_id = ""
 
+    # Device vendor name as a string.
+    chip_device_config_device_vendor_name = ""
+
     # Device product id as a decimal integer. Configurable product ids allowed are in the range 32768 (0x8000) - 32867 (0x8063)
     chip_device_config_device_product_id = ""
+
+    # Device product name as a string.
+    chip_device_config_device_product_name = ""
+
+    # Device hardware version as a string
+    chip_device_config_device_hardware_version_string = ""
+
+    # Device serial number as a string
+    chip_device_config_device_serial_number = ""
 
     # Define the default number of ip addresses to discover
     chip_max_discovered_ip_addresses = 5
@@ -165,6 +177,10 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR=${chip_enable_ota_requestor}",
     ]
 
+    if (chip_enable_nfc_based_commissioning) {
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING=1" ]
+    }
+
     if (chip_device_project_config_include != "") {
       defines += [ "CHIP_DEVICE_PROJECT_CONFIG_INCLUDE=${chip_device_project_config_include}" ]
     }
@@ -181,7 +197,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
     if (chip_device_platform == "cc13x4_26x4") {
       device_layer_target_define = "CC13X4_26X4"
-      defines += [ "CHIP_DEVICE_LAYER_TARGET=cc13xx_26xx/cc13x4_26x4" ]
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=ti/cc13xx_26xx/cc13x4_26x4" ]
     } else if (chip_device_platform == "cc32xx") {
       device_layer_target_define = "CC32XX"
       defines += [ "CHIP_DEVICE_LAYER_TARGET=cc32xx" ]
@@ -286,10 +302,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       ]
     } else if (chip_device_platform == "realtek_bee") {
       device_layer_target_define = "REALTEK_BEE"
-      defines += [
-        "CHIP_DEVICE_LAYER_TARGET_REALTEK_BEE=1",
-        "CHIP_DEVICE_LAYER_TARGET=Realtek_bee",
-      ]
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=realtek/BEE" ]
     } else if (chip_device_platform == "cyw30739") {
       device_layer_target_define = "CYW30739"
       defines += [ "CHIP_DEVICE_LAYER_TARGET=Infineon/CYW30739" ]
@@ -301,9 +314,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       ]
       defines -=
           [ "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}" ]
-    } else if (chip_device_platform == "mw320") {
-      device_layer_target_define = "MW320"
-      defines += [ "CHIP_DEVICE_LAYER_TARGET=nxp/mw320" ]
     } else if (chip_device_platform == "zephyr") {
       device_layer_target_define = "ZEPHYR"
       defines += [ "CHIP_DEVICE_LAYER_TARGET=Zephyr" ]
@@ -409,6 +419,22 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
     if (chip_device_config_device_product_id != "") {
       defines += [ "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${chip_device_config_device_product_id}" ]
+    }
+
+    if (chip_device_config_device_vendor_name != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_VENDOR_NAME=\"${chip_device_config_device_vendor_name}\"" ]
+    }
+
+    if (chip_device_config_device_product_name != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME=\"${chip_device_config_device_product_name}\"" ]
+    }
+
+    if (chip_device_config_device_hardware_version_string != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING=\"${chip_device_config_device_hardware_version_string}\"" ]
+    }
+
+    if (chip_device_config_device_serial_number != "") {
+      defines += [ "CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER=\"${chip_device_config_device_serial_number}\"" ]
     }
 
     defines += [ "CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES=${chip_max_discovered_ip_addresses}" ]
@@ -556,7 +582,7 @@ if (chip_device_platform != "none") {
     ]
 
     if (chip_device_platform == "cc13x4_26x4") {
-      _platform_target = "cc13xx_26xx/cc13x4_26x4"
+      _platform_target = "ti/cc13xx_26xx/cc13x4_26x4"
     } else if (chip_device_platform == "cc32xx") {
       _platform_target = "cc32xx"
     } else if (chip_device_platform == "darwin") {
@@ -592,7 +618,7 @@ if (chip_device_platform != "none") {
     } else if (chip_device_platform == "ameba") {
       _platform_target = "Ameba"
     } else if (chip_device_platform == "realtek_bee") {
-      _platform_target = "Realtek_bee"
+      _platform_target = "realtek/BEE"
     } else if (chip_device_platform == "webos") {
       _platform_target = "webos"
     } else if (chip_device_platform == "bl602") {
@@ -607,8 +633,6 @@ if (chip_device_platform != "none") {
       _platform_target = "fake"
     } else if (chip_device_platform == "cyw30739") {
       _platform_target = "Infineon/CYW30739"
-    } else if (chip_device_platform == "mw320") {
-      _platform_target = "nxp/mw320"
     } else if (chip_device_platform == "zephyr") {
       _platform_target = "Zephyr"
     } else if (chip_device_platform == "beken") {

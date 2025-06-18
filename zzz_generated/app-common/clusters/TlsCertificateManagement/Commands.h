@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -137,7 +138,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ProvisionRootCertificate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     chip::ByteSpan certificate;
     DataModel::Nullable<uint16_t> caid;
@@ -174,11 +174,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ProvisionRootCertificateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t caid = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -190,7 +189,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ProvisionRootCertificateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t caid = static_cast<uint16_t>(0);
 
@@ -209,7 +207,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::FindRootCertificate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     DataModel::Nullable<uint16_t> caid;
 
@@ -244,11 +241,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::FindRootCertificateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     DataModel::List<const Structs::TLSCertStruct::Type> certificateDetails;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -260,7 +256,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::FindRootCertificateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     DataModel::DecodableList<Structs::TLSCertStruct::DecodableType> certificateDetails;
 
@@ -279,7 +274,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::LookupRootCertificate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     chip::ByteSpan fingerprint;
 
@@ -314,11 +308,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::LookupRootCertificateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t caid = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -330,7 +323,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::LookupRootCertificateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t caid = static_cast<uint16_t>(0);
 
@@ -349,7 +341,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveRootCertificate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     uint16_t caid = static_cast<uint16_t>(0);
 
@@ -384,7 +375,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::TLSClientCSR::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     chip::ByteSpan nonce;
 
@@ -421,13 +411,12 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::TLSClientCSRResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t ccdid = static_cast<uint16_t>(0);
     chip::ByteSpan csr;
     chip::ByteSpan nonce;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -439,7 +428,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::TLSClientCSRResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t ccdid = static_cast<uint16_t>(0);
     chip::ByteSpan csr;
@@ -461,7 +449,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ProvisionClientCertificate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     uint16_t ccdid = static_cast<uint16_t>(0);
     Structs::TLSClientCertificateDetailStruct::Type clientCertificateDetails;
@@ -498,7 +485,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::FindClientCertificate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     DataModel::Nullable<uint16_t> ccdid;
 
@@ -533,11 +519,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::FindClientCertificateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     DataModel::List<const Structs::TLSClientCertificateDetailStruct::Type> certificateDetails;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -549,7 +534,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::FindClientCertificateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     DataModel::DecodableList<Structs::TLSClientCertificateDetailStruct::DecodableType> certificateDetails;
 
@@ -568,7 +552,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::LookupClientCertificate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     chip::ByteSpan fingerprint;
 
@@ -603,11 +586,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::LookupClientCertificateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t ccdid = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -619,7 +601,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::LookupClientCertificateResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t ccdid = static_cast<uint16_t>(0);
 
@@ -638,7 +619,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveClientCertificate::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TlsCertificateManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     uint16_t ccdid = static_cast<uint16_t>(0);
 

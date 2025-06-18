@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -101,7 +102,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannel::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::CharSpan match;
 
@@ -137,12 +137,11 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     StatusEnum status = static_cast<StatusEnum>(0);
     Optional<chip::CharSpan> data;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -154,7 +153,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     StatusEnum status = static_cast<StatusEnum>(0);
     Optional<chip::CharSpan> data;
@@ -175,7 +173,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelByNumber::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t majorNumber = static_cast<uint16_t>(0);
     uint16_t minorNumber = static_cast<uint16_t>(0);
@@ -212,7 +209,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SkipChannel::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     int16_t count = static_cast<int16_t>(0);
 
@@ -253,7 +249,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetProgramGuide::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Optional<uint32_t> startTime;
     Optional<uint32_t> endTime;
@@ -301,12 +296,11 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ProgramGuideResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Structs::ChannelPagingStruct::Type paging;
     DataModel::List<const Structs::ProgramStruct::Type> programList;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -318,7 +312,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ProgramGuideResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Structs::ChannelPagingStruct::DecodableType paging;
     DataModel::DecodableList<Structs::ProgramStruct::DecodableType> programList;
@@ -341,7 +334,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RecordProgram::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::CharSpan programIdentifier;
     bool shouldRecordSeries = static_cast<bool>(0);
@@ -385,7 +377,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CancelRecordProgram::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::CharSpan programIdentifier;
     bool shouldRecordSeries = static_cast<bool>(0);

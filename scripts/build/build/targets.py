@@ -25,7 +25,6 @@ from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary, Ho
 from builders.imx import IMXApp, IMXBuilder
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
 from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
-from builders.mw320 import MW320App, MW320Builder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.nuttx import NuttXApp, NuttXBoard, NuttXBuilder
 from builders.nxp import NxpApp, NxpBoard, NxpBoardVariant, NxpBuilder, NxpBuildSystem, NxpLogLevel, NxpOsUsed
@@ -122,11 +121,11 @@ def BuildHostTarget():
         TargetPart('shell', app=HostApp.SHELL),
         TargetPart('ota-provider', app=HostApp.OTA_PROVIDER, enable_ble=False),
         TargetPart('ota-requestor', app=HostApp.OTA_REQUESTOR,
-                   enable_ble=False),
+                   enable_ble=False, enable_wifipaf=False),
         TargetPart('simulated-app1', app=HostApp.SIMULATED_APP1,
-                   enable_ble=False),
+                   enable_ble=False, enable_wifipaf=False),
         TargetPart('simulated-app2', app=HostApp.SIMULATED_APP2,
-                   enable_ble=False),
+                   enable_ble=False, enable_wifipaf=False),
         TargetPart('python-bindings', app=HostApp.PYTHON_BINDINGS),
         TargetPart('tv-app', app=HostApp.TV_APP),
         TargetPart('tv-casting-app', app=HostApp.TV_CASTING),
@@ -173,8 +172,10 @@ def BuildHostTarget():
         'no-interactive', interactive_mode=False).OnlyIfRe('-chip-tool')
     target.AppendModifier("ipv6only", enable_ipv4=False)
     target.AppendModifier("no-ble", enable_ble=False)
+    target.AppendModifier("no-wifipaf", enable_wifipaf=False)
     target.AppendModifier("no-wifi", enable_wifi=False)
     target.AppendModifier("no-thread", enable_thread=False)
+    target.AppendModifier('nfc-commission', chip_enable_nfc_based_commissioning=True)
     target.AppendModifier('no-shell', disable_shell=True)
     target.AppendModifier(
         "mbedtls", crypto_library=HostCryptoLibrary.MBEDTLS).ExceptIfRe('-boringssl')
@@ -515,8 +516,6 @@ def BuildNxpTarget():
 
     # boards
     target.AppendFixedTargets([
-        TargetPart('k32w0', board=NxpBoard.K32W0),
-        TargetPart('k32w1', board=NxpBoard.K32W1),
         TargetPart('rt1060', board=NxpBoard.RT1060),
         TargetPart('rt1170', board=NxpBoard.RT1170),
         TargetPart('rw61x', board=NxpBoard.RW61X),
@@ -531,9 +530,9 @@ def BuildNxpTarget():
 
     # apps
     target.AppendFixedTargets([
-        TargetPart('lighting', app=NxpApp.LIGHTING).OnlyIfRe('(k32w0|k32w1|mcxw71)'),
-        TargetPart('contact-sensor', app=NxpApp.CONTACT).OnlyIfRe('(k32w0|k32w1|mcxw71)'),
-        TargetPart('lock-app', app=NxpApp.LOCK_APP).OnlyIfRe('(k32w1|mcxw71)'),
+        TargetPart('lighting', app=NxpApp.LIGHTING).OnlyIfRe('mcxw71'),
+        TargetPart('contact-sensor', app=NxpApp.CONTACT).OnlyIfRe('mcxw71'),
+        TargetPart('lock-app', app=NxpApp.LOCK_APP).OnlyIfRe('mcxw71'),
         TargetPart('all-clusters', app=NxpApp.ALLCLUSTERS).OnlyIfRe('rt1060|rt1170|rw61x'),
         TargetPart('laundry-washer', app=NxpApp.LAUNDRYWASHER).OnlyIfRe('rt1060|rt1170|rw61x'),
         TargetPart('thermostat', app=NxpApp.THERMOSTAT).OnlyIfRe('rt1060|rt1170|rw61x')
@@ -542,16 +541,15 @@ def BuildNxpTarget():
     target.AppendModifier(name="factory", enable_factory_data=True)
     target.AppendModifier(name="low-power", low_power=True).OnlyIfRe('contact-sensor')
     target.AppendModifier(name="lit", enable_lit=True).OnlyIfRe('contact-sensor')
-    target.AppendModifier(name="fro32k", use_fro32k=True).OnlyIfRe('k32w0')
-    target.AppendModifier(name="smu2", smu2=True).OnlyIfRe('(k32w1|mcxw71)-freertos-lighting')
-    target.AppendModifier(name="dac-conversion", convert_dac_pk=True).OnlyIfRe('factory').ExceptIfRe('(k32w0|rw61x)')
+    target.AppendModifier(name="smu2", smu2=True).OnlyIfRe('mcxw71-freertos-lighting')
+    target.AppendModifier(name="dac-conversion", convert_dac_pk=True).OnlyIfRe('factory').ExceptIfRe('rw61x')
     target.AppendModifier(name="rotating-id", enable_rotating_id=True).ExceptIfRe('rw61x')
     target.AppendModifier(name="sw-v2", has_sw_version_2=True)
     target.AppendModifier(name="ota", enable_ota=True).ExceptIfRe('zephyr')
     target.AppendModifier(name="wifi", enable_wifi=True).OnlyIfRe('rt1060|rt1170|rw61x')
     target.AppendModifier(name="ethernet", enable_ethernet=True).OnlyIfRe('rw61x')
     target.AppendModifier(name="thread", enable_thread=True).ExceptIfRe('zephyr')
-    target.AppendModifier(name="matter-shell", enable_shell=True).ExceptIfRe('k32w0|k32w1')
+    target.AppendModifier(name="matter-shell", enable_shell=True)
     target.AppendModifier(name="factory-build", enable_factory_data_build=True).OnlyIfRe('rt1060|rt1170|rw61x')
     target.AppendModifier(name="frdm", board_variant=NxpBoardVariant.FRDM).OnlyIfRe('rw61x|mcxw71')
     target.AppendModifier(name="cmake", build_system=NxpBuildSystem.CMAKE).ExceptIfRe(
@@ -632,7 +630,7 @@ def BuildQorvoTarget():
 
     # board
     target.AppendFixedTargets([
-        TargetPart('qpg6105', board=QpgBoard.QPG6105),
+        TargetPart('qpg6200', board=QpgBoard.QPG6200),
     ])
 
     # apps
@@ -764,13 +762,6 @@ def BuildIMXTarget():
     return target
 
 
-def BuildMW320Target():
-    target = BuildTarget('mw320', MW320Builder)
-    target.AppendFixedTargets(
-        [TargetPart('all-clusters-app', app=MW320App.ALL_CLUSTERS)])
-    return target
-
-
 def BuildGenioTarget():
     target = BuildTarget('genio', GenioBuilder)
     target.AppendFixedTargets([TargetPart('lighting-app', app=GenioApp.LIGHT)])
@@ -823,7 +814,6 @@ def BuildTelinkTarget():
     target.AppendModifier('thread-analyzer', thread_analyzer_config=True)
     target.AppendModifier('precompiled-ot', precompiled_ot_config=True)
     target.AppendModifier('tflm', tflm_config=True)
-    target.AppendModifier('newlib', newlib_libc_config=True)
 
     return target
 
@@ -883,7 +873,6 @@ BUILD_TARGETS = [
     BuildInfineonTarget(),
     BuildNxpTarget(),
     BuildMbedTarget(),
-    BuildMW320Target(),
     BuildNrfTarget(),
     BuildNrfNativeTarget(),
     BuildNuttXTarget(),

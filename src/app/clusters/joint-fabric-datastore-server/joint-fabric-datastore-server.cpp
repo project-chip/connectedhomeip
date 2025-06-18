@@ -27,6 +27,9 @@
 #include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
+#include <platform/CHIPDeviceConfig.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
 using namespace chip;
 using namespace chip::app;
@@ -459,3 +462,5 @@ void MatterJointFabricDatastorePluginServerInitCallback()
 
     Server::GetInstance().GetJointFabricDatastore().AddListener(gJointFabricDatastoreAttrAccess);
 }
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC

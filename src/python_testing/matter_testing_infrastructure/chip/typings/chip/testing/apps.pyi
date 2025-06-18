@@ -1,6 +1,9 @@
+# src/python_testing/matter_testing_infrastructure/chip/typings/chip/testing/apps.py
+
 from typing import Any
 
 from chip.testing.tasks import Subprocess
+
 
 class AppServerSubprocess(Subprocess):
     PREFIX: bytes

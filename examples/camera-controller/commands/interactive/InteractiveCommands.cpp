@@ -18,6 +18,7 @@
 
 #include "InteractiveCommands.h"
 
+#include <device-manager/DeviceManager.h>
 #include <platform/logging/LogV.h>
 #include <system/SystemClock.h>
 
@@ -211,6 +212,7 @@ CHIP_ERROR InteractiveStartCommand::RunCommand()
         }
     }
 
+    camera::DeviceManager::Instance().Shutdown();
     SetCommandExitStatus(CHIP_NO_ERROR);
     CloseLogFile();
 

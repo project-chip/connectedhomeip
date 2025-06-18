@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -102,7 +103,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SolicitOffer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     Globals::StreamUsageEnum streamUsage   = static_cast<Globals::StreamUsageEnum>(0);
     chip::EndpointId originatingEndpointID = static_cast<chip::EndpointId>(0);
@@ -152,14 +152,13 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SolicitOfferResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
     bool deferredOffer       = static_cast<bool>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -171,7 +170,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SolicitOfferResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
     bool deferredOffer       = static_cast<bool>(0);
@@ -201,7 +199,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ProvideOffer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     DataModel::Nullable<uint16_t> webRTCSessionID;
     chip::CharSpan sdp;
@@ -254,13 +251,12 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ProvideOfferResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -272,7 +268,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ProvideOfferResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
     Optional<DataModel::Nullable<uint16_t>> videoStreamID;
@@ -294,7 +289,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ProvideAnswer::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
     chip::CharSpan sdp;
@@ -332,7 +326,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ProvideICECandidates::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     uint16_t webRTCSessionID = static_cast<uint16_t>(0);
     DataModel::List<const Globals::Structs::ICECandidateStruct::Type> ICECandidates;
@@ -370,7 +363,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::EndSession::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WebRTCTransportProvider::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     uint16_t webRTCSessionID            = static_cast<uint16_t>(0);
     Globals::WebRTCEndReasonEnum reason = static_cast<Globals::WebRTCEndReasonEnum>(0);

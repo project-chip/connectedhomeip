@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -109,7 +110,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MoveToLevel::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t level = static_cast<uint8_t>(0);
     DataModel::Nullable<uint16_t> transitionTime;
@@ -153,7 +153,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Move::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     MoveModeEnum moveMode = static_cast<MoveModeEnum>(0);
     DataModel::Nullable<uint8_t> rate;
@@ -198,7 +197,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     StepModeEnum stepMode = static_cast<StepModeEnum>(0);
     uint8_t stepSize      = static_cast<uint8_t>(0);
@@ -242,7 +240,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
     chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
@@ -282,7 +279,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MoveToLevelWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t level = static_cast<uint8_t>(0);
     DataModel::Nullable<uint16_t> transitionTime;
@@ -326,7 +322,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MoveWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     MoveModeEnum moveMode = static_cast<MoveModeEnum>(0);
     DataModel::Nullable<uint8_t> rate;
@@ -371,7 +366,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StepWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     StepModeEnum stepMode = static_cast<StepModeEnum>(0);
     uint8_t stepSize      = static_cast<uint8_t>(0);
@@ -415,7 +409,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StopWithOnOff::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::BitMask<OptionsBitmap> optionsMask     = static_cast<chip::BitMask<OptionsBitmap>>(0);
     chip::BitMask<OptionsBitmap> optionsOverride = static_cast<chip::BitMask<OptionsBitmap>>(0);
@@ -452,7 +445,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::MoveToClosestFrequency::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t frequency = static_cast<uint16_t>(0);
 

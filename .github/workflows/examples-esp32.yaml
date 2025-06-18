@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:133
+            image: ghcr.io/project-chip/chip-build-esp32:140
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -135,7 +135,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' &&  github.repository_owner == 'espressif'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:133
+            image: ghcr.io/project-chip/chip-build-esp32:140
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -184,4 +184,13 @@ jobs:
               run: scripts/examples/esp_example.sh lock-app sdkconfig.defaults esp32c6
 
             - name: Build example thread-br-app (Target:ESP32S3)
-              run: scripts/examples/esp_example.sh thread-br-app sdkconfig.defaults esp32s3
+              shell: bash
+              run: |
+                   cd $IDF_PATH
+                   cd examples/openthread/ot_rcp
+                   source $IDF_PATH/export.sh
+                   idf.py set-target esp32h2
+                   idf.py build
+                   source $IDF_PATH/export.sh
+                   cd $GITHUB_WORKSPACE
+                   scripts/examples/esp_example.sh thread-br-app sdkconfig.defaults esp32s3

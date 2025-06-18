@@ -23,7 +23,7 @@
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
-#include <app/util/basic-types.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
 #include <lib/support/BitMask.h>
@@ -233,6 +233,7 @@ enum class Fields : uint8_t
     kConnectionID     = 0,
     kTransportStatus  = 1,
     kTransportOptions = 2,
+    kFabricIndex      = 254,
 };
 
 struct Type
@@ -241,10 +242,19 @@ public:
     uint16_t connectionID               = static_cast<uint16_t>(0);
     TransportStatusEnum transportStatus = static_cast<TransportStatusEnum>(0);
     Optional<Structs::TransportOptionsStruct::Type> transportOptions;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
-    static constexpr bool kIsFabricScoped = false;
+    static constexpr bool kIsFabricScoped = true;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
+
+    CHIP_ERROR EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR EncodeForRead(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
+
+private:
+    CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
 };
 
 struct DecodableType
@@ -253,10 +263,15 @@ public:
     uint16_t connectionID               = static_cast<uint16_t>(0);
     TransportStatusEnum transportStatus = static_cast<TransportStatusEnum>(0);
     Optional<Structs::TransportOptionsStruct::DecodableType> transportOptions;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
-    static constexpr bool kIsFabricScoped = false;
+    static constexpr bool kIsFabricScoped = true;
+
+    auto GetFabricIndex() const { return fabricIndex; }
+
+    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
 };
 
 } // namespace TransportConfigurationStruct

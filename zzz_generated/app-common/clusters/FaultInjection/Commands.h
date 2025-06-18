@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -75,7 +76,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::FailAtFault::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::FaultInjection::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     FaultType type          = static_cast<FaultType>(0);
     uint32_t id             = static_cast<uint32_t>(0);
@@ -120,7 +120,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::FailRandomlyAtFault::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::FaultInjection::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     FaultType type     = static_cast<FaultType>(0);
     uint32_t id        = static_cast<uint32_t>(0);

@@ -1188,7 +1188,7 @@ CHIP_ERROR CASESession::SendSigma2Resume(System::PacketBufferHandle && msgR2Resu
 
     mState = State::kSentSigma2Resume;
 
-    ChipLogDetail(SecureChannel, "Sent Sigma2Resume msg");
+    ChipLogProgress(SecureChannel, "Sent Sigma2Resume msg");
 
     return CHIP_NO_ERROR;
 }
@@ -1271,6 +1271,10 @@ CHIP_ERROR CASESession::PrepareSigma2(EncodeSigma2Inputs & outSigma2Data)
     TLVType outerContainerType = kTLVType_NotSpecified;
 
     ReturnErrorOnFailure(tlvWriter.StartContainer(AnonymousTag(), kTLVType_Structure, outerContainerType));
+
+    CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma2NOC, *nocCert.data() ^= 0xFF);
+    CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma2ICAC, *icaCert.data() ^= 0xFF);
+
     ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(TBEDataTags::kSenderNOC), nocCert));
     if (!icaCert.empty())
     {
@@ -1285,6 +1289,8 @@ CHIP_ERROR CASESession::PrepareSigma2(EncodeSigma2Inputs & outSigma2Data)
         nocBuf.Free();
         nocCert = MutableByteSpan{};
     }
+
+    CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma2Signature, *tbsData2Signature.Bytes() ^= 0xFF);
 
     ReturnErrorOnFailure(tlvWriter.PutBytes(AsTlvContextTag(TBEDataTags::kSignature), tbsData2Signature.ConstBytes(),
                                             static_cast<uint32_t>(tbsData2Signature.Length())));
@@ -1339,6 +1345,8 @@ CHIP_ERROR CASESession::EncodeSigma2(System::PacketBufferHandle & msgR2, EncodeS
 
     ReturnErrorOnFailure(tlvWriterMsg2.PutBytes(AsTlvContextTag(Sigma2Tags::kResponderEphPubKey), *input.responderEphPubKey,
                                                 static_cast<uint32_t>(input.responderEphPubKey->Length())));
+
+    CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptTBEData2Encrypted, *input.msgR2Encrypted.Get() ^= 0xFF);
 
     ReturnErrorOnFailure(tlvWriterMsg2.PutBytes(AsTlvContextTag(Sigma2Tags::kEncrypted2), input.msgR2Encrypted.Get(),
                                                 static_cast<uint32_t>(input.encrypted2Length)));

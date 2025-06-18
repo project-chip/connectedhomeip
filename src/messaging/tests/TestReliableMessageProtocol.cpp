@@ -1798,8 +1798,8 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseDelayed)
     ASSERT_NE(rm, nullptr);
 
     exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+        100_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        100_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     }));
 
     constexpr uint32_t kMaxMRPTransmits = 5; // Counting the initial message.
@@ -1813,7 +1813,7 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseDelayed)
     // Ensure the retransmit table is empty right now
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
-    exchange->SetResponseTimeout(3000_ms32);
+    exchange->SetResponseTimeout(5000_ms32);
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendMessageFlags::kExpectResponse);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     DrainAndServiceIO();
@@ -1863,8 +1863,8 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseDelayed)
     loopback.mDroppedMessageCount = 0;
 
     mockReceiver.mExchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+        100_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        100_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     }));
 
     buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
@@ -1957,8 +1957,8 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
     ASSERT_NE(rm, nullptr);
 
     exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+        100_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        100_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     }));
 
     constexpr uint32_t kMaxMRPTransmits = 5; // Counting the initial message.
@@ -1972,7 +1972,7 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
     // Ensure the retransmit table is empty right now
     EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
 
-    exchange->SetResponseTimeout(2500_ms32);
+    exchange->SetResponseTimeout(4000_ms32);
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendMessageFlags::kExpectResponse);
     EXPECT_EQ(err, CHIP_NO_ERROR);
     DrainAndServiceIO();
@@ -1986,7 +1986,7 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
     EXPECT_FALSE(mockSender.IsOnMessageReceivedCalled);
 
     // Wait for all but the last retransmit to happen.
-    GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mDroppedMessageCount >= kMaxMRPTransmits - 1; });
+    GetIOContext().DriveIOUntil(2000_ms32, [&] { return loopback.mDroppedMessageCount >= kMaxMRPTransmits - 1; });
     DrainAndServiceIO();
 
     // Ensure that nothing has been sent yet.
@@ -2000,7 +2000,7 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
     // Now allow through the next message (our last retransmit), but make sure
     // there is no standalone ack for it.
     mockReceiver.SetDropAckResponse(true);
-    GetIOContext().DriveIOUntil(500_ms32, [&] { return loopback.mSentMessageCount >= kMaxMRPTransmits; });
+    GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= kMaxMRPTransmits; });
     DrainAndServiceIO();
 
     // Verify that message was sent and received but nothing else has been sent.
@@ -2014,7 +2014,7 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
     mockReceiver.SetDropAckResponse(false);
 
     // Now wait for us to time out our MRP context.
-    GetIOContext().DriveIOUntil(1000_ms32, [&] { return rm->TestGetCountRetransTable() == 0; });
+    GetIOContext().DriveIOUntil(5000_ms32, [&] { return rm->TestGetCountRetransTable() == 0; });
     DrainAndServiceIO();
 
     EXPECT_EQ(loopback.mSentMessageCount, kMaxMRPTransmits);
@@ -2053,7 +2053,7 @@ TEST_F(TestReliableMessageProtocol, CheckApplicationResponseNeverComes)
 }
 
 #if CHIP_CONFIG_MRP_ANALYTICS_ENABLED
-TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEventualSuccessForEsablishedCase)
+TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEventualSuccessForEstablishedCase)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Make sure we are using CASE sessions, because there is no defunct-marking for PASE.
@@ -2076,9 +2076,10 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     TestReliablityAnalyticDelegate testAnalyticsDelegate;
     rm->RegisterAnalyticsDelegate(&testAnalyticsDelegate);
 
+    constexpr auto kTestRetryInterval = System::Clock::Milliseconds32(100_ms32);
     exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+        kTestRetryInterval, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        kTestRetryInterval, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     }));
 
     const auto expectedFabricIndex = exchange->GetSessionHandle()->GetFabricIndex();
@@ -2102,7 +2103,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(loopback.mDroppedMessageCount, 1u);
     EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
 
-    // Wait for the initial message to fail (should take 330-413ms)
+    // Wait for the first retransmission to be sent (occurs after at least 100ms but less than 1000ms)
     GetIOContext().DriveIOUntil(1000_ms32, [&] { return loopback.mSentMessageCount >= 2; });
     DrainAndServiceIO();
 
@@ -2145,6 +2146,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(firstTransmitEvent.fabricIndex, expectedFabricIndex);
     EXPECT_EQ(firstTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kInitialSend);
     EXPECT_EQ(firstTransmitEvent.retransmissionCount, std::nullopt);
+    EXPECT_EQ(firstTransmitEvent.ackLatencyMs, std::nullopt);
     // We have no way of validating the first messageCounter since this is a randomly generated value, but it should
     // remain constant for all subsequent transmit events in this test.
     const uint32_t messageCounter = firstTransmitEvent.messageCounter;
@@ -2155,6 +2157,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(secondTransmitEvent.fabricIndex, expectedFabricIndex);
     EXPECT_EQ(secondTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
     EXPECT_EQ(secondTransmitEvent.retransmissionCount, 1);
+    EXPECT_EQ(secondTransmitEvent.ackLatencyMs, std::nullopt);
     EXPECT_EQ(messageCounter, secondTransmitEvent.messageCounter);
 
     testAnalyticsDelegate.mTransmitEvents.pop();
@@ -2163,6 +2166,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(thirdTransmitEvent.fabricIndex, expectedFabricIndex);
     EXPECT_EQ(thirdTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
     EXPECT_EQ(thirdTransmitEvent.retransmissionCount, 2);
+    EXPECT_EQ(thirdTransmitEvent.ackLatencyMs, std::nullopt);
     EXPECT_EQ(messageCounter, thirdTransmitEvent.messageCounter);
 
     testAnalyticsDelegate.mTransmitEvents.pop();
@@ -2171,6 +2175,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(fourthTransmitEvent.fabricIndex, expectedFabricIndex);
     EXPECT_EQ(fourthTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
     EXPECT_EQ(fourthTransmitEvent.retransmissionCount, 3);
+    EXPECT_EQ(fourthTransmitEvent.ackLatencyMs, std::nullopt);
     EXPECT_EQ(messageCounter, fourthTransmitEvent.messageCounter);
 
     testAnalyticsDelegate.mTransmitEvents.pop();
@@ -2179,6 +2184,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(fifthTransmitEvent.fabricIndex, expectedFabricIndex);
     EXPECT_EQ(fifthTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kRetransmission);
     EXPECT_EQ(fifthTransmitEvent.retransmissionCount, 4);
+    EXPECT_EQ(fifthTransmitEvent.ackLatencyMs, std::nullopt);
     EXPECT_EQ(messageCounter, fifthTransmitEvent.messageCounter);
 
     testAnalyticsDelegate.mTransmitEvents.pop();
@@ -2187,10 +2193,13 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEven
     EXPECT_EQ(sixthTransmitEvent.fabricIndex, expectedFabricIndex);
     EXPECT_EQ(sixthTransmitEvent.eventType, ReliableMessageAnalyticsDelegate::EventType::kAcknowledged);
     EXPECT_EQ(sixthTransmitEvent.retransmissionCount, std::nullopt);
+    EXPECT_TRUE(sixthTransmitEvent.ackLatencyMs.has_value());
+    auto expectedMinimumAckLatencyTime = System::Clock::Milliseconds64(kTestRetryInterval * 5);
+    EXPECT_GT(sixthTransmitEvent.ackLatencyMs, expectedMinimumAckLatencyTime);
     EXPECT_EQ(messageCounter, sixthTransmitEvent.messageCounter);
 }
 
-TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitFailureForEsablishedCase)
+TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitFailureForEstablishedCase)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Make sure we are using CASE sessions, because there is no defunct-marking for PASE.
@@ -2214,8 +2223,8 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitFail
     rm->RegisterAnalyticsDelegate(&testAnalyticsDelegate);
 
     exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+        100_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        100_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     }));
 
     const auto expectedFabricIndex = exchange->GetSessionHandle()->GetFabricIndex();
@@ -2332,7 +2341,7 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitFail
     EXPECT_EQ(messageCounter, sixthTransmitEvent.messageCounter);
 }
 
-TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEsablishedPase)
+TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEstablishedPase)
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
@@ -2349,8 +2358,8 @@ TEST_F(TestReliableMessageProtocol, CheckReliableMessageAnalyticsForTransmitEsab
     rm->RegisterAnalyticsDelegate(&testAnalyticsDelegate);
 
     exchange->GetSessionHandle()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
-        30_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
+        100_ms32, // CHIP_CONFIG_MRP_LOCAL_IDLE_RETRY_INTERVAL
+        100_ms32, // CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL
     }));
 
     ASSERT_TRUE(exchange->GetSessionHandle()->AsSecureSession()->IsPASESession());

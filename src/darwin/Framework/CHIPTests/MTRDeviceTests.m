@@ -61,6 +61,18 @@ static MTRDeviceController * sController = nil;
 // Keys we can use to restart the controller.
 static MTRTestKeys * sTestKeys = nil;
 
+static NSDate * MatterEpoch(void)
+{
+    __auto_type * utcTz = [NSTimeZone timeZoneForSecondsFromGMT:0];
+    __auto_type * dateComponents = [[NSDateComponents alloc] init];
+    dateComponents.timeZone = utcTz;
+    dateComponents.year = 2000;
+    dateComponents.month = 1;
+    dateComponents.day = 1;
+    NSCalendar * gregorianCalendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    return [gregorianCalendar dateFromComponents:dateComponents];
+}
+
 static void WaitForCommissionee(XCTestExpectation * expectation)
 {
     MTRDeviceController * controller = sController;
@@ -2870,21 +2882,12 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     XCTAssertTrue(dstOffset.count > 0);
     MTRTimeSynchronizationClusterDSTOffsetStruct * currentDSTOffset = dstOffset[0];
 
-    __auto_type * utcTz = [NSTimeZone timeZoneForSecondsFromGMT:0];
-    __auto_type * dateComponents = [[NSDateComponents alloc] init];
-    dateComponents.timeZone = utcTz;
-    dateComponents.year = 2000;
-    dateComponents.month = 1;
-    dateComponents.day = 1;
-    NSCalendar * gregorianCalendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-    NSDate * matterEpoch = [gregorianCalendar dateFromComponents:dateComponents];
-
     NSDate * nextReportedDSTTransition;
     if (currentDSTOffset.validUntil == nil) {
         nextReportedDSTTransition = nil;
     } else {
         double validUntilMicroSeconds = currentDSTOffset.validUntil.doubleValue;
-        nextReportedDSTTransition = [NSDate dateWithTimeInterval:validUntilMicroSeconds / 1e6 sinceDate:matterEpoch];
+        nextReportedDSTTransition = [NSDate dateWithTimeInterval:validUntilMicroSeconds / 1e6 sinceDate:MatterEpoch()];
     }
 
     __auto_type * tz = [NSTimeZone localTimeZone];
@@ -6222,6 +6225,103 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
 
     [self waitForExpectations:@[ subscriptionPoolWorkCompleteForTriggerTestExpectation ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test049_CorrectTimeOnDevice
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+
+    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
+                                                          arguments:@[]
+                                                         controller:controller
+                                                            payload:kOnboardingPayload2
+                                                             nodeID:@(kDeviceId2)];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.forceTimeUpdateShortDelayToZero = YES;
+
+    XCTestExpectation * reachableExpectation = [self expectationWithDescription:@"Device is reachable"];
+    delegate.onReachable = ^{
+        [reachableExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ reachableExpectation ] timeout:60];
+
+    // We relaunch the app multiple times, to try to trigger time
+    // synchronization loss detection. These are the different cases:
+    //
+    //   1) Relaunch with a bad clock, this should just trigger an update,
+    //      because it's the first time that we detect a bad time.
+    //   2) Relaunch with a bad clock again, this should not trigger an update,
+    //      because we avoid doing it too soon after a previous update (see
+    //      MTR_DEVICE_TIME_SYNCHRONIZATION_LOSS_CHECK_CADENCE).
+    //   3) Set the cadence to zero and relaunch with a bad clock again. This
+    //      should trigger an update, because with cadence being zero we won't
+    //      block an update.
+    //   4) Relaunch with a slightly bad clock (and cadence still set to zero).
+    //      This should not trigger an update, because the time is not out of
+    //      sync enough.
+    for (int i = 0; i < 4; ++i) {
+        if (i == 2) {
+            delegate.forceTimeSynchronizationLossDetectionCadenceToZero = YES;
+        }
+
+        __weak __auto_type weakDelegate = delegate;
+
+        XCTestExpectation * subscriptionDroppedExpectation = [self expectationWithDescription:@"Subscription has dropped"];
+        delegate.onNotReachable = ^() {
+            [subscriptionDroppedExpectation fulfill];
+        };
+
+        XCTestExpectation * resubscriptionReachableExpectation =
+            [self expectationWithDescription:@"Resubscription has become reachable"];
+        XCTestExpectation * gotReportsExpectation = [self expectationWithDescription:@"Resubscription got reports"];
+        XCTestExpectation * correctedTime = [self expectationWithDescription:@"onUTCTimeSet called"];
+        delegate.onReachable = ^() {
+            __strong __auto_type strongDelegate = weakDelegate;
+
+            strongDelegate.onReportEnd = ^() {
+                __strong __auto_type strongDelegate = weakDelegate;
+                strongDelegate.onReportEnd = nil;
+                [gotReportsExpectation fulfill];
+            };
+
+            strongDelegate.onUTCTimeSet = ^(NSError * _Nullable error) {
+                XCTAssertNil(error);
+                [correctedTime fulfill];
+            };
+            if (i == 1 || i == 3) {
+                correctedTime.inverted = YES;
+            }
+            [resubscriptionReachableExpectation fulfill];
+        };
+
+        double utcTime;
+        if (i < 3) {
+            utcTime = 0;
+        } else {
+            // Set an incorrect time that's within the range that we ignore (we
+            // offset it by 4 minutes, which is smaller than the 5 minutes that
+            // MTR_DEVICE_TIME_DIFFERENCE_TRIGGERING_TIME_SYNC is currently set
+            // to.
+            utcTime = [[NSDate dateWithTimeIntervalSinceNow:-240] timeIntervalSinceDate:MatterEpoch()];
+        }
+        // This will add duplicate arguments, but that shouldn't hurt anything. Last one will take precedence.
+        BOOL started = [self restartApp:app additionalArguments:@[ @"--use_mock_clock", @(utcTime).stringValue ]];
+        XCTAssertTrue(started);
+
+        [self waitForExpectations:@[ subscriptionDroppedExpectation, resubscriptionReachableExpectation, gotReportsExpectation ] timeout:60];
+
+        // correctedTime is sometimes inverted, so wait on it separately with a lower timeout to avoid
+        // always waiting for at least a minute every time we don't expect onUTCTimeset to be called.
+        [self waitForExpectations:@[ correctedTime ] timeout:10];
+    }
 }
 
 @end

@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -76,6 +77,16 @@ struct Type;
 struct DecodableType;
 } // namespace RemoveZone
 
+namespace CreateOrUpdateTrigger {
+struct Type;
+struct DecodableType;
+} // namespace CreateOrUpdateTrigger
+
+namespace RemoveTrigger {
+struct Type;
+struct DecodableType;
+} // namespace RemoveTrigger
+
 } // namespace Commands
 
 namespace Commands {
@@ -91,7 +102,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CreateTwoDCartesianZone::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Structs::TwoDCartesianZoneStruct::Type zone;
 
@@ -126,11 +136,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CreateTwoDCartesianZoneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t zoneID = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -142,7 +151,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::CreateTwoDCartesianZoneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t zoneID = static_cast<uint16_t>(0);
 
@@ -162,7 +170,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::UpdateTwoDCartesianZone::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t zoneID = static_cast<uint16_t>(0);
     Structs::TwoDCartesianZoneStruct::Type zone;
@@ -199,7 +206,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetTwoDCartesianZone::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Optional<DataModel::Nullable<uint16_t>> zoneID;
 
@@ -234,11 +240,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetTwoDCartesianZoneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const Structs::TwoDCartesianZoneStruct::Type> zones;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -250,7 +255,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetTwoDCartesianZoneResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::DecodableList<Structs::TwoDCartesianZoneStruct::DecodableType> zones;
 
@@ -269,7 +273,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveZone::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t zoneID = static_cast<uint16_t>(0);
 
@@ -292,6 +295,74 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RemoveZone
+namespace CreateOrUpdateTrigger {
+enum class Fields : uint8_t
+{
+    kTrigger = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::CreateOrUpdateTrigger::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+
+    Structs::ZoneTriggerControlStruct::Type trigger;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::CreateOrUpdateTrigger::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    Structs::ZoneTriggerControlStruct::DecodableType trigger;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace CreateOrUpdateTrigger
+namespace RemoveTrigger {
+enum class Fields : uint8_t
+{
+    kZoneID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::RemoveTrigger::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+
+    uint16_t zoneID = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::RemoveTrigger::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
+    static constexpr bool kIsFabricScoped = false;
+
+    uint16_t zoneID = static_cast<uint16_t>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace RemoveTrigger
 } // namespace Commands
 } // namespace ZoneManagement
 } // namespace Clusters

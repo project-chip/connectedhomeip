@@ -336,7 +336,8 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * userData)
         err == CHIP_NO_ERROR,
         ChipLogError(DeviceLayer, "chip::Inet::InterfaceId::InterfaceNameToId() failed: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    ret = dnssd_service_get_all_txt_record(service, &rCtx->mResultTxtRecordLen, reinterpret_cast<void **>(&rCtx->mResultTxtRecord));
+    ret = dnssd_service_get_all_txt_record(service, &rCtx->mResultTxtRecordLen,
+                                           reinterpret_cast<void **>(&rCtx->mResultTxtRecord.GetReceiver()));
     VerifyOrExit(ret == DNSSD_ERROR_NONE,
                  ChipLogError(DeviceLayer, "dnssd_service_get_all_txt_record() failed: %s", get_error_message(ret)));
 
@@ -462,11 +463,6 @@ ResolveContext::ResolveContext(DnssdTizen * instance, const char * name, const c
     mCbContext = context;
 }
 
-ResolveContext::~ResolveContext()
-{
-    g_free(mResultTxtRecord);
-}
-
 void ResolveContext::Finalize(CHIP_ERROR error)
 {
     ChipLogProgress(DeviceLayer, "DNSsd %s", __func__);
@@ -474,7 +470,7 @@ void ResolveContext::Finalize(CHIP_ERROR error)
     VerifyOrReturn(error == CHIP_NO_ERROR, mCallback(mCbContext, nullptr, chip::Span<chip::Inet::IPAddress>(), error));
 
     std::vector<chip::Dnssd::TextEntry> textEntries;
-    GetTextEntries(mResultTxtRecordLen, mResultTxtRecord, textEntries);
+    GetTextEntries(mResultTxtRecordLen, reinterpret_cast<uint8_t *>(mResultTxtRecord.get()), textEntries);
     mResult.mTextEntries   = textEntries.empty() ? nullptr : textEntries.data();
     mResult.mTextEntrySize = textEntries.size();
 

@@ -279,6 +279,7 @@ static void ResolveCallback(
     std::lock_guard lock(sConnectivityMonitorLock);
     if (!sSharedResolverConnection || !sSharedResolverQueue) {
         MTR_LOG("%@ shared resolver connection already stopped - nothing to do", self);
+        return;
     }
 
     // DNSServiceRefDeallocate must be called on the same queue set on the shared connection.

@@ -364,6 +364,42 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRDataTypeViewportStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _x1 = @(0);
+
+        _y1 = @(0);
+
+        _x2 = @(0);
+
+        _y2 = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeViewportStruct alloc] init];
+
+    other.x1 = self.x1;
+    other.y1 = self.y1;
+    other.x2 = self.x2;
+    other.y2 = self.y2;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: x1:%@; y1:%@; x2:%@; y2:%@; >", NSStringFromClass([self class]), _x1, _y1, _x2, _y2];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDataTypeWebRTCSessionStruct
 - (instancetype)init
 {
@@ -9327,6 +9363,8 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
+        _zoneID = @(0);
+
         _initialDuration = @(0);
 
         _augmentationDuration = @(0);
@@ -9344,6 +9382,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRZoneManagementClusterZoneTriggerControlStruct alloc] init];
 
+    other.zoneID = self.zoneID;
     other.initialDuration = self.initialDuration;
     other.augmentationDuration = self.augmentationDuration;
     other.maxDuration = self.maxDuration;
@@ -9355,7 +9394,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: initialDuration:%@; augmentationDuration:%@; maxDuration:%@; blindDuration:%@; sensitivity:%@; >", NSStringFromClass([self class]), _initialDuration, _augmentationDuration, _maxDuration, _blindDuration, _sensitivity];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; initialDuration:%@; augmentationDuration:%@; maxDuration:%@; blindDuration:%@; sensitivity:%@; >", NSStringFromClass([self class]), _zoneID, _initialDuration, _augmentationDuration, _maxDuration, _blindDuration, _sensitivity];
     return descriptionString;
 }
 
@@ -9366,7 +9405,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _zones = [NSArray array];
+        _zone = @(0);
 
         _reason = @(0);
     }
@@ -9377,7 +9416,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRZoneManagementClusterZoneTriggeredEvent alloc] init];
 
-    other.zones = self.zones;
+    other.zone = self.zone;
     other.reason = self.reason;
 
     return other;
@@ -9385,7 +9424,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zones:%@; reason:%@; >", NSStringFromClass([self class]), _zones, _reason];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; >", NSStringFromClass([self class]), _zone, _reason];
     return descriptionString;
 }
 
@@ -9396,7 +9435,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _zones = [NSArray array];
+        _zone = @(0);
 
         _reason = @(0);
     }
@@ -9407,7 +9446,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     auto other = [[MTRZoneManagementClusterZoneStoppedEvent alloc] init];
 
-    other.zones = self.zones;
+    other.zone = self.zone;
     other.reason = self.reason;
 
     return other;
@@ -9415,7 +9454,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zones:%@; reason:%@; >", NSStringFromClass([self class]), _zones, _reason];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; >", NSStringFromClass([self class]), _zone, _reason];
     return descriptionString;
 }
 
@@ -9474,9 +9513,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _maxBitRate = @(0);
 
-        _minFragmentLen = @(0);
+        _minKeyFrameInterval = @(0);
 
-        _maxFragmentLen = @(0);
+        _maxKeyFrameInterval = @(0);
 
         _watermarkEnabled = nil;
 
@@ -9500,8 +9539,8 @@ NS_ASSUME_NONNULL_BEGIN
     other.maxResolution = self.maxResolution;
     other.minBitRate = self.minBitRate;
     other.maxBitRate = self.maxBitRate;
-    other.minFragmentLen = self.minFragmentLen;
-    other.maxFragmentLen = self.maxFragmentLen;
+    other.minKeyFrameInterval = self.minKeyFrameInterval;
+    other.maxKeyFrameInterval = self.maxKeyFrameInterval;
     other.watermarkEnabled = self.watermarkEnabled;
     other.osdEnabled = self.osdEnabled;
     other.referenceCount = self.referenceCount;
@@ -9511,7 +9550,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: videoStreamID:%@; streamUsage:%@; videoCodec:%@; minFrameRate:%@; maxFrameRate:%@; minResolution:%@; maxResolution:%@; minBitRate:%@; maxBitRate:%@; minFragmentLen:%@; maxFragmentLen:%@; watermarkEnabled:%@; osdEnabled:%@; referenceCount:%@; >", NSStringFromClass([self class]), _videoStreamID, _streamUsage, _videoCodec, _minFrameRate, _maxFrameRate, _minResolution, _maxResolution, _minBitRate, _maxBitRate, _minFragmentLen, _maxFragmentLen, _watermarkEnabled, _osdEnabled, _referenceCount];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: videoStreamID:%@; streamUsage:%@; videoCodec:%@; minFrameRate:%@; maxFrameRate:%@; minResolution:%@; maxResolution:%@; minBitRate:%@; maxBitRate:%@; minKeyFrameInterval:%@; maxKeyFrameInterval:%@; watermarkEnabled:%@; osdEnabled:%@; referenceCount:%@; >", NSStringFromClass([self class]), _videoStreamID, _streamUsage, _videoCodec, _minFrameRate, _maxFrameRate, _minResolution, _maxResolution, _minBitRate, _maxBitRate, _minKeyFrameInterval, _maxKeyFrameInterval, _watermarkEnabled, _osdEnabled, _referenceCount];
     return descriptionString;
 }
 
@@ -9766,42 +9805,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRCameraAVStreamManagementClusterViewportStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _x1 = @(0);
-
-        _y1 = @(0);
-
-        _x2 = @(0);
-
-        _y2 = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRCameraAVStreamManagementClusterViewportStruct alloc] init];
-
-    other.x1 = self.x1;
-    other.y1 = self.y1;
-    other.x2 = self.x2;
-    other.y2 = self.y2;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: x1:%@; y1:%@; x2:%@; y2:%@; >", NSStringFromClass([self class]), _x1, _y1, _x2, _y2];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRCameraAVSettingsUserLevelManagementClusterMPTZStruct
 - (instancetype)init
 {
@@ -9868,42 +9871,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRCameraAVSettingsUserLevelManagementClusterViewportStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _x1 = @(0);
-
-        _y1 = @(0);
-
-        _x2 = @(0);
-
-        _y2 = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRCameraAVSettingsUserLevelManagementClusterViewportStruct alloc] init];
-
-    other.x1 = self.x1;
-    other.y1 = self.y1;
-    other.x2 = self.x2;
-    other.y2 = self.y2;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: x1:%@; y1:%@; x2:%@; y2:%@; >", NSStringFromClass([self class]), _x1, _y1, _x2, _y2];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRCameraAVSettingsUserLevelManagementClusterDPTZStruct
 - (instancetype)init
 {
@@ -9911,7 +9878,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _videoStreamID = @(0);
 
-        _viewport = [MTRCameraAVSettingsUserLevelManagementClusterViewportStruct new];
+        _viewport = [MTRDataTypeViewportStruct new];
     }
     return self;
 }
@@ -10166,6 +10133,8 @@ NS_ASSUME_NONNULL_BEGIN
         _transportStatus = @(0);
 
         _transportOptions = nil;
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -10177,13 +10146,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.connectionID = self.connectionID;
     other.transportStatus = self.transportStatus;
     other.transportOptions = self.transportOptions;
+    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; transportStatus:%@; transportOptions:%@; >", NSStringFromClass([self class]), _connectionID, _transportStatus, _transportOptions];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: connectionID:%@; transportStatus:%@; transportOptions:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _connectionID, _transportStatus, _transportOptions, _fabricIndex];
     return descriptionString;
 }
 
@@ -11378,6 +11348,8 @@ NS_ASSUME_NONNULL_BEGIN
         _ccdid = nil;
 
         _status = @(0);
+
+        _fabricIndex = @(0);
     }
     return self;
 }
@@ -11392,13 +11364,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.caid = self.caid;
     other.ccdid = self.ccdid;
     other.status = self.status;
+    other.fabricIndex = self.fabricIndex;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpointID:%@; hostname:%@; port:%@; caid:%@; ccdid:%@; status:%@; >", NSStringFromClass([self class]), _endpointID, [_hostname base64EncodedStringWithOptions:0], _port, _caid, _ccdid, _status];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: endpointID:%@; hostname:%@; port:%@; caid:%@; ccdid:%@; status:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _endpointID, [_hostname base64EncodedStringWithOptions:0], _port, _caid, _ccdid, _status, _fabricIndex];
     return descriptionString;
 }
 

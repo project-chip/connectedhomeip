@@ -60,9 +60,9 @@ class TC_FAN_2_1(MatterBaseTest):
                 TestStep(2, "[FC] TH checks for support of the Auto feature.",
                          "Save result for future use."),
                 TestStep(3, "[FC] TH reads from the DUT the FanModeSequence attribute.",
-                         "Verify that the DUT response contains a FanModeSequenceEnum with value between 0 and 5 inclusive. If Auto is not supported, verify that the FanModeSequence attribute is a valid sequence (non-auto only). If Auto is supported, verify that the FanModeSequence attribute is a valid sequence (auto only)."),
+                         "Verify that the DUT response contains a FanModeSequenceEnum with value between 0 and 5 inclusive. If Auto is not supported, verify that the FanModeSequence attribute value is 0, 1, or 5. If Auto is supported, verify that the FanModeSequence attribute value is 2, 3, or 4."),
                 TestStep(4, "[FC] TH reads from the DUT the FanMode attribute value.",
-                         "Verify that the DUT response contains a FanModeEnum with a value between 0 and 5, excluding 4. Verify that the FanMode attribute value is supported by the FanModeSequence attribute value."),
+                         "Verify that the DUT response contains a FanModeEnum with a value between 0 and 5, excluding 4 and 6 (deprecated). Verify that the FanMode attribute value is supported by the FanModeSequence attribute value."),
                 TestStep(5, "[FC] TH reads from the DUT the PercentSetting attribute.",
                          "Verify that the DUT response contains a uint8 with value between 0 and 100 inclusive."),
                 TestStep(6, "[FC] TH reads from the DUT the PercentCurrent attribute.",
@@ -146,9 +146,9 @@ class TC_FAN_2_1(MatterBaseTest):
         fan_mode_sequence = await self.verify_setting(attribute.FanModeSequence, fms_enum, range(0, 6))
 
         # - If Auto is not supported, verify that the FanModeSequence
-        #   attribute is a valid sequence (non-auto only)
+        #   attribute value is 0, 1, or 5
         # - If Auto is supported, verify that the FanModeSequence
-        #   attribute is a valid sequence (auto only)
+        #   attribute value is 2, 3, or 4
         supported_fan_mode_sequence_values = auto_fan_mode_sequence_values if supports_auto else non_auto_fan_mode_sequence_values
         asserts.assert_in(fan_mode_sequence, supported_fan_mode_sequence_values,
                           f"[FC] FanModeSequence attribute value ({fan_mode_sequence}:{fan_mode_sequence.name}) is not a supoorted sequence: [{', '.join(f'{seq}:{seq.name}' for seq in supported_fan_mode_sequence_values)}].")
@@ -156,7 +156,7 @@ class TC_FAN_2_1(MatterBaseTest):
         # *** STEP 4 ***
         # TH reads from the DUT the FanMode attribute value
         # Verify that the DUT response contains an enum8 with
-        # a value between 0 and 5, excluding 4
+        # a value between 0 and 5, excluding 4 and 6 (deprecated).
         self.step(4)
         fan_mode = await self.verify_setting(attribute.FanMode, fm_enum, [0, 1, 2, 3, 5])
 

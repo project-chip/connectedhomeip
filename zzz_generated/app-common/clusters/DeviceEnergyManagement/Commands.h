@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -103,7 +104,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::PowerAdjustRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     int64_t power             = static_cast<int64_t>(0);
     uint32_t duration         = static_cast<uint32_t>(0);
@@ -141,7 +141,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CancelPowerAdjustRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -173,7 +172,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StartTimeAdjustRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint32_t requestedStartTime = static_cast<uint32_t>(0);
     AdjustmentCauseEnum cause   = static_cast<AdjustmentCauseEnum>(0);
@@ -211,7 +209,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::PauseRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint32_t duration         = static_cast<uint32_t>(0);
     AdjustmentCauseEnum cause = static_cast<AdjustmentCauseEnum>(0);
@@ -247,7 +244,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ResumeRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -280,7 +276,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ModifyForecastRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint32_t forecastID = static_cast<uint32_t>(0);
     DataModel::List<const Structs::SlotAdjustmentStruct::Type> slotAdjustments;
@@ -320,7 +315,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RequestConstraintBasedForecast::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const Structs::ConstraintsStruct::Type> constraints;
     AdjustmentCauseEnum cause = static_cast<AdjustmentCauseEnum>(0);
@@ -356,7 +350,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CancelRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 

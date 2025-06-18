@@ -74,7 +74,11 @@ namespace FaultInjection {
     X(CASECorruptSigma3ICAC, 24)                         /**< Send Sigma3 with invalid initiatorICAC */                            \
     X(CASECorruptSigma3Signature, 25)                    /**< Send Sigma3 with invalid signature */                                \
     X(CASECorruptSigma3InitiatorEphPubKey, 26)           /**< Send Sigma3 with invalid initiator ephemeral public key */           \
-    X(CASECorruptSigma3ResponderEphPubKey, 27)           /**< Send Sigma3 with invalid responder ephemeral public key */
+    X(CASECorruptSigma3ResponderEphPubKey, 27)           /**< Send Sigma3 with invalid responder ephemeral public key */           \
+    X(CASECorruptTBEData2Encrypted, 28)                  /**< Send Sigma2 with improperly generated TBEData2Encrypted */           \
+    X(CASECorruptSigma2NOC, 29)                          /**< Send Sigma2 with invalid responderNOC */                             \
+    X(CASECorruptSigma2ICAC, 30)                         /**< Send Sigma2 with invalid responderICAC */                            \
+    X(CASECorruptSigma2Signature, 31)                    /**< Send Sigma2 with invalid signature */
 
 // END-IF-CHANGE-ALSO-CHANGE(src/controller/python/chip/fault_injection/__init__.py)
 // WARNING: When adding/modifying Faults to the below macro, make sure the changes are duplicated to the CHIPFaultId enum in the

@@ -40,6 +40,12 @@ using namespace chip::app::Clusters;
 #include "refrigerator-and-temperature-controlled-cabinet-mode/tcc-mode.h"
 #endif // MATTER_DM_PLUGIN_REFRIGERATOR_AND_TEMPERATURE_CONTROLLED_CABINET_MODE_SERVER
 
+#ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+#include "chef-pump.h"
+#endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
+#endif // MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+
 namespace {
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
@@ -278,11 +284,31 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         HandleOnOffAttributeChangeForFan(attributePath.mEndpointId, bool(*value));
 #endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
 #endif // MATTER_DM_PLUGIN_FAN_CONTROL_SERVER
+
+#ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+        if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, chef::DeviceTypes::kPumpDeviceId))
+        {
+            chef::pump::postOnOff(attributePath.mEndpointId, bool(*value));
+        }
+#endif // #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+#endif // MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
     }
     else if (clusterId == LevelControl::Id)
     {
         ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
+
+#ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+#ifdef MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
+        if (chef::DeviceTypes::EndpointHasDeviceType(attributePath.mEndpointId, chef::DeviceTypes::kPumpDeviceId))
+        {
+            chef::pump::postMoveToLevel(attributePath.mEndpointId, *value);
+        }
+#endif // MATTER_DM_PLUGIN_LEVEL_CONTROL_SERVER
+#endif // #ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+#endif // MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 
         // WIP Apply attribute change to Light
     }
@@ -481,6 +507,12 @@ void ApplicationInit()
 
     RefrigeratorTemperatureControlledCabinetInit();
     OvenTemperatureControlledCabinetCooktopCookSurfaceInit();
+
+#ifdef MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
+#ifdef MATTER_DM_PLUGIN_ON_OFF_SERVER
+    chef::pump::init();
+#endif // MATTER_DM_PLUGIN_ON_OFF_SERVER
+#endif // MATTER_DM_PLUGIN_PUMP_CONFIGURATION_AND_CONTROL_SERVER
 
 #ifdef MATTER_DM_PLUGIN_WINDOW_COVERING_SERVER
     ChipLogProgress(NotSpecified, "Initializing WindowCovering cluster delegate.");
