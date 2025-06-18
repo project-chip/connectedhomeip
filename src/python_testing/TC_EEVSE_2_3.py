@@ -41,7 +41,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from datetime import datetime, timedelta, timezone
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
