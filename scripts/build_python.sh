@@ -99,7 +99,7 @@ while (($#)); do
             shift
             ;;
         --enable_wifi_paf | -p)
-            declare wifi_paf_arg=$2
+            declare wifi_paf_arg="$2"
             if [[ "$wifi_paf_arg" != "true" && "$wifi_paf_arg" != "false" ]]; then
                 echo "enable_wifi_paf should have a true/false value, not '$wifi_paf_arg'"
                 exit
