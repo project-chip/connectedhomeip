@@ -21,7 +21,6 @@
 
 #include "app/clusters/bindings/BindingManager.h"
 #include <app/server/Dnssd.h>
-#include <lib/support/StringBuilder.h>
 
 using namespace chip;
 using namespace chip::Controller;

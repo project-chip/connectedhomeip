@@ -25,7 +25,6 @@
 #include <app/util/util.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
-#include <lib/support/StringBuilder.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;

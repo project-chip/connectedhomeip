@@ -21,7 +21,6 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <lib/support/StringBuilder.h>
 
 /**
  * Utility for converting a hex string to bytes, with the right error checking

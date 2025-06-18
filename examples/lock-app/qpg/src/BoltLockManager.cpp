@@ -22,7 +22,6 @@
 #include "AppConfig.h"
 #include "AppTask.h"
 #include <FreeRTOS.h>
-#include <lib/support/StringBuilder.h>
 
 using namespace chip;
 

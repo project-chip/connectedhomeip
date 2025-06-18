@@ -17,7 +17,6 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/StringBuilder.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ESP32/ESP32Utils.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>

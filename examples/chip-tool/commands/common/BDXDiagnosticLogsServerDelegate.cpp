@@ -18,7 +18,6 @@
 
 #include "BDXDiagnosticLogsServerDelegate.h"
 
-#include <lib/support/StringBuilder.h>
 #include <string>
 #include <unistd.h>
 
