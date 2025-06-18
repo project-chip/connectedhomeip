@@ -216,7 +216,7 @@ private:
     System::Clock::Milliseconds32 mFastPollingInterval = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
 
     static_assert((CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_FALLBACK <= kSitIcdSlowPollMaximum),
-                  "The SIT slow polling intervals fallback cannot greater than 15 seconds");
+                  "The SIT slow polling intervals fallback must not exceed 15 seconds");
     System::Clock::Milliseconds32 mSlowPollingFallback = CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_FALLBACK;
 
     BitFlags<app::Clusters::IcdManagement::Feature> mFeatureMap;
