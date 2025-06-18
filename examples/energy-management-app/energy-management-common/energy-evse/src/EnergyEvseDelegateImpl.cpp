@@ -1610,7 +1610,7 @@ DataModel::Nullable<int64_t> EnergyEvseDelegate::GetBatteryCapacity()
 {
     return mBatteryCapacity;
 }
-CHIP_ERROR  EnergyEvseDelegate::SetBatteryCapacity(DataModel::Nullable<int64_t> newValue)
+CHIP_ERROR EnergyEvseDelegate::SetBatteryCapacity(DataModel::Nullable<int64_t> newValue)
 {
     DataModel::Nullable<int64_t> oldValue = mBatteryCapacity;
 
@@ -1631,7 +1631,6 @@ CHIP_ERROR  EnergyEvseDelegate::SetBatteryCapacity(DataModel::Nullable<int64_t> 
 
     return CHIP_NO_ERROR;
 }
-
 
 /* PNC attributes*/
 DataModel::Nullable<CharSpan> EnergyEvseDelegate::GetVehicleID()
