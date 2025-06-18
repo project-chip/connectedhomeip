@@ -182,9 +182,13 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureControl)
         await sub_handler.start(self.default_controller, self.dut.node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
-        self.step("2c")
-        latch_control_modes: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
-        logging.info(f"LatchControlModes: {latch_control_modes}")
+        if is_latching_supported:
+            self.step("2c")
+            latch_control_modes: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
+            logging.info(f"LatchControlModes: {latch_control_modes}")
+        else:
+            logging.info("LatchControlModes attribute is not supported, skipping read")
+            self.skip_step("2c")
 
         self.step("3")
         try:
