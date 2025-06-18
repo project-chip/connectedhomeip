@@ -501,14 +501,14 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     // TODO: If this command is sent while the closure is in a non-compatible internal-state, a status code of
     // INVALID_IN_STATE SHALL be returned.
 
-    DataModel::Nullable<GenericTargetStruct> target;
+    DataModel::Nullable<GenericDimensionStateStruct> target;
     VerifyOrReturnError(GetTarget(target) == CHIP_NO_ERROR, Status::Failure);
 
     // If target is null, we need to initialize to default value.
     // This is to ensure that we can set the position, latch, and speed values in the target.
     if (target.IsNull())
     {
-        target.SetNonNull(GenericTargetStruct{});
+        target.SetNonNull(GenericDimensionStateStruct{});
     }
 
     // If position field is present and Positioning(PS) feature is not supported, we should not set target.position value.
@@ -579,14 +579,14 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     VerifyOrReturnError(direction != StepDirectionEnum::kUnknownEnumValue, Status::ConstraintError);
     VerifyOrReturnError(numberOfSteps > 0, Status::ConstraintError);
 
-    DataModel::Nullable<GenericTargetStruct> stepTarget;
+    DataModel::Nullable<GenericDimensionStateStruct> stepTarget;
     VerifyOrReturnError(GetTarget(stepTarget) == CHIP_NO_ERROR, Status::Failure);
 
     if (stepTarget.IsNull())
     {
         // If stepTarget is null, we need to initialize to default value.
         // This is to ensure that we can set the position, latch, and speed values in the stepTarget.
-        stepTarget.SetNonNull(GenericTargetStruct{});
+        stepTarget.SetNonNull(GenericDimensionStateStruct{});
     }
 
     // If speed field is present and Speed feature is not supported, we should not set stepTarget.speed value.
