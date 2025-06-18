@@ -199,39 +199,14 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             logger.error(f"Snapshot capture is not supported: {e}")
             pass
 
-        self.step(6)
-        try:
-            await self.send_single_cmd(endpoint=endpoint, cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=aStreamID))
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
-
-        self.step(7)
-        aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
-        )
-        logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
-        asserts.assert_equal(len(aAllocatedSnapshotStreams), 0, "The number of allocated snapshot streams in the list is not 0.")
-
-        self.step(8)
-        try:
-            captureSnapshotResponse = await self.send_single_cmd(
-                cmd=commands.CaptureSnapshot(requestedResolution=aResolution), endpoint=endpoint)
-            asserts.assert_true(False, "Unexpected success when expecting NOT_FOUND due to 0 allocated snapshot streams")
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status, Status.NotFound, "Unexpected error returned when expecting NOT_FOUND due to 0 allocated snapshot streams"
-            )
-            pass
-
         if self.privacySupport:
-            self.step(9)
+            self.step(6)
             result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(True),
                                                        endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
             logger.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{True}")
 
-            self.step(10)
+            self.step(7)
             try:
                 await self.send_single_cmd(
                     cmd=commands.CaptureSnapshot(snapshotStreamID=aStreamID, requestedResolution=aResolution), endpoint=endpoint)
@@ -245,8 +220,33 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
                 pass
 
         else:
-            self.skip_step(9)
-            self.skip_step(10)
+            self.skip_step(6)
+            self.skip_step(7)
+
+        self.step(8)
+        try:
+            await self.send_single_cmd(endpoint=endpoint, cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=aStreamID))
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            pass
+
+        self.step(9)
+        aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
+        )
+        logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
+        asserts.assert_equal(len(aAllocatedSnapshotStreams), 0, "The number of allocated snapshot streams in the list is not 0.")
+
+        self.step(10)
+        try:
+            captureSnapshotResponse = await self.send_single_cmd(
+                cmd=commands.CaptureSnapshot(requestedResolution=aResolution), endpoint=endpoint)
+            asserts.assert_true(False, "Unexpected success when expecting NOT_FOUND due to 0 allocated snapshot streams")
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status, Status.NotFound, "Unexpected error returned when expecting NOT_FOUND due to 0 allocated snapshot streams"
+            )
+            pass
 
 
 if __name__ == "__main__":
