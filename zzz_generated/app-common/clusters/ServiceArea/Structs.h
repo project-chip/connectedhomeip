@@ -70,8 +70,8 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> locationInfo;
-    DataModel::Nullable<Structs::LandmarkInfoStruct::Type> landmarkInfo;
+    DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::DecodableType> locationInfo;
+    DataModel::Nullable<Structs::LandmarkInfoStruct::DecodableType> landmarkInfo;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -96,7 +96,7 @@ struct Type
 public:
     uint32_t areaID = static_cast<uint32_t>(0);
     DataModel::Nullable<uint32_t> mapID;
-    Structs::AreaInfoStruct::Type areaInfo;
+    Structs::AreaInfoStruct::DecodableType areaInfo;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

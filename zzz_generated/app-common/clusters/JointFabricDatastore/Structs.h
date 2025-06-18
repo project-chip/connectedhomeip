@@ -75,7 +75,7 @@ struct Type
 public:
     chip::NodeId nodeID    = static_cast<chip::NodeId>(0);
     uint16_t groupKeySetID = static_cast<uint16_t>(0);
-    Structs::DatastoreStatusEntryStruct::Type statusEntry;
+    Structs::DatastoreStatusEntryStruct::DecodableType statusEntry;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -100,7 +100,7 @@ struct Type
 public:
     chip::NodeId nodeID = static_cast<chip::NodeId>(0);
     chip::CharSpan friendlyName;
-    Structs::DatastoreStatusEntryStruct::Type commissioningStatusEntry;
+    Structs::DatastoreStatusEntryStruct::DecodableType commissioningStatusEntry;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -127,7 +127,7 @@ public:
     chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
     chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
     chip::GroupId groupID       = static_cast<chip::GroupId>(0);
-    Structs::DatastoreStatusEntryStruct::Type statusEntry;
+    Structs::DatastoreStatusEntryStruct::DecodableType statusEntry;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -154,7 +154,7 @@ public:
     chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
     chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
     chip::CharSpan friendlyName;
-    Structs::DatastoreStatusEntryStruct::Type statusEntry;
+    Structs::DatastoreStatusEntryStruct::DecodableType statusEntry;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -209,8 +209,8 @@ public:
     chip::NodeId nodeID         = static_cast<chip::NodeId>(0);
     chip::EndpointId endpointID = static_cast<chip::EndpointId>(0);
     uint16_t listID             = static_cast<uint16_t>(0);
-    Structs::DatastoreBindingTargetStruct::Type binding;
-    Structs::DatastoreStatusEntryStruct::Type statusEntry;
+    Structs::DatastoreBindingTargetStruct::DecodableType binding;
+    Structs::DatastoreStatusEntryStruct::DecodableType statusEntry;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -261,26 +261,17 @@ struct Type
 public:
     DatastoreAccessControlEntryPrivilegeEnum privilege = static_cast<DatastoreAccessControlEntryPrivilegeEnum>(0);
     DatastoreAccessControlEntryAuthModeEnum authMode   = static_cast<DatastoreAccessControlEntryAuthModeEnum>(0);
-    DataModel::Nullable<DataModel::List<const uint64_t>> subjects;
-    DataModel::Nullable<DataModel::List<const Structs::DatastoreAccessControlTargetStruct::Type>> targets;
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    DatastoreAccessControlEntryPrivilegeEnum privilege = static_cast<DatastoreAccessControlEntryPrivilegeEnum>(0);
-    DatastoreAccessControlEntryAuthModeEnum authMode   = static_cast<DatastoreAccessControlEntryAuthModeEnum>(0);
     DataModel::Nullable<DataModel::DecodableList<uint64_t>> subjects;
     DataModel::Nullable<DataModel::DecodableList<Structs::DatastoreAccessControlTargetStruct::DecodableType>> targets;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace DatastoreAccessControlEntryStruct
 namespace DatastoreACLEntryStruct {
@@ -297,26 +288,17 @@ struct Type
 public:
     chip::NodeId nodeID = static_cast<chip::NodeId>(0);
     uint16_t listID     = static_cast<uint16_t>(0);
-    Structs::DatastoreAccessControlEntryStruct::Type ACLEntry;
-    Structs::DatastoreStatusEntryStruct::Type statusEntry;
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    chip::NodeId nodeID = static_cast<chip::NodeId>(0);
-    uint16_t listID     = static_cast<uint16_t>(0);
     Structs::DatastoreAccessControlEntryStruct::DecodableType ACLEntry;
     Structs::DatastoreStatusEntryStruct::DecodableType statusEntry;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace DatastoreACLEntryStruct
 namespace DatastoreAdministratorInformationEntryStruct {

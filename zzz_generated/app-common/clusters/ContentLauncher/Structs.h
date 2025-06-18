@@ -74,25 +74,17 @@ struct Type
 {
 public:
     chip::CharSpan languageCode;
-    Optional<DataModel::List<const CharacteristicEnum>> characteristics;
-    uint8_t audioOutputIndex = static_cast<uint8_t>(0);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    chip::CharSpan languageCode;
     Optional<DataModel::DecodableList<CharacteristicEnum>> characteristics;
     uint8_t audioOutputIndex = static_cast<uint8_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace TrackPreferenceStruct
 namespace PlaybackPreferencesStruct {
@@ -107,25 +99,17 @@ struct Type
 {
 public:
     uint64_t playbackPosition = static_cast<uint64_t>(0);
-    Structs::TrackPreferenceStruct::Type textTrack;
-    Optional<DataModel::List<const Structs::TrackPreferenceStruct::Type>> audioTracks;
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    uint64_t playbackPosition = static_cast<uint64_t>(0);
     Structs::TrackPreferenceStruct::DecodableType textTrack;
     Optional<DataModel::DecodableList<Structs::TrackPreferenceStruct::DecodableType>> audioTracks;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace PlaybackPreferencesStruct
 namespace AdditionalInfoStruct {
@@ -164,24 +148,16 @@ struct Type
 public:
     ParameterEnum type = static_cast<ParameterEnum>(0);
     chip::CharSpan value;
-    Optional<DataModel::List<const Structs::AdditionalInfoStruct::Type>> externalIDList;
+    Optional<DataModel::DecodableList<Structs::AdditionalInfoStruct::DecodableType>> externalIDList;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
-struct DecodableType
-{
-public:
-    ParameterEnum type = static_cast<ParameterEnum>(0);
-    chip::CharSpan value;
-    Optional<DataModel::DecodableList<Structs::AdditionalInfoStruct::DecodableType>> externalIDList;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-};
+using DecodableType = Type;
 
 } // namespace ParameterStruct
 namespace ContentSearchStruct {
@@ -193,22 +169,16 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    DataModel::List<const Structs::ParameterStruct::Type> parameterList;
+    DataModel::DecodableList<Structs::ParameterStruct::DecodableType> parameterList;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
-struct DecodableType
-{
-public:
-    DataModel::DecodableList<Structs::ParameterStruct::DecodableType> parameterList;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-};
+using DecodableType = Type;
 
 } // namespace ContentSearchStruct
 namespace StyleInformationStruct {
@@ -224,7 +194,7 @@ struct Type
 public:
     Optional<chip::CharSpan> imageURL;
     Optional<chip::CharSpan> color;
-    Optional<Structs::DimensionStruct::Type> size;
+    Optional<Structs::DimensionStruct::DecodableType> size;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -251,11 +221,11 @@ struct Type
 {
 public:
     chip::CharSpan providerName;
-    Optional<Structs::StyleInformationStruct::Type> background;
-    Optional<Structs::StyleInformationStruct::Type> logo;
-    Optional<Structs::StyleInformationStruct::Type> progressBar;
-    Optional<Structs::StyleInformationStruct::Type> splash;
-    Optional<Structs::StyleInformationStruct::Type> waterMark;
+    Optional<Structs::StyleInformationStruct::DecodableType> background;
+    Optional<Structs::StyleInformationStruct::DecodableType> logo;
+    Optional<Structs::StyleInformationStruct::DecodableType> progressBar;
+    Optional<Structs::StyleInformationStruct::DecodableType> splash;
+    Optional<Structs::StyleInformationStruct::DecodableType> waterMark;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

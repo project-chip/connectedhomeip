@@ -101,24 +101,17 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    DataModel::Nullable<DataModel::List<const Structs::PowerAdjustStruct::Type>> powerAdjustCapability;
-    PowerAdjustReasonEnum cause = static_cast<PowerAdjustReasonEnum>(0);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
     DataModel::Nullable<DataModel::DecodableList<Structs::PowerAdjustStruct::DecodableType>> powerAdjustCapability;
     PowerAdjustReasonEnum cause = static_cast<PowerAdjustReasonEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace PowerAdjustCapabilityStruct
 namespace SlotStruct {
@@ -160,33 +153,6 @@ public:
     Optional<int64_t> minPower;
     Optional<int64_t> maxPower;
     Optional<int64_t> nominalEnergy;
-    Optional<DataModel::List<const Structs::CostStruct::Type>> costs;
-    Optional<int64_t> minPowerAdjustment;
-    Optional<int64_t> maxPowerAdjustment;
-    Optional<uint32_t> minDurationAdjustment;
-    Optional<uint32_t> maxDurationAdjustment;
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    uint32_t minDuration       = static_cast<uint32_t>(0);
-    uint32_t maxDuration       = static_cast<uint32_t>(0);
-    uint32_t defaultDuration   = static_cast<uint32_t>(0);
-    uint32_t elapsedSlotTime   = static_cast<uint32_t>(0);
-    uint32_t remainingSlotTime = static_cast<uint32_t>(0);
-    Optional<bool> slotIsPausable;
-    Optional<uint32_t> minPauseDuration;
-    Optional<uint32_t> maxPauseDuration;
-    Optional<uint16_t> manufacturerESAState;
-    Optional<int64_t> nominalPower;
-    Optional<int64_t> minPower;
-    Optional<int64_t> maxPower;
-    Optional<int64_t> nominalEnergy;
     Optional<DataModel::DecodableList<Structs::CostStruct::DecodableType>> costs;
     Optional<int64_t> minPowerAdjustment;
     Optional<int64_t> maxPowerAdjustment;
@@ -196,7 +162,11 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace SlotStruct
 namespace ForecastStruct {
@@ -223,31 +193,17 @@ public:
     Optional<DataModel::Nullable<uint32_t>> earliestStartTime;
     Optional<uint32_t> latestEndTime;
     bool isPausable = static_cast<bool>(0);
-    DataModel::List<const Structs::SlotStruct::Type> slots;
-    ForecastUpdateReasonEnum forecastUpdateReason = static_cast<ForecastUpdateReasonEnum>(0);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    uint32_t forecastID = static_cast<uint32_t>(0);
-    DataModel::Nullable<uint16_t> activeSlotNumber;
-    uint32_t startTime = static_cast<uint32_t>(0);
-    uint32_t endTime   = static_cast<uint32_t>(0);
-    Optional<DataModel::Nullable<uint32_t>> earliestStartTime;
-    Optional<uint32_t> latestEndTime;
-    bool isPausable = static_cast<bool>(0);
     DataModel::DecodableList<Structs::SlotStruct::DecodableType> slots;
     ForecastUpdateReasonEnum forecastUpdateReason = static_cast<ForecastUpdateReasonEnum>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace ForecastStruct
 namespace ConstraintsStruct {

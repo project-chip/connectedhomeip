@@ -73,23 +73,16 @@ struct Type
 {
 public:
     chip::BitMask<TargetDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<TargetDayOfWeekBitmap>>(0);
-    DataModel::List<const Structs::ChargingTargetStruct::Type> chargingTargets;
+    DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> chargingTargets;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
-struct DecodableType
-{
-public:
-    chip::BitMask<TargetDayOfWeekBitmap> dayOfWeekForSequence = static_cast<chip::BitMask<TargetDayOfWeekBitmap>>(0);
-    DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> chargingTargets;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-};
+using DecodableType = Type;
 
 } // namespace ChargingTargetScheduleStruct
 } // namespace Structs

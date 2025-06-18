@@ -73,24 +73,16 @@ struct Type
 public:
     chip::EndpointId endpoint = static_cast<chip::EndpointId>(0);
     chip::ClusterId cluster   = static_cast<chip::ClusterId>(0);
-    DataModel::List<const Structs::AccessRestrictionStruct::Type> restrictions;
+    DataModel::DecodableList<Structs::AccessRestrictionStruct::DecodableType> restrictions;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
-struct DecodableType
-{
-public:
-    chip::EndpointId endpoint = static_cast<chip::EndpointId>(0);
-    chip::ClusterId cluster   = static_cast<chip::ClusterId>(0);
-    DataModel::DecodableList<Structs::AccessRestrictionStruct::DecodableType> restrictions;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-};
+using DecodableType = Type;
 
 } // namespace CommissioningAccessRestrictionEntryStruct
 namespace AccessRestrictionEntryStruct {
@@ -107,8 +99,10 @@ struct Type
 public:
     chip::EndpointId endpoint = static_cast<chip::EndpointId>(0);
     chip::ClusterId cluster   = static_cast<chip::ClusterId>(0);
-    DataModel::List<const Structs::AccessRestrictionStruct::Type> restrictions;
+    DataModel::DecodableList<Structs::AccessRestrictionStruct::DecodableType> restrictions;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = true;
 
@@ -123,22 +117,7 @@ private:
     CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
 };
 
-struct DecodableType
-{
-public:
-    chip::EndpointId endpoint = static_cast<chip::EndpointId>(0);
-    chip::ClusterId cluster   = static_cast<chip::ClusterId>(0);
-    DataModel::DecodableList<Structs::AccessRestrictionStruct::DecodableType> restrictions;
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = true;
-
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-};
+using DecodableType = Type;
 
 } // namespace AccessRestrictionEntryStruct
 namespace AccessControlTargetStruct {
@@ -181,9 +160,11 @@ struct Type
 public:
     AccessControlEntryPrivilegeEnum privilege = static_cast<AccessControlEntryPrivilegeEnum>(0);
     AccessControlEntryAuthModeEnum authMode   = static_cast<AccessControlEntryAuthModeEnum>(0);
-    DataModel::Nullable<DataModel::List<const uint64_t>> subjects;
-    DataModel::Nullable<DataModel::List<const Structs::AccessControlTargetStruct::Type>> targets;
+    DataModel::Nullable<DataModel::DecodableList<uint64_t>> subjects;
+    DataModel::Nullable<DataModel::DecodableList<Structs::AccessControlTargetStruct::DecodableType>> targets;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = true;
 
@@ -198,23 +179,7 @@ private:
     CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
 };
 
-struct DecodableType
-{
-public:
-    AccessControlEntryPrivilegeEnum privilege = static_cast<AccessControlEntryPrivilegeEnum>(0);
-    AccessControlEntryAuthModeEnum authMode   = static_cast<AccessControlEntryAuthModeEnum>(0);
-    DataModel::Nullable<DataModel::DecodableList<uint64_t>> subjects;
-    DataModel::Nullable<DataModel::DecodableList<Structs::AccessControlTargetStruct::DecodableType>> targets;
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = true;
-
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-};
+using DecodableType = Type;
 
 } // namespace AccessControlEntryStruct
 namespace AccessControlExtensionStruct {

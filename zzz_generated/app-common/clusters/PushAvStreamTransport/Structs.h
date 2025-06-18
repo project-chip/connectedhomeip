@@ -101,20 +101,6 @@ struct Type
 {
 public:
     TransportTriggerTypeEnum triggerType = static_cast<TransportTriggerTypeEnum>(0);
-    Optional<DataModel::Nullable<DataModel::List<const Structs::TransportZoneOptionsStruct::Type>>> motionZones;
-    Optional<DataModel::Nullable<uint8_t>> motionSensitivity;
-    Optional<Structs::TransportMotionTriggerTimeControlStruct::Type> motionTimeControl;
-    Optional<uint16_t> maxPreRollLen;
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    TransportTriggerTypeEnum triggerType = static_cast<TransportTriggerTypeEnum>(0);
     Optional<DataModel::Nullable<DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType>>> motionZones;
     Optional<DataModel::Nullable<uint8_t>> motionSensitivity;
     Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> motionTimeControl;
@@ -123,7 +109,11 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace TransportTriggerOptionsStruct
 namespace CMAFContainerOptionsStruct {
@@ -164,7 +154,7 @@ struct Type
 {
 public:
     ContainerFormatEnum containerType = static_cast<ContainerFormatEnum>(0);
-    Optional<Structs::CMAFContainerOptionsStruct::Type> CMAFContainerOptions;
+    Optional<Structs::CMAFContainerOptionsStruct::DecodableType> CMAFContainerOptions;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -198,24 +188,6 @@ public:
     Optional<DataModel::Nullable<uint16_t>> audioStreamID;
     uint16_t endpointID = static_cast<uint16_t>(0);
     chip::CharSpan url;
-    Structs::TransportTriggerOptionsStruct::Type triggerOptions;
-    IngestMethodsEnum ingestMethod = static_cast<IngestMethodsEnum>(0);
-    Structs::ContainerOptionsStruct::Type containerOptions;
-    Optional<uint32_t> expiryTime;
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    Globals::StreamUsageEnum streamUsage = static_cast<Globals::StreamUsageEnum>(0);
-    Optional<DataModel::Nullable<uint16_t>> videoStreamID;
-    Optional<DataModel::Nullable<uint16_t>> audioStreamID;
-    uint16_t endpointID = static_cast<uint16_t>(0);
-    chip::CharSpan url;
     Structs::TransportTriggerOptionsStruct::DecodableType triggerOptions;
     IngestMethodsEnum ingestMethod = static_cast<IngestMethodsEnum>(0);
     Structs::ContainerOptionsStruct::DecodableType containerOptions;
@@ -224,7 +196,11 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace TransportOptionsStruct
 namespace TransportConfigurationStruct {
@@ -241,8 +217,10 @@ struct Type
 public:
     uint16_t connectionID               = static_cast<uint16_t>(0);
     TransportStatusEnum transportStatus = static_cast<TransportStatusEnum>(0);
-    Optional<Structs::TransportOptionsStruct::Type> transportOptions;
+    Optional<Structs::TransportOptionsStruct::DecodableType> transportOptions;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = true;
 
@@ -257,22 +235,7 @@ private:
     CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
 };
 
-struct DecodableType
-{
-public:
-    uint16_t connectionID               = static_cast<uint16_t>(0);
-    TransportStatusEnum transportStatus = static_cast<TransportStatusEnum>(0);
-    Optional<Structs::TransportOptionsStruct::DecodableType> transportOptions;
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = true;
-
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-};
+using DecodableType = Type;
 
 } // namespace TransportConfigurationStruct
 namespace SupportedFormatStruct {

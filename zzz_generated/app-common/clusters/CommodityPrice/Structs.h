@@ -83,27 +83,16 @@ public:
     Optional<int64_t> price;
     Optional<int16_t> priceLevel;
     Optional<chip::CharSpan> description;
-    Optional<DataModel::List<const Structs::CommodityPriceComponentStruct::Type>> components;
+    Optional<DataModel::DecodableList<Structs::CommodityPriceComponentStruct::DecodableType>> components;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
-struct DecodableType
-{
-public:
-    uint32_t periodStart = static_cast<uint32_t>(0);
-    DataModel::Nullable<uint32_t> periodEnd;
-    Optional<int64_t> price;
-    Optional<int16_t> priceLevel;
-    Optional<chip::CharSpan> description;
-    Optional<DataModel::DecodableList<Structs::CommodityPriceComponentStruct::DecodableType>> components;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-};
+using DecodableType = Type;
 
 } // namespace CommodityPriceStruct
 } // namespace Structs

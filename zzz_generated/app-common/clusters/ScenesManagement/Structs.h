@@ -85,23 +85,16 @@ struct Type
 {
 public:
     chip::ClusterId clusterID = static_cast<chip::ClusterId>(0);
-    DataModel::List<const Structs::AttributeValuePairStruct::Type> attributeValueList;
+    DataModel::DecodableList<Structs::AttributeValuePairStruct::DecodableType> attributeValueList;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
-struct DecodableType
-{
-public:
-    chip::ClusterId clusterID = static_cast<chip::ClusterId>(0);
-    DataModel::DecodableList<Structs::AttributeValuePairStruct::DecodableType> attributeValueList;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-};
+using DecodableType = Type;
 
 } // namespace ExtensionFieldSetStruct
 namespace SceneInfoStruct {

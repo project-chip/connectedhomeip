@@ -73,24 +73,16 @@ struct Type
 public:
     chip::CharSpan label;
     uint8_t mode = static_cast<uint8_t>(0);
-    DataModel::List<const Structs::SemanticTagStruct::Type> semanticTags;
+    DataModel::DecodableList<Structs::SemanticTagStruct::DecodableType> semanticTags;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
-struct DecodableType
-{
-public:
-    chip::CharSpan label;
-    uint8_t mode = static_cast<uint8_t>(0);
-    DataModel::DecodableList<Structs::SemanticTagStruct::DecodableType> semanticTags;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-};
+using DecodableType = Type;
 
 } // namespace ModeOptionStruct
 } // namespace Structs

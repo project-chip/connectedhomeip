@@ -83,25 +83,16 @@ public:
     uint16_t endpointListID = static_cast<uint16_t>(0);
     chip::CharSpan name;
     EndpointListTypeEnum type = static_cast<EndpointListTypeEnum>(0);
-    DataModel::List<const chip::EndpointId> endpoints;
+    DataModel::DecodableList<chip::EndpointId> endpoints;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
-struct DecodableType
-{
-public:
-    uint16_t endpointListID = static_cast<uint16_t>(0);
-    chip::CharSpan name;
-    EndpointListTypeEnum type = static_cast<EndpointListTypeEnum>(0);
-    DataModel::DecodableList<chip::EndpointId> endpoints;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-};
+using DecodableType = Type;
 
 } // namespace EndpointListStruct
 } // namespace Structs

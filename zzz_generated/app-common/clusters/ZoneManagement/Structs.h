@@ -74,26 +74,17 @@ struct Type
 public:
     chip::CharSpan name;
     ZoneUseEnum use = static_cast<ZoneUseEnum>(0);
-    DataModel::List<const Structs::TwoDCartesianVertexStruct::Type> vertices;
-    Optional<chip::CharSpan> color;
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    chip::CharSpan name;
-    ZoneUseEnum use = static_cast<ZoneUseEnum>(0);
     DataModel::DecodableList<Structs::TwoDCartesianVertexStruct::DecodableType> vertices;
     Optional<chip::CharSpan> color;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace TwoDCartesianZoneStruct
 namespace ZoneInformationStruct {

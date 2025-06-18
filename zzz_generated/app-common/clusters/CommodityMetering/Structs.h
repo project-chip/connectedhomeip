@@ -47,24 +47,17 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    DataModel::List<const uint32_t> tariffComponentIDs;
-    int64_t quantity = static_cast<int64_t>(0);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
     DataModel::DecodableList<uint32_t> tariffComponentIDs;
     int64_t quantity = static_cast<int64_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace MeteredQuantityStruct
 } // namespace Structs

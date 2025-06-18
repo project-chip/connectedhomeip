@@ -87,8 +87,8 @@ public:
     VideoCodecEnum videoCodec            = static_cast<VideoCodecEnum>(0);
     uint16_t minFrameRate                = static_cast<uint16_t>(0);
     uint16_t maxFrameRate                = static_cast<uint16_t>(0);
-    Structs::VideoResolutionStruct::Type minResolution;
-    Structs::VideoResolutionStruct::Type maxResolution;
+    Structs::VideoResolutionStruct::DecodableType minResolution;
+    Structs::VideoResolutionStruct::DecodableType maxResolution;
     uint32_t minBitRate          = static_cast<uint32_t>(0);
     uint32_t maxBitRate          = static_cast<uint32_t>(0);
     uint16_t minKeyFrameInterval = static_cast<uint16_t>(0);
@@ -129,8 +129,8 @@ public:
     uint16_t snapshotStreamID = static_cast<uint16_t>(0);
     ImageCodecEnum imageCodec = static_cast<ImageCodecEnum>(0);
     uint16_t frameRate        = static_cast<uint16_t>(0);
-    Structs::VideoResolutionStruct::Type minResolution;
-    Structs::VideoResolutionStruct::Type maxResolution;
+    Structs::VideoResolutionStruct::DecodableType minResolution;
+    Structs::VideoResolutionStruct::DecodableType maxResolution;
     uint8_t quality        = static_cast<uint8_t>(0);
     uint8_t referenceCount = static_cast<uint8_t>(0);
     bool encodedPixels     = static_cast<bool>(0);
@@ -161,7 +161,7 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    Structs::VideoResolutionStruct::Type resolution;
+    Structs::VideoResolutionStruct::DecodableType resolution;
     uint16_t maxFrameRate      = static_cast<uint16_t>(0);
     ImageCodecEnum imageCodec  = static_cast<ImageCodecEnum>(0);
     bool requiresEncodedPixels = static_cast<bool>(0);
@@ -189,7 +189,7 @@ struct Type
 {
 public:
     VideoCodecEnum codec = static_cast<VideoCodecEnum>(0);
-    Structs::VideoResolutionStruct::Type resolution;
+    Structs::VideoResolutionStruct::DecodableType resolution;
     uint32_t minBitRate = static_cast<uint32_t>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -215,19 +215,6 @@ struct Type
 {
 public:
     uint8_t maxNumberOfChannels = static_cast<uint8_t>(0);
-    DataModel::List<const AudioCodecEnum> supportedCodecs;
-    DataModel::List<const uint32_t> supportedSampleRates;
-    DataModel::List<const uint8_t> supportedBitDepths;
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    uint8_t maxNumberOfChannels = static_cast<uint8_t>(0);
     DataModel::DecodableList<AudioCodecEnum> supportedCodecs;
     DataModel::DecodableList<uint32_t> supportedSampleRates;
     DataModel::DecodableList<uint8_t> supportedBitDepths;
@@ -235,7 +222,11 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace AudioCapabilitiesStruct
 namespace AudioStreamStruct {

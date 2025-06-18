@@ -48,7 +48,7 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    Structs::ApplicationStruct::Type application;
+    Structs::ApplicationStruct::DecodableType application;
     Optional<chip::EndpointId> endpoint;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

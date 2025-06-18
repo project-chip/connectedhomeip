@@ -50,9 +50,11 @@ struct Type
 {
 public:
     chip::GroupId groupId = static_cast<chip::GroupId>(0);
-    DataModel::List<const chip::EndpointId> endpoints;
+    DataModel::DecodableList<chip::EndpointId> endpoints;
     Optional<chip::CharSpan> groupName;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = true;
 
@@ -67,22 +69,7 @@ private:
     CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
 };
 
-struct DecodableType
-{
-public:
-    chip::GroupId groupId = static_cast<chip::GroupId>(0);
-    DataModel::DecodableList<chip::EndpointId> endpoints;
-    Optional<chip::CharSpan> groupName;
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = true;
-
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-};
+using DecodableType = Type;
 
 } // namespace GroupInfoMapStruct
 namespace GroupKeyMapStruct {
