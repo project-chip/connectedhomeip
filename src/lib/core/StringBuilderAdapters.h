@@ -43,7 +43,7 @@
 
 #include <chrono>
 
-#include <pw_string/string_builder.h>
+#include "pw_string/string_builder.h"
 #include <pw_unit_test/framework.h>
 
 #include <lib/core/CHIPError.h>

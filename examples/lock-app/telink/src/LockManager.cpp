@@ -24,6 +24,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <cstring>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/StringBuilder.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
@@ -496,9 +497,9 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
 
     ChipLogProgress(Zcl,
                     "Found occupied user "
-                    "[endpoint=%d,name=\"%.*s\",credentialsCount=%u,uniqueId=%x,type=%u,credentialRule=%u,"
+                    "[endpoint=%d,name=\"%s\",credentialsCount=%u,uniqueId=%x,type=%u,credentialRule=%u,"
                     "createdBy=%d,lastModifiedBy=%d]",
-                    endpointId, static_cast<int>(user.userName.size()), user.userName.data(), user.credentials.size(),
+                    endpointId, ChipLogFormat(100, "%.*s", static_cast<int>(user.userName.size()), user.userName.data()), user.credentials.size(),
                     user.userUniqueId, to_underlying(user.userType), to_underlying(user.credentialRule), user.createdBy,
                     user.lastModifiedBy);
     return true;

@@ -23,6 +23,7 @@
 #include <cstring>
 #include <esp_log.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/StringBuilder.h>
 
 BoltLockManager BoltLockManager::sLock;
 
@@ -378,9 +379,9 @@ bool BoltLockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, E
     user.lastModifiedBy     = userInDb.lastModifiedBy;
 
     ESP_LOGI(TAG,
-             "Found occupied user [endpoint=%d,name=\"%.*s\",credentialsCount=%u,uniqueId=%" PRIu32
+             "Found occupied user [endpoint=%d,name=\"%s\",credentialsCount=%u,uniqueId=%" PRIu32
              ",type=%u,credentialRule=%u,createdBy=%d,lastModifiedBy=%d]",
-             endpointId, static_cast<int>(user.userName.size()), user.userName.data(), user.credentials.size(), user.userUniqueId,
+             endpointId, ChipLogFormat(100, "%.*s", static_cast<int>(user.userName.size()), user.userName.data()), user.credentials.size(), user.userUniqueId,
              to_underlying(user.userType), to_underlying(user.credentialRule), user.createdBy, user.lastModifiedBy);
 
     return true;

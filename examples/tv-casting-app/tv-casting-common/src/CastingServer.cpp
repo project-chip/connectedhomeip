@@ -21,6 +21,7 @@
 
 #include "app/clusters/bindings/BindingManager.h"
 #include <app/server/Dnssd.h>
+#include <lib/support/StringBuilder.h>
 
 using namespace chip;
 using namespace chip::Controller;
@@ -374,8 +375,8 @@ CHIP_ERROR CastingServer::ReadMACAddress(TargetEndpointInfo * endpoint)
                 if (response.data() != nullptr && response.size() > 0)
                 {
                     videoPlayerInfo->SetMACAddress(response);
-                    ChipLogProgress(AppServer, "Updating cache of VideoPlayers with MACAddress: %.*s",
-                                    static_cast<int>(response.size()), response.data());
+                    ChipLogProgress(AppServer, "Updating cache of VideoPlayers with MACAddress: %s",
+                                    ChipLogFormat(100, "%.*s", static_cast<int>(response.size()), response.data()));
                     CHIP_ERROR error = CastingServer::GetInstance()->mPersistenceManager.AddVideoPlayer(videoPlayerInfo);
                     if (error != CHIP_NO_ERROR)
                     {

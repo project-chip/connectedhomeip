@@ -157,7 +157,7 @@ CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
 
     wifiConfig.security = WFX_SEC_WPA2;
 
-    ChipLogProgress(NetworkProvisioning, "Setting up connection for WiFi SSID: %.*s", static_cast<int>(ssidLen), ssid);
+    ChipLogProgress(NetworkProvisioning, "Setting up connection for WiFi SSID: %s", ChipLogFormat(100, "%.*s", static_cast<int>(ssidLen), ssid));
     // Configure the WFX WiFi interface.
     WifiInterface::GetInstance().SetWifiCredentials(wifiConfig);
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));

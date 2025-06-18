@@ -36,6 +36,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/StringBuilder.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -557,9 +558,9 @@ void DoorLockServer::getUserCommandHandler(chip::app::CommandHandler * commandOb
     {
         ChipLogProgress(Zcl,
                         "Found user in storage: "
-                        "[userIndex=%d,userName=\"%.*s\",userStatus=%u,userType=%u"
+                        "[userIndex=%d,userName=\"%s\",userStatus=%u,userType=%u"
                         ",credentialRule=%u,createdBy=%u,modifiedBy=%u]",
-                        userIndex, static_cast<int>(user.userName.size()), user.userName.data(), to_underlying(user.userStatus),
+                        userIndex, ChipLogFormat(100, "%.*s", static_cast<int>(user.userName.size()), user.userName.data()), to_underlying(user.userStatus),
                         to_underlying(user.userType), to_underlying(user.credentialRule), user.createdBy, user.lastModifiedBy);
 
         response.userName.SetNonNull(user.userName);
@@ -1996,9 +1997,9 @@ ClusterStatusCode DoorLockServer::createUser(chip::EndpointId endpointId, chip::
     {
         ChipLogProgress(Zcl,
                         "[createUser] Unable to create user: app error "
-                        "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%.*s\",userUniqueId=0x%" PRIx32 ",userStatus=%u,"
+                        "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%u,"
                         "userType=%u,credentialRule=%u,totalCredentials=%u]",
-                        endpointId, creatorFabricIdx, userIndex, static_cast<int>(newUserName.size()), newUserName.data(),
+                        endpointId, creatorFabricIdx, userIndex, ChipLogFormat(100, "%.*s", static_cast<int>(newUserName.size()), newUserName.data()),
                         newUserUniqueId, to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule),
                         static_cast<unsigned int>(newTotalCredentials));
         return ClusterStatusCode(Status::Failure);
@@ -2006,9 +2007,9 @@ ClusterStatusCode DoorLockServer::createUser(chip::EndpointId endpointId, chip::
 
     ChipLogProgress(Zcl,
                     "[createUser] User created "
-                    "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%.*s\",userUniqueId=0x%" PRIx32 ",userStatus=%u,"
+                    "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%u,"
                     "userType=%u,credentialRule=%u,totalCredentials=%u]",
-                    endpointId, creatorFabricIdx, userIndex, static_cast<int>(newUserName.size()), newUserName.data(),
+                    endpointId, creatorFabricIdx, userIndex, ChipLogFormat(100, "%.*s", static_cast<int>(newUserName.size()), newUserName.data()),
                     newUserUniqueId, to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule),
                     static_cast<unsigned int>(newTotalCredentials));
 
@@ -2070,18 +2071,18 @@ Status DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::FabricIndex
     {
         ChipLogError(Zcl,
                      "[modifyUser] Unable to modify the user: app error "
-                     "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%.*s\",userUniqueId=0x%" PRIx32 ",userStatus=%u"
+                     "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%u"
                      ",userType=%u,credentialRule=%u]",
-                     endpointId, modifierFabricIndex, userIndex, static_cast<int>(newUserName.size()), newUserName.data(),
+                     endpointId, modifierFabricIndex, userIndex, ChipLogFormat(100, "%.*s", static_cast<int>(newUserName.size()), newUserName.data()),
                      newUserUniqueId, to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule));
         return Status::Failure;
     }
 
     ChipLogProgress(Zcl,
                     "[modifyUser] User modified "
-                    "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%.*s\",userUniqueId=0x%" PRIx32
+                    "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32
                     ",userStatus=%u,userType=%u,credentialRule=%u]",
-                    endpointId, modifierFabricIndex, userIndex, static_cast<int>(newUserName.size()), newUserName.data(),
+                    endpointId, modifierFabricIndex, userIndex, ChipLogFormat(100, "%.*s", static_cast<int>(newUserName.size()), newUserName.data()),
                     newUserUniqueId, to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule));
 
     sendRemoteLockUserChange(endpointId, LockDataTypeEnum::kUserIndex, DataOperationTypeEnum::kModify, sourceNodeId,

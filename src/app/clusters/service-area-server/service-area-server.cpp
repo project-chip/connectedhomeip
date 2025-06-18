@@ -34,6 +34,7 @@
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/StringBuilder.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using Status = chip::Protocols::InteractionModel::Status;
@@ -833,8 +834,8 @@ bool Instance::AddSupportedMap(uint32_t aMapId, const CharSpan & aMapName)
         // the name cannot be the same as an existing map
         if (entry.IsNameEqual(aMapName))
         {
-            ChipLogError(Zcl, "AddSupportedMapRaw %" PRIu32 " - A map already exists with same name '%.*s'", aMapId,
-                         static_cast<int>(entry.GetName().size()), entry.GetName().data());
+            ChipLogError(Zcl, "AddSupportedMapRaw %" PRIu32 " - A map already exists with same name '%s'", aMapId,
+                         ChipLogFormat(100, "%.*s", static_cast<int>(entry.GetName().size()), entry.GetName().data()));
             return false;
         }
 
@@ -1023,8 +1024,8 @@ bool Instance::AddSelectedArea(uint32_t & aSelectedArea)
 
     if (!mDelegate->IsSetSelectedAreasAllowed(locationStatusText))
     {
-        ChipLogError(Zcl, "AddSelectedAreaRaw %" PRIu32 " - %.*s", aSelectedArea, static_cast<int>(locationStatusText.size()),
-                     locationStatusText.data());
+        ChipLogError(Zcl, "AddSelectedAreaRaw %" PRIu32 " - %s", aSelectedArea, ChipLogFormat(100, "%.*s", static_cast<int>(locationStatusText.size()),
+                     locationStatusText.data()));
         return false;
     }
 
