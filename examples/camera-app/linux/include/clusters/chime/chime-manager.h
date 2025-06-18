@@ -19,9 +19,11 @@
 #pragma once
 #include <app/clusters/chime-server/chime-server.h>
 
-namespace Camera {
+namespace chip {
+namespace app {
+namespace Clusters {
 
-class ChimeManager : public chip::app::Clusters::ChimeDelegate
+class ChimeManager : public ChimeDelegate
 {
 
 public:
@@ -41,4 +43,6 @@ private:
     };
 };
 
-} // namespace Camera
+} // namespace Clusters
+} // namespace app
+} // namespace chip

@@ -283,9 +283,8 @@ private:
     CameraError SetV4l2Control(uint32_t controlId, int value);
 
     // Various cluster server delegates
-    ChimeManager mChimeManager;
-    WebRTCProviderManager mWebRTCProviderManager;
-
+    chip::app::Clusters::ChimeManager mChimeManager;
+    chip::app::Clusters::WebRTCTransportProvider::WebRTCProviderManager mWebRTCProviderManager;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager mCameraAVStreamManager;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAVSettingsUserLevelManager mCameraAVSettingsUserLevelManager;
 
