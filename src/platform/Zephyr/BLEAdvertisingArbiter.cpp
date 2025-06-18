@@ -32,7 +32,7 @@ namespace {
 sys_slist_t sRequests;
 
 bool sIsInitialized    = false;
-bool sWasDisconnection = false;
+bool sWasDisconnection = false; // Tracks if a recent disconnection might require an advertising restart.
 uint8_t sBtId          = 0;
 
 // Cast an intrusive list node to the containing request object
@@ -94,7 +94,12 @@ BT_CONN_CB_DEFINE(conn_callbacks) = {
                         // Starting from Zephyr 4.0 Automatic advertiser resumption is deprecated,
                         // so the BLE Advertising Arbiter has to take over the responsibility of restarting the advertiser.
                         // Restart advertising in this callback if there are pending requests after the connection is released.
-                        RestartAdvertising();
+                        CHIP_ERROR advRestartErr = RestartAdvertising();
+                        if (advRestartErr != CHIP_NO_ERROR)
+                        {
+                            ChipLogError(DeviceLayer, "BLE advertising restart failed: %" CHIP_ERROR_FORMAT,
+                                         advRestartErr.Format());
+                        }
                     }
                 });
                 // Reset the disconnection flag to avoid restarting advertising multiple times
