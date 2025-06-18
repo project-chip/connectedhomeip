@@ -31,9 +31,13 @@ namespace {
 // List of advertising requests ordered by priority
 sys_slist_t sRequests;
 
-bool sIsInitialized    = false;
+bool sIsInitialized = false;
+uint8_t sBtId       = 0;
+
+// TODO: Remove this if when all vendors have updated to Zephyr 3.6 or later.
+#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
 bool sWasDisconnection = false; // Tracks if a recent disconnection might require an advertising restart.
-uint8_t sBtId          = 0;
+#endif                          // CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
 
 // Cast an intrusive list node to the containing request object
 const BLEAdvertisingArbiter::Request & ToRequest(const sys_snode_t * node)
@@ -80,6 +84,10 @@ CHIP_ERROR RestartAdvertising()
     return System::MapErrorZephyr(result);
 }
 
+// In nrfconnect we must use the recycled callback to restart advertising after a disconnection.
+// The callback is available since Zephyr 3.6.
+// TODO: Remove this if when all vendors have updated to Zephyr 3.6 or later.
+#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
 BT_CONN_CB_DEFINE(conn_callbacks) = {
     .disconnected = [](struct bt_conn * conn, uint8_t reason) { sWasDisconnection = true; },
     .recycled =
@@ -107,6 +115,8 @@ BT_CONN_CB_DEFINE(conn_callbacks) = {
             }
         },
 };
+#endif // CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
+
 } // namespace
 
 CHIP_ERROR Init(uint8_t btId)
