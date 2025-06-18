@@ -39,6 +39,7 @@
 #include <clusters/GeneralCommissioning/Structs.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/StringBuilder.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceControlServer.h>
@@ -515,7 +516,7 @@ void GeneralCommissioningGlobalInstance::HandleSetRegulatoryConfig(HandlerContex
 
     if (countryCode.size() != ConfigurationManager::kMaxLocationLength)
     {
-        ChipLogError(Zcl, "Invalid country code: '%.*s'", static_cast<int>(countryCode.size()), countryCode.data());
+        ChipLogError(Zcl, "Invalid country code: '%s'", ChipLogFormat(100, "%.*s", static_cast<int>(countryCode.size()), countryCode.data()));
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
         return;
     }

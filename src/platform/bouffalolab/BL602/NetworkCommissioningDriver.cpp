@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <lib/support/StringBuilder.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
 #include <wifi_mgmr_ext.h>
@@ -194,8 +195,8 @@ void BLWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
-    ChipLogProgress(NetworkProvisioning, "BL NetworkCommissioningDelegate: SSID: %.*s", static_cast<int>(networkId.size()),
-                    networkId.data());
+    ChipLogProgress(NetworkProvisioning, "BL NetworkCommissioningDelegate: SSID: %s", ChipLogFormat(100, "%.*s", static_cast<int>(networkId.size()),
+                    networkId.data()));
 
     err               = ConnectWiFiNetwork(reinterpret_cast<const char *>(mStagingNetwork.ssid), mStagingNetwork.ssidLen,
                                            reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);

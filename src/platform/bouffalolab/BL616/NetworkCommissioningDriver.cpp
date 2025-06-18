@@ -19,6 +19,7 @@
 
 #include <lwip/netif.h>
 #include <lwip/tcpip.h>
+#include <lib/support/StringBuilder.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/bouffalolab/BL616/NetworkCommissioningDriver.h>
 extern "C" {
@@ -181,8 +182,8 @@ void BLWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
-    ChipLogProgress(NetworkProvisioning, "BL NetworkCommissioningDelegate: SSID: %.*s", static_cast<int>(networkId.size()),
-                    networkId.data());
+    ChipLogProgress(NetworkProvisioning, "BL NetworkCommissioningDelegate: SSID: %s", ChipLogFormat(100, "%.*s", static_cast<int>(networkId.size()),
+                    networkId.data()));
 
     err               = ConnectWiFiNetwork(reinterpret_cast<const char *>(mStagingNetwork.ssid), mStagingNetwork.ssidLen,
                                            reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);

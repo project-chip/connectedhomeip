@@ -21,6 +21,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/EventLogging.h>
 #include <app/SafeAttributePersistenceProvider.h>
+#include <lib/support/StringBuilder.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -585,7 +586,7 @@ Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
 
     mVehicleID = MakeNullable(static_cast<CharSpan>(destinationString));
 
-    ChipLogDetail(AppServer, "VehicleID updated %.*s", static_cast<int>(mVehicleID.Value().size()), mVehicleID.Value().data());
+    ChipLogDetail(AppServer, "VehicleID updated %s", ChipLogFormat(100, "%.*s", static_cast<int>(mVehicleID.Value().size()), mVehicleID.Value().data()));
     MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, VehicleID::Id);
 
     return Status::Success;

@@ -513,7 +513,7 @@ void JsonBackend::OutputValue(::Json::Value & value)
         chip::CharSpan line;
         while (splitter.Next(line))
         {
-            ChipLogProgress(Automation, "%.*s", static_cast<int>(line.size()), line.data());
+            ChipLogProgress(Automation, "%s", ChipLogFormat(100, "%.*s", static_cast<int>(line.size()), line.data()));
         }
     }
 }

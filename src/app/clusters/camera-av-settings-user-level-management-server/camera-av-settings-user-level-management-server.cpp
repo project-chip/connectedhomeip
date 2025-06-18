@@ -25,6 +25,7 @@
 #include <app/util/util.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
+#include <lib/support/StringBuilder.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using namespace chip;
@@ -492,8 +493,8 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::ReadAndEncodeMPTZPresets(Attribu
             presetStruct.name     = CharSpan(name.c_str(), name.size());
             presetStruct.settings = mptzPresets.GetMptzPosition();
             ChipLogDetail(Zcl,
-                          "CameraAVSettingsUserLevelMgmt[ep=%d]: Encoding an instance of MPTZPresetStruct. ID = %d. Name = %.*s",
-                          mEndpointId, presetStruct.presetID, static_cast<int>(presetStruct.name.size()), presetStruct.name.data());
+                          "CameraAVSettingsUserLevelMgmt[ep=%d]: Encoding an instance of MPTZPresetStruct. ID = %d. Name = %s",
+                          mEndpointId, presetStruct.presetID, ChipLogFormat(100, "%.*s", static_cast<int>(presetStruct.name.size()), presetStruct.name.data()));
             ReturnErrorOnFailure(encoder.Encode(presetStruct));
         }
 

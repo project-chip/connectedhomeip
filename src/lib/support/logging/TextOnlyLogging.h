@@ -84,6 +84,8 @@ namespace Logging {
 // Log redirection
 using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, const char * msg, va_list args);
 
+#define ChipLogFormat(BUFSIZE, MSG, ...) chip::StringBuilder<BUFSIZE>().AddFormat(MSG, ##__VA_ARGS__).c_str()
+
 #if CHIP_ERROR_LOGGING
 /**
  * @def ChipLogError(MOD, MSG, ...)

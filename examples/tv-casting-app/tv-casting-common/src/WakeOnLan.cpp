@@ -17,6 +17,7 @@
  */
 
 #include "WakeOnLan.h"
+#include <lib/support/StringBuilder.h>
 
 constexpr int kBroadcastOption    = 1;
 constexpr int kWoLMagicPacketSize = 102;
@@ -78,7 +79,7 @@ CHIP_ERROR SendWakeOnLanPacket(chip::CharSpan * MACAddress)
         close(sockfd);
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    ChipLogProgress(AppServer, "Broadcasted WoL magic packet with MACAddress %.*s", 2 * kMACLength, MACAddress->data());
+    ChipLogProgress(AppServer, "Broadcasted WoL magic packet with MACAddress %s", ChipLogFormat(100, "%.*s", 2 * kMACLength, MACAddress->data()));
 
     close(sockfd);
     return CHIP_NO_ERROR;

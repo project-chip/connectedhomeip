@@ -19,6 +19,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
 #include <cstring>
+#include <lib/support/StringBuilder.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -100,9 +101,9 @@ bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & u
 
     ChipLogDetail(Zcl,
                   "Found occupied user "
-                  "[endpoint=%d,adjustedIndex=%hu,name=\"%.*s\",credentialsCount=%u,uniqueId=%x,type=%u,credentialRule=%u,"
+                  "[endpoint=%d,adjustedIndex=%hu,name=\"%s\",credentialsCount=%u,uniqueId=%x,type=%u,credentialRule=%u,"
                   "createdBy=%d,lastModifiedBy=%d]",
-                  mEndpointId, adjustedUserIndex, static_cast<int>(user.userName.size()), user.userName.data(),
+                  mEndpointId, adjustedUserIndex, ChipLogFormat(100, "%.*s", static_cast<int>(user.userName.size()), user.userName.data()),
                   static_cast<unsigned int>(user.credentials.size()), user.userUniqueId, to_underlying(user.userType),
                   to_underlying(user.credentialRule), user.createdBy, user.lastModifiedBy);
 
@@ -115,10 +116,10 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
 {
     ChipLogProgress(Zcl,
                     "Lock App: LockEndpoint::SetUser "
-                    "[endpoint=%d,userIndex=%u,creator=%d,modifier=%d,userName=\"%.*s\",uniqueId=%" PRIx32
+                    "[endpoint=%d,userIndex=%u,creator=%d,modifier=%d,userName=\"%s\",uniqueId=%" PRIx32
                     ",userStatus=%u,userType=%u,"
                     "credentialRule=%u,credentials=%p,totalCredentials=%u]",
-                    mEndpointId, userIndex, creator, modifier, static_cast<int>(userName.size()), userName.data(), uniqueId,
+                    mEndpointId, userIndex, creator, modifier, ChipLogFormat(100, "%.*s", static_cast<int>(userName.size()), userName.data()), uniqueId,
                     to_underlying(userStatus), to_underlying(usertype), to_underlying(credentialRule), credentials,
                     static_cast<unsigned int>(totalCredentials));
 

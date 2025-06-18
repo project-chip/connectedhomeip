@@ -21,6 +21,7 @@
 #include "wiced_bt_event.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/StringBuilder.h>
 #include <platform/CHIPDeviceLayer.h>
 
 LockManager LockManager::sLock;
@@ -331,9 +332,9 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
 
     ChipLogDetail(Zcl,
                   "Found occupied user "
-                  "[endpoint=%d,name=\"%.*s\",credentialsCount=%u,uniqueId=%lx,type=%u,credentialRule=%u,"
+                  "[endpoint=%d,name=\"%s\",credentialsCount=%u,uniqueId=%lx,type=%u,credentialRule=%u,"
                   "createdBy=%d,lastModifiedBy=%d]",
-                  endpointId, static_cast<int>(user.userName.size()), user.userName.data(), user.credentials.size(),
+                  endpointId, ChipLogFormat(100, "%.*s", static_cast<int>(user.userName.size()), user.userName.data()), user.credentials.size(),
                   user.userUniqueId, to_underlying(user.userType), to_underlying(user.credentialRule), user.createdBy,
                   user.lastModifiedBy);
 
