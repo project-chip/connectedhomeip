@@ -61,8 +61,8 @@ function(chip_codegen TARGET_NAME)
         endforeach()
 
         # Python is expected to be in the path
-        #
-        # find_package(Python3 REQUIRED)
+        # Forcing a call to find find_package here as ${Python3_EXECUTABLE} would be used
+        find_package(Python3 REQUIRED)
         add_custom_command(
             OUTPUT ${OUT_NAMES}
             COMMAND "${Python3_EXECUTABLE}" "${CHIP_ROOT}/scripts/codegen.py"
@@ -181,8 +181,8 @@ function(chip_zapgen TARGET_NAME)
         endif()
 
         # Python is expected to be in the path
-        #
-        # find_package(Python3 REQUIRED)
+        # Forcing a call to find find_package here as ${Python3_EXECUTABLE} would be used
+        find_package(Python3 REQUIRED)
         #
         # TODO: lockfile support should be removed as this serializes zap
         # (slower), however this is currently done because on Darwin zap startup
