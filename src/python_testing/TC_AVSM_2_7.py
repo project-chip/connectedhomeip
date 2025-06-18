@@ -121,7 +121,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             TestStep(
                 14,
                 "If the CameraAVSettingsUserLevelManagement cluster is present, with the DPTZ feature flag set the proceed to step 15, otherwise jump to step 17.",
-            ),            
+            ),
             TestStep(
                 15,
                 "TH reads the `Viewport` attribute from CameraAVStreamManagement Cluster on DUT.",
@@ -302,7 +302,7 @@ class TC_AVSM_2_7(MatterBaseTest):
         logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
         asserts.assert_equal(len(aAllocatedVideoStreams), 1, "The number of allocated video streams in the list is not 1")
 
-        ## Viewport check
+        # Viewport check
         descriptor = await self.default_controller.ReadAttribute(self.dut_node_id, [(endpoint, Clusters.Descriptor)])
         server_list = descriptor[endpoint][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList]
         has_cameraavsettings = (Clusters.CameraAvSettingsUserLevelManagement.id in server_list)
@@ -325,7 +325,8 @@ class TC_AVSM_2_7(MatterBaseTest):
                         if dptzStream.viewport == aViewport:
                             dptzWritten = True
 
-                asserts.assert_true(dptzWritten ,"DPTZStreams in CameraAvSettingsUserLevelManagement was not updated with the allocated stream id")
+                asserts.assert_true(
+                    dptzWritten, "DPTZStreams in CameraAvSettingsUserLevelManagement was not updated with the allocated stream id")
             else:
                 self.skip_step(15)
                 self.skip_step(16)
@@ -417,7 +418,8 @@ class TC_AVSM_2_7(MatterBaseTest):
                 OSDEnabled=osd
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-            asserts.assert_true(False, "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to MinFrameRate > MaxFrameRate")
+            asserts.assert_true(
+                False, "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to MinFrameRate > MaxFrameRate")
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
@@ -541,6 +543,7 @@ class TC_AVSM_2_7(MatterBaseTest):
                 "Unexpected error returned when expecting DYNAMIC_CONSTRAINT_ERROR due to invalid codec",
             )
             pass
+
 
 if __name__ == "__main__":
     default_matter_test_main()
