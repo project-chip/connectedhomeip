@@ -415,7 +415,6 @@ class ClusterAttributeChangeAccumulator:
 
     async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 5, keepSubscriptions: bool = True) -> Any:
         """This starts a subscription for attributes on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
-        from typing import Union
 
         if self._expected_attribute is not None:
             attributes: list[tuple[int, Union[ClusterObjects.Cluster, ClusterObjects.ClusterAttributeDescriptor]]] = [
