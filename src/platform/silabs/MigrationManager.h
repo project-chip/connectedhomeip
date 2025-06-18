@@ -47,6 +47,7 @@ void MigrateKvsMap(void);
 void MigrateDacProvider(void);
 void MigrateCounterConfigs(void);
 void MigrateHardwareVersion(void);
+void MigrateLockManager(void);
 
 } // namespace Silabs
 } // namespace DeviceLayer
