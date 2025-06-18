@@ -18,6 +18,7 @@
 
 #include "ClosureManager.h"
 #include "AppTask.h"
+#include "AppConfig.h"
 #include "ClosureControlEndpoint.h"
 #include "ClosureDimensionEndpoint.h"
 
@@ -153,27 +154,26 @@ void ClosureManager::InitiateAction(AppEvent * event)
 
 void ClosureManager::HandleClosureEvent(AppEvent * event)
 {
-    Action_t action           = static_cast<ClosureManager::Action_t>(event->ClosureEvent.Action);
-    ClosureManager & instance = ClosureManager::GetInstance();
+    Action_t currentAction           = static_cast<ClosureManager::Action_t>(event->ClosureEvent.Action);
 
-    switch (action)
+    switch (currentAction)
     {
     case Action_t::CALIBRATE_ACTION:
-        ChipLogError(AppServer, "Starting calibration action");
+        ChipLogDetail(AppServer, "Starting calibration action");
         PlatformMgr().ScheduleWork([](intptr_t) {
             ClosureManager & instance = ClosureManager::GetInstance();
             instance.HandleClosureActionComplete(instance.GetCurrentAction());
         });
         break;
     case Action_t::STOP_MOTION_ACTION:
-        ChipLogError(AppServer, "Starting stop motion action");
+        ChipLogDetail(AppServer, "Starting stop motion action");
         PlatformMgr().ScheduleWork([](intptr_t) {
             ClosureManager & instance = ClosureManager::GetInstance();
             instance.HandleClosureActionComplete(instance.GetCurrentAction());
         });
         break;
     case Action_t::STOP_CALIBRATE_ACTION:
-        ChipLogError(AppServer, "Starting stop calibrate action");
+        ChipLogDetail(AppServer, "Starting stop calibrate action");
         PlatformMgr().ScheduleWork([](intptr_t) {
             ClosureManager & instance = ClosureManager::GetInstance();
             instance.HandleClosureActionComplete(instance.GetCurrentAction());
