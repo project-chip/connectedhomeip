@@ -39,7 +39,6 @@
 #include <clusters/GeneralCommissioning/Structs.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <lib/support/StringBuilder.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceControlServer.h>

@@ -23,7 +23,6 @@
 #include <cstring>
 #include <esp_log.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <lib/support/StringBuilder.h>
 
 BoltLockManager BoltLockManager::sLock;
 

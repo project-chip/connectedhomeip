@@ -20,7 +20,6 @@
 #include <lib/support/Base64.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <lib/support/StringBuilder.h>
 
 #include <algorithm>
 #include <fstream>

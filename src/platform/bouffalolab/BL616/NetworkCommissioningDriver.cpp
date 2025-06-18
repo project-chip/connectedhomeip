@@ -19,7 +19,6 @@
 
 #include <lwip/netif.h>
 #include <lwip/tcpip.h>
-#include <lib/support/StringBuilder.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/bouffalolab/BL616/NetworkCommissioningDriver.h>
 extern "C" {

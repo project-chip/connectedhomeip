@@ -34,7 +34,6 @@
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <lib/support/StringBuilder.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using Status = chip::Protocols::InteractionModel::Status;

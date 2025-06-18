@@ -36,7 +36,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/StringBuilder.h>
 
 using namespace chip;
 using namespace chip::app;

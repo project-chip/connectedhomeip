@@ -20,7 +20,6 @@
 #include <app-common/zap-generated/cluster-enums.h>
 #include <cstring>
 #include <lib/core/CHIPEncoding.h>
-#include <lib/support/StringBuilder.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
