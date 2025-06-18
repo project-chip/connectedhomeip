@@ -49,7 +49,7 @@ class NFCMessage
 {
 private:
     // Pointer to the NFC Tag instance to communicate with
-    TagInstance * mTagInstance;
+    std::shared_ptr<TagInstance> mTagInstance;
 
     // Data to send to the NFC Tag
     chip::ByteSpan mDataToSend;
@@ -61,7 +61,7 @@ private:
 
 public:
     // Constructor
-    NFCMessage(TagInstance * instance, System::PacketBufferHandle && msgBuf) : mTagInstance(instance)
+    NFCMessage(std::shared_ptr<TagInstance> instance, System::PacketBufferHandle && msgBuf) : mTagInstance(std::move(instance))
     {
         // Duplicate the data from the PacketBufferHandle
         size_t dataSize = msgBuf->DataLength();
@@ -120,7 +120,7 @@ public:
     ~NFCMessage() = default;
 
     // Get the TagInstance
-    TagInstance * GetTagInstance() { return mTagInstance; }
+    std::shared_ptr<TagInstance> GetTagInstance() { return mTagInstance; }
 
     // Get the data to send
     chip::ByteSpan GetDataToSend() { return mDataToSend; }
@@ -160,9 +160,9 @@ private:
 
     static NFCCommissioningManagerImpl sInstance;
 
-    void DeleteAllTagInstancesUsingReaderName(const char * readerName);
-    TagInstance * SearchTagInstanceFromReaderNameAndCardHandle(const char * readerName, SCARDHANDLE cardHandle);
-    TagInstance * SearchTagInstanceFromDiscriminator(uint16_t discriminator);
+    void EraseAllTagInstancesUsingReaderName(const char * readerName);
+    std::shared_ptr<TagInstance> SearchTagInstanceFromReaderNameAndCardHandle(const char * readerName, SCARDHANDLE cardHandle);
+    std::shared_ptr<TagInstance> SearchTagInstanceFromDiscriminator(uint16_t discriminator);
 
     CHIP_ERROR ScanAllReaders(uint16_t nfcShortId);
     CHIP_ERROR ScanReader(uint16_t nfcShortId, char * readerName);

@@ -72,14 +72,13 @@ static SCARD_IO_REQUEST pioSendPci;
 class TagInstance
 {
 private:
-    static constexpr uint32_t kMagicNumber = 0xDEADBEEF;
-
-    uint32_t mMagicNumber;
     Transport::NFCBase * nfcBase;
     const Transport::PeerAddress peerAddress;
     char * readerName;
     SCARDHANDLE cardHandle;
     uint16_t discriminator;
+
+    bool mIsValid = true;
 
     // Buffer containing a single APDU command to send to the tag
     uint8_t mAPDUTxBuffer[MAX_APDU_SIZE];
@@ -98,7 +97,6 @@ public:
     {
         readerName    = strdup(name); // Allocate memory and copy the string
         discriminator = 0;            // Will be retrieved when RetrieveDiscriminator() is called
-        mMagicNumber  = kMagicNumber;
 
         memset(mAPDUTxBuffer, 0, sizeof(mAPDUTxBuffer));
         memset(mAPDURxBuffer, 0, sizeof(mAPDURxBuffer));
@@ -111,10 +109,11 @@ public:
         {
             free(readerName);
         }
-        mMagicNumber = 0; // Invalidate the magic number
     }
 
-    bool IsValid() const { return mMagicNumber == kMagicNumber; }
+    bool IsValid() const { return mIsValid; }
+
+    void Invalidate() { mIsValid = false; }
 
     void Print()
     {
@@ -495,10 +494,10 @@ public:
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 SCARDCONTEXT hPcscContext;
-TagInstance * pLastTagInstanceUsed;
+std::shared_ptr<TagInstance> lastTagInstanceUsed;
 
 // Empty vector of TagInstance pointers
-std::vector<TagInstance *> tagInstances;
+std::vector<std::shared_ptr<TagInstance>> tagInstances;
 
 NFCCommissioningManagerImpl NFCCommissioningManagerImpl::sInstance;
 
@@ -510,7 +509,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::_Init()
     long result = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hPcscContext);
     CHECK("SCardEstablishContext", result)
 
-    pLastTagInstanceUsed = nullptr;
+    lastTagInstanceUsed = nullptr;
 
     // Start the NFC processing thread
     mThreadRunning = true;
@@ -548,16 +547,16 @@ bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & a
     // nfcShortId is used to find the peer device
     uint16_t nfcShortId = address.GetNFCShortId();
 
-    // Check if pLastTagInstanceUsed corresponds to the same nfcShortId
-    if ((pLastTagInstanceUsed != nullptr) && (pLastTagInstanceUsed->GetDiscriminator() == nfcShortId))
+    // Check if lastTagInstanceUsed corresponds to the same nfcShortId
+    if ((lastTagInstanceUsed != nullptr) && (lastTagInstanceUsed->GetDiscriminator() == nfcShortId))
     {
         return true;
     }
 
     // Check if we already have a TagInstance corresponding to this nfcShortId
-    TagInstance * pTagInstance = SearchTagInstanceFromDiscriminator(nfcShortId);
+    std::shared_ptr<TagInstance> tagInstance = SearchTagInstanceFromDiscriminator(nfcShortId);
 
-    if (pTagInstance != nullptr)
+    if (tagInstance != nullptr)
     {
         // Found a matching cardHandle
         canSendToPeer = true;
@@ -570,13 +569,13 @@ bool NFCCommissioningManagerImpl::CanSendToPeer(const Transport::PeerAddress & a
         ScanAllReaders(nfcShortId);
 
         // and check if we now have a TagInstance corresponding to this nfcShortId
-        pTagInstance = SearchTagInstanceFromDiscriminator(nfcShortId);
+        tagInstance = SearchTagInstanceFromDiscriminator(nfcShortId);
 
-        canSendToPeer = (pTagInstance != nullptr);
+        canSendToPeer = (tagInstance != nullptr);
     }
 
     // Save the pointer to this TagInstance for a faster access at next call
-    pLastTagInstanceUsed = pTagInstance;
+    lastTagInstanceUsed = tagInstance;
 
     return canSendToPeer;
 }
@@ -592,31 +591,31 @@ void NFCCommissioningManagerImpl::EnqueueMessage(std::unique_ptr<NFCMessage> mes
 
 CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf)
 {
-    TagInstance * pTargetedTagInstance = nullptr;
+    std::shared_ptr<TagInstance> targetedTagInstance = nullptr;
 
     // nfcShortId is used to find the peer device
     uint16_t nfcShortId = address.GetNFCShortId();
 
-    // Check if pLastTagInstanceUsed corresponds to the same nfcShortId
-    if ((pLastTagInstanceUsed != nullptr) && (pLastTagInstanceUsed->GetDiscriminator() == nfcShortId))
+    // Check if lastTagInstanceUsed corresponds to the same nfcShortId
+    if ((lastTagInstanceUsed != nullptr) && (lastTagInstanceUsed->GetDiscriminator() == nfcShortId))
     {
-        pTargetedTagInstance = pLastTagInstanceUsed;
+        targetedTagInstance = lastTagInstanceUsed;
     }
     else
     {
         // Search in all the TagInstance if there is one with this Discriminator
-        TagInstance * pTagInstance = SearchTagInstanceFromDiscriminator(nfcShortId);
-        if (pTagInstance != nullptr)
+        std::shared_ptr<TagInstance> tagInstance = SearchTagInstanceFromDiscriminator(nfcShortId);
+        if (tagInstance != nullptr)
         {
             // Found an instance with expected Discriminator
-            pTargetedTagInstance = pTagInstance;
+            targetedTagInstance = tagInstance;
         }
     }
 
-    VerifyOrReturnLogError(pTargetedTagInstance != nullptr, CHIP_ERROR_PEER_NODE_NOT_FOUND);
+    VerifyOrReturnLogError(targetedTagInstance != nullptr, CHIP_ERROR_PEER_NODE_NOT_FOUND);
 
     // Create the NFCMessage as a unique_ptr
-    auto nfcMessage = std::make_unique<NFCMessage>(pTargetedTagInstance, std::move(msgBuf));
+    auto nfcMessage = std::make_unique<NFCMessage>(targetedTagInstance, std::move(msgBuf));
     VerifyOrReturnLogError(nfcMessage->IsMessageValid(), CHIP_ERROR_NO_MEMORY);
 
     // Enqueue the message for processing in the NFC thread
@@ -650,7 +649,7 @@ void NFCCommissioningManagerImpl::NfcThreadMain()
         // Process the message
         if (message)
         {
-            TagInstance * tagInstance = message->GetTagInstance();
+            std::shared_ptr<TagInstance> tagInstance = message->GetTagInstance();
             if (tagInstance == nullptr || !tagInstance->IsValid())
             {
                 ChipLogError(DeviceLayer, "Invalid TagInstance detected. Discarding message.");
@@ -724,10 +723,10 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanReader(uint16_t nfcShortId, char * r
 {
     SCARDHANDLE cardHandle;
     DWORD dwActiveProtocol;
-    TagInstance * pTagInstance = nullptr;
+    std::shared_ptr<TagInstance>  tagInstance = nullptr;
 
     // Before launching a new scan of a reader, we should discard all the saved instances using this readerName
-    DeleteAllTagInstancesUsingReaderName(readerName);
+    EraseAllTagInstancesUsingReaderName(readerName);
 
     long result = SCardConnect(hPcscContext, readerName, SCARD_SHARE_SHARED, SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1, &cardHandle,
                                &dwActiveProtocol);
@@ -746,16 +745,15 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanReader(uint16_t nfcShortId, char * r
         }
 
         // Check if we already have this couple (readerName, cardHandle)
-        pTagInstance = SearchTagInstanceFromReaderNameAndCardHandle(readerName, cardHandle);
-        if (pTagInstance != nullptr)
+        tagInstance = SearchTagInstanceFromReaderNameAndCardHandle(readerName, cardHandle);
+        if (tagInstance != nullptr)
         {
             // This couple (readerName, cardHandle) is already known: Nothing else to do
         }
         else
         {
             // This couple (readerName, cardHandle) is not known yet: Create a new TagInstance
-            TagInstance * newTagInstance =
-                new TagInstance(mNFCBase, Transport::PeerAddress::NFC(nfcShortId), readerName, cardHandle);
+            auto newTagInstance = std::make_shared<TagInstance>(mNFCBase, Transport::PeerAddress::NFC(nfcShortId), readerName, cardHandle);
 
             ReturnErrorOnFailure(newTagInstance->RetrieveDiscriminator());
 
@@ -777,7 +775,7 @@ CHIP_ERROR NFCCommissioningManagerImpl::ScanReader(uint16_t nfcShortId, char * r
 }
 
 // Function to search for a TagInstance based on readerName and cardHandle
-TagInstance * NFCCommissioningManagerImpl::SearchTagInstanceFromReaderNameAndCardHandle(const char * readerName,
+std::shared_ptr<TagInstance> NFCCommissioningManagerImpl::SearchTagInstanceFromReaderNameAndCardHandle(const char * readerName,
                                                                                         SCARDHANDLE cardHandle)
 {
     for (auto & instance : tagInstances)
@@ -791,7 +789,7 @@ TagInstance * NFCCommissioningManagerImpl::SearchTagInstanceFromReaderNameAndCar
 }
 
 // Function to search for a TagInstance based on discriminator
-TagInstance * NFCCommissioningManagerImpl::SearchTagInstanceFromDiscriminator(uint16_t discriminator)
+std::shared_ptr<TagInstance> NFCCommissioningManagerImpl::SearchTagInstanceFromDiscriminator(uint16_t discriminator)
 {
     for (auto & instance : tagInstances)
     {
@@ -803,20 +801,22 @@ TagInstance * NFCCommissioningManagerImpl::SearchTagInstanceFromDiscriminator(ui
     return nullptr; // Return nullptr if not found
 }
 
-// Delete all the TagInstance(s) using the given readerName
-void NFCCommissioningManagerImpl::DeleteAllTagInstancesUsingReaderName(const char * readerName)
+// Erase all the TagInstance(s) using the given readerName
+void NFCCommissioningManagerImpl::EraseAllTagInstancesUsingReaderName(const char * readerName)
 {
-    if ((pLastTagInstanceUsed != nullptr) && (strcmp(pLastTagInstanceUsed->GetReaderName(), readerName) == 0))
+    if ((lastTagInstanceUsed != nullptr) && (strcmp(lastTagInstanceUsed->GetReaderName(), readerName) == 0))
     {
-        pLastTagInstanceUsed = nullptr;
+        lastTagInstanceUsed = nullptr;
     }
 
     for (auto it = tagInstances.begin(); it != tagInstances.end();)
     {
         if (strcmp((*it)->GetReaderName(), readerName) == 0)
         {
-            delete *it;                  // Free the memory allocated for the TagInstance
-            it = tagInstances.erase(it); // Erase the item from the vector and get the next iterator
+            (*it)->Invalidate();  // Mark as invalid before erasing
+            // tagInstance will be deleted automatically when both the tagInstances vector
+            //  and the message queue will no more use it.
+            it = tagInstances.erase(it);
         }
         else
         {
