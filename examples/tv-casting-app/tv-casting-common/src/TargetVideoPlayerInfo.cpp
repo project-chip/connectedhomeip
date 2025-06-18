@@ -18,6 +18,7 @@
 #include "TargetVideoPlayerInfo.h"
 
 #include <app/server/Server.h>
+#include <lib/support/StringBuilder.h>
 
 using namespace chip;
 
@@ -168,7 +169,7 @@ void TargetVideoPlayerInfo::PrintInfo()
                     ChipLogValueX64(mNodeId), mFabricIndex);
     if (mMACAddress.size() > 0)
     {
-        ChipLogProgress(NotSpecified, "  MACAddress=%.*s", static_cast<int>(mMACAddress.size()), mMACAddress.data());
+        ChipLogProgress(NotSpecified, "  MACAddress=%s", ChipLogFormat(100, "%.*s", static_cast<int>(mMACAddress.size()), mMACAddress.data()));
     }
 
     for (auto & endpointInfo : mEndpoints)

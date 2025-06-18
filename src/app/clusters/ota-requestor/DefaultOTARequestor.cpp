@@ -24,6 +24,7 @@
 #include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <controller/CHIPCluster.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/StringBuilder.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/OTAImageProcessor.h>
@@ -61,8 +62,8 @@ static void LogQueryImageResponse(const QueryImageResponse::DecodableType & resp
     }
     if (response.imageURI.HasValue())
     {
-        ChipLogDetail(SoftwareUpdate, "  imageURI: %.*s", static_cast<int>(response.imageURI.Value().size()),
-                      response.imageURI.Value().data());
+        ChipLogDetail(SoftwareUpdate, "  imageURI: %s", ChipLogFormat(100, "%.*s", static_cast<int>(response.imageURI.Value().size()),
+                      response.imageURI.Value().data()));
     }
     if (response.softwareVersion.HasValue())
     {
@@ -70,9 +71,9 @@ static void LogQueryImageResponse(const QueryImageResponse::DecodableType & resp
     }
     if (response.softwareVersionString.HasValue())
     {
-        ChipLogDetail(SoftwareUpdate, "  softwareVersionString: %.*s",
-                      static_cast<int>(response.softwareVersionString.Value().size()),
-                      response.softwareVersionString.Value().data());
+        ChipLogDetail(SoftwareUpdate, "  softwareVersionString: %s",
+                      ChipLogFormat(100, "%.*s", static_cast<int>(response.softwareVersionString.Value().size()),
+                      response.softwareVersionString.Value().data()));
     }
     if (response.updateToken.HasValue())
     {

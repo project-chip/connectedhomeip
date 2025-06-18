@@ -1080,8 +1080,8 @@ void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::Connec
 void Instance::HandleNonConcurrentConnectNetwork()
 {
     ByteSpan nonConcurrentNetworkID = ByteSpan(mConnectingNetworkID, mConnectingNetworkIDLen);
-    ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Network SSID=%.*s", mConnectingNetworkIDLen,
-                    mConnectingNetworkID);
+    ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Network SSID=%s", ChipLogFormat(100, "%.*s", static_cast<int>(mConnectingNetworkIDLen),
+                    mConnectingNetworkID));
     mpWirelessDriver->ConnectNetwork(nonConcurrentNetworkID, this);
 }
 

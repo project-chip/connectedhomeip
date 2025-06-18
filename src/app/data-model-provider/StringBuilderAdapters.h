@@ -33,7 +33,7 @@
 /// On failure without adapters, the objects are reported as "24-byte object at 0x....."
 /// which is not as helpful as a full formatted output.
 
-#include <pw_string/string_builder.h>
+#include "pw_string/string_builder.h"
 #include <pw_unit_test/framework.h>
 
 #include <app/data-model-provider/ActionReturnStatus.h>
