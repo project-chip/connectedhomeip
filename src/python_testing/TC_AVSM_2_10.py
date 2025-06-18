@@ -84,28 +84,28 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 6,
-                "TH sends the SnapshotStreamDeallocate command with SnapshotStreamID set to aStreamID.",
-                "DUT responds with a SUCCESS status code.",
-            ),
-            TestStep(
-                7,
-                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT",
-                "Verify the number of allocated snapshot streams in the list is 0.",
-            ),
-            TestStep(
-                8,
-                "TH sends the CaptureSnapshot command with SnapshotStreamID set to Null.",
-                "DUT responds with NOT_FOUND status code.",
-            ),
-            TestStep(
-                9,
                 "If DUT supports Privacy feature, TH writes SoftLivestreamPrivacyModeEnabled = true on DUT",
                 "DUT responds with a SUCCESS status code.",
             ),
             TestStep(
-                10,
+                7,
                 "TH sends the CaptureSnapshot command with SnapshotStreamID set to aStreamID.",
                 "DUT responds with INVALID_IN_STATE status code.",
+            ),
+            TestStep(
+                8,
+                "TH sends the SnapshotStreamDeallocate command with SnapshotStreamID set to aStreamID.",
+                "DUT responds with a SUCCESS status code.",
+            ),
+            TestStep(
+                9,
+                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT",
+                "Verify the number of allocated snapshot streams in the list is 0.",
+            ),
+            TestStep(
+                10,
+                "TH sends the CaptureSnapshot command with SnapshotStreamID set to Null.",
+                "DUT responds with NOT_FOUND status code.",
             ),
         ]
 
