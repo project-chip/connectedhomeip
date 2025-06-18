@@ -1601,11 +1601,11 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
 
-    DataModel::Nullable<GenericDimensionStateStruct> currentState;
-    DataModel::Nullable<GenericDimensionStateStruct> target;
-    GenericDimensionStateStruct testTargetStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                                  Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
-    DataModel::Nullable<GenericDimensionStateStruct> testTarget(testTargetStruct);
+    DataModel::Nullable<GenericCurrentStateStruct> currentState;
+    DataModel::Nullable<GenericTargetStruct> target;
+    GenericTargetStruct testTargetStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
+                                          Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+    DataModel::Nullable<GenericTargetStruct> testTarget(testTargetStruct);
     EXPECT_EQ(logic->SetTarget(testTarget), CHIP_NO_ERROR);
     // Validating SetTarget with no arguments
     mockContext.ClearDirtyList();
@@ -1666,8 +1666,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand)
     EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(10000), NullOptional, NullOptional), Status::Success);
     EXPECT_EQ(logic->GetTarget(target), CHIP_NO_ERROR);
     EXPECT_EQ(target.Value().position.Value(), 10000);
-    EXPECT_EQ(target.Value().latch.HasValue(), false);
-    EXPECT_EQ(target.Value().speed.HasValue(), false);
+    EXPECT_EQ(target.Value().latch.HasValue(), true);
+    EXPECT_EQ(target.Value().speed.HasValue(), true);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_TRUE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::Target::Id));
 }
@@ -1686,11 +1686,11 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommandWithLimitatio
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
 
-    DataModel::Nullable<GenericDimensionStateStruct> currentState;
-    DataModel::Nullable<GenericDimensionStateStruct> target;
-    GenericDimensionStateStruct testTargetStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                                  Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
-    DataModel::Nullable<GenericDimensionStateStruct> testTarget(testTargetStruct);
+    DataModel::Nullable<GenericCurrentStateStruct> currentState;
+    DataModel::Nullable<GenericTargetStruct> target;
+    GenericTargetStruct testTargetStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
+                                          Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+    DataModel::Nullable<GenericTargetStruct> testTarget(testTargetStruct);
 
     EXPECT_EQ(logic->SetTarget(testTarget), CHIP_NO_ERROR);
     Structs::RangePercent100thsStruct::Type limitRange = { .min = 1000, .max = 9000 };
@@ -1743,9 +1743,9 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommand)
     DataModel::Nullable<GenericCurrentStateStruct> currentState;
     DataModel::Nullable<GenericTargetStruct> target;
 
-    GenericDimensionStateStruct testTargetStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                                  Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
-    DataModel::Nullable<GenericDimensionStateStruct> testTarget(testTargetStruct);
+    GenericTargetStruct testTargetStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
+                                          Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+    DataModel::Nullable<GenericTargetStruct> testTarget(testTargetStruct);
     EXPECT_EQ(logic->SetTarget(testTarget), CHIP_NO_ERROR);
 
     // Validating Step with Invalid direction
@@ -1865,11 +1865,11 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommandWithLimitation)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
 
-    DataModel::Nullable<GenericDimensionStateStruct> currentState;
-    DataModel::Nullable<GenericDimensionStateStruct> target;
-    GenericDimensionStateStruct testTargetStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
-                                                  Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
-    DataModel::Nullable<GenericDimensionStateStruct> testTarget(testTargetStruct);
+    DataModel::Nullable<GenericCurrentStateStruct> currentState;
+    DataModel::Nullable<GenericTargetStruct> target;
+    GenericTargetStruct testTargetStruct{ Optional<Percent100ths>(0), Optional<bool>(false),
+                                          Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto) };
+    DataModel::Nullable<GenericTargetStruct> testTarget(testTargetStruct);
 
     EXPECT_EQ(logic->SetTarget(testTarget), CHIP_NO_ERROR);
 
