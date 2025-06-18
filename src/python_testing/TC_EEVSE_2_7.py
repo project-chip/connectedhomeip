@@ -224,28 +224,56 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
         if not has_pref:
             self.mark_all_remaining_steps_skipped("9")
         else:
-            self.step("8")
-            # If FeatureMap does not include EEVSE.S.F00(ChargingPreferences),
             self.step("9")
             # TH sends command ClearTargets
+            await self.send_clear_targets_command()
+
             self.step("9a")
             # TH reads from the DUT the NextChargeStartTime
+            await self.check_evse_attribute("NextChargeStartTime", NullValue)
+
             self.step("9b")
             # TH reads from the DUT the NextChargeTargetTime
+            await self.check_evse_attribute("NextChargeTargetTime", NullValue)
+
             self.step("9c")
             # TH reads from the DUT the NextChargeRequiredEnergy
+            await self.check_evse_attribute("NextChargeRequiredEnergy", NullValue)
+
             self.step("9d")
             # TH reads from the DUT the NextChargeTargetSoC
+            await self.check_evse_attribute("NextChargeTargetSoC", NullValue)
+
             self.step("10")
             # TH sends command SetTargets with DayOfTheWeekforSequence=0x7F (i.e. having all days set) and a single ChargingTargets={TargetTime=1439, TargetSoC=80, AddedEnergy=25000000}
+            # The targets is a list of up to 7x ChargingTargetScheduleStruct's (one per day)
+            # each containing a list of up to 10x targets per day
+            minutes_past_midnight = 1439
+            dailyTargets = [Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=minutes_past_midnight,
+                                                                             targetSoC=80,
+                                                                             addedEnergy=25000000)]
+            targets = [Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct(
+                dayOfWeekForSequence=0x7F, chargingTargets=dailyTargets)]
+
+            # This should be all days Sun-Sat (0x7F) with an TargetTime 1439 and added Energy 25kWh or targetSoc=80
+            await self.send_set_targets_command(chargingTargetSchedules=targets)
+
             self.step("10a")
             # TH reads from the DUT the NextChargeStartTime
+            await self.check_evse_attribute("NextChargeStartTime", NullValue)
+
             self.step("10b")
             # TH reads from the DUT the NextChargeTargetTime
+            await self.check_evse_attribute("NextChargeTargetTime", NullValue)
+
             self.step("10c")
             # TH reads from the DUT the NextChargeRequiredEnergy
+            await self.check_evse_attribute("NextChargeRequiredEnergy", NullValue)
+
             self.step("10d")
             # TH reads from the DUT the NextChargeTargetSoC
+            await self.check_evse_attribute("NextChargeTargetSoC", NullValue)
+
             self.step("11")
             # TH sends command EnableCharging with ChargingEnabledUntil=null, minimumChargeCurrent=6000, maximumChargeCurrent=60000
             self.step("11a")
