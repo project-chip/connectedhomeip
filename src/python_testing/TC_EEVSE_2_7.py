@@ -45,7 +45,7 @@ import time
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest, TestStep,
+from chip.testing.matter_testing import (EventChangeCallback, MatterBaseTest, TestStep,
                                          async_test_body, default_matter_test_main)
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
@@ -88,6 +88,89 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
                      "Value has to be 20% state Of charge"),
             TestStep("7b", "TH reads from the DUT the BatteryCapacity",
                      "Value has to be 70,000,000 (70kWh)"),
+            TestStep("8", "If FeatureMap does not include EEVSE.S.F00(ChargingPreferences), skip all remaining test steps."),
+            TestStep("9", "TH sends command ClearTargets",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep("9a", "TH reads from the DUT the NextChargeStartTime",
+                     "Value has to be null."),
+            TestStep("9b", "TH reads from the DUT the NextChargeTargetTime",
+                     "Value has to be null."),
+            TestStep("9c", "TH reads from the DUT the NextChargeRequiredEnergy",
+                     "Value has to be null."),
+            TestStep("9d", "TH reads from the DUT the NextChargeTargetSoC",
+                     "Value has to be null."),
+            TestStep("10", "TH sends command SetTargets with DayOfTheWeekforSequence=0x7F (i.e. having all days set) and a single ChargingTargets={TargetTime=1439, TargetSoC=80, AddedEnergy=25000000}",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep("10a", "TH reads from the DUT the NextChargeStartTime",
+                     "Value has to be null."),
+            TestStep("10b", "TH reads from the DUT the NextChargeTargetTime",
+                     "Value has to be null."),
+            TestStep("10c", "TH reads from the DUT the NextChargeRequiredEnergy",
+                     "Value has to be null."),
+            TestStep("10d", "TH reads from the DUT the NextChargeTargetSoC",
+                     "Value has to be null."),
+            TestStep("11", "TH sends command EnableCharging with ChargingEnabledUntil=null, minimumChargeCurrent=6000, maximumChargeCurrent=60000",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep("11a", "TH reads from the DUT the NextChargeStartTime",
+                     "Value has to be before the next TargetTime above."),
+            TestStep("11b", "TH reads from the DUT the NextChargeTargetTime",
+                     "Value has to be TargetTime above."),
+            TestStep("11c", "TH reads from the DUT the NextChargeRequiredEnergy",
+                     "Value has to be null."),
+            TestStep("11d", "TH reads from the DUT the NextChargeTargetSoC",
+                     "Value has to be TargetSoC above."),
+            TestStep("12", "TH sends command Disable",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep("12a", "TH reads from the DUT the NextChargeStartTime",
+                     "Value has to be null."),
+            TestStep("12b", "TH reads from the DUT the NextChargeTargetTime",
+                     "Value has to be null."),
+            TestStep("12c", "TH reads from the DUT the NextChargeRequiredEnergy",
+                     "Value has to be null."),
+            TestStep("12d", "TH reads from the DUT the NextChargeTargetSoC",
+                     "Value has to be null."),
+            TestStep("13", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EVSE Set SoC High Test Event",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep("13a", "TH reads from the DUT the StateOfCharge",
+                     "Value has to be 95 % state of charge."),
+            TestStep("13b", "TH reads from the DUT the BatteryCapacity",
+                     "Value has to be 70,000,000 (70kWh)."),
+            TestStep("14", "TH sends command EnableCharging with ChargingEnabledUntil=null, minimumChargeCurrent=6000, maximumChargeCurrent=60000",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep("14a", "TH reads from the DUT the NextChargeStartTime",
+                     "Value has to be null."),
+            TestStep("14b", "TH reads from the DUT the NextChargeTargetTime",
+                     "Value has to be null."),
+            TestStep("14c", "TH reads from the DUT the NextChargeRequiredEnergy",
+                     "Value has to be null."),
+            TestStep("14d", "TH reads from the DUT the NextChargeTargetSoC",
+                     "Value has to be TargetSoC above."),
+            TestStep("15", "TH sends command Disable",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep("15a", "TH reads from the DUT the NextChargeStartTime",
+                     "Value has to be null."),
+            TestStep("15b", "TH reads from the DUT the NextChargeTargetTime",
+                     "Value has to be null."),
+            TestStep("15c", "TH reads from the DUT the NextChargeRequiredEnergy",
+                     "Value has to be null."),
+            TestStep("15d", "TH reads from the DUT the NextChargeTargetSoC",
+                     "Value has to be null."),
+            TestStep("16", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EVSE Set SoC Clear Test Event",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep("16a", "TH reads from the DUT the StateOfCharge",
+                     "Value has to be null."),
+            TestStep("16b", "TH reads from the DUT the BatteryCapacity",
+                     "Value has to be null."),
+            TestStep("17", "TH sends command EnableCharging with ChargingEnabledUntil=null, minimumChargeCurrent=6000, maximumChargeCurrent=60000",
+                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+            TestStep("17a", "TH reads from the DUT the NextChargeStartTime",
+                     "Value has to be before the next TargetTime above."),
+            TestStep("17b", "TH reads from the DUT the NextChargeTargetTime",
+                     "Value has to be TargetTime above."),
+            TestStep("17c", "TH reads from the DUT the NextChargeRequiredEnergy",
+                     "Value has to be AddedEnergy above."),
+            TestStep("17d", "TH reads from the DUT the NextChargeTargetSoC",
+                     "Value has to be null."),
 
         ]
 
@@ -95,6 +178,9 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
 
     @async_test_body
     async def test_TC_EEVSE_2_7(self):
+        endpoint = self.get_endpoint()
+        cluster = Clusters.EnergyEvse
+
         self.step("1")
         # Commission DUT - already done
 
@@ -107,7 +193,6 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
         self.step("2")
         feature_map = await self.read_evse_attribute_expect_success(attribute="FeatureMap")
         logger.info(f"FeatureMap: {feature_map}")
-        has_v2x = feature_map & Clusters.EnergyEvse.Bitmaps.Feature.kV2x
 
         self.step("3")
         await self.check_test_event_triggers_enabled()
@@ -131,6 +216,98 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("7b")
         await self.check_evse_attribute("BatteryCapacity", 70000)
+
+        self.step("8")
+        has_pref = self.feature_guard(endpoint=endpoint, cluster=cluster,
+                                      feature_int=Clusters.EnergyEvse.Bitmaps.Feature.kChargingPreferences)
+
+        if not has_pref:
+            self.mark_all_remaining_steps_skipped("9")
+        else:
+            self.step("8")
+            # If FeatureMap does not include EEVSE.S.F00(ChargingPreferences),
+            self.step("9")
+            # TH sends command ClearTargets
+            self.step("9a")
+            # TH reads from the DUT the NextChargeStartTime
+            self.step("9b")
+            # TH reads from the DUT the NextChargeTargetTime
+            self.step("9c")
+            # TH reads from the DUT the NextChargeRequiredEnergy
+            self.step("9d")
+            # TH reads from the DUT the NextChargeTargetSoC
+            self.step("10")
+            # TH sends command SetTargets with DayOfTheWeekforSequence=0x7F (i.e. having all days set) and a single ChargingTargets={TargetTime=1439, TargetSoC=80, AddedEnergy=25000000}
+            self.step("10a")
+            # TH reads from the DUT the NextChargeStartTime
+            self.step("10b")
+            # TH reads from the DUT the NextChargeTargetTime
+            self.step("10c")
+            # TH reads from the DUT the NextChargeRequiredEnergy
+            self.step("10d")
+            # TH reads from the DUT the NextChargeTargetSoC
+            self.step("11")
+            # TH sends command EnableCharging with ChargingEnabledUntil=null, minimumChargeCurrent=6000, maximumChargeCurrent=60000
+            self.step("11a")
+            # TH reads from the DUT the NextChargeStartTime
+            self.step("11b")
+            # TH reads from the DUT the NextChargeTargetTime
+            self.step("11c")
+            # TH reads from the DUT the NextChargeRequiredEnergy
+            self.step("11d")
+            # TH reads from the DUT the NextChargeTargetSoC
+            self.step("12")
+            # TH sends command Disable
+            self.step("12a")
+            # TH reads from the DUT the NextChargeStartTime
+            self.step("12b")
+            # TH reads from the DUT the NextChargeTargetTime
+            self.step("12c")
+            # TH reads from the DUT the NextChargeRequiredEnergy
+            self.step("12d")
+            # TH reads from the DUT the NextChargeTargetSoC
+            self.step("13")
+            # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EVSE Set SoC High Test Event
+            self.step("13a")
+            # TH reads from the DUT the StateOfCharge
+            self.step("13b")
+            # TH reads from the DUT the BatteryCapacity
+            self.step("14")
+            # TH sends command EnableCharging with ChargingEnabledUntil=null, minimumChargeCurrent=6000, maximumChargeCurrent=60000
+            self.step("14a")
+            # TH reads from the DUT the NextChargeStartTime
+            self.step("14b")
+            # TH reads from the DUT the NextChargeTargetTime
+            self.step("14c")
+            # TH reads from the DUT the NextChargeRequiredEnergy
+            self.step("14d")
+            # TH reads from the DUT the NextChargeTargetSoC
+            self.step("15")
+            # TH sends command Disable
+            self.step("15a")
+            # TH reads from the DUT the NextChargeStartTime
+            self.step("15b")
+            # TH reads from the DUT the NextChargeTargetTime
+            self.step("15c")
+            # TH reads from the DUT the NextChargeRequiredEnergy
+            self.step("15d")
+            # TH reads from the DUT the NextChargeTargetSoC
+            self.step("16")
+            # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EVSE Set SoC Clear Test Event
+            self.step("16a")
+            # TH reads from the DUT the StateOfCharge
+            self.step("16b")
+            # TH reads from the DUT the BatteryCapacity
+            self.step("17")
+            # TH sends command EnableCharging with ChargingEnabledUntil=null, minimumChargeCurrent=6000, maximumChargeCurrent=60000
+            self.step("17a")
+            # TH reads from the DUT the NextChargeStartTime
+            self.step("17b")
+            # TH reads from the DUT the NextChargeTargetTime
+            self.step("17c")
+            # TH reads from the DUT the NextChargeRequiredEnergy
+            self.step("17d")
+            # TH reads from the DUT the NextChargeTargetSoC
 
 
 if __name__ == "__main__":
