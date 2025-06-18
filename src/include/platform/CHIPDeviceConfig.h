@@ -457,6 +457,15 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+ *
+ * Enable support for Joint Fabric in core SDK.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+#define CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC 0
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_WIFIPAF_MIN_ADVERTISING_TIMEOUT_SECS
  *
  * The min amount of time (in seconds) after which the chip platform will stop PAF advertisement
@@ -575,6 +584,17 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_LWIP_WIFI_AP_IF_NAME
 #define CHIP_DEVICE_CONFIG_LWIP_WIFI_AP_IF_NAME "ap"
+#endif
+
+// -------------------- NFC/CHIPoNFC Configuration --------------------
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+ *
+ * Enable support for NFC Commissioning (chip-over-NFC).
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+#define CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING 0
 #endif
 
 // -------------------- BLE/CHIPoBLE Configuration --------------------

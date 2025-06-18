@@ -54,7 +54,7 @@
         }
       ],
       "deviceVersions": [
-        1
+        3
       ],
       "deviceIdentifiers": [
         22
@@ -255,7 +255,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "array",
-              "included": 1,
+              "included": 0,
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
@@ -368,7 +368,7 @@
               "side": "server",
               "type": "bitmap32",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
@@ -838,7 +838,7 @@
               "storageOption": "RAM",
               "singleton": 1,
               "bounded": 0,
-              "defaultValue": "3",
+              "defaultValue": "5",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -1078,7 +1078,7 @@
               "side": "server",
               "type": "int16u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "1",
@@ -3476,7 +3476,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0",
+              "defaultValue": "1",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3602,6 +3602,30 @@
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "SetVIDVerificationStatement",
+              "code": 12,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "SignVIDVerificationRequest",
+              "code": 13,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "SignVIDVerificationResponse",
+              "code": 14,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
               "isEnabled": 1
             }
           ],
@@ -4010,7 +4034,7 @@
         }
       ],
       "deviceVersions": [
-        1
+        2
       ],
       "deviceIdentifiers": [
         14
@@ -4151,7 +4175,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "2",
+              "defaultValue": "0x0005",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

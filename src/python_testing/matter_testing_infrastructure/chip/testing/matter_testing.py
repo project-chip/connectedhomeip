@@ -26,6 +26,7 @@ import pathlib
 import queue
 import random
 import re
+import shlex
 import sys
 import textwrap
 import threading
@@ -38,11 +39,12 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
 from itertools import chain
-from typing import Any, Iterable, List, Optional, Tuple
+from typing import Any, Callable, Iterable, List, Optional, Tuple
 
 import chip.testing.conversions as conversions
 import chip.testing.decorators as decorators
 import chip.testing.matchers as matchers
+import chip.testing.runner as runner
 import chip.testing.timeoperations as timeoperations
 
 # isort: off
@@ -69,17 +71,9 @@ from chip.storage import PersistentStorage
 from chip.testing.commissioning import CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.pics import read_pics_from_file
-from chip.tracing import TracingContext
+from chip.testing.runner import TestRunnerHooks, TestStep
+from chip.tlv import uint
 from mobly import asserts, base_test, signals, utils
-from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
-from mobly.test_runner import TestRunner
-
-try:
-    from matter_yamltests.hooks import TestRunnerHooks
-except ImportError:
-    class TestRunnerHooks:
-        pass
-
 
 # TODO: Add utility to commission a device if needed
 # TODO: Add utilities to keep track of controllers/fabrics
@@ -291,6 +285,42 @@ class AttributeValue:
     timestamp_utc: Optional[datetime] = None
 
 
+class AttributeMatcher:
+    """Matcher for a self-descripbed AttributeValue matcher, to be used in `await_all_expected_report_matches` methods.
+
+    This class embodies a predicate for a condition that must be matched by an attribute report.
+
+    A match is considered as having occurred when the `matches` method returns True for an `AttributeValue` report.
+    """
+
+    def __init__(self, description: str):
+        self._description: str = description
+
+    def matches(self, report: AttributeValue) -> bool:
+        """Implementers must override this method to return True when an attribute value matches.
+
+        The condition matched should be clearly expressed by the `description` property.
+        """
+        pass
+
+    @property
+    def description(self):
+        return self._description
+
+    @staticmethod
+    def from_callable(description: str, matcher: Callable[[AttributeValue], bool]) -> "AttributeMatcher":
+        """Take a single callable and wrap it into an AttributeMatcher object. Useful to wrap closures."""
+        class AttributeMatcherFromCallable(AttributeMatcher):
+            def __init__(self, description, matcher: Callable[[AttributeValue], bool]):
+                super().__init__(description)
+                self._matcher = matcher
+
+            def matches(self, report: AttributeValue) -> bool:
+                return self._matcher(report)
+
+        return AttributeMatcherFromCallable(description, matcher)
+
+
 def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
     """Given a queue.Queue hooked-up to an attribute change accumulator, await a given expected sequence of attribute reports.
 
@@ -348,8 +378,21 @@ def await_sequence_of_reports(report_queue: queue.Queue, endpoint_id: int, attri
 
 
 class ClusterAttributeChangeAccumulator:
-    def __init__(self, expected_cluster: ClusterObjects.Cluster):
+    """
+    Subscribes to a cluster or single attribute and accumulates attribute reports in a queue.
+
+    If `expected_attribute` is provided, it subscribes only to that specific attribute.
+    Otherwise, it subscribes to all attributes from the cluster.
+
+    Args:
+        expected_cluster (ClusterObjects.Cluster): The cluster to subscribe to.
+        expected_attribute (ClusterObjects.ClusterAttributeDescriptor, optional):
+            If provided, subscribes to a single attribute. Defaults to None.
+    """
+
+    def __init__(self, expected_cluster: ClusterObjects.Cluster, expected_attribute: ClusterObjects.ClusterAttributeDescriptor = None):
         self._expected_cluster = expected_cluster
+        self._expected_attribute = expected_attribute
         self._subscription = None
         self._lock = threading.Lock()
         self._q = queue.Queue()
@@ -361,7 +404,9 @@ class ClusterAttributeChangeAccumulator:
             self._attribute_report_counts = {}
             attrs = [cls for name, cls in inspect.getmembers(self._expected_cluster.Attributes) if inspect.isclass(
                 cls) and issubclass(cls, ClusterObjects.ClusterAttributeDescriptor)]
-            self._attribute_reports = {}
+            self._attribute_reports: dict[Any, AttributeValue] = {}
+            if self._expected_attribute is not None:
+                attrs = [self._expected_attribute]
             for a in attrs:
                 self._attribute_report_counts[a] = 0
                 self._attribute_reports[a] = []
@@ -370,9 +415,12 @@ class ClusterAttributeChangeAccumulator:
 
     async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 5, keepSubscriptions: bool = True) -> Any:
         """This starts a subscription for attributes on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
+        attributes = [(endpoint, self._expected_cluster)]
+        if self._expected_attribute is not None:
+            attributes = [(endpoint, self._expected_attribute)]
         self._subscription = await dev_ctrl.ReadAttribute(
             nodeid=node_id,
-            attributes=[(endpoint, self._expected_cluster)],
+            attributes=attributes,
             reportInterval=(int(min_interval_sec), int(max_interval_sec)),
             fabricFiltered=fabric_filtered,
             keepSubscriptions=keepSubscriptions
@@ -393,7 +441,14 @@ class ClusterAttributeChangeAccumulator:
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
         """This is the subscription callback when an attribute report is received.
            It checks the report is from the expected_cluster and then posts it into the queue for later processing."""
+        valid_report = False
         if path.ClusterType == self._expected_cluster:
+            if self._expected_attribute is not None:
+                valid_report = path.ClusterId == self._expected_attribute.cluster_id
+            else:
+                valid_report = True
+
+        if valid_report:
             data = transaction.GetAttribute(path)
             value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
                                    value=data, timestamp_utc=datetime.now(timezone.utc))
@@ -450,6 +505,54 @@ class ClusterAttributeChangeAccumulator:
             logging.info(f"  -> {expected_element} found: {last_report_matches.get(expected_idx)}")
         asserts.fail("Did not find all expected last report values before time-out")
 
+    def await_all_expected_report_matches(self, expected_matchers: Iterable[AttributeMatcher], timeout_sec: float = 1.0):
+        """Expect that every predicate in `expected_matchers`, when run against all the incoming reports, reaches true by the end, ignoring timestamps.
+
+        Waits for at least `timeout_sec` seconds.
+
+        This is a form of barrier for a set of attribute changes that should all happen together for an action.
+
+        Note that this does not check against the "last" value of every attribute, only that each expected
+        report was seen at least once.
+        """
+        start_time = time.time()
+        elapsed = 0.0
+        time_remaining = timeout_sec
+
+        report_matches: dict[int, bool] = {idx: False for idx, _ in enumerate(expected_matchers)}
+
+        for matcher in expected_matchers:
+            logging.info(
+                f"--> Matcher waiting: {matcher.description}")
+        logging.info(f"Waiting for {timeout_sec:.1f} seconds for all reports.")
+
+        while time_remaining > 0:
+            # Snapshot copy at the beginning of the loop. This is thread-safe based on the design.
+            all_reports = self._attribute_reports
+
+            # Recompute all last-value matches
+            for expected_idx, matcher in enumerate(expected_matchers):
+                for attribute, reports in all_reports.items():
+                    for report in reports:
+                        if matcher.matches(report) and not report_matches[expected_idx]:
+                            logging.info(f"  --> Found a match for: {matcher.description}")
+                            report_matches[expected_idx] = True
+
+            # Determine if all were met
+            if all(report_matches.values()):
+                logging.info("Found all expected matchers did match.")
+                return
+
+            elapsed = time.time() - start_time
+            time_remaining = timeout_sec - elapsed
+            time.sleep(0.1)
+
+        # If we reach here, there was no early return and we failed to find all the values.
+        logging.error("Reached time-out without finding all expected report values.")
+        for expected_idx, expected_matcher in enumerate(expected_matchers):
+            logging.info(f"  -> {expected_matcher.description}: {report_matches.get(expected_idx)}")
+        asserts.fail("Did not find all expected reports before time-out")
+
     def await_sequence_of_reports(self, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
         """Await a given expected sequence of attribute reports in the accumulator for the endpoint associated.
 
@@ -497,51 +600,6 @@ class ClusterAttributeChangeAccumulator:
         return
 
 
-class InternalTestRunnerHooks(TestRunnerHooks):
-
-    def start(self, count: int):
-        logging.info(f'Starting test set, running {count} tests')
-
-    def stop(self, duration: int):
-        logging.info(f'Finished test set, ran for {duration}ms')
-
-    def test_start(self, filename: str, name: str, count: int, steps: list[str] = []):
-        logging.info(f'Starting test from {filename}: {name} - {count} steps')
-
-    def test_stop(self, exception: Exception, duration: int):
-        logging.info(f'Finished test in {duration}ms')
-
-    def step_skipped(self, name: str, expression: str):
-        # TODO: Do we really need the expression as a string? We can evaluate this in code very easily
-        logging.info(f'\t\t**** Skipping: {name}')
-
-    def step_start(self, name: str):
-        # The way I'm calling this, the name is already includes the step number, but it seems like it might be good to separate these
-        logging.info(f'\t\t***** Test Step {name}')
-
-    def step_success(self, logger, logs, duration: int, request):
-        pass
-
-    def step_failure(self, logger, logs, duration: int, request, received):
-        # TODO: there's supposed to be some kind of error message here, but I have no idea where it's meant to come from in this API
-        logging.info('\t\t***** Test Failure : ')
-
-    def step_unknown(self):
-        """
-        This method is called when the result of running a step is unknown. For example during a dry-run.
-        """
-        pass
-
-    def show_prompt(self,
-                    msg: str,
-                    placeholder: Optional[str] = None,
-                    default_value: Optional[str] = None) -> None:
-        pass
-
-    def test_skipped(self, filename: str, name: str):
-        logging.info(f"Skipping test from {filename}: {name}")
-
-
 @dataclass
 class MatterTestConfig:
     storage_path: pathlib.Path = pathlib.Path(".")
@@ -558,6 +616,7 @@ class MatterTestConfig:
     timeout: typing.Union[int, None] = None
     endpoint: typing.Union[int, None] = 0
     app_pid: int = 0
+    pipe_name: typing.Union[str, None] = None
     fail_on_skipped_tests: bool = False
 
     commissioning_method: Optional[str] = None
@@ -607,6 +666,8 @@ class MatterTestConfig:
     tc_user_response_to_simulate: int = None
     # path to device attestation revocation set json file
     dac_revocation_set_path: Optional[pathlib.Path] = None
+
+    legacy: bool = False
 
 
 class ClusterMapper:
@@ -839,25 +900,6 @@ class MatterStackState:
         return builtins.chipStack
 
 
-@dataclass
-class TestStep:
-    test_plan_number: typing.Union[int, str]
-    description: str
-    expectation: str = ""
-    is_commissioning: bool = False
-
-    def __str__(self):
-        return f'{self.test_plan_number}: {self.description}\tExpected outcome: {self.expectation}'
-
-
-@dataclass
-class TestInfo:
-    function: str
-    desc: str
-    steps: list[TestStep]
-    pics: list[str]
-
-
 class MatterBaseTest(base_test.BaseTestClass):
     def __init__(self, *args):
         super().__init__(*args)
@@ -865,8 +907,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         # List of accumulated problems across all tests
         self.problems = []
         self.is_commissioning = False
-        # The named pipe name must be set in the derived classes
-        self.app_pipe = None
         self.cached_steps: dict[str, list[TestStep]] = {}
 
     def get_test_steps(self, test: str) -> list[TestStep]:
@@ -936,63 +976,60 @@ class MatterBaseTest(base_test.BaseTestClass):
         except AttributeError:
             return test
 
-    def get_default_app_pipe_name(self) -> str:
-        return self.app_pipe
-
-    def write_to_app_pipe(self, command_dict: dict, app_pipe_name: Optional[str] = None):
+    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None):
         """
-        Sends an out-of-band command to a Matter app.
+        Send an out-of-band command to a Matter app.
+        Args:
+            command_dict (dict): dictionary with the command and data.
+            app_pipe (Optional[str], optional): Name of the cluster pipe file  (i.e. /tmp/chip_all_clusters_fifo_55441 or /tmp/chip_rvc_fifo_11111). Raises
+            FileNotFoundError if pipe file is not found. If None takes the value from the CI argument --app-pipe,  arg --app-pipe has his own file exists check.
 
-        Use the following environment variables:
+        This method uses the following environment variables:
 
          - LINUX_DUT_IP
             * if not provided, the Matter app is assumed to run on the same machine as the test,
               such as during CI, and the commands are sent to it using a local named pipe
             * if provided, the commands for writing to the named pipe are forwarded to the DUT
         - LINUX_DUT_USER
-
             * if LINUX_DUT_IP is provided, use this for the DUT user name
             * If a remote password is needed, set up ssh keys to ensure that this script can log in to the DUT without a password:
                  + Step 1: If you do not have a key, create one using ssh-keygen
                  + Step 2: Authorize this key on the remote host: run ssh-copy-id user@ip once, using your password
                  + Step 3: From now on ssh user@ip will no longer ask for your password
         """
+        # If is not empty from the args, verify if the fifo file exists.
+        if app_pipe is not None and not os.path.exists(app_pipe):
+            logging.error("Named pipe %r does NOT exist" % app_pipe)
+            raise FileNotFoundError("CANNOT FIND %r" % app_pipe)
 
-        if app_pipe_name is None:
-            app_pipe_name = self.get_default_app_pipe_name()
+        if app_pipe is None:
+            app_pipe = self.matter_test_config.app_pipe
 
-        if not isinstance(app_pipe_name, str):
-            raise TypeError("the named pipe must be provided as a string value")
+        if not isinstance(app_pipe, str):
+            raise TypeError("The named pipe must be provided as a string value")
 
         if not isinstance(command_dict, dict):
-            raise TypeError("the command must be passed as a dictionary value")
+            raise TypeError("The command must be passed as a dictionary value")
 
-        import json
         command = json.dumps(command_dict)
-
-        import os
         dut_ip = os.getenv('LINUX_DUT_IP')
 
+        # Checks for concatenate app_pipe and app_pid
         if dut_ip is None:
-            if not os.path.exists(app_pipe_name):
-                # Named pipes are unique, so we MUST have consistent PID/paths
-                # set up for them to work.
-                logging.error("Named pipe %r does NOT exist" % app_pipe_name)
-                raise FileNotFoundError("CANNOT FIND %r" % app_pipe_name)
-            with open(app_pipe_name, "w") as app_pipe:
-                app_pipe.write(command + "\n")
+            with open(app_pipe, "w") as app_pipe_fp:
+                logger.info(f"Sending out-of-band command: {command} to file: {app_pipe}")
+                app_pipe_fp.write(json.dumps(command_dict) + "\n")
             # TODO(#31239): remove the need for sleep
-            sleep(0.001)
+            # This was tested with matter.js as being reliable enough
+            sleep(0.05)
         else:
             logging.info(f"Using DUT IP address: {dut_ip}")
 
             dut_uname = os.getenv('LINUX_DUT_USER')
             asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
-
             logging.info(f"Using DUT user name: {dut_uname}")
-
-            command_fixed = command.replace('\"', '\\"')
-            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe_name)
+            command_fixed = shlex.quote(json.dumps(command_dict))
+            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe)
             os.system(cmd)
 
     # Override this if the test requires a different default timeout.
@@ -1027,6 +1064,22 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def get_endpoint(self, default: Optional[int] = 0) -> int:
         return self.matter_test_config.endpoint if self.matter_test_config.endpoint is not None else default
+
+    def get_wifi_ssid(self, default: Optional[str] = 0) -> str:
+        ''' Get WiFi SSID
+
+            Get the WiFi networks name provided with flags
+
+        '''
+        return self.matter_test_config.wifi_ssid if self.matter_test_config.wifi_ssid is not None else default
+
+    def get_credentials(self, default: Optional[str] = 0) -> str:
+        ''' Get WiFi passphrase
+
+            Get the WiFi credentials provided with flags
+
+        '''
+        return self.matter_test_config.wifi_passphrase if self.matter_test_config.wifi_passphrase is not None else default
 
     def setup_class(self):
         super().setup_class()
@@ -1079,6 +1132,27 @@ class MatterBaseTest(base_test.BaseTestClass):
     @property
     def is_pics_sdk_ci_only(self) -> bool:
         return self.check_pics('PICS_SDK_CI_ONLY')
+
+    def _update_legacy_test_event_triggers(self, eventTrigger: int) -> int:
+        """ This function updates eventTriged if legacy flag is activated. """
+        target_endpoint = 0
+
+        if self.matter_test_config.legacy:
+            logger.info("Legacy test event trigger activated")
+        else:
+            logger.info("Legacy test event trigger deactivated")
+            target_endpoint = self.get_endpoint()
+
+        if not (0 <= target_endpoint <= 0xFFFF):
+            raise ValueError("Target endpoint should be between 0 and 0xFFFF")
+
+        # Clean endpoint target
+        eventTrigger = eventTrigger & ~ (0xFFFF << 32)
+
+        # Sets endpoint in eventTrigger
+        eventTrigger |= (target_endpoint & 0xFFFF) << 32
+
+        return eventTrigger
 
     async def commission_devices(self) -> bool:
         dev_ctrl: ChipDeviceCtrl.ChipDeviceController = self.default_controller
@@ -1248,13 +1322,11 @@ class MatterBaseTest(base_test.BaseTestClass):
             else:
                 enableKey = self.matter_test_config.global_test_params['enableKey']
 
+        eventTrigger = self._update_legacy_test_event_triggers(eventTrigger)
+
         try:
             # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
-            await self.send_single_cmd(endpoint=0,
-                                       cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(
-                                           enableKey,
-                                           eventTrigger)
-                                       )
+            await self.send_single_cmd(endpoint=0, cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey, eventTrigger))
 
         except InteractionModelError as e:
             asserts.fail(
@@ -1491,21 +1563,24 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step(step)
         self.mark_current_step_skipped()
 
-    def skip_all_remaining_steps(self, starting_step_number):
-        ''' Skips all remaining test steps starting with provided starting step
-
+    def mark_all_remaining_steps_skipped(self, starting_step_number: typing.Union[int, str]) -> None:
+        """Mark all remaining test steps starting with provided starting step
             starting_step_number gives the first step to be skipped, as defined in the TestStep.test_plan_number
-            starting_step_number must be provided, and is not derived intentionally. By providing argument
-                test is more deliberately identifying where test skips are starting from, making
-                it easier to validate against the test plan for correctness.
-        '''
+            starting_step_number must be provided, and is not derived intentionally.
+            By providing argument test is more deliberately identifying where test skips are starting from, 
+            making it easier to validate against the test plan for correctness.
+        Args:
+            starting_step_number (int,str): Number of name of the step to start skipping the steps.
+
+        Returns nothing on success so the test can go on.
+        """
         steps = self.get_test_steps(self.current_test_info.name)
         for idx, step in enumerate(steps):
             if step.test_plan_number == starting_step_number:
                 starting_step_idx = idx
                 break
         else:
-            asserts.fail("skip_all_remaining_steps was provided with invalid starting_step_num")
+            asserts.fail("mark_all_remaining_steps_skipped was provided with invalid starting_step_num")
         remaining = steps[starting_step_idx:]
         for step in remaining:
             self.skip_step(step.test_plan_number)
@@ -1541,13 +1616,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         for qr_code in self.matter_test_config.qr_code_content:
             try:
                 setup_payloads.append(SetupPayload().ParseQrCode(qr_code))
-            except ChipStackError:
+            except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Can not use 'with' because it is not expected to fail
                 asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
 
         for manual_code in self.matter_test_config.manual_code:
             try:
                 setup_payloads.append(SetupPayload().ParseManualPairingCode(manual_code))
-            except ChipStackError:
+            except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Can not use 'with' because it is not expected to fail
                 asserts.fail(
                     f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
 
@@ -1612,25 +1687,58 @@ class MatterBaseTest(base_test.BaseTestClass):
             logging.info("========= EOF on STDIN =========")
             return None
 
+    def user_verify_snap_shot(self,
+                              prompt_msg: str,
+                              image: bytes) -> Optional[str]:
+        """Show Image Verification Prompt and wait for user validation.
 
-def generate_mobly_test_config(matter_test_config: MatterTestConfig):
-    test_run_config = TestRunConfig()
-    # We use a default name. We don't use Mobly YAML configs, so that we can be
-    # freestanding without relying
-    test_run_config.testbed_name = "MatterTest"
+        Args:
+            prompt_msg (str): Message for TH UI prompt and input function.
+            Indicates what is expected from the user.
+            image (bytes): Image data as bytes.
 
-    log_path = matter_test_config.logs_path
-    log_path = _DEFAULT_LOG_PATH if log_path is None else log_path
-    if ENV_MOBLY_LOGPATH in os.environ:
-        log_path = os.environ[ENV_MOBLY_LOGPATH]
+        Returns:
+            str: User input or none if input is closed.
+        """
 
-    test_run_config.log_path = log_path
-    # TODO: For later, configure controllers
-    test_run_config.controller_configs = {}
+        # Convert bytes to comma separated hex string
+        hex_string = ', '.join(f'{byte:02x}' for byte in image)
+        if self.runner_hook:
+            self.runner_hook.show_image_prompt(
+                msg=prompt_msg,
+                img_hex_str=hex_string
+            )
 
-    test_run_config.user_params = matter_test_config.global_test_params
+        logging.info("========= USER PROMPT for Image Verification =========")
+        logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
+        try:
+            return input()
+        except EOFError:
+            logging.info("========= EOF on STDIN =========")
+            return None
 
-    return test_run_config
+    def user_verify_video_stream(self,
+                                 prompt_msg: str) -> Optional[str]:
+        """Show Video Verification Prompt and wait for user validation.
+
+        Args:
+            prompt_msg (str): Message for TH UI prompt and input function.
+            Indicates what is expected from the user.
+
+        Returns:
+            str: User input or none if input is closed.
+        """
+
+        if self.runner_hook:
+            self.runner_hook.show_video_prompt(msg=prompt_msg)
+
+        logging.info("========= USER PROMPT for Video Stream Verification =========")
+        logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
+        try:
+            return input()
+        except EOFError:
+            logging.info("========= EOF on STDIN =========")
+            return None
 
 
 def _find_test_class():
@@ -1885,8 +1993,16 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
-    config.app_pid = 0 if args.app_pid is None else args.app_pid
+    config.app_pipe = args.app_pipe
+    if config.app_pipe is not None and not os.path.exists(config.app_pipe):
+        # Named pipes are unique, so we MUST have consistent paths
+        # Verify from start the named pipe exists.
+        logging.error("Named pipe %r does NOT exist" % config.app_pipe)
+        raise FileNotFoundError("CANNOT FIND %r" % config.app_pipe)
+
     config.fail_on_skipped_tests = args.fail_on_skipped
+
+    config.legacy = args.use_legacy_test_event_triggers
 
     config.controller_node_id = args.controller_node_id
     config.trace_to = args.trace_to
@@ -1942,9 +2058,12 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                              help='Node ID for primary DUT communication, '
                              'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
     basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
-    basic_group.add_argument('--app-pid', type=int, default=0, help="The PID of the app against which the test is going to run")
+    basic_group.add_argument('--app-pipe', type=str, default=None, help="The full path of the app to send an out-of-band command")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
+
+    basic_group.add_argument("--use-legacy-test-event-triggers", action="store_true", default=False,
+                             help="Send test event triggers with endpoint 0 for older devices")
 
     commission_group = parser.add_argument_group(title="Commissioning", description="Arguments to commission a node")
 
@@ -2034,6 +2153,49 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
     return convert_args_to_matter_config(parser.parse_known_args(argv)[0])
 
 
+def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
+    """Runs an async function within the test's event loop with a timeout.
+
+    This helper function takes an awaitable (async function) and executes it
+    using the test's event loop (`self.event_loop.run_until_complete`).
+    It applies a timeout based on the test configuration (`self.matter_test_config.timeout`)
+    or the default timeout (`self.default_timeout`) if not specified.
+
+    Args:
+        body: The async function (coroutine) to execute. It will be called
+              with `self` as the first argument, followed by `*args` and `**kwargs`.
+        self: The instance of the MatterBaseTest class.
+        *args: Positional arguments to pass to the `body` function.
+        **kwargs: Keyword arguments to pass to the `body` function.
+
+    Returns:
+        The result returned by the awaited `body` function.
+    """
+    timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
+    return self.event_loop.run_until_complete(asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout))
+
+
+EndpointCheckFunction = typing.Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
+
+
+def get_cluster_from_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> ClusterObjects.Cluster:
+    """Returns the cluster object for a given attribute descriptor."""
+    return ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
+
+
+def get_cluster_from_command(command: ClusterObjects.ClusterCommand) -> ClusterObjects.Cluster:
+    """Returns the cluster object for a given command object."""
+    return ClusterObjects.ALL_CLUSTERS[command.cluster_id]
+
+
+async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
+    """ Returns a list of endpoints matching the accept condition. """
+    wildcard = await self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
+    matching = [e for e in wildcard.attributes.keys()
+                if accept_function(wildcard, e)]
+    return matching
+
+
 class CommissionDeviceTest(MatterBaseTest):
     """Test class auto-injected at the start of test list to commission a device when requested"""
 
@@ -2044,156 +2206,6 @@ class CommissionDeviceTest(MatterBaseTest):
     def test_run_commissioning(self):
         if not self.event_loop.run_until_complete(self.commission_devices()):
             raise signals.TestAbortAll("Failed to commission node(s)")
-
-
-def default_matter_test_main():
-    """Execute the test class in a test module.
-    This is the default entry point for running a test script file directly.
-    In this case, only one test class in a test script is allowed.
-    To make your test script executable, add the following to your file:
-    .. code-block:: python
-      from chip.testing.matter_testing import default_matter_test_main
-      ...
-      if __name__ == '__main__':
-        default_matter_test_main()
-    """
-
-    matter_test_config = parse_matter_test_args()
-
-    # Find the test class in the test script.
-    test_class = _find_test_class()
-
-    hooks = InternalTestRunnerHooks()
-
-    run_tests(test_class, matter_test_config, hooks)
-
-
-def get_test_info(test_class: MatterBaseTest, matter_test_config: MatterTestConfig) -> list[TestInfo]:
-    test_config = generate_mobly_test_config(matter_test_config)
-    base = test_class(test_config)
-
-    if len(matter_test_config.tests) > 0:
-        tests = matter_test_config.tests
-    else:
-        tests = base.get_existing_test_names()
-
-    info = []
-    for t in tests:
-        info.append(TestInfo(t, steps=base.get_test_steps(t), desc=base.get_test_desc(t), pics=base.get_test_pics(t)))
-
-    return info
-
-
-def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTestConfig,
-                      event_loop: asyncio.AbstractEventLoop, hooks: TestRunnerHooks,
-                      default_controller=None, external_stack=None) -> bool:
-
-    # NOTE: It's not possible to pass event loop via Mobly TestRunConfig user params, because the
-    #       Mobly deep copies the user params before passing them to the test class and the event
-    #       loop is not serializable. So, we are setting the event loop as a test class member.
-    CommissionDeviceTest.event_loop = event_loop
-    test_class.event_loop = event_loop
-
-    get_test_info(test_class, matter_test_config)
-
-    # Load test config file.
-    test_config = generate_mobly_test_config(matter_test_config)
-
-    # Parse test specifiers if exist.
-    tests = None
-    if len(matter_test_config.tests) > 0:
-        tests = matter_test_config.tests
-
-    if external_stack:
-        stack = external_stack
-    else:
-        stack = MatterStackState(matter_test_config)
-
-    with TracingContext() as tracing_ctx:
-        for destination in matter_test_config.trace_to:
-            tracing_ctx.StartFromString(destination)
-
-        test_config.user_params["matter_stack"] = stash_globally(stack)
-
-        # TODO: Steer to right FabricAdmin!
-        # TODO: If CASE Admin Subject is a CAT tag range, then make sure to issue NOC with that CAT tag
-        if not default_controller:
-            default_controller = stack.certificate_authorities[0].adminList[0].NewController(
-                nodeId=matter_test_config.controller_node_id,
-                paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
-                catTags=matter_test_config.controller_cat_tags,
-                dacRevocationSetPath=str(matter_test_config.dac_revocation_set_path),
-            )
-        test_config.user_params["default_controller"] = stash_globally(default_controller)
-
-        test_config.user_params["matter_test_config"] = stash_globally(matter_test_config)
-        test_config.user_params["hooks"] = stash_globally(hooks)
-
-        # Execute the test class with the config
-        ok = True
-
-        test_config.user_params["certificate_authority_manager"] = stash_globally(stack.certificate_authority_manager)
-
-        # Execute the test class with the config
-        ok = True
-
-        runner = TestRunner(log_dir=test_config.log_path,
-                            testbed_name=test_config.testbed_name)
-
-        with runner.mobly_logger():
-            if matter_test_config.commissioning_method is not None:
-                runner.add_test_class(test_config, CommissionDeviceTest, None)
-
-            # Add the tests selected unless we have a commission-only request
-            if not matter_test_config.commission_only:
-                runner.add_test_class(test_config, test_class, tests)
-
-            if hooks:
-                # Right now, we only support running a single test class at once,
-                # but it's relatively easy to expand that to make the test process faster
-                # TODO: support a list of tests
-                hooks.start(count=1)
-                # Mobly gives the test run time in seconds, lets be a bit more precise
-                runner_start_time = datetime.now(timezone.utc)
-
-            try:
-                runner.run()
-                ok = runner.results.is_all_pass and ok
-                if matter_test_config.fail_on_skipped_tests and runner.results.skipped:
-                    ok = False
-            except TimeoutError:
-                ok = False
-            except signals.TestAbortAll:
-                ok = False
-            except Exception:
-                logging.exception('Exception when executing %s.', test_config.testbed_name)
-                ok = False
-
-    if hooks:
-        duration = (datetime.now(timezone.utc) - runner_start_time) / timedelta(microseconds=1)
-        hooks.stop(duration=duration)
-
-    if not external_stack:
-        async def shutdown():
-            stack.Shutdown()
-        # Shutdown the stack when all done. Use the async runner to ensure that
-        # during the shutdown callbacks can use tha same async context which was used
-        # during the initialization.
-        event_loop.run_until_complete(shutdown())
-
-    if ok:
-        logging.info("Final result: PASS !")
-    else:
-        logging.error("Final result: FAIL !")
-    return ok
-
-
-def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig,
-              hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> None:
-    with asyncio.Runner() as runner:
-        if not run_tests_no_exit(test_class, matter_test_config, runner.get_loop(),
-                                 hooks, default_controller, external_stack):
-            sys.exit(1)
 
 
 # TODO(#37537): Remove these temporary aliases after transition period
@@ -2220,3 +2232,8 @@ _get_all_matching_endpoints = decorators._get_all_matching_endpoints
 _has_feature = decorators._has_feature
 _has_command = decorators._has_command
 _has_attribute = decorators._has_attribute
+
+default_matter_test_main = runner.default_matter_test_main
+get_test_info = runner.get_test_info
+run_tests = runner.run_tests
+run_tests_no_exit = runner.run_tests_no_exit

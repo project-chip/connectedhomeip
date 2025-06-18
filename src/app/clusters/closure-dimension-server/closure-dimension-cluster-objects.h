@@ -44,10 +44,10 @@ struct GenericCurrentStateStruct : public Structs::CurrentStateStruct::Type
         return *this;
     }
 
-    void Set(Optional<Percent100ths> positioningValue = NullOptional, Optional<bool> latchValue = NullOptional,
+    void Set(Optional<Percent100ths> positionValue = NullOptional, Optional<bool> latchValue = NullOptional,
              Optional<Globals::ThreeLevelAutoEnum> speedValue = NullOptional)
     {
-        position = positioningValue;
+        position = positionValue;
         latch    = latchValue;
         speed    = speedValue;
     }

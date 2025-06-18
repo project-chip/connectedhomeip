@@ -15,6 +15,9 @@
  *    limitations under the License.
  */
 
+#pragma once
+
+#include <app-common/zap-generated/cluster-enums.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
@@ -30,11 +33,83 @@ public:
     DelegateBase()          = default;
     virtual ~DelegateBase() = default;
 
-    // TODO: Delagte only has the default three APIs for now. This will be refined when the updated cluster structure is integrated
-    // in the Closure Sample app
-    virtual Protocols::InteractionModel::Status HandleStopCommand()      = 0;
-    virtual Protocols::InteractionModel::Status HandleMoveToCommand()    = 0;
+    /**
+     * @brief This function handles Stop command implementaion.
+     *
+     * @return Success when closure succesfully handles stop.
+     *         Error when stop fails.
+     */
+    virtual Protocols::InteractionModel::Status HandleStopCommand() = 0;
+
+    /**
+     * @brief This function handles MoveTo command implementaion.
+     *
+     * @param [in] position Target position to be set
+     * @param [in] latch Target Latch to be set
+     * @param [in] speed Target speed to be set
+     *
+     * @return Success when closure succesfully handles motion.
+     *         Error when motion fails.
+     */
+    virtual Protocols::InteractionModel::Status HandleMoveToCommand(const Optional<TargetPositionEnum> & position,
+                                                                    const Optional<bool> & latch,
+                                                                    const Optional<Globals::ThreeLevelAutoEnum> & speed) = 0;
+
+    /**
+     * @brief This function handles Calibrate command implementaion.
+     *
+     * @return Success when closure succesfully handles calibration.
+     *         Error when calibration fails.
+     */
     virtual Protocols::InteractionModel::Status HandleCalibrateCommand() = 0;
+
+    /**
+     * @brief This function returns the current error at the specified index of CurrentErrorList.
+     *
+     * @param [in] index Index of the error to be retrieved
+     * @param [out] closureError Current error at the specified index
+     *
+     * @return CHIP_NO_ERROR if the error is retrieved successfully
+     *         CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if there are no more errors to retrieve
+     */
+    virtual CHIP_ERROR GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError) = 0;
+
+    /**
+     * @brief Checks whether the closure can move (as opposed to still needing pre-motion stages to complete).
+     *
+     * @return true if closure is ready to move
+     *         false if closure is not ready to move
+     */
+    virtual bool IsReadyToMove() = 0;
+
+    /**
+     * @brief Checks whether this closure needs manual latching.
+     *
+     * @return true if manual latching is needed
+     *         false if manual latching not needed
+     */
+    virtual bool IsManualLatchingNeeded() = 0;
+
+    /**
+     * @brief Get the countdown time required by the closure for calibration.
+     *
+     * @return Time required for calibration action.
+     */
+    virtual ElapsedS GetCalibrationCountdownTime() = 0;
+
+    /**
+     * @brief Get the countdown time required by the closure for Motion.
+     *
+     * @return Time required for Motion action.
+     */
+    virtual ElapsedS GetMovingCountdownTime() = 0;
+
+    /**
+     * @brief Get the countdown time required by the closure for pre-stage before start of motion.
+     *
+     * @return Time required for Motion action.
+     */
+    virtual ElapsedS GetWaitingForMotionCountdownTime() = 0;
 };
 
 } // namespace ClosureControl

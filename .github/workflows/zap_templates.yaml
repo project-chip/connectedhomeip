@@ -35,7 +35,7 @@ jobs:
 
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/project-chip/chip-build:125
+            image: ghcr.io/project-chip/chip-build:140
         defaults:
             run:
                 shell: sh
@@ -59,6 +59,14 @@ jobs:
             # this may leave obsolete files. Ensure we always check for clean regen.
             - name: Ensure clean java
               run: rm -rf src/controller/java/generated/
+            # CPP code is also one folder per cluster, so we need a cleanup to ensure deleted items
+            # actually disappear
+            #
+            # Note though: the shared/BUILD.gn is NOT generated, so we keep it
+            - name: Ensure clean clusters
+              run: |
+                  rm -rf zzz_generated/app-common/clusters
+                  git checkout -f zzz_generated/app-common/clusters/shared/BUILD.gn
             - name: Generate all
               run: ./scripts/run_in_build_env.sh scripts/tools/zap_regen_all.py
             - name: Generate script-maintained items (ERROR_CODES.md)

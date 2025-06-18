@@ -19,18 +19,18 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../../src/app/zap-templates/app-templates.json",
-      "type": "gen-templates-json",
-      "category": "matter",
-      "version": "chip-v1"
-    },
-    {
-      "pathRelativity": "relativeToZap",
       "path": "../../../../src/app/zap-templates/zcl/zcl.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
       "description": "Matter SDK ZCL data"
+    },
+    {
+      "pathRelativity": "relativeToZap",
+      "path": "../../../../src/app/zap-templates/app-templates.json",
+      "type": "gen-templates-json",
+      "category": "matter",
+      "version": "chip-v1"
     }
   ],
   "endpointTypes": [
@@ -54,7 +54,7 @@
         }
       ],
       "deviceVersions": [
-        1
+        3
       ],
       "deviceIdentifiers": [
         22
@@ -247,7 +247,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "array",
-              "included": 1,
+              "included": 0,
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
@@ -360,7 +360,7 @@
               "side": "server",
               "type": "bitmap32",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
@@ -821,7 +821,7 @@
               "storageOption": "RAM",
               "singleton": 1,
               "bounded": 0,
-              "defaultValue": "3",
+              "defaultValue": "5",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -1298,7 +1298,7 @@
               "side": "server",
               "type": "int16u",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "1",
@@ -2421,6 +2421,30 @@
               "source": "client",
               "isIncoming": 1,
               "isEnabled": 1
+            },
+            {
+              "name": "SetVIDVerificationStatement",
+              "code": 12,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "SignVIDVerificationRequest",
+              "code": 13,
+              "mfgCode": null,
+              "source": "client",
+              "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "SignVIDVerificationResponse",
+              "code": 14,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
+              "isEnabled": 1
             }
           ],
           "attributes": [
@@ -2961,7 +2985,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "2",
+              "defaultValue": "0x0005",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

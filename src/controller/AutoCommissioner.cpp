@@ -39,11 +39,7 @@ AutoCommissioner::AutoCommissioner()
     SetCommissioningParameters(CommissioningParameters());
 }
 
-AutoCommissioner::~AutoCommissioner()
-{
-    ReleaseDAC();
-    ReleasePAI();
-}
+AutoCommissioner::~AutoCommissioner() {}
 
 void AutoCommissioner::SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate)
 {
@@ -386,6 +382,16 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kAttestationVerification:
         return CommissioningStage::kAttestationRevocationCheck;
     case CommissioningStage::kAttestationRevocationCheck:
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+        if (mParams.GetExecuteJCM().ValueOr(false))
+        {
+            return CommissioningStage::kJFValidateNOC;
+        }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+        return CommissioningStage::kSendOpCertSigningRequest;
+    case CommissioningStage::kJFValidateNOC:
+        return CommissioningStage::kSendVIDVerificationRequest;
+    case CommissioningStage::kSendVIDVerificationRequest:
         return CommissioningStage::kSendOpCertSigningRequest;
     case CommissioningStage::kSendOpCertSigningRequest:
         return CommissioningStage::kValidateCSR;
@@ -577,6 +583,9 @@ CHIP_ERROR AutoCommissioner::StartCommissioning(DeviceCommissioner * commissione
     auto transportType =
         mCommissioneeDeviceProxy->GetSecureSession().Value()->AsSecureSession()->GetPeerAddress().GetTransportType();
     mNeedsNetworkSetup = (transportType == Transport::Type::kBle);
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+    mNeedsNetworkSetup = mNeedsNetworkSetup || (transportType == Transport::Type::kNfc);
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     mNeedsNetworkSetup = mNeedsNetworkSetup || (transportType == Transport::Type::kWiFiPAF);
 #endif
@@ -777,17 +786,46 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                     mParams.ClearICDStayActiveDurationMsec();
                 }
             }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+            if (mParams.GetExecuteJCM().ValueOr(false) &&
+                (mDeviceCommissioningInfo.JFAdministratorFabricIndex != kUndefinedFabricIndex))
+            {
+                ReturnErrorOnFailure(AllocateMemoryAndCopySpan(mJFAdminRCAC, mDeviceCommissioningInfo.JFAdminRCAC));
+                mParams.SetJFAdminRCAC(mJFAdminRCAC.Span());
+
+                ReturnErrorOnFailure(AllocateMemoryAndCopySpan(mJFAdminICAC, mDeviceCommissioningInfo.JFAdminICAC));
+                mParams.SetJFAdminICAC(mJFAdminICAC.Span());
+
+                ReturnErrorOnFailure(AllocateMemoryAndCopySpan(mJFAdminNOC, mDeviceCommissioningInfo.JFAdminNOC));
+                mParams.SetJFAdminNOC(mJFAdminNOC.Span());
+
+                mParams.SetJFAdminEndpointId(mDeviceCommissioningInfo.JFAdminEndpointId)
+                    .SetJFAdministratorFabricIndex(mDeviceCommissioningInfo.JFAdministratorFabricIndex)
+                    .SetJFAdminFabricId(mDeviceCommissioningInfo.JFAdminFabricTable.fabricId)
+                    .SetJFAdminVendorId(mDeviceCommissioningInfo.JFAdminFabricTable.vendorId);
+            }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
             break;
         }
         case CommissioningStage::kConfigureTimeZone:
             mNeedsDST = report.Get<TimeZoneResponseInfo>().requiresDSTOffsets;
             break;
-        case CommissioningStage::kSendPAICertificateRequest:
-            SetPAI(report.Get<RequestedCertificate>().certificate);
+        case CommissioningStage::kSendPAICertificateRequest: {
+            auto reportPAISpan = report.Get<RequestedCertificate>().certificate;
+
+            ReturnErrorOnFailure(AllocateMemoryAndCopySpan(mPAI, reportPAISpan));
+            mParams.SetPAI(mPAI.Span());
             break;
-        case CommissioningStage::kSendDACCertificateRequest:
-            SetDAC(report.Get<RequestedCertificate>().certificate);
+        }
+        case CommissioningStage::kSendDACCertificateRequest: {
+            auto reportDACSpan = report.Get<RequestedCertificate>().certificate;
+
+            ReturnErrorOnFailure(AllocateMemoryAndCopySpan(mDAC, reportDACSpan));
+            mParams.SetDAC(ByteSpan(mDAC.Span()));
             break;
+        }
         case CommissioningStage::kSendAttestationRequest: {
             auto & elements  = report.Get<AttestationResponse>().attestationElements;
             auto & signature = report.Get<AttestationResponse>().signature;
@@ -853,8 +891,13 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             {
                 ResetTryingSecondaryNetwork();
             }
-            ReleasePAI();
-            ReleaseDAC();
+            mPAI.Free();
+            mDAC.Free();
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+            mJFAdminRCAC.Free();
+            mJFAdminICAC.Free();
+            mJFAdminNOC.Free();
+#endif
             mCommissioneeDeviceProxy = nullptr;
             mOperationalDeviceProxy  = OperationalDeviceProxy();
             mDeviceCommissioningInfo = ReadCommissioningInfo();
@@ -927,77 +970,19 @@ CHIP_ERROR AutoCommissioner::PerformStep(CommissioningStage nextStage)
     return CHIP_NO_ERROR;
 }
 
-void AutoCommissioner::ReleaseDAC()
+CHIP_ERROR AutoCommissioner::AllocateMemoryAndCopySpan(Platform::ScopedMemoryBufferWithSize<uint8_t> & scopedBuffer, ByteSpan span)
 {
-    if (mDAC != nullptr)
+    if (!span.size())
     {
-        Platform::MemoryFree(mDAC);
-    }
-    mDACLen = 0;
-    mDAC    = nullptr;
-}
-
-CHIP_ERROR AutoCommissioner::SetDAC(const ByteSpan & dac)
-{
-    if (dac.size() == 0)
-    {
-        ReleaseDAC();
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
     }
 
-    VerifyOrReturnError(dac.size() <= Credentials::kMaxDERCertLength, CHIP_ERROR_INVALID_ARGUMENT);
-    if (mDACLen != 0)
+    if (!scopedBuffer.Alloc(span.size()))
     {
-        ReleaseDAC();
+        ChipLogError(Controller, "AutoCommissioner: AllocateMemoryAndCopySpan failed");
+        return CHIP_ERROR_NO_MEMORY;
     }
-
-    VerifyOrReturnError(CanCastTo<uint16_t>(dac.size()), CHIP_ERROR_INVALID_ARGUMENT);
-    if (mDAC == nullptr)
-    {
-        mDAC = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(dac.size()));
-    }
-    VerifyOrReturnError(mDAC != nullptr, CHIP_ERROR_NO_MEMORY);
-    mDACLen = static_cast<uint16_t>(dac.size());
-    memcpy(mDAC, dac.data(), mDACLen);
-    mParams.SetDAC(ByteSpan(mDAC, mDACLen));
-
-    return CHIP_NO_ERROR;
-}
-
-void AutoCommissioner::ReleasePAI()
-{
-    if (mPAI != nullptr)
-    {
-        chip::Platform::MemoryFree(mPAI);
-    }
-    mPAILen = 0;
-    mPAI    = nullptr;
-}
-
-CHIP_ERROR AutoCommissioner::SetPAI(const chip::ByteSpan & pai)
-{
-    if (pai.size() == 0)
-    {
-        ReleasePAI();
-        return CHIP_NO_ERROR;
-    }
-
-    VerifyOrReturnError(pai.size() <= Credentials::kMaxDERCertLength, CHIP_ERROR_INVALID_ARGUMENT);
-    if (mPAILen != 0)
-    {
-        ReleasePAI();
-    }
-
-    VerifyOrReturnError(CanCastTo<uint16_t>(pai.size()), CHIP_ERROR_INVALID_ARGUMENT);
-    if (mPAI == nullptr)
-    {
-        mPAI = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(pai.size()));
-    }
-    VerifyOrReturnError(mPAI != nullptr, CHIP_ERROR_NO_MEMORY);
-    mPAILen = static_cast<uint16_t>(pai.size());
-    memcpy(mPAI, pai.data(), mPAILen);
-    mParams.SetPAI(ByteSpan(mPAI, mPAILen));
-
+    memcpy(scopedBuffer.Get(), span.data(), scopedBuffer.AllocatedSize());
     return CHIP_NO_ERROR;
 }
 

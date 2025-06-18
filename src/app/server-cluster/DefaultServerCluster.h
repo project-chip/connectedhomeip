@@ -16,8 +16,11 @@
  */
 #pragma once
 
+#include <access/Privilege.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/server-cluster/ServerClusterInterface.h>
+#include <lib/core/CHIPError.h>
+
 #include <optional>
 
 namespace chip {
@@ -63,6 +66,13 @@ public:
     ///
     /// Default implementation just returns the global attributes required by the API contract.
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+    /// Must only be implemented if event readability is relevant
+    CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) override
+    {
+        eventInfo.readPrivilege = Access::Privilege::kView;
+        return CHIP_NO_ERROR;
+    }
 
     ///////////////////////////////////// Command Support /////////////////////////////////////////////////////////
 

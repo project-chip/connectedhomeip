@@ -451,8 +451,8 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
 
     if (earliestStartTimeNullable.IsNull())
     {
-        System::Clock::Milliseconds64 cTMs;
-        CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
+        uint32_t matterEpoch = 0;
+        CHIP_ERROR err       = System::Clock::GetClock_MatterEpochS(matterEpoch);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "DEM: Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
@@ -460,17 +460,8 @@ void Instance::HandleStartTimeAdjustRequest(HandlerContext & ctx,
             return;
         }
 
-        auto unixEpoch     = std::chrono::duration_cast<System::Clock::Seconds32>(cTMs).count();
-        uint32_t chipEpoch = 0;
-        if (!UnixEpochToChipEpochTime(unixEpoch, chipEpoch))
-        {
-            ChipLogError(Zcl, "DEM: unable to convert Unix Epoch time to Matter Epoch Time");
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
-            return;
-        }
-
         /* Null means - We can start immediately */
-        earliestStartTimeEpoch = chipEpoch; /* NOW */
+        earliestStartTimeEpoch = matterEpoch; /* NOW */
     }
     else
     {
@@ -756,11 +747,11 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
     }
 
     uint32_t currentUtcTime = 0;
-    status                  = GetMatterEpochTimeFromUnixTime(currentUtcTime);
-    if (status != Status::Success)
+    CHIP_ERROR err          = System::Clock::GetClock_MatterEpochS(currentUtcTime);
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "DEM: Failed to get UTC time");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
         return;
     }
 
@@ -894,28 +885,6 @@ void Instance::HandleCancelRequest(HandlerContext & ctx, const Commands::CancelR
     }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-}
-
-Status Instance::GetMatterEpochTimeFromUnixTime(uint32_t & currentUtcTime) const
-{
-    currentUtcTime = 0;
-    System::Clock::Milliseconds64 cTMs;
-
-    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "DEM: Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
-        return Status::Failure;
-    }
-
-    auto unixEpoch = std::chrono::duration_cast<System::Clock::Seconds32>(cTMs).count();
-    if (!UnixEpochToChipEpochTime(unixEpoch, currentUtcTime))
-    {
-        ChipLogError(Zcl, "DEM: unable to convert Unix Epoch time to Matter Epoch Time");
-        return Status::Failure;
-    }
-
-    return Status::Success;
 }
 
 } // namespace DeviceEnergyManagement

@@ -4,7 +4,7 @@
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 
-#include <app/common/GlobalIds.h>
+#include <clusters/shared/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
@@ -24,9 +24,9 @@ namespace VideoSensorParams {
 inline constexpr AttributeId Id = 0x00000002;
 } // namespace VideoSensorParams
 
-namespace NightVisionCapable {
+namespace NightVisionUsesInfrared {
 inline constexpr AttributeId Id = 0x00000003;
-} // namespace NightVisionCapable
+} // namespace NightVisionUsesInfrared
 
 namespace MinViewport {
 inline constexpr AttributeId Id = 0x00000004;
@@ -84,9 +84,9 @@ namespace AllocatedSnapshotStreams {
 inline constexpr AttributeId Id = 0x00000011;
 } // namespace AllocatedSnapshotStreams
 
-namespace RankedVideoStreamPrioritiesList {
+namespace StreamUsagePriorities {
 inline constexpr AttributeId Id = 0x00000012;
-} // namespace RankedVideoStreamPrioritiesList
+} // namespace StreamUsagePriorities
 
 namespace SoftRecordingPrivacyModeEnabled {
 inline constexpr AttributeId Id = 0x00000013;
@@ -183,10 +183,6 @@ inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 namespace AcceptedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
 } // namespace AcceptedCommandList
-
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
 
 namespace AttributeList {
 inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;

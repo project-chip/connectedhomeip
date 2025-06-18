@@ -271,6 +271,21 @@ public:
      **/
     static CHIP_ERROR generateRandomSetupPin(uint32_t & setupPINCode);
 
+    /**
+     * @brief Get a list of setup payloads from a string representation.
+     *
+     * @param[in] stringRepresentation The string representing the payloads.
+
+     * @param[out] outPayloads On success, the contents of this vector will be
+     *                         replaces with the list of parsed payloads.  The
+     *                         result may have only one entry, or multiple
+     *                         entries if concatenated QR codes are used.
+     *
+     *                         On failure, the value of the out param should not
+     *                         be relied on to be anything in particular.
+     */
+    static CHIP_ERROR FromStringRepresentation(std::string stringRepresentation, std::vector<SetupPayload> & outPayloads);
+
 private:
     std::map<uint8_t, OptionalQRCodeInfo> optionalVendorData;
     std::map<uint8_t, OptionalQRCodeInfoExtension> optionalExtensionData;

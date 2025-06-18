@@ -136,7 +136,11 @@ def tree_display_name(name: str) -> list[str]:
     'emberAf' prefixes to make them common and uses 'vtable for' information
     """
 
-    name = cxxfilt.demangle(name)
+    try:
+        name = cxxfilt.demangle(name)
+    except cxxfilt.InvalidName:
+        # Allow display of the name as-is
+        pass
 
     if name.startswith("non-virtual thunk to "):
         name = name[21:]
@@ -556,7 +560,7 @@ def symbols_from_objdump(elf_file: str) -> list[Symbol]:
 
     # The format looks like:
     #
-    #     out/qpg-qpg6105-light/chip-qpg6105-lighting-example.out:     file format elf32-little                                                                                          │
+    #     out/qpg-qpg6200-light/chip-qpg6200-lighting-example.out:     file format elf32-little                                                                                          │
     #                                                                                                                                                                                │
     #     SYMBOL TABLE:                                                                                                                                                                  │
     #     04000010 l    d  .bl_user_license   00000000 .bl_user_license                                                                                                                  │

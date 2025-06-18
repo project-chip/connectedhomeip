@@ -48,6 +48,7 @@ import os
 import signal
 import subprocess
 
+from chip import ChipDeviceCtrl
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -60,6 +61,30 @@ class TC_DA_1_9(MatterBaseTest):
         self.dac_provider_base_path = self.matter_test_config.global_test_params.get('dac_provider_base_path')
         self.revocation_set_base_path = self.matter_test_config.global_test_params.get('revocation_set_base_path')
 
+        # Set ROOT_DIR and default app path
+        # if we are running in CI, we expect the app to be in the SDK root
+        # else we expect the app is running in chip-cert-bin docker image
+        # same for dac_provider_base_path and revocation_set_base_path
+        if self.is_pics_sdk_ci_only:
+            ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..'))
+            DEFAULT_APP_PATH = os.path.join(
+                ROOT_DIR, "out/linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test/chip-all-clusters-app")
+        else:
+            ROOT_DIR = "/root"
+            DEFAULT_APP_PATH = os.path.join(ROOT_DIR, "apps/chip-all-clusters-app")
+
+        if self.app_path is None:
+            self.app_path = DEFAULT_APP_PATH
+
+        if self.dac_provider_base_path is None:
+            self.dac_provider_base_path = os.path.join(
+                ROOT_DIR, "credentials/test/revoked-attestation-certificates/dac-provider-test-vectors")
+
+        if self.revocation_set_base_path is None:
+            self.revocation_set_base_path = os.path.join(
+                ROOT_DIR, "credentials/test/revoked-attestation-certificates/revocation-sets")
+
+        # Check if paths that we expect to exist do exist
         if self.app_path is None or not os.path.exists(self.app_path):
             asserts.fail("--string-arg app_path:<app_path> is required for this test, please provide the path to the app (eg: all-clusters-app)")
 
@@ -184,23 +209,35 @@ class TC_DA_1_9(MatterBaseTest):
                 # Run the all-clusters-app in background
                 app_process = subprocess.Popen(app_cmd.split(), stdout=app_log_file, stderr=app_log_file)
 
+                revocation_set = os.path.join(self.revocation_set_base_path, test_case['revocation_set'])
                 # Prompt user with instructions
                 prompt_msg = (
                     f"\nPlease commission the DUT with:\n"
                     f"  Manual Pairing Code: '{test_case['manual_pairing_code']}'\n"
-                    f"  Revocation Set: {os.path.join(self.revocation_set_base_path, test_case['revocation_set'])}\n\n"
+                    f"  Revocation Set: {revocation_set}\n\n"
                     f"Input 'Y' if DUT successfully commissions without any warnings\n"
                     f"Input 'N' if commissioner warns about commissioning the non-genuine device, "
                     f"Or Commissioning fails with device appropriate attestation error\n"
                 )
 
-                # TODO: Run Python commissioner, commission the DUT, and check the return code
                 if self.is_pics_sdk_ci_only:
-                    resp = 'Y' if test_case['expects_commissioning_success'] else 'N'
+                    try:
+                        self.default_controller.SetDACRevocationSetPath(revocation_set)
+                        await self.default_controller.CommissionWithCode(
+                            setupPayload=test_case['manual_pairing_code'],
+                            nodeid=1,
+                            discoveryType=ChipDeviceCtrl.DiscoveryType.DISCOVERY_NETWORK_ONLY,
+                        )
+                        resp = 'Y'
+                    except Exception:
+                        resp = 'N'
                 else:
                     resp = self.wait_for_user_input(prompt_msg)
 
                 commissioning_success = resp.lower() == 'y'
+
+                app_process.send_signal(signal.SIGTERM.value)
+                app_process.wait()
 
                 # Verify results
                 asserts.assert_equal(
@@ -208,9 +245,6 @@ class TC_DA_1_9(MatterBaseTest):
                     test_case['expects_commissioning_success'],
                     f"Commissioning {'succeeded' if commissioning_success else 'failed'} when it should have {'succeeded' if test_case['expects_commissioning_success'] else 'failed'}"
                 )
-
-                app_process.send_signal(signal.SIGTERM.value)
-                app_process.wait()
 
 
 if __name__ == "__main__":

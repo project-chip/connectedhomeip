@@ -15,10 +15,6 @@ namespace CurrentConditionsChanged {
 inline constexpr EventId Id = 0x00000000;
 } // namespace CurrentConditionsChanged
 
-namespace ForecastConditionsChanged {
-inline constexpr EventId Id = 0x00000001;
-} // namespace ForecastConditionsChanged
-
 } // namespace Events
 } // namespace ElectricalGridConditions
 } // namespace Clusters

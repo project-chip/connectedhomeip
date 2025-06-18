@@ -62,6 +62,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Actions
     - Closure Control
     - Closure Dimension
+    - OTA Software Update Provider
 
 # We need a more configurable way of deciding which clusters have which init functions....
 # See https://github.com/project-chip/connectedhomeip/issues/4369
@@ -81,7 +82,7 @@ ClustersWithInitFunctions:
     - Scenes Management
 
 ClustersWithAttributeChangedFunctions:
-    - Bridged Device Basic
+    - Bridged Device Basic Information
     - Door Lock
     - Identify
     - Pump Configuration and Control

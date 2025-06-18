@@ -141,6 +141,13 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
     )
     targets.append(
         ApplicationTarget(
+            key="ENERGY_GATEWAY_APP",
+            target=f"{target_prefix}-energy-gateway-{suffix}",
+            binary="chip-energy-gateway-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
             key="ENERGY_MANAGEMENT_APP",
             target=f"{target_prefix}-energy-management-{suffix}",
             binary="chip-energy-management-app",
@@ -244,6 +251,13 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
             key="TERMS_AND_CONDITIONS_APP",
             target=f"{target_prefix}-terms-and-conditions-{suffix}",
             binary="chip-terms-and-conditions-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="CAMERA_APP",
+            target=f"{target_prefix}-camera-{suffix}",
+            binary="chip-camera-app",
         )
     )
 
@@ -882,7 +896,7 @@ def python_tests(
                 tend = time.time()
 
                 if result.returncode != 0:
-                    logging.error("Test failed: %s", script)
+                    logging.error("Test failed: %s (error code %d when running %r)", script, result.returncode, cmd)
                     if fail_log_dir:
                         out_name = os.path.join(fail_log_dir, f"{base_name}.out.log")
                         err_name = os.path.join(fail_log_dir, f"{base_name}.err.log")
@@ -1062,6 +1076,20 @@ def casting_test(test, log_directory, tv_app, tv_casting_app, runner):
 
 
 @cli.command()
+def prereq():
+    """
+    Install/force some prerequisites inside the build environment.
+
+    Work in progress, however generally we have:
+      - libdatachannel requires cmake 3.5
+    """
+
+    # Camera app needs cmake 3.5 and 4.0 removed compatibility. Force cmake 3.*
+    cmd = ";".join(["set -e", "source scripts/activate.sh", "pip install 'cmake>=3,<4'"])
+    subprocess.run(["bash", "-c", cmd], check=True)
+
+
+@cli.command()
 @click.option("--target", default=None)
 @click.option("--target-glob", default=None)
 @click.option("--include-tags", default=None)
@@ -1093,7 +1121,7 @@ def chip_tool_tests(
     # This likely should be run in docker to not allow breaking things
     # run as:
     #
-    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:125
+    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:140
     runner = __RUNNERS__[runner]
 
     # make sure we are fully aware if running with or without coverage

@@ -4,7 +4,7 @@
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 
-#include <app/common/GlobalIds.h>
+#include <clusters/shared/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
@@ -12,16 +12,12 @@ namespace app {
 namespace Clusters {
 namespace PushAvStreamTransport {
 namespace Attributes {
-namespace SupportedContainerFormats {
+namespace SupportedFormats {
 inline constexpr AttributeId Id = 0x00000000;
-} // namespace SupportedContainerFormats
-
-namespace SupportedIngestMethods {
-inline constexpr AttributeId Id = 0x00000001;
-} // namespace SupportedIngestMethods
+} // namespace SupportedFormats
 
 namespace CurrentConnections {
-inline constexpr AttributeId Id = 0x00000002;
+inline constexpr AttributeId Id = 0x00000001;
 } // namespace CurrentConnections
 
 namespace GeneratedCommandList {
@@ -31,10 +27,6 @@ inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 namespace AcceptedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::AcceptedCommandList::Id;
 } // namespace AcceptedCommandList
-
-namespace EventList {
-inline constexpr AttributeId Id = Globals::Attributes::EventList::Id;
-} // namespace EventList
 
 namespace AttributeList {
 inline constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;

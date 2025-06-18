@@ -16,13 +16,14 @@
  */
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/ConcreteEventPath.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/List.h>
+#include <clusters/Descriptor/Structs.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
 
@@ -34,18 +35,6 @@ namespace DataModel {
 ///
 /// The data model can be viewed as a tree of endpoint/cluster/(attribute+commands+events)
 /// where each element can be iterated through independently.
-///
-/// Iteration rules:
-///   - Invalid paths will be returned when iteration ends (IDs will be kInvalid* and in particular
-///     mEndpointId will be kInvalidEndpointId). See `::kInvalid` constants for entries and
-///     can use ::IsValid() to determine if the entry is valid or not.
-///   - Global Attributes are NOT returned since they are implied
-///   - Any internal iteration errors are just logged (callers do not handle iteration CHIP_ERROR)
-///   - Iteration order is NOT guaranteed globally. Only the following is guaranteed:
-///     - Complete tree iteration (e.g. when iterating an endpoint, ALL clusters of that endpoint
-///       are returned, when iterating over a cluster, all attributes/commands are iterated over)
-///     - uniqueness and completeness (iterate over all possible distinct values as long as no
-///       internal structural changes occur)
 class ProviderMetadataTree
 {
 public:
@@ -59,6 +48,25 @@ public:
     virtual CHIP_ERROR DeviceTypes(EndpointId endpointId, ReadOnlyBufferBuilder<DeviceTypeEntry> & builder)       = 0;
     virtual CHIP_ERROR ClientClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ClusterId> & builder)          = 0;
     virtual CHIP_ERROR ServerClusters(EndpointId endpointId, ReadOnlyBufferBuilder<ServerClusterEntry> & builder) = 0;
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+    virtual CHIP_ERROR EndpointUniqueID(EndpointId endpointId, MutableCharSpan & EndpointUniqueId) = 0;
+#endif
+
+    /// Fetch event metadata for a specific event
+    ///
+    /// This metadata is used for event validation, specifically ACL at this time. Method is generally
+    /// expected to return required access data for events.
+    ///
+    /// - Implementations MUST return valid event permission values for known events.
+    /// - Implementations MAY choose to default to return a default kView when events are unknown,
+    ///   in order to save on processing complexity and not deny event subscriptions
+    ///   (even if specific events may never be generated).
+    ///
+    /// No explicit CHIP_ERROR values beyond CHIP_NO_ERROR (i.e. success) are defined. Returning failure
+    /// from this method essentially means "This event is known as not supported by this provider" and
+    /// the caller is not required to make any more differentiation beyond that, nor is the implementation
+    /// required to return specific CHIP_ERROR values (like invalid endpoint/cluster/...)
+    virtual CHIP_ERROR EventInfo(const ConcreteEventPath & path, EventEntry & eventInfo) = 0;
 
     /// Attribute lists contain all attributes. This MUST include all global
     /// attributes (See SPEC 7.13 Global Elements / Global Attributes Table).

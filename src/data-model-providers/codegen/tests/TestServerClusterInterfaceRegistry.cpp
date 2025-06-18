@@ -529,3 +529,24 @@ TEST_F(TestServerClusterInterfaceRegistry, StartupErrors)
         EXPECT_FALSE(cluster2.HasContext());
     }
 }
+
+TEST_F(TestServerClusterInterfaceRegistry, LazyRegistrationTest)
+{
+    LazyRegisteredServerCluster<FakeServerClusterInterface> obj;
+
+    EXPECT_FALSE(obj.IsConstructed());
+
+    obj.Create(kEp1, kCluster1);
+    EXPECT_TRUE(obj.IsConstructed());
+    EXPECT_EQ(obj.Cluster().GetPath(), ConcreteClusterPath(kEp1, kCluster1));
+    EXPECT_EQ(obj.Registration().serverClusterInterface, &obj.Cluster());
+    obj.Destroy();
+    EXPECT_FALSE(obj.IsConstructed());
+
+    obj.Create(kEp2, kCluster3);
+    EXPECT_TRUE(obj.IsConstructed());
+    EXPECT_EQ(obj.Cluster().GetPath(), ConcreteClusterPath(kEp2, kCluster3));
+    EXPECT_EQ(obj.Registration().serverClusterInterface, &obj.Cluster());
+    obj.Destroy();
+    EXPECT_FALSE(obj.IsConstructed());
+}

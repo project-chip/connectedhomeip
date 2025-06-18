@@ -53,9 +53,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-MTRDeviceController * sController;
-
-@implementation MTRBleTests
+@implementation MTRBleTests {
+    MTRDeviceController * _controller;
+}
 
 - (void)setUp
 {
@@ -63,8 +63,14 @@ MTRDeviceController * sController;
 
     [self.class.mockCoreBluetooth reset];
 
-    sController = [self createControllerOnTestFabric];
-    XCTAssertNotNil(sController);
+    _controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(_controller);
+}
+
+- (void)tearDown
+{
+    _controller = nil; // MTRTestCase handles shutdown
+    [super tearDown];
 }
 
 - (void)testBleCommissionableBrowserResultAdditionAndRemoval
@@ -92,7 +98,7 @@ MTRDeviceController * sController;
         }
     };
 
-    XCTAssertTrue([sController startBrowseForCommissionables:delegate queue:dispatch_get_main_queue()]);
+    XCTAssertTrue([_controller startBrowseForCommissionables:delegate queue:dispatch_get_main_queue()]);
 
     NSUUID * peripheralID = [NSUUID UUID];
     [self.class.mockCoreBluetooth addMockCommissionableMatterDeviceWithIdentifier:peripheralID vendorID:@0xfff1 productID:@0x1234 discriminator:@0x444];
@@ -100,7 +106,7 @@ MTRDeviceController * sController;
 
     // BleConnectionDelegateImpl kCachePeripheralTimeoutInSeconds is approximately 10 seconds
     [self waitForExpectations:@[ didFindDevice, didRemoveDevice ] timeout:14 enforceOrder:YES];
-    XCTAssertTrue([sController stopBrowseForCommissionables]);
+    XCTAssertTrue([_controller stopBrowseForCommissionables]);
 }
 
 - (void)testBleCommissionAfterStopBrowseUAF
@@ -119,24 +125,24 @@ MTRDeviceController * sController;
         }
     };
 
-    XCTAssertTrue([sController startBrowseForCommissionables:delegate queue:dispatch_get_main_queue()]);
+    XCTAssertTrue([_controller startBrowseForCommissionables:delegate queue:dispatch_get_main_queue()]);
 
     NSUUID * peripheralID = [NSUUID UUID];
     [self.class.mockCoreBluetooth addMockCommissionableMatterDeviceWithIdentifier:peripheralID vendorID:@0xfff1 productID:@0x1234 discriminator:@0x444];
     [self waitForExpectations:@[ didFindDevice ] timeout:2 enforceOrder:YES];
 
-    XCTAssertTrue([sController stopBrowseForCommissionables]);
+    XCTAssertTrue([_controller stopBrowseForCommissionables]);
 
     // Attempt to use the MTRCommissionableBrowserResult after we stopped browsing
     // This used to result in a UAF because BLE_CONNECTION_OBJECT is a void*
     // carrying a CBPeripheral without retaining it. When browsing is stopped,
     // BleConnectionDelegateImpl releases all cached CBPeripherals.
     MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithSetupPasscode:@54321 discriminator:@0x444];
-    [sController setupCommissioningSessionWithDiscoveredDevice:device
+    [_controller setupCommissioningSessionWithDiscoveredDevice:device
                                                        payload:payload
                                                      newNodeID:@999
                                                          error:NULL];
-    [sController cancelCommissioningForNodeID:@999 error:NULL];
+    [_controller cancelCommissioningForNodeID:@999 error:NULL];
 }
 
 - (void)testShutdownBlePowerOffRaceUAF
@@ -145,7 +151,7 @@ MTRDeviceController * sController;
     MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithSetupPasscode:@54321 discriminator:@0xb1e];
     payload.discoveryCapabilities = MTRDiscoveryCapabilitiesBLE;
     NSError * error;
-    XCTAssertTrue([sController setupCommissioningSessionWithPayload:payload newNodeID:@999 error:&error],
+    XCTAssertTrue([_controller setupCommissioningSessionWithPayload:payload newNodeID:@999 error:&error],
         "setupCommissioningSessionWithPayload failed: %@", error);
 
     // Create a race between shutdown and a CBManager callback that used to provoke a UAF.
@@ -157,8 +163,8 @@ MTRDeviceController * sController;
         // Shut down the controller. This causes the SetupCodePairer to call
         // BleConnectionDelegateImpl::CancelConnection(), then the SetupCodePairer
         // is deallocated along with the DeviceCommissioner
-        [sController shutdown];
-        sController = nil;
+        [self->_controller shutdown];
+        self->_controller = nil;
         if (atomic_fetch_sub(&tasks, 1) == 1) {
             dispatch_semaphore_signal(done);
         }
@@ -176,6 +182,42 @@ MTRDeviceController * sController;
     dispatch_async(pool, shutdown);
     dispatch_async(pool, powerOff);
     dispatch_wait(done, DISPATCH_TIME_FOREVER);
+}
+
+- (void)testShutdownAndBlePowerOffAfterSuccessfulConnect
+{
+    // Attempt a PASE connection over BLE, this will call BleConnectionDelegateImpl::NewConnection()
+    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithSetupPasscode:@54321 discriminator:@0xb1e];
+    payload.discoveryCapabilities = MTRDiscoveryCapabilitiesBLE;
+    NSError * error;
+    XCTAssertTrue([_controller setupCommissioningSessionWithPayload:payload newNodeID:@999 error:&error],
+        "setupCommissioningSessionWithPayload failed: %@", error);
+
+    // Now make a matching device appear. The commissioner will connect over BLE
+    // and attempt to establish a PASE connection by doing a BLE write.
+    XCTestExpectation * didConnect = [self expectationWithDescription:@"did connect to peripheral"];
+    self.class.mockCoreBluetooth.onConnectPeripheralWithOptions = ^BOOL(CBPeripheral * peripheral, NSDictionary<NSString *, id> * _Nullable options) {
+        [didConnect fulfill];
+        return YES; // let connection establishment succeed
+    };
+
+    XCTestExpectation * didWrite = [self expectationWithDescription:@"did perform write"];
+    self.class.mockCoreBluetooth.onWriteValueForCharacteristic = ^(CBPeripheral * peripheral, NSData * value, CBMutableCharacteristic * characteristic, CBCharacteristicWriteType type) {
+        [didWrite fulfill];
+    };
+
+    [self.class.mockCoreBluetooth addMockCommissionableMatterDeviceWithIdentifier:[NSUUID UUID] vendorID:@0xfff1 productID:@0x1234 discriminator:@0xb1e];
+
+    [self waitForExpectations:@[ didConnect, didWrite ] timeout:5];
+
+    // The BLE connection in the Matter stack is now in an established state,
+    // waiting for the commissionee to respond to the BLE write. Shutting down
+    // the controller will free the DeviceCommissioner and its SetupCodePairer.
+    [_controller shutdown];
+    _controller = nil;
+
+    // Now trigger a CBCentralManager state update, attempting to provoke a UAF.
+    self.class.mockCoreBluetooth.state = CBManagerStatePoweredOff;
 }
 
 @end

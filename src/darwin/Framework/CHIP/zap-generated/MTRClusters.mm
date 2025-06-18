@@ -1268,6 +1268,11 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeTagListID) params:params];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeEndpointUniqueIDWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeEndpointUniqueIDID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeGeneratedCommandListID) params:params];
@@ -2575,6 +2580,11 @@ using chip::System::Clock::Timeout;
     [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeUnitLocalizationID) attributeID:@(MTRAttributeIDTypeClusterUnitLocalizationAttributeTemperatureUnitID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
 }
 
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedTemperatureUnitsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeUnitLocalizationID) attributeID:@(MTRAttributeIDTypeClusterUnitLocalizationAttributeSupportedTemperatureUnitsID) params:params];
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeUnitLocalizationID) attributeID:@(MTRAttributeIDTypeClusterUnitLocalizationAttributeGeneratedCommandListID) params:params];
@@ -3025,6 +3035,16 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeTCUpdateDeadlineWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGeneralCommissioningID) attributeID:@(MTRAttributeIDTypeClusterGeneralCommissioningAttributeTCUpdateDeadlineID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeRecoveryIdentifierWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGeneralCommissioningID) attributeID:@(MTRAttributeIDTypeClusterGeneralCommissioningAttributeRecoveryIdentifierID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeNetworkRecoveryReasonWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeGeneralCommissioningID) attributeID:@(MTRAttributeIDTypeClusterGeneralCommissioningAttributeNetworkRecoveryReasonID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -8982,236 +9002,6 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityPriceID) attributeID:@(MTRAttributeIDTypeClusterCommodityPriceAttributeClusterRevisionID) params:params];
-}
-
-@end
-
-@implementation MTRClusterDemandResponseLoadControl
-
-- (void)registerLoadControlProgramRequestWithParams:(MTRDemandResponseLoadControlClusterRegisterLoadControlProgramRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
-{
-    if (params == nil) {
-        params = [[MTRDemandResponseLoadControlClusterRegisterLoadControlProgramRequestParams
-            alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(error);
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-
-    using RequestType = DemandResponseLoadControl::Commands::RegisterLoadControlProgramRequest::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                    expectedValues:expectedValues
-                             expectedValueInterval:expectedValueIntervalMs
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:nil
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
-}
-
-- (void)unregisterLoadControlProgramRequestWithParams:(MTRDemandResponseLoadControlClusterUnregisterLoadControlProgramRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
-{
-    if (params == nil) {
-        params = [[MTRDemandResponseLoadControlClusterUnregisterLoadControlProgramRequestParams
-            alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(error);
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-
-    using RequestType = DemandResponseLoadControl::Commands::UnregisterLoadControlProgramRequest::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                    expectedValues:expectedValues
-                             expectedValueInterval:expectedValueIntervalMs
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:nil
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
-}
-
-- (void)addLoadControlEventRequestWithParams:(MTRDemandResponseLoadControlClusterAddLoadControlEventRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
-{
-    if (params == nil) {
-        params = [[MTRDemandResponseLoadControlClusterAddLoadControlEventRequestParams
-            alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(error);
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-
-    using RequestType = DemandResponseLoadControl::Commands::AddLoadControlEventRequest::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                    expectedValues:expectedValues
-                             expectedValueInterval:expectedValueIntervalMs
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:nil
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
-}
-
-- (void)removeLoadControlEventRequestWithParams:(MTRDemandResponseLoadControlClusterRemoveLoadControlEventRequestParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
-{
-    if (params == nil) {
-        params = [[MTRDemandResponseLoadControlClusterRemoveLoadControlEventRequestParams
-            alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(error);
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-
-    using RequestType = DemandResponseLoadControl::Commands::RemoveLoadControlEventRequest::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                    expectedValues:expectedValues
-                             expectedValueInterval:expectedValueIntervalMs
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:nil
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
-}
-
-- (void)clearLoadControlEventsRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
-{
-    [self clearLoadControlEventsRequestWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
-}
-- (void)clearLoadControlEventsRequestWithParams:(MTRDemandResponseLoadControlClusterClearLoadControlEventsRequestParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
-{
-    if (params == nil) {
-        params = [[MTRDemandResponseLoadControlClusterClearLoadControlEventsRequestParams
-            alloc] init];
-    }
-
-    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
-        completion(error);
-    };
-
-    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
-
-    using RequestType = DemandResponseLoadControl::Commands::ClearLoadControlEventsRequest::Type;
-    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
-                                         clusterID:@(RequestType::GetClusterId())
-                                         commandID:@(RequestType::GetCommandId())
-                                    commandPayload:params
-                                    expectedValues:expectedValues
-                             expectedValueInterval:expectedValueIntervalMs
-                                timedInvokeTimeout:timedInvokeTimeoutMs
-                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
-                                     responseClass:nil
-                                             queue:self.callbackQueue
-                                        completion:responseHandler];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeLoadControlProgramsWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeLoadControlProgramsID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeNumberOfLoadControlProgramsWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfLoadControlProgramsID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeEventsWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeEventsID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeActiveEventsWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeActiveEventsID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeNumberOfEventsPerProgramWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfEventsPerProgramID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeNumberOfTransitionsWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeNumberOfTransitionsID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeDefaultRandomStartWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeDefaultRandomStartID) params:params];
-}
-
-- (void)writeAttributeDefaultRandomStartWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeDefaultRandomStartWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeDefaultRandomStartWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeDefaultRandomStartID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeDefaultRandomDurationWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeDefaultRandomDurationID) params:params];
-}
-
-- (void)writeAttributeDefaultRandomDurationWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
-{
-    [self writeAttributeDefaultRandomDurationWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeDefaultRandomDurationWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeDefaultRandomDurationID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeGeneratedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeAcceptedCommandListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeAttributeListID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeFeatureMapID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeDemandResponseLoadControlID) attributeID:@(MTRAttributeIDTypeClusterDemandResponseLoadControlAttributeClusterRevisionID) params:params];
 }
 
 @end
@@ -16423,6 +16213,45 @@ using chip::System::Clock::Timeout;
 
 @end
 
+@implementation MTRClusterSoilMeasurement
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSoilMoistureMeasurementLimitsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSoilMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSoilMeasurementAttributeSoilMoistureMeasurementLimitsID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSoilMoistureMeasuredValueWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSoilMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSoilMeasurementAttributeSoilMoistureMeasuredValueID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSoilMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSoilMeasurementAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSoilMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSoilMeasurementAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSoilMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSoilMeasurementAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSoilMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSoilMeasurementAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeSoilMeasurementID) attributeID:@(MTRAttributeIDTypeClusterSoilMeasurementAttributeClusterRevisionID) params:params];
+}
+
+@end
+
 @implementation MTRClusterWiFiNetworkManagement
 
 - (void)networkPassphraseRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRWiFiNetworkManagementClusterNetworkPassphraseResponseParams * _Nullable data, NSError * _Nullable error))completion
@@ -19332,9 +19161,68 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedZoneSourcesWithParams:(MTRReadParams * _Nullable)params
+- (void)createOrUpdateTriggerWithParams:(MTRZoneManagementClusterCreateOrUpdateTriggerParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeSupportedZoneSourcesID) params:params];
+    if (params == nil) {
+        params = [[MTRZoneManagementClusterCreateOrUpdateTriggerParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ZoneManagement::Commands::CreateOrUpdateTrigger::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)removeTriggerWithParams:(MTRZoneManagementClusterRemoveTriggerParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRZoneManagementClusterRemoveTriggerParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = ZoneManagement::Commands::RemoveTrigger::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxUserDefinedZonesWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeMaxUserDefinedZonesID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxZonesWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeMaxZonesID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeZonesWithParams:(MTRReadParams * _Nullable)params
@@ -19347,15 +19235,9 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeTriggersID) params:params];
 }
 
-- (void)writeAttributeTriggersWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSensitivityMaxWithParams:(MTRReadParams * _Nullable)params
 {
-    [self writeAttributeTriggersWithValue:dataValueDictionary expectedValueInterval:expectedValueIntervalMs params:nil];
-}
-- (void)writeAttributeTriggersWithValue:(NSDictionary<NSString *, id> *)dataValueDictionary expectedValueInterval:(NSNumber *)expectedValueIntervalMs params:(MTRWriteParams * _Nullable)params
-{
-    NSNumber * timedWriteTimeout = params.timedWriteTimeout;
-
-    [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeTriggersID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeSensitivityMaxID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSensitivityWithParams:(MTRReadParams * _Nullable)params
@@ -19372,6 +19254,11 @@ using chip::System::Clock::Timeout;
     NSNumber * timedWriteTimeout = params.timedWriteTimeout;
 
     [self.device writeAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeSensitivityID) value:dataValueDictionary expectedValueInterval:expectedValueIntervalMs timedWriteTimeout:timedWriteTimeout];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeTwoDCartesianMaxWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeZoneManagementID) attributeID:@(MTRAttributeIDTypeClusterZoneManagementAttributeTwoDCartesianMaxID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -19688,9 +19575,9 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeVideoSensorParamsID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeNightVisionCapableWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeNightVisionUsesInfraredWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeNightVisionCapableID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeNightVisionUsesInfraredID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeMinViewportWithParams:(MTRReadParams * _Nullable)params
@@ -19774,9 +19661,9 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedSnapshotStreamsID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeRankedVideoStreamPrioritiesListWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeStreamUsagePrioritiesWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeRankedVideoStreamPrioritiesListID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeStreamUsagePrioritiesID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSoftRecordingPrivacyModeEnabledWithParams:(MTRReadParams * _Nullable)params
@@ -20317,9 +20204,9 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVSettingsUserLevelManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeMPTZPresetsID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeDPTZRelativeMoveWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeDPTZStreamsWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVSettingsUserLevelManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeDPTZRelativeMoveID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVSettingsUserLevelManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVSettingsUserLevelManagementAttributeDPTZStreamsID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeZoomMaxWithParams:(MTRReadParams * _Nullable)params
@@ -20853,14 +20740,9 @@ using chip::System::Clock::Timeout;
                                         completion:responseHandler];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedContainerFormatsWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedFormatsWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePushAVStreamTransportID) attributeID:@(MTRAttributeIDTypeClusterPushAVStreamTransportAttributeSupportedContainerFormatsID) params:params];
-}
-
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeSupportedIngestMethodsWithParams:(MTRReadParams * _Nullable)params
-{
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePushAVStreamTransportID) attributeID:@(MTRAttributeIDTypeClusterPushAVStreamTransportAttributeSupportedIngestMethodsID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypePushAVStreamTransportID) attributeID:@(MTRAttributeIDTypeClusterPushAVStreamTransportAttributeSupportedFormatsID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentConnectionsWithParams:(MTRReadParams * _Nullable)params
@@ -21293,6 +21175,853 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommissionerControlID) attributeID:@(MTRAttributeIDTypeClusterCommissionerControlAttributeClusterRevisionID) params:params];
+}
+
+@end
+
+@implementation MTRClusterJointFabricDatastore
+
+- (void)addKeySetWithParams:(MTRJointFabricDatastoreClusterAddKeySetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricDatastoreClusterAddKeySetParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricDatastore::Commands::AddKeySet::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)updateKeySetWithParams:(MTRJointFabricDatastoreClusterUpdateKeySetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricDatastoreClusterUpdateKeySetParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricDatastore::Commands::UpdateKeySet::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)removeKeySetWithParams:(MTRJointFabricDatastoreClusterRemoveKeySetParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricDatastoreClusterRemoveKeySetParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricDatastore::Commands::RemoveKeySet::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)addGroupWithParams:(MTRJointFabricDatastoreClusterAddGroupParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricDatastoreClusterAddGroupParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricDatastore::Commands::AddGroup::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)updateGroupWithParams:(MTRJointFabricDatastoreClusterUpdateGroupParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricDatastoreClusterUpdateGroupParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricDatastore::Commands::UpdateGroup::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)removeGroupWithParams:(MTRJointFabricDatastoreClusterRemoveGroupParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricDatastoreClusterRemoveGroupParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricDatastore::Commands::RemoveGroup::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)addAdminWithParams:(MTRJointFabricDatastoreClusterAddAdminParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricDatastoreClusterAddAdminParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricDatastore::Commands::AddAdmin::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)updateAdminWithParams:(MTRJointFabricDatastoreClusterUpdateAdminParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricDatastoreClusterUpdateAdminParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricDatastore::Commands::UpdateAdmin::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)removeAdminWithParams:(MTRJointFabricDatastoreClusterRemoveAdminParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricDatastoreClusterRemoveAdminParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricDatastore::Commands::RemoveAdmin::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)addPendingNodeWithParams:(MTRJointFabricDatastoreClusterAddPendingNodeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricDatastoreClusterAddPendingNodeParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricDatastore::Commands::AddPendingNode::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)refreshNodeWithParams:(MTRJointFabricDatastoreClusterRefreshNodeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricDatastoreClusterRefreshNodeParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricDatastore::Commands::RefreshNode::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)updateNodeWithParams:(MTRJointFabricDatastoreClusterUpdateNodeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricDatastoreClusterUpdateNodeParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricDatastore::Commands::UpdateNode::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)removeNodeWithParams:(MTRJointFabricDatastoreClusterRemoveNodeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricDatastoreClusterRemoveNodeParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricDatastore::Commands::RemoveNode::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)updateEndpointForNodeWithParams:(MTRJointFabricDatastoreClusterUpdateEndpointForNodeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricDatastoreClusterUpdateEndpointForNodeParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricDatastore::Commands::UpdateEndpointForNode::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)addGroupIDToEndpointForNodeWithParams:(MTRJointFabricDatastoreClusterAddGroupIDToEndpointForNodeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricDatastoreClusterAddGroupIDToEndpointForNodeParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricDatastore::Commands::AddGroupIDToEndpointForNode::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)removeGroupIDFromEndpointForNodeWithParams:(MTRJointFabricDatastoreClusterRemoveGroupIDFromEndpointForNodeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricDatastoreClusterRemoveGroupIDFromEndpointForNodeParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricDatastore::Commands::RemoveGroupIDFromEndpointForNode::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)addBindingToEndpointForNodeWithParams:(MTRJointFabricDatastoreClusterAddBindingToEndpointForNodeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricDatastoreClusterAddBindingToEndpointForNodeParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricDatastore::Commands::AddBindingToEndpointForNode::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)removeBindingFromEndpointForNodeWithParams:(MTRJointFabricDatastoreClusterRemoveBindingFromEndpointForNodeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricDatastoreClusterRemoveBindingFromEndpointForNodeParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricDatastore::Commands::RemoveBindingFromEndpointForNode::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)addACLToNodeWithParams:(MTRJointFabricDatastoreClusterAddACLToNodeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricDatastoreClusterAddACLToNodeParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricDatastore::Commands::AddACLToNode::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)removeACLFromNodeWithParams:(MTRJointFabricDatastoreClusterRemoveACLFromNodeParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricDatastoreClusterRemoveACLFromNodeParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricDatastore::Commands::RemoveACLFromNode::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAnchorRootCAWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricDatastoreID) attributeID:@(MTRAttributeIDTypeClusterJointFabricDatastoreAttributeAnchorRootCAID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAnchorNodeIDWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricDatastoreID) attributeID:@(MTRAttributeIDTypeClusterJointFabricDatastoreAttributeAnchorNodeIDID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAnchorVendorIDWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricDatastoreID) attributeID:@(MTRAttributeIDTypeClusterJointFabricDatastoreAttributeAnchorVendorIDID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFriendlyNameWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricDatastoreID) attributeID:@(MTRAttributeIDTypeClusterJointFabricDatastoreAttributeFriendlyNameID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGroupKeySetListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricDatastoreID) attributeID:@(MTRAttributeIDTypeClusterJointFabricDatastoreAttributeGroupKeySetListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGroupListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricDatastoreID) attributeID:@(MTRAttributeIDTypeClusterJointFabricDatastoreAttributeGroupListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeNodeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricDatastoreID) attributeID:@(MTRAttributeIDTypeClusterJointFabricDatastoreAttributeNodeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAdminListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricDatastoreID) attributeID:@(MTRAttributeIDTypeClusterJointFabricDatastoreAttributeAdminListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeStatusWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricDatastoreID) attributeID:@(MTRAttributeIDTypeClusterJointFabricDatastoreAttributeStatusID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeEndpointGroupIDListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricDatastoreID) attributeID:@(MTRAttributeIDTypeClusterJointFabricDatastoreAttributeEndpointGroupIDListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeEndpointBindingListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricDatastoreID) attributeID:@(MTRAttributeIDTypeClusterJointFabricDatastoreAttributeEndpointBindingListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeNodeKeySetListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricDatastoreID) attributeID:@(MTRAttributeIDTypeClusterJointFabricDatastoreAttributeNodeKeySetListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeNodeACLListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricDatastoreID) attributeID:@(MTRAttributeIDTypeClusterJointFabricDatastoreAttributeNodeACLListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeNodeEndpointListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricDatastoreID) attributeID:@(MTRAttributeIDTypeClusterJointFabricDatastoreAttributeNodeEndpointListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricDatastoreID) attributeID:@(MTRAttributeIDTypeClusterJointFabricDatastoreAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricDatastoreID) attributeID:@(MTRAttributeIDTypeClusterJointFabricDatastoreAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricDatastoreID) attributeID:@(MTRAttributeIDTypeClusterJointFabricDatastoreAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricDatastoreID) attributeID:@(MTRAttributeIDTypeClusterJointFabricDatastoreAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricDatastoreID) attributeID:@(MTRAttributeIDTypeClusterJointFabricDatastoreAttributeClusterRevisionID) params:params];
+}
+
+@end
+
+@implementation MTRClusterJointFabricAdministrator
+
+- (void)ICACCSRRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRJointFabricAdministratorClusterICACCSRResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    [self ICACCSRRequestWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)ICACCSRRequestWithParams:(MTRJointFabricAdministratorClusterICACCSRRequestParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRJointFabricAdministratorClusterICACCSRResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricAdministratorClusterICACCSRRequestParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricAdministrator::Commands::ICACCSRRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRJointFabricAdministratorClusterICACCSRResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)addICACWithParams:(MTRJointFabricAdministratorClusterAddICACParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRJointFabricAdministratorClusterICACResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricAdministratorClusterAddICACParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricAdministrator::Commands::AddICAC::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRJointFabricAdministratorClusterICACResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)openJointCommissioningWindowWithParams:(MTRJointFabricAdministratorClusterOpenJointCommissioningWindowParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricAdministratorClusterOpenJointCommissioningWindowParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricAdministrator::Commands::OpenJointCommissioningWindow::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)transferAnchorRequestWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(void (^)(MTRJointFabricAdministratorClusterTransferAnchorResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    [self transferAnchorRequestWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)transferAnchorRequestWithParams:(MTRJointFabricAdministratorClusterTransferAnchorRequestParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRJointFabricAdministratorClusterTransferAnchorResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricAdministratorClusterTransferAnchorRequestParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricAdministrator::Commands::TransferAnchorRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRJointFabricAdministratorClusterTransferAnchorResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)transferAnchorCompleteWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    [self transferAnchorCompleteWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)transferAnchorCompleteWithParams:(MTRJointFabricAdministratorClusterTransferAnchorCompleteParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricAdministratorClusterTransferAnchorCompleteParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricAdministrator::Commands::TransferAnchorComplete::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)announceJointFabricAdministratorWithParams:(MTRJointFabricAdministratorClusterAnnounceJointFabricAdministratorParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRJointFabricAdministratorClusterAnnounceJointFabricAdministratorParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = JointFabricAdministrator::Commands::AnnounceJointFabricAdministrator::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAdministratorFabricIndexWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricAdministratorID) attributeID:@(MTRAttributeIDTypeClusterJointFabricAdministratorAttributeAdministratorFabricIndexID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricAdministratorID) attributeID:@(MTRAttributeIDTypeClusterJointFabricAdministratorAttributeGeneratedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAcceptedCommandListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricAdministratorID) attributeID:@(MTRAttributeIDTypeClusterJointFabricAdministratorAttributeAcceptedCommandListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeAttributeListWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricAdministratorID) attributeID:@(MTRAttributeIDTypeClusterJointFabricAdministratorAttributeAttributeListID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeFeatureMapWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricAdministratorID) attributeID:@(MTRAttributeIDTypeClusterJointFabricAdministratorAttributeFeatureMapID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeClusterRevisionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeJointFabricAdministratorID) attributeID:@(MTRAttributeIDTypeClusterJointFabricAdministratorAttributeClusterRevisionID) params:params];
 }
 
 @end
@@ -22538,6 +23267,40 @@ using chip::System::Clock::Timeout;
                                 timedInvokeTimeout:timedInvokeTimeoutMs
                        serverSideProcessingTimeout:params.serverSideProcessingTimeout
                                      responseClass:MTRUnitTestingClusterGlobalEchoResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)testCheckCommandFlagsWithExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)expectedValues expectedValueInterval:(NSNumber *)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    [self testCheckCommandFlagsWithParams:nil expectedValues:expectedValues expectedValueInterval:expectedValueIntervalMs completion:completion];
+}
+- (void)testCheckCommandFlagsWithParams:(MTRUnitTestingClusterTestCheckCommandFlagsParams * _Nullable)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRUnitTestingClusterTestCheckCommandFlagsParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
+
+    using RequestType = UnitTesting::Commands::TestCheckCommandFlags::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
                                              queue:self.callbackQueue
                                         completion:responseHandler];
 }

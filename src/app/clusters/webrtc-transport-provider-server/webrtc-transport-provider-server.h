@@ -28,8 +28,11 @@ namespace app {
 namespace Clusters {
 namespace WebRTCTransportProvider {
 
-using ICEServerDecodableStruct = Structs::ICEServerStruct::DecodableType;
-using WebRTCSessionStruct      = Structs::WebRTCSessionStruct::Type;
+using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
+using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
+using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
+using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
 
 /**
  * @brief
@@ -50,7 +53,6 @@ public:
         Optional<DataModel::Nullable<uint16_t>> audioStreamId;
         Optional<std::vector<ICEServerDecodableStruct>> iceServers;
         Optional<std::string> iceTransportPolicy;
-        Optional<BitMask<WebRTCMetadataOptionsBitmap>> metadataOptions;
         NodeId peerNodeId;
         FabricIndex fabricIndex;
         EndpointId originatingEndpointId;
@@ -158,13 +160,15 @@ public:
      *   (i.e., Trickle ICE).
      *
      * @param[in] sessionId  The current session ID.
-     * @param[in] candidates A list of ICE candidate strings.
+     * @param[in] candidates A list of ICE candidate structs.
+     * Note: The callee cannot reference the `candidates` vector after this call
+     * returns, and must copy the contents over for later use, if required.
      *
      * @return CHIP_ERROR
      *   - CHIP_NO_ERROR on success
      *   - An error if the session is invalid or the candidates cannot be processed
      */
-    virtual CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates) = 0;
+    virtual CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates) = 0;
 
     /**
      * @brief
@@ -203,6 +207,71 @@ public:
     virtual CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage,
                                            const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                            const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) = 0;
+
+    /**
+     * @brief
+     *   Validates that the given VideoStreamID matches a value in AllocatedVideoStreams.
+     *
+     *   This method is called during SolicitOffer command processing when a VideoStreamID
+     *   is present and not null. The implementation must check if the provided ID exists
+     *   in the AllocatedVideoStreams list from the CameraAvStreamManagement cluster.
+     *
+     * @param[in] videoStreamId  The video stream ID to validate.
+     *
+     * @return CHIP_ERROR
+     *   - CHIP_NO_ERROR if the VideoStreamID is valid and matches AllocatedVideoStreams.
+     *   - CHIP_ERROR_NOT_FOUND or other appropriate error if validation fails.
+     */
+    virtual CHIP_ERROR ValidateVideoStreamID(uint16_t videoStreamId) = 0;
+
+    /**
+     * @brief
+     *   Validates that the given AudioStreamID matches a value in AllocatedAudioStreams.
+     *
+     *   This method is called during SolicitOffer command processing when an AudioStreamID
+     *   is present and not null. The implementation must check if the provided ID exists
+     *   in the AllocatedAudioStreams list from the CameraAvStreamManagement cluster.
+     *
+     * @param[in] audioStreamId  The audio stream ID to validate.
+     *
+     * @return CHIP_ERROR
+     *   - CHIP_NO_ERROR if the AudioStreamID is valid and matches AllocatedAudioStreams.
+     *   - CHIP_ERROR_NOT_FOUND or other appropriate error if validation fails.
+     */
+    virtual CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) = 0;
+
+    /**
+     * @brief Check whether privacy mode is active.
+     *
+     * Reads the SoftLivestreamPrivacyModeEnabled and HardPrivacyModeOn attributes from the CameraAvStreamManagement
+     * cluster. Privacy mode is considered **active** when **either** attribute is true.
+     *
+     * @param[out] isActive Set to true if privacy mode is active, false if inactive.
+     * @return CHIP_NO_ERROR on success, error code if privacy mode state cannot be determined.
+     */
+    virtual CHIP_ERROR IsPrivacyModeActive(bool & isActive) = 0;
+
+    /**
+     * @brief Check if there are any allocated video streams.
+     *
+     * This method is called during ProvideOffer command processing when VideoStreamID
+     * is present and null to determine if automatic stream selection is possible.
+     *
+     * @return true if there are allocated video streams available.
+     * @return false if no video streams are currently allocated.
+     */
+    virtual bool HasAllocatedVideoStreams() = 0;
+
+    /**
+     * @brief Check if there are any allocated audio streams.
+     *
+     * This method is called during ProvideOffer command processing when AudioStreamID
+     * is present and null to determine if automatic stream selection is possible.
+     *
+     * @return true if there are allocated audio streams available.
+     * @return false if no audio streams are currently allocated.
+     */
+    virtual bool HasAllocatedAudioStreams() = 0;
 };
 
 class WebRTCTransportProviderServer : public AttributeAccessInterface, public CommandHandlerInterface
@@ -238,6 +307,16 @@ public:
      *   Unregisters the command handler and attribute interface, releasing resources.
      */
     void Shutdown();
+
+    /**
+     * @brief Get a reference to the current WebRTC sessions.
+     *
+     * This method provides read-only access to the current list of active WebRTC sessions
+     * managed by this server instance.
+     *
+     * @return const std::vector<WebRTCSessionStruct>& Reference to the current sessions list.
+     */
+    const std::vector<WebRTCSessionStruct> & GetCurrentSessions() const { return mCurrentSessions; }
 
 private:
     enum class UpsertResultEnum : uint8_t

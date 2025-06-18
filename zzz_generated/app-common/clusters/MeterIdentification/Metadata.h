@@ -20,44 +20,24 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace MeterType {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MeterType::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MeterType::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace MeterType
 namespace PointOfDelivery {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PointOfDelivery::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(PointOfDelivery::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace PointOfDelivery
 namespace MeterSerialNumber {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = MeterSerialNumber::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MeterSerialNumber::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace MeterSerialNumber
 namespace ProtocolVersion {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = ProtocolVersion::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(ProtocolVersion::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace ProtocolVersion
 namespace PowerThreshold {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = PowerThreshold::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(PowerThreshold::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
 } // namespace PowerThreshold
 
 } // namespace Attributes

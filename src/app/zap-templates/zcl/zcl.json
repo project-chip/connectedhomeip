@@ -3,7 +3,7 @@
     "category": "matter",
     "version": 1,
     "requiredFeatureLevel": 102,
-    "xmlRoot": [".", "./data-model/chip/", "./data-model/silabs/"],
+    "xmlRoot": [".", "./data-model/chip"],
     "_comment": "Ensure access-control-definitions.xml is first in xmlFile array",
     "xmlFile": [
         "access-control-definitions.xml",
@@ -48,7 +48,6 @@
         "microwave-oven-mode-cluster.xml",
         "meter-identification-cluster.xml",
         "door-lock-cluster.xml",
-        "drlc-cluster.xml",
         "ecosystem-information-cluster.xml",
         "electrical-energy-measurement-cluster.xml",
         "electrical-grid-conditions-cluster.xml",
@@ -72,6 +71,8 @@
         "icd-management-cluster.xml",
         "identify-cluster.xml",
         "illuminance-measurement-cluster.xml",
+        "joint-fabric-datastore-cluster.xml",
+        "joint-fabric-administrator-cluster.xml",
         "keypad-input-cluster.xml",
         "laundry-washer-mode-cluster.xml",
         "laundry-dryer-controls-cluster.xml",
@@ -106,14 +107,14 @@
         "refrigerator-and-temperature-controlled-cabinet-mode-cluster.xml",
         "refrigerator-alarm.xml",
         "relative-humidity-measurement-cluster.xml",
-        "rvc-clean-mode-cluster.xml ",
+        "rvc-clean-mode-cluster.xml",
         "rvc-run-mode-cluster.xml",
-        "replacable-monitoring-cluster.xml",
         "resource-monitoring-cluster.xml",
         "scene.xml",
         "service-area-cluster.xml",
         "smoke-co-alarm-cluster.xml",
         "software-diagnostics-cluster.xml",
+        "soil-measurement-cluster.xml",
         "switch-cluster.xml",
         "target-navigator-cluster.xml",
         "temperature-control-cluster.xml",
@@ -144,12 +145,9 @@
         "window-covering.xml",
         "matter-devices.xml",
         "sample-mei-cluster.xml",
-        "types/door-lock.xml",
-        "types/occupancy-sensing.xml",
-        "types/thermostat-user-interface-configuration.xml",
         "zone-management-cluster.xml"
     ],
-    "manufacturersXml": "../../../../src/app/zap-templates/zcl/data-model/manufacturers.xml",
+    "manufacturersXml": "./data-model/manufacturers.xml",
     "options": {
         "text": {
             "defaultResponsePolicy": ["Always", "Conditional", "Never"]
@@ -171,9 +169,11 @@
             "ClusterRevision",
             "SubjectsPerAccessControlEntry",
             "TargetsPerAccessControlEntry",
-            "AccessControlEntriesPerFabric"
+            "AccessControlEntriesPerFabric",
+            "FeatureMap"
         ],
         "Administrator Commissioning": [
+            "ClusterRevision",
             "WindowStatus",
             "AdminFabricIndex",
             "AdminVendorId"
@@ -202,14 +202,28 @@
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Chime": ["SelectedChime", "Enabled"],
-        "Closure Control": ["CountdownTime", "OverallState", "OverallTarget"],
+        "Closure Control": [
+            "CountdownTime",
+            "OverallState",
+            "OverallTarget",
+            "FeatureMap",
+            "ClusterRevision"
+        ],
         "Closure Dimension": [
             "CurrentState",
             "Target",
             "UnitRange",
-            "LimitRange"
+            "LimitRange",
+            "FeatureMap",
+            "ClusterRevision"
         ],
-        "Commodity Price": ["Currency", "CurrentPrice"],
+        "Commodity Price": [
+            "TariffUnit",
+            "Currency",
+            "CurrentPrice",
+            "PriceForecast",
+            "FeatureMap"
+        ],
         "Commodity Tariff": [
             "TariffInfo",
             "CurrentDay",
@@ -316,7 +330,30 @@
             "OperatingMode",
             "FeatureMap"
         ],
-        "Meter Identification": ["PowerThreshold"],
+        "Joint Fabric Datastore": ["Status"],
+        "Meter Identification": [
+            "MeterType",
+            "PointOfDelivery",
+            "MeterSerialNumber",
+            "ProtocolVersion",
+            "PowerThreshold",
+            "FeatureMap"
+        ],
+        "Network Commissioning": [
+            "ClusterRevision",
+            "ConnectMaxTimeSeconds",
+            "FeatureMap",
+            "InterfaceEnabled",
+            "LastConnectErrorValue",
+            "LastNetworkID",
+            "LastNetworkingStatus",
+            "MaxNetworks",
+            "Networks",
+            "ScanMaxTimeSeconds",
+            "SupportedThreadFeatures",
+            "SupportedWiFiBands",
+            "ThreadVersion"
+        ],
         "Occupancy Sensing": [
             "HoldTimeLimits",
             "HoldTime",
@@ -331,6 +368,7 @@
             "CurrentFabricIndex"
         ],
         "Software Diagnostics": [
+            "ClusterRevision",
             "CurrentHeapFree",
             "CurrentHeapHighWatermark",
             "CurrentHeapUsed",
@@ -718,19 +756,12 @@
             "Viewport",
             "MaxConcurrentEncoders",
             "MaxEncodedPixelRate",
-            "NightVisionCapable",
-            "RateDistortionTradeOffPoints",
+            "NightVisionUsesInfrared",
             "MaxContentBufferSize",
             "TwoWayTalkSupport",
-            "SnapshotCapabilities",
             "MaxNetworkBandwidth",
             "CurrentFrameRate",
             "HDRModeEnabled",
-            "SupportedStreamUsages",
-            "AllocatedVideoStreams",
-            "AllocatedAudioStreams",
-            "AllocatedSnapshotStreams",
-            "RankedVideoStreamPrioritiesList",
             "SoftRecordingPrivacyModeEnabled",
             "SoftLivestreamPrivacyModeEnabled",
             "HardPrivacyModeOn",
@@ -754,7 +785,14 @@
             "StatusLightBrightness",
             "FeatureMap"
         ],
-        "Camera AV Settings User Level Management": ["MPTZPosition"]
+        "Camera AV Settings User Level Management": ["MPTZPosition"],
+        "Soil Measurement": [
+            "SoilMoistureMeasurementLimits",
+            "SoilMoistureMeasuredValue",
+            "ClusterRevision"
+        ],
+        "Unit Localization": ["TemperatureUnit"],
+        "Zone Management": ["TwoDCartesianMax"]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",

@@ -29,7 +29,7 @@
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
 
-#include <ClosureAppCommonMain.h>
+#include <ClosureManager.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -49,19 +49,11 @@
 #include <setup_payload/SetupPayload.h>
 
 #define APP_FUNCTION_BUTTON 0
-#define APP_ClOSURE_BUTTON 1
-
-namespace {
-
-constexpr chip::EndpointId kClosureBaseEndpoint = 1;
-
-} // namespace
+#define APP_CLOSURE_BUTTON 1
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::ClosureControl;
-using namespace chip::app::Clusters::ClosureControl::Attributes;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Silabs;
 using namespace ::chip::DeviceLayer::Internal;
@@ -81,28 +73,6 @@ static chip::BitMask<Feature> sFeatureMap(Feature::kCalibration);
 
 AppTask AppTask::sAppTask;
 
-EndpointId GetClosureDeviceEndpointId()
-{
-    return kClosureBaseEndpoint;
-}
-
-void ApplicationInit()
-{
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    SILABS_LOG("==================================================");
-    SILABS_LOG("Closure-app ClosureControl starting. featureMap 0x%08lx", ClosureControl::sFeatureMap.Raw());
-    ClosureApplicationInit();
-    SILABS_LOG("==================================================");
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-}
-
-void ApplicationShutdown()
-{
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    ClosureApplicationShutdown();
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-}
-
 CHIP_ERROR AppTask::AppInit()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -112,7 +82,8 @@ CHIP_ERROR AppTask::AppInit()
     GetLCD().Init((uint8_t *) "Closure-App");
 #endif
 
-    ApplicationInit();
+    // Initialization of Closure Manager and endpoints of closure and closurepanel.
+    ClosureManager::GetInstance().Init();
 
 // Update the LCD with the Stored value. Show QR Code if not provisioned
 #ifdef DISPLAY_ENABLED

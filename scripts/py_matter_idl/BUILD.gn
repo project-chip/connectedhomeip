@@ -20,7 +20,7 @@ import("$dir_pw_build/python.gni")
 
 import("${chip_root}/scripts/py_matter_idl/files.gni")
 
-pw_python_package("matter_idl") {
+pw_python_package("matter-idl") {
   setup = [
     "setup.py",
     "setup.cfg",

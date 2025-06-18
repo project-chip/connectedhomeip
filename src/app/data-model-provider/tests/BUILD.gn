@@ -20,6 +20,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestActionReturnStatus.cpp",
     "TestEventEmitting.cpp",
+    "TestMetadataEntries.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -43,7 +44,6 @@ source_set("encode-decode") {
     "ReadTesting.cpp",
     "ReadTesting.h",
     "TestConstants.h",
-    "WriteTesting.cpp",
     "WriteTesting.h",
   ]
 

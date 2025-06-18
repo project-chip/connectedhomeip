@@ -18,7 +18,9 @@
 
 #pragma once
 
+#include <lib/core/Optional.h>
 #include <lib/support/BufferWriter.h>
+#include <optional>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
 #include <system/SystemClock.h>
@@ -96,6 +98,17 @@ public:
     const System::PacketBufferHandle & GetProtocolData() const { return mProtocolData; }
 
     /**
+     * Returns the minimum wait time if the status report is of type busy.
+     * If status report is not busy, then this is an empty optional.
+     */
+    std::optional<System::Clock::Milliseconds16> GetMinimumWaitTime() const { return mMinimumWaitTime; }
+
+    /**
+     *  Returns true if the status report is of type busy.
+     */
+    bool IsBusy() const;
+
+    /**
      * Builds a busy status report with protocol data containing the minimum wait time.
      *
      * @param[in] minimumWaitTime Time in milliseconds before initiator retries the request
@@ -108,7 +121,7 @@ private:
     GeneralStatusCode mGeneralCode;
     Protocols::Id mProtocolId;
     uint16_t mProtocolCode;
-
+    std::optional<System::Clock::Milliseconds16> mMinimumWaitTime;
     System::PacketBufferHandle mProtocolData;
 };
 

@@ -496,8 +496,10 @@ public:
      * communicating, so right now is a good time to try to resubscribe.
      *
      * The reason string is used for logging if a resubscribe is triggered.
+     *
+     * Returns whether a resubscribe is triggered.
      */
-    void TriggerResubscribeIfScheduled(const char * reason);
+    bool TriggerResubscribeIfScheduled(const char * reason);
 
     /**
      * Returns the timeout after which we consider the subscription to have

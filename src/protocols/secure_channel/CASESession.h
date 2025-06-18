@@ -462,6 +462,8 @@ protected:
      **/
     static CHIP_ERROR ParseSigma3TBEData(TLV::ContiguousBufferTLVReader & tlvReader, HandleSigma3Data & data);
 
+    static CHIP_ERROR HandleSigma3b(HandleSigma3Data & data, bool & cancel);
+
 private:
     friend class TestCASESession;
 
@@ -505,7 +507,6 @@ private:
     CHIP_ERROR SendSigma3c(SendSigma3Data & data, CHIP_ERROR status);
 
     CHIP_ERROR HandleSigma3a(System::PacketBufferHandle && msg);
-    static CHIP_ERROR HandleSigma3b(HandleSigma3Data & data, bool & cancel);
     CHIP_ERROR HandleSigma3c(HandleSigma3Data & data, CHIP_ERROR status);
 
     CHIP_ERROR SendSigma2Resume();

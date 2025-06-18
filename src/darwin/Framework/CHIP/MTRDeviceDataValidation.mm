@@ -53,20 +53,20 @@ static BOOL MTRDictionaryHasExpectedShape(NSDictionary * input, NSDictionary * e
 
 #pragma mark - Attribute report validation
 
-static const auto sAttributeDataShape = @{
-    MTRAttributePathKey : MTR_CHECK_CLASS(MTRAttributePath),
-    MTRDataKey : (^(MTRDeviceDataValueDictionary arg) {
-        return MTRDataValueDictionaryIsWellFormed(arg);
-    }),
-};
-
-static const auto sAttributeErrorShape = @{
-    MTRAttributePathKey : MTR_CHECK_CLASS(MTRAttributePath),
-    MTRErrorKey : MTR_CHECK_CLASS(NSError),
-};
-
 BOOL MTRAttributeReportIsWellFormed(NSArray<MTRDeviceResponseValueDictionary> * report)
 {
+    static const auto sAttributeDataShape = @ {
+        MTRAttributePathKey : MTR_CHECK_CLASS(MTRAttributePath),
+        MTRDataKey : (^(MTRDeviceDataValueDictionary arg) {
+            return MTRDataValueDictionaryIsWellFormed(arg);
+        }),
+    };
+
+    static const auto sAttributeErrorShape = @ {
+        MTRAttributePathKey : MTR_CHECK_CLASS(MTRAttributePath),
+        MTRErrorKey : MTR_CHECK_CLASS(NSError),
+    };
+
     if (!MTR_SAFE_CAST(report, NSArray)) {
         MTR_LOG_ERROR("Attribute report is not an array: %@", report);
         return NO;
@@ -92,27 +92,27 @@ BOOL MTRAttributeReportIsWellFormed(NSArray<MTRDeviceResponseValueDictionary> * 
 
 #pragma mark - Event report validation
 
-// MTREventIsHistoricalKey is claimed to be present no matter what, as
-// long as MTREventPathKey is present.
-static const auto sEventDataShape = @{
-    MTREventPathKey : MTR_CHECK_CLASS(MTREventPath),
-    MTRDataKey : (^(MTRDeviceDataValueDictionary arg) {
-        return MTRDataValueDictionaryIsWellFormed(arg);
-    }),
-    MTREventIsHistoricalKey : MTR_CHECK_CLASS(NSNumber),
-    MTREventNumberKey : MTR_CHECK_CLASS(NSNumber),
-    MTREventPriorityKey : MTR_CHECK_CLASS(NSNumber),
-    MTREventTimeTypeKey : MTR_CHECK_CLASS(NSNumber),
-};
-
-static const auto sEventErrorShape = @{
-    MTREventPathKey : MTR_CHECK_CLASS(MTREventPath),
-    MTRErrorKey : MTR_CHECK_CLASS(NSError),
-    MTREventIsHistoricalKey : MTR_CHECK_CLASS(NSNumber),
-};
-
 BOOL MTREventReportIsWellFormed(NSArray<MTRDeviceResponseValueDictionary> * report)
 {
+    // MTREventIsHistoricalKey is claimed to be present no matter what, as
+    // long as MTREventPathKey is present.
+    static const auto sEventDataShape = @ {
+        MTREventPathKey : MTR_CHECK_CLASS(MTREventPath),
+        MTRDataKey : (^(MTRDeviceDataValueDictionary arg) {
+            return MTRDataValueDictionaryIsWellFormed(arg);
+        }),
+        MTREventIsHistoricalKey : MTR_CHECK_CLASS(NSNumber),
+        MTREventNumberKey : MTR_CHECK_CLASS(NSNumber),
+        MTREventPriorityKey : MTR_CHECK_CLASS(NSNumber),
+        MTREventTimeTypeKey : MTR_CHECK_CLASS(NSNumber),
+    };
+
+    static const auto sEventErrorShape = @ {
+        MTREventPathKey : MTR_CHECK_CLASS(MTREventPath),
+        MTRErrorKey : MTR_CHECK_CLASS(NSError),
+        MTREventIsHistoricalKey : MTR_CHECK_CLASS(NSNumber),
+    };
+
     if (!MTR_SAFE_CAST(report, NSArray)) {
         MTR_LOG_ERROR("Event report is not an array: %@", report);
         return NO;
