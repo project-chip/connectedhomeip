@@ -249,8 +249,9 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
             # The targets is a list of up to 7x ChargingTargetScheduleStruct's (one per day)
             # each containing a list of up to 10x targets per day
             minutes_past_midnight = 1439
+            target_soc = 80
             dailyTargets = [Clusters.EnergyEvse.Structs.ChargingTargetStruct(targetTimeMinutesPastMidnight=minutes_past_midnight,
-                                                                             targetSoC=80,
+                                                                             targetSoC=target_soc,
                                                                              addedEnergy=25000000)]
             targets = [Clusters.EnergyEvse.Structs.ChargingTargetScheduleStruct(
                 dayOfWeekForSequence=0x7F, chargingTargets=dailyTargets)]
@@ -276,14 +277,36 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
 
             self.step("11")
             # TH sends command EnableCharging with ChargingEnabledUntil=null, minimumChargeCurrent=6000, maximumChargeCurrent=60000
+            await self.send_enable_charge_command(charge_until=NullValue, min_charge=6000, max_charge=60000)
+
             self.step("11a")
             # TH reads from the DUT the NextChargeStartTime
+            # Value has to be before the next TargetTime above.
+            next_start_time_epoch_s = await self.read_evse_attribute_expect_success(attribute="NextChargeStartTime")
+            logger.info(
+                f"Received NextChargeStartTime: {next_start_time_epoch_s} = {self.convert_epoch_s_to_time(next_start_time_epoch_s, tz=None)}")
+
+            expected_next_target_time_epoch_s = self.compute_expected_target_time_as_epoch_s(
+                minutes_past_midnight)
+            asserts.assert_less(next_start_time_epoch_s,
+                                expected_next_target_time_epoch_s)
+
             self.step("11b")
             # TH reads from the DUT the NextChargeTargetTime
+            # Value has to be TargetTime above.
+            await self.check_evse_attribute("NextChargeTargetTime",
+                                            expected_next_target_time_epoch_s)
+
             self.step("11c")
             # TH reads from the DUT the NextChargeRequiredEnergy
+            # Value has to be null.
+            await self.check_evse_attribute("NextChargeRequiredEnergy", NullValue)
+
             self.step("11d")
             # TH reads from the DUT the NextChargeTargetSoC
+            # Value has to be TargetSoC above.
+            await self.check_evse_attribute("NextChargeTargetSoC", target_soc)
+
             self.step("12")
             # TH sends command Disable
             self.step("12a")
