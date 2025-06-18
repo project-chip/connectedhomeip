@@ -185,8 +185,8 @@ private:
      * @brief Timer event handler for the ClosureManager.
      *
      * This static function is called when the closure timer expires. The handler creates an AppEvent and
-     * posts the event to the application task queue. This ensures that the closure event is processed in the context of the application
-     * task rather than the timer task.
+     * posts the event to the application task queue. This ensures that the closure event is processed in the context of the
+     * application task rather than the timer task.
      *
      * @param timerCbArg Pointer to the callback argument (unused).
      */
