@@ -30,7 +30,6 @@
 #include <common/Esp32AppServer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <diagnostic-logs-provider-delegate-impl.h>
 #include <platform/ESP32/ESP32Utils.h>
 
 #include <cmath>
@@ -53,6 +52,7 @@
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+#include <diagnostic-logs-provider-delegate-impl.h>
 #include <tracing/esp32_diagnostic_trace/DiagnosticTracing.h>
 static uint8_t endUserBuffer[CONFIG_END_USER_BUFFER_SIZE]; // Global static buffer used to store diagnostics
 using namespace chip::Tracing::Diagnostics;
@@ -140,12 +140,12 @@ extern "C" void app_main()
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }
 
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 using namespace chip::app::Clusters::DiagnosticLogs;
 void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
 {
     auto & logProvider = LogProvider::GetInstance();
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     logProvider.SetDiagnosticStorageInstance(&diagnosticStorage);
-#endif
     DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
 }
+#endif

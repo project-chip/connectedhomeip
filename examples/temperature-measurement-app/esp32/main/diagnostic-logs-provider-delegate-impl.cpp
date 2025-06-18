@@ -40,12 +40,6 @@ bool IsValidIntent(IntentEnum intent)
     return intent != IntentEnum::kUnknownEnumValue;
 }
 
-// end_user_support.log and network_diag.log files are embedded in the firmware
-extern const uint8_t endUserSupportLogStart[] asm("_binary_end_user_support_log_start");
-extern const uint8_t endUserSupportLogEnd[] asm("_binary_end_user_support_log_end");
-
-extern const uint8_t networkDiagnosticLogStart[] asm("_binary_network_diag_log_start");
-extern const uint8_t networkDiagnosticLogEnd[] asm("_binary_network_diag_log_end");
 } // namespace
 
 LogProvider::~LogProvider()
@@ -85,10 +79,10 @@ size_t LogProvider::GetSizeForIntent(IntentEnum intent)
                             ChipLogError(DeviceLayer, "Diagnostic Storage instance cannot be null."));
         return mStorageInstance->GetDataSize();
 #else
-        return static_cast<size_t>(endUserSupportLogEnd - endUserSupportLogStart);
+        return 0;
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     case IntentEnum::kNetworkDiag:
-        return static_cast<size_t>(networkDiagnosticLogEnd - networkDiagnosticLogStart);
+        return 0;
     case IntentEnum::kCrashLogs:
         return GetCrashSize();
     default:
@@ -133,15 +127,13 @@ CHIP_ERROR LogProvider::PrepareLogContextForIntent(LogContext * context, IntentE
         }
         context->EndUserSupport.span = endUserSupportSpan;
 #else
-        context->EndUserSupport.span =
-            ByteSpan(&endUserSupportLogStart[0], static_cast<size_t>(endUserSupportLogEnd - endUserSupportLogStart));
+        return CHIP_ERROR_INVALID_ARGUMENT;
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     }
     break;
 
     case IntentEnum::kNetworkDiag: {
-        context->NetworkDiag.span =
-            ByteSpan(&networkDiagnosticLogStart[0], static_cast<size_t>(networkDiagnosticLogEnd - networkDiagnosticLogStart));
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
     break;
 
