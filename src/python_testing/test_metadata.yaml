@@ -21,6 +21,10 @@ not_automated:
       reason: Camera App does not support all features required for this TC
     - name: TC_AVSM_2_9.py
       reason: Camera App does not support all features required for this TC
+    - name: TC_AVSM_2_10.py
+      reason:
+        CI failure
+        See https://github.com/project-chip/connectedhomeip/issues/39594
     - name: TC_AVSM_2_11.py
       reason: Camera App does not support all features required for this TC
     - name: TC_CNET_4_2.py
