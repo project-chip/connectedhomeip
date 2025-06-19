@@ -92,7 +92,8 @@ TEST_F(TestICDConfigurationData, TestSetSlowPollingFallback)
 {
     ICDConfigurationDataTestAccess privateConfigData(&ICDConfigurationData::GetInstance());
     System::Clock::Milliseconds32 validFallback(10000);
-    System::Clock::Milliseconds32 invalidFallback(20000); // Above SIT threshold
+    System::Clock::Milliseconds32 invalidFallback =
+        privateConfigData.GetSitSlowPollMaximum() + System::Clock::Milliseconds32(1000); // Above SIT threshold
 
     // Should succeed for valid value
     EXPECT_EQ(privateConfigData.SetSlowPollingFallback(validFallback), CHIP_NO_ERROR);

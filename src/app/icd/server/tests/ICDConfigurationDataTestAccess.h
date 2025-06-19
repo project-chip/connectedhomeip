@@ -43,6 +43,7 @@ public:
     {
         return mData->SetModeDurations(active, idle);
     }
+    System::Clock::Milliseconds32 GetSitSlowPollMaximum() { return mData->kSitIcdSlowPollMaximum; }
 
 private:
     ICDConfigurationData * mData = nullptr;
