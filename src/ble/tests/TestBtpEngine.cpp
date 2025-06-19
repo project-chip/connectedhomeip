@@ -206,7 +206,8 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendTwoPacketWithIncorrectAck)
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_InProgress);
     EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(20));
 
-    // Try to continue sending the next fragment, also attempting to send an ack when the sequence  is incorrect and check the transmission state.
+    // Try to continue sending the next fragment, also attempting to send an ack
+    // when the sequence is incorrect and check the transmission state.
     EXPECT_FALSE(mBtpEngine.HandleCharacteristicSend(nullptr, true));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_InProgress);
 
