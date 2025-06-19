@@ -191,6 +191,7 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction, uint8_t *
 
     if (aAction == LEVEL_ACTION)
     {
+        VerifyOrReturnValue(aValue != nullptr, action_initiated);
         action_initiated = true;
         if (mCurrentLevel != *aValue)
         {
