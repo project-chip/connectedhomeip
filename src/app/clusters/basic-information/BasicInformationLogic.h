@@ -40,6 +40,9 @@ public:
     /// BasicInformationLogic is a SINGLETON according to the matter specification.
     static BasicInformationLogic & Instance();
 
+    /// Load any persistent data from persistent storage
+    CHIP_ERROR Init();
+
     bool GetReachable() const { return mReachable; }
     bool GetLocalConfigDisabled() const { return mLocalConfigDisabled; }
     CharSpan GetNodeLabel() const { return { mNodeLabelBuffer, mNodeLabelSize }; }

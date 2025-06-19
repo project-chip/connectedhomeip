@@ -32,6 +32,18 @@ BasicInformationLogic & BasicInformationLogic::Instance()
     return sInstance;
 }
 
+CHIP_ERROR BasicInformationLogic::Init() {
+    // TODO: implement
+    //
+    // Some prototype:
+    //
+    // ReadDestination data(mNodeLabelBuffer);
+    //
+    // ReturnErrorOnFailure(mPersistence.ReadAttribute({kRootEndpointId, BasicInformation::Id, NodeLabel::Id}, data));
+    // mNodeLabelSize = data.size();
+    return CHIP_NO_ERROR;
+}
+
 DataModel::ActionReturnStatus BasicInformationLogic::SetNodeLabel(CharSpan label)
 {
     // TODO:
@@ -40,6 +52,16 @@ DataModel::ActionReturnStatus BasicInformationLogic::SetNodeLabel(CharSpan label
     VerifyOrReturnError(label.size() <= sizeof(mNodeLabelBuffer), Protocols::InteractionModel::Status::ConstraintError);
     memcpy(mNodeLabelBuffer, label.data(), label.size());
     mNodeLabelSize = label.size();
+
+    // TODO: implement
+    //
+    // Some prototype:
+    //
+    //   return mPersistence.WriteAttribute(
+    //     {kRootEndpointId, BasicInformation::Id, NodeLabel::Id},
+    //     AttributeData(label)
+    //   );
+
     return CHIP_NO_ERROR;
 }
 

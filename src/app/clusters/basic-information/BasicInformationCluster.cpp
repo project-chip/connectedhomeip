@@ -397,6 +397,7 @@ CHIP_ERROR BasicInformationCluster::Attributes(const ConcreteClusterPath & path,
 
 CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
 {
+    ReturnErrorOnFailure(BasicInformationLogic::Instance().Init());
     if (PlatformMgr().GetDelegate() == nullptr)
     {
         PlatformMgr().SetDelegate(this);
