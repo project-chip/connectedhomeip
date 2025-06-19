@@ -84,11 +84,12 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 6,
-                "If DUT supports `Privacy` feature, TH writes attribute `SoftLivestreamPrivacyModeEnabled = true` in the CameraAVStreamManagement Cluster on DUT",
+                "If DUT supports Privacy feature, TH writes SoftLivestreamPrivacyModeEnabled = true on DUT",
+                "DUT responds with a SUCCESS status code.",
             ),
             TestStep(
                 7,
-                "TH sends the `CaptureSnapshot` command with `SnapshotStreamID` set to `aStreamID`.",
+                "TH sends the CaptureSnapshot command with SnapshotStreamID set to aStreamID.",
                 "DUT responds with INVALID_IN_STATE status code.",
             ),
             TestStep(
@@ -227,7 +228,8 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
         try:
             await self.send_single_cmd(endpoint=endpoint, cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=aStreamID))
         except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            asserts.fail(
+                f"Expected SnapshotStreamDeallocate to succeed, but it failed with status: {e.status}")
             pass
 
         self.step(9)
