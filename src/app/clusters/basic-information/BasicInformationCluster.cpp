@@ -102,8 +102,9 @@ DataModel::ActionReturnStatus ReadLocation(AttributeValueEncoder & encoder, Stri
     CHIP_ERROR err = ConfigurationMgr().GetCountryCode(buffer.buffer, sizeof(buffer.buffer), codeLen);
     if ((err != CHIP_NO_ERROR) || (codeLen != BasicInformationLogic::kFixedLocationLength))
     {
+        static_assert(BasicInformationLogic::kFixedLocationLength == 2); // we write a string of size 2
         strcpy(buffer.buffer, "XX");
-        codeLen = 2;
+        codeLen = BasicInformationLogic::kFixedLocationLength;
     }
     return encoder.Encode(CharSpan(buffer.buffer, codeLen));
 }

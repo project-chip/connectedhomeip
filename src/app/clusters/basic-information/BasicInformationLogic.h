@@ -35,7 +35,7 @@ private:
     BasicInformationLogic() {}
 
 public:
-    static constexpr size_t kFixedLocationLength = 0;
+    static constexpr size_t kFixedLocationLength = 2;
 
     /// BasicInformationLogic is a SINGLETON according to the matter specification.
     static BasicInformationLogic & Instance();
