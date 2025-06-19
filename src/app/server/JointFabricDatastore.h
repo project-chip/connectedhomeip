@@ -92,13 +92,6 @@ public:
         return sInstance;
     }
 
-    CHIP_ERROR SetAdministratorFabricIndex(FabricIndex fabricIndex)
-    {
-        mAdministratorFabricIndex = fabricIndex;
-        return CHIP_NO_ERROR;
-    }
-    FabricIndex GetAdministratorFabricIndex() { return mAdministratorFabricIndex; }
-
     CHIP_ERROR SetAnchorNodeId(NodeId anchorNodeId)
     {
         mAnchorNodeId = anchorNodeId;
@@ -179,8 +172,6 @@ private:
     static constexpr size_t kMaxAdminNodes  = 32;
     static constexpr size_t kMaxGroups      = kMaxNodes / 16;
     static constexpr size_t kMaxGroupKeySet = kMaxGroups * 16;
-
-    FabricIndex mAdministratorFabricIndex = kUndefinedFabricIndex;
 
     NodeId mAnchorNodeId     = kUndefinedNodeId;
     VendorId mAnchorVendorId = VendorId::NotSpecified;

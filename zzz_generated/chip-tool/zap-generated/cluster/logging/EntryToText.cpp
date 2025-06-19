@@ -4337,8 +4337,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "AllocatedAudioStreams";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AllocatedSnapshotStreams::Id:
             return "AllocatedSnapshotStreams";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::RankedVideoStreamPrioritiesList::Id:
-            return "RankedVideoStreamPrioritiesList";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::StreamUsagePriorities::Id:
+            return "StreamUsagePriorities";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::SoftRecordingPrivacyModeEnabled::Id:
             return "SoftRecordingPrivacyModeEnabled";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::SoftLivestreamPrivacyModeEnabled::Id:

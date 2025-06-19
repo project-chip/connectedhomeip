@@ -159,7 +159,12 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     // Initialize device attestation verifier
     // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
     const Credentials::AttestationTrustStore * testingRootStore = Credentials::GetTestAttestationTrustStore();
-    SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+    Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+    auto * dacVerifier = GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked);
+
+    VerifyOrDie(dacVerifier != nullptr);
+    dacVerifier->EnableVerboseLogs(true);
+    SetDeviceAttestationVerifier(dacVerifier);
 
     Platform::ScopedMemoryBuffer<uint8_t> noc;
     VerifyOrReturnError(noc.Alloc(Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
