@@ -32,8 +32,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifndef CHIP_CONFIG_NON_POSIX_LONG_OPT
-#define CHIP_CONFIG_NON_POSIX_LONG_OPT 0
+#ifndef CONFIG_NON_POSIX_GETOPT_LONG
+#define CONFIG_NON_POSIX_GETOPT_LONG 0
 #endif
 
 namespace chip {
