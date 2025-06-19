@@ -60,8 +60,10 @@ k_timer sFunctionTimer;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
+#ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
 Identify sIdentify = { kIdentifyEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,
                        Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator };
+#endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
 
 LEDWidget sStatusLED;
 LEDWidget sIdentifyLED;
@@ -233,6 +235,7 @@ CHIP_ERROR AppTask::StartApp()
     return CHIP_NO_ERROR;
 }
 
+#ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
 void AppTask::IdentifyStartHandler(Identify *)
 {
     AppEvent event;
@@ -248,6 +251,7 @@ void AppTask::IdentifyStopHandler(Identify *)
     event.Handler = [](const AppEvent &) { sIdentifyLED.Set(false); };
     PostEvent(event);
 }
+#endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
 
 void AppTask::ButtonEventHandler(uint32_t buttonState, uint32_t hasChanged)
 {
