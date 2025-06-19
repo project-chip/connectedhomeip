@@ -18,7 +18,6 @@
 
 #include <CommodityTariffMain.h>
 #include <app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h>
-#include <app/util/af-types.h>
 
 #include <fstream>
 
@@ -33,7 +32,6 @@ uint8_t presetIndex = 0;
 
 namespace TariffPresets {
 static constexpr const char * kTariff1 = "./DefaultTariff.json";
-;
 static constexpr const char * kTariff2 = "./full_complex_tariff_1.json";
 static constexpr const char * kTariff3 = "./full_complex_tariff_2.json";
 
@@ -50,38 +48,6 @@ static constexpr const char * GetPreset(size_t index)
 }
 } // namespace TariffPresets
 
-static bool LoadJsonFile(const char * aFname, Json::Value & jsonValue)
-{
-    bool is_ok = false;
-    std::ifstream ifs;
-    Json::CharReaderBuilder builder;
-    Json::String errs;
-
-    ifs.open(aFname);
-
-    if (!ifs.good())
-    {
-        ChipLogError(NotSpecified, "AllClusters App: Error open file %s", aFname);
-        goto exit;
-    }
-
-    if (!parseFromStream(builder, ifs, &jsonValue, &errs))
-    {
-        ChipLogError(NotSpecified, "AllClusters App: Error parsing JSON file %s with error %s:", aFname, errs.c_str());
-        goto exit;
-    }
-
-    if (jsonValue.empty() || !jsonValue.isObject())
-    {
-        ChipLogError(NotSpecified, "Invalid file format %s", aFname);
-        goto exit;
-    }
-
-    is_ok = true;
-
-exit:
-    return is_ok;
-}
 
 void SetTestEventTrigger_TariffDataUpdated()
 {
@@ -89,21 +55,8 @@ void SetTestEventTrigger_TariffDataUpdated()
 
     if (const char * preset = TariffPresets::GetPreset(presetIndex))
     {
-        Json::Value json_root;
-        ChipLogProgress(NotSpecified, "Tariff preset file %s", preset);
-        if (LoadJsonFile(preset, json_root))
-        {
-            ChipLogProgress(NotSpecified, "The tariff file opened successfully");
-            if ( CHIP_NO_ERROR == dg->LoadTariffData(json_root) )
-            {
-                dg->TariffDataUpdate();
-            }
-        }
-        else
-        {
-            ChipLogError(NotSpecified, "Unable to load tariff file");
-        }
-        presetIndex++;
+        LoadTariffFromJSONFile(preset, dg);
+        presetIndex++;            
     }
     else
     {

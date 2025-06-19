@@ -52,11 +52,16 @@
             "cwd": "${workspaceFolder}"
         },
         {
-            "name": "Run application Energy-Gtw-Sample (Darwin x64)",
+            "name": "Run application Energy-Gtw-Sample (Darwin arm64)",
             "type": "lldb",
             "request": "launch",
-            "program": "${workspaceFolder}/out/chip-energy-gateway-app/chip-energy-gateway-app",
-            "args": ["--enable-key", "00112233445566778899aabbccddeeff"],
+            "program": "${workspaceFolder}/out/darwin-arm64-energy-gateway/chip-energy-gateway-app",
+            "args": [
+                "--enable-key",
+                "00112233445566778899aabbccddeeff",
+                "--tariff-file",
+                "./DefaultTariff.json"
+            ],
             "cwd": "${workspaceFolder}/examples/energy-gateway-app/commodity-tariff"
         },
         {

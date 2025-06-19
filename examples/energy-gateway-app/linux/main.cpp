@@ -31,12 +31,19 @@ using namespace chip::app::Clusters;
 static bool EnergyGatewayAppOptionHandler(const char * aProgram, chip::ArgParser::OptionSet * aOptions, int aIdentifier,
                                           const char * aName, const char * aValue);
 
-static chip::ArgParser::OptionDef sEnergyGatewayAppOptionDefs[] = { { nullptr } };
+constexpr uint16_t kOptionTariffFile = 0xffd0;
+
+static chip::ArgParser::OptionDef sEnergyGatewayAppOptionDefs[] = {
+    { "tariff-file", chip::ArgParser::kArgumentRequired, kOptionTariffFile },
+    { nullptr }
+};
 
 static chip::ArgParser::OptionSet sCmdLineOptions = { EnergyGatewayAppOptionHandler, // handler function
                                                       sEnergyGatewayAppOptionDefs,   // array of option definitions
                                                       "PROGRAM OPTIONS",             // help group
-                                                      "\n" };
+                                                      "--tariff-file <Path to JSON file>\n" };
+
+const char * spTariffFile        = nullptr;
 
 void ApplicationInit()
 {
@@ -44,6 +51,10 @@ void ApplicationInit()
 
     // If we are emulating Electrical Energy Tariff device type then call this
     // TODO consider how other clusters / endpoints should be used in this example app
+    if (spTariffFile != nullptr)
+    {
+        ElectricalEnergyTariffSetTariffFile(spTariffFile);
+    }
     ElectricalEnergyTariffInit();
 }
 
@@ -61,6 +72,12 @@ static bool EnergyGatewayAppOptionHandler(const char * aProgram, chip::ArgParser
 
     switch (aIdentifier)
     {
+    case kOptionTariffFile:
+        if (strlen(aValue) > 0 )
+        {
+            spTariffFile = aValue;
+        }
+        break;
     default:
         ChipLogError(Support, "%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
         retval = false;
