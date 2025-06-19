@@ -15,25 +15,7 @@
  *    limitations under the License.
  */
 #include "MinimalMdnsServer.h"
-
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
-
-#ifndef CHIP_MINMDNS_DEFAULT_POLICY
-#define CHIP_MINMDNS_DEFAULT_POLICY 0
-#endif
-
-#ifndef CHIP_MINMDNS_LIBNL_POLICY
-#define CHIP_MINMDNS_LIBNL_POLICY 0
-#endif
-
-#if CHIP_MINMDNS_DEFAULT_POLICY
-#include <lib/dnssd/minimal_mdns/AddressPolicy_DefaultImpl.h> // nogncheck
-#endif
-
-#if CHIP_MINMDNS_LIBNL_POLICY
-#include <lib/dnssd/minimal_mdns/AddressPolicy_LibNlImpl.h> // nogncheck
-#endif
-
 namespace chip {
 namespace Dnssd {
 
@@ -43,14 +25,6 @@ using chip::Platform::UniquePtr;
 GlobalMinimalMdnsServer::GlobalMinimalMdnsServer()
 {
     mServer.SetDelegate(this);
-
-#if CHIP_MINMDNS_DEFAULT_POLICY
-    mdns::Minimal::SetDefaultAddressPolicy();
-#endif
-
-#if CHIP_MINMDNS_LIBNL_POLICY
-    mdns::Minimal::LibNl::SetAddressPolicy();
-#endif
 }
 
 GlobalMinimalMdnsServer & GlobalMinimalMdnsServer::Instance()
