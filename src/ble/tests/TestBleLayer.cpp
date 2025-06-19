@@ -414,7 +414,8 @@ TEST_F(TestBleLayer, OnConnectionErrorCallbackPath)
 
     auto exhaustedConnObj = GetConnectionObject();
     EXPECT_EQ(NewBleConnectionByObject(exhaustedConnObj), CHIP_NO_ERROR);
-    SUCCEED();
+    EXPECT_FALSE(mOnBleConnectionCompleteCalled);
+    EXPECT_TRUE(mOnBleConnectionErrorCalled);
 }
 
 }; // namespace Ble
