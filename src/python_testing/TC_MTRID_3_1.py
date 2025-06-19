@@ -42,16 +42,15 @@
 """Define Matter test case TC_MTRID_3_1."""
 
 import logging
-import time
 import queue
+import time
 
-from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
-from chip.clusters import ClusterObjects
+import test_plan_support
 from chip.ChipDeviceCtrl import ChipDeviceController
-from chip.clusters import MeterIdentification
+from chip.clusters import ClusterObjects, MeterIdentification
+from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-import test_plan_support
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +104,8 @@ class TC_MTRID_3_1(MatterBaseTest):
 
         self.default_controller: ChipDeviceController
         self.subscription: SubscriptionTransaction = await self.default_controller.ReadAttribute(self.dut_node_id,
-                                                                                                 [(self.get_endpoint(), MeterIdentification.Attributes.PowerThreshold)],
+                                                                                                 [(self.get_endpoint(
+                                                                                                 ), MeterIdentification.Attributes.PowerThreshold)],
                                                                                                  fabricFiltered=True,
                                                                                                  reportInterval=(
                                                                                                      5, 30),
@@ -135,15 +135,15 @@ class TC_MTRID_3_1(MatterBaseTest):
             TestStep("3", "Read PowerThreshold attribute and save value", "DUT reply a value of PowerThresholdStruct type."),
             TestStep("4", "Read TestEventTriggersEnabled attribute", "TestEventTriggersEnabled is True."),
             TestStep("5", "Send TestEventTrigger", "DUT returns SUCCESS."),
-            TestStep("6", "TH awaits a ReportDataMessage containing a PowerThreshold attribute", 
+            TestStep("6", "TH awaits a ReportDataMessage containing a PowerThreshold attribute",
                      "Verify the report is received and the value does not match the saved value."),
             TestStep("7", "Read PowerThreshold attribute and save value", "DUT reply a value of PowerThresholdStruct type."),
             TestStep("8", "Send TestEventTrigger", "DUT returns SUCCESS."),
-            TestStep("9", "TH awaits a ReportDataMessage containing a PowerThreshold attribute", 
+            TestStep("9", "TH awaits a ReportDataMessage containing a PowerThreshold attribute",
                      "Verify the report is received and the value does not match the saved value."),
             TestStep("10", "Read PowerThreshold attribute and save value", "DUT reply a value of PowerThresholdStruct type."),
             TestStep("11", "Send TestEventTrigger", "DUT returns SUCCESS."),
-            TestStep("12", "TH awaits a ReportDataMessage containing a PowerThreshold attribute", 
+            TestStep("12", "TH awaits a ReportDataMessage containing a PowerThreshold attribute",
                      "Verify the report is received and the value does not match the saved value."),
             TestStep("13", "TH removes the subscription to PowerThreshold attribute.", "Subscription successfully removed."),
         ]
@@ -164,13 +164,13 @@ class TC_MTRID_3_1(MatterBaseTest):
             asserts.skip("PICS MTRID.S.A0004 is not True")
 
         self.step("1")
-        
+
         self.step("2")
         await self.subscribe_attribute()
 
         self.step("3")
         if await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kPowerThreshold):
-            saved_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, 
+            saved_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                                          attribute=cluster.Attributes.PowerThreshold)
 
         self.step("4")
@@ -185,7 +185,7 @@ class TC_MTRID_3_1(MatterBaseTest):
         asserts.assert_not_equal(reported_value, saved_value, "Reported value should be different from saved value")
 
         self.step("7")
-        saved_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, 
+        saved_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                                      attribute=cluster.Attributes.PowerThreshold)
 
         self.step("8")
@@ -197,7 +197,7 @@ class TC_MTRID_3_1(MatterBaseTest):
         asserts.assert_not_equal(reported_value, saved_value, "Reported value should be different from saved value")
 
         self.step("10")
-        saved_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, 
+        saved_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                                      attribute=cluster.Attributes.PowerThreshold)
 
         self.step("11")
@@ -210,6 +210,7 @@ class TC_MTRID_3_1(MatterBaseTest):
 
         self.step("13")
         self.subscription.Shutdown()
+
 
 if __name__ == "__main__":
     default_matter_test_main()

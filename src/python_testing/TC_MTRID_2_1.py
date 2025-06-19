@@ -43,12 +43,12 @@
 
 import logging
 
+import test_plan_support
 from chip.clusters import MeterIdentification
-from chip.clusters.Types import NullValue, Nullable
+from chip.clusters.Types import Nullable, NullValue
 from chip.testing import matter_asserts
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-import test_plan_support
 
 logger = logging.getLogger(__name__)
 
@@ -69,37 +69,37 @@ class TC_MTRID_2_1(MatterBaseTest):
     def steps_TC_MTRID_2_1(self) -> list[TestStep]:
         steps = [
             TestStep("1", "Commissioning, already done", test_plan_support.commission_if_required(), is_commissioning=True),
-            TestStep("2", "Read MeterType attribute", 
+            TestStep("2", "Read MeterType attribute",
                           "- DUT reply a null value of Nullable type."),
-            TestStep("3", "Read PointOfDelivery attribute", 
+            TestStep("3", "Read PointOfDelivery attribute",
                           "- DUT reply a null value of Nullable type."),
-            TestStep("4", "Read MeterSerialNumber attribute", 
+            TestStep("4", "Read MeterSerialNumber attribute",
                           "- DUT reply a null value of Nullable type."),
-            TestStep("5", "Read ProtocolVersion attribute", 
+            TestStep("5", "Read ProtocolVersion attribute",
                           "- DUT reply a null value of Nullable type."),
-            TestStep("6", "Read PowerThreshold attribute", 
+            TestStep("6", "Read PowerThreshold attribute",
                           "- DUT reply a null value of Nullable type."),
-            TestStep("7", "Read TestEventTriggersEnabled attribute", 
+            TestStep("7", "Read TestEventTriggersEnabled attribute",
                           "- TestEventTriggersEnabled is True."),
-            TestStep("8", "Send TestEventTrigger", 
+            TestStep("8", "Send TestEventTrigger",
                           "- DUT returns SUCCESS."),
-            TestStep("9", "Read MeterType attribute", 
+            TestStep("9", "Read MeterType attribute",
                           """- DUT reply a enum8 (MeterTypeEnum) value"""),
             TestStep("10", "Read PointOfDelivery attribute",
                            """- DUTreply a value of string type.
                               - Verify that size is in range 0 - 64""",
-            ),
+                     ),
             TestStep("11", "Read MeterSerialNumber attribute",
                            """- DUT reply a value of string type.
                               - Verify that size is in range 0 - 64""",
-            ),
+                     ),
             TestStep("12", "Read ProtocolVersion attribute",
                            """- DUT reply a value of string type.
                               - Verify that size is in range 0 - 64""",
-            ),
-            TestStep("13", "Read PowerThreshold attribute", 
+                     ),
+            TestStep("13", "Read PowerThreshold attribute",
                            """- DUT reply a struct (PowerThresholdStruct) value."""),
-            TestStep("14", "Send TestEventTrigger Clear", 
+            TestStep("14", "Send TestEventTrigger Clear",
                            """- DUT returns SUCCESS."""),
         ]
 
