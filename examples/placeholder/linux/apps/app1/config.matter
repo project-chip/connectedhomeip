@@ -8589,7 +8589,7 @@ endpoint 0 {
     callback attribute localConfigDisabled;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
-    callback attribute configurationVersion default = 1;
+    callback attribute configurationVersion;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -9420,7 +9420,7 @@ endpoint 1 {
     callback attribute reachable;
     callback attribute uniqueID;
     callback attribute capabilityMinima;
-    callback attribute configurationVersion default = 1;
+    callback attribute configurationVersion;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
