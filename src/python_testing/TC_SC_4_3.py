@@ -155,7 +155,7 @@ class TC_SC_4_3(MatterBaseTest):
         if not has_t:
             asserts.assert_false(self.check_pics(TCP_PICS_STR),
                                  f"T key must be included if TCP is supported - returned TXT record: {operational_record}")
-            return True, f'T is not provided or required'
+            return True, 'T is not provided or required'
 
         t_value = operational_record.txt_record['T']
         logging.info("T key is present in TXT record, verify if that it is a decimal value with no leading zeros and is less than or equal to 6. Convert the value to a bitmap and verify bit 0 is clear.")
