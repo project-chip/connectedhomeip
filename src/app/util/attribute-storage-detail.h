@@ -32,6 +32,8 @@ extern uint8_t attributeData[]; // main storage bucket for all attributes
 
 void emAfCallInits();
 
+void emAfCallShutdowns();
+
 chip::Protocols::InteractionModel::Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord,
                                                                    const EmberAfAttributeMetadata ** metadata, uint8_t * buffer,
                                                                    uint16_t readLength, bool write);
