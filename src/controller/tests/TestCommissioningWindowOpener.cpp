@@ -71,8 +71,7 @@ TEST_F(TestCommissioningWindowOpener, OpenBasicCommissioningWindowVerifier_Succe
 {
     chip::System::Clock::Seconds16 timeout(300);
     Callback::Callback<Controller::OnOpenBasicCommissioningWindow> callback(OCWVerifierCallback, this);
-    CHIP_ERROR err = opener.OpenBasicCommissioningWindow(0x1234, timeout, &callback);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(opener.OpenBasicCommissioningWindow(0x1234, timeout, &callback), CHIP_NO_ERROR);
 }
 
 TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowVerifier_SuccessArguments)
