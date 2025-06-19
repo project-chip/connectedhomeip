@@ -44,7 +44,7 @@
 import logging
 
 import test_plan_support
-from chip.clusters import MeterIdentification
+from chip.clusters import Globals, MeterIdentification
 from chip.clusters.Types import Nullable, NullValue
 from chip.testing import matter_asserts
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -105,7 +105,7 @@ class TC_MTRID_2_1(MatterBaseTest):
 
         return steps
 
-    async def checkPowerThresholdStruct(self, struct: MeterIdentification.Structs.PowerThresholdStruct = None):
+    async def checkPowerThresholdStruct(self, struct: Globals.Structs.PowerThresholdStruct = None):
         if struct.powerThreshold is not None:
             matter_asserts.assert_valid_int64(struct.powerThreshold, "PowerThreshold")
         if struct.apparentPowerThreshold is not None:
@@ -113,8 +113,8 @@ class TC_MTRID_2_1(MatterBaseTest):
         if struct.powerThresholdSource is not NullValue:
             matter_asserts.assert_valid_enum(
                 struct.powerThresholdSource,
-                "PowerThresholdSource attribute must return a MeterIdentification.Enums.PowerThresholdSourceEnum",
-                MeterIdentification.Enums.PowerThresholdSourceEnum,
+                "PowerThresholdSource attribute must return a Globals.Enums.PowerThresholdSourceEnum",
+                Globals.Enums.PowerThresholdSourceEnum,
             )
 
     @async_test_body
@@ -230,8 +230,8 @@ class TC_MTRID_2_1(MatterBaseTest):
             )
             if val is not NullValue:
                 asserts.assert_true(
-                    isinstance(val, MeterIdentification.Structs.PowerThresholdStruct),
-                    "val must be of type MeterIdentification.Structs.PowerThresholdStruct",
+                    isinstance(val, Globals.Structs.PowerThresholdStruct),
+                    "val must be of type Globals.Structs.PowerThresholdStruct",
                 )
                 await self.checkPowerThresholdStruct(struct=val)
 
