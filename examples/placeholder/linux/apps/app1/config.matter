@@ -9399,32 +9399,6 @@ endpoint 1 {
     callback attribute clusterRevision;
   }
 
-  server cluster BasicInformation {
-    callback attribute dataModelRevision;
-    callback attribute vendorName;
-    callback attribute vendorID;
-    callback attribute productName;
-    callback attribute productID;
-    callback attribute nodeLabel;
-    callback attribute location;
-    callback attribute hardwareVersion;
-    callback attribute hardwareVersionString;
-    callback attribute softwareVersion;
-    callback attribute softwareVersionString;
-    callback attribute manufacturingDate;
-    callback attribute partNumber;
-    callback attribute productURL;
-    callback attribute productLabel;
-    callback attribute serialNumber;
-    callback attribute localConfigDisabled;
-    callback attribute reachable;
-    callback attribute uniqueID;
-    callback attribute capabilityMinima;
-    callback attribute configurationVersion;
-    callback attribute featureMap;
-    callback attribute clusterRevision;
-  }
-
   server cluster UserLabel {
     callback attribute labelList;
     ram      attribute featureMap default = 0;
