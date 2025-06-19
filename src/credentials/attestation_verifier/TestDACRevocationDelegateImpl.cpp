@@ -287,6 +287,9 @@ bool TestDACRevocationDelegateImpl::IsCertificateRevoked(const ByteSpan & certDe
     std::string akid;
     std::string issuerName;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+
     VerifyOrReturnValue(CHIP_NO_ERROR == GetIssuerNameBase64Str(certDer, issuerName), false);
     ChipLogDetail(NotSpecified, "Issuer: %s", ChipLogInlineString(100, static_cast<int>(issuerName.size()), issuerName.data()));
 
@@ -296,6 +299,8 @@ bool TestDACRevocationDelegateImpl::IsCertificateRevoked(const ByteSpan & certDe
 
     VerifyOrReturnValue(CHIP_NO_ERROR == GetAKIDHexStr(certDer, akid), false);
     ChipLogDetail(NotSpecified, "AKID: %s", ChipLogInlineString(100, static_cast<int>(akid.size()), akid.data()));
+
+#pragma GCC diagnostic pop
 
     return IsEntryInRevocationSet(akid, issuerName, serialNumber);
 }
