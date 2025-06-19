@@ -90,12 +90,12 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
             TestStep(
                 7,
                 "TH sends the SetStreamPriorities command with StreamPriorities containing a StreamUsage not in aSupportedStreamUsages.",
-                "DUT responds with a INVALID_DATA_TYPE status code.",
+                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
             ),
             TestStep(
                 8,
                 "TH sends the SetStreamPriorities command with StreamPriorities containing duplicate StreamUsage values from aSupportedStreamUsages.",
-                "DUT responds with a CONSTRAINT_ERROR status code.",
+                "DUT responds with a ALREADY_EXISTS status code.",
             ),
         ]
 
@@ -171,7 +171,7 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
-                Status.InvalidDataType,
+                Status.DynamicConstraintError,
                 "Unexpected error returned expecting INVALID_DATA_TYPE due to StreamPriorities containing a StreamUsage not in aSupportedStreamUsages",
             )
             pass
@@ -189,7 +189,7 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
-                Status.ConstraintError,
+                Status.AlreadyExists,
                 "Unexpected error returned when expecting CONSTRAINT_ERROR due to StreamPriorities containing duplicate StreamUsage values from aSupportedStreamUsages",
             )
             pass
