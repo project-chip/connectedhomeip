@@ -151,7 +151,7 @@ class TC_SC_4_3(MatterBaseTest):
             return (False, f"Input ({input_value}) is not a valid decimal number.")
 
     def verify_t_value(self, operational_record):
-        has_t = operational_record is not None and operational_record.txt_record is not None and 'T' in operational_record.txt_record.keys()
+        has_t = operational_record and operational_record.txt_record and 'T' in operational_record.txt_record
         if not has_t:
             asserts.assert_false(self.check_pics(TCP_PICS_STR),
                                  f"T key must be included if TCP is supported - returned TXT record: {operational_record}")
@@ -305,7 +305,7 @@ class TC_SC_4_3(MatterBaseTest):
         # Request the TXT record. The device may opt not to return a TXT record if there are no mandatory TXT keys
         txt_record_returned = operational_record is not None and operational_record.txt_record is not None and bool(
             operational_record.txt_record)
-        txt_record_required = supports_icd or self.check_pics("MCORE.SC.TCP")
+        txt_record_required = supports_icd or self.check_pics(TCP_PICS_STR)
 
         if txt_record_required:
             asserts.assert_true(txt_record_returned, "TXT record is required and was not returned or contains no values")
