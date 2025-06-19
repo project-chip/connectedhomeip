@@ -80,6 +80,9 @@ CHIP_ERROR EVSEManufacturer::Init(chip::EndpointId powerSourceEndpointId)
     /*
      * This is an example implementation for manufacturers to consider
      *
+     * For Manufacturer to specify the hardware mains voltage in mV:
+     *  dg->HwSetNominalMainsVoltage(230000);       // 230V
+     *
      * For Manufacturer to specify the hardware capability in mA:
      *  dg->HwSetMaxHardwareCurrentLimit(32000);    // 32A
      *
@@ -196,11 +199,8 @@ CHIP_ERROR FindNextTarget(const BitMask<EnergyEvse::TargetDayOfWeekBitmap> dayOf
  * @brief   DetermineRequiredEnergy based on if we know vehicle SoC, BatteryCapacity
  *          and TargetSoC or fallback to addedEnergy target.
  *
- * @param   Output: requiredEnergy_mWh - how much energy is needed to charge
+ *  Output: requiredEnergy_mWh - how much energy is needed to charge
  *          Note this could be 0 if the vehicleSoC > targetSoC
- *          If so, then then NextChargeStartTime should be Null
- *
- * @param   targetSoC
  */
 CHIP_ERROR EVSEManufacturer::DetermineRequiredEnergy(EnergyEvseDelegate * dg, int64_t & requiredEnergy_mWh,
                                                      DataModel::Nullable<Percent> & targetSoC,
@@ -235,16 +235,13 @@ CHIP_ERROR EVSEManufacturer::DetermineRequiredEnergy(EnergyEvseDelegate * dg, in
                 }
                 // Since we are charging using SoC then always null out the NextAddedEnergy target
                 // to indicate that the SoC target is being followed (per spec)
-                // this is done by the caller based on targetAddedEnergy_mWh
+                // NextChargeAddedEnergy is set by the caller based on targetAddedEnergy_mWh
                 targetAddedEnergy_mWh.SetNull();
 
                 return CHIP_NO_ERROR;
             }
             // ELSE we don't have VehicleSoC and Battery Capacity so we have to
             // fallback to AddedEnergy charging below
-            // According to spec if we can't use SoC for charging (falling back to AddedEnergy)
-            // then NextTargetSoC should be Null
-            targetSoC.SetNull();
         }
         else
         {
@@ -270,12 +267,17 @@ CHIP_ERROR EVSEManufacturer::DetermineRequiredEnergy(EnergyEvseDelegate * dg, in
         ChipLogError(AppServer,
                      "EVSE ERROR: Cannot use TargetSoC (maybe missing VehicleSoC/BatteryCapacity?) or AddedEnergy has not been "
                      "provided - assume large battery!");
+
         requiredEnergy_mWh = kMaxRequiredEnergy;
         return CHIP_NO_ERROR;
     }
 
     // Otherwise just use targetAddedEnergy_mWh
     requiredEnergy_mWh = targetAddedEnergy_mWh.Value();
+
+    // According to spec if we can't use SoC for charging (falling back to AddedEnergy)
+    // then NextTargetSoC should be Null is set by the caller based on targetSoC
+    targetSoC.SetNull();
 
     return CHIP_NO_ERROR;
 }
@@ -294,6 +296,7 @@ CHIP_ERROR EVSEManufacturer::ComputeStartTime(EnergyEvseDelegate * dg, DataModel
     if (requiredEnergy_mWh == 0)
     {
         // If we don't need to charge, then ensure we do not set a NextStartTime
+        // (spec says this should be NULL if we don't plan to schedule a charge)
         startTime_epoch_s.SetNull();
         return CHIP_NO_ERROR;
     }
@@ -301,11 +304,11 @@ CHIP_ERROR EVSEManufacturer::ComputeStartTime(EnergyEvseDelegate * dg, DataModel
     // Compute power from nominal voltage and maxChargingRate
     // GetMaximumChargeCurrent returns mA, but to help avoid overflow
     // We use V (not mV) and compute power to the nearest Watt
-    uint32_t power_W =
-        static_cast<uint32_t>((230 * dg->GetMaximumChargeCurrent()) / 1000); // TODO don't use 230V - not all markets will use that
+    uint32_t power_W = static_cast<uint32_t>((dg->HwGetNominalMainsVoltage() * dg->GetMaximumChargeCurrent()) / 1000000);
     if (power_W == 0)
     {
         ChipLogError(AppServer, "EVSE Error: MaxCurrent = 0Amp - Can't schedule charging");
+        startTime_epoch_s.SetNull();
         return CHIP_ERROR_INTERNAL;
     }
 

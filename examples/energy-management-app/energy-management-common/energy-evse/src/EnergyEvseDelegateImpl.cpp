@@ -353,6 +353,27 @@ Status EnergyEvseDelegate::HwSetMaxHardwareCurrentLimit(int64_t currentmA)
 }
 
 /**
+ * @brief    Called by EVSE Hardware to notify the delegate of the nominal
+ *           mains voltage (in mV)
+ *
+ *           This is normally called at start-up.
+ *
+ * @param   voltage_mV - nominal mains voltage
+ */
+Status EnergyEvseDelegate::HwSetNominalMainsVoltage(int64_t voltage_mV)
+{
+    if (voltage_mV < kMinMainsVoltageLimit)
+    {
+        ChipLogError(AppServer, "Mains voltage looks too low - check value is in mV");
+        return Status::ConstraintError;
+    }
+
+    mNominalMainsVoltage = voltage_mV;
+
+    return Status::Success;
+}
+
+/**
  * @brief    Called by EVSE Hardware to notify the delegate of maximum electrician
  *           set current limit.
  *
@@ -1584,9 +1605,9 @@ DataModel::Nullable<Percent> EnergyEvseDelegate::GetStateOfCharge()
 {
     return mStateOfCharge;
 }
-CHIP_ERROR EnergyEvseDelegate::SetStateOfCharge(DataModel::Nullable<uint8_t> newValue)
+CHIP_ERROR EnergyEvseDelegate::SetStateOfCharge(DataModel::Nullable<Percent> newValue)
 {
-    DataModel::Nullable<uint8_t> oldValue = mStateOfCharge;
+    DataModel::Nullable<Percent> oldValue = mStateOfCharge;
 
     mStateOfCharge = newValue;
     if (oldValue != newValue)
