@@ -127,13 +127,13 @@ CHIP_ERROR LogProvider::PrepareLogContextForIntent(LogContext * context, IntentE
         }
         context->EndUserSupport.span = endUserSupportSpan;
 #else
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     }
     break;
 
     case IntentEnum::kNetworkDiag: {
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
     break;
 
