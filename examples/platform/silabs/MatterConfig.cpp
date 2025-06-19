@@ -25,6 +25,7 @@
 #include <mbedtls/platform.h>
 
 #ifdef SL_WIFI
+#include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 #include <platform/silabs/wifi/WifiInterface.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -85,6 +86,8 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
+#include <app/clusters/network-commissioning/NetworkCommissioningDriverDelegate.h>
+
 /**********************************************************
  * Defines
  *********************************************************/
@@ -94,6 +97,10 @@ using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Credentials;
 using namespace chip::DeviceLayer::Silabs;
+
+#ifdef SL_WIFI
+app::Clusters::NetworkDriverObj<NetworkCommissioning::SlWiFiDriver> wifiNetworkDriver(chip::kRootEndpointId);
+#endif /* SL_WIFI */
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
@@ -108,6 +115,9 @@ using namespace chip::DeviceLayer::Silabs;
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
 
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+
+app::Clusters::NetworkDriverObj<NetworkCommissioning::GenericThreadDriver> threadNetworkDriver(chip::kRootEndpointId);
 // ================================================================================
 // Matter Networking Callbacks
 // ================================================================================
@@ -124,7 +134,6 @@ void UnlockOpenThreadTask(void)
 // ================================================================================
 // SilabsMatterConfig Methods
 // ================================================================================
-
 CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 {
     ChipLogProgress(DeviceLayer, "Initializing OpenThread stack");
@@ -143,6 +152,8 @@ CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
     ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice));
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // CHIP_DEVICE_CONFIG_THREAD_FTD
+
+    threadNetworkDriver.Init();
 
     ChipLogProgress(DeviceLayer, "Starting OpenThread task");
     return ThreadStackMgrImpl().StartThreadTask();
@@ -320,6 +331,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #ifdef SL_WIFI
 CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 {
+    wifiNetworkDriver.Init();
     return WifiInterface::GetInstance().InitWiFiStack();
 }
 #endif // SL_WIFI
