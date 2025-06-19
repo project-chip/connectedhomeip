@@ -140,11 +140,11 @@ private:
      * @brief Sets the fallback value for the slow polling interval.
      *
      * This function sets the fallback slow polling interval, which is used when the configured
-     * slow polling interval exceeds the allowed threshold when operation in SIT mode. The provided value must
-     * be less than or equal to the SIT polling threshold (kSITPollingThreshold).
+     * slow polling interval exceeds the allowed threshold for SIT mode. The provided value must
+     * be less than, or equal to the SIT polling threshold (kSITPollingThreshold).
      *
      * This fallback Slow Polling configuration allows ICD LIT device to configure a longer SlowPollingInterval
-     * when operating as LIT, but use a faster SlowPollingInterval when the device must operate as a SIT
+     * when operating as LIT, but use a faster SlowPollingInterval when the device must operate in SIT mode
      *
      * @param[in] slowPollFallback The fallback slow polling interval in milliseconds.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if the value is invalid.

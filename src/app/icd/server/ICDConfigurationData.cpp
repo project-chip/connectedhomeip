@@ -26,7 +26,7 @@ System::Clock::Milliseconds32 ICDConfigurationData::GetSlowPollingInterval()
 {
     // When LIT capable device operates in SIT mode, it shall transition to use the SlowPollingFallback
     // if this one is shorter than the configured mSlowPollingInterval.
-    // Eitherway, the slow poll interval used SHALL NOT be greater than the SIT mode polling threshold, per spec.
+    // Either way, the slow poll interval used SHALL NOT be greater than the SIT mode polling threshold, per spec.
     // This is important for ICD device configured for LIT operation but currently operating as a SIT
     // due to a lack of client registration
     if (mFeatureMap.Has(app::Clusters::IcdManagement::Feature::kLongIdleTimeSupport) && mICDMode == ICDMode::SIT)
