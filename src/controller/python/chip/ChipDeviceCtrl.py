@@ -353,7 +353,7 @@ class DeviceProxyWrapper():
 
         localSessionId = ctypes.c_uint16(0)
 
-        builtins.chipStack.Call(        # type: ignore[attr-defined]  # 'chipStack' added dynamically (refer to def __del__(self): method of DeviceProxyWrapper class)
+        builtins.chipStack.Call(        # type: ignore[attr-defined]  # 'chipStack' is dynamically added; referred to in DeviceProxyWrapper class __del__ method
             lambda: self._dmLib.pychip_GetLocalSessionId(self._deviceProxy, pointer(localSessionId))
         ).raise_on_error()
 
@@ -366,7 +366,7 @@ class DeviceProxyWrapper():
 
         numSessions = ctypes.c_uint32(0)
 
-        builtins.chipStack.Call(        # type: ignore[attr-defined]  # 'chipStack' added dynamically (refer to def __del__(self): method of of DeviceProxyWrapper class)
+        builtins.chipStack.Call(        # type: ignore[attr-defined]  # 'chipStack' is dynamically added; referred to in DeviceProxyWrapper class __del__ method
             lambda: self._dmLib.pychip_GetNumSessionsToPeer(self._deviceProxy, pointer(numSessions))
         ).raise_on_error()
 
@@ -380,7 +380,7 @@ class DeviceProxyWrapper():
         size = 64
         buf = (ctypes.c_uint8 * size)()
         csize = ctypes.c_size_t(size)
-        builtins.chipStack.Call(        # type: ignore[attr-defined]  # 'chipStack' added dynamically (refer to def __del__(self): method of of DeviceProxyWrapper class)
+        builtins.chipStack.Call(        # type: ignore[attr-defined]  # 'chipStack' is dynamically added; referred to in DeviceProxyWrapper class __del__ method
             lambda: self._dmLib.pychip_GetAttestationChallenge(self._deviceProxy, buf, ctypes.byref(csize))
         ).raise_on_error()
 
@@ -393,7 +393,7 @@ class DeviceProxyWrapper():
 
         supportsLargePayload = ctypes.c_bool(False)
 
-        builtins.chipStack.Call(        # type: ignore[attr-defined]  # 'chipStack' added dynamically (refer to def __del__(self): method of of DeviceProxyWrapper class)
+        builtins.chipStack.Call(        # type: ignore[attr-defined]  # 'chipStack' is dynamically added; referred to in DeviceProxyWrapper class __del__ method
             lambda: self._dmLib.pychip_SessionAllowsLargePayload(self._deviceProxy, pointer(supportsLargePayload))
         ).raise_on_error()
 
@@ -406,7 +406,7 @@ class DeviceProxyWrapper():
 
         isSessionOverTCP = ctypes.c_bool(False)
 
-        builtins.chipStack.Call(        # type: ignore[attr-defined]  # 'chipStack' added dynamically (refer to def __del__(self): method of of DeviceProxyWrapper class)
+        builtins.chipStack.Call(        # type: ignore[attr-defined]  # 'chipStack' is dynamically added; referred to in DeviceProxyWrapper class __del__ method
             lambda: self._dmLib.pychip_IsSessionOverTCPConnection(self._deviceProxy, pointer(isSessionOverTCP))
         ).raise_on_error()
 
@@ -419,7 +419,7 @@ class DeviceProxyWrapper():
 
         isActiveSession = ctypes.c_bool(False)
 
-        builtins.chipStack.Call(        # type: ignore[attr-defined]  # 'chipStack' added dynamically (refer to def __del__(self): method of of DeviceProxyWrapper class)
+        builtins.chipStack.Call(        # type: ignore[attr-defined]  # 'chipStack' is dynamically added; referred to in DeviceProxyWrapper class __del__ method
             lambda: self._dmLib.pychip_IsActiveSession(self._deviceProxy, pointer(isActiveSession))
         ).raise_on_error()
 
@@ -443,7 +443,8 @@ class ChipDeviceControllerBase():
 
     def __init__(self, name: str = ''):
         self.devCtrl = None
-        self._ChipStack = builtins.chipStack   # type: ignore[attr-defined]
+        # 'chipStack' is dynamically added; referred to in DeviceProxyWrapper class __del__ method
+        self._ChipStack = builtins.chipStack  # type: ignore[attr-defined]
         self._dmLib: typing.Any = None
 
         self._InitLib()
@@ -457,7 +458,8 @@ class ChipDeviceControllerBase():
         self._fabricCheckNodeId = -1
         self._isActive = False
 
-        self._Cluster = ChipClusters(builtins.chipStack)   # type: ignore[attr-defined]
+        # 'chipStack' is dynamically added; referred to in DeviceProxyWrapper class __del__ method
+        self._Cluster = ChipClusters(builtins.chipStack)  # type: ignore[attr-defined]
         self._commissioning_lock: asyncio.Lock = asyncio.Lock()
         self._commissioning_context: CommissioningContext = CommissioningContext(self, self._commissioning_lock)
         self._open_window_context: CallbackContext = CallbackContext(asyncio.Lock())
@@ -1235,7 +1237,7 @@ class ChipDeviceControllerBase():
         size = 128
         buf = (ctypes.c_uint8 * size)()
         csize = ctypes.c_size_t(size)
-        builtins.chipStack.Call(    # type: ignore[attr-defined]  # 'chipStack' added dynamically (refer to def __del__(self): method of DeviceProxyWrapper class)
+        builtins.chipStack.Call(    # type: ignore[attr-defined]  # 'chipStack' is dynamically added; referred to in DeviceProxyWrapper class __del__ method
             lambda: self._dmLib.pychip_DeviceController_GetRootPublicKeyBytes(self.devCtrl, buf, ctypes.byref(csize))
         ).raise_on_error()
 
