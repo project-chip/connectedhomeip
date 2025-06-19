@@ -555,8 +555,8 @@ void DoorLockServer::getUserCommandHandler(chip::app::CommandHandler * commandOb
     // appclusters, 5.2.4.36: we should not set user-specific fields to non-null if the user status is set to Available
     if (UserStatusEnum::kAvailable != user.userStatus)
     {
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
         ChipLogProgress(Zcl,
                         "Found user in storage: "
@@ -566,7 +566,7 @@ void DoorLockServer::getUserCommandHandler(chip::app::CommandHandler * commandOb
                         to_underlying(user.userStatus), to_underlying(user.userType), to_underlying(user.credentialRule),
                         user.createdBy, user.lastModifiedBy);
 
-        #pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
 
         response.userName.SetNonNull(user.userName);
         if (0xFFFFFFFFU != user.userUniqueId)
@@ -2000,8 +2000,8 @@ ClusterStatusCode DoorLockServer::createUser(chip::EndpointId endpointId, chip::
     if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, creatorFabricIdx, creatorFabricIdx, newUserName, newUserUniqueId,
                                       newUserStatus, newUserType, newCredentialRule, newCredentials, newTotalCredentials))
     {
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
         ChipLogProgress(Zcl,
                         "[createUser] Unable to create user: app error "
@@ -2012,13 +2012,13 @@ ClusterStatusCode DoorLockServer::createUser(chip::EndpointId endpointId, chip::
                         to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule),
                         static_cast<unsigned int>(newTotalCredentials));
 
-        #pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
 
         return ClusterStatusCode(Status::Failure);
     }
 
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
     ChipLogProgress(Zcl,
                     "[createUser] User created "
@@ -2029,7 +2029,7 @@ ClusterStatusCode DoorLockServer::createUser(chip::EndpointId endpointId, chip::
                     to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule),
                     static_cast<unsigned int>(newTotalCredentials));
 
-    #pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
 
     sendRemoteLockUserChange(endpointId, LockDataTypeEnum::kUserIndex, DataOperationTypeEnum::kAdd, sourceNodeId, creatorFabricIdx,
                              userIndex, userIndex);
@@ -2087,8 +2087,8 @@ Status DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::FabricIndex
                                       newUserStatus, newUserType, newCredentialRule, user.credentials.data(),
                                       user.credentials.size()))
     {
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
         ChipLogError(Zcl,
                      "[modifyUser] Unable to modify the user: app error "
@@ -2098,13 +2098,13 @@ Status DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::FabricIndex
                      ChipLogInlineString(100, static_cast<int>(newUserName.size()), newUserName.data()), newUserUniqueId,
                      to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule));
 
-        #pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
 
         return Status::Failure;
     }
 
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
     ChipLogProgress(Zcl,
                     "[modifyUser] User modified "
@@ -2114,7 +2114,7 @@ Status DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::FabricIndex
                     ChipLogInlineString(100, static_cast<int>(newUserName.size()), newUserName.data()), newUserUniqueId,
                     to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule));
 
-    #pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
 
     sendRemoteLockUserChange(endpointId, LockDataTypeEnum::kUserIndex, DataOperationTypeEnum::kModify, sourceNodeId,
                              modifierFabricIndex, userIndex, userIndex);

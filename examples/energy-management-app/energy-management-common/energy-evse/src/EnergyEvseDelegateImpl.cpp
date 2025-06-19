@@ -585,13 +585,13 @@ Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
 
     mVehicleID = MakeNullable(static_cast<CharSpan>(destinationString));
 
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
     ChipLogDetail(AppServer, "VehicleID updated %s",
                   ChipLogInlineString(100, static_cast<int>(mVehicleID.Value().size()), mVehicleID.Value().data()));
 
-    #pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
 
     MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, VehicleID::Id);
 
