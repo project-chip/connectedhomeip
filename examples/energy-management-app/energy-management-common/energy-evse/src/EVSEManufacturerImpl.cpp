@@ -216,7 +216,7 @@ CHIP_ERROR EVSEManufacturer::DetermineRequiredEnergy(EnergyEvseDelegate * dg, in
             // We support SoCReporting, but it doesn't mean the Vehicle supports it
             vehicleSoC          = dg->GetStateOfCharge();
             batteryCapacity_mWh = dg->GetBatteryCapacity();
-            if (!vehicleSoC.IsNull() & !batteryCapacity_mWh.IsNull())
+            if (!vehicleSoC.IsNull() && !batteryCapacity_mWh.IsNull())
             {
                 if (vehicleSoC.Value() < targetSoC.Value())
                 {
