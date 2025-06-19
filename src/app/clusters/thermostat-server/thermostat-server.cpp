@@ -17,6 +17,7 @@
 
 #include "thermostat-server.h"
 #include "PresetStructWithOwnedMembers.h"
+#include "ScheduleStructWithOwnedMembers.h"
 
 #include <app/util/attribute-storage.h>
 
@@ -631,11 +632,93 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
     }
     break;
     case ScheduleTypes::Id: {
-        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+        auto delegate = GetDelegate(aPath.mEndpointId);
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+            for (uint8_t i = 0; true; i++)
+            {
+                ScheduleTypeStruct::Type scheduleType;
+                auto err = delegate->GetScheduleTypeAtIndex(i, scheduleType);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                ReturnErrorOnFailure(err);
+                ReturnErrorOnFailure(encoder.Encode(scheduleType));
+            }
+        });
+    }
+    break;
+    case NumberOfSchedules::Id: {
+        auto delegate = GetDelegate(aPath.mEndpointId);
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        ReturnErrorOnFailure(aEncoder.Encode(delegate->GetNumberOfSchedules()));
+    }
+    break;
+    case NumberOfScheduleTransitions::Id: {
+        auto delegate = GetDelegate(aPath.mEndpointId);
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        ReturnErrorOnFailure(aEncoder.Encode(delegate->GetNumberOfScheduleTransitions()));
+    }
+    break;
+    case NumberOfScheduleTransitionPerDay::Id: {
+        auto delegate = GetDelegate(aPath.mEndpointId);
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        ReturnErrorOnFailure(aEncoder.Encode(delegate->GetNumberOfScheduleTransitionPerDay()));
+    }
+    break;
+    case ActiveScheduleHandle::Id: {
+        auto delegate = GetDelegate(aPath.mEndpointId);
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        uint8_t buffer[kScheduleHandleSize];
+        MutableByteSpan activeScheduleHandleSpan(buffer);
+        auto activeScheduleHandle = DataModel::MakeNullable(activeScheduleHandleSpan);
+
+        CHIP_ERROR err = delegate->GetActiveScheduleHandle(activeScheduleHandle);
+        ReturnErrorOnFailure(err);
+
+        ReturnErrorOnFailure(aEncoder.Encode(activeScheduleHandle));
     }
     break;
     case Schedules::Id: {
-        return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+        auto delegate = GetDelegate(aPath.mEndpointId);
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        auto & subjectDescriptor = aEncoder.GetSubjectDescriptor();
+        if (InAtomicWrite(aPath.mEndpointId, subjectDescriptor, MakeOptional(aPath.mAttributeId)))
+        {
+            return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+                for (uint8_t i = 0; true; i++)
+                {
+                    ScheduleStructWithOwnedMembers schedule;
+                    auto err = delegate->GetPendingScheduleAtIndex(i, schedule);
+                    if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                    {
+                        return CHIP_NO_ERROR;
+                    }
+                    ReturnErrorOnFailure(err);
+                    ReturnErrorOnFailure(encoder.Encode(schedule));
+                }
+            });
+        }
+        return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
+            for (uint8_t i = 0; true; i++)
+            {
+                ScheduleStructWithOwnedMembers schedule;
+                auto err = delegate->GetScheduleAtIndex(i, schedule);
+                if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+                {
+                    return CHIP_NO_ERROR;
+                }
+                ReturnErrorOnFailure(err);
+                ReturnErrorOnFailure(encoder.Encode(schedule));
+            }
+        });
     }
     break;
     default: // return CHIP_NO_ERROR and just read from the attribute store in default
@@ -656,7 +739,6 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
     switch (aPath.mAttributeId)
     {
     case Presets::Id: {
-
         auto delegate = GetDelegate(endpoint);
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
@@ -699,10 +781,99 @@ CHIP_ERROR ThermostatAttrAccess::Write(const ConcreteDataAttributePath & aPath, 
             ReturnErrorOnFailure(aDecoder.Decode(preset));
             return AppendPendingPreset(delegate, preset);
         }
+
+        return CHIP_IM_GLOBAL_STATUS(InvalidInState);
     }
     break;
     case Schedules::Id: {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        auto delegate = GetDelegate(endpoint);
+        VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
+
+        // Schedules are not editable, return INVALID_IN_STATE.
+        VerifyOrReturnError(InAtomicWrite(endpoint, MakeOptional(aPath.mAttributeId)), CHIP_IM_GLOBAL_STATUS(InvalidInState),
+                            ChipLogError(Zcl, "Schedules are not editable"));
+
+        // OK, we're in an atomic write, make sure the requesting node is the same one that started the atomic write,
+        // otherwise return BUSY.
+        if (!InAtomicWrite(endpoint, subjectDescriptor, MakeOptional(aPath.mAttributeId)))
+        {
+            ChipLogError(Zcl, "Another node is editing schedules. Server is busy. Try again later");
+            return CHIP_IM_GLOBAL_STATUS(Busy);
+        }
+
+        // If the list operation is replace all, clear the existing pending list, iterate over the new schedules list
+        // and add to the pending schedules list.
+        if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+        {
+            // Clear the pending schedules list
+            delegate->ClearPendingScheduleList();
+
+            Schedules::TypeInfo::DecodableType newSchedulesList;
+            ReturnErrorOnFailure(aDecoder.Decode(newSchedulesList));
+
+            // Iterate over the schedules and call the delegate to append to the list of pending schedules.
+            auto iter = newSchedulesList.begin();
+            while (iter.Next())
+            {
+                ScheduleStruct::DecodableType decodeSchedule = iter.GetValue();
+                ScheduleTransitionStruct::Type transitions[5];
+                auto iter2 = decodeSchedule.transitions.begin();
+                int i      = 0;
+
+                while (iter2.Next())
+                {
+                    transitions[i] = iter2.GetValue();
+                    i++;
+                }
+
+                ScheduleStruct::Type schedule;
+                schedule.systemMode     = decodeSchedule.systemMode;
+                schedule.scheduleHandle = decodeSchedule.scheduleHandle;
+                schedule.name           = decodeSchedule.name;
+                schedule.presetHandle   = decodeSchedule.presetHandle;
+                schedule.transitions    = DataModel::List<const Structs::ScheduleTransitionStruct::Type>(transitions, i);
+                schedule.builtIn        = decodeSchedule.builtIn;
+                ReturnErrorOnFailure(AppendPendingSchedule(delegate, schedule));
+            }
+            return iter.GetStatus();
+        }
+
+        // If the list operation is AppendItem, call the delegate to append the item to the list of pending schedules.
+        if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+        {
+            ScheduleStruct::DecodableType decodeSchedule;
+            std::unique_ptr<ScheduleTransitionStruct::Type[]> transitions(
+                new ScheduleTransitionStruct::Type[delegate->GetNumberOfScheduleTransitions()]);
+
+            ReturnErrorOnFailure(aDecoder.Decode(decodeSchedule));
+
+            auto iter = decodeSchedule.transitions.begin();
+            int i     = 0;
+
+            while (iter.Next())
+            {
+                if (i >= delegate->GetNumberOfScheduleTransitions())
+                {
+                    ChipLogError(Zcl, "Too many transitions in schedule");
+                    return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+                }
+
+                transitions[i] = iter.GetValue();
+                i++;
+            }
+
+            ScheduleStruct::Type schedule;
+            schedule.systemMode     = decodeSchedule.systemMode;
+            schedule.scheduleHandle = decodeSchedule.scheduleHandle;
+            schedule.name           = decodeSchedule.name;
+            schedule.presetHandle   = decodeSchedule.presetHandle;
+            schedule.transitions    = DataModel::List<const Structs::ScheduleTransitionStruct::Type>(transitions.get(), i);
+            schedule.builtIn        = decodeSchedule.builtIn;
+
+            return AppendPendingSchedule(delegate, schedule);
+        }
+
+        return CHIP_IM_GLOBAL_STATUS(InvalidInState);
     }
     break;
     }
@@ -1098,14 +1269,6 @@ bool emberAfThermostatClusterGetWeeklyScheduleCallback(app::CommandHandler * com
 bool emberAfThermostatClusterSetWeeklyScheduleCallback(app::CommandHandler * commandObj,
                                                        const app::ConcreteCommandPath & commandPath,
                                                        const Commands::SetWeeklySchedule::DecodableType & commandData)
-{
-    // TODO
-    return false;
-}
-
-bool emberAfThermostatClusterSetActiveScheduleRequestCallback(
-    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const Clusters::Thermostat::Commands::SetActiveScheduleRequest::DecodableType & commandData)
 {
     // TODO
     return false;

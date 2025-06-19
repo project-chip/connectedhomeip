@@ -51,6 +51,7 @@ qpg_executable("thermostat") {
   output_name = "chip-${qpg_target_ic}-thermostat-example.out"
 
   sources = [
+    "${chip_root}/examples/thermostat/thermostat-common/src/thermostat-delegate-impl.cpp",
     "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.cpp",
     "${examples_plat_dir}/app/battery.cpp",
     "${examples_plat_dir}/app/main.cpp",
@@ -86,6 +87,7 @@ qpg_executable("thermostat") {
 
   include_dirs = [
     "include",
+    "${chip_root}/examples/thermostat/thermostat-common/include",
     "${examples_plat_dir}/ota",
     "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/halCortexM4/inc",
     "${qpg_sdk_root}/Components/ThirdParty/secure_element/software/esec/libs/common",

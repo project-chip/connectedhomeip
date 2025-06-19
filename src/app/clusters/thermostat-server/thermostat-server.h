@@ -84,6 +84,32 @@ private:
     Protocols::InteractionModel::Status PrecommitPresets(EndpointId endpoint);
 
     /**
+     * @brief Set the Active Schedule to a given schedule handle, or null
+     *
+     * @param endpoint The endpoint
+     * @param scheduleHandle The handle of the schedule to set active, or null to clear the active schedule
+     * @return Success if the active schedule was updated, an error code if not
+     */
+    Protocols::InteractionModel::Status SetActiveSchedule(EndpointId endpoint, DataModel::Nullable<ByteSpan> scheduleHandle);
+
+    /**
+     * @brief Apply a schedule to the pending lists of schedules during an atomic write
+     *
+     * @param delegate The current ThermostatDelegate
+     * @param preset The schedule to append
+     * @return CHIP_NO_ERROR if successful, an error code if not
+     */
+    CHIP_ERROR AppendPendingSchedule(Thermostat::Delegate * delegate, const Structs::ScheduleStruct::Type & schedule);
+
+    /**
+     * @brief Verifies if the pending schedules for a given endpoint are valid
+     *
+     * @param endpoint The endpoint
+     * @return Success if the list of pending schedules is valid, an error code if not
+     */
+    Protocols::InteractionModel::Status PrecommitSchedules(EndpointId endpoint);
+
+    /**
      * @brief Callback for when the server is removed from a given fabric; all associated atomic writes are reset
      *
      * @param fabricTable The fabric table
@@ -212,6 +238,10 @@ private:
     friend bool emberAfThermostatClusterSetActivePresetRequestCallback(
         CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
         const Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData);
+
+    friend bool emberAfThermostatClusterSetActiveScheduleRequestCallback(
+        CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+        const Clusters::Thermostat::Commands::SetActiveScheduleRequest::DecodableType & commandData);
 
     friend bool
     emberAfThermostatClusterAtomicRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
