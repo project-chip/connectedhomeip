@@ -84,6 +84,15 @@ namespace Logging {
 // Log redirection
 using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, const char * msg, va_list args);
 
+/**
+ * @def InlineString(BUFSIZE, LEN, DATA)
+ *
+ * @brief
+ *   A null-terminated string that can be used inplace for logging purposes.
+ *
+ */
+#define InlineString(BUFSIZE, LEN, DATA) chip::StringBuilder<BUFSIZE>().AddFormat("%.*s", LEN, DATA).c_str()
+
 #if CHIP_ERROR_LOGGING
 /**
  * @def ChipLogError(MOD, MSG, ...)

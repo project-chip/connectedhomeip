@@ -19,6 +19,7 @@
 #include <credentials/attestation_verifier/TestDACRevocationDelegateImpl.h>
 #include <lib/support/Base64.h>
 #include <lib/support/BytesToHex.h>
+#include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <algorithm>
@@ -287,14 +288,20 @@ bool TestDACRevocationDelegateImpl::IsCertificateRevoked(const ByteSpan & certDe
     std::string akid;
     std::string issuerName;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+
     VerifyOrReturnValue(CHIP_NO_ERROR == GetIssuerNameBase64Str(certDer, issuerName), false);
-    ChipLogDetail(NotSpecified, "Issuer: %.*s", static_cast<int>(issuerName.size()), issuerName.data());
+    ChipLogDetail(NotSpecified, "Issuer: %s", InlineString(100, static_cast<int>(issuerName.size()), issuerName.data()));
 
     VerifyOrReturnValue(CHIP_NO_ERROR == GetSerialNumberHexStr(certDer, serialNumber), false);
-    ChipLogDetail(NotSpecified, "Serial Number: %.*s", static_cast<int>(serialNumber.size()), serialNumber.data());
+    ChipLogDetail(NotSpecified, "Serial Number: %s",
+                  InlineString(100, static_cast<int>(serialNumber.size()), serialNumber.data()));
 
     VerifyOrReturnValue(CHIP_NO_ERROR == GetAKIDHexStr(certDer, akid), false);
-    ChipLogDetail(NotSpecified, "AKID: %.*s", static_cast<int>(akid.size()), akid.data());
+    ChipLogDetail(NotSpecified, "AKID: %s", InlineString(100, static_cast<int>(akid.size()), akid.data()));
+
+#pragma GCC diagnostic pop
 
     return IsEntryInRevocationSet(akid, issuerName, serialNumber);
 }

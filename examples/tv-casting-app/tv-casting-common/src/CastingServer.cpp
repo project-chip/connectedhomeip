@@ -374,8 +374,15 @@ CHIP_ERROR CastingServer::ReadMACAddress(TargetEndpointInfo * endpoint)
                 if (response.data() != nullptr && response.size() > 0)
                 {
                     videoPlayerInfo->SetMACAddress(response);
-                    ChipLogProgress(AppServer, "Updating cache of VideoPlayers with MACAddress: %.*s",
-                                    static_cast<int>(response.size()), response.data());
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+
+                    ChipLogProgress(AppServer, "Updating cache of VideoPlayers with MACAddress: %s",
+                                    InlineString(100, static_cast<int>(response.size()), response.data()));
+
+#pragma GCC diagnostic pop
+
                     CHIP_ERROR error = CastingServer::GetInstance()->mPersistenceManager.AddVideoPlayer(videoPlayerInfo);
                     if (error != CHIP_NO_ERROR)
                     {

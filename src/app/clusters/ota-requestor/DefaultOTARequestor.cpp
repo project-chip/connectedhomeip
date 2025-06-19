@@ -61,8 +61,14 @@ static void LogQueryImageResponse(const QueryImageResponse::DecodableType & resp
     }
     if (response.imageURI.HasValue())
     {
-        ChipLogDetail(SoftwareUpdate, "  imageURI: %.*s", static_cast<int>(response.imageURI.Value().size()),
-                      response.imageURI.Value().data());
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+
+        ChipLogDetail(
+            SoftwareUpdate, "  imageURI: %s",
+            InlineString(100, static_cast<int>(response.imageURI.Value().size()), response.imageURI.Value().data()));
+
+#pragma GCC diagnostic pop
     }
     if (response.softwareVersion.HasValue())
     {
@@ -70,9 +76,14 @@ static void LogQueryImageResponse(const QueryImageResponse::DecodableType & resp
     }
     if (response.softwareVersionString.HasValue())
     {
-        ChipLogDetail(SoftwareUpdate, "  softwareVersionString: %.*s",
-                      static_cast<int>(response.softwareVersionString.Value().size()),
-                      response.softwareVersionString.Value().data());
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+
+        ChipLogDetail(SoftwareUpdate, "  softwareVersionString: %s",
+                      InlineString(100, static_cast<int>(response.softwareVersionString.Value().size()),
+                                   response.softwareVersionString.Value().data()));
+
+#pragma GCC diagnostic pop
     }
     if (response.updateToken.HasValue())
     {
