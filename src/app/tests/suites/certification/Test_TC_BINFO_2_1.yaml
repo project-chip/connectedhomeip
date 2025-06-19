@@ -143,7 +143,7 @@ tests:
           constraints:
               type: vendor_id
               minValue: 1
-              maxValue: 65521
+              maxValue: 65520
 
     - label:
           "Verify that VendorID matches the value assigned to this manufacturer"
@@ -257,7 +257,7 @@ tests:
       response:
           constraints:
               type: char_string
-              maxLength: 16
+              maxLength: 2
 
     - label:
           "Verify that the Location is same as CountryCode value saved from
