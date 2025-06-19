@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "BasicInformationLogic.h"
+#include <app/clusters/basic-information/BasicInformationLogic.h>
 
 #include <app/InteractionModelEngine.h>
 #include <clusters/BasicInformation/Enums.h>

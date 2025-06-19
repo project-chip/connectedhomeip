@@ -23,8 +23,6 @@
 #include <lib/support/Span.h>
 #include <platform/ConfigurationManager.h>
 
-#include <algorithm>
-
 namespace chip {
 namespace app {
 namespace Clusters {
