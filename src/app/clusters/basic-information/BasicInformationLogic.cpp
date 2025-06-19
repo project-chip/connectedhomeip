@@ -52,7 +52,7 @@ DataModel::ActionReturnStatus BasicInformationLogic::SetNodeLabel(CharSpan label
     //   Label MUST BE STORED COMPATIBLE !
     VerifyOrReturnError(label.size() <= sizeof(mNodeLabelBuffer), Protocols::InteractionModel::Status::ConstraintError);
     memcpy(mNodeLabelBuffer, label.data(), label.size());
-    mNodeLabelSize = label.size();
+    mNodeLabelSize = static_cast<uint8_t>(label.size()); // we know that label size is at most 32
 
     // TODO: implement
     //
