@@ -231,7 +231,7 @@ class TC_MTRID_2_1(MatterBaseTest):
             if val is not NullValue:
                 asserts.assert_true(
                     isinstance(val, MeterIdentification.Structs.PowerThresholdStruct),
-                    f"val must be of type MeterIdentification.Structs.PowerThresholdStruct",
+                    "val must be of type MeterIdentification.Structs.PowerThresholdStruct",
                 )
                 await self.checkPowerThresholdStruct(struct=val)
 
