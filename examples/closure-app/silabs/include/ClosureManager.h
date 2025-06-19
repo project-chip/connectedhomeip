@@ -120,6 +120,8 @@ private:
     static ClosureManager sClosureMgr;
     osTimerId_t mClosureTimer;
     bool isCalibrationInProgress = false;
+    bool isMoveToInProgress = false;
+    bool isStopInProgress = false;
     Action_t mCurrentAction      = Action_t::INVALID_ACTION;
 
     // Define the endpoint ID for the Closure

@@ -67,12 +67,13 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
 
 void ClosureDimensionEndpoint::OnStopMotionActionComplete()
 {
-    // This function should handle closure dimension state updation after stopping of motion Action.
+    UpdateTargetStateFromCurrentState();
 }
 
 void ClosureDimensionEndpoint::OnStopCalibrateActionComplete()
 {
-    // This function should handle closure dimension state updation after stopping of calibration Action.
+    mLogic.SetCurrentState(DataModel::NullNullable);
+    mLogic.SetTarget(DataModel::NullNullable);
 }
 
 void ClosureDimensionEndpoint::OnCalibrateActionComplete()
@@ -88,3 +89,29 @@ void ClosureDimensionEndpoint::OnMoveToActionComplete()
 {
     // This function should handle closure dimension state updation after MoveTo Action.
 }
+
+void ClosureDimensionEndpoint::UpdateTargetStateFromCurrentState()
+{
+    DataModel::Nullable<GenericCurrentStateStruct> currentState;
+    mLogic.GetCurrentState(currentState);
+
+    if (currentState.IsNull())
+    {
+        mLogic.SetTarget(DataModel::NullNullable);
+        return;
+    }
+
+    DataModel::Nullable<GenericTargetStruct> target;
+    mLogic.GetTarget(target);
+
+    if (target.IsNull())
+    {
+        target.SetNonNull(GenericTargetStruct());
+    }
+
+    target.Value().position = currentState.Value().position;
+    target.Value().latch = currentState.Value().latch;
+    target.Value().speed = currentState.Value().speed;
+
+    mLogic.SetTarget(target);
+}   

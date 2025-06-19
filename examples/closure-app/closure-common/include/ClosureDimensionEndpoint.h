@@ -142,6 +142,8 @@ private:
     ClosureDimensionDelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
+
+    void UpdateTargetStateFromCurrentState();
 };
 
 } // namespace ClosureDimension

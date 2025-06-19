@@ -159,12 +159,36 @@ CHIP_ERROR ClosureControlEndpoint::Init()
 
 void ClosureControlEndpoint::OnStopCalibrateActionComplete()
 {
-    // This function should handle closure control state updation after stopping of calibration Action.
+    mLogic.SetMainState(MainStateEnum::kStopped);
+    mLogic.SetOverallState(DataModel::NullNullable);
+    mLogic.SetOverallTarget(DataModel::NullNullable);
+    mLogic.SetCountdownTimeFromDelegate(0);
+    mLogic.GenerateMovementCompletedEvent();
 }
 
 void ClosureControlEndpoint::OnStopMotionActionComplete()
 {
-    // This function should handle closure control state updation after stopping of Motion Action.
+    mLogic.SetMainState(MainStateEnum::kStopped);
+
+    // Set the OverallState position to PartiallyOpened as motion has been stopped
+    // and the closure is not fully closed or fully opened.
+    auto position = MakeOptional(MakeNullable(PositioningEnum::kPartiallyOpened));
+    
+    DataModel::Nullable<GenericOverallState> overallState;
+    mLogic.GetOverallState(overallState);
+    if (overallState.IsNull())
+    {
+        overallState.SetNonNull(GenericOverallState(position, NullOptional, NullOptional, NullOptional)); 
+    } else
+    {
+        overallState.Value().positioning = position;
+    }
+    mLogic.SetOverallState(overallState);
+
+    UpdateTargetStateFromCurrentState();
+
+    mLogic.SetCountdownTimeFromDelegate(0);
+    mLogic.GenerateMovementCompletedEvent();
 }
 
 void ClosureControlEndpoint::OnCalibrateActionComplete()
@@ -184,4 +208,71 @@ void ClosureControlEndpoint::OnCalibrateActionComplete()
 void ClosureControlEndpoint::OnMoveToActionComplete()
 {
     // This function should handle closure control state updation after completion of Motion Action.
+}
+
+void ClosureControlEndpoint::MapCurrentPositioningToTargetPosition(PositioningEnum positioning, TargetPositionEnum & targetPosition)
+{
+    switch (positioning)
+    {
+    case PositioningEnum::kFullyClosed:
+        targetPosition = TargetPositionEnum::kCloseInFull;
+        break;
+    case PositioningEnum::kFullyOpened:
+        targetPosition = TargetPositionEnum::kOpenInFull;
+        break;
+    case PositioningEnum::kPartiallyOpened:
+        targetPosition = TargetPositionEnum::kUnknownEnumValue;
+        break;
+    case PositioningEnum::kOpenedForPedestrian:
+        targetPosition = TargetPositionEnum::kPedestrian;
+        break;
+    case PositioningEnum::kOpenedForVentilation:
+        targetPosition = TargetPositionEnum::kVentilation;
+        break;
+    case PositioningEnum::kOpenedAtSignature:
+        targetPosition = TargetPositionEnum::kSignature;
+        break;
+    default:
+        ChipLogDetail(AppServer, "Unknown PositioningEnum value: %d", static_cast<int>(positioning));
+        targetPosition = TargetPositionEnum::kUnknownEnumValue;
+        break;
+    }
+}
+
+void ClosureControlEndpoint::UpdateTargetStateFromCurrentState()
+{
+    DataModel::Nullable<GenericOverallState> overallState;
+    mLogic.GetOverallState(overallState);
+    if (overallState.IsNull())
+    {
+         mLogic.SetOverallTarget(DataModel::NullNullable);
+         return;
+    }
+
+    DataModel::Nullable<GenericOverallTarget> overallTarget;
+    mLogic.GetOverallTarget(overallTarget);
+    if (overallTarget.IsNull())
+    {
+        overallTarget.SetNonNull(GenericOverallTarget());
+    }
+
+    if (overallState.Value().positioning.HasValue() && 
+            !overallState.Value().positioning.Value().IsNull()) 
+    {
+        PositioningEnum positioning = overallState.Value().positioning.Value();
+        TargetPositionEnum targetPosition;
+        MapCurrentPositioningToTargetPosition(positioning, targetPosition);
+        if (targetPosition == TargetPositionEnum::kUnknownEnumValue)
+        {
+            // If the target position is unknown, we set the position field of overallTarget to NullNullable.
+            overallTarget.Value().position.SetValue(NullOptional);
+        } else {
+            overallTarget.Value().position.SetValue(targetPosition);
+        }
+    }
+
+    overallTarget.Value().latch = overallState.Value().latch;
+    overallTarget.Value().speed = overallState.Value().speed;
+
+    mLogic.SetOverallTarget(overallTarget);
 }
