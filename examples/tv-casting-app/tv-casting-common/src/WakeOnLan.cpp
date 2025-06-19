@@ -78,8 +78,14 @@ CHIP_ERROR SendWakeOnLanPacket(chip::CharSpan * MACAddress)
         close(sockfd);
         return CHIP_ERROR_INCORRECT_STATE;
     }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+
     ChipLogProgress(AppServer, "Broadcasted WoL magic packet with MACAddress %s",
                     ChipLogInlineString(100, 2 * kMACLength, MACAddress->data()));
+
+#pragma GCC diagnostic pop
 
     close(sockfd);
     return CHIP_NO_ERROR;
