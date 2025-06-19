@@ -206,15 +206,6 @@ public:
 
     void SetTariffUpdCb(std::function<void()> cb) { mTariffDataUpdatedCb = cb; }
 
-    // Pure virtual interface methods
-    virtual Protocols::InteractionModel::Status GetDayEntryById(DataModel::Nullable<uint32_t> aDayEntryId,
-                                                                Structs::DayEntryStruct::Type & aDayEntry) = 0;
-
-    virtual Protocols::InteractionModel::Status
-    GetTariffComponentInfoById(DataModel::Nullable<uint32_t> aTariffComponentId, DataModel::Nullable<chip::CharSpan> & label,
-                               DataModel::List<const uint32_t> & dayEntryIDs,
-                               Structs::TariffComponentStruct::Type & aTariffComponent) = 0;
-
     /**
      * @brief Process incoming tariff data updates
      *
@@ -320,6 +311,15 @@ protected:
     std::function<void()> mTariffDataUpdatedCb;
 };
 
+struct CurrentTariffAttrsCtx
+{
+    Delegate * TariffProvider;
+
+    std::map<uint32_t, const Structs::DayPatternStruct::Type *> DayPatternsMap;
+    std::map<uint32_t, const Structs::DayEntryStruct::Type *> DayEntriesMap;
+    std::map<uint32_t, const Structs::TariffComponentStruct::Type *> TariffComponentsMap;
+};
+
 /**
  * @class CommodityTariffServer
  * @brief Matter server implementation for the Commodity Tariff cluster
@@ -345,6 +345,7 @@ public:
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);
         mEndpointId = aEndpointId;
+        mDelegate.SetTariffUpdCb([this]() { this->TariffDataUpdatedCb(); });
     }
 
     ~Instance() { Shutdown(); }
@@ -355,6 +356,15 @@ public:
     bool HasFeature(Feature aFeature) const;
 
 private:
+    enum class UpdateEventCode
+    {
+        TariffUpdating,
+        DaysUpdating,
+        DayEntryUpdating
+    };
+
+    CurrentTariffAttrsCtx mServerTariffAttrsCtx;
+
     Delegate & mDelegate;
     BitMask<Feature> mFeature;
 
@@ -377,8 +387,14 @@ private:
     COMMODITY_TARIFF_CURRENT_ATTRIBUTES
 #undef X
 
+    void TariffDataUpdatedCb();
+    void ResetCurrentAttributes();
+
     // Current attrs (time depended) update methods
-    void UpdateCurrentAttrs();
+    void UpdateCurrentAttrs(UpdateEventCode aEvt);
+    void ScheduleTariffActivation(uint32_t delay);
+    void ScheduleMidnightUpdate();
+    void ScheduleDayEntryUpdate(uint16_t minutesSinceMidnight);
 };
 
 } // namespace CommodityTariff
