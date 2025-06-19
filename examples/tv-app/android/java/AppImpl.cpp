@@ -106,6 +106,8 @@ DECLARE_DYNAMIC_ATTRIBUTE(ApplicationBasic::Attributes::VendorName::Id, CHAR_STR
                               0), /* ApplicationVersion */
     DECLARE_DYNAMIC_ATTRIBUTE(ApplicationBasic::Attributes::AllowedVendorList::Id, ARRAY, kDescriptorAttributeArraySize,
                               0), /* AllowedVendorList */
+    DECLARE_DYNAMIC_ATTRIBUTE(ApplicationBasic::Attributes::Application::Id, STRUCT, 1, 0),                  /* Application */
+    DECLARE_DYNAMIC_ATTRIBUTE(ApplicationBasic::Attributes::FeatureMap::Id, BITMAP32, 4, 0),                 /* FeatureMap */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Keypad Input cluster attributes
@@ -117,12 +119,14 @@ DECLARE_DYNAMIC_ATTRIBUTE(KeypadInput::Attributes::FeatureMap::Id, BITMAP32, 4, 
 // NOTE: Does not make sense for content app to be able to set the AP feature flag
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(applicationLauncherAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(ApplicationLauncher::Attributes::CatalogList::Id, ARRAY, kDescriptorAttributeArraySize,
-                          0),                                                                 /* catalog list */
-    DECLARE_DYNAMIC_ATTRIBUTE(ApplicationLauncher::Attributes::CurrentApp::Id, STRUCT, 1, 0), /* current app */
+                          0),                                                                   /* catalog list */
+    DECLARE_DYNAMIC_ATTRIBUTE(ApplicationLauncher::Attributes::CurrentApp::Id, STRUCT, 1, 0),   /* current app */
+    DECLARE_DYNAMIC_ATTRIBUTE(ApplicationLauncher::Attributes::FeatureMap::Id, BITMAP32, 4, 0), /* FeatureMap */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Account Login cluster attributes
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(accountLoginAttrs)
+    DECLARE_DYNAMIC_ATTRIBUTE(AccountLogin::Attributes::FeatureMap::Id, BITMAP32, 4, 0), /* FeatureMap */
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Content Launcher cluster attributes
@@ -150,6 +154,7 @@ DECLARE_DYNAMIC_ATTRIBUTE(MediaPlayback::Attributes::CurrentState::Id, ENUM8, 1,
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(targetNavigatorAttrs)
 DECLARE_DYNAMIC_ATTRIBUTE(TargetNavigator::Attributes::TargetList::Id, ARRAY, kDescriptorAttributeArraySize, 0), /* target list */
     DECLARE_DYNAMIC_ATTRIBUTE(TargetNavigator::Attributes::CurrentTarget::Id, INT8U, 1, 0), /* current target */
+    DECLARE_DYNAMIC_ATTRIBUTE(TargetNavigator::Attributes::FeatureMap::Id, BITMAP32, 4, 0), /* FeatureMap */
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // Declare Channel cluster attributes
