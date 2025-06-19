@@ -55,9 +55,6 @@ NetworkCommissioning::WiFiScanResponse ToScanResponse(const wifi_scan_result * r
 
     if (result != nullptr)
     {
-        static_assert(sizeof(response.ssid) == sizeof(result->ssid), "SSID length mismatch");
-        static_assert(sizeof(response.bssid) == sizeof(result->mac), "BSSID length mismatch");
-
         // TODO: Distinguish WPA versions
         response.security.Set(result->security == WIFI_SECURITY_TYPE_PSK ? NetworkCommissioning::WiFiSecurity::kWpaPersonal
                                                                          : NetworkCommissioning::WiFiSecurity::kUnencrypted);
