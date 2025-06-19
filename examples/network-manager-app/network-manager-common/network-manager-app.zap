@@ -3184,7 +3184,6 @@
           "define": "WIFI_NETWORK_MANAGEMENT_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "NetworkPassphraseRequest",
@@ -3325,7 +3324,6 @@
           "define": "THREAD_BORDER_ROUTER_MANAGEMENT_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "GetActiveDatasetRequest",
@@ -3554,7 +3552,6 @@
           "define": "THREAD_NETWORK_DIRECTORY_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "apiMaturity": "provisional",
           "commands": [
             {
               "name": "AddNetwork",
