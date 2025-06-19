@@ -84,7 +84,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 6,
-                 "If DUT supports `Privacy` feature, TH writes attribute `SoftLivestreamPrivacyModeEnabled = true` in the CameraAVStreamManagement Cluster on DUT",
+                "If DUT supports `Privacy` feature, TH writes attribute `SoftLivestreamPrivacyModeEnabled = true` in the CameraAVStreamManagement Cluster on DUT",
             ),
             TestStep(
                 7,
