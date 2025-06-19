@@ -405,7 +405,7 @@ TEST_F(TestBleLayer, OnConnectionCompleteCallbackPath)
 // and that the error callback is invoked.
 TEST_F(TestBleLayer, OnConnectionErrorCallbackPath)
 {
-    // Simulate a connection error by passing an invalid connection object
+    // Simulate a connection error by exhausting the BLE endpoint pool
     for (size_t i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
     {
         // Saturate BLE end-point pool
