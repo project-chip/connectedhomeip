@@ -177,7 +177,7 @@ class TC_DA_1_5(MatterBaseTest):
         bad_nonce = random.randbytes(31)
         try:
             await self.send_single_cmd(cmd=opcreds.Commands.CSRRequest(CSRNonce=bad_nonce, isForUpdateNOC=False))
-            asserts.fail("Unexpected success when running command")
+            asserts.fail("CSRRequest with 31-byte nonce was expected to fail but succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidCommand, "Received incorrect error from CSRRequest command with bad nonce")
 
