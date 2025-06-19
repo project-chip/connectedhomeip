@@ -273,7 +273,7 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendInsufficientHeadroom)
     // Create a new packet buffer with maximum size and set its data length to the maximum.
     auto packet0 = PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize, 0);
     packet0->SetDataLength(packet0->MaxDataLength());
-    
+
     // Attempt to send the packet with acknowledgment required, which should fail due to insufficient headroom.
     EXPECT_FALSE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), true));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Error);
