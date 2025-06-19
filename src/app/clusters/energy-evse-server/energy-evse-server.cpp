@@ -309,13 +309,13 @@ void Instance::HandleEnableCharging(HandlerContext & ctx, const Commands::Enable
     auto & minimumChargeCurrent = commandData.minimumChargeCurrent;
     auto & maximumChargeCurrent = commandData.maximumChargeCurrent;
 
-    if (minimumChargeCurrent < kMinimumChargeCurrent)
+    if (minimumChargeCurrent < kMinimumChargeCurrentLimit)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
 
-    if (maximumChargeCurrent < kMinimumChargeCurrent)
+    if (maximumChargeCurrent < kMinimumChargeCurrentLimit)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
@@ -339,7 +339,7 @@ void Instance::HandleEnableDischarging(HandlerContext & ctx, const Commands::Ena
     auto & dischargingEnabledUntil = commandData.dischargingEnabledUntil;
     auto & maximumDischargeCurrent = commandData.maximumDischargeCurrent;
 
-    if (maximumDischargeCurrent < kMinimumChargeCurrent)
+    if (maximumDischargeCurrent < kMinimumChargeCurrentLimit)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
