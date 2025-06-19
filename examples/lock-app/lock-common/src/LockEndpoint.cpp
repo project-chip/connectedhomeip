@@ -99,13 +99,18 @@ bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & u
     user.modificationSource = DlAssetSource::kMatterIM;
     user.lastModifiedBy     = userInDb.lastModifiedBy;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+
     ChipLogDetail(Zcl,
                   "Found occupied user "
-                  "[endpoint=%d,adjustedIndex=%hu,name=\"%.*s\",credentialsCount=%u,uniqueId=%x,type=%u,credentialRule=%u,"
+                  "[endpoint=%d,adjustedIndex=%hu,name=\"%s\",credentialsCount=%u,uniqueId=%x,type=%u,credentialRule=%u,"
                   "createdBy=%d,lastModifiedBy=%d]",
-                  mEndpointId, adjustedUserIndex, static_cast<int>(user.userName.size()), user.userName.data(),
+                  mEndpointId, adjustedUserIndex, InlineString(100, static_cast<int>(user.userName.size()), user.userName.data()),
                   static_cast<unsigned int>(user.credentials.size()), user.userUniqueId, to_underlying(user.userType),
                   to_underlying(user.credentialRule), user.createdBy, user.lastModifiedBy);
+
+#pragma GCC diagnostic pop
 
     return true;
 }
@@ -114,14 +119,19 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
                            const chip::CharSpan & userName, uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum usertype,
                            CredentialRuleEnum credentialRule, const CredentialStruct * credentials, size_t totalCredentials)
 {
-    ChipLogProgress(Zcl,
-                    "Lock App: LockEndpoint::SetUser "
-                    "[endpoint=%d,userIndex=%u,creator=%d,modifier=%d,userName=\"%.*s\",uniqueId=%" PRIx32
-                    ",userStatus=%u,userType=%u,"
-                    "credentialRule=%u,credentials=%p,totalCredentials=%u]",
-                    mEndpointId, userIndex, creator, modifier, static_cast<int>(userName.size()), userName.data(), uniqueId,
-                    to_underlying(userStatus), to_underlying(usertype), to_underlying(credentialRule), credentials,
-                    static_cast<unsigned int>(totalCredentials));
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+
+    ChipLogProgress(
+        Zcl,
+        "Lock App: LockEndpoint::SetUser "
+        "[endpoint=%d,userIndex=%u,creator=%d,modifier=%d,userName=\"%s\",uniqueId=%" PRIx32 ",userStatus=%u,userType=%u,"
+        "credentialRule=%u,credentials=%p,totalCredentials=%u]",
+        mEndpointId, userIndex, creator, modifier, InlineString(100, static_cast<int>(userName.size()), userName.data()),
+        uniqueId, to_underlying(userStatus), to_underlying(usertype), to_underlying(credentialRule), credentials,
+        static_cast<unsigned int>(totalCredentials));
+
+#pragma GCC diagnostic pop
 
     auto adjustedUserIndex = static_cast<uint16_t>(userIndex - 1);
     if (adjustedUserIndex > mLockUsers.size())

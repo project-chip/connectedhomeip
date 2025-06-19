@@ -168,7 +168,13 @@ void TargetVideoPlayerInfo::PrintInfo()
                     ChipLogValueX64(mNodeId), mFabricIndex);
     if (mMACAddress.size() > 0)
     {
-        ChipLogProgress(NotSpecified, "  MACAddress=%.*s", static_cast<int>(mMACAddress.size()), mMACAddress.data());
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+
+        ChipLogProgress(NotSpecified, "  MACAddress=%s",
+                        InlineString(100, static_cast<int>(mMACAddress.size()), mMACAddress.data()));
+
+#pragma GCC diagnostic pop
     }
 
     for (auto & endpointInfo : mEndpoints)
