@@ -19,4 +19,6 @@
 #ifndef APP_CONFIG_H
 #define APP_CONFIG_H
 
+// Mapping of Functional buttons
+
 #endif // APP_CONFIG_H

@@ -21,4 +21,7 @@
 
 // Mapping of Functional buttons
 
+// This defines activates configuration of Identify cluster on endpoint 2 in base AppTask.cpp
+#define ACTIVATE_IDENTIFY_ON_EP2
+
 #endif // APP_CONFIG_H
