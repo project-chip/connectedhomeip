@@ -218,7 +218,7 @@ void LinuxWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
     if (network.UsingPDC())
     {
         ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: ConnectNetwork (PDC) '%s'",
-                        ChipLogFormat(100, "%.*s", static_cast<int>(network.ssidLen), network.ssid));
+                        ChipLogInlineString(100, static_cast<int>(network.ssidLen), network.ssid));
         err = ConnectivityMgrImpl().ConnectWiFiNetworkWithPDCAsync(
             ByteSpan(network.ssid, network.ssidLen), ByteSpan(network.networkIdentity, network.networkIdentityLen),
             ByteSpan(network.clientIdentity, network.clientIdentityLen), *network.clientIdentityKeypair, callback);
@@ -227,7 +227,7 @@ void LinuxWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     {
         ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: ConnectNetwork '%s'",
-                        ChipLogFormat(100, "%.*s", static_cast<int>(network.ssidLen), network.ssid));
+                        ChipLogInlineString(100, static_cast<int>(network.ssidLen), network.ssid));
 
         err = ConnectivityMgrImpl().ConnectWiFiNetworkAsync(ByteSpan(network.ssid, network.ssidLen),
                                                             ByteSpan(network.credentials, network.credentialsLen), callback);

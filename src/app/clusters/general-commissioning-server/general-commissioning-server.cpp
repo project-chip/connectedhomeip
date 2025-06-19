@@ -515,8 +515,14 @@ void GeneralCommissioningGlobalInstance::HandleSetRegulatoryConfig(HandlerContex
 
     if (countryCode.size() != ConfigurationManager::kMaxLocationLength)
     {
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wformat-nonliteral"
+
         ChipLogError(Zcl, "Invalid country code: '%s'",
-                     ChipLogFormat(100, "%.*s", static_cast<int>(countryCode.size()), countryCode.data()));
+                     ChipLogInlineString(100, static_cast<int>(countryCode.size()), countryCode.data()));
+
+        #pragma GCC diagnostic pop
+
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
         return;
     }

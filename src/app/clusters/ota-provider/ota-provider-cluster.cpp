@@ -207,8 +207,13 @@ OtaProviderLogic::QueryImage(const ConcreteCommandPath & commandPath,
     }
     if (location.HasValue())
     {
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wformat-nonliteral"
+
         ChipLogDetail(Zcl, "  Location: %s",
-                      ChipLogFormat(100, "%.*s", static_cast<int>(location.Value().size()), location.Value().data()));
+                      ChipLogInlineString(100, static_cast<int>(location.Value().size()), location.Value().data()));
+
+        #pragma GCC diagnostic pop
     }
     if (requestorCanConsent.HasValue())
     {

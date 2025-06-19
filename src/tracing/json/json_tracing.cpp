@@ -510,11 +510,16 @@ void JsonBackend::OutputValue(::Json::Value & value)
         std::string data_string = output.str();
         chip::StringSplitter splitter(data_string.c_str(), '\n');
 
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wformat-nonliteral"
+
         chip::CharSpan line;
         while (splitter.Next(line))
         {
-            ChipLogProgress(Automation, "%s", ChipLogFormat(100, "%.*s", static_cast<int>(line.size()), line.data()));
+            ChipLogProgress(Automation, "%s", ChipLogInlineString(100, static_cast<int>(line.size()), line.data()));
         }
+
+        #pragma GCC diagnostic pop
     }
 }
 
