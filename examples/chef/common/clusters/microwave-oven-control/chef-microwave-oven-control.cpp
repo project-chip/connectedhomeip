@@ -30,7 +30,7 @@ using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 using Status            = Protocols::InteractionModel::Status;
 
-#ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
+#if MATTER_DM_MICROWAVE_OVEN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
     mOperationalStateInstancePtr(OperationalState::GetOperationalStateInstance()),
@@ -64,7 +64,7 @@ ChefMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, ui
         return status;
     }
 
-    mMicrowaveOvenControlInstance.SetCookTimeSec(cookTimeSec);
+    HandleModifyCookTimeSecondsCallback(cookTimeSec);
 
     // If using power as number, check if powerSettingNum has value before setting the power number.
     // If powerSetting field is missing in the command, the powerSettingNum passed here is handled to the max value
@@ -76,7 +76,10 @@ ChefMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, ui
 
     if (startAfterSetting)
     {
-        mOperationalStateInstancePtr->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
+
+        OperationalStateDelegate * mOperationalStateDelegate = OperationalState::GetOperationalStateDelegate();
+        GenericOperationalError noError(to_underlying(ErrorStateEnum::kNoError));
+        mOperationalStateDelegate->HandleStartStateCallback(noError);
     }
 
     return Status::Success;
@@ -85,6 +88,19 @@ ChefMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, ui
 Protocols::InteractionModel::Status ChefMicrowaveOvenDevice::HandleModifyCookTimeSecondsCallback(uint32_t finalCookTimeSec)
 {
     mMicrowaveOvenControlInstance.SetCookTimeSec(finalCookTimeSec);
+
+    OperationalStateDelegate * mOperationalStateDelegate = OperationalState::GetOperationalStateDelegate();
+
+    if (mOperationalStateDelegate)
+    {
+        mOperationalStateDelegate->mCountDownTime.SetNonNull(finalCookTimeSec);
+    }
+
+    if (mOperationalStateInstancePtr)
+    {
+        mOperationalStateInstancePtr->UpdateCountdownTimeFromDelegate();
+    }
+
     return Status::Success;
 }
 
@@ -126,4 +142,4 @@ void InitChefMicrowaveOvenControlCluster()
     }
 }
 
-#endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
+#endif // MATTER_DM_MICROWAVE_OVEN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT > 0
