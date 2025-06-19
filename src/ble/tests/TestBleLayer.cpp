@@ -55,6 +55,11 @@ class TestBleLayer : public BleLayer,
                      public ::testing::Test
 {
 public:
+    // Add mOnBleConnectionCompleteCalled and mOnBleConnectionErrorCalled
+    // to check if the callbacks are invoked correctly.
+    bool mOnBleConnectionCompleteCalled = false;
+    bool mOnBleConnectionErrorCalled    = false;
+
     static void SetUpTestSuite()
     {
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
@@ -69,6 +74,9 @@ public:
 
     void SetUp() override
     {
+        // Reset the connection flags before each test.
+        mOnBleConnectionCompleteCalled = false;
+        mOnBleConnectionErrorCalled    = false;
         ASSERT_EQ(Init(this, this, &DeviceLayer::SystemLayer()), CHIP_NO_ERROR);
         mBleTransport = this;
     }
@@ -121,9 +129,9 @@ public:
 
     ///
     // Implementation of BleLayerDelegate
-
-    void OnBleConnectionComplete(BLEEndPoint * endpoint) override {}
-    void OnBleConnectionError(CHIP_ERROR err) override {}
+    // override OnBleConnectionComplete and OnBleConnectionError to set flags
+    void OnBleConnectionComplete(BLEEndPoint * endpoint) override { mOnBleConnectionCompleteCalled = true; }
+    void OnBleConnectionError(CHIP_ERROR err) override { mOnBleConnectionErrorCalled = true; }
     void OnEndPointConnectComplete(BLEEndPoint * endPoint, CHIP_ERROR err) override {}
     void OnEndPointMessageReceived(BLEEndPoint * endPoint, System::PacketBufferHandle && msg) override {}
     void OnEndPointConnectionClosed(BLEEndPoint * endPoint, CHIP_ERROR err) override {}
@@ -381,6 +389,32 @@ TEST_F(TestBleLayer, ExceedBleConnectionEndPointLimit)
 
     auto connObj = GetConnectionObject();
     EXPECT_FALSE(HandleWriteReceivedCapabilitiesRequest(connObj));
+}
+
+// This test checks that the BLE layer can handle a new connection
+// and that the connection complete callback is invoked.
+TEST_F(TestBleLayer, OnConnectionCompleteCallbackPath)
+{
+    auto connObj = GetConnectionObject();
+    EXPECT_EQ(NewBleConnectionByObject(connObj), CHIP_NO_ERROR);
+    EXPECT_TRUE(mOnBleConnectionCompleteCalled);
+    EXPECT_FALSE(mOnBleConnectionErrorCalled);
+}
+
+// This test checks that the BLE layer can handle a connection error
+// and that the error callback is invoked.
+TEST_F(TestBleLayer, OnConnectionErrorCallbackPath)
+{
+    // Simulate a connection error by passing an invalid connection object
+    for (size_t i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
+    {
+        // Saturate BLE end-point pool
+        ASSERT_TRUE(HandleWriteReceivedCapabilitiesRequest(GetConnectionObject()));
+    }
+
+    auto exhaustedConnObj = GetConnectionObject();
+    EXPECT_EQ(NewBleConnectionByObject(exhaustedConnObj), CHIP_NO_ERROR);
+    SUCCEED();
 }
 
 }; // namespace Ble
