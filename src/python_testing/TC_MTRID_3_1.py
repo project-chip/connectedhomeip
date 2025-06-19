@@ -126,7 +126,7 @@ class TC_MTRID_3_1(MatterBaseTest):
         return ["MTRID.S",
                 "MTRID.S.A0004"
                 "DGGEN.S",
-                "DGGEN.S.A0008,"
+                "DGGEN.S.A0008",
                 "DGGEN.S.C00.Rsp"]
 
     def steps_TC_MTRID_3_1(self) -> list[TestStep]:
