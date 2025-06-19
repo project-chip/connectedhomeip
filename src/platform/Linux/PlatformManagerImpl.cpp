@@ -69,7 +69,7 @@ void * GLibMainLoopThread(void * userData)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
-gboolean WiFiIPChangeListener(GIOChannel * ch, GIOCondition /* condition */, void * /* userData */)
+gboolean IPChangeListener(GIOChannel * ch, GIOCondition /* condition */, void * /* userData */)
 {
 
     char buffer[4096];
@@ -108,14 +108,10 @@ gboolean WiFiIPChangeListener(GIOChannel * ch, GIOCondition /* condition */, voi
                             continue;
                         }
 
-                        if (ConnectivityMgrImpl().GetWiFiIfName() == nullptr)
-                        {
-                            ChipLogDetail(DeviceLayer, "No wifi interface name. Ignoring IP update event.");
-                            continue;
-                        }
-
-                        if (strcmp(name, ConnectivityMgrImpl().GetWiFiIfName()) != 0)
-                        {
+                        bool wifi_matched = ConnectivityMgrImpl().GetWiFiIfName()!= nullptr && strcmp(name, ConnectivityMgrImpl().GetWiFiIfName()) == 0;
+                        bool ethernet_matched = ConnectivityMgrImpl().GetEthernetIfName() != nullptr && strcmp(name, ConnectivityMgrImpl().GetEthernetIfName()) == 0;
+                        if(!wifi_matched && !ethernet_matched){
+                             ChipLogDetail(DeviceLayer, "No wifi interface name or ethernet interface name match the router info interface name . Ignoring IP update event.");
                             continue;
                         }
 
@@ -154,7 +150,7 @@ gboolean WiFiIPChangeListener(GIOChannel * ch, GIOCondition /* condition */, voi
 
 // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
 // This should be removed or find a better place once we deprecate the rendezvous session.
-CHIP_ERROR RunWiFiIPChangeListener()
+CHIP_ERROR RunIPChangeListener()
 {
     int sock;
     if ((sock = socket(PF_NETLINK, SOCK_RAW, NETLINK_ROUTE)) == -1)
@@ -177,7 +173,7 @@ CHIP_ERROR RunWiFiIPChangeListener()
 
     GIOChannel * ch       = g_io_channel_unix_new(sock);
     GSource * watchSource = g_io_create_watch(ch, G_IO_IN);
-    g_source_set_callback(watchSource, G_SOURCE_FUNC(WiFiIPChangeListener), nullptr, nullptr);
+    g_source_set_callback(watchSource, G_SOURCE_FUNC(IPChangeListener), nullptr, nullptr);
     g_io_channel_set_close_on_unref(ch, TRUE);
     g_io_channel_set_encoding(ch, nullptr, nullptr);
 
@@ -230,7 +226,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    ReturnErrorOnFailure(RunWiFiIPChangeListener());
+    ReturnErrorOnFailure(RunIPChangeListener());
 #endif
 
     // Initialize the configuration system.
