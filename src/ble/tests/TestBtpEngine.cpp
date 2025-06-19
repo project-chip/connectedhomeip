@@ -181,11 +181,6 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendThreePacket)
     EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(8));
 }
 
-TEST_F(TestBtpEngine, HandleCharacteristicSendEmptyPacket)
-{
-    EXPECT_FALSE(mBtpEngine.HandleCharacteristicSend(nullptr, true));
-}
-
 TEST_F(TestBtpEngine, HandleCharacteristicSendOnePacketWithAck)
 {
     auto packet0 = System::PacketBufferHandle::New(15);
@@ -208,6 +203,7 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendTwoPacketWithIncorrectAck)
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_InProgress);
     EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(nullptr, false));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Complete);
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(17));
 }
 
 TEST_F(TestBtpEngine, HandleCharacteristicSendTwoPacketWithCorrectAck)
@@ -224,6 +220,29 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendTwoPacketWithCorrectAck)
     EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(20));
     EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(nullptr, true));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Complete);
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(17));
+}
+
+TEST_F(TestBtpEngine, HandleCharacteristicSendRejectsNewSendUntilPreviousAcked)
+{
+    auto packet0 = System::PacketBufferHandle::New(30);
+    packet0->SetDataLength(30);
+
+    auto data0 = packet0->Start();
+    ASSERT_NE(data0, nullptr);
+    std::iota(data0, data0 + 30, 0);
+
+    EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), false));
+    EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_InProgress);
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(20));
+
+    auto packet1 = System::PacketBufferHandle::New(30);
+    packet1->SetDataLength(30);
+    EXPECT_FALSE(mBtpEngine.HandleCharacteristicSend(packet1.Retain(), false));
+
+    EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(nullptr, true));
+    EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Complete);
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(17));
 }
 
 TEST_F(TestBtpEngine, HandleCharacteristicSendInsufficientHeadroom)
