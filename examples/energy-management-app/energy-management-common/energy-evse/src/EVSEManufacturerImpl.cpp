@@ -242,6 +242,9 @@ CHIP_ERROR EVSEManufacturer::DetermineRequiredEnergy(EnergyEvseDelegate * dg, in
             }
             // ELSE we don't have VehicleSoC and Battery Capacity so we have to
             // fallback to AddedEnergy charging below
+            // According to spec if we can't use SoC for charging (falling back to AddedEnergy)
+            // then NextTargetSoC should be Null
+            targetSoC.SetNull();
         }
         else
         {
