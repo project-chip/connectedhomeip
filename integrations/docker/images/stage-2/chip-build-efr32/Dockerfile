@@ -28,13 +28,13 @@ RUN wget https://github.com/SiliconLabs/simplicity_sdk/releases/download/v2025.6
     && find /tmp/simplicity_sdk/platform/Device/SiliconLabs  -mindepth 1 -maxdepth 1 -type d ! \( -name 'EFR32MG24' -o -name 'EFR32MG26' -o -name 'MGM24' -o -name 'MGM26' \) -exec rm -rf {} + \
     && : # last line
 
-# Clone WiSeConnect Wi-Fi and Bluetooth Software 2.11.4 (a18b5dd)
+# Clone WiSeConnect Wi-Fi and Bluetooth Software 2.12.0 (a18b5dd)
 RUN git clone --depth=1 --single-branch --branch=2.12.0 https://github.com/SiliconLabs/wiseconnect-wifi-bt-sdk.git /tmp/wiseconnect-wifi-bt-sdk && \
     cd /tmp/wiseconnect-wifi-bt-sdk && \
     rm -rf .git examples \
     && : # last line
 
-# Clone WiSeConnect SDK v3.4.2 (ca4c4b0)
+# Clone WiSeConnect SDK v3.5.0 (ca4c4b0)
 RUN git clone --depth=1 --single-branch --branch=v3.5.0 https://github.com/SiliconLabs/wiseconnect.git /tmp/wifi_sdk && \
     cd /tmp/wifi_sdk && \
     rm -rf .git examples components/device/stm32 \
