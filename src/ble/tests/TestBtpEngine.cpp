@@ -185,26 +185,29 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendThreePacket)
 TEST_F(TestBtpEngine, HandleCharacteristicSendOnePacketWithAck)
 {
     // Create a new packet buffer with space for a 15-byte payload and set its data length to 15.
-    auto packet0 = System::PacketBufferHandle::New(15);
-    packet0->SetDataLength(15);
+    auto dataLength = 15;
+    auto packet0 = System::PacketBufferHandle::New(dataLength);
+    packet0->SetDataLength(dataLength);
 
     // Send the packet with acknowledgment required, checking the transmission state and the packet buffer.
     EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), true));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Complete);
-    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(20)); // protocol header (5 bytes) + payload (15 bytes)
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(dataLength + 5)); // protocol header (5 bytes) + payload (15 bytes)
 }
 
 // Test sending a 30-byte payload with acknowledgment required, but providing incorrect ack sequence.
 TEST_F(TestBtpEngine, HandleCharacteristicSendTwoPacketWithIncorrectAck)
 {
     // Create a new packet buffer with space for a 30-byte payload and set its data length to 30.
-    auto packet0 = System::PacketBufferHandle::New(30);
-    packet0->SetDataLength(30);
+    auto dataLength = 30;
+    auto packet0 = System::PacketBufferHandle::New(dataLength);
+    packet0->SetDataLength(dataLength);
 
     // Start sending the payload with acknowledgment required, checking the transmission state and the packet buffer.
+    auto data0MaxLength = BtpEngine::sDefaultFragmentSize;
     EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), true));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_InProgress);
-    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(20));
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(data0MaxLength));
 
     // Try to continue sending the next fragment, also attempting to send an ack
     // when the sequence is incorrect and check the transmission state.
@@ -214,58 +217,65 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendTwoPacketWithIncorrectAck)
     // Continue sending without acknowledgment, checking the transmission state and the packet buffer.
     EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(nullptr, false));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Complete);
-    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(17));
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(dataLength - (data0MaxLength -
+        (kTransferProtocolMaxHeaderSize - kTransferProtocolAckSize)) + kTransferProtocolMidFragmentMaxHeaderSize));
 }
 
 // Test sending a 30-byte payload with correct acknowledgment sequence.
 TEST_F(TestBtpEngine, HandleCharacteristicSendTwoPacketWithCorrectAck)
 {
     // Create a new packet buffer with space for a 30-byte payload and set its data length to 30.
-    auto packet0 = System::PacketBufferHandle::New(30);
-    packet0->SetDataLength(30);
+    auto dataLength = 30;
+    auto packet0 = System::PacketBufferHandle::New(dataLength);
+    packet0->SetDataLength(dataLength);
 
     // Initialize the payload data with sequential values for testing.
     auto data0 = packet0->Start();
     ASSERT_NE(data0, nullptr);
-    std::iota(data0, data0 + 30, 0);
+    std::iota(data0, data0 + dataLength, 0);
 
     // Start sending the payload without requiring an acknowledgment for the first fragment.
+    auto data0MaxLength = BtpEngine::sDefaultFragmentSize;
     EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), false));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_InProgress);
-    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(20));
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(data0MaxLength));
 
     // Continue sending second fragment with acknowledgment required.
     EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(nullptr, true));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Complete);
-    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(17));
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(dataLength - (data0MaxLength -
+        (kTransferProtocolMaxHeaderSize - kTransferProtocolAckSize)) + kTransferProtocolMidFragmentMaxHeaderSize));
 }
 
 // Test that the engine prevents sending a new payload until the previous payload has been acknowledged.
 TEST_F(TestBtpEngine, HandleCharacteristicSendRejectsNewSendUntilPreviousAcked)
 {
     // Create a new packet buffer with space for a 30-byte payload and set its data length to 30.
-    auto packet0 = System::PacketBufferHandle::New(30);
-    packet0->SetDataLength(30);
+    auto dataLength = 30;
+    auto packet0 = System::PacketBufferHandle::New(dataLength);
+    packet0->SetDataLength(dataLength);
 
     // Initialize the payload data with sequential values for testing.
     auto data0 = packet0->Start();
     ASSERT_NE(data0, nullptr);
-    std::iota(data0, data0 + 30, 0);
+    std::iota(data0, data0 + dataLength, 0);
 
     // Start sending the payload without requiring an acknowledgment for the first fragment.
+    auto data0MaxLength = BtpEngine::sDefaultFragmentSize;
     EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), false));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_InProgress);
-    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(20));
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(data0MaxLength));
 
     // Attempt to send another payload while the first one is still in progress.
-    auto packet1 = System::PacketBufferHandle::New(30);
-    packet1->SetDataLength(30);
+    auto packet1 = System::PacketBufferHandle::New(dataLength);
+    packet1->SetDataLength(dataLength);
     EXPECT_FALSE(mBtpEngine.HandleCharacteristicSend(packet1.Retain(), false));
 
     // Send the second fragment of the first payload with acknowledgment required.
     EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(nullptr, true));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Complete);
-    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(17));
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(dataLength - (data0MaxLength -
+        (kTransferProtocolMaxHeaderSize - kTransferProtocolAckSize)) + kTransferProtocolMidFragmentMaxHeaderSize));
 }
 
 // Test sending a payload when there is not enough headroom in the packet buffer.
@@ -281,8 +291,9 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendInsufficientHeadroom)
     EXPECT_EQ(packet0->DataLength(), packet0->MaxDataLength());
 
     // Create a new packet buffer with space for a 15-byte payload and zero headroom, then set its data length to 15.
-    auto packet1 = System::PacketBufferHandle::New(15, 0);
-    packet1->SetDataLength(15);
+    auto dataLength = 15;
+    auto packet1 = System::PacketBufferHandle::New(dataLength, 0);
+    packet1->SetDataLength(dataLength);
 
     // Attempt to send another packet with insufficient headroom, which should also fail.
     EXPECT_FALSE(mBtpEngine.HandleCharacteristicSend(packet1.Retain(), true));
