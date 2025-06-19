@@ -147,6 +147,10 @@ void ClosureManager::InitiateAction(AppEvent * event)
         break;
     case Action_t::MOVE_TO_ACTION:
         ChipLogDetail(AppServer, "Initiating move to action");
+        // For Closure sample app, Motion action is simulated with a timer with rate
+        // of 10% change of position per second.
+        // In a real application, this would be replaced with actual move to logic.
+        instance.StartTimer(kCountdownTimeSeconds * 100);
         break;
     default:
         ChipLogDetail(AppServer, "Invalid action received in InitiateAction");
@@ -195,6 +199,12 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
     case Action_t::MOVE_TO_ACTION:
         PlatformMgr().ScheduleWork([](intptr_t) {
             ClosureManager & instance = ClosureManager::GetInstance();
+            instance.HandleClosureMotionAction();
+        });
+        break;
+    case Action_t::LATCH_ACTION:
+        PlatformMgr().ScheduleWork([](intptr_t) {
+            ClosureManager & instance = ClosureManager::GetInstance();
             instance.HandleClosureActionComplete(instance.GetCurrentAction());
         });
         break;
@@ -230,12 +240,157 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
                                 const chip::Optional<bool> latch,
                                 const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> speed)
 {
-    // this function will contain the code for MoveTo command handling and initiate the motion action.
+
+    // Update the target state for the closure panels based on the MoveTo command.
+    // This closure sample app assumes that the closure panels are represented by three endpoints:
+    // - Endpoint 1: Represents the Closure Control Cluster.
+    // - Endpoint 2: Represents the Closure Dimension Cluster for the first panel.
+    // - Endpoint 3: Represents the Closure Dimension Cluster for the second panel.
+    chip::app::Clusters::ClosureDimension::ClusterState ep2State = ep2.GetLogic().GetState();
+    chip::app::Clusters::ClosureDimension::ClusterState ep3State = ep3.GetLogic().GetState();
+
+    DataModel::Nullable<GenericCurrentStateStruct> ep2CurrentState = ep2State.currentState;
+    DataModel::Nullable<GenericCurrentStateStruct> ep3CurrentState = ep3State.currentState;
+
+    VerifyOrReturnValue(!ep2CurrentState.IsNull(), Status::Failure,
+                        ChipLogError(AppServer, "MoveToCommand failed due to Null value Current state on Endpoint 2"));
+    VerifyOrReturnValue(!ep3CurrentState.IsNull(), Status::Failure,
+                        ChipLogError(AppServer, "MoveToCommand failed due to Null value Current state on Endpoint 3"));
+
+    GenericTargetStruct ep2Target = ep2State.target.IsNull() ? GenericTargetStruct() : ep2State.target.Value();
+    GenericTargetStruct ep3Target = ep3State.target.IsNull() ? GenericTargetStruct() : ep3State.target.Value();
+
+    if (position.HasValue())
+    {
+        ChipLogError(AppServer, "Updating target position for move to command");
+       // Set the Closure panel target position for the panels based on the Closure position.
+       // The position is represented as a TargetPositionEnum, which maps to specific positions for the panels.
+       // The mapping values used below are for closure sample app.
+        chip::Percent100ths ep2Position;
+        chip::Percent100ths ep3Position;
+
+        switch (position.Value())
+        {
+        case TargetPositionEnum::kCloseInFull:
+            ep2Position = static_cast<chip::Percent100ths>(10000);
+            ep3Position = static_cast<chip::Percent100ths>(10000);
+            break;
+        case TargetPositionEnum::kOpenInFull:
+            ep2Position = static_cast<chip::Percent100ths>(0);
+            ep3Position = static_cast<chip::Percent100ths>(0);
+            break;
+        case TargetPositionEnum::kPedestrian:
+            ep2Position = static_cast<chip::Percent100ths>(3000);
+            ep3Position = static_cast<chip::Percent100ths>(3000);
+            break;
+        case TargetPositionEnum::kSignature:
+            ep2Position = static_cast<chip::Percent100ths>(2000);
+            ep3Position = static_cast<chip::Percent100ths>(2000);
+            break;
+        case TargetPositionEnum::kVentilation:
+            ep2Position = static_cast<chip::Percent100ths>(1000);
+            ep3Position = static_cast<chip::Percent100ths>(1000);
+            break;
+        default:
+            ChipLogError(AppServer, "Invalid target position received in OnMoveToCommand");
+            return Status::Failure;
+        }
+
+        ep2Target.position.SetValue(ep2Position);
+        ep3Target.position.SetValue(ep3Position);
+    }
+
+    if (latch.HasValue())
+    {
+      ChipLogError(AppServer, "Updating target latch for move to command");
+        ep2Target.latch.SetValue(latch.Value());
+        ep3Target.latch.SetValue(latch.Value());
+    }
+
+    if (speed.HasValue())
+    {
+      ChipLogError(AppServer, "Updating target speed for move to command");
+        ep2Target.speed.SetValue(speed.Value());
+        ep3Target.speed.SetValue(speed.Value());
+    }
+
+    VerifyOrReturnError(ep2.GetLogic().SetTarget(DataModel::MakeNullable(ep2Target)) == CHIP_NO_ERROR,  Status::Failure,
+                        ChipLogError(AppServer, "Failed to set target for Endpoint 2"));
+    VerifyOrReturnError(ep3.GetLogic().SetTarget(DataModel::MakeNullable(ep3Target)) == CHIP_NO_ERROR, Status::Failure,
+                        ChipLogError(AppServer, "Failed to set target for Endpoint 3"));
+    VerifyOrReturnError(ep1.GetLogic().SetCountdownTimeFromDelegate(10) == CHIP_NO_ERROR, Status::Failure,
+                        ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
+
+    // Post an event to initiate the move to action asynchronously.
+    AppEvent event;
+    event.Type              = AppEvent::kEventType_Closure;
+    event.ClosureEvent.Action = MOVE_TO_ACTION;
+    event.Handler           = InitiateAction;
+    AppTask::GetAppTask().PostEvent(&event);
+
+    isMoveToInProgress = true;
     return Status::Success;
+}
+
+void ClosureManager::HandleClosureMotionAction()
+{
+    ClosureManager & instance = ClosureManager::GetInstance();
+
+    chip::app::Clusters::ClosureControl::ClusterState ep1State = instance.ep1.GetLogic().GetState();
+    chip::app::Clusters::ClosureDimension::ClusterState ep2State = instance.ep2.GetLogic().GetState();
+    chip::app::Clusters::ClosureDimension::ClusterState ep3State = instance.ep3.GetLogic().GetState();
+
+    DataModel::Nullable<GenericCurrentStateStruct> currentState = DataModel::NullNullable;
+    
+    bool isEndPoint2TargetReached = false;
+    bool isEndPoint3TargetReached = false;
+
+    if (ep2State.target.Value().position.HasValue() && !isEndPoint2TargetReached)
+    {
+        // Update the current state for Endpoint 2
+        UpdatePanelCurrentStateToNextPosition(ep2State, currentState);
+        instance.ep2.GetLogic().SetCurrentState(currentState);
+        isEndPoint2TargetReached = (currentState.Value().position.Value() == ep2State.target.Value().position.Value());
+        ChipLogError(AppServer, "EndPoint 2 Current Position: %d, Target Position: %d", currentState.Value().position.Value(),
+                                                                                          ep2State.target.Value().position.Value());
+    }
+    
+    if (ep3State.target.Value().position.HasValue() && !isEndPoint3TargetReached)
+    {
+        // Update the current state for Endpoint 3
+        UpdatePanelCurrentStateToNextPosition(ep3State, currentState);
+        instance.ep3.GetLogic().SetCurrentState(currentState);
+        isEndPoint3TargetReached = (currentState.Value().position.Value() == ep3State.target.Value().position.Value());
+        ChipLogError(AppServer, "EndPoint 3 Current Position: %d, Target Position: %d", currentState.Value().position.Value(),
+                                                                                          ep3State.target.Value().position.Value());
+    }
+
+    bool closureTargetReached = isEndPoint2TargetReached || isEndPoint3TargetReached;
+
+    ChipLogError(AppServer, "Motion progress possible: %s", closureTargetReached ? "true" : "false");
+
+    if (closureTargetReached)
+    {
+        instance.CancelTimer(); // Cancel any existing timer before starting a new action
+        instance.SetCurrentAction(MOVE_TO_ACTION);
+        instance.StartTimer(kCountdownTimeSeconds * 100);
+        return;
+    }
+
+    if (IsClosureLatchActionNeeded(ep1State)){
+        ChipLogError(AppServer, "Starting latch action timer");
+        instance.SetCurrentAction(LATCH_ACTION);
+        instance.StartTimer(kCountdownTimeSeconds * 200);
+    } else {
+      // Target reached and no latch action needed, call HandleClosureAction
+      instance.HandleClosureActionComplete(ClosureManager::Action_t::MOVE_TO_ACTION);
+    }
 }
 
 void ClosureManager::HandleClosureActionComplete(Action_t action)
 {
+    ClosureManager & instance = ClosureManager::GetInstance();
+    
     switch (action)
     {
     case Action_t::CALIBRATE_ACTION: {
@@ -243,6 +398,7 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         GetInstance().ep2.OnCalibrateActionComplete();
         GetInstance().ep3.OnCalibrateActionComplete();
         isCalibrationInProgress = false;
+        instance.isCalibrationInProgress = false;
         break;
     }
     case Action_t::STOP_MOTION_ACTION:
@@ -252,12 +408,104 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         // This should handle the completion of a stop calibration action.
         break;
     case Action_t::MOVE_TO_ACTION:
-        // This should handle the completion of a move-to action.
+        instance.ep1.OnMoveToActionComplete();
+        instance.ep2.OnMoveToActionComplete();
+        instance.ep3.OnMoveToActionComplete();
+        instance.isMoveToInProgress = false;
+        break;
+    case Action_t::LATCH_ACTION:
+        // For sample app, Action completion tasks for Latch is same as MoveTo action.
+        instance.ep1.OnMoveToActionComplete();
+        instance.ep2.OnMoveToActionComplete();
+        instance.ep3.OnMoveToActionComplete();
+        instance.isMoveToInProgress = false;
         break;
     default:
         ChipLogError(AppServer, "Invalid action received in HandleClosureAction");
         break;
     }
     // Reset the current action after handling the closure action
-    GetInstance().SetCurrentAction(Action_t::INVALID_ACTION);
+    instance.SetCurrentAction(Action_t::INVALID_ACTION);
+}
+
+void ClosureManager::UpdatePanelCurrentStateToNextPosition(
+                                const chip::app::Clusters::ClosureDimension::ClusterState & epState,
+                                DataModel::Nullable<GenericCurrentStateStruct> & currentState) 
+
+{
+  if (epState.target.IsNull())
+  {
+      ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to Target State is null");
+      return;
+  }
+
+  if (!epState.target.Value().position.HasValue())
+  {
+      ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to  Target position is not set");
+      return;
+  }
+
+  if (epState.currentState.IsNull())
+  {
+      ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to Current State is null");
+      return;
+  }
+
+  if (!epState.currentState.Value().position.HasValue())
+  {
+      ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to Current position is not set");
+      return;
+  }
+
+  chip::Percent100ths currentPosition = epState.currentState.Value().position.Value();
+  chip::Percent100ths targetPosition = epState.target.Value().position.Value();
+  chip::Percent100ths nextCurrentPosition;
+
+  if (currentPosition < targetPosition)
+  {
+      // Increment position by 1000 units, capped at target.
+      nextCurrentPosition = std::min(static_cast<chip::Percent100ths>(currentPosition + 1000), targetPosition);
+  }
+  else if (currentPosition > targetPosition)
+  {
+      // Moving down: Decreasing the current position by a step of 1000 units, 
+      // ensuring it does not go below the target position.
+      nextCurrentPosition = std::max(static_cast<chip::Percent100ths>(currentPosition - 1000), targetPosition);
+  }
+  else
+  {
+      // Already at target: No further action is needed as the current position matches the target position.
+      nextCurrentPosition = currentPosition;
+  }
+  
+  currentState.SetNonNull().Set(
+            MakeOptional(nextCurrentPosition),
+            epState.currentState.Value().latch.HasValue() ? MakeOptional(epState.currentState.Value().latch.Value()) : NullOptional,
+            epState.currentState.Value().speed.HasValue() ? MakeOptional(epState.currentState.Value().speed.Value()) : NullOptional
+  );
+}
+
+bool ClosureManager::IsClosureLatchActionNeeded(const chip::app::Clusters::ClosureControl::ClusterState & epState)
+{
+  // Latch action not needed if OverallTarget is null or latch is not set
+  if (epState.mOverallTarget.IsNull() || !epState.mOverallTarget.Value().latch.HasValue())
+  {
+    ChipLogError(AppServer, "Latch action not needed as OverallTarget is null or latch is not set");
+    return false;
+  }
+
+  // latch action needed if OverallState is null or latch is not set and OverallTarget has latch set
+  if (epState.mOverallState.IsNull() || !epState.mOverallState.Value().latch.HasValue() || 
+      epState.mOverallState.Value().latch.Value().IsNull())
+  {
+    ChipLogError(AppServer, "Latch action needed as OverallState is null or latch is not set, while OverallTarget has latch set");
+    return true;
+  }
+
+  // Only return true if the latch value is different between target and state
+  bool targetLatch = epState.mOverallTarget.Value().latch.Value();
+  bool stateLatch = epState.mOverallState.Value().latch.Value().Value();
+  ChipLogError(AppServer, "Target Latch: %s, State Latch: %s", 
+               targetLatch ? "true" : "false", stateLatch ? "true" : "false");
+  return targetLatch != stateLatch;
 }
