@@ -270,6 +270,19 @@ class TC_ACL_2_8(MatterBaseTest):
         )
         logging.info("TH1 read ACL result (fabric_filtered=False): %s", str(acl_list_unfiltered))
         asserts.assert_equal(len(acl_list_unfiltered), 2, "Should have two ACL entries when not fabric filtered")
+        # Check non-accessing fabric entry is empty because data leaks are bad
+        for entry in acl_list_unfiltered:
+            if entry.fabricIndex == f2:
+                asserts.assert_equal(entry.privilege, 0)
+                asserts.assert_equal(entry.authMode, 0)
+                asserts.assert_true(
+                    entry.subjects is None or entry.subjects == NullValue or entry.subjects == [],
+                    "Non-accessing fabric: subjects should be empty"
+                )
+                asserts.assert_true(
+                    entry.targets is None or entry.targets == NullValue,
+                    "Non-accessing fabric: targets should be empty"
+                )
 
         self.step(8)
         # TH2 reads ACL attribute with fabricFiltered=True (default)
@@ -305,6 +318,19 @@ class TC_ACL_2_8(MatterBaseTest):
         )
         logging.info("TH2 read ACL result (fabric_filtered=False): %s", str(acl_list_unfiltered))
         asserts.assert_equal(len(acl_list_unfiltered), 2, "Should have two ACL entries when not fabric filtered")
+        # Check non-accessing fabric entry is empty because data leaks are bad
+        for entry in acl_list_unfiltered:
+            if entry.fabricIndex == f1:
+                asserts.assert_equal(entry.privilege, 0)
+                asserts.assert_equal(entry.authMode, 0)
+                asserts.assert_true(
+                    entry.subjects is None or entry.subjects == NullValue or entry.subjects == [],
+                    "Non-accessing fabric: subjects should be empty"
+                )
+                asserts.assert_true(
+                    entry.targets is None or entry.targets == NullValue,
+                    "Non-accessing fabric: targets should be empty"
+                )
 
         self.step(9)
         # TH1 reads AccessControlEntryChanged events with fabricFiltered=True
