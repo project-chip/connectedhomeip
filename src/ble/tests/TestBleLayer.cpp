@@ -38,6 +38,7 @@
 #include <ble/BleLayer.h>
 #include <ble/BleLayerDelegate.h>
 #include <ble/BlePlatformDelegate.h>
+#include <ble/BleConnectionDelegate.h>
 
 namespace chip {
 namespace Ble {
@@ -50,6 +51,7 @@ constexpr ChipBleUUID uuidZero{};
 
 class TestBleLayer : public BleLayer,
                      private BleApplicationDelegate,
+                     public BleConnectionDelegate,
                      private BleLayerDelegate,
                      private BlePlatformDelegate,
                      public ::testing::Test
@@ -69,7 +71,7 @@ public:
 
     void SetUp() override
     {
-        ASSERT_EQ(Init(this, this, &DeviceLayer::SystemLayer()), CHIP_NO_ERROR);
+        ASSERT_EQ(Init(this, this, this, &DeviceLayer::SystemLayer()), CHIP_NO_ERROR);
         mBleTransport = this;
     }
 
@@ -118,6 +120,13 @@ public:
     // Implementation of BleApplicationDelegate
 
     void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj) override {}
+
+    ///
+    // Implementation of BleConnectionDelegate
+
+    void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override {}
+    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override {}
+    CHIP_ERROR CancelConnection() override { return CHIP_NO_ERROR; }
 
     ///
     // Implementation of BleLayerDelegate
@@ -381,6 +390,27 @@ TEST_F(TestBleLayer, ExceedBleConnectionEndPointLimit)
 
     auto connObj = GetConnectionObject();
     EXPECT_FALSE(HandleWriteReceivedCapabilitiesRequest(connObj));
+    CloseAllBleConnections();
+}
+
+TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorSuccess)
+{
+    // Start new connection
+    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), static_cast<BleLayer*>(this)), CHIP_NO_ERROR);
+
+    // Simulate success
+    auto connObj = GetConnectionObject();
+    BleConnectionDelegate::OnConnectionComplete(static_cast<BleLayer*>(this), connObj);
+}
+
+TEST_F(TestBleLayer, NewBleConnectionByObjectCancel)
+{
+    // Start new connection
+    auto connObj = GetConnectionObject();
+    ASSERT_EQ(NewBleConnectionByObject(connObj, static_cast<BleLayer*>(this)), CHIP_NO_ERROR);
+
+    // Cancel the connection
+    ASSERT_EQ(CancelBleIncompleteConnection(), CHIP_NO_ERROR);
 }
 
 }; // namespace Ble
