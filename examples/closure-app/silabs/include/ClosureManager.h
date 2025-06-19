@@ -40,6 +40,10 @@ public:
         MOVE_TO_ACTION,
         STOP_MOTION_ACTION,
         STOP_CALIBRATE_ACTION,
+        LATCH_ACTION,
+        PANEL_SET_TARGET_ACTION,
+        PANEL_LATCH_ACTION,
+        PANEL_STEP_ACTION,
 
         INVALID_ACTION
     };
@@ -103,6 +107,45 @@ public:
     chip::Protocols::InteractionModel::Status OnStopCommand();
 
     /**
+     * @brief Handles the SetTarget command for a closure panel.
+     *
+     * This method processes the SetTarget command, allowing the caller to specify a target position,
+     * latch state, and speed for the closure panel at the given panel endpoint.
+     *
+     * @param[in] pos      Optional target position as a percentage in hundredths (0-10000).
+     * @param[in] latch    Optional latch state (true to latch, false to unlatch).
+     * @param[in] speed    Optional speed setting as a ThreeLevelAutoEnum value.
+     * @param[in] endpointId The endpoint identifier for the closure panel.
+     *
+     * @return chip::Protocols::InteractionModel::Status
+     *         Returns Status::Success if the Stop command is handled successfully,
+     *         or an appropriate error status otherwise.
+     */
+    chip::Protocols::InteractionModel::Status OnSetTargetCommand(
+                        const chip::Optional<chip::Percent100ths> & pos, 
+                        const chip::Optional<bool> & latch, 
+                        const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
+                        chip::EndpointId endpointId);
+    
+    /**
+     * @brief Handles the Step command for the ClosureDimension cluster.
+     *
+     * This method processes a step operation in a specified direction for a given number of steps,
+     * optionally at a specified speed, on the provided panel endpoint.
+     *
+     * @param direction The direction in which to perform the step operation.
+     * @param numberOfSteps The number of steps to move in the specified direction.
+     * @param speed Optional speed setting for the step operation.
+     * @param endpointId The endpoint on which to perform the operation.
+     * @return chip::Protocols::InteractionModel::Status Status of the command execution.
+     */
+    chip::Protocols::InteractionModel::Status OnStepCommand(
+        const chip::app::Clusters::ClosureDimension::StepDirectionEnum & direction, 
+        const uint16_t & numberOfSteps, 
+        const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
+        chip::EndpointId endpointId);
+
+    /**
      * @brief Sets the current action being performed by the closure device.
      *
      * @param action The action to set, represented as chip::app::Clusters::ClosureControl::Action_t.
@@ -116,10 +159,19 @@ public:
      */
     const Action_t & GetCurrentAction() const { return mCurrentAction; }
 
+    bool IsMotionActionInProgress() const
+    {
+        return isMoveToInProgress || isSetTargetInProgress || isStepActionInProgress;
+    }
+
 private:
     static ClosureManager sClosureMgr;
     osTimerId_t mClosureTimer;
     bool isCalibrationInProgress = false;
+    bool isMoveToInProgress = false;
+    bool isStopInProgress = false;
+    bool isSetTargetInProgress = false;
+    bool isStepActionInProgress = false;
     Action_t mCurrentAction      = Action_t::INVALID_ACTION;
 
     // Define the endpoint ID for the Closure
@@ -191,4 +243,66 @@ private:
      * @param timerCbArg Pointer to the callback argument (unused).
      */
     static void TimerEventHandler(void * timerCbArg);
+
+    /**
+     * @brief Handles the motion action for closure endpoints.
+     *
+     * This method manages the state transitions and actions for closure endpoints (such as panels or doors)
+     * during a motion event. It updates the current positions of endpoints 2 and 3 to next position. 
+     * It also triggers
+     *       - Timer for MoveTo action completion if the target position is not reached
+     *       - Timer for Latch action if needed based on the current state of the closure.
+     *       - HandleMotionActionComplete to finalize the motion action when the target is reached.
+     */
+    void HandleClosureMotionAction();
+
+    /**
+     * @brief Handles the action to set the target position of the panel for a panel endpoint.
+     *
+     * This method manages the state transitions and actions for closure endpoints (such as panels or doors)
+     * during a motion event. It updates the current positions of endpoints 2 and 3 to next position. 
+     * It also triggers
+     *       - Timer for SetTarget action completion if the target position is not reached
+     *       - Timer for Panel Latch action if needed based on the current state of the closure.
+     *       - HandleMotionActionComplete to finalize the motion action when the target is reached.
+     *
+     * @param endpointId The identifier of the endpoint for which the panel target action should be handled.
+     */
+    void HandlePanelSetTargetAction(chip::EndpointId endpointId);
+
+    /**
+     * @brief Handles a single step action for the panel associated with the specified endpoint.
+     *
+     * This method processes a panel step action, typically triggered by a user interaction or
+     * an automation event, for the panel given endpoint. The implementation should define the specific
+     * behavior of a "step" for the panel (e.g., moving to the next position, toggling state, etc.).
+     *
+     * @param endpointId The identifier of the endpoint for which the panel step action is to be handled.
+     */
+    void HandlePanelStepAction(chip::EndpointId endpointId);
+
+    /**
+     * @brief Updates the current state of a closure panel to the next position towards its target.
+     *
+     * This function increments or decrements the current position of the panel by a fixed step (1000 units)
+     * towards the target position, ensuring it does not overshoot the target. It also preserves the latch and speed
+     * values if they are set in the current state.
+     *
+     * @param[in]  panelState   The current cluster state of the closure dimension endpoint.
+     * @param[in]  currentState The updated current state struct reflecting the next position.
+     * @return true if the current state was successfully updated to the next position, false if update failed or target reached.
+     */
+    bool UpdatePanelCurrentStateToNextPosition(const chip::app::Clusters::ClosureDimension::ClusterState & panelState, 
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::GenericCurrentStateStruct> & currentState);
+
+    /**
+     * @brief Determines if a latch action is needed based on the current and target closure states.
+     *
+     * This function checks the provided closure state to decide whether a latch action should be performed.
+     * The latch action is needed if target and state latch values differ.
+     *
+     * @param epState The current closure cluster state, containing both the overall target and state.
+     * @return true if a latch action is needed, false otherwise.
+     */                                        
+    bool IsClosureLatchActionNeeded(const chip::app::Clusters::ClosureControl::ClusterState & epState);
 };

@@ -155,6 +155,33 @@ public:
      */
     void OnMoveToActionComplete();
 
+    /**
+     * @brief Handles the completion of a set target action.
+     *
+     * This function is called when a set target action has finished executing.
+     * It should update the internal state of the closure control endpoint to reflect the
+     * completion of the set target action.
+     */
+    void OnSetTargetActionComplete();
+
+    /**
+     * @brief Callback for when a step action is completed.
+     *
+     * This function is called when a step action has been completed.
+     * It should update the internal state of the closure control endpoint to reflect
+     * the completion of the step action.
+     */
+    void OnStepActionComplete();
+
+
+    /**
+     * @brief Retrieves the endpoint identifier associated with ClusterLogic instance.
+     *
+     * @return The endpoint ID (EndpointId) for this instance.
+     */
+    EndpointId GetEndpoint() const { return mEndpoint; }
+
+
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
     MatterContext mContext;

@@ -35,16 +35,15 @@ Status ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> &
                                                  const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     ChipLogProgress(AppServer, "HandleSetTarget");
-    // Add the SetTarget handling logic here
-    return Status::Success;
+    return ClosureManager::GetInstance().OnSetTargetCommand(pos, latch, speed, GetEndpoint());
 }
 
 Status ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                                             const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     ChipLogProgress(AppServer, "HandleStep");
-    // Add the Step handling logic here
-    return Status::Success;
+    SetStepCommandTargetDirection(direction);
+    return ClosureManager::GetInstance().OnStepCommand(direction, numberOfSteps, speed, GetEndpoint());
 }
 
 CHIP_ERROR ClosureDimensionEndpoint::Init()
@@ -88,3 +87,74 @@ void ClosureDimensionEndpoint::OnMoveToActionComplete()
 {
     // This function should handle closure dimension state updation after MoveTo Action.
 }
+
+void ClosureDimensionEndpoint::OnSetTargetActionComplete()
+{
+    UpdateCurrentStateFromTargetState();
+}
+
+void ClosureDimensionEndpoint::OnStepActionComplete()
+{
+    UpdateCurrentStateFromTargetState();
+}
+
+void ClosureDimensionEndpoint::UpdateCurrentStateFromTargetState()
+{
+    ClusterState state = mLogic.GetState();
+    GenericCurrentStateStruct currentState{};
+
+    if (state.target.IsNull())
+    {
+        ChipLogError(AppServer, "Target is null, Move to action Failed");
+        return;
+    }
+
+    if (state.currentState.IsNull())
+    {   
+        ChipLogError(AppServer, "Current state is null, Move to action Failed");
+        return;
+    }
+    else
+    {
+        currentState = state.currentState.Value();
+    }
+
+    auto updateFieldIfPresent = [](auto & targetField, auto & currentField) {
+        if (targetField.HasValue())
+        {
+            currentField.SetValue(targetField.Value());
+        }
+    };
+
+    updateFieldIfPresent(state.target.Value().position, currentState.position);
+    updateFieldIfPresent(state.target.Value().latch, currentState.latch);
+    updateFieldIfPresent(state.target.Value().speed, currentState.speed);
+
+    mLogic.SetCurrentState(DataModel::MakeNullable(currentState));
+}
+
+void ClosureDimensionEndpoint::UpdateTargetStateFromCurrentState()
+{
+    DataModel::Nullable<GenericCurrentStateStruct> currentState;
+    mLogic.GetCurrentState(currentState);
+
+    if (currentState.IsNull())
+    {
+        mLogic.SetTarget(DataModel::NullNullable);
+        return;
+    }
+
+    DataModel::Nullable<GenericTargetStruct> target;
+    mLogic.GetTarget(target);
+
+    if (target.IsNull())
+    {
+        target.SetNonNull(GenericTargetStruct());
+    }
+
+    target.Value().position = currentState.Value().position;
+    target.Value().latch = currentState.Value().latch;
+    target.Value().speed = currentState.Value().speed;
+
+    mLogic.SetTarget(target);
+}   
