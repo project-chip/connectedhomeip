@@ -165,7 +165,28 @@ void ClosureControlEndpoint::OnStopCalibrateActionComplete()
 
 void ClosureControlEndpoint::OnStopMotionActionComplete()
 {
-    // This function should handle closure control state updation after stopping of Motion Action.
+    mLogic.SetMainState(MainStateEnum::kStopped);
+
+    // Set the OverallState position to PartiallyOpened as motion has been stopped
+    // and the closure is not fully closed or fully opened.
+    auto position = MakeOptional(MakeNullable(PositioningEnum::kPartiallyOpened));
+    
+    DataModel::Nullable<GenericOverallState> overallState;
+    mLogic.GetOverallState(overallState);
+
+    if (overallState.IsNull())
+    {
+        overallState.SetNonNull(GenericOverallState(position, NullOptional, NullOptional, NullOptional)); 
+    } else
+    {
+        overallState.Value().positioning = position;
+    }
+    mLogic.SetOverallState(overallState);
+
+    UpdateTargetStateFromCurrentState();
+
+    mLogic.SetCountdownTimeFromDelegate(0);
+    mLogic.GenerateMovementCompletedEvent();
 }
 
 void ClosureControlEndpoint::OnCalibrateActionComplete()
@@ -188,6 +209,33 @@ void ClosureControlEndpoint::OnMoveToActionComplete()
     mLogic.SetMainState(MainStateEnum::kStopped);
     mLogic.SetCountdownTimeFromDelegate(0);
     mLogic.GenerateMovementCompletedEvent();
+}
+
+void ClosureControlEndpoint::OnSetTargetActionComplete()
+{
+    mLogic.SetMainState(MainStateEnum::kStopped);
+
+    // Set the OverallState position to PartiallyOpened as motion has been stopped
+    // and the closure is not fully closed or fully opened.
+    auto position = MakeOptional(MakeNullable(PositioningEnum::kPartiallyOpened));
+    
+    DataModel::Nullable<GenericOverallState> overallState;
+    mLogic.GetOverallState(overallState);
+    
+    if (overallState.IsNull())
+    {
+        overallState.SetNonNull(GenericOverallState(position, NullOptional, NullOptional, NullOptional)); 
+    } else
+    {
+        overallState.Value().positioning = position;
+    }
+    mLogic.SetOverallState(overallState);
+
+    UpdateTargetStateFromCurrentState();
+
+    mLogic.SetCountdownTimeFromDelegate(0);
+    mLogic.GenerateMovementCompletedEvent();
+
 }
 
 void ClosureControlEndpoint::MapCurrentPositioningToTargetPosition(PositioningEnum positioning, TargetPositionEnum & targetPosition)
@@ -239,20 +287,37 @@ void ClosureControlEndpoint::UpdateTargetStateFromCurrentState()
     if (overallState.Value().positioning.HasValue() && 
             !overallState.Value().positioning.Value().IsNull()) 
     {
-        PositioningEnum positioning = overallState.Value().positioning.Value();
+        PositioningEnum positioning = overallState.Value().positioning.Value().Value();
         TargetPositionEnum targetPosition;
         MapCurrentPositioningToTargetPosition(positioning, targetPosition);
         if (targetPosition == TargetPositionEnum::kUnknownEnumValue)
         {
             // If the target position is unknown, we set the position field of overallTarget to NullNullable.
-            overallTarget.Value().position.SetValue(NullOptional);
+            overallTarget.Value().position = NullOptional;
         } else {
             overallTarget.Value().position.SetValue(targetPosition);
         }
     }
 
-    overallTarget.Value().latch = overallState.Value().latch;
-    overallTarget.Value().speed = overallState.Value().speed;
+    // Assign latch only if present and not null
+    if (overallState.Value().latch.HasValue() && !overallState.Value().latch.Value().IsNull())
+    {
+        overallTarget.Value().latch.SetValue(overallState.Value().latch.Value().Value());
+    }
+    else
+    {
+        overallTarget.Value().latch.ClearValue();
+    }
+
+    // Assign speed only if present and not null
+    if (overallState.Value().speed.HasValue() && !overallState.Value().speed.Value().IsNull())
+    {
+        overallTarget.Value().speed.SetValue(overallState.Value().speed.Value().Value());
+    }
+    else
+    {
+        overallTarget.Value().speed.ClearValue();
+    }
 
     mLogic.SetOverallTarget(overallTarget);
 }
@@ -282,16 +347,25 @@ void ClosureControlEndpoint::UpdateCurrentStateFromTargetState()
         PositioningEnum currentPositioning =
             MapTargetPositionToCurrentPositioning(state.mOverallTarget.Value().position.Value());
         currentOverallState.positioning.SetValue(MakeNullable(currentPositioning));
+    } else
+    {
+        currentOverallState.positioning.ClearValue();
     }
 
     if (state.mOverallTarget.Value().latch.HasValue())
     {
         currentOverallState.latch.SetValue(MakeNullable(state.mOverallTarget.Value().latch.Value()));
+    } else
+    {
+        currentOverallState.latch.ClearValue(); 
     }
 
     if (state.mOverallTarget.Value().speed.HasValue())
     {
         currentOverallState.speed.SetValue(MakeNullable(state.mOverallTarget.Value().speed.Value()));
+    } else
+    {
+        currentOverallState.speed.ClearValue();
     }
 
     mLogic.SetOverallState(DataModel::MakeNullable(currentOverallState));

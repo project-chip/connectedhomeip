@@ -47,7 +47,7 @@ using Protocols::InteractionModel::Status;
 class ClosureDimensionDelegate : public DelegateBase
 {
 public:
-    ClosureDimensionDelegate() {}
+    ClosureDimensionDelegate(EndpointId endpoint) : mEndpoint(endpoint) {}
 
     // Override for the DelegateBase Virtual functions
     Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
@@ -55,6 +55,15 @@ public:
     Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                       const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
     bool IsManualLatchingNeeded() override { return false; }
+
+    /**
+     * @brief Retrieves the endpoint identifier associated with ClusterLogic instance.
+     *
+     * @return The endpoint ID (EndpointId) for this instance.
+     */
+    EndpointId GetEndpoint() const { return mEndpoint; }
+private:
+    EndpointId mEndpoint = kInvalidEndpointId;
 };
 
 /**
@@ -74,7 +83,7 @@ class ClosureDimensionEndpoint
 {
 public:
     ClosureDimensionEndpoint(EndpointId endpoint) :
-        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
+        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
     {}
 
     /**
@@ -97,6 +106,13 @@ public:
      * @return ClusterLogic& Reference to the internal ClusterLogic object.
      */
     ClusterLogic & GetLogic() { return mLogic; }
+
+    /**
+     * @brief Retrieves the endpoint identifier associated with ClusterLogic instance.
+     *
+     * @return The endpoint ID (EndpointId) for this instance.
+     */
+    EndpointId GetEndpoint() const { return mEndpoint; }
 
     /**
      * @brief Handles the completion of a stop motion action.
@@ -135,6 +151,15 @@ public:
      * a motion completed event.
      */
     void OnMoveToActionComplete();
+
+        /**
+     * @brief Handles the completion of a set target action.
+     *
+     * This function is called when a set target action has finished executing.
+     * It should update the internal state of the closure control endpoint to reflect the
+     * completion of the set target action.
+     */
+    void OnSetTargetActionComplete();
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
