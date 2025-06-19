@@ -257,9 +257,9 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendInsufficientHeadroom)
     auto packet1 = System::PacketBufferHandle::New(15, 0);
     packet1->SetDataLength(15);
 
-    EXPECT_FALSE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), true));
+    EXPECT_FALSE(mBtpEngine.HandleCharacteristicSend(packet1.Retain(), true));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Error);
-    EXPECT_EQ(packet0->DataLength(), packet0->MaxDataLength());
+    EXPECT_EQ(packet1->DataLength(), packet1->MaxDataLength());
 }
 
 } // namespace
