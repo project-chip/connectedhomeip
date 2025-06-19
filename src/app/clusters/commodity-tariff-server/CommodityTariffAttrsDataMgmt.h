@@ -394,7 +394,7 @@ public:
      * - List types: initialized as empty list
      * - Others: left uninitialized
      */
-    explicit CTC_BaseDataClass(T & aValueStorage, uint32_t aAttrId) : mValue(aValueStorage), mNewValue(mValue), mAttrId(aAttrId)
+    explicit CTC_BaseDataClass(T & aValueStorage, uint32_t aAttrId) : mValue(aValueStorage), mAttrId(aAttrId)
     {
         if constexpr (IsValueNullable())
         {
@@ -627,7 +627,7 @@ public:
         if (mUpdateState != UpdateState::kUpdated)
         {
             CleanupValue(mNewValue);
-            mNewValue    = mValue;
+            //mNewValue    = mValue;
             mUpdateState = UpdateState::kIdle;
         }
     }
@@ -636,7 +636,7 @@ public:
 
 protected:
     T & mValue;             // Reference to the applied value storage
-    T & mNewValue = mValue; // Reference to a value for updating
+    T mNewValue;            // Value for updating
     void * mAuxData;        // Pointer to an auxiliary data which can be used in some method implementations
     const uint32_t mAttrId;
     void (*mAuxCb)(uint32_t, void *);
