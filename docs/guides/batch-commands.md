@@ -9,7 +9,7 @@ in a single Invoke Interaction. This document explains how to enable accepting b
 
 The best place to look in the specification concerning batch commands is sections that mention `MAX_PATHS_PER_INVOKE`.
 Another helpful area in the specification for detailed information is the list of `InvokeRequests` within the Invoke Request Action,
-and how specification-outlined requests are processed and responded to.
+and how specification outlines how requests are processed and responded to.
 
 One very important aspect of a batch of commands within a single Invoke Request Message is that the paths associated
 with each of the commands SHALL be a concrete (non-wildcard) path, where each path is unique.
@@ -20,9 +20,9 @@ Enabling should be as simple as setting `CHIP_CONFIG_MAX_PATHS_PER_INVOKE` to th
 
 Note:
 * While `CHIP_CONFIG_MAX_PATHS_PER_INVOKE` can technically be set up to 65535, most Matter devices send traffic
-  using UDP. This means that the real constraint will be the MTU of the UDP packet. In practice, if
-  the `CommandDataIB` contains only `CommandPath` and `CommandRef` with no `CommandFields` (For example: An On or Off command),
-  you can fit roughly 58 `InvokeRequests`.
+  using UDP. This means that the real constraint will be the MTU of the UDP packet. In practice,
+  a list of `CommandDataIB` containing only `CommandPath` and `CommandRef` with no `CommandFields` (For example: An On or Off command),
+  you can fit roughly 58 `CommandDataIB` into a single Invoke Request Message before exceeding the MTU of a UDP packet.
 
 ## Testing
 
@@ -38,7 +38,7 @@ sent in a batch and find more efficient ways of handling them. For example, a br
 all batched commands in a single invoke action and send them as a group command to all bridged devices.
 
 Theoretically this could be done by adding a Batcher instance and leveraging the matter event loop. You would insert
-the instance of Batcher to handle relavent commands, it would append the command to a list, schedule task on the event
+the instance of Batcher to handle relavent command(s), it would append the command to a list, schedule task on the event
 loop to process the entire list. Pseudocode below:
 ```
 class Batcher : public CommandHandlerImpl::Callback{
@@ -46,7 +46,7 @@ public:
   [...]
   static void DispatchCommandsAsList(intptr_t arg) {
     auto this_ = reinterpert_cast<Batcher*>(arg);
-    std::vector<Commands> commands;
+    std::vector<std::unique_ptr<Commands>> commands;
     commands.swap(this_->mCommands);
     // Call thing that is capable more efficently process
     // commands in parallel with arg of std::move(commands)
@@ -54,12 +54,12 @@ public:
 
   void DispatchCommand(...) override {
     bool has_previous_pending_request = !mCommands.empty();
-    mCommands.push_back(Command(...));
+    mCommands.push_back(std::make_unique<Command>(...));
     if (!has_previous_pending_request && !mCommands.empty()) {
       SystemLayer().ScheduleWork(DispatchCommandsAsList, this)
     }
   }
 private:
-  std::vector<Command> mCommands;
+  std::vector<std::unique_ptr<Command>> mCommands;
 };
 ```
