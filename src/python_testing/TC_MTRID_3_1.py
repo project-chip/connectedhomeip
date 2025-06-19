@@ -31,6 +31,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --hex-arg enableKey:00112233445566778899aabbccddeeff
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json

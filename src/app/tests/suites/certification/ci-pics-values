@@ -3021,3 +3021,15 @@ THNETDIR.S=1
 
 # Wi-Fi Network Management Cluster
 WIFINM.S=1
+
+# Meter Identification
+
+#Server
+MTRID.S=1
+
+#Features
+MTRID.S.F00=1
+
+#Attributes
+MTRID.S.A0003=1
+MTRID.S.A0004=1
