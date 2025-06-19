@@ -51,10 +51,10 @@ chip_with_lwip = false
 chip_enable_openthread = true
 chip_inet_config_enable_tcp_endpoint = false
 
-# Disable CHIP Logging
-#chip_progress_logging = true
-#chip_detail_logging = true
-#chip_automation_logging = true
+#Enable logging
+chip_progress_logging=true
+chip_detail_logging = true
+chip_automation_logging = true
 
 # BLE options
 chip_config_network_layer_ble = true
