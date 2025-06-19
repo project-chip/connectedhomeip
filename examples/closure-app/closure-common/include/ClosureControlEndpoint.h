@@ -161,6 +161,11 @@ private:
     ClosureControlDelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
+
+    void UpdateTargetStateFromCurrentState();
+    void UpdateCurrentStateFromTargetState();
+    void MapCurrentPositioningToTargetPosition(PositioningEnum positioning, TargetPositionEnum & targetPosition);
+    PositioningEnum MapTargetPositionToCurrentPositioning(TargetPositionEnum value);
 };
 
 } // namespace ClosureControl

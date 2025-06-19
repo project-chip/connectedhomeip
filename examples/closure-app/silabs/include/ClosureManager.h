@@ -191,4 +191,40 @@ private:
      * @param timerCbArg Pointer to the callback argument (unused).
      */
     static void TimerEventHandler(void * timerCbArg);
+
+    /**
+     * @brief Handles the motion action for closure endpoints.
+     *
+     * This method manages the state transitions and actions for closure endpoints (such as panels or doors)
+     * during a motion event. It updates the current positions of endpoints 2 and 3 to next position. 
+     * It also triggers
+     *       - Timer for motion action completion if the target position is not reached
+     *       - Timer for Latch action if needed based on the current state of the closure.
+     *       - HandleMotionActionComplete to finalize the motion action when the target is reached.
+     */
+    void HandleClosureMotionAction();
+
+    /**
+     * @brief Updates the current state of a closure panel to the next position towards its target.
+     *
+     * This function increments or decrements the current position of the panel by a fixed step (1000 units)
+     * towards the target position, ensuring it does not overshoot the target. It also preserves the latch and speed
+     * values if they are set in the current state.
+     *
+     * @param[in]  epState      The current cluster state of the closure dimension endpoint.
+     * @param[out] currentState The updated current state struct reflecting the next position.
+     */
+    void UpdatePanelCurrentStateToNextPosition(const chip::app::Clusters::ClosureDimension::ClusterState & panelState, 
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::GenericCurrentStateStruct> & currentState);
+
+    /**
+     * @brief Determines if a latch action is needed based on the current and target closure states.
+     *
+     * This function checks the provided closure state to decide whether a latch action should be performed.
+     * The latch action is needed if target and state latch values differ.
+     *
+     * @param epState The current closure cluster state, containing both the overall target and state.
+     * @return true if a latch action is needed, false otherwise.
+     */                                        
+    bool IsClosureLatchActionNeeded(const chip::app::Clusters::ClosureControl::ClusterState & epState);
 };
