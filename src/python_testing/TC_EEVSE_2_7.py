@@ -41,7 +41,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import time
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
@@ -204,8 +203,7 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("6")
         await self.send_test_event_trigger_pluggedin()
-        event_data = events_callback.wait_for_event_report(
-            Clusters.EnergyEvse.Events.EVConnected)
+        events_callback.wait_for_event_report(Clusters.EnergyEvse.Events.EVConnected)
 
         self.step("7")
         await self.send_test_event_trigger_evse_set_soc_low()
