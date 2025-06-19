@@ -18,6 +18,7 @@
 
 #include <diagnostic-logs-provider-delegate-impl.h>
 #include <lib/support/SafeInt.h>
+#include <tracing/esp32_diagnostic_trace/DiagnosticTracing.h>
 
 #if defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
 #include <esp_core_dump.h>
@@ -31,7 +32,6 @@ LogProvider::CrashLogContext LogProvider::sCrashLogContext;
 
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 static uint32_t sReadEntries = 0;
-static uint8_t retrievalBuffer[CONFIG_RETRIEVAL_BUFFER_SIZE];
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 namespace {
@@ -49,13 +49,22 @@ LogProvider::~LogProvider()
         Platform::MemoryFree(sessionSpan.second);
     }
     mSessionContextMap.clear();
+    Platform::MemoryFree(mStorageInstance);
+    mStorageInstance = nullptr;
 }
 
-CHIP_ERROR LogProvider::Init(uint8_t * retrievalBuffer, size_t bufferSize)
+CHIP_ERROR LogProvider::Init(uint8_t * endUserBuffer, size_t endUserBufferSize, uint8_t * retrievalBuffer,
+                             size_t retrievalBufferSize)
 {
     mRetrievalBuffer = retrievalBuffer;
-    mBufferSize      = bufferSize;
-
+    mBufferSize      = retrievalBufferSize;
+    mStorageInstance = new CircularDiagnosticBuffer(endUserBuffer, endUserBufferSize);
+    if (mStorageInstance == nullptr)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    static chip::Tracing::Diagnostics::ESP32Diagnostics diagnosticBackend(mStorageInstance);
+    chip::Tracing::Register(diagnosticBackend);
     return CHIP_NO_ERROR;
 }
 

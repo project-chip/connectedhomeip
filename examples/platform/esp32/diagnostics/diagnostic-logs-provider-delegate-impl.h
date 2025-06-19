@@ -44,7 +44,7 @@ class LogProvider : public DiagnosticLogsProviderDelegate
 {
 public:
     static inline LogProvider & GetInstance() { return sInstance; }
-    CHIP_ERROR Init(uint8_t * retrievalBuffer, size_t bufferSize);
+    CHIP_ERROR Init(uint8_t * endUserBuffer, size_t endUserBufferSize, uint8_t * retrievalBuffer, size_t retrievalBufferSize);
     /////////// DiagnosticLogsProviderDelegate Interface /////////
     CHIP_ERROR StartLogCollection(IntentEnum intent, LogSessionHandle & outHandle, Optional<uint64_t> & outTimeStamp,
                                   Optional<uint64_t> & outTimeSinceBoot) override;
@@ -53,7 +53,6 @@ public:
     size_t GetSizeForIntent(IntentEnum intent) override;
     CHIP_ERROR GetLogForIntent(IntentEnum intent, MutableByteSpan & outBuffer, Optional<uint64_t> & outTimeStamp,
                                Optional<uint64_t> & outTimeSinceBoot) override;
-    void SetDiagnosticStorageInstance(CircularDiagnosticBuffer * bufferInstance) { mStorageInstance = bufferInstance; }
 
 private:
     static LogProvider sInstance;
@@ -64,9 +63,8 @@ private:
     LogProvider & operator=(const LogProvider &) = delete;
     // If mStorageInstance is nullptr then operations related to diagnostic storage will be skipped.
     CircularDiagnosticBuffer * mStorageInstance = nullptr;
-
-    uint8_t * mRetrievalBuffer                 = nullptr;
-    size_t mBufferSize                         = 0;
+    uint8_t * mRetrievalBuffer                  = nullptr;
+    size_t mBufferSize                          = 0;
     struct CrashLogContext
     {
 #if defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
