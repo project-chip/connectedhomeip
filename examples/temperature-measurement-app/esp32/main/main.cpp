@@ -54,6 +54,7 @@
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 #include <diagnostic-logs-provider-delegate-impl.h>
 #include <tracing/esp32_diagnostic_trace/DiagnosticTracing.h>
+static uint8_t retrievalBuffer[CONFIG_RETRIEVAL_BUFFER_SIZE];
 static uint8_t endUserBuffer[CONFIG_END_USER_BUFFER_SIZE]; // Global static buffer used to store diagnostics
 using namespace chip::Tracing::Diagnostics;
 CircularDiagnosticBuffer diagnosticStorage(endUserBuffer, CONFIG_END_USER_BUFFER_SIZE);
@@ -145,6 +146,7 @@ using namespace chip::app::Clusters::DiagnosticLogs;
 void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
 {
     auto & logProvider = LogProvider::GetInstance();
+    logProvider.Init(retrievalBuffer, CONFIG_RETRIEVAL_BUFFER_SIZE);
     logProvider.SetDiagnosticStorageInstance(&diagnosticStorage);
     DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
 }

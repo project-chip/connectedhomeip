@@ -51,6 +51,14 @@ LogProvider::~LogProvider()
     mSessionContextMap.clear();
 }
 
+CHIP_ERROR LogProvider::Init(uint8_t * retrievalBuffer, size_t bufferSize)
+{
+    mRetrievalBuffer = retrievalBuffer;
+    mBufferSize      = bufferSize;
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR LogProvider::GetLogForIntent(IntentEnum intent, MutableByteSpan & outBuffer, Optional<uint64_t> & outTimeStamp,
                                         Optional<uint64_t> & outTimeSinceBoot)
 {
@@ -115,7 +123,7 @@ CHIP_ERROR LogProvider::PrepareLogContextForIntent(LogContext * context, IntentE
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
         VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INTERNAL,
                             ChipLogError(DeviceLayer, "Diagnostic Storage instance cannot be null."));
-        MutableByteSpan endUserSupportSpan(retrievalBuffer, CONFIG_RETRIEVAL_BUFFER_SIZE);
+        MutableByteSpan endUserSupportSpan(mRetrievalBuffer, mBufferSize);
         VerifyOrReturnError(!mStorageInstance->IsBufferEmpty(), CHIP_ERROR_NOT_FOUND,
                             ChipLogError(DeviceLayer, "Empty Diagnostic buffer"));
         // Retrieve data from the diagnostic storage
