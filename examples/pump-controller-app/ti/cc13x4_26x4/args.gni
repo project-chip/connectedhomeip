@@ -52,7 +52,7 @@ chip_enable_openthread = true
 chip_inet_config_enable_tcp_endpoint = false
 
 #Enable logging
-chip_progress_logging=true
+chip_progress_logging = true
 chip_detail_logging = true
 chip_automation_logging = true
 
