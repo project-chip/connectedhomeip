@@ -32,7 +32,8 @@ BasicInformationLogic & BasicInformationLogic::Instance()
     return sInstance;
 }
 
-CHIP_ERROR BasicInformationLogic::Init() {
+CHIP_ERROR BasicInformationLogic::Init()
+{
     // TODO: implement
     //
     // Some prototype:
