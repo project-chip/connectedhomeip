@@ -38,17 +38,17 @@ sent in a batch and find more efficient ways of handling them. For example, a br
 all batched commands in a single invoke action and send them as a group command to all bridged devices.
 
 Theoretically this could be done by adding a Batcher instance and leveraging the matter event loop. You would insert
-the instance of Batcher to handle relavent command(s), it would append the command to a list, schedule task on the event
+the instance of Batcher to handle relevant command(s), it would append the command to a list, schedule a task on the event
 loop to process the entire list. Pseudocode below:
-```
+```cpp
 class Batcher : public CommandHandlerImpl::Callback{
 public:
   [...]
   static void DispatchCommandsAsList(intptr_t arg) {
-    auto this_ = reinterpert_cast<Batcher*>(arg);
-    std::vector<std::unique_ptr<Commands>> commands;
+    auto this_ = reinterpret_cast<Batcher*>(arg);
+    std::vector<std::unique_ptr<Command>> commands;
     commands.swap(this_->mCommands);
-    // Call thing that is capable more efficently process
+    // Call thing that is capable of more efficiently processing
     // commands in parallel with arg of std::move(commands)
   }
 
@@ -56,7 +56,7 @@ public:
     bool has_previous_pending_request = !mCommands.empty();
     mCommands.push_back(std::make_unique<Command>(...));
     if (!has_previous_pending_request && !mCommands.empty()) {
-      SystemLayer().ScheduleWork(DispatchCommandsAsList, this)
+      SystemLayer().ScheduleWork(DispatchCommandsAsList, this);
     }
   }
 private:
