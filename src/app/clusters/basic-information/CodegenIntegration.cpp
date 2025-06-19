@@ -49,10 +49,7 @@ LazyRegisteredServerCluster<BasicInformationCluster> gServer;
 
 void emberAfBasicInformationClusterInitCallback(EndpointId endpointId)
 {
-    if (endpointId != kRootEndpointId)
-    {
-        return;
-    }
+    VerifyOrReturn(endpointId == kRootEndpointId);
 
     // TODO:
     //  - set up ember data from zap:
@@ -79,10 +76,7 @@ void emberAfBasicInformationClusterInitCallback(EndpointId endpointId)
 
 void emberAfBasicInformationClusterShutdownCallback(EndpointId endpointId)
 {
-    if (endpointId != kRootEndpointId)
-    {
-        return;
-    }
+    VerifyOrReturn(endpointId == kRootEndpointId);
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
     if (err != CHIP_NO_ERROR)
