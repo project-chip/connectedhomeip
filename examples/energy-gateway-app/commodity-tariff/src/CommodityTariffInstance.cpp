@@ -449,17 +449,17 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
         ChipLogError(NotSpecified, "TariffInfo not present!");
         return false;
     }
-    else if (GetDayEntries_MgmtObj().IsValid())
+    else if (!GetDayEntries_MgmtObj().IsValid())
     {
         ChipLogError(NotSpecified, "DayEntries not present!");
         return false;
     }
-    else if (GetTariffComponents_MgmtObj().IsValid())
+    else if (!GetTariffComponents_MgmtObj().IsValid())
     {
         ChipLogError(NotSpecified, "TariffComponents not present!");
         return false;
     }
-    else if (GetTariffPeriods_MgmtObj().IsValid())
+    else if (!GetTariffPeriods_MgmtObj().IsValid())
     {
         ChipLogError(NotSpecified, "TariffPeriods not present!");
         return false;
@@ -539,19 +539,6 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
     }
 
     return true;
-}
-
-Status CommodityTariffDelegate::GetDayEntryById(DataModel::Nullable<uint32_t> aDayEntryId, DayEntryStructType & aDayEntry)
-{
-    return Status::Success;
-}
-
-Status CommodityTariffDelegate::GetTariffComponentInfoById(DataModel::Nullable<uint32_t> aTariffComponentId,
-                                                           DataModel::Nullable<chip::CharSpan> & label,
-                                                           DataModel::List<const uint32_t> & dayEntryIDs,
-                                                           TariffComponentStructType & aTariffComponent)
-{
-    return Status::Success;
 }
 
 CHIP_ERROR CommodityTariffInstance::AppInit()

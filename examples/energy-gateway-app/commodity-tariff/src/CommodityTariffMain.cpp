@@ -16,8 +16,9 @@
  *    limitations under the License.
  */
 
-#include "CommodityTariffInstance.h"
 #include <CommodityTariffMain.h>
+#include <fstream>
+
 /*
  *  @brief  Creates a Delegate and Instance for Commodity Tariff cluster
  *
@@ -35,6 +36,8 @@ using namespace chip::app::Clusters::CommodityTariff;
 static std::unique_ptr<CommodityTariffInstance> gCommodityTariffInstance;
 static std::unique_ptr<CommodityTariffDelegate> gCommodityTariffDelegate;
 
+static const char * TariffFile = nullptr;
+
 CommodityTariffInstance * CommodityTariff::GetCommodityTariffInstance()
 {
     return gCommodityTariffInstance.get();
@@ -48,6 +51,62 @@ CommodityTariffDelegate * CommodityTariff::GetCommodityTariffDelegate()
     VerifyOrDieWithMsg(dg != nullptr, AppServer, "CommodityTariffInstance is null");
 
     return dg;
+}
+
+static bool LoadJsonFile(const char * aFname, Json::Value & jsonValue)
+{
+    bool is_ok = false;
+    std::ifstream ifs;
+    Json::CharReaderBuilder builder;
+    Json::String errs;
+
+    ifs.open(aFname);
+
+    if (!ifs.good())
+    {
+        ChipLogError(NotSpecified, "AllClusters App: Error open file %s", aFname);
+        goto exit;
+    }
+
+    if (!parseFromStream(builder, ifs, &jsonValue, &errs))
+    {
+        ChipLogError(NotSpecified, "AllClusters App: Error parsing JSON file %s with error %s:", aFname, errs.c_str());
+        goto exit;
+    }
+
+    if (jsonValue.empty() || !jsonValue.isObject())
+    {
+        ChipLogError(NotSpecified, "Invalid file format %s", aFname);
+        goto exit;
+    }
+
+    is_ok = true;
+
+exit:
+    return is_ok;
+}
+
+void LoadTariffFromJSONFile(const char * aFname, CommodityTariffDelegate * dg)
+{
+    Json::Value json_root;
+    ChipLogProgress(NotSpecified, "Tariff preset file %s", aFname);
+    if (LoadJsonFile(aFname, json_root))
+    {
+        ChipLogProgress(NotSpecified, "The tariff file opened successfully");
+        if ( CHIP_NO_ERROR == dg->LoadTariffData(json_root) )
+        {
+            dg->TariffDataUpdate();
+        }
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Unable to load tariff file");
+    }
+}
+
+void CommodityTariffSetDefaultTariffFile(const char * aFile)
+{
+    TariffFile = aFile;
 }
 
 CHIP_ERROR CommodityTariffInit(EndpointId endpointId)
@@ -89,6 +148,11 @@ CHIP_ERROR CommodityTariffInit(EndpointId endpointId)
         gCommodityTariffInstance.reset();
         gCommodityTariffDelegate.reset();
         return err;
+    }
+
+    if (TariffFile != nullptr)
+    {
+        LoadTariffFromJSONFile(TariffFile, gCommodityTariffDelegate.get());
     }
 
     return CHIP_NO_ERROR;

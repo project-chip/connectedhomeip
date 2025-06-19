@@ -25,8 +25,12 @@
 
 #include "CommodityTariffInstance.h"
 
+void CommodityTariffSetDefaultTariffFile(const char * aFile);
 CHIP_ERROR CommodityTariffInit(chip::EndpointId endpointId);
 CHIP_ERROR CommodityTariffShutdown();
+
+void LoadTariffFromJSONFile(const char * aFname, chip::app::Clusters::CommodityTariff::CommodityTariffDelegate * dg);
+
 namespace chip {
 namespace app {
 namespace Clusters {
