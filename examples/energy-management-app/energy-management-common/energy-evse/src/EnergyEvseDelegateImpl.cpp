@@ -1623,7 +1623,7 @@ CHIP_ERROR EnergyEvseDelegate::SetBatteryCapacity(DataModel::Nullable<int64_t> n
         }
         else
         {
-            ChipLogDetail(AppServer, "BatteryCapacity updated to %ld", mBatteryCapacity.Value());
+            ChipLogDetail(AppServer, "BatteryCapacity updated to %ld", static_cast<long>(mBatteryCapacity.Value()));
         }
 
         MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, BatteryCapacity::Id);
