@@ -471,7 +471,7 @@ bool AppTask::OnUpdateAvailableHandler(void * context, uint32_t softwareVersion,
 {
     AppTask * appTask = reinterpret_cast<AppTask *>(context);
     ChipLogProgress(NotSpecified, "\tNew update available: \t %s [%d]",
-                    ChipLogFormat(100, "%.*s", static_cast<int>(softwareVersionString.size()), softwareVersionString.data()),
+                    ChipLogInlineString(100, static_cast<int>(softwareVersionString.size()), softwareVersionString.data()),
                     softwareVersion);
 
     ChipLogProgress(NotSpecified, "\tDo you want to download new update?");

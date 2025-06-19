@@ -41,7 +41,7 @@ CHIP_ERROR HexToBytes(chip::CharSpan hex, F bufferAllocator, size_t * octetCount
     if (hex.size() % 2 != 0)
     {
         ChipLogError(NotSpecified, "Error while encoding '%s' as an octet string: Odd number of characters.",
-                     ChipLogFormat(100, "%.*s", static_cast<int>(hex.size()), hex.data()));
+                     ChipLogInlineString(100, static_cast<int>(hex.size()), hex.data()));
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
 
@@ -57,7 +57,7 @@ CHIP_ERROR HexToBytes(chip::CharSpan hex, F bufferAllocator, size_t * octetCount
     if (byteCount == 0 && hex.size() != 0)
     {
         ChipLogError(NotSpecified, "Error while encoding '%s' as an octet string.",
-                     ChipLogFormat(100, "%.*s", static_cast<int>(hex.size()), hex.data()));
+                     ChipLogInlineString(100, static_cast<int>(hex.size()), hex.data()));
         return CHIP_ERROR_INTERNAL;
     }
 
