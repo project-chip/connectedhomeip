@@ -28,11 +28,8 @@ struct AppEvent : public BaseAppEvent
         kEventType_Closure = BaseAppEvent::kEventType_Max + 1,
         kEventType_Install,
     };
-    union
+    struct
     {
-        struct
-        {
-            uint8_t Action;
-        } ClosureEvent;
-    };
+        uint8_t Action;
+    } ClosureEvent;
 };
