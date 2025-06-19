@@ -861,26 +861,10 @@ menu "CHIP Device Layer"
                 Enables the ESP Diagnostics platform to collect, store, and retrieve diagnostic data for the Matter protocol.
                 This feature helps monitor system health and performance by providing insights through diagnostics logs.
 
-       config ENABLE_ESP_INSIGHTS_TRACE
-           bool "Enable Matter ESP Insights"
-           depends on ESP_INSIGHTS_ENABLED
-           default y
-           help
-               ESP Insights is a remote diagnostics solution to monitor the health of ESP devices in the field.
-               Enabling the above option will enable the esp32 specific tracing functionality and report the
-               diagnostic information to the insights cloud.
-
-      config ENABLE_ESP_INSIGHTS_SYSTEM_STATS
-           bool "Enable System Stats for insights"
-           depends on ESP_INSIGHTS_ENABLED
-           default n
-           help
-               This option enables the system statistics to be sent to the insights cloud.
-
         config MAX_PERMIT_LIST_SIZE
             int "Set permit list size for Insights traces"
             range 5 30
-            depends on ESP_INSIGHTS_ENABLED || ENABLE_ESP_DIAGNOSTICS_TRACE
+            depends on ENABLE_ESP_DIAGNOSTICS_TRACE
             default 20
             help
                 Set the maximum number of group entries that can be included in the permit list for reporting
