@@ -139,7 +139,7 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("14a", "TH reads from the DUT the NextChargeStartTime",
                      "Value has to be null."),
             TestStep("14b", "TH reads from the DUT the NextChargeTargetTime",
-                     "Value has to be null."),
+                     "Value has to be TargetTime above."),
             TestStep("14c", "TH reads from the DUT the NextChargeRequiredEnergy",
                      "Value has to be null."),
             TestStep("14d", "TH reads from the DUT the NextChargeTargetSoC",
@@ -307,31 +307,66 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
             await self.check_evse_attribute("NextChargeTargetSoC", target_soc)
 
             self.step("12")
-            # TH sends command Disable
+            # TH sends command Disable - Verify DUT responds w/ status SUCCESS(0x00)
+            await self.send_disable_command()
+
             self.step("12a")
             # TH reads from the DUT the NextChargeStartTime
+            # Value has to be null
+            await self.check_evse_attribute("NextChargeStartTime", NullValue)
+
             self.step("12b")
             # TH reads from the DUT the NextChargeTargetTime
+            # Value has to be null
+            await self.check_evse_attribute("NextChargeTargetTime", NullValue)
+
             self.step("12c")
             # TH reads from the DUT the NextChargeRequiredEnergy
+            # Value has to be null
+            await self.check_evse_attribute("NextChargeRequiredEnergy", NullValue)
+
             self.step("12d")
             # TH reads from the DUT the NextChargeTargetSoC
+            # Value has to be null
+            await self.check_evse_attribute("NextChargeTargetSoC", NullValue)
+
             self.step("13")
             # TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EVSE Set SoC High Test Event
+            await self.send_test_event_trigger_evse_set_soc_high()
+
             self.step("13a")
             # TH reads from the DUT the StateOfCharge
+            # Value has to be 95 % state of charge
+            await self.check_evse_attribute("StateOfCharge", 95)
+
             self.step("13b")
             # TH reads from the DUT the BatteryCapacity
+            # Value has to be 70,000,000 (70kWh)
+            await self.check_evse_attribute("BatteryCapacity", 70000)
+
             self.step("14")
             # TH sends command EnableCharging with ChargingEnabledUntil=null, minimumChargeCurrent=6000, maximumChargeCurrent=60000
+            await self.send_enable_charge_command(charge_until=NullValue, min_charge=6000, max_charge=60000)
+
             self.step("14a")
             # TH reads from the DUT the NextChargeStartTime
+            # Value has to be null
+            await self.check_evse_attribute("NextChargeStartTime", NullValue)
+
             self.step("14b")
             # TH reads from the DUT the NextChargeTargetTime
+            # Value has to be TargetTime above
+            await self.check_evse_attribute("NextChargeTargetTime", expected_next_target_time_epoch_s)
+
             self.step("14c")
             # TH reads from the DUT the NextChargeRequiredEnergy
+            # Value has to be null
+            await self.check_evse_attribute("NextChargeRequiredEnergy", NullValue)
+
             self.step("14d")
             # TH reads from the DUT the NextChargeTargetSoC
+            # Value has to be TargetSoC above
+            await self.check_evse_attribute("NextChargeTargetSoC", target_soc)
             self.step("15")
             # TH sends command Disable
             self.step("15a")

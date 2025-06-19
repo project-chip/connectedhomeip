@@ -221,15 +221,15 @@ CHIP_ERROR EVSEManufacturer::DetermineRequiredEnergy(EnergyEvseDelegate * dg, in
                 if (vehicleSoC.Value() < targetSoC.Value())
                 {
                     // The current SoC is below the target SoC - we need to charge
-                    ChipLogError(AppServer, "EVSE: Vehicle reports current SoC: %d < targetSoC: %d", vehicleSoC.Value(),
-                                 targetSoC.Value());
+                    ChipLogProgress(AppServer, "EVSE: Vehicle reports current SoC: %d < targetSoC: %d", vehicleSoC.Value(),
+                                    targetSoC.Value());
                     requiredEnergy_mWh = (targetSoC.Value() - vehicleSoC.Value()) * batteryCapacity_mWh.Value() / 100;
                 }
                 else
                 {
                     // The current SoC is already >= targetSoC - we don't need to charge
-                    ChipLogError(AppServer, "EVSE: Vehicle reports current SoC: %d >= targetSoC: %d", vehicleSoC.Value(),
-                                 targetSoC.Value());
+                    ChipLogProgress(AppServer, "EVSE: Vehicle reports current SoC: %d >= targetSoC: %d", vehicleSoC.Value(),
+                                    targetSoC.Value());
 
                     requiredEnergy_mWh = 0;
                 }
@@ -287,6 +287,13 @@ CHIP_ERROR EVSEManufacturer::ComputeStartTime(EnergyEvseDelegate * dg, DataModel
 
     uint32_t chargingDuration_s;
     uint32_t tempStartTime_epoch_s;
+
+    if (requiredEnergy_mWh == 0)
+    {
+        // If we don't need to charge, then ensure we do not set a NextStartTime
+        startTime_epoch_s.SetNull();
+        return CHIP_NO_ERROR;
+    }
 
     // Compute power from nominal voltage and maxChargingRate
     // GetMaximumChargeCurrent returns mA, but to help avoid overflow
