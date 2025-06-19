@@ -626,6 +626,12 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
         case Clusters::DoorLock::Commands::LockDoor::Id:
         case Clusters::DoorLock::Commands::UnlockDoor::Id:
         case Clusters::DoorLock::Commands::UnlockWithTimeout::Id:
+        case Clusters::DoorLock::Commands::SetPINCode::Id:
+        case Clusters::DoorLock::Commands::ClearPINCode::Id:
+        case Clusters::DoorLock::Commands::ClearAllPINCodes::Id:
+        case Clusters::DoorLock::Commands::SetRFIDCode::Id:
+        case Clusters::DoorLock::Commands::ClearRFIDCode::Id:
+        case Clusters::DoorLock::Commands::ClearAllRFIDCodes::Id:
         case Clusters::DoorLock::Commands::SetUser::Id:
         case Clusters::DoorLock::Commands::ClearUser::Id:
         case Clusters::DoorLock::Commands::SetCredential::Id:
