@@ -294,18 +294,19 @@ bool DayIsValid(Structs::DayStruct::Type * aDay)
 }
 
 std::pair<const Structs::DayEntryStruct::Type *, const Structs::DayEntryStruct::Type *>
-FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t> & dayEntryIDs, uint16_t minutesSinceMidnight, uint16_t * nextUpdInterval)
+FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t> & dayEntryIDs, uint16_t minutesSinceMidnight,
+             uint16_t * nextUpdInterval)
 {
     const Structs::DayEntryStruct::Type * currentPtr = nullptr;
     const Structs::DayEntryStruct::Type * nextPtr    = nullptr;
-    uint16_t duration = 0;    
+    uint16_t duration                                = 0;
 
     for (const auto & entryID : dayEntryIDs)
     {
         auto [current, next] = GetCurrNextItemsById<Structs::DayEntryStruct::Type>(aCtx.DayEntriesMap, entryID);
-        duration  = (1500 - current->startTime); 
+        duration             = (1500 - current->startTime);
 
-        if ( (next != nullptr) && (next->dayEntryID == entryID+1) ) //Next DayEntry is belong to this day range
+        if ((next != nullptr) && (next->dayEntryID == entryID + 1)) // Next DayEntry is belong to this day range
         {
             nextPtr = next;
 
@@ -317,7 +318,6 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
             {
                 duration = next->startTime - current->startTime;
             }
-
         }
 
         if (current->startTime <= minutesSinceMidnight && (current->startTime + duration) > minutesSinceMidnight)
@@ -334,37 +334,44 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
 
 const Structs::TariffPeriodStruct::Type * FindTariffPeriodByDayEntryId(CurrentTariffAttrsCtx & aCtx, uint32_t dayEntryID)
 {
-    for (const auto& period : aCtx.TariffProvider->GetTariffPeriods()) {
-        for (const auto& entryID : period.dayEntryIDs) {
-            if (entryID == dayEntryID) {
+    for (const auto & period : aCtx.TariffProvider->GetTariffPeriods())
+    {
+        for (const auto & entryID : period.dayEntryIDs)
+        {
+            if (entryID == dayEntryID)
+            {
                 return &period;
             }
         }
     }
-    
+
     return nullptr;
 }
 
 const Structs::TariffPeriodStruct::Type * FindTariffPeriodByTariffComponentId(CurrentTariffAttrsCtx & aCtx, uint32_t componentID)
 {
-    for (const auto& period : aCtx.TariffProvider->GetTariffPeriods()) {
-        for (const auto& entryID : period.tariffComponentIDs) {
-            if (entryID == componentID) {
+    for (const auto & period : aCtx.TariffProvider->GetTariffPeriods())
+    {
+        for (const auto & entryID : period.tariffComponentIDs)
+        {
+            if (entryID == componentID)
+            {
                 return &period;
             }
         }
     }
-    
+
     return nullptr;
 }
 
-CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(CurrentTariffAttrsCtx & aCtx, uint32_t dayEntryID,  DataModel::List<Structs::TariffComponentStruct::Type> & aValue)
+CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(CurrentTariffAttrsCtx & aCtx, uint32_t dayEntryID,
+                                                  DataModel::List<Structs::TariffComponentStruct::Type> & aValue)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                                   = CHIP_NO_ERROR;
     const Structs::TariffPeriodStruct::Type * period = FindTariffPeriodByDayEntryId(aCtx, dayEntryID);
     std::vector<Structs::TariffComponentStruct::Type> tempList;
     tempList.reserve(aValue.size());
-    TariffComponentsDataClass mgmtObj{aValue};
+    TariffComponentsDataClass mgmtObj{ aValue };
 
     if (period != nullptr)
     {
@@ -375,7 +382,7 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(CurrentTariffAttrsCtx & aCtx, 
             for (auto & item : aValue)
             {
                 mgmtObj.CleanupExtEntry(item);
-            }            
+            }
         }
 
         for (const auto & entryID : componentIDs)
@@ -395,7 +402,8 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(CurrentTariffAttrsCtx & aCtx, 
                 mgmtObj.CleanupExtEntry(entry);
         }
     }
-    else {
+    else
+    {
         err = CHIP_ERROR_NOT_FOUND;
     }
 
@@ -484,13 +492,15 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
     }
     case UpdateEventCode::DayEntryUpdating: {
         uint16_t minutesSinceMidnight = (timestampNow % kSecondsPerDay) / 60;
-        uint16_t nextUpdInterval = 0;
-        auto & mCurrentDayEntryIDs       = mCurrentDay.Value().dayEntryIDs;
-        auto [current, next] = Utils::FindDayEntry(mServerTariffAttrsCtx, mCurrentDayEntryIDs, minutesSinceMidnight, &nextUpdInterval);
+        uint16_t nextUpdInterval      = 0;
+        auto & mCurrentDayEntryIDs    = mCurrentDay.Value().dayEntryIDs;
+        auto [current, next] =
+            Utils::FindDayEntry(mServerTariffAttrsCtx, mCurrentDayEntryIDs, minutesSinceMidnight, &nextUpdInterval);
 
         if (current != nullptr)
         {
-            if (CHIP_NO_ERROR == Utils::UpdateTariffComponentAttrsDayEntryById(mServerTariffAttrsCtx, current->dayEntryID, mCurrentTariffComponents))
+            if (CHIP_NO_ERROR ==
+                Utils::UpdateTariffComponentAttrsDayEntryById(mServerTariffAttrsCtx, current->dayEntryID, mCurrentTariffComponents))
             {
                 mCurrentDayEntry.SetNonNull(*current);
                 mCurrentDayEntryDate.SetNonNull(mCurrentDay.Value().date);
@@ -507,7 +517,8 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
 
         if (next != nullptr)
         {
-            DataModel::List<Structs::TariffComponentStruct::Type> tempList = DataModel::List<Structs::TariffComponentStruct::Type>();
+            DataModel::List<Structs::TariffComponentStruct::Type> tempList =
+                DataModel::List<Structs::TariffComponentStruct::Type>();
 
             if (CHIP_NO_ERROR == Utils::UpdateTariffComponentAttrsDayEntryById(mServerTariffAttrsCtx, next->dayEntryID, tempList))
             {
@@ -546,14 +557,14 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
     Commands::GetTariffComponentResponse::Type response;
     Status status = Status::Failure;
 
-    auto component = Utils::GetCurrNextItemsById<Structs::TariffComponentStruct::Type>(mServerTariffAttrsCtx.TariffComponentsMap, commandData.tariffComponentID).first;
+    auto component = Utils::GetCurrNextItemsById<Structs::TariffComponentStruct::Type>(mServerTariffAttrsCtx.TariffComponentsMap,
+                                                                                       commandData.tariffComponentID)
+                         .first;
     auto period = Utils::FindTariffPeriodByTariffComponentId(mServerTariffAttrsCtx, commandData.tariffComponentID);
 
     if (component != nullptr && period != nullptr)
     {
-        response.label = period->label,
-        response.dayEntryIDs = period->dayEntryIDs,
-        response.tariffComponent = *component;
+        response.label = period->label, response.dayEntryIDs = period->dayEntryIDs, response.tariffComponent = *component;
         status = Status::Success;
     }
 
@@ -571,12 +582,14 @@ void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEnt
     Commands::GetDayEntryResponse::Type response;
     Status status = Status::Failure;
 
-    auto entry = Utils::GetCurrNextItemsById<Structs::DayEntryStruct::Type>(mServerTariffAttrsCtx.DayEntriesMap, commandData.dayEntryID).first;
+    auto entry =
+        Utils::GetCurrNextItemsById<Structs::DayEntryStruct::Type>(mServerTariffAttrsCtx.DayEntriesMap, commandData.dayEntryID)
+            .first;
 
     if (entry != nullptr)
     {
         response.dayEntry = *entry;
-        status = Status::Success;
+        status            = Status::Success;
     }
 
     if (status != Status::Success)
