@@ -52,8 +52,10 @@ source_set("attribute-storage") {
     "EmberAttributeStorageImpl.h",
   ]
   public_deps = [
+    "${chip_root}/src/app/common:attribute-type",
     "${chip_root}/src/app/storage:attribute-storage",
     "${chip_root}/src/app/util/persistence",
+    "${chip_root}/src/lib/support",
   ]
 }
 

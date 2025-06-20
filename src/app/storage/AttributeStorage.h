@@ -16,6 +16,7 @@
 #pragma once
 
 #include <app/ConcreteAttributePath.h>
+#include <app/storage/PascalString.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 
@@ -37,6 +38,7 @@ class AttributeStorage
 {
 private:
     static ByteSpan asByteSpan(CharSpan span) { return { reinterpret_cast<const uint8_t *>(span.data()), span.size() }; }
+    static ByteSpan asByteSpan(ByteSpan span) { return span; }
 
 public:
     /// Represents an attribute value that can be written to storage.
@@ -60,21 +62,35 @@ public:
         enum class Type
         {
             kNumeric,             // the data represents an integer value. The span will contain the value
-            kStringOneByteLength, // string where length is never larger than 255 characters
-            kStringTwoByteLength, // string where length is never larger than 0xFFFF characters
+            kRaw,                 // Raw bytes, not interpreted
+            kStringOneByteLength, // string where length is never larger than 255 characters. Data is a pascal string.
+            kStringTwoByteLength, // string where length is never larger than 0xFFFF characters. Data is a pascal string.
         };
 
         Value(const Value & other) = default;
 
-        Value ShortString(ByteSpan data) { return { data, Type::kStringOneByteLength }; }
-        Value ShortString(CharSpan data) { return { asByteSpan(data), Type::kStringOneByteLength }; }
-        Value LongString(ByteSpan data) { return { data, Type::kStringTwoByteLength }; }
-        Value LongString(CharSpan data) { return { asByteSpan(data), Type::kStringTwoByteLength }; }
+        template <typename T>
+        Value ShortString(ShortPascalString<T> & data)
+        {
+            return { asByteSpan(data.PascalContent()), Type::kStringOneByteLength };
+        }
+
+        template <typename T>
+        Value LongString(LongPascalString<T> & data)
+        {
+            return { asByteSpan(data.PascalContent()), Type::kStringTwoByteLength };
+        }
 
         template <typename T>
         Value Number(T & value)
         {
             return { ByteSpan(reinterpret_cast<uint8_t *>(&value), sizeof(value)), Type::kNumeric };
+        }
+
+        template <typename T>
+        Value Raw(ByteSpan bytes)
+        {
+            return { bytes, Type::kRaw };
         }
 
         ByteSpan data() const { return mData; }
@@ -95,6 +111,7 @@ public:
         enum class Type
         {
             kNumeric,             // the data represents an integer value
+            kRaw,                 // the data represents raw, not interpreted data
             kStringOneByteLength, // string where length is never larger than 255 characters
             kStringTwoByteLength, // string where length is never larger than 0xFFFF characters
             kBytesOneByteLength,  // byte string where length is never larger than 255 characters
@@ -103,17 +120,33 @@ public:
 
         Buffer(const Buffer & other) = default;
 
-        Buffer ShortString(MutableCharSpan & data) { return { &data, data.size(), Type::kStringOneByteLength }; }
-        Buffer LongString(MutableCharSpan & data) { return { &data, data.size(), Type::kStringTwoByteLength }; }
+        Buffer ShortString(ShortPascalString<char> & data)
+        {
+            return { data.PascalContent().data(), data.PascalContent().size(), Type::kStringOneByteLength };
+        }
+        Buffer LongString(LongPascalString<char> & data)
+        {
+            return { data.PascalContent().data(), data.PascalContent().size(), Type::kStringTwoByteLength };
+        }
 
-        Buffer ShortBytes(MutableByteSpan & data) { return { &data, data.size(), Type::kBytesOneByteLength }; }
-        Buffer LongBytes(MutableByteSpan & data) { return { &data, data.size(), Type::kBytesTwoByteLength }; }
+        Buffer ShortString(ShortPascalString<uint8_t> & data)
+        {
+            return { data.PascalContent().data(), data.PascalContent().size(), Type::kStringOneByteLength };
+        }
+        Buffer LongString(LongPascalString<uint8_t> & data)
+        {
+            return { data.PascalContent().data(), data.PascalContent().size(), Type::kStringTwoByteLength };
+        }
 
         template <typename T>
-        Value Number(T & value)
+        Buffer Number(T & value)
         {
             return { &value, sizeof(value), Type::kNumeric };
         }
+
+        /// initializes the data as "raw". Note that `data()` in this case
+        /// will return a pointer to the underlying `MutableByteSpan`
+        Buffer Raw(MutableByteSpan & data) { return { &data, 0, Type::kRaw }; }
 
         void * data() { return mData; }
         size_t size() const { return mBufferSize; }
@@ -123,7 +156,7 @@ public:
         Buffer(void * data, size_t size, Type type) : mData(data), mBufferSize(size), mType(type) {}
 
         void * mData;
-        size_t mBufferSize; // size of the output buffer (numeric decides size of number)
+        size_t mBufferSize; // size of the data in mData
         Type mType;
     };
 
@@ -139,7 +172,7 @@ public:
     /// Notable possible errors:
     ///    CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND - path does not exist in storage
     ///    CHIP_ERROR_BUFFER_TOO_SMALL - insufficient storage to fetch the data
-    virtual CHIP_ERROR Read(const ConcreteAttributePath & path, Buffer &buffer)  = 0;
+    virtual CHIP_ERROR Read(const ConcreteAttributePath & path, Buffer & buffer) = 0;
 };
 
 } // namespace Storage
