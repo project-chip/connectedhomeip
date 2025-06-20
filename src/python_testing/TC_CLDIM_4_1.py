@@ -45,11 +45,10 @@ from mobly import asserts
 
 def current_position_matcher(position: int) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
-        if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState or not isinstance(report.value, list):
+        if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
             return False
-        for entry in report.value:
-            if entry.Position == position:
-                return True
+        if report.value.position == position:
+            return True
         else:
             return False
     return AttributeMatcher.from_callable(description=f"CurrentState.Position is {position}", matcher=predicate)
@@ -57,11 +56,10 @@ def current_position_matcher(position: int) -> AttributeMatcher:
 
 def current_position_and_speed_matcher(position: int, speed: Globals.Enums.ThreeLevelAutoEnum) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
-        if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState or not isinstance(report.value, list):
+        if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
             return False
-        for entry in report.value:
-            if (entry.Position == position) and (entry.Speed == speed):
-                return True
+        if (report.value.position == position) and (report.value.speed == speed):
+            return True
         else:
             return False
     return AttributeMatcher.from_callable(description=f"CurrentState.Position is {position} and CurrentState.Speed is {speed}", matcher=predicate)
@@ -177,6 +175,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
 
         # STEP 3a: Send Step command to increase position to MaxPosition
         self.step("3a")
+        sub_handler.reset()
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
@@ -197,6 +196,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
 
         # STEP 4a: Send Step command to decrease position by 2 steps
         self.step("4a")
+        sub_handler.reset()
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
@@ -221,6 +221,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
 
         # STEP 4d: Send Step command to increase position by 2 steps
         self.step("4d")
+        sub_handler.reset()
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
@@ -251,6 +252,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         else:
             # STEP 5b: Send Step command to decrease position by 1 step with Speed=High
             self.step("5b")
+            sub_handler.reset()
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.Step(
@@ -288,6 +290,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         else:
             # STEP 6b: Send Step command to increase position by 1 step with Speed=Auto
             self.step("6b")
+            sub_handler.reset()
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.Step(
@@ -318,6 +321,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         # STEP 7a: Send Step command to decrease position by 1 step
         self.step("7a")
 
+        sub_handler.reset()
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
@@ -376,6 +380,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
 
         # STEP 8b: Send Step command to decrease position beyond MinPosition
         self.step("8b")
+        sub_handler.reset()
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
@@ -404,6 +409,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
 
         # STEP 8e: Send Step command to increase position beyond MaxPosition
         self.step("8e")
+        sub_handler.reset()
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
