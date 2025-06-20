@@ -1958,9 +1958,6 @@ endpoint 0 {
     callback attribute rebootCount;
     callback attribute upTime;
     callback attribute bootReason;
-    callback attribute activeHardwareFaults;
-    callback attribute activeRadioFaults;
-    callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
     callback attribute featureMap;
     callback attribute clusterRevision;

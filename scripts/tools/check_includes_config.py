@@ -170,6 +170,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/controller/SetUpCodePairer.cpp': {'vector'},
 
     'src/controller/ExamplePersistentStorage.cpp': {'fstream', 'string', 'map'},
+    'src/controller/ExamplePersistentStorage.h': {'string'},
 
     # Library meant for non-embedded
     'src/tracing/json/json_tracing.cpp': {'string', 'sstream'},
