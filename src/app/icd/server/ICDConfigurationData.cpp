@@ -24,20 +24,20 @@ ICDConfigurationData ICDConfigurationData::instance;
 
 System::Clock::Milliseconds32 ICDConfigurationData::GetSlowPollingInterval()
 {
-    // When LIT capable device operates in SIT mode, it shall transition to use the SlowPollingFallback
-    // if this one is shorter than the configured mSlowPollingInterval.
+    // When LIT capable device operates in SIT mode, it shall transition to use the mSITPollingInterval
+    // if this one is shorter than the configured mLITPollingInterval.
     // Either way, the slow poll interval used SHALL NOT be greater than the SIT mode polling threshold, per spec.
     // This is important for ICD device configured for LIT operation but currently operating as a SIT
     // due to a lack of client registration
     if (mFeatureMap.Has(app::Clusters::IcdManagement::Feature::kLongIdleTimeSupport) && mICDMode == ICDMode::SIT)
     {
-        // mSlowPollingFallback cannot be configured to a value greater than kSITPollingThreshold.
+        // mSITPollingInterval cannot be configured to a value greater than kSITPollingThreshold.
         // The SIT slow polling interval compliance is therefore always respected by using the smallest
-        // value from mSlowPollingInterval or mSlowPollingFallback;
-        return std::min(mSlowPollingInterval, mSlowPollingFallback);
+        // value from mLITPollingInterval or mSITPollingInterval;
+        return std::min(mLITPollingInterval, mSITPollingInterval);
     }
 
-    return mSlowPollingInterval;
+    return mLITPollingInterval;
 }
 
 CHIP_ERROR ICDConfigurationData::SetSlowPollingInterval(System::Clock::Milliseconds32 slowPollInterval)
@@ -46,14 +46,14 @@ CHIP_ERROR ICDConfigurationData::SetSlowPollingInterval(System::Clock::Milliseco
     // If LIT is not supported, the slow polling interval cannot be set higher than kSITPollingThreshold.
     VerifyOrReturnError((isLITSupported || slowPollInterval <= kSITPollingThreshold), CHIP_ERROR_INVALID_ARGUMENT);
 
-    mSlowPollingInterval = slowPollInterval;
+    mLITPollingInterval = slowPollInterval;
     return CHIP_NO_ERROR;
 };
 
-CHIP_ERROR ICDConfigurationData::SetSlowPollingFallback(System::Clock::Milliseconds32 slowPollFallback)
+CHIP_ERROR ICDConfigurationData::SetSITPollingInterval(System::Clock::Milliseconds32 pollingInterval)
 {
-    VerifyOrReturnError(slowPollFallback <= kSITPollingThreshold, CHIP_ERROR_INVALID_ARGUMENT);
-    mSlowPollingFallback = slowPollFallback;
+    VerifyOrReturnError(pollingInterval <= kSITPollingThreshold, CHIP_ERROR_INVALID_ARGUMENT);
+    mSITPollingInterval = pollingInterval;
     return CHIP_NO_ERROR;
 }
 

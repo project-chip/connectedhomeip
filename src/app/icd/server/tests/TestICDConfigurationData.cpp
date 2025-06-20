@@ -88,18 +88,18 @@ TEST_F(TestICDConfigurationData, TestICDModeSwitching)
     EXPECT_EQ(configData.GetICDMode(), ICDConfigurationData::ICDMode::SIT);
 }
 
-TEST_F(TestICDConfigurationData, TestSetSlowPollingFallback)
+TEST_F(TestICDConfigurationData, TestSetSITPollingInterval)
 {
     ICDConfigurationDataTestAccess privateConfigData(&ICDConfigurationData::GetInstance());
-    System::Clock::Milliseconds32 validFallback(10000);
-    System::Clock::Milliseconds32 invalidFallback =
+    System::Clock::Milliseconds32 validSITPollInterval(10000);
+    System::Clock::Milliseconds32 invalidSITPollInterval =
         privateConfigData.GetSitSlowPollMaximum() + System::Clock::Milliseconds32(1000); // Above SIT threshold
 
     // Should succeed for valid value
-    EXPECT_EQ(privateConfigData.SetSlowPollingFallback(validFallback), CHIP_NO_ERROR);
+    EXPECT_EQ(privateConfigData.SetSITPollingInterval(validSITPollInterval), CHIP_NO_ERROR);
 
     // Should fail for invalid value
-    EXPECT_EQ(privateConfigData.SetSlowPollingFallback(invalidFallback), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(privateConfigData.SetSITPollingInterval(invalidSITPollInterval), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 TEST_F(TestICDConfigurationData, TestGetAndSetSlowPollingInterval)
@@ -113,9 +113,9 @@ TEST_F(TestICDConfigurationData, TestGetAndSetSlowPollingInterval)
     featureMap.Set(Feature::kLongIdleTimeSupport);
     privateConfigData.SetFeatureMap(featureMap);
 
-    // Set a ICD SIT Slow Poll fallback
-    System::Clock::Milliseconds32 fallback(10000);
-    EXPECT_EQ(privateConfigData.SetSlowPollingFallback(fallback), CHIP_NO_ERROR);
+    // Set a ICD SIT Slow Poll Interval
+    System::Clock::Milliseconds32 SITPollInterval(10000);
+    EXPECT_EQ(privateConfigData.SetSITPollingInterval(SITPollInterval), CHIP_NO_ERROR);
 
     // Set operation mode to LIT and confirm mode
     privateConfigData.SetICDMode(ICDConfigurationData::ICDMode::LIT);
@@ -132,11 +132,11 @@ TEST_F(TestICDConfigurationData, TestGetAndSetSlowPollingInterval)
     privateConfigData.SetICDMode(ICDConfigurationData::ICDMode::SIT);
     EXPECT_EQ(configData.GetICDMode(), ICDConfigurationData::ICDMode::SIT);
 
-    // In SIT mode The shortest interval between SlowPollingInterval and SlowPollingFallback is used
-    // In this case the the Fallback interval is used
-    EXPECT_EQ(configData.GetSlowPollingInterval(), fallback);
+    // In SIT mode The shortest interval between SlowPollingInterval and SITPollingInterval is used
+    // In this case the the SITPollInterval interval is used
+    EXPECT_EQ(configData.GetSlowPollingInterval(), SITPollInterval);
 
-    // Reduce slow polling interval to 5s, shorter than SlowPollingFallback
+    // Reduce slow polling interval to 5s, shorter than SITPollingInterval
     System::Clock::Milliseconds32 shortSlowPollInterval(5000);
     privateConfigData.SetSlowPollingInterval(shortSlowPollInterval);
     EXPECT_EQ(privateConfigData.SetSlowPollingInterval(shortSlowPollInterval), CHIP_NO_ERROR);
@@ -148,7 +148,7 @@ TEST_F(TestICDConfigurationData, TestGetAndSetSlowPollingInterval)
     // slow polling interval remains in use
     EXPECT_EQ(configData.GetSlowPollingInterval(), shortSlowPollInterval);
 
-    // increase slow polling interval to 20s, longer than SlowPollingFallback
+    // increase slow polling interval to 20s, longer than SITPollingInterval
     System::Clock::Milliseconds32 longerSlowPollInterval(20000);
     EXPECT_EQ(privateConfigData.SetSlowPollingInterval(longerSlowPollInterval), CHIP_NO_ERROR);
     // longerSlowPollInterval is used
@@ -157,18 +157,18 @@ TEST_F(TestICDConfigurationData, TestGetAndSetSlowPollingInterval)
     // Switch operation mode to SIT and confirm mode
     privateConfigData.SetICDMode(ICDConfigurationData::ICDMode::SIT);
     EXPECT_EQ(configData.GetICDMode(), ICDConfigurationData::ICDMode::SIT);
-    //  Fallback Slow Polling interval is used
-    EXPECT_EQ(configData.GetSlowPollingInterval(), fallback);
+    //  SIT Polling Interval is used
+    EXPECT_EQ(configData.GetSlowPollingInterval(), SITPollInterval);
 
     featureMap.Clear(Feature::kLongIdleTimeSupport);
     privateConfigData.SetFeatureMap(featureMap);
     // Without LIT support, the slow polling interval cannot bet set greater than the SIT polling threshold
     EXPECT_EQ(privateConfigData.SetSlowPollingInterval(longerSlowPollInterval), CHIP_ERROR_INVALID_ARGUMENT);
-    // Set a Valid SIT Slow Polling Interval greater than the fallback
-    System::Clock::Milliseconds32 validSitSlowPollInterval(12000);
-    EXPECT_EQ(privateConfigData.SetSlowPollingInterval(validSitSlowPollInterval), CHIP_NO_ERROR);
-    //  Without LIT support, the slow polling interval is used and not the fallback
-    EXPECT_EQ(configData.GetSlowPollingInterval(), validSitSlowPollInterval);
+    // Set a Valid Slow Polling Interval greater than the SIT Polling Interval
+    System::Clock::Milliseconds32 validSlowPollInterval(12000);
+    EXPECT_EQ(privateConfigData.SetSlowPollingInterval(validSlowPollInterval), CHIP_NO_ERROR);
+    //  Without LIT support, the slow polling interval is used and the SIT Polling Interval value is not taken into account
+    EXPECT_EQ(configData.GetSlowPollingInterval(), validSlowPollInterval);
 }
 
 TEST_F(TestICDConfigurationData, TestSetModeDurations)

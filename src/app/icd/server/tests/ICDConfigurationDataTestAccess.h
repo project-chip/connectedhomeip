@@ -38,7 +38,7 @@ public:
     void SetFeatureMap(BitFlags<app::Clusters::IcdManagement::Feature> featureMap) { mData->SetFeatureMap(featureMap); }
     void SetICDMode(ICDConfigurationData::ICDMode mode) { mData->SetICDMode(mode); }
     CHIP_ERROR SetSlowPollingInterval(System::Clock::Milliseconds32 interval) { return mData->SetSlowPollingInterval(interval); }
-    CHIP_ERROR SetSlowPollingFallback(System::Clock::Milliseconds32 fallback) { return mData->SetSlowPollingFallback(fallback); }
+    CHIP_ERROR SetSITPollingInterval(System::Clock::Milliseconds32 interval) { return mData->SetSITPollingInterval(interval); }
     CHIP_ERROR SetModeDurations(Optional<System::Clock::Milliseconds32> active, Optional<System::Clock::Milliseconds32> idle)
     {
         return mData->SetModeDurations(active, idle);

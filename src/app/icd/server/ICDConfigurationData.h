@@ -137,19 +137,19 @@ private:
     CHIP_ERROR SetSlowPollingInterval(System::Clock::Milliseconds32 slowPollInterval);
 
     /**
-     * @brief Sets the fallback value for the slow polling interval.
+     * @brief Sets the SIT Idle polling interval.
      *
-     * This function sets the fallback slow polling interval, which is used when the configured
+     * This function sets the slow/idle polling interval, which is used when the configured
      * slow polling interval exceeds the allowed threshold for SIT mode. The provided value must
      * be less than, or equal to the SIT polling threshold (kSITPollingThreshold).
      *
-     * This fallback Slow Polling configuration allows ICD LIT device to configure a longer SlowPollingInterval
+     * This SIT Slow Polling configuration allows ICD LIT device to configure a longer SlowPollingInterval
      * when operating as LIT, but use a faster SlowPollingInterval when the device must operate in SIT mode
      *
-     * @param[in] slowPollFallback The fallback slow polling interval in milliseconds.
+     * @param[in] pollingInterval The SIT slow polling interval in milliseconds.
      * @return CHIP_ERROR CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if the value is invalid.
      */
-    CHIP_ERROR SetSlowPollingFallback(System::Clock::Milliseconds32 slowPollFallback);
+    CHIP_ERROR SetSITPollingInterval(System::Clock::Milliseconds32 pollingInterval);
 
     static constexpr System::Clock::Milliseconds16 kMinLitActiveModeThreshold = System::Clock::Milliseconds16(5000);
 
@@ -212,12 +212,16 @@ private:
     static_assert((CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL <= kSitIcdSlowPollMaximum),
                   "LIT support is required for slow polling intervals superior to 15 seconds");
 #endif
-    System::Clock::Milliseconds32 mSlowPollingInterval = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
+    // The Polling interval used in Idle mode
+    System::Clock::Milliseconds32 mLITPollingInterval = CHIP_DEVICE_CONFIG_ICD_SLOW_POLL_INTERVAL;
+    // The Polling interval used in Active mode
     System::Clock::Milliseconds32 mFastPollingInterval = CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL;
 
-    static_assert((CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_FALLBACK <= kSitIcdSlowPollMaximum),
-                  "The SIT slow polling intervals fallback must not exceed 15 seconds");
-    System::Clock::Milliseconds32 mSlowPollingFallback = CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_FALLBACK;
+    static_assert((CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL <= kSitIcdSlowPollMaximum),
+                  "The SIT polling intervals must not exceed 15 seconds");
+    // The Polling interval used in Idle mode when a LIT capable device operates in SIT mode and that is mLITPollingInterval is
+    // greater than mSITPollingInterval
+    System::Clock::Milliseconds32 mSITPollingInterval = CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL;
 
     BitFlags<app::Clusters::IcdManagement::Feature> mFeatureMap;
 
