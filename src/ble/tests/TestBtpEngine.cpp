@@ -185,8 +185,8 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendThreePacket)
 TEST_F(TestBtpEngine, HandleCharacteristicSendOnePacketWithAck)
 {
     // Create a new packet buffer with space for a 15-byte payload and set its data length to 15.
-    auto dataLength = 15;
-    auto packet0    = System::PacketBufferHandle::New(dataLength);
+    size_t dataLength = 15;
+    auto packet0      = System::PacketBufferHandle::New(dataLength);
     packet0->SetDataLength(dataLength);
 
     // Send the packet with acknowledgment required, checking the transmission state and the packet buffer.
@@ -199,8 +199,8 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendOnePacketWithAck)
 TEST_F(TestBtpEngine, HandleCharacteristicSendTwoPacketWithIncorrectAck)
 {
     // Create a new packet buffer with space for a 30-byte payload and set its data length to 30.
-    auto dataLength = 30;
-    auto packet0    = System::PacketBufferHandle::New(dataLength);
+    size_t dataLength = 30;
+    auto packet0      = System::PacketBufferHandle::New(dataLength);
     packet0->SetDataLength(dataLength);
 
     // Start sending the payload with acknowledgment required, checking the transmission state and the packet buffer.
@@ -226,8 +226,8 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendTwoPacketWithIncorrectAck)
 TEST_F(TestBtpEngine, HandleCharacteristicSendTwoPacketWithCorrectAck)
 {
     // Create a new packet buffer with space for a 30-byte payload and set its data length to 30.
-    auto dataLength = 30;
-    auto packet0    = System::PacketBufferHandle::New(dataLength);
+    size_t dataLength = 30;
+    auto packet0      = System::PacketBufferHandle::New(dataLength);
     packet0->SetDataLength(dataLength);
 
     // Initialize the payload data with sequential values for testing.
@@ -253,8 +253,8 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendTwoPacketWithCorrectAck)
 TEST_F(TestBtpEngine, HandleCharacteristicSendRejectsNewSendUntilPreviousAcked)
 {
     // Create a new packet buffer with space for a 30-byte payload and set its data length to 30.
-    auto dataLength = 30;
-    auto packet0    = System::PacketBufferHandle::New(dataLength);
+    size_t dataLength = 30;
+    auto packet0      = System::PacketBufferHandle::New(dataLength);
     packet0->SetDataLength(dataLength);
 
     // Initialize the payload data with sequential values for testing.
@@ -294,8 +294,8 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendInsufficientHeadroom)
     EXPECT_EQ(packet0->DataLength(), packet0->MaxDataLength());
 
     // Create a new packet buffer with space for a 15-byte payload and zero headroom, then set its data length to 15.
-    auto dataLength = 15;
-    auto packet1    = System::PacketBufferHandle::New(dataLength, 0);
+    size_t dataLength = 15;
+    auto packet1      = System::PacketBufferHandle::New(dataLength, 0);
     packet1->SetDataLength(dataLength);
 
     // Attempt to send another packet with insufficient headroom, which should also fail.
