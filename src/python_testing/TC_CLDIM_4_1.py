@@ -149,17 +149,16 @@ class TC_CLDIM_4_1(MatterBaseTest):
 
         # STEP 2c: Read AttributeList attribute
         self.step("2c")
-        attribute_list = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
         # STEP 2d: Read StepValue attribute
         self.step("2d")
         step_value = 1  # Default step value
-        if attributes.StepValue.attribute_id in attribute_list:
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.StepValue):
             step_value = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.StepValue)
 
         # STEP 2e: Read LimitRange attribute
         self.step("2e")
-        if attributes.LimitRange.attribute_id in attribute_list:
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.LimitRange):
             limit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LimitRange)
             min_position = limit_range.min
             max_position = limit_range.max
@@ -208,7 +207,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
 
         # STEP 4b: Verify TargetState attribute is updated
         self.step("4b")
-        if attributes.TargetState.attribute_id in attribute_list:
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TargetState):
             target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
             expected_position = max(max_position - 2 * step_value, min_position)
             asserts.assert_equal(target_state.position, expected_position, "TargetState Position is not updated correctly")
@@ -233,7 +232,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
 
         # STEP 4e: Verify TargetState attribute is updated
         self.step("4e")
-        if attributes.TargetState.attribute_id in attribute_list:
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TargetState):
             target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
             asserts.assert_equal(target_state.position, max_position, "TargetState Position is not updated correctly")
 
@@ -267,7 +266,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
 
             # STEP 5c: Verify TargetState attribute is updated
             self.step("5c")
-            if attributes.TargetState.attribute_id in attribute_list:
+            if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TargetState):
                 target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
                 expected_position = max_position - step_value
                 asserts.assert_equal(target_state.position, expected_position, "TargetState Position is not updated correctly")
@@ -305,7 +304,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
 
             # STEP 6c: Verify TargetState attribute is updated
             self.step("6c")
-            if attributes.TargetState.attribute_id in attribute_list:
+            if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TargetState):
                 target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
                 expected_position = max_position
                 asserts.assert_equal(target_state.position, expected_position, "TargetState Position is not updated correctly")
@@ -363,7 +362,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
 
         # STEP 7d: Verify TargetState attribute is updated after multiple steps
         self.step("7d")
-        if attributes.TargetState.attribute_id in attribute_list:
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TargetState):
             target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
             expected_position = max(max_position - 3 * step_value, min_position)
             asserts.assert_equal(target_state.position, expected_position, "TargetState Position is not updated correctly")
@@ -394,7 +393,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
 
         # STEP 8c: Verify TargetState attribute is at MinPosition
         self.step("8c")
-        if attributes.TargetState.attribute_id in attribute_list:
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TargetState):
             target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
             asserts.assert_equal(target_state.position, min_position, "TargetState Position is not at MinPosition")
 
@@ -423,7 +422,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
 
         # STEP 8f: Verify TargetState attribute is at MaxPosition
         self.step("8f")
-        if attributes.TargetState.attribute_id in attribute_list:
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TargetState):
             target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
             asserts.assert_equal(target_state.position, max_position, "TargetState Position is not at MaxPosition")
 
