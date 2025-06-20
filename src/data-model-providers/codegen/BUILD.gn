@@ -46,6 +46,17 @@ source_set("instance-header") {
   sources = [ "Instance.h" ]
 }
 
+source_set("attribute-storage") {
+  sources = [
+    "EmberAttributeStorageImpl.cpp",
+    "EmberAttributeStorageImpl.h",
+  ]
+  public_deps = [
+    "${chip_root}/src/app/storage:attribute-storage",
+    "${chip_root}/src/app/util/persistence",
+  ]
+}
+
 source_set("registry") {
   sources = [
     "ServerClusterInterfaceRegistry.cpp",

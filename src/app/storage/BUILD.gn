@@ -19,6 +19,17 @@ config("includes") {
   include_dirs = [ "${chip_app_zap_dir}" ]
 }
 
+source_set("attribute-storage") {
+  sources = [
+    "AttributeStorage.h",
+  ]
+  public_deps = [
+    "${chip_root}/src/app:paths",
+    "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/support:span",
+  ]
+}
+
 source_set("fabric-table") {
   sources = [
     "FabricTableImpl.h",
