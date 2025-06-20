@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Contains non-inline method definitions for the
- *          GenericPlatformManagerImpl_Zephyr<> template.
+ *          GenericPlatformManagerImpl_Zephyr<> template which uses select().
  */
 
 #ifndef GENERIC_PLATFORM_MANAGER_IMPL_ZEPHYR_CPP
