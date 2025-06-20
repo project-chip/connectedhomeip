@@ -99,9 +99,10 @@ class TC_CLDIM_2_1(MatterBaseTest):
                 asserts.assert_is_instance(current_state, Clusters.ClosureDimension.Structs.DimensionStateStruct,
                                            "CurrentState is not of expected type")
                 if is_positioning_supported:
-                    asserts.assert_true(0 <= current_state.position <= 10000, "Position is not in the expected range [0:10000]")
+                    asserts.assert_true( current_state.position is NullValue or (0 <= current_state.position <= 10000), "Position is not in the expected range [0:10000]")
                 if is_latching_supported:
-                    asserts.assert_is_instance(current_state.latch, bool, "Latch is not a boolean")
+                    asserts.assert_true(isinstance(current_state.latch, bool) or current_state.latch is NullValue,
+                                        "Latch is not a boolean or NullValue")
                 if is_speed_supported:
                     asserts.assert_true(0 <= current_state.speed <= 3, "Speed is not in the expected range [0:3]")
 
@@ -119,8 +120,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
                     asserts.assert_true(isinstance(target_state.latch, bool) or target_state.latch is NullValue,
                                         "Latch is not a boolean or NullValue")
                 if is_speed_supported:
-                    asserts.assert_true(target_state.speed is NullValue or (0 <= target_state.speed <= 3),
-                                        "Speed is not NullValue or in the expected range [0:3]")
+                    asserts.assert_true(0 <= target_state.speed <= 3, "Speed is not in the expected range [0:3]")
 
         # STEP 5: Read Resolution attribute
         self.step(5)
@@ -134,7 +134,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.StepValue):
             step_value = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.StepValue)
             asserts.assert_is_instance(step_value, uint, "StepValue is not of expected type")
-            asserts.assert_true(0 <= step_value <= 10000, "StepValue is not in the expected range [0:10000]")
+            asserts.assert_true(1 <= step_value <= 10000, "StepValue is not in the expected range [1:10000]")
             asserts.assert_true(step_value % resolution == 0, "StepValue is not a multiple of Resolution")
 
         # STEP 7: Read Unit attribute
@@ -152,7 +152,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             if unit_range is not NullValue:
                 asserts.assert_is_instance(unit_range, Clusters.ClosureDimension.Structs.UnitRangeStruct,
                                            "UnitRange is not of expected type")
-                asserts.assert_true(unit >= 0, "Unit is unknown - cannot check UnitRange")
+                asserts.assert_true(0 <= unit <= 1, "Unit is unknown - cannot check UnitRange")
 
                 if unit == 0:
                     asserts.assert_true(0 <= unit_range.min, "UnitRange.min is not in the expected range [0:32767]")
@@ -184,7 +184,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
             translation_direction = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TranslationDirection)
             asserts.assert_is_instance(translation_direction, Clusters.ClosureDimension.Enums.TranslationDirectionEnum,
                                        "TranslationDirection is not of expected type")
-            asserts.assert_true(0 <= translation_direction <= 15, "TranslationDirection is not in the expected range [0:15]")
+            asserts.assert_true(0 <= translation_direction <= 11, "TranslationDirection is not in the expected range [0:11]")
 
         # STEP 11: Read RotationAxis attribute
         self.step(11)
