@@ -193,7 +193,7 @@ class TC_CC_2_1(MatterBaseTest):
             logger.info(f"Current value for {attribute} is {attr_val}")
             if nullable and attr_val is NullValue:
                 logger.info("Value is NULL (ok)")
-                return
+                return attr_val
             if data_type == ValueTypesEnum.UINT8:
                 logger.info("Checking is uint8")
                 matter_asserts.assert_valid_uint8(attr_val, "Is not uint8")
@@ -330,8 +330,8 @@ class TC_CC_2_1(MatterBaseTest):
 
         self.step(24)
         # Read NumberOfPrimaries from the cluster.
-        number_of_primaries_value = await self._verify_attribute(self.attributes.NumberOfPrimaries, ValueTypesEnum.UINT8, min_len=0, max_len=6)
-        if number_of_primaries_value == 0:
+        number_of_primaries_value = await self._verify_attribute(self.attributes.NumberOfPrimaries, ValueTypesEnum.UINT8, min_len=0, max_len=6, nullable=True)
+        if number_of_primaries_value is NullValue or number_of_primaries_value == 0:
             logger.info("NumberOfPrimaries is 0 skipping steps 25 through 42.")
             for i in range(25, 43):
                 self.skip_step(i)
