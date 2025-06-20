@@ -117,17 +117,17 @@ public:
         Buffer(const Buffer & other) = default;
 
         Buffer(ShortPascalString<char> & data) :
-            Buffer(data.PascalContent().data(), data.PascalContent().size(), Type::kStringOneByteLength)
+            Buffer(data.Buffer().data(), data.Buffer().size(), Type::kStringOneByteLength)
         {}
         Buffer(LongPascalString<char> & data) :
-            Buffer(data.PascalContent().data(), data.PascalContent().size(), Type::kStringTwoByteLength)
+            Buffer(data.Buffer().data(), data.Buffer().size(), Type::kStringTwoByteLength)
         {}
 
         Buffer(ShortPascalString<uint8_t> & data) :
-            Buffer(data.PascalContent().data(), data.PascalContent().size(), Type::kStringOneByteLength)
+            Buffer(data.Buffer().data(), data.Buffer().size(), Type::kStringOneByteLength)
         {}
         Buffer(LongPascalString<uint8_t> & data) :
-            Buffer(data.PascalContent().data(), data.PascalContent().size(), Type::kStringTwoByteLength)
+            Buffer(data.Buffer().data(), data.Buffer().size(), Type::kStringTwoByteLength)
         {}
 
         template <typename T>
