@@ -155,6 +155,13 @@ public:
      */
     void OnMoveToActionComplete();
 
+    /**
+     * @brief Retrieves the endpoint identifier associated with this Closure Control Endpoint.
+     *
+     * @return The endpoint ID as a chip::EndpointId.
+     */
+    chip::EndpointId GetEndpointId() const { return mEndpoint; }
+
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
     MatterContext mContext;
@@ -163,7 +170,7 @@ private:
     Interface mInterface;
 
     void UpdateTargetStateFromCurrentState();
-    void MapCurrentPositioningToTargetPosition(PositioningEnum positioning, TargetPositionEnum & targetPosition)
+    void MapCurrentPositioningToTargetPosition(PositioningEnum positioning, TargetPositionEnum & targetPosition);
 };
 
 } // namespace ClosureControl

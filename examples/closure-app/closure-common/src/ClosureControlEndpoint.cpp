@@ -172,7 +172,7 @@ void ClosureControlEndpoint::OnStopMotionActionComplete()
 
     // Set the OverallState position to PartiallyOpened as motion has been stopped
     // and the closure is not fully closed or fully opened.
-    auto position = MakeOptional(MakeNullable(PositioningEnum::kPartiallyOpened));
+    auto position = MakeOptional(DataModel::MakeNullable(PositioningEnum::kPartiallyOpened));
     
     DataModel::Nullable<GenericOverallState> overallState;
     mLogic.GetOverallState(overallState);
@@ -259,20 +259,33 @@ void ClosureControlEndpoint::UpdateTargetStateFromCurrentState()
     if (overallState.Value().positioning.HasValue() && 
             !overallState.Value().positioning.Value().IsNull()) 
     {
-        PositioningEnum positioning = overallState.Value().positioning.Value();
+        PositioningEnum positioning = overallState.Value().positioning.Value().Value();
         TargetPositionEnum targetPosition;
         MapCurrentPositioningToTargetPosition(positioning, targetPosition);
         if (targetPosition == TargetPositionEnum::kUnknownEnumValue)
         {
             // If the target position is unknown, we set the position field of overallTarget to NullNullable.
-            overallTarget.Value().position.SetValue(NullOptional);
+            overallTarget.Value().position.ClearValue();
         } else {
             overallTarget.Value().position.SetValue(targetPosition);
         }
     }
 
-    overallTarget.Value().latch = overallState.Value().latch;
-    overallTarget.Value().speed = overallState.Value().speed;
+    if (overallState.Value().latch.HasValue() && 
+            !overallState.Value().latch.Value().IsNull()) 
+    {
+        overallTarget.Value().latch.SetValue(overallState.Value().latch.Value().Value());
+    } else {
+        overallTarget.Value().latch.ClearValue();
+    }
+
+    if (overallState.Value().speed.HasValue() && 
+            !overallState.Value().speed.Value().IsNull()) 
+    {
+        overallTarget.Value().speed.SetValue(overallState.Value().speed.Value().Value());
+    } else {
+        overallTarget.Value().speed.ClearValue();
+    }
 
     mLogic.SetOverallTarget(overallTarget);
 }

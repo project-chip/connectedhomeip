@@ -130,6 +130,7 @@ void ClosureManager::InitiateAction(AppEvent * event)
 
     instance.CancelTimer(); // Cancel any existing timer before starting a new action
     instance.SetCurrentAction(action);
+    instance.mCurrentActionEndpointId = static_cast<chip::EndpointId>( event->ClosureEvent.EndpointId);
 
     switch (action)
     {
@@ -139,22 +140,12 @@ void ClosureManager::InitiateAction(AppEvent * event)
         // In a real application, this would be replaced with actual calibration logic.
         instance.StartTimer(kCountdownTimeSeconds * 1000);
         break;
-    case Action_t::STOP_MOTION_ACTION:
-        ChipLogDetail(AppServer, "Initiating stop motion action");
-        // Timer used in sample application to simulate the stop motion process.
-        // In a real application, this would be replaced with actual logic to stop
-        // any ongoing motion of the closure.
-        instance.StartTimer(kCountdownTimeSeconds * 1000);
-        break;
-    case Action_t::STOP_CALIBRATE_ACTION:
-        ChipLogDetail(AppServer, "Initiating stop calibration action");
-        // Timer used in sample application to simulate the stop calibration process.
-        // In a real application, this would be replaced with actual logic to stop
-        // any ongoing calibration of the closure.
-        instance.StartTimer(kCountdownTimeSeconds * 1000);
-        break;
     case Action_t::MOVE_TO_ACTION:
         ChipLogDetail(AppServer, "Initiating move to action");
+        // Timer used in sample application to simulate the move to process.
+        // In a real application, this would be replaced with actual logic to move
+        // the closure to the desired position.
+        instance.StartTimer(kCountdownTimeSeconds * 1000);
         break;
     default:
         ChipLogDetail(AppServer, "Invalid action received in InitiateAction");
@@ -172,6 +163,7 @@ void ClosureManager::TimerEventHandler(void * timerCbArg)
     AppEvent event;
     event.Type                = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action = closureManager->GetCurrentAction();
+    event.ClosureEvent.EndpointId = closureManager->mCurrentActionEndpointId;
     event.Handler             = HandleClosureActionCompleteEvent;
     AppTask::GetAppTask().PostEvent(&event);
 }
@@ -183,18 +175,6 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
     switch (currentAction)
     {
     case Action_t::CALIBRATE_ACTION:
-        PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager & instance = ClosureManager::GetInstance();
-            instance.HandleClosureActionComplete(instance.GetCurrentAction());
-        });
-        break;
-    case Action_t::STOP_MOTION_ACTION:
-        PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager & instance = ClosureManager::GetInstance();
-            instance.HandleClosureActionComplete(instance.GetCurrentAction());
-        });
-        break;
-    case Action_t::STOP_CALIBRATE_ACTION:
         PlatformMgr().ScheduleWork([](intptr_t) {
             ClosureManager & instance = ClosureManager::GetInstance();
             instance.HandleClosureActionComplete(instance.GetCurrentAction());
@@ -220,6 +200,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
     AppEvent event;
     event.Type                = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action = CALIBRATE_ACTION;
+    event.ClosureEvent.EndpointId = ep1.GetEndpointId();
     event.Handler             = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
 
@@ -229,32 +210,10 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
 
 chip::Protocols::InteractionModel::Status ClosureManager::OnStopCommand()
 {
-  ClosureManager::Action_t action;
-  if (isCalibrationInProgress ) 
-    {
-      ChipLogError(AppServer, "Stopping calibration action"); 
-      isCalibrationInProgress = false;
-      action = ClosureManager::Action_t::STOP_CALIBRATE_ACTION; 
-    }
-    else if (isMoveToInProgress)
-    {
-      ChipLogError(AppServer, "Stopping Motion action");
-      isMoveToInProgress = false;
-      action = ClosureManager::Action_t::STOP_MOTION_ACTION;
-    } 
-    else
-    {
-      action = ClosureManager::Action_t::INVALID_ACTION;
-    }
-
-    // Post an event to initiate the stop action asynchronously.
-    AppEvent event;
-    event.Type              = AppEvent::kEventType_Closure;
-    event.ClosureEvent.Action = action;
-    event.Handler           = InitiateAction;
-    AppTask::GetAppTask().PostEvent(&event);
-
-    isStopInProgress = true;
+    // As Stop should be handled immediately, we will handle it synchronously.
+    // For simulation purposes, we will just log the stop action and contnue to handle the stop action completion.
+    // In a real application, this would be replaced with actual logic to stop the closure action.
+    HandleClosureActionComplete(Action_t::STOP_ACTION);
     return Status::Success;
 }
 
@@ -272,32 +231,46 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
     ClosureManager & instance = ClosureManager::GetInstance();
     switch (action)
     {
-    case Action_t::CALIBRATE_ACTION: {
+    case Action_t::CALIBRATE_ACTION: 
+    {
         instance.ep1.OnCalibrateActionComplete();
         instance.ep2.OnCalibrateActionComplete();
         instance.ep3.OnCalibrateActionComplete();
         isCalibrationInProgress = false;
         break;
     }
-    case Action_t::STOP_MOTION_ACTION:
-        instance.ep1.OnStopMotionActionComplete();
-        instance.ep2.OnStopMotionActionComplete();
-        instance.ep3.OnStopMotionActionComplete();
-        isStopInProgress = false;
-        break;
-    case Action_t::STOP_CALIBRATE_ACTION:
-        instance.ep1.OnStopCalibrateActionComplete();
-        instance.ep2.OnStopCalibrateActionComplete();
-        instance.ep3.OnStopCalibrateActionComplete();
-        isStopInProgress = false;   
-        break;
     case Action_t::MOVE_TO_ACTION:
         // This should handle the completion of a move-to action.
         break;
+    case Action_t::STOP_ACTION:
+    {
+        if(isCalibrationInProgress)
+        {
+            ChipLogDetail(AppServer, "Stopping calibration action");
+            instance.ep1.OnStopCalibrateActionComplete();
+            instance.ep2.OnStopCalibrateActionComplete();
+            instance.ep3.OnStopCalibrateActionComplete();
+            isCalibrationInProgress = false;
+        } 
+        else if (isMoveToInProgress) 
+        {
+            ChipLogDetail(AppServer, "Stopping move to action");
+            instance.ep1.OnStopMotionActionComplete();
+            instance.ep2.OnStopMotionActionComplete();
+            instance.ep3.OnStopMotionActionComplete();
+            isMoveToInProgress = false;
+        }
+        else 
+        {
+            ChipLogDetail(AppServer, "No action in progress to stop");
+        }
+        break;
+    }
     default:
         ChipLogError(AppServer, "Invalid action received in HandleClosureAction");
         break;
     }
     // Reset the current action after handling the closure action
-    GetInstance().SetCurrentAction(Action_t::INVALID_ACTION);
+    instance.SetCurrentAction(Action_t::INVALID_ACTION);
+    instance.mCurrentActionEndpointId = chip::kInvalidEndpointId;
 }
