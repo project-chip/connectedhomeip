@@ -89,7 +89,6 @@ private:
     static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor, uint8_t * value);
     static void ActionCompleted(LightingManager::Action_t aAction);
     static void LightActionEventHandler(AppEvent * aEvent);
-    static void LightActionLevelEventHandler(AppEvent * aEvent);
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
     static void LightControlEventHandler(AppEvent * aEvent);
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
