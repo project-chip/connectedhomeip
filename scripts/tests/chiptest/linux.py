@@ -18,11 +18,16 @@
 Handles linux-specific functionality for running test cases
 """
 
+import asyncio
 import logging
 import os
+import pathlib
 import subprocess
 import sys
+import threading
 import time
+
+import sdbus
 
 from .test_definition import ApplicationPaths
 
@@ -124,7 +129,7 @@ def CreateNamespacesForAppTest():
             break
         time.sleep(0.1)
     else:
-        logging.warn("Some addresses look to still be tentative")
+        logging.warning("Some addresses look to still be tentative")
 
 
 def RemoveNamespaceForAppTest():
@@ -167,6 +172,158 @@ def PrepareNamespacesForTestExecution(in_unshare: bool):
 
 def ShutdownNamespaceForTestExecution():
     RemoveNamespaceForAppTest()
+
+
+class DBusTestSystemBus(subprocess.Popen):
+    """Run a dbus-daemon in a subprocess as a test system bus."""
+
+    SOCKET = pathlib.Path(f"/tmp/chip-dbus-{os.getpid()}")
+    ADDRESS = f"unix:path={SOCKET}"
+
+    def __init__(self):
+        super().__init__(["dbus-daemon", "--session", "--print-address", "--address", self.ADDRESS],
+                         stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        os.environ["DBUS_SYSTEM_BUS_ADDRESS"] = self.ADDRESS
+        # Wait for the bus to start (it will print the address to stdout).
+        self.stdout.readline()
+
+    def terminate(self):
+        super().terminate()
+        self.SOCKET.unlink(True)
+        self.wait()
+
+
+class BluetoothMock(subprocess.Popen):
+    """Run a BlueZ mock server in a subprocess."""
+
+    # The MAC addresses of the virtual Bluetooth adapters.
+    ADAPTERS = ["00:00:00:11:11:11", "00:00:00:22:22:22"]
+
+    def __init__(self):
+        adapters = [f"--adapter={mac}" for mac in self.ADAPTERS]
+        super().__init__(["bluezoo", "--quiet", "--auto-enable"] + adapters)
+
+    def terminate(self):
+        super().terminate()
+        self.wait()
+
+
+class WpaSupplicantMock(threading.Thread):
+    """Mock server for WpaSupplicant D-Bus API."""
+
+    class Wpa(sdbus.DbusInterfaceCommonAsync,
+              interface_name="fi.w1.wpa_supplicant1"):
+        path = "/fi/w1/wpa_supplicant1"
+
+        @sdbus.dbus_method_async("a{sv}", "o")
+        async def CreateInterface(self, args) -> str:
+            # Always return our pre-defined mock interface.
+            return WpaSupplicantMock.WpaInterface.path
+
+        @sdbus.dbus_method_async("s", "o")
+        async def GetInterface(self, name) -> str:
+            # Always return our pre-defined mock interface.
+            return WpaSupplicantMock.WpaInterface.path
+
+    class WpaInterface(sdbus.DbusInterfaceCommonAsync,
+                       interface_name="fi.w1.wpa_supplicant1.Interface"):
+        path = "/fi/w1/wpa_supplicant1/Interfaces/1"
+        state = "disconnected"
+        current_network = "/"
+
+        @sdbus.dbus_method_async("s")
+        async def AutoScan(self, arg):
+            pass
+
+        @sdbus.dbus_method_async("a{sv}")
+        async def Scan(self, args):
+            pass
+
+        @sdbus.dbus_method_async("a{sv}", "o")
+        async def AddNetwork(self, args):
+            # Mock AP association process.
+            await self.State.set_async("associating")
+            await self.State.set_async("associated")
+            await self.State.set_async("completed")
+            # Always return our pre-defined mock network.
+            return WpaSupplicantMock.WpaNetwork.path
+
+        @sdbus.dbus_method_async("o")
+        async def SelectNetwork(self, path):
+            self.current_network = path
+
+        @sdbus.dbus_method_async("o")
+        async def RemoveNetwork(self, path):
+            self.current_network = "/"
+
+        @sdbus.dbus_method_async()
+        async def RemoveAllNetworks(self):
+            self.current_network = "/"
+
+        @sdbus.dbus_method_async()
+        async def Disconnect(self):
+            pass
+
+        @sdbus.dbus_method_async()
+        async def SaveConfig(self):
+            pass
+
+        @sdbus.dbus_property_async("s")
+        def State(self):
+            return self.state
+
+        @State.setter_private
+        def State_setter(self, value):
+            self.state = value
+
+        @sdbus.dbus_property_async("o")
+        def CurrentNetwork(self):
+            return self.current_network
+
+        @sdbus.dbus_property_async("s")
+        def CurrentAuthMode(self):
+            return "WPA2-PSK"
+
+    class WpaNetwork(sdbus.DbusInterfaceCommonAsync,
+                     interface_name="fi.w1.wpa_supplicant1.Network"):
+        path = "/fi/w1/wpa_supplicant1/Interfaces/1/Networks/1"
+        enabled = False
+
+        @sdbus.dbus_property_async("a{sv}")
+        def Properties(self):
+            return {}
+
+        @sdbus.dbus_property_async("b")
+        def Enabled(self):
+            return self.enabled
+
+        @Enabled.setter
+        def Enabled_setter(self, value):
+            self.enabled = value
+
+    async def startup(self):
+        # Attach to the system bus which in fact is our mock bus.
+        bus = sdbus.sd_bus_open_system()
+        sdbus.set_default_bus(bus)
+        # Acquire name on the system bus.
+        await bus.request_name_async("fi.w1.wpa_supplicant1", 0)
+        # Expose interfaces of our service.
+        self.wpa = WpaSupplicantMock.Wpa()
+        self.wpa.export_to_dbus(self.wpa.path)
+        self.iface = WpaSupplicantMock.WpaInterface()
+        self.iface.export_to_dbus(self.iface.path)
+        self.net = WpaSupplicantMock.WpaNetwork()
+        self.net.export_to_dbus(self.net.path)
+
+    def __init__(self):
+        self.loop = asyncio.new_event_loop()
+        self.loop.run_until_complete(self.startup())
+        super().__init__(target=self.loop.run_forever)
+        self.start()
+
+    def terminate(self):
+        self.loop.call_soon_threadsafe(self.loop.stop)
+        self.join()
 
 
 def PathsWithNetworkNamespaces(paths: ApplicationPaths) -> ApplicationPaths:
