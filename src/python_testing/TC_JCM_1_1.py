@@ -33,20 +33,20 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import base64
 import logging
 import os
 import random
 import tempfile
-import base64
+from configparser import ConfigParser
 
 import chip.clusters as Clusters
 import chip.tlv
+from chip import CertificateAuthority
+from chip.storage import PersistentStorage
 from chip.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-from chip import CertificateAuthority
-from chip.storage import PersistentStorage
-from configparser import ConfigParser
 
 
 class TC_JCM_1_1(MatterBaseTest):
