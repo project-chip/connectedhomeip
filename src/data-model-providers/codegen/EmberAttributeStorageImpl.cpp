@@ -63,6 +63,8 @@ EmberAfAttributeType attributeType(AttributeStorage::Buffer & buffer)
     case AttributeStorage::Buffer::Type::kBytesTwoByteLength:
         return ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE;
     }
+
+    return ZCL_NO_DATA_ATTRIBUTE_TYPE;
 }
 
 } // namespace
