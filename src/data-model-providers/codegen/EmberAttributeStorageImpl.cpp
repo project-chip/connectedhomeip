@@ -24,7 +24,7 @@ namespace app {
 namespace Storage {
 namespace {
 
-// EmberAfAttributeType possible values  are part of the unnamed enum in `attribute-type.h`,
+// EmberAfAttributeType possible values are part of the unnamed enum in `attribute-type.h`,
 // of the form ZCL_*_ATTRIBUTE_TYPE
 EmberAfAttributeType attributeType(AttributeStorage::Buffer & buffer)
 {
