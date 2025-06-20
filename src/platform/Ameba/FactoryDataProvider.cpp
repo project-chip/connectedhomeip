@@ -623,7 +623,8 @@ CHIP_ERROR FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)
     }
     else
     {
-        err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+        hardwareVersion = CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION;
+        err             = CHIP_NO_ERROR;
     }
 
     return err;
@@ -695,6 +696,14 @@ CHIP_ERROR FactoryDataProvider::GetProductPrimaryColor(ColorEnum * primaryColor)
     CHIP_ERROR err = CHIP_NO_ERROR;
     *primaryColor  = ColorEnum::kBlack;
     return err;
+}
+
+CHIP_ERROR FactoryDataProvider::GetSoftwareVersionString(char * buf, size_t bufSize)
+{
+    VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+    snprintf(buf, bufSize, "%s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer
