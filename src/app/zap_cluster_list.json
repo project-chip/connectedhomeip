@@ -153,6 +153,7 @@
         "WIFI_NETWORK_DIAGNOSTICS_CLUSTER": [],
         "WINDOW_COVERING_CLUSTER": [],
         "WI_FI_NETWORK_DIAGNOSTICS_CLUSTER": [],
+        "WI_FI_NETWORK_MANAGEMENT_CLUSTER": [],
         "ZONE_MANAGEMENT_CLUSTER": []
     },
     "ServerDirectories": {
@@ -366,6 +367,7 @@
         "WATER_HEATER_MANAGEMENT_CLUSTER": ["water-heater-management-server"],
         "WATER_HEATER_MODE_CLUSTER": ["mode-base-server"],
         "WI_FI_NETWORK_DIAGNOSTICS_CLUSTER": [],
+        "WI_FI_NETWORK_MANAGEMENT_CLUSTER": [],
         "ZONE_MANAGEMENT_CLUSTER": []
     }
 }
