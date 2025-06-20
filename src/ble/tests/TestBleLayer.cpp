@@ -57,6 +57,11 @@ class TestBleLayer : public BleLayer,
                      public ::testing::Test
 {
 public:
+    // Add mOnBleConnectionCompleteCalled and mOnBleConnectionErrorCalled
+    // to check if the callbacks are invoked correctly.
+    bool mOnBleConnectionCompleteCalled = false;
+    bool mOnBleConnectionErrorCalled    = false;
+    
     static void SetUpTestSuite()
     {
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
@@ -71,6 +76,9 @@ public:
 
     void SetUp() override
     {
+        // Reset the connection flags before each test.
+        mOnBleConnectionCompleteCalled = false;
+        mOnBleConnectionErrorCalled    = false;
         ASSERT_EQ(Init(this, this, this, &DeviceLayer::SystemLayer()), CHIP_NO_ERROR);
         mBleTransport = this;
     }
@@ -131,8 +139,9 @@ public:
     ///
     // Implementation of BleLayerDelegate
 
-    void OnBleConnectionComplete(BLEEndPoint * endpoint) override {}
-    void OnBleConnectionError(CHIP_ERROR err) override {}
+    // override OnBleConnectionComplete and OnBleConnectionError to set flags
+    void OnBleConnectionComplete(BLEEndPoint * endpoint) override { mOnBleConnectionCompleteCalled = true; }
+    void OnBleConnectionError(CHIP_ERROR err) override { mOnBleConnectionErrorCalled = true; }
     void OnEndPointConnectComplete(BLEEndPoint * endPoint, CHIP_ERROR err) override {}
     void OnEndPointMessageReceived(BLEEndPoint * endPoint, System::PacketBufferHandle && msg) override {}
     void OnEndPointConnectionClosed(BLEEndPoint * endPoint, CHIP_ERROR err) override {}
@@ -390,20 +399,23 @@ TEST_F(TestBleLayer, ExceedBleConnectionEndPointLimit)
 
     auto connObj = GetConnectionObject();
     EXPECT_FALSE(HandleWriteReceivedCapabilitiesRequest(connObj));
-    CloseAllBleConnections();
 }
 
-TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorSuccess)
+// This test creats new ble connection by discriminator and simulates error
+TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorThenError)
 {
     // Start new connection
     ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), static_cast<BleLayer*>(this)), CHIP_NO_ERROR);
 
-    // Simulate success
-    auto connObj = GetConnectionObject();
-    BleConnectionDelegate::OnConnectionComplete(static_cast<BleLayer*>(this), connObj);
+    // Simulate error
+    BleConnectionDelegate::OnConnectionError(static_cast<BleLayer*>(this), CHIP_NO_ERROR);
+
+    EXPECT_FALSE(mOnBleConnectionCompleteCalled);
+    EXPECT_TRUE(mOnBleConnectionErrorCalled);
 }
 
-TEST_F(TestBleLayer, NewBleConnectionByObjectCancel)
+// This test creats new ble connection by object and tests cancelation
+TEST_F(TestBleLayer, NewBleConnectionByObjectThenCancel)
 {
     // Start new connection
     auto connObj = GetConnectionObject();
@@ -411,6 +423,9 @@ TEST_F(TestBleLayer, NewBleConnectionByObjectCancel)
 
     // Cancel the connection
     ASSERT_EQ(CancelBleIncompleteConnection(), CHIP_NO_ERROR);
+
+    EXPECT_FALSE(mOnBleConnectionCompleteCalled);
+    EXPECT_FALSE(mOnBleConnectionErrorCalled);
 }
 
 }; // namespace Ble
