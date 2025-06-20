@@ -83,6 +83,24 @@ public:
     virtual bool IsReadyToMove() = 0;
 
     /**
+     * @brief Clears the current error list.
+     *
+     * @return CHIP_NO_ERROR if the error list is cleared successfully
+     *         Returns an appropriate error code if clearing the error list fails
+     */
+    virtual CHIP_ERROR ClearErrorList() = 0;
+    
+    /**
+     * @brief Adds an error to the current error list.
+     *
+     * @param error The error to be added to the current error list
+     *
+     * @return CHIP_NO_ERROR if the error is added successfully
+     *         Returns an appropriate error code if adding the error fails
+     */
+    virtual CHIP_ERROR AddErrorToCurrentErrorList(ClosureErrorEnum error) = 0;
+
+    /**
      * @brief Checks whether this closure needs manual latching.
      *
      * @return true if manual latching is needed

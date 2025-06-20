@@ -55,6 +55,8 @@ public:
                                                             const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
     Protocols::InteractionModel::Status HandleCalibrateCommand() override;
 
+    CHIP_ERROR AddErrorToCurrentErrorList(ClosureErrorEnum error);
+    CHIP_ERROR ClearErrorList();
     CHIP_ERROR GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError) override;
     bool IsReadyToMove() override;
     bool IsManualLatchingNeeded() override;
@@ -72,6 +74,9 @@ public:
 
 private:
     ClusterLogic * mLogic;
+    static constexpr size_t kMaxErrorCount = 10;
+    ClosureErrorEnum mCurrentErrorList[kMaxErrorCount];
+    size_t mCurrentErrorCount = 0;
 };
 
 /**
