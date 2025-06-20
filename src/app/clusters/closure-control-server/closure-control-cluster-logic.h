@@ -115,9 +115,9 @@ struct ClusterState
     };
 
     QuieterReportingAttribute<ElapsedS> mCountdownTime{ DataModel::NullNullable };
-    MainStateEnum mMainState                                 = MainStateEnum::kUnknownEnumValue;
-    DataModel::Nullable<GenericOverallState> mOverallState   = DataModel::NullNullable;
-    DataModel::Nullable<GenericOverallTarget> mOverallTarget = DataModel::NullNullable;
+    MainStateEnum mMainState                                      = MainStateEnum::kUnknownEnumValue;
+    DataModel::Nullable<GenericOverallCurrentState> mOverallState = DataModel::NullNullable;
+    DataModel::Nullable<GenericOverallTargetState> mOverallTarget = DataModel::NullNullable;
 
     // CurrentErrorList attribute is not stored here. When it is necessary it will be requested from the delegate to get the current
     // active errors.
@@ -128,8 +128,8 @@ struct ClusterState
  */
 struct ClusterInitParameters
 {
-    MainStateEnum mMainState                               = MainStateEnum::kStopped;
-    DataModel::Nullable<GenericOverallState> mOverallState = DataModel::NullNullable;
+    MainStateEnum mMainState                                      = MainStateEnum::kStopped;
+    DataModel::Nullable<GenericOverallCurrentState> mOverallState = DataModel::NullNullable;
 };
 
 /**
@@ -169,8 +169,8 @@ public:
 
     CHIP_ERROR GetCountdownTime(DataModel::Nullable<ElapsedS> & countdownTime);
     CHIP_ERROR GetMainState(MainStateEnum & mainState);
-    CHIP_ERROR GetOverallState(DataModel::Nullable<GenericOverallState> & overallState);
-    CHIP_ERROR GetOverallTarget(DataModel::Nullable<GenericOverallTarget> & overallTarget);
+    CHIP_ERROR GetOverallState(DataModel::Nullable<GenericOverallCurrentState> & overallState);
+    CHIP_ERROR GetOverallTarget(DataModel::Nullable<GenericOverallTargetState> & overallTarget);
     // The delegate is expected to return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to indicate end of list
     CHIP_ERROR GetCurrentErrorList(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
     CHIP_ERROR GetFeatureMap(BitFlags<Feature> & featureMap);
@@ -186,7 +186,7 @@ public:
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
-    CHIP_ERROR SetOverallState(const DataModel::Nullable<GenericOverallState> & overallState);
+    CHIP_ERROR SetOverallState(const DataModel::Nullable<GenericOverallCurrentState> & overallState);
 
     /**
      * @brief Set OverallTarget.
@@ -198,7 +198,7 @@ public:
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
-    CHIP_ERROR SetOverallTarget(const DataModel::Nullable<GenericOverallTarget> & overallTarget);
+    CHIP_ERROR SetOverallTarget(const DataModel::Nullable<GenericOverallTargetState> & overallTarget);
 
     /**
      * @brief Sets the main state of the cluster.
@@ -353,7 +353,7 @@ private:
      * @return true if the requested Positioning is supported
      *        false, otherwise
      */
-    bool IsSupportedOverallStatePositioning(PositioningEnum positioning) const;
+    bool IsSupportedOverallStatePositioning(CurrentPositionEnum positioning) const;
 
     /**
      * @brief Function validates if the requested OverallTarget positioning is supported by the closure.

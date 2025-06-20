@@ -88,13 +88,13 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
             [&logic = mClusterLogic](const auto & encoder) -> CHIP_ERROR { return logic.GetCurrentErrorList(encoder); });
     }
 
-    case Attributes::OverallState::Id: {
-        typedef DataModel::Nullable<GenericOverallState> T;
+    case Attributes::OverallCurrentState::Id: {
+        typedef DataModel::Nullable<GenericOverallCurrentState> T;
         return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetOverallState(ret); });
     }
 
-    case Attributes::OverallTarget::Id: {
-        typedef DataModel::Nullable<GenericOverallTarget> T;
+    case Attributes::OverallTargetState::Id: {
+        typedef DataModel::Nullable<GenericOverallTargetState> T;
         return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetOverallTarget(ret); });
     }
 
