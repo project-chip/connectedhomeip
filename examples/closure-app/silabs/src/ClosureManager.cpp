@@ -345,31 +345,29 @@ void ClosureManager::HandleClosureMotionAction()
     bool isEndPoint2TargetReached = false;
     bool isEndPoint3TargetReached = false;
 
-    if (ep2State.target.Value().position.HasValue() && !isEndPoint2TargetReached)
+    if (UpdatePanelCurrentStateToNextPosition(ep2State, currentState))
     {
         // Update the current state for Endpoint 2
-        UpdatePanelCurrentStateToNextPosition(ep2State, currentState);
         instance.ep2.GetLogic().SetCurrentState(currentState);
         isEndPoint2TargetReached = (currentState.Value().position.Value() == ep2State.target.Value().position.Value());
         ChipLogError(AppServer, "EndPoint 2 Current Position: %d, Target Position: %d", currentState.Value().position.Value(),
                                                                                           ep2State.target.Value().position.Value());
     }
-    
-    if (ep3State.target.Value().position.HasValue() && !isEndPoint3TargetReached)
+
+    if (UpdatePanelCurrentStateToNextPosition(ep3State, currentState))
     {
         // Update the current state for Endpoint 3
-        UpdatePanelCurrentStateToNextPosition(ep3State, currentState);
         instance.ep3.GetLogic().SetCurrentState(currentState);
         isEndPoint3TargetReached = (currentState.Value().position.Value() == ep3State.target.Value().position.Value());
         ChipLogError(AppServer, "EndPoint 3 Current Position: %d, Target Position: %d", currentState.Value().position.Value(),
                                                                                           ep3State.target.Value().position.Value());
     }
 
-    bool closureTargetReached = isEndPoint2TargetReached || isEndPoint3TargetReached;
+    bool closureTargetReached = isEndPoint2TargetReached && isEndPoint3TargetReached;
 
     ChipLogError(AppServer, "Motion progress possible: %s", closureTargetReached ? "true" : "false");
 
-    if (closureTargetReached)
+    if (!closureTargetReached)
     {
         instance.CancelTimer(); // Cancel any existing timer before starting a new action
         instance.SetCurrentAction(MOVE_TO_ACTION);
@@ -428,7 +426,7 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
     GetInstance().SetCurrentAction(Action_t::INVALID_ACTION);
 }
 
-void ClosureManager::UpdatePanelCurrentStateToNextPosition(
+bool ClosureManager::UpdatePanelCurrentStateToNextPosition(
                                 const chip::app::Clusters::ClosureDimension::ClusterState & epState,
                                 DataModel::Nullable<GenericCurrentStateStruct> & currentState) 
 
@@ -436,25 +434,25 @@ void ClosureManager::UpdatePanelCurrentStateToNextPosition(
   if (epState.target.IsNull())
   {
       ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to Target State is null");
-      return;
+      return false;
   }
 
   if (!epState.target.Value().position.HasValue())
   {
       ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to  Target position is not set");
-      return;
+      return false;
   }
 
   if (epState.currentState.IsNull())
   {
       ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to Current State is null");
-      return;
+      return false;
   }
 
   if (!epState.currentState.Value().position.HasValue())
   {
       ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to Current position is not set");
-      return;
+      return false;
   }
 
   chip::Percent100ths currentPosition = epState.currentState.Value().position.Value();
@@ -476,6 +474,7 @@ void ClosureManager::UpdatePanelCurrentStateToNextPosition(
   {
       // Already at target: No further action is needed as the current position matches the target position.
       nextCurrentPosition = currentPosition;
+      return false; // No update needed
   }
   
   currentState.SetNonNull().Set(
@@ -483,6 +482,7 @@ void ClosureManager::UpdatePanelCurrentStateToNextPosition(
             epState.currentState.Value().latch.HasValue() ? MakeOptional(epState.currentState.Value().latch.Value()) : NullOptional,
             epState.currentState.Value().speed.HasValue() ? MakeOptional(epState.currentState.Value().speed.Value()) : NullOptional
   );
+  return true;
 }
 
 bool ClosureManager::IsClosureLatchActionNeeded(const chip::app::Clusters::ClosureControl::ClusterState & epState)

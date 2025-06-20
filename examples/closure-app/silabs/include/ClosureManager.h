@@ -38,8 +38,8 @@ public:
     {
         CALIBRATE_ACTION = 0,
         MOVE_TO_ACTION,
-        STOP_MOTION_ACTION,
-        STOP_CALIBRATE_ACTION,
+        STOP_ACTION,
+        LATCH_ACTION,
 
         INVALID_ACTION
     };
@@ -212,9 +212,11 @@ private:
      * values if they are set in the current state.
      *
      * @param[in]  epState      The current cluster state of the closure dimension endpoint.
-     * @param[out] currentState The updated current state struct reflecting the next position.
+     * @param[out] currentState The updated current state struct reflecting the next position.  
+     * @return true if the current state need to be updated to the next position, 
+     *         false if the target position is already reached or update to next position failed.
      */
-    void UpdatePanelCurrentStateToNextPosition(const chip::app::Clusters::ClosureDimension::ClusterState & panelState, 
+    bool UpdatePanelCurrentStateToNextPosition(const chip::app::Clusters::ClosureDimension::ClusterState & panelState, 
             chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::GenericCurrentStateStruct> & currentState);
 
     /**
