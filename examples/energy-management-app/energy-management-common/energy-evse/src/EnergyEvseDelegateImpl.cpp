@@ -581,35 +581,58 @@ Status EnergyEvseDelegate::HwSetRFID(ByteSpan uid)
  */
 Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
 {
-    // TODO this code to be refactored - See Issue #30993
+    // If the input is empty, treat it as a request to clear the vehicle ID
+    if (newValue.empty())
+    {
+        mVehicleID.SetNull();
+        ChipLogDetail(AppServer, "VehicleID cleared");
+        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, VehicleID::Id);
+        return Status::Success;
+    }
+
     if (!mVehicleID.IsNull() && newValue.data_equal(mVehicleID.Value()))
     {
         return Status::Success;
     }
 
-    /* create a copy of the string so the callee doesn't have to keep it */
-    char * destinationBuffer = new char[kMaxVehicleIDBufSize];
-
-    MutableCharSpan destinationString(destinationBuffer, kMaxVehicleIDBufSize);
-    CHIP_ERROR err = CopyCharSpanToMutableCharSpan(newValue, destinationString);
-    if (err != CHIP_NO_ERROR)
+    if (newValue.size() > kMaxVehicleIDBufSize)
     {
-        ChipLogError(AppServer, "HwSetVehicleID - could not copy vehicleID");
-        delete[] destinationBuffer;
+        ChipLogError(AppServer, "HwSetVehicleID - input too long");
         return Status::Failure;
     }
 
-    if (!mVehicleID.IsNull())
-    {
-        delete[] mVehicleID.Value().data();
-    }
-
-    mVehicleID = MakeNullable(static_cast<CharSpan>(destinationString));
+    memcpy(mVehicleIDBuf, newValue.data(), newValue.size());
+    mVehicleID = MakeNullable(CharSpan(mVehicleIDBuf, newValue.size()));
 
     ChipLogDetail(AppServer, "VehicleID updated %.*s", static_cast<int>(mVehicleID.Value().size()), mVehicleID.Value().data());
     MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, VehicleID::Id);
 
     return Status::Success;
+}
+
+/**
+ * @brief Allows the caller to get a copy of the VehicleID into its own
+ *        MutableCharSpan avoiding potential use-after-free if vehicleID
+ *        was to change in the background
+ */
+CHIP_ERROR EnergyEvseDelegate::HwGetVehicleID(DataModel::Nullable<MutableCharSpan> & outValue)
+{
+    if (mVehicleID.IsNull())
+    {
+        outValue.SetNull();
+        return CHIP_NO_ERROR;
+    }
+
+    MutableCharSpan & buffer = outValue.Value();
+    if (buffer.size() < mVehicleID.Value().size())
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    memcpy(buffer.data(), mVehicleID.Value().data(), mVehicleID.Value().size());
+    buffer.reduce_size(mVehicleID.Value().size());
+
+    return CHIP_NO_ERROR;
 }
 
 /**
