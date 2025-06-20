@@ -18,3 +18,11 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/general-diagnostics-server.cpp"
 )
+
+# These are the things that BUILD.gn dependencies would pull
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/general-fault-listener.cpp"
+    "${CLUSTER_DIR}/general-fault-listener.h"
+)
