@@ -57,7 +57,7 @@ public:
     bool SetLength(size_t len)
     {
         VerifyOrReturnError(len <= mMaxSize, false);
-        mData[0] = static_cast<uint8_t>(len);
+        mData[0] = static_cast<T>(len);
         return true;
     }
 
