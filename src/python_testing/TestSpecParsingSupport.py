@@ -268,10 +268,10 @@ class TestSpecParsingSupport(MatterBaseTest):
 
     def test_build_xml_override(self):
         one_two_clusters, one_two_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_2)
-        one_four_two_xml_clusters, one_four_two_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
         one_three_clusters, one_three_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
         one_four_clusters, one_four_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
         one_four_one_clusters, one_four_one_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
+        one_four_two_xml_clusters, one_four_two_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
 
         # We know 1.2, 1.3, 1.4 and 1.4.1, 1.4.2 are clear of errors, ensure it stays that way.
         asserts.assert_equal(len(one_two_problems), 0, "Unexpected problems found on 1.2 cluster parsing")
