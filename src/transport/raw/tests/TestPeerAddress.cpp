@@ -103,8 +103,8 @@ TEST(TestPeerAddress, TestToString)
 
 TEST(TestPeerAddress, TestEqualityOperator)
 {
-    using chip::Inet::IPAddress;
     using chip::Inet::InterfaceId;
+    using chip::Inet::IPAddress;
     using chip::Transport::PeerAddress;
     using chip::Transport::Type;
 
@@ -155,13 +155,13 @@ TEST(TestPeerAddress, TestEqualityOperator)
     // 9. WiFiPAF transport with same remote ID ? equal
     constexpr chip::NodeId nodeId1 = 0x123456789ABCDEF0;
     constexpr chip::NodeId nodeId2 = 0x123456789ABCDEF0;
-    PeerAddress wifi1 = PeerAddress::WiFiPAF(nodeId1);
-    PeerAddress wifi2 = PeerAddress::WiFiPAF(nodeId2);
+    PeerAddress wifi1              = PeerAddress::WiFiPAF(nodeId1);
+    PeerAddress wifi2              = PeerAddress::WiFiPAF(nodeId2);
     EXPECT_TRUE(wifi1 == wifi2);
 
     // 10. WiFiPAF transport with different remote ID ? not equal
     constexpr chip::NodeId nodeId3 = 0x0FEDCBA987654321;
-    PeerAddress wifi3 = PeerAddress::WiFiPAF(nodeId3);
+    PeerAddress wifi3              = PeerAddress::WiFiPAF(nodeId3);
     EXPECT_FALSE(wifi1 == wifi3);
 
     // 11. Cross-type comparisons: BLE != NFC, BLE != UDP, BLE != TCP, NFC != UDP, NFC != TCP, UDP != WiFiPAF
