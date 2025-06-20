@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <string>
 #include <lib/core/CASEAuthTag.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/NodeId.h>
@@ -36,8 +37,6 @@ public:
      * null, falls back to getenv("TMPDIR") and if that is not set falls back
      * to /tmp.
      *
-     * If non-null values are provided, the memory they point to is expected to
-     * outlive this object.
      */
     CHIP_ERROR Init(const char * name = nullptr, const char * directory = nullptr);
 
@@ -71,8 +70,9 @@ public:
     const char * GetDirectory() const;
 
 private:
-    CHIP_ERROR CommitConfig(const char * directory, const char * name);
+    CHIP_ERROR CommitConfig();
+    std::string GenerateFilename(const std::string & name) const;
     inipp::Ini<char> mConfig;
-    const char * mName;
-    const char * mDirectory;
+    std::string mUsedFilename;
+    std::string mUsedDirectory;
 };
