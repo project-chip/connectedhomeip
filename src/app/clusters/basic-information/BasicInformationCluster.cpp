@@ -377,11 +377,13 @@ CHIP_ERROR BasicInformationCluster::Attributes(const ConcreteClusterPath & path,
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(8));
 
 #define OPTIONAL_ATTR_SET(name)                                                                                                    \
-    if (mEnabledOptionalAttributes.Has(OptionalBasicInformationAttributes::k##name))                                               \
+    do                                                                                                                             \
     {                                                                                                                              \
-        ReturnErrorOnFailure(builder.Append(name::kMetadataEntry));                                                                \
-    }                                                                                                                              \
-    (void) 0
+        if (mEnabledOptionalAttributes.Has(OptionalBasicInformationAttributes::k##name))                                           \
+        {                                                                                                                          \
+            ReturnErrorOnFailure(builder.Append(name::kMetadataEntry));                                                            \
+        }                                                                                                                          \
+    } while (false)
 
     OPTIONAL_ATTR_SET(ManufacturingDate);
     OPTIONAL_ATTR_SET(PartNumber);

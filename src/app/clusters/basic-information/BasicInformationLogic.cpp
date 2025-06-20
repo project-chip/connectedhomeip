@@ -38,10 +38,12 @@ CHIP_ERROR BasicInformationLogic::Init()
     //
     // Some prototype:
     //
-    // ReadDestination data(mNodeLabelBuffer);
+    // MutableCharSpan dest(mNodeLabelBuffer);
     //
-    // ReturnErrorOnFailure(mPersistence.ReadAttribute({kRootEndpointId, BasicInformation::Id, NodeLabel::Id}, data));
-    // mNodeLabelSize = data.size();
+    // ReturnErrorOnFailure(mPersistence.ReadAttribute(
+    //     {kRootEndpointId, BasicInformation::Id, NodeLabel::Id}, dest)
+    // );
+    // mNodeLabelSize = dest.size();
     return CHIP_NO_ERROR;
 }
 
@@ -60,7 +62,7 @@ DataModel::ActionReturnStatus BasicInformationLogic::SetNodeLabel(CharSpan label
     //
     //   return mPersistence.WriteAttribute(
     //     {kRootEndpointId, BasicInformation::Id, NodeLabel::Id},
-    //     AttributeData(label)
+    //     GetNodeLabel()
     //   );
 
     return CHIP_NO_ERROR;
