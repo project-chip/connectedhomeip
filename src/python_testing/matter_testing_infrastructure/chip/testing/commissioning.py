@@ -27,6 +27,7 @@ from chip import ChipDeviceCtrl, discovery
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.exceptions import ChipStackError
+from mobly import asserts
 
 logger = logging.getLogger("matter.python_testing")
 logger.setLevel(logging.INFO)
@@ -156,8 +157,11 @@ async def commission_device(
             return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "ble-wifi":
         try:
-            assert commissioning_info.wifi_ssid is not None, "WiFi SSID must be provided for ble-wifi commissioning"
-            assert commissioning_info.wifi_passphrase is not None, "WiFi Passphrase must be provided for ble-wifi commissioning"
+            asserts.assert_is_not_none(commissioning_info.wifi_ssid, "WiFi SSID must be provided for ble-wifi commissioning")
+            asserts.assert_is_not_none(commissioning_info.wifi_passphrase, "WiFi Passphrase must be provided for ble-wifi commissioning")
+            # Type assertions to help mypy understand these are not None after the asserts
+            assert commissioning_info.wifi_ssid is not None
+            assert commissioning_info.wifi_passphrase is not None
             await dev_ctrl.CommissionWiFi(
                 info.filter_value,
                 info.passcode,
@@ -172,7 +176,9 @@ async def commission_device(
             return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "ble-thread":
         try:
-            assert commissioning_info.thread_operational_dataset is not None, "Thread dataset must be provided for ble-thread commissioning"
+            asserts.assert_is_not_none(commissioning_info.thread_operational_dataset, "Thread dataset must be provided for ble-thread commissioning")
+            # Type assertion to help mypy understand this is not None after the assert
+            assert commissioning_info.thread_operational_dataset is not None
             await dev_ctrl.CommissionThread(
                 info.filter_value,
                 info.passcode,
