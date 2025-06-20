@@ -329,6 +329,13 @@ struct TestGlobalStruct {
   optional nullable TestGlobalEnum myEnum = 2;
 }
 
+struct ViewportStruct {
+  int16u x1 = 0;
+  int16u y1 = 1;
+  int16u x2 = 2;
+  int16u y2 = 3;
+}
+
 fabric_scoped struct WebRTCSessionStruct {
   int16u id = 0;
   node_id peerNodeID = 1;
@@ -1294,7 +1301,7 @@ cluster LocalizationConfiguration = 43 {
       or audibly convey time information need a mechanism by which they can be configured to use a
       user’s preferred format. */
 cluster TimeFormatLocalization = 44 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum CalendarTypeEnum : enum8 {
     kBuddhist = 0;
@@ -1730,7 +1737,7 @@ cluster GeneralCommissioning = 48 {
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 cluster NetworkCommissioning = 49 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum NetworkCommissioningStatusEnum : enum8 {
     kSuccess = 0;
@@ -3385,7 +3392,7 @@ cluster ModeSelect = 80 {
     int8u newMode = 0;
   }
 
-  /** On receipt of this command, if the NewMode field matches the Mode field in an entry of the SupportedModes list, the server SHALL set the CurrentMode attribute to the NewMode value, otherwise, the server SHALL respond with an INVALID_COMMAND status response. */
+  /** On receipt of this command, if the NewMode field indicates a valid mode transition within the supported list, the server SHALL set the CurrentMode attribute to the NewMode value, otherwise, the server SHALL respond with an INVALID_COMMAND status response. */
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
 }
 
@@ -6678,7 +6685,7 @@ provisional cluster ClosureDimension = 261 {
 }
 
 /** The Service Area cluster provides an interface for controlling the areas where a device should operate, and for querying the current area being serviced. */
-provisional cluster ServiceArea = 336 {
+cluster ServiceArea = 336 {
   revision 2;
 
   enum OperationalStatusEnum : enum8 {
@@ -8524,8 +8531,8 @@ cluster ThreadNetworkDirectory = 1107 {
     int64u activeTimestamp = 3;
   }
 
-  attribute access(read: manage, write: manage) nullable octet_string<8> preferredExtendedPanID = 0;
-  readonly attribute access(read: operate) ThreadNetworkStruct threadNetworks[] = 1;
+  attribute access(write: manage) nullable octet_string<8> preferredExtendedPanID = 0;
+  readonly attribute ThreadNetworkStruct threadNetworks[] = 1;
   readonly attribute int8u threadNetworkTableSize = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -8554,7 +8561,7 @@ cluster ThreadNetworkDirectory = 1107 {
   /** Removes an entry from the ThreadNetworks list. */
   timed command access(invoke: manage) RemoveNetwork(RemoveNetworkRequest): DefaultSuccess = 1;
   /** Retrieves a Thread Operational Dataset from the ThreadNetworks list. */
-  command GetOperationalDataset(GetOperationalDatasetRequest): OperationalDatasetResponse = 2;
+  command access(invoke: manage) GetOperationalDataset(GetOperationalDatasetRequest): OperationalDatasetResponse = 2;
 }
 
 /** This cluster provides an interface for managing low power mode on a device that supports the Wake On LAN protocol. */
@@ -9774,8 +9781,8 @@ provisional cluster CameraAvStreamManagement = 1361 {
     VideoResolutionStruct maxResolution = 6;
     int32u minBitRate = 7;
     int32u maxBitRate = 8;
-    int16u minFragmentLen = 9;
-    int16u maxFragmentLen = 10;
+    int16u minKeyFrameInterval = 9;
+    int16u maxKeyFrameInterval = 10;
     optional boolean watermarkEnabled = 11;
     optional boolean OSDEnabled = 12;
     int8u referenceCount = 13;
@@ -9834,13 +9841,6 @@ provisional cluster CameraAvStreamManagement = 1361 {
     optional int16u maxHDRFPS = 3;
   }
 
-  shared struct ViewportStruct {
-    int16u x1 = 0;
-    int16u y1 = 1;
-    int16u x2 = 2;
-    int16u y2 = 3;
-  }
-
   readonly attribute optional int8u maxConcurrentEncoders = 0;
   readonly attribute optional int32u maxEncodedPixelRate = 1;
   readonly attribute optional VideoSensorParamsStruct videoSensorParams = 2;
@@ -9859,7 +9859,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   readonly attribute optional VideoStreamStruct allocatedVideoStreams[] = 15;
   readonly attribute optional AudioStreamStruct allocatedAudioStreams[] = 16;
   readonly attribute optional SnapshotStreamStruct allocatedSnapshotStreams[] = 17;
-  readonly attribute optional StreamUsageEnum rankedVideoStreamPrioritiesList[] = 18;
+  readonly attribute StreamUsageEnum streamUsagePriorities[] = 18;
   attribute optional boolean softRecordingPrivacyModeEnabled = 19;
   attribute optional boolean softLivestreamPrivacyModeEnabled = 20;
   readonly attribute optional boolean hardPrivacyModeOn = 21;
@@ -9914,8 +9914,8 @@ provisional cluster CameraAvStreamManagement = 1361 {
     VideoResolutionStruct maxResolution = 5;
     int32u minBitRate = 6;
     int32u maxBitRate = 7;
-    int16u minFragmentLen = 8;
-    int16u maxFragmentLen = 9;
+    int16u minKeyFrameInterval = 8;
+    int16u maxKeyFrameInterval = 9;
     optional boolean watermarkEnabled = 10;
     optional boolean OSDEnabled = 11;
   }
@@ -10017,13 +10017,6 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
     int8u presetID = 0;
     char_string<32> name = 1;
     MPTZStruct settings = 2;
-  }
-
-  shared struct ViewportStruct {
-    int16u x1 = 0;
-    int16u y1 = 1;
-    int16u x2 = 2;
-    int16u y2 = 3;
   }
 
   struct DPTZStruct {
@@ -11041,6 +11034,11 @@ provisional cluster JointFabricAdministrator = 1875 {
 provisional cluster TlsCertificateManagement = 2049 {
   revision 1;
 
+  enum StatusCodeEnum : enum8 {
+    kCertificateAlreadyInstalled = 2;
+    kDuplicateKey = 3;
+  }
+
   fabric_scoped struct TLSCertStruct {
     int16u caid = 0;
     optional long_octet_string<3000> certificate = 1;
@@ -11094,13 +11092,13 @@ provisional cluster TlsCertificateManagement = 2049 {
   }
 
   request struct TLSClientCSRRequest {
-    octet_string nonce = 0;
+    octet_string<128> nonce = 0;
   }
 
   response struct TLSClientCSRResponse = 8 {
     int16u ccdid = 0;
-    octet_string csr = 1;
-    octet_string nonce = 2;
+    long_octet_string<3000> csr = 1;
+    octet_string<128> nonce = 2;
   }
 
   request struct ProvisionClientCertificateRequest {
@@ -11152,18 +11150,26 @@ provisional cluster TlsCertificateManagement = 2049 {
 provisional cluster TlsClientManagement = 2050 {
   revision 1;
 
+  enum StatusCodeEnum : enum8 {
+    kEndpointAlreadyInstalled = 2;
+    kRootCertificateNotFound = 3;
+    kClientCertificateNotFound = 4;
+    kEndpointInUse = 5;
+  }
+
   enum TLSEndpointStatusEnum : enum8 {
     kProvisioned = 0;
     kInUse = 1;
   }
 
-  struct TLSEndpointStruct {
+  fabric_scoped struct TLSEndpointStruct {
     int16u endpointID = 0;
     octet_string<253> hostname = 1;
     int16u port = 2;
     int16u caid = 3;
     nullable int16u ccdid = 4;
     TLSEndpointStatusEnum status = 5;
+    fabric_idx fabricIndex = 254;
   }
 
   readonly attribute int8u maxProvisioned = 0;
@@ -11175,7 +11181,7 @@ provisional cluster TlsClientManagement = 2050 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct ProvisionEndpointRequest {
-    octet_string hostname = 0;
+    octet_string<253> hostname = 0;
     int16u port = 1;
     int16u caid = 2;
     nullable int16u ccdid = 3;
@@ -11187,22 +11193,22 @@ provisional cluster TlsClientManagement = 2050 {
   }
 
   request struct FindEndpointRequest {
-    nullable int16u endpointID = 0;
+    int16u endpointID = 0;
   }
 
   response struct FindEndpointResponse = 3 {
-    TLSEndpointStruct endpoints[] = 0;
+    TLSEndpointStruct endpoint = 0;
   }
 
   request struct RemoveEndpointRequest {
     int16u endpointID = 0;
   }
 
-  /** This command SHALL provision a TLS Endpoint for the provided HostName / Port combination. */
+  /** This command is used to provision a TLS Endpoint for the provided HostName / Port combination. */
   fabric command access(invoke: administer) ProvisionEndpoint(ProvisionEndpointRequest): ProvisionEndpointResponse = 0;
-  /** This command SHALL return the TLS Endpoint details for the passed in EndpointID, or all provisioned endpoints if null */
+  /** This command is used to find a TLS Endpoint by its ID. */
   fabric command FindEndpoint(FindEndpointRequest): FindEndpointResponse = 2;
-  /** This command SHALL be generated to request the Node remove any TLS Endpoint. */
+  /** This command is used to remove a TLS Endpoint by its ID. */
   fabric command access(invoke: administer) RemoveEndpoint(RemoveEndpointRequest): DefaultSuccess = 4;
 }
 

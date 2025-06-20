@@ -329,6 +329,13 @@ struct TestGlobalStruct {
   optional nullable TestGlobalEnum myEnum = 2;
 }
 
+struct ViewportStruct {
+  int16u x1 = 0;
+  int16u y1 = 1;
+  int16u x2 = 2;
+  int16u y2 = 3;
+}
+
 fabric_scoped struct WebRTCSessionStruct {
   int16u id = 0;
   node_id peerNodeID = 1;
@@ -696,7 +703,7 @@ cluster GeneralCommissioning = 48 {
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 cluster NetworkCommissioning = 49 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum NetworkCommissioningStatusEnum : enum8 {
     kSuccess = 0;
@@ -1635,8 +1642,8 @@ cluster ThreadNetworkDirectory = 1107 {
     int64u activeTimestamp = 3;
   }
 
-  attribute access(read: manage, write: manage) nullable octet_string<8> preferredExtendedPanID = 0;
-  readonly attribute access(read: operate) ThreadNetworkStruct threadNetworks[] = 1;
+  attribute access(write: manage) nullable octet_string<8> preferredExtendedPanID = 0;
+  readonly attribute ThreadNetworkStruct threadNetworks[] = 1;
   readonly attribute int8u threadNetworkTableSize = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1665,7 +1672,7 @@ cluster ThreadNetworkDirectory = 1107 {
   /** Removes an entry from the ThreadNetworks list. */
   timed command access(invoke: manage) RemoveNetwork(RemoveNetworkRequest): DefaultSuccess = 1;
   /** Retrieves a Thread Operational Dataset from the ThreadNetworks list. */
-  command GetOperationalDataset(GetOperationalDatasetRequest): OperationalDatasetResponse = 2;
+  command access(invoke: manage) GetOperationalDataset(GetOperationalDatasetRequest): OperationalDatasetResponse = 2;
 }
 
 endpoint 0 {
@@ -1861,7 +1868,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
     handle command RevokeCommissioning;

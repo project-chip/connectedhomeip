@@ -132,7 +132,8 @@ class TC_IDM_1_4(MatterBaseTest):
             asserts.assert_equal(e.status, Status.InvalidAction,
                                  "DUT sent back an unexpected error, we were expecting InvalidAction")
             logging.info("DUT successfully failed to process `MaxPathsPerInvoke + 1` InvokeRequests")
-        except ChipStackError as e:
+        except ChipStackError as e:  # chipstack-ok: Multiple error types are expected depending on DUT capability
+            # assert_raises is not used here because we validate error types
             chip_error_no_memory = 0x0b
             asserts.assert_equal(e.err, chip_error_no_memory, "Unexpected error while trying to send InvokeRequest")
             # TODO it is possible we want to confirm DUT can handle up to MTU max. But that is not in test plan as of right now.
@@ -141,7 +142,8 @@ class TC_IDM_1_4(MatterBaseTest):
             logging.info("DUTs reported MaxPathsPerInvoke + 1 is larger than what fits into MTU. Test step is skipped")
 
         if max_paths_per_invoke == 1:
-            self.skip_all_remaining_steps(3)
+            self.mark_all_remaining_steps_skipped(3)
+            return
         else:
             asserts.assert_true('PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY' in self.matter_test_config.global_test_params,
                                 "PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY must be included on the command line in "
