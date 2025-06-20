@@ -19,7 +19,9 @@ syntax = "proto3";
 import 'pw_protobuf_protos/common.proto';
 
 message OwnershipContext {
-  uint64 node_id = 1;
+  uint64 node_id = 1; // jf-admin-app should finalize commissioning with this specific node_id
+  bool jcm = 2; // should be set to true if jf-admin-app has to finalize the jcm process
+  bytes trustedIcacPublicKeyB = 3; // see spec., JCM steps
 }
 
 service JointFabric {
