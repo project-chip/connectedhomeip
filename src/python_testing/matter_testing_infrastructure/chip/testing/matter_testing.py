@@ -1388,7 +1388,6 @@ class MatterBaseTest(base_test.BaseTestClass):
                 test_duration = 0
             # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
             self.runner_hook.step_failure(logger=None, logs=None, duration=step_duration, request=None, received=None)
-            
             # Convert a potentially complex exception (with custom types or non-serializable data)
             # into a simple Exception containing only the message and stacktrace, making it safe
             # to send across process boundaries or for reporting purposes.
