@@ -106,5 +106,5 @@ class JFControllerSubprocess(Subprocess):
                          output_cb=lambda line, is_stderr: self.PREFIX + line)
 
     def __del__(self):
-        # Remove folder used for storage
+        # Remove file used for storage
         os.remove(self.storage_dir)
