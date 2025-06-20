@@ -21,6 +21,8 @@ import("${chip_root}/build/chip/buildconfig_header.gni")
 
 import("device.gni")
 
+import("${chip_root}/src/crypto/crypto.gni")
+
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
 
@@ -225,6 +227,9 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_LAYER_TARGET=Linux",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
+      if (chip_with_trusty_os) {
+        defines += [ "CHIP_ATTESTATION_TRUSTY_OS=1" ]
+      }
     } else if (chip_device_platform == "tizen") {
       device_layer_target_define = "TIZEN"
       defines += [
