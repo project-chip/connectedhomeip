@@ -408,7 +408,7 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorThenError)
     ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), static_cast<BleLayer*>(this)), CHIP_NO_ERROR);
 
     // Simulate error
-    BleConnectionDelegate::OnConnectionError(static_cast<BleLayer*>(this), CHIP_NO_ERROR);
+    BleConnectionDelegate::OnConnectionError(static_cast<BleLayer*>(this), CHIP_ERROR_CONNECTION_ABORTED);
 
     EXPECT_FALSE(mOnBleConnectionCompleteCalled);
     EXPECT_TRUE(mOnBleConnectionErrorCalled);
