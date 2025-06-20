@@ -10,6 +10,9 @@ using SilabsConfig = chip::DeviceLayer::Internal::SilabsConfig;
 namespace {
 namespace Legacy {
 
+//
+// These constants must match the ZAP configuration used to generate the data.
+//
 static constexpr uint16_t kMaxUserName               = 10;
 static constexpr uint16_t kMaxUsers                  = 6;
 static constexpr uint8_t kMaxCredentialsPerUser      = 5;
@@ -93,7 +96,7 @@ bool ReadKey(SilabsConfig::Key key, uint8_t *&p, size_t &size)
 
 bool MigrateCredentials(chip::EndpointId endpoint_id)
 {
-    constexpr size_t single_type_creds_size = Legacy::kMaxCredentials * Legacy::kMaxCredentialSize;
+    constexpr size_t kSingleTypeCredsSize = Legacy::kMaxCredentials * Legacy::kMaxCredentialSize;
     uint8_t *creds_data_buffer = nullptr;
     uint8_t *creds_info_buffer = nullptr;
     bool success = true;
@@ -106,8 +109,8 @@ bool MigrateCredentials(chip::EndpointId endpoint_id)
         size_t creds_type_count = 0;
         VerifyOrReturnValue(ReadKey(SilabsConfig::kConfigKey_CredentialData, creds_data_buffer, creds_data_size), false);
         VerifyOrReturnValue(nullptr != creds_data_buffer, false);
-        VerifyOrExit((creds_data_size > single_type_creds_size) && (0 == creds_data_size % single_type_creds_size), success=false);
-        creds_type_count = creds_data_size / single_type_creds_size;
+        VerifyOrExit((creds_data_size > kSingleTypeCredsSize) && (0 == creds_data_size % kSingleTypeCredsSize), success=false);
+        creds_type_count = creds_data_size / kSingleTypeCredsSize;
         VerifyOrExit(kNumCredentialTypes == creds_type_count, success=false);
     }
 
@@ -116,14 +119,14 @@ bool MigrateCredentials(chip::EndpointId endpoint_id)
     //   EmberAfPluginDoorLockCredentialInfo mLockCredentials[kNumCredentialTypes][kMaxCredentials];
     //   kConfigKey_Credential = 0x87311
     {
-        constexpr size_t single_type_info_size = Legacy::kMaxCredentials * sizeof(Legacy::EmberAfPluginDoorLockCredentialInfo);
+        constexpr size_t kSingleTypeInfoSize = Legacy::kMaxCredentials * sizeof(Legacy::EmberAfPluginDoorLockCredentialInfo);
         Legacy::EmberAfPluginDoorLockCredentialInfo *creds_info = nullptr;
         size_t creds_info_size = 0;
         size_t type_info_count = 0;
         VerifyOrExit(ReadKey(SilabsConfig::kConfigKey_Credential, creds_info_buffer, creds_info_size), success=false);
         VerifyOrExit(nullptr != creds_info_buffer, success=false);
-        VerifyOrExit((creds_info_size > single_type_info_size) && (0 == creds_info_size % single_type_info_size), success=false);
-        type_info_count = creds_info_size / single_type_info_size;
+        VerifyOrExit((creds_info_size > kSingleTypeInfoSize) && (0 == creds_info_size % kSingleTypeInfoSize), success=false);
+        type_info_count = creds_info_size / kSingleTypeInfoSize;
         VerifyOrExit(kNumCredentialTypes == type_info_count, success=false);
         creds_info = (Legacy::EmberAfPluginDoorLockCredentialInfo*)creds_info_buffer;
 
@@ -137,7 +140,7 @@ bool MigrateCredentials(chip::EndpointId endpoint_id)
                 Legacy::EmberAfPluginDoorLockCredentialInfo &info = creds_info[(type_idx *  Legacy::kMaxCredentials) + cred_idx];
                 if(DlCredentialStatus::kOccupied == info.status)
                 {
-                    uint8_t *data = creds_data_buffer + (type_idx * single_type_creds_size + cred_idx * Legacy::kMaxCredentialSize);
+                    uint8_t *data = creds_data_buffer + (type_idx * kSingleTypeCredsSize + cred_idx * Legacy::kMaxCredentialSize);
                     const chip::ByteSpan data_span(data, info.credentialData.size());
                     success = LockMgr().SetCredential(endpoint_id, cred_idx, info.createdBy, info.lastModifiedBy, info.status, info.credentialType, data_span);
                 }
@@ -153,8 +156,7 @@ exit:
 
 bool MigrateUsers(chip::EndpointId endpoint_id)
 {
-    constexpr size_t single_name_size = Legacy::kMaxUserName;
-    constexpr size_t single_user_creds_size = sizeof(Legacy::CredentialStruct) * Legacy::kMaxCredentials;
+    constexpr size_t kSingleUserCredsSize = sizeof(Legacy::CredentialStruct) * Legacy::kMaxCredentials;
     Legacy::CredentialStruct *all_user_creds = nullptr;
     Legacy::EmberAfPluginDoorLockUserInfo *users_info = nullptr;
     uint8_t *user_creds_buffer = nullptr;
@@ -175,8 +177,8 @@ bool MigrateUsers(chip::EndpointId endpoint_id)
 
         VerifyOrReturnValue(ReadKey(SilabsConfig::kConfigKey_UserCredentials, user_creds_buffer, user_creds_size), false);
         VerifyOrReturnValue(nullptr != user_creds_buffer, false);
-        VerifyOrExit((user_creds_size > single_user_creds_size) && (0 == user_creds_size % single_user_creds_size), success=false);
-        user_creds_count = user_creds_size / single_user_creds_size;
+        VerifyOrExit((user_creds_size > kSingleUserCredsSize) && (0 == user_creds_size % kSingleUserCredsSize), success=false);
+        user_creds_count = user_creds_size / kSingleUserCredsSize;
         VerifyOrExit(Legacy::kMaxUsers == user_creds_count, success=false);
         all_user_creds = (Legacy::CredentialStruct *)user_creds_buffer;
     }
@@ -190,8 +192,8 @@ bool MigrateUsers(chip::EndpointId endpoint_id)
         size_t names_count = 0;
         VerifyOrExit(ReadKey(SilabsConfig::kConfigKey_LockUserName, names_buffer, names_size), success=false);
         VerifyOrExit(nullptr != names_buffer, success=false);
-        VerifyOrExit((names_size > single_name_size) && (0 == names_size % single_name_size), success=false);
-        names_count = names_size / single_name_size;
+        VerifyOrExit((names_size > Legacy::kMaxUserName) && (0 == names_size % Legacy::kMaxUserName), success=false);
+        names_count = names_size / Legacy::kMaxUserName;
         VerifyOrExit(Legacy::kMaxUsers == names_count, success=false);
     }
 
@@ -200,21 +202,21 @@ bool MigrateUsers(chip::EndpointId endpoint_id)
     //  EmberAfPluginDoorLockUserInfo mLockUsers[kMaxUsers];
     //  kConfigKey_LockUser = 0x87310
     {
-        constexpr size_t single_info_size = sizeof(Legacy::EmberAfPluginDoorLockUserInfo);
+        constexpr size_t kSingleInfoSize = sizeof(Legacy::EmberAfPluginDoorLockUserInfo);
         size_t total_info_size = 0;
         VerifyOrExit(ReadKey(SilabsConfig::kConfigKey_LockUser, users_buffer, total_info_size), success=false);
         VerifyOrExit(nullptr != users_buffer, success=false);
-        VerifyOrExit((total_info_size > single_info_size) && (0 == total_info_size % single_info_size), success=false);
-        user_count = total_info_size / single_info_size;
+        VerifyOrExit((total_info_size > kSingleInfoSize) && (0 == total_info_size % kSingleInfoSize), success=false);
+        user_count = total_info_size / kSingleInfoSize;
         VerifyOrExit(Legacy::kMaxUsers == user_count, success=false);
         users_info = (Legacy::EmberAfPluginDoorLockUserInfo*) users_buffer;
     }
 
     for (size_t user_idx = 0; success && (user_idx < user_count); user_idx++)
     {
-        const char *name = (const char *)(names_buffer + single_name_size * user_idx);
+        const char *name = (const char *)(names_buffer + Legacy::kMaxUserName * user_idx);
         Legacy::EmberAfPluginDoorLockUserInfo &info = users_info[user_idx];
-        Legacy::CredentialStruct *creds = all_user_creds + (user_idx * single_user_creds_size);
+        Legacy::CredentialStruct *creds = all_user_creds + (user_idx * kSingleUserCredsSize);
         CredentialStruct creds2[Legacy::kMaxCredentials];
         VerifyOrExit(Legacy::kMaxCredentials >= info.credentials.size(), success=false);
         // Translate credentials
@@ -254,12 +256,12 @@ bool MigrateSchedules(chip::EndpointId endpoint_id)
     //   Read/write: sizeof(EmberAfPluginDoorLockWeekDaySchedule) * LockParams.numberOfWeekdaySchedulesPerUser * LockParams.numberOfUsers
     //   kConfigKey_WeekDaySchedules = 0x87315
     {
-        constexpr size_t single_schedule_size = sizeof(Legacy::WeekDaysScheduleInfo);
+        constexpr size_t kSingleScheduleSize = sizeof(Legacy::WeekDaysScheduleInfo);
         size_t schedules_size = 0;
         VerifyOrReturnValue(ReadKey(SilabsConfig::kConfigKey_WeekDaySchedules, week_schedules_buffer, schedules_size), false);
         VerifyOrReturnValue(nullptr != week_schedules_buffer, false);
-        VerifyOrExit((schedules_size > single_schedule_size) && (0 == schedules_size % single_schedule_size), success=false);
-        week_schedules_count = schedules_size / single_schedule_size;
+        VerifyOrExit((schedules_size > kSingleScheduleSize) && (0 == schedules_size % kSingleScheduleSize), success=false);
+        week_schedules_count = schedules_size / kSingleScheduleSize;
         user_count = week_schedules_count / Legacy::kMaxWeekdaySchedulesPerUser;
         VerifyOrExit(Legacy::kMaxUsers == user_count, success=false);
         VerifyOrExit(Legacy::kMaxUsers * Legacy::kMaxWeekdaySchedulesPerUser == week_schedules_count, success=false);
@@ -271,12 +273,12 @@ bool MigrateSchedules(chip::EndpointId endpoint_id)
     //   sizeof(EmberAfPluginDoorLockYearDaySchedule) * LockParams.numberOfYeardaySchedulesPerUser * LockParams.numberOfUsers;
     //   kConfigKey_YearDaySchedules = 0x87316
     {
-        constexpr size_t single_schedule_size = sizeof(Legacy::YearDayScheduleInfo);
+        constexpr size_t kSingleScheduleSize = sizeof(Legacy::YearDayScheduleInfo);
         size_t schedules_size = 0;
         VerifyOrExit(ReadKey(SilabsConfig::kConfigKey_YearDaySchedules, year_schedules_buffer, schedules_size), success=false);
         VerifyOrExit(nullptr != year_schedules_buffer, success=false);
-        VerifyOrExit((schedules_size > single_schedule_size) && (0 == schedules_size % single_schedule_size), success=false);
-        year_schedules_count = schedules_size / single_schedule_size;
+        VerifyOrExit((schedules_size > kSingleScheduleSize) && (0 == schedules_size % kSingleScheduleSize), success=false);
+        year_schedules_count = schedules_size / kSingleScheduleSize;
         user_count = year_schedules_count / Legacy::kMaxYeardaySchedulesPerUser;
         VerifyOrExit(Legacy::kMaxUsers == user_count, success=false);
         VerifyOrExit(Legacy::kMaxUsers * Legacy::kMaxYeardaySchedulesPerUser == year_schedules_count, success=false);
@@ -315,14 +317,14 @@ bool MigrateSchedules(chip::EndpointId endpoint_id)
     //   Read/write: sizeof(EmberAfPluginDoorLockHolidaySchedule) * LockParams.numberOfHolidaySchedules
     //   kConfigKey_HolidaySchedules = 0x87317
     {
-        constexpr size_t single_schedule_size = sizeof(Legacy::HolidayScheduleInfo);
+        constexpr size_t kSingleScheduleSize = sizeof(Legacy::HolidayScheduleInfo);
         Legacy::HolidayScheduleInfo *holiday_schedules = nullptr;
         size_t holiday_schedules_count = 0;
         size_t schedules_size = 0;
         VerifyOrExit(ReadKey(SilabsConfig::kConfigKey_HolidaySchedules, holiday_schedules_buffer, schedules_size), success=false);
         VerifyOrExit(nullptr != holiday_schedules_buffer, success=false);
-        VerifyOrExit((schedules_size > single_schedule_size) && (0 == schedules_size % single_schedule_size), success=false);
-        holiday_schedules_count = schedules_size / single_schedule_size;
+        VerifyOrExit((schedules_size > kSingleScheduleSize) && (0 == schedules_size % kSingleScheduleSize), success=false);
+        holiday_schedules_count = schedules_size / kSingleScheduleSize;
         VerifyOrExit(Legacy::kMaxHolidaySchedules == holiday_schedules_count, success=false);
         holiday_schedules = (Legacy::HolidayScheduleInfo *) holiday_schedules_buffer;
 
