@@ -341,6 +341,13 @@ CHIP_ERROR ClusterLogic::SetOverallTarget(const DataModel::Nullable<GenericOvera
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ClusterLogic::SetCurrentErrorList(ClosureErrorEnum error)
+{
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(EnsureKnownEnumValue(error) != ClosureErrorEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+    return mDelegate.AddErrorToCurrentErrorList(error);
+}
+
 // TODO: Move the CountdownTime handling to Delegate
 CHIP_ERROR ClusterLogic::GetCountdownTime(DataModel::Nullable<ElapsedS> & countdownTime)
 {
