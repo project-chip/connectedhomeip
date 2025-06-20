@@ -61,7 +61,7 @@ public:
     // to check if the callbacks are invoked correctly.
     bool mOnBleConnectionCompleteCalled = false;
     bool mOnBleConnectionErrorCalled    = false;
-    
+
     static void SetUpTestSuite()
     {
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
