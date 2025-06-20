@@ -76,7 +76,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
 
     @async_test_body
     async def test_TC_CLDIM_2_1(self):
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint(default=2)
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
         self.step(1)
