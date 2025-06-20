@@ -7067,7 +7067,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRClosureDimensionClusterCurrentStateStruct
+@implementation MTRClosureDimensionClusterDimensionStateStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7083,7 +7083,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRClosureDimensionClusterCurrentStateStruct alloc] init];
+    auto other = [[MTRClosureDimensionClusterDimensionStateStruct alloc] init];
 
     other.position = self.position;
     other.latch = self.latch;
@@ -7125,39 +7125,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: min:%@; max:%@; >", NSStringFromClass([self class]), _min, _max];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRClosureDimensionClusterTargetStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _position = nil;
-
-        _latch = nil;
-
-        _speed = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRClosureDimensionClusterTargetStruct alloc] init];
-
-    other.position = self.position;
-    other.latch = self.latch;
-    other.speed = self.speed;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: position:%@; latch:%@; speed:%@; >", NSStringFromClass([self class]), _position, _latch, _speed];
     return descriptionString;
 }
 
