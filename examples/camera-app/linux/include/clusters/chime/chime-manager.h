@@ -38,8 +38,10 @@ public:
 private:
     using ChimeSoundStructType = chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type;
 
-    const ChimeSoundStructType mChimeSounds[1] = {
+    const ChimeSoundStructType mChimeSounds[3] = {
         ChimeSoundStructType{ .chimeID = 0, .name = chip::CharSpan::fromCharString("Basic Door Chime") },
+        ChimeSoundStructType{ .chimeID = 1, .name = chip::CharSpan::fromCharString("Enhanced Door Chime") },
+        ChimeSoundStructType{ .chimeID = 2, .name = chip::CharSpan::fromCharString("Star Wars Door Chime") },
     };
 };
 
