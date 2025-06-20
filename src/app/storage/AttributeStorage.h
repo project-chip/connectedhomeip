@@ -70,15 +70,15 @@ public:
         Value(const Value & other) = default;
 
         template <typename T>
-        Value ShortString(ShortPascalString<T> & data)
+        explicit Value(ShortPascalString<T> & data)
+        : Value({ asByteSpan(data.PascalContent()), Type::kStringOneByteLength })
         {
-            return { asByteSpan(data.PascalContent()), Type::kStringOneByteLength };
         }
 
         template <typename T>
-        Value LongString(LongPascalString<T> & data)
+        explicit Value(LongPascalString<T> & data)
+        : Value({ asByteSpan(data.PascalContent()), Type::kStringTwoByteLength })
         {
-            return { asByteSpan(data.PascalContent()), Type::kStringTwoByteLength };
         }
 
         template <typename T>

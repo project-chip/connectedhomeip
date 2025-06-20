@@ -22,6 +22,7 @@ config("includes") {
 source_set("attribute-storage") {
   sources = [
     "AttributeStorage.h",
+    "PascalString.h",
   ]
   public_deps = [
     "${chip_root}/src/app:paths",

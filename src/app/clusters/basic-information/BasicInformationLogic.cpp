@@ -49,12 +49,8 @@ CHIP_ERROR BasicInformationLogic::Init()
 
 DataModel::ActionReturnStatus BasicInformationLogic::SetNodeLabel(CharSpan label)
 {
-    // TODO:
-    //   Label MUST BE PERSISTED across reboots
-    //   Label MUST BE STORED COMPATIBLE !
-    VerifyOrReturnError(label.size() <= sizeof(mNodeLabelBuffer), Protocols::InteractionModel::Status::ConstraintError);
-    memcpy(mNodeLabelBuffer, label.data(), label.size());
-    mNodeLabelSize = static_cast<uint8_t>(label.size()); // we know that label size is at most 32
+    Storage::ShortPascalString labelBuffer(mNodeLabelBuffer);
+    VerifyOrReturnError(labelBuffer.SetValue(label), Protocols::InteractionModel::Status::ConstraintError);
 
     // TODO: implement
     //
@@ -62,7 +58,7 @@ DataModel::ActionReturnStatus BasicInformationLogic::SetNodeLabel(CharSpan label
     //
     //   return mPersistence.WriteAttribute(
     //     {kRootEndpointId, BasicInformation::Id, NodeLabel::Id},
-    //     GetNodeLabel()
+    //     AttributeStorage::Value(labelBuffer),
     //   );
 
     return CHIP_NO_ERROR;

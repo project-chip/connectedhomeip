@@ -18,6 +18,7 @@
 
 #include <app/SpecificationDefinedRevisions.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/storage/PascalString.h>
 #include <clusters/BasicInformation/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
@@ -45,7 +46,7 @@ public:
 
     bool GetReachable() const { return mReachable; }
     bool GetLocalConfigDisabled() const { return mLocalConfigDisabled; }
-    CharSpan GetNodeLabel() const { return { mNodeLabelBuffer, mNodeLabelSize }; }
+    CharSpan GetNodeLabel() const { return Storage::ShortPascalString(mNodeLabelBuffer).Content(); }
 
     // NOTE: these methods do NOT notify the cluster implementation of
     //       changes. Callers are responsible for that.
@@ -54,8 +55,7 @@ public:
     DataModel::ActionReturnStatus SetLocation(CharSpan location);
 
 private:
-    char mNodeLabelBuffer[32];
-    uint8_t mNodeLabelSize    = 0;
+    char mNodeLabelBuffer[32 + 1];
     bool mReachable           = true;
     bool mLocalConfigDisabled = false;
 };
