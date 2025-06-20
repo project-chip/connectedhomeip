@@ -38,15 +38,11 @@ public:
     CHIP_ERROR FinalizeAction() override;
 
 private:
-    uint8_t mFWchunktype                    = SL_FWUP_RPS_HEADER;
+    uint8_t mFWchunkType                    = SL_FWUP_RPS_HEADER;
     bool mReset                             = false;
     bool mDescriptorProcessed               = false;
     static constexpr size_t kAlignmentBytes = 64;
     static constexpr size_t kBlockSize      = 1024;
-
-#if SL_MATTER_ENABLE_OTA_ENCRYPTION
-    uint32_t mUnalignmentNum = 0;
-#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
     CHIP_ERROR ProcessInternal(ByteSpan & block) override;
 
