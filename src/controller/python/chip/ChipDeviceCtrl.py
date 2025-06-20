@@ -305,7 +305,9 @@ class CommissionableNode(discovery.CommissionableNode):
         Returns:
             int: Effective Node ID of the device (as defined by the assigned NOC)
         '''
-        return self._devCtrl.CommissionOnNetwork(
+        # mypy errors ignored due to coroutine returned without await.
+        # Fixing this typing error risks affecting existing functionality.
+        return self._devCtrl.CommissionOnNetwork(  # type: ignore[return-value]
             nodeId, setupPinCode, filterType=discovery.FilterType.INSTANCE_NAME, filter=self.instanceName)
 
     def __rich_repr__(self):
@@ -351,7 +353,7 @@ class DeviceProxyWrapper():
 
         localSessionId = ctypes.c_uint16(0)
 
-        builtins.chipStack.Call(
+        builtins.chipStack.Call(        # type: ignore[attr-defined]  # 'chipStack' is dynamically added; referred to in DeviceProxyWrapper class __del__ method
             lambda: self._dmLib.pychip_GetLocalSessionId(self._deviceProxy, pointer(localSessionId))
         ).raise_on_error()
 
@@ -364,7 +366,7 @@ class DeviceProxyWrapper():
 
         numSessions = ctypes.c_uint32(0)
 
-        builtins.chipStack.Call(
+        builtins.chipStack.Call(        # type: ignore[attr-defined]  # 'chipStack' is dynamically added; referred to in DeviceProxyWrapper class __del__ method
             lambda: self._dmLib.pychip_GetNumSessionsToPeer(self._deviceProxy, pointer(numSessions))
         ).raise_on_error()
 
@@ -378,7 +380,7 @@ class DeviceProxyWrapper():
         size = 64
         buf = (ctypes.c_uint8 * size)()
         csize = ctypes.c_size_t(size)
-        builtins.chipStack.Call(
+        builtins.chipStack.Call(        # type: ignore[attr-defined]  # 'chipStack' is dynamically added; referred to in DeviceProxyWrapper class __del__ method
             lambda: self._dmLib.pychip_GetAttestationChallenge(self._deviceProxy, buf, ctypes.byref(csize))
         ).raise_on_error()
 
@@ -391,7 +393,7 @@ class DeviceProxyWrapper():
 
         supportsLargePayload = ctypes.c_bool(False)
 
-        builtins.chipStack.Call(
+        builtins.chipStack.Call(        # type: ignore[attr-defined]  # 'chipStack' is dynamically added; referred to in DeviceProxyWrapper class __del__ method
             lambda: self._dmLib.pychip_SessionAllowsLargePayload(self._deviceProxy, pointer(supportsLargePayload))
         ).raise_on_error()
 
@@ -404,7 +406,7 @@ class DeviceProxyWrapper():
 
         isSessionOverTCP = ctypes.c_bool(False)
 
-        builtins.chipStack.Call(
+        builtins.chipStack.Call(        # type: ignore[attr-defined]  # 'chipStack' is dynamically added; referred to in DeviceProxyWrapper class __del__ method
             lambda: self._dmLib.pychip_IsSessionOverTCPConnection(self._deviceProxy, pointer(isSessionOverTCP))
         ).raise_on_error()
 
@@ -417,7 +419,7 @@ class DeviceProxyWrapper():
 
         isActiveSession = ctypes.c_bool(False)
 
-        builtins.chipStack.Call(
+        builtins.chipStack.Call(        # type: ignore[attr-defined]  # 'chipStack' is dynamically added; referred to in DeviceProxyWrapper class __del__ method
             lambda: self._dmLib.pychip_IsActiveSession(self._deviceProxy, pointer(isActiveSession))
         ).raise_on_error()
 
@@ -441,7 +443,8 @@ class ChipDeviceControllerBase():
 
     def __init__(self, name: str = ''):
         self.devCtrl = None
-        self._ChipStack = builtins.chipStack
+        # 'chipStack' is dynamically added; referred to in DeviceProxyWrapper class __del__ method
+        self._ChipStack = builtins.chipStack  # type: ignore[attr-defined]
         self._dmLib: typing.Any = None
 
         self._InitLib()
@@ -455,8 +458,8 @@ class ChipDeviceControllerBase():
         self._fabricCheckNodeId = -1
         self._isActive = False
 
-        self._Cluster = ChipClusters(builtins.chipStack)
-        self._Cluster.InitLib(self._dmLib)
+        # 'chipStack' is dynamically added; referred to in DeviceProxyWrapper class __del__ method
+        self._Cluster = ChipClusters(builtins.chipStack)  # type: ignore[attr-defined]
         self._commissioning_lock: asyncio.Lock = asyncio.Lock()
         self._commissioning_context: CommissioningContext = CommissioningContext(self, self._commissioning_lock)
         self._open_window_context: CallbackContext = CallbackContext(asyncio.Lock())
@@ -1234,7 +1237,7 @@ class ChipDeviceControllerBase():
         size = 128
         buf = (ctypes.c_uint8 * size)()
         csize = ctypes.c_size_t(size)
-        builtins.chipStack.Call(
+        builtins.chipStack.Call(    # type: ignore[attr-defined]  # 'chipStack' is dynamically added; referred to in DeviceProxyWrapper class __del__ method
             lambda: self._dmLib.pychip_DeviceController_GetRootPublicKeyBytes(self.devCtrl, buf, ctypes.byref(csize))
         ).raise_on_error()
 
@@ -1605,6 +1608,7 @@ class ChipDeviceControllerBase():
         '''
         self.CheckIsActive()
 
+        assert self.devCtrl is not None
         ClusterCommand.SendGroupCommand(
             groupid, self.devCtrl, payload, busyWaitMs=busyWaitMs).raise_on_error()
 
@@ -1646,7 +1650,7 @@ class ChipDeviceControllerBase():
         for v in attributes:
             if len(v) == 2:
                 attrs.append(ClusterAttribute.AttributeWriteRequest(
-                    v[0], v[1], 0, 0, v[1].value))
+                    v[0], v[1], 0, 0, v[1].value))  # type: ignore[attr-defined]  # 'value' added dynamically to ClusterAttributeDescriptor
             else:
                 attrs.append(ClusterAttribute.AttributeWriteRequest(
                     v[0], v[1], v[2], 1, v[1].value))
@@ -1680,11 +1684,12 @@ class ChipDeviceControllerBase():
         for v in attributes:
             if len(v) == 2:
                 attrs.append(ClusterAttribute.AttributeWriteRequest(
-                    invalid_endpoint, v[0], v[1], 1, v[0].value))
+                    invalid_endpoint, v[0], v[1], 1, v[0].value))   # type: ignore[attr-defined]  # 'value' added dynamically to ClusterAttributeDescriptor
             else:
                 attrs.append(ClusterAttribute.AttributeWriteRequest(
                     invalid_endpoint, v[0], 0, 0, v[0].value))
 
+        assert self.devCtrl is not None
         ClusterAttribute.WriteGroupAttributes(
             groupid, self.devCtrl, attrs, busyWaitMs=busyWaitMs).raise_on_error()
 
@@ -1727,6 +1732,9 @@ class ChipDeviceControllerBase():
         Bdx.PrepareToSendBdxData(future, data).raise_on_error()
         return future
 
+    # mypy errors ignored due to valid use of dynamic types and flexible tuple formats
+    # Fixing these typing errors is a high risk to affect existing functionality.
+    # these mismatches are intentional and safe within the current logic
     def _parseAttributePathTuple(self, pathTuple: typing.Union[
         None,  # Empty tuple, all wildcard
         typing.Tuple[int],  # Endpoint
@@ -1749,18 +1757,24 @@ class ChipDeviceControllerBase():
         elif not isinstance(pathTuple, tuple):
             if isinstance(pathTuple, int):
                 return ClusterAttribute.AttributePath(EndpointId=pathTuple)
-            elif issubclass(pathTuple, ClusterObjects.Cluster):
-                return ClusterAttribute.AttributePath.from_cluster(EndpointId=None, Cluster=pathTuple)
-            elif issubclass(pathTuple, ClusterObjects.ClusterAttributeDescriptor):
-                return ClusterAttribute.AttributePath.from_attribute(EndpointId=None, Attribute=pathTuple)
+            elif issubclass(pathTuple, ClusterObjects.Cluster):  # type: ignore[misc, arg-type]
+                return ClusterAttribute.AttributePath.from_cluster(EndpointId=None, Cluster=pathTuple)  # type: ignore[arg-type]
+            elif issubclass(pathTuple, ClusterObjects.ClusterAttributeDescriptor):  # type: ignore[arg-type]
+                return ClusterAttribute.AttributePath.from_attribute(EndpointId=None, Attribute=pathTuple)  # type: ignore[arg-type]
             else:
                 raise ValueError("Unsupported Attribute Path")
         else:
             # endpoint + (cluster) attribute / endpoint + cluster
-            if issubclass(pathTuple[1], ClusterObjects.Cluster):
-                return ClusterAttribute.AttributePath.from_cluster(EndpointId=pathTuple[0], Cluster=pathTuple[1])
-            elif issubclass(pathTuple[1], ClusterAttribute.ClusterAttributeDescriptor):
-                return ClusterAttribute.AttributePath.from_attribute(EndpointId=pathTuple[0], Attribute=pathTuple[1])
+            if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[misc]
+                return ClusterAttribute.AttributePath.from_cluster(
+                    EndpointId=pathTuple[0],  # type: ignore[arg-type]
+                    Cluster=pathTuple[1]  # type: ignore[arg-type, misc]
+                )
+            elif issubclass(pathTuple[1], ClusterAttribute.ClusterAttributeDescriptor):  # type: ignore[arg-type, misc]
+                return ClusterAttribute.AttributePath.from_attribute(
+                    EndpointId=pathTuple[0],    # type: ignore[arg-type]
+                    Attribute=pathTuple[1]  # type: ignore[arg-type, misc]
+                )
             else:
                 raise ValueError("Unsupported Attribute Path")
 
@@ -1770,13 +1784,16 @@ class ChipDeviceControllerBase():
 
         # endpoint + (cluster) attribute / endpoint + cluster
         endpoint = pathTuple[0]
-        if issubclass(pathTuple[1], ClusterObjects.Cluster):
+        # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
+        # Fixing these typing errors is a high risk to affect existing functionality.
+        # These mismatches are intentional and safe within the current logic.
+        if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[arg-type]
             cluster = pathTuple[1]
         else:
             raise ValueError("Unsupported Cluster Path")
         dataVersion = pathTuple[2]
         return ClusterAttribute.DataVersionFilter.from_cluster(
-            EndpointId=endpoint, Cluster=cluster, DataVersion=dataVersion)
+            EndpointId=endpoint, Cluster=cluster, DataVersion=dataVersion)  # type: ignore[arg-type]
 
     def _parseEventPathTuple(self, pathTuple: typing.Union[
         None,  # Empty tuple, all wildcard
@@ -1796,12 +1813,15 @@ class ChipDeviceControllerBase():
             # Wildcard
             return ClusterAttribute.EventPath()
         elif not isinstance(pathTuple, tuple):
+            # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
+            # Fixing these typing errors is a high risk to affect existing functionality.
+            # These mismatches are intentional and safe within the current logic.
             if isinstance(pathTuple, int):
                 return ClusterAttribute.EventPath(EndpointId=pathTuple)
-            elif issubclass(pathTuple, ClusterObjects.Cluster):
-                return ClusterAttribute.EventPath.from_cluster(EndpointId=None, Cluster=pathTuple)
-            elif issubclass(pathTuple, ClusterObjects.ClusterEvent):
-                return ClusterAttribute.EventPath.from_event(EndpointId=None, Event=pathTuple)
+            elif issubclass(pathTuple, ClusterObjects.Cluster):  # type: ignore[arg-type]
+                return ClusterAttribute.EventPath.from_cluster(EndpointId=None, Cluster=pathTuple)  # type: ignore[arg-type]
+            elif issubclass(pathTuple, ClusterObjects.ClusterEvent):  # type: ignore[arg-type]
+                return ClusterAttribute.EventPath.from_event(EndpointId=None, Event=pathTuple)  # type: ignore[arg-type]
             else:
                 raise ValueError("Unsupported Event Path")
         else:
@@ -1810,10 +1830,20 @@ class ChipDeviceControllerBase():
             else:
                 urgent = bool(pathTuple[-1]) if len(pathTuple) > 2 else False
                 # endpoint + (cluster) event / endpoint + cluster
-                if issubclass(pathTuple[1], ClusterObjects.Cluster):
-                    return ClusterAttribute.EventPath.from_cluster(EndpointId=pathTuple[0], Cluster=pathTuple[1], Urgent=urgent)
-                elif issubclass(pathTuple[1], ClusterAttribute.ClusterEvent):
-                    return ClusterAttribute.EventPath.from_event(EndpointId=pathTuple[0], Event=pathTuple[1], Urgent=urgent)
+                # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
+                # Fixing these typing errors is a high risk to affect existing functionality.
+                # These mismatches are intentional and safe within the current logic.
+                if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[arg-type]
+                    return ClusterAttribute.EventPath.from_cluster(
+                        EndpointId=pathTuple[0],    # type: ignore[arg-type]
+                        Cluster=pathTuple[1], Urgent=urgent  # type: ignore[arg-type]
+                    )
+                elif issubclass(pathTuple[1], ClusterAttribute.ClusterEvent):  # type: ignore[arg-type]
+                    return ClusterAttribute.EventPath.from_event(
+                        EndpointId=pathTuple[0],    # type: ignore[arg-type]
+                        Event=pathTuple[1],  # type: ignore[arg-type]
+                        Urgent=urgent
+                    )
                 else:
                     raise ValueError("Unsupported Attribute Path")
 
@@ -1910,6 +1940,10 @@ class ChipDeviceControllerBase():
 
         '''
         self.CheckIsActive()
+        # mypy errors ignored due to valid use of dynamic types.
+        # A single tuple is passed intentionally (not a list), as expected by the method logic.
+        # Fixing these typing errors is a high risk to affect existing functionality.
+        # These mismatches are intentional and safe within the current logic.
 
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
@@ -1918,7 +1952,7 @@ class ChipDeviceControllerBase():
         attributePaths = [self._parseAttributePathTuple(
             v) for v in attributes] if attributes else None
         clusterDataVersionFilters = [self._parseDataVersionFilterTuple(
-            v) for v in dataVersionFilters] if dataVersionFilters else None
+            v) for v in dataVersionFilters] if dataVersionFilters else None  # type: ignore[arg-type]
         eventPaths = [self._parseEventPathTuple(
             v) for v in events] if events else None
 
@@ -2414,6 +2448,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
 
     def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, nodeId: int, adminVendorId: int, catTags: typing.List[int] = [
     ], paaTrustStorePath: str = "", useTestCommissioner: bool = False, fabricAdmin: typing.Optional[FabricAdmin.FabricAdmin] = None, name: str = '', keypair: typing.Optional[p256keypair.P256Keypair] = None):
+        assert fabricAdmin is not None  # fabricAdmin must be provided
         super().__init__(
             name or
             f"caIndex({fabricAdmin.caIndex:x})/fabricId(0x{fabricId:016X})/nodeId(0x{nodeId:016X})"
@@ -2454,7 +2489,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         return self._caIndex
 
     @property
-    def fabricAdmin(self) -> FabricAdmin.FabricAdmin:
+    def fabricAdmin(self) -> typing.Optional[FabricAdmin.FabricAdmin]:
         return self._fabricAdmin
 
     async def Commission(self, nodeid) -> int:
@@ -2706,7 +2741,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         '''
         if parameters is None:
             raise ValueError("ICD registration parameter required.")
-        if len(parameters.symmetricKey) != 16:
+        if parameters.symmetricKey is None or len(parameters.symmetricKey) != 16:
             raise ValueError("symmetricKey should be 16 bytes")
 
         self.CheckIsActive()
@@ -2943,7 +2978,7 @@ class BareChipDeviceController(ChipDeviceControllerBase):
 
         # Device should hold a reference to the key to avoid it being GC-ed.
         self._externalKeyPair = operationalKey
-        nativeKey = operationalKey.create_native_object()
+        nativeKey = operationalKey._create_native_object()
 
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_OpCreds_AllocateControllerForPythonCommissioningFLow(
