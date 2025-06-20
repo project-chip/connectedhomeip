@@ -321,7 +321,7 @@ class TC_CC_2_1(MatterBaseTest):
         # Manual check
         if await self.attribute_guard(endpoint=self.endpoint, attribute=self.attributes.StartUpColorTemperatureMireds):
             sctmr_val = await self.read_single_attribute_check_success(cluster=self.cluster, endpoint=self.endpoint, attribute=self.attributes.StartUpColorTemperatureMireds)
-            asserts.assert_true(sctmr_val is NullValue or (sctmr_val >= 1) and (sctmr_val <= 65279), "Value is out of range.")
+            asserts.assert_true(sctmr_val is NullValue or ((sctmr_val >= 1) and (sctmr_val <= 65279)), "Value is out of range.")
 
         # NumberOfPrimaries will be used to verify Primary<n>[X|Y|Intensity]
         # Number of primaries cant be 0, it should be greater or equal than 1.
