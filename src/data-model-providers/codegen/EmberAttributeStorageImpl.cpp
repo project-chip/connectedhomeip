@@ -64,6 +64,7 @@ EmberAfAttributeType attributeType(AttributeStorage::Buffer & buffer)
         return ZCL_LONG_OCTET_STRING_ATTRIBUTE_TYPE;
     }
 
+    // This should NEVER be reached, however I did have compilers ocmplain about it.
     return ZCL_NO_DATA_ATTRIBUTE_TYPE;
 }
 
