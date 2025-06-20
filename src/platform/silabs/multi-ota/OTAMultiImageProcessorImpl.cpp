@@ -22,6 +22,15 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 
+using namespace chip::DeviceLayer;
+using namespace ::chip::DeviceLayer::Internal;
+
+static chip::OTAMultiImageProcessorImpl gImageProcessor;
+
+#if SL_WIFI && !SLI_SI91X_MCU_INTERFACE
+#include <platform/silabs/wifi/wf200/platform/spi_multiplex.h>
+#endif // SL_WIFI
+
 extern "C" {
 #ifdef SLI_SI91X_MCU_INTERFACE
 #include "sl_si91x_driver.h"
@@ -29,14 +38,9 @@ extern "C" {
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 #else // This is not needed for the 917 SoC; it is required for EFR host applications
 #include "btl_interface.h"
-#include "em_bus.h" // For CORE_CRITICAL_SECTION
-#endif              // SLI_SI91X_MCU_INTERFACE
+#include "sl_core.h" // For CORE_CRITICAL_SECTION
+#endif               // SLI_SI91X_MCU_INTERFACE
 }
-
-using namespace chip::DeviceLayer;
-using namespace ::chip::DeviceLayer::Internal;
-
-static chip::OTAMultiImageProcessorImpl gImageProcessor;
 
 namespace chip {
 
@@ -427,6 +431,9 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
 #ifdef SLI_SI91X_MCU_INTERFACE // 917 SoC reboot
     chip::DeviceLayer::Silabs::GetPlatform().SoftwareReset();
 #else // EFR reboot
+#if defined(_SILICON_LABS_32B_SERIES_3) && CHIP_PROGRESS_LOGGING
+    osDelay(100); // sl-temp: delay for uart print before reboot
+#endif
     CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
 #endif
 }

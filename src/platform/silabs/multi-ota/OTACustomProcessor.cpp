@@ -21,18 +21,6 @@
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 
-#if SL_WIFI
-#include <platform/silabs/wifi/ncp/spi_multiplex.h>
-#endif // SL_WIFI
-
-extern "C" {
-#include "btl_interface.h"
-#include "sl_core.h"
-}
-
-/// No error, operation OK
-#define SL_BOOTLOADER_OK 0L
-
 namespace chip {
 
 // Define static memebers
