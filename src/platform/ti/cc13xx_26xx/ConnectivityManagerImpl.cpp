@@ -43,11 +43,6 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/BLEManager.h>
 
-#include <lwip/dns.h>
-#include <lwip/ip_addr.h>
-#include <lwip/nd6.h>
-#include <lwip/netif.h>
-
 using namespace ::chip;
 using namespace ::chip::DeviceLayer::Internal;
 
