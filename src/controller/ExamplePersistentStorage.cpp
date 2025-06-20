@@ -50,7 +50,7 @@ std::string GetUsedDirectory(const std::string & directory)
     }
 
     // Fall-back to environment-provided directory.
-    if (const char *dir = getenv("TMPDIR"); dir != nullptr)
+    if (const char * dir = getenv("TMPDIR"); dir != nullptr)
     {
         return dir;
     }
@@ -76,8 +76,8 @@ CHIP_ERROR PersistentStorage::Init(const char * name, const char * directory)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    mUsedDirectory = GetUsedDirectory(directory != nullptr ? directory : "");
-    mStorageFilePath  = GenerateStoragePath(name != nullptr ? name : "");
+    mUsedDirectory   = GetUsedDirectory(directory != nullptr ? directory : "");
+    mStorageFilePath = GenerateStoragePath(name != nullptr ? name : "");
 
     std::ifstream ifs;
     ifs.open(mStorageFilePath, std::ifstream::in);
