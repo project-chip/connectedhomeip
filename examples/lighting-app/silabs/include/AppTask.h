@@ -79,7 +79,6 @@ public:
      */
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
     void PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction);
-    void PostLightLevelActionRequest(int32_t aActor, LightingManager::Action_t aAction, uint8_t * aValue);
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
     void PostLightControlActionRequest(int32_t aActor, LightingManager::Action_t aAction, RGBLEDWidget::ColorData_t * aValue);
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)
@@ -87,7 +86,7 @@ public:
 private:
     static AppTask sAppTask;
 
-    static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor);
+    static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor, uint8_t * value);
     static void ActionCompleted(LightingManager::Action_t aAction);
     static void LightActionEventHandler(AppEvent * aEvent);
     static void LightActionLevelEventHandler(AppEvent * aEvent);

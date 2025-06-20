@@ -65,11 +65,15 @@ CHIP_ERROR LightingManager::Init()
     }
 
     bool currentLedState;
-    app::DataModel::Nullable<uint8_t> brightness;
 
     // read current on/off value on endpoint one.
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     OnOffServer::Instance().getOnOffValue(1, &currentLedState);
+
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+    app::DataModel::Nullable<uint8_t> brightness;
+    uint16_t currentx, currenty, currentctmireds;
+    uint8_t currenthue, currentsaturation;
 
     // Read brightness value
     if (Clusters::LevelControl::Attributes::CurrentLevel::Get(1, brightness) == Protocols::InteractionModel::Status::Success &&
@@ -77,10 +81,6 @@ CHIP_ERROR LightingManager::Init()
     {
         mCurrentLevel = brightness.Value();
     }
-
-#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-    uint16_t currentx, currenty, currentctmireds;
-    uint8_t currenthue, currentsaturation;
 
     if (Clusters::ColorControl::Attributes::CurrentX::Get(1, &currentx) == Protocols::InteractionModel::Status::Success)
     {
@@ -143,7 +143,7 @@ void LightingManager::SetAutoTurnOffDuration(uint32_t aDurationInSecs)
     mAutoTurnOffDuration = aDurationInSecs;
 }
 
-bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction)
+bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction, uint8_t * aValue)
 {
     bool action_initiated = false;
     State_t new_state;
@@ -161,32 +161,38 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction)
 
         new_state = kState_OffInitiated;
     }
+    else if (aAction == LEVEL_ACTION)
+    {
+        action_initiated = true;
+    }
 
     if (action_initiated)
     {
-        if (mAutoTurnOffTimerArmed && new_state == kState_OffInitiated)
+        if (aAction != LEVEL_ACTION)
         {
-            // If auto turn off timer has been armed and someone initiates turning off,
-            // cancel the timer and continue as normal.
-            mAutoTurnOffTimerArmed = false;
+            if (mAutoTurnOffTimerArmed && new_state == kState_OffInitiated)
+            {
+                // If auto turn off timer has been armed and someone initiates turning off,
+                // cancel the timer and continue as normal.
+                mAutoTurnOffTimerArmed = false;
 
-            CancelTimer();
+                CancelTimer();
+            }
+
+            if (mOffEffectArmed && new_state == kState_OnInitiated)
+            {
+                CancelTimer();
+                mOffEffectArmed = false;
+            }
+
+            StartTimer(ACTUATOR_MOVEMENT_PERIOS_MS);
+
+            // Since the timer started successfully, update the state and trigger callback
+            mState = new_state;
         }
-
-        if (mOffEffectArmed && new_state == kState_OnInitiated)
-        {
-            CancelTimer();
-            mOffEffectArmed = false;
-        }
-
-        StartTimer(ACTUATOR_MOVEMENT_PERIOS_MS);
-
-        // Since the timer started successfully, update the state and trigger callback
-        mState = new_state;
-
         if (mActionInitiated_CB)
         {
-            mActionInitiated_CB(aAction, aActor);
+            mActionInitiated_CB(aAction, aActor, aValue);
         }
     }
 
@@ -242,6 +248,7 @@ void LightingManager::AutoTurnOffTimerEventHandler(AppEvent * aEvent)
 {
     LightingManager * light = static_cast<LightingManager *>(aEvent->TimerEvent.Context);
     int32_t actor           = AppEvent::kEventType_Timer;
+    uint8_t value           = aEvent->LightEvent.Value;
 
     // Make sure auto turn off timer is still armed.
     if (!light->mAutoTurnOffTimerArmed)
@@ -253,13 +260,14 @@ void LightingManager::AutoTurnOffTimerEventHandler(AppEvent * aEvent)
 
     SILABS_LOG("Auto Turn Off has been triggered!");
 
-    light->InitiateAction(actor, OFF_ACTION);
+    light->InitiateAction(actor, OFF_ACTION, &value);
 }
 
 void LightingManager::OffEffectTimerEventHandler(AppEvent * aEvent)
 {
     LightingManager * light = static_cast<LightingManager *>(aEvent->TimerEvent.Context);
     int32_t actor           = AppEvent::kEventType_Timer;
+    uint8_t value           = aEvent->LightEvent.Value;
 
     // Make sure auto turn off timer is still armed.
     if (!light->mOffEffectArmed)
@@ -271,7 +279,7 @@ void LightingManager::OffEffectTimerEventHandler(AppEvent * aEvent)
 
     SILABS_LOG("OffEffect completed");
 
-    light->InitiateAction(actor, OFF_ACTION);
+    light->InitiateAction(actor, OFF_ACTION, &value);
 }
 
 void LightingManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
@@ -349,23 +357,6 @@ void LightingManager::OnTriggerOffWithEffect(OnOffEffect * effect)
 
     LightMgr().mOffEffectArmed = true;
     LightMgr().StartTimer(offEffectDuration);
-}
-
-bool LightingManager::InitiateLevelAction(int32_t aActor, Action_t aAction, uint8_t * aValue)
-{
-    bool action_initiated = false;
-    if (aAction == LEVEL_ACTION)
-    {
-        VerifyOrReturnValue(aValue != nullptr, action_initiated);
-        if (mCurrentLevel != *aValue)
-        {
-            mCurrentLevel    = *aValue;
-            action_initiated = true;
-            AppTask::GetAppTask().PostLightLevelActionRequest(aActor, aAction, aValue);
-        }
-    }
-
-    return action_initiated;
 }
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)

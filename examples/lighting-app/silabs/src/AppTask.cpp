@@ -142,6 +142,7 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     bool initiated = false;
     LightingManager::Action_t action;
     int32_t actor;
+    uint8_t value  = aEvent->LightEvent.Value;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (aEvent->Type == AppEvent::kEventType_Light)
@@ -161,23 +162,12 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
 
     if (err == CHIP_NO_ERROR)
     {
-        initiated = LightMgr().InitiateAction(actor, action);
+        initiated = LightMgr().InitiateAction(actor, action, &value);
 
         if (!initiated)
         {
             SILABS_LOG("Action is already in progress or active.");
         }
-    }
-}
-
-void AppTask::LightActionLevelEventHandler(AppEvent * aEvent)
-{
-    LightingManager::Action_t action = static_cast<LightingManager::Action_t>(aEvent->LightEventData.Action);
-    uint8_t value                    = aEvent->LightEventData.Value;
-
-    if (action == LightingManager::LEVEL_ACTION)
-    {
-        sLightLED.SetLevel(value);
     }
 }
 
@@ -238,21 +228,28 @@ void AppTask::ButtonEventHandler(uint8_t button, uint8_t btnAction)
     }
 }
 
-void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
+void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor, uint8_t * aValue)
 {
-    // Action initiated, update the light led
-    bool lightOn = aAction == LightingManager::ON_ACTION;
-    SILABS_LOG("Turning light %s", (lightOn) ? "On" : "Off")
+    if (aAction == LightingManager::LEVEL_ACTION)
+    {
+        sLightLED.SetLevel(*aValue);
+    }
+    else
+    {
+        // Action initiated, update the light led
+        bool lightOn = aAction == LightingManager::ON_ACTION;
+        SILABS_LOG("Turning light %s", (lightOn) ? "On" : "Off")
 
-    sLightLED.Set(lightOn);
+        sLightLED.Set(lightOn);
 
 #ifdef DISPLAY_ENABLED
-    sAppTask.GetLCD().WriteDemoUI(lightOn);
+        sAppTask.GetLCD().WriteDemoUI(lightOn);
 #endif
 
-    if (aActor == AppEvent::kEventType_Button)
-    {
-        sAppTask.mSyncClusterToButtonAction = true;
+        if (aActor == AppEvent::kEventType_Button)
+        {
+            sAppTask.mSyncClusterToButtonAction = true;
+        }
     }
 }
 
@@ -282,17 +279,6 @@ void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t a
     event.LightEvent.Actor  = aActor;
     event.LightEvent.Action = aAction;
     event.Handler           = LightActionEventHandler;
-    PostEvent(&event);
-}
-
-void AppTask::PostLightLevelActionRequest(int32_t aActor, LightingManager::Action_t aAction, uint8_t * aValue)
-{
-    AppEvent event;
-    event.Type                  = AppEvent::kEventType_Light;
-    event.LightEventData.Actor  = aActor;
-    event.LightEventData.Action = aAction;
-    event.LightEventData.Value  = *aValue;
-    event.Handler               = LightActionLevelEventHandler;
     PostEvent(&event);
 }
 
