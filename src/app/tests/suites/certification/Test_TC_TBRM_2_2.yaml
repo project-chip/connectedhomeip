@@ -48,12 +48,26 @@ tests:
       response:
           value: null
 
+    - label: "TH send a GetActiveDatasetRequest command to the DUT"
+      command: GetActiveDatasetRequest
+      response:
+          values:
+              - name: Dataset
+                value: ""
+
     # Step 2
     - label: "TH reads the PendingDatasetTimestamp attribute from the DUT"
       command: readAttribute
       attribute: PendingDatasetTimestamp
       response:
           value: null
+
+    - label: "TH send a GetPendingDatasetRequest command to the DUT"
+      command: GetPendingDatasetRequest
+      response:
+          values:
+              - name: Dataset
+                value: ""
 
     # Step 3
     - label:
