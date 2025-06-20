@@ -142,7 +142,6 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     bool initiated = false;
     LightingManager::Action_t action;
     int32_t actor;
-    // uint8_t value  = aEvent->LightEvent.Value;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (aEvent->Type == AppEvent::kEventType_Light)
