@@ -1065,6 +1065,22 @@ class MatterBaseTest(base_test.BaseTestClass):
     def get_endpoint(self, default: Optional[int] = 0) -> int:
         return self.matter_test_config.endpoint if self.matter_test_config.endpoint is not None else default
 
+    def get_wifi_ssid(self, default: Optional[str] = 0) -> str:
+        ''' Get WiFi SSID
+
+            Get the WiFi networks name provided with flags
+
+        '''
+        return self.matter_test_config.wifi_ssid if self.matter_test_config.wifi_ssid is not None else default
+
+    def get_credentials(self, default: Optional[str] = 0) -> str:
+        ''' Get WiFi passphrase
+
+            Get the WiFi credentials provided with flags
+
+        '''
+        return self.matter_test_config.wifi_passphrase if self.matter_test_config.wifi_passphrase is not None else default
+
     def setup_class(self):
         super().setup_class()
 
@@ -1600,13 +1616,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         for qr_code in self.matter_test_config.qr_code_content:
             try:
                 setup_payloads.append(SetupPayload().ParseQrCode(qr_code))
-            except ChipStackError:
+            except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Can not use 'with' because it is not expected to fail
                 asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
 
         for manual_code in self.matter_test_config.manual_code:
             try:
                 setup_payloads.append(SetupPayload().ParseManualPairingCode(manual_code))
-            except ChipStackError:
+            except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Can not use 'with' because it is not expected to fail
                 asserts.fail(
                     f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
 

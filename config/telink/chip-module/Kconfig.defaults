@@ -89,7 +89,8 @@ config HEAP_MEM_POOL_SIZE
 
 config COMMON_LIBC_MALLOC_ARENA_SIZE
     default 20716 if SOC_SERIES_RISCV_TELINK_B9X_RETENTION || (SOC_RISCV_TELINK_TL321X && ZEPHYR_VERSION_3_3) || (SOC_RISCV_TELINK_TL721X && SOC_SERIES_RISCV_TELINK_TLX_RETENTION)
-    default 16384 if SOC_RISCV_TELINK_TL721X || (SOC_RISCV_TELINK_TL321X && !ZEPHYR_VERSION_3_3)
+    default 16954 if (SOC_RISCV_TELINK_TL321X && !ZEPHYR_VERSION_3_3)
+    default 18000 if (SOC_RISCV_TELINK_TL721X && !ZEPHYR_VERSION_3_3)
     default 29448 if SOC_RISCV_TELINK_W91
     default 12288
 
@@ -156,9 +157,6 @@ config BT_BUF_ACL_TX_SIZE
     default 251
 
 config BT_BUF_EVT_RX_COUNT
-    default 4
-
-config BT_BUF_ACL_RX_COUNT
     default 4
 
 config BT_GATT_CACHING
@@ -490,6 +488,28 @@ config MBEDTLS_HKDF_C
 config MBEDTLS_X509_CSR_WRITE_C
     bool "X.509 Certificate Signing Requests writing"
     default y
+
+config PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY
+    bool "PSA_WANT_KEY_TYPE_ECC_PUBLIC_KEY"
+    default y
+
+# Disable PSA usage
+config MBEDTLS_USE_PSA_CRYPTO
+    bool "MBEDTLS_USE_PSA_CRYPTO"
+    default n
+
+config MBEDTLS_PSA_STATIC_KEY_SLOTS
+    bool "MBEDTLS_PSA_STATIC_KEY_SLOTS"
+    default n
+
+config MBEDTLS_PSA_CRYPTO_C
+    bool "MBEDTLS_PSA_CRYPTO_C"
+    default n
+
+config CHIP_CRYPTO_PSA
+    bool "CHIP_CRYPTO_PSA"
+    default n
+
 endif # !ZEPHYR_VERSION_3_3
 
 config GETOPT_LONG

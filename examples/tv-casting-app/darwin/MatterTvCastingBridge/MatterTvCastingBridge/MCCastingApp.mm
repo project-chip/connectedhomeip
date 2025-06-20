@@ -93,8 +93,10 @@
     _serverInitParamsProvider = new MCCommonCaseDeviceServerInitParamsProvider();
 
     // Create cpp AppParameters
+    // TODO: Properly validate revocation!
+    chip::Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
     VerifyOrReturnValue(_appParameters.Create(&_uniqueIdProvider, _commissionableDataProvider, _dacProvider,
-                            GetDefaultDACVerifier(chip::Credentials::GetTestAttestationTrustStore()), _serverInitParamsProvider)
+                            GetDefaultDACVerifier(chip::Credentials::GetTestAttestationTrustStore(), kDeviceAttestationRevocationNotChecked), _serverInitParamsProvider)
             == CHIP_NO_ERROR,
         [MCErrorUtils NSErrorFromChipError:CHIP_ERROR_INVALID_ARGUMENT]);
 
