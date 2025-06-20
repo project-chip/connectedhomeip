@@ -1190,7 +1190,7 @@ def chip_tool_tests(
         ("--microwave-oven-app", "CHIP_MICROWAVE_OVEN_APP"),
         ("--rvc-app", "CHIP_RVC_APP"),
         ("--energy-gateway-app", "ENERGY_GATEWAY_APP"),
-        ("--energy-management-app", "ENERGY_MANAGEMENT_APP"),        
+        ("--energy-management-app", "ENERGY_MANAGEMENT_APP"),
     ]
 
     for flag, path_key in target_flags:
