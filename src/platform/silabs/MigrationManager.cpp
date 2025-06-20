@@ -41,7 +41,6 @@ static migrationData_t migrationTable[] = {
     { .migrationGroup = 2, .migrationFunc = MigrateDacProvider },
     { .migrationGroup = 3, .migrationFunc = MigrateCounterConfigs },
     { .migrationGroup = 4, .migrationFunc = MigrateHardwareVersion },
-    { .migrationGroup = 5, .migrationFunc = MigrateLockManager },
     // add any additional migration neccesary. migrationGroup should stay equal if done in the same commit or increment by 1 for
     // each new entry.
 };
@@ -58,9 +57,7 @@ void MigrationManager::applyMigrations()
     {
         if (lastMigationGroupDone < migrationTable[i].migrationGroup)
         {
-            chip::DeviceLayer::PlatformMgr().LockChipStack();
             (*migrationTable[i].migrationFunc)();
-            chip::DeviceLayer::PlatformMgr().UnlockChipStack();
             completedMigrationGroup = std::max(migrationTable[i].migrationGroup, completedMigrationGroup);
         }
     }
