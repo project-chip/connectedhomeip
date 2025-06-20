@@ -31,7 +31,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
