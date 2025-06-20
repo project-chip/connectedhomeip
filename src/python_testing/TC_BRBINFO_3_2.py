@@ -36,7 +36,9 @@
 
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+import test_plan_support
+from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
+                                         default_matter_test_main)
 from mobly import asserts
 
 
@@ -50,11 +52,17 @@ class TC_BRBINFO_3_2(MatterBaseTest):
 
     def steps_TC_BRBINFO_3_2(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "TH reads ConfigurationVersion from the DUT and stores the value as initialConfigurationVersion",
+            TestStep(1, test_plan_support.commission_if_required(), is_commissioning=True),
+            TestStep(2, "Set up a subscription wildcard subscription, with MinIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false"),
+            TestStep(3, "TH reads ConfigurationVersion from the DUT and stores the value as initialConfigurationVersion",
                      "Verify that the value is in the inclusive range of 1 to 4294967295"),
-            TestStep(2, "Change the configuration version in a way which results in functionality to be added or removed (e.g. rewire thermostat to support a new mode)"),
-            TestStep(3, "TH reads ConfigurationVersion from the DUT",
+            TestStep(4, "Change the configuration version in a way which results in functionality to be added or removed (e.g. rewire thermostat to support a new mode)"),
+            TestStep(5, "TH reads ConfigurationVersion from the DUT",
                      "Verify that the value is higher than the value of initialConfigurationVersion"),
+            TestStep(6, "Verify that the DUT sends an attribute report for ConfigurationVersion",
+                     "Only one report received"),
+            TestStep(7, "Verify that the value in the attribute report is equal to the value read in step 5",
+                     "Verify that the reported value is equal to the value read in step 5"),
         ]
         return steps
 
@@ -69,15 +77,20 @@ class TC_BRBINFO_3_2(MatterBaseTest):
     @async_test_body
     async def test_TC_BRBINFO_3_2(self):
 
-        endpoint = self.get_endpoint(default=3)
-
-        attributes = Clusters.BridgedDeviceBasicInformation.Attributes
-
         self.step(1)
+        endpoint = self.get_endpoint(default=3)
+        cluster = Clusters.BridgedDeviceBasicInformation
+        attributes = cluster.Attributes
+
+        self.step(2)
+        sub_handler = ClusterAttributeChangeAccumulator(cluster)
+        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint)
+
+        self.step(3)
         initialConfigurationVersion = await self.read_brbinfo_attribute_expect_success(endpoint=endpoint, attribute=attributes.ConfigurationVersion)
         asserts.assert_greater_equal(initialConfigurationVersion, 1, "ConfigurationVersion attribute is out of range")
 
-        self.step(2)
+        self.step(4)
         if self.is_pics_sdk_ci_only:
             command_dict = {"Name": "SimulateConfigurationVersionChange"}
             self.write_to_app_pipe(command_dict)
@@ -85,10 +98,19 @@ class TC_BRBINFO_3_2(MatterBaseTest):
             self.wait_for_user_input(
                 prompt_msg="Change the configuration version in a way which results in functionality to be added or removed, then continue")
 
-        self.step(3)
+        self.step(5)
         newConfigurationVersion = await self.read_brbinfo_attribute_expect_success(endpoint=endpoint, attribute=attributes.ConfigurationVersion)
         asserts.assert_greater(newConfigurationVersion, initialConfigurationVersion,
                                "ConfigurationVersion attribute not grater than initialConfigurationVersion")
+
+        self.step(6)
+        count = sub_handler.attribute_report_counts[attributes.ConfigurationVersion]
+        asserts.assert_equal(count, 1, "Unexpected number of ConfigurationVersion reports")
+
+        self.step(7)
+        reportedConfigurationVersionValuesList = sub_handler.attribute_reports[attributes.ConfigurationVersion]
+        asserts.assert_equal(
+            reportedConfigurationVersionValuesList[0].value, newConfigurationVersion, msg="Unexpected value in ConfigurationVersion report")
 
 
 if __name__ == "__main__":
