@@ -16,6 +16,8 @@
  */
 #include <pw_unit_test/framework.h>
 
+#include <app/ConcreteAttributePath.h>
+#include <app/storage/AttributeStorage.h>
 #include <app/storage/PascalString.h>
 #include <app/util/persistence/AttributePersistenceProvider.h>
 #include <app/util/persistence/DefaultAttributePersistenceProvider.h>
@@ -32,6 +34,12 @@ using namespace chip::app::Storage;
 
 TEST(EmberAttributeStorageImpl, TestStorage)
 {
+    // some distinct paths since we want to make sure read/write operate on different paths
+    const ConcreteAttributePath kShortStringPath = { 0, 1, 2 };
+    const ConcreteAttributePath kLongStringPath  = { 0, 2, 2 };
+    const ConcreteAttributePath kUint16Path      = { 1, 2, 2 };
+    const ConcreteAttributePath kUint32Path      = { 1, 2, 3 };
+
     DefaultAttributePersistenceProvider persistenceProvider;
     TestPersistentStorageDelegate testPersistenceDelegate;
 
@@ -45,13 +53,13 @@ TEST(EmberAttributeStorageImpl, TestStorage)
     {
         char buff[8];
         ShortPascalString str(buff);
-        EXPECT_EQ(storage.Read({ 0, 1, 2 }, str), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        EXPECT_EQ(storage.Read(kShortStringPath, str), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
         EXPECT_TRUE(str.SetValue("foo"_span));
-        EXPECT_EQ(storage.Write({ 0, 1, 2 }, str), CHIP_NO_ERROR);
+        EXPECT_EQ(storage.Write(kShortStringPath, str), CHIP_NO_ERROR);
         EXPECT_TRUE(str.SetValue("barbaz"_span));
         EXPECT_TRUE(str.Content().data_equal("barbaz"_span));
-        EXPECT_EQ(storage.Read({ 0, 1, 2 }, str), CHIP_NO_ERROR);
+        EXPECT_EQ(storage.Read(kShortStringPath, str), CHIP_NO_ERROR);
         EXPECT_TRUE(str.Content().data_equal("foo"_span));
     }
 
@@ -61,14 +69,38 @@ TEST(EmberAttributeStorageImpl, TestStorage)
         constexpr uint8_t kData2[]{ 1, 2, 7, 8 };
 
         LongPascalString str(buff);
-        EXPECT_EQ(storage.Read({ 0, 2, 2 }, str), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+        EXPECT_EQ(storage.Read(kLongStringPath, str), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
         EXPECT_TRUE(str.SetValue(ByteSpan(kData1)));
-        EXPECT_EQ(storage.Write({ 0, 2, 2 }, str), CHIP_NO_ERROR);
+        EXPECT_EQ(storage.Write(kLongStringPath, str), CHIP_NO_ERROR);
         EXPECT_TRUE(str.SetValue(ByteSpan(kData2)));
         EXPECT_TRUE(str.Content().data_equal(ByteSpan(kData2)));
-        EXPECT_EQ(storage.Read({ 0, 2, 2 }, str), CHIP_NO_ERROR);
+        EXPECT_EQ(storage.Read(kLongStringPath, str), CHIP_NO_ERROR);
         EXPECT_TRUE(str.Content().data_equal(ByteSpan(kData1)));
+    }
+
+    {
+        uint16_t number = 321;
+
+        EXPECT_EQ(storage.Read(kUint16Path, AttributeStorage::Buffer::Number(number)),
+                  CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+
+        EXPECT_EQ(storage.Write(kUint16Path, AttributeStorage::Value::Number(number)), CHIP_NO_ERROR);
+        number = 100;
+        EXPECT_EQ(storage.Read(kUint16Path, AttributeStorage::Buffer::Number(number)), CHIP_NO_ERROR);
+        EXPECT_EQ(number, 321);
+    }
+
+    {
+        uint32_t number = 1234;
+
+        EXPECT_EQ(storage.Read(kUint32Path, AttributeStorage::Buffer::Number(number)),
+                  CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+
+        EXPECT_EQ(storage.Write(kUint32Path, AttributeStorage::Value::Number(number)), CHIP_NO_ERROR);
+        number = 2345;
+        EXPECT_EQ(storage.Read(kUint32Path, AttributeStorage::Buffer::Number(number)), CHIP_NO_ERROR);
+        EXPECT_EQ(number, 1234u);
     }
 
     SetAttributePersistenceProvider(nullptr);

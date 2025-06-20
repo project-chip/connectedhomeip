@@ -78,13 +78,13 @@ public:
         {}
 
         template <typename T>
-        Value Number(T & value)
+        static Value Number(T & value)
         {
             return { ByteSpan(reinterpret_cast<uint8_t *>(&value), sizeof(value)), Type::kNumeric };
         }
 
         template <typename T>
-        Value Raw(ByteSpan bytes)
+        static Value Raw(ByteSpan bytes)
         {
             return { bytes, Type::kRaw };
         }
@@ -124,14 +124,14 @@ public:
         Buffer(LongPascalString<uint8_t> & data) : Buffer(data.Buffer().data(), data.Buffer().size(), Type::kStringTwoByteLength) {}
 
         template <typename T>
-        Buffer Number(T & value)
+        static Buffer Number(T & value)
         {
             return { &value, sizeof(value), Type::kNumeric };
         }
 
         /// initializes the data as "raw". Note that `data()` in this case
         /// will return a pointer to the underlying `MutableByteSpan`
-        Buffer Raw(MutableByteSpan & data) { return { &data, 0, Type::kRaw }; }
+        static Buffer Raw(MutableByteSpan & data) { return { &data, 0, Type::kRaw }; }
 
         void * data() { return mData; }
         size_t size() const { return mBufferSize; }
