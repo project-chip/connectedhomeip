@@ -48,7 +48,7 @@ CHIP_ERROR ICDConfigurationData::SetSlowPollingInterval(System::Clock::Milliseco
 
     mLITPollingInterval = slowPollInterval;
     return CHIP_NO_ERROR;
-};
+}
 
 CHIP_ERROR ICDConfigurationData::SetSITPollingInterval(System::Clock::Milliseconds32 pollingInterval)
 {

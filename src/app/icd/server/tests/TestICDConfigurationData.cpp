@@ -138,7 +138,6 @@ TEST_F(TestICDConfigurationData, TestGetAndSetSlowPollingInterval)
 
     // Reduce slow polling interval to 5s, shorter than SITPollingInterval
     System::Clock::Milliseconds32 shortSlowPollInterval(5000);
-    privateConfigData.SetSlowPollingInterval(shortSlowPollInterval);
     EXPECT_EQ(privateConfigData.SetSlowPollingInterval(shortSlowPollInterval), CHIP_NO_ERROR);
     EXPECT_EQ(configData.GetSlowPollingInterval(), shortSlowPollInterval);
 
@@ -162,7 +161,7 @@ TEST_F(TestICDConfigurationData, TestGetAndSetSlowPollingInterval)
 
     featureMap.Clear(Feature::kLongIdleTimeSupport);
     privateConfigData.SetFeatureMap(featureMap);
-    // Without LIT support, the slow polling interval cannot bet set greater than the SIT polling threshold
+    // Without LIT support, the slow polling interval cannot be set greater than the SIT polling threshold
     EXPECT_EQ(privateConfigData.SetSlowPollingInterval(longerSlowPollInterval), CHIP_ERROR_INVALID_ARGUMENT);
     // Set a Valid Slow Polling Interval greater than the SIT Polling Interval
     System::Clock::Milliseconds32 validSlowPollInterval(12000);
