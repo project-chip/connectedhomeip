@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -101,7 +102,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AllocatePushTransport::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     Structs::TransportOptionsStruct::Type transportOptions;
 
@@ -136,11 +136,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AllocatePushTransportResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Structs::TransportConfigurationStruct::Type transportConfiguration;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -152,7 +151,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AllocatePushTransportResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Structs::TransportConfigurationStruct::DecodableType transportConfiguration;
 
@@ -171,7 +169,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::DeallocatePushTransport::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     uint16_t connectionID = static_cast<uint16_t>(0);
 
@@ -207,7 +204,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ModifyPushTransport::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     uint16_t connectionID = static_cast<uint16_t>(0);
     Structs::TransportOptionsStruct::Type transportOptions;
@@ -245,7 +241,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetTransportStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     DataModel::Nullable<uint16_t> connectionID;
     TransportStatusEnum transportStatus = static_cast<TransportStatusEnum>(0);
@@ -284,7 +279,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ManuallyTriggerTransport::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     uint16_t connectionID                        = static_cast<uint16_t>(0);
     TriggerActivationReasonEnum activationReason = static_cast<TriggerActivationReasonEnum>(0);
@@ -323,7 +317,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::FindTransport::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     Optional<DataModel::Nullable<uint16_t>> connectionID;
 
@@ -358,11 +351,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::FindTransportResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const Structs::TransportConfigurationStruct::Type> transportConfigurations;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -374,7 +366,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::FindTransportResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::PushAvStreamTransport::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::DecodableList<Structs::TransportConfigurationStruct::DecodableType> transportConfigurations;
 

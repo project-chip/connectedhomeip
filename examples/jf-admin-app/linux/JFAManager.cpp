@@ -18,6 +18,7 @@
 
 #include "JFAManager.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
@@ -29,6 +30,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::Controller;
+using namespace chip::Crypto;
 
 JFAManager JFAManager::sJFA;
 
@@ -40,12 +42,15 @@ CHIP_ERROR JFAManager::Init(Server & server)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR JFAManager::FinalizeCommissioning(NodeId nodeId)
+CHIP_ERROR JFAManager::FinalizeCommissioning(NodeId nodeId, bool isJCM, P256PublicKey & trustedIcacPublicKeyB)
 {
     if (jfFabricIndex == kUndefinedFabricId)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
+
+    ChipLogProgress(JointFabric, "FinalizeCommissioning for NodeID: 0x" ChipLogFormatX64 ", isJCM = %d", ChipLogValueX64(nodeId),
+                    isJCM);
 
     ScopedNodeId scopedNodeId = ScopedNodeId(nodeId, jfFabricIndex);
 
@@ -61,11 +66,13 @@ void JFAManager::HandleCommissioningCompleteEvent()
         FabricIndex fabricIndex = fb.GetFabricIndex();
         CATValues cats;
 
-        if ((jfFabricIndex == kUndefinedFabricId) && mServer->GetFabricTable().FetchCATs(fabricIndex, cats) == CHIP_NO_ERROR)
+        if ((jfFabricIndex == kUndefinedFabricIndex) && mServer->GetFabricTable().FetchCATs(fabricIndex, cats) == CHIP_NO_ERROR)
         {
-            /* When JFA is commissioned, it has to be issued with Anchor CAT and Administrator CAT */
+            /* When JFA is commissioned, it has to be issued a NOC with Anchor CAT and Administrator CAT */
             if (cats.ContainsIdentifier(kAdminCATIdentifier) && cats.ContainsIdentifier(kAnchorCATIdentifier))
             {
+                (void) app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::Set(1, fabricIndex);
+
                 jfFabricIndex = fabricIndex;
             }
         }

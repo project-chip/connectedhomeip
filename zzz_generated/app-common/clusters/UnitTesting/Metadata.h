@@ -503,6 +503,12 @@ namespace GlobalEchoRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(GlobalEchoRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kOperate);
 } // namespace GlobalEchoRequest
+namespace TestCheckCommandFlags {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(
+    TestCheckCommandFlags::Id,
+    BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kFabricScoped, DataModel::CommandQualityFlags::kTimed),
+    Access::Privilege::kOperate);
+} // namespace TestCheckCommandFlags
 namespace TestDifferentVendorMeiRequest {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(TestDifferentVendorMeiRequest::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kOperate);

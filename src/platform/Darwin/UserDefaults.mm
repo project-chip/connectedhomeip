@@ -21,8 +21,6 @@
 
 #import <Foundation/Foundation.h>
 
-static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
-
 static NSString * const kBDXThrottleIntervalInMsecsUserDefaultKey = @"BDXThrottleIntervalForThreadDevicesInMSecs";
 
 static NSString * const kBDXThreadFramesPerBlockDefaultKey = @"BDXThreadFramesPerBlock";
@@ -56,15 +54,6 @@ namespace Platform {
         }
 
     } // namespace
-
-    std::optional<uint16_t> GetUserDefaultDnssdSRPTimeoutInMSecs()
-    {
-        std::optional timeoutinMsecs = GetUserDefault<uint16_t>(kSRPTimeoutInMsecsUserDefaultKey, kAcceptZero);
-        if (timeoutinMsecs.has_value()) {
-            ChipLogProgress(Discovery, "Got a user default value for Dnssd SRP timeout - %d msecs", timeoutinMsecs.value());
-        }
-        return timeoutinMsecs;
-    }
 
     std::optional<System::Clock::Milliseconds16> GetUserDefaultBDXThrottleIntervalForThread()
     {

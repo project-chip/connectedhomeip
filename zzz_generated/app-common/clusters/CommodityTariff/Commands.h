@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -81,7 +82,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetTariffComponent::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint32_t tariffComponentID = static_cast<uint32_t>(0);
 
@@ -118,13 +118,12 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetTariffComponentResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<chip::CharSpan> label;
     DataModel::List<const uint32_t> dayEntryIDs;
     Structs::TariffComponentStruct::Type tariffComponent;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -136,7 +135,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetTariffComponentResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<chip::CharSpan> label;
     DataModel::DecodableList<uint32_t> dayEntryIDs;
@@ -157,7 +155,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetDayEntry::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint32_t dayEntryID = static_cast<uint32_t>(0);
 
@@ -192,11 +189,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetDayEntryResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Structs::DayEntryStruct::Type dayEntry;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -208,7 +204,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetDayEntryResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityTariff::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Structs::DayEntryStruct::DecodableType dayEntry;
 

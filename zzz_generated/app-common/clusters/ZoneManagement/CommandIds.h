@@ -27,6 +27,14 @@ namespace RemoveZone {
 inline constexpr CommandId Id = 0x00000005;
 } // namespace RemoveZone
 
+namespace CreateOrUpdateTrigger {
+inline constexpr CommandId Id = 0x00000006;
+} // namespace CreateOrUpdateTrigger
+
+namespace RemoveTrigger {
+inline constexpr CommandId Id = 0x00000007;
+} // namespace RemoveTrigger
+
 namespace CreateTwoDCartesianZoneResponse {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace CreateTwoDCartesianZoneResponse

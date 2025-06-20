@@ -196,6 +196,7 @@ source_set("closure-dimension-test-srcs") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
+    "${chip_root}/zzz_generated/app-common/clusters/ClosureDimension:metadata",
   ]
 }
 
@@ -228,7 +229,6 @@ source_set("closure-control-test-srcs") {
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-logic.cpp",
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-logic.h",
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-matter-context.h",
-    "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-matter-context.h",
     "${chip_root}/src/app/clusters/closure-control-server/closure-control-cluster-objects.h",
   ]
 
@@ -239,6 +239,7 @@ source_set("closure-control-test-srcs") {
     "${chip_root}/src/app/common:enums",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/zzz_generated/app-common/clusters/ClosureControl:metadata",
   ]
 }
 
@@ -348,7 +349,10 @@ chip_test_suite("tests") {
     ]
   } else if (!chip_fake_platform) {
     test_sources += [ "TestThreadBorderRouterManagementCluster.cpp" ]
-    public_deps += [ ":thread-border-router-management-test-srcs" ]
+    public_deps += [
+      ":thread-border-router-management-test-srcs",
+      "${chip_root}/src/app/clusters/general-commissioning-server:test-only-temporary-coupling",
+    ]
   }
 
   if (!chip_fake_platform) {

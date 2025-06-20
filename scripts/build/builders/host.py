@@ -350,7 +350,7 @@ class HostBoard(Enum):
 class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE,
-                 enable_ipv4=True, enable_ble=True, enable_wifi=True,
+                 enable_ipv4=True, enable_ble=True, enable_wifi=True, enable_wifipaf=True,
                  enable_thread=True, use_tsan=False, use_asan=False, use_ubsan=False,
                  separate_event_loop=True, fuzzing_type: HostFuzzingType = HostFuzzingType.NONE, use_clang=False,
                  interactive_mode=True, extra_tests=False, use_nl_fault_injection=False, use_platform_mdns=False, enable_rpcs=False,
@@ -361,7 +361,7 @@ class HostBuilder(GnBuilder):
                  chip_casting_simplified: Optional[bool] = None,
                  disable_shell=False,
                  use_googletest=False,
-                 terms_and_conditions_required: Optional[bool] = None,
+                 terms_and_conditions_required: Optional[bool] = None, chip_enable_nfc_based_commissioning=None,
                  ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
@@ -382,6 +382,9 @@ class HostBuilder(GnBuilder):
         if not enable_ble:
             self.extra_gn_options.append('chip_config_network_layer_ble=false')
             self.extra_gn_options.append('chip_enable_ble=false')
+
+        if not enable_wifipaf:
+            self.extra_gn_options.append('chip_device_config_enable_wifipaf=false')
 
         if not enable_wifi:
             self.extra_gn_options.append('chip_enable_wifi=false')
@@ -483,6 +486,12 @@ class HostBuilder(GnBuilder):
                 self.extra_gn_options.append('chip_enable_dnssd_tests=true')
             else:
                 self.extra_gn_options.append('chip_enable_dnssd_tests=false')
+
+        if chip_enable_nfc_based_commissioning is not None:
+            if chip_enable_nfc_based_commissioning:
+                self.extra_gn_options.append('chip_enable_nfc_based_commissioning=true')
+            else:
+                self.extra_gn_options.append('chip_enable_nfc_based_commissioning=false')
 
         if chip_casting_simplified is not None:
             self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')

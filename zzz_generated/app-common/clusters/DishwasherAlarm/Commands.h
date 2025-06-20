@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -71,7 +72,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Reset::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::BitMask<AlarmBitmap> alarms = static_cast<chip::BitMask<AlarmBitmap>>(0);
 
@@ -106,7 +106,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ModifyEnabledAlarms::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DishwasherAlarm::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::BitMask<AlarmBitmap> mask = static_cast<chip::BitMask<AlarmBitmap>>(0);
 

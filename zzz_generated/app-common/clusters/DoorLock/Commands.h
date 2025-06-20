@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -196,7 +197,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::LockDoor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Optional<chip::ByteSpan> PINCode;
 
@@ -231,7 +231,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::UnlockDoor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Optional<chip::ByteSpan> PINCode;
 
@@ -267,7 +266,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::UnlockWithTimeout::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t timeout = static_cast<uint16_t>(0);
     Optional<chip::ByteSpan> PINCode;
@@ -310,7 +308,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetWeekDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t weekDayIndex                = static_cast<uint8_t>(0);
     uint16_t userIndex                  = static_cast<uint16_t>(0);
@@ -358,7 +355,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetWeekDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t weekDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
@@ -402,7 +398,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetWeekDayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t weekDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
@@ -413,7 +408,7 @@ public:
     Optional<uint8_t> endHour;
     Optional<uint8_t> endMinute;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -425,7 +420,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetWeekDayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t weekDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
@@ -452,7 +446,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ClearWeekDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t weekDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
@@ -492,7 +485,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetYearDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t yearDayIndex    = static_cast<uint8_t>(0);
     uint16_t userIndex      = static_cast<uint16_t>(0);
@@ -534,7 +526,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetYearDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t yearDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
@@ -575,7 +566,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetYearDayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t yearDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
@@ -583,7 +573,7 @@ public:
     Optional<uint32_t> localStartTime;
     Optional<uint32_t> localEndTime;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -595,7 +585,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetYearDayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t yearDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
@@ -619,7 +608,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ClearYearDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t yearDayIndex = static_cast<uint8_t>(0);
     uint16_t userIndex   = static_cast<uint16_t>(0);
@@ -659,7 +647,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetHolidaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t holidayIndex            = static_cast<uint8_t>(0);
     uint32_t localStartTime         = static_cast<uint32_t>(0);
@@ -700,7 +687,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetHolidaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t holidayIndex = static_cast<uint8_t>(0);
 
@@ -739,7 +725,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetHolidayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t holidayIndex = static_cast<uint8_t>(0);
     DlStatus status      = static_cast<DlStatus>(0);
@@ -747,7 +732,7 @@ public:
     Optional<uint32_t> localEndTime;
     Optional<OperatingModeEnum> operatingMode;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -759,7 +744,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetHolidayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t holidayIndex = static_cast<uint8_t>(0);
     DlStatus status      = static_cast<DlStatus>(0);
@@ -782,7 +766,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ClearHolidaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t holidayIndex = static_cast<uint8_t>(0);
 
@@ -823,7 +806,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetUser::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataOperationTypeEnum operationType = static_cast<DataOperationTypeEnum>(0);
     uint16_t userIndex                  = static_cast<uint16_t>(0);
@@ -870,7 +852,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetUser::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t userIndex = static_cast<uint16_t>(0);
 
@@ -914,7 +895,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetUserResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t userIndex = static_cast<uint16_t>(0);
     DataModel::Nullable<chip::CharSpan> userName;
@@ -927,7 +907,7 @@ public:
     DataModel::Nullable<chip::FabricIndex> lastModifiedFabricIndex;
     DataModel::Nullable<uint16_t> nextUserIndex;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -939,7 +919,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetUserResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t userIndex = static_cast<uint16_t>(0);
     DataModel::Nullable<chip::CharSpan> userName;
@@ -967,7 +946,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ClearUser::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t userIndex = static_cast<uint16_t>(0);
 
@@ -1007,7 +985,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetCredential::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataOperationTypeEnum operationType = static_cast<DataOperationTypeEnum>(0);
     Structs::CredentialStruct::Type credential;
@@ -1054,13 +1031,12 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetCredentialResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DlStatus status = static_cast<DlStatus>(0);
     DataModel::Nullable<uint16_t> userIndex;
     DataModel::Nullable<uint16_t> nextCredentialIndex;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -1072,7 +1048,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::SetCredentialResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DlStatus status = static_cast<DlStatus>(0);
     DataModel::Nullable<uint16_t> userIndex;
@@ -1093,7 +1068,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetCredentialStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Structs::CredentialStruct::Type credential;
 
@@ -1133,7 +1107,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetCredentialStatusResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     bool credentialExists = static_cast<bool>(0);
     DataModel::Nullable<uint16_t> userIndex;
@@ -1142,7 +1115,7 @@ public:
     DataModel::Nullable<uint16_t> nextCredentialIndex;
     Optional<DataModel::Nullable<chip::ByteSpan>> credentialData;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -1154,7 +1127,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetCredentialStatusResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     bool credentialExists = static_cast<bool>(0);
     DataModel::Nullable<uint16_t> userIndex;
@@ -1178,7 +1150,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ClearCredential::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<Structs::CredentialStruct::Type> credential;
 
@@ -1213,7 +1184,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::UnboltDoor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Optional<chip::ByteSpan> PINCode;
 
@@ -1251,7 +1221,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetAliroReaderConfig::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::ByteSpan signingKey;
     chip::ByteSpan verificationKey;
@@ -1291,7 +1260,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ClearAliroReaderConfig::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 

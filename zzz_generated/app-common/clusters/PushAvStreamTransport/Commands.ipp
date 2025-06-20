@@ -59,10 +59,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
 } // namespace AllocatePushTransport.
 namespace AllocatePushTransportResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kTransportConfiguration), transportConfiguration);
+    encoder.EncodeResponseCommandFabricScopedStructField(to_underlying(Fields::kTransportConfiguration),
+                                                         aWriter.mAccessingFabricIndex, transportConfiguration);
     return encoder.Finalize();
 }
 
@@ -247,10 +248,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader, FabricIndex aAccessing
 } // namespace FindTransport.
 namespace FindTransportResponse {
 
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kTransportConfigurations), transportConfigurations);
+    encoder.EncodeResponseCommandFabricScopedStructField(to_underlying(Fields::kTransportConfigurations),
+                                                         aWriter.mAccessingFabricIndex, transportConfigurations);
     return encoder.Finalize();
 }
 

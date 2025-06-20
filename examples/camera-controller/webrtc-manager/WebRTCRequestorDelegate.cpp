@@ -38,7 +38,7 @@ CHIP_ERROR WebRTCRequestorDelegate::HandleAnswer(uint16_t sessionId, const std::
     return WebRTCManager::Instance().HandleAnswer(sessionId, sdpAnswer);
 }
 
-CHIP_ERROR WebRTCRequestorDelegate::HandleICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates)
+CHIP_ERROR WebRTCRequestorDelegate::HandleICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates)
 {
     ChipLogProgress(Camera, "WebRTCRequestorDelegate::HandleICECandidates");
     return WebRTCManager::Instance().HandleICECandidates(sessionId, candidates);

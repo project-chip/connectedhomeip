@@ -13,12 +13,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include <cmath>
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
+#include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/SoftwareDiagnostics/Enums.h>
@@ -28,7 +27,7 @@
 #include <lib/support/ReadOnlyBuffer.h>
 #include <platform/DiagnosticDataProvider.h>
 
-#include <map>
+#include <cmath>
 
 namespace {
 
@@ -37,76 +36,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 
-// Comparse two attribute entries as "sets of attributes" and ensures that the content is identical
-bool EqualAttributeSets(Span<const AttributeEntry> a, Span<const AttributeEntry> b)
-{
-
-    std::map<AttributeId, const AttributeEntry *> entriesA;
-    std::map<AttributeId, const AttributeEntry *> entriesB;
-
-    for (const AttributeEntry & entry : a)
-    {
-        if (!entriesA.emplace(entry.attributeId, &entry).second)
-        {
-            ChipLogError(Test, "Duplicate attribute ID in span A: 0x%08X", static_cast<int>(entry.attributeId));
-            return false;
-        }
-    }
-
-    for (const AttributeEntry & entry : b)
-    {
-        if (!entriesB.emplace(entry.attributeId, &entry).second)
-        {
-            ChipLogError(Test, "Duplicate attribute ID in span B: 0x%08X", static_cast<int>(entry.attributeId));
-            return false;
-        }
-    }
-
-    if (entriesA.size() != entriesB.size())
-    {
-        ChipLogError(Test, "Sets of different sizes.");
-
-        for (const auto it : entriesA)
-        {
-            if (entriesB.find(it.first) == entriesB.end())
-            {
-                ChipLogError(Test, "Attribute 0x%08X missing in B", static_cast<int>(it.first));
-            }
-        }
-
-        for (const auto it : entriesB)
-        {
-            if (entriesA.find(it.first) == entriesA.end())
-            {
-                ChipLogError(Test, "Attribute 0x%08X missing in A", static_cast<int>(it.first));
-            }
-        }
-
-        return false;
-    }
-
-    for (const auto it : entriesA)
-    {
-        const auto other = entriesB.find(it.first);
-        if (other == entriesB.end())
-        {
-
-            ChipLogError(Test, "Missing entry: 0x%08X", static_cast<int>(it.first));
-            return false;
-        }
-
-        if (*it.second != *other->second)
-        {
-
-            ChipLogError(Test, "Different content (different flags?): 0x%08X", static_cast<int>(it.first));
-            return false;
-        }
-    }
-    // set sizes are the same and all entreisA have a corresponding entriesB, so sets should match
-    return true;
-}
-
-// initialize memory as ReadOnlyBufferBuilder may allocate
 struct TestSoftwareDiagnosticsCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -157,7 +86,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
         ASSERT_EQ(diag.Attributes(attributesBuilder), CHIP_NO_ERROR);
 
-        ASSERT_TRUE(EqualAttributeSets(attributesBuilder.TakeBuffer(), DefaultServerCluster::GlobalAttributes()));
+        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), DefaultServerCluster::GlobalAttributes()));
     }
 
     {
@@ -198,7 +127,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
         ASSERT_EQ(expectedBuilder.AppendElements({ SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::kMetadataEntry }),
                   CHIP_NO_ERROR);
 
-        ASSERT_TRUE(EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
     }
 
     {
@@ -260,7 +189,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
                   }),
                   CHIP_NO_ERROR);
 
-        ASSERT_TRUE(EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
+        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 
         // assert values are read correctly
         uint64_t value = 0;

@@ -246,3 +246,7 @@ config CHIP_USE_MARS_SENSOR
 	bool "Use Mars board sensor"
 	depends on SOC_RISCV_TELINK_B9X && (BOARD_TLSR9518ADK80D || BOARD_TLSR9518ADK80D_RETENTION)
 	default n
+
+config TFLM_FEATURE
+	bool "Enable the TFLM micro speech feature"
+	default n

@@ -19,15 +19,4 @@
 #ifndef APP_CONFIG_H
 #define APP_CONFIG_H
 
-#define APP_TASK_NAME "APP"
-
-// Mapping of Functional buttons
-#define APP_READ_TEMPERATURE_BUTTON BTN_SW1
-#define APP_COMMISSION_BUTTON BTN_SW3
-#define APP_FUNCTION5_BUTTON BTN_SW5
-
-// Mapping of LEDs
-#define SYSTEM_STATE_LED LED_GREEN
-#define SYSTEM_OPERATING_LED LED_WHITE
-
 #endif // APP_CONFIG_H

@@ -663,6 +663,7 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
         switch (aCommand)
         {
         case Clusters::UnitTesting::Commands::TimedInvokeRequest::Id:
+        case Clusters::UnitTesting::Commands::TestCheckCommandFlags::Id:
             return true;
         default:
             return false;
@@ -1369,8 +1370,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::TlsCertificateManagement::Commands::FindRootCertificate::Id:
             return true;
-        case Clusters::TlsCertificateManagement::Commands::FindRootCertificateResponse::Id:
-            return true;
         case Clusters::TlsCertificateManagement::Commands::LookupRootCertificate::Id:
             return true;
         case Clusters::TlsCertificateManagement::Commands::RemoveRootCertificate::Id:
@@ -1380,8 +1379,6 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         case Clusters::TlsCertificateManagement::Commands::ProvisionClientCertificate::Id:
             return true;
         case Clusters::TlsCertificateManagement::Commands::FindClientCertificate::Id:
-            return true;
-        case Clusters::TlsCertificateManagement::Commands::FindClientCertificateResponse::Id:
             return true;
         case Clusters::TlsCertificateManagement::Commands::LookupClientCertificate::Id:
             return true;
@@ -1407,6 +1404,8 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
     case Clusters::UnitTesting::Id: {
         switch (aCommand)
         {
+        case Clusters::UnitTesting::Commands::TestCheckCommandFlags::Id:
+            return true;
         default:
             return false;
         }
@@ -1621,6 +1620,10 @@ bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
     }
     if ((aCluster == Clusters::TlsClientManagement::Id) &&
         (aCommand == Clusters::TlsClientManagement::Commands::RemoveEndpoint::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::UnitTesting::Id) && (aCommand == Clusters::UnitTesting::Commands::TestCheckCommandFlags::Id))
     {
         return true;
     }

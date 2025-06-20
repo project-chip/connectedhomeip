@@ -101,6 +101,9 @@ related SDK tests.
 
 1. Implement new clusters here:
    [src/app/clusters](https://github.com/project-chip/connectedhomeip/tree/master/src/app/clusters)
+
+    Documentation [here](../guides/writing_clusters.md)
+
 2. Implement tests here:
    [src/app/tests/suites](https://github.com/project-chip/connectedhomeip/tree/master/src/app/tests/suites)
 3. Implement the example cluster server application:
@@ -244,4 +247,4 @@ code and to commit the results to the git repo?
 
 **Q5**: Where can I find ZAP documentation?
 
-**A5**: https://github.com/project-chip/zap/blob/master/README.md
+**A5**: <https://github.com/project-chip/zap/blob/master/README.md>

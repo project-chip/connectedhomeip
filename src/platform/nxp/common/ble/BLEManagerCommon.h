@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2021,2025 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -71,7 +71,7 @@ typedef enum service_mode_t
 } service_mode_t;
 
 /**
- * Base class for different platform implementations (K32W0 and K32W1 for now).
+ * Base class for different platform implementations.
  */
 class BLEManagerCommon : public BLEManager, protected BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
 {

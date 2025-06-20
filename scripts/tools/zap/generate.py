@@ -269,7 +269,7 @@ def expandPlaceholderWildcards(path: str) -> Generator[str, None, None]:
         path = path[:s] + '*' + path[e+1:]
 
     # path is a glob target, expand it
-    for result in glob.glob(path, include_hidden=True):
+    for result in glob.glob(path):
         yield result
 
 

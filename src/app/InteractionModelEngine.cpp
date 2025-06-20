@@ -25,17 +25,15 @@
 
 #include "InteractionModelEngine.h"
 
-#include <cinttypes>
-
 #include <access/AccessRestrictionProvider.h>
 #include <access/Privilege.h>
 #include <access/RequestPath.h>
 #include <access/SubjectDescriptor.h>
 #include <app/AppConfig.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/ConcreteClusterPath.h>
 #include <app/EventPathParams.h>
-#include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
 #include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/MetadataTypes.h>
@@ -54,6 +52,8 @@
 #include <lib/support/ReadOnlyBuffer.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <cinttypes>
+
 namespace chip {
 namespace app {
 namespace {
@@ -65,7 +65,8 @@ namespace {
  *    - Cluster::View in case the path is a wildcard for the event id
  *    - Event read if the path is a concrete event path
  */
-bool MayHaveAccessibleEventPathForEndpointAndCluster(const ConcreteClusterPath & path, const EventPathParams & aEventPath,
+bool MayHaveAccessibleEventPathForEndpointAndCluster(DataModel::Provider * aProvider, const ConcreteClusterPath & path,
+                                                     const EventPathParams & aEventPath,
                                                      const Access::SubjectDescriptor & aSubjectDescriptor)
 {
     Access::RequestPath requestPath{ .cluster     = path.mClusterId,
@@ -77,8 +78,21 @@ bool MayHaveAccessibleEventPathForEndpointAndCluster(const ConcreteClusterPath &
     if (!aEventPath.HasWildcardEventId())
     {
         requestPath.entityId = aEventPath.mEventId;
-        requiredPrivilege =
-            RequiredPrivilege::ForReadEvent(ConcreteEventPath(path.mEndpointId, path.mClusterId, aEventPath.mEventId));
+
+        DataModel::EventEntry eventInfo;
+        if (aProvider->EventInfo(
+                {
+                    aEventPath.mEndpointId,
+                    aEventPath.mClusterId,
+                    aEventPath.mEventId,
+                },
+                eventInfo) != CHIP_NO_ERROR)
+        {
+            // Non-wildcard path is not valid, so the event represented by the path is not accessible
+            // (because it does not exist at all).
+            return false;
+        }
+        requiredPrivilege = eventInfo.readPrivilege;
     }
 
     return (Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requiredPrivilege) == CHIP_NO_ERROR);
@@ -89,14 +103,14 @@ bool MayHaveAccessibleEventPathForEndpoint(DataModel::Provider * aProvider, Endp
 {
     if (!aEventPath.HasWildcardClusterId())
     {
-        return MayHaveAccessibleEventPathForEndpointAndCluster(ConcreteClusterPath(aEndpoint, aEventPath.mClusterId), aEventPath,
-                                                               aSubjectDescriptor);
+        return MayHaveAccessibleEventPathForEndpointAndCluster(aProvider, ConcreteClusterPath(aEndpoint, aEventPath.mClusterId),
+                                                               aEventPath, aSubjectDescriptor);
     }
 
     for (auto & cluster : aProvider->ServerClustersIgnoreError(aEndpoint))
     {
-        if (MayHaveAccessibleEventPathForEndpointAndCluster(ConcreteClusterPath(aEndpoint, cluster.clusterId), aEventPath,
-                                                            aSubjectDescriptor))
+        if (MayHaveAccessibleEventPathForEndpointAndCluster(aProvider, ConcreteClusterPath(aEndpoint, cluster.clusterId),
+                                                            aEventPath, aSubjectDescriptor))
         {
             return true;
         }
@@ -123,6 +137,29 @@ bool MayHaveAccessibleEventPath(DataModel::Provider * aProvider, const EventPath
         }
     }
     return false;
+}
+
+/// Checks if the given path/attributeId, entry are ACL-accessible
+/// for the given subject descriptor
+bool IsAccessibleAttributeEntry(const ConcreteAttributePath & path, const Access::SubjectDescriptor & subjectDescriptor,
+                                const std::optional<DataModel::AttributeEntry> & entry)
+{
+    if (!entry.has_value() || !entry->GetReadPrivilege().has_value())
+    {
+        // Entry must be valid and be readable to begin with
+        return false;
+    }
+
+    Access::RequestPath requestPath{ .cluster     = path.mClusterId,
+                                     .endpoint    = path.mEndpointId,
+                                     .requestType = Access::RequestType::kAttributeReadRequest,
+                                     .entityId    = path.mAttributeId };
+
+    // We know entry has value and GetReadPrivilege has value according to the check above
+    // the assign below is safe.
+    const Access::Privilege privilege = *entry->GetReadPrivilege(); // NOLINT(bugprone-unchecked-optional-access)
+
+    return (Access::GetAccessControl().Check(subjectDescriptor, requestPath, privilege) == CHIP_NO_ERROR);
 }
 
 } // namespace
@@ -601,18 +638,17 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
             auto state = AttributePathExpandIterator::Position::StartIterating(&paramsList);
             AttributePathExpandIterator pathIterator(GetDataModelProvider(), state);
             ConcreteAttributePath readPath;
+            std::optional<DataModel::AttributeEntry> entry;
 
             // The definition of "valid path" is "path exists and ACL allows access". The "path exists" part is handled by
             // AttributePathExpandIterator. So we just need to check the ACL bits.
-            while (pathIterator.Next(readPath))
+            while (pathIterator.Next(readPath, &entry))
             {
-                // leave requestPath.entityId optional value unset to indicate wildcard
-                Access::RequestPath requestPath{ .cluster     = readPath.mClusterId,
-                                                 .endpoint    = readPath.mEndpointId,
-                                                 .requestType = Access::RequestType::kAttributeReadRequest };
-                err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath,
-                                                       RequiredPrivilege::ForReadAttribute(readPath));
-                if (err == CHIP_NO_ERROR)
+                // readPath is based on path expansion, so entire path is a `valid attribute path`.
+                //
+                // Here we check if the cluster is accessible at all (at least one attribute) for the
+                // given entry permissions.
+                if (IsAccessibleAttributeEntry(readPath, aSubjectDescriptor, entry))
                 {
                     aHasValidAttributePath = true;
                     break;
@@ -624,19 +660,11 @@ CHIP_ERROR InteractionModelEngine::ParseAttributePaths(const Access::SubjectDesc
             ConcreteAttributePath concretePath(paramsList.mValue.mEndpointId, paramsList.mValue.mClusterId,
                                                paramsList.mValue.mAttributeId);
 
-            if (IsExistentAttributePath(concretePath))
-            {
-                Access::RequestPath requestPath{ .cluster     = concretePath.mClusterId,
-                                                 .endpoint    = concretePath.mEndpointId,
-                                                 .requestType = Access::RequestType::kAttributeReadRequest,
-                                                 .entityId    = paramsList.mValue.mAttributeId };
+            std::optional<DataModel::AttributeEntry> entry = FindAttributeEntry(concretePath);
 
-                err = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath,
-                                                       RequiredPrivilege::ForReadAttribute(concretePath));
-                if (err == CHIP_NO_ERROR)
-                {
-                    aHasValidAttributePath = true;
-                }
+            if (IsAccessibleAttributeEntry(concretePath, aSubjectDescriptor, entry))
+            {
+                aHasValidAttributePath = true;
             }
         }
 
@@ -1614,10 +1642,10 @@ CHIP_ERROR InteractionModelEngine::PushFrontAttributePathList(SingleLinkedListNo
     return err;
 }
 
-bool InteractionModelEngine::IsExistentAttributePath(const ConcreteAttributePath & path)
+std::optional<DataModel::AttributeEntry> InteractionModelEngine::FindAttributeEntry(const ConcreteAttributePath & path)
 {
     DataModel::AttributeFinder finder(mDataModelProvider);
-    return finder.Find(path).has_value();
+    return finder.Find(path);
 }
 
 void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(SingleLinkedListNode<AttributePathParams> *& aAttributePaths)
@@ -1631,8 +1659,9 @@ void InteractionModelEngine::RemoveDuplicateConcreteAttributePath(SingleLinkedLi
 
         // skip all wildcard paths and invalid concrete attribute
         if (path1->mValue.IsWildcardPath() ||
-            !IsExistentAttributePath(
-                ConcreteAttributePath(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId)))
+            !FindAttributeEntry(
+                 ConcreteAttributePath(path1->mValue.mEndpointId, path1->mValue.mClusterId, path1->mValue.mAttributeId))
+                 .has_value())
         {
             prev  = path1;
             path1 = path1->mpNext;
@@ -1811,9 +1840,15 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(c
 Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(const DataModel::InvokeRequest & aRequest,
                                                                               const DataModel::AcceptedCommandEntry & entry)
 {
-    const bool commandNeedsTimedInvoke = entry.HasFlags(DataModel::CommandQualityFlags::kTimed);
-    const bool commandIsFabricScoped   = entry.HasFlags(DataModel::CommandQualityFlags::kFabricScoped);
+    // Command that is marked as having a large payload must be sent over a
+    // session that supports it.
+    if (entry.HasFlags(DataModel::CommandQualityFlags::kLargeMessage) &&
+        !CurrentExchange()->GetSessionHandle()->AllowsLargePayload())
+    {
+        return Status::InvalidTransportType;
+    }
 
+    const bool commandIsFabricScoped = entry.HasFlags(DataModel::CommandQualityFlags::kFabricScoped);
     if (commandIsFabricScoped)
     {
         // SPEC: Else if the command in the path is fabric-scoped and there is no accessing fabric,
@@ -1827,17 +1862,10 @@ Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandFlags(co
         }
     }
 
+    const bool commandNeedsTimedInvoke = entry.HasFlags(DataModel::CommandQualityFlags::kTimed);
     if (commandNeedsTimedInvoke && !aRequest.invokeFlags.Has(DataModel::InvokeFlags::kTimed))
     {
         return Status::NeedsTimedInteraction;
-    }
-
-    // Command that is marked as having a large payload must be sent over a
-    // session that supports it.
-    if (entry.HasFlags(DataModel::CommandQualityFlags::kLargeMessage) &&
-        !CurrentExchange()->GetSessionHandle()->AllowsLargePayload())
-    {
-        return Status::InvalidTransportType;
     }
 
     return Status::Success;

@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -135,7 +136,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Play::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -165,7 +165,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Pause::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -195,7 +194,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Stop::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -225,7 +223,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::StartOver::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -255,7 +252,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Previous::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -285,7 +281,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Next::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -316,7 +311,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Rewind::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Optional<bool> audioAdvanceUnmuted;
 
@@ -351,7 +345,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::FastForward::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Optional<bool> audioAdvanceUnmuted;
 
@@ -386,7 +379,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SkipForward::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint64_t deltaPositionMilliseconds = static_cast<uint64_t>(0);
 
@@ -421,7 +413,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SkipBackward::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint64_t deltaPositionMilliseconds = static_cast<uint64_t>(0);
 
@@ -457,12 +448,11 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::PlaybackResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     StatusEnum status = static_cast<StatusEnum>(0);
     Optional<chip::CharSpan> data;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -474,7 +464,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::PlaybackResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     StatusEnum status = static_cast<StatusEnum>(0);
     Optional<chip::CharSpan> data;
@@ -494,7 +483,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Seek::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint64_t position = static_cast<uint64_t>(0);
 
@@ -530,7 +518,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ActivateAudioTrack::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::CharSpan trackID;
     uint8_t audioOutputIndex = static_cast<uint8_t>(0);
@@ -567,7 +554,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ActivateTextTrack::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     chip::CharSpan trackID;
 
@@ -601,7 +587,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::DeactivateTextTrack::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 

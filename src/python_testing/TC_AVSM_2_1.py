@@ -111,7 +111,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             ),
             TestStep(
                 20,
-                "TH reads RankedVideoStreamPrioritiesList attribute.",
+                "TH reads StreamUsagePriorities attribute.",
                 "Verify that the DUT response contains a list of StreamUsageEnum entries.",
             ),
             TestStep(
@@ -282,9 +282,9 @@ class TC_AVSM_2_1(MatterBaseTest):
         self.step(20)
         if self.pics_guard(self.check_pics("AVSM.S.A0012")):
             value = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attr.RankedVideoStreamPrioritiesList
+                endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
             )
-            logger.info(f"Rx'd RankedVideoStreamPrioritiesList: {value}")
+            logger.info(f"Rx'd StreamUsagePrioritiesList: {value}")
 
         self.step(21)
         if self.pics_guard(self.check_pics("AVSM.S.A0013")):

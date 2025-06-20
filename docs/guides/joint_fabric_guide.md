@@ -231,7 +231,7 @@ $ ./chip-lighting-app --capabilities 0x4 --passcode 110220066 --KVS light_b_kvs
 -   Commission lighting-app
 
 ```
->>> pairing onnetwork 22 110220044
+>>> pairing onnetwork 22 110220066
 ```
 
 Check that a Fabric having `AdminVendorID` set to 0xFFF2 has been installed:

@@ -50,7 +50,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:132
+            image: ghcr.io/project-chip/chip-build:140
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
@@ -195,6 +195,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/rvc-clean-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/rvc-run-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/scene.xml \
+                      src/app/zap-templates/zcl/data-model/chip/service-area-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/smoke-co-alarm-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/software-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/soil-measurement-cluster.xml \
@@ -485,7 +486,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:132
+            image: ghcr.io/project-chip/chip-build:140
             options:
                --privileged
                --sysctl net.ipv6.conf.all.disable_ipv6=0
@@ -533,6 +534,7 @@ jobs:
                       --target linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang \
                       --target linux-x64-fabric-sync-${BUILD_VARIANT}-clang \
                       --target linux-x64-camera \
+                      --target linux-x64-camera-controller \
                       --target linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang \
                       --target linux-x64-terms-and-conditions \
                       --target linux-x64-python-bindings \
@@ -546,6 +548,7 @@ jobs:
                   echo "BRIDGE_APP: out/linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test/chip-bridge-app" >> /tmp/test_env.yaml
                   echo "CHIP_LOCK_APP: out/linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test/chip-lock-app" >> /tmp/test_env.yaml
                   echo "CAMERA_APP: out/linux-x64-camera/chip-camera-app" >> /tmp/test_env.yaml
+                  echo "CAMERA_CONTROLLER_APP: out/linux-x64-camera-controller/chip-camera-controller" >> /tmp/test_env.yaml                  
                   echo "ENERGY_MANAGEMENT_APP: out/linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test/chip-energy-management-app" >> /tmp/test_env.yaml
                   echo "ENERGY_GATEWAY_APP: out/linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test/chip-energy-gateway-app" >> /tmp/test_env.yaml
                   echo "LIT_ICD_APP: out/linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test/lit-icd-app" >> /tmp/test_env.yaml

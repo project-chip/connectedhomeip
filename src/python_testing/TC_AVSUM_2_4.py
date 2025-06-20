@@ -36,6 +36,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
+from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 from TC_AVSUMTestBase import AVSUMTestBase
@@ -61,15 +62,21 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(2, "Read the value of MaxPresets, fail if unsupported."),
             TestStep(3, "Read the value of MPTZPresets, fail if unsupported"),
-            TestStep(4, "If MPTZPresets is empty, jump to step 9"),
-            TestStep(5, "Verify that the size of the Presets List is not greater than MaxPresets"),
-            TestStep(6, "Loop over the supported presets, for each verify the PresetID and Name are in range"),
-            TestStep(7, "For each found preset, invoke MoveToPreset with the PresetID. Verify that the MPTZPosition is that from the Preset"),
-            TestStep(8, "Exit the testcase"),
-            TestStep(9, "Create a new saved preset with PresetID of MaxPresets"),
-            TestStep(10, "Move to a new MPTZPosition that is the mid-point of all support PTZ attributes"),
-            TestStep(11, "Move to the newly saved preset"),
-            TestStep(12, "Verify that the MPTZPosition is that of the preset"),
+            TestStep(4, "Send a MPTZMovePreset command with a presetID of MaxPresets+1. Verify Constraint Error failure response."),
+            TestStep(5, "If MPTZPresets is empty, jump to step 11"),
+            TestStep(6, "Verify that the size of the Presets List is not greater than MaxPresets"),
+            TestStep(7, "Loop over the supported presets, for each verify the PresetID and Name are in range"),
+            TestStep(8, "For each found preset, invoke MoveToPreset with the PresetID. Verify that the MPTZPosition is that from the Preset"),
+            TestStep(9, "If PIXIT.CANBEMADEBUSY is set, place the DUT into a state where it cannot accept a command. Else exit the test case."),
+            TestStep(10, "Send an MPTZMoveToPreset Command with a valid presetID. Verify busy failure response. End the text case"),
+            TestStep(11, "Send a MPTZMovePreset command with a presetID of MaxPresets. Verify Not Found failure response."),
+            TestStep(12, "Create a new saved preset with PresetID of MaxPresets"),
+            TestStep(13, "Create a new MPTZPosition that is the mid-point of all support PTZ attributes"),
+            TestStep(14, "Move to a the MPTZPosition created in step 13."),
+            TestStep(15, "Move to the saved preset from step 12"),
+            TestStep(16, "Verify that the MPTZPosition is that of the preset"),
+            TestStep(17, "If PIXIT.CANBEMADEBUSY is set, place the DUT into a state where it cannot accept a command. Else exit the test case."),
+            TestStep(18, "Send an MPTZMoveToPreset Command with a valid presetID. Verify busy failure response."),
         ]
         return steps
 
@@ -85,6 +92,8 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         attributes = cluster.Attributes
         endpoint = self.get_endpoint(default=1)
+        # PIXIT check
+        canbemadebusy = self.user_params.get("PIXIT.CANBEMADEBUSY", False)
 
         tilt_min_dut = tilt_max_dut = pan_min_dut = pan_max_dut = zoom_max_dut = None
 
@@ -125,13 +134,16 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
         mptz_presets_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPresets)
 
         self.step(4)
+        await self.send_move_to_preset_command(endpoint, max_presets_dut+1, expected_status=Status.ConstraintError)
+
+        self.step(5)
         if mptz_presets_dut:
-            self.step(5)
+            self.step(6)
             asserts.assert_less_equal(len(mptz_presets_dut), max_presets_dut,
                                       "MPTZPresets size is greater than the allowed max.")
 
-            self.step(6)
             self.step(7)
+            self.step(8)
             for mptzpreset in mptz_presets_dut:
                 asserts.assert_less_equal(mptzpreset.presetID, max_presets_dut, "PresetID is out of range")
                 asserts.assert_less_equal(len(mptzpreset.name), 32, "Preset name is too long")
@@ -141,17 +153,34 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
                 await self.send_move_to_preset_command(endpoint, mptzpreset.presetID)
                 mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
                 self.verify_preset_matches(mptzpreset, mptzposition_dut)
-            self.step(8)
-            self.skip_all_remaining_tests(9)
+
+            self.step(9)
+            if canbemadebusy:
+                self.step(10)
+                # Busy response check
+                if not self.is_ci:
+                    self.wait_for_user_input(prompt_msg="Place device into a busy state. Hit ENTER once ready.")
+                    await self.send_move_to_preset_command(endpoint, mptz_presets_dut[0].presetID, expected_status=Status.Busy)
+            else:
+                self.skip_step(10)
+            self.mark_all_remaining_steps_skipped(11)
+            return
         else:
-            self.skip_step(5)
             self.skip_step(6)
             self.skip_step(7)
             self.skip_step(8)
-            self.step(9)
+            self.skip_step(9)
+            self.skip_step(10)
+            self.step(11)
+            # Empty list, expect Not Found
+            await self.send_move_to_preset_command(endpoint, max_presets_dut, expected_status=Status.NotFound)
+
             # For now force a preset to be present so there is something to read
-            await self.send_save_presets_command(endpoint, name="newpreset", presetID=max_presets_dut)
+            self.step(12)
+            await self.send_save_preset_command(endpoint, name="newpreset", presetID=max_presets_dut)
             stored_preset = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPresets)
+
+            self.step(13)
             newPan = newTilt = newZoom = None
             if self.has_feature_mpan:
                 newPan = (pan_max_dut - pan_min_dut)//2
@@ -160,15 +189,25 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
             if self.has_feature_mzoom:
                 newZoom = (zoom_max_dut)//2
 
-            self.step(10)
+            self.step(14)
             await self.send_mptz_set_position_command(endpoint, newPan, newTilt, newZoom)
 
-            self.step(11)
+            self.step(15)
             await self.send_move_to_preset_command(endpoint, max_presets_dut)
             mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
 
-            self.step(12)
+            self.step(16)
             self.verify_preset_matches(stored_preset[0], mptzposition_dut)
+
+            self.step(17)
+            if canbemadebusy:
+                self.step(18)
+                # Busy response check
+                if not self.is_ci:
+                    self.wait_for_user_input(prompt_msg="Place device into a busy state. Hit ENTER once ready.")
+                    await self.send_move_to_preset_command(endpoint, max_presets_dut, expected_status=Status.Busy)
+            else:
+                self.skip_step(18)
 
 
 if __name__ == "__main__":

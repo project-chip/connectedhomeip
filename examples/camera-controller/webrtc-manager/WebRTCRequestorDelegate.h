@@ -24,6 +24,9 @@
 class WebRTCRequestorDelegate : public chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorDelegate
 {
 public:
+    using ICECandidateStruct  = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
+    using WebRTCEndReasonEnum = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
+
     WebRTCRequestorDelegate()  = default;
     ~WebRTCRequestorDelegate() = default;
 
@@ -31,8 +34,7 @@ public:
 
     CHIP_ERROR HandleAnswer(uint16_t sessionId, const std::string & sdpAnswer) override;
 
-    CHIP_ERROR HandleICECandidates(uint16_t sessionId, const std::vector<std::string> & candidates) override;
+    CHIP_ERROR HandleICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates) override;
 
-    CHIP_ERROR HandleEnd(uint16_t sessionId,
-                         chip::app::Clusters::WebRTCTransportRequestor::WebRTCEndReasonEnum reasonCode) override;
+    CHIP_ERROR HandleEnd(uint16_t sessionId, WebRTCEndReasonEnum reasonCode) override;
 };

@@ -203,6 +203,8 @@ private:
     pointer mDataBuf;
     size_t mDataLen;
 };
+template <class T>
+Span(T * data, size_t size) -> Span<T>;
 
 inline namespace literals {
 

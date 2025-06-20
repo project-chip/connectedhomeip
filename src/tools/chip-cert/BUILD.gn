@@ -49,6 +49,7 @@ executable("chip-cert") {
     "${chip_root}/src/lib/asn1",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform/logging:stdio",
   ]
 
   output_dir = root_out_dir

@@ -42,7 +42,6 @@ config("config") {
     "include/clusters/camera-avstream-mgmt",
     "include/clusters/camera-avsettingsuserlevel-mgmt",
     "include/media-controller",
-    "include/network-stream-source",
     "include/transport",
     "${chip_root}/examples/camera-app/camera-common/include",
     "${chip_root}/examples/camera-app/camera-common/include/media-controller",
@@ -54,6 +53,7 @@ config("config") {
 pkg_config("gstreamer") {
   packages = [
     "gstreamer-1.0",
+    "gstreamer-app-1.0",
     "gobject-2.0",
   ]
 }
@@ -71,7 +71,6 @@ executable("chip-camera-app") {
     "${chip_root}/examples/camera-app/linux/src/clusters/chime/chime-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/webrtc-provider/webrtc-provider-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/media-controller/default-media-controller.cpp",
-    "${chip_root}/examples/camera-app/linux/src/network-stream-source/network-stream-source.cpp",
     "${chip_root}/examples/camera-app/linux/src/webrtc-transport.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",

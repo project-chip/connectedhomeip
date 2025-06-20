@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -91,7 +92,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::KeySetWrite::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     Structs::GroupKeySetStruct::Type groupKeySet;
 
@@ -126,7 +126,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::KeySetRead::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     uint16_t groupKeySetID = static_cast<uint16_t>(0);
 
@@ -161,11 +160,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Structs::GroupKeySetStruct::Type groupKeySet;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -177,7 +175,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Structs::GroupKeySetStruct::DecodableType groupKeySet;
 
@@ -196,7 +193,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::KeySetRemove::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     uint16_t groupKeySetID = static_cast<uint16_t>(0);
 
@@ -230,7 +226,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndices::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -261,11 +256,10 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndicesResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::List<const uint16_t> groupKeySetIDs;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -277,7 +271,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndicesResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::DecodableList<uint16_t> groupKeySetIDs;
 

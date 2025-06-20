@@ -255,6 +255,7 @@ ClusterName
 ClusterObjectTests
 ClusterRevision
 ClusterTestGeneration
+CMAC
 cmake
 CMakeLists
 CMD
@@ -270,6 +271,7 @@ CodeGenerator
 CodeLab
 codelabs
 ColorControl
+Combinators
 Comcast
 Commandline
 CommandHandlerInterface

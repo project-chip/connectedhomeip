@@ -1311,6 +1311,9 @@ static BOOL CommandNeedsTimedInvokeInUnitTestingCluster(AttributeId aAttributeId
     case Commands::TimedInvokeRequest::Id: {
         return YES;
     }
+    case Commands::TestCheckCommandFlags::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }

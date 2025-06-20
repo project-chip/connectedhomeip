@@ -939,7 +939,7 @@ limitations under the License.
         <typeName>Closure</typeName>
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0230</deviceId>
-        <class>App</class>
+        <class>Simple</class>
         <scope>Endpoint</scope>
         <clusters>
             <include cluster="Closure Control" client="false" server="true" clientLocked="true" serverLocked="true"></include>
@@ -3043,6 +3043,22 @@ limitations under the License.
             <include cluster="Identify" client="true" server="false" clientLocked="false" serverLocked="true"></include>
             <include cluster="Groups" client="true" server="false" clientLocked="false" serverLocked="true"></include>
             <include cluster="Scenes Management" client="true" server="false" clientLocked="false" serverLocked="true"></include>
+        </clusters>
+    </deviceType>
+    <deviceType>
+        <name>MA-soilsensor</name>
+        <domain>CHIP</domain>
+        <typeName>Soil Sensor</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0x0045</deviceId>
+        <class>Simple</class>
+        <scope>Endpoint</scope>
+        <clusters lockOthers="true">
+            <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true">
+            </include>
+            <include cluster="Descriptor" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Temperature Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Soil Measurement" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>
 </configurator>

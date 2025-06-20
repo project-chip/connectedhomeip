@@ -67,11 +67,7 @@ static_library("qpg") {
   ]
 
   if (chip_enable_openthread) {
-    if (chip_openthread_ftd) {
-      public_deps += [ "${openthread_root}:libopenthread-ftd" ]
-    } else {
-      public_deps += [ "${openthread_root}:libopenthread-mtd" ]
-    }
+    public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
 
     public_configs += [
       "${chip_root}/third_party/openthread/platforms/qpg:openthread_qpg_config",

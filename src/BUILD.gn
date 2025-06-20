@@ -51,6 +51,8 @@ if (chip_build_tests) {
     deps = []
     tests = [
       "${chip_root}/src/access/tests",
+      "${chip_root}/src/app/clusters/administrator-commissioning-server/tests",
+      "${chip_root}/src/app/clusters/network-commissioning/tests",
       "${chip_root}/src/app/clusters/ota-provider/tests",
       "${chip_root}/src/app/clusters/software-diagnostics-server/tests",
       "${chip_root}/src/app/cluster-building-blocks/tests",
@@ -58,6 +60,7 @@ if (chip_build_tests) {
       "${chip_root}/src/app/data-model/tests",
       "${chip_root}/src/app/icd/server/tests",
       "${chip_root}/src/crypto/tests",
+      "${chip_root}/src/data-model-providers/endpoint/tests",
       "${chip_root}/src/inet/tests",
       "${chip_root}/src/lib/address_resolve/tests",
       "${chip_root}/src/app/server-cluster/tests",
@@ -131,8 +134,7 @@ if (chip_build_tests) {
       tests += [ "${chip_root}/src/lib/dnssd/minimal_mdns/tests" ]
     }
 
-    if (chip_device_platform != "ameba" &&
-        chip_device_platform != "realtek_bee") {
+    if (chip_device_platform != "ameba") {
       tests += [ "${chip_root}/src/platform/tests" ]
     }
 
@@ -157,8 +159,7 @@ if (chip_build_tests) {
     }
 
     if (current_os != "zephyr" && current_os != "mbed" &&
-        chip_device_platform != "esp32" && chip_device_platform != "ameba" &&
-        chip_device_platform != "realtek_bee") {
+        chip_device_platform != "esp32" && chip_device_platform != "ameba") {
       tests += [ "${chip_root}/src/lib/shell/tests" ]
     }
 
@@ -167,6 +168,10 @@ if (chip_build_tests) {
       build_monolithic_library = true
       output_name = "libCHIP_tests"
       output_dir = "${root_out_dir}/lib"
+    }
+
+    if (chip_device_config_enable_joint_fabric) {
+      tests += [ "${chip_root}/src/app/server/tests" ]
     }
   }
 

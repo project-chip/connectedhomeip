@@ -139,13 +139,19 @@ def run_fuzz_test(context):
         if context.run_mode == FuzzTestMode.UNIT_TEST_MODE:
             subprocess.run([context.fuzz_test_binary_path, ], env=env, check=True)
             logging.info("Fuzz Test Suite executed in Unit Test Mode.\n")
-
         elif context.run_mode == FuzzTestMode.CONTINUOUS_FUZZ_MODE:
-            subprocess.run([context.fuzz_test_binary_path, f"--fuzz={context.selected_fuzz_test_case}"], env=env, check=True)
+            cmd_args = [context.fuzz_test_binary_path, f"--fuzz={context.selected_fuzz_test_case}"]
+            # Use Popen instead of run() so we can always terminate cleanly and avoid profraw file issues
+            process = subprocess.Popen(cmd_args, env=env)
+            return_code = process.wait()
+            if return_code != 0:
+                raise subprocess.CalledProcessError(process.returncode, cmd_args)
 
-    # in FuzzTestMode.CONTINUOUS_FUZZ_MODE, the fuzzing will run indefinitely until stopped by the user
     except KeyboardInterrupt:
-        logging.info("\n===============\nContinuous-Mode Fuzzing Stopped")
+        logging.info("\nFuzzing Interrupted by the user \n")
+        if context.run_mode == FuzzTestMode.CONTINUOUS_FUZZ_MODE:
+            process.terminate()
+            process.wait()
 
     except Exception as e:
         raise ValueError(f"Error running fuzz test: {e}")
@@ -208,7 +214,7 @@ def generate_coverage_report(context, output_dir_arg):
     cmd = ["genhtml"]
 
     errors_to_ignore = [
-        "inconsistent", "source"
+        "inconsistent", "source", "unmapped"
     ]
     for e in errors_to_ignore:
         cmd.append("--ignore-errors")
@@ -344,9 +350,11 @@ def run_script_in_normal_mode(fuzz_test, test_case, list_test_cases, help):
 
     if test_case.strip().lower() == "all":
         context.run_mode = FuzzTestMode.UNIT_TEST_MODE
-    else:
+    elif test_case in test_cases:
         context.run_mode = FuzzTestMode.CONTINUOUS_FUZZ_MODE
         context.selected_fuzz_test_case = test_case
+    else:
+        raise ValueError(f"Test case '{test_case}' not found in the list of test cases for {context.fuzz_test_binary_name} ")
 
     return context
 

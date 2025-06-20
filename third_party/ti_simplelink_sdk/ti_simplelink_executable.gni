@@ -17,8 +17,8 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/ti_simplelink_sdk.gni")
 
 import("${build_root}/toolchain/flashable_executable.gni")
-import("${chip_root}/src/platform/cc13xx_26xx/factory_data_config.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/ti/cc13xx_26xx/factory_data_config.gni")
 import("ti_simplelink_board.gni")
 import("ti_simplelink_sdk.gni")
 
@@ -74,17 +74,17 @@ template("ti_simplelink_executable") {
     if (ti_simplelink_device_family == "cc13x4_26x4") {
       if (chip_enable_ota_requestor) {
         sources +=
-            [ "${chip_root}/src/platform/cc13xx_26xx/oad_image_header.c" ]
+            [ "${chip_root}/src/platform/ti/cc13xx_26xx/oad_image_header.c" ]
         if (custom_factory_data) {
-          ldscript = "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/cc13x4_cc26x4_freertos_ota_factory_data.lds"
+          ldscript = "${chip_root}/src/platform/ti/cc13xx_26xx/cc13x4_26x4/cc13x4_cc26x4_freertos_ota_factory_data.lds"
         } else {
-          ldscript = "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/cc13x4_cc26x4_freertos_ota.lds"
+          ldscript = "${chip_root}/src/platform/ti/cc13xx_26xx/cc13x4_26x4/cc13x4_cc26x4_freertos_ota.lds"
         }
       } else {
         if (custom_factory_data) {
-          ldscript = "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/cc13x4_cc26x4_freertos_factory_data.lds"
+          ldscript = "${chip_root}/src/platform/ti/cc13xx_26xx/cc13x4_26x4/cc13x4_cc26x4_freertos_factory_data.lds"
         } else {
-          ldscript = "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/cc13x4_cc26x4_freertos.lds"
+          ldscript = "${chip_root}/src/platform/ti/cc13xx_26xx/cc13x4_26x4/cc13x4_cc26x4_freertos.lds"
         }
       }
     } else if (ti_simplelink_device_family == "cc32xx") {
@@ -127,18 +127,18 @@ template("ti_simplelink_executable") {
         pw_python_action("${simplelink_target_name}-factory-data.hex") {
           script = "${ti_simplelink_sdk_build_root}/create_factory_data.py"
           sources = [
-            "${chip_root}/src/platform/cc13xx_26xx/factory_data.schema",
-            "${chip_root}/src/platform/cc13xx_26xx/factory_data_cc13xx_26xx.json",
+            "${chip_root}/src/platform/ti/cc13xx_26xx/factory_data.schema",
+            "${chip_root}/src/platform/ti/cc13xx_26xx/factory_data_cc13xx_26xx.json",
           ]
           outputs = [ "${root_out_dir}/${output_base_name}-factory-data.hex" ]
 
           args = [
             "-factory_data",
             rebase_path(
-                "${chip_root}/src/platform/cc13xx_26xx/factory_data_cc13xx_26xx.json"),
+                "${chip_root}/src/platform/ti/cc13xx_26xx/factory_data_cc13xx_26xx.json"),
             "-schema",
             rebase_path(
-                "${chip_root}/src/platform/cc13xx_26xx/factory_data.schema"),
+                "${chip_root}/src/platform/ti/cc13xx_26xx/factory_data.schema"),
             "-o",
             rebase_path("${root_out_dir}/${output_base_name}-factory-data.hex",
                         root_out_dir),
@@ -148,26 +148,43 @@ template("ti_simplelink_executable") {
         }
       }
 
-      # add MCUBoot Header to the executable
-      action("${simplelink_target_name}_header.hex") {
+      action("${simplelink_target_name}_noheader.bin") {
         if (custom_factory_data) {
           public_deps =
               [ ":${simplelink_target_name}-without-factory-data.hex" ]
+          inputs =
+              [ "${root_out_dir}/${output_base_name}-without-factory-data.hex" ]
         } else {
           public_deps = [ ":${simplelink_target_name}.out.image" ]
+          inputs = [ "${root_out_dir}/${output_base_name}.hex" ]
         }
+        outputs = [ "${root_out_dir}/${output_base_name}_noheader.bin" ]
+
+        input_path = inputs[0]
+
+        args = [
+          objcopy,
+          "-I",
+          "ihex",
+          "-O",
+          "binary",
+          rebase_path(input_path, root_build_dir),
+          rebase_path("${root_out_dir}/${output_base_name}_noheader.bin",
+                      root_build_dir),
+        ]
+        script = "${build_root}/gn_run_binary.py"
+      }
+
+      # add MCUBoot Header to the executable
+      action("${simplelink_target_name}_header.bin") {
+        public_deps = [ ":${simplelink_target_name}_noheader.bin" ]
 
         script = "${ti_simplelink_sdk_root}/source/third_party/mcuboot/scripts/imgtool.py"
-        if (custom_factory_data) {
-          sources =
-              [ "${root_out_dir}/${output_base_name}-without-factory-data.hex" ]
-          input_path =
-              "${root_out_dir}/${output_base_name}-without-factory-data.hex"
-        } else {
-          sources = [ "${root_out_dir}/${output_base_name}.hex" ]
-          input_path = "${root_out_dir}/${output_base_name}.hex"
-        }
-        outputs = [ "${root_out_dir}/${output_base_name}_header.hex" ]
+        sources = [ "${root_out_dir}/${output_base_name}_noheader.bin" ]
+
+        input_path = "${root_out_dir}/${output_base_name}_noheader.bin"
+
+        outputs = [ "${root_out_dir}/${output_base_name}_header.bin" ]
 
         args = [
           "sign",
@@ -186,24 +203,27 @@ template("ti_simplelink_executable") {
               "${ti_simplelink_sdk_root}/source/third_party/mcuboot/root-ec-p256.pem",
               root_build_dir),
           rebase_path(input_path, root_out_dir),
-          rebase_path("${root_out_dir}/${output_base_name}_header.hex",
+          rebase_path("${root_out_dir}/${output_base_name}_header.bin",
                       root_out_dir),
         ]
       }
-      action("${simplelink_target_name}_header.bin") {
-        inputs = [ "${root_out_dir}/${output_base_name}_header.hex" ]
-        outputs = [ "${root_out_dir}/${output_base_name}_header.bin" ]
-        deps = [ ":${simplelink_target_name}_header.hex" ]
+
+      action("${simplelink_target_name}_header.hex") {
+        public_deps = [ ":${simplelink_target_name}_header.bin" ]
+        inputs = [ "${root_out_dir}/${output_base_name}_header.bin" ]
+        outputs = [ "${root_out_dir}/${output_base_name}_header.hex" ]
+
         args = [
           objcopy,
           "-I",
-          "ihex",
-          "-O",
           "binary",
-          rebase_path("${root_out_dir}/${output_base_name}_header.hex",
-                      root_build_dir),
+          "-O",
+          "ihex",
           rebase_path("${root_out_dir}/${output_base_name}_header.bin",
                       root_build_dir),
+          rebase_path("${root_out_dir}/${output_base_name}_header.hex",
+                      root_build_dir),
+          "--change-addresses=0x6000",
         ]
         script = "${build_root}/gn_run_binary.py"
       }
@@ -252,15 +272,13 @@ template("ti_simplelink_executable") {
           "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/encrypted.c",
           "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/fault_injection_hardening.c",
           "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/fault_injection_hardening_delay_rng_mbedtls.c",
-          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/image_ec.c",
-          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/image_ec256.c",
+          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/image_ecdsa.c",
           "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/image_ed25519.c",
           "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/image_rsa.c",
           "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/image_validate.c",
           "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/loader.c",
           "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/swap_misc.c",
           "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/swap_move.c",
-          "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/swap_priv.h",
           "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/swap_scratch.c",
           "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/bootutil/src/tlv.c",
           "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/ti/source/mcuboot_app/keys.c",
@@ -270,6 +288,7 @@ template("ti_simplelink_executable") {
           "${ti_simplelink_sdk_root}/source/third_party/mcuboot/ext/mbedtls-asn1/src/platform_util.c",
           "${ti_simplelink_sdk_root}/source/third_party/mcuboot/ext/ti-crypto/sl_crypto.c",
           "${ti_simplelink_sdk_root}/source/ti/common/cc26xx/debug/led_debug.c",
+          "${ti_simplelink_sdk_root}/source/ti/common/cc26xx/ecc/AESCTRCC26X4_driverlib.c",
           "${ti_simplelink_sdk_root}/source/ti/common/cc26xx/ecc/ECDSACC26X4_driverlib.c",
           "${ti_simplelink_sdk_root}/source/ti/common/cc26xx/sha2/sha2_driverlib.c",
           "${ti_simplelink_sdk_root}/source/ti/common/flash/no_rtos/extFlash/bsp_spi_cc13x4_cc26x4.c",
@@ -282,6 +301,7 @@ template("ti_simplelink_executable") {
           # "${ti_simplelink_sdk_root}/source/third_party/mcuboot/boot/ti/source/mcuboot_app"
           # to eclipse the mcuboot config header
           "${ti_simplelink_sdk_build_root}/mcuboot",
+          "${ti_simplelink_sdk_build_root}/mcuboot/mcuboot_config",
 
           "${ti_simplelink_sdk_root}/kernel/nortos",
           "${ti_simplelink_sdk_root}/source",
@@ -312,11 +332,14 @@ template("ti_simplelink_executable") {
               root_build_dir),
           "-T" + rebase_path(ldscript, root_build_dir),
         ]
+
+        # We do not want to modify third party code, so we are adding this flag to suppress the warnings coming from it
+        cflags_c = [ "-Wno-incompatible-pointer-types" ]
       }
 
       action("${simplelink_target_name}-mcuboot.hex") {
         public_deps = [
-          ":${simplelink_target_name}_header.bin",
+          ":${simplelink_target_name}_header.hex",
           ":${simplelink_target_name}_mcubootloader.image",
         ]
 
@@ -327,13 +350,13 @@ template("ti_simplelink_executable") {
           sources = [
             "${root_out_dir}/${output_base_name}-factory-data.hex",
             "${root_out_dir}/${output_base_name}.mcubootloader.hex",
-            "${root_out_dir}/${output_base_name}_header.bin",
+            "${root_out_dir}/${output_base_name}_header.hex",
           ]
         } else {
           script = "${ti_simplelink_sdk_build_root}/oad_merge_tool.py"
           sources = [
             "${root_out_dir}/${output_base_name}.mcubootloader.hex",
-            "${root_out_dir}/${output_base_name}_header.bin",
+            "${root_out_dir}/${output_base_name}_header.hex",
           ]
         }
 
@@ -427,18 +450,18 @@ template("ti_simplelink_executable") {
     pw_python_action("${simplelink_target_name}-factory-data.hex") {
       script = "${ti_simplelink_sdk_build_root}/create_factory_data.py"
       sources = [
-        "${chip_root}/src/platform/cc13xx_26xx/factory_data.schema",
-        "${chip_root}/src/platform/cc13xx_26xx/factory_data_cc13xx_26xx.json",
+        "${chip_root}/src/platform/ti/cc13xx_26xx/factory_data.schema",
+        "${chip_root}/src/platform/ti/cc13xx_26xx/factory_data_cc13xx_26xx.json",
       ]
       outputs = [ "${root_out_dir}/${output_base_name}-factory-data.hex" ]
 
       args = [
         "-factory_data",
         rebase_path(
-            "${chip_root}/src/platform/cc13xx_26xx/factory_data_cc13xx_26xx.json"),
+            "${chip_root}/src/platform/ti/cc13xx_26xx/factory_data_cc13xx_26xx.json"),
         "-schema",
         rebase_path(
-            "${chip_root}/src/platform/cc13xx_26xx/factory_data.schema"),
+            "${chip_root}/src/platform/ti/cc13xx_26xx/factory_data.schema"),
         "-o",
         rebase_path("${root_out_dir}/${output_base_name}-factory-data.hex",
                     root_out_dir),

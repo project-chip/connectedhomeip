@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -73,7 +74,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SetTarget::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     Optional<chip::Percent100ths> position;
     Optional<bool> latch;
@@ -114,7 +114,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Step::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     StepDirectionEnum direction = static_cast<StepDirectionEnum>(0);
     uint16_t numberOfSteps      = static_cast<uint16_t>(0);

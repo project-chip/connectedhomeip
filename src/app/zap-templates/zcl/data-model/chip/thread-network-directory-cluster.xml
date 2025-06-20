@@ -39,12 +39,12 @@ limitations under the License.
     <globalAttribute side="either" code="0xFFFD" value="1"/>
     
     <attribute side="server" code="0x0000" name="PreferredExtendedPanID" define="PREFERRED_EXTENDED_PAN_ID" type="octet_string" length="8" writable="true" isNullable="true" optional="false">
-      <access op="read" privilege="manage"/>
+      <access op="read" privilege="view"/>
       <access op="write" privilege="manage"/>
       <mandatoryConform/>
     </attribute>
     <attribute side="server" code="0x0001" name="ThreadNetworks" define="THREAD_NETWORKS" type="array" entryType="ThreadNetworkStruct" writable="false" optional="false">
-      <access op="read" privilege="operate"/>
+      <access op="read" privilege="view"/>
       <mandatoryConform/>
     </attribute>
     <attribute side="server" code="0x0002" name="ThreadNetworkTableSize" define="THREAD_NETWORK_TABLE_SIZE" type="int8u" writable="false" optional="false">
@@ -65,7 +65,7 @@ limitations under the License.
     </command>
     <command source="client" code="0x02" name="GetOperationalDataset" optional="false" response="OperationalDatasetResponse">
       <description>Retrieves a Thread Operational Dataset from the ThreadNetworks list.</description>
-      <access op="invoke" privilege="operate"/>
+      <access op="invoke" privilege="manage"/>
       <arg name="ExtendedPanID" type="octet_string" length="8"/>
       <mandatoryConform/>
     </command>

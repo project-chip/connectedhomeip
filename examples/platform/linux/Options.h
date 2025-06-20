@@ -74,6 +74,7 @@ struct LinuxDeviceOptions
     const char * command                = nullptr;
     const char * PICS                   = nullptr;
     const char * KVS                    = nullptr;
+    const char * app_pipe               = "";
     chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     bool traceStreamDecodeEnabled = false;
@@ -104,6 +105,11 @@ struct LinuxDeviceOptions
     chip::Optional<chip::System::Clock::Milliseconds32> icdActiveModeDurationMs;
     chip::Optional<chip::System::Clock::Milliseconds32> icdIdleModeDurationMs;
 #endif
+    chip::Optional<std::string> vendorName;
+    chip::Optional<std::string> productName;
+    chip::Optional<std::string> hardwareVersionString;
+    chip::Optional<std::string> softwareVersionString;
+    chip::Optional<std::string> serialNumber;
     static LinuxDeviceOptions & GetInstance();
 };
 

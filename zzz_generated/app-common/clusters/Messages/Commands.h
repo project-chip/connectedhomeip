@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -77,7 +78,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::PresentMessagesRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     chip::ByteSpan messageID;
     MessagePriorityEnum priority                       = static_cast<MessagePriorityEnum>(0);
@@ -124,7 +124,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CancelMessagesRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Messages::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     DataModel::List<const chip::ByteSpan> messageIDs;
 

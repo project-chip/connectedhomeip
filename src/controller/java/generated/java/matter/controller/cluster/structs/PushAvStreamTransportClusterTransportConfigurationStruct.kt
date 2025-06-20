@@ -27,12 +27,14 @@ class PushAvStreamTransportClusterTransportConfigurationStruct(
   val connectionID: UShort,
   val transportStatus: UByte,
   val transportOptions: Optional<PushAvStreamTransportClusterTransportOptionsStruct>,
+  val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
     append("PushAvStreamTransportClusterTransportConfigurationStruct {\n")
     append("\tconnectionID : $connectionID\n")
     append("\ttransportStatus : $transportStatus\n")
     append("\ttransportOptions : $transportOptions\n")
+    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -45,6 +47,7 @@ class PushAvStreamTransportClusterTransportConfigurationStruct(
         val opttransportOptions = transportOptions.get()
         opttransportOptions.toTlv(ContextSpecificTag(TAG_TRANSPORT_OPTIONS), this)
       }
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
@@ -53,6 +56,7 @@ class PushAvStreamTransportClusterTransportConfigurationStruct(
     private const val TAG_CONNECTION_ID = 0
     private const val TAG_TRANSPORT_STATUS = 1
     private const val TAG_TRANSPORT_OPTIONS = 2
+    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
       tlvTag: Tag,
@@ -72,6 +76,7 @@ class PushAvStreamTransportClusterTransportConfigurationStruct(
         } else {
           Optional.empty()
         }
+      val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
@@ -79,6 +84,7 @@ class PushAvStreamTransportClusterTransportConfigurationStruct(
         connectionID,
         transportStatus,
         transportOptions,
+        fabricIndex,
       )
     }
   }

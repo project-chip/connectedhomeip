@@ -15,14 +15,10 @@ namespace Commands {
 {{#zcl_commands}}
 namespace {{asUpperCamelCase name}} {
 
-{{#if isFabricScoped~}}
-{{#if (isServer source)}}
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const {
-{{else}}
+{{#if (isClient source)}}
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const {
-{{/if}}
 {{else}}
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const {
+CHIP_ERROR Type::Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const {
 {{/if}}
     DataModel::WrappedStructEncoder encoder{aWriter, aTag};
     {{#zcl_command_arguments~}}
@@ -31,7 +27,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const {
     {{#if (isClient parent.source)}}
     encoder.EncodeRequestCommandFabricScopedStructField(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
     {{else}}
-    encoder.EncodeResponseCommandFabricScopedStructField(to_underlying(Fields::k{{asUpperCamelCase label}}), aAccessingFabricIndex, {{asLowerCamelCase label}});
+    encoder.EncodeResponseCommandFabricScopedStructField(to_underlying(Fields::k{{asUpperCamelCase label}}), aWriter.mAccessingFabricIndex, {{asLowerCamelCase label}});
     {{/if}}
     {{else}}
     encoder.Encode(to_underlying(Fields::k{{asUpperCamelCase label}}), {{asLowerCamelCase label}});
@@ -41,8 +37,8 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const {
     return encoder.Finalize();
 }
 
-{{#if isFabricScoped~}}
 {{#if (isClient source)}}
+{{#if isFabricScoped~}}
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader, FabricIndex aAccessingFabricIndex) {
 {{else}}
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader &reader) {
