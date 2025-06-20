@@ -381,7 +381,7 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kAttestationVerification:
         return CommissioningStage::kAttestationRevocationCheck;
     case CommissioningStage::kAttestationRevocationCheck:
-        if (mParams.UseJCM().ValueOr(false)) {
+        if (mParams.GetUseJCM().ValueOr(false)) {
             return CommissioningStage::kJCMTrustVerification;
         }
         return CommissioningStage::kSendOpCertSigningRequest;

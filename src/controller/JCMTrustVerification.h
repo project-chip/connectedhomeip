@@ -131,7 +131,7 @@ class DLL_EXPORT JCMTrustVerificationDelegate
 public:
     virtual ~JCMTrustVerificationDelegate() = default;
 
-    virtual void OnProgressUpdate(JCMDeviceCommissioner & commissioner, JCMTrustVerificationStage stage, JCMTrustVerificationError error) = 0;
+    virtual void OnProgressUpdate(JCMDeviceCommissioner & commissioner, JCMTrustVerificationStage stage, JCMTrustVerificationInfo & info, JCMTrustVerificationError error) = 0;
     virtual void OnAskUserForConsent(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info) = 0;
     virtual void OnVerifyVendorId(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info) = 0;
 };

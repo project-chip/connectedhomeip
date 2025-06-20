@@ -474,8 +474,11 @@ void CHIPCommand::ShutdownCommissioner(const CommissionerIdentity & key)
 }
 
 struct TrustVerificationDelegate : public JCMTrustVerificationDelegate {
-    void OnProgressUpdate(JCMDeviceCommissioner & commissioner, JCMTrustVerificationStage stage,
-                          JCMTrustVerificationError error) override
+    void OnProgressUpdate(
+        JCMDeviceCommissioner & commissioner, 
+        JCMTrustVerificationStage stage,
+        JCMTrustVerificationInfo & info,
+        JCMTrustVerificationError error) override
     {
         ChipLogProgress(Controller, "JCM: Trust Verification progress: %d", static_cast<int>(stage));
     }

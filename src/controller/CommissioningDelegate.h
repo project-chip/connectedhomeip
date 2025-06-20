@@ -556,7 +556,7 @@ public:
     }
 
     // Check for Joint Commissioning Method
-    Optional<bool> UseJCM() const { return mUseJCM; }
+    Optional<bool> GetUseJCM() const { return mUseJCM; }
 
     // Set the Joint Commissioning Method
     CommissioningParameters & SetUseJCM(bool useJCM)

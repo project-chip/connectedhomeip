@@ -308,7 +308,7 @@ CHIP_ERROR JCMDeviceCommissioner::ParseExtraCommissioningInfo(ReadCommissioningI
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (!params.UseJCM().ValueOr(false))
+    if (!params.GetUseJCM().ValueOr(false))
     {
         return DeviceCommissioner::ParseExtraCommissioningInfo(info, params);
     }
@@ -437,7 +437,7 @@ void JCMDeviceCommissioner::TrustVerificationStageFinished(JCMTrustVerificationS
 
     if (mTrustVerificationDelegate != nullptr)
     {
-        mTrustVerificationDelegate->OnProgressUpdate(*this, completedStage, error);
+        mTrustVerificationDelegate->OnProgressUpdate(*this, completedStage, mInfo, error);
     }
 
     if (error != JCMTrustVerificationError::kSuccess)
@@ -523,7 +523,7 @@ CHIP_ERROR JCMAutoCommissioner::SetCommissioningParameters(const CommissioningPa
 {
     ReturnErrorOnFailure(AutoCommissioner::SetCommissioningParameters(params));
 
-    if (params.UseJCM().ValueOr(false)) {
+    if (params.GetUseJCM().ValueOr(false)) {
         auto extraReadPaths = params.GetExtraReadPaths();
 
         mTempReadPaths.clear();

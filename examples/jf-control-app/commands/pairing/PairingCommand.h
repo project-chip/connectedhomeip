@@ -52,6 +52,8 @@ enum class PairingNetworkType
     WiFiOrThread,
 };
 
+constexpr char kAnchorNodeIdKey[]           = "AnchorNodeId";
+
 class PairingCommand : public CHIPCommand,
                        public chip::Controller::DevicePairingDelegate,
                        public chip::Controller::DeviceDiscoveryDelegate,
@@ -315,4 +317,6 @@ private:
 
     static void OnCurrentFabricRemove(void * context, NodeId remoteNodeId, CHIP_ERROR status);
     void PersistIcdInfo();
+    CHIP_ERROR SetAnchorNodeId(NodeId value);
+    NodeId GetAnchorNodeId();
 };

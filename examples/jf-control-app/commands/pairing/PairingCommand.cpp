@@ -37,6 +37,28 @@
 using namespace ::chip;
 using namespace ::chip::Controller;
 
+NodeId PairingCommand::GetAnchorNodeId()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    uint64_t nodeId;
+    uint16_t size = static_cast<uint16_t>(sizeof(nodeId));
+    err           = mCommissionerStorage.SyncGetKeyValue(kAnchorNodeIdKey, &nodeId, size);
+    if (err == CHIP_NO_ERROR)
+    {
+        return static_cast<NodeId>(Encoding::LittleEndian::HostSwap64(nodeId));
+    }
+
+    return chip::kUndefinedNodeId;
+}
+
+CHIP_ERROR PairingCommand::SetAnchorNodeId(NodeId value)
+{
+    uint64_t nodeId = Encoding::LittleEndian::HostSwap64(value);
+    return mCommissionerStorage.SyncSetKeyValue(kAnchorNodeIdKey, &nodeId, sizeof(nodeId));
+}
+
+
 CHIP_ERROR PairingCommand::RunCommand()
 {
     CurrentCommissioner().RegisterPairingDelegate(this);
@@ -48,6 +70,8 @@ CHIP_ERROR PairingCommand::RunCommand()
         ChipLogError(JointFabric, "--anchor and --jcm options are not allowed simultaneously!");
         return CHIP_ERROR_BAD_REQUEST;
     }
+
+    mAnchorNodeId = GetAnchorNodeId();
 
     // TODO: persist and restore mAnchorNodeId due to mAnchorNodeId being reset on
     // JFC restart and across command invocations
@@ -536,6 +560,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
             {
                 ChipLogProgress(JointFabric, "Anchor Administrator (nodeId=%ld) commissioned with success", nodeId);
                 mAnchorNodeId = nodeId;
+                SetAnchorNodeId(mAnchorNodeId);
             }
             else if (mJCM.ValueOr(false))
             {
