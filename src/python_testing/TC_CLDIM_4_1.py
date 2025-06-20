@@ -78,11 +78,10 @@ class TC_CLDIM_4_1(MatterBaseTest):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "If Positioning feature is not supported, skip remaining steps"),
-            TestStep("2c", "Read AttributeList attribute"),
-            TestStep("2d", "Read StepValue attribute"),
-            TestStep("2e", "Read LimitRange attribute"),
-            TestStep("2f", "Establish wilcard subscription to all attributes"),
-            TestStep("2g", "Read CurrentState attribute"),
+            TestStep("2c", "Read StepValue attribute"),
+            TestStep("2d", "Read LimitRange attribute"),
+            TestStep("2e", "Establish wilcard subscription to all attributes"),
+            TestStep("2f", "Read CurrentState attribute"),
             TestStep("3a", "Send Step command to increase position to MaxPosition"),
             TestStep("3b", "Wait for CurrentState.Position to be updated to MaxPosition"),
             TestStep("4a", "Send Step command to decrease position by 2 steps"),
@@ -147,29 +146,26 @@ class TC_CLDIM_4_1(MatterBaseTest):
             self.skip_all_remaining_steps("2c")
             return
 
-        # STEP 2c: Read AttributeList attribute
+        # STEP 2c: Read StepValue attribute
         self.step("2c")
-
-        # STEP 2d: Read StepValue attribute
-        self.step("2d")
         step_value = 1  # Default step value
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.StepValue):
             step_value = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.StepValue)
 
-        # STEP 2e: Read LimitRange attribute
-        self.step("2e")
+        # STEP 2d: Read LimitRange attribute
+        self.step("2d")
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.LimitRange):
             limit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LimitRange)
             min_position = limit_range.min
             max_position = limit_range.max
 
-        # STEP 2f: Establish wildcard subscription to all attributes"
-        self.step("2f")
+        # STEP 2e: Establish wildcard subscription to all attributes"
+        self.step("2e")
         sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureDimension)
         await sub_handler.start(self.default_controller, self.dut.node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
 
-        # STEP 2g: Read CurrentState attribute
-        self.step("2g")
+        # STEP 2f: Read CurrentState attribute
+        self.step("2f")
         initial_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
         # STEP 3a: Send Step command to increase position to MaxPosition
