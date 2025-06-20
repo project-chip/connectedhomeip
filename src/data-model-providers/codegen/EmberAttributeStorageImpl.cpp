@@ -13,6 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "lib/core/CHIPError.h"
 #include <data-model-providers/codegen/EmberAttributeStorageImpl.h>
 
 #include <app-common/zap-generated/attribute-type.h>
@@ -151,6 +152,10 @@ CHIP_ERROR EmberAttributeStorageImpl::Read(const ConcreteAttributePath & path, B
         return CHIP_NO_ERROR;
     }
     }
+
+    // should never be reached because switch above covers all cases
+    // added here to make come compilers happy.
+    return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
 } // namespace Storage
