@@ -47,11 +47,11 @@ public:
     Span<const T> Content() const { return { mData + 1, GetLength() }; }
 
     /// Accesses the "PASCAL" string (i.e. valid data includint the string perfix)
-    Span<T> PascalContent() const { return { mData, static_cast<size_t>(GetLength() + 1) }; }
+    Span<const T> PascalContent() const { return { mData, static_cast<size_t>(GetLength() + 1) }; }
 
     /// Access to the full buffer. does NOT take into account current size
     /// and includes the "size prefix"
-    Span<T> Buffer() { return { mData, mMaxSize + 1 }; }
+    Span<T> Buffer() { return { mData, static_cast<size_t>(mMaxSize + 1) }; }
 
     uint8_t GetLength() const { return std::min(mMaxSize, (reinterpret_cast<const uint8_t *>(mData))[0]); }
     bool SetLength(size_t len)
@@ -97,11 +97,11 @@ public:
     Span<const T> Content() const { return { mData + 2, GetLength() }; }
 
     /// Accesses the "PASCAL" string (i.e. valid data includint the string perfix)
-    Span<T> PascalContent() const { return { mData, static_cast<size_t>(GetLength() + 2) }; }
+    Span<const T> PascalContent() const { return { mData, static_cast<size_t>(GetLength() + 2) }; }
 
     /// Access to the full buffer. does NOT take into account current size
     /// and includes the "size prefix"
-    Span<T> Buffer() { return { mData, mMaxSize + 2 }; }
+    Span<T> Buffer() { return { mData, static_cast<size_t>(mMaxSize + 2) }; }
 
     uint16_t GetLength() const
     {
