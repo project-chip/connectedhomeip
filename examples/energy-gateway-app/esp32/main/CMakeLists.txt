@@ -25,6 +25,7 @@ set(PRIV_INCLUDE_DIRS_LIST
   "${ENERGY_GATEWAY_DIR}/commodity-price/include"
   "${ENERGY_GATEWAY_DIR}/common/include"
   "${ENERGY_GATEWAY_DIR}/electrical-grid-conditions/include"
+  "${ENERGY_GATEWAY_DIR}/meter-identification/include"
   "${CMAKE_CURRENT_LIST_DIR}/include"
   "${CHIP_ROOT}/examples/platform/esp32"
 )
@@ -36,6 +37,7 @@ set(SRC_DIRS_LIST
   "${ENERGY_GATEWAY_DIR}/commodity-price/src"
   "${ENERGY_GATEWAY_DIR}/common/src"
   "${ENERGY_GATEWAY_DIR}/electrical-grid-conditions/src"
+  "${ENERGY_GATEWAY_DIR}/meter-identification/src"
   "${CHIP_ROOT}/examples/platform/esp32/ota"
   "${CHIP_ROOT}/examples/platform/esp32/common"
   "${CHIP_ROOT}/examples/platform/esp32/time"
