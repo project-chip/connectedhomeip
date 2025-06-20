@@ -73,6 +73,7 @@ private:
     CHIP_ERROR CommitConfig();
     std::string GenerateStoragePath(const std::string & name) const;
     inipp::Ini<char> mConfig;
+    // The mStorageFilePath is the complete path (directory included) of the persisted data file.
     std::string mStorageFilePath;
     std::string mUsedDirectory;
 };
