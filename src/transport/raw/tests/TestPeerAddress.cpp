@@ -101,4 +101,68 @@ TEST(TestPeerAddress, TestToString)
     }
 }
 
+TEST(TestPeerAddress, TestEqualityOperator)
+{
+    using chip::Inet::IPAddress;
+    using chip::Inet::InterfaceId;
+    using chip::Transport::PeerAddress;
+    using chip::Transport::Type;
+
+    IPAddress ip1, ip2;
+    IPAddress::FromString("192.168.1.1", ip1);
+    IPAddress::FromString("192.168.1.2", ip2);
+
+    InterfaceId iface1 = InterfaceId::Null();
+    InterfaceId iface2 = InterfaceId(1); // Example interface ID
+
+    // 1. Same UDP address, port, interface ? equal
+    PeerAddress addr1 = PeerAddress::UDP(ip1, 1234).SetInterface(iface1);
+    PeerAddress addr2 = PeerAddress::UDP(ip1, 1234).SetInterface(iface1);
+    EXPECT_TRUE(addr1 == addr2);
+    EXPECT_FALSE(addr1 != addr2);
+
+    // 2. Different IP address ? not equal
+    PeerAddress addr3 = PeerAddress::UDP(ip2, 1234).SetInterface(iface1);
+    EXPECT_FALSE(addr1 == addr3);
+    EXPECT_TRUE(addr1 != addr3);
+
+    // 3. Different port ? not equal
+    PeerAddress addr4 = PeerAddress::UDP(ip1, 4321).SetInterface(iface1);
+    EXPECT_FALSE(addr1 == addr4);
+
+    // 4. Different interface ? not equal
+    PeerAddress addr5 = PeerAddress::UDP(ip1, 1234).SetInterface(iface2);
+    EXPECT_FALSE(addr1 == addr5);
+
+    // 5. Different transport type ? not equal
+    PeerAddress addr6 = PeerAddress::TCP(ip1, 1234).SetInterface(iface1);
+    EXPECT_FALSE(addr1 == addr6);
+
+    // 6. BLE transport (no additional fields) ? equal if same type
+    PeerAddress ble1 = PeerAddress::BLE();
+    PeerAddress ble2 = PeerAddress::BLE();
+    EXPECT_TRUE(ble1 == ble2);
+
+    // 7. NFC transport with same short ID ? equal
+    PeerAddress nfc1 = PeerAddress::NFC(100);
+    PeerAddress nfc2 = PeerAddress::NFC(100);
+    EXPECT_TRUE(nfc1 == nfc2);
+
+    // 8. NFC transport with different short ID ? not equal
+    PeerAddress nfc3 = PeerAddress::NFC(101);
+    EXPECT_FALSE(nfc1 == nfc3);
+
+    // 9. WiFiPAF transport with same remote ID ? equal
+    constexpr chip::NodeId nodeId1 = 0x123456789ABCDEF0;
+    constexpr chip::NodeId nodeId2 = 0x123456789ABCDEF0;
+    PeerAddress wifi1 = PeerAddress::WiFiPAF(nodeId1);
+    PeerAddress wifi2 = PeerAddress::WiFiPAF(nodeId2);
+    EXPECT_TRUE(wifi1 == wifi2);
+
+    // 10. WiFiPAF transport with different remote ID ? not equal
+    constexpr chip::NodeId nodeId3 = 0x0FEDCBA987654321;
+    PeerAddress wifi3 = PeerAddress::WiFiPAF(nodeId3);
+    EXPECT_FALSE(wifi1 == wifi3);
+}
+
 } // namespace
