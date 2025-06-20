@@ -94,7 +94,7 @@ config TELINK_OTA_PARTITION_ADDR
 
 config CHIP_ROTATING_DEVICE_ID
 	bool "Generate rotating device ID"
-	default y
+	default n
 	help
 	  Enables the rotating device identifier that provides a non-trackable
 	  identifier. The identifier is unique per device and rotates at pre-defined
