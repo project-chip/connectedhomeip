@@ -46,7 +46,7 @@ using namespace chip::app::Clusters::PowerSource::Attributes;
 
 using Protocols::InteractionModel::Status;
 
-constexpr int64_t kMaxRequiredEnergy_mWh = 1000000000; // 1000 MWh
+constexpr int64_t kMaxRequiredEnergy_mWh = 1000000000000; // 1000 MWh
 
 CHIP_ERROR EVSEManufacturer::Init(chip::EndpointId powerSourceEndpointId)
 {
@@ -304,7 +304,8 @@ CHIP_ERROR EVSEManufacturer::ComputeStartTime(EnergyEvseDelegate * dg, DataModel
 
     // Time to charge(seconds) = (3600 * Energy(mWh) / Power(W)) / 1000
     // to avoid using floats we multiply by 36 and then divide by 10 (instead of x3600 and dividing by 1000)
-    chargingDuration_s = static_cast<uint32_t>(((requiredEnergy_mWh / power_W) * 36) / 10);
+    chargingDuration_s =
+        static_cast<uint32_t>((static_cast<uint64_t>(requiredEnergy_mWh) * 36) / (static_cast<uint64_t>(power_W) * 10));
 
     // Add in 15 minutes leeway to account for slow starting vehicles
     // that need to condition the battery or if it is cold etc
