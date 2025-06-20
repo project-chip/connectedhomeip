@@ -103,40 +103,41 @@ TEST(TestPeerAddress, TestToString)
 
 TEST(TestPeerAddress, TestEqualityOperator)
 {
-    using chip::Inet::InterfaceId;
     using chip::Inet::IPAddress;
+    using chip::Inet::InterfaceId;
     using chip::Transport::PeerAddress;
     using chip::Transport::Type;
 
     IPAddress ip1, ip2;
-    IPAddress::FromString("192.168.1.1", ip1);
-    IPAddress::FromString("192.168.1.2", ip2);
+    IPAddress::FromString("2001:db8::1", ip1);
+    IPAddress::FromString("2001:db8::2", ip2);
 
     InterfaceId iface1 = InterfaceId::Null();
     InterfaceId iface2 = InterfaceId(1); // Example interface ID
 
     // 1. Same UDP address, port, interface ? equal
-    PeerAddress addr1 = PeerAddress::UDP(ip1, 1234).SetInterface(iface1);
-    PeerAddress addr2 = PeerAddress::UDP(ip1, 1234).SetInterface(iface1);
-    EXPECT_TRUE(addr1 == addr2);
-    EXPECT_FALSE(addr1 != addr2);
+    PeerAddress udp1 = PeerAddress::UDP(ip1, 1234).SetInterface(iface1);
+    PeerAddress udp2 = PeerAddress::UDP(ip1, 1234).SetInterface(iface1);
+    EXPECT_TRUE(udp1 == udp2);
+    EXPECT_FALSE(udp1 != udp2);
 
-    // 2. Different IP address ? not equal
-    PeerAddress addr3 = PeerAddress::UDP(ip2, 1234).SetInterface(iface1);
-    EXPECT_FALSE(addr1 == addr3);
-    EXPECT_TRUE(addr1 != addr3);
+    // 2. Different IPv6 address ? not equal
+    PeerAddress udp3 = PeerAddress::UDP(ip2, 1234).SetInterface(iface1);
+    EXPECT_FALSE(udp1 == udp3);
+    EXPECT_TRUE(udp1 != udp3);
 
     // 3. Different port ? not equal
-    PeerAddress addr4 = PeerAddress::UDP(ip1, 4321).SetInterface(iface1);
-    EXPECT_FALSE(addr1 == addr4);
+    PeerAddress udp4 = PeerAddress::UDP(ip1, 4321).SetInterface(iface1);
+    EXPECT_FALSE(udp1 == udp4);
 
     // 4. Different interface ? not equal
-    PeerAddress addr5 = PeerAddress::UDP(ip1, 1234).SetInterface(iface2);
-    EXPECT_FALSE(addr1 == addr5);
+    PeerAddress udp5 = PeerAddress::UDP(ip1, 1234).SetInterface(iface2);
+    EXPECT_FALSE(udp1 == udp5);
 
-    // 5. Different transport type ? not equal
-    PeerAddress addr6 = PeerAddress::TCP(ip1, 1234).SetInterface(iface1);
-    EXPECT_FALSE(addr1 == addr6);
+    // 5. TCP and UDP with same IP, port, interface ? not equal
+    PeerAddress tcp1 = PeerAddress::TCP(ip1, 1234).SetInterface(iface1);
+    EXPECT_FALSE(udp1 == tcp1);
+    EXPECT_TRUE(udp1 != tcp1);
 
     // 6. BLE transport (no additional fields) ? equal if same type
     PeerAddress ble1 = PeerAddress::BLE();
@@ -155,14 +156,22 @@ TEST(TestPeerAddress, TestEqualityOperator)
     // 9. WiFiPAF transport with same remote ID ? equal
     constexpr chip::NodeId nodeId1 = 0x123456789ABCDEF0;
     constexpr chip::NodeId nodeId2 = 0x123456789ABCDEF0;
-    PeerAddress wifi1              = PeerAddress::WiFiPAF(nodeId1);
-    PeerAddress wifi2              = PeerAddress::WiFiPAF(nodeId2);
+    PeerAddress wifi1 = PeerAddress::WiFiPAF(nodeId1);
+    PeerAddress wifi2 = PeerAddress::WiFiPAF(nodeId2);
     EXPECT_TRUE(wifi1 == wifi2);
 
     // 10. WiFiPAF transport with different remote ID ? not equal
     constexpr chip::NodeId nodeId3 = 0x0FEDCBA987654321;
-    PeerAddress wifi3              = PeerAddress::WiFiPAF(nodeId3);
+    PeerAddress wifi3 = PeerAddress::WiFiPAF(nodeId3);
     EXPECT_FALSE(wifi1 == wifi3);
+
+    // 11. Cross-type comparisons: BLE != NFC, BLE != UDP, BLE != TCP, NFC != UDP, NFC != TCP, UDP != WiFiPAF
+    EXPECT_FALSE(ble1 == nfc1);
+    EXPECT_FALSE(ble1 == udp1);
+    EXPECT_FALSE(ble1 == tcp1);
+    EXPECT_FALSE(nfc1 == udp1);
+    EXPECT_FALSE(nfc1 == tcp1);
+    EXPECT_FALSE(udp1 == wifi1);
 }
 
 } // namespace
