@@ -51,8 +51,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 #ifdef DIC_ENABLE
         dic_sendmsg("light/state", (const char *) (value ? (*value ? "on" : "off") : "invalid"));
 #endif // DIC_ENABLE
-        LightMgr().InitiateAction(AppEvent::kEventType_Light, *value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION,
-                                  value);
+        LightMgr().InitiateAction(AppEvent::kEventType_Light, *value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
     }
     // WIP Apply attribute change to Light
     else if (clusterId == LevelControl::Id)
@@ -60,7 +59,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
         ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
 
-        LightMgr().InitiateAction(AppEvent::kEventType_Light, LightingManager::LEVEL_ACTION, value);
+        LightMgr().InitiateLevelAction(AppEvent::kEventType_Light, LightingManager::LEVEL_ACTION, value);
     }
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
     // WIP Apply attribute change to Light

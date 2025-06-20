@@ -38,8 +38,13 @@ struct AppEvent : public BaseAppEvent
         {
             uint8_t Action;
             int32_t Actor;
-            uint8_t Value;
         } LightEvent;
+        struct
+        {
+            uint8_t Action;
+            int32_t Actor;
+            uint8_t Value;
+        } LightEventData;
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
         struct

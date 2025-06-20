@@ -65,15 +65,11 @@ CHIP_ERROR LightingManager::Init()
     }
 
     bool currentLedState;
+    app::DataModel::Nullable<uint8_t> brightness;
 
     // read current on/off value on endpoint one.
     chip::DeviceLayer::PlatformMgr().LockChipStack();
     OnOffServer::Instance().getOnOffValue(1, &currentLedState);
-
-#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
-    app::DataModel::Nullable<uint8_t> brightness;
-    uint16_t currentx, currenty, currentctmireds;
-    uint8_t currenthue, currentsaturation;
 
     // Read brightness value
     if (Clusters::LevelControl::Attributes::CurrentLevel::Get(1, brightness) == Protocols::InteractionModel::Status::Success &&
@@ -81,6 +77,11 @@ CHIP_ERROR LightingManager::Init()
     {
         mCurrentLevel = brightness.Value();
     }
+
+#if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+    uint16_t currentx, currenty, currentctmireds;
+    uint8_t currenthue, currentsaturation;
+
     if (Clusters::ColorControl::Attributes::CurrentX::Get(1, &currentx) == Protocols::InteractionModel::Status::Success)
     {
         mCurrentX = currentx;
@@ -142,7 +143,7 @@ void LightingManager::SetAutoTurnOffDuration(uint32_t aDurationInSecs)
     mAutoTurnOffDuration = aDurationInSecs;
 }
 
-bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction, uint8_t * aValue)
+bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction)
 {
     bool action_initiated = false;
     State_t new_state;
@@ -186,17 +187,6 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction, uint8_t *
         if (mActionInitiated_CB)
         {
             mActionInitiated_CB(aAction, aActor);
-        }
-    }
-
-    if (aAction == LEVEL_ACTION)
-    {
-        VerifyOrReturnValue(aValue != nullptr, action_initiated);
-        if (mCurrentLevel != *aValue)
-        {
-            mCurrentLevel    = *aValue;
-            action_initiated = true;
-            AppTask::GetAppTask().PostLightActionRequest(aActor, aAction, aValue);
         }
     }
 
@@ -263,7 +253,7 @@ void LightingManager::AutoTurnOffTimerEventHandler(AppEvent * aEvent)
 
     SILABS_LOG("Auto Turn Off has been triggered!");
 
-    light->InitiateAction(actor, OFF_ACTION, nullptr); // nullptr: no additional data needed for OFF_ACTION
+    light->InitiateAction(actor, OFF_ACTION);
 }
 
 void LightingManager::OffEffectTimerEventHandler(AppEvent * aEvent)
@@ -281,7 +271,7 @@ void LightingManager::OffEffectTimerEventHandler(AppEvent * aEvent)
 
     SILABS_LOG("OffEffect completed");
 
-    light->InitiateAction(actor, OFF_ACTION, nullptr); // nullptr: no additional data needed for OFF_ACTION
+    light->InitiateAction(actor, OFF_ACTION);
 }
 
 void LightingManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
@@ -359,6 +349,23 @@ void LightingManager::OnTriggerOffWithEffect(OnOffEffect * effect)
 
     LightMgr().mOffEffectArmed = true;
     LightMgr().StartTimer(offEffectDuration);
+}
+
+bool LightingManager::InitiateLevelAction(int32_t aActor, Action_t aAction, uint8_t * aValue)
+{
+    bool action_initiated = false;
+    if (aAction == LEVEL_ACTION)
+    {
+        VerifyOrReturnValue(aValue != nullptr, action_initiated);
+        if (mCurrentLevel != *aValue)
+        {
+            mCurrentLevel    = *aValue;
+            action_initiated = true;
+            AppTask::GetAppTask().PostLightLevelActionRequest(aActor, aAction, aValue);
+        }
+    }
+
+    return action_initiated;
 }
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)

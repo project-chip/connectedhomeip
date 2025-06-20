@@ -56,7 +56,8 @@ public:
     void EnableAutoTurnOff(bool aOn);
     void SetAutoTurnOffDuration(uint32_t aDurationInSecs);
     bool IsActionInProgress();
-    bool InitiateAction(int32_t aActor, Action_t aAction, uint8_t * aValue);
+    bool InitiateAction(int32_t aActor, Action_t aAction);
+    bool InitiateLevelAction(int32_t aActor, Action_t aAction, uint8_t * aValue);
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
     bool InitiateLightCtrlAction(int32_t aActor, Action_t aAction, uint32_t aAttributeId, uint8_t * value);
 #endif // (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED)

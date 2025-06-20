@@ -142,17 +142,13 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     bool initiated = false;
     LightingManager::Action_t action;
     int32_t actor;
-    uint8_t value  = aEvent->LightEvent.Value;
+    // uint8_t value  = aEvent->LightEvent.Value;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (aEvent->Type == AppEvent::kEventType_Light)
     {
         action = static_cast<LightingManager::Action_t>(aEvent->LightEvent.Action);
         actor  = aEvent->LightEvent.Actor;
-        if (action == LightingManager::LEVEL_ACTION)
-        {
-            sLightLED.SetLevel(value);
-        }
     }
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
@@ -166,12 +162,23 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
 
     if (err == CHIP_NO_ERROR)
     {
-        initiated = LightMgr().InitiateAction(actor, action, NULL);
+        initiated = LightMgr().InitiateAction(actor, action);
 
         if (!initiated)
         {
             SILABS_LOG("Action is already in progress or active.");
         }
+    }
+}
+
+void AppTask::LightActionLevelEventHandler(AppEvent * aEvent)
+{
+    LightingManager::Action_t action = static_cast<LightingManager::Action_t>(aEvent->LightEventData.Action);
+    uint8_t value                    = aEvent->LightEventData.Value;
+
+    if (action == LightingManager::LEVEL_ACTION)
+    {
+        sLightLED.SetLevel(value);
     }
 }
 
@@ -269,14 +276,24 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
     }
 }
 
-void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction, uint8_t * aValue)
+void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction)
 {
     AppEvent event;
     event.Type              = AppEvent::kEventType_Light;
     event.LightEvent.Actor  = aActor;
     event.LightEvent.Action = aAction;
-    event.LightEvent.Value  = *aValue;
     event.Handler           = LightActionEventHandler;
+    PostEvent(&event);
+}
+
+void AppTask::PostLightLevelActionRequest(int32_t aActor, LightingManager::Action_t aAction, uint8_t * aValue)
+{
+    AppEvent event;
+    event.Type                  = AppEvent::kEventType_Light;
+    event.LightEventData.Actor  = aActor;
+    event.LightEventData.Action = aAction;
+    event.LightEventData.Value  = *aValue;
+    event.Handler               = LightActionLevelEventHandler;
     PostEvent(&event);
 }
 
