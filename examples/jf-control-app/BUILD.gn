@@ -66,7 +66,7 @@ config("config") {
 
 static_library("jfc-utils") {
   sources = [
-    "${chip_root}/examples/chip-tool/CHIPCommand.h",
+    "${chip_root}/examples/chip-tool/commands/common/CHIPCommand.h",
     "${chip_root}/examples/chip-tool/commands/clusters/ModelCommand.cpp",
     "${chip_root}/examples/chip-tool/commands/clusters/ModelCommand.h",
     "${chip_root}/examples/chip-tool/commands/common/BDXDiagnosticLogsServerDelegate.cpp",

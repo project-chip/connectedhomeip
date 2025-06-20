@@ -25,8 +25,8 @@
 #   run1:
 #     script-args: >
 #       --string-arg th_server_app:${ALL_CLUSTERS_APP}
-#       --string-arg jfa_server_app:${ALL_CLUSTERS_APP}
-#       --string-arg jfc_server_app:${ALL_CLUSTERS_APP}
+#       --string-arg jfa_server_app:${JF_ADMIN_APP}
+#       --string-arg jfc_server_app:${JF_CONTROL_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -40,6 +40,7 @@ import tempfile
 import base64
 
 import chip.clusters as Clusters
+import chip.tlv
 from chip.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
@@ -282,11 +283,51 @@ class TC_JCM_1_1(MatterBaseTest):
         response = await devCtrlEcoA.ReadAttribute(
             nodeid=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
             returnClusterObject=True)
-        # TODO: Check Anchor CAT, Admin CAT inside NOC; jf-anchor-icac inside ICAC
+        # Search Administrator CAT (FFFF0001) and Anchor CAT (FFFD0001) in JF-Admin NOC on Ecoystem A
+        noc_tlv_data = chip.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].noc).get()
+        _admin_cat_found = False
+        _anchor_cat_found = False
+        for _tag, _value in noc_tlv_data['Any'][6]:
+            if _tag == 22 and _value == int(self.ecoACATs, 16):
+                _admin_cat_found = True
+            elif _tag == 22 and _value == int("FFFE0001", 16):
+                _anchor_cat_found = True
+            if _admin_cat_found and _anchor_cat_found:
+                break
+        asserts.assert_true(_admin_cat_found, "Administrator CAT not found in Admin App NOC on Ecosystem A")
+        asserts.assert_true(_anchor_cat_found, "Anchor CAT not found in Admin App NOC on Ecosystem A")
+        # Search jf-anchor-cat in Subject field of JF-Admin ICAC on Ecoystem A
+        icac_tlv_data = chip.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].icac).get()
+        _found = False
+        for _tag, _value in icac_tlv_data['Any'][6]:
+            if _tag == 8 and _value == 'jf-anchor-icac':
+                _found = True
+                break
+        asserts.assert_true(_found, "Anchor ICAC (jf-anchor-icac) not found in Admin App ICAC Subject field on Ecosystem A")
         response = await devCtrlEcoB.ReadAttribute(
             nodeid=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
             returnClusterObject=True)
-        # TODO: Check Anchor CAT, Admin CAT inside NOC; jf-anchor-icac inside ICAC
+        # Search Administrator CAT (FFFF0001) and Anchor CAT (FFFD0001) in JF-Admin NOC on Ecoystem A
+        noc_tlv_data = chip.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].noc).get()
+        _admin_cat_found = False
+        _anchor_cat_found = False
+        for _tag, _value in noc_tlv_data['Any'][6]:
+            if _tag == 22 and _value == int(self.ecoBCATs, 16):
+                _admin_cat_found = True
+            elif _tag == 22 and _value == int("FFFE0001", 16):
+                _anchor_cat_found = True
+            if _admin_cat_found and _anchor_cat_found:
+                break
+        asserts.assert_true(_admin_cat_found, "Administrator CAT not found in Admin App NOC on Ecosystem A")
+        asserts.assert_true(_anchor_cat_found, "Anchor CAT not found in Admin App NOC on Ecosystem A")
+        # Search jf-anchor-cat in Subject field of JF-Admin ICAC on Ecoystem A
+        icac_tlv_data = chip.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].icac).get()
+        _found = False
+        for _tag, _value in icac_tlv_data['Any'][6]:
+            if _tag == 8 and _value == 'jf-anchor-icac':
+                _found = True
+                break
+        asserts.assert_true(_found, "Anchor ICAC (jf-anchor-icac) not found in Admin App ICAC Subject field on Ecosystem A")
 
         self.step("3")
         self.thserver_fabric_a_passcode = random.randint(110220011, 110220999)
