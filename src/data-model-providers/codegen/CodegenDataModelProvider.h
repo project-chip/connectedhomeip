@@ -21,6 +21,7 @@
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/NodeConfigurationListener.h>
 #include <app/util/af-types.h>
 #include <data-model-providers/codegen/ServerClusterInterfaceRegistry.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -69,6 +70,12 @@ public:
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
 
+    /// Functions for managing the configuration version
+    void SetNodeConfigurationListener(DataModel::NodeConfigurationListener * nodeConfigurationListener) override;
+    void NotifyNodeConfigurationListener() override;
+    CHIP_ERROR GetNodeDataModelConfiguration(DataModel::NodeDataModelConfiguration & nodeDataModelConfiguration) override;
+    CHIP_ERROR ResetNodeDataModelConfigurationVersion() override;
+
     /// attribute tree iteration
     CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<DataModel::EndpointEntry> & out) override;
     CHIP_ERROR SemanticTags(EndpointId endpointId, ReadOnlyBufferBuilder<SemanticTag> & builder) override;
@@ -92,7 +99,16 @@ protected:
     // It is expected to be removed or replaced with a proper implementation in the future.TODO:(#36837).
     virtual void InitDataModelForTesting();
 
+    /// Function for managing the configuration version
+    CHIP_ERROR Internal_BumpNodeDataModelConfigurationVersion() override;
+
 private:
+    // The registered listener for changes to the data model configuration
+    DataModel::NodeConfigurationListener * mNodeConfigurationListener;
+
+    // The local cached configuration version value
+    uint32_t mConfigurationVersion = 1;
+
     // Iteration is often done in a tight loop going through all values.
     // To avoid N^2 iterations, cache a hint of where something is positioned
     uint16_t mEndpointIterationHint = 0;

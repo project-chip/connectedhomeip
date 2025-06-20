@@ -27,6 +27,7 @@
 #include <app/EventPathParams.h>
 #include <app/GlobalAttributes.h>
 #include <app/RequiredPrivilege.h>
+#include <app/SpecificationDefinedRevisions.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <app/server-cluster/ServerClusterContext.h>
@@ -41,6 +42,7 @@
 #include <app/util/persistence/DefaultAttributePersistenceProvider.h>
 #include <data-model-providers/codegen/EmberMetadata.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
@@ -161,6 +163,34 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
 
     InitDataModelForTesting();
 
+    chip::StorageKeyName kStorageKey = chip::DefaultStorageKeyAllocator::ConfigurationVersion();
+    if (!mPersistentStorageDelegate->SyncDoesKeyExist(kStorageKey.KeyName()))
+    {
+        // In case the key does not exist, it is assumed the configuration version is uninitialized.
+        // Initialize by setting local cache to 1 and write to persistent storage
+        mConfigurationVersion = 1;
+        uint16_t size         = sizeof(mConfigurationVersion);
+        if (mPersistentStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), &mConfigurationVersion, size) != CHIP_NO_ERROR)
+        {
+            ChipLogError(DataManagement, "Not able to init ConfigurationVersion in presistent storage, only using local cache");
+        }
+    }
+    else
+    {
+        // If present in persistent storage, read the value and store it in the local cache.
+        uint16_t size = sizeof(mConfigurationVersion);
+        if (mPersistentStorageDelegate->SyncGetKeyValue(kStorageKey.KeyName(), &mConfigurationVersion, size) != CHIP_NO_ERROR)
+        {
+            // Due to failure of reading ConfigurationVersion from persisten storage,
+            // reset local cache to 1 and try to write the new value to persisten storage.
+            mConfigurationVersion = 1;
+            if (mPersistentStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), &mConfigurationVersion, size) != CHIP_NO_ERROR)
+            {
+                ChipLogError(DataManagement, "Not able to init ConfigurationVersion in presistent storage, only using local cache");
+            }
+        }
+    }
+
     return mRegistry.SetContext(ServerClusterContext{
         .provider           = this,
         .storage            = mPersistentStorageDelegate,
@@ -195,6 +225,74 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
     // Ember always sets the return in the handler
     DispatchSingleClusterCommand(request.path, input_arguments, handler);
     return std::nullopt;
+}
+
+void CodegenDataModelProvider::SetNodeConfigurationListener(DataModel::NodeConfigurationListener * nodeConfigurationListener)
+{
+    mNodeConfigurationListener = nodeConfigurationListener;
+};
+
+void CodegenDataModelProvider::NotifyNodeConfigurationListener()
+{
+    if (mNodeConfigurationListener != nullptr)
+    {
+        // Notify the listener that the configuration version has been updated
+        mNodeConfigurationListener->OnConfigurationVersionChanged();
+    }
+};
+
+CHIP_ERROR
+CodegenDataModelProvider::GetNodeDataModelConfiguration(DataModel::NodeDataModelConfiguration & nodeDataModelConfiguration)
+{
+    // Grab the related data and return the node data model configuration
+    nodeDataModelConfiguration.configurationVersion = mConfigurationVersion;
+    nodeDataModelConfiguration.dataModelVersion     = Revision::kDataModelRevision;
+    nodeDataModelConfiguration.specVersion          = Revision::kSpecificationVersion;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CodegenDataModelProvider::Internal_BumpNodeDataModelConfigurationVersion()
+{
+    uint32_t tempConfigurationVersion = mConfigurationVersion;
+    uint16_t size                     = sizeof(tempConfigurationVersion);
+    chip::StorageKeyName kStorageKey  = chip::DefaultStorageKeyAllocator::ConfigurationVersion();
+
+    // Bump the configuration version and write to persistent storage
+    tempConfigurationVersion++;
+    ReturnErrorOnFailure(mPersistentStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), &tempConfigurationVersion, size));
+
+    // If successful, update local cache
+    mConfigurationVersion = tempConfigurationVersion;
+
+    // Nofity the registered listener
+    NotifyNodeConfigurationListener();
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CodegenDataModelProvider::ResetNodeDataModelConfigurationVersion()
+{
+    // This will (or at least should) only be called in the case of a factory reset,
+    // in the case a device is able to do a factory reset without rebooting,
+    // the implementation will still notify the listener, but it is assumed that
+    // any clients will not be informed of this change, since the factory reset
+    // will also remove all fabrics.
+
+    uint32_t tempConfigurationVersion = 1;
+    uint16_t size                     = sizeof(tempConfigurationVersion);
+    chip::StorageKeyName kStorageKey  = chip::DefaultStorageKeyAllocator::ConfigurationVersion();
+
+    // Write the reset configuration value to persisten storage
+    ReturnErrorOnFailure(mPersistentStorageDelegate->SyncSetKeyValue(kStorageKey.KeyName(), &tempConfigurationVersion, size));
+
+    // If successful, update local cache
+    mConfigurationVersion = tempConfigurationVersion;
+
+    // Nofity the registered listener
+    NotifyNodeConfigurationListener();
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CodegenDataModelProvider::Endpoints(ReadOnlyBufferBuilder<DataModel::EndpointEntry> & builder)

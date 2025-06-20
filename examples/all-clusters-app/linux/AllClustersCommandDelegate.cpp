@@ -20,6 +20,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/EventLogging.h>
+#include <app/InteractionModelEngine.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
 #include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
@@ -373,6 +374,50 @@ void EmitOccupancyChangedEvent(EndpointId endpointId, uint8_t occupancyValue)
     }
 }
 
+/**
+ * Named pipe handler for simulating a configuration change
+ * by changing the LevelStep value in the ValveConfigurationAndControl cluster
+ * and incrementing the ConfigurationVersion
+ *
+ * Usage example:
+ *   echo '{"Name":"SimulateConfigurationChange"}' > /tmp/chip_all_clusters_fifo_53713
+ */
+
+void HandleSimulateConfigurationChange(void)
+{
+    EndpointId endpoint = 1;
+
+    // Change a F attribute to simulate a change in configuration of the device
+    uint8_t valveLevelStep = 0;
+    Protocols::InteractionModel::Status status =
+        ValveConfigurationAndControl::Attributes::LevelStep::Get(endpoint, &valveLevelStep);
+    VerifyOrDie(status == Protocols::InteractionModel::Status::Success);
+
+    if (valveLevelStep == 1)
+    {
+        // Change fixed LevelStep value to 10
+        valveLevelStep = 10;
+    }
+    else
+    {
+        // Change fixed LevelStep value back to 1
+        valveLevelStep = 1;
+    }
+
+    status = ValveConfigurationAndControl::Attributes::LevelStep::Set(endpoint, valveLevelStep);
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        ChipLogError(NotSpecified, "Failed to set LevelStep value");
+    }
+    else
+    {
+        // LevelStep in ValveConfigurationAndControl has been modified,so bump ConfigurationVersion
+        // by calling the getter function to obtain a ScopedConfigurationVersionUpdater
+        DataModel::ProviderMetadataTree::ScopedConfigurationVersionUpdater configurationVersionTransaction =
+            InteractionModelEngine::GetInstance()->GetDataModelProvider()->GetNodeDataModelConfigurationVersionUpdater();
+    }
+}
+
 } // namespace
 
 AllClustersAppCommandHandler * AllClustersAppCommandHandler::FromJSON(const char * json)
@@ -556,16 +601,9 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     {
         SetRefrigeratorDoorStatusHandler(self->mJsonValue);
     }
-    else if (name == "SimulateConfigurationVersionChange")
+    else if (name == "SimulateConfigurationChange")
     {
-        uint32_t configurationVersion = 0;
-        ConfigurationMgr().GetConfigurationVersion(configurationVersion);
-        configurationVersion++;
-
-        if (ConfigurationMgr().StoreConfigurationVersion(configurationVersion + 1) != CHIP_NO_ERROR)
-        {
-            ChipLogError(NotSpecified, "Failed to store configuration version:%d", configurationVersion);
-        }
+        HandleSimulateConfigurationChange();
     }
     else if (name == "SetSimulatedSoilMoisture")
     {

@@ -65,6 +65,7 @@
 #include <lib/core/TLVTags.h>
 #include <lib/core/TLVTypes.h>
 #include <lib/core/TLVWriter.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -2832,3 +2833,44 @@ TEST_F(TestCodegenModelViaMocks, EndpointUniqueID)
     EXPECT_TRUE(span.data_equal("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01"_span));
 }
 #endif
+
+TEST_F(TestCodegenModelViaMocks, ConfigurationVersionBump)
+{
+    TestServerClusterContext testContext;
+
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
+    ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
+
+    // Assert that the ConfigurationVersion exists in persistent storage due to init
+    chip::StorageKeyName kStorageKey = chip::DefaultStorageKeyAllocator::ConfigurationVersion();
+    ASSERT_EQ(testContext.StorageDelegate().SyncDoesKeyExist(kStorageKey.KeyName()), true);
+
+    // Asset that the ConfigurationVersion is 1
+    uint32_t configurationVersion = 0;
+    uint16_t size                 = sizeof(configurationVersion);
+    ASSERT_EQ(testContext.StorageDelegate().SyncGetKeyValue(kStorageKey.KeyName(), &configurationVersion, size), CHIP_NO_ERROR);
+    EXPECT_EQ(configurationVersion, (uint32_t) 1);
+
+    // Create and register the listener
+    // model.SetNodeConfigurationListener(&gAttrAccess.mNodeConfigurationListener);
+
+    {
+        // Start the ConfigurationVersionTransaction
+        chip::app::DataModel::ProviderMetadataTree::ScopedConfigurationVersionUpdater configurationVersionTransaction(model);
+
+        // Assert the ConfigurationVersion is still 1, since the ScopedConfigurationVersionUpdater has not been descructed
+        configurationVersion = 0;
+        ASSERT_EQ(testContext.StorageDelegate().SyncGetKeyValue(kStorageKey.KeyName(), &configurationVersion, size), CHIP_NO_ERROR);
+        EXPECT_EQ(configurationVersion, (uint32_t) 1);
+    }
+
+    // Assert that the listener was called
+
+    // Assert the ConfigurationVersion is bumped to 2
+    configurationVersion = 0;
+    ASSERT_EQ(testContext.StorageDelegate().SyncGetKeyValue(kStorageKey.KeyName(), &configurationVersion, size), CHIP_NO_ERROR);
+    EXPECT_EQ(configurationVersion, (uint32_t) 2);
+}
