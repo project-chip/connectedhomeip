@@ -37,8 +37,8 @@ namespace EnergyEvse {
 constexpr uint8_t kAllTargetDaysMask = 0x7f;
 
 // A sensible minimum limit for mains voltage (100V) to avoid accidental use
-// of 100V instead of 100000mV
-constexpr int64_t kMinMainsVoltageLimit = 100000;
+// of 100mV instead of 100000mV
+constexpr int64_t kMinimumMainsVoltage_mV = 100000;
 
 /* Local state machine Events to allow simpler handling of state transitions */
 enum EVSEStateMachineEvent

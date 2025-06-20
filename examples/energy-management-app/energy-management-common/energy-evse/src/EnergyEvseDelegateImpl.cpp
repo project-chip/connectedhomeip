@@ -86,7 +86,7 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
 
     if (minimumChargeCurrent < kMinimumChargeCurrentLimit)
     {
-        ChipLogError(AppServer, "Maximum Current outside limits");
+        ChipLogError(AppServer, "Minimum Current outside limits");
         return Status::ConstraintError;
     }
 

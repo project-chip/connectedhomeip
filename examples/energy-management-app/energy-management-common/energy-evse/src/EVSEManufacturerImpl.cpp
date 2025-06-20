@@ -46,7 +46,7 @@ using namespace chip::app::Clusters::PowerSource::Attributes;
 
 using Protocols::InteractionModel::Status;
 
-constexpr int64_t kMaxRequiredEnergy = 1000000000; // 1000 MWh
+constexpr int64_t kMaxRequiredEnergy_mWh = 1000000000; // 1000 MWh
 
 CHIP_ERROR EVSEManufacturer::Init(chip::EndpointId powerSourceEndpointId)
 {
@@ -218,21 +218,9 @@ CHIP_ERROR EVSEManufacturer::DetermineRequiredEnergy(EnergyEvseDelegate * dg, in
             batteryCapacity_mWh = dg->GetBatteryCapacity();
             if (!vehicleSoC.IsNull() && !batteryCapacity_mWh.IsNull())
             {
-                if (vehicleSoC.Value() < targetSoC.Value())
-                {
-                    // The current SoC is below the target SoC - we need to charge
-                    ChipLogProgress(AppServer, "EVSE: Vehicle reports current SoC: %d < targetSoC: %d", vehicleSoC.Value(),
-                                    targetSoC.Value());
-                    requiredEnergy_mWh = (targetSoC.Value() - vehicleSoC.Value()) * batteryCapacity_mWh.Value() / 100;
-                }
-                else
-                {
-                    // The current SoC is already >= targetSoC - we don't need to charge
-                    ChipLogProgress(AppServer, "EVSE: Vehicle reports current SoC: %d >= targetSoC: %d", vehicleSoC.Value(),
-                                    targetSoC.Value());
-
-                    requiredEnergy_mWh = 0;
-                }
+                // If the current SoC is already >= targetSoC - we don't need to charge, set to 0.
+                requiredEnergy_mWh = std::max(0,  (targetSoC.Value() - vehicleSoC.Value()) * batteryCapacity_mWh.Value() / 100);
+                ChipLogProgress(AppServer, "EVSE: Vehicle reports current SoC: %d    ----- target SoC: %d", vehicleSoC.Value(), targetSoC.Value());
                 // Since we are charging using SoC then always null out the NextAddedEnergy target
                 // to indicate that the SoC target is being followed (per spec)
                 // NextChargeAddedEnergy is set by the caller based on targetAddedEnergy_mWh
