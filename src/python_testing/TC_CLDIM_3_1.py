@@ -146,11 +146,10 @@ class TC_CLDIM_3_1(MatterBaseTest):
 
         # STEP 2c: Read AttributeList attribute
         self.step("2c")
-        attribute_list = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
         # STEP 2d: Read LimitRange attribute if supported
         self.step("2d")
-        if attributes.LimitRange.attribute_id in attribute_list:
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.LimitRange):
             limit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LimitRange)
             min_position = limit_range.min
             max_position = limit_range.max
@@ -185,13 +184,10 @@ class TC_CLDIM_3_1(MatterBaseTest):
 
             # STEP 3c: Verify TargetState attribute is updated
             self.step("3c")
-            if attributes.TargetState.attribute_id in attribute_list:
+            if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TargetState):
                 target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
 
                 asserts.assert_equal(target_state.position, max_position, "TargetState Position does not match MaxPosition")
-            else:
-                logging.info("TargetState attribute is not supported. Skipping step 3b.")
-                self.mark_current_step_skipped()
 
             # STEP 3d: Wait for CurrentState.Position to be updated to MaxPosition
             self.step("3d")
@@ -220,14 +216,11 @@ class TC_CLDIM_3_1(MatterBaseTest):
 
             # STEP 4c: Verify TargetState attribute is updated
             self.step("4c")
-            if attributes.TargetState.attribute_id in attribute_list:
+            if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TargetState):
                 target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
 
                 asserts.assert_equal(target_state.speed, Globals.Enums.ThreeLevelAutoEnum.kMedium,
                                      "TargetState Speed does not match Medium")
-            else:
-                logging.info("TargetState attribute is not supported. Skipping step 4c.")
-                self.mark_current_step_skipped()
 
             # STEP 4d: Wait for CurrentState.Speed to be updated to Medium
             self.step("4d")
@@ -247,13 +240,10 @@ class TC_CLDIM_3_1(MatterBaseTest):
 
         # STEP 5b: Verify TargetState attribute is updated
         self.step("5b")
-        if attributes.TargetState.attribute_id in attribute_list:
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TargetState):
             target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
 
             asserts.assert_equal(target_state.position, min_position, "TargetState Position does not match MinPosition")
-        else:
-            logging.info("TargetState attribute is not supported. Skipping step 5b.")
-            self.mark_current_step_skipped()
 
         # STEP 5c: Wait for CurrentState.Position to be updated to MinPosition
         self.step("5c")
@@ -282,16 +272,13 @@ class TC_CLDIM_3_1(MatterBaseTest):
 
             # STEP 6c: Verify TargetState attribute is updated
             self.step("6c")
-            if attributes.TargetState.attribute_id in attribute_list:
+            if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TargetState):
                 target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
 
                 asserts.assert_equal(target_state.position, max_position, "TargetState Position does not match MaxPosition")
 
                 asserts.assert_equal(target_state.speed, Globals.Enums.ThreeLevelAutoEnum.kHigh,
                                      "TargetState Speed does not match High")
-            else:
-                logging.info("TargetState attribute is not supported. Skipping step 6c.")
-                self.mark_current_step_skipped()
 
             # STEP 6d: Wait for CurrentState.Position to be updated to MaxPosition and CurrentState.Speed to High
             self.step("6d")
