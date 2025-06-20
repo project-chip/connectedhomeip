@@ -165,6 +165,35 @@ private:
     chip::Platform::ScopedMemoryBufferWithSize<uint8_t> mBuffer;
 };
 
+class FillTLVBuffer : public app::DataModel::EncodableToTLV
+{
+public:
+    CHIP_ERROR EncodeTo(TLV::TLVWriter & aWriter, TLV::Tag aTag) const override
+    {
+        TLV::TLVType outerContainerType;
+        ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, outerContainerType));
+
+        size_t remaining_length = aWriter.GetRemainingFreeLength();
+        // Caller will still will need 1 byte for EndOfCommandDataIB and 1 byte for EndOfInvokeResponseIB
+        constexpr size_t kReserveForCallersFinishCommand = 1 + 1;
+        // Overhead include 1 control byte, 1 byte for ContextTag, 2 bytes for length, 1 byte for end container.
+        constexpr size_t kReservedOverhead = 1 + 1 + 2 + 1 + kReserveForCallersFinishCommand;
+        // kReservedOverhead assumes that the length we will be writing is over 255 as this will require an extra byte.
+        constexpr size_t kMinimumExpectedLengthToWrite = kReservedOverhead + 255;
+        VerifyOrReturnError(remaining_length > kMinimumExpectedLengthToWrite, CHIP_ERROR_INTERNAL);
+        remaining_length = remaining_length - kReservedOverhead;
+        chip::Platform::ScopedMemoryBufferWithSize<uint8_t> buf;
+        buf.Alloc(remaining_length);
+        VerifyOrReturnError(buf, CHIP_ERROR_NO_MEMORY);
+
+        // No significance with using 0x12, just using a value.
+        memset(buf.Get(), 0x12, remaining_length);
+
+        ReturnErrorOnFailure(app::DataModel::Encode(aWriter, TLV::ContextTag(1), ByteSpan(buf.Get(), buf.AllocatedSize())));
+        return aWriter.EndContainer(outerContainerType);
+    }
+};
+
 struct Fields
 {
     static constexpr chip::CommandId GetCommandId() { return 4; }
@@ -265,6 +294,11 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
         if (aRequestCommandPath.mCommandId == kTestCommandIdNoData || aRequestCommandPath.mCommandId == kTestCommandIdWithData)
         {
             apCommandObj->AddStatus(aRequestCommandPath, Protocols::InteractionModel::Status::Success);
+        }
+        else if (aRequestCommandPath.mCommandId == kTestCommandIdFillResponseMessage)
+        {
+            FillTLVBuffer response;
+            EXPECT_EQ(apCommandObj->AddResponseData(aRequestCommandPath, aRequestCommandPath.mCommandId, response), CHIP_NO_ERROR);
         }
         else
         {
@@ -1188,6 +1222,35 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_ValidateSecondLarg
     EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
     EXPECT_EQ(commandSender.GetInvokeResponseMessageCount(), 0u);
 
+    DrainAndServiceIO();
+
+    EXPECT_EQ(mockCommandSenderExtendedDelegate.onResponseCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderExtendedDelegate.onFinalCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderExtendedDelegate.onErrorCalledTimes, 0);
+}
+
+TEST_F(TestCommandInteraction, TestCommandHandler_CommandHandlerFillsUpResponse)
+{
+    mockCommandSenderExtendedDelegate.ResetCounter();
+    PendingResponseTrackerImpl pendingResponseTracker;
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
+                                     &pendingResponseTracker);
+
+    app::CommandSender::AddRequestDataParameters addRequestDataParams;
+
+    CommandSender::ConfigParameters config;
+    EXPECT_EQ(commandSender.SetCommandSenderConfig(config), CHIP_NO_ERROR);
+
+    auto firstCommandPathParams = MakeTestCommandPath(kTestCommandIdFillResponseMessage);
+    SimpleTLVPayload simplePayloadWriter;
+    EXPECT_EQ(commandSender.AddRequestData(firstCommandPathParams, simplePayloadWriter, addRequestDataParams), CHIP_NO_ERROR);
+
+    // Confirm that we can still send out a request with the first command.
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(commandSender.GetInvokeResponseMessageCount(), 0u);
+
+    sendResponse           = true;
+    commandDispatchedCount = 0;
     DrainAndServiceIO();
 
     EXPECT_EQ(mockCommandSenderExtendedDelegate.onResponseCalledTimes, 1);

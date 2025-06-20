@@ -259,6 +259,37 @@ CHIP_ERROR MdnsContexts::Has(GenericContext * context)
     return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
+#if DNSSD_VERBOSE_CONTEXT_PRINT
+void MdnsContexts::Print() const
+{
+    ChipLogDetail(Discovery, "MdnsContexts:");
+    std::vector<GenericContext *>::const_iterator iter = mContexts.cbegin();
+    while (iter != mContexts.cend())
+    {
+        const char * contextType = "Unknown";
+        switch ((*iter)->type)
+        {
+        case ContextType::Register:
+            contextType = "Register";
+            break;
+        case ContextType::Browse:
+            contextType = "Browse";
+            break;
+        case ContextType::BrowseWithDelegate:
+            contextType = "BrowseWithDelegate";
+            break;
+        case ContextType::Resolve:
+            contextType = "Resolve";
+            break;
+        }
+
+        // Print the pointer as a unique identifier so concurrent contexts can be distinguished in logs
+        ChipLogDetail(Discovery, "\t%p: %s", *iter, contextType);
+        iter++;
+    }
+}
+#endif // DNSSD_VERBOSE_CONTEXT_PRINT
+
 CHIP_ERROR MdnsContexts::GetRegisterContextOfTypeAndName(const char * type, const char * name, RegisterContext ** context)
 {
     bool found = false;
@@ -491,11 +522,6 @@ ResolveContext::ResolveContext(DiscoverNodeDelegate * delegate, chip::Inet::IPAd
     consumerCounter = std::move(consumerCounterToUse);
 }
 
-ResolveContext::~ResolveContext()
-{
-    CancelSRPTimerIfRunning();
-}
-
 void ResolveContext::DispatchFailure(const char * errorStr, CHIP_ERROR err)
 {
     ChipLogError(Discovery, "Mdns: Resolve failure (%s)", errorStr);
@@ -632,26 +658,6 @@ void ResolveContext::DispatchSuccess()
     VerifyOrDo(interfacesOrder.size(),
                ChipLogError(Discovery, "Successfully finalizing resolve for %s without finding any actual IP addresses.",
                             instanceName.c_str()));
-}
-
-void ResolveContext::SRPTimerExpiredCallback(chip::System::Layer * systemLayer, void * callbackContext)
-{
-    auto sdCtx = static_cast<ResolveContext *>(callbackContext);
-    VerifyOrDie(sdCtx != nullptr);
-    sdCtx->isSRPTimerRunning = false;
-
-    ChipLogProgress(Discovery, "SRP resolve timer for %s expired; completing resolve", sdCtx->instanceName.c_str());
-    sdCtx->Finalize();
-}
-
-void ResolveContext::CancelSRPTimerIfRunning()
-{
-    if (isSRPTimerRunning)
-    {
-        DeviceLayer::SystemLayer().CancelTimer(SRPTimerExpiredCallback, static_cast<void *>(this));
-        ChipLogProgress(Discovery, "SRP resolve timer for %s cancelled; resolve timed out", instanceName.c_str());
-        isSRPTimerRunning = false;
-    }
 }
 
 CHIP_ERROR ResolveContext::OnNewAddress(const InterfaceKey & interfaceKey, const struct sockaddr * address)
