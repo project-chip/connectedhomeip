@@ -55,10 +55,10 @@ std::string GetUsedDirectory(const std::string & directory)
         dir = "/tmp";
     }
 
-    return std::string{dir};
+    return std::string{ dir };
 }
 
-std::string PersistentStorage::GenerateFilename(const std::string  & name) const
+std::string PersistentStorage::GenerateFilename(const std::string & name) const
 {
     std::string dir = mUsedDirectory;
 
@@ -75,7 +75,7 @@ CHIP_ERROR PersistentStorage::Init(const char * name, const char * directory)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     mUsedDirectory = GetUsedDirectory(directory != nullptr ? directory : "");
-    mUsedFilename = GenerateFilename(name != nullptr ? name : "");
+    mUsedFilename  = GenerateFilename(name != nullptr ? name : "");
 
     std::ifstream ifs;
     ifs.open(mUsedFilename, std::ifstream::in);

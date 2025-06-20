@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include <string>
 #include <lib/core/CASEAuthTag.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <string>
 
 #include <inipp/inipp.h>
 
