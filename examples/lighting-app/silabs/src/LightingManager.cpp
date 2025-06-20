@@ -81,6 +81,7 @@ CHIP_ERROR LightingManager::Init()
     {
         mCurrentLevel = brightness.Value();
     }
+
     if (Clusters::ColorControl::Attributes::CurrentX::Get(1, &currentx) == Protocols::InteractionModel::Status::Success)
     {
         mCurrentX = currentx;
@@ -160,42 +161,38 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction, uint8_t *
 
         new_state = kState_OffInitiated;
     }
+    else if (aAction == LEVEL_ACTION)
+    {
+        action_initiated = true;
+    }
 
     if (action_initiated)
     {
-        if (mAutoTurnOffTimerArmed && new_state == kState_OffInitiated)
+        if (aAction != LEVEL_ACTION)
         {
-            // If auto turn off timer has been armed and someone initiates turning off,
-            // cancel the timer and continue as normal.
-            mAutoTurnOffTimerArmed = false;
+            if (mAutoTurnOffTimerArmed && new_state == kState_OffInitiated)
+            {
+                // If auto turn off timer has been armed and someone initiates turning off,
+                // cancel the timer and continue as normal.
+                mAutoTurnOffTimerArmed = false;
 
-            CancelTimer();
+                CancelTimer();
+            }
+
+            if (mOffEffectArmed && new_state == kState_OnInitiated)
+            {
+                CancelTimer();
+                mOffEffectArmed = false;
+            }
+
+            StartTimer(ACTUATOR_MOVEMENT_PERIOS_MS);
+
+            // Since the timer started successfully, update the state and trigger callback
+            mState = new_state;
         }
-
-        if (mOffEffectArmed && new_state == kState_OnInitiated)
-        {
-            CancelTimer();
-            mOffEffectArmed = false;
-        }
-
-        StartTimer(ACTUATOR_MOVEMENT_PERIOS_MS);
-
-        // Since the timer started successfully, update the state and trigger callback
-        mState = new_state;
-
         if (mActionInitiated_CB)
         {
-            mActionInitiated_CB(aAction, aActor);
-        }
-    }
-
-    if (aAction == LEVEL_ACTION)
-    {
-        action_initiated = true;
-        if (mCurrentLevel != *aValue)
-        {
-            mCurrentLevel = *aValue;
-            AppTask::GetAppTask().PostLightActionRequest(aActor, aAction, aValue);
+            mActionInitiated_CB(aAction, aActor, aValue);
         }
     }
 
@@ -251,6 +248,7 @@ void LightingManager::AutoTurnOffTimerEventHandler(AppEvent * aEvent)
 {
     LightingManager * light = static_cast<LightingManager *>(aEvent->TimerEvent.Context);
     int32_t actor           = AppEvent::kEventType_Timer;
+    uint8_t value           = aEvent->LightEvent.Value;
 
     // Make sure auto turn off timer is still armed.
     if (!light->mAutoTurnOffTimerArmed)
@@ -262,13 +260,14 @@ void LightingManager::AutoTurnOffTimerEventHandler(AppEvent * aEvent)
 
     SILABS_LOG("Auto Turn Off has been triggered!");
 
-    light->InitiateAction(actor, OFF_ACTION, nullptr); // nullptr: no additional data needed for OFF_ACTION
+    light->InitiateAction(actor, OFF_ACTION, &value);
 }
 
 void LightingManager::OffEffectTimerEventHandler(AppEvent * aEvent)
 {
     LightingManager * light = static_cast<LightingManager *>(aEvent->TimerEvent.Context);
     int32_t actor           = AppEvent::kEventType_Timer;
+    uint8_t value           = aEvent->LightEvent.Value;
 
     // Make sure auto turn off timer is still armed.
     if (!light->mOffEffectArmed)
@@ -280,7 +279,7 @@ void LightingManager::OffEffectTimerEventHandler(AppEvent * aEvent)
 
     SILABS_LOG("OffEffect completed");
 
-    light->InitiateAction(actor, OFF_ACTION, nullptr); // nullptr: no additional data needed for OFF_ACTION
+    light->InitiateAction(actor, OFF_ACTION, &value);
 }
 
 void LightingManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
