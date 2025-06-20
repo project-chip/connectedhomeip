@@ -162,7 +162,12 @@ void SetTestEventTrigger_EVSESetSoCClear()
 }
 void SetTestEventTrigger_EVSESetVehicleID()
 {
-    // TODO
+    constexpr char newVehicleID[] = "Test-Vehicle-ID-012345789-ABCDEF";
+
+    CharSpan vehicleIdSpan(newVehicleID, strlen(newVehicleID));
+
+    EnergyEvseDelegate * dg = GetEvseDelegate();
+    dg->HwSetVehicleID(vehicleIdSpan);
 }
 void SetTestEventTrigger_EVSETriggerRFID()
 {
