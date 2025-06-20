@@ -27,7 +27,8 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import ClusterAttributeChangeAccumulator, EventChangeCallback, TestStep
+from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator, EventChangeCallback
+from chip.testing.matter_testing import TestStep
 from mobly import asserts
 
 
