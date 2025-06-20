@@ -89,10 +89,9 @@ class TC_CLDIM_3_1(MatterBaseTest):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "If Positioning feature is not supported, skip remaining steps"),
-            TestStep("2c", "Read AttributeList attribute"),
-            TestStep("2d", "Read LimitRange attribute"),
-            TestStep("2e", "Establish wilcard subscription to all attributes"),
-            TestStep("2f", "Read CurrentState attribute"),
+            TestStep("2c", "Read LimitRange attribute"),
+            TestStep("2d", "Establish wilcard subscription to all attributes"),
+            TestStep("2e", "Read CurrentState attribute"),
             TestStep("3a", "If Position = MaxPosition, skip steps 3b to 3d"),
             TestStep("3b", "Set Position to MaxPosition"),
             TestStep("3c", "Verify TargetState attribute is updated"),
@@ -144,23 +143,20 @@ class TC_CLDIM_3_1(MatterBaseTest):
             self.skip_all_remaining_steps("2c")
             return
 
-        # STEP 2c: Read AttributeList attribute
+        # STEP 2c: Read LimitRange attribute if supported
         self.step("2c")
-
-        # STEP 2d: Read LimitRange attribute if supported
-        self.step("2d")
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.LimitRange):
             limit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LimitRange)
             min_position = limit_range.min
             max_position = limit_range.max
 
-        # STEP 2e: Establish wildcard subscription to all attributes"
-        self.step("2e")
+        # STEP 2d: Establish wildcard subscription to all attributes"
+        self.step("2d")
         sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureDimension)
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
 
-        # STEP 2f: Read CurrentState attribute
-        self.step("2f")
+        # STEP 2e: Read CurrentState attribute
+        self.step("2e")
         initial_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
         # STEP 3a: If Position = MaxPosition, skip steps 3b to 3d

@@ -66,10 +66,9 @@ class TC_CLDIM_3_2(MatterBaseTest):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "If MotionLatching feature is not supported, skip remaining steps"),
-            TestStep("2c", "Read AttributeList attribute"),
-            TestStep("2d", "Read LimitRange attribute"),
-            TestStep("2e", "Read LatchControlModes attribute"),
-            TestStep("2f", "Establish wilcard subscription to all attributes"),
+            TestStep("2c", "Read LimitRange attribute"),
+            TestStep("2d", "Read LatchControlModes attribute"),
+            TestStep("2e", "Establish wilcard subscription to all attributes"),
             TestStep("3a", "If manual latching is required, skip steps 3b and 3c"),
             TestStep("3b", "Send SetTarget command with Latch=True"),
             TestStep("3c", "Manually latch the device"),
@@ -119,23 +118,20 @@ class TC_CLDIM_3_2(MatterBaseTest):
             self.skip_all_remaining_steps("2c")
             return
 
-        # STEP 2c: Read AttributeList attribute
+        # STEP 2c: Read LimitRange attribute if supported
         self.step("2c")
-
-        # STEP 2d: Read LimitRange attribute if supported
-        self.step("2d")
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.LimitRange):
             limit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LimitRange)
             max_position = limit_range.max
 
-        # STEP 2e: Read LatchControlModes attribute
-        self.step("2e")
+        # STEP 2d: Read LatchControlModes attribute
+        self.step("2d")
         latch_control_modes = 0b0  # Default value as a bitmap
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.LatchControlModes):
             latch_control_modes = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
 
-        # STEP 2f: Establish wildcard subscription to all attributes
-        self.step("2f")
+        # STEP 2e: Establish wildcard subscription to all attributes
+        self.step("2e")
         sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureDimension)
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
 
