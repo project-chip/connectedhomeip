@@ -69,11 +69,37 @@ Status ClosureControlDelegate::HandleStopCommand()
     return ClosureManager::GetInstance().OnStopCommand();
 }
 
+CHIP_ERROR ClosureControlDelegate::ClearErrorList()
+{
+    mCurrentErrorCount = 0;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClosureControlDelegate::AddErrorToCurrentErrorList(ClosureErrorEnum error)
+{
+    VerifyOrReturnError(mCurrentErrorCount < kMaxErrorCount, CHIP_ERROR_BUFFER_TOO_SMALL,
+                        ChipLogError(AppServer, "Error list full"));
+    // Check for duplicates
+    for (size_t i = 0; i < mCurrentErrorCount; ++i)
+    {
+        VerifyOrReturnError(mCurrentErrorList[i] != ClosureErrorEnum::kUnknownEnumValue,
+                            CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(AppServer, "Unknown error in the list"));
+    }
+    mCurrentErrorList[mCurrentErrorCount++] = error;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ClosureControlDelegate::GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError)
 {
     // This function should return the current error at the specified index.
     // For now, we dont have a ErrorList implemented, so will return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED.
-    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    // return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    if (index >= mCurrentErrorCount)
+    {
+        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    }
+    closureError = mCurrentErrorList[index];
+    return CHIP_NO_ERROR;
 }
 
 bool ClosureControlDelegate::IsReadyToMove()
@@ -120,19 +146,24 @@ CHIP_ERROR ClosureControlDelegate::HandleEventTrigger(uint64_t eventTrigger)
     switch (trigger)
     {
     case ClosureControlTestEventTrigger::kMainStateIsSetupRequired:
-        return logic->SetMainState(MainStateEnum::kSetupRequired);
+        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kSetupRequired));
+        ReturnErrorOnFailure(AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor));
+        break;
     case ClosureControlTestEventTrigger::kMainStateIsProtected:
-        return logic->SetMainState(MainStateEnum::kProtected);
+        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kProtected));
+        break;
     case ClosureControlTestEventTrigger::kMainStateIsError:
         return logic->SetMainState(MainStateEnum::kError);
     case ClosureControlTestEventTrigger::kMainStateIsDisengaged:
         return logic->SetMainState(MainStateEnum::kDisengaged);
     case ClosureControlTestEventTrigger::kClearEvent:
-        // TODO : Implement logic to clear test event after Test plan Spec issue #5429 is resolved.
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kStopped));
+        ReturnErrorOnFailure(ClearErrorList());
+        break;
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ClosureControlEndpoint::Init()
