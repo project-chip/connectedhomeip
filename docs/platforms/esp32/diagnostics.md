@@ -1,10 +1,12 @@
 # Using ESP32 Diagnostic Logs Provider
 
-This document outlines how to integrate the ESP32 Diagnostic Logs Provider into your Matter application.
+This document outlines how to integrate the ESP32 Diagnostic Logs Provider into
+your Matter application.
 
 ## Configuration Options
 
-Enable the following configuration options to use the ESP32 Diagnostic Logs Provider:
+Enable the following configuration options to use the ESP32 Diagnostic Logs
+Provider:
 
 ```
 CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE=y
@@ -21,7 +23,8 @@ examples/platform/esp32/diagnostics/diagnostic-logs-provider-delegate-impl.h
 examples/platform/esp32/diagnostics/diagnostic-logs-provider-delegate-impl.cpp
 ```
 
-These files contain the implementation of the `LogProvider` class which implements the `DiagnosticLogsProviderDelegate` interface.
+These files contain the implementation of the `LogProvider` class which
+implements the `DiagnosticLogsProviderDelegate` interface.
 
 ## Integration Steps
 
@@ -47,8 +50,11 @@ using namespace chip::app::Clusters::DiagnosticLogs;
 ```
 
 The buffer sizes can be configured through Kconfig options:
-- `CONFIG_RETRIEVAL_BUFFER_SIZE`: Size of the buffer used for retrieving diagnostic data inside the diagnostic-logs-provider-delegate.
-- `CONFIG_END_USER_BUFFER_SIZE`: Size of the buffer used to store diagnostic data in esp32_diagnostic_trace backend.
+
+-   `CONFIG_RETRIEVAL_BUFFER_SIZE`: Size of the buffer used for retrieving
+    diagnostic data inside the diagnostic-logs-provider-delegate.
+-   `CONFIG_END_USER_BUFFER_SIZE`: Size of the buffer used to store diagnostic
+    data in esp32_diagnostic_trace backend.
 
 ### 3. Initialize the Log Provider
 
@@ -65,7 +71,8 @@ void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 ```
 
-This callback initializes the log provider with the configured buffers and sets it as the delegate for the DiagnosticLogs cluster.
+This callback initializes the log provider with the configured buffers and sets
+it as the delegate for the DiagnosticLogs cluster.
 
 ### 4. Include Diagnostic Logs Server
 
@@ -88,11 +95,13 @@ CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF=y
 
 ## Example Integration
 
-The `examples/temperature-measurement-app/esp32/` demonstrates proper integration:
-For more information releted to the retrieval of diagnostics throught diagnosticlogs cluster refer readme.md in app folder.
+The `examples/temperature-measurement-app/esp32/` demonstrates proper
+integration: For more information related to the retrieval of diagnostics
+through diagnosticlogs cluster refer readme.md in app folder.
 
 ## Important Notes
 
-- The diagnostic logs provider **must** be explicitly enabled through the `CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE` option
-- Buffer sizes should be adjusted based on your application's needs
-- The provider supports end-user support logs and crash logs (when configured)
+-   The diagnostic logs provider **must** be explicitly enabled through the
+    `CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE` option
+-   Buffer sizes should be adjusted based on your application's needs
+-   The provider supports end-user support logs and crash logs (when configured)
