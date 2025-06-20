@@ -23,8 +23,8 @@ chip_test_suite("tests") {
   test_sources = [ "TestPascalString.cpp" ]
 
   public_deps = [
-    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/app/storage:attribute-storage",
+    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support:testing",
   ]
 }
