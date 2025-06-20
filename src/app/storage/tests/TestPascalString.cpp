@@ -24,7 +24,7 @@ using namespace chip::app::Storage;
 
 TEST(TestPascalString, TestCharStringOperations)
 {
-    char buffer[8] = {0};
+    char buffer[8] = { 0 };
 
     {
         ShortPascalString str(buffer);
