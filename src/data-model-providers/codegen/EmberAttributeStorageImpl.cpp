@@ -78,7 +78,7 @@ CHIP_ERROR EmberAttributeStorageImpl::Write(const ConcreteAttributePath & path, 
     return provider->WriteValue(path, value.data());
 }
 
-CHIP_ERROR EmberAttributeStorageImpl::Read(const ConcreteAttributePath & path, Buffer & buffer)
+CHIP_ERROR EmberAttributeStorageImpl::Read(const ConcreteAttributePath & path, Buffer buffer)
 {
     VerifyOrReturnError(buffer.size() > 0, CHIP_ERROR_BUFFER_TOO_SMALL);
 

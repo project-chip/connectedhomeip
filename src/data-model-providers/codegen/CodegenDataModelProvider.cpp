@@ -39,6 +39,7 @@
 #include <app/util/endpoint-config-api.h>
 #include <app/util/persistence/AttributePersistenceProvider.h>
 #include <app/util/persistence/DefaultAttributePersistenceProvider.h>
+#include <data-model-providers/codegen/EmberAttributeStorageImpl.h>
 #include <data-model-providers/codegen/EmberMetadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -161,9 +162,12 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
 
     InitDataModelForTesting();
 
+    static Storage::EmberAttributeStorageImpl gAttributeStorage;
+
     return mRegistry.SetContext(ServerClusterContext{
         .provider           = this,
         .storage            = mPersistentStorageDelegate,
+        .attributeStorage   = &gAttributeStorage,
         .interactionContext = &mContext,
     });
 }

@@ -32,36 +32,22 @@ BasicInformationLogic & BasicInformationLogic::Instance()
     return sInstance;
 }
 
-CHIP_ERROR BasicInformationLogic::Init()
+CHIP_ERROR BasicInformationLogic::Init(Storage::AttributeStorage & storage)
 {
-    // TODO: implement
-    //
-    // Some prototype:
-    //
-    // MutableCharSpan dest(mNodeLabelBuffer);
-    //
-    // ReturnErrorOnFailure(mPersistence.ReadAttribute(
-    //     {kRootEndpointId, BasicInformation::Id, NodeLabel::Id}, dest)
-    // );
-    // mNodeLabelSize = dest.size();
-    return CHIP_NO_ERROR;
+    Storage::ShortPascalString labelBuffer(mNodeLabelBuffer);
+    CHIP_ERROR err = storage.Read({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, labelBuffer);
+    if (err == CHIP_ERROR_KEY_NOT_FOUND)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    return err;
 }
 
-DataModel::ActionReturnStatus BasicInformationLogic::SetNodeLabel(CharSpan label)
+DataModel::ActionReturnStatus BasicInformationLogic::SetNodeLabel(CharSpan label, Storage::AttributeStorage & storage)
 {
     Storage::ShortPascalString labelBuffer(mNodeLabelBuffer);
     VerifyOrReturnError(labelBuffer.SetValue(label), Protocols::InteractionModel::Status::ConstraintError);
-
-    // TODO: implement
-    //
-    // Some prototype:
-    //
-    //   return mPersistence.WriteAttribute(
-    //     {kRootEndpointId, BasicInformation::Id, NodeLabel::Id},
-    //     AttributeStorage::Value(labelBuffer),
-    //   );
-
-    return CHIP_NO_ERROR;
+    return storage.Write({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, labelBuffer);
 }
 
 DataModel::ActionReturnStatus BasicInformationLogic::SetLocation(CharSpan location)

@@ -18,6 +18,7 @@
 
 #include <app/data-model-provider/Context.h>
 #include <app/data-model-provider/Provider.h>
+#include <app/storage/AttributeStorage.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
@@ -34,8 +35,10 @@ namespace app {
 /// for every cluster maintaining such a context.
 struct ServerClusterContext
 {
-    DataModel::Provider * const provider                          = nullptr; /// underlying provider that the cluster operates in
-    PersistentStorageDelegate * const storage                     = nullptr; /// read/write persistent storage
+    DataModel::Provider * const provider      = nullptr; /// underlying provider that the cluster operates in
+    PersistentStorageDelegate * const storage = nullptr; /// read/write persistent storage
+    Storage::AttributeStorage * const attributeStorage =
+        nullptr; /// read/write attributes (i.e. persistent storage with attribute keys)
     DataModel::InteractionModelContext * const interactionContext = nullptr; /// outside-world communication
 
     bool operator!=(const ServerClusterContext & other) const

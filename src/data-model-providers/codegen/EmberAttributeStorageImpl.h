@@ -23,12 +23,12 @@ namespace Storage {
 
 /// Provides an attribute storage implementation that is using
 /// AttributePersistenceProvider to implement read/write operations.
-class EmberAttributeStorageImpl : AttributeStorage
+class EmberAttributeStorageImpl : public AttributeStorage
 {
 public:
     ~EmberAttributeStorageImpl() override = default;
     CHIP_ERROR Write(const ConcreteAttributePath & path, const Value & value) override;
-    CHIP_ERROR Read(const ConcreteAttributePath & path, Buffer & buffer) override;
+    CHIP_ERROR Read(const ConcreteAttributePath & path, Buffer buffer) override;
 };
 
 } // namespace Storage

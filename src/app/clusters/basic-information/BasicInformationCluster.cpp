@@ -355,7 +355,7 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteAttribute(const Data
     case NodeLabel::Id: {
         CharSpan label;
         ReturnErrorOnFailure(decoder.Decode(label));
-        return NotifyAttributeChangedIfSuccess(NodeLabel::Id, BasicInformationLogic::Instance().SetNodeLabel(label));
+        return NotifyAttributeChangedIfSuccess(NodeLabel::Id, BasicInformationLogic::Instance().SetNodeLabel(label, *mContext->attributeStorage));
     }
     case LocalConfigDisabled::Id: {
         bool value;
@@ -399,7 +399,7 @@ CHIP_ERROR BasicInformationCluster::Attributes(const ConcreteClusterPath & path,
 
 CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
 {
-    ReturnErrorOnFailure(BasicInformationLogic::Instance().Init());
+    ReturnErrorOnFailure(BasicInformationLogic::Instance().Init(*context.attributeStorage));
     if (PlatformMgr().GetDelegate() == nullptr)
     {
         PlatformMgr().SetDelegate(this);

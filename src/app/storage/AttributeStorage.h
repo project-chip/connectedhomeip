@@ -116,23 +116,19 @@ public:
 
         Buffer(const Buffer & other) = default;
 
-        Buffer ShortString(ShortPascalString<char> & data)
-        {
-            return { data.PascalContent().data(), data.PascalContent().size(), Type::kStringOneByteLength };
-        }
-        Buffer LongString(LongPascalString<char> & data)
-        {
-            return { data.PascalContent().data(), data.PascalContent().size(), Type::kStringTwoByteLength };
-        }
+        Buffer(ShortPascalString<char> & data) :
+            Buffer(data.PascalContent().data(), data.PascalContent().size(), Type::kStringOneByteLength)
+        {}
+        Buffer(LongPascalString<char> & data) :
+            Buffer(data.PascalContent().data(), data.PascalContent().size(), Type::kStringTwoByteLength)
+        {}
 
-        Buffer ShortString(ShortPascalString<uint8_t> & data)
-        {
-            return { data.PascalContent().data(), data.PascalContent().size(), Type::kStringOneByteLength };
-        }
-        Buffer LongString(LongPascalString<uint8_t> & data)
-        {
-            return { data.PascalContent().data(), data.PascalContent().size(), Type::kStringTwoByteLength };
-        }
+        Buffer(ShortPascalString<uint8_t> & data) :
+            Buffer(data.PascalContent().data(), data.PascalContent().size(), Type::kStringOneByteLength)
+        {}
+        Buffer(LongPascalString<uint8_t> & data) :
+            Buffer(data.PascalContent().data(), data.PascalContent().size(), Type::kStringTwoByteLength)
+        {}
 
         template <typename T>
         Buffer Number(T & value)
@@ -168,7 +164,7 @@ public:
     /// Notable possible errors:
     ///    CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND - path does not exist in storage
     ///    CHIP_ERROR_BUFFER_TOO_SMALL - insufficient storage to fetch the data
-    virtual CHIP_ERROR Read(const ConcreteAttributePath & path, Buffer & buffer) = 0;
+    virtual CHIP_ERROR Read(const ConcreteAttributePath & path, Buffer buffer) = 0;
 };
 
 } // namespace Storage
