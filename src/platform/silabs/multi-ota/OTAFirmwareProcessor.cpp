@@ -53,26 +53,26 @@ CHIP_ERROR OTAFirmwareProcessor::ProcessInternal(ByteSpan & block)
 #endif
     }
 #ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
-    MutableByteSpan byteblock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
-    memcpy(&byteblock[0], &byteblock[requestedOtaMaxBlockSize], mUnalignmentNum);
-    memcpy(&byteblock[mUnalignmentNum], block.data(), block.size());
+    MutableByteSpan byteBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
+    memcpy(&byteBlock[0], &byteBlock[requestedOtaMaxBlockSize], mUnalignmentNum);
+    memcpy(&byteBlock[mUnalignmentNum], block.data(), block.size());
 
     if (mUnalignmentNum + block.size() < requestedOtaMaxBlockSize)
     {
         uint32_t mAlignmentNum = (mUnalignmentNum + block.size()) / 16;
         mAlignmentNum          = mAlignmentNum * 16;
         mUnalignmentNum        = (mUnalignmentNum + block.size()) % 16;
-        memcpy(&byteblock[requestedOtaMaxBlockSize], &byteblock[mAlignmentNum], mUnalignmentNum);
-        byteblock.reduce_size(mAlignmentNum);
+        memcpy(&byteBlock[requestedOtaMaxBlockSize], &byteBlock[mAlignmentNum], mUnalignmentNum);
+        byteBlock.reduce_size(mAlignmentNum);
     }
     else
     {
         mUnalignmentNum = mUnalignmentNum + block.size() - requestedOtaMaxBlockSize;
-        byteblock.reduce_size(requestedOtaMaxBlockSize);
+        byteBlock.reduce_size(requestedOtaMaxBlockSize);
     }
 
-    OTATlvProcessor::vOtaProcessInternalEncryption(byteblock);
-    block = byteblock;
+    OTATlvProcessor::vOtaProcessInternalEncryption(byteBlock);
+    block = byteBlock;
 #endif
 
     uint32_t blockReadOffset = 0;

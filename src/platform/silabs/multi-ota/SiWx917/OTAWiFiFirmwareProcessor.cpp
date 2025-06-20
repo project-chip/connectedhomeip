@@ -44,29 +44,29 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
     }
 
 #if SL_MATTER_ENABLE_OTA_ENCRYPTION
-    MutableByteSpan byteblock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
-    memcpy(&byteblock[0], &byteblock[requestedOtaMaxBlockSize], mUnalignmentNum);
-    memcpy(&byteblock[mUnalignmentNum], block.data(), block.size());
+    MutableByteSpan byteBlock = MutableByteSpan(mAccumulator.data(), mAccumulator.GetThreshold());
+    memcpy(&byteBlock[0], &byteBlock[requestedOtaMaxBlockSize], mUnalignmentNum);
+    memcpy(&byteBlock[mUnalignmentNum], block.data(), block.size());
 
     if (mUnalignmentNum + block.size() < requestedOtaMaxBlockSize)
     {
         uint32_t alignmentnum = (mUnalignmentNum + block.size()) / 16;
         alignmentnum          = alignmentnum * 16;
         mUnalignmentNum       = (mUnalignmentNum + block.size()) % 16;
-        memcpy(&byteblock[requestedOtaMaxBlockSize], &byteblock[alignmentnum], mUnalignmentNum);
-        byteblock.reduce_size(alignmentnum);
+        memcpy(&byteBlock[requestedOtaMaxBlockSize], &byteBlock[alignmentnum], mUnalignmentNum);
+        byteBlock.reduce_size(alignmentnum);
     }
     else
     {
         mUnalignmentNum = mUnalignmentNum + block.size() - requestedOtaMaxBlockSize;
-        byteblock.reduce_size(requestedOtaMaxBlockSize);
+        byteBlock.reduce_size(requestedOtaMaxBlockSize);
     }
 
-    OTATlvProcessor::vOtaProcessInternalEncryption(byteblock);
-    block = byteblock;
-#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
+    OTATlvProcessor::vOtaProcessInternalEncryption(byteBlock);
+    block = byteBlock;
+#endif // OTA_ENCRYPTION_ENABLE
 
-    if (mFWchunktype == SL_FWUP_RPS_HEADER)
+    if (mFWchunkType == SL_FWUP_RPS_HEADER)
     {
         // Validate block size
         VerifyOrReturnError(block.size() >= kAlignmentBytes, CHIP_ERROR_INVALID_ARGUMENT,
@@ -79,7 +79,7 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
         // Send RPS header
         status       = sl_si91x_fwup_start(rpsHeaderSpan.data());
         status       = sl_si91x_fwup_load(rpsHeaderSpan.data(), rpsHeaderSpan.size());
-        mFWchunktype = SL_FWUP_RPS_CONTENT;
+        mFWchunkType = SL_FWUP_RPS_CONTENT;
 
         // Send the rest of the block as content, if any
         if (rpsContentSpan.size() > 0)
@@ -87,7 +87,7 @@ CHIP_ERROR OTAWiFiFirmwareProcessor::ProcessInternal(ByteSpan & block)
             status = sl_si91x_fwup_load(rpsContentSpan.data(), rpsContentSpan.size());
         }
     }
-    else if (mFWchunktype == SL_FWUP_RPS_CONTENT)
+    else if (mFWchunkType == SL_FWUP_RPS_CONTENT)
     {
         // Send RPS content
         status = sl_si91x_fwup_load(block.data(), block.size());

@@ -33,7 +33,6 @@ private:
     CHIP_ERROR ProcessInternal(ByteSpan & block) override;
     CHIP_ERROR ProcessDescriptor(ByteSpan & block);
 
-    OTADataAccumulator mAccumulator;
     bool mDescriptorProcessed               = false;
     static constexpr size_t kAlignmentBytes = 64;
     static uint32_t mWriteOffset; // End of last written block

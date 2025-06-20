@@ -34,9 +34,6 @@ private:
     CHIP_ERROR ProcessDescriptor(ByteSpan & block);
 
     bool mDescriptorProcessed = false;
-#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
-    uint32_t mUnalignmentNum = 0;
-#endif
     static constexpr size_t kAlignmentBytes = 64;
     static uint32_t mWriteOffset; // End of last written block
     static uint8_t mSlotId;       // Bootloader storage slot
