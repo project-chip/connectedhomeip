@@ -408,7 +408,7 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorThenError)
     ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), static_cast<BleLayer*>(this)), CHIP_NO_ERROR);
 
     // Simulate error
-    BleConnectionDelegate::OnConnectionError(static_cast<BleLayer*>(this), CHIP_ERROR_CONNECTION_ABORTED);
+    BleConnectionDelegate::OnConnectionError(static_cast<BleLayer *>(this), CHIP_ERROR_CONNECTION_ABORTED);
 
     EXPECT_FALSE(mOnBleConnectionCompleteCalled);
     EXPECT_TRUE(mOnBleConnectionErrorCalled);
@@ -419,7 +419,7 @@ TEST_F(TestBleLayer, NewBleConnectionByObjectThenCancel)
 {
     // Start new connection
     auto connObj = GetConnectionObject();
-    ASSERT_EQ(NewBleConnectionByObject(connObj, static_cast<BleLayer*>(this)), CHIP_NO_ERROR);
+    ASSERT_EQ(NewBleConnectionByObject(connObj, static_cast<BleLayer *>(this)), CHIP_NO_ERROR);
 
     // Cancel the connection
     ASSERT_EQ(CancelBleIncompleteConnection(), CHIP_NO_ERROR);
