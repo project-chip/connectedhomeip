@@ -35,10 +35,10 @@
 
 #define _CHIP_BLE_BLE_H
 #include <ble/BleApplicationDelegate.h>
+#include <ble/BleConnectionDelegate.h>
 #include <ble/BleLayer.h>
 #include <ble/BleLayerDelegate.h>
 #include <ble/BlePlatformDelegate.h>
-#include <ble/BleConnectionDelegate.h>
 
 namespace chip {
 namespace Ble {
@@ -405,7 +405,7 @@ TEST_F(TestBleLayer, ExceedBleConnectionEndPointLimit)
 TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorThenError)
 {
     // Start new connection
-    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), static_cast<BleLayer*>(this)), CHIP_NO_ERROR);
+    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), static_cast<BleLayer *>(this)), CHIP_NO_ERROR);
 
     // Simulate error
     BleConnectionDelegate::OnConnectionError(static_cast<BleLayer *>(this), CHIP_ERROR_CONNECTION_ABORTED);
