@@ -99,7 +99,8 @@ class TC_CLDIM_2_1(MatterBaseTest):
                 asserts.assert_is_instance(current_state, Clusters.ClosureDimension.Structs.DimensionStateStruct,
                                            "CurrentState is not of expected type")
                 if is_positioning_supported:
-                    asserts.assert_true( current_state.position is NullValue or (0 <= current_state.position <= 10000), "Position is not in the expected range [0:10000]")
+                    asserts.assert_true(current_state.position is NullValue or (0 <= current_state.position <=
+                                        10000), "Position is not in the expected range [0:10000]")
                 if is_latching_supported:
                     asserts.assert_true(isinstance(current_state.latch, bool) or current_state.latch is NullValue,
                                         "Latch is not a boolean or NullValue")
