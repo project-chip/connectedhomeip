@@ -394,13 +394,10 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
         storageData.SetName(req.sceneName);
     }
 
-    auto fieldSetIter = req.extensionFieldSetStructs.begin();
-    uint8_t EFSCount  = 0;
     // Goes through all EFS in command
-    while (fieldSetIter.Next() && EFSCount < scenes::kMaxClustersPerScene)
-    {
+    auto iterateStatus = req.extensionFieldSetStructs.Iterate([&](auto & fieldSet, bool & breakLoop) -> CHIP_ERROR {
         scenes::ExtensionFieldSet tempEFS;
-        tempEFS.mID = fieldSetIter.GetValue().clusterID;
+        tempEFS.mID = fieldSet.clusterID;
 
         MutableByteSpan buff_span(tempEFS.mBytesBuffer);
 
@@ -409,8 +406,7 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
         {
             if (handler.SupportsCluster(ctx.mRequestPath.mEndpointId, tempEFS.mID))
             {
-                ReturnOnFailure(AddResponseOnError(
-                    ctx, response, handler.SerializeAdd(ctx.mRequestPath.mEndpointId, fieldSetIter.GetValue(), buff_span)));
+                ReturnErrorOnFailure(handler.SerializeAdd(ctx.mRequestPath.mEndpointId, fieldSet, buff_span));
                 break;
             }
         }
@@ -421,9 +417,14 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
         if (!tempEFS.IsEmpty())
         {
             storageData.mExtensionFieldSets.InsertFieldSet(tempEFS);
+            if (storageData.mExtensionFieldSets.GetFieldSetCount() >= scenes::kMaxClustersPerScene)
+            {
+                breakLoop = true;
+            }
         }
-    }
-    ReturnOnFailure(AddResponseOnError(ctx, response, fieldSetIter.GetStatus()));
+        return CHIP_NO_ERROR;
+    });
+    ReturnOnFailure(AddResponseOnError(ctx, response, iterateStatus));
 
     // Create scene from data and ID
     SceneTableEntry scene(SceneStorageId(req.sceneID, req.groupID), storageData);

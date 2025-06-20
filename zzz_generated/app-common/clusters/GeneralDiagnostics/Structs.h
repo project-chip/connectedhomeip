@@ -58,23 +58,6 @@ public:
     DataModel::Nullable<bool> offPremiseServicesReachableIPv4;
     DataModel::Nullable<bool> offPremiseServicesReachableIPv6;
     chip::ByteSpan hardwareAddress;
-    DataModel::List<const chip::ByteSpan> IPv4Addresses;
-    DataModel::List<const chip::ByteSpan> IPv6Addresses;
-    InterfaceTypeEnum type = static_cast<InterfaceTypeEnum>(0);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    chip::CharSpan name;
-    bool isOperational = static_cast<bool>(0);
-    DataModel::Nullable<bool> offPremiseServicesReachableIPv4;
-    DataModel::Nullable<bool> offPremiseServicesReachableIPv6;
-    chip::ByteSpan hardwareAddress;
     DataModel::DecodableList<chip::ByteSpan> IPv4Addresses;
     DataModel::DecodableList<chip::ByteSpan> IPv6Addresses;
     InterfaceTypeEnum type = static_cast<InterfaceTypeEnum>(0);
@@ -82,7 +65,11 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace NetworkInterface
 } // namespace Structs

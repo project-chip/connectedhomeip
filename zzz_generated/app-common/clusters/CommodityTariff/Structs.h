@@ -126,11 +126,11 @@ struct Type
 {
 public:
     uint32_t tariffComponentID = static_cast<uint32_t>(0);
-    Optional<DataModel::Nullable<Structs::TariffPriceStruct::Type>> price;
+    Optional<DataModel::Nullable<Structs::TariffPriceStruct::DecodableType>> price;
     Optional<bool> friendlyCredit;
-    Optional<Structs::AuxiliaryLoadSwitchSettingsStruct::Type> auxiliaryLoad;
-    Optional<Structs::PeakPeriodStruct::Type> peakPeriod;
-    Optional<Globals::Structs::PowerThresholdStruct::Type> powerThreshold;
+    Optional<Structs::AuxiliaryLoadSwitchSettingsStruct::DecodableType> auxiliaryLoad;
+    Optional<Structs::PeakPeriodStruct::DecodableType> peakPeriod;
+    Optional<Globals::Structs::PowerThresholdStruct::DecodableType> powerThreshold;
     DataModel::Nullable<uint32_t> threshold;
     Optional<DataModel::Nullable<chip::CharSpan>> label;
     Optional<bool> predicted;
@@ -156,23 +156,16 @@ struct Type
 {
 public:
     DataModel::Nullable<uint32_t> startDate;
-    DataModel::List<const uint32_t> dayPatternIDs;
+    DataModel::DecodableList<uint32_t> dayPatternIDs;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
-struct DecodableType
-{
-public:
-    DataModel::Nullable<uint32_t> startDate;
-    DataModel::DecodableList<uint32_t> dayPatternIDs;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-};
+using DecodableType = Type;
 
 } // namespace CalendarPeriodStruct
 namespace DayEntryStruct {
@@ -217,24 +210,16 @@ struct Type
 public:
     uint32_t dayPatternID                               = static_cast<uint32_t>(0);
     chip::BitMask<DayPatternDayOfWeekBitmap> daysOfWeek = static_cast<chip::BitMask<DayPatternDayOfWeekBitmap>>(0);
-    DataModel::List<const uint32_t> dayEntryIDs;
+    DataModel::DecodableList<uint32_t> dayEntryIDs;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
-struct DecodableType
-{
-public:
-    uint32_t dayPatternID                               = static_cast<uint32_t>(0);
-    chip::BitMask<DayPatternDayOfWeekBitmap> daysOfWeek = static_cast<chip::BitMask<DayPatternDayOfWeekBitmap>>(0);
-    DataModel::DecodableList<uint32_t> dayEntryIDs;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-};
+using DecodableType = Type;
 
 } // namespace DayPatternStruct
 namespace DayStruct {
@@ -250,24 +235,16 @@ struct Type
 public:
     uint32_t date       = static_cast<uint32_t>(0);
     DayTypeEnum dayType = static_cast<DayTypeEnum>(0);
-    DataModel::List<const uint32_t> dayEntryIDs;
+    DataModel::DecodableList<uint32_t> dayEntryIDs;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
-struct DecodableType
-{
-public:
-    uint32_t date       = static_cast<uint32_t>(0);
-    DayTypeEnum dayType = static_cast<DayTypeEnum>(0);
-    DataModel::DecodableList<uint32_t> dayEntryIDs;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-};
+using DecodableType = Type;
 
 } // namespace DayStruct
 namespace TariffInformationStruct {
@@ -284,7 +261,7 @@ struct Type
 public:
     DataModel::Nullable<chip::CharSpan> tariffLabel;
     DataModel::Nullable<chip::CharSpan> providerName;
-    Optional<DataModel::Nullable<Globals::Structs::CurrencyStruct::Type>> currency;
+    Optional<DataModel::Nullable<Globals::Structs::CurrencyStruct::DecodableType>> currency;
     DataModel::Nullable<BlockModeEnum> blockMode;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -309,25 +286,17 @@ struct Type
 {
 public:
     DataModel::Nullable<chip::CharSpan> label;
-    DataModel::List<const uint32_t> dayEntryIDs;
-    DataModel::List<const uint32_t> tariffComponentIDs;
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    DataModel::Nullable<chip::CharSpan> label;
     DataModel::DecodableList<uint32_t> dayEntryIDs;
     DataModel::DecodableList<uint32_t> tariffComponentIDs;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace TariffPeriodStruct
 } // namespace Structs

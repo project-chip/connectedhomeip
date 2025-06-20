@@ -212,25 +212,24 @@ public:
         ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
 
         size_t attributeCount = 0;
-        ReturnErrorOnFailure(attributeValueList.ComputeSize(&attributeCount));
+        ReturnErrorOnFailure(attributeValueList.ComputeSize(attributeCount));
         VerifyOrReturnError(attributeCount <= scenableAttributeCount, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-        auto pair_iterator = attributeValueList.begin();
-        while (pair_iterator.Next())
-        {
-            auto & decodePair = pair_iterator.GetValue();
+        bool inserted      = false;
+        auto iterateStatus = attributeValueList.Iterate([&](auto & decodePair, bool &) -> CHIP_ERROR {
             VerifyOrReturnError(decodePair.attributeID == Attributes::OnOff::Id, CHIP_ERROR_INVALID_ARGUMENT);
             VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
             ReturnErrorOnFailure(mSceneEndpointStatePairs.InsertPair(
                 OnOffEndPointPair(endpoint, static_cast<bool>(decodePair.valueUnsigned8.Value()))));
-        }
+            inserted = true;
+            return CHIP_NO_ERROR;
+        });
         // Verify that the EFS was completely read
-        CHIP_ERROR err = pair_iterator.GetStatus();
-        if (CHIP_NO_ERROR != err)
+        if (inserted && CHIP_NO_ERROR != iterateStatus)
         {
             mSceneEndpointStatePairs.RemovePair(endpoint);
-            return err;
         }
+        ReturnErrorOnFailure(iterateStatus);
 
         VerifyOrReturnError(mTransitionTimeInterface.sceneEventControl(endpoint) != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         OnOffServer::Instance().scheduleTimerCallbackMs(mTransitionTimeInterface.sceneEventControl(endpoint), timeMs);

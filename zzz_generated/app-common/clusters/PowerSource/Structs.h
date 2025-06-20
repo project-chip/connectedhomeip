@@ -47,24 +47,17 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    DataModel::List<const BatChargeFaultEnum> current;
-    DataModel::List<const BatChargeFaultEnum> previous;
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
     DataModel::DecodableList<BatChargeFaultEnum> current;
     DataModel::DecodableList<BatChargeFaultEnum> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace BatChargeFaultChangeType
 namespace BatFaultChangeType {
@@ -77,24 +70,17 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    DataModel::List<const BatFaultEnum> current;
-    DataModel::List<const BatFaultEnum> previous;
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
     DataModel::DecodableList<BatFaultEnum> current;
     DataModel::DecodableList<BatFaultEnum> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace BatFaultChangeType
 namespace WiredFaultChangeType {
@@ -107,24 +93,17 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    DataModel::List<const WiredFaultEnum> current;
-    DataModel::List<const WiredFaultEnum> previous;
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
     DataModel::DecodableList<WiredFaultEnum> current;
     DataModel::DecodableList<WiredFaultEnum> previous;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace WiredFaultChangeType
 } // namespace Structs

@@ -966,10 +966,12 @@ TEST_F(TestSceneTable, TestHandlerFunctions)
     EXPECT_EQ(CHIP_NO_ERROR, extensionFieldValueCapIn.attributeValueList.Decode(reader));
 
     // Verify that the initial value is not capped
-    auto pair_iterator = extensionFieldValueCapIn.attributeValueList.begin();
-    pair_iterator.Next();
-    app::Clusters::ScenesManagement::Structs::AttributeValuePairStruct::Type pair = pair_iterator.GetValue();
-    EXPECT_EQ(pair.valueUnsigned8.Value(), OOPairs[0].valueUnsigned8.Value());
+    bool hasElement = false;
+    extensionFieldValueCapIn.attributeValueList.Iterate([&](auto & pair, bool & breakLoop) -> CHIP_ERROR {
+        EXPECT_EQ(pair.valueUnsigned8.Value(), OOPairs[0].valueUnsigned8.Value());
+        breakLoop = hasElement = true;
+    });
+    EXPECT_TRUE(hasElement);
 
     // Verify that we cap the value to the mock attribute size when serializing
     EXPECT_EQ(CHIP_NO_ERROR, mpSceneHandler->SerializeAdd(kTestEndpoint1, extensionFieldValueCapIn, buff_span));

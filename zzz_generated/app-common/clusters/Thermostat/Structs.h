@@ -86,28 +86,17 @@ public:
     SystemModeEnum systemMode = static_cast<SystemModeEnum>(0);
     Optional<chip::CharSpan> name;
     Optional<chip::ByteSpan> presetHandle;
-    DataModel::List<const Structs::ScheduleTransitionStruct::Type> transitions;
-    DataModel::Nullable<bool> builtIn;
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    DataModel::Nullable<chip::ByteSpan> scheduleHandle;
-    SystemModeEnum systemMode = static_cast<SystemModeEnum>(0);
-    Optional<chip::CharSpan> name;
-    Optional<chip::ByteSpan> presetHandle;
     DataModel::DecodableList<Structs::ScheduleTransitionStruct::DecodableType> transitions;
     DataModel::Nullable<bool> builtIn;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace ScheduleStruct
 namespace PresetStruct {

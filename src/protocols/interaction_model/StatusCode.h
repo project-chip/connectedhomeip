@@ -161,6 +161,12 @@ private:
 
 static_assert(sizeof(ClusterStatusCode) <= sizeof(uint32_t), "ClusterStatusCode must not grow to be larger than a uint32_t");
 
+/**
+ * Gets an IM global status when the CHIP_ERROR is an IM Global Status; otherwise,
+ * return the value specified by defaultNotStatus if there's an error; or Success if it's CHIP_NO_ERROR.
+ */
+Status IMGlobalStatusFromError(CHIP_ERROR error, Status defaultNotStatus = Status::Failure);
+
 } // namespace InteractionModel
 } // namespace Protocols
 } // namespace chip

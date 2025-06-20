@@ -84,8 +84,10 @@ struct Type
 public:
     uint16_t ccdid = static_cast<uint16_t>(0);
     Optional<chip::ByteSpan> clientCertificate;
-    Optional<DataModel::List<const chip::ByteSpan>> intermediateCertificates;
+    Optional<DataModel::DecodableList<chip::ByteSpan>> intermediateCertificates;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = true;
 
@@ -100,22 +102,7 @@ private:
     CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
 };
 
-struct DecodableType
-{
-public:
-    uint16_t ccdid = static_cast<uint16_t>(0);
-    Optional<chip::ByteSpan> clientCertificate;
-    Optional<DataModel::DecodableList<chip::ByteSpan>> intermediateCertificates;
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = true;
-
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-};
+using DecodableType = Type;
 
 } // namespace TLSClientCertificateDetailStruct
 } // namespace Structs

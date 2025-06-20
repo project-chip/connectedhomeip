@@ -95,9 +95,11 @@ public:
     DataModel::Nullable<uint8_t> nullableFabricSensitiveInt8u;
     Optional<DataModel::Nullable<uint8_t>> nullableOptionalFabricSensitiveInt8u;
     chip::CharSpan fabricSensitiveCharString;
-    Structs::SimpleStruct::Type fabricSensitiveStruct;
-    DataModel::List<const uint8_t> fabricSensitiveInt8uList;
+    Structs::SimpleStruct::DecodableType fabricSensitiveStruct;
+    DataModel::DecodableList<uint8_t> fabricSensitiveInt8uList;
     chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = true;
 
@@ -112,26 +114,7 @@ private:
     CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
 };
 
-struct DecodableType
-{
-public:
-    uint8_t fabricSensitiveInt8u = static_cast<uint8_t>(0);
-    Optional<uint8_t> optionalFabricSensitiveInt8u;
-    DataModel::Nullable<uint8_t> nullableFabricSensitiveInt8u;
-    Optional<DataModel::Nullable<uint8_t>> nullableOptionalFabricSensitiveInt8u;
-    chip::CharSpan fabricSensitiveCharString;
-    Structs::SimpleStruct::DecodableType fabricSensitiveStruct;
-    DataModel::DecodableList<uint8_t> fabricSensitiveInt8uList;
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = true;
-
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-};
+using DecodableType = Type;
 
 } // namespace TestFabricScoped
 namespace NullablesAndOptionalsStruct {
@@ -160,27 +143,6 @@ public:
     DataModel::Nullable<chip::CharSpan> nullableString;
     Optional<chip::CharSpan> optionalString;
     Optional<DataModel::Nullable<chip::CharSpan>> nullableOptionalString;
-    DataModel::Nullable<Structs::SimpleStruct::Type> nullableStruct;
-    Optional<Structs::SimpleStruct::Type> optionalStruct;
-    Optional<DataModel::Nullable<Structs::SimpleStruct::Type>> nullableOptionalStruct;
-    DataModel::Nullable<DataModel::List<const SimpleEnum>> nullableList;
-    Optional<DataModel::List<const SimpleEnum>> optionalList;
-    Optional<DataModel::Nullable<DataModel::List<const SimpleEnum>>> nullableOptionalList;
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    DataModel::Nullable<uint16_t> nullableInt;
-    Optional<uint16_t> optionalInt;
-    Optional<DataModel::Nullable<uint16_t>> nullableOptionalInt;
-    DataModel::Nullable<chip::CharSpan> nullableString;
-    Optional<chip::CharSpan> optionalString;
-    Optional<DataModel::Nullable<chip::CharSpan>> nullableOptionalString;
     DataModel::Nullable<Structs::SimpleStruct::DecodableType> nullableStruct;
     Optional<Structs::SimpleStruct::DecodableType> optionalStruct;
     Optional<DataModel::Nullable<Structs::SimpleStruct::DecodableType>> nullableOptionalStruct;
@@ -191,7 +153,11 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace NullablesAndOptionalsStruct
 namespace NestedStruct {
@@ -208,8 +174,8 @@ struct Type
 public:
     uint8_t a = static_cast<uint8_t>(0);
     bool b    = static_cast<bool>(0);
-    Structs::SimpleStruct::Type c;
-    Optional<Globals::Structs::TestGlobalStruct::Type> d;
+    Structs::SimpleStruct::DecodableType c;
+    Optional<Globals::Structs::TestGlobalStruct::DecodableType> d;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -238,22 +204,6 @@ struct Type
 public:
     uint8_t a = static_cast<uint8_t>(0);
     bool b    = static_cast<bool>(0);
-    Structs::SimpleStruct::Type c;
-    DataModel::List<const Structs::SimpleStruct::Type> d;
-    DataModel::List<const uint32_t> e;
-    DataModel::List<const chip::ByteSpan> f;
-    DataModel::List<const uint8_t> g;
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    uint8_t a = static_cast<uint8_t>(0);
-    bool b    = static_cast<bool>(0);
     Structs::SimpleStruct::DecodableType c;
     DataModel::DecodableList<Structs::SimpleStruct::DecodableType> d;
     DataModel::DecodableList<uint32_t> e;
@@ -263,7 +213,11 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace NestedStructList
 namespace DoubleNestedStructList {
@@ -275,22 +229,16 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    DataModel::List<const Structs::NestedStructList::Type> a;
+    DataModel::DecodableList<Structs::NestedStructList::DecodableType> a;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
-struct DecodableType
-{
-public:
-    DataModel::DecodableList<Structs::NestedStructList::DecodableType> a;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-};
+using DecodableType = Type;
 
 } // namespace DoubleNestedStructList
 namespace TestListStructOctet {

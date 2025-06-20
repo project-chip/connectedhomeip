@@ -167,34 +167,6 @@ struct Type
 {
 public:
     chip::CharSpan identifier;
-    Structs::ChannelInfoStruct::Type channel;
-    uint32_t startTime = static_cast<uint32_t>(0);
-    uint32_t endTime   = static_cast<uint32_t>(0);
-    chip::CharSpan title;
-    Optional<chip::CharSpan> subtitle;
-    Optional<chip::CharSpan> description;
-    Optional<DataModel::List<const chip::CharSpan>> audioLanguages;
-    Optional<DataModel::List<const chip::CharSpan>> ratings;
-    Optional<chip::CharSpan> thumbnailUrl;
-    Optional<chip::CharSpan> posterArtUrl;
-    Optional<chip::CharSpan> dvbiUrl;
-    Optional<chip::CharSpan> releaseDate;
-    Optional<chip::CharSpan> parentalGuidanceText;
-    Optional<chip::BitMask<RecordingFlagBitmap>> recordingFlag;
-    Optional<DataModel::Nullable<Structs::SeriesInfoStruct::Type>> seriesInfo;
-    Optional<DataModel::List<const Structs::ProgramCategoryStruct::Type>> categoryList;
-    Optional<DataModel::List<const Structs::ProgramCastStruct::Type>> castList;
-    Optional<DataModel::List<const Structs::ProgramCastStruct::Type>> externalIDList;
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
-    chip::CharSpan identifier;
     Structs::ChannelInfoStruct::DecodableType channel;
     uint32_t startTime = static_cast<uint32_t>(0);
     uint32_t endTime   = static_cast<uint32_t>(0);
@@ -217,7 +189,11 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace ProgramStruct
 namespace PageTokenStruct {
@@ -255,8 +231,8 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    Optional<DataModel::Nullable<Structs::PageTokenStruct::Type>> previousToken;
-    Optional<DataModel::Nullable<Structs::PageTokenStruct::Type>> nextToken;
+    Optional<DataModel::Nullable<Structs::PageTokenStruct::DecodableType>> previousToken;
+    Optional<DataModel::Nullable<Structs::PageTokenStruct::DecodableType>> nextToken;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

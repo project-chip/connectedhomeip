@@ -77,24 +77,16 @@ struct Type
 public:
     chip::CharSpan label;
     uint8_t mode = static_cast<uint8_t>(0);
-    DataModel::List<const Structs::ModeTagStruct::Type> modeTags;
+    DataModel::DecodableList<Structs::ModeTagStruct::DecodableType> modeTags;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
-struct DecodableType
-{
-public:
-    chip::CharSpan label;
-    uint8_t mode = static_cast<uint8_t>(0);
-    DataModel::DecodableList<Structs::ModeTagStruct::DecodableType> modeTags;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-};
+using DecodableType = Type;
 
 } // namespace ModeOptionStruct
 namespace MeasurementAccuracyRangeStruct {
@@ -149,26 +141,16 @@ public:
     bool measured                       = static_cast<bool>(0);
     int64_t minMeasuredValue            = static_cast<int64_t>(0);
     int64_t maxMeasuredValue            = static_cast<int64_t>(0);
-    DataModel::List<const Structs::MeasurementAccuracyRangeStruct::Type> accuracyRanges;
+    DataModel::DecodableList<Structs::MeasurementAccuracyRangeStruct::DecodableType> accuracyRanges;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
-struct DecodableType
-{
-public:
-    MeasurementTypeEnum measurementType = static_cast<MeasurementTypeEnum>(0);
-    bool measured                       = static_cast<bool>(0);
-    int64_t minMeasuredValue            = static_cast<int64_t>(0);
-    int64_t maxMeasuredValue            = static_cast<int64_t>(0);
-    DataModel::DecodableList<Structs::MeasurementAccuracyRangeStruct::DecodableType> accuracyRanges;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-};
+using DecodableType = Type;
 
 } // namespace MeasurementAccuracyStruct
 namespace ApplicationStruct {
@@ -307,7 +289,7 @@ struct Type
 {
 public:
     int64_t amount = static_cast<int64_t>(0);
-    Globals::Structs::CurrencyStruct::Type currency;
+    Globals::Structs::CurrencyStruct::DecodableType currency;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -373,26 +355,16 @@ public:
     bool measured                                = static_cast<bool>(0);
     int64_t minMeasuredValue                     = static_cast<int64_t>(0);
     int64_t maxMeasuredValue                     = static_cast<int64_t>(0);
-    DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type> accuracyRanges;
+    DataModel::DecodableList<Globals::Structs::MeasurementAccuracyRangeStruct::DecodableType> accuracyRanges;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
-struct DecodableType
-{
-public:
-    Globals::MeasurementTypeEnum measurementType = static_cast<Globals::MeasurementTypeEnum>(0);
-    bool measured                                = static_cast<bool>(0);
-    int64_t minMeasuredValue                     = static_cast<int64_t>(0);
-    int64_t maxMeasuredValue                     = static_cast<int64_t>(0);
-    DataModel::DecodableList<Globals::Structs::MeasurementAccuracyRangeStruct::DecodableType> accuracyRanges;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-};
+using DecodableType = Type;
 
 } // namespace MeasurementAccuracyStruct
 
@@ -458,19 +430,6 @@ enum class Fields : uint8_t
 struct Type
 {
 public:
-    DataModel::List<const chip::CharSpan> URLs;
-    Optional<chip::CharSpan> username;
-    Optional<chip::CharSpan> credential;
-    Optional<uint16_t> caid;
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-struct DecodableType
-{
-public:
     DataModel::DecodableList<chip::CharSpan> URLs;
     Optional<chip::CharSpan> username;
     Optional<chip::CharSpan> credential;
@@ -479,7 +438,11 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
+
+using DecodableType = Type;
 
 } // namespace ICEServerStruct
 

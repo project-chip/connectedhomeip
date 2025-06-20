@@ -80,10 +80,12 @@ public:
     Optional<uint64_t> deviceNameLastEdit;
     chip::EndpointId bridgedEndpoint  = static_cast<chip::EndpointId>(0);
     chip::EndpointId originalEndpoint = static_cast<chip::EndpointId>(0);
-    DataModel::List<const Structs::DeviceTypeStruct::Type> deviceTypes;
-    DataModel::List<const chip::CharSpan> uniqueLocationIDs;
+    DataModel::DecodableList<Structs::DeviceTypeStruct::DecodableType> deviceTypes;
+    DataModel::DecodableList<chip::CharSpan> uniqueLocationIDs;
     uint64_t uniqueLocationIDsLastEdit = static_cast<uint64_t>(0);
     chip::FabricIndex fabricIndex      = static_cast<chip::FabricIndex>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
 
     static constexpr bool kIsFabricScoped = true;
 
@@ -98,26 +100,7 @@ private:
     CHIP_ERROR DoEncode(TLV::TLVWriter & aWriter, TLV::Tag aTag, const Optional<FabricIndex> & aAccessingFabricIndex) const;
 };
 
-struct DecodableType
-{
-public:
-    Optional<chip::CharSpan> deviceName;
-    Optional<uint64_t> deviceNameLastEdit;
-    chip::EndpointId bridgedEndpoint  = static_cast<chip::EndpointId>(0);
-    chip::EndpointId originalEndpoint = static_cast<chip::EndpointId>(0);
-    DataModel::DecodableList<Structs::DeviceTypeStruct::DecodableType> deviceTypes;
-    DataModel::DecodableList<chip::CharSpan> uniqueLocationIDs;
-    uint64_t uniqueLocationIDsLastEdit = static_cast<uint64_t>(0);
-    chip::FabricIndex fabricIndex      = static_cast<chip::FabricIndex>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = true;
-
-    auto GetFabricIndex() const { return fabricIndex; }
-
-    void SetFabricIndex(chip::FabricIndex fabricIndex_) { fabricIndex = fabricIndex_; }
-};
+using DecodableType = Type;
 
 } // namespace EcosystemDeviceStruct
 namespace EcosystemLocationStruct {
@@ -133,7 +116,7 @@ struct Type
 {
 public:
     chip::CharSpan uniqueLocationID;
-    Globals::Structs::LocationDescriptorStruct::Type locationDescriptor;
+    Globals::Structs::LocationDescriptorStruct::DecodableType locationDescriptor;
     uint64_t locationDescriptorLastEdit = static_cast<uint64_t>(0);
     chip::FabricIndex fabricIndex       = static_cast<chip::FabricIndex>(0);
 

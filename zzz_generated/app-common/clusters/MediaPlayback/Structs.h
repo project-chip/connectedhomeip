@@ -71,7 +71,7 @@ struct Type
 {
 public:
     chip::CharSpan id;
-    DataModel::Nullable<Structs::TrackAttributesStruct::Type> trackAttributes;
+    DataModel::Nullable<Structs::TrackAttributesStruct::DecodableType> trackAttributes;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

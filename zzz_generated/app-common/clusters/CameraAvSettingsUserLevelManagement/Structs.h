@@ -75,7 +75,7 @@ struct Type
 public:
     uint8_t presetID = static_cast<uint8_t>(0);
     chip::CharSpan name;
-    Structs::MPTZStruct::Type settings;
+    Structs::MPTZStruct::DecodableType settings;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 
@@ -98,7 +98,7 @@ struct Type
 {
 public:
     uint16_t videoStreamID = static_cast<uint16_t>(0);
-    Globals::Structs::ViewportStruct::Type viewport;
+    Globals::Structs::ViewportStruct::DecodableType viewport;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

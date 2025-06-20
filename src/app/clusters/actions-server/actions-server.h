@@ -89,16 +89,21 @@ struct EndpointListStorage : public Structs::EndpointListStruct::Type
     }
 
     void Set(uint16_t aEpListId, const CharSpan & aEpListName, EndpointListTypeEnum aEpListType,
-             const DataModel::List<const EndpointId> & aEndpointList)
+             const DataModel::DecodableList<EndpointId> & aEndpointList)
     {
         endpointListID    = aEpListId;
         type              = aEpListType;
         size_t epListSize = std::min(aEndpointList.size(), MATTER_ARRAY_SIZE(mEpList));
 
-        for (size_t index = 0; index < epListSize; index++)
-        {
-            mEpList[index] = aEndpointList[index];
-        }
+        size_t index = 0;
+        aEndpointList.Iterate([this, &index](auto & value, bool & breakLoop) -> CHIP_ERROR {
+            mEpList[index++] = value;
+            if (index >= MATTER_ARRAY_SIZE(mEpList))
+            {
+                breakLoop = true;
+            }
+            return CHIP_NO_ERROR;
+        });
         endpoints = DataModel::List<const EndpointId>(Span(mEpList, epListSize));
         MutableCharSpan epListName(mBuffer);
         CopyCharSpanToMutableCharSpanWithTruncation(aEpListName, epListName);
