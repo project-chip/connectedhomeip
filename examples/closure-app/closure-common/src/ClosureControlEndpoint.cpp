@@ -82,8 +82,8 @@ CHIP_ERROR ClosureControlDelegate::AddErrorToCurrentErrorList(ClosureErrorEnum e
     // Check for duplicates
     for (size_t i = 0; i < mCurrentErrorCount; ++i)
     {
-        VerifyOrReturnError(mCurrentErrorList[i] != ClosureErrorEnum::kUnknownEnumValue,
-                            CHIP_ERROR_INVALID_ARGUMENT, ChipLogError(AppServer, "Unknown error in the list"));
+        VerifyOrReturnError(mCurrentErrorList[i] != error, CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED, 
+                            ChipLogError(AppServer, "Error already exists in the list"));
     }
     mCurrentErrorList[mCurrentErrorCount++] = error;
     return CHIP_NO_ERROR;
