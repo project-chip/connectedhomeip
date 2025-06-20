@@ -67,6 +67,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <string>
+#include <vector>
+
 #if CHIP_CRYPTO_MBEDTLS || CHIP_CRYPTO_PSA
 #include <mbedtls/memory_buffer_alloc.h>
 #endif
@@ -91,6 +94,24 @@ using TestSpake2p_P256_SHA256_HKDF_HMAC = Spake2p_P256_SHA256_HKDF_HMAC;
 using TestPBKDF2_sha256                 = PBKDF2_sha256;
 using TestHKDF_sha                      = HKDF_sha;
 using TestHMAC_sha                      = HMAC_sha;
+
+// Trivial StringJoin to use for PEM encoding testing.
+std::string StringJoin(const std::vector<std::string> & elements, const std::string & delimiter)
+{
+    if (elements.empty())
+    {
+        return "";
+    }
+
+    std::string outStr = elements[0];
+
+    for (size_t i = 1; i < elements.size(); ++i)
+    {
+        outStr += delimiter + elements[i];
+    }
+
+    return outStr;
+}
 
 // Helper class to verify that all mbedTLS heap objects are released at the end of a test.
 #if defined(MBEDTLS_MEMORY_DEBUG)
@@ -3238,4 +3259,170 @@ TEST_F(TestChipCryptoPAL, GenerateVendorIdVerificationToBeSignedWorks)
                   CHIP_NO_ERROR);
         EXPECT_TRUE(vendorIdVerificationTbs.data_equal(kExpectedVendorIdVerificationTbsSpan));
     }
+}
+
+TEST_F(TestChipCryptoPAL, PemEncodingWorks)
+{
+    // Known cert case: sTestCert_PAA_FFF1_Cert should succeed
+    {
+        size_t numLines = 0;
+        std::vector<std::string> pemLines;
+        const char * pemLine = nullptr;
+
+        PemEncoder encoder("CERTIFICATE", TestCerts::sTestCert_PAA_FFF1_Cert);
+        while ((pemLine = encoder.NextLine()))
+        {
+            ++numLines;
+            pemLines.push_back(std::string{ pemLine });
+        }
+        ASSERT_EQ(pemLine, nullptr);
+
+        // Asking for lines when done always gives more nullptr.
+        ASSERT_EQ(encoder.NextLine(), nullptr);
+        ASSERT_EQ(encoder.NextLine(), nullptr);
+
+        const char * kExpectedPemForPaa =
+            "-----BEGIN "
+            "CERTIFICATE-----"
+            "\nMIIBvTCCAWSgAwIBAgIITqjoMYLUHBwwCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwP\nTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMT"
+            "AgFw0yMTA2Mjgx\nNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3Qg\nUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTBZ"
+            "MBMGByqGSM49AgEGCCqGSM49AwEH\nA0IABLbLY3KIfyko9brIGqnZOuJDHK2p154kL2UXfvnO2TKijs0Duq9qj8oYShpQ\nNUKWDUU/"
+            "MD8fGUIddR6Pjxqam3WjZjBkMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYD\nVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRq/"
+            "SJ3H1Ef7L8WQZdnENzcMaFxfjAfBgNV\nHSMEGDAWgBRq/"
+            "SJ3H1Ef7L8WQZdnENzcMaFxfjAKBggqhkjOPQQDAgNHADBEAiBQ\nqoAC9NkyqaAFOPZTaK0P/8jvu8m+t9pWmDXPmqdRDgIgI7rI/"
+            "g8j51RFtlM5CBpH\nmUkpxyqvChVI1A0DTVFLJd4=\n-----END CERTIFICATE-----";
+
+        std::string finalPem = StringJoin(pemLines, "\n");
+        EXPECT_STREQ(finalPem.c_str(), kExpectedPemForPaa);
+        EXPECT_EQ(numLines, 12u);
+    }
+
+    // Known cert case, different heading requested: sTestCert_PAA_FFF1_Cert should succeed with "ROBOTO" instead of "CERTIFICATE".
+    {
+        size_t numLines = 0;
+        std::vector<std::string> pemLines;
+        const char * pemLine = nullptr;
+
+        PemEncoder encoder("ROBOTO", TestCerts::sTestCert_PAA_FFF1_Cert);
+        while ((pemLine = encoder.NextLine()))
+        {
+            ++numLines;
+            pemLines.push_back(std::string{ pemLine });
+        }
+        ASSERT_EQ(pemLine, nullptr);
+
+        // Result should match exactly the expected PEM.
+        const char * kExpectedPemForPaa =
+            "-----BEGIN "
+            "ROBOTO-----"
+            "\nMIIBvTCCAWSgAwIBAgIITqjoMYLUHBwwCgYIKoZIzj0EAwIwMDEYMBYGA1UEAwwP\nTWF0dGVyIFRlc3QgUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMT"
+            "AgFw0yMTA2Mjgx\nNDIzNDNaGA85OTk5MTIzMTIzNTk1OVowMDEYMBYGA1UEAwwPTWF0dGVyIFRlc3Qg\nUEFBMRQwEgYKKwYBBAGConwCAQwERkZGMTBZ"
+            "MBMGByqGSM49AgEGCCqGSM49AwEH\nA0IABLbLY3KIfyko9brIGqnZOuJDHK2p154kL2UXfvnO2TKijs0Duq9qj8oYShpQ\nNUKWDUU/"
+            "MD8fGUIddR6Pjxqam3WjZjBkMBIGA1UdEwEB/wQIMAYBAf8CAQEwDgYD\nVR0PAQH/BAQDAgEGMB0GA1UdDgQWBBRq/"
+            "SJ3H1Ef7L8WQZdnENzcMaFxfjAfBgNV\nHSMEGDAWgBRq/"
+            "SJ3H1Ef7L8WQZdnENzcMaFxfjAKBggqhkjOPQQDAgNHADBEAiBQ\nqoAC9NkyqaAFOPZTaK0P/8jvu8m+t9pWmDXPmqdRDgIgI7rI/"
+            "g8j51RFtlM5CBpH\nmUkpxyqvChVI1A0DTVFLJd4=\n-----END ROBOTO-----";
+
+        std::string finalPem = StringJoin(pemLines, "\n");
+        EXPECT_STREQ(finalPem.c_str(), kExpectedPemForPaa);
+        EXPECT_EQ(numLines, 12u);
+    }
+
+    // Empty body case shoudld succeed. Casedness is for the client to deal with.
+    {
+        size_t numLines = 0;
+        std::vector<std::string> pemLines;
+        const char * pemLine = nullptr;
+
+        PemEncoder encoder("EMPTY_thing", ByteSpan{});
+        while ((pemLine = encoder.NextLine()))
+        {
+            ++numLines;
+            pemLines.push_back(std::string{ pemLine });
+        }
+        ASSERT_EQ(pemLine, nullptr);
+
+        const char * kExpectedPem = "-----BEGIN EMPTY_thing-----\n-----END EMPTY_thing-----";
+        std::string finalPem      = StringJoin(pemLines, "\n");
+        EXPECT_STREQ(finalPem.c_str(), kExpectedPem);
+        EXPECT_EQ(numLines, 2u);
+    }
+
+    // Single-byte should also work.
+    {
+        size_t numLines = 0;
+        std::vector<std::string> pemLines;
+        const char * pemLine = nullptr;
+
+        const uint8_t kOneByte[1] = { 0 };
+        PemEncoder encoder("SINGLE_BYTE", ByteSpan{ kOneByte });
+        while ((pemLine = encoder.NextLine()))
+        {
+            ++numLines;
+            pemLines.push_back(std::string{ pemLine });
+        }
+        ASSERT_EQ(pemLine, nullptr);
+
+        const char * kExpectedPem = "-----BEGIN SINGLE_BYTE-----\nAA==\n-----END SINGLE_BYTE-----";
+        std::string finalPem      = StringJoin(pemLines, "\n");
+        EXPECT_STREQ(finalPem.c_str(), kExpectedPem);
+        EXPECT_EQ(numLines, 3u);
+    }
+
+    // Clamping of very long headings should work.
+    {
+        size_t numLines = 0;
+        std::vector<std::string> pemLines;
+
+        PemEncoder encoder("SOME_EXCESSIVE_LENGTH_123456789_ABCDEDFHIJKLMNOPQRSTUVWXYZ_123456789", ByteSpan{});
+        const char * pemLine = encoder.NextLine();
+        while (pemLine)
+        {
+            ++numLines;
+            pemLines.push_back(std::string{ pemLine });
+            pemLine = encoder.NextLine();
+        }
+        ASSERT_EQ(pemLine, nullptr);
+
+        const char * kExpectedPem = "-----BEGIN SOME_EXCESSIVE_LENGTH_123456789_ABCDEDFHIJKLMNOP-----\n-----END "
+                                    "SOME_EXCESSIVE_LENGTH_123456789_ABCDEDFHIJKLMNOPQR-----";
+
+        std::string finalPem = StringJoin(pemLines, "\n");
+        EXPECT_STREQ(finalPem.c_str(), kExpectedPem);
+        EXPECT_EQ(numLines, 2u);
+    }
+}
+
+TEST_F(TestChipCryptoPAL, KeyIdStringifierWorks)
+{
+    KeyIdStringifier stringifier;
+    const char * result = nullptr;
+
+    // Case with Empty ByteSpan.
+    result = stringifier.KeyIdToHex(ByteSpan{});
+    EXPECT_STREQ(result, "<EMPTY KEY ID>");
+
+    // Case with 1 byte (no colons!).
+    const uint8_t oneByte[] = { 0xAB };
+    result                  = stringifier.KeyIdToHex(ByteSpan{ oneByte });
+    EXPECT_STREQ(result, "AB");
+
+    // Case with specific key that is < the typical length.
+    const uint8_t kDeadBeefBytes[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0x12, 0x34 };
+    result                         = stringifier.KeyIdToHex(ByteSpan{ kDeadBeefBytes });
+    EXPECT_STREQ(result, "DE:AD:BE:EF:12:34");
+
+    // Case with 20 bytes (typical SKID/AKID length).
+    uint8_t kTypicalKeyId[kAuthorityKeyIdentifierLength] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09,
+                                                             0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13 };
+    result                                               = stringifier.KeyIdToHex(ByteSpan{ kTypicalKeyId });
+    EXPECT_STREQ(result, "00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F:10:11:12:13");
+
+    // Case with 21 bytes (truncation) with ellipsis.
+    uint8_t kTooLongKeyId[kAuthorityKeyIdentifierLength + 1] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A,
+                                                                 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13, 0x14 };
+
+    result = stringifier.KeyIdToHex(ByteSpan{ kTooLongKeyId });
+    EXPECT_TRUE(strstr(result, "...") != nullptr);
+    EXPECT_STREQ(result, "00:01:02:03:04:05:06:07:08:09:0A:0B:0C:0D:0E:0F:10:11:12:...");
 }

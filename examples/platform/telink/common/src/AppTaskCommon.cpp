@@ -160,6 +160,9 @@ class AppFabricTableDelegate : public FabricTable::Delegate
                 {
                     ChipLogError(DeviceLayer, "Storage clearance failed: %d", status);
                 }
+#ifdef CONFIG_TFLM_FEATURE
+                AppTask::MicroSpeechProcessStop();
+#endif
             }
         }
     }
@@ -270,6 +273,10 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     InitPwms();
 
     InitButtons();
+
+#ifdef CONFIG_TFLM_FEATURE
+    mThreadStateChangedEventCaptured = false;
+#endif
 
     // Initialize function button timer
     k_timer_init(&sFactoryResetTimer, &AppTask::FactoryResetTimerTimeoutCallback, nullptr);
@@ -722,6 +729,22 @@ void AppTaskCommon::SetExampleButtonCallbacks(EventHandler aAction_CB)
     ExampleActionEventHandler = aAction_CB;
 }
 
+#ifdef CONFIG_TFLM_FEATURE
+void AppTaskCommon::TriggerMicroSpeechCallback()
+{
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_Timer;
+    event.Handler = TriggerMicroSpeechEventHandler;
+    GetAppTask().PostEvent(&event);
+}
+
+void AppTaskCommon::TriggerMicroSpeechEventHandler(AppEvent * aEvent)
+{
+    LOG_INF("**************TriggerMicroSpeechEventHandler**************");
+    AppTask::MicroSpeechProcessStart();
+}
+#endif
+
 void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */)
 {
     switch (event->Type)
@@ -747,6 +770,14 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
         }
 #endif
         break;
+    case DeviceEventType::kCHIPoBLEConnectionClosed:
+        if (Internal::BLEMgrImpl().NeedToResetFailSafeTimer())
+        {
+            LOG_INF("BLE disconnected during commissioning.");
+            Internal::BLEMgrImpl().ClearResetFailSafeTimerFlag();
+            Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
+        }
+        break;
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     case DeviceEventType::kDnssdInitialized:
 #if CONFIG_CHIP_OTA_REQUESTOR
@@ -765,6 +796,22 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
         sIsNetworkProvisioned = ConnectivityMgr().IsThreadProvisioned();
         sIsNetworkEnabled     = ConnectivityMgr().IsThreadEnabled();
         sIsNetworkAttached    = ConnectivityMgr().IsThreadAttached();
+#ifdef CONFIG_TFLM_FEATURE
+        if (sIsNetworkProvisioned && sIsNetworkAttached)
+        {
+            if (GetAppTask().GetThreadStateChangedEventCapturedFlag() == false)
+            {
+                LOG_INF("**************TriggerMicroSpeechCallback invoked**************");
+                GetAppTask().SetThreadStateChangedEventCapturedFlag();
+                AppTaskCommon::TriggerMicroSpeechCallback();
+            }
+            else
+            {
+                LOG_INF("**************TriggerMicroSpeechCallback skipped**************");
+            }
+        }
+#endif
+
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
     case DeviceEventType::kWiFiConnectivityChange:
         sIsNetworkProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();

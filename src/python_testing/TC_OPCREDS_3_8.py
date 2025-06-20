@@ -28,6 +28,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 0
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -48,7 +49,8 @@ import chip.clusters as Clusters
 import nest_asyncio
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest,
-                                         TestStep, async_test_body, default_matter_test_main)
+                                         TestStep, default_matter_test_main, has_command, run_if_endpoint_matches)
+from chip.testing.pics import accepted_cmd_pics_str
 from chip.tlv import TLVReader
 from chip.utils import CommissioningBuildingBlocks
 from ecdsa import NIST256p, VerifyingKey
@@ -356,7 +358,10 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
         self.current_step_id = 0
         return self.aggregated_steps
 
-    @async_test_body
+    def pics_TC_OPCREDS_3_8(self) -> list[str]:
+        return [accepted_cmd_pics_str('OPCREDS', Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement.command_id)]
+
+    @run_if_endpoint_matches(has_command(Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement))
     async def test_TC_OPCREDS_3_8(self):
         # TODO(test_plans#5046): actually make the test follow final test plan. For now
         # it functionally validates the VID Verification parts of Operational Credentials Cluster

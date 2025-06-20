@@ -124,6 +124,13 @@ public:
         kWiFiAPState_Deactivating,
     };
 
+    enum CHIPoNFCServiceMode
+    {
+        kCHIPoNFCServiceMode_NotSupported = 0,
+        kCHIPoNFCServiceMode_Enabled      = 1,
+        kCHIPoNFCServiceMode_Disabled     = 2,
+    };
+
     enum CHIPoBLEServiceMode
     {
         kCHIPoBLEServiceMode_NotSupported = 0,
@@ -262,7 +269,6 @@ private:
 
     CHIP_ERROR Init();
     void OnPlatformEvent(const ChipDeviceEvent * event);
-    bool CanStartWiFiScan();
     void OnWiFiScanDone();
     void OnWiFiStationProvisionChange();
 
@@ -636,11 +642,6 @@ inline CHIP_ERROR ConnectivityManager::Init()
 inline void ConnectivityManager::OnPlatformEvent(const ChipDeviceEvent * event)
 {
     static_cast<ImplClass *>(this)->_OnPlatformEvent(event);
-}
-
-inline bool ConnectivityManager::CanStartWiFiScan()
-{
-    return static_cast<ImplClass *>(this)->_CanStartWiFiScan();
 }
 
 inline void ConnectivityManager::OnWiFiScanDone()

@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -71,7 +72,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::Identify::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t identifyTime = static_cast<uint16_t>(0);
 
@@ -107,7 +107,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::TriggerEffect::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     EffectIdentifierEnum effectIdentifier = static_cast<EffectIdentifierEnum>(0);
     EffectVariantEnum effectVariant       = static_cast<EffectVariantEnum>(0);

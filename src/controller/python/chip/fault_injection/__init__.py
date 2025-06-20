@@ -45,6 +45,11 @@ class CHIPFaultId(IntEnum):
     CASECorruptSigma3Signature = 25
     CASECorruptSigma3InitiatorEphPubKey = 26
     CASECorruptSigma3ResponderEphPubKey = 27
+    CASECorruptTBEData2Encrypted = 28
+    CASECorruptSigma2NOC = 29
+    CASECorruptSigma2ICAC = 30
+    CASECorruptSigma2Signature = 31
+
 
 # END-IF-CHANGE-ALSO-CHANGE(/src/lib/support/CHIPFaultInjection.h)
 # IMPORTANT: CHIPFaultId enum above must be kept in sync with the 'Id' enum in src/lib/support/CHIPFaultInjection.h

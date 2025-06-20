@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -79,7 +80,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RequestCommissioningApproval::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint64_t requestID      = static_cast<uint64_t>(0);
     chip::VendorId vendorID = static_cast<chip::VendorId>(0);
@@ -121,7 +121,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::CommissionNode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint64_t requestID              = static_cast<uint64_t>(0);
     uint16_t responseTimeoutSeconds = static_cast<uint16_t>(0);
@@ -162,7 +161,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ReverseOpenCommissioningWindow::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t commissioningTimeout = static_cast<uint16_t>(0);
     chip::ByteSpan PAKEPasscodeVerifier;
@@ -170,7 +168,7 @@ public:
     uint32_t iterations    = static_cast<uint32_t>(0);
     chip::ByteSpan salt;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -182,7 +180,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ReverseOpenCommissioningWindow::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::CommissionerControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint16_t commissioningTimeout = static_cast<uint16_t>(0);
     chip::ByteSpan PAKEPasscodeVerifier;

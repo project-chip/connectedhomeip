@@ -242,22 +242,6 @@
               "reportableChange": 0
             },
             {
-              "name": "Extension",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "type": "array",
-              "included": 0,
-              "storageOption": "External",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": null,
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
               "name": "SubjectsPerAccessControlEntry",
               "code": 2,
               "mfgCode": null,
@@ -390,13 +374,6 @@
             {
               "name": "AccessControlEntryChanged",
               "code": 0,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1
-            },
-            {
-              "name": "AccessControlExtensionChanged",
-              "code": 1,
               "mfgCode": null,
               "side": "server",
               "included": 1
@@ -708,22 +685,6 @@
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
-              "bounded": 0,
-              "defaultValue": null,
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "ProductAppearance",
-              "code": 20,
-              "mfgCode": null,
-              "side": "server",
-              "type": "ProductAppearanceStruct",
-              "included": 1,
-              "storageOption": "External",
-              "singleton": 1,
               "bounded": 0,
               "defaultValue": null,
               "reportable": 1,
@@ -1516,7 +1477,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "array",
-              "included": 1,
+              "included": 0,
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
@@ -1532,7 +1493,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "array",
-              "included": 1,
+              "included": 0,
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
@@ -1548,7 +1509,7 @@
               "mfgCode": null,
               "side": "server",
               "type": "array",
-              "included": 1,
+              "included": 0,
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
@@ -2611,7 +2572,7 @@
         }
       ],
       "deviceVersions": [
-        1
+        2
       ],
       "deviceIdentifiers": [
         121
@@ -3028,7 +2989,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "1",
+              "defaultValue": "2",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

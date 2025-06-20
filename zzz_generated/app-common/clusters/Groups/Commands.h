@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
 #include <app/data-model/Nullable.h>
@@ -112,7 +113,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddGroup::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     chip::CharSpan groupName;
@@ -150,12 +150,11 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddGroupResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -167,7 +166,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::AddGroupResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
@@ -187,7 +185,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ViewGroup::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
 
@@ -224,13 +221,12 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ViewGroupResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     chip::CharSpan groupName;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -242,7 +238,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::ViewGroupResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
@@ -263,7 +258,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembership::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     DataModel::List<const chip::GroupId> groupList;
 
@@ -299,12 +293,11 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembershipResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<uint8_t> capacity;
     DataModel::List<const chip::GroupId> groupList;
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -316,7 +309,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembershipResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     DataModel::Nullable<uint8_t> capacity;
     DataModel::DecodableList<chip::GroupId> groupList;
@@ -336,7 +328,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveGroup::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
 
@@ -372,12 +363,11 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveGroupResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
 
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
@@ -389,7 +379,6 @@ struct DecodableType
 public:
     static constexpr CommandId GetCommandId() { return Commands::RemoveGroupResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-    static constexpr bool kIsFabricScoped = false;
 
     uint8_t status        = static_cast<uint8_t>(0);
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
@@ -408,7 +397,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::RemoveAllGroups::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 
@@ -440,7 +428,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::AddGroupIfIdentifying::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
-    static constexpr bool kIsFabricScoped = true;
 
     chip::GroupId groupID = static_cast<chip::GroupId>(0);
     chip::CharSpan groupName;

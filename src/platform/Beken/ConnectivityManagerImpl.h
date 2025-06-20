@@ -110,7 +110,6 @@ private:
     System::Clock::Timeout _GetWiFiAPIdleTimeout(void);
     void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
     CHIP_ERROR _GetAndLogWifiStatsCounters(void);
-    bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
 
@@ -192,10 +191,6 @@ inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiAPIdleTimeout(voi
     return mWiFiAPIdleTimeout;
 }
 
-inline bool ConnectivityManagerImpl::_CanStartWiFiScan()
-{
-    return mWiFiStationState != kWiFiStationState_Connecting;
-}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 /**

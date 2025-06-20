@@ -368,6 +368,11 @@ CHIP_ERROR BaseApplication::BaseInit()
     return err;
 }
 
+void BaseApplication::InitCompleteCallback(CHIP_ERROR err)
+{
+    // A stub for backward compatibility
+}
+
 void BaseApplication::FunctionTimerEventHandler(void * timerCbArg)
 {
     AppEvent event;

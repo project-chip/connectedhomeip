@@ -4,6 +4,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
 #include <app/data-model/NullObject.h>
@@ -59,21 +60,16 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::{{asUpperCamelCase name}}::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
-    static constexpr bool kIsFabricScoped = {{isFabricScoped}};
 
     {{#zcl_command_arguments}}
     {{zapTypeToEncodableClusterObjectType type cluster=../../name}} {{asLowerCamelCase label}}{{> cluster_objects_field_init cluster=../../name}};
     {{/zcl_command_arguments}}
 
 
-    {{#if isFabricScoped~}}
-    {{#if (isServer source)}}
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag, FabricIndex aAccessingFabricIndex) const;
-    {{else}}
+    {{#if (isClient source)}}
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-    {{/if}}
     {{else}}
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
     {{/if}}
 
     using ResponseType =
@@ -90,14 +86,16 @@ struct DecodableType {
 public:
     static constexpr CommandId GetCommandId() { return Commands::{{asUpperCamelCase name}}::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
+    {{#if (isClient source)}}
     static constexpr bool kIsFabricScoped = {{isFabricScoped}};
+    {{/if}}
 
     {{#zcl_command_arguments}}
     {{zapTypeToDecodableClusterObjectType type cluster=../../name}} {{asLowerCamelCase label}}{{> cluster_objects_field_init cluster=../../name}};
     {{/zcl_command_arguments}}
 
-    {{#if isFabricScoped~}}
     {{#if (isClient source)}}
+    {{#if isFabricScoped~}}
     CHIP_ERROR Decode(TLV::TLVReader &reader, FabricIndex aAccessingFabricIndex);
     {{else}}
     CHIP_ERROR Decode(TLV::TLVReader &reader);

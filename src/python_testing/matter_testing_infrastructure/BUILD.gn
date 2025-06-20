@@ -88,14 +88,13 @@ pw_zip("data_model_zip_1_4_1") {
   output = "${root_out_dir}/data_model/zip_1_4_1.zip"
 }
 
-pw_zip("data_model_zip_1_5") {
+pw_zip("data_model_zip_1_4_2") {
   inputs = []
-  foreach(file, data_model_XMLS_1_5_in_progress) {
-    zip_path =
-        rebase_path(file, "${chip_root}/data_model/1.5_in_progress/", "/")
+  foreach(file, data_model_XMLS_1_4_2) {
+    zip_path = rebase_path(file, "${chip_root}/data_model/1.4.2/", "/")
     inputs += [ "${file} > /${zip_path}" ]
   }
-  output = "${root_out_dir}/data_model/zip_1_5.zip"
+  output = "${root_out_dir}/data_model/zip_1_4_2.zip"
 }
 
 pw_python_distribution("chip-testing") {
@@ -103,7 +102,7 @@ pw_python_distribution("chip-testing") {
 
   generate_setup_cfg = {
     name = "chip-testing"
-    version = "1.4.1"
+    version = "1.4.2"
     include_default_pyproject_file = true
     include_extra_files_in_package_data = true
   }
@@ -112,13 +111,13 @@ pw_python_distribution("chip-testing") {
     ":data_model_zip_1_3",
     ":data_model_zip_1_4",
     ":data_model_zip_1_4_1",
-    ":data_model_zip_1_5",
+    ":data_model_zip_1_4_2",
   ]
 
   extra_files = [
     "${root_out_dir}/data_model/zip_1_3.zip > chip/testing/data_model/1.3/allfiles.zip",
     "${root_out_dir}/data_model/zip_1_4.zip > chip/testing/data_model/1.4/allfiles.zip",
     "${root_out_dir}/data_model/zip_1_4_1.zip > chip/testing/data_model/1.4.1/allfiles.zip",
-    "${root_out_dir}/data_model/zip_1_5.zip > chip/testing/data_model/1.5_in_progress/allfiles.zip",
+    "${root_out_dir}/data_model/zip_1_4_2.zip > chip/testing/data_model/1.4.2/allfiles.zip",
   ]
 }

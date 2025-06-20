@@ -27,6 +27,12 @@ if (chip_enable_openthread) {
   import("//build_overrides/ot_br_posix.gni")
 }
 
+if (chip_enable_nfc_based_commissioning) {
+  pkg_config("nfc_commissioning_config") {
+    packages = [ "libpcsclite" ]
+  }
+}
+
 if (chip_mdns == "platform") {
   pkg_config("avahi_client_config") {
     packages = [ "avahi-client" ]
@@ -111,6 +117,14 @@ static_library("Linux") {
   ]
 
   public_configs = []
+
+  if (chip_enable_nfc_based_commissioning) {
+    sources += [
+      "NFCCommissioningManagerImpl.cpp",
+      "NFCCommissioningManagerImpl.h",
+    ]
+    public_configs += [ ":nfc_commissioning_config" ]
+  }
 
   if (chip_mdns == "platform") {
     sources += [

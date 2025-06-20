@@ -21,7 +21,6 @@
 #include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/MessageDef/StatusIB.h>
-#include <app/RequiredPrivilege.h>
 #include <app/StatusResponse.h>
 #include <app/data-model-provider/OperationTypes.h>
 #include <app/util/MatterCallbacks.h>
@@ -71,8 +70,15 @@ CHIP_ERROR CommandHandlerImpl::AllocateBuffer()
 
         const size_t commandBufferMaxSize = mpResponder->GetCommandResponseMaxBufferSize();
         auto commandPacket                = System::PacketBufferHandle::New(commandBufferMaxSize);
-
         VerifyOrReturnError(!commandPacket.IsNull(), CHIP_ERROR_NO_MEMORY);
+        // On some platforms we can get more available length in the packet than what we requested.
+        // It is vital that we only use up to commandBufferMaxSize for the entire packet and
+        // nothing more.
+        uint32_t reservedSize = 0;
+        if (commandPacket->AvailableDataLength() > commandBufferMaxSize)
+        {
+            reservedSize = static_cast<uint32_t>(commandPacket->AvailableDataLength() - commandBufferMaxSize);
+        }
 
         mCommandMessageWriter.Init(std::move(commandPacket));
         ReturnErrorOnFailure(mInvokeResponseBuilder.InitWithEndBufferReserved(&mCommandMessageWriter));
@@ -81,6 +87,10 @@ CHIP_ERROR CommandHandlerImpl::AllocateBuffer()
         {
             ReturnErrorOnFailure(mInvokeResponseBuilder.ReserveSpaceForMoreChunkedMessages());
         }
+
+        // Reserving space for MIC at the end.
+        ReturnErrorOnFailure(
+            mInvokeResponseBuilder.GetWriter()->ReserveBuffer(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
         // Sending an InvokeResponse to an InvokeResponse is going to be removed from the spec soon.
         // It was never implemented in the SDK, and there are no command responses that expect a
@@ -156,7 +166,9 @@ CHIP_ERROR CommandHandlerImpl::TryAddResponseData(const ConcreteCommandPath & aR
         accessingFabricIndex = kUndefinedFabricIndex;
     }
 
-    ReturnErrorOnFailure(aEncodable.EncodeTo(*writer, TLV::ContextTag(CommandDataIB::Tag::kFields), accessingFabricIndex));
+    DataModel::FabricAwareTLVWriter responseWriter(*writer, accessingFabricIndex);
+
+    ReturnErrorOnFailure(aEncodable.EncodeTo(responseWriter, TLV::ContextTag(CommandDataIB::Tag::kFields)));
     return FinishCommand(/* aEndDataStruct = */ false);
 }
 
@@ -599,14 +611,13 @@ CHIP_ERROR CommandHandlerImpl::FallibleAddStatus(const ConcreteCommandPath & pat
             context = "no additional context";
         }
 
-        if (status.HasClusterSpecificCode())
+        if (const auto clusterStatus = status.GetClusterSpecificCode(); clusterStatus.has_value())
         {
             ChipLogError(DataManagement,
                          "Endpoint=%u Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI " status " ChipLogFormatIMStatus
                          " ClusterSpecificCode=%u (%s)",
                          path.mEndpointId, ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mCommandId),
-                         ChipLogValueIMStatus(status.GetStatus()), static_cast<unsigned>(status.GetClusterSpecificCode().Value()),
-                         context);
+                         ChipLogValueIMStatus(status.GetStatus()), static_cast<unsigned>(*clusterStatus), context);
         }
         else
         {

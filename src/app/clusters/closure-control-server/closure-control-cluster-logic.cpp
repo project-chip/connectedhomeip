@@ -16,6 +16,7 @@
  */
 
 #include <app/clusters/closure-control-server/closure-control-cluster-logic.h>
+#include <clusters/ClosureControl/Metadata.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/LockTracker.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -402,6 +403,20 @@ CHIP_ERROR ClusterLogic::GetCurrentErrorList(const AttributeValueEncoder::ListEn
         ReturnErrorOnFailure(encoder.Encode(error));
     }
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterLogic::GetFeatureMap(BitFlags<Feature> & featureMap)
+{
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    featureMap = mConformance.FeatureMap();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterLogic::GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision)
+{
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    clusterRevision = ClosureControl::kRevision;
     return CHIP_NO_ERROR;
 }
 

@@ -58,7 +58,7 @@ static void gpAppFramework_HardwareResetTriggered(void)
     qvStatus_t status;
     size_t readBytesSize;
 
-    status = qvCHIP_KvsGet(KVS_RESET_CYCLES_KEY, &resetCounts, 1, &readBytesSize, 0);
+    status = qvCHIP_KvsGet(KVS_RESET_CYCLES_KEY, &resetCounts, 1, &readBytesSize, 0, qvCHIP_insensitive);
     if (status == QV_STATUS_INVALID_DATA)
     {
         // No reset count stored yet - create new key
@@ -74,7 +74,7 @@ static void gpAppFramework_HardwareResetTriggered(void)
 
     resetCounts++;
 
-    status = qvCHIP_KvsPut(KVS_RESET_CYCLES_KEY, &resetCounts, 1);
+    status = qvCHIP_KvsPut(KVS_RESET_CYCLES_KEY, &resetCounts, 1, qvCHIP_insensitive);
     if (status != QV_STATUS_NO_ERROR)
     {
         GP_LOG_SYSTEM_PRINTF("got status %d", 0, status);
@@ -92,7 +92,7 @@ UInt8 gpAppFramework_Reset_GetResetCount(void)
 
     qvStatus_t status;
     size_t readBytesSize;
-    status = qvCHIP_KvsGet(KVS_RESET_CYCLES_KEY, &resetCounts, 1, &readBytesSize, 0);
+    status = qvCHIP_KvsGet(KVS_RESET_CYCLES_KEY, &resetCounts, 1, &readBytesSize, 0, qvCHIP_insensitive);
     if (status == QV_STATUS_INVALID_DATA || readBytesSize != 1)
     {
         // Reset count was not stored yet
@@ -106,7 +106,7 @@ UInt8 gpAppFramework_Reset_GetResetCount(void)
 
     GP_LOG_PRINTF("Processing reset counts: %u", 0, resetCounts);
 
-    status = qvCHIP_KvsPut(KVS_RESET_CYCLES_KEY, &resetCountsCleared, 1);
+    status = qvCHIP_KvsPut(KVS_RESET_CYCLES_KEY, &resetCountsCleared, 1, qvCHIP_insensitive);
     if (status != QV_STATUS_NO_ERROR)
     {
         GP_LOG_SYSTEM_PRINTF("got status %d", 0, status);

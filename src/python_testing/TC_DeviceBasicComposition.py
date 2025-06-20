@@ -457,11 +457,10 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                             continue
 
                         attribute_value = cluster[attribute_id]
-                        if isinstance(attribute_value, ValueDecodeFailure):
-                            self.record_warning(self.get_test_name(), location=location,
-                                                problem=f"Found a failure to read/decode {attribute_string} on {location.as_cluster_string(self.cluster_mapper)} when it was claimed as supported in AttributeList ({attribute_list}): {str(attribute_value)}", spec_location="AttributeList Attribute")
-                            # Warn only for now
-                            # TODO: Fail in the future
+                        if isinstance(attribute_value, ValueDecodeFailure) and cluster_id != Clusters.Objects.UnitTesting.id:
+                            self.record_error(self.get_test_name(), location=location,
+                                              problem=f"Found a failure to read/decode {attribute_string} on {location.as_cluster_string(self.cluster_mapper)} when it was claimed as supported in AttributeList ({attribute_list}): {str(attribute_value)}", spec_location="AttributeList Attribute")
+                            success = False
                             continue
                     for attribute_id in cluster:
                         if attribute_id not in attribute_list:
@@ -686,7 +685,7 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                                                                    reportInterval=(100, 1000))
             if len(subscription.GetEvents()) == 0:
                 test_failure = 'Wildcard event subscription returned no events'
-        except ChipStackError as e:
+        except ChipStackError as e:  # chipstack-ok: assert_raises not suitable here since error must be inspected before determining test outcome
             # Connection over PASE will fail subscriptions with "Unsupported access"
             # TODO: ideally we should SKIP this test for PASE connections
             _IM_UNSUPPORTED_ACCESS_CODE = 0x500 + Status.UnsupportedAccess
