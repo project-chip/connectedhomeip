@@ -49,8 +49,16 @@ LogProvider::~LogProvider()
         Platform::MemoryFree(sessionSpan.second);
     }
     mSessionContextMap.clear();
-    Platform::MemoryFree(mStorageInstance);
-    mStorageInstance = nullptr;
+    if (mStorageInstance != nullptr)
+    {
+        delete mStorageInstance;
+        mStorageInstance = nullptr;
+    }
+    if (mRetrievalBuffer != nullptr)
+    {
+        Platform::MemoryFree(mRetrievalBuffer);
+        mRetrievalBuffer = nullptr;
+    }
 }
 
 CHIP_ERROR LogProvider::Init(uint8_t * endUserBuffer, size_t endUserBufferSize, uint8_t * retrievalBuffer,

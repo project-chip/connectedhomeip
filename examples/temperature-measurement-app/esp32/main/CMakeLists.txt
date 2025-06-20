@@ -22,7 +22,6 @@ get_filename_component(APP_COMMON_GEN_DIR ${CHIP_ROOT}/zzz_generated/app-common/
 set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}/include"
                       "${CHIP_ROOT}/examples/platform/esp32"
-                      "${CHIP_ROOT}/examples/platform/esp32/diagnostics"
                       "${CHIP_ROOT}/examples/providers"
 )
 set(SRC_DIRS_LIST
@@ -30,9 +29,13 @@ set(SRC_DIRS_LIST
                       "${APP_COMMON_GEN_DIR}/attributes"
                       "${APP_COMMON_GEN_DIR}"
                       "${CHIP_ROOT}/examples/platform/esp32/common"
-                      "${CHIP_ROOT}/examples/platform/esp32/diagnostics"
                       "${CHIP_ROOT}/examples/providers"
 )
+
+if (CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${CHIP_ROOT}/examples/platform/esp32/diagnostics")
+    list(APPEND SRC_DIRS_LIST "${CHIP_ROOT}/examples/platform/esp32/diagnostics")
+endif (CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
 
 if (CONFIG_ENABLE_PW_RPC)
 # Append additional directories for RPC build
