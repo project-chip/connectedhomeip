@@ -332,7 +332,7 @@ class TC_CC_2_1(MatterBaseTest):
         # Read NumberOfPrimaries from the cluster.
         number_of_primaries_value = await self._verify_attribute(self.attributes.NumberOfPrimaries, ValueTypesEnum.UINT8, min_len=0, max_len=6, nullable=True)
         if number_of_primaries_value is NullValue or number_of_primaries_value == 0:
-            logger.info("NumberOfPrimaries is 0 skipping steps 25 through 42.")
+            logger.info("NumberOfPrimaries is Null or 0 - skipping steps 25 through 42.")
             for i in range(25, 43):
                 self.skip_step(i)
         else:
