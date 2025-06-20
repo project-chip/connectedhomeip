@@ -158,7 +158,8 @@ async def commission_device(
     elif commissioning_info.commissioning_method == "ble-wifi":
         try:
             asserts.assert_is_not_none(commissioning_info.wifi_ssid, "WiFi SSID must be provided for ble-wifi commissioning")
-            asserts.assert_is_not_none(commissioning_info.wifi_passphrase, "WiFi Passphrase must be provided for ble-wifi commissioning")
+            asserts.assert_is_not_none(commissioning_info.wifi_passphrase,
+                                       "WiFi Passphrase must be provided for ble-wifi commissioning")
             # Type assertions to help mypy understand these are not None after the asserts
             assert commissioning_info.wifi_ssid is not None
             assert commissioning_info.wifi_passphrase is not None
@@ -176,7 +177,8 @@ async def commission_device(
             return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "ble-thread":
         try:
-            asserts.assert_is_not_none(commissioning_info.thread_operational_dataset, "Thread dataset must be provided for ble-thread commissioning")
+            asserts.assert_is_not_none(commissioning_info.thread_operational_dataset,
+                                       "Thread dataset must be provided for ble-thread commissioning")
             # Type assertion to help mypy understand this is not None after the assert
             assert commissioning_info.thread_operational_dataset is not None
             await dev_ctrl.CommissionThread(
