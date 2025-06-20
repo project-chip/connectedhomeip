@@ -51,7 +51,6 @@ class TC_CLDIM_2_1(MatterBaseTest):
         steps = [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
             TestStep("2a", "Read feature map determine supported features"),
-            TestStep("2b", "Read attribute list to determine supported attributes"),
             TestStep(3, "Read CurrentState attribute, if supported"),
             TestStep(4, "Read TargetState attribute, if supported"),
             TestStep(5, "Read Resolution attribute, if supported"),
@@ -91,9 +90,6 @@ class TC_CLDIM_2_1(MatterBaseTest):
         is_positioning_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
         is_latching_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
         is_speed_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
-
-        # STEP 2b: Read attribute list to determine supported attributes
-        self.step("2b")
 
         # STEP 3: Read CurrentState attribute
         self.step(3)
