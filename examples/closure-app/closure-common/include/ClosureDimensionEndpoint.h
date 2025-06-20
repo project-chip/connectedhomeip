@@ -37,18 +37,17 @@ namespace ClosureDimension {
 using Protocols::InteractionModel::Status;
 
 /**
- * @class PrintOnlyDelegate
+ * @class ClosureDimensionDelegate
  * @brief A delegate class that handles Closure Dimension commands at the application level.
  *
  * This class is responsible for processing Closure Dimension commands such as Stop, MoveTo, and Calibrate
  * according to specific business logic. It is designed to be used as a delegate for the Closure Dimension cluster.
  *
- * @note This implementation is a "PrintOnly" delegate, which may primarily log or print command handling actions.
  */
-class PrintOnlyDelegate : public DelegateBase
+class ClosureDimensionDelegate : public DelegateBase
 {
 public:
-    PrintOnlyDelegate() {}
+    ClosureDimensionDelegate() {}
 
     // Override for the DelegateBase Virtual functions
     Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
@@ -88,14 +87,59 @@ public:
     /**
      * @brief Retrieves the delegate associated with this Closure Dimension endpoint.
      *
-     * @return Reference to the PrintOnlyDelegate instance.
+     * @return Reference to the ClosureDimensionDelegate instance.
      */
-    PrintOnlyDelegate & GetDelegate() { return mDelegate; }
+    ClosureDimensionDelegate & GetDelegate() { return mDelegate; }
+
+    /**
+     * @brief Returns a reference to the associated ClusterLogic instance.
+     *
+     * @return ClusterLogic& Reference to the internal ClusterLogic object.
+     */
+    ClusterLogic & GetLogic() { return mLogic; }
+
+    /**
+     * @brief Handles the completion of a stop motion action.
+     *
+     * This function is called when a motion action has been stopped.
+     * It should update the internal state of the closure dimension endpoint to reflect
+     * the completion of the stop motion action.
+     */
+    void OnStopMotionActionComplete();
+
+    /**
+     * @brief Handles the completion of the stop calibration action.
+     *
+     * This function is called when the calibration action has been stopped.
+     * It should update the internal state of the closure dimension endpoint to reflect
+     * the completion of the stop calibration action.
+     */
+    void OnStopCalibrateActionComplete();
+
+    /**
+     * @brief Handles the completion of a calibration action.
+     *
+     * This method is called when the calibration process is finished.
+     * It should update the internal state of the closure dimension endpoint to reflect
+     * the completion of the calibration action, resets the countdown timer and generates
+     * a motion completed event.
+     */
+    void OnCalibrateActionComplete();
+
+    /**
+     * @brief Handles the completion of a motion action for closure control.
+     *
+     * This function is called when a move-to action has finished executing.
+     * It should update the internal state of the closure dimension endpoint to reflect
+     * the completion of the move-to action, resets the countdown timer and generates
+     * a motion completed event.
+     */
+    void OnMoveToActionComplete();
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
     MatterContext mContext;
-    PrintOnlyDelegate mDelegate;
+    ClosureDimensionDelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
 };
