@@ -38,6 +38,13 @@ _install_lcov() {
 
 _install_lcov
 
+_install_gcovr() {
+    if ! gcovr --version >/dev/null 2>&1; then
+        echo "gcovr not installed. Installing..."
+        pip3 install gcovr==8.3
+    fi
+}
+
 _normpath() {
     python3 -c "import os.path; print(os.path.normpath('$@'))"
 }
@@ -54,6 +61,8 @@ TEST_TARGET=check
 # By default, do not run YAML or Python tests
 ENABLE_YAML=false
 ENABLE_PYTHON=false
+
+GENERATE_XML=false
 
 help() {
     echo "Usage: $file_name [--output_root=<output_root>] [--code=<core|clusters|all>] [Test options"
@@ -111,6 +120,10 @@ for i in "$@"; do
             ;;
         --python)
             ENABLE_PYTHON=true
+            shift
+            ;;
+        --xml)
+            GENERATE_XML=true
             shift
             ;;
         *)
@@ -218,7 +231,6 @@ fi
 mkdir -p "$COVERAGE_ROOT"
 
 lcov --initial --capture --directory "$OUTPUT_ROOT/obj/src" \
-    --ignore-errors inconsistent \
     --exclude="$PWD"/zzz_generated/* \
     --exclude="$PWD"/third_party/* \
     --exclude=/usr/include/* \
@@ -243,6 +255,28 @@ genhtml "$COVERAGE_ROOT/lcov_final.info" \
     --output-directory "$COVERAGE_ROOT/html" \
     --title "SHA:$(git rev-parse HEAD)" \
     --header-title "Matter SDK Coverage Report"
+
+if [ "$GENERATE_XML" == true ]; then
+    _install_gcovr
+
+    gcovr --exclude=zzz_generated/ \
+        --exclude=third_party/ \
+        --include=src/ \
+        --gcov-ignore-parse-errors \
+        --xml="$COVERAGE_ROOT"/coverage.xml
+
+    XML_INDEX=$(_normpath "$COVERAGE_ROOT/coverage.xml")
+    if [ -f "$XML_INDEX" ]; then
+        echo
+        echo "============================================================"
+        echo "Coverage report successfully generated:"
+        echo "    file://$XML_INDEX"
+        echo "============================================================"
+    else
+        echo "WARNING: Coverage XML index was not found at expected path:"
+        echo "    $XML_INDEX"
+    fi
+fi
 
 cp "$CHIP_ROOT/integrations/appengine/webapp_config.yaml" \
     "$COVERAGE_ROOT/webapp_config.yaml"
