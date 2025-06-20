@@ -43,31 +43,33 @@ constexpr LogCategory kDefaultLoggingLevel = kLogCategory_Automation;
 
 std::string GetUsedDirectory(const std::string & directory)
 {
-    const char * dir = directory.c_str();
-
-    if (directory.empty())
+    // Explicit directory given: use as-is.
+    if (!directory.empty())
     {
-        dir = getenv("TMPDIR");
+        return directory;
     }
 
-    if (dir == nullptr)
+    // Fall-back to environment-provided directory.
+    if (const char *dir = getenv("TMPDIR"); dir != nullptr)
     {
-        dir = "/tmp";
+        return dir;
     }
 
-    return std::string{ dir };
+    // Worst-case: just /tmp (legacy behavior from long ago).
+    return "/tmp";
 }
 
-std::string PersistentStorage::GenerateFilename(const std::string & name) const
+std::string PersistentStorage::GenerateStoragePath(const std::string & name) const
 {
-    std::string dir = mUsedDirectory;
+    std::string storagePath = mUsedDirectory + "/chip_tool_config";
 
-    if (name.empty())
+    if (!name.empty())
     {
-        return dir + "/chip_tool_config.ini";
+        storagePath.append(".");
+        storagePath.append(name);
     }
 
-    return dir + "/chip_tool_config." + name + ".ini";
+    return storagePath.append(".ini");
 }
 
 CHIP_ERROR PersistentStorage::Init(const char * name, const char * directory)
@@ -75,14 +77,14 @@ CHIP_ERROR PersistentStorage::Init(const char * name, const char * directory)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     mUsedDirectory = GetUsedDirectory(directory != nullptr ? directory : "");
-    mUsedFilename  = GenerateFilename(name != nullptr ? name : "");
+    mStorageFilePath  = GenerateStoragePath(name != nullptr ? name : "");
 
     std::ifstream ifs;
-    ifs.open(mUsedFilename, std::ifstream::in);
+    ifs.open(mStorageFilePath, std::ifstream::in);
     if (!ifs.good())
     {
         CommitConfig();
-        ifs.open(mUsedFilename, std::ifstream::in);
+        ifs.open(mStorageFilePath, std::ifstream::in);
     }
     VerifyOrExit(ifs.is_open(), err = CHIP_ERROR_OPEN_FAILED);
 
@@ -203,7 +205,7 @@ CHIP_ERROR PersistentStorage::CommitConfig()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     std::ofstream ofs;
-    std::string tmpPath = mUsedFilename + ".tmp";
+    std::string tmpPath = mStorageFilePath + ".tmp";
     ofs.open(tmpPath, std::ofstream::out | std::ofstream::trunc);
     VerifyOrExit(ofs.good(), err = CHIP_ERROR_WRITE_FAILED);
 
@@ -211,7 +213,7 @@ CHIP_ERROR PersistentStorage::CommitConfig()
     ofs.close();
     VerifyOrExit(ofs.good(), err = CHIP_ERROR_WRITE_FAILED);
 
-    VerifyOrExit(rename(tmpPath.c_str(), mUsedFilename.c_str()) == 0, err = CHIP_ERROR_WRITE_FAILED);
+    VerifyOrExit(rename(tmpPath.c_str(), mStorageFilePath.c_str()) == 0, err = CHIP_ERROR_WRITE_FAILED);
 
 exit:
     return err;

@@ -71,8 +71,8 @@ public:
 
 private:
     CHIP_ERROR CommitConfig();
-    std::string GenerateFilename(const std::string & name) const;
+    std::string GenerateStoragePath(const std::string & name) const;
     inipp::Ini<char> mConfig;
-    std::string mUsedFilename;
+    std::string mStorageFilePath;
     std::string mUsedDirectory;
 };
