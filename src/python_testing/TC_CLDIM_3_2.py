@@ -44,11 +44,10 @@ from mobly import asserts
 
 def current_latch_matcher(latch: bool) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
-        if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState or not isinstance(report.value, list):
+        if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
             return False
-        for entry in report.value:
-            if entry.Latch == latch:
-                return True
+        if report.value.latch == latch:
+            return True
         else:
             return False
     return AttributeMatcher.from_callable(description=f"CurrentState.Latch is {latch}", matcher=predicate)
@@ -171,6 +170,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
         else:
             # STEP 3e: Send SetTarget command with Latch=True
             self.step("3e")
+            sub_handler.reset()
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=True),
@@ -236,6 +236,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
         else:
             # STEP 5c: Send SetTarget command with Latch=False
             self.step("5c")
+            sub_handler.reset()
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=False),

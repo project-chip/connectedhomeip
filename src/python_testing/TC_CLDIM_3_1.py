@@ -49,6 +49,8 @@ def current_position_matcher(position: int) -> AttributeMatcher:
             return False
         if report.value.position == position:
             return True
+        else:
+            return False
     return AttributeMatcher.from_callable(description=f"CurrentState.Position is {position}", matcher=predicate)
 
 
@@ -58,6 +60,8 @@ def current_speed_matcher(speed: Globals.Enums.ThreeLevelAutoEnum) -> AttributeM
             return False
         if report.value.speed == speed:
             return True
+        else:
+            return False
     return AttributeMatcher.from_callable(description=f"CurrentState.Speed is {speed}", matcher=predicate)
 
 
@@ -67,6 +71,8 @@ def current_position_and_speed_matcher(position: int, speed: Globals.Enums.Three
             return False
         if (report.value.position == position) and (report.value.speed == speed):
             return True
+        else:
+            return False
     return AttributeMatcher.from_callable(description=f"CurrentState.Position is {position} and CurrentState.Speed is {speed}", matcher=predicate)
 
 

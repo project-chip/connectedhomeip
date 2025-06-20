@@ -45,11 +45,10 @@ from mobly import asserts
 
 def current_position_matcher(position: int) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
-        if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState or not isinstance(report.value, list):
+        if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
             return False
-        for entry in report.value:
-            if entry.Position == position:
-                return True
+        if report.value.position == position:
+            return True
         else:
             return False
     return AttributeMatcher.from_callable(description=f"CurrentState.Position is {position}", matcher=predicate)
@@ -243,6 +242,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         else:
             # STEP 5b: Send SetTarget command with Position 0%
             self.step("5b")
+            sub_handler.reset()
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=0),
@@ -268,6 +268,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
 
             # STEP 5e: Send SetTarget command with Position 100%
             self.step("5e")
+            sub_handler.reset()
             if max_position < 10000:
                 try:
                     await self.send_single_cmd(
@@ -335,6 +336,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
 
             # STEP 7c: Send SetTarget command with Position not a multiple of Resolution
             self.step("7c")
+            sub_handler.reset()
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=min_position + resolution - 1),
@@ -375,6 +377,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
 
             # STEP 7g: Send SetTarget command with Position not a multiple of Resolution
             self.step("7g")
+            sub_handler.reset()
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=(max_position - resolution) + 1),
