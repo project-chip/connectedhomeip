@@ -174,9 +174,10 @@ class TC_DA_1_5(MatterBaseTest):
         await self.send_single_cmd(cmd=gcomm.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=1))
 
         self.print_step(11, "Send CSRRequest wtih 31-byte nonce")
-        bad_nonce = random.randbytes(32)
+        bad_nonce = random.randbytes(31)
         try:
             await self.send_single_cmd(cmd=opcreds.Commands.CSRRequest(CSRNonce=bad_nonce, isForUpdateNOC=False))
+            asserts.fail("CSRRequest with 31-byte nonce was expected to fail but succeeded")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.InvalidCommand, "Received incorrect error from CSRRequest command with bad nonce")
 
