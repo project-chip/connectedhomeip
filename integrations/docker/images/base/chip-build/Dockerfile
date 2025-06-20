@@ -42,6 +42,7 @@ RUN set -x \
     curl \
     dbus-daemon \
     flex \
+    ffmpeg \
     g++ \
     generate-ninja \
     git \
