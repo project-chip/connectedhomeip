@@ -237,9 +237,6 @@ def cmd_list(context):
     '--all-clusters-app',
     help='what all clusters app to use')
 @click.option(
-    '--energy-gateway-app',
-    help='what energy gateway app to use')
-@click.option(
     '--lock-app',
     help='what lock app to use')
 @click.option(
@@ -320,9 +317,6 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     if all_clusters_app is None:
         all_clusters_app = paths_finder.get('chip-all-clusters-app')
 
-    if energy_gateway_app is None:
-        energy_gateway_app = paths_finder.get('chip-energy-gateway-app')
-
     if lock_app is None:
         lock_app = paths_finder.get('chip-lock-app')
 
@@ -372,7 +366,6 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     paths = chiptest.ApplicationPaths(
         chip_tool=[context.obj.chip_tool],
         all_clusters_app=[all_clusters_app],
-        energy_gateway_app=[energy_gateway_app],
         lock_app=[lock_app],
         fabric_bridge_app=[fabric_bridge_app],
         ota_provider_app=[ota_provider_app],
