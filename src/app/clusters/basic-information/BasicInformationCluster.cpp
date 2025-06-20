@@ -355,7 +355,8 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteAttribute(const Data
     case NodeLabel::Id: {
         CharSpan label;
         ReturnErrorOnFailure(decoder.Decode(label));
-        return NotifyAttributeChangedIfSuccess(NodeLabel::Id, BasicInformationLogic::Instance().SetNodeLabel(label, *mContext->attributeStorage));
+        return NotifyAttributeChangedIfSuccess(NodeLabel::Id,
+                                               BasicInformationLogic::Instance().SetNodeLabel(label, *mContext->attributeStorage));
     }
     case LocalConfigDisabled::Id: {
         bool value;

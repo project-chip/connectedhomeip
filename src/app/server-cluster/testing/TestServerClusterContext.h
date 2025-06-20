@@ -38,15 +38,12 @@ public:
 
 /// TODO: this is a useless class. For testing purposes we should
 ///       extend this to something sensible
-class ErrorAttributeStorage : public app::Storage::AttributeStorage {
+class ErrorAttributeStorage : public app::Storage::AttributeStorage
+{
 public:
-    CHIP_ERROR Write(const app::ConcreteAttributePath & path, const Value & value) override {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    CHIP_ERROR Write(const app::ConcreteAttributePath & path, const Value & value) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
-    CHIP_ERROR Read(const app::ConcreteAttributePath & path, Buffer buffer) override {
-        return CHIP_ERROR_NOT_IMPLEMENTED;
-    }
+    CHIP_ERROR Read(const app::ConcreteAttributePath & path, Buffer buffer) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 };
 
 /// This is a ServerClusterContext that is initialized with VALID

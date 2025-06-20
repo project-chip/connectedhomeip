@@ -18,8 +18,8 @@
 
 #include <app/SpecificationDefinedRevisions.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
-#include <app/storage/PascalString.h>
 #include <app/storage/AttributeStorage.h>
+#include <app/storage/PascalString.h>
 #include <clusters/BasicInformation/Structs.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
@@ -42,7 +42,7 @@ public:
     /// BasicInformationLogic is a SINGLETON according to the matter specification.
     static BasicInformationLogic & Instance();
 
-    CHIP_ERROR Init(Storage::AttributeStorage &storage);
+    CHIP_ERROR Init(Storage::AttributeStorage & storage);
 
     bool GetReachable() const { return mReachable; }
     bool GetLocalConfigDisabled() const { return mLocalConfigDisabled; }
@@ -51,7 +51,7 @@ public:
     // NOTE: these methods do NOT notify the cluster implementation of
     //       changes. Callers are responsible for that.
     void SetLocalConfigDisabled(bool value) { mLocalConfigDisabled = value; }
-    DataModel::ActionReturnStatus SetNodeLabel(CharSpan label, Storage::AttributeStorage &storage);
+    DataModel::ActionReturnStatus SetNodeLabel(CharSpan label, Storage::AttributeStorage & storage);
     DataModel::ActionReturnStatus SetLocation(CharSpan location);
 
 private:
