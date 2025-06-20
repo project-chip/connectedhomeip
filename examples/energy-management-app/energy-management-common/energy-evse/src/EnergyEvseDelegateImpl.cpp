@@ -362,7 +362,7 @@ Status EnergyEvseDelegate::HwSetMaxHardwareCurrentLimit(int64_t currentmA)
  */
 Status EnergyEvseDelegate::HwSetNominalMainsVoltage(int64_t voltage_mV)
 {
-    if (voltage_mV < kMinMainsVoltageLimit)
+    if (voltage_mV < kMinimumMainsVoltage_mV)
     {
         ChipLogError(AppServer, "Mains voltage looks too low - check value is in mV");
         return Status::ConstraintError;

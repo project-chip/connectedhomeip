@@ -219,8 +219,10 @@ CHIP_ERROR EVSEManufacturer::DetermineRequiredEnergy(EnergyEvseDelegate * dg, in
             if (!vehicleSoC.IsNull() && !batteryCapacity_mWh.IsNull())
             {
                 // If the current SoC is already >= targetSoC - we don't need to charge, set to 0.
-                requiredEnergy_mWh = std::max(0,  (targetSoC.Value() - vehicleSoC.Value()) * batteryCapacity_mWh.Value() / 100);
-                ChipLogProgress(AppServer, "EVSE: Vehicle reports current SoC: %d    ----- target SoC: %d", vehicleSoC.Value(), targetSoC.Value());
+                requiredEnergy_mWh = std::max<int64_t>(
+                    0, static_cast<int64_t>((targetSoC.Value() - vehicleSoC.Value()) * batteryCapacity_mWh.Value() / 100));
+                ChipLogProgress(AppServer, "EVSE: Vehicle reports current SoC: %d    ----- target SoC: %d", vehicleSoC.Value(),
+                                targetSoC.Value());
                 // Since we are charging using SoC then always null out the NextAddedEnergy target
                 // to indicate that the SoC target is being followed (per spec)
                 // NextChargeAddedEnergy is set by the caller based on targetAddedEnergy_mWh
@@ -242,7 +244,7 @@ CHIP_ERROR EVSEManufacturer::DetermineRequiredEnergy(EnergyEvseDelegate * dg, in
             // We don't know the Vehicle SoC so we must charge now
             // Let's assume an unreasonably large battery size which
             // ComputeStartTime uses to recognise it needs to start now
-            requiredEnergy_mWh = kMaxRequiredEnergy;
+            requiredEnergy_mWh = kMaxRequiredEnergy_mWh;
 
             return CHIP_NO_ERROR;
         }
@@ -256,7 +258,7 @@ CHIP_ERROR EVSEManufacturer::DetermineRequiredEnergy(EnergyEvseDelegate * dg, in
                      "EVSE ERROR: Cannot use TargetSoC (maybe missing VehicleSoC/BatteryCapacity?) or AddedEnergy has not been "
                      "provided - assume large battery!");
 
-        requiredEnergy_mWh = kMaxRequiredEnergy;
+        requiredEnergy_mWh = kMaxRequiredEnergy_mWh;
         return CHIP_NO_ERROR;
     }
 
