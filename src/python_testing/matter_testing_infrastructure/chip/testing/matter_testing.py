@@ -29,6 +29,7 @@ import re
 import shlex
 import sys
 import textwrap
+import traceback
 import threading
 import time
 import typing
