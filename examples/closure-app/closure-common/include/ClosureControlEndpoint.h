@@ -25,6 +25,7 @@
 #include <app/clusters/closure-control-server/closure-control-server.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -35,18 +36,17 @@ namespace Clusters {
 namespace ClosureControl {
 
 /**
- * @class PrintOnlyDelegate
- * @brief A delegate class that handles Closure Control commands at the application level.
+ * @class ClosureControlDelegate
+ * @brief Delegate class for handling closure control commands and Test event triggers.
  *
- * This class is responsible for processing Closure Control commands such as Stop, MoveTo, and Calibrate
- * according to specific business logic. It is designed to be used as a delegate for the Closure Control cluster.
- *
- * @note This implementation is a "PrintOnly" delegate, which may primarily log or print command handling actions.
+ * Inherits from DelegateBase and TestEventTriggerHandler to provide implementations
+ * for closure control operations such as Stop, MoveTo, Calibration, and
+ * error retrieval, and Test event triggering.
  */
-class PrintOnlyDelegate : public DelegateBase
+class ClosureControlDelegate : public DelegateBase, public TestEventTriggerHandler
 {
 public:
-    PrintOnlyDelegate() {}
+    ClosureControlDelegate() {}
 
     // Override for the DelegateBase Virtual functions
     Protocols::InteractionModel::Status HandleStopCommand() override;
@@ -61,6 +61,17 @@ public:
     ElapsedS GetCalibrationCountdownTime() override;
     ElapsedS GetMovingCountdownTime() override;
     ElapsedS GetWaitingForMotionCountdownTime() override;
+
+    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
+
+    // Delegate specific functions and variables
+
+    void SetLogic(ClusterLogic * logic) { mLogic = logic; }
+
+    ClusterLogic * GetLogic() const { return mLogic; }
+
+private:
+    ClusterLogic * mLogic;
 };
 
 /**
@@ -81,7 +92,9 @@ class ClosureControlEndpoint
 public:
     ClosureControlEndpoint(EndpointId endpoint) :
         mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
-    {}
+    {
+        mDelegate.SetLogic(&mLogic);
+    }
 
     /**
      * @brief Initializes the ClosureControlEndpoint instance.
@@ -93,14 +106,59 @@ public:
     /**
      * @brief Retrieves the delegate associated with this Closure Control endpoint.
      *
-     * @return Reference to the PrintOnlyDelegate instance.
+     * @return Reference to the ClosureControlDelegate instance.
      */
-    PrintOnlyDelegate & GetDelegate() { return mDelegate; }
+    ClosureControlDelegate & GetDelegate() { return mDelegate; }
+
+    /**
+     * @brief Returns a reference to the ClusterLogic instance associated with this object.
+     *
+     * @return ClusterLogic& Reference to the internal ClusterLogic object.
+     */
+    ClusterLogic & GetLogic() { return mLogic; }
+
+    /**
+     * @brief Handles the completion of a stop motion action.
+     *
+     * This function is called when a motion action has been stopped.
+     * It should update the internal state of the closure control endpoint to reflect the
+     * completion of the stop motion action.
+     */
+    void OnStopMotionActionComplete();
+
+    /**
+     * @brief Handles the completion of the stop calibration action.
+     *
+     * This function is called when the calibration action has been stopped.
+     * It should update the internal state of the closure control endpoint to reflect the
+     * completion of the stop calibration action.
+     */
+    void OnStopCalibrateActionComplete();
+
+    /**
+     * @brief Handles the completion of a calibration action.
+     *
+     * This method is called when the calibration process is finished.
+     * It should update the internal state of the closure control endpoint to reflect the
+     * completion of the calibration action, resets the countdown timer and generates
+     * a motion completed event.
+     */
+    void OnCalibrateActionComplete();
+
+    /**
+     * @brief Handles the completion of a motion action for closure control.
+     *
+     * This function is called when a move-to action has finished executing.
+     * It should update the internal state of the closure control endpoint to reflect the
+     * completion of the move-to action, resets the countdown timer and generates
+     * a motion completed event.
+     */
+    void OnMoveToActionComplete();
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
     MatterContext mContext;
-    PrintOnlyDelegate mDelegate;
+    ClosureControlDelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
 };
