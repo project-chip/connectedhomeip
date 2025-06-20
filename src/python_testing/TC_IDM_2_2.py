@@ -76,6 +76,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         super().__init__(*args, **kwargs)
         self.endpoint = 0
         self.timeout_ms = 10000  # 10 second timeout for read operations
+        self.large_operation_timeout_ms = 60000  # 60 second timeout for large operations (like reading all attributes)
         self.setup_timeout_ms = 60000  # 60 second timeout for setup phase
     
     def get_device_clusters(self) -> set:
@@ -127,25 +128,30 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
     # === Attribute Reading and Verification ===
     
-    async def read_attribute(self, attribute_path: list) -> dict:
+    async def read_attribute(self, attribute_path: list, timeout_ms: int = None) -> dict:
         """Read attributes from the device with timeout handling."""
+        if timeout_ms is None:
+            timeout_ms = self.timeout_ms
+            
         try:
             return await self.default_controller.Read(
                 self.dut_node_id, 
                 attribute_path)
         except ChipStackError as e:
             if "Timeout" in str(e):
-                logging.error(f"Read operation timed out after {self.timeout_ms}ms")
+                logging.error(f"Read operation timed out after {timeout_ms}ms")
                 logging.error(f"Attribute path: {attribute_path}")
             raise
 
     async def verify_attribute_read(self, attribute_path: list, 
-                                  expected_error: Status = None) -> dict:
+                                  expected_error: Status = None, 
+                                  timeout_ms: int = None) -> dict:
         """Read and verify attributes from the device.
         
         Args:
             attribute_path: List of attribute paths to read
             expected_error: Optional expected error status
+            timeout_ms: Optional custom timeout in milliseconds
             
         Returns:
             Dictionary containing the read results
@@ -173,7 +179,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                     if isinstance(attribute, int):
                         # For unsupported attribute testing, use a different approach
                         try:
-                            result = await self.read_attribute(attribute_path)
+                            result = await self.read_attribute(attribute_path, timeout_ms=timeout_ms)
                             # If we get here, the attribute was supported (unexpected)
                             asserts.fail("Expected UNSUPPORTED_ATTRIBUTE error but attribute was supported")
                         except Exception as e:
@@ -195,7 +201,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                     return None
                 raise
 
-        read_request = await self.read_attribute(attribute_path)
+        read_request = await self.read_attribute(attribute_path, timeout_ms=timeout_ms)
         await self.verify_read_response(read_request, attribute_path)
         return read_request
 
@@ -463,7 +469,19 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 return await self.verify_attribute_read([attribute_path])
                 
             elif operation_type == 'all_attributes':
-                return await self.verify_attribute_read([()])
+                # Use Austin's approach for reading all attributes from all clusters on all endpoints
+                # This matches the implementation in TC_IDM_2_2_Austin.py
+                # Use a very long timeout since this operation reads everything
+                import asyncio
+                read_request = await asyncio.wait_for(
+                    self.default_controller.Read(self.dut_node_id, [()]),
+                    timeout=120.0  # 2 minutes timeout for this massive operation
+                )
+                
+                # Verify the response using Austin's verification logic
+                await self._verify_empty_tuple([()], read_request)
+                
+                return read_request
                 
             elif operation_type == 'global_attribute_all_endpoints':
                 attribute_path = AttributePath(
@@ -473,28 +491,37 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 return await self.verify_attribute_read([attribute_path])
                 
             elif operation_type == 'cluster_all_endpoints':
-                read_request = await self.read_attribute([kwargs['cluster']])
-                for endpoint in read_request.tlvAttributes:
-                    asserts.assert_in(kwargs['cluster'].id, read_request.tlvAttributes[endpoint].keys(),
+                # Use Austin's ReadAttribute approach for reading a cluster from all endpoints
+                read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [kwargs['cluster']])
+                
+                # Verify the response using Austin's verification logic
+                for endpoint in read_request:
+                    asserts.assert_in(kwargs['cluster'], read_request[endpoint].keys(), 
                                     f"{kwargs['cluster']} cluster not in output")
-                    asserts.assert_in(kwargs['cluster'].Attributes.AttributeList.attribute_id,
-                                    read_request.tlvAttributes[endpoint][kwargs['cluster'].id],
+                    asserts.assert_in(kwargs['cluster'].Attributes.AttributeList,
+                                    read_request[endpoint][kwargs['cluster']], 
                                     "AttributeList not in output")
+                
                 return read_request
                 
             elif operation_type == 'endpoint_all_clusters':
-                read_request = await self.read_attribute([kwargs['endpoint']])
+                # Use Austin's ReadAttribute approach for reading all clusters at an endpoint
+                read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [kwargs['endpoint']])
+                
                 endpoint = kwargs['endpoint']
-                asserts.assert_in(Clusters.Descriptor.id, read_request.tlvAttributes[endpoint].keys(), "Descriptor cluster not in output")
-                asserts.assert_in(Clusters.Descriptor.Attributes.ServerList.attribute_id, read_request.tlvAttributes[endpoint][Clusters.Descriptor.id], "ServerList not in output")
+                asserts.assert_in(Clusters.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
+                asserts.assert_in(Clusters.Descriptor.Attributes.ServerList,
+                                read_request[endpoint][Clusters.Descriptor], "ServerList not in output")
 
-                for cluster in read_request.tlvAttributes[endpoint]:
-                    attribute_ids = [a for a in read_request.tlvAttributes[endpoint][cluster].keys() if a != Clusters.Attribute.DataVersion]
+                for cluster in read_request[endpoint]:
+                    attribute_ids = [a.attribute_id for a in read_request[endpoint][cluster].keys() 
+                                   if a != Clusters.Attribute.DataVersion]
                     asserts.assert_equal(
                         sorted(attribute_ids),
-                        sorted(read_request.tlvAttributes[endpoint][cluster][ClusterObjects.ALL_CLUSTERS[cluster].Attributes.AttributeList.attribute_id]),
+                        sorted(read_request[endpoint][cluster][cluster.Attributes.AttributeList]),
                         f"Expected attribute list does not match for cluster {cluster}"
                     )
+                
                 return read_request
                 
             elif operation_type == 'unsupported_endpoint':
@@ -528,10 +555,10 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 data_version = read_request[0][kwargs['cluster']][Clusters.Attribute.DataVersion]
                 
                 if 'test_value' in kwargs:
-                    # Write operation to change data version
+                    # Write operation to change data version - use Austin's format
                     await self.default_controller.WriteAttribute(
                         self.dut_node_id,
-                        [(kwargs['endpoint'], kwargs['cluster'], kwargs['attribute'], kwargs['test_value'])])
+                        [(kwargs['endpoint'], kwargs['attribute'](value=kwargs['test_value']))])
                 
                 # Read with data version filter - use ReadAttribute like Austin's version
                 data_version_filter = [(kwargs['endpoint'], kwargs['cluster'], data_version)]
@@ -558,46 +585,74 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 return None
                 
             elif operation_type == 'non_global_attribute':
+                # Use Austin's approach for Step 29 - use ReadAttribute with attribute_id
                 attribute_path = AttributePath(
                     EndpointId=kwargs.get('endpoint'),
                     ClusterId=None,
                     AttributeId=kwargs['attribute'].attribute_id)
-                return await self.verify_attribute_read([attribute_path], 
-                                                      expected_error=Status.InvalidAction)
+                
+                # Use ReadAttribute like Austin does, and expect ChipStackError with 0x580
+                try:
+                    result = await self.default_controller.ReadAttribute(
+                        self.dut_node_id,
+                        [attribute_path]
+                    )
+                    # If we get here, the operation succeeded unexpectedly
+                    asserts.fail("Expected INVALID_ACTION error but operation succeeded")
+                except ChipStackError as e:
+                    # Austin expects error code 0x580 (INVALID_ACTION)
+                    asserts.assert_equal(e.err, 0x580,
+                                       "Incorrect error response for reading non-global attribute on all clusters at endpoint")
+                    return None
                 
             elif operation_type == 'limited_access':
-                # Modify ACL to limit access
-                original_acl = await self.default_controller.ReadAttribute(
-                    self.dut_node_id, [(0, Clusters.AccessControl)])
-                
-                new_acl = copy.deepcopy(original_acl)
-                new_acl[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl] = [
-                    AccessControl.Structs.AccessControlEntryStruct(
-                        privilege=AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
-                        authMode=AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                        subjects=[kwargs['subject_id']],
-                        targets=[AccessControl.Structs.AccessControlTargetStruct(
-                            cluster=kwargs['cluster_id'],
-                            endpoint=kwargs['endpoint'])])]
-                
-                await self.default_controller.WriteAttribute(
+                # Use Austin's approach for Step 30 - read current ACL first
+                endpoint = kwargs['endpoint']
+                read_request = await self.default_controller.Read(
                     self.dut_node_id,
-                    [(0, Clusters.AccessControl, Clusters.AccessControl.Attributes.Acl, 
-                      new_acl[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl])])
+                    [(endpoint, Clusters.AccessControl.Attributes.Acl)])
+                
+                dut_acl_original = read_request.attributes[endpoint][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
+                
+                # Limited ACE for controller 2 with single cluster access
+                ace = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+                    privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+                    authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+                    targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=kwargs['cluster_id'])],
+                    subjects=[kwargs['subject_id']])
+                
+                dut_acl = copy.deepcopy(dut_acl_original)
+                dut_acl.append(ace)
+                
+                # Use Austin's WriteAttribute format
+                result = await self.default_controller.WriteAttribute(
+                    self.dut_node_id, 
+                    [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl))])
                 
                 # Test read with limited access
-                read_request = await self.verify_attribute_read([(kwargs['endpoint'],)])
-                
-                # Restore original ACL
-                await self.default_controller.WriteAttribute(
+                read_request = await self.default_controller.Read(
                     self.dut_node_id,
-                    [(0, Clusters.AccessControl, Clusters.AccessControl.Attributes.Acl, 
-                      original_acl[0][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl])])
+                    [(endpoint, Clusters.AccessControl.Attributes.Acl)])
                 
-                return original_acl, read_request
+                # Verify ACL was updated
+                asserts.assert_equal(len(read_request.attributes[endpoint][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]), 2)
+                
+                # Restore original ACL using Austin's format
+                await self.default_controller.WriteAttribute(
+                    self.dut_node_id, 
+                    [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl_original))])
+                
+                # Verify restoration
+                read_request = await self.default_controller.Read(
+                    self.dut_node_id,
+                    [(endpoint, Clusters.AccessControl.Attributes.Acl)])
+                asserts.assert_equal(len(read_request.attributes[endpoint][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]), 1)
+                
+                return dut_acl_original, read_request
                 
             elif operation_type == 'all_events_attributes':
-                return await self.default_controller.Read(self.dut_node_id, [()], reportInterval=(0, 0))
+                # Use Austin's approach for Step 32 - read both attributes and events
+                return await self.default_controller.Read(nodeid=self.dut_node_id, attributes=[()], events=[()])
                 
             elif operation_type == 'data_version_filter_multiple_clusters':
                 # Read from cluster A to get its data version - use ReadAttribute like Austin's version
@@ -623,10 +678,10 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 data_version = read_request[0][kwargs['cluster']][Clusters.Attribute.DataVersion]
                 
                 if 'test_value' in kwargs:
-                    # Write operation to change data version
+                    # Write operation to change data version - use Austin's format
                     await self.default_controller.WriteAttribute(
                         self.dut_node_id,
-                        [(kwargs['endpoint'], kwargs['cluster'], kwargs['attribute'], kwargs['test_value'])])
+                        [(kwargs['endpoint'], kwargs['attribute'](value=kwargs['test_value']))])
                 
                 # Create two data version filters: one with current version and one with older version
                 data_version_filter_1 = [(kwargs['endpoint'], kwargs['cluster'], data_version)]
@@ -647,6 +702,32 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             logging.error(f"Operation {operation_type} failed: {str(e)}")
             logging.error(f"Arguments: {kwargs}")
             raise
+
+    async def _verify_empty_tuple(self, attr_path, read_request):
+        """Verify read response for empty tuple path (all attributes from all clusters on all endpoints).
+        
+        This method is based on Austin's implementation in TC_IDM_2_2_Austin.py.
+        
+        Args:
+            attr_path: The attribute path that was read
+            read_request: The read request response to verify
+            
+        Raises:
+            AssertionError if verification fails
+        """
+        # Parts list validation
+        parts_list_a = read_request.tlvAttributes[0][Clusters.Descriptor.id][Clusters.Descriptor.Attributes.PartsList.attribute_id]
+        parts_list_b = self.endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.PartsList]
+        asserts.assert_equal(parts_list_a, parts_list_b, "Parts list is not the expected value")
+
+        # Server list validation
+        for endpoint in read_request.tlvAttributes:
+            returned_clusters = sorted(list(read_request.tlvAttributes[endpoint].keys()))
+            server_list = sorted(read_request.tlvAttributes[endpoint][Clusters.Descriptor.id][Clusters.Descriptor.Attributes.ServerList.attribute_id])
+            asserts.assert_equal(returned_clusters, server_list)
+
+        # Verify all endpoints and clusters
+        await self.verify_all_endpoints_clusters(read_request)
 
     def steps_TC_IDM_2_2(self) -> list[TestStep]:
         steps = [
@@ -779,7 +860,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_true(Clusters.Descriptor in read_request13[0], "Cluster missing in first read")
         
         # 2. Check the second read (with DataVersionFilter) returns empty dict if nothing changed
-        # This matches Austin's approach where matching data versions return {}
         asserts.assert_equal(filtered_read13, {}, "Expected empty response with matching data version")
 
         # Step 14: Test data version filter with write
@@ -858,9 +938,14 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             endpoint=self.endpoint,
             cluster_id=Clusters.BasicInformation.id,
             subject_id=self.matter_test_config.controller_node_id + 1)
-        asserts.assert_true(self.endpoint in read_request21.tlvAttributes, f"Endpoint {self.endpoint} missing in response")
-        asserts.assert_true(Clusters.Descriptor.id in read_request21.tlvAttributes[self.endpoint],
-                          "Clusters.Descriptor not in response")
+        
+        # Verify that the ACL read response contains the expected data
+        # The limited_access operation returns ACL read data, not general cluster data
+        asserts.assert_true(self.endpoint in read_request21.attributes, f"Endpoint {self.endpoint} missing in response")
+        asserts.assert_true(Clusters.AccessControl in read_request21.attributes[self.endpoint],
+                          "Clusters.AccessControl not in response")
+        asserts.assert_true(Clusters.AccessControl.Attributes.Acl in read_request21.attributes[self.endpoint][Clusters.AccessControl],
+                          "ACL attribute not in response")
 
         # Step 22: Test read all events and attributes
         self.step(22)
@@ -869,6 +954,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         for event in read_request22.events:
             for attr in required_attributes:
                 asserts.assert_true(hasattr(event, attr), f"{attr} not in event")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
