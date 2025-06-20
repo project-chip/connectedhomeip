@@ -212,7 +212,7 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
         await self.check_evse_attribute("StateOfCharge", 20)
 
         self.step("7b")
-        await self.check_evse_attribute("BatteryCapacity", 70000)
+        await self.check_evse_attribute("BatteryCapacity", 70000000)
 
         self.step("8")
         has_pref = self.feature_guard(endpoint=endpoint, cluster=cluster,
@@ -341,7 +341,7 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
             self.step("13b")
             # TH reads from the DUT the BatteryCapacity
             # Value has to be 70,000,000 (70kWh)
-            await self.check_evse_attribute("BatteryCapacity", 70000)
+            await self.check_evse_attribute("BatteryCapacity", 70000000)
 
             self.step("14")
             # TH sends command EnableCharging with ChargingEnabledUntil=null, minimumChargeCurrent=6000, maximumChargeCurrent=60000
