@@ -242,6 +242,7 @@ class EEVSEBaseTestHelper:
 
     def convert_epoch_s_to_time(self, epoch_s, tz=timezone.utc):
         delta_from_epoch = timedelta(seconds=epoch_s)
+        # Matter Epoch is 1st Jan 2000
         matter_epoch = datetime(2000, 1, 1, 0, 0, 0, 0, tz)
 
         return matter_epoch + delta_from_epoch
@@ -271,6 +272,7 @@ class EEVSEBaseTestHelper:
             f"{int(minutes_past_midnight/60)}:{int(minutes_past_midnight%60)}"
             f" Expected target_time = {target_time}")
 
+        # Matter Epoch is 1st Jan 2000
         matter_base_time = datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=timezone.utc)
 
         target_time_delta = target_time - matter_base_time
