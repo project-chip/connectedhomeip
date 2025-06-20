@@ -30,9 +30,7 @@ using namespace chip::app::Clusters::DiagnosticLogs;
 LogProvider LogProvider::sInstance;
 LogProvider::CrashLogContext LogProvider::sCrashLogContext;
 
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 static uint32_t sReadEntries = 0;
-#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 namespace {
 bool IsValidIntent(IntentEnum intent)
@@ -99,13 +97,9 @@ size_t LogProvider::GetSizeForIntent(IntentEnum intent)
     switch (intent)
     {
     case IntentEnum::kEndUserSupport:
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
         VerifyOrReturnError(mStorageInstance != nullptr, 0,
                             ChipLogError(DeviceLayer, "Diagnostic Storage instance cannot be null."));
         return mStorageInstance->GetDataSize();
-#else
-        return 0;
-#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     case IntentEnum::kNetworkDiag:
         return 0;
     case IntentEnum::kCrashLogs:
@@ -137,7 +131,6 @@ CHIP_ERROR LogProvider::PrepareLogContextForIntent(LogContext * context, IntentE
     switch (intent)
     {
     case IntentEnum::kEndUserSupport: {
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
         VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INTERNAL,
                             ChipLogError(DeviceLayer, "Diagnostic Storage instance cannot be null."));
         MutableByteSpan endUserSupportSpan(mRetrievalBuffer, mBufferSize);
@@ -151,9 +144,6 @@ CHIP_ERROR LogProvider::PrepareLogContextForIntent(LogContext * context, IntentE
             return err;
         }
         context->EndUserSupport.span = endUserSupportSpan;
-#else
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     }
     break;
 
@@ -321,7 +311,6 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
 
 CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle, CHIP_ERROR error)
 {
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "Diagnostic Storage instance cannot be null."));
     if (error == CHIP_NO_ERROR)
@@ -336,7 +325,6 @@ CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle, CHIP_ER
             ChipLogDetail(DeviceLayer, "Cleared all read diagnostics successfully");
         }
     }
-#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
     VerifyOrReturnValue(sessionHandle != kInvalidLogSessionHandle, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnValue(mSessionContextMap.count(sessionHandle), CHIP_ERROR_INVALID_ARGUMENT);

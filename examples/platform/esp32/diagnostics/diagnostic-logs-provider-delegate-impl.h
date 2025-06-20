@@ -28,7 +28,6 @@
 
 #include <tracing/esp32_diagnostic_trace/DiagnosticStorage.h>
 using namespace chip::Tracing::Diagnostics;
-
 namespace chip {
 namespace app {
 namespace Clusters {

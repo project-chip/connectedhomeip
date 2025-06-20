@@ -51,6 +51,14 @@
 #include <DeviceInfoProviderImpl.h>
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+#include <diagnostic-logs-provider-delegate-impl.h>
+static uint8_t retrievalBuffer[CONFIG_RETRIEVAL_BUFFER_SIZE]; // Global static buffer used to retrieve diagnostics
+static uint8_t endUserBuffer[CONFIG_END_USER_BUFFER_SIZE];    // Global static buffer used to store diagnostics
+
+using namespace chip::app::Clusters::DiagnosticLogs;
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+
 namespace {
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 chip::DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
@@ -129,11 +137,6 @@ extern "C" void app_main()
 }
 
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-#include <diagnostic-logs-provider-delegate-impl.h>
-static uint8_t retrievalBuffer[CONFIG_RETRIEVAL_BUFFER_SIZE]; // Global static buffer used to retrieve diagnostics
-static uint8_t endUserBuffer[CONFIG_END_USER_BUFFER_SIZE];    // Global static buffer used to store diagnostics
-
-using namespace chip::app::Clusters::DiagnosticLogs;
 void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
 {
     auto & logProvider = LogProvider::GetInstance();
