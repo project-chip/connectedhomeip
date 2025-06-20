@@ -89,7 +89,7 @@ public:
      *         Returns an appropriate error code if clearing the error list fails
      */
     virtual CHIP_ERROR ClearErrorList() = 0;
-    
+
     /**
      * @brief Adds an error to the current error list.
      *

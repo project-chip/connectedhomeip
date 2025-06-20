@@ -82,7 +82,7 @@ CHIP_ERROR ClosureControlDelegate::AddErrorToCurrentErrorList(ClosureErrorEnum e
     // Check for duplicates
     for (size_t i = 0; i < mCurrentErrorCount; ++i)
     {
-        VerifyOrReturnError(mCurrentErrorList[i] != error, CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED, 
+        VerifyOrReturnError(mCurrentErrorList[i] != error, CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED,
                             ChipLogError(AppServer, "Error already exists in the list"));
     }
     mCurrentErrorList[mCurrentErrorCount++] = error;
