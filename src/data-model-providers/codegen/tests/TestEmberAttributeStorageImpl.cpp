@@ -56,8 +56,8 @@ TEST(EmberAttributeStorageImpl, TestStorage)
 
     {
         uint8_t buff[8];
-        constexpr uint8_t kData1[] {1,2,3, 4};
-        constexpr uint8_t kData2[] {1,2,7, 8};
+        constexpr uint8_t kData1[]{ 1, 2, 3, 4 };
+        constexpr uint8_t kData2[]{ 1, 2, 7, 8 };
 
         LongPascalString str(buff);
         EXPECT_EQ(storage.Read({ 0, 2, 2 }, str), CHIP_ERROR_KEY_NOT_FOUND);
