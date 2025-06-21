@@ -42,6 +42,15 @@ class App:
         self.options = None
         self.killed = False
 
+    @property
+    def returncode(self):
+        """Exposes return code of the underlying process, so that
+           common code can be used between subprocess.Popen and Apps.
+        """
+        if not self.process:
+            return None
+        return self.process.returncode
+
     def start(self, options=None):
         if not self.process:
             # Cache command line options to be used for reboots
