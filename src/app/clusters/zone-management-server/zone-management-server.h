@@ -82,19 +82,6 @@ public:
                                                                         const TwoDCartesianZoneDecodableStruct & zone) = 0;
 
     /**
-     *    @brief Command Delegate for retrieval of a TwoDCartesianZone for a given zoneID.
-     *
-     *   @param[in] zoneID    Indicates the ID of the zone to fetch.
-     *   @param[out]  outZones  TwoDCartesian zone being fetched.
-     *   Note: The whole list of zones is returned if zoneID is null.
-     *
-     *   @return Success if the retrieval is successful; otherwise, the command SHALL be
-     *   rejected with an appropriate error.
-     */
-    virtual Protocols::InteractionModel::Status GetTwoDCartesianZone(const Optional<DataModel::Nullable<uint16_t>> zoneID,
-                                                                     const std::vector<TwoDCartesianZoneStruct> & outZones) = 0;
-
-    /**
      *    @brief Command Delegate for the removal of a TwoDCartesianZone for a given zoneID.
      *
      *   @param[in] zoneID  Indicates the ID of the zone to remove.
@@ -211,9 +198,11 @@ public:
     const TwoDCartesianVertexStruct & GetTwoDCartesianMax() const { return mTwoDCartesianMax; }
 
     CHIP_ERROR AddZone(const ZoneInformationStruct & zone);
+    CHIP_ERROR UpdateZone(uint16_t zoneId, const ZoneInformationStruct & zone);
     CHIP_ERROR RemoveZone(uint16_t zoneId);
 
     CHIP_ERROR AddTrigger(const ZoneTriggerControlStruct & trigger);
+    CHIP_ERROR UpdateTrigger(uint16_t zoneId, const ZoneTriggerControlStruct & trigger);
     CHIP_ERROR RemoveTrigger(uint16_t zoneId);
 
     // Send Zone events
@@ -231,6 +220,7 @@ private:
     const uint8_t mMaxZones;
     const uint8_t mSensitivityMax;
     const TwoDCartesianVertexStruct mTwoDCartesianMax;
+    uint8_t mUserDefinedZonesCount = 0;
 
     std::vector<ZoneInformationStruct> mZones;
     std::vector<ZoneTriggerControlStruct> mTriggers;
@@ -253,6 +243,7 @@ private:
     CHIP_ERROR ReadAndEncodeTriggers(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
     Protocols::InteractionModel::Status ValidateTwoDCartesianZone(const TwoDCartesianZoneDecodableStruct & zone);
+
     /**
      * @brief Inherited from CommandHandlerInterface
      */
@@ -261,8 +252,6 @@ private:
     void HandleCreateTwoDCartesianZone(HandlerContext & ctx, const Commands::CreateTwoDCartesianZone::DecodableType & req);
 
     void HandleUpdateTwoDCartesianZone(HandlerContext & ctx, const Commands::UpdateTwoDCartesianZone::DecodableType & req);
-
-    void HandleGetTwoDCartesianZone(HandlerContext & ctx, const Commands::GetTwoDCartesianZone::DecodableType & req);
 
     void HandleRemoveZone(HandlerContext & ctx, const Commands::RemoveZone::DecodableType & req);
 
