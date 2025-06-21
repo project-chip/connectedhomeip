@@ -238,21 +238,6 @@ void ZoneMgmtServer::InvokeCommand(HandlerContext & handlerContext)
         }
         return;
 
-    case Commands::GetTwoDCartesianZone::Id:
-        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Get TwoDCartesian Zone", mEndpointId);
-
-        if (!HasFeature(Feature::kTwoDimensionalCartesianZone))
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
-        }
-        else
-        {
-            HandleCommand<Commands::GetTwoDCartesianZone::DecodableType>(
-                handlerContext,
-                [this](HandlerContext & ctx, const auto & commandData) { HandleGetTwoDCartesianZone(ctx, commandData); });
-        }
-        return;
-
     case Commands::RemoveZone::Id:
         ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Removing TwoDCartesian Zone", mEndpointId);
 
@@ -294,6 +279,12 @@ CHIP_ERROR ZoneMgmtServer::AddZone(const ZoneInformationStruct & zone)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ZoneMgmtServer::UpdateZone(uint16_t zoneId, const ZoneInformationStruct & zone)
+{
+    // TODO: Update zone
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ZoneMgmtServer::RemoveZone(uint16_t zoneId)
 {
     mZones.erase(
@@ -313,6 +304,12 @@ CHIP_ERROR ZoneMgmtServer::AddTrigger(const ZoneTriggerControlStruct & trigger)
     mDelegate.OnAttributeChanged(Attributes::Triggers::Id);
     MatterReportingAttributeChangeCallback(path);
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ZoneMgmtServer::UpdateTrigger(uint16_t zoneId, const ZoneTriggerControlStruct & trigger)
+{
+    // TODO: Update trigger
     return CHIP_NO_ERROR;
 }
 
@@ -360,9 +357,48 @@ void ZoneMgmtServer::HandleCreateTwoDCartesianZone(HandlerContext & ctx,
         return;
     }
 
+    VerifyOrReturn(mUserDefinedZonesCount < mMaxUserDefinedZones,
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted));
+
+    if (zoneToCreate.use == ZoneUseEnum::kFocus && !HasFeature(Feature::kFocusZones))
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        return;
+    }
+
+    auto iter = zoneToCreate.vertices.begin();
+    while (iter.Next())
+    {
+        auto vertex = iter.GetValue();
+        if (vertex.x > mTwoDCartesianMax.x || vertex.y > mTwoDCartesianMax.y)
+        {
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+            return;
+        }
+    }
+
+    // Check the list validity
+    CHIP_ERROR err = iter.GetStatus();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "HandleCreateTwoDCartesianZone: Vertices list error: %" CHIP_ERROR_FORMAT, err.Format());
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        return;
+    }
+
     // Call the delegate
     status = mDelegate.CreateTwoDCartesianZone(zoneToCreate, zoneID);
-    if (status != Status::Success)
+    if (status == Status::Success)
+    {
+        ZoneInformationStruct zone;
+        zone.zoneID     = zoneID;
+        zone.zoneType   = ZoneTypeEnum::kTwoDCARTZone;
+        zone.zoneSource = ZoneSourceEnum::kUser;
+
+        AddZone(zone);
+        mUserDefinedZonesCount++;
+    }
+    else
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
@@ -379,15 +415,63 @@ void ZoneMgmtServer::HandleUpdateTwoDCartesianZone(HandlerContext & ctx,
     auto & zoneToUpdate = commandData.zone;
 
     Status status = ValidateTwoDCartesianZone(zoneToUpdate);
+
     if (status != Status::Success)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
     }
 
+    auto foundZone =
+        std::find_if(mZones.begin(), mZones.end(), [&](const ZoneInformationStruct & z) { return z.zoneID == zoneID; });
+    if (foundZone == mZones.end())
+    {
+        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: No zone exists by id %d", mEndpointId, zoneID);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+        return;
+    }
+
+    if (foundZone->zoneSource == ZoneSourceEnum::kMfg)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        return;
+    }
+
+    if (foundZone->zoneType != ZoneTypeEnum::kTwoDCARTZone)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+        return;
+    }
+
+    auto iter = zoneToUpdate.vertices.begin();
+    while (iter.Next())
+    {
+        auto vertex = iter.GetValue();
+        if (vertex.x > mTwoDCartesianMax.x || vertex.y > mTwoDCartesianMax.y)
+        {
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+            return;
+        }
+    }
+
+    // Check the list validity
+    CHIP_ERROR err = iter.GetStatus();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "HandleUpdateTwoDCartesianZone: Vertices list error: %" CHIP_ERROR_FORMAT, err.Format());
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        return;
+    }
+
     // Call the delegate
     status = mDelegate.UpdateTwoDCartesianZone(zoneID, zoneToUpdate);
-    if (status != Status::Success)
+    if (status == Status::Success)
+    {
+        ZoneInformationStruct zone;
+        // TODO: Populate zone
+        UpdateZone(zoneID, zone);
+    }
+    else
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
@@ -396,35 +480,43 @@ void ZoneMgmtServer::HandleUpdateTwoDCartesianZone(HandlerContext & ctx,
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
 }
 
-void ZoneMgmtServer::HandleGetTwoDCartesianZone(HandlerContext & ctx,
-                                                const Commands::GetTwoDCartesianZone::DecodableType & commandData)
-{
-    Commands::GetTwoDCartesianZoneResponse::Type response;
-    Optional<DataModel::Nullable<uint16_t>> zoneID = commandData.zoneID;
-
-    std::vector<TwoDCartesianZoneStruct> zones;
-    // Call the delegate
-    Status status = mDelegate.GetTwoDCartesianZone(zoneID, zones);
-
-    if (status != Status::Success)
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-        return;
-    }
-
-    response.zones = DataModel::List<const TwoDCartesianZoneStruct>(zones.data(), zones.size());
-
-    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
-}
-
 void ZoneMgmtServer::HandleRemoveZone(HandlerContext & ctx, const Commands::RemoveZone::DecodableType & commandData)
 {
     uint16_t zoneID = commandData.zoneID;
 
+    auto foundZone =
+        std::find_if(mZones.begin(), mZones.end(), [&](const ZoneInformationStruct & z) { return z.zoneID == zoneID; });
+    if (foundZone == mZones.end())
+    {
+        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: No zone exists by id %d", mEndpointId, zoneID);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+        return;
+    }
+
+    if (foundZone->zoneSource == ZoneSourceEnum::kMfg)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        return;
+    }
+
+    auto foundTrigger =
+        std::find_if(mTriggers.begin(), mTriggers.end(), [&](const ZoneTriggerControlStruct & t) { return t.zoneID == zoneID; });
+    if (foundTrigger != mTriggers.end())
+    {
+        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: Zone id %d is referenced in zone triggers", mEndpointId, zoneID);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
+        return;
+    }
+
     // Call the delegate
     Status status = mDelegate.RemoveZone(zoneID);
 
-    if (status != Status::Success)
+    if (status == Status::Success)
+    {
+        RemoveZone(zoneID);
+        mUserDefinedZonesCount--;
+    }
+    else
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
@@ -438,10 +530,35 @@ void ZoneMgmtServer::HandleCreateOrUpdateTrigger(HandlerContext & ctx,
 {
     ZoneTriggerControlStruct trigger = commandData.trigger;
 
+    auto foundZone =
+        std::find_if(mZones.begin(), mZones.end(), [&](const ZoneInformationStruct & z) { return z.zoneID == trigger.zoneID; });
+    if (foundZone == mZones.end())
+    {
+        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: No zone exists by id %d", mEndpointId, trigger.zoneID);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+        return;
+    }
+
+    // TODO: ZoneUse check after TwoDCartesianStruct lands in
+    // ZoneInformationStruct(Spec PR #11732)
+
     // Call the delegate
     Status status = mDelegate.CreateOrUpdateTrigger(trigger);
 
-    if (status != Status::Success)
+    if (status == Status::Success)
+    {
+        auto foundTrigger = std::find_if(mTriggers.begin(), mTriggers.end(),
+                                         [&](const ZoneTriggerControlStruct & t) { return t.zoneID == trigger.zoneID; });
+        if (foundTrigger == mTriggers.end())
+        {
+            AddTrigger(trigger);
+        }
+        else
+        {
+            UpdateTrigger(foundTrigger->zoneID, trigger);
+        }
+    }
+    else
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
@@ -454,10 +571,23 @@ void ZoneMgmtServer::HandleRemoveTrigger(HandlerContext & ctx, const Commands::R
 {
     uint16_t zoneID = commandData.zoneID;
 
+    auto foundTrigger =
+        std::find_if(mTriggers.begin(), mTriggers.end(), [&](const ZoneTriggerControlStruct & t) { return t.zoneID == zoneID; });
+    if (foundTrigger == mTriggers.end())
+    {
+        ChipLogError(Zcl, "ZoneMgmt[ep=%d]: Trigger for zone id %d does not exist", mEndpointId, zoneID);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+        return;
+    }
+
     // Call the delegate
     Status status = mDelegate.RemoveTrigger(zoneID);
 
-    if (status != Status::Success)
+    if (status == Status::Success)
+    {
+        RemoveTrigger(zoneID);
+    }
+    else
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
         return;
