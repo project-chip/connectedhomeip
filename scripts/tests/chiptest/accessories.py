@@ -41,9 +41,6 @@ class AppsRegister:
     def uninit(self):
         self.__stopXMLRPCServer()
 
-    def __repr__(self) -> str:
-        return f'AppsRegister[accessories=({', '.join(self.__accessories.keys())})]'
-
     @property
     def accessories(self):
         """List of registered accessory applications."""
