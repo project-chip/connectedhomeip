@@ -42,7 +42,7 @@ class AppsRegister:
         self.__stopXMLRPCServer()
 
     def __repr__(self) -> str:
-        return f'AppsRegister[accessories=({','.join(self.__accessories.keys())})]'
+        return f'AppsRegister[accessories=({', '.join(self.__accessories.keys())})]'
 
     @property
     def accessories(self):
