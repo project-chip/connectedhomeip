@@ -76,10 +76,11 @@ constexpr uint8_t kMaxZoomValue = 75;
 class CameraDevice : public CameraDeviceInterface, public CameraDeviceInterface::CameraHALInterface
 {
 public:
-    chip::app::Clusters::ChimeDelegate & GetChimeDelegate() override;
-    chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate() override;
-    chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() override;
-    chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
+    chip::app::Clusters::ChimeController & GetChimeDelegate() override;
+    chip::app::Clusters::WebRTCTransportProvider::WebRTCProviderController & GetWebRTCProviderDelegate() override;
+    chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtDelegate() override;
+    chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAVSettingsUserLevelController &
+    GetCameraAVSettingsUserLevelMgmtDelegate() override;
 
     MediaController & GetMediaController() override;
 

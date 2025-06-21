@@ -37,6 +37,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
+using namespace chip::app::Clusters::WebRTCTransportProvider;
 
 using namespace Camera;
 
@@ -1210,22 +1211,22 @@ void CameraDevice::InitializeSnapshotStreams()
     mSnapshotStreams.push_back(snapshotStream);
 }
 
-ChimeDelegate & CameraDevice::GetChimeDelegate()
+ChimeController & CameraDevice::GetChimeDelegate()
 {
     return mChimeManager;
 }
 
-WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
+WebRTCProviderController & CameraDevice::GetWebRTCProviderDelegate()
 {
     return mWebRTCProviderManager;
 }
 
-CameraAVStreamMgmtDelegate & CameraDevice::GetCameraAVStreamMgmtDelegate()
+CameraAVStreamController & CameraDevice::GetCameraAVStreamMgmtDelegate()
 {
     return mCameraAVStreamManager;
 }
 
-CameraAvSettingsUserLevelManagement::Delegate & CameraDevice::GetCameraAVSettingsUserLevelMgmtDelegate()
+CameraAVSettingsUserLevelController & CameraDevice::GetCameraAVSettingsUserLevelMgmtDelegate()
 {
     return mCameraAVSettingsUserLevelManager;
 }

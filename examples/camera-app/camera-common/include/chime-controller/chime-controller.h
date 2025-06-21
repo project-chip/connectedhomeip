@@ -17,30 +17,26 @@
  */
 
 #pragma once
-#include "chime-controller.h"
+
+#include <app/clusters/chime-server/chime-server.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
-class ChimeManager : public ChimeController
+/**
+ * The application interface to define the options & implement commands.
+ */
+class ChimeController : public ChimeDelegate
 {
-
 public:
-    ChimeManager() {}
+    virtual ~ChimeController() = default;
 
     // Chime Delegate methods
-    CHIP_ERROR GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, chip::MutableCharSpan & name) override;
-    CHIP_ERROR GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID) override;
+    CHIP_ERROR GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, chip::MutableCharSpan & name) override = 0;
+    CHIP_ERROR GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID) override                                  = 0;
 
-    chip::Protocols::InteractionModel::Status PlayChimeSound() override;
-
-private:
-    using ChimeSoundStructType = chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type;
-
-    const ChimeSoundStructType mChimeSounds[1] = {
-        ChimeSoundStructType{ .chimeID = 0, .name = chip::CharSpan::fromCharString("Basic Door Chime") },
-    };
+    chip::Protocols::InteractionModel::Status PlayChimeSound() override = 0;
 };
 
 } // namespace Clusters
