@@ -50,13 +50,6 @@ Protocols::InteractionModel::Status ZoneManager::UpdateTwoDCartesianZone(uint16_
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status ZoneManager::GetTwoDCartesianZone(const Optional<DataModel::Nullable<uint16_t>> zoneID,
-                                                                      const std::vector<TwoDCartesianZoneStruct> & outZones)
-{
-
-    return Status::Success;
-}
-
 Protocols::InteractionModel::Status ZoneManager::RemoveZone(uint16_t zoneID)
 {
 

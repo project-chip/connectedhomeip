@@ -41,9 +41,6 @@ public:
     Protocols::InteractionModel::Status UpdateTwoDCartesianZone(uint16_t zoneID,
                                                                 const TwoDCartesianZoneDecodableStruct & zone) override;
 
-    Protocols::InteractionModel::Status GetTwoDCartesianZone(const Optional<DataModel::Nullable<uint16_t>> zoneID,
-                                                             const std::vector<TwoDCartesianZoneStruct> & outZones) override;
-
     Protocols::InteractionModel::Status RemoveZone(uint16_t zoneID) override;
 
     Protocols::InteractionModel::Status CreateOrUpdateTrigger(const ZoneTriggerControlStruct & zoneTrigger) override;
