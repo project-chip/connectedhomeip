@@ -400,12 +400,12 @@ CHIP_ERROR BasicInformationCluster::Attributes(const ConcreteClusterPath & path,
 
 CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
 {
-    ReturnErrorOnFailure(BasicInformationLogic::Instance().Init(*context.attributeStorage));
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
     if (PlatformMgr().GetDelegate() == nullptr)
     {
         PlatformMgr().SetDelegate(this);
     }
-    return DefaultServerCluster::Startup(context);
+    return BasicInformationLogic::Instance().Init(*context.attributeStorage);
 }
 
 void BasicInformationCluster::Shutdown()

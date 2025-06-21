@@ -36,7 +36,7 @@ CHIP_ERROR BasicInformationLogic::Init(Storage::AttributeStorage & storage)
 {
     Storage::ShortPascalString labelBuffer(mNodeLabelBuffer);
     CHIP_ERROR err = storage.Read({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, labelBuffer);
-    if (err == CHIP_ERROR_KEY_NOT_FOUND)
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         err = CHIP_NO_ERROR;
     }
