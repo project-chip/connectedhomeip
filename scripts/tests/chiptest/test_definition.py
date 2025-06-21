@@ -42,6 +42,9 @@ class App:
         self.options = None
         self.killed = False
 
+    def __repr__(self) -> str:
+        return f'App[{self.command!r} - status {self.returncode}]'
+
     @property
     def returncode(self):
         """Exposes return code of the underlying process, so that
