@@ -91,6 +91,8 @@ class HostApp(Enum):
     TERMS_AND_CONDITIONS = auto()
     CAMERA = auto()
     CAMERA_CONTROLLER = auto()
+    JF_CONTROL = auto()
+    JF_ADMIN = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -173,6 +175,10 @@ class HostApp(Enum):
             return 'camera-app/linux'
         elif self == HostApp.CAMERA_CONTROLLER:
             return 'camera-controller'
+        elif self == HostApp.JF_CONTROL:
+            return 'jf-control-app'
+        elif self == HostApp.JF_ADMIN:
+            return 'jf-admin-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -303,6 +309,10 @@ class HostApp(Enum):
         elif self == HostApp.CAMERA_CONTROLLER:
             yield 'chip-camera-controller'
             yield 'chip-camera-controller.map'
+        elif self == HostApp.JF_CONTROL:
+            yield 'jfc-app'
+        elif self == HostApp.JF_ADMIN:
+            yield 'jfa-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
