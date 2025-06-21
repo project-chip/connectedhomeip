@@ -86,9 +86,7 @@ class JFControllerSubprocess(Subprocess):
     PREFIX = b"[JF-CTRL]"
 
     def __init__(self, app: str, rpc_server_port: int, storage_dir: str,
-                 vendor_id: hex, extra_args: list[str] = []):
-
-        self.kvs_fd, self.kvs_path = tempfile.mkstemp(dir=storage_dir)
+                 vendor_id: int, extra_args: list[str] = []):
 
         # Build the command list
         command = [app]
@@ -104,7 +102,3 @@ class JFControllerSubprocess(Subprocess):
         # Start the server application
         super().__init__(*command,  # Pass the constructed command list
                          output_cb=lambda line, is_stderr: self.PREFIX + line)
-
-    def __del__(self):
-        # Remove file used for storage
-        os.remove(self.storage_dir)
