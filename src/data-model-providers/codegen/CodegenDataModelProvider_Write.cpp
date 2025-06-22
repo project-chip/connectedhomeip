@@ -94,6 +94,11 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 {
     if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
     {
+        if (request.path.mDataVersion.HasValue())
+        {
+            VerifyOrReturnError(request.path.mDataVersion.Value() == cluster->GetDataVersion(request.path),
+                                Status::DataVersionMismatch);
+        }
         return cluster->WriteAttribute(request, decoder);
     }
 
