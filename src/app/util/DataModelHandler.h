@@ -21,3 +21,8 @@
  * data model messages.
  */
 void InitDataModelHandler();
+
+/**
+ * Shutdown the data model.
+ */
+void ShutdownDataModelHandler();

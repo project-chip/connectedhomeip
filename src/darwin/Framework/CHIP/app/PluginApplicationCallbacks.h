@@ -23,5 +23,7 @@
  */
 
 void MatterDescriptorPluginServerInitCallback();
+void MatterDescriptorPluginServerShutdownCallback();
 
 #define MATTER_PLUGINS_INIT MatterDescriptorPluginServerInitCallback();
+#define MATTER_PLUGINS_SHUTDOWN MatterDescriptorPluginServerShutdownCallback();
