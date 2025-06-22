@@ -133,5 +133,12 @@ CHIP_ERROR DefaultServerCluster::GeneratedCommands(const ConcreteClusterPath & p
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DefaultServerCluster::ValidateDataVersion(Optional<DataVersion> version)
+{
+    VerifyOrReturnError(version.HasValue(), CHIP_NO_ERROR);
+    VerifyOrReturnError(version.Value() == mDataVersion, CHIP_IM_GLOBAL_STATUS(DataVersionMismatch));
+    return CHIP_NO_ERROR;
+}
+
 } // namespace app
 } // namespace chip

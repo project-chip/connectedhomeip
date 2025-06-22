@@ -344,6 +344,7 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteAttribute(const Data
                                                                       AttributeValueDecoder & decoder)
 {
     using namespace BasicInformation::Attributes;
+    ReturnErrorOnFailure(ValidateDataVersion(request.path.mDataVersion));
 
     switch (request.path.mAttributeId)
     {

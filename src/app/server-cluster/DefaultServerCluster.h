@@ -103,6 +103,11 @@ protected:
 
     void IncreaseDataVersion() { mDataVersion++; }
 
+    /// Checks that `version` matches the current data version,
+    /// returns CHIP_IM_ERROR(DataVersionMismatch) if version is
+    /// a set value not matching the current cluster version
+    CHIP_ERROR ValidateDataVersion(Optional<DataVersion> version);
+
     /// Marks that a specific attribute has changed value
     ///
     /// This increases cluster data version and if a cluster context is available it will
