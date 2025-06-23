@@ -35,7 +35,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import queue
 import time
 import typing
 from datetime import datetime, timedelta, timezone
