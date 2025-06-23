@@ -28,7 +28,7 @@ using namespace ::chip::DeviceLayer::Internal;
 static chip::OTAMultiImageProcessorImpl gImageProcessor;
 
 #if SL_WIFI && !SLI_SI91X_MCU_INTERFACE
-#include <platform/silabs/wifi/wf200/platform/spi_multiplex.h>
+#include <platform/silabs/wifi/ncp/spi_multiplex.h>
 #endif // SL_WIFI
 
 extern "C" {

@@ -331,6 +331,16 @@ template("siwx917_sdk") {
       defines += [ "DIC_ENABLE=1" ]
     }
 
+    if (chip_enable_multi_ota_requestor) {
+      if (chip_enable_multi_ota_encryption) {
+        defines += [ "SL_MATTER_ENABLE_OTA_ENCRYPTION=1" ]
+      }
+
+      if (chip_enable_ota_custom_tlv_testing) {
+        defines += [ "OTA_TEST_CUSTOM_TLVS=1" ]
+      }
+    }
+
     if (aws_sdk_ota) {
       defines += [ "ENABLE_AWS_OTA_FEAT=1" ]
     }
