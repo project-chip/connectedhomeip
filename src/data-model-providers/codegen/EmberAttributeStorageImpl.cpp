@@ -139,7 +139,7 @@ CHIP_ERROR EmberAttributeStorageImpl::Read(const ConcreteAttributePath & path, B
         // first byte should be a valid size, If we read an empty value, empty it out
         if (raw.empty())
         {
-            *reinterpret_cast<uint8_t *>(buffer.data()) = 0;
+            *reinterpret_cast<uint8_t *>(buffer.data())       = 0;
             *(reinterpret_cast<uint8_t *>(buffer.data()) + 1) = 0;
         }
         else
