@@ -1796,6 +1796,9 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
 
     DataModel::AcceptedCommandEntry acceptedCommandEntry;
 
+    // Execute the ACL Access Granting Algorithm before existence checks, assuming the required_privilege for the element is
+    // Operate, to determine if the subject would have had at least some access against the concrete path. This is done so we don't
+    // leak information if we do fail existence checks.
     Status status = CheckCommandAccess(request, Access::Privilege::kOperate);
     VerifyOrReturnValue(status == Status::Success, status);
 

@@ -765,11 +765,12 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
                                                               const ConcreteAttributePath & aPath)
 {
 
-    // 1. To make sure that we have at least some access against the concrete path.
+    // Execute the ACL Access Granting Algorithm before existence checks, assuming the required_privilege for the element is
+    // View, to determine if the subject would have had at least some access against the concrete path. This is done so we don't
+    // leak information if we do fail existence checks.
     Status writeAccessStatus = CheckWriteAccess(aSubject, aPath, Access::Privilege::kView);
     VerifyOrReturnValue(writeAccessStatus == Status::Success, writeAccessStatus);
 
-    // 2. Get AttributeEntry
     DataModel::AttributeFinder finder(mDataModelProvider);
 
     std::optional<DataModel::AttributeEntry> attributeEntry = finder.Find(aPath);
@@ -787,7 +788,7 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     // Allow writes on writable attributes only
     VerifyOrReturnValue(attributeEntry->GetWritePrivilege().has_value(), Status::UnsupportedWrite);
 
-    // 3. Execute the ACL Access Granting Algorithm against the concrete path a second time, using the actual required_privilege
+    // Execute the ACL Access Granting Algorithm against the concrete path a second time, using the actual required_privilege
     writeAccessStatus = CheckWriteAccess(aSubject, aPath, *attributeEntry->GetWritePrivilege());
     VerifyOrReturnValue(writeAccessStatus == Status::Success, writeAccessStatus);
 
@@ -824,8 +825,6 @@ Status WriteHandler::CheckWriteAccess(const Access::SubjectDescriptor & aSubject
                                          .requestType = Access::RequestType::kAttributeWriteRequest,
                                          .entityId    = aPath.mAttributeId };
 
-        //  NOTE: we know that attributeEntry has a GetWritePrivilege based on the check before the call to this function.
-        //        so we just directly reference it.
         CHIP_ERROR err = Access::GetAccessControl().Check(aSubject, requestPath, aRequiredPrivilege);
 
         if (err == CHIP_NO_ERROR)
