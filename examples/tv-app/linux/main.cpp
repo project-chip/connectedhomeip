@@ -44,7 +44,6 @@ void ApplicationInit()
     // supported clusters so that ZAP will generated the requisite code.
     ChipLogDetail(DeviceLayer, "TV Linux App: Warning - Fixed Content App Endpoint Not Disabled");
     // Can't disable this without breaking CI unit tests that act upon account login cluster (only available on ep3)
-    // emberAfEndpointEnableDisable(3, false);
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     // Install Content Apps
