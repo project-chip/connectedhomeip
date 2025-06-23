@@ -106,9 +106,9 @@ Status __attribute__((weak)) AppPlatformExternalAttributeReadCallback(EndpointId
     return (Status::Failure);
 }
 
-Status __attribute__((weak)) AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                                                       const EmberAfAttributeMetadata * attributeMetadata,
-                                                                       uint8_t * buffer)
+Status __attribute__((weak))
+AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
+                                          const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
     return (Status::Failure);
 }
