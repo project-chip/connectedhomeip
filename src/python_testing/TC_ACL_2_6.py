@@ -42,10 +42,14 @@ from mobly import asserts
 
 
 class TC_ACL_2_6(MatterBaseTest):
-    async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlExtensionChanged) -> int:
+    async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlEntryChanged) -> int:
         event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
         events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
-        return max([e.Header.EventNumber for e in events])
+
+        if not events:
+            raise AssertionError(f"No events found for {acec_event} to determine latest event number.")
+
+        return max(e.Header.EventNumber for e in events)
 
     # Compare events by their relevant fields instead of string representation
     def event_key(self, event):
@@ -103,6 +107,7 @@ class TC_ACL_2_6(MatterBaseTest):
             fabricFiltered=True
         )
         logging.info(f"Events response: {events_response}")
+        events_response = [events_response[0]]
 
         # If we found events via read, verify them
         expected_event = Clusters.AccessControl.Events.AccessControlEntryChanged(
@@ -118,6 +123,7 @@ class TC_ACL_2_6(MatterBaseTest):
             ),
             fabricIndex=f1
         )
+        asserts.assert_equal(len(events_response), 1, "Expected 1 event")
 
         # Verify read events match expectations
         found = False
@@ -126,6 +132,8 @@ class TC_ACL_2_6(MatterBaseTest):
                 found = True
                 break
         asserts.assert_true(found, "Expected event not found in read response")
+
+        latest_event_number = await self.get_latest_event_number(acec_event)
 
         self.step(4)
         # Write ACL attribute
@@ -165,7 +173,8 @@ class TC_ACL_2_6(MatterBaseTest):
         events_response = await self.th1.ReadEvent(
             self.dut_node_id,
             events=[(0, acec_event)],
-            fabricFiltered=True
+            fabricFiltered=True,
+            eventNumberFilter=latest_event_number + 1
         )
         logging.info(f"Read events response: {events_response}")
 
@@ -244,12 +253,12 @@ class TC_ACL_2_6(MatterBaseTest):
 
         self.step(7)
         # Verify no events for invalid entry via read as well
-        latest_event_num = await self.get_latest_event_number(acec_event)
+        latest_event_number = await self.get_latest_event_number(acec_event)
         events_response = await self.th1.ReadEvent(
             self.dut_node_id,
             events=[(0, acec_event)],
             fabricFiltered=True,
-            eventNumberFilter=latest_event_num + 1
+            eventNumberFilter=latest_event_number + 1
         )
 
         # Check if any of the read events correspond to the invalid entry
