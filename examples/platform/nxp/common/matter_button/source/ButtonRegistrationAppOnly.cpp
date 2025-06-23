@@ -23,7 +23,6 @@
 
 #include <lib/support/CodeUtils.h>
 
-
 CHIP_ERROR chip::NXP::App::RegisterButtons(void)
 {
     ReturnErrorOnFailure(ButtonMgr().Init());
