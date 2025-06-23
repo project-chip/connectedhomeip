@@ -351,8 +351,7 @@ CHIP_ERROR BasicAttrAccess::WriteLocation(AttributeValueDecoder & aDecoder)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
-        ChipLogError(Zcl, "Invalid country code: '%s'",
-                     InlineString(100, static_cast<int>(location.size()), location.data()));
+        ChipLogError(Zcl, "Invalid country code: '%s'", InlineString(100, static_cast<int>(location.size()), location.data()));
 
 #pragma GCC diagnostic pop
 
