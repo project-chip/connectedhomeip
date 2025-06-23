@@ -36,6 +36,10 @@
 #include <lib/dnssd/minimal_mdns/responders/Txt.h>
 #include <lib/support/CHIPMem.h>
 
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+#include <dns_sd.h>
+#endif
+
 using chip::Dnssd::DnssdService;
 using chip::Dnssd::DnssdServiceProtocol;
 using chip::Dnssd::TextEntry;
@@ -78,8 +82,8 @@ class TestDnssd : public ::testing::Test
 public: // protected
     static void SetUpTestSuite()
     {
-        EXPECT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
-        EXPECT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
     }
     static void TearDownTestSuite()
     {
@@ -110,7 +114,7 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
     auto * ctx = static_cast<TestDnssd *>(context);
     char addrBuf[100];
 
-    EXPECT_NE(result, nullptr);
+    ASSERT_NE(result, nullptr);
     EXPECT_EQ(error, CHIP_NO_ERROR);
 
     if (!addresses.empty())
@@ -120,6 +124,8 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
     }
 
     EXPECT_EQ(result->mTextEntrySize, 1u);
+    // must have at least 1 entry to check next key/val expectations.
+    ASSERT_GE(result->mTextEntrySize, 1u);
     EXPECT_STREQ(result->mTextEntries[0].mKey, "key");
     EXPECT_STREQ(reinterpret_cast<const char *>(result->mTextEntries[0].mData), "val");
 
@@ -263,7 +269,13 @@ static void TestDnssdPublishService_DnssdInitCallback(void * context, CHIP_ERROR
     DnssdService service{};
     TextEntry entry{ "key", reinterpret_cast<const uint8_t *>("val"), 3 };
 
-    service.mInterface = chip::Inet::InterfaceId::Null();
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+    constexpr chip::Inet::InterfaceId kInterfaceId = chip::Inet::InterfaceId(kDNSServiceInterfaceIndexLocalOnly);
+#else
+    constexpr chip::Inet::InterfaceId kInterfaceId = chip::Inet::InterfaceId::Null();
+#endif
+
+    service.mInterface = kInterfaceId;
     service.mPort      = 80;
     strcpy(service.mHostName, "MatterTest");
     strcpy(service.mName, "test");
@@ -277,8 +289,8 @@ static void TestDnssdPublishService_DnssdInitCallback(void * context, CHIP_ERROR
 
     EXPECT_EQ(ChipDnssdPublishService(&service, HandlePublish, nullptr), CHIP_NO_ERROR);
 
-    EXPECT_EQ(ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolTcp, chip::Inet::IPAddressType::kAny,
-                              chip::Inet::InterfaceId::Null(), HandleBrowse, context, &ctx->mBrowseIdentifier),
+    EXPECT_EQ(ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolTcp, chip::Inet::IPAddressType::kAny, kInterfaceId,
+                              HandleBrowse, context, &ctx->mBrowseIdentifier),
               CHIP_NO_ERROR);
 }
 

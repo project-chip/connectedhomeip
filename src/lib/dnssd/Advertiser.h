@@ -27,6 +27,7 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/SafeString.h>
 #include <lib/support/Span.h>
+#include <platform/CHIPDeviceConfig.h>
 
 namespace chip {
 namespace Dnssd {
@@ -204,6 +205,15 @@ public:
     }
     CommissioningMode GetCommissioningMode() const { return mCommissioningMode; }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    CommissionAdvertisingParameters & SetJointFabricMode(BitFlags<JointFabricMode> mode)
+    {
+        mJointFabricMode = mode;
+        return *this;
+    }
+    BitFlags<JointFabricMode> GetJointFabricMode() const { return mJointFabricMode; }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
     CommissionAdvertisingParameters & SetDeviceType(std::optional<uint32_t> deviceType)
     {
         mDeviceType = deviceType;
@@ -291,6 +301,9 @@ private:
     uint16_t mLongDiscriminator          = 0; // 12-bit according to spec
     CommssionAdvertiseMode mMode         = CommssionAdvertiseMode::kCommissionableNode;
     CommissioningMode mCommissioningMode = CommissioningMode::kEnabledBasic;
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    BitFlags<JointFabricMode> mJointFabricMode;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     std::optional<uint16_t> mVendorId;
     std::optional<uint16_t> mProductId;
     std::optional<uint32_t> mDeviceType;

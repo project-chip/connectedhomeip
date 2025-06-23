@@ -51,9 +51,13 @@ qpg_executable("light_switch_app") {
   output_name = "chip-${qpg_target_ic}-light-switch-example.out"
 
   sources = [
-    "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.cpp",
+    "${examples_plat_dir}/app/battery.cpp",
     "${examples_plat_dir}/app/main.cpp",
     "${examples_plat_dir}/ota/ota.cpp",
+    "${qpg_sdk_root}/Applications/Matter/shared/src/application_header.c",
+    "${qpg_sdk_root}/Components/Qorvo/BSP/qButton/src/ButtonHandler.c",
+    "${qpg_sdk_root}/Components/Qorvo/BSP/qLed/src/StatusLed.c",
+    "${qpg_sdk_root}/Components/Qorvo/BSP/qPinCfg/src/qPinCfg.c",
     "src/AppTask.cpp",
     "src/SwitchManager.cpp",
     "src/ZclCallbacks.cpp",
@@ -69,7 +73,7 @@ qpg_executable("light_switch_app") {
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
-    "${chip_root}/third_party/qpg_sdk:qpg_switch_factorydata_lib",
+    "${chip_root}/third_party/qpg_sdk:qpg_switch_factorydata",
     "${chip_root}/third_party/qpg_sdk:qpg_switch_firmwaredata_lib",
   ]
 
@@ -82,9 +86,15 @@ qpg_executable("light_switch_app") {
   include_dirs = [
     "include",
     "${examples_plat_dir}/ota",
+    "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/halCortexM4/inc",
+    "${qpg_sdk_root}/Components/ThirdParty/secure_element/software/esec/libs/common",
+    "${qpg_sdk_root}/Components/ThirdParty/secure_element/software/esec/libs/base/include",  # esec_reatures.h
+    "${qpg_sdk_root}/Libraries/Qorvo/QorvoStack/gen/QorvoStack_qpg6200",  #esec_config.h
+    "${qpg_sdk_root}/Components/Qorvo/BSP/qButton/inc",
+    "${qpg_sdk_root}/Components/Qorvo/BSP/qLed/inc",
   ]
 
-  defines = []
+  defines = [ "GP_DIVERSITY_GPHAL_XP4002" ]
 
   if (chip_enable_pw_rpc) {
     defines += [
@@ -120,10 +130,6 @@ qpg_executable("light_switch_app") {
       "${chip_root}/examples/common",
       "${chip_root}/examples/common/pigweed/qpg",
     ]
-  } else {
-    # The below gives compiler erros in pigweed, therefore it is only enabled
-    # when rpc is not
-    cflags = [ "-Wconversion" ]
   }
 
   if (chip_build_libshell) {
@@ -138,7 +144,13 @@ qpg_executable("light_switch_app") {
     }
   }
 
-  ldscript = "${qpg_sdk_root}/Libraries/Qorvo/QorvoStack/gen/QorvoStack_${qpg_target_ic}${qpg_flavour}/QorvoStack_${qpg_target_ic}${qpg_flavour}.ld"
+  ldscript = "${qpg_sdk_root}/Libraries/Qorvo/QorvoStack/gen/QorvoStack_${qpg_target_ic}/QorvoStack_${qpg_target_ic}.ld"
+  ldscript = "${qpg_sdk_root}/Applications/Matter/base/gen/base_${qpg_target_ic}_development/base_${qpg_target_ic}_development.ld"
+
+  sources += [
+    "${examples_plat_dir}/diagnostic_logs/DiagnosticLogsProviderDelegateImpl.cpp",
+    "${examples_plat_dir}/diagnostic_logs/DiagnosticLogsProviderDelegateImpl.h",
+  ]
 
   inputs = [ ldscript ]
 

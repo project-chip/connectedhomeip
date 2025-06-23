@@ -234,7 +234,7 @@ namespace Inet {
 #endif // INET_CONFIG_ENABLE_IPV4
         {
             aAddress.ToString(addrStr);
-            if (interfaceIndex != InterfaceId::Null() && aAddress.IsIPv6LinkLocal()) {
+            if (interfaceIndex != InterfaceId::Null() && (aAddress.IsIPv6LinkLocal() || aAddress.IsIPv6Multicast())) {
                 char interface[InterfaceId::kMaxIfNameLength + 1] = {}; // +1 to prepend '%'
                 interface[0] = '%';
                 interface[1] = 0;

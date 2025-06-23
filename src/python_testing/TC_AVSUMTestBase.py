@@ -71,7 +71,7 @@ class AVSUMTestBase:
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     async def read_avstr_attribute_expect_success(self, endpoint, attribute):
-        cluster = Clusters.Objects.CameraAvStreamManagement
+        cluster = Clusters.CameraAvStreamManagement
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
     async def check_avsum_attribute(self, attribute, expected_value, endpoint):
@@ -211,17 +211,23 @@ class AVSUMTestBase:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
     async def video_stream_allocate_command(self, endpoint, expected_status: Status = Status.Success):
-        attrs = Clusters.Objects.CameraAvStreamManagement.Attributes
+        cluster = Clusters.Objects.CameraAvStreamManagement
+        attrs = cluster.Attributes
+
+        # Check for watermark and OSD features
+        feature_map = await self.read_avstr_attribute_expect_success(endpoint, attrs.FeatureMap)
+        watermark = True if (feature_map & cluster.Bitmaps.Feature.kWatermark) != 0 else None
+        osd = True if (feature_map & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
 
         # Get the parms from the device (those which are available)
-        aRankedStreamPriorities = await self.read_avstr_attribute_expect_success(endpoint, attrs.RankedVideoStreamPrioritiesList)
+        aStreamUsagePriorities = await self.read_avstr_attribute_expect_success(endpoint, attrs.StreamUsagePriorities)
         aRateDistortionTradeOffPoints = await self.read_avstr_attribute_expect_success(endpoint, attrs.RateDistortionTradeOffPoints)
         aMinViewport = await self.read_avstr_attribute_expect_success(endpoint, attrs.MinViewport)
         aVideoSensorParams = await self.read_avstr_attribute_expect_success(endpoint, attrs.VideoSensorParams)
 
         try:
             response = await self.send_single_cmd(cmd=Clusters.CameraAvStreamManagement.Commands.VideoStreamAllocate(
-                streamUsage=aRankedStreamPriorities[0],
+                streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
                 minFrameRate=30,
                 maxFrameRate=aVideoSensorParams.maxFPS,
@@ -230,8 +236,10 @@ class AVSUMTestBase:
                                                                                               height=aVideoSensorParams.sensorHeight),
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                minFragmentLen=2000,
-                maxFragmentLen=8000
+                minKeyFrameInterval=2000,
+                maxKeyFrameInterval=8000,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             ),
                 endpoint=endpoint)
 

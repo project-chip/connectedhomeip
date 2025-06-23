@@ -4681,10 +4681,13 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterContentAppObserverAttributeClusterRevisionID MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4)) = MTRAttributeIDTypeGlobalAttributeClusterRevisionID,
 
     // Cluster ZoneManagement attributes
-    MTRAttributeIDTypeClusterZoneManagementAttributeSupportedZoneSourcesID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
-    MTRAttributeIDTypeClusterZoneManagementAttributeZonesID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
-    MTRAttributeIDTypeClusterZoneManagementAttributeTriggersID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRAttributeIDTypeClusterZoneManagementAttributeSensitivityID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterZoneManagementAttributeMaxUserDefinedZonesID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
+    MTRAttributeIDTypeClusterZoneManagementAttributeMaxZonesID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
+    MTRAttributeIDTypeClusterZoneManagementAttributeZonesID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
+    MTRAttributeIDTypeClusterZoneManagementAttributeTriggersID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRAttributeIDTypeClusterZoneManagementAttributeSensitivityMaxID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRAttributeIDTypeClusterZoneManagementAttributeSensitivityID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRAttributeIDTypeClusterZoneManagementAttributeTwoDCartesianMaxID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
     MTRAttributeIDTypeClusterZoneManagementAttributeGeneratedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeGeneratedCommandListID,
     MTRAttributeIDTypeClusterZoneManagementAttributeAcceptedCommandListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID,
     MTRAttributeIDTypeClusterZoneManagementAttributeAttributeListID MTR_PROVISIONALLY_AVAILABLE = MTRAttributeIDTypeGlobalAttributeAttributeListID,
@@ -4710,7 +4713,7 @@ typedef NS_ENUM(uint32_t, MTRAttributeIDType) {
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedVideoStreamsID MTR_PROVISIONALLY_AVAILABLE = 0x0000000F,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedAudioStreamsID MTR_PROVISIONALLY_AVAILABLE = 0x00000010,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedSnapshotStreamsID MTR_PROVISIONALLY_AVAILABLE = 0x00000011,
-    MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeRankedVideoStreamPrioritiesListID MTR_PROVISIONALLY_AVAILABLE = 0x00000012,
+    MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeStreamUsagePrioritiesID MTR_PROVISIONALLY_AVAILABLE = 0x00000012,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSoftRecordingPrivacyModeEnabledID MTR_PROVISIONALLY_AVAILABLE = 0x00000013,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeSoftLivestreamPrivacyModeEnabledID MTR_PROVISIONALLY_AVAILABLE = 0x00000014,
     MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeHardPrivacyModeOnID MTR_PROVISIONALLY_AVAILABLE = 0x00000015,
@@ -7092,6 +7095,8 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterZoneManagementCommandGetTwoDCartesianZoneID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
     MTRCommandIDTypeClusterZoneManagementCommandGetTwoDCartesianZoneResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
     MTRCommandIDTypeClusterZoneManagementCommandRemoveZoneID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
+    MTRCommandIDTypeClusterZoneManagementCommandCreateOrUpdateTriggerID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
+    MTRCommandIDTypeClusterZoneManagementCommandRemoveTriggerID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
 
     // Cluster CameraAVStreamManagement commands
     MTRCommandIDTypeClusterCameraAVStreamManagementCommandAudioStreamAllocateID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,

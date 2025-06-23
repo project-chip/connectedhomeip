@@ -173,6 +173,7 @@
             "FeatureMap"
         ],
         "Administrator Commissioning": [
+            "ClusterRevision",
             "WindowStatus",
             "AdminFabricIndex",
             "AdminVendorId"
@@ -201,12 +202,20 @@
         ],
         "Bridged Device Basic Information": ["ProductAppearance"],
         "Chime": ["SelectedChime", "Enabled"],
-        "Closure Control": ["CountdownTime", "OverallState", "OverallTarget"],
+        "Closure Control": [
+            "CountdownTime",
+            "OverallState",
+            "OverallTarget",
+            "FeatureMap",
+            "ClusterRevision"
+        ],
         "Closure Dimension": [
             "CurrentState",
             "Target",
             "UnitRange",
-            "LimitRange"
+            "LimitRange",
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "Commodity Price": [
             "TariffUnit",
@@ -329,6 +338,21 @@
             "ProtocolVersion",
             "PowerThreshold",
             "FeatureMap"
+        ],
+        "Network Commissioning": [
+            "ClusterRevision",
+            "ConnectMaxTimeSeconds",
+            "FeatureMap",
+            "InterfaceEnabled",
+            "LastConnectErrorValue",
+            "LastNetworkID",
+            "LastNetworkingStatus",
+            "MaxNetworks",
+            "Networks",
+            "ScanMaxTimeSeconds",
+            "SupportedThreadFeatures",
+            "SupportedWiFiBands",
+            "ThreadVersion"
         ],
         "Occupancy Sensing": [
             "HoldTimeLimits",
@@ -733,18 +757,11 @@
             "MaxConcurrentEncoders",
             "MaxEncodedPixelRate",
             "NightVisionUsesInfrared",
-            "RateDistortionTradeOffPoints",
             "MaxContentBufferSize",
             "TwoWayTalkSupport",
-            "SnapshotCapabilities",
             "MaxNetworkBandwidth",
             "CurrentFrameRate",
             "HDRModeEnabled",
-            "SupportedStreamUsages",
-            "AllocatedVideoStreams",
-            "AllocatedAudioStreams",
-            "AllocatedSnapshotStreams",
-            "RankedVideoStreamPrioritiesList",
             "SoftRecordingPrivacyModeEnabled",
             "SoftLivestreamPrivacyModeEnabled",
             "HardPrivacyModeOn",
@@ -774,7 +791,8 @@
             "SoilMoistureMeasuredValue",
             "ClusterRevision"
         ],
-        "Unit Localization": ["TemperatureUnit"]
+        "Unit Localization": ["TemperatureUnit"],
+        "Zone Management": ["TwoDCartesianMax"]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",

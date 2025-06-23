@@ -22,10 +22,10 @@ declare_args() {
   # Location of the QPG SDK.
   qpg_sdk_root = "${chip_root}/third_party/qpg_sdk/repo"
 
-  # subdirectory in qpg_sdk_root where the binary library builds (.a) are to be found
+  # Subdirectory in qpg_sdk_root where the binary library builds (.a) are to be found
   qpg_sdk_lib_dir = "Work"
 
-  # an option to disable referencing qorvo object archive files (*.a)
+  # An option to disable referencing qorvo object archive files (*.a)
   qpg_sdk_include_platform_libs = true
 
   # Enable Sleepy end device
@@ -37,23 +37,12 @@ declare_args() {
   matter_ota_test_image = false
 }
 
-assert(qpg_sdk_root != "", "qpg_sdk_root must be specified")
-assert(qpg_target_ic != "", "qpg_target_ic must be specified")
+declare_args() {
+  # Root directory for FreeRTOS
+  freertos_root = "${qpg_sdk_root}/Components/ThirdParty/FreeRTOS"
+}
 
-# Defines an QPG SDK build target.
-#
-# Parameters:
-#   qpg_sdk_root - The location of the QPG SDK.
-#   sources - The sources files to build.
 template("qpg_sdk") {
-  if (defined(invoker.qpg_sdk_root)) {
-    qpg_sdk_root = invoker.qpg_sdk_root
-  }
-
-  if (defined(invoker.qpg_target_ic)) {
-    qpg_target_ic = invoker.qpg_target_ic
-  }
-
   assert(qpg_sdk_root != "", "qpg_sdk_root must be specified")
   assert(qpg_target_ic != "", "qpg_target_ic must be specified")
 
@@ -70,19 +59,33 @@ template("qpg_sdk") {
 
     include_dirs += [
       "${qpg_sdk_root}/Components/Qorvo/Matter/qvCHIP/inc",
-      "${qpg_sdk_root}/Components/Qorvo/BSP/qvIO/inc",
       "${openthread_root}/include",
+      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/include",
+      "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/inc",
+      "${qpg_sdk_root}/Components/Qorvo/BSP/qLed/inc",
+      "${qpg_sdk_root}/Components/Qorvo/BSP/qButton/inc",
+      "${qpg_sdk_root}/Components/Qorvo/BSP/qPinCfg/inc",
+      "${qpg_sdk_root}/Components/Qorvo/BSP/qPinCfg/inc/boards",
+      "${qpg_sdk_root}/Components/Qorvo/BSP/qPinCfg/inc/qpg6200",
+      "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/gpPeripheral/inc",
+      "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/gpPeripheral/xp400x/inc",
+      "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/gpPeripheral/xp4002/inc",
+      "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/gpRegMap/inc",
+      "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/gpRegMap/xp4002/inc",
+      "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/halCortexM4/inc",
+      "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/halCortexM4/xp4002/inc",
+      "${qpg_sdk_root}/Components/ThirdParty/mera/sw/appuc",
+      "${qpg_sdk_root}/Components/ThirdParty/mera/sw/regmap",
+      "${qpg_sdk_root}/Components/ThirdParty/mera/sw/sys_regmap",
+      "${qpg_sdk_root}/Components/ThirdParty/mera/sw/regmap",
+      "${qpg_sdk_root}/Components/ThirdParty/CMSIS_5/CMSIS/Core/Include",
+      "${qpg_sdk_root}/Components/Qorvo/BSP/gpBsp/inc",
+      "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/halPlatform/inc",
+      "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/halPlatform/xp4002/inc",
+      "${qpg_sdk_root}/Components/Qorvo/HAL_RF/gphal/inc",
+      "${qpg_sdk_root}/Components/Qorvo/HAL_PLATFORM/gpRap/xp4002/inc",
+      "${qpg_sdk_root}/Components/Qorvo/BaseUtils/gpBatteryMonitor/inc",
     ]
-
-    if (mbedtls_alt_enabled) {
-      include_dirs += [
-        "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0",
-        "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/inc",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/include",
-      ]
-    } else {
-      include_dirs += [ "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/inc" ]
-    }
 
     lib_dirs = []
 
@@ -101,7 +104,31 @@ template("qpg_sdk") {
     }
 
     if (qpg_target_ic == "qpg6200") {
-      defines += [ "QPG_6200" ]
+      defines += [
+        "QPG6200",
+        "QPINCFG_BOARD_FILENAME=\"qPinCfg_IoTCarrierBoard_qpg6200.h\"",
+        "GP_COMPONENT_ID_HALCORTEXM4",
+        "GP_COMPONENT_ID_APP=1",
+        "Q_DRV_IRQ_PRIO_HIGH=configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY",
+      ]
+
+      defines += [
+        "CRYPTO",
+        "ESEC_AUTH_ALGO=ESEC_AUTH_ALGO_ECDSA_P256",
+        "ESEC_PUBKEY_HASH_ALGO=ESEC_HASH_ALGO_SHA256",
+        "HOST_VERSION=0",
+      ]
+      include_dirs += [
+        "${qpg_sdk_root}/Components/ThirdParty/secure_element/software/host/libs/mbedtls_alt/inc",
+        "${qpg_sdk_root}/Components/ThirdParty/secure_element/software/host/libs/esecure/include/",
+        "${qpg_sdk_root}/Components/ThirdParty/secure_element/software/esec/libs/base/include",
+        "${qpg_sdk_root}/Components/ThirdParty/secure_element/software/esec/libs/common",
+        "${qpg_sdk_root}/Applications/Matter/base/gen/base_qpg6200_development",
+      ]
+      if (chip_crypto == "psa") {
+        # activate the right headers (*_se.h) for crypto hw accel
+        defines += [ "PSA_CRYPTO_IMPLEMENTED" ]
+      }
     } else {
       include_dirs += [ "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0" ]
     }
@@ -150,75 +177,80 @@ template("qpg_sdk") {
 
     chip_glue_sources = [
       #
-      "${qpg_sdk_root}/Components/Qorvo/BSP/qvIO/inc/qvIO.h",
       "${qpg_sdk_root}/Components/Qorvo/Matter/qvCHIP/inc/qvCHIP.h",
     ]
     sources += chip_glue_sources
 
-    if (mbedtls_alt_enabled) {
-      mbedtls_alt_sources = [
-        # Add alt src
-        "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0/aes_alt.h",
-        "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0/ecjpake_alt.h",
-        "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0/ecp_alt.h",
-        "${qpg_sdk_root}/Components/ThirdParty/Silex/cryptosoc/mbedtls_alt_3.3.0/sha256_alt.h",
+    mbedtls_sources = [ "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/inc/${qpg_target_ic}-mbedtls-config.h" ]
+    if (qpg_target_ic == "qpg6200" && !mbedtls_alt_enabled) {
+      mbedtls_sources += [
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/asn1parse.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/asn1write.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/bignum.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/bignum_core.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ccm.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/cipher.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/cipher_wrap.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ctr_drbg.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ecdsa.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/entropy.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/hash_info.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/hkdf.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/hmac_drbg.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/md.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/oid.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/pk.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/pk_wrap.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/pkcs5.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/pkparse.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/pkwrite.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/platform.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/platform_util.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/sha1.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/sha256.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/x509_create.c",
+        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/x509write_csr.c",
       ]
     }
 
-    mbedtls_sources = [
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/asn1parse.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/asn1write.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/bignum.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/bignum_core.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ccm.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/cipher.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/cipher_wrap.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ctr_drbg.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ecdsa.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/entropy.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/hash_info.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/hkdf.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/hmac_drbg.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/md.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/oid.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/pk.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/pk_wrap.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/pkcs5.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/pkparse.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/pkwrite.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/platform.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/platform_util.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/sha1.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/sha256.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/x509_create.c",
-      "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/x509write_csr.c",
-      "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/inc/${qpg_target_ic}-mbedtls-config.h",
-      "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/src/trng.c",
-    ]
-
     sources += mbedtls_sources
 
-    if (mbedtls_alt_enabled) {
-      sources += mbedtls_alt_sources
-    } else {
-      sources += [
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/aes.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/constant_time.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ecdh.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ecp.c",
-        "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ecp_curves.c",
-      ]
+    if (qpg_target_ic == "qpg6200") {
+      # use gpRandom for now
+      sources += [ "${qpg_sdk_root}/Libraries/Qorvo/mbedtls_alt/src/trng.c" ]
+      if (!mbedtls_alt_enabled) {
+        sources += [
+          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/aes.c",
+          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/cmac.c",
+          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/constant_time.c",
+          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ecdh.c",
+          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ecp.c",
+          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/ecp_curves.c",
+          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/psa_crypto.c",
+          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/psa_crypto_aead.c",
+          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/psa_crypto_cipher.c",
+          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/psa_crypto_client.c",
+          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/psa_crypto_ecp.c",
+          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/psa_crypto_hash.c",
+          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/psa_crypto_mac.c",
+          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/psa_crypto_rsa.c",
+          "${qpg_sdk_root}/Components/ThirdParty/ARM/mbedtls/v3.3.0/library/psa_crypto_slot_management.c",
+        ]
+      }
     }
 
     if (defined(invoker.sources)) {
       sources += invoker.sources
     }
 
-    public_configs = [ ":${sdk_target_name}_config" ]
-    public_deps = [ "${chip_root}/third_party/qpg_sdk:freertos" ]
+    public_configs = [
+      ":${sdk_target_name}_config",
+      "${chip_root}/third_party/qpg_sdk:qpg_freertos_config",
+    ]
+    public_deps = []
     if (qpg_sdk_include_platform_libs) {
       public_deps += [
-        "${chip_root}/third_party/qpg_sdk:qpg_bootloader_lib",
+        "${chip_root}/third_party/qpg_sdk:qpg_bootloader",
         "${chip_root}/third_party/qpg_sdk:qpg_glue_lib",
         "${chip_root}/third_party/qpg_sdk:qpg_openthread_glue_lib",
         "${chip_root}/third_party/qpg_sdk:qpg_stack_lib",
