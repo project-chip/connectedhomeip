@@ -88,7 +88,7 @@ public:
     LongPascalString(T (&data)[N]) : mData(data), mMaxSize(N - 2)
     {
         static_assert(N > 0);
-        static_assert(N <= 0xFF);
+        static_assert(N <= 0xFFFF);
     }
 
     /// Returns the content of the pascal string.
