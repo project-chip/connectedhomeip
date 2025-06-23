@@ -8,32 +8,32 @@ check_symbols() {
     local exclusions=()
     while [[ $# -gt 0 ]]; do
         case $1 in
-        --skip-subtree)
-            exclusions+=(":(exclude)$2")
-            shift 2
-            ;;
-        --skip-from-file)
-            if [[ -f "$2" ]]; then
-                while IFS= read -r line || [[ -n "$line" ]]; do
-                    [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
-                    exclusions+=(":(exclude)$line")
-                done <"$2"
-            else
-                echo "Warning: File '$2' not found, continuing without these exclusions"
-            fi
-            shift 2
-            ;;
-        --help)
-            echo "Usage: $0 [--skip-subtree <dir>] [--skip-from-file <file>]"
-            echo "  --skip-subtree <dir>     Skip the specified subtree or file from the search (can be used multiple times)"
-            echo "  --skip-from-file <file>  Read paths to exclude from the specified file (one path per line)"
-            echo "  --help                   Display this help message"
-            exit 0
-            ;;
-        *)
-            echo "Unknown option: $1"
-            exit 1
-            ;;
+            --skip-subtree)
+                exclusions+=(":(exclude)$2")
+                shift 2
+                ;;
+            --skip-from-file)
+                if [[ -f "$2" ]]; then
+                    while IFS= read -r line || [[ -n "$line" ]]; do
+                        [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+                        exclusions+=(":(exclude)$line")
+                    done <"$2"
+                else
+                    echo "Warning: File '$2' not found, continuing without these exclusions"
+                fi
+                shift 2
+                ;;
+            --help)
+                echo "Usage: $0 [--skip-subtree <dir>] [--skip-from-file <file>]"
+                echo "  --skip-subtree <dir>     Skip the specified subtree or file from the search (can be used multiple times)"
+                echo "  --skip-from-file <file>  Read paths to exclude from the specified file (one path per line)"
+                echo "  --help                   Display this help message"
+                exit 0
+                ;;
+            *)
+                echo "Unknown option: $1"
+                exit 1
+                ;;
         esac
     done
 
