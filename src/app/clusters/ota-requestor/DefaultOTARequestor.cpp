@@ -80,7 +80,7 @@ static void LogQueryImageResponse(const QueryImageResponse::DecodableType & resp
 
         ChipLogDetail(SoftwareUpdate, "  softwareVersionString: %s",
                       SPAN_TO_TRUNCATED_CSTR(static_cast<int>(response.softwareVersionString.Value().size()),
-                                   response.softwareVersionString.Value().data()));
+                                             response.softwareVersionString.Value().data()));
 
 #pragma GCC diagnostic pop
     }

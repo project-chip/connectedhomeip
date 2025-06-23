@@ -102,7 +102,8 @@ bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & u
                   "Found occupied user "
                   "[endpoint=%d,adjustedIndex=%hu,name=\"%s\",credentialsCount=%u,uniqueId=%x,type=%u,credentialRule=%u,"
                   "createdBy=%d,lastModifiedBy=%d]",
-                  mEndpointId, adjustedUserIndex, SPAN_TO_TRUNCATED_CSTR(static_cast<int>(user.userName.size()), user.userName.data()),
+                  mEndpointId, adjustedUserIndex,
+                  SPAN_TO_TRUNCATED_CSTR(static_cast<int>(user.userName.size()), user.userName.data()),
                   static_cast<unsigned int>(user.credentials.size()), user.userUniqueId, to_underlying(user.userType),
                   to_underlying(user.credentialRule), user.createdBy, user.lastModifiedBy);
 
@@ -118,8 +119,8 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
         "Lock App: LockEndpoint::SetUser "
         "[endpoint=%d,userIndex=%u,creator=%d,modifier=%d,userName=\"%s\",uniqueId=%" PRIx32 ",userStatus=%u,userType=%u,"
         "credentialRule=%u,credentials=%p,totalCredentials=%u]",
-        mEndpointId, userIndex, creator, modifier, SPAN_TO_TRUNCATED_CSTR(static_cast<int>(userName.size()), userName.data()), uniqueId,
-        to_underlying(userStatus), to_underlying(usertype), to_underlying(credentialRule), credentials,
+        mEndpointId, userIndex, creator, modifier, SPAN_TO_TRUNCATED_CSTR(static_cast<int>(userName.size()), userName.data()),
+        uniqueId, to_underlying(userStatus), to_underlying(usertype), to_underlying(credentialRule), credentials,
         static_cast<unsigned int>(totalCredentials));
 
     auto adjustedUserIndex = static_cast<uint16_t>(userIndex - 1);
