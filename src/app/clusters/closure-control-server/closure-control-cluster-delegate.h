@@ -93,7 +93,8 @@ public:
      * @param error The error to be added to the current error list
      *
      * @return CHIP_NO_ERROR if the error is added successfully
-     *         Returns an appropriate error code if adding the error fails
+     *         CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED if the error already exists in the list
+     *         CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the error list is full
      */
     virtual CHIP_ERROR AddErrorToCurrentErrorList(ClosureErrorEnum error) = 0;
 
