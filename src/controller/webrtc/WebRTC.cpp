@@ -17,6 +17,7 @@
 
 #include "WebRTC.h"
 #include "Callbacks.h"
+#include "WebRTCClient.h"
 
 #include <memory>
 #include <thread>
@@ -31,317 +32,95 @@
 namespace chip {
 namespace webrtc {
 
-class WebRTCClient
-{
-public:
-    int client_id;
-    std::shared_ptr<rtc::PeerConnection> pc;
-    std::shared_ptr<rtc::DataChannel> dc;
-    rtc::Configuration config;
-    SdpOfferCallback offerCb;
-    SdpAnswerCallback answerCb;
-    IceCallback iceCb;
-    ErrorCallback errorCb;
-    PeerConnectedCallback peerConnectedCb;
-    PeerDisconnectedCallback peerDisconnectedCb;
-    StatsCollectedCallback statsCb;
+static std::mutex g_mutex;
+static std::map<WebRTCClientHandle, std::shared_ptr<WebRTCClient>> g_clients;
 
-    WebRTCClient(int id) { client_id = id; }
-};
-
-// Function to create a new WebRTC client
-void * CreateWebrtcClient(int id)
+WebRTCClientHandle webrtc_client_create()
 {
-    WebRTCClient * client = new WebRTCClient(id);
-    return (void *) client;
+    auto client               = std::make_shared<WebRTCClient>();
+    WebRTCClientHandle handle = reinterpret_cast<WebRTCClientHandle>(client.get());
+    std::lock_guard<std::mutex> lock(g_mutex);
+    g_clients[handle] = client;
+    return handle;
 }
 
-// Function to initialize the peer connection
-void InitialisePeerConnection(void * Client)
+void webrtc_client_destroy(WebRTCClientHandle handle)
 {
-    rtc::InitLogger(rtc::LogLevel::Verbose);
-
-    WebRTCClient * client = static_cast<WebRTCClient *>(Client);
-
-    // Create a new peer connection
-    client->pc = std::make_shared<rtc::PeerConnection>(client->config);
-
-    // Set up event handlers for the peer connection
-    client->pc->onLocalDescription([client](rtc::Description description) {
-        std::string desc_string = std::string(description);
-        ChipLogProgress(NotSpecified, "Local Description (Paste this to the other peer): %s", desc_string.c_str());
-        if (client->offerCb)
-        {
-            client->offerCb(desc_string.c_str(), client->client_id);
-        }
-    });
-
-    client->pc->onLocalCandidate([client](rtc::Candidate candidate) {
-        std::string cand_string = std::string(candidate);
-        ChipLogProgress(NotSpecified, "Local Candidate (Paste this to the other peer after the local description): %s",
-                        cand_string.c_str());
-        if (client->iceCb)
-        {
-            client->iceCb(cand_string.c_str(), client->client_id);
-        }
-    });
-
-    client->pc->onStateChange([client](rtc::PeerConnection::State state) {
-        ChipLogProgress(NotSpecified, "[State: %u]", static_cast<unsigned>(state));
-        if (state == rtc::PeerConnection::State::Connected)
-        {
-            if (client->peerConnectedCb)
-            {
-                client->peerConnectedCb(client->client_id);
-            }
-        }
-        else if (state == rtc::PeerConnection::State::Disconnected)
-        {
-            if (client->peerDisconnectedCb)
-            {
-                client->peerDisconnectedCb(client->client_id);
-            }
-        }
-    });
-
-    client->pc->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
-        ChipLogProgress(NotSpecified, "[Gathering State: %u]", static_cast<unsigned>(state));
-    });
-
-    // Create a data channel for communication
-    client->dc = client->pc->createDataChannel("test");
-    if (Client == nullptr)
-    {
-        ChipLogError(NotSpecified, "Client is null");
-        return;
-    }
-
-    WebRTCClient * rtcClient = static_cast<WebRTCClient *>(Client);
-    if (rtcClient->pc == nullptr)
-    {
-        ChipLogError(NotSpecified, "PeerConnection is null");
-        return;
-    }
-
-    // Set up event handlers for the data channel
-    client->dc->onOpen([&]() { ChipLogProgress(NotSpecified, "[DataChannel open: %s]", client->dc->label().c_str()); });
-    client->dc->onClosed([&]() { ChipLogProgress(NotSpecified, "[DataChannel closed: %s]", client->dc->label().c_str()); });
-    client->dc->onMessage([](auto data) {
-        if (std::holds_alternative<std::string>(data))
-        {
-            ChipLogProgress(NotSpecified, "[Received message: %s]", std::get<std::string>(data).c_str());
-        }
-    });
+    std::lock_guard<std::mutex> lock(g_mutex);
+    g_clients.erase(handle);
 }
 
-// API to destroy WebRTC client
-void DestroyClient(void * Client)
+void webrtc_client_create_peer_connection(WebRTCClientHandle handle, const char * stun_url)
 {
-    if (Client == nullptr)
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it != g_clients.end())
     {
-        ChipLogError(NotSpecified, "Client is null");
-        return;
-    }
-
-    WebRTCClient * rtcClient = static_cast<WebRTCClient *>(Client);
-    delete rtcClient;
-}
-
-// API to close the peer connection and free up resources
-void ClosePeerConnection(void * Client)
-{
-    if (Client == nullptr)
-    {
-        ChipLogError(NotSpecified, "Client is null");
-        return;
-    }
-
-    WebRTCClient * rtcClient = static_cast<WebRTCClient *>(Client);
-    if (rtcClient->pc == nullptr)
-    {
-        ChipLogError(NotSpecified, "PeerConnection is null");
-        return;
-    }
-
-    rtcClient->pc->close();
-}
-
-// Function to get statistics from the peer connection
-void GetStats(void * Client)
-{
-    if (Client == nullptr)
-    {
-        ChipLogError(NotSpecified, "Client is null");
-        return;
-    }
-
-    WebRTCClient * rtcClient = static_cast<WebRTCClient *>(Client);
-    if (rtcClient->pc == nullptr)
-    {
-        ChipLogError(NotSpecified, "PeerConnection is null");
-        return;
-    }
-
-    // Retrieve statistics from the peer connection
-    size_t bytesSent     = rtcClient->pc->bytesSent();
-    size_t bytesReceived = rtcClient->pc->bytesReceived();
-
-    // Print the data statistics
-    ChipLogProgress(NotSpecified, "Stats: Total bytes sent: %lu Total bytes received: %lu", bytesSent, bytesReceived);
-}
-
-// Function to create an offer for the peer connection
-void CreateOffer(void * Client)
-{
-    if (Client == nullptr)
-    {
-        ChipLogError(NotSpecified, "Client is null");
-        return;
-    }
-
-    WebRTCClient * rtcClient = static_cast<WebRTCClient *>(Client);
-    if (rtcClient->pc == nullptr)
-    {
-        ChipLogError(NotSpecified, "PeerConnection is null");
-        return;
-    }
-
-    // Create an offer for the peer connection
-    rtc::Description description = rtcClient->pc->createOffer();
-
-    // Call the offer callback with the offer description
-    if (rtcClient->offerCb)
-    {
-        std::string sdpOffer = description.typeString();
-        rtcClient->offerCb(sdpOffer.c_str(), rtcClient->client_id);
+        it->second->createPeerConnection(stun_url);
     }
 }
 
-// Function to create an answer for the peer connection
-void CreateAnswer(void * Client, const std::string & offer, std::function<void(std::string)> callback, int index)
+void webrtc_client_create_offer(WebRTCClientHandle handle)
 {
-    if (Client == nullptr)
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it != g_clients.end())
     {
-        ChipLogError(NotSpecified, "Client is null");
-        return;
+        it->second->createOffer();
     }
-
-    WebRTCClient * rtcClient = static_cast<WebRTCClient *>(Client);
-    if (rtcClient->pc == nullptr)
-    {
-        ChipLogError(NotSpecified, "PeerConnection is null");
-        return;
-    }
-
-    // Set the remote offer
-    rtcClient->pc->setRemoteDescription(rtc::Description(offer, "offer"));
-
-    // Create an answer for the peer connection
-    rtc::Description answer = rtcClient->pc->createAnswer();
-
-    // Call the provided callback with the answer description
-    rtcClient->answerCb(answer.typeString().c_str(), rtcClient->client_id);
 }
 
-// Function to get the local session description
-const char * GetLocalSdp(void * Client)
+void webrtc_client_create_answer(WebRTCClientHandle handle)
 {
-    if (Client == nullptr)
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it != g_clients.end())
     {
-        ChipLogError(NotSpecified, "Client is null");
-        return "";
+        it->second->createAnswer();
     }
-
-    WebRTCClient * rtcClient = static_cast<WebRTCClient *>(Client);
-    if (rtcClient->pc == nullptr)
-    {
-        ChipLogError(NotSpecified, "PeerConnection is null");
-        return "";
-    }
-
-    // Return the local session description as a string
-    return rtcClient->pc->localDescription()->typeString().c_str();
 }
 
-// Function to set the remote session description
-void SetAnswer(void * Client, const std::string & answer)
+void webrtc_client_set_remote_description(WebRTCClientHandle handle, const char * sdp, const char * type)
 {
-    if (Client == nullptr)
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it != g_clients.end())
     {
-        ChipLogError(NotSpecified, "Client is null");
-        return;
+        it->second->setRemoteDescription(sdp, type);
     }
-
-    WebRTCClient * rtcClient = static_cast<WebRTCClient *>(Client);
-    if (rtcClient->pc == nullptr)
-    {
-        ChipLogError(NotSpecified, "PeerConnection is null");
-        return;
-    }
-
-    // Create a remote description from the answer string
-    rtc::Description remoteDescription(answer, "answer");
-
-    // Set the remote description on the PeerConnection
-    rtcClient->pc->setRemoteDescription(remoteDescription);
-
-    ChipLogProgress(NotSpecified, "Remote description set successfully");
 }
 
-// Function to set the remote candidate
-void SetCandidate(void * Client, const std::string & candidate)
+void webrtc_client_add_ice_candidate(WebRTCClientHandle handle, const char * candidate, const char * mid)
 {
-    if (Client == nullptr)
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it != g_clients.end())
     {
-        ChipLogError(NotSpecified, "Client is null");
-        return;
+        it->second->addIceCandidate(candidate, mid);
     }
-
-    WebRTCClient * rtcClient = static_cast<WebRTCClient *>(Client);
-    if (rtcClient->pc == nullptr)
-    {
-        ChipLogError(NotSpecified, "PeerConnection is null");
-        return;
-    }
-
-    // Add the remote candidate to the peer connection
-    rtcClient->pc->addRemoteCandidate(rtc::Candidate(candidate));
 }
 
-// Function to send data over the data channel
-void SendData(void * Client, const std::string & data)
+void webrtc_client_set_local_description_callback(WebRTCClientHandle handle, LocalDescriptionCallback cb, void * user_data)
 {
-    if (Client == nullptr)
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it != g_clients.end())
     {
-        ChipLogError(NotSpecified, "Client is null");
-        return;
+        it->second->onLocalDescription(
+            [cb, user_data](const std::string & sdp, const std::string & type) { cb(sdp.c_str(), type.c_str(), user_data); });
     }
-
-    WebRTCClient * rtcClient = static_cast<WebRTCClient *>(Client);
-    if (rtcClient->dc == nullptr)
-    {
-        ChipLogError(NotSpecified, "Datachannel is null");
-        return;
-    }
-
-    rtcClient->dc->send(data);
 }
 
-// Function to set callbacks for various events
-void SetCallbacks(void * Client, SdpOfferCallback offer_callback, SdpAnswerCallback answer_callback, IceCallback ice_callback,
-                  ErrorCallback error_callback, PeerConnectedCallback peer_connected_callback,
-                  PeerDisconnectedCallback peer_disconnected_callback, StatsCollectedCallback stats_callback)
+void webrtc_client_set_ice_candidate_callback(WebRTCClientHandle handle, IceCandidateCallback cb, void * user_data)
 {
-    WebRTCClient * client = static_cast<WebRTCClient *>(Client);
-
-    // Set the callbacks for various events
-    client->offerCb            = offer_callback;
-    client->answerCb           = answer_callback;
-    client->iceCb              = ice_callback;
-    client->errorCb            = error_callback;
-    client->peerConnectedCb    = peer_connected_callback;
-    client->peerDisconnectedCb = peer_disconnected_callback;
-    client->statsCb            = stats_callback;
+    std::lock_guard<std::mutex> lock(g_mutex);
+    auto it = g_clients.find(handle);
+    if (it != g_clients.end())
+    {
+        it->second->onIceCandidate([cb, user_data](const std::string & candidate, const std::string & mid) {
+            cb(candidate.c_str(), mid.c_str(), user_data);
+        });
+    }
 }
 
 } // namespace webrtc

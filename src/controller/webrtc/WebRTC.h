@@ -19,182 +19,34 @@
 
 #include "Callbacks.h"
 
+extern "C" {
+
 namespace chip {
 namespace webrtc {
-/**
- * @brief
- *    This function creates a new WebRTC client with the specified ID.
- *
- * @param[in]  id
- *     The unique identifier for the WebRTC client.
- *
- * @return void *
- *     A pointer to the newly created WebRTC client.
- */
-void * CreateWebrtcClient(int id);
+typedef void * WebRTCClientHandle;
 
-/**
- * @brief
- *    This function destroys a WebRTC client.
- *
- * @param[in]  Client
- *     A pointer to the WebRTC client to be destroyed.
- *
- * @return void
- */
-void DestroyClient(void * Client);
+typedef void (*LocalDescriptionCallback)(const char * sdp, const char * type, void * user_data);
+typedef void (*IceCandidateCallback)(const char * candidate, const char * mid, void * user_data);
 
-/**
- * @brief
- *    This function initializes the peer connection for a WebRTC client.
- *
- * @param[in]  Client
- *     A pointer to the WebRTC client for which to initialize the peer connection.
- *
- * @return void
- */
-void InitialisePeerConnection(void * Client);
+WebRTCClientHandle webrtc_client_create();
 
-/**
- * @brief
- *    This function closes the peer connection and frees up resources for a WebRTC client.
- *
- * @param[in]  Client
- *     A pointer to the WebRTC client for which to close the peer connection.
- *
- * @return void
- */
-void ClosePeerConnection(void * Client);
+void webrtc_client_destroy(WebRTCClientHandle handle);
 
-/**
- * @brief
- *    This function retrieves statistics from the peer connection of a WebRTC client.
- *
- * @param[in]  Client
- *     A pointer to the WebRTC client for which to retrieve statistics.
- *
- * @return void
- */
-void GetStats(void * Client);
+void webrtc_client_create_peer_connection(WebRTCClientHandle handle, const char * stun_url);
 
-/**
- * @brief
- *    This function creates an offer for the peer connection of a WebRTC client.
- *
- * @param[in]  Client
- *     A pointer to the WebRTC client for which to create an offer.
- *
- * @return void
- */
-void CreateOffer(void * Client);
+void webrtc_client_create_offer(WebRTCClientHandle handle);
 
-/**
- * @brief
- *    This function creates an answer for the peer connection of a WebRTC client.
- *
- * @param[in]  Client
- *     A pointer to the WebRTC client for which to create an answer.
- *
- * @param[in]  offer
- *     The offer string received from the other peer.
- *
- * @param[in]  callback
- *     A callback function to be called with the answer string when it is ready.
- *
- * @param[in]  index
- *     An index parameter that can be used by the implementation (if needed).
- *
- * @return void
- */
-void CreateAnswer(void * Client, const std::string & offer, std::function<void(std::string)> callback, int index);
+void webrtc_client_create_answer(WebRTCClientHandle handle);
 
-/**
- * @brief
- *    This function retrieves the local session description string for a WebRTC client.
- *
- * @param[in]  Client
- *     A pointer to the WebRTC client for which to retrieve the local session description.
- *
- * @return const char *
- *     A pointer to the local session description string.
- */
-const char *GetLocalSdp(void * Client);
+void webrtc_client_set_remote_description(WebRTCClientHandle handle, const char * sdp, const char * type);
 
-/**
- * @brief
- *    This function sets the remote session description for a WebRTC client.
- *
- * @param[in]  Client
- *     A pointer to the WebRTC client for which to set the remote session description.
- *
- * @param[in]  answer
- *     The answer string received from the other peer.
- *
- * @return void
- */
-void SetAnswer(void * Client, const std::string & answer);
+void webrtc_client_add_ice_candidate(WebRTCClientHandle handle, const char * candidate, const char * mid);
 
-/**
- * @brief
- *    This function sets a remote candidate for a WebRTC client.
- *
- * @param[in]  Client
- *     A pointer to the WebRTC client for which to set the remote candidate.
- *
- * @param[in]  candidate
- *     The candidate string received from the other peer.
- *
- * @return void
- */
-void SetCandidate(void * Client, const std::string & candidate);
+void webrtc_client_set_local_description_callback(WebRTCClientHandle handle, LocalDescriptionCallback cb, void * user_data);
 
-/**
- * @brief
- *    This function sends data over the data channel of a WebRTC client.
- *
- * @param[in]  Client
- *     A pointer to the WebRTC client for which to send data.
- *
- * @param[in]  data
- *     The data string to be sent over the data channel.
- *
- * @return void
- */
-void SendData(void * Client, const std::string & data);
-
-/**
- * @brief
- *    This function sets various callbacks for a WebRTC client.
- *
- * @param[in]  Client
- *     A pointer to the WebRTC client for which to set callbacks.
- *
- * @param[in]  offer_callback
- *     A callback function to be called when an offer is received.
- *
- * @param[in]  answer_callback
- *     A callback function to be called when an answer is received.
- *
- * @param[in]  ice_callback
- *     A callback function to be called when an ICE candidate is received.
- *
- * @param[in]  error_callback
- *     A callback function to be called when an error occurs.
- *
- * @param[in]  peer_connected_callback
- *     A callback function to be called when a peer connection is established.
- *
- * @param[in]  peer_disconnected_callback
- *     A callback function to be called when a peer connection is disconnected.
- *
- * @param[in]  stats_callback
- *     A callback function to be called when statistics are collected.
- *
- * @return void
- */
-void SetCallbacks(void * Client, SdpOfferCallback offer_callback, SdpAnswerCallback answer_callback, IceCallback ice_callback,
-                  ErrorCallback error_callback, PeerConnectedCallback peer_connected_callback,
-                  PeerDisconnectedCallback peer_disconnected_callback, StatsCollectedCallback stats_callback);
+void webrtc_client_set_ice_candidate_callback(WebRTCClientHandle handle, IceCandidateCallback cb, void * user_data);
 
 } // namespace webrtc
 } // namespace chip
+
+} // extern "C"
