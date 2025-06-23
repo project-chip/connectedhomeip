@@ -37,7 +37,7 @@ import random
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
-from chip.testing.event_attribute_reporting import EventChangeCallback
+from chip.testing.event_attribute_reporting import EventCallback
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -94,7 +94,7 @@ class TC_ACL_2_6(MatterBaseTest):
         self.step(3)
         # Set up event subscription for future steps
         acec_event = Clusters.AccessControl.Events.AccessControlEntryChanged
-        events_callback = EventChangeCallback(Clusters.AccessControl)
+        events_callback = EventCallback(expected_cluster=Clusters.AccessControl)
         await events_callback.start(self.default_controller, self.dut_node_id, 0)
 
         # Read initial events

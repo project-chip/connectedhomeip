@@ -85,7 +85,7 @@ import chip.clusters as Clusters
 import test_plan_support
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult
-from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator, EventChangeCallback, await_sequence_of_reports
+from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator, EventCallback, await_sequence_of_reports
 from chip.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep, default_matter_test_main, has_feature,
                                          run_if_endpoint_matches)
 from chip.tlv import uint
@@ -294,7 +294,7 @@ class TC_SwitchTests(MatterBaseTest):
 
         logging.info(f"Successfully waited for no further events on {expected_cluster} for {elapsed:.1f} seconds")
 
-    def _received_event(self, event_listener: EventChangeCallback, target_event: ClusterObjects.ClusterEvent, timeout_s: int) -> bool:
+    def _received_event(self, event_listener: EventCallback, target_event: ClusterObjects.ClusterEvent, timeout_s: int) -> bool:
         """
             Returns true if this event was received, false otherwise
         """
@@ -338,7 +338,7 @@ class TC_SwitchTests(MatterBaseTest):
 
         # Step 2: Set up subscription to all events of Switch cluster on the endpoint.
         self.step(2)
-        event_listener = EventChangeCallback(cluster)
+        event_listener = EventCallback(expected_cluster=cluster)
         await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
         attrib_listener = ClusterAttributeChangeAccumulator(cluster)
         await attrib_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
@@ -451,7 +451,7 @@ class TC_SwitchTests(MatterBaseTest):
         endpoint_id = self.get_endpoint()
 
         self.step(2)
-        event_listener = EventChangeCallback(cluster)
+        event_listener = EventCallback(expected_cluster=cluster)
         await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
 
         self.step(3)
@@ -541,7 +541,7 @@ class TC_SwitchTests(MatterBaseTest):
 
         # Step 2: Set up subscription to all events and attributes of Switch cluster on the endpoint
         self.step(2)
-        event_listener = EventChangeCallback(cluster)
+        event_listener = EventCallback(expected_cluster=cluster)
         await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
         attrib_listener = ClusterAttributeChangeAccumulator(cluster)
         await attrib_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
@@ -704,7 +704,7 @@ class TC_SwitchTests(MatterBaseTest):
         pressed_position = self._default_pressed_position
 
         self.step(2)
-        event_listener = EventChangeCallback(cluster)
+        event_listener = EventCallback(expected_cluster=cluster)
         await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
 
         self.step(3)
@@ -882,7 +882,7 @@ class TC_SwitchTests(MatterBaseTest):
         pressed_position = self._default_pressed_position
 
         self.step(2)
-        event_listener = EventChangeCallback(cluster)
+        event_listener = EventCallback(expected_cluster=cluster)
         await event_listener.start(self.default_controller, self.dut_node_id, endpoint=endpoint_id)
 
         self.step(3)

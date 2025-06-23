@@ -44,7 +44,7 @@ from typing import Any, Optional
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator, EventChangeCallback, await_sequence_of_reports
+from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator, EventCallback, await_sequence_of_reports
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -136,7 +136,7 @@ class TC_OCC_3_1(MatterBaseTest):
         await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint_id, min_interval_sec=0, max_interval_sec=30)
 
         if occupancy_event_supported:
-            event_listener = EventChangeCallback(cluster)
+            event_listener = EventCallback(expected_cluster=cluster)
             await event_listener.start(dev_ctrl, node_id, endpoint=endpoint_id, min_interval_sec=0, max_interval_sec=30)
 
         self.step("5a")

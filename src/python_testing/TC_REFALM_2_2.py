@@ -48,7 +48,7 @@ from chip import ChipUtility
 from chip.clusters.ClusterObjects import ClusterCommand, ClusterObjectDescriptor, ClusterObjectFieldDescriptor
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing import matter_asserts
-from chip.testing.event_attribute_reporting import EventChangeCallback
+from chip.testing.event_attribute_reporting import EventCallback
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from chip.tlv import uint
 from mobly import asserts
@@ -259,7 +259,7 @@ class TC_REFALM_2_2(MatterBaseTest):
 
         # Subscribe to Notify Event
         self.step(11)
-        event_callback = EventChangeCallback(Clusters.RefrigeratorAlarm)
+        event_callback = EventCallback(expected_cluster=Clusters.RefrigeratorAlarm)
         await event_callback.start(self.default_controller,
                                    self.dut_node_id,
                                    self.get_endpoint(1))

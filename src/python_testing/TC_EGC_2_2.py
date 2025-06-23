@@ -41,7 +41,7 @@
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.event_attribute_reporting import EventChangeCallback
+from chip.testing.event_attribute_reporting import EventCallback
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
@@ -85,7 +85,7 @@ class TC_EGC_2_2(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
         # Commission DUT - already done
 
         self.step("2")
-        events_callback = EventChangeCallback(cluster)
+        events_callback = EventCallback(expected_cluster=cluster)
         await events_callback.start(self.default_controller,
                                     self.dut_node_id,
                                     endpoint)

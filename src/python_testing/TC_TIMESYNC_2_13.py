@@ -41,15 +41,15 @@ import time
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters.Types import NullValue
-from chip.testing.event_attribute_reporting import SimpleEventCallback
+from chip.testing.event_attribute_reporting import EventCallback
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
 
 class TC_TIMESYNC_2_13(MatterBaseTest):
-    def wait_for_trusted_time_souce_event(self, timeout):
+    def wait_for_trusted_time_souce_event(self, timeout, cb):
         try:
-            ret = self.q.get(block=True, timeout=timeout)
+            ret = cb.get_block(block=True, timeout=timeout)
             asserts.assert_true(type_matches(received_value=ret.Data,
                                 desired_type=Clusters.TimeSynchronization.Events.MissingTrustedTimeSource), "Incorrect type received for event")
         except queue.Empty:
@@ -88,8 +88,7 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
 
         self.print_step(5, "TH1 subscribeds to the MissingTrustedTimeSource event")
         event = Clusters.TimeSynchronization.Events.MissingTrustedTimeSource
-        self.q = queue.Queue()
-        cb = SimpleEventCallback("MissingTrustedTimeSource", event.cluster_id, event.event_id, self.q)
+        cb = EventCallback("MissingTrustedTimeSource", event.cluster_id, event.event_id)
         urgent = 1
         subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
         subscription.SetEventUpdateCallback(callback=cb)
@@ -98,7 +97,7 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
         await self.send_single_cmd(cmd=Clusters.OperationalCredentials.Commands.RemoveFabric(fabricIndex=th2_fabric_idx))
 
         self.print_step(7, "TH1 waits for the MissingTrustedTimeSource event with a timeout of 5 seconds")
-        self.wait_for_trusted_time_souce_event(5)
+        self.wait_for_trusted_time_souce_event(5, cb)
 
         self.print_step(8, "TH1 sends a SetTrusteTimeSource command")
         tts = Clusters.TimeSynchronization.Structs.FabricScopedTrustedTimeSourceStruct(
@@ -112,7 +111,7 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
         await self.send_single_cmd(cmd=Clusters.TimeSynchronization.Commands.SetTrustedTimeSource(NullValue))
 
         self.print_step(11, "TH1 waits for the MissingTrustedTimeSource event with a timeout of 5 seconds")
-        self.wait_for_trusted_time_souce_event(5)
+        self.wait_for_trusted_time_souce_event(5, cb)
 
 
 if __name__ == "__main__":

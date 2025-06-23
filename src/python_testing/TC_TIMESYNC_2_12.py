@@ -43,7 +43,7 @@ from datetime import datetime, timedelta, timezone
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
-from chip.testing.event_attribute_reporting import SimpleEventCallback
+from chip.testing.event_attribute_reporting import EventCallback
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from chip.testing.timeoperations import get_wait_seconds_from_set_time, utc_time_in_matter_epoch
 from chip.tlv import uint
@@ -61,10 +61,10 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
     async def send_set_utc_cmd(self, utc: uint) -> None:
         await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetUTCTime(UTCTime=utc, granularity=Clusters.Objects.TimeSynchronization.Enums.GranularityEnum.kMillisecondsGranularity))
 
-    def wait_for_tz_status(self, th_utc, wait_s, expected_offset, expected_name):
+    def wait_for_tz_status(self, th_utc, wait_s, expected_offset, expected_name, cb):
         timeout = get_wait_seconds_from_set_time(th_utc, wait_s)
         try:
-            ret = self.q.get(block=True, timeout=timeout)
+            ret = cb.get_block(block=True, timeout=timeout)
             asserts.assert_true(type_matches(received_value=ret.Data,
                                 desired_type=Clusters.TimeSynchronization.Events.TimeZoneStatus), "Incorrect type received for event")
             asserts.assert_equal(ret.Data.offset, expected_offset, "Unexpected offset returned")
@@ -100,8 +100,7 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
 
         self.print_step(3, "Subscribe to TimeZoneStatus event")
         event = time_cluster.Events.TimeZoneStatus
-        self.q = queue.Queue()
-        cb = SimpleEventCallback("TimeZoneStatus", event.cluster_id, event.event_id, self.q)
+        cb = EventCallback("TimeZoneStatus", event.cluster_id, event.event_id)
         urgent = 1
         subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
         subscription.SetEventUpdateCallback(callback=cb)
@@ -132,7 +131,7 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
         await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
 
         self.print_step(9, "TH waits for TimeZoneStatus event until th_utc + 5s")
-        self.wait_for_tz_status(th_utc, 5, 3600, "Not/Real")
+        self.wait_for_tz_status(th_utc, 5, 3600, "Not/Real", cb)
 
         self.print_step(10, "If tz_list_size > 1, TH waits until th_utc + 15s")
         if tz_list_size > 1:
@@ -144,7 +143,7 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
 
         self.print_step(12, "if tz_list_size > 1, TH waits for a TimeZoneStatus event until th_utc + 20s")
         if tz_list_size > 1:
-            self.wait_for_tz_status(th_utc, 20, 7200, "Un/Real")
+            self.wait_for_tz_status(th_utc, 20, 7200, "Un/Real", cb)
 
         self.print_step(13, "Set time zone back to 0")
         tz = [tz_struct(offset=0, validAt=0)]
