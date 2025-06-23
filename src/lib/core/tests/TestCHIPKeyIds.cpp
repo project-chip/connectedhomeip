@@ -127,7 +127,8 @@ TEST(TestCHIPKeyIds, MakesAppKeyId)
     ASSERT_FALSE(ChipKeyId::UsesCurrentEpochKey(key));
     ASSERT_EQ(ChipKeyId::GetRootKeyId(key), ChipKeyId::kType_AppRootKey);
     ASSERT_EQ(ChipKeyId::GetEpochKeyId(key), ChipKeyId::kType_AppEpochKey);
-    ASSERT_EQ(ChipKeyId::ConvertToCurrentAppKeyId(key), kFlag_UseCurrentEpochKey | ChipKeyId::kType_General); // (keyId & ~kMask_EpochKeyNumber) | kFlag_UseCurrentEpochKey
+    ASSERT_EQ(ChipKeyId::ConvertToCurrentAppKeyId(key),
+              kFlag_UseCurrentEpochKey | ChipKeyId::kType_General); // (keyId & ~kMask_EpochKeyNumber) | kFlag_UseCurrentEpochKey
 
     key = ChipKeyId::MakeAppKeyId(key, ChipKeyId::kServiceRootKey, 0x00000380, ChipKeyId::kNone, true);
 
@@ -151,7 +152,8 @@ TEST(TestCHIPKeyIds, MakesAppIntermediateKeyId)
     ASSERT_FALSE(ChipKeyId::UsesCurrentEpochKey(key));
     ASSERT_EQ(ChipKeyId::GetRootKeyNumber(key), uint8_t{ 2 });
     ASSERT_EQ(ChipKeyId::GetEpochKeyNumber(key), uint8_t{ 7 });
-    ASSERT_EQ(ChipKeyId::ConvertToCurrentAppKeyId(key), kFlag_UseCurrentEpochKey | (ChipKeyId::kType_AppIntermediateKey | (static_cast<uint32_t>(2) << 10)));
+    ASSERT_EQ(ChipKeyId::ConvertToCurrentAppKeyId(key),
+              kFlag_UseCurrentEpochKey | (ChipKeyId::kType_AppIntermediateKey | (static_cast<uint32_t>(2) << 10)));
     ASSERT_EQ(ChipKeyId::GetType(key), ChipKeyId::kType_AppIntermediateKey);
 }
 
@@ -189,7 +191,8 @@ TEST(TestCHIPKeyIds, MakesAppStaticKeyId)
     ASSERT_FALSE(ChipKeyId::UsesCurrentEpochKey(key));
     ASSERT_EQ(ChipKeyId::GetRootKeyNumber(key), uint8_t{ 2 });
     ASSERT_EQ(ChipKeyId::GetEpochKeyNumber(key), uint8_t{ 0 });
-    ASSERT_EQ(ChipKeyId::ConvertToCurrentAppKeyId(key), kFlag_UseCurrentEpochKey | (ChipKeyId::kType_AppStaticKey | (static_cast<uint32_t>(2) << 10)));
+    ASSERT_EQ(ChipKeyId::ConvertToCurrentAppKeyId(key),
+              kFlag_UseCurrentEpochKey | (ChipKeyId::kType_AppStaticKey | (static_cast<uint32_t>(2) << 10)));
     ASSERT_EQ(ChipKeyId::GetType(key), ChipKeyId::kType_AppStaticKey);
 }
 
@@ -314,6 +317,6 @@ TEST(TestCHIPKeyIds, UpdateEpochKeyId)
     // 10 bits shift for root key number, 7 bits shift for epoch key number
     KeyID key = ChipKeyId::kType_AppRotatingKey | (1 << 10) | (2 << 7);
 
-    ASSERT_EQ(key, uint32_t{0x00005500});
-    ASSERT_EQ(ChipKeyId::UpdateEpochKeyId(key, 0), uint32_t{0x00005400});
+    ASSERT_EQ(key, uint32_t{ 0x00005500 });
+    ASSERT_EQ(ChipKeyId::UpdateEpochKeyId(key, 0), uint32_t{ 0x00005400 });
 }
