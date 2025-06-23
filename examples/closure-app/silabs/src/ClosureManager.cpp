@@ -33,9 +33,9 @@ using namespace chip::app::Clusters::ClosureControl;
 using namespace chip::app::Clusters::ClosureDimension;
 
 namespace {
-constexpr uint32_t kCountdownTimeSeconds = 10;
+constexpr uint32_t kCountdownTimeSeconds  = 10;
 constexpr uint32_t kMotionCountdownTimeMs = 1000; // 10% change of position per second
-constexpr uint32_t kLatchCountdownTimeMs = 2000;
+constexpr uint32_t kLatchCountdownTimeMs  = 2000;
 
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
@@ -264,9 +264,9 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
     if (position.HasValue())
     {
         ChipLogError(AppServer, "Updating target position for move to command");
-       // Set the Closure panel target position for the panels based on the Closure position.
-       // The position is represented as a TargetPositionEnum, which maps to specific positions for the panels.
-       // The mapping values used below are for closure sample app.
+        // Set the Closure panel target position for the panels based on the Closure position.
+        // The position is represented as a TargetPositionEnum, which maps to specific positions for the panels.
+        // The mapping values used below are for closure sample app.
         chip::Percent100ths ep2Position;
         chip::Percent100ths ep3Position;
 
@@ -303,19 +303,19 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
 
     if (latch.HasValue())
     {
-      ChipLogError(AppServer, "Updating target latch for move to command");
+        ChipLogError(AppServer, "Updating target latch for move to command");
         ep2Target.latch.SetValue(latch.Value());
         ep3Target.latch.SetValue(latch.Value());
     }
 
     if (speed.HasValue())
     {
-      ChipLogError(AppServer, "Updating target speed for move to command");
+        ChipLogError(AppServer, "Updating target speed for move to command");
         ep2Target.speed.SetValue(speed.Value());
         ep3Target.speed.SetValue(speed.Value());
     }
 
-    VerifyOrReturnError(ep2.GetLogic().SetTarget(DataModel::MakeNullable(ep2Target)) == CHIP_NO_ERROR,  Status::Failure,
+    VerifyOrReturnError(ep2.GetLogic().SetTarget(DataModel::MakeNullable(ep2Target)) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set target for Endpoint 2"));
     VerifyOrReturnError(ep3.GetLogic().SetTarget(DataModel::MakeNullable(ep3Target)) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set target for Endpoint 3"));
@@ -324,9 +324,9 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
 
     // Post an event to initiate the move to action asynchronously.
     AppEvent event;
-    event.Type              = AppEvent::kEventType_Closure;
+    event.Type                = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action = MOVE_TO_ACTION;
-    event.Handler           = InitiateAction;
+    event.Handler             = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
 
     isMoveToInProgress = true;
@@ -337,7 +337,7 @@ void ClosureManager::HandleClosureMotionAction()
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
-    chip::app::Clusters::ClosureControl::ClusterState ep1State = instance.ep1.GetLogic().GetState();
+    chip::app::Clusters::ClosureControl::ClusterState ep1State   = instance.ep1.GetLogic().GetState();
     chip::app::Clusters::ClosureDimension::ClusterState ep2State = instance.ep2.GetLogic().GetState();
     chip::app::Clusters::ClosureDimension::ClusterState ep3State = instance.ep3.GetLogic().GetState();
 
@@ -352,7 +352,7 @@ void ClosureManager::HandleClosureMotionAction()
         instance.ep2.GetLogic().SetCurrentState(currentState);
         isEndPoint2TargetReached = (currentState.Value().position.Value() == ep2State.target.Value().position.Value());
         ChipLogProgress(AppServer, "EndPoint 2 Current Position: %d, Target Position: %d", currentState.Value().position.Value(),
-                                                                                          ep2State.target.Value().position.Value());
+                        ep2State.target.Value().position.Value());
     }
 
     if (UpdatePanelCurrentStateToNextPosition(ep3State, currentState))
@@ -361,7 +361,7 @@ void ClosureManager::HandleClosureMotionAction()
         instance.ep3.GetLogic().SetCurrentState(currentState);
         isEndPoint3TargetReached = (currentState.Value().position.Value() == ep3State.target.Value().position.Value());
         ChipLogProgress(AppServer, "EndPoint 3 Current Position: %d, Target Position: %d", currentState.Value().position.Value(),
-                                                                                          ep3State.target.Value().position.Value());
+                        ep3State.target.Value().position.Value());
     }
 
     bool closureTargetReached = isEndPoint2TargetReached && isEndPoint3TargetReached;
@@ -376,14 +376,17 @@ void ClosureManager::HandleClosureMotionAction()
         return;
     }
 
-    if (IsClosureLatchActionNeeded(ep1State)){
+    if (IsClosureLatchActionNeeded(ep1State))
+    {
         instance.CancelTimer(); // Cancel any existing timer before starting a new action
         ChipLogProgress(AppServer, "Starting latch action timer");
         instance.SetCurrentAction(LATCH_ACTION);
         instance.StartTimer(kLatchCountdownTimeMs);
-    } else {
-      // Target reached and no latch action needed, call HandleClosureAction
-      instance.HandleClosureActionComplete(ClosureManager::Action_t::MOVE_TO_ACTION);
+    }
+    else
+    {
+        // Target reached and no latch action needed, call HandleClosureAction
+        instance.HandleClosureActionComplete(ClosureManager::Action_t::MOVE_TO_ACTION);
     }
 }
 
@@ -397,7 +400,7 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         GetInstance().ep1.OnCalibrateActionComplete();
         GetInstance().ep2.OnCalibrateActionComplete();
         GetInstance().ep3.OnCalibrateActionComplete();
-        isCalibrationInProgress = false;
+        isCalibrationInProgress          = false;
         instance.isCalibrationInProgress = false;
         break;
     }
@@ -428,86 +431,84 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
     GetInstance().SetCurrentAction(Action_t::INVALID_ACTION);
 }
 
-bool ClosureManager::UpdatePanelCurrentStateToNextPosition(
-                                const chip::app::Clusters::ClosureDimension::ClusterState & epState,
-                                DataModel::Nullable<GenericCurrentStateStruct> & currentState)
+bool ClosureManager::UpdatePanelCurrentStateToNextPosition(const chip::app::Clusters::ClosureDimension::ClusterState & epState,
+                                                           DataModel::Nullable<GenericCurrentStateStruct> & currentState)
 
 {
-  if (epState.target.IsNull())
-  {
-      ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to Target State is null");
-      return false;
-  }
+    if (epState.target.IsNull())
+    {
+        ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to Target State is null");
+        return false;
+    }
 
-  if (!epState.target.Value().position.HasValue())
-  {
-      ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to  Target position is not set");
-      return false;
-  }
+    if (!epState.target.Value().position.HasValue())
+    {
+        ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to  Target position is not set");
+        return false;
+    }
 
-  if (epState.currentState.IsNull())
-  {
-      ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to Current State is null");
-      return false;
-  }
+    if (epState.currentState.IsNull())
+    {
+        ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to Current State is null");
+        return false;
+    }
 
-  if (!epState.currentState.Value().position.HasValue())
-  {
-      ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to Current position is not set");
-      return false;
-  }
+    if (!epState.currentState.Value().position.HasValue())
+    {
+        ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to Current position is not set");
+        return false;
+    }
 
-  chip::Percent100ths currentPosition = epState.currentState.Value().position.Value();
-  chip::Percent100ths targetPosition = epState.target.Value().position.Value();
-  chip::Percent100ths nextCurrentPosition;
+    chip::Percent100ths currentPosition = epState.currentState.Value().position.Value();
+    chip::Percent100ths targetPosition  = epState.target.Value().position.Value();
+    chip::Percent100ths nextCurrentPosition;
 
-  if (currentPosition < targetPosition)
-  {
-      // Increment position by 1000 units, capped at target.
-      nextCurrentPosition = std::min(static_cast<chip::Percent100ths>(currentPosition + 1000), targetPosition);
-  }
-  else if (currentPosition > targetPosition)
-  {
-      // Moving down: Decreasing the current position by a step of 1000 units,
-      // ensuring it does not go below the target position.
-      nextCurrentPosition = std::max(static_cast<chip::Percent100ths>(currentPosition - 1000), targetPosition);
-  }
-  else
-  {
-      // Already at target: No further action is needed as the current position matches the target position.
-      nextCurrentPosition = currentPosition;
-      return false; // No update needed
-  }
+    if (currentPosition < targetPosition)
+    {
+        // Increment position by 1000 units, capped at target.
+        nextCurrentPosition = std::min(static_cast<chip::Percent100ths>(currentPosition + 1000), targetPosition);
+    }
+    else if (currentPosition > targetPosition)
+    {
+        // Moving down: Decreasing the current position by a step of 1000 units,
+        // ensuring it does not go below the target position.
+        nextCurrentPosition = std::max(static_cast<chip::Percent100ths>(currentPosition - 1000), targetPosition);
+    }
+    else
+    {
+        // Already at target: No further action is needed as the current position matches the target position.
+        nextCurrentPosition = currentPosition;
+        return false; // No update needed
+    }
 
-  currentState.SetNonNull().Set(
-            MakeOptional(nextCurrentPosition),
-            epState.currentState.Value().latch.HasValue() ? MakeOptional(epState.currentState.Value().latch.Value()) : NullOptional,
-            epState.currentState.Value().speed.HasValue() ? MakeOptional(epState.currentState.Value().speed.Value()) : NullOptional
-  );
-  return true;
+    currentState.SetNonNull().Set(
+        MakeOptional(nextCurrentPosition),
+        epState.currentState.Value().latch.HasValue() ? MakeOptional(epState.currentState.Value().latch.Value()) : NullOptional,
+        epState.currentState.Value().speed.HasValue() ? MakeOptional(epState.currentState.Value().speed.Value()) : NullOptional);
+    return true;
 }
 
 bool ClosureManager::IsClosureLatchActionNeeded(const chip::app::Clusters::ClosureControl::ClusterState & epState)
 {
-  // Latch action not needed if OverallTarget is null or latch is not set
-  if (epState.mOverallTarget.IsNull() || !epState.mOverallTarget.Value().latch.HasValue())
-  {
-    ChipLogError(AppServer, "Latch action not needed as OverallTarget is null or latch is not set");
-    return false;
-  }
+    // Latch action not needed if OverallTarget is null or latch is not set
+    if (epState.mOverallTarget.IsNull() || !epState.mOverallTarget.Value().latch.HasValue())
+    {
+        ChipLogError(AppServer, "Latch action not needed as OverallTarget is null or latch is not set");
+        return false;
+    }
 
-  // latch action needed if OverallState is null or latch is not set and OverallTarget has latch set
-  if (epState.mOverallState.IsNull() || !epState.mOverallState.Value().latch.HasValue() ||
-      epState.mOverallState.Value().latch.Value().IsNull())
-  {
-    ChipLogError(AppServer, "Latch action needed as OverallState is null or latch is not set, while OverallTarget has latch set");
-    return true;
-  }
+    // latch action needed if OverallState is null or latch is not set and OverallTarget has latch set
+    if (epState.mOverallState.IsNull() || !epState.mOverallState.Value().latch.HasValue() ||
+        epState.mOverallState.Value().latch.Value().IsNull())
+    {
+        ChipLogError(AppServer,
+                     "Latch action needed as OverallState is null or latch is not set, while OverallTarget has latch set");
+        return true;
+    }
 
-  // Only return true if the latch value is different between target and state
-  bool targetLatch = epState.mOverallTarget.Value().latch.Value();
-  bool stateLatch = epState.mOverallState.Value().latch.Value().Value();
-  ChipLogError(AppServer, "Target Latch: %s, State Latch: %s",
-               targetLatch ? "true" : "false", stateLatch ? "true" : "false");
-  return targetLatch != stateLatch;
+    // Only return true if the latch value is different between target and state
+    bool targetLatch = epState.mOverallTarget.Value().latch.Value();
+    bool stateLatch  = epState.mOverallState.Value().latch.Value().Value();
+    ChipLogError(AppServer, "Target Latch: %s, State Latch: %s", targetLatch ? "true" : "false", stateLatch ? "true" : "false");
+    return targetLatch != stateLatch;
 }

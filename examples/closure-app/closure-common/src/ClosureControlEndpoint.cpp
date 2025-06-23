@@ -225,8 +225,8 @@ void ClosureControlEndpoint::UpdateTargetStateFromCurrentState()
     mLogic.GetOverallState(overallState);
     if (overallState.IsNull())
     {
-         mLogic.SetOverallTarget(DataModel::NullNullable);
-         return;
+        mLogic.SetOverallTarget(DataModel::NullNullable);
+        return;
     }
 
     DataModel::Nullable<GenericOverallTarget> overallTarget;
@@ -236,8 +236,7 @@ void ClosureControlEndpoint::UpdateTargetStateFromCurrentState()
         overallTarget.SetNonNull(GenericOverallTarget());
     }
 
-    if (overallState.Value().positioning.HasValue() &&
-            !overallState.Value().positioning.Value().IsNull())
+    if (overallState.Value().positioning.HasValue() && !overallState.Value().positioning.Value().IsNull())
     {
         PositioningEnum positioning = overallState.Value().positioning.Value().Value();
         TargetPositionEnum targetPosition;
@@ -246,24 +245,28 @@ void ClosureControlEndpoint::UpdateTargetStateFromCurrentState()
         {
             // If the target position is unknown, we set the position field of overallTarget to NullNullable.
             overallTarget.Value().position.ClearValue();
-        } else {
+        }
+        else
+        {
             overallTarget.Value().position.SetValue(targetPosition);
         }
     }
 
-    if (overallState.Value().latch.HasValue() &&
-            !overallState.Value().latch.Value().IsNull())
+    if (overallState.Value().latch.HasValue() && !overallState.Value().latch.Value().IsNull())
     {
         overallTarget.Value().latch.SetValue(overallState.Value().latch.Value().Value());
-    } else {
+    }
+    else
+    {
         overallTarget.Value().latch.ClearValue();
     }
 
-    if (overallState.Value().speed.HasValue() &&
-            !overallState.Value().speed.Value().IsNull())
+    if (overallState.Value().speed.HasValue() && !overallState.Value().speed.Value().IsNull())
     {
         overallTarget.Value().speed.SetValue(overallState.Value().speed.Value().Value());
-    } else {
+    }
+    else
+    {
         overallTarget.Value().speed.ClearValue();
     }
 
@@ -292,8 +295,7 @@ void ClosureControlEndpoint::UpdateCurrentStateFromTargetState()
 
     if (state.mOverallTarget.Value().position.HasValue())
     {
-        PositioningEnum currentPositioning =
-            MapTargetPositionToCurrentPositioning(state.mOverallTarget.Value().position.Value());
+        PositioningEnum currentPositioning = MapTargetPositionToCurrentPositioning(state.mOverallTarget.Value().position.Value());
         currentOverallState.positioning.SetValue(MakeNullable(currentPositioning));
     }
 

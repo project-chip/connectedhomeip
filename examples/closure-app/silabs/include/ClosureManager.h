@@ -124,7 +124,7 @@ private:
     bool isCalibrationInProgress = false;
     bool isMoveToInProgress      = false;
 
-    Action_t mCurrentAction      = Action_t::INVALID_ACTION;
+    Action_t mCurrentAction = Action_t::INVALID_ACTION;
 
     // Define the endpoint ID for the Closure
     static constexpr chip::EndpointId kClosureEndpoint       = 1;
@@ -220,8 +220,9 @@ private:
      * @return true if the current state need to be updated to the next position,
      *         false if the target position is already reached or update to next position failed.
      */
-    bool UpdatePanelCurrentStateToNextPosition(const chip::app::Clusters::ClosureDimension::ClusterState & panelState,
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::GenericCurrentStateStruct> & currentState);
+    bool UpdatePanelCurrentStateToNextPosition(
+        const chip::app::Clusters::ClosureDimension::ClusterState & panelState,
+        chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::GenericCurrentStateStruct> & currentState);
 
     /**
      * @brief Determines if a latch action is needed based on the current and target closure states.
