@@ -28,6 +28,7 @@ from typing import Optional
 from unittest.mock import MagicMock
 
 import chip.testing.global_stash as global_stash
+import chip.testing.matter_global_defaults as matter_global_defaults
 from chip.clusters import Attribute
 from mobly import signals
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
@@ -55,8 +56,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from chip.testing.matter_testing import MatterTestConfig
-
-_DEFAULT_LOG_PATH = "/tmp/matter_testing/logs"
 
 
 class InternalTestRunnerHooks(TestRunnerHooks):
@@ -230,7 +229,7 @@ def generate_mobly_test_config(matter_test_config):
     test_run_config.testbed_name = "MatterTest"
 
     log_path = matter_test_config.logs_path
-    log_path = _DEFAULT_LOG_PATH if log_path is None else log_path
+    log_path = matter_global_defaults._DEFAULT_LOG_PATH if log_path is None else log_path
     if ENV_MOBLY_LOGPATH in os.environ:
         log_path = os.environ[ENV_MOBLY_LOGPATH]
 
