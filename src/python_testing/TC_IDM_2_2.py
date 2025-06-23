@@ -78,6 +78,28 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         self.timeout_ms = 10000  # 10 second timeout for read operations
         self.large_operation_timeout_ms = 60000  # 60 second timeout for large operations (like reading all attributes)
         self.setup_timeout_ms = 60000  # 60 second timeout for setup phase
+        # Operation type to handler mapping
+        self._operation_map = {
+            'single_attribute': self._read_single_attribute,
+            'all_cluster_attributes': self._read_all_cluster_attributes,
+            'attribute_all_endpoints': self._read_attribute_all_endpoints,
+            'global_attribute': self._read_global_attribute,
+            'all_attributes': self._read_all_attributes,
+            'global_attribute_all_endpoints': self._read_global_attribute_all_endpoints,
+            'cluster_all_endpoints': self._read_cluster_all_endpoints,
+            'endpoint_all_clusters': self._read_endpoint_all_clusters,
+            'unsupported_endpoint': self._read_unsupported_endpoint,
+            'unsupported_cluster': self._read_unsupported_cluster,
+            'unsupported_attribute': self._read_unsupported_attribute,
+            'repeat_attribute': self._read_repeat_attribute,
+            'data_version_filter': self._read_data_version_filter,
+            'non_global_attribute': self._read_non_global_attribute,
+            'limited_access': self._read_limited_access,
+            'all_events_attributes': self._read_all_events_attributes,
+            'data_version_filter_multiple_clusters': self._read_data_version_filter_multiple_clusters,
+            'multiple_data_version_filters': self._read_multiple_data_version_filters,
+            'chunked_data': self._read_chunked_data,
+        }
     
     def get_device_clusters(self) -> set:
         """Get all clusters supported by the device.
@@ -434,252 +456,193 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             logging.error(f"Read response: {descriptor_read}")
             raise
 
-    async def _test_read_operation(self, operation_type: str, **kwargs) -> dict:
-        """Execute a read operation based on the specified type.
-                
-        Args:
-            operation_type: Type of read operation to perform
-            **kwargs: Additional arguments specific to the operation type
-                
-        Returns:
-            Dictionary containing the read results
-            
-        Raises:
-            ValueError if operation_type is invalid
-            AssertionError if verification fails
-            ChipStackError if the read operation fails
-        """
+    async def _read_single_attribute(self, **kwargs):
+        return await self.verify_attribute_read([(kwargs['endpoint'], kwargs['attribute'])])
+
+    async def _read_all_cluster_attributes(self, **kwargs):
+        return await self.verify_attribute_read([(kwargs['endpoint'], kwargs['cluster'])])
+
+    async def _read_attribute_all_endpoints(self, **kwargs):
+        return await self.verify_attribute_read([(None, kwargs['cluster'], kwargs['attribute'])])
+
+    async def _read_global_attribute(self, **kwargs):
+        attribute_path = AttributePath(
+            EndpointId=kwargs['endpoint'],
+            ClusterId=None,
+            AttributeId=kwargs['attribute_id'])
+        return await self.verify_attribute_read([attribute_path])
+
+    async def _read_all_attributes(self, **kwargs):
+        import asyncio
+        read_request = await asyncio.wait_for(
+            self.default_controller.Read(self.dut_node_id, [()]),
+            timeout=120.0
+        )
+        await self._verify_empty_tuple([()], read_request)
+        return read_request
+
+    async def _read_global_attribute_all_endpoints(self, **kwargs):
+        attribute_path = AttributePath(
+            EndpointId=None,
+            ClusterId=None,
+            AttributeId=kwargs['attribute_id'])
+        return await self.verify_attribute_read([attribute_path])
+
+    async def _read_cluster_all_endpoints(self, **kwargs):
+        read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [kwargs['cluster']])
+        for endpoint in read_request:
+            asserts.assert_in(kwargs['cluster'], read_request[endpoint].keys(),
+                              f"{kwargs['cluster']} cluster not in output")
+            asserts.assert_in(kwargs['cluster'].Attributes.AttributeList,
+                              read_request[endpoint][kwargs['cluster']],
+                              "AttributeList not in output")
+        return read_request
+
+    async def _read_endpoint_all_clusters(self, **kwargs):
+        read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [kwargs['endpoint']])
+        endpoint = kwargs['endpoint']
+        asserts.assert_in(Clusters.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
+        asserts.assert_in(Clusters.Descriptor.Attributes.ServerList,
+                          read_request[endpoint][Clusters.Descriptor], "ServerList not in output")
+        for cluster in read_request[endpoint]:
+            attribute_ids = [a.attribute_id for a in read_request[endpoint][cluster].keys()
+                             if a != Clusters.Attribute.DataVersion]
+            asserts.assert_equal(
+                sorted(attribute_ids),
+                sorted(read_request[endpoint][cluster][cluster.Attributes.AttributeList]),
+                f"Expected attribute list does not match for cluster {cluster}"
+            )
+        return read_request
+
+    async def _read_unsupported_endpoint(self, **kwargs):
+        return await self.verify_attribute_read(
+            [(0xFFFF, Clusters.Descriptor, Clusters.Descriptor.Attributes.ServerList)],
+            expected_error=Status.UnsupportedEndpoint)
+
+    async def _read_unsupported_cluster(self, **kwargs):
+        return await self.verify_attribute_read(
+            [(0, 0xFFFF, Clusters.Descriptor.Attributes.ServerList)],
+            expected_error=Status.UnsupportedCluster)
+
+    async def _read_unsupported_attribute(self, **kwargs):
+        return await self.verify_attribute_read(
+            [(0, Clusters.Descriptor, 0xFFFF)],
+            expected_error=Status.UnsupportedAttribute)
+
+    async def _read_repeat_attribute(self, **kwargs):
+        results = []
+        for _ in range(kwargs['repeat_count']):
+            results.append(await self.verify_attribute_read(
+                [(kwargs['endpoint'], kwargs['cluster'], kwargs['attribute'])]))
+        return results
+
+    async def _read_data_version_filter(self, **kwargs):
+        read_request = await self.default_controller.ReadAttribute(
+            self.dut_node_id, [(kwargs['endpoint'], kwargs['cluster'], kwargs['attribute'])])
+        data_version = read_request[0][kwargs['cluster']][Clusters.Attribute.DataVersion]
+        if 'test_value' in kwargs:
+            await self.default_controller.WriteAttribute(
+                self.dut_node_id,
+                [(kwargs['endpoint'], kwargs['attribute'](value=kwargs['test_value']))])
+        data_version_filter = [(kwargs['endpoint'], kwargs['cluster'], data_version)]
+        filtered_read = await self.default_controller.ReadAttribute(
+            self.dut_node_id,
+            [(kwargs['endpoint'], kwargs['cluster'], kwargs['attribute'])],
+            dataVersionFilters=data_version_filter)
+        return read_request, filtered_read
+
+    async def _read_non_global_attribute(self, **kwargs):
+        attribute_path = AttributePath(
+            EndpointId=kwargs.get('endpoint'),
+            ClusterId=None,
+            AttributeId=kwargs['attribute'].attribute_id)
         try:
-            if operation_type == 'single_attribute':
-                return await self.verify_attribute_read([(kwargs['endpoint'], kwargs['attribute'])])
-                
-            elif operation_type == 'all_cluster_attributes':
-                return await self.verify_attribute_read([(kwargs['endpoint'], kwargs['cluster'])])
-                
-            elif operation_type == 'attribute_all_endpoints':
-                return await self.verify_attribute_read([(None, kwargs['cluster'], kwargs['attribute'])])
-                
-            elif operation_type == 'global_attribute':
-                attribute_path = AttributePath(
-                    EndpointId=kwargs['endpoint'],
-                    ClusterId=None,
-                    AttributeId=kwargs['attribute_id'])
-                return await self.verify_attribute_read([attribute_path])
-                
-            elif operation_type == 'all_attributes':
-                import asyncio
-                read_request = await asyncio.wait_for(
-                    self.default_controller.Read(self.dut_node_id, [()]),
-                    timeout=120.0 
-                )
-                
-                await self._verify_empty_tuple([()], read_request)
-                
-                return read_request
-                
-            elif operation_type == 'global_attribute_all_endpoints':
-                attribute_path = AttributePath(
-                    EndpointId=None,
-                    ClusterId=None,
-                    AttributeId=kwargs['attribute_id'])
-                return await self.verify_attribute_read([attribute_path])
-                
-            elif operation_type == 'cluster_all_endpoints':
-                # Use Austin's ReadAttribute approach for reading a cluster from all endpoints
-                read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [kwargs['cluster']])
-                
-                for endpoint in read_request:
-                    asserts.assert_in(kwargs['cluster'], read_request[endpoint].keys(), 
-                                    f"{kwargs['cluster']} cluster not in output")
-                    asserts.assert_in(kwargs['cluster'].Attributes.AttributeList,
-                                    read_request[endpoint][kwargs['cluster']], 
-                                    "AttributeList not in output")
-                
-                return read_request
-                
-            elif operation_type == 'endpoint_all_clusters':
-                read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [kwargs['endpoint']])
-                
-                endpoint = kwargs['endpoint']
-                asserts.assert_in(Clusters.Descriptor, read_request[endpoint].keys(), "Descriptor cluster not in output")
-                asserts.assert_in(Clusters.Descriptor.Attributes.ServerList,
-                                read_request[endpoint][Clusters.Descriptor], "ServerList not in output")
+            result = await self.default_controller.ReadAttribute(
+                self.dut_node_id,
+                [attribute_path]
+            )
+            asserts.fail("Expected INVALID_ACTION error but operation succeeded")
+        except ChipStackError as e:
+            asserts.assert_equal(e.err, 0x580,
+                                 "Incorrect error response for reading non-global attribute on all clusters at endpoint")
+            return None
 
-                for cluster in read_request[endpoint]:
-                    attribute_ids = [a.attribute_id for a in read_request[endpoint][cluster].keys() 
-                                   if a != Clusters.Attribute.DataVersion]
-                    asserts.assert_equal(
-                        sorted(attribute_ids),
-                        sorted(read_request[endpoint][cluster][cluster.Attributes.AttributeList]),
-                        f"Expected attribute list does not match for cluster {cluster}"
-                    )
-                
-                return read_request
-                
-            elif operation_type == 'unsupported_endpoint':
-                return await self.verify_attribute_read(
-                    [(0xFFFF, Clusters.Descriptor, Clusters.Descriptor.Attributes.ServerList)],
-                    expected_error=Status.UnsupportedEndpoint)
-                
-            elif operation_type == 'unsupported_cluster':
-                return await self.verify_attribute_read(
-                    [(0, 0xFFFF, Clusters.Descriptor.Attributes.ServerList)],
-                    expected_error=Status.UnsupportedCluster)
-                
-            elif operation_type == 'unsupported_attribute':
-                # Use a known unsupported attribute ID (0xFFFF) to test UNSUPPORTED_ATTRIBUTE response
-                # Use tuple format to avoid conflicts with other operations
-                return await self.verify_attribute_read(
-                    [(0, Clusters.Descriptor, 0xFFFF)],
-                    expected_error=Status.UnsupportedAttribute)
-                
-            elif operation_type == 'repeat_attribute':
-                results = []
-                for _ in range(kwargs['repeat_count']):
-                    results.append(await self.verify_attribute_read(
-                        [(kwargs['endpoint'], kwargs['cluster'], kwargs['attribute'])]))
-                return results
-                
-            elif operation_type == 'data_version_filter':
-                # Initial read to get data version - use ReadAttribute like Austin's version
-                read_request = await self.default_controller.ReadAttribute(
-                    self.dut_node_id, [(kwargs['endpoint'], kwargs['cluster'], kwargs['attribute'])])
-                data_version = read_request[0][kwargs['cluster']][Clusters.Attribute.DataVersion]
-                
-                if 'test_value' in kwargs:
-                    await self.default_controller.WriteAttribute(
-                        self.dut_node_id,
-                        [(kwargs['endpoint'], kwargs['attribute'](value=kwargs['test_value']))])
-                
-                data_version_filter = [(kwargs['endpoint'], kwargs['cluster'], data_version)]
-                filtered_read = await self.default_controller.ReadAttribute(
-                    self.dut_node_id, 
-                    [(kwargs['endpoint'], kwargs['cluster'], kwargs['attribute'])], 
-                    dataVersionFilters=data_version_filter)
-                
-                return read_request, filtered_read
-                
-            elif operation_type == 'non_global_attribute':
-                attribute_path = AttributePath(
-                    EndpointId=kwargs.get('endpoint'),
-                    ClusterId=None,
-                    AttributeId=kwargs['attribute'].attribute_id)
-                
-                # Use ReadAttribute like Austin did, and expect ChipStackError with 0x580
-                try:
-                    result = await self.default_controller.ReadAttribute(
-                        self.dut_node_id,
-                        [attribute_path]
-                    )
-                    # If we get here, the operation succeeded unexpectedly
-                    asserts.fail("Expected INVALID_ACTION error but operation succeeded")
-                except ChipStackError as e:
-                    asserts.assert_equal(e.err, 0x580,
-                                       "Incorrect error response for reading non-global attribute on all clusters at endpoint")
-                    return None
-                
-            elif operation_type == 'limited_access':
-                endpoint = kwargs['endpoint']
-                read_request = await self.default_controller.Read(
-                    self.dut_node_id,
-                    [(endpoint, Clusters.AccessControl.Attributes.Acl)])
-                
-                dut_acl_original = read_request.attributes[endpoint][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
-                
-                # Limited ACE for controller 2 with single cluster access
-                ace = Clusters.AccessControl.Structs.AccessControlEntryStruct(
-                    privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
-                    authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                    targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=kwargs['cluster_id'])],
-                    subjects=[kwargs['subject_id']])
-                
-                dut_acl = copy.deepcopy(dut_acl_original)
-                dut_acl.append(ace)
-                
-                result = await self.default_controller.WriteAttribute(
-                    self.dut_node_id, 
-                    [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl))])
-                
-                read_request = await self.default_controller.Read(
-                    self.dut_node_id,
-                    [(endpoint, Clusters.AccessControl.Attributes.Acl)])
-                
-                # Verify ACL was updated
-                asserts.assert_equal(len(read_request.attributes[endpoint][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]), 2)
-                
-                await self.default_controller.WriteAttribute(
-                    self.dut_node_id, 
-                    [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl_original))])
-                
-                # Verify restoration
-                read_request = await self.default_controller.Read(
-                    self.dut_node_id,
-                    [(endpoint, Clusters.AccessControl.Attributes.Acl)])
-                asserts.assert_equal(len(read_request.attributes[endpoint][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]), 1)
-                
-                return dut_acl_original, read_request
-                
-            elif operation_type == 'all_events_attributes':
-                return await self.default_controller.Read(nodeid=self.dut_node_id, attributes=[()], events=[()])
-                
-            elif operation_type == 'data_version_filter_multiple_clusters':
-                # Read from cluster A to get its data version - use ReadAttribute
-                read_a = await self.default_controller.ReadAttribute(
-                    self.dut_node_id, [(kwargs['endpoint'], kwargs['cluster'], kwargs['attribute'])])
-                data_version_a = read_a[0][kwargs['cluster']][Clusters.Attribute.DataVersion]
-                
-                # Read from both cluster A and cluster B, but only filter cluster A
-                # This should return data from cluster B but not from cluster A (due to matching data version)
-                data_version_filter_a = [(kwargs['endpoint'], kwargs['cluster'], data_version_a)]
-                read_both = await self.default_controller.ReadAttribute(
-                    self.dut_node_id,
-                    [(kwargs['endpoint'], kwargs['cluster'], kwargs['attribute']),
-                     (kwargs['endpoint'], kwargs['other_cluster'], kwargs['other_attribute'])],
-                    dataVersionFilters=data_version_filter_a)
-                
-                return read_a, read_both
-                
-            elif operation_type == 'multiple_data_version_filters':
-                # Initial read to get data version - use ReadAttribute
-                read_request = await self.default_controller.ReadAttribute(
-                    self.dut_node_id, [(kwargs['endpoint'], kwargs['cluster'], kwargs['attribute'])])
-                data_version = read_request[0][kwargs['cluster']][Clusters.Attribute.DataVersion]
-                
-                if 'test_value' in kwargs:
-                    # Write operation to change data version
-                    await self.default_controller.WriteAttribute(
-                        self.dut_node_id,
-                        [(kwargs['endpoint'], kwargs['attribute'](value=kwargs['test_value']))])
-                
-                # Create two data version filters: one with current version and one with older version
-                data_version_filter_1 = [(kwargs['endpoint'], kwargs['cluster'], data_version)]
-                data_version_filter_2 = [(kwargs['endpoint'], kwargs['cluster'], data_version - 1)]
-                
-                # Read with multiple data version filters - use ReadAttribute
-                filtered_read = await self.default_controller.ReadAttribute(
-                    self.dut_node_id,
-                    [(kwargs['endpoint'], kwargs['cluster'], kwargs['attribute'])],
-                    dataVersionFilters=data_version_filter_1)
-                
-                return read_request, filtered_read
-                
-            elif operation_type == 'chunked_data':
-                # Use a known large attribute from UnitTesting cluster
-                endpoint = self.endpoint
-                cluster = Clusters.UnitTesting
-                attribute = Clusters.UnitTesting.Attributes.ListLongOctetString
+    async def _read_limited_access(self, **kwargs):
+        endpoint = kwargs['endpoint']
+        read_request = await self.default_controller.Read(
+            self.dut_node_id,
+            [(endpoint, Clusters.AccessControl.Attributes.Acl)])
+        dut_acl_original = read_request.attributes[endpoint][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
+        ace = Clusters.AccessControl.Structs.AccessControlEntryStruct(
+            privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+            authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
+            targets=[Clusters.AccessControl.Structs.AccessControlTargetStruct(cluster=kwargs['cluster_id'])],
+            subjects=[kwargs['subject_id']])
+        dut_acl = copy.deepcopy(dut_acl_original)
+        dut_acl.append(ace)
+        result = await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl))])
+        read_request = await self.default_controller.Read(
+            self.dut_node_id,
+            [(endpoint, Clusters.AccessControl.Attributes.Acl)])
+        asserts.assert_equal(len(read_request.attributes[endpoint][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]), 2)
+        await self.default_controller.WriteAttribute(
+            self.dut_node_id,
+            [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl_original))])
+        read_request = await self.default_controller.Read(
+            self.dut_node_id,
+            [(endpoint, Clusters.AccessControl.Attributes.Acl)])
+        asserts.assert_equal(len(read_request.attributes[endpoint][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]), 1)
+        return dut_acl_original, read_request
 
-                # Perform the read operation
-                read_responses = await self.default_controller.Read(
-                    self.dut_node_id,
-                    [(endpoint, cluster, attribute)]
-                )
+    async def _read_all_events_attributes(self, **kwargs):
+        return await self.default_controller.Read(nodeid=self.dut_node_id, attributes=[()], events=[()])
 
-                return read_responses
-                
-            else:
+    async def _read_data_version_filter_multiple_clusters(self, **kwargs):
+        read_a = await self.default_controller.ReadAttribute(
+            self.dut_node_id, [(kwargs['endpoint'], kwargs['cluster'], kwargs['attribute'])])
+        data_version_a = read_a[0][kwargs['cluster']][Clusters.Attribute.DataVersion]
+        data_version_filter_a = [(kwargs['endpoint'], kwargs['cluster'], data_version_a)]
+        read_both = await self.default_controller.ReadAttribute(
+            self.dut_node_id,
+            [(kwargs['endpoint'], kwargs['cluster'], kwargs['attribute']),
+             (kwargs['endpoint'], kwargs['other_cluster'], kwargs['other_attribute'])],
+            dataVersionFilters=data_version_filter_a)
+        return read_a, read_both
+
+    async def _read_multiple_data_version_filters(self, **kwargs):
+        read_request = await self.default_controller.ReadAttribute(
+            self.dut_node_id, [(kwargs['endpoint'], kwargs['cluster'], kwargs['attribute'])])
+        data_version = read_request[0][kwargs['cluster']][Clusters.Attribute.DataVersion]
+        if 'test_value' in kwargs:
+            await self.default_controller.WriteAttribute(
+                self.dut_node_id,
+                [(kwargs['endpoint'], kwargs['attribute'](value=kwargs['test_value']))])
+        data_version_filter_1 = [(kwargs['endpoint'], kwargs['cluster'], data_version)]
+        data_version_filter_2 = [(kwargs['endpoint'], kwargs['cluster'], data_version - 1)]
+        filtered_read = await self.default_controller.ReadAttribute(
+            self.dut_node_id,
+            [(kwargs['endpoint'], kwargs['cluster'], kwargs['attribute'])],
+            dataVersionFilters=data_version_filter_1)
+        return read_request, filtered_read
+
+    async def _read_chunked_data(self, **kwargs):
+        endpoint = self.endpoint
+        cluster = Clusters.UnitTesting
+        attribute = Clusters.UnitTesting.Attributes.ListLongOctetString
+        read_responses = await self.default_controller.Read(
+            self.dut_node_id,
+            [(endpoint, cluster, attribute)]
+        )
+        return read_responses
+
+    async def _test_read_operation(self, operation_type: str, **kwargs) -> dict:
+        try:
+            handler = self._operation_map.get(operation_type)
+            if handler is None:
                 raise ValueError(f"Invalid operation type: {operation_type}")
-
+            return await handler(**kwargs)
         except ChipStackError as e:
             logging.error(f"Operation {operation_type} failed: {str(e)}")
             logging.error(f"Arguments: {kwargs}")
