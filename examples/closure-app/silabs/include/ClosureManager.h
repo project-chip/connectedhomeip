@@ -120,7 +120,7 @@ public:
 private:
     static ClosureManager sClosureMgr;
     osTimerId_t mClosureTimer;
-    
+
     bool isCalibrationInProgress = false;
     bool isMoveToInProgress      = false;
 
@@ -200,7 +200,7 @@ private:
      * @brief Handles the motion action for closure endpoints.
      *
      * This method manages the state transitions and actions for closure endpoints (such as panels or doors)
-     * during a motion event. It updates the current positions of endpoints 2 and 3 to next position. 
+     * during a motion event. It updates the current positions of endpoints 2 and 3 to next position.
      * It also triggers
      *       - Timer for motion action completion if the target position is not reached
      *       - Timer for Latch action if needed based on the current state of the closure.
@@ -216,11 +216,11 @@ private:
      * values if they are set in the current state.
      *
      * @param[in]  epState      The current cluster state of the closure dimension endpoint.
-     * @param[out] currentState The updated current state struct reflecting the next position.  
-     * @return true if the current state need to be updated to the next position, 
+     * @param[out] currentState The updated current state struct reflecting the next position.
+     * @return true if the current state need to be updated to the next position,
      *         false if the target position is already reached or update to next position failed.
      */
-    bool UpdatePanelCurrentStateToNextPosition(const chip::app::Clusters::ClosureDimension::ClusterState & panelState, 
+    bool UpdatePanelCurrentStateToNextPosition(const chip::app::Clusters::ClosureDimension::ClusterState & panelState,
             chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::GenericCurrentStateStruct> & currentState);
 
     /**
@@ -231,6 +231,6 @@ private:
      *
      * @param epState The current closure cluster state, containing both the overall target and state.
      * @return true if a latch action is needed, false otherwise.
-     */                                        
+     */
     bool IsClosureLatchActionNeeded(const chip::app::Clusters::ClosureControl::ClusterState & epState);
 };

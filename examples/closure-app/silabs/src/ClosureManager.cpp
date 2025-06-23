@@ -35,7 +35,7 @@ using namespace chip::app::Clusters::ClosureDimension;
 namespace {
 constexpr uint32_t kCountdownTimeSeconds = 10;
 constexpr uint32_t kMotionCountdownTimeMs = 1000; // 10% change of position per second
-constexpr uint32_t kLatchCountdownTimeMs = 2000; 
+constexpr uint32_t kLatchCountdownTimeMs = 2000;
 
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
@@ -342,7 +342,7 @@ void ClosureManager::HandleClosureMotionAction()
     chip::app::Clusters::ClosureDimension::ClusterState ep3State = instance.ep3.GetLogic().GetState();
 
     DataModel::Nullable<GenericCurrentStateStruct> currentState = DataModel::NullNullable;
-    
+
     bool isEndPoint2TargetReached = false;
     bool isEndPoint3TargetReached = false;
 
@@ -390,7 +390,7 @@ void ClosureManager::HandleClosureMotionAction()
 void ClosureManager::HandleClosureActionComplete(Action_t action)
 {
     ClosureManager & instance = ClosureManager::GetInstance();
-    
+
     switch (action)
     {
     case Action_t::CALIBRATE_ACTION: {
@@ -430,7 +430,7 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
 
 bool ClosureManager::UpdatePanelCurrentStateToNextPosition(
                                 const chip::app::Clusters::ClosureDimension::ClusterState & epState,
-                                DataModel::Nullable<GenericCurrentStateStruct> & currentState) 
+                                DataModel::Nullable<GenericCurrentStateStruct> & currentState)
 
 {
   if (epState.target.IsNull())
@@ -468,7 +468,7 @@ bool ClosureManager::UpdatePanelCurrentStateToNextPosition(
   }
   else if (currentPosition > targetPosition)
   {
-      // Moving down: Decreasing the current position by a step of 1000 units, 
+      // Moving down: Decreasing the current position by a step of 1000 units,
       // ensuring it does not go below the target position.
       nextCurrentPosition = std::max(static_cast<chip::Percent100ths>(currentPosition - 1000), targetPosition);
   }
@@ -478,7 +478,7 @@ bool ClosureManager::UpdatePanelCurrentStateToNextPosition(
       nextCurrentPosition = currentPosition;
       return false; // No update needed
   }
-  
+
   currentState.SetNonNull().Set(
             MakeOptional(nextCurrentPosition),
             epState.currentState.Value().latch.HasValue() ? MakeOptional(epState.currentState.Value().latch.Value()) : NullOptional,
@@ -497,7 +497,7 @@ bool ClosureManager::IsClosureLatchActionNeeded(const chip::app::Clusters::Closu
   }
 
   // latch action needed if OverallState is null or latch is not set and OverallTarget has latch set
-  if (epState.mOverallState.IsNull() || !epState.mOverallState.Value().latch.HasValue() || 
+  if (epState.mOverallState.IsNull() || !epState.mOverallState.Value().latch.HasValue() ||
       epState.mOverallState.Value().latch.Value().IsNull())
   {
     ChipLogError(AppServer, "Latch action needed as OverallState is null or latch is not set, while OverallTarget has latch set");
@@ -507,7 +507,7 @@ bool ClosureManager::IsClosureLatchActionNeeded(const chip::app::Clusters::Closu
   // Only return true if the latch value is different between target and state
   bool targetLatch = epState.mOverallTarget.Value().latch.Value();
   bool stateLatch = epState.mOverallState.Value().latch.Value().Value();
-  ChipLogError(AppServer, "Target Latch: %s, State Latch: %s", 
+  ChipLogError(AppServer, "Target Latch: %s, State Latch: %s",
                targetLatch ? "true" : "false", stateLatch ? "true" : "false");
   return targetLatch != stateLatch;
 }

@@ -236,8 +236,8 @@ void ClosureControlEndpoint::UpdateTargetStateFromCurrentState()
         overallTarget.SetNonNull(GenericOverallTarget());
     }
 
-    if (overallState.Value().positioning.HasValue() && 
-            !overallState.Value().positioning.Value().IsNull()) 
+    if (overallState.Value().positioning.HasValue() &&
+            !overallState.Value().positioning.Value().IsNull())
     {
         PositioningEnum positioning = overallState.Value().positioning.Value().Value();
         TargetPositionEnum targetPosition;
@@ -251,16 +251,16 @@ void ClosureControlEndpoint::UpdateTargetStateFromCurrentState()
         }
     }
 
-    if (overallState.Value().latch.HasValue() && 
-            !overallState.Value().latch.Value().IsNull()) 
+    if (overallState.Value().latch.HasValue() &&
+            !overallState.Value().latch.Value().IsNull())
     {
         overallTarget.Value().latch.SetValue(overallState.Value().latch.Value().Value());
     } else {
         overallTarget.Value().latch.ClearValue();
     }
 
-    if (overallState.Value().speed.HasValue() && 
-            !overallState.Value().speed.Value().IsNull()) 
+    if (overallState.Value().speed.HasValue() &&
+            !overallState.Value().speed.Value().IsNull())
     {
         overallTarget.Value().speed.SetValue(overallState.Value().speed.Value().Value());
     } else {
