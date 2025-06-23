@@ -22,16 +22,42 @@ using namespace chip::webrtc;
 
 extern "C" {
 
-void * pychip_webrtc_CreateWebrtcClient(int id)
+void * pychip_webrtc_client_create()
 {
-    return chip::webrtc::CreateWebrtcClient(id);
+    return chip::webrtc::webrtc_client_create();
 }
 
-void pychip_webrtc_InitialiseConnection(void * client)
+void pychip_webrtc_client_destroy(void * client)
 {
-    return chip::webrtc::InitialisePeerConnection(client);
+    return chip::webrtc::webrtc_client_destroy(client);
 }
 
+void pychip_webrtc_client_create_peer_connection(void * client, char * stun_url)
+{
+    return chip::webrtc::webrtc_client_create_peer_connection(client, stun_url);
+}
+
+void pychip_webrtc_client_create_offer(void * client)
+{
+    chip::webrtc::webrtc_client_create_offer(client);
+}
+
+void pychip_webrtc_client_create_answer(void * client)
+{
+    chip::webrtc::webrtc_client_create_answer(client);
+}
+
+void pychip_webrtc_client_set_remote_description(void * client, char * sdp, char * type)
+{
+    chip::webrtc::webrtc_client_set_remote_description(client, sdp, type);
+}
+
+void pychip_webrtc_client_add_ice_candidate(void * client, char * candidate, char * mid)
+{
+    chip::webrtc::webrtc_client_add_ice_candidate(client, candidate, mid);
+}
+
+#if 0
 void pychip_webrtc_CloseConnection(void * client)
 {
     return chip::webrtc::ClosePeerConnection(client);
@@ -42,29 +68,15 @@ void pychip_webrtc_DestroyClient(void * client)
     return chip::webrtc::DestroyClient(client);
 }
 
+
 void pychip_webrtc_GetStats(void * client)
 {
     return chip::webrtc::GetStats(client);
 }
 
-void pychip_webrtc_CreateOffer(void * client)
-{
-    chip::webrtc::CreateOffer(client);
-}
-
 const char * pychip_webrtc_GetLocalSDP(void * client)
 {
     return chip::webrtc::GetLocalSdp(client);
-}
-
-void pychip_webrtc_SetAnswer(void * client, const char * answer)
-{
-    chip::webrtc::SetAnswer(client, answer);
-}
-
-void pychip_webrtc_SetCandidate(void * client, const char * candidate)
-{
-    chip::webrtc::SetCandidate(client, candidate);
 }
 
 void pychip_webrtc_SetCallbacks(void * client, SdpOfferCallback offer_cb, SdpAnswerCallback answer_cb, IceCallback ice_cb,
@@ -74,4 +86,5 @@ void pychip_webrtc_SetCallbacks(void * client, SdpOfferCallback offer_cb, SdpAns
     chip::webrtc::SetCallbacks(client, offer_cb, answer_cb, ice_cb, error_cb, peer_connected_cb, peer_disconnected_cb,
                                stats_callback);
 }
+#endif
 }

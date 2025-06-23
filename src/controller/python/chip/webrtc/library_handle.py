@@ -38,26 +38,19 @@ def _GetWebRTCLibraryHandle() -> ctypes.CDLL:
     # initialized.
     if not handle.pychip_webrtc_CreateWebrtcClient.argtypes:
         setter = chip.native.NativeLibraryHandleMethodArguments(handle)
-
-        setter.Set('pychip_webrtc_CreateWebrtcClient',
-                   ctypes.c_void_p, [c_uint32])
-        setter.Set('pychip_webrtc_InitialiseConnection',
+        setter.Set('pychip_webrtc_client_create',
+                   ctypes.c_void_p, [None])
+        setter.Set('pychip_webrtc_client_destroy',
                    ctypes.c_void_p, [c_void_p])
-        setter.Set('pychip_webrtc_CloseConnection',
-                   ctypes.c_void_p, [c_void_p])
-        setter.Set('pychip_webrtc_GetStats',
-                   ctypes.c_void_p, [c_void_p])
-        setter.Set('pychip_webrtc_DestroyClient',
-                   ctypes.c_void_p, [c_void_p])
-        setter.Set('pychip_webrtc_CreateOffer',
-                   ctypes.c_void_p, [c_void_p])
-        setter.Set('pychip_webrtc_GetLocalSDP',
-                   ctypes.c_char_p, [c_void_p])
-        setter.Set('pychip_webrtc_SetAnswer',
+        setter.Set('pychip_webrtc_client_create_peer_connection',
                    ctypes.c_void_p, [c_void_p, c_char_p])
-        setter.Set('pychip_webrtc_SetCandidate',
-                   ctypes.c_void_p, [c_void_p, c_char_p])
-        setter.Set('pychip_webrtc_SetCallbacks',
-                   ctypes.c_void_p, [c_void_p, SdpOfferCallback_t, SdpAnswerCallback_t, IceCallback_t, ErrorCallback_t, PeerConnectedCallback_t, PeerDisconnectedCallback_t, StatsCallback_t])
+        setter.Set('pychip_webrtc_client_create_offer',
+                   ctypes.c_void_p, [c_void_p])
+        setter.Set('pychip_webrtc_client_create_answer',
+                   ctypes.c_void_p, [c_void_p])
+        setter.Set('pychip_webrtc_client_set_remote_description',
+                   ctypes.c_void_p, [c_void_p, c_char_p, c_char_p])
+        setter.Set('pychip_webrtc_client_add_ice_candidate',
+                   ctypes.c_void_p, [c_void_p, c_char_p, c_char_p])
 
     return handle
