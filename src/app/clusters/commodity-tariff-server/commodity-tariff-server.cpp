@@ -26,7 +26,7 @@
 #include <cstddef>
 #include <cstdint>
 
-constexpr uint32_t kSecInOneDay = 60 * 60 * 24;
+constexpr uint32_t kSecondsPerDay = chip::kSecondsPerDay; // Or directly use chip::kSecondsPerDay
 
 using namespace chip;
 using namespace chip::app;
