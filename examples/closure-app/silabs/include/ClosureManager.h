@@ -121,9 +121,9 @@ private:
     osTimerId_t mClosureTimer;
 
     bool isCalibrationInProgress = false;
-    bool isMoveToInProgress = false;
+    bool isMoveToInProgress      = false;
 
-    Action_t mCurrentAction      = Action_t::INVALID_ACTION;
+    Action_t mCurrentAction = Action_t::INVALID_ACTION;
 
     // Define the endpoint ID for the Closure
     static constexpr chip::EndpointId kClosureEndpoint       = 1;

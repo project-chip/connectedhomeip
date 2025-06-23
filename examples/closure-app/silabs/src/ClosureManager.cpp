@@ -229,8 +229,7 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
     ClosureManager & instance = ClosureManager::GetInstance();
     switch (action)
     {
-    case Action_t::CALIBRATE_ACTION:
-    {
+    case Action_t::CALIBRATE_ACTION: {
         instance.ep1.OnCalibrateActionComplete();
         instance.ep2.OnCalibrateActionComplete();
         instance.ep3.OnCalibrateActionComplete();
@@ -240,9 +239,8 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
     case Action_t::MOVE_TO_ACTION:
         // This should handle the completion of a move-to action.
         break;
-    case Action_t::STOP_ACTION:
-    {
-        if(isCalibrationInProgress)
+    case Action_t::STOP_ACTION: {
+        if (isCalibrationInProgress)
         {
             ChipLogDetail(AppServer, "Stopping calibration action");
             instance.ep1.OnStopCalibrateActionComplete();

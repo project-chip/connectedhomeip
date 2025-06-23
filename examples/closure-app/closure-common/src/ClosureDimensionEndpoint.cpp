@@ -105,7 +105,7 @@ void ClosureDimensionEndpoint::UpdateTargetStateFromCurrentState()
     if (currentState.IsNull())
     {
         VerifyOrReturn(mLogic.SetTarget(DataModel::NullNullable) == CHIP_NO_ERROR,
-                    ChipLogError(AppServer, "Failed to set target to null in UpdateTargetStateFromCurrentState"));
+                       ChipLogError(AppServer, "Failed to set target to null in UpdateTargetStateFromCurrentState"));
         return;
     }
 
@@ -119,8 +119,8 @@ void ClosureDimensionEndpoint::UpdateTargetStateFromCurrentState()
     }
 
     target.Value().position = currentState.Value().position;
-    target.Value().latch = currentState.Value().latch;
-    target.Value().speed = currentState.Value().speed;
+    target.Value().latch    = currentState.Value().latch;
+    target.Value().speed    = currentState.Value().speed;
 
     VerifyOrReturn(mLogic.SetTarget(target) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to set target in UpdateTargetStateFromCurrentState"));
