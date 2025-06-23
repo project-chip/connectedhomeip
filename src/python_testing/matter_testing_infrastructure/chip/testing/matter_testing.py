@@ -59,7 +59,6 @@ import chip.native
 import chip.testing.global_stash as global_stash
 from chip.ChipStack import ChipStack
 from chip.clusters import Attribute, ClusterObjects
-from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
