@@ -27,7 +27,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-enum class OptionalBasicInformationAttributes : uint8_t
+enum class OptionalBasicInformationAttributes : uint16_t
 {
     kManufacturingDate   = 1 << 0,
     kPartNumber          = 1 << 1,
@@ -37,6 +37,11 @@ enum class OptionalBasicInformationAttributes : uint8_t
     kLocalConfigDisabled = 1 << 5,
     kReachable           = 1 << 6,
     kProductAppearance   = 1 << 7,
+
+    // Old specification versions had UniqueID as optional, so this
+    // appears here even though MANDATORY in the latest spec. We default
+    // it enabled (to decrease chances of error)
+    kDisableMandatoryUniqueIDOnPurpose = 1 << 8,
 };
 
 /// The BasicInformationCluster is a SINGLETON that only applies to

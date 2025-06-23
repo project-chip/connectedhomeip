@@ -51,9 +51,6 @@ void emberAfBasicInformationClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
-    // TODO:
-    //  - set up ember data from zap:
-    //     - nodelabel (we should have our own persistence!)
     constexpr auto enabledOptionalAttributes =
         BitFlags<OptionalBasicInformationAttributes>()
             .Set(OptionalBasicInformationAttributes::kManufacturingDate, IsAttributeEnabledOnSomeEndpoint(ManufacturingDate::Id))
@@ -64,7 +61,10 @@ void emberAfBasicInformationClusterInitCallback(EndpointId endpointId)
             .Set(OptionalBasicInformationAttributes::kLocalConfigDisabled,
                  IsAttributeEnabledOnSomeEndpoint(LocalConfigDisabled::Id))
             .Set(OptionalBasicInformationAttributes::kReachable, IsAttributeEnabledOnSomeEndpoint(Reachable::Id))
-            .Set(OptionalBasicInformationAttributes::kProductAppearance, IsAttributeEnabledOnSomeEndpoint(ProductAppearance::Id));
+            .Set(OptionalBasicInformationAttributes::kProductAppearance, IsAttributeEnabledOnSomeEndpoint(ProductAppearance::Id))
+            // This is NOT typical, however we try to respect ZAP here. MCORE_FS tests require this
+            .Set(OptionalBasicInformationAttributes::kDisableMandatoryUniqueIDOnPurpose,
+                 !IsAttributeEnabledOnSomeEndpoint(UniqueID::Id));
 
     gServer.Create(enabledOptionalAttributes);
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());

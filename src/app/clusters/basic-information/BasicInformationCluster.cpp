@@ -53,11 +53,13 @@ constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
     HardwareVersionString::kMetadataEntry,
     SoftwareVersion::kMetadataEntry,
     SoftwareVersionString::kMetadataEntry,
-    UniqueID::kMetadataEntry,
     CapabilityMinima::kMetadataEntry,
     SpecificationVersion::kMetadataEntry,
     MaxPathsPerInvoke::kMetadataEntry,
     ConfigurationVersion::kMetadataEntry,
+    // NOTE: UniqueID used to NOT be mandatory in previous spec version, so we add
+    // this as a separate condition
+    // UniqueID::kMetadataEntry,
 
 };
 
@@ -375,7 +377,11 @@ CHIP_ERROR BasicInformationCluster::Attributes(const ConcreteClusterPath & path,
 {
     ReturnErrorOnFailure(builder.ReferenceExisting(kMandatoryAttributes));
 
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(8));
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(9));
+
+    if (!mEnabledOptionalAttributes.Has(OptionalBasicInformationAttributes::kDisableMandatoryUniqueIDOnPurpose)) {
+        ReturnErrorOnFailure(builder.Append(UniqueID::kMetadataEntry));
+    }
 
 #define OPTIONAL_ATTR_SET(name)                                                                                                    \
     do                                                                                                                             \
