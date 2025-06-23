@@ -126,5 +126,8 @@ pw_python_distribution("chip-testing") {
       extra_files +=
           [ "${file} > chip/testing/idt/" + get_path_info(file, "file") ]
     }
+    foreach(file, credentials_files) {
+      extra_files += [ "${file} > credentials/" + get_path_info(file, "file") ]
+    }
   }
 }

@@ -21,8 +21,9 @@ declare_args() {
 }
 
 idt_files = [
-  "${chip_root}/credentials/fetch_paa_certs_from_dcl.py",
   "${chip_root}/src/python_testing/post_certification_tests/production_device_checks.py",
   "${chip_root}/src/python_testing/TC_DA_1_2.py",
   "${chip_root}/src/python_testing/TC_DA_1_7.py",
 ]
+
+credentials_files = [ "${chip_root}/credentials/fetch_paa_certs_from_dcl.py" ]
