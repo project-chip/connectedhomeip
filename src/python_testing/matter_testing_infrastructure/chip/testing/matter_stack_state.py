@@ -16,8 +16,9 @@
 #
 
 import builtins
-import chip
 import logging
+
+import chip
 from chip.ChipStack import ChipStack
 from chip.storage import PersistentStorage
 from matter_testing import MatterTestConfig
