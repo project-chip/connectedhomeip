@@ -38,7 +38,8 @@ public:
     {
         CALIBRATE_ACTION = 0,
         MOVE_TO_ACTION,
-        STOP_ACTION,
+        STOP_MOTION_ACTION,
+        STOP_CALIBRATE_ACTION,
         LATCH_ACTION,
 
         INVALID_ACTION
@@ -119,7 +120,10 @@ public:
 private:
     static ClosureManager sClosureMgr;
     osTimerId_t mClosureTimer;
+    
     bool isCalibrationInProgress = false;
+    bool isMoveToInProgress      = false;
+
     Action_t mCurrentAction      = Action_t::INVALID_ACTION;
 
     // Define the endpoint ID for the Closure

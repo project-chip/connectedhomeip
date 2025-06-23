@@ -34,6 +34,8 @@ using namespace chip::app::Clusters::ClosureDimension;
 
 namespace {
 constexpr uint32_t kCountdownTimeSeconds = 10;
+constexpr uint32_t kMotionCountdownTimeMs = 1000; // 10% change of position per second
+constexpr uint32_t kLatchCountdownTimeMs = 2000; 
 
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
@@ -150,7 +152,7 @@ void ClosureManager::InitiateAction(AppEvent * event)
         // For Closure sample app, Motion action is simulated with a timer with rate
         // of 10% change of position per second.
         // In a real application, this would be replaced with actual move to logic.
-        instance.StartTimer(kCountdownTimeSeconds * 100);
+        instance.StartTimer(kMotionCountdownTimeMs);
         break;
     default:
         ChipLogDetail(AppServer, "Invalid action received in InitiateAction");
@@ -242,8 +244,7 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
 {
 
     // Update the target state for the closure panels based on the MoveTo command.
-    // This closure sample app assumes that the closure panels are represented by three endpoints:
-    // - Endpoint 1: Represents the Closure Control Cluster.
+    // This closure sample app assumes that the closure panels are represented by two endpoints:
     // - Endpoint 2: Represents the Closure Dimension Cluster for the first panel.
     // - Endpoint 3: Represents the Closure Dimension Cluster for the second panel.
     chip::app::Clusters::ClosureDimension::ClusterState ep2State = ep2.GetLogic().GetState();
@@ -350,7 +351,7 @@ void ClosureManager::HandleClosureMotionAction()
         // Update the current state for Endpoint 2
         instance.ep2.GetLogic().SetCurrentState(currentState);
         isEndPoint2TargetReached = (currentState.Value().position.Value() == ep2State.target.Value().position.Value());
-        ChipLogError(AppServer, "EndPoint 2 Current Position: %d, Target Position: %d", currentState.Value().position.Value(),
+        ChipLogProgress(AppServer, "EndPoint 2 Current Position: %d, Target Position: %d", currentState.Value().position.Value(),
                                                                                           ep2State.target.Value().position.Value());
     }
 
@@ -359,13 +360,13 @@ void ClosureManager::HandleClosureMotionAction()
         // Update the current state for Endpoint 3
         instance.ep3.GetLogic().SetCurrentState(currentState);
         isEndPoint3TargetReached = (currentState.Value().position.Value() == ep3State.target.Value().position.Value());
-        ChipLogError(AppServer, "EndPoint 3 Current Position: %d, Target Position: %d", currentState.Value().position.Value(),
+        ChipLogProgress(AppServer, "EndPoint 3 Current Position: %d, Target Position: %d", currentState.Value().position.Value(),
                                                                                           ep3State.target.Value().position.Value());
     }
 
     bool closureTargetReached = isEndPoint2TargetReached && isEndPoint3TargetReached;
 
-    ChipLogError(AppServer, "Motion progress possible: %s", closureTargetReached ? "true" : "false");
+    ChipLogProgress(AppServer, "Motion progress possible: %s", closureTargetReached ? "true" : "false");
 
     if (!closureTargetReached)
     {
@@ -376,9 +377,10 @@ void ClosureManager::HandleClosureMotionAction()
     }
 
     if (IsClosureLatchActionNeeded(ep1State)){
-        ChipLogError(AppServer, "Starting latch action timer");
+        instance.CancelTimer(); // Cancel any existing timer before starting a new action
+        ChipLogProgress(AppServer, "Starting latch action timer");
         instance.SetCurrentAction(LATCH_ACTION);
-        instance.StartTimer(kCountdownTimeSeconds * 200);
+        instance.StartTimer(kLatchCountdownTimeMs);
     } else {
       // Target reached and no latch action needed, call HandleClosureAction
       instance.HandleClosureActionComplete(ClosureManager::Action_t::MOVE_TO_ACTION);
