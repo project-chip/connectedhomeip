@@ -185,6 +185,7 @@ void ClosureManager::HandleClosureActionTimer(System::Layer * layer, void * aApp
         break;
     case ClosureManager::Action_t::LATCH_ACTION:
         // Add logic to handle Latch action completion
+        break;
     case ClosureManager::Action_t::SET_TARGET_ACTION:
         manager->HandleClosureActionComplete(ClosureManager::Action_t::SET_TARGET_ACTION);
         break;
