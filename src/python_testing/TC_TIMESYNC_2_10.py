@@ -93,7 +93,7 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
 
         self.print_step(4, "Subscribe to DSTTableEmpy event")
         event = time_cluster.Events.DSTTableEmpty
-        cb = EventCallback("DSTTableEmpty", event.cluster_id, event.event_id)
+        cb = EventCallback(name="DSTTableEmpty", expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
         urgent = 1
         subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
         subscription.SetEventUpdateCallback(callback=cb)

@@ -264,7 +264,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self.step("2")
         event = brb_info_cluster.Events.ActiveChanged
         urgent = 1
-        cb = EventCallback("ActiveChanged", event.cluster_id, event.event_id, self.q)
+        cb = EventCallback(name="ActiveChanged", expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
         self._active_change_event_subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(dynamic_endpoint_id, event, urgent)], reportInterval=[1, 3])
         self._active_change_event_subscription.SetEventUpdateCallback(callback=cb)
 

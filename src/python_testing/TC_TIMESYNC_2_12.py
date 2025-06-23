@@ -100,7 +100,7 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
 
         self.print_step(3, "Subscribe to TimeZoneStatus event")
         event = time_cluster.Events.TimeZoneStatus
-        cb = EventCallback("TimeZoneStatus", event.cluster_id, event.event_id)
+        cb = EventCallback(name="TimeZoneStatus", expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
         urgent = 1
         subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
         subscription.SetEventUpdateCallback(callback=cb)
