@@ -837,7 +837,7 @@ bool Instance::AddSupportedMap(uint32_t aMapId, const CharSpan & aMapName)
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
             ChipLogError(Zcl, "AddSupportedMapRaw %" PRIu32 " - A map already exists with same name '%s'", aMapId,
-                         InlineString(100, static_cast<int>(entry.GetName().size()), entry.GetName().data()));
+                         SPAN_TO_TRUNCATED_CSTR(static_cast<int>(entry.GetName().size()), entry.GetName().data()));
 
 #pragma GCC diagnostic pop
             return false;
@@ -901,8 +901,13 @@ bool Instance::RenameSupportedMap(uint32_t aMapId, const CharSpan & newMapName)
 
         if (entry.IsNameEqual(newMapName))
         {
-            ChipLogError(Zcl, "RenameSupportedMap %" PRIu32 " - map already exists with same name '%.*s'", aMapId,
-                         static_cast<int>(entry.GetName().size()), entry.GetName().data());
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+
+            ChipLogError(Zcl, "RenameSupportedMap %" PRIu32 " - map already exists with same name '%s'", aMapId,
+                         SPAN_TO_TRUNCATED_CSTR(static_cast<int>(entry.GetName().size()), entry.GetName().data()));
+
+#pragma GCC diagnostic pop
             return false;
         }
 
@@ -1032,7 +1037,7 @@ bool Instance::AddSelectedArea(uint32_t & aSelectedArea)
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
         ChipLogError(Zcl, "AddSelectedAreaRaw %" PRIu32 " - %s", aSelectedArea,
-                     InlineString(100, static_cast<int>(locationStatusText.size()), locationStatusText.data()));
+                     SPAN_TO_TRUNCATED_CSTR(static_cast<int>(locationStatusText.size()), locationStatusText.data()));
 
 #pragma GCC diagnostic pop
         return false;

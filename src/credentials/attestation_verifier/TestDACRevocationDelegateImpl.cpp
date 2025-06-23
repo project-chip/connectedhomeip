@@ -292,13 +292,13 @@ bool TestDACRevocationDelegateImpl::IsCertificateRevoked(const ByteSpan & certDe
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
     VerifyOrReturnValue(CHIP_NO_ERROR == GetIssuerNameBase64Str(certDer, issuerName), false);
-    ChipLogDetail(NotSpecified, "Issuer: %s", InlineString(100, static_cast<int>(issuerName.size()), issuerName.data()));
+    ChipLogDetail(NotSpecified, "Issuer: %s", SPAN_TO_TRUNCATED_CSTR(static_cast<int>(issuerName.size()), issuerName.data()));
 
     VerifyOrReturnValue(CHIP_NO_ERROR == GetSerialNumberHexStr(certDer, serialNumber), false);
-    ChipLogDetail(NotSpecified, "Serial Number: %s", InlineString(100, static_cast<int>(serialNumber.size()), serialNumber.data()));
+    ChipLogDetail(NotSpecified, "Serial Number: %s", SPAN_TO_TRUNCATED_CSTR(static_cast<int>(serialNumber.size()), serialNumber.data()));
 
     VerifyOrReturnValue(CHIP_NO_ERROR == GetAKIDHexStr(certDer, akid), false);
-    ChipLogDetail(NotSpecified, "AKID: %s", InlineString(100, static_cast<int>(akid.size()), akid.data()));
+    ChipLogDetail(NotSpecified, "AKID: %s", SPAN_TO_TRUNCATED_CSTR(static_cast<int>(akid.size()), akid.data()));
 
 #pragma GCC diagnostic pop
 

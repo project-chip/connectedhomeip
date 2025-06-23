@@ -100,7 +100,7 @@ void LogFileDesignator(const char * prefix, const chip::CharSpan & fileDesignato
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
-    ChipLogProgress(chipTool, "%s (%u): %s", prefix, size, InlineString(100, static_cast<int>(size), data));
+    ChipLogProgress(chipTool, "%s (%u): %s", prefix, size, SPAN_TO_TRUNCATED_CSTR(static_cast<int>(size), data));
 
 #pragma GCC diagnostic pop
 

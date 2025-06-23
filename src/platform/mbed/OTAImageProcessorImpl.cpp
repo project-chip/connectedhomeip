@@ -191,7 +191,7 @@ int OTAImageProcessorImpl::MemoryTest()
             }
         }
 
-        ChipLogProgress(SoftwareUpdate, " %s", InlineString(100, static_cast<int>(buffer_size - i), &buffer[i]));
+        ChipLogProgress(SoftwareUpdate, " %s", SPAN_TO_TRUNCATED_CSTR(static_cast<int>(buffer_size - i), &buffer[i]));
     }
     ChipLogProgress(SoftwareUpdate, "---\n");
 

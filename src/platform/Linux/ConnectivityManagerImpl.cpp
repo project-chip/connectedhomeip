@@ -2164,7 +2164,7 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
         bssidLen = 0;
         ChipLogError(DeviceLayer, "Got a network with bssid not equals to 6");
     }
-    ChipLogDetail(DeviceLayer, "Network Found: %.*s (%s) Signal:%d", int(ssidLen), StringOrNullMarker((const gchar *) ssidStr),
+    ChipLogDetail(DeviceLayer, "Network Found: %s (%s) Signal:%d", SPAN_TO_TRUNCATED_CSTR(int(ssidLen), StringOrNullMarker((const gchar *) ssidStr)),
                   bssidStr, signal);
 
     // A flag for enterprise encryption option to avoid returning open for these networks by mistake

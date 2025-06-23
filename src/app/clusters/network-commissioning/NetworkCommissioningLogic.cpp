@@ -666,8 +666,15 @@ NetworkCommissioningLogic::HandleConnectNetwork(CommandHandler & handler, const 
 std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleNonConcurrentConnectNetwork()
 {
     ByteSpan nonConcurrentNetworkID = ByteSpan(mConnectingNetworkID, mConnectingNetworkIDLen);
-    ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Network SSID=%.*s", mConnectingNetworkIDLen,
-                    mConnectingNetworkID);
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+
+    ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Network SSID=%s",
+                    SPAN_TO_TRUNCATED_CSTR(mConnectingNetworkIDLen, mConnectingNetworkID));
+
+#pragma GCC diagnostic pop
+
     mpWirelessDriver->ConnectNetwork(nonConcurrentNetworkID, this);
     return std::nullopt;
 }

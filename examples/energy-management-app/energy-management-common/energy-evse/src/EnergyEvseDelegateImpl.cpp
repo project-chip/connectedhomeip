@@ -610,7 +610,7 @@ Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
     ChipLogDetail(AppServer, "VehicleID updated %s",
-                  InlineString(100, static_cast<int>(mVehicleID.Value().size()), mVehicleID.Value().data()));
+                  SPAN_TO_TRUNCATED_CSTR(static_cast<int>(mVehicleID.Value().size()), mVehicleID.Value().data()));
 
 #pragma GCC diagnostic pop
 

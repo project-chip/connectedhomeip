@@ -493,7 +493,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::ReadAndEncodeMPTZPresets(Attribu
             presetStruct.settings = mptzPresets.GetMptzPosition();
             ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Encoding an instance of MPTZPresetStruct. ID = %d. Name = %s",
                           mEndpointId, presetStruct.presetID,
-                          InlineString(100, static_cast<int>(presetStruct.name.size()), presetStruct.name.data()));
+                          SPAN_TO_TRUNCATED_CSTR(static_cast<int>(presetStruct.name.size()), presetStruct.name.data()));
             ReturnErrorOnFailure(encoder.Encode(presetStruct));
         }
 

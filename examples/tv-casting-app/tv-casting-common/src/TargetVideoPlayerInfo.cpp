@@ -172,7 +172,7 @@ void TargetVideoPlayerInfo::PrintInfo()
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
         ChipLogProgress(NotSpecified, "  MACAddress=%s",
-                        InlineString(100, static_cast<int>(mMACAddress.size()), mMACAddress.data()));
+                        SPAN_TO_TRUNCATED_CSTR(static_cast<int>(mMACAddress.size()), mMACAddress.data()));
 
 #pragma GCC diagnostic pop
     }
