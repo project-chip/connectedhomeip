@@ -278,6 +278,9 @@ void InitNetworkCommissioning()
     {
 #if CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
         sEthernetNetworkCommissioningInstance.Init();
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+        DeviceLayer::ConnectivityMgrImpl().UpdateEthernetNetworkingStatus();
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 #endif // CHIP_APP_MAIN_HAS_ETHERNET_DRIVER
     }
 }
@@ -465,7 +468,7 @@ public:
 
     CHIP_ERROR GetProductId(uint16_t & productId) override { return mDefaultProvider->GetProductId(productId); }
     CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) override { return mDefaultProvider->GetPartNumber(buf, bufSize); }
-    CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override { return mDefaultProvider->GetPartNumber(buf, bufSize); }
+    CHIP_ERROR GetProductURL(char * buf, size_t bufSize) override { return mDefaultProvider->GetProductURL(buf, bufSize); }
     CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) override { return mDefaultProvider->GetProductLabel(buf, bufSize); }
 
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override
@@ -915,7 +918,12 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 #endif
 
     // Init ZCL Data Model and CHIP App Server
-    Server::GetInstance().Init(initParams);
+    CHIP_ERROR err = Server::GetInstance().Init(initParams);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Server init failed: %" CHIP_ERROR_FORMAT, err.Format());
+        chipDie();
+    }
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     if (LinuxDeviceOptions::GetInstance().commissioningArlEntries.HasValue())

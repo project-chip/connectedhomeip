@@ -503,6 +503,15 @@ limitations under the License.
       <arg name="field2" type="TestGlobalEnum"/>
     </command>
 
+    <command source="client" code="0x1A" name="TestCheckCommandFlags"
+             isFabricScoped="true" mustUseTimedInvoke="true" optional="true">
+      <description>
+        Command that returns Success if the CommandFlags pass all checks at the IM layer.
+        Otherwise, return appropriate StatusCode back.
+      </description>
+      <quality largeMessage="true"/>
+    </command>
+
     <command source="client" code="0xFFF200AA" name="TestDifferentVendorMeiRequest"
              optional="true" response="TestDifferentVendorMeiResponse">
       <description>

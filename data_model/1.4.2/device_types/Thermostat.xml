@@ -74,9 +74,6 @@ Davis, CA 95616, USA
         <condition name="Active"/>
       </mandatoryConform>
     </cluster>
-    <cluster id="0x0096" name="Demand Response Load Control" side="server">
-      <optionalConform/>
-    </cluster>
     <cluster id="0x009B" name="Energy Preference" side="server">
       <optionalConform/>
     </cluster>

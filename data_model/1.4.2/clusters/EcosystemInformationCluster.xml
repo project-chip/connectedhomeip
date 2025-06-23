@@ -66,6 +66,17 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="ECOINFO" scope="Endpoint"/>
   <dataTypes>
+    <struct name="DeviceTypeStruct">
+      <field id="0" name="DeviceType" type="devtype-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Revision" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+    </struct>
     <struct name="EcosystemDeviceStruct">
       <field id="0" name="DeviceName" type="string" default="empty">
         <access fabricSensitive="true"/>

@@ -121,6 +121,7 @@ packages:
   - libglib2.0-dev
   - libgstreamer1.0-0
   - libgstreamer1.0-dev
+  - libgstreamer-plugins-base1.0-dev
   - libpcsclite-dev
   - libreadline-dev
   - libsdl2-dev

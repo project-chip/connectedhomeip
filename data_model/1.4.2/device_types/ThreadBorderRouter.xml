@@ -57,15 +57,13 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0091" name="Thread Border Router" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0091" name="Thread Border Router" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Extend &quot;Other Requirements&quot; section"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>
-    <cluster id="ID-TBD" name="Thread Border Router Diagnostics" side="server">
-      <optionalConform/>
-    </cluster>
     <cluster id="0x0035" name="Thread Network Diagnostics" side="server">
       <mandatoryConform/>
     </cluster>

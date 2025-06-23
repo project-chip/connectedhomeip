@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x010F" name="Mounted On/Off Control" revision="1">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x010F" name="Mounted On/Off Control" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
+    <revision revision="2" summary="Add superset classification and usage guidance for both device types"/>
   </revisionHistory>
   <classification superset="On/Off Plug-in Unit" class="simple" scope="endpoint"/>
   <clusters>

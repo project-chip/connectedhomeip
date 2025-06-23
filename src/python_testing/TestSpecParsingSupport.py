@@ -280,8 +280,8 @@ class TestSpecParsingSupport(MatterBaseTest):
 
         asserts.assert_greater(len(set(one_four_two_xml_clusters.keys()) - set(one_three_clusters.keys())),
                                0, "Master dir does not contain any clusters not in 1.3")
-        asserts.assert_greater(len(set(one_four_two_xml_clusters.keys()) - set(one_four_clusters.keys())),
-                               0, "Master dir does not contain any clusters not in 1.4")
+        asserts.assert_equal(len(set(one_four_two_xml_clusters.keys()) - set(one_four_clusters.keys())),
+                             0, "1.4.2 contains clusters not in 1.4")
         asserts.assert_greater(len(set(one_four_clusters.keys()) - set(one_three_clusters.keys())),
                                0, "1.4 dir does not contain any clusters not in 1.3")
         asserts.assert_equal(len(one_four_clusters.keys()), len(one_four_one_clusters.keys()),

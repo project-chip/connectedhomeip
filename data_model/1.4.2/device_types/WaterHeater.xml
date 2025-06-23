@@ -69,9 +69,6 @@ Davis, CA 95616, USA
     <cluster id="0x0094" name="Water Heater Management" side="server">
       <mandatoryConform/>
     </cluster>
-    <cluster id="0x0096" name="Demand Response Load Control" side="server">
-      <optionalConform/>
-    </cluster>
     <cluster id="0x009E" name="Water Heater Mode" side="server">
       <mandatoryConform/>
     </cluster>
