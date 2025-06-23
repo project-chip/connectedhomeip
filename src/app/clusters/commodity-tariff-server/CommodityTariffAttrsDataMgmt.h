@@ -26,26 +26,6 @@
 #include <cstring>
 #include <type_traits>
 
-static constexpr size_t kDefaultStringValuesMaxBufLength = 128u;
-static constexpr size_t kDefaultListAttrMaxLength        = 128u;
-constexpr uint16_t kMaxCurrencyValue                     = 999; // From spec
-
-static constexpr size_t kTariffInfoMaxLabelLength      = kDefaultStringValuesMaxBufLength;
-static constexpr size_t kTariffInfoMaxProviderLength   = kDefaultStringValuesMaxBufLength;
-static constexpr size_t kTariffComponentMaxLabelLength = kDefaultStringValuesMaxBufLength;
-
-static constexpr size_t kDayEntriesAttrMaxLength       = kDefaultListAttrMaxLength;
-static constexpr size_t kDayPatternsAttrMaxLength      = kDefaultListAttrMaxLength;
-static constexpr size_t kTariffComponentsAttrMaxLength = kDefaultListAttrMaxLength;
-static constexpr size_t kTariffPeriodsAttrMaxLength    = kDefaultListAttrMaxLength;
-
-static constexpr size_t kCalendarPeriodsAttrMaxLength = 4;
-static constexpr size_t kIndividualDaysAttrMaxLength  = 50;
-
-static constexpr size_t kCalendarPeriodItemMaxDayPatternIDs = 7;
-static constexpr size_t kDayStructItemMaxDayEntryIDs        = 96;
-static constexpr size_t kDayPatternItemMaxDayEntryIDs       = kDayStructItemMaxDayEntryIDs;
-static constexpr size_t kTariffPeriodItemMaxIDs             = 20;
 namespace chip {
 namespace app {
 
@@ -215,27 +195,6 @@ private:
 
     template <typename U>
     using ExtractPayloadType_t = typename ExtractPayloadType<U>::type;
-
-    // Helper to recursively unwrap values
-    template <typename U>
-    static auto unwrapValue(const U & value) -> typename std::enable_if<!IsNullable<U>::value && !IsList<U>::value, U>::type
-    {
-        return value; // Base case - not a wrapper
-    }
-
-    template <typename U>
-    static auto unwrapValue(const U & value) -> typename std::enable_if<IsNullable<U>::value, ExtractWrappedType_t<U>>::type
-    {
-        return value.HasValue() ? unwrapValue(value.Value()) : ExtractWrappedType_t<U>{};
-    }
-
-    template <typename U>
-    static auto unwrapValue(const U & value) -> typename std::enable_if<IsList<U>::value, ExtractWrappedType_t<U>>::type
-    {
-        if (value.empty())
-            return ExtractWrappedType_t<U>{};
-        return unwrapValue(value.front()); // For lists, return the type of the first element
-    }
 
     // Type categorization traits
     template <typename U>
@@ -410,7 +369,7 @@ public:
     }
 
     /// @brief Virtual destructor for proper cleanup
-    virtual ~CTC_BaseDataClass() { CleanupValue(mValue); };
+    virtual ~CTC_BaseDataClass() { Cleanup(); };
 
     /**
      * @brief Get mutable reference to stored value
@@ -550,15 +509,26 @@ public:
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
-        assert(aUpdCtx != nullptr && aUpdCb != nullptr);
-        mAuxData = aUpdCtx;
-        mAuxCb   = aUpdCb;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+    
+        //Bypass validation if ctx not set
+        if (aUpdCtx != nullptr)
+        {
+            mAuxData = aUpdCtx;
 
-        CHIP_ERROR err = ValidateValue();
+            err = ValidateValue();
+        }
+
+        if ( aUpdCb != nullptr )
+        {
+            mAuxCb   = aUpdCb;
+        }
+
         if (err == CHIP_NO_ERROR)
         {
             mUpdateState = UpdateState::kValidated;
         }
+    
         return err;
     }
 
@@ -589,7 +559,7 @@ public:
         {
             if (mHoldState == StorageState::kHold)
             {
-                CleanupValue(mValue);
+                Cleanup();
             }
 
             mValue     = mNewValue;
@@ -627,12 +597,14 @@ public:
         if (mUpdateState != UpdateState::kUpdated)
         {
             CleanupValue(mNewValue);
-            //mNewValue    = mValue;
-            mUpdateState = UpdateState::kIdle;
         }
+        mUpdateState = UpdateState::kIdle;
     }
 
-    void Cleanup() { CleanupValue(mValue); }
+    void Cleanup() { 
+        CleanupValue(mValue);
+        mHoldState = StorageState::kEmpty;
+    }
 
 protected:
     T & mValue;             // Reference to the applied value storage

@@ -47,75 +47,107 @@ inline bool operator!=(const Span<const uint32_t> & a, const Span<const uint32_t
 
 namespace app {
 namespace Clusters {
+namespace Globals {
+namespace Structs {
 
 // CurrencyStruct
-inline bool operator==(const Globals::Structs::CurrencyStruct::Type & lhs, const Globals::Structs::CurrencyStruct::Type & rhs)
+inline bool operator==(const CurrencyStruct::Type & lhs, const CurrencyStruct::Type & rhs)
 {
     return (lhs.currency == rhs.currency) && (lhs.decimalPoints == rhs.decimalPoints);
 }
 
-inline bool operator!=(const Globals::Structs::CurrencyStruct::Type & lhs, const Globals::Structs::CurrencyStruct::Type & rhs)
+inline bool operator!=(const CurrencyStruct::Type & lhs, const CurrencyStruct::Type & rhs)
 {
     return !(lhs == rhs);
 }
 
 // PowerThresholdStruct
-inline bool operator==(const Globals::Structs::PowerThresholdStruct::Type & lhs,
-                       const Globals::Structs::PowerThresholdStruct::Type & rhs)
+inline bool operator==(const PowerThresholdStruct::Type & lhs,
+                       const PowerThresholdStruct::Type & rhs)
 {
     return (lhs.powerThresholdSource == rhs.powerThresholdSource) && (lhs.powerThreshold == rhs.powerThreshold) &&
         (lhs.apparentPowerThreshold == rhs.apparentPowerThreshold);
 }
 
-inline bool operator!=(const Globals::Structs::PowerThresholdStruct::Type & lhs,
-                       const Globals::Structs::PowerThresholdStruct::Type & rhs)
+inline bool operator!=(const PowerThresholdStruct::Type & lhs,
+                       const PowerThresholdStruct::Type & rhs)
 {
     return !(lhs == rhs);
 }
 
+} // namespace Structs
+} // namespace Globals
+
+namespace CommodityTariff {
+namespace Structs {
+
 // TariffPriceStruct
-inline bool operator==(const CommodityTariff::Structs::TariffPriceStruct::Type & lhs,
-                       const CommodityTariff::Structs::TariffPriceStruct::Type & rhs)
+inline bool operator==(const TariffPriceStruct::Type & lhs,
+                       const TariffPriceStruct::Type & rhs)
 {
     return (lhs.priceType == rhs.priceType) && (lhs.price == rhs.price) && (lhs.priceLevel == rhs.priceLevel);
 }
 
-inline bool operator!=(const CommodityTariff::Structs::TariffPriceStruct::Type & lhs,
-                       const CommodityTariff::Structs::TariffPriceStruct::Type & rhs)
+inline bool operator!=(const TariffPriceStruct::Type & lhs,
+                       const TariffPriceStruct::Type & rhs)
 {
     return !(lhs == rhs);
 }
 
 // AuxiliaryLoadSwitchSettingsStruct
-inline bool operator==(const CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & lhs,
-                       const CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & rhs)
+inline bool operator==(const AuxiliaryLoadSwitchSettingsStruct::Type & lhs,
+                       const AuxiliaryLoadSwitchSettingsStruct::Type & rhs)
 {
     return (lhs.number == rhs.number) && (lhs.requiredState == rhs.requiredState);
 }
 
-inline bool operator!=(const CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & lhs,
-                       const CommodityTariff::Structs::AuxiliaryLoadSwitchSettingsStruct::Type & rhs)
+inline bool operator!=(const AuxiliaryLoadSwitchSettingsStruct::Type & lhs,
+                       const AuxiliaryLoadSwitchSettingsStruct::Type & rhs)
 {
     return !(lhs == rhs);
 }
 
 // PeakPeriodStruct
-inline bool operator==(const CommodityTariff::Structs::PeakPeriodStruct::Type & lhs,
-                       const CommodityTariff::Structs::PeakPeriodStruct::Type & rhs)
+inline bool operator==(const PeakPeriodStruct::Type & lhs,
+                       const PeakPeriodStruct::Type & rhs)
 {
     return (lhs.severity == rhs.severity) && (lhs.peakPeriod == rhs.peakPeriod);
 }
 
-inline bool operator!=(const CommodityTariff::Structs::PeakPeriodStruct::Type & lhs,
-                       const CommodityTariff::Structs::PeakPeriodStruct::Type & rhs)
+inline bool operator!=(const PeakPeriodStruct::Type & lhs,
+                       const PeakPeriodStruct::Type & rhs)
 {
     return !(lhs == rhs);
 }
+
+} // namespace Structs
+} // namespace CommodityTariff
 
 } // namespace Clusters
 
 } // namespace app
 } // namespace chip
+
+static constexpr size_t kDefaultStringValuesMaxBufLength = 128u;
+static constexpr size_t kDefaultListAttrMaxLength        = 128u;
+constexpr uint16_t kMaxCurrencyValue                     = 999; // From spec
+
+static constexpr size_t kTariffInfoMaxLabelLength      = kDefaultStringValuesMaxBufLength;
+static constexpr size_t kTariffInfoMaxProviderLength   = kDefaultStringValuesMaxBufLength;
+static constexpr size_t kTariffComponentMaxLabelLength = kDefaultStringValuesMaxBufLength;
+
+static constexpr size_t kDayEntriesAttrMaxLength       = kDefaultListAttrMaxLength;
+static constexpr size_t kDayPatternsAttrMaxLength      = kDefaultListAttrMaxLength;
+static constexpr size_t kTariffComponentsAttrMaxLength = kDefaultListAttrMaxLength;
+static constexpr size_t kTariffPeriodsAttrMaxLength    = kDefaultListAttrMaxLength;
+
+static constexpr size_t kCalendarPeriodsAttrMaxLength = 4;
+static constexpr size_t kIndividualDaysAttrMaxLength  = 50;
+
+static constexpr size_t kCalendarPeriodItemMaxDayPatternIDs = 7;
+static constexpr size_t kDayStructItemMaxDayEntryIDs        = 96;
+static constexpr size_t kDayPatternItemMaxDayEntryIDs       = kDayStructItemMaxDayEntryIDs;
+static constexpr size_t kTariffPeriodItemMaxIDs             = 20;
 
 using namespace chip;
 using namespace chip::app;
@@ -164,16 +196,30 @@ static bool HasDuplicateIDs(const DataModel::List<const uint32_t> & IDs, std::un
 }
 
 template <typename T>
-static bool AreOptionalNullableEqual(const Optional<DataModel::Nullable<T>> & lhs, const Optional<DataModel::Nullable<T>> & rhs)
+static bool AreOptionalNullableEqual(const Optional<DataModel::Nullable<T>>& lhs,
+                                    const Optional<DataModel::Nullable<T>>& rhs)
 {
-    if (lhs.HasValue() != rhs.HasValue())
-        return false;
-    if (!lhs.HasValue())
+    // Both missing -> true
+    if (!lhs.HasValue() && !rhs.HasValue()) {
         return true;
-    if (lhs.Value().IsNull() != rhs.Value().IsNull())
+    }
+    
+    // One present, one missing -> false
+    if (lhs.HasValue() != rhs.HasValue()) {
         return false;
-    if (lhs.Value().IsNull())
+    }
+    
+    // Both present and both null -> true
+    if (lhs.Value().IsNull() && rhs.Value().IsNull()) {
         return true;
+    }
+    
+    // One null, one not null -> false
+    if (lhs.Value().IsNull() != rhs.Value().IsNull()) {
+        return false;
+    }
+    
+    // Both present and not null -> return false if equal
     return (lhs.Value().Value() != rhs.Value().Value());
 }
 
