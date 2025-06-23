@@ -83,10 +83,7 @@ public:
             return { ByteSpan(reinterpret_cast<uint8_t *>(&value), sizeof(value)), Type::kPrimitive };
         }
 
-        static Value Raw(ByteSpan bytes)
-        {
-            return { bytes, Type::kRaw };
-        }
+        static Value Raw(ByteSpan bytes) { return { bytes, Type::kRaw }; }
 
         ByteSpan data() const { return mData; }
         Type type() const { return mType; }
