@@ -112,7 +112,10 @@ TEST(TestPeerAddress, TestEqualityOperator)
     IPAddress::FromString("2001:db8::1", ip1);
     IPAddress::FromString("2001:db8::2", ip2);
 
-    InterfaceId iface1 = InterfaceId::Null();
+    InterfaceId iface1;
+    iface1.SetId(1);
+    InterfaceId iface2;
+    iface2.SetId(2);
 
     // 1. Same UDP address, port, interface ? equal
     PeerAddress udp1 = PeerAddress::UDP(ip1, 1234).SetInterface(iface1);
@@ -130,7 +133,7 @@ TEST(TestPeerAddress, TestEqualityOperator)
     EXPECT_FALSE(udp1 == udp4);
 
     // 4. Different interface ? not equal
-    PeerAddress udp5 = PeerAddress::UDP(ip1, 1234).SetInterface(iface1);
+    PeerAddress udp5 = PeerAddress::UDP(ip1, 1234).SetInterface(iface2);
     EXPECT_FALSE(udp1 == udp5);
 
     // 5. TCP and UDP with same IP, port, interface ? not equal
