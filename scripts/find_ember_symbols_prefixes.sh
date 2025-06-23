@@ -46,8 +46,7 @@ check_symbols() {
     if [[ -n "$raw_ember_matches" ]]; then
         while IFS= read -r line; do
             # Skip if match is inside a // or /* comment
-            if ! echo "$line" | grep -q '//.*\<ember[A-Za-z0-9_]*(' &&
-                ! echo "$line" | grep -q '/\*.*\<ember[A-Za-z0-9_]*('; then
+            if ! echo "$line" | grep -q '//.*\<ember[A-Za-z0-9_]*(\|/\*.*\<ember[A-Za-z0-9_]*('; then
                 ember_matches+="$line"$'\n'
             fi
         done <<<"$raw_ember_matches"
