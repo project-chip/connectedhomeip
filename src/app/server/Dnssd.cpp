@@ -26,6 +26,7 @@
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/ConfigurationManager.h>
@@ -270,6 +271,18 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
         advertiseParameters.SetProductId(std::make_optional<uint16_t>(value));
     }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    uint8_t jointFabricMode;
+    if (DeviceLayer::GetDeviceInstanceInfoProvider()->GetJointFabricMode(jointFabricMode) == CHIP_NO_ERROR)
+    {
+        advertiseParameters.SetJointFabricMode(static_cast<Dnssd::JointFabricMode>(jointFabricMode));
+    }
+    else
+    {
+        ChipLogDetail(Discovery, "Joint Fabric Mode not enabled or value could not be retrieved");
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
     if (DeviceLayer::ConfigurationMgr().IsCommissionableDeviceTypeEnabled() &&
         DeviceLayer::ConfigurationMgr().GetDeviceTypeId(val32) == CHIP_NO_ERROR)
     {
@@ -363,11 +376,22 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 
     auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
-    ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u cm=%u cp=%u",
+    ChipLogProgress(Discovery,
+                    "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u cm=%u cp=%u"
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+                    " jf=%u"
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+                    ,
                     advertiseParameters.GetVendorId().value_or(0), advertiseParameters.GetProductId().value_or(0),
                     advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator(),
                     to_underlying(advertiseParameters.GetCommissioningMode()),
-                    advertiseParameters.GetCommissionerPasscodeSupported().value_or(false) ? 1 : 0);
+                    advertiseParameters.GetCommissionerPasscodeSupported().value_or(false) ? 1 : 0
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+                    ,
+                    advertiseParameters.GetJointFabricMode().Raw()
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    );
+
     return mdnsAdvertiser.Advertise(advertiseParameters);
 }
 
