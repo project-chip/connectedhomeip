@@ -30,7 +30,7 @@ else()
 endif()
 
 # Export CHIP_ROOT as an environment variable to be recognized by Kconfig
-set(ENV{CHIP_ROOT} ${CHIP_ROOT})
+set(COMMON_KCONFIG_ENV_SETTINGS CHIP_ROOT=${CHIP_ROOT})
 
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
