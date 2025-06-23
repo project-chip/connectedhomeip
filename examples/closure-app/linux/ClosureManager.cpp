@@ -21,10 +21,10 @@
 #include "ClosureDimensionEndpoint.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <memory>
 #include <platform/CHIPDeviceLayer.h>
-#include <app/server/Server.h>
 
 using namespace chip;
 using namespace chip::app;
