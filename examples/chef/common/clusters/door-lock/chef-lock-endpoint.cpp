@@ -118,8 +118,8 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
         "Lock App: LockEndpoint::SetUser "
         "[endpoint=%d,userIndex=%u,creator=%d,modifier=%d,userName=\"%s\",uniqueId=%" PRIx32 ",userStatus=%u,userType=%u,"
         "credentialRule=%u,credentials=%p,totalCredentials=%u]",
-        mEndpointId, userIndex, creator, modifier, InlineString(100, static_cast<int>(userName.size()), userName.data()),
-        uniqueId, to_underlying(userStatus), to_underlying(usertype), to_underlying(credentialRule), credentials,
+        mEndpointId, userIndex, creator, modifier, InlineString(100, static_cast<int>(userName.size()), userName.data()), uniqueId,
+        to_underlying(userStatus), to_underlying(usertype), to_underlying(credentialRule), credentials,
         static_cast<unsigned int>(totalCredentials));
 
     auto adjustedUserIndex = static_cast<uint16_t>(userIndex - 1);
