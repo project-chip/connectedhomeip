@@ -25,6 +25,20 @@
 #include <string>
 #include <thread>
 
+typedef struct UploadDataInfo
+{
+    char * mData;
+    long mSize;
+    long mBytesRead;
+} PushAvUploadInfo;
+
+typedef struct CerficatesInfo
+{
+    std::string mRootCert;
+    std::string mDevCert;
+    std::string mDevKey;
+} PushAVCertPath;
+
 class PushAVUploader
 {
 public:
@@ -33,7 +47,7 @@ public:
 
     void Start();
     void Stop();
-    void AddUploadData(const std::string & filename, const std::string & url);
+    void AddUploadData(std::string & filename, std::string & url);
 
 private:
     void ProcessQueue();

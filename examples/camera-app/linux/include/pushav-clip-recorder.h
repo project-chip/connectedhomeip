@@ -118,7 +118,8 @@ public:
 
     /// @name Construction/Destruction
     /// @{
-    PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStruct & aAudioInfo, VideoInfoStruct & aVideoInfo);
+    PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStruct & aAudioInfo, VideoInfoStruct & aVideoInfo,
+                       PushAVUploader * aUploader);
     ~PushAVClipRecorder();
     /// @}
 
@@ -136,8 +137,8 @@ public:
      */
     void PushPacket(const char * data, size_t size, bool isVideo);
 
-    std::atomic<bool> mRunning; ///< Recording activity flag
-    std::atomic<bool> mDeintializeRecorder;
+    std::atomic<bool> mRunning{ false };              ///< Recording activity flag
+    std::atomic<bool> mDeinitializeRecorder{ false }; ///< Deinitialization flag
 
 private:
     long unsigned int kMaxQueueSize = 500;
@@ -170,7 +171,7 @@ private:
     bool mUploadedInitSegment    = false;
     bool mUploadMPD              = false;
 
-    PushAVUploader mUploader;
+    PushAVUploader * mUploader;
 
     /// @name Internal Methods
     /// @{
