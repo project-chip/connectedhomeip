@@ -139,6 +139,7 @@
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 
 #include <platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_config.h>
+#include <platform/nxp/crypto/se05x/PersistentStorageOperationalKeystore_se05x.h>
 #if ENABLE_SE05X_DEVICE_ATTESTATION
 #include "DeviceAttestationSe05xCredsExample.h"
 #endif
@@ -625,9 +626,11 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 {
     gMainLoopImplementation = impl;
 
+    static chip::PersistentStorageOpKeystorese05x se05xInstance;
     static chip::CommonCaseDeviceServerInitParams initParams;
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
     initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+    initParams.operationalKeystore = &se05xInstance;
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     if (LinuxDeviceOptions::GetInstance().tcVersion.HasValue() && LinuxDeviceOptions::GetInstance().tcRequired.HasValue())
@@ -752,6 +755,7 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
 
     // Init ZCL Data Model and CHIP App Server
     Server::GetInstance().Init(initParams);
+    se05xInstance.Init(initParams.persistentStorageDelegate);
 
 #if CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
     if (LinuxDeviceOptions::GetInstance().commissioningArlEntries.HasValue())
