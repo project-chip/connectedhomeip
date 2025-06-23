@@ -95,7 +95,7 @@ void ClosureManager::Init()
     SetTagList(/* endpoint= */ kClosurePanelEndpoint2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kClosurePanelEndpoint2TagList));
 
     TestEventTriggerDelegate * pTestEventDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
-  
+
     if (pTestEventDelegate != nullptr)
     {
         CHIP_ERROR err = pTestEventDelegate->AddHandler(&mClosureEndpoint.GetDelegate());
@@ -118,14 +118,14 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
 
   // For sample application, we are using a timer to simulate the hardware calibration action.
   // In a real application, this would be replaced with actual calibration logic and call HandleClosureActionComplete.
-  VerifyOrReturnValue(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kCountdownTimeSeconds), HandleClosureActionTimer, this) == CHIP_NO_ERROR, 
+  VerifyOrReturnValue(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kCountdownTimeSeconds), HandleClosureActionTimer, this) == CHIP_NO_ERROR,
                       Status::Failure, ChipLogError(AppServer, "Failed to start closure action timer"));
   mCurrentAction = ClosureManager::Action_t::CALIBRATE_ACTION;
   mCurrentEndpointId = kClosureEndpoint;
   mIsCalibrationActionInProgress = true;
 
   ChipLogProgress(AppServer, "ClosureManager: Calibration action started for endpoint %d", mCurrentEndpointId);
-  
+
   return Status::Success;
 }
 
@@ -135,7 +135,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStopCommand()
   return Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(const Optional<TargetPositionEnum> & position, 
+chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(const Optional<TargetPositionEnum> & position,
                                                                           const Optional<bool> & latch,
                                                                           const Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed)
 {
@@ -143,8 +143,8 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(const 
     return Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(const Optional<Percent100ths> & pos, 
-                                                                             const Optional<bool> & latch, 
+chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(const Optional<Percent100ths> & pos,
+                                                                             const Optional<bool> & latch,
                                                                              const Optional<Globals::ThreeLevelAutoEnum> & speed,
                                                                              const chip::EndpointId endpointId)
 {

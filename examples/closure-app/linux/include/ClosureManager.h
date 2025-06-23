@@ -58,7 +58,7 @@ public:
     /**
      * @brief Handles the "Calibrate" command for the closure manager.
      *
-     * This method intiates the calibration action for the closure system. It triggers closure action timer and 
+     * This method intiates the calibration action for the closure system. It triggers closure action timer and
      * updates the current action and endpoint ID accordingly.
      *
      * @return Status::Success if the calibration command is successfully processed.
@@ -94,8 +94,8 @@ public:
      * @return Status::Success if the set target command is successfully processed.
      */
     chip::Protocols::InteractionModel::Status OnSetTargetCommand(
-        const chip::Optional<chip::Percent100ths> & pos, 
-        const chip::Optional<bool> & latch, 
+        const chip::Optional<chip::Percent100ths> & pos,
+        const chip::Optional<bool> & latch,
         const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
         const chip::EndpointId endpointId);
 
@@ -112,8 +112,8 @@ public:
      * @return Status::Success if the step command is successfully processed.
      */
     chip::Protocols::InteractionModel::Status OnStepCommand(
-        const chip::app::Clusters::ClosureDimension::StepDirectionEnum & direction, 
-        const uint16_t & numberOfSteps, 
+        const chip::app::Clusters::ClosureDimension::StepDirectionEnum & direction,
+        const uint16_t & numberOfSteps,
         const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
         const chip::EndpointId endpointId);
 
