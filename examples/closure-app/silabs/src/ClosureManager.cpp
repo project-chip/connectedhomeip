@@ -222,7 +222,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStopCommand()
     // In a real application, this would be replaced with actual logic to stop the closure action.
     ChipLogDetail(AppServer, "Handling Stop command for closure action");
     CancelTimer();
-    
+
     SetCurrentAction(Action_t::STOP_ACTION);
     HandleClosureActionComplete(Action_t::STOP_ACTION);
     return Status::Success;
