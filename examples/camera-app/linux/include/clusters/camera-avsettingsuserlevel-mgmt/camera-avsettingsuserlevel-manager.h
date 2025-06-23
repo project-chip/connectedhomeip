@@ -18,8 +18,9 @@
 
 #pragma once
 
-#include "camera-avsettingsuserlevel-controller.h"
 #include "camera-device-interface.h"
+#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -29,7 +30,7 @@ namespace CameraAvSettingsUserLevelManagement {
 /**
  * The application delegate to define the options & implement commands.
  */
-class CameraAVSettingsUserLevelManager : public CameraAVSettingsUserLevelController
+class CameraAVSettingsUserLevelManager : public Delegate
 {
 public:
     CameraAVSettingsUserLevelManager()  = default;

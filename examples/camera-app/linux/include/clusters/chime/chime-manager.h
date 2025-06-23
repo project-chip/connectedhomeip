@@ -17,13 +17,13 @@
  */
 
 #pragma once
-#include "chime-controller.h"
+#include <app/clusters/chime-server/chime-server.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
-class ChimeManager : public ChimeController
+class ChimeManager : public ChimeDelegate
 {
 
 public:

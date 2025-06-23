@@ -17,11 +17,12 @@
  */
 
 #pragma once
-#include "camera-avsettingsuserlevel-controller.h"
 #include "camera-avstream-controller.h"
-#include "chime-controller.h"
 #include "media-controller.h"
-#include "webrtc-provider-controller.h"
+#include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
+#include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
+#include <app/clusters/chime-server/chime-server.h>
+#include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
 
 using chip::app::Clusters::CameraAvStreamManagement::AudioCapabilitiesStruct;
 using chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct;
@@ -113,17 +114,19 @@ public:
     virtual ~CameraDeviceInterface() = default;
 
     // Getter for Chime Delegate
-    virtual chip::app::Clusters::ChimeController & GetChimeDelegate() = 0;
+    virtual chip::app::Clusters::ChimeDelegate & GetChimeDelegate() = 0;
 
     // Getter for WebRTCProvider Delegate
-    virtual chip::app::Clusters::WebRTCTransportProvider::WebRTCProviderController & GetWebRTCProviderDelegate() = 0;
+    virtual chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate() = 0;
 
     // Getter for CameraAVStreamManagement Delegate
-    virtual chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtDelegate() = 0;
+    virtual chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() = 0;
+
+    // Getter for CameraAVStreamManagement Controller
+    virtual chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() = 0;
 
     // Getter for CameraAVSettingsUserLevelManagement Delegate
-    virtual chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAVSettingsUserLevelController &
-    GetCameraAVSettingsUserLevelMgmtDelegate() = 0;
+    virtual chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() = 0;
 
     // Getter for the Media Controller
     virtual MediaController & GetMediaController() = 0;

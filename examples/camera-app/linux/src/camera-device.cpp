@@ -1211,22 +1211,27 @@ void CameraDevice::InitializeSnapshotStreams()
     mSnapshotStreams.push_back(snapshotStream);
 }
 
-ChimeController & CameraDevice::GetChimeDelegate()
+ChimeDelegate & CameraDevice::GetChimeDelegate()
 {
     return mChimeManager;
 }
 
-WebRTCProviderController & CameraDevice::GetWebRTCProviderDelegate()
+WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
 {
     return mWebRTCProviderManager;
 }
 
-CameraAVStreamController & CameraDevice::GetCameraAVStreamMgmtDelegate()
+CameraAVStreamMgmtDelegate & CameraDevice::GetCameraAVStreamMgmtDelegate()
 {
     return mCameraAVStreamManager;
 }
 
-CameraAVSettingsUserLevelController & CameraDevice::GetCameraAVSettingsUserLevelMgmtDelegate()
+CameraAVStreamController & CameraDevice::GetCameraAVStreamMgmtController()
+{
+    return mCameraAVStreamManager;
+}
+
+CameraAvSettingsUserLevelManagement::Delegate & CameraDevice::GetCameraAVSettingsUserLevelMgmtDelegate()
 {
     return mCameraAVSettingsUserLevelManager;
 }
