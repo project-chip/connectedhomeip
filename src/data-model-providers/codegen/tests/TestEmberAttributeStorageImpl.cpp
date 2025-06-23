@@ -82,24 +82,24 @@ TEST(EmberAttributeStorageImpl, TestStorage)
     {
         uint16_t number = 321;
 
-        EXPECT_EQ(storage.Read(kUint16Path, AttributeStorage::Buffer::Number(number)),
+        EXPECT_EQ(storage.Read(kUint16Path, AttributeStorage::Buffer::Primitive(number)),
                   CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
-        EXPECT_EQ(storage.Write(kUint16Path, AttributeStorage::Value::Number(number)), CHIP_NO_ERROR);
+        EXPECT_EQ(storage.Write(kUint16Path, AttributeStorage::Value::Primitive(number)), CHIP_NO_ERROR);
         number = 100;
-        EXPECT_EQ(storage.Read(kUint16Path, AttributeStorage::Buffer::Number(number)), CHIP_NO_ERROR);
+        EXPECT_EQ(storage.Read(kUint16Path, AttributeStorage::Buffer::Primitive(number)), CHIP_NO_ERROR);
         EXPECT_EQ(number, 321);
     }
 
     {
         uint32_t number = 1234;
 
-        EXPECT_EQ(storage.Read(kUint32Path, AttributeStorage::Buffer::Number(number)),
+        EXPECT_EQ(storage.Read(kUint32Path, AttributeStorage::Buffer::Primitive(number)),
                   CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
-        EXPECT_EQ(storage.Write(kUint32Path, AttributeStorage::Value::Number(number)), CHIP_NO_ERROR);
+        EXPECT_EQ(storage.Write(kUint32Path, AttributeStorage::Value::Primitive(number)), CHIP_NO_ERROR);
         number = 2345;
-        EXPECT_EQ(storage.Read(kUint32Path, AttributeStorage::Buffer::Number(number)), CHIP_NO_ERROR);
+        EXPECT_EQ(storage.Read(kUint32Path, AttributeStorage::Buffer::Primitive(number)), CHIP_NO_ERROR);
         EXPECT_EQ(number, 1234u);
     }
 
