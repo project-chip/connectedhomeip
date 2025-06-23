@@ -232,6 +232,7 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor,
 {
     if (aAction == LightingManager::LEVEL_ACTION)
     {
+        VerifyOrReturn(aValue != nullptr);
         sLightLED.SetLevel(*aValue);
     }
     else
