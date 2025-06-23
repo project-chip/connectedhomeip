@@ -509,22 +509,25 @@ CHIP_ERROR ReliableMessageMgr::MapSendError(CHIP_ERROR error, uint16_t exchangeI
 {
     if (
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-        error == System::MapErrorLwIP(ERR_MEM)
+        error == System::MapErrorLwIP(ERR_MEM) || error == System::MapErrorLwIP(ERR_CONN)
 #else
-        error == CHIP_ERROR_POSIX(ENOBUFS)
+        error == CHIP_ERROR_POSIX(ENOBUFS) || error == CHIP_ERROR_POSIX(ENETDOWN)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
     )
     {
-        // sendmsg on BSD-based systems never blocks, no matter how the
-        // socket is configured, and will return ENOBUFS in situation in
-        // which Linux, for example, blocks.
+        // Treat specific send errors as transient and non-fatal:
         //
-        // This is typically a transient situation, so we pretend like this
-        // packet drop happened somewhere on the network instead of inside
-        // sendmsg and will just resend it in the normal MRP way later.
+        // - Errors caused by lack of transmit (TX) buffers (e.g. ERR_MEM, ENOBUFS):
+        //   These indicate that the system temporarily cannot allocate memory for sending data,
+        //   often due to momentary buffer exhaustion under high load.
         //
-        // Similarly, on LwIP an ERR_MEM on send indicates a likely
-        // temporary lack of TX buffers.
+        // - Errors caused by network connection issues (e.g. ERR_CONN, ENETDOWN):
+        //   These can occur when the connection is temporarily lost or the interface goes down.
+        //   Such conditions may resolve shortly without requiring a full teardown.
+        //
+        // These errors are treated as recoverable to avoid prematurely closing exchanges
+        // or tearing down subscriptions during transient conditions.
+
         ChipLogError(ExchangeManager, "Ignoring transient send error: %" CHIP_ERROR_FORMAT " on exchange " ChipLogFormatExchangeId,
                      error.Format(), ChipLogValueExchangeId(exchangeId, isInitiator));
         error = CHIP_NO_ERROR;
