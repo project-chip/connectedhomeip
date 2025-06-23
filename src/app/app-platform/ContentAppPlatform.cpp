@@ -106,9 +106,9 @@ Status __attribute__((weak)) AppPlatformExternalAttributeReadCallback(EndpointId
     return (Status::Failure);
 }
 
-Status __attribute__((weak))
-AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                          const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
+Status __attribute__((weak)) AppPlatformExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
+                                                                       const EmberAfAttributeMetadata * attributeMetadata,
+                                                                       uint8_t * buffer)
 {
     return (Status::Failure);
 }
@@ -286,7 +286,6 @@ void ContentAppPlatform::SetupAppPlatform()
 
     // Disable last fixed endpoint, which is used as a placeholder for all of the
     // supported clusters so that ZAP will generated the requisite code.
-    // emberAfEndpointEnableDisable(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1)), false);
 }
 
 ContentApp * ContentAppPlatform::GetContentAppInternal(const CatalogVendorApp & vendorApp)
