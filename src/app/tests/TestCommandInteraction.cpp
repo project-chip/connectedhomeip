@@ -81,6 +81,7 @@ constexpr CommandId kTestCommandIdWithData                = 4;
 constexpr CommandId kTestCommandIdNoData                  = 5;
 constexpr CommandId kTestCommandIdCommandSpecificResponse = 6;
 constexpr CommandId kTestCommandIdFillResponseMessage     = 7;
+constexpr CommandId kTestCommandIdIgnoreCommandFields     = 8;
 constexpr CommandId kTestNonExistCommandId                = 0;
 
 const app::CommandSender::TestOnlyMarker kCommandSenderTestOnlyMarker;
@@ -115,6 +116,7 @@ const chip::Test::MockNodeConfig & TestMockNodeConfig()
                 kTestCommandIdNoData,
                 kTestCommandIdCommandSpecificResponse,
                 kTestCommandIdFillResponseMessage,
+                kTestCommandIdIgnoreCommandFields,
             }, // accepted commands
             {} // generated commands
           ),
@@ -270,6 +272,10 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aRequestCommandPat
     if (aRequestCommandPath.mCommandId == kTestCommandIdNoData)
     {
         EXPECT_EQ(err, CHIP_ERROR_END_OF_TLV);
+    }
+    else if (aRequestCommandPath.mCommandId == kTestCommandIdIgnoreCommandFields)
+    {
+        EXPECT_EQ(err, CHIP_NO_ERROR);
     }
     else
     {
@@ -1222,6 +1228,34 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_ValidateSecondLarg
     EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
     EXPECT_EQ(commandSender.GetInvokeResponseMessageCount(), 0u);
 
+    DrainAndServiceIO();
+
+    EXPECT_EQ(mockCommandSenderExtendedDelegate.onResponseCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderExtendedDelegate.onFinalCalledTimes, 1);
+    EXPECT_EQ(mockCommandSenderExtendedDelegate.onErrorCalledTimes, 0);
+}
+
+TEST_F(TestCommandInteraction, TestCommandSender_FillUpRequest)
+{
+    mockCommandSenderExtendedDelegate.ResetCounter();
+    PendingResponseTrackerImpl pendingResponseTracker;
+    app::CommandSender commandSender(kCommandSenderTestOnlyMarker, &mockCommandSenderExtendedDelegate, &GetExchangeManager(),
+                                     &pendingResponseTracker);
+
+    app::CommandSender::AddRequestDataParameters addRequestDataParams;
+
+    CommandSender::ConfigParameters config;
+    EXPECT_EQ(commandSender.SetCommandSenderConfig(config), CHIP_NO_ERROR);
+
+    auto firstCommandPathParams = MakeTestCommandPath(kTestCommandIdIgnoreCommandFields);
+    FillTLVBuffer payloadWriter;
+    EXPECT_EQ(commandSender.AddRequestData(firstCommandPathParams, payloadWriter, addRequestDataParams), CHIP_NO_ERROR);
+
+    EXPECT_EQ(commandSender.SendCommandRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(commandSender.GetInvokeResponseMessageCount(), 0u);
+
+    sendResponse           = true;
+    commandDispatchedCount = 0;
     DrainAndServiceIO();
 
     EXPECT_EQ(mockCommandSenderExtendedDelegate.onResponseCalledTimes, 1);
