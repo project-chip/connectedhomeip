@@ -50,7 +50,7 @@ public:
 
     // NOTE: these methods do NOT notify the cluster implementation of
     //       changes. Callers are responsible for that.
-    void SetLocalConfigDisabled(bool value) { mLocalConfigDisabled = value; }
+    DataModel::ActionReturnStatus SetLocalConfigDisabled(bool value, Storage::AttributeStorage & storage);
     DataModel::ActionReturnStatus SetNodeLabel(CharSpan label, Storage::AttributeStorage & storage);
     DataModel::ActionReturnStatus SetLocation(CharSpan location);
 

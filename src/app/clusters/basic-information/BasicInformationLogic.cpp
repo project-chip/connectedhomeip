@@ -25,6 +25,11 @@ using namespace chip::app::Clusters::BasicInformation;
 namespace chip {
 namespace app {
 namespace Clusters {
+namespace {
+
+void LogIfReadError(AttributeId attributeId, CHIP_ERROR err) {}
+
+} // namespace
 
 BasicInformationLogic & BasicInformationLogic::Instance()
 {
@@ -35,12 +40,21 @@ BasicInformationLogic & BasicInformationLogic::Instance()
 CHIP_ERROR BasicInformationLogic::Init(Storage::AttributeStorage & storage)
 {
     Storage::ShortPascalString labelBuffer(mNodeLabelBuffer);
-    CHIP_ERROR err = storage.Read({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, labelBuffer);
-    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        err = CHIP_NO_ERROR;
-    }
-    return err;
+    LogIfReadError(Attributes::NodeLabel::Id,
+                   storage.Read({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, labelBuffer));
+
+    LogIfReadError(Attributes::LocalConfigDisabled::Id,
+                   storage.Read({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id },
+                                Storage::AttributeStorage::Buffer::Primitive(mLocalConfigDisabled)));
+
+    return CHIP_NO_ERROR;
+}
+
+DataModel::ActionReturnStatus BasicInformationLogic::SetLocalConfigDisabled(bool value, Storage::AttributeStorage & storage)
+{
+    mLocalConfigDisabled = value;
+    return storage.Write({ kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
+                         Storage::AttributeStorage::Value::Primitive(value));
 }
 
 DataModel::ActionReturnStatus BasicInformationLogic::SetNodeLabel(CharSpan label, Storage::AttributeStorage & storage)

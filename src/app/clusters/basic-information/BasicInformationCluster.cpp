@@ -361,7 +361,7 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteAttribute(const Data
     case LocalConfigDisabled::Id: {
         bool value;
         ReturnErrorOnFailure(decoder.Decode(value));
-        BasicInformationLogic::Instance().SetLocalConfigDisabled(value);
+        BasicInformationLogic::Instance().SetLocalConfigDisabled(value, *mContext->attributeStorage);
         NotifyAttributeChanged(request.path.mAttributeId);
         return CHIP_NO_ERROR;
     }

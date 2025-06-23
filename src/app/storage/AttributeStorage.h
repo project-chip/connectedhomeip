@@ -61,7 +61,7 @@ public:
         ///     is dictated by the maximum string size
         enum class Type
         {
-            kNumeric,             // the data represents an integer value. The span will contain the value
+            kPrimitive,           // the data represents an integer/bool/float value. The span will contain the value
             kRaw,                 // Raw bytes, not interpreted
             kStringOneByteLength, // string where length is never larger than 255 characters. Data is a pascal string.
             kStringTwoByteLength, // string where length is never larger than 0xFFFF characters. Data is a pascal string.
@@ -78,9 +78,9 @@ public:
         {}
 
         template <typename T>
-        static Value Number(T & value)
+        static Value Primitive(T & value)
         {
-            return { ByteSpan(reinterpret_cast<uint8_t *>(&value), sizeof(value)), Type::kNumeric };
+            return { ByteSpan(reinterpret_cast<uint8_t *>(&value), sizeof(value)), Type::kPrimitive };
         }
 
         template <typename T>
@@ -106,8 +106,8 @@ public:
         // Separates out what `mData`
         enum class Type
         {
-            kNumeric,             // the data represents an integer value
-            kRaw,                 // the data represents raw, not interpreted data
+            kPrimitive,           // Integer/bool/float (generally fixed size memory buffer)
+            kMutableByteSpan,     // Raw ByteSpan
             kStringOneByteLength, // string where length is never larger than 255 characters
             kStringTwoByteLength, // string where length is never larger than 0xFFFF characters
             kBytesOneByteLength,  // byte string where length is never larger than 255 characters
@@ -124,14 +124,15 @@ public:
         Buffer(LongPascalString<uint8_t> & data) : Buffer(data.Buffer().data(), data.Buffer().size(), Type::kStringTwoByteLength) {}
 
         template <typename T>
-        static Buffer Number(T & value)
+        static Buffer Primitive(T & value)
         {
-            return { &value, sizeof(value), Type::kNumeric };
+            static_assert(sizeof(value) <= 8, "Implementations rely these can be mapped as 8 byte or less");
+            return { &value, sizeof(value), Type::kPrimitive };
         }
 
         /// initializes the data as "raw". Note that `data()` in this case
         /// will return a pointer to the underlying `MutableByteSpan`
-        static Buffer Raw(MutableByteSpan & data) { return { &data, 0, Type::kRaw }; }
+        static Buffer Raw(MutableByteSpan & data) { return { &data, 0, Type::kMutableByteSpan }; }
 
         void * data() { return mData; }
         size_t size() const { return mBufferSize; }

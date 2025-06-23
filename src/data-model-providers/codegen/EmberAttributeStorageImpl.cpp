@@ -31,7 +31,7 @@ EmberAfAttributeType attributeType(AttributeStorage::Buffer & buffer)
 {
     switch (buffer.type())
     {
-    case AttributeStorage::Buffer::Type::kNumeric:
+    case AttributeStorage::Buffer::Type::kPrimitive:
         switch (buffer.size())
         {
         case 1:
@@ -54,7 +54,7 @@ EmberAfAttributeType attributeType(AttributeStorage::Buffer & buffer)
             // This one is a bit nonsense..
             return ZCL_NO_DATA_ATTRIBUTE_TYPE;
         }
-    case AttributeStorage::Buffer::Type::kRaw:
+    case AttributeStorage::Buffer::Type::kMutableByteSpan:
         // Generally ember persistence did not persist raw values.
         return ZCL_STRUCT_ATTRIBUTE_TYPE;
     case AttributeStorage::Buffer::Type::kStringOneByteLength:
@@ -97,7 +97,7 @@ CHIP_ERROR EmberAttributeStorageImpl::Read(const ConcreteAttributePath & path, B
 
     switch (buffer.type())
     {
-    case AttributeStorage::Buffer::Type::kNumeric: {
+    case AttributeStorage::Buffer::Type::kPrimitive: {
         MutableByteSpan raw{ reinterpret_cast<uint8_t *>(buffer.data()), buffer.size() };
         // numbers are just read as-is
         ReturnErrorOnFailure(provider->ReadValue(path, &fakeMetadata, raw));
@@ -106,7 +106,7 @@ CHIP_ERROR EmberAttributeStorageImpl::Read(const ConcreteAttributePath & path, B
         VerifyOrReturnError(raw.size() == fakeMetadata.size, CHIP_ERROR_INVALID_INTEGER_VALUE);
         return CHIP_NO_ERROR;
     }
-    case AttributeStorage::Buffer::Type::kRaw: {
+    case AttributeStorage::Buffer::Type::kMutableByteSpan: {
         // raw data is a mutable byte buffer that we modify
         auto raw = reinterpret_cast<MutableByteSpan *>(buffer.data());
         return provider->ReadValue(path, &fakeMetadata, *raw);
