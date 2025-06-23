@@ -901,14 +901,15 @@ achieve the desired behavior of your application.
 ## Programming factory data
 
 The HEX file containing factory data can be programmed into the device's flash
-memory using `nrfutil device` and the J-Link programmer. To do this, use the following
-command:
+memory using `nrfutil device` and the J-Link programmer. To do this, use the
+following command:
 
 ```
 $ nrfutil device program --firmware factory_data.hex
 ```
 
-> Note: For more information about how to use the `nrfutil device` utility, visit
+> Note: For more information about how to use the `nrfutil device` utility,
+> visit
 > [Programming SoCs with nrfutil's device module](https://docs.nordicsemi.com/bundle/nrfutil/page/README.html)
 
 Another way to program the factory data to a device is to use the nRF Connect
