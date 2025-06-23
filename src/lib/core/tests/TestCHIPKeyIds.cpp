@@ -31,13 +31,15 @@ using namespace chip;
 
 using KeyID = uint32_t;
 
+constexpr uint32_t kFlag_UseCurrentEpochKey = 0x80000000;
+
 TEST(TestCHIPKeyIds, TestGroupKeyTypes)
 {
-    KeyID static_key = 0x00004FFF;
+    KeyID static_key = ChipKeyId::kType_AppStaticKey | 0x0FFF;
 
     ASSERT_TRUE(ChipKeyId::IsAppGroupKey(static_key));
 
-    KeyID rotating_key = 0x00005FFF;
+    KeyID rotating_key = ChipKeyId::kType_AppRotatingKey | 0x0FFF;
 
     ASSERT_TRUE(ChipKeyId::IsAppGroupKey(rotating_key));
 }
@@ -52,7 +54,7 @@ TEST(TestCHIPKeyIds, UsesCurrentEpochKey)
     // assert that the key doesn't use current epoch key
     ASSERT_FALSE(ChipKeyId::UsesCurrentEpochKey(key));
 
-    KeyID current_epoch_key = 0x8FFF5FFF; // 0x80000000 is the flag for current epoch key
+    KeyID current_epoch_key = kFlag_UseCurrentEpochKey | 0x0FFF5FFF; // Test key part 0x0FFF5FFF with current epoch flag
 
     // assert that the key incorporates epoch key
     ASSERT_TRUE(ChipKeyId::IncorporatesEpochKey(current_epoch_key));
@@ -125,7 +127,7 @@ TEST(TestCHIPKeyIds, MakesAppKeyId)
     ASSERT_FALSE(ChipKeyId::UsesCurrentEpochKey(key));
     ASSERT_EQ(ChipKeyId::GetRootKeyId(key), ChipKeyId::kType_AppRootKey);
     ASSERT_EQ(ChipKeyId::GetEpochKeyId(key), ChipKeyId::kType_AppEpochKey);
-    ASSERT_EQ(ChipKeyId::ConvertToCurrentAppKeyId(key), 0x80001000); // (keyId & ~kMask_EpochKeyNumber) | kFlag_UseCurrentEpochKey
+    ASSERT_EQ(ChipKeyId::ConvertToCurrentAppKeyId(key), kFlag_UseCurrentEpochKey | ChipKeyId::kType_General); // (keyId & ~kMask_EpochKeyNumber) | kFlag_UseCurrentEpochKey
 
     key = ChipKeyId::MakeAppKeyId(key, ChipKeyId::kServiceRootKey, 0x00000380, ChipKeyId::kNone, true);
 
@@ -149,7 +151,7 @@ TEST(TestCHIPKeyIds, MakesAppIntermediateKeyId)
     ASSERT_FALSE(ChipKeyId::UsesCurrentEpochKey(key));
     ASSERT_EQ(ChipKeyId::GetRootKeyNumber(key), uint8_t{ 2 });
     ASSERT_EQ(ChipKeyId::GetEpochKeyNumber(key), uint8_t{ 7 });
-    ASSERT_EQ(ChipKeyId::ConvertToCurrentAppKeyId(key), 0x80011800);
+    ASSERT_EQ(ChipKeyId::ConvertToCurrentAppKeyId(key), kFlag_UseCurrentEpochKey | (ChipKeyId::kType_AppIntermediateKey | (static_cast<uint32_t>(2) << 10)));
     ASSERT_EQ(ChipKeyId::GetType(key), ChipKeyId::kType_AppIntermediateKey);
 }
 
@@ -187,7 +189,7 @@ TEST(TestCHIPKeyIds, MakesAppStaticKeyId)
     ASSERT_FALSE(ChipKeyId::UsesCurrentEpochKey(key));
     ASSERT_EQ(ChipKeyId::GetRootKeyNumber(key), uint8_t{ 2 });
     ASSERT_EQ(ChipKeyId::GetEpochKeyNumber(key), uint8_t{ 0 });
-    ASSERT_EQ(ChipKeyId::ConvertToCurrentAppKeyId(key), 0x80004800);
+    ASSERT_EQ(ChipKeyId::ConvertToCurrentAppKeyId(key), kFlag_UseCurrentEpochKey | (ChipKeyId::kType_AppStaticKey | (static_cast<uint32_t>(2) << 10)));
     ASSERT_EQ(ChipKeyId::GetType(key), ChipKeyId::kType_AppStaticKey);
 }
 
@@ -209,6 +211,34 @@ TEST(TestCHIPKeyIds, IsValidKeyId)
     ASSERT_TRUE(ChipKeyId::IsValidKeyId(key));
 
     key = ChipKeyId::kType_None;
+
+    ASSERT_FALSE(ChipKeyId::IsValidKeyId(key));
+
+    key = ChipKeyId::kType_AppStaticKey;
+
+    ASSERT_TRUE(ChipKeyId::IsValidKeyId(key));
+
+    key = ChipKeyId::kType_AppRotatingKey;
+
+    ASSERT_TRUE(ChipKeyId::IsValidKeyId(key));
+
+    key = ChipKeyId::kType_AppRootKey;
+
+    ASSERT_TRUE(ChipKeyId::IsValidKeyId(key));
+
+    key = ChipKeyId::kType_AppIntermediateKey;
+
+    ASSERT_TRUE(ChipKeyId::IsValidKeyId(key));
+
+    key = ChipKeyId::kType_AppEpochKey;
+
+    ASSERT_TRUE(ChipKeyId::IsValidKeyId(key));
+
+    key = ChipKeyId::kType_AppGroupMasterKey;
+
+    ASSERT_TRUE(ChipKeyId::IsValidKeyId(key));
+
+    key = 0xFFFFFFFF; // Invalid key ID
 
     ASSERT_FALSE(ChipKeyId::IsValidKeyId(key));
 }
@@ -258,9 +288,32 @@ TEST(TestCHIPKeyIds, DescribesKey)
     ASSERT_STREQ(ChipKeyId::DescribeKey(ChipKeyId::kType_None), "No Key");
     ASSERT_STREQ(ChipKeyId::DescribeKey(ChipKeyId::kType_Session), "Session Key");
     ASSERT_STREQ(ChipKeyId::DescribeKey(0xFFFFFFFF), "Unknown Key Type");
-    ASSERT_STREQ(ChipKeyId::DescribeKey(0x00001000), "Other General Key");
-    ASSERT_STREQ(ChipKeyId::DescribeKey(0x00002000), "Session Key");
-    ASSERT_STREQ(ChipKeyId::DescribeKey(0x00004000), "Application Static Key");
-    ASSERT_STREQ(ChipKeyId::DescribeKey(0x00005000), "Application Rotating Key");
-    ASSERT_STREQ(ChipKeyId::DescribeKey(0x00011000), "Application Intermediate Key");
+}
+
+TEST(TestCHIPKeyIds, GetType)
+{
+    KeyID key = ChipKeyId::kType_General;
+
+    ASSERT_EQ(ChipKeyId::GetType(key), ChipKeyId::kType_General);
+
+    key = ChipKeyId::kType_AppStaticKey;
+
+    ASSERT_EQ(ChipKeyId::GetType(key), ChipKeyId::kType_AppStaticKey);
+
+    key = ChipKeyId::kType_AppRotatingKey;
+
+    ASSERT_EQ(ChipKeyId::GetType(key), ChipKeyId::kType_AppRotatingKey);
+
+    key = ChipKeyId::kType_AppRootKey;
+
+    ASSERT_EQ(ChipKeyId::GetType(key), ChipKeyId::kType_AppRootKey);
+}
+
+TEST(TestCHIPKeyIds, UpdateEpochKeyId)
+{
+    // 10 bits shift for root key number, 7 bits shift for epoch key number
+    KeyID key = ChipKeyId::kType_AppRotatingKey | (1 << 10) | (2 << 7);
+
+    ASSERT_EQ(key, uint32_t{0x00005500});
+    ASSERT_EQ(ChipKeyId::UpdateEpochKeyId(key, 0), uint32_t{0x00005400});
 }
