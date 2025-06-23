@@ -470,7 +470,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 import asyncio
                 read_request = await asyncio.wait_for(
                     self.default_controller.Read(self.dut_node_id, [()]),
-                    timeout=120.0  # 2 minutes timeout for this massive operation
+                    timeout=120.0 
                 )
                 
                 await self._verify_empty_tuple([()], read_request)
@@ -675,7 +675,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                     [(endpoint, cluster, attribute)]
                 )
 
-                # Return the raw responses for verification
                 return read_responses
                 
             else:
