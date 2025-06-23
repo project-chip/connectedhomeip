@@ -565,8 +565,10 @@ jobs:
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
-                  echo "JF_ADMIN_APP: out/linux-x64-jf-admin-app/jfa-app" >> /tmp/test_env.yaml
-                  echo "JF_CONTROL_APP: out/linux-x64-jf-control-app/jfc-app" >> /tmp/test_env.yaml
+                  echo "JF_ADMIN_APP: objdir-clone/linux-x64-jf-control-app/jfa-app" >> /tmp/test_env.yaml
+                  rm -rf out/linux-x64-jf-control-app
+                  echo "JF_CONTROL_APP: objdir-clone/linux-x64-jf-admin-app/jfc-app" >> /tmp/test_env.yaml
+                  rm -rf out/linux-x64-jf-admin-app
 
             - name: Verify Testing Support
               run: |
