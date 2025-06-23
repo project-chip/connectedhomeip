@@ -19661,9 +19661,9 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeAllocatedSnapshotStreamsID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeRankedVideoStreamPrioritiesListWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeStreamUsagePrioritiesWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeRankedVideoStreamPrioritiesListID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCameraAVStreamManagementID) attributeID:@(MTRAttributeIDTypeClusterCameraAVStreamManagementAttributeStreamUsagePrioritiesID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSoftRecordingPrivacyModeEnabledWithParams:(MTRReadParams * _Nullable)params

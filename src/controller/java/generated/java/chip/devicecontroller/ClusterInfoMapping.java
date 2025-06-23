@@ -18396,7 +18396,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCameraAvStreamManagementClusterRankedVideoStreamPrioritiesListAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.RankedVideoStreamPrioritiesListAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCameraAvStreamManagementClusterStreamUsagePrioritiesAttributeCallback implements ChipClusters.CameraAvStreamManagementCluster.StreamUsagePrioritiesAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -29601,11 +29601,11 @@ public class ClusterInfoMapping {
     CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatemaxBitRateCommandParameterInfo = new CommandParameterInfo("maxBitRate", Long.class, Long.class);
     cameraAvStreamManagementvideoStreamAllocateCommandParams.put("maxBitRate",cameraAvStreamManagementvideoStreamAllocatemaxBitRateCommandParameterInfo);
 
-    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocateminFragmentLenCommandParameterInfo = new CommandParameterInfo("minFragmentLen", Integer.class, Integer.class);
-    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("minFragmentLen",cameraAvStreamManagementvideoStreamAllocateminFragmentLenCommandParameterInfo);
+    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocateminKeyFrameIntervalCommandParameterInfo = new CommandParameterInfo("minKeyFrameInterval", Integer.class, Integer.class);
+    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("minKeyFrameInterval",cameraAvStreamManagementvideoStreamAllocateminKeyFrameIntervalCommandParameterInfo);
 
-    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatemaxFragmentLenCommandParameterInfo = new CommandParameterInfo("maxFragmentLen", Integer.class, Integer.class);
-    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("maxFragmentLen",cameraAvStreamManagementvideoStreamAllocatemaxFragmentLenCommandParameterInfo);
+    CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatemaxKeyFrameIntervalCommandParameterInfo = new CommandParameterInfo("maxKeyFrameInterval", Integer.class, Integer.class);
+    cameraAvStreamManagementvideoStreamAllocateCommandParams.put("maxKeyFrameInterval",cameraAvStreamManagementvideoStreamAllocatemaxKeyFrameIntervalCommandParameterInfo);
 
     CommandParameterInfo cameraAvStreamManagementvideoStreamAllocatewatermarkEnabledCommandParameterInfo = new CommandParameterInfo("watermarkEnabled", Optional.class, Boolean.class);
     cameraAvStreamManagementvideoStreamAllocateCommandParams.put("watermarkEnabled",cameraAvStreamManagementvideoStreamAllocatewatermarkEnabledCommandParameterInfo);
@@ -29641,10 +29641,10 @@ public class ClusterInfoMapping {
              commandArguments.get("maxBitRate")
 
            , (Integer)
-             commandArguments.get("minFragmentLen")
+             commandArguments.get("minKeyFrameInterval")
 
            , (Integer)
-             commandArguments.get("maxFragmentLen")
+             commandArguments.get("maxKeyFrameInterval")
 
            , (Optional<Boolean>)
              commandArguments.get("watermarkEnabled")

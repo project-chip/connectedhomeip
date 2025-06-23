@@ -20,7 +20,7 @@
 #include <AppMain.h>
 #include <CommissionerMain.h>
 #include <app/server/Server.h>
-#include <bridge/include/FabricBridge.h>
+#include <bridge/FabricBridge.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 
 using namespace ::chip;
