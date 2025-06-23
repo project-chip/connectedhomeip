@@ -112,12 +112,14 @@ public:
      */
     CHIPDeviceManagerCallbacks * GetCHIPDeviceManagerCallbacks() { return mCB; }
 
+    bool IsInitDone() { return mIsInitDone; }
     /**
      * Use internally for registration of the ChipDeviceEvents
      */
     static void CommonDeviceEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
 private:
+    mIsInitDone                      = false;
     CHIPDeviceManagerCallbacks * mCB = nullptr;
     CHIPDeviceManager() {}
 };

@@ -108,6 +108,7 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
     ChipLogProgress(DeviceLayer, "Start OpenThread task done!!");
 #endif // CHIP_ENABLE_OPENTHREAD
 
+    mIsInitDone = true;
 exit:
     return err;
 }
