@@ -59,20 +59,7 @@ namespace Dnssd {
     {
         VerifyOrReturnError(nullptr != callback, CHIP_ERROR_INVALID_ARGUMENT);
 
-        __auto_type & systemLayer = static_cast<System::LayerDispatch &>(chip::DeviceLayer::SystemLayer());
-
-        // Wrap the callback block in a “call-once” block so that
-        // either the first success or the timeout fires, but never both.
-        __block BOOL called = NO;
-        __auto_type wrapper = ^(DNSServiceErrorType err) {
-            if (!called) {
-                called = YES;
-                callback(err);
-                mOnRegisterRecordCallback = nil;
-            }
-        };
-
-        mOnRegisterRecordCallback = wrapper;
+        mOnRegisterRecordCallback = callback;
 
         CHIP_ERROR error = CHIP_NO_ERROR;
 
@@ -97,8 +84,18 @@ namespace Dnssd {
         }
         ReturnErrorOnFailure(error);
 
-        __auto_type onTimeout = ^{ wrapper(kDNSServiceErr_Timeout); };
-        __auto_type delay = System::Clock::Seconds16(kRegisterRecordTimeoutInSeconds);
+        std::shared_ptr<bool> livenessTracker = mLivenessTracker;
+
+        auto onTimeout = ^{
+            VerifyOrReturn(*livenessTracker);
+            VerifyOrReturn(nullptr != this->mOnRegisterRecordCallback);
+
+            auto registerRecordCallback = this->mOnRegisterRecordCallback;
+            this->mOnRegisterRecordCallback = nullptr;
+            registerRecordCallback(kDNSServiceErr_Timeout);
+        };
+        auto & systemLayer = static_cast<System::LayerDispatch &>(chip::DeviceLayer::SystemLayer());
+        auto delay = System::Clock::Seconds16(kRegisterRecordTimeoutInSeconds);
         return systemLayer.StartTimerWithBlock(onTimeout, delay);
     }
 
@@ -116,7 +113,7 @@ namespace Dnssd {
             NetworkMonitor::Stop();
         }
         StopSharedConnection();
-        mOnRegisterRecordCallback = nil;
+        mOnRegisterRecordCallback = nullptr;
     }
 
     CHIP_ERROR HostNameRegistrar::StartSharedConnection()
@@ -155,16 +152,16 @@ namespace Dnssd {
     {
         ChipLogProgress(Discovery, "Mdns: %s flags: %d", __func__, flags);
 
-        auto * self = static_cast<HostNameRegistrar *>(context);
         if (kDNSServiceErr_NoError != err) {
             ChipLogError(Discovery, "%s (%s)", __func__, Error::ToString(err));
             return;
         }
 
+        auto * self = static_cast<HostNameRegistrar *>(context);
         VerifyOrReturn(nullptr != self->mOnRegisterRecordCallback);
-
-        // This calls our wrapper block exactly once—and the first call will prevent the timeout timer from doing anything.
-        self->mOnRegisterRecordCallback(err);
+        auto registerRecordCallback = self->mOnRegisterRecordCallback;
+        self->mOnRegisterRecordCallback = nullptr;
+        registerRecordCallback(err);
     }
 
 } // namespace Dnssd

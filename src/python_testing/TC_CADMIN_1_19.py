@@ -96,7 +96,7 @@ class TC_CADMIN_1_19(MatterBaseTest):
         self.max_window_duration = duration.maxCumulativeFailsafeSeconds
 
         self.step(3)
-        fabrics = await self.support.get_fabrics(th=self.th1)
+        fabrics = await self.support.get_fabrics(th=self.th1, fabric_filtered=False)
         initial_number_of_fabrics = len(fabrics)
 
         self.step(4)
