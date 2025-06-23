@@ -84,11 +84,8 @@ public:
 
     /**
      * @brief Clears the current error list.
-     *
-     * @return CHIP_NO_ERROR if the error list is cleared successfully
-     *         Returns an appropriate error code if clearing the error list fails
      */
-    virtual CHIP_ERROR ClearErrorList() = 0;
+    virtual void ClearErrorList() = 0;
 
     /**
      * @brief Adds an error to the current error list.
