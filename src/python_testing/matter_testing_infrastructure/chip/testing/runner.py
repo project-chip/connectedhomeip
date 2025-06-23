@@ -312,7 +312,6 @@ def run_tests_no_exit(
     from typing import TYPE_CHECKING
 
     from chip.testing.matter_stack_state import MatterStackState
-    from chip.testing.matter_testing import stash_globally
     if TYPE_CHECKING:
         from chip.testing.matter_testing import CommissionDeviceTest
     else:
