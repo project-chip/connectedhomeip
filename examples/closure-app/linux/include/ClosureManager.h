@@ -35,7 +35,7 @@ class ClosureManager
 public:
     enum Action_t
     {
-        CALIBRATE_ACTION   = 0,
+        CALIBRATE_ACTION = 0,
         MOVE_TO_ACTION,
         LATCH_ACTION,
         STOP_ACTION,
@@ -65,10 +65,10 @@ public:
      */
     chip::Protocols::InteractionModel::Status OnCalibrateCommand();
 
-    chip::Protocols::InteractionModel::Status OnMoveToCommand(
-        const chip::Optional<chip::app::Clusters::ClosureControl::TargetPositionEnum> & position,
-        const chip::Optional<bool> & latch,
-        const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed);
+    chip::Protocols::InteractionModel::Status
+    OnMoveToCommand(const chip::Optional<chip::app::Clusters::ClosureControl::TargetPositionEnum> & position,
+                    const chip::Optional<bool> & latch,
+                    const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed);
 
     /*
      * @brief Handles the "Stop" command for the closure manager.
@@ -93,11 +93,10 @@ public:
      * @param endpointId The endpoint ID for which this command is being processed.
      * @return Status::Success if the set target command is successfully processed.
      */
-    chip::Protocols::InteractionModel::Status OnSetTargetCommand(
-        const chip::Optional<chip::Percent100ths> & pos,
-        const chip::Optional<bool> & latch,
-        const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
-        const chip::EndpointId endpointId);
+    chip::Protocols::InteractionModel::Status
+    OnSetTargetCommand(const chip::Optional<chip::Percent100ths> & pos, const chip::Optional<bool> & latch,
+                       const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
+                       const chip::EndpointId endpointId);
 
     /*
      * @brief Handles the "Step" command for the closure manager.
@@ -111,11 +110,10 @@ public:
      * @param endpointId The endpoint ID for which this command is being processed.
      * @return Status::Success if the step command is successfully processed.
      */
-    chip::Protocols::InteractionModel::Status OnStepCommand(
-        const chip::app::Clusters::ClosureDimension::StepDirectionEnum & direction,
-        const uint16_t & numberOfSteps,
-        const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
-        const chip::EndpointId endpointId);
+    chip::Protocols::InteractionModel::Status
+    OnStepCommand(const chip::app::Clusters::ClosureDimension::StepDirectionEnum & direction, const uint16_t & numberOfSteps,
+                  const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
+                  const chip::EndpointId endpointId);
 
 private:
     /**
@@ -126,7 +124,7 @@ private:
     static ClosureManager sInstance;
 
     // Endpoint ID for the main closure device
-    static constexpr chip::EndpointId kClosureEndpoint       = 1;
+    static constexpr chip::EndpointId kClosureEndpoint = 1;
     // Endpoint ID for the first closure panel
     static constexpr chip::EndpointId kClosurePanelEndpoint1 = 2;
     // Endpoint ID for the second closure panel
@@ -172,7 +170,7 @@ private:
     void HandleClosureActionComplete(ClosureManager::Action_t action);
 
     bool mIsCalibrationActionInProgress = false;
-    bool mIsMoveToActionInProgress = false;
-    bool mIsSetTargetActionInProgress = false;
-    bool mIsStepActionInProgress = false;
+    bool mIsMoveToActionInProgress      = false;
+    bool mIsSetTargetActionInProgress   = false;
+    bool mIsStepActionInProgress        = false;
 };

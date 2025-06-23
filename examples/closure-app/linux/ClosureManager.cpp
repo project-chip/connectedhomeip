@@ -21,10 +21,10 @@
 #include "ClosureDimensionEndpoint.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <memory>
 #include <platform/CHIPDeviceLayer.h>
-#include <app/server/Server.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -90,9 +90,12 @@ void ClosureManager::Init()
     ChipLogProgress(AppServer, "Closure Panel Endpoint 2 initialized successfully");
 
     // Set Taglist for Closure endpoints
-    SetTagList(/* endpoint= */ kClosureEndpoint, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kClosureEndpointTagList));
-    SetTagList(/* endpoint= */ kClosurePanelEndpoint1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kClosurePanelEndpoint1TagList));
-    SetTagList(/* endpoint= */ kClosurePanelEndpoint2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kClosurePanelEndpoint2TagList));
+    SetTagList(/* endpoint= */ kClosureEndpoint,
+               Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kClosureEndpointTagList));
+    SetTagList(/* endpoint= */ kClosurePanelEndpoint1,
+               Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kClosurePanelEndpoint1TagList));
+    SetTagList(/* endpoint= */ kClosurePanelEndpoint2,
+               Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kClosurePanelEndpoint2TagList));
 
     TestEventTriggerDelegate * pTestEventDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
 
@@ -110,36 +113,36 @@ void ClosureManager::Init()
     }
 }
 
-
 chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
 {
-  // Cancel any existing timer for closure action
-  DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
+    // Cancel any existing timer for closure action
+    DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
 
-  // For sample application, we are using a timer to simulate the hardware calibration action.
-  // In a real application, this would be replaced with actual calibration logic and call HandleClosureActionComplete.
-  VerifyOrReturnValue(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kCountdownTimeSeconds), HandleClosureActionTimer, this) == CHIP_NO_ERROR,
-                      Status::Failure, ChipLogError(AppServer, "Failed to start closure action timer"));
-  mCurrentAction = ClosureManager::Action_t::CALIBRATE_ACTION;
-  mCurrentEndpointId = kClosureEndpoint;
-  mIsCalibrationActionInProgress = true;
+    // For sample application, we are using a timer to simulate the hardware calibration action.
+    // In a real application, this would be replaced with actual calibration logic and call HandleClosureActionComplete.
+    VerifyOrReturnValue(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kCountdownTimeSeconds),
+                                                              HandleClosureActionTimer, this) == CHIP_NO_ERROR,
+                        Status::Failure, ChipLogError(AppServer, "Failed to start closure action timer"));
+    mCurrentAction                 = ClosureManager::Action_t::CALIBRATE_ACTION;
+    mCurrentEndpointId             = kClosureEndpoint;
+    mIsCalibrationActionInProgress = true;
 
-  ChipLogProgress(AppServer, "ClosureManager: Calibration action started for endpoint %d", mCurrentEndpointId);
+    ChipLogProgress(AppServer, "ClosureManager: Calibration action started for endpoint %d", mCurrentEndpointId);
 
-  return Status::Success;
+    return Status::Success;
 }
 
 chip::Protocols::InteractionModel::Status ClosureManager::OnStopCommand()
 {
-  // Add logic to handle the Stop command
-  return Status::Success;
+    // Add logic to handle the Stop command
+    return Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(const Optional<TargetPositionEnum> & position,
-                                                                          const Optional<bool> & latch,
-                                                                          const Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed)
+chip::Protocols::InteractionModel::Status
+ClosureManager::OnMoveToCommand(const Optional<TargetPositionEnum> & position, const Optional<bool> & latch,
+                                const Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed)
 {
-  // Add logic to handle the MoveTo command
+    // Add logic to handle the MoveTo command
     return Status::Success;
 }
 
@@ -148,8 +151,8 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
                                                                              const Optional<Globals::ThreeLevelAutoEnum> & speed,
                                                                              const chip::EndpointId endpointId)
 {
-  // Add logic to handle the SetTarget command
-  return Status::Success;
+    // Add logic to handle the SetTarget command
+    return Status::Success;
 }
 
 chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const StepDirectionEnum & direction,
@@ -157,8 +160,8 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
                                                                         const Optional<Globals::ThreeLevelAutoEnum> & speed,
                                                                         const chip::EndpointId endpointId)
 {
-  // Add logic to handle the Step command
-  return Status::Success;
+    // Add logic to handle the Step command
+    return Status::Success;
 }
 
 void ClosureManager::HandleClosureActionTimer(System::Layer * layer, void * aAppState)
@@ -172,97 +175,94 @@ void ClosureManager::HandleClosureActionTimer(System::Layer * layer, void * aApp
     switch (manager->mCurrentAction)
     {
     case ClosureManager::Action_t::CALIBRATE_ACTION:
-      manager->HandleClosureActionComplete(ClosureManager::Action_t::CALIBRATE_ACTION);
-      break;
+        manager->HandleClosureActionComplete(ClosureManager::Action_t::CALIBRATE_ACTION);
+        break;
     case ClosureManager::Action_t::STOP_ACTION:
-      manager->HandleClosureActionComplete(ClosureManager::Action_t::STOP_ACTION);
-      break;
+        manager->HandleClosureActionComplete(ClosureManager::Action_t::STOP_ACTION);
+        break;
     case ClosureManager::Action_t::MOVE_TO_ACTION:
-      manager->HandleClosureActionComplete(ClosureManager::Action_t::MOVE_TO_ACTION);
-      break;
+        manager->HandleClosureActionComplete(ClosureManager::Action_t::MOVE_TO_ACTION);
+        break;
     case ClosureManager::Action_t::LATCH_ACTION:
-      // Add logic to handle Latch action completion
+        // Add logic to handle Latch action completion
     case ClosureManager::Action_t::SET_TARGET_ACTION:
-      manager->HandleClosureActionComplete(ClosureManager::Action_t::SET_TARGET_ACTION);
-      break;
+        manager->HandleClosureActionComplete(ClosureManager::Action_t::SET_TARGET_ACTION);
+        break;
     case ClosureManager::Action_t::STEP_ACTION:
-      manager->HandleClosureActionComplete(ClosureManager::Action_t::STEP_ACTION);
-      break;
+        manager->HandleClosureActionComplete(ClosureManager::Action_t::STEP_ACTION);
+        break;
     case ClosureManager::Action_t::PANEL_LATCH_ACTION:
-      // Add logic to handle Panel Latch action completion
-      break;
+        // Add logic to handle Panel Latch action completion
+        break;
     default:
-      ChipLogError(AppServer, "Invalid action received in HandleClosureActionTimer");
-      break;
+        ChipLogError(AppServer, "Invalid action received in HandleClosureActionTimer");
+        break;
     }
 }
 
 void ClosureManager::HandleClosureActionComplete(ClosureManager::Action_t action)
 {
-  ChipLogProgress(AppServer, "HandleClosureActionComplete called for action: %d", static_cast<int>(action));
-  switch (action)
-  {
-    case ClosureManager::Action_t::CALIBRATE_ACTION:
+    ChipLogProgress(AppServer, "HandleClosureActionComplete called for action: %d", static_cast<int>(action));
+    switch (action)
     {
-      mClosureEndpoint.OnCalibrateActionComplete();
-      mClosurePanelEndpoint1.OnCalibrateActionComplete();
-      mClosurePanelEndpoint2.OnCalibrateActionComplete();
-      mIsCalibrationActionInProgress = false;
-      break;
-    }
-
-    case ClosureManager::Action_t::STOP_ACTION:
-    {
-      if(mIsCalibrationActionInProgress)
-      {
-        mClosureEndpoint.OnStopCalibrateActionComplete();
-        mClosurePanelEndpoint1.OnStopCalibrateActionComplete();
-        mClosurePanelEndpoint2.OnStopCalibrateActionComplete();
+    case ClosureManager::Action_t::CALIBRATE_ACTION: {
+        mClosureEndpoint.OnCalibrateActionComplete();
+        mClosurePanelEndpoint1.OnCalibrateActionComplete();
+        mClosurePanelEndpoint2.OnCalibrateActionComplete();
         mIsCalibrationActionInProgress = false;
-      }
-      else if(mIsMoveToActionInProgress)
-      {
-        mClosureEndpoint.OnStopMotionActionComplete();
-        mClosurePanelEndpoint1.OnStopMotionActionComplete();
-        mClosurePanelEndpoint2.OnStopMotionActionComplete();
-        mIsMoveToActionInProgress = false;
-      }
-      else if(mIsSetTargetActionInProgress)
-      {
-        // Add logic to handle stopping SetTarget action
-        mIsSetTargetActionInProgress = false;
-      }
-      else if(mIsStepActionInProgress)
-      {
-        // Add logic to handle stopping Step action
-        mIsStepActionInProgress = false;
-      }
-      break;
+        break;
     }
 
-    case ClosureManager::Action_t::MOVE_TO_ACTION:
-    {
-      mClosureEndpoint.OnMoveToActionComplete();
-      mClosurePanelEndpoint1.OnMoveToActionComplete();
-      mClosurePanelEndpoint2.OnMoveToActionComplete();
-      mIsMoveToActionInProgress = false;
-      break;
+    case ClosureManager::Action_t::STOP_ACTION: {
+        if (mIsCalibrationActionInProgress)
+        {
+            mClosureEndpoint.OnStopCalibrateActionComplete();
+            mClosurePanelEndpoint1.OnStopCalibrateActionComplete();
+            mClosurePanelEndpoint2.OnStopCalibrateActionComplete();
+            mIsCalibrationActionInProgress = false;
+        }
+        else if (mIsMoveToActionInProgress)
+        {
+            mClosureEndpoint.OnStopMotionActionComplete();
+            mClosurePanelEndpoint1.OnStopMotionActionComplete();
+            mClosurePanelEndpoint2.OnStopMotionActionComplete();
+            mIsMoveToActionInProgress = false;
+        }
+        else if (mIsSetTargetActionInProgress)
+        {
+            // Add logic to handle stopping SetTarget action
+            mIsSetTargetActionInProgress = false;
+        }
+        else if (mIsStepActionInProgress)
+        {
+            // Add logic to handle stopping Step action
+            mIsStepActionInProgress = false;
+        }
+        break;
+    }
+
+    case ClosureManager::Action_t::MOVE_TO_ACTION: {
+        mClosureEndpoint.OnMoveToActionComplete();
+        mClosurePanelEndpoint1.OnMoveToActionComplete();
+        mClosurePanelEndpoint2.OnMoveToActionComplete();
+        mIsMoveToActionInProgress = false;
+        break;
     }
 
     case ClosureManager::Action_t::SET_TARGET_ACTION:
-      // Add logic to handle SetTarget action completion
-      mIsSetTargetActionInProgress = false;
-      break;
+        // Add logic to handle SetTarget action completion
+        mIsSetTargetActionInProgress = false;
+        break;
 
     case ClosureManager::Action_t::STEP_ACTION:
-      // Add logic to handle Step action completion
-      mIsStepActionInProgress = false;
-      break;
+        // Add logic to handle Step action completion
+        mIsStepActionInProgress = false;
+        break;
 
     default:
-      ChipLogError(AppServer, "Invalid action received in HandleClosureAction");
-      break;
-  }
-  mCurrentAction = ClosureManager::Action_t::INVALID_ACTION;
-  mCurrentEndpointId = chip::kInvalidEndpointId;
+        ChipLogError(AppServer, "Invalid action received in HandleClosureAction");
+        break;
+    }
+    mCurrentAction     = ClosureManager::Action_t::INVALID_ACTION;
+    mCurrentEndpointId = chip::kInvalidEndpointId;
 }
