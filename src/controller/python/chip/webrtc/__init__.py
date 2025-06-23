@@ -19,7 +19,7 @@ import chip.native
 import ctypes
 from ctypes import c_void_p, c_char_p, CFUNCTYPE
 
-lib = chip.native.GetLibraryHandle(chip.native.HandleFlags(0));
+lib = chip.native.GetLibraryHandle(chip.native.HandleFlags(0))
 
 WebRTCClientHandle = c_void_p
 
@@ -37,6 +37,7 @@ lib.webrtc_client_add_ice_candidate.argtypes = [WebRTCClientHandle, c_char_p, c_
 
 lib.webrtc_client_set_local_description_callback.argtypes = [WebRTCClientHandle, LocalDescriptionCallbackType, c_void_p]
 lib.webrtc_client_set_ice_candidate_callback.argtypes = [WebRTCClientHandle, IceCandidateCallbackType, c_void_p]
+
 
 class WebRTCClient:
     def __init__(self):
