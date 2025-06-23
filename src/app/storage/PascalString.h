@@ -38,7 +38,7 @@ public:
     ShortPascalString(T (&data)[N]) : mData(data), mMaxSize(N - 1)
     {
         static_assert(N > 0);
-        static_assert(N <= 0xFF);
+        static_assert(N <= (1 + 0xFF)); // N-1 must fit in uint8_t
     }
 
     /// Returns the content of the pascal string.
@@ -88,7 +88,7 @@ public:
     LongPascalString(T (&data)[N]) : mData(data), mMaxSize(N - 2)
     {
         static_assert(N > 0);
-        static_assert(N <= 0xFFFF);
+        static_assert(N <= (2 + 0xFFFF)); // N-2 must fit in uint16_t
     }
 
     /// Returns the content of the pascal string.
