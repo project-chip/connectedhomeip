@@ -115,9 +115,8 @@ public:
         Buffer(ShortPascalString<char> & data) : Buffer(data.Buffer().data(), data.Buffer().size(), Type::kStringOneByteLength) {}
         Buffer(LongPascalString<char> & data) : Buffer(data.Buffer().data(), data.Buffer().size(), Type::kStringTwoByteLength) {}
 
-        Buffer(ShortPascalString<uint8_t> & data) : Buffer(data.Buffer().data(), data.Buffer().size(), Type::kStringOneByteLength)
-        {}
-        Buffer(LongPascalString<uint8_t> & data) : Buffer(data.Buffer().data(), data.Buffer().size(), Type::kStringTwoByteLength) {}
+        Buffer(ShortPascalString<uint8_t> & data) : Buffer(data.Buffer().data(), data.Buffer().size(), Type::kBytesOneByteLength) {}
+        Buffer(LongPascalString<uint8_t> & data) : Buffer(data.Buffer().data(), data.Buffer().size(), Type::kBytesTwoByteLength) {}
 
         template <typename T>
         static Buffer Primitive(T & value)
