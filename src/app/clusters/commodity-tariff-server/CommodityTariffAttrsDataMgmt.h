@@ -410,7 +410,7 @@ public:
     }
 
     /// @brief Virtual destructor for proper cleanup
-    virtual ~CTC_BaseDataClass() { CleanupValue(mValue); };
+    virtual ~CTC_BaseDataClass() { Cleanup(); };
 
     /**
      * @brief Get mutable reference to stored value
@@ -550,15 +550,26 @@ public:
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
-        assert(aUpdCtx != nullptr && aUpdCb != nullptr);
-        mAuxData = aUpdCtx;
-        mAuxCb   = aUpdCb;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+    
+        //Bypass validation if ctx not set
+        if (aUpdCtx != nullptr)
+        {
+            mAuxData = aUpdCtx;
 
-        CHIP_ERROR err = ValidateValue();
+            err = ValidateValue();
+        }
+
+        if ( aUpdCb != nullptr )
+        {
+            mAuxCb   = aUpdCb;
+        }
+
         if (err == CHIP_NO_ERROR)
         {
             mUpdateState = UpdateState::kValidated;
         }
+    
         return err;
     }
 
@@ -589,7 +600,7 @@ public:
         {
             if (mHoldState == StorageState::kHold)
             {
-                CleanupValue(mValue);
+                Cleanup();
             }
 
             mValue     = mNewValue;
@@ -627,12 +638,14 @@ public:
         if (mUpdateState != UpdateState::kUpdated)
         {
             CleanupValue(mNewValue);
-            //mNewValue    = mValue;
-            mUpdateState = UpdateState::kIdle;
         }
+        mUpdateState = UpdateState::kIdle;
     }
 
-    void Cleanup() { CleanupValue(mValue); }
+    void Cleanup() { 
+        CleanupValue(mValue);
+        mHoldState = StorageState::kEmpty;
+    }
 
 protected:
     T & mValue;             // Reference to the applied value storage

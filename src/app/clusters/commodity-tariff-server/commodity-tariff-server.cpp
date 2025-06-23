@@ -167,8 +167,7 @@ static uint32_t GetCurrentTimestamp(void)
     System::SystemClock().GetClock_RealTime(utcTimeUnix);
     UnixEpochToChipEpochMicros(utcTimeUnix.count(), chipEpochTime);
 
-    chipEpochTime = (chipEpochTime / chip::kMicrosecondsPerSecond);
-    return static_cast<uint32_t>(chipEpochTime % kSecInOneDay);
+    return static_cast<uint32_t>(chipEpochTime / chip::kMicrosecondsPerSecond);
 }
 
 void Instance::ScheduleTariffActivation(uint32_t delay)
@@ -184,8 +183,12 @@ void Instance::ScheduleTariffActivation(uint32_t delay)
 void Instance::ScheduleMidnightUpdate()
 {
     uint32_t now      = GetCurrentTimestamp();
-    uint32_t midnight = ((now / kSecondsPerDay) + 1) * kSecondsPerDay;
-    uint32_t delay    = midnight - now;
+    uint32_t secondsSinceMidnight = now % kSecInOneDay;
+    uint32_t delay  = (secondsSinceMidnight == 0) ? kSecInOneDay 
+                                                : kSecInOneDay - secondsSinceMidnight;
+
+    // Store the exact trigger time
+    mServerTariffAttrsCtx.AlarmTriggerTime = now + delay;
 
     DeviceLayer::SystemLayer().StartTimer(
         System::Clock::Milliseconds32(delay * 1000),
@@ -198,9 +201,16 @@ void Instance::ScheduleMidnightUpdate()
 void Instance::ScheduleDayEntryUpdate(uint16_t minutesSinceMidnight)
 {
     uint32_t now         = GetCurrentTimestamp();
-    uint32_t todayStart  = (now / kSecondsPerDay) * kSecondsPerDay;
-    uint32_t triggerTime = todayStart + (minutesSinceMidnight * 60);
-    uint32_t delay       = triggerTime - now;
+    uint32_t secondsSinceMidnight = now % kSecInOneDay;
+    uint32_t triggerOffset = minutesSinceMidnight * 60;
+
+    // Calculate delay considering next day if needed
+    uint32_t delay = (triggerOffset > secondsSinceMidnight) 
+                   ? triggerOffset - secondsSinceMidnight
+                   : kSecInOneDay - secondsSinceMidnight + triggerOffset;
+
+    // Store the exact trigger time
+    mServerTariffAttrsCtx.AlarmTriggerTime = now + delay;
 
     DeviceLayer::SystemLayer().StartTimer(
         System::Clock::Milliseconds32(delay * 1000),
@@ -365,25 +375,17 @@ const Structs::TariffPeriodStruct::Type * FindTariffPeriodByTariffComponentId(Cu
 }
 
 CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(CurrentTariffAttrsCtx & aCtx, uint32_t dayEntryID,
-                                                  DataModel::List<Structs::TariffComponentStruct::Type> & aValue)
+                                                  TariffComponentsDataClass & mgmtObj)
 {
     CHIP_ERROR err                                   = CHIP_NO_ERROR;
     const Structs::TariffPeriodStruct::Type * period = FindTariffPeriodByDayEntryId(aCtx, dayEntryID);
     std::vector<Structs::TariffComponentStruct::Type> tempList;
-    tempList.reserve(aValue.size());
-    TariffComponentsDataClass mgmtObj{ aValue };
 
     if (period != nullptr)
     {
         const DataModel::List<const uint32_t> & componentIDs = period->tariffComponentIDs;
 
-        if (!aValue.empty())
-        {
-            for (auto & item : aValue)
-            {
-                mgmtObj.CleanupExtEntry(item);
-            }
-        }
+        tempList.reserve(componentIDs.size());
 
         for (const auto & entryID : componentIDs)
         {
@@ -394,7 +396,9 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(CurrentTariffAttrsCtx & aCtx, 
         if ((err = mgmtObj.CreateNewValue(tempList.size())) == CHIP_NO_ERROR)
         {
             std::copy(tempList.begin(), tempList.end(), mgmtObj.GetNewValue()->data());
-            aValue = *mgmtObj.GetNewValue();
+            mgmtObj.MarkAsAssigned();
+            mgmtObj.UpdateBegin(nullptr, nullptr);
+            mgmtObj.UpdateCommit();
         }
         else
         {
@@ -433,7 +437,7 @@ static void AttrsCtxDeinit(CurrentTariffAttrsCtx & aCtx)
 
 void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
 {
-    uint32_t timestampNow = GetCurrentTimestamp();
+    uint32_t timestampNow = mServerTariffAttrsCtx.AlarmTriggerTime;
 
     ChipLogProgress(NotSpecified, "EGW-CTC: UpdateEventCode: %x", aEvt);
 
@@ -500,7 +504,7 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
         if (current != nullptr)
         {
             if (CHIP_NO_ERROR ==
-                Utils::UpdateTariffComponentAttrsDayEntryById(mServerTariffAttrsCtx, current->dayEntryID, mCurrentTariffComponents))
+                Utils::UpdateTariffComponentAttrsDayEntryById(mServerTariffAttrsCtx, current->dayEntryID, mCurrentTariffComponentsMgmtObj))
             {
                 mCurrentDayEntry.SetNonNull(*current);
                 mCurrentDayEntryDate.SetNonNull(mCurrentDay.Value().date);
@@ -517,10 +521,7 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
 
         if (next != nullptr)
         {
-            DataModel::List<Structs::TariffComponentStruct::Type> tempList =
-                DataModel::List<Structs::TariffComponentStruct::Type>();
-
-            if (CHIP_NO_ERROR == Utils::UpdateTariffComponentAttrsDayEntryById(mServerTariffAttrsCtx, next->dayEntryID, tempList))
+            if (CHIP_NO_ERROR == Utils::UpdateTariffComponentAttrsDayEntryById(mServerTariffAttrsCtx, next->dayEntryID, mNextTariffComponentsMgmtObj))
             {
                 mNextDayEntry.SetNonNull(*next);
                 mNextDayEntryDate.SetNonNull(mCurrentDay.Value().date);
@@ -528,20 +529,21 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
                 MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, NextDayEntryDate::Id);
             }
 
-            if (tempList.empty())
+            if (mCurrentTariffComponentsMgmtObj.GetValue().empty())
             {
                 mNextTariffComponents.SetNull();
             }
             else
             {
-                mNextTariffComponents.SetNonNull(tempList);
-                MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, NextTariffComponents::Id);
+                mNextTariffComponents.SetNonNull(mNextTariffComponentsMgmtObj.GetValue());
             }
+            MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, NextTariffComponents::Id);
         }
         else
         {
             mNextDayEntry.SetNull();
             mNextDayEntryDate.SetNull();
+            mNextTariffComponents.SetNull();
         }
 
         if (nextUpdInterval > 0)
