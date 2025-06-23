@@ -117,7 +117,7 @@ public:
 
 private:
     static ClosureManager sClosureMgr;
-    
+
     osTimerId_t mClosureTimer;
 
     bool isCalibrationInProgress = false;

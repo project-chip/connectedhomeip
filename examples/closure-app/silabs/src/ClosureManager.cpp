@@ -229,7 +229,7 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
     ClosureManager & instance = ClosureManager::GetInstance();
     switch (action)
     {
-    case Action_t::CALIBRATE_ACTION: 
+    case Action_t::CALIBRATE_ACTION:
     {
         instance.ep1.OnCalibrateActionComplete();
         instance.ep2.OnCalibrateActionComplete();
@@ -249,8 +249,8 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
             instance.ep2.OnStopCalibrateActionComplete();
             instance.ep3.OnStopCalibrateActionComplete();
             isCalibrationInProgress = false;
-        } 
-        else if (isMoveToInProgress) 
+        }
+        else if (isMoveToInProgress)
         {
             ChipLogDetail(AppServer, "Stopping move to action");
             instance.ep1.OnStopMotionActionComplete();
@@ -258,7 +258,7 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
             instance.ep3.OnStopMotionActionComplete();
             isMoveToInProgress = false;
         }
-        else 
+        else
         {
             ChipLogDetail(AppServer, "No action in progress to stop");
         }

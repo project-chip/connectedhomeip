@@ -181,12 +181,12 @@ void ClosureControlEndpoint::OnStopMotionActionComplete()
     // Set the OverallState position to PartiallyOpened as motion has been stopped
     // and the closure is not fully closed or fully opened.
     auto position = MakeOptional(DataModel::MakeNullable(PositioningEnum::kPartiallyOpened));
-    
+
     DataModel::Nullable<GenericOverallState> overallState;
     mLogic.GetOverallState(overallState);
     if (overallState.IsNull())
     {
-        overallState.SetNonNull(GenericOverallState(position, NullOptional, NullOptional, NullOptional)); 
+        overallState.SetNonNull(GenericOverallState(position, NullOptional, NullOptional, NullOptional));
     } else
     {
         overallState.Value().positioning = position;
@@ -277,8 +277,8 @@ void ClosureControlEndpoint::UpdateTargetStateFromCurrentState()
     }
 
     // Update the position field of overallTarget based on the current positioning state.
-    if (overallState.Value().positioning.HasValue() && 
-            !overallState.Value().positioning.Value().IsNull()) 
+    if (overallState.Value().positioning.HasValue() &&
+            !overallState.Value().positioning.Value().IsNull())
     {
         PositioningEnum positioning = overallState.Value().positioning.Value().Value();
         TargetPositionEnum targetPosition = MapCurrentPositionToTargetPosition(positioning);
@@ -298,24 +298,24 @@ void ClosureControlEndpoint::UpdateTargetStateFromCurrentState()
     }
 
     // Update the latch field of overallTarget based on the current latch state.
-    if (overallState.Value().latch.HasValue() && 
-            !overallState.Value().latch.Value().IsNull()) 
+    if (overallState.Value().latch.HasValue() &&
+            !overallState.Value().latch.Value().IsNull())
     {
         overallTarget.Value().latch.SetValue(overallState.Value().latch.Value().Value());
     }
     else
-    {   
+    {
         overallTarget.Value().latch.ClearValue();
     }
 
     // Update the speed field of overallTarget based on the current speed state.
-    if (overallState.Value().speed.HasValue() && 
-            !overallState.Value().speed.Value().IsNull()) 
+    if (overallState.Value().speed.HasValue() &&
+            !overallState.Value().speed.Value().IsNull())
     {
         overallTarget.Value().speed.SetValue(overallState.Value().speed.Value().Value());
     }
     else
-    {   
+    {
         overallTarget.Value().speed.ClearValue();
     }
 
