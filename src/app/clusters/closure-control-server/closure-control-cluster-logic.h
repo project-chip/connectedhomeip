@@ -243,6 +243,18 @@ public:
     }
 
     /**
+     * @brief Sets the current error list.
+     *
+     * @param[in] error The error to be added to the current error list.
+     *
+     * @return CHIP_NO_ERROR if the error was added successfully.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     *         Other CHIP_ERROR codes as returned by the delegate.
+     */
+    CHIP_ERROR SetCurrentErrorList(ClosureErrorEnum error);
+
+    /**
      *  @brief Calls delegate HandleStopCommand function after validating MainState, parameters and conformance.
      *
      *  @return Exits if the cluster is not initialized.
