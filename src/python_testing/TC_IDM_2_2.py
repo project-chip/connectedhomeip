@@ -436,9 +436,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
     async def _test_read_operation(self, operation_type: str, **kwargs) -> dict:
         """Execute a read operation based on the specified type.
-        
-        This is a private helper method for test_TC_IDM_2_2.
-        
+                
         Args:
             operation_type: Type of read operation to perform
             **kwargs: Additional arguments specific to the operation type
@@ -469,16 +467,12 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 return await self.verify_attribute_read([attribute_path])
                 
             elif operation_type == 'all_attributes':
-                # Use Austin's approach for reading all attributes from all clusters on all endpoints
-                # This matches the implementation in TC_IDM_2_2_Austin.py
-                # Use a very long timeout since this operation reads everything
                 import asyncio
                 read_request = await asyncio.wait_for(
                     self.default_controller.Read(self.dut_node_id, [()]),
                     timeout=120.0  # 2 minutes timeout for this massive operation
                 )
                 
-                # Verify the response using Austin's verification logic
                 await self._verify_empty_tuple([()], read_request)
                 
                 return read_request
@@ -494,7 +488,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 # Use Austin's ReadAttribute approach for reading a cluster from all endpoints
                 read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [kwargs['cluster']])
                 
-                # Verify the response using Austin's verification logic
                 for endpoint in read_request:
                     asserts.assert_in(kwargs['cluster'], read_request[endpoint].keys(), 
                                     f"{kwargs['cluster']} cluster not in output")
@@ -505,7 +498,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 return read_request
                 
             elif operation_type == 'endpoint_all_clusters':
-                # Use Austin's ReadAttribute approach for reading all clusters at an endpoint
                 read_request = await self.default_controller.ReadAttribute(self.dut_node_id, [kwargs['endpoint']])
                 
                 endpoint = kwargs['endpoint']
@@ -555,12 +547,10 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 data_version = read_request[0][kwargs['cluster']][Clusters.Attribute.DataVersion]
                 
                 if 'test_value' in kwargs:
-                    # Write operation to change data version - use Austin's format
                     await self.default_controller.WriteAttribute(
                         self.dut_node_id,
                         [(kwargs['endpoint'], kwargs['attribute'](value=kwargs['test_value']))])
                 
-                # Read with data version filter - use ReadAttribute like Austin's version
                 data_version_filter = [(kwargs['endpoint'], kwargs['cluster'], data_version)]
                 filtered_read = await self.default_controller.ReadAttribute(
                     self.dut_node_id, 
@@ -569,29 +559,13 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 
                 return read_request, filtered_read
                 
-            elif operation_type == 'chunked_data':
-                # Find a large attribute to read
-                for endpoint in self.endpoints:
-                    for cluster in self.endpoints[endpoint]:
-                        for attribute in self.endpoints[endpoint][cluster]:
-                            if attribute == Clusters.Attribute.DataVersion:
-                                continue
-                            try:
-                                return await self.verify_attribute_read([(endpoint, cluster, attribute)])
-                            except ChipStackError as e:
-                                if "Response too large" in str(e):
-                                    continue
-                                raise
-                return None
-                
             elif operation_type == 'non_global_attribute':
-                # Use Austin's approach for Step 29 - use ReadAttribute with attribute_id
                 attribute_path = AttributePath(
                     EndpointId=kwargs.get('endpoint'),
                     ClusterId=None,
                     AttributeId=kwargs['attribute'].attribute_id)
                 
-                # Use ReadAttribute like Austin does, and expect ChipStackError with 0x580
+                # Use ReadAttribute like Austin did, and expect ChipStackError with 0x580
                 try:
                     result = await self.default_controller.ReadAttribute(
                         self.dut_node_id,
@@ -600,13 +574,11 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                     # If we get here, the operation succeeded unexpectedly
                     asserts.fail("Expected INVALID_ACTION error but operation succeeded")
                 except ChipStackError as e:
-                    # Austin expects error code 0x580 (INVALID_ACTION)
                     asserts.assert_equal(e.err, 0x580,
                                        "Incorrect error response for reading non-global attribute on all clusters at endpoint")
                     return None
                 
             elif operation_type == 'limited_access':
-                # Use Austin's approach for Step 30 - read current ACL first
                 endpoint = kwargs['endpoint']
                 read_request = await self.default_controller.Read(
                     self.dut_node_id,
@@ -624,12 +596,10 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 dut_acl = copy.deepcopy(dut_acl_original)
                 dut_acl.append(ace)
                 
-                # Use Austin's WriteAttribute format
                 result = await self.default_controller.WriteAttribute(
                     self.dut_node_id, 
                     [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl))])
                 
-                # Test read with limited access
                 read_request = await self.default_controller.Read(
                     self.dut_node_id,
                     [(endpoint, Clusters.AccessControl.Attributes.Acl)])
@@ -637,7 +607,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 # Verify ACL was updated
                 asserts.assert_equal(len(read_request.attributes[endpoint][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]), 2)
                 
-                # Restore original ACL using Austin's format
                 await self.default_controller.WriteAttribute(
                     self.dut_node_id, 
                     [(endpoint, Clusters.AccessControl.Attributes.Acl(dut_acl_original))])
@@ -651,11 +620,10 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 return dut_acl_original, read_request
                 
             elif operation_type == 'all_events_attributes':
-                # Use Austin's approach for Step 32 - read both attributes and events
                 return await self.default_controller.Read(nodeid=self.dut_node_id, attributes=[()], events=[()])
                 
             elif operation_type == 'data_version_filter_multiple_clusters':
-                # Read from cluster A to get its data version - use ReadAttribute like Austin's version
+                # Read from cluster A to get its data version - use ReadAttribute
                 read_a = await self.default_controller.ReadAttribute(
                     self.dut_node_id, [(kwargs['endpoint'], kwargs['cluster'], kwargs['attribute'])])
                 data_version_a = read_a[0][kwargs['cluster']][Clusters.Attribute.DataVersion]
@@ -672,13 +640,13 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 return read_a, read_both
                 
             elif operation_type == 'multiple_data_version_filters':
-                # Initial read to get data version - use ReadAttribute like Austin's version
+                # Initial read to get data version - use ReadAttribute
                 read_request = await self.default_controller.ReadAttribute(
                     self.dut_node_id, [(kwargs['endpoint'], kwargs['cluster'], kwargs['attribute'])])
                 data_version = read_request[0][kwargs['cluster']][Clusters.Attribute.DataVersion]
                 
                 if 'test_value' in kwargs:
-                    # Write operation to change data version - use Austin's format
+                    # Write operation to change data version
                     await self.default_controller.WriteAttribute(
                         self.dut_node_id,
                         [(kwargs['endpoint'], kwargs['attribute'](value=kwargs['test_value']))])
@@ -687,13 +655,28 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 data_version_filter_1 = [(kwargs['endpoint'], kwargs['cluster'], data_version)]
                 data_version_filter_2 = [(kwargs['endpoint'], kwargs['cluster'], data_version - 1)]
                 
-                # Read with multiple data version filters - use ReadAttribute like Austin's version
+                # Read with multiple data version filters - use ReadAttribute
                 filtered_read = await self.default_controller.ReadAttribute(
                     self.dut_node_id,
                     [(kwargs['endpoint'], kwargs['cluster'], kwargs['attribute'])],
                     dataVersionFilters=data_version_filter_1)
                 
                 return read_request, filtered_read
+                
+            elif operation_type == 'chunked_data':
+                # Use a known large attribute from UnitTesting cluster
+                endpoint = self.endpoint
+                cluster = Clusters.UnitTesting
+                attribute = Clusters.UnitTesting.Attributes.ListLongOctetString
+
+                # Perform the read operation
+                read_responses = await self.default_controller.Read(
+                    self.dut_node_id,
+                    [(endpoint, cluster, attribute)]
+                )
+
+                # Return the raw responses for verification
+                return read_responses
                 
             else:
                 raise ValueError(f"Invalid operation type: {operation_type}")
@@ -706,7 +689,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
     async def _verify_empty_tuple(self, attr_path, read_request):
         """Verify read response for empty tuple path (all attributes from all clusters on all endpoints).
         
-        This method is based on Austin's implementation in TC_IDM_2_2_Austin.py.
+        This method is based on Austin's implementation in PR #34003.
         
         Args:
             attr_path: The attribute path that was read
@@ -771,7 +754,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                      "On the TH verify that the DUT sends an error message and not the value of the attribute."),
             TestStep(20, "TH sends a Read Request Message to the DUT to read a non global attribute from all clusters at all Endpoints, AttributePath = [[Attribute = Specific Non Global Attribute]] +",
                      "On the TH verify that the DUT sends an error message and not the value of the attribute."),
-            TestStep(21, "TH should have access to only a single cluster at one Endpoint1.TH sends a Read Request Message to the DUT to read all attributes from all clusters at Endpoint1, AttributePath = [[Endpoint = Specific Endpoint]] +",
+            TestStep(21, "TH should have access to only a single cluster at one Endpoint1. TH sends a Read Request Message to the DUT to read all attributes from all clusters at Endpoint1, AttributePath = [[Endpoint = Specific Endpoint]] +",
                       "Verify that the DUT sends back data of all attributes only from that one cluster to which it has access. Verify that there are no errors sent back for attributes the TH has no access to."),
             TestStep(22, "TH sends a Read Request Message to read all events and attributes from the DUT.",
                       "Verify that the DUT sends back data of all attributes and events that the TH has access to."),
@@ -780,67 +763,66 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
     @async_test_body
     async def test_TC_IDM_2_2(self):
-        """Execute the IDM-2.2 test case."""
         # Test Setup with targeted read
         await self._setup_device_info()
 
-        # Step 1: Read single attribute
+        # Step 1: TH sends the Read Request Message to the DUT to read one attribute on a given cluster and endpoint
         self.step(1)
         read_request1 = await self._test_read_operation(operation_type='single_attribute',
             endpoint=self.endpoint,
             cluster=Clusters.Descriptor,
             attribute=Clusters.Descriptor.Attributes.ServerList)
 
-        # Step 2: Read all cluster attributes
+        # Step 2: TH sends the Read Request Message to the DUT to read all attributes on a given cluster and Endpoint
         self.step(2)
         read_request2 = await self._test_read_operation(operation_type='all_cluster_attributes',
             endpoint=self.endpoint,
             cluster=Clusters.Descriptor)
 
-        # Step 3: Read attribute all endpoints
+        # Step 3: TH sends the Read Request Message to the DUT to read an attribute from a cluster at all Endpoints
         self.step(3)
         read_request3 = await self._test_read_operation(operation_type='attribute_all_endpoints',
             cluster=Clusters.Descriptor,
             attribute=Clusters.Descriptor.Attributes.ServerList)
 
-        # Step 4: Read global attribute
+        # Step 4: TH sends the Read Request Message to the DUT to read a global attribute from all clusters at that Endpoint
         self.step(4)
         read_request4 = await self._test_read_operation(operation_type='global_attribute',
             endpoint=self.endpoint,
             attribute_id=global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID)
 
-        # Step 5: Read all attributes
+        # Step 5: TH sends the Read Request Message to the DUT to read all attributes from all clusters on all Endpoints
         self.step(5)
         read_request5 = await self._test_read_operation(operation_type='all_attributes')
 
-        # Step 6: Read global attribute all endpoints
+        # Step 6: TH sends the Read Request Message to the DUT to read a global attribute from all clusters at all Endpoints
         self.step(6)
         read_request6 = await self._test_read_operation(operation_type='global_attribute_all_endpoints',
             attribute_id=global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID)
 
-        # Step 7: Read cluster all endpoints
+        # Step 7: TH sends the Read Request Message to the DUT to read all attributes from a cluster at all Endpoints
         self.step(7)
         read_request7 = await self._test_read_operation(operation_type='cluster_all_endpoints',
             cluster=Clusters.Descriptor)
 
-        # Step 8: Read endpoint all clusters
+        # Step 8: TH sends the Read Request Message to the DUT to read all attributes from all clusters at one Endpoint
         self.step(8)
         read_request8 = await self._test_read_operation(operation_type='endpoint_all_clusters',
             endpoint=self.endpoint)
 
-        # Step 9: Test unsupported endpoint
+        # Step 9: TH sends the Read Request Message to the DUT to read any attribute to an unsupported Endpoint
         self.step(9)
         result9 = await self._test_read_operation(operation_type='unsupported_endpoint')
 
-        # Step 10: Test unsupported cluster
+        # Step 10: TH sends the Read Request Message to the DUT to read any attribute to an unsupported cluster
         self.step(10)
         result10 = await self._test_read_operation(operation_type='unsupported_cluster')
 
-        # Step 11: Test unsupported attribute
+        # Step 11: TH sends the Read Request Message to the DUT to read an unsupported attribute
         self.step(11)
         result11 = await self._test_read_operation(operation_type='unsupported_attribute')
 
-        # Step 12: Test repeat attribute read
+        # Step 12: TH sends the Read Request Message to the DUT to read an attribute. Repeat the above steps 3 times.
         self.step(12)
         read_requests12 = await self._test_read_operation(operation_type='repeat_attribute',
             endpoint=self.endpoint,
@@ -848,7 +830,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             attribute=Clusters.Descriptor.Attributes.ServerList,
             repeat_count=3)
 
-        # Step 13: Test data version filter single read
+        # Step 13: TH sends a Read Request Message to the DUT to read a particular attribute with the DataVersionFilter Field not set.
+        #TH sends a second read request to the same cluster with the DataVersionFilter Field set with the dataversion value received before.
         self.step(13)
         read_request13, filtered_read13 = await self._test_read_operation(operation_type='data_version_filter',
             endpoint=self.endpoint,
@@ -862,7 +845,9 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # 2. Check the second read (with DataVersionFilter) returns empty dict if nothing changed
         asserts.assert_equal(filtered_read13, {}, "Expected empty response with matching data version")
 
-        # Step 14: Test data version filter with write
+        # Step 14: TH sends a Read Request Message to the DUT to read a particular attribute with the DataVersionFilter Field not set.
+        # DUT sends back the attribute value with the DataVersion of the cluster. TH sends a write request to the same cluster to write to any attribute.
+        # TH sends a second read request to read an attribute from the same cluster with the DataVersionFilter Field set with the dataversion value received before.
         self.step(14)
         read_request14, filtered_read14 = await self._test_read_operation(operation_type='data_version_filter',
             endpoint=self.endpoint,
@@ -877,13 +862,16 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             asserts.assert_equal((read_request14[0][Clusters.BasicInformation][Clusters.Attribute.DataVersion] + 1), data_version14,
                 "DataVersion was not incremented")
 
-        # Step 15: Test data version filter all attributes
+        # Step 15: TH sends a Read Request Message to the DUT to read all attributes on a cluster with the DataVersionFilter Field not set.
+        # DUT sends back the all the attribute values with the DataVersion of the cluster. TH sends a write request to the same cluster to write to any attribute.
+        # TH sends a second read request to read all the attributes from the same cluster with the DataVersionFilter Field set with the dataversion value received before.
         self.step(15)
         read_request15, filtered_read15 = await self._test_read_operation(operation_type='data_version_filter',
             endpoint=self.endpoint,
             cluster=Clusters.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.NodeLabel,
             test_value="Goodbye World")
+
         # Check if filtered_read15 contains the new value
         if filtered_read15 and 0 in filtered_read15:
             data_version15 = filtered_read15[0][Clusters.BasicInformation][Clusters.Attribute.DataVersion]
@@ -892,19 +880,24 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             asserts.assert_equal((read_request15[0][Clusters.BasicInformation][Clusters.Attribute.DataVersion] + 1), data_version15,
                 "DataVersion was not incremented")
 
-        # Step 16: Test multiple data version filters
+        # Step 16: TH sends a Read Request Message to the DUT to read a particular attribute on a particular cluster with the DataVersionFilter Field not set.
+        # DUT sends back the attribute value with the DataVersion of the cluster. TH sends a read request to the same cluster to read any attribute with the right DataVersion(received in the previous step) and also an older DataVersion.
+        # The Read Request Message should have 2 DataVersionIB filters.
         self.step(16)
         read_request16, filtered_read16 = await self._test_read_operation(operation_type='multiple_data_version_filters',
             endpoint=self.endpoint,
             cluster=Clusters.BasicInformation,
             attribute=Clusters.BasicInformation.Attributes.NodeLabel,
             test_value="Hello World Again")
+
         # Check if filtered_read16 contains the new value
         if filtered_read16 and 0 in filtered_read16:
             asserts.assert_equal(filtered_read16[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.NodeLabel], "Hello World Again",
                 "Data version does not match expected value")
 
-        # Step 17: Test data version filter multiple clusters
+        # Step 17: TH sends a Read Request Message to the DUT to read a particular attribute on a particular cluster with the DataVersionFilter Field not set.
+        # DUT sends back the attribute value with the DataVersion of the cluster. TH sends a read request to the same cluster to read any attribute with the right DataVersion(received in the previous step) and also an older DataVersion.
+        # The Read Request Message should have 2 DataVersionIB filters.
         self.step(17)
         read_a17, read_both17 = await self._test_read_operation(operation_type='data_version_filter_multiple_clusters',
             endpoint=self.endpoint,
@@ -917,22 +910,38 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_not_equal(data_version_a17, data_version_b17,
                                "Data versions should be different")
 
-        # Step 18: Test chunked data message
+        # Step 18: TH sends a Read Request Message to the DUT to read something(Attribute) which is larger than 1 MTU(1280 bytes) and per spec can be chunked +
+        # Verify on the TH that the DUT sends a chunked data message with the SuppressResponse field set to False for all the messages except the last one. 
+        # Verify the last chunked message sent has the SuppressResponse field set to True.
         self.step(18)
-        read_request18 = await self._test_read_operation(operation_type='chunked_data')
+        read_chunks = await self._test_read_operation(operation_type='chunked_data')
+        
+        # Check if SuppressResponse is available
+        if isinstance(read_chunks, list) and hasattr(read_chunks[0], 'SuppressResponse'):
+            for i, chunk in enumerate(read_chunks):
+                suppress_response = getattr(chunk, 'SuppressResponse', None)
+                if i < len(read_chunks) - 1:
+                    asserts.assert_false(suppress_response, f"Chunk {i} should have SuppressResponse == False")
+                else:
+                    asserts.assert_true(suppress_response, f"Last chunk should have SuppressResponse == True")
+        else:
+            # We do not appear to have access to the SuppressResponse field during testing, currently skipping this section of the step.
+            logging.warning("SDK does not expose SuppressResponse; cannot verify at test level.")
+            pass
 
-        # Step 19: Test non-global attribute on endpoint
+        # Step 19: TH sends a Read Request Message to the DUT to read a non-global attribute on a given endpoint.
         self.step(19)
         result19 = await self._test_read_operation(operation_type='non_global_attribute',
             endpoint=self.endpoint,
             attribute=Clusters.Descriptor.Attributes.ServerList)
 
-        # Step 20: Test non-global attribute all endpoints
+        # Step 20: TH sends a Read Request Message to the DUT to read a non-global attribute on all endpoints.
         self.step(20)
         result20 = await self._test_read_operation(operation_type='non_global_attribute',
             attribute=Clusters.Descriptor.Attributes.ServerList)
 
-        # Step 21: Test limited access read
+        # Step 21: TH should have access to only a single cluster at one Endpoint. 
+        # TH sends a Read Request Message to the DUT to read all attributes from all clusters at Endpoint1
         self.step(21)
         original_acl21, read_request21 = await self._test_read_operation(operation_type='limited_access',
             endpoint=self.endpoint,
@@ -947,7 +956,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_true(Clusters.AccessControl.Attributes.Acl in read_request21.attributes[self.endpoint][Clusters.AccessControl],
                           "ACL attribute not in response")
 
-        # Step 22: Test read all events and attributes
+        # Step 22: TH sends a Read Request Message to read all events and attributes from the DUT.
         self.step(22)
         read_request22 = await self._test_read_operation(operation_type='all_events_attributes')
         required_attributes = ["Header", "Status", "Data"]
