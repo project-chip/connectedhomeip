@@ -42,7 +42,7 @@ CHIP_ERROR JFAManager::Init(Server & server)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR JFAManager::FinalizeCommissioning(NodeId nodeId, bool isJCM, P256PublicKey & trustedIcacPublicKeyB)
+CHIP_ERROR JFAManager::FinalizeCommissioning(NodeId nodeId, bool isJCM)
 {
     if (jfFabricIndex == kUndefinedFabricId)
     {

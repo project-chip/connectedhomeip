@@ -165,6 +165,7 @@ executable("jfc-app") {
 
   deps = [
     ":jfc-utils",
+    "${chip_root}/src/controller:jcm",
     "${chip_root}/src/platform/logging:stdio",
   ]
 

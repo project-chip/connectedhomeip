@@ -65,24 +65,27 @@ CHIP_ERROR PairingCommand::RunCommand()
     chip::CASEAuthTag administratorCAT   = GetAdminCATWithVersion(CHIP_CONFIG_ADMINISTRATOR_CAT_INITIAL_VERSION);
     NodeId administratorCaseAdminSubject = NodeIdFromCASEAuthTag(administratorCAT);
 
+    // This check is to ensure that the --anchor and --jcm options are not used together.  If they are return an immediate error.
     if (mJCM.ValueOr(false) && mAnchor.ValueOr(false))
     {
         ChipLogError(JointFabric, "--anchor and --jcm options are not allowed simultaneously!");
         return CHIP_ERROR_BAD_REQUEST;
     }
 
-    mAnchorNodeId = GetAnchorNodeId();
+    NodeId anchorNodeId = GetAnchorNodeId();
 
-    // TODO: persist and restore mAnchorNodeId due to mAnchorNodeId being reset on
-    // JFC restart and across command invocations
-    if (mAnchorNodeId == chip::kUndefinedNodeId)
+    // Check if the Anchor Administrator is not already commissioned.
+    if (anchorNodeId == chip::kUndefinedNodeId)
     {
-        // TODO: Once the above is fixed uncomment this code
-        // if (!mAnchor.ValueOr(false))
-        // {
-        //     ChipLogError(JointFabric, "Please first commission the Anchor Administrator: add `--anchor true` parameter");
-        //     return CHIP_ERROR_NOT_CONNECTED;
-        // }
+        // The Anchor Administrator is not already commissions, check if the mAnchor option is set.
+        // If the --anchor option is not set, we cannot proceed unless we commission the Anchor Administrator first.
+        if (!mAnchor.ValueOr(false))
+        {
+            // Since the Anchor Administrator is not commissioned and we are not attempting to commission the Anchor Administrator
+            // this is an error so we cannot proceed with the JFA commissioning.
+            ChipLogError(JointFabric, "Please first commission the Anchor Administrator: add `--anchor true` parameter");
+            return CHIP_ERROR_NOT_CONNECTED;
+        }
         
         chip::CASEAuthTag anchorCAT = GetAnchorCATWithVersion(CHIP_CONFIG_ANCHOR_CAT_INITIAL_VERSION);
 
@@ -91,15 +94,17 @@ CHIP_ERROR PairingCommand::RunCommand()
     }
     else if (mAnchor.ValueOr(false))
     {
+        // The Anchor Administrator is already commissioned, but the --anchor option is set.  This is an error, as we cannot
+        // proceed with commissioning another Anchor Administrator.
         ChipLogError(JointFabric, "Anchor Administrator already commissioned as Node ID: " ChipLogFormatX64,
-                     ChipLogValueX64(mAnchorNodeId));
+                     ChipLogValueX64(anchorNodeId));
         return CHIP_ERROR_BAD_REQUEST;
     }
-    else if (!mJCM.ValueOr(false))
+    else  
     {
-        // Only skip commissioning complete if we are not using JCM
-        mSkipCommissioningComplete = MakeOptional(true);
-    }
+        // Skip commissioning complete for JCM and other device commissioning methods but not Anchor Administrator commissioning.
+        mSkipCommissioningComplete = MakeOptional(true);  
+    }  
 
     // Clear the CATs in OperationalCredentialsIssuer
     mCredIssuerCmds->SetCredentialIssuerCATValues(kUndefinedCATs);
@@ -147,6 +152,17 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         break;
     case PairingMode::Ble:
         err = Pair(remoteId, PeerAddress::BLE());
+        break;
+    case PairingMode::Nfc:
+        if (mDiscriminator.has_value())
+        {
+            err = Pair(remoteId, PeerAddress::NFC(mDiscriminator.value()));
+        }
+        else
+        {
+            // Discriminator is mandatory
+            err = CHIP_ERROR_MESSAGE_INCOMPLETE;
+        }
         break;
     case PairingMode::OnNetwork:
         err = PairWithMdns(remoteId);
@@ -550,27 +566,14 @@ void OnOwnershipTransferDone(const _pw_protobuf_Empty & response, ::pw::Status s
 
 } // namespace
 
-void PairingCommand::OnCommissioningComplete(NodeId nodeId, const Optional<Crypto::P256PublicKey> & trustedIcacPublicKeyB,
-                                             CHIP_ERROR err)
+void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 {
     if (err == CHIP_NO_ERROR)
     {
         if (!mSkipCommissioningComplete.ValueOr(false))
         {
-            if (mAnchor.ValueOr(false))
-            {
-                ChipLogProgress(JointFabric, "Anchor Administrator (nodeId=%ld) commissioned with success", nodeId);
-                mAnchorNodeId = nodeId;
-                SetAnchorNodeId(mAnchorNodeId);
-            }
-            else if (mJCM.ValueOr(false))
-            {
-                ChipLogProgress(JointFabric, "Joint Commissioning Method (nodeId=%ld) commissioned with success", nodeId);
-            }
-            else
-            {
-                ChipLogProgress(JointFabric, "Device (%ld) commissioned with success", nodeId);
-            }
+            ChipLogProgress(JointFabric, "Anchor Administrator (nodeId=%ld) commissioned with success", nodeId);
+            SetAnchorNodeId(nodeId);
         }
         else
         {
@@ -578,31 +581,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, const Optional<Crypt
 
             memset(&request, 0, sizeof(request));
             request.node_id = nodeId;
-            request.jcm     = false;
-
-            if (mExecuteJCM.ValueOr(false))
-            {
-                request.jcm = true;
-
-                if (trustedIcacPublicKeyB.HasValue())
-                {
-                    memcpy(request.trustedIcacPublicKeyB.bytes, trustedIcacPublicKeyB.Value().ConstBytes(),
-                           Crypto::kP256_PublicKey_Length);
-                    request.trustedIcacPublicKeyB.size = Crypto::kP256_PublicKey_Length;
-
-                    for (size_t i = 0; i < Crypto::kP256_PublicKey_Length; ++i)
-                    {
-                        ChipLogProgress(JointFabric, "trustedIcacPublicKeyB[%li] = %02X", i,
-                                        request.trustedIcacPublicKeyB.bytes[i]);
-                    }
-                }
-                else
-                {
-                    SetCommandExitStatus(CHIP_ERROR_INVALID_ARGUMENT);
-                    ChipLogError(chipTool, "JCM requested but peer Admin ICAC not found");
-                    return;
-                }
-            }
+            request.jcm     = mJCM.ValueOr(false);
 
             auto call = rpcClient.TransferOwnership(request, OnOwnershipTransferDone);
             if (!call.active())
@@ -614,7 +593,11 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, const Optional<Crypt
             err = WaitForResponse(call);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(JointFabric, "RPC: OwnershipTransfer Timeout Error");
+                ChipLogError(JointFabric, "Joint Commissioning Method (nodeId=%ld) failed: RPC OwnershipTransfer Timeout Error", nodeId);
+            }
+            else
+            {
+                ChipLogProgress(JointFabric, "Joint Commissioning Method (nodeId=%ld) success", nodeId);
             }
         }
     }

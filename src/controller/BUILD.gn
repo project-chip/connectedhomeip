@@ -41,6 +41,15 @@ source_set("interactions") {
   public_deps = [ "${chip_root}/src/app" ]
 }
 
+source_set("jcm") {
+  sources = [
+    "JCMCommissioner.cpp",
+    "JCMCommissioner.h",
+    "JCMTrustVerification.h",
+  ]
+  public_deps = [ "${chip_root}/src/app" ]
+}
+
 static_library("controller") {
   output_name = "libChipController"
 
@@ -99,14 +108,6 @@ static_library("controller") {
         "CurrentFabricRemover.cpp",
       ]
     }
-  }
-
-  if (chip_device_config_enable_joint_fabric) {
-    sources += [
-      "JCMCommissioner.cpp",
-      "JCMCommissioner.h",
-      "JCMTrustVerification.h",
-    ]
   }
 
   public_deps = [

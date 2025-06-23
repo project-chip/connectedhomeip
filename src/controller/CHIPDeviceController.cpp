@@ -2045,12 +2045,7 @@ void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const
         return;
     }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    mPairingDelegate->OnCommissioningComplete(nodeId, mTrustedIcacPublicKeyB, completionStatus.err);
-    mTrustedIcacPublicKeyB.ClearValue();
-#else
-    mPairingDelegate->OnCommissioningComplete(nodeId, NullOptional, completionStatus.err);
-#endif
+    mPairingDelegate->OnCommissioningComplete(nodeId, completionStatus.err);
 
     PeerId peerId(GetCompressedFabricId(), nodeId);
     if (completionStatus.err == CHIP_NO_ERROR)
