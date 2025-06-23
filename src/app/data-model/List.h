@@ -51,11 +51,6 @@ struct List : public Span<T>
     //
     using Span<T>::Span;
 
-    // Function to iterate through elements; iteration aborts if function
-    // returns something other than CHIP_NO_ERROR or if breakLoop is true
-    using IterateConstFnType = std::function<CHIP_ERROR(const T & element, bool & breakLoop)>;
-    using IterateFnType      = std::function<CHIP_ERROR(T & element, bool & breakLoop)>;
-
     // Inherited copy constructors are _not_ imported by the using statement
     // above, though, so we need to implement that ourselves.  This is templated
     // on the span's type to allow us to init a List<const Foo> from Span<Foo>.
@@ -76,7 +71,8 @@ struct List : public Span<T>
     //
     static constexpr bool kIsFabricScoped = DataModel::IsFabricScoped<T>::value;
 
-    CHIP_ERROR Iterate(IterateConstFnType iterateFn) const
+    template <typename F>
+    __attribute__((always_inline)) CHIP_ERROR Iterate(F iterateFn) const
     {
         for (const auto & item : *this)
         {
@@ -90,7 +86,8 @@ struct List : public Span<T>
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Iterate(IterateFnType iterateFn)
+    template <typename F>
+    __attribute__((always_inline)) CHIP_ERROR Iterate(F iterateFn)
     {
         for (const auto & item : *this)
         {
@@ -112,7 +109,7 @@ List(T * data, size_t size) -> List<T>;
 template <class T, size_t N>
 List(T (&databuf)[N]) -> List<T>;
 
-template <typename X>
+template <typename X, std::enable_if_t<!DataModel::IsFabricScoped<X>::value, bool> = true>
 inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, List<X> list)
 {
     TLV::TLVType type;

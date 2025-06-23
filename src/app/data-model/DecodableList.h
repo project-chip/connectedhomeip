@@ -36,47 +36,26 @@ namespace detail {
  */
 class DecodableListBase
 {
-public:
+protected:
     DecodableListBase() {}
-    virtual ~DecodableListBase() = default;
 
-    /*
-     * @brief
-     *
-     * This call stores a TLV reader positioned on the list this class is to manage.
-     *
-     * Specifically, the passed-in reader should be pointing into the list just after
-     * having called `OpenContainer` on the list element.
-     */
-    virtual void SetReader(const TLV::TLVReader & reader) = 0;
-
-    /*
-     * @brief
-     *
-     * Compute the size of the list. This can fail if the TLV is malformed. If
-     * this succeeds, that does not guarantee that the individual items can be
-     * successfully decoded; consumers should check Iterator::GetStatus() when
-     * actually decoding them. If there is no list then the size is considered
-     * to be zero.
-     * @param size[out] the size of the list
-     */
-    CHIP_ERROR ComputeSize(size_t & size) const
+    CHIP_ERROR ComputeSize(size_t & size, const TLV::TLVReader & reader) const
     {
-        if (reader().GetContainerType() == TLV::kTLVType_NotSpecified)
+        if (reader.GetContainerType() == TLV::kTLVType_NotSpecified)
         {
             size = 0;
             return CHIP_NO_ERROR;
         }
 
-        return reader().CountRemainingInContainer(&size);
+        return reader.CountRemainingInContainer(&size);
     }
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader)
+    CHIP_ERROR DecodeInternal(TLV::TLVReader & mReader, TLV::TLVReader & reader)
     {
         VerifyOrReturnError(reader.GetType() == TLV::kTLVType_Array, CHIP_ERROR_SCHEMA_MISMATCH);
         TLV::TLVType type;
         ReturnErrorOnFailure(reader.EnterContainer(type));
-        SetReader(reader);
+        mReader.Init(reader);
         ReturnErrorOnFailure(reader.ExitContainer(type));
         return CHIP_NO_ERROR;
     }
@@ -126,8 +105,6 @@ protected:
         CHIP_ERROR mStatus;
         TLV::TLVReader mReader;
     };
-
-    virtual const TLV::TLVReader & reader() const = 0;
 };
 
 template <bool IsFabricScoped>
@@ -149,6 +126,10 @@ template <bool IsFabricScoped>
 struct DecodableHolder
 {
     TLV::TLVReader mReader;
+
+    inline void ClearReader() { mReader.Init(nullptr, 0); }
+
+    inline void SetReader(const TLV::TLVReader & reader) { mReader.Init(reader); }
 };
 
 template <>
@@ -156,6 +137,18 @@ struct DecodableHolder<true>
 {
     TLV::TLVReader mReader;
     Optional<FabricIndex> mFabricIndex;
+
+    inline void ClearReader()
+    {
+        mReader.Init(nullptr, 0);
+        mFabricIndex.ClearValue();
+    }
+
+    inline void SetReader(const TLV::TLVReader & reader)
+    {
+        mReader.Init(reader);
+        mFabricIndex.ClearValue();
+    }
 };
 
 template <bool IsFabricScoped>
@@ -186,30 +179,29 @@ protected:
  *
  * This class provides an iteratable decoder of list items within TLV payloads
  * such that no memory has to be provided ahead of time to store the entirety of the decoded
- * list contents.
+ * list contents; it can also be a wrapper for List<T> in the case where the list contents are available
  *
  * Typical use of a DecodableList looks like this:
  *
- *    auto iter = list.begin();
- *    while (iter.Next()) {
- *        auto & entry = iter.GetValue();
+ *    CHIP_ERROR err = list.Iterate([&](auto & entry, bool &breakLoop) -> CHIP_ERROR {
  *        // Do whatever with entry
- *    }
- *    CHIP_ERROR err = iter.GetStatus();
- *    // If err is failure, decoding failed somewhere along the way.  Some valid
+ *        // Returning something other than CHIP_NO_ERROR will abort iteration
+ *        // Setting breakLoop = true will also abort iteration
+ *    });
+ *    // If err is failure, it is the non-success status of the lambda, or decoding failed somewhere along the way.  Some valid
  *    // entries may have been processed already.
  *
  */
 template <typename T>
 class DecodableList : public detail::DecodableMaybeFabricScopedList<DataModel::IsFabricScoped<T>::value>
 {
+    friend class Iterator;
+
 public:
     using Super = detail::DecodableMaybeFabricScopedList<DataModel::IsFabricScoped<T>::value>;
-    using Super::Decode;
     using Super::kIsFabricScoped;
-    using IterateConstFnType = typename List<T>::IterateConstFnType;
 
-    DecodableList() {}
+    DecodableList() { ClearReader(); }
 
     template <class U, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible<U *, T *>::value>>
     constexpr inline DecodableList(const Span<const U> & other) : readerOrSpan(other)
@@ -224,123 +216,6 @@ public:
     {}
 
     DecodableList(typename List<const T>::pointer databuf, size_t datalen) : readerOrSpan(databuf, datalen) {}
-
-    constexpr DecodableList & operator=(const List<const T> & src)
-    {
-        readerOrSpan.mIsDecodable = false;
-        readerOrSpan.mValue.mList = src;
-        return *this;
-    }
-
-    template <size_t N>
-    constexpr DecodableList & operator=(T (&databuf)[N])
-    {
-        readerOrSpan.mIsDecodable = false;
-        readerOrSpan.mValue.mList = databuf;
-        return (*this);
-    }
-
-    CHIP_ERROR ComputeSize(size_t & size) const
-    {
-        if (!readerOrSpan.mIsDecodable)
-        {
-            size = readerOrSpan.mValue.mList.size();
-            return CHIP_NO_ERROR;
-        }
-        return Super::ComputeSize(size);
-    }
-
-    /*
-     * @brief
-     *
-     * This call clears the TLV reader managed by this class, so it can be reused.
-     */
-    void ClearReader()
-    {
-        readerOrSpan.mValue.mHolder.mReader.Init(nullptr, 0);
-        readerOrSpan.mIsDecodable = true;
-        FabricInit();
-    }
-
-    void SetReader(const TLV::TLVReader & reader) override
-    {
-        readerOrSpan.mValue.mHolder.mReader = reader;
-        readerOrSpan.mIsDecodable           = true;
-        FabricInit();
-    }
-
-    template <typename T0 = T, std::enable_if_t<DataModel::IsFabricScoped<T0>::value, bool> = true>
-    void SetFabricIndex(FabricIndex fabricIndex)
-    {
-        VerifyOrDie(!readerOrSpan.mIsDecodable);
-        readerOrSpan.mValue.mHolder.mFabricIndex.SetValue(fabricIndex);
-    }
-
-    // Iterates through all elements in the list, calling IterateConstFnType on each element
-    // The T element passed in to iterateFn has a guaranteed lifetime of the method call,
-    // though if the implementation is a list, the element has a lifetiem beyond the call to iterateFn
-    template <typename T0 = T, std::enable_if_t<DataModel::IsFabricScoped<T0>::value, bool> = true>
-    inline CHIP_ERROR Iterate(IterateConstFnType iterateFn) const
-    {
-        if (readerOrSpan.mIsDecodable)
-        {
-            Iterator iter(this->readerOrSpan.mValue.mHolder.mReader, this->readerOrSpan.mValue.mHolder.mFabricIndex);
-            return Iterate(iter, iterateFn);
-        }
-        else
-        {
-            return this->readerOrSpan.mValue.mList.Iterate(iterateFn);
-        }
-    }
-
-    // Iterates through all elements in the list, calling IterateConstFnType on each element
-    // The T element passed in to iterateFn has a guaranteed lifetime of the method call,
-    // though if the implementation is a list, the element has a lifetiem beyond the call to iterateFn
-    template <typename T0 = T, std::enable_if_t<!DataModel::IsFabricScoped<T0>::value, bool> = true>
-    inline CHIP_ERROR Iterate(IterateConstFnType iterateFn) const
-    {
-        if (readerOrSpan.mIsDecodable)
-        {
-            Iterator iter(this->readerOrSpan.mValue.mHolder.mReader);
-            return Iterate(iter, iterateFn);
-        }
-        else
-        {
-            return this->readerOrSpan.mValue.mList.Iterate(iterateFn);
-        }
-    }
-
-    inline typename List<const T>::pointer begin() const
-    {
-        VerifyOrDie(!readerOrSpan.mIsDecodable);
-        return readerOrSpan.mValue.mList.begin();
-    }
-
-    inline typename List<const T>::pointer end() const
-    {
-        VerifyOrDie(!readerOrSpan.mIsDecodable);
-        return readerOrSpan.mValue.mList.end();
-    }
-
-    inline typename List<const T>::reference operator[](size_t index) const
-    {
-        VerifyOrDie(!readerOrSpan.mIsDecodable);
-        return readerOrSpan.mValue.mList[index];
-    }
-
-    inline size_t size() const
-    {
-        VerifyOrDie(!readerOrSpan.mIsDecodable);
-        return readerOrSpan.mValue.mList.size();
-    }
-
-    inline void reduce_size(size_t new_size)
-    {
-        if (!readerOrSpan.mIsDecodable)
-        {
-            readerOrSpan.mValue.mList.reduce_size(new_size);
-        }
-    }
 
     class Iterator : private Super::Iterator
     {
@@ -358,11 +233,11 @@ public:
          * no list.
          */
         template <typename T0 = T, std::enable_if_t<DataModel::IsFabricScoped<T0>::value, bool> = true>
-        Iterator(const TLV::TLVReader & reader, Optional<FabricIndex> fabricIndex) : IteratorBase(reader, fabricIndex)
+        inline Iterator(const DecodableList & list) : IteratorBase(list.reader(), list.readerOrSpan.mValue.mHolder.mFabricIndex)
         {}
 
         template <typename T0 = T, std::enable_if_t<!DataModel::IsFabricScoped<T0>::value, bool> = true>
-        Iterator(const TLV::TLVReader & reader) : IteratorBase(reader)
+        inline Iterator(const DecodableList & list) : IteratorBase(list.reader())
         {}
 
         /*
@@ -428,9 +303,96 @@ public:
         T mValue;
     };
 
-private:
-    CHIP_ERROR Iterate(Iterator & iter, IterateConstFnType iterateFn) const
+    constexpr DecodableList & operator=(const List<const T> & src)
     {
+        readerOrSpan.mIsDecodable = false;
+        readerOrSpan.mValue.mList = src;
+        return *this;
+    }
+
+    template <size_t N>
+    constexpr DecodableList & operator=(T (&databuf)[N])
+    {
+        readerOrSpan.mIsDecodable = false;
+        readerOrSpan.mValue.mList = databuf;
+        return (*this);
+    }
+
+    /** Use ComputeSize(size_t &) instead; backwards-compatibility. */
+    inline CHIP_ERROR ComputeSize(size_t * size) const { return ComputeSize(*size); }
+
+    /*
+     * @brief
+     *
+     * Compute the size of the list. This can fail if the TLV is malformed. If
+     * this succeeds, that does not guarantee that the individual items can be
+     * successfully decoded; consumers should check Iterator::GetStatus() when
+     * actually decoding them. If there is no list then the size is considered
+     * to be zero.
+     * @param size[out] the size of the list
+     */
+    inline CHIP_ERROR ComputeSize(size_t & size) const
+    {
+        if (readerOrSpan.mIsDecodable)
+        {
+            return Super::ComputeSize(size, reader());
+        }
+        else
+        {
+            size = readerOrSpan.mValue.mList.size();
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    /*
+     * @brief
+     *
+     * This call clears the TLV reader managed by this class, so it can be reused.
+     */
+    void ClearReader()
+    {
+        if (readerOrSpan.mIsDecodable)
+        {
+            readerOrSpan.mValue.mHolder.ClearReader();
+        }
+    }
+
+    template <typename T0 = T, std::enable_if_t<DataModel::IsFabricScoped<T0>::value, bool> = true>
+    void SetFabricIndex(FabricIndex fabricIndex)
+    {
+        if (readerOrSpan.mIsDecodable)
+        {
+            readerOrSpan.mValue.mHolder.mFabricIndex.SetValue(fabricIndex);
+        }
+    }
+
+    /*
+     * @brief
+     *
+     * This call stores a TLV reader positioned on the list this class is to manage.
+     *
+     * Specifically, the passed-in reader should be pointing into the list just after
+     * having called `OpenContainer` on the list element.
+     */
+    void SetReader(const TLV::TLVReader & reader)
+    {
+        readerOrSpan.mIsDecodable = true;
+        readerOrSpan.mValue.mHolder.SetReader(reader);
+    }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader)
+    {
+        readerOrSpan.mIsDecodable = true;
+        return Super::DecodeInternal(this->reader(), reader);
+    }
+
+    // Iterates through all elements in the list, calling iterateFn on each element
+    // The T element passed in to iterateFn has a guaranteed lifetime of the method call,
+    // though if the implementation is a list, the element has a lifetiem beyond the call to iterateFn
+    template <class F>
+    __attribute__((always_inline)) inline CHIP_ERROR Iterate(F iterateFn) const
+    {
+        Iterator iter(*this);
         while (iter.Next())
         {
             bool breakLoop = false;
@@ -443,21 +405,113 @@ private:
         return iter.GetStatus();
     }
 
-    const TLV::TLVReader & reader() const override
+    inline typename List<const T>::pointer begin() const
     {
-        VerifyOrDie(readerOrSpan.mIsDecodable);
-        return readerOrSpan.mValue.mHolder.mReader;
+        VerifyOrDie(!readerOrSpan.mIsDecodable);
+        return readerOrSpan.mValue.mList.begin();
     }
 
-    template <typename T0 = T, std::enable_if_t<DataModel::IsFabricScoped<T0>::value, bool> = true>
-    inline void FabricInit()
+    inline typename List<const T>::pointer end() const
     {
-        readerOrSpan.mValue.mHolder.mFabricIndex.ClearValue();
+        VerifyOrDie(!readerOrSpan.mIsDecodable);
+        return readerOrSpan.mValue.mList.end();
+    }
+
+    inline typename List<const T>::reference operator[](size_t index) const
+    {
+        VerifyOrDie(!readerOrSpan.mIsDecodable);
+        return readerOrSpan.mValue.mList[index];
+    }
+
+    inline size_t size() const
+    {
+        VerifyOrDie(!readerOrSpan.mIsDecodable);
+        return readerOrSpan.mValue.mList.size();
+    }
+
+    inline void reduce_size(size_t new_size)
+    {
+        if (!readerOrSpan.mIsDecodable)
+        {
+            readerOrSpan.mValue.mList.reduce_size(new_size);
+        }
     }
 
     template <typename T0 = T, std::enable_if_t<!DataModel::IsFabricScoped<T0>::value, bool> = true>
-    inline void FabricInit()
-    {}
+    inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+    {
+        TLV::TLVType type;
+
+        ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Array, type));
+        if (!readerOrSpan.mIsDecodable)
+        {
+            for (auto & item : readerOrSpan.mValue.mList)
+            {
+                ReturnErrorOnFailure(DataModel::Encode(writer, TLV::AnonymousTag(), item));
+            }
+        }
+        else
+        {
+            CHIP_ERROR result = Iterate([&](const auto & element, bool &) -> CHIP_ERROR {
+                ReturnErrorOnFailure(DataModel::Encode(writer, TLV::AnonymousTag(), element));
+                return CHIP_NO_ERROR;
+            });
+            ReturnErrorOnFailure(result);
+        }
+        return writer.EndContainer(type);
+    }
+
+    template <typename T0 = T, std::enable_if_t<DataModel::IsFabricScoped<T0>::value, bool> = true>
+    inline CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag) const
+    {
+        TLV::TLVType type;
+
+        ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Array, type));
+        if (!readerOrSpan.mIsDecodable)
+        {
+            for (auto & item : readerOrSpan.mValue.mList)
+            {
+                ReturnErrorOnFailure(DataModel::EncodeForWrite(writer, TLV::AnonymousTag(), item));
+            }
+        }
+        else
+        {
+            CHIP_ERROR result = Iterate([&](const auto & element, bool &) -> CHIP_ERROR {
+                ReturnErrorOnFailure(DataModel::EncodeForWrite(writer, TLV::AnonymousTag(), element));
+                return CHIP_NO_ERROR;
+            });
+            ReturnErrorOnFailure(result);
+        }
+        return writer.EndContainer(type);
+    }
+
+    template <typename T0 = T, std::enable_if_t<DataModel::IsFabricScoped<T0>::value, bool> = true>
+    inline CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex) const
+    {
+        TLV::TLVType type;
+
+        ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Array, type));
+        if (!readerOrSpan.mIsDecodable)
+        {
+            for (auto & item : readerOrSpan.mValue.mList)
+            {
+                ReturnErrorOnFailure(DataModel::EncodeForRead(writer, TLV::AnonymousTag(), accessingFabricIndex, item));
+            }
+        }
+        else
+        {
+            CHIP_ERROR result = Iterate([&](const auto & element, bool &) -> CHIP_ERROR {
+                ReturnErrorOnFailure(EncodeForRead(writer, TLV::AnonymousTag(), accessingFabricIndex, element));
+                return CHIP_NO_ERROR;
+            });
+            ReturnErrorOnFailure(result);
+        }
+        return writer.EndContainer(type);
+    }
+
+private:
+    inline const TLV::TLVReader & reader() const { return readerOrSpan.mValue.mHolder.mReader; }
+    inline TLV::TLVReader & reader() { return readerOrSpan.mValue.mHolder.mReader; }
 
     // A container of bool + either a DataModel::List or a mReader for DecodableList
     class ValueHolder
@@ -483,48 +537,6 @@ private:
 
     ValueHolder readerOrSpan;
 };
-
-template <typename X>
-inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, DecodableList<X> list)
-{
-    TLV::TLVType type;
-
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Array, type));
-    CHIP_ERROR result = list.Iterate([&writer](const auto & element, bool &) -> CHIP_ERROR {
-        ReturnErrorOnFailure(Encode(writer, TLV::AnonymousTag(), element));
-        return CHIP_NO_ERROR;
-    });
-    ReturnErrorOnFailure(result);
-    return writer.EndContainer(type);
-}
-
-template <typename X, std::enable_if_t<DataModel::IsFabricScoped<X>::value, bool> = true>
-inline CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag, DecodableList<X> list)
-{
-    TLV::TLVType type;
-
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Array, type));
-    CHIP_ERROR result = list.Iterate([&writer](const auto & element, bool &) -> CHIP_ERROR {
-        ReturnErrorOnFailure(EncodeForWrite(writer, TLV::AnonymousTag(), element));
-        return CHIP_NO_ERROR;
-    });
-    ReturnErrorOnFailure(result);
-    return writer.EndContainer(type);
-}
-
-template <typename X, std::enable_if_t<DataModel::IsFabricScoped<X>::value, bool> = true>
-inline CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex, DecodableList<X> list)
-{
-    TLV::TLVType type;
-
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Array, type));
-    CHIP_ERROR result = list.Iterate([&writer](const auto & element, bool &) -> CHIP_ERROR {
-        ReturnErrorOnFailure(EncodeForRead(writer, TLV::AnonymousTag(), element));
-        return CHIP_NO_ERROR;
-    });
-    ReturnErrorOnFailure(result);
-    return writer.EndContainer(type);
-}
 
 } // namespace DataModel
 } // namespace app
