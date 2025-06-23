@@ -159,16 +159,24 @@ CHIP_ERROR ClosureControlEndpoint::Init()
 
 void ClosureControlEndpoint::OnStopCalibrateActionComplete()
 {
-    mLogic.SetMainState(MainStateEnum::kStopped);
-    mLogic.SetOverallState(DataModel::NullNullable);
-    mLogic.SetOverallTarget(DataModel::NullNullable);
-    mLogic.SetCountdownTimeFromDelegate(0);
-    mLogic.GenerateMovementCompletedEvent();
+    VerifyOrReturn(mLogic.SetMainState(MainStateEnum::kStopped) == CHIP_NO_ERROR,
+        ChipLogError(AppServer, "Failed to set main state in OnStopCalibrateActionComplete"));
+
+    // After stopping calibration, the overall and target state is explicitly nulled to indicate an unknown state,
+    VerifyOrReturn(mLogic.SetOverallState(DataModel::NullNullable) == CHIP_NO_ERROR,
+        ChipLogError(AppServer, "Failed to set overall state to null in OnStopCalibrateActionComplete"));
+    VerifyOrReturn(mLogic.SetOverallTarget(DataModel::NullNullable) == CHIP_NO_ERROR,
+        ChipLogError(AppServer, "Failed to set overall target to null in OnStopCalibrateActionComplete"));
+    VerifyOrReturn(mLogic.SetCountdownTimeFromDelegate(0) == CHIP_NO_ERROR,
+        ChipLogError(AppServer, "Failed to set countdown time to 0 in OnStopCalibrateActionComplete"));
+    VerifyOrReturn(mLogic.GenerateMovementCompletedEvent() == CHIP_NO_ERROR,
+        ChipLogError(AppServer, "Failed to generate movement completed event in OnStopCalibrateActionComplete"));
 }
 
 void ClosureControlEndpoint::OnStopMotionActionComplete()
 {
-    mLogic.SetMainState(MainStateEnum::kStopped);
+    VerifyOrReturn(mLogic.SetMainState(MainStateEnum::kStopped) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer,"Failed to set main state in OnStopMotionActionComplete"));
 
     // Set the OverallState position to PartiallyOpened as motion has been stopped
     // and the closure is not fully closed or fully opened.
@@ -183,12 +191,16 @@ void ClosureControlEndpoint::OnStopMotionActionComplete()
     {
         overallState.Value().positioning = position;
     }
-    mLogic.SetOverallState(overallState);
+    VerifyOrReturn(mLogic.SetOverallState(overallState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer,"Failed to set overall state in OnStopMotionActionComplete"));
 
+    // As motion is stopped in between, target and current state will be out of sync and need to be synchronized.
     UpdateTargetStateFromCurrentState();
 
-    mLogic.SetCountdownTimeFromDelegate(0);
-    mLogic.GenerateMovementCompletedEvent();
+    VerifyOrReturn(mLogic.SetCountdownTimeFromDelegate(0) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set countdown time to 0 in OnStopMotionActionComplete"));
+    VerifyOrReturn(mLogic.GenerateMovementCompletedEvent() == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to generate movement completed event in OnStopMotionActionComplete"));
 }
 
 void ClosureControlEndpoint::OnCalibrateActionComplete()
@@ -210,8 +222,10 @@ void ClosureControlEndpoint::OnMoveToActionComplete()
     // This function should handle closure control state updation after completion of Motion Action.
 }
 
-void ClosureControlEndpoint::MapCurrentPositioningToTargetPosition(PositioningEnum positioning, TargetPositionEnum & targetPosition)
+TargetPositionEnum ClosureControlEndpoint::MapCurrentPositionToTargetPosition(PositioningEnum positioning)
 {
+    TargetPositionEnum targetPosition = TargetPositionEnum::kUnknownEnumValue;
+
     switch (positioning)
     {
     case PositioningEnum::kFullyClosed:
@@ -234,58 +248,77 @@ void ClosureControlEndpoint::MapCurrentPositioningToTargetPosition(PositioningEn
         break;
     default:
         ChipLogDetail(AppServer, "Unknown PositioningEnum value: %d", static_cast<int>(positioning));
-        targetPosition = TargetPositionEnum::kUnknownEnumValue;
         break;
     }
+    return targetPosition;
 }
 
 void ClosureControlEndpoint::UpdateTargetStateFromCurrentState()
 {
     DataModel::Nullable<GenericOverallState> overallState;
-    mLogic.GetOverallState(overallState);
+
+    VerifyOrReturn(mLogic.GetOverallState(overallState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get overall state in UpdateTargetStateFromCurrentState"));
     if (overallState.IsNull())
     {
-         mLogic.SetOverallTarget(DataModel::NullNullable);
+         // If the overall state is null, set the overall target to NullNullable to indicate no valid target state.
+         VerifyOrReturn(mLogic.SetOverallTarget(DataModel::NullNullable) == CHIP_NO_ERROR,
+                        ChipLogError(AppServer, "Failed to set overall target to NullNullable in UpdateTargetStateFromCurrentState"));
          return;
     }
 
     DataModel::Nullable<GenericOverallTarget> overallTarget;
     mLogic.GetOverallTarget(overallTarget);
+    // If the overall target is null, we create a new GenericOverallTarget with default values.
+    // This ensures that we always have a valid target state to work with.
     if (overallTarget.IsNull())
     {
         overallTarget.SetNonNull(GenericOverallTarget());
     }
 
+    // Update the position field of overallTarget based on the current positioning state.
     if (overallState.Value().positioning.HasValue() && 
             !overallState.Value().positioning.Value().IsNull()) 
     {
         PositioningEnum positioning = overallState.Value().positioning.Value().Value();
-        TargetPositionEnum targetPosition;
-        MapCurrentPositioningToTargetPosition(positioning, targetPosition);
+        TargetPositionEnum targetPosition = MapCurrentPositionToTargetPosition(positioning);
         if (targetPosition == TargetPositionEnum::kUnknownEnumValue)
         {
             // If the target position is unknown, we set the position field of overallTarget to NullNullable.
             overallTarget.Value().position.ClearValue();
-        } else {
+        }
+        else
+        {
             overallTarget.Value().position.SetValue(targetPosition);
         }
     }
+    else
+    {
+        overallTarget.Value().position.ClearValue();
+    }
 
+    // Update the latch field of overallTarget based on the current latch state.
     if (overallState.Value().latch.HasValue() && 
             !overallState.Value().latch.Value().IsNull()) 
     {
         overallTarget.Value().latch.SetValue(overallState.Value().latch.Value().Value());
-    } else {
+    }
+    else
+    {   
         overallTarget.Value().latch.ClearValue();
     }
 
+    // Update the speed field of overallTarget based on the current speed state.
     if (overallState.Value().speed.HasValue() && 
             !overallState.Value().speed.Value().IsNull()) 
     {
         overallTarget.Value().speed.SetValue(overallState.Value().speed.Value().Value());
-    } else {
+    }
+    else
+    {   
         overallTarget.Value().speed.ClearValue();
     }
 
-    mLogic.SetOverallTarget(overallTarget);
+    VerifyOrReturn(mLogic.SetOverallTarget(overallTarget) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set overall target in UpdateTargetStateFromCurrentState"));
 }

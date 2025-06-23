@@ -130,7 +130,6 @@ void ClosureManager::InitiateAction(AppEvent * event)
 
     instance.CancelTimer(); // Cancel any existing timer before starting a new action
     instance.SetCurrentAction(action);
-    instance.mCurrentActionEndpointId = static_cast<chip::EndpointId>( event->ClosureEvent.EndpointId);
 
     switch (action)
     {
@@ -163,7 +162,6 @@ void ClosureManager::TimerEventHandler(void * timerCbArg)
     AppEvent event;
     event.Type                = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action = closureManager->GetCurrentAction();
-    event.ClosureEvent.EndpointId = closureManager->mCurrentActionEndpointId;
     event.Handler             = HandleClosureActionCompleteEvent;
     AppTask::GetAppTask().PostEvent(&event);
 }
@@ -200,7 +198,6 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
     AppEvent event;
     event.Type                = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action = CALIBRATE_ACTION;
-    event.ClosureEvent.EndpointId = ep1.GetEndpointId();
     event.Handler             = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
 
@@ -213,6 +210,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStopCommand()
     // As Stop should be handled immediately, we will handle it synchronously.
     // For simulation purposes, we will just log the stop action and contnue to handle the stop action completion.
     // In a real application, this would be replaced with actual logic to stop the closure action.
+    ChipLogDetail(AppServer, "Handling Stop command for closure action");
     HandleClosureActionComplete(Action_t::STOP_ACTION);
     return Status::Success;
 }
@@ -272,5 +270,4 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
     }
     // Reset the current action after handling the closure action
     instance.SetCurrentAction(Action_t::INVALID_ACTION);
-    instance.mCurrentActionEndpointId = chip::kInvalidEndpointId;
 }

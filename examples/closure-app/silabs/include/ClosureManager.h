@@ -117,12 +117,13 @@ public:
 
 private:
     static ClosureManager sClosureMgr;
+    
     osTimerId_t mClosureTimer;
+
     bool isCalibrationInProgress = false;
     bool isMoveToInProgress = false;
-    bool isStopInProgress = false;
+
     Action_t mCurrentAction      = Action_t::INVALID_ACTION;
-    chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
 
     // Define the endpoint ID for the Closure
     static constexpr chip::EndpointId kClosureEndpoint       = 1;

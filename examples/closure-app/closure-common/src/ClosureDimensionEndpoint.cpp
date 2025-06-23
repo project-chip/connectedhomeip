@@ -67,13 +67,18 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
 
 void ClosureDimensionEndpoint::OnStopMotionActionComplete()
 {
+    // When the stop motion action is complete, we update the target state to match the current state.
+    // This ensures that the target reflects the last known position and state of the closure dimension.
     UpdateTargetStateFromCurrentState();
 }
 
 void ClosureDimensionEndpoint::OnStopCalibrateActionComplete()
 {
-    mLogic.SetCurrentState(DataModel::NullNullable);
-    mLogic.SetTarget(DataModel::NullNullable);
+    // Current state and target are set to null after calibration is stopped to indicate an unknown state.
+    VerifyOrReturn(mLogic.SetCurrentState(DataModel::NullNullable) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set current state to null in OnStopCalibrateActionComplete"));
+    VerifyOrReturn(mLogic.SetTarget(DataModel::NullNullable) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set target to null in OnStopCalibrateActionComplete"));
 }
 
 void ClosureDimensionEndpoint::OnCalibrateActionComplete()
@@ -93,16 +98,20 @@ void ClosureDimensionEndpoint::OnMoveToActionComplete()
 void ClosureDimensionEndpoint::UpdateTargetStateFromCurrentState()
 {
     DataModel::Nullable<GenericCurrentStateStruct> currentState;
-    mLogic.GetCurrentState(currentState);
+
+    VerifyOrReturn(mLogic.GetCurrentState(currentState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get current state in UpdateTargetStateFromCurrentState"));
 
     if (currentState.IsNull())
     {
-        mLogic.SetTarget(DataModel::NullNullable);
+        VerifyOrReturn(mLogic.SetTarget(DataModel::NullNullable) == CHIP_NO_ERROR,
+                    ChipLogError(AppServer, "Failed to set target to null in UpdateTargetStateFromCurrentState"));
         return;
     }
 
     DataModel::Nullable<GenericTargetStruct> target;
-    mLogic.GetTarget(target);
+    VerifyOrReturn(mLogic.GetTarget(target) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get target in UpdateTargetStateFromCurrentState"));
 
     if (target.IsNull())
     {
@@ -113,5 +122,6 @@ void ClosureDimensionEndpoint::UpdateTargetStateFromCurrentState()
     target.Value().latch = currentState.Value().latch;
     target.Value().speed = currentState.Value().speed;
 
-    mLogic.SetTarget(target);
-}   
+    VerifyOrReturn(mLogic.SetTarget(target) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set target in UpdateTargetStateFromCurrentState"));
+}

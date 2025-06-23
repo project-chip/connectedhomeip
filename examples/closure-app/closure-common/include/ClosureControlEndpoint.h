@@ -155,13 +155,6 @@ public:
      */
     void OnMoveToActionComplete();
 
-    /**
-     * @brief Retrieves the endpoint identifier associated with this Closure Control Endpoint.
-     *
-     * @return The endpoint ID as a chip::EndpointId.
-     */
-    chip::EndpointId GetEndpointId() const { return mEndpoint; }
-
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
     MatterContext mContext;
@@ -169,8 +162,25 @@ private:
     ClusterLogic mLogic;
     Interface mInterface;
 
+    /**
+     * @brief Updates the target state to match the current state.
+     *
+     * This method synchronizes the target state variable with the current state,
+     * ensuring that any changes in the current state are reflected in the target state.
+     * Typically used to reset or align the target state after a stop action.
+     */
     void UpdateTargetStateFromCurrentState();
-    void MapCurrentPositioningToTargetPosition(PositioningEnum positioning, TargetPositionEnum & targetPosition);
+
+    /**
+     * @brief Maps the current PositioningEnum to a TargetPositionEnum.
+     *
+     * This function converts the current position state to a target position
+     * that can be used for closure control operations.
+     *
+     * @param positioning The current position state.
+     * @return The corresponding TargetPositionEnum value.
+     */
+    TargetPositionEnum MapCurrentPositionToTargetPosition(PositioningEnum positioning);
 };
 
 } // namespace ClosureControl
