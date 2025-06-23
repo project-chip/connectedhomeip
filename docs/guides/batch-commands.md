@@ -57,6 +57,22 @@ loop to process the entire list. Pseudocode below:
 ```cpp
 class Batcher : public CommandHandlerImpl::Callback{
 public:
+  class Command {
+  public:
+    // Command's constructor will need to capture all information needed
+    // to process the command when DispatchCommandsAsList is scheduled
+    // (or potentially in a subsequent scheduled task). It will also be
+    // critical to instantiate an instance of CommandHandler::Handle
+    // to allow for the command to be handled asynchronously. For more
+    // information on how to properly use CommandHandler::Handle to
+    // perform async command handling, see the documentation for
+    // CommandHandler::Handle.
+    Command(...) {
+    }
+  private:
+    CommandHandler::Handle mHandle;
+    [...] // 
+  };
   [...]
   static void DispatchCommandsAsList(intptr_t arg) {
     auto this_ = reinterpret_cast<Batcher*>(arg);
