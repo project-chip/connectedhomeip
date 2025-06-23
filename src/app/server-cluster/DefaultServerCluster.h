@@ -109,18 +109,6 @@ protected:
     /// notify that the attribute has changed.
     void NotifyAttributeChanged(AttributeId attributeId);
 
-    /// Marks that a specific attribute has changed value, if `status` is succes.
-    ///
-    /// Will return `status`
-    DataModel::ActionReturnStatus NotifyAttributeChangedIfSuccess(AttributeId attributeId, DataModel::ActionReturnStatus status)
-    {
-        if (status.IsSuccess())
-        {
-            NotifyAttributeChanged(attributeId);
-        }
-        return status;
-    }
-
 private:
     DataVersion mDataVersion; // will be random-initialized as per spec
 };
