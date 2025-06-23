@@ -126,7 +126,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = mCameraDevice->GetCameraHALInterface().GetSnapshotCapabilities();
     uint32_t maxNetworkBandwidth                                 = mCameraDevice->GetCameraHALInterface().GetMaxNetworkBandwidth();
     std::vector<StreamUsageEnum> supportedStreamUsages = mCameraDevice->GetCameraHALInterface().GetSupportedStreamUsages();
-    std::vector<StreamUsageEnum> streamUsagePriorities = mCameraDevice->GetCameraHALInterface().GetStreamUsagePriorities();
+    std::set<StreamUsageEnum> streamUsagePriorities    = mCameraDevice->GetCameraHALInterface().GetStreamUsagePriorities();
 
     // Instantiate the CameraAVStreamMgmt Server
     mAVStreamMgmtServerPtr = std::make_unique<CameraAVStreamMgmtServer>(
