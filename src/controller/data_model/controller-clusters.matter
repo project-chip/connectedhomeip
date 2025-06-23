@@ -8556,11 +8556,11 @@ cluster ThreadNetworkDirectory = 1107 {
     octet_string<254> operationalDataset = 0;
   }
 
-  /** Adds an entry to the ThreadNetworks list. */
+  /** Adds an entry to the ThreadNetworks attribute with the specified Thread Operational Dataset. */
   timed command access(invoke: manage) AddNetwork(AddNetworkRequest): DefaultSuccess = 0;
-  /** Removes an entry from the ThreadNetworks list. */
+  /** Removes the network with the given Extended PAN ID from the ThreadNetworks attribute. */
   timed command access(invoke: manage) RemoveNetwork(RemoveNetworkRequest): DefaultSuccess = 1;
-  /** Retrieves a Thread Operational Dataset from the ThreadNetworks list. */
+  /** Retrieves the Thread Operational Dataset with the given Extended PAN ID. */
   command access(invoke: manage) GetOperationalDataset(GetOperationalDatasetRequest): OperationalDatasetResponse = 2;
 }
 

@@ -12887,19 +12887,19 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 /**
  * Command AddNetwork
  *
- * Adds an entry to the ThreadNetworks list.
+ * Adds an entry to the ThreadNetworks attribute with the specified Thread Operational Dataset.
  */
 - (void)addNetworkWithParams:(MTRThreadNetworkDirectoryClusterAddNetworkParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 /**
  * Command RemoveNetwork
  *
- * Removes an entry from the ThreadNetworks list.
+ * Removes the network with the given Extended PAN ID from the ThreadNetworks attribute.
  */
 - (void)removeNetworkWithParams:(MTRThreadNetworkDirectoryClusterRemoveNetworkParams *)params completion:(MTRStatusCompletion)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 /**
  * Command GetOperationalDataset
  *
- * Retrieves a Thread Operational Dataset from the ThreadNetworks list.
+ * Retrieves the Thread Operational Dataset with the given Extended PAN ID.
  */
 - (void)getOperationalDatasetWithParams:(MTRThreadNetworkDirectoryClusterGetOperationalDatasetParams *)params completion:(void (^)(MTRThreadNetworkDirectoryClusterOperationalDatasetResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
