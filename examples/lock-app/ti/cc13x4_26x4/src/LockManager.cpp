@@ -327,7 +327,7 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
                   "Found occupied user "
                   "[endpoint=%d,name=\"%s\",credentialsCount=%u,uniqueId=%lx,type=%u,credentialRule=%u,"
                   "createdBy=%d,lastModifiedBy=%d]",
-                  endpointId, InlineString(100, static_cast<int>(user.userName.size()), user.userName.data()),
+                  endpointId, SPAN_TO_TRUNCATED_CSTR(static_cast<int>(user.userName.size()), user.userName.data()),
                   user.credentials.size(), user.userUniqueId, to_underlying(user.userType), to_underlying(user.credentialRule),
                   user.createdBy, user.lastModifiedBy);
 

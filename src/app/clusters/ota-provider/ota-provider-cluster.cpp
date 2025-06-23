@@ -210,7 +210,7 @@ OtaProviderLogic::QueryImage(const ConcreteCommandPath & commandPath,
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
-        ChipLogDetail(Zcl, "  Location: %s", InlineString(100, static_cast<int>(location.Value().size()), location.Value().data()));
+        ChipLogDetail(Zcl, "  Location: %s", SPAN_TO_TRUNCATED_CSTR(static_cast<int>(location.Value().size()), location.Value().data()));
 
 #pragma GCC diagnostic pop
     }

@@ -562,7 +562,7 @@ void DoorLockServer::getUserCommandHandler(chip::app::CommandHandler * commandOb
                         "Found user in storage: "
                         "[userIndex=%d,userName=\"%s\",userStatus=%u,userType=%u"
                         ",credentialRule=%u,createdBy=%u,modifiedBy=%u]",
-                        userIndex, InlineString(100, static_cast<int>(user.userName.size()), user.userName.data()),
+                        userIndex, SPAN_TO_TRUNCATED_CSTR(static_cast<int>(user.userName.size()), user.userName.data()),
                         to_underlying(user.userStatus), to_underlying(user.userType), to_underlying(user.credentialRule),
                         user.createdBy, user.lastModifiedBy);
 
@@ -2008,7 +2008,7 @@ ClusterStatusCode DoorLockServer::createUser(chip::EndpointId endpointId, chip::
                         "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%u,"
                         "userType=%u,credentialRule=%u,totalCredentials=%u]",
                         endpointId, creatorFabricIdx, userIndex,
-                        InlineString(100, static_cast<int>(newUserName.size()), newUserName.data()), newUserUniqueId,
+                        SPAN_TO_TRUNCATED_CSTR(static_cast<int>(newUserName.size()), newUserName.data()), newUserUniqueId,
                         to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule),
                         static_cast<unsigned int>(newTotalCredentials));
 
@@ -2025,7 +2025,7 @@ ClusterStatusCode DoorLockServer::createUser(chip::EndpointId endpointId, chip::
                     "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%u,"
                     "userType=%u,credentialRule=%u,totalCredentials=%u]",
                     endpointId, creatorFabricIdx, userIndex,
-                    InlineString(100, static_cast<int>(newUserName.size()), newUserName.data()), newUserUniqueId,
+                    SPAN_TO_TRUNCATED_CSTR(static_cast<int>(newUserName.size()), newUserName.data()), newUserUniqueId,
                     to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule),
                     static_cast<unsigned int>(newTotalCredentials));
 
@@ -2095,7 +2095,7 @@ Status DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::FabricIndex
                      "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%u"
                      ",userType=%u,credentialRule=%u]",
                      endpointId, modifierFabricIndex, userIndex,
-                     InlineString(100, static_cast<int>(newUserName.size()), newUserName.data()), newUserUniqueId,
+                     SPAN_TO_TRUNCATED_CSTR(static_cast<int>(newUserName.size()), newUserName.data()), newUserUniqueId,
                      to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule));
 
 #pragma GCC diagnostic pop
@@ -2111,7 +2111,7 @@ Status DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::FabricIndex
                     "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32
                     ",userStatus=%u,userType=%u,credentialRule=%u]",
                     endpointId, modifierFabricIndex, userIndex,
-                    InlineString(100, static_cast<int>(newUserName.size()), newUserName.data()), newUserUniqueId,
+                    SPAN_TO_TRUNCATED_CSTR(static_cast<int>(newUserName.size()), newUserName.data()), newUserUniqueId,
                     to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule));
 
 #pragma GCC diagnostic pop

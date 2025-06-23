@@ -65,7 +65,7 @@ static void LogQueryImageResponse(const QueryImageResponse::DecodableType & resp
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
         ChipLogDetail(SoftwareUpdate, "  imageURI: %s",
-                      InlineString(100, static_cast<int>(response.imageURI.Value().size()), response.imageURI.Value().data()));
+                      SPAN_TO_TRUNCATED_CSTR(static_cast<int>(response.imageURI.Value().size()), response.imageURI.Value().data()));
 
 #pragma GCC diagnostic pop
     }
@@ -79,7 +79,7 @@ static void LogQueryImageResponse(const QueryImageResponse::DecodableType & resp
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
         ChipLogDetail(SoftwareUpdate, "  softwareVersionString: %s",
-                      InlineString(100, static_cast<int>(response.softwareVersionString.Value().size()),
+                      SPAN_TO_TRUNCATED_CSTR(static_cast<int>(response.softwareVersionString.Value().size()),
                                    response.softwareVersionString.Value().data()));
 
 #pragma GCC diagnostic pop

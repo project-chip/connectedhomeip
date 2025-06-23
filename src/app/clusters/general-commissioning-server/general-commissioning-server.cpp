@@ -519,7 +519,7 @@ void GeneralCommissioningGlobalInstance::HandleSetRegulatoryConfig(HandlerContex
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
         ChipLogError(Zcl, "Invalid country code: '%s'",
-                     InlineString(100, static_cast<int>(countryCode.size()), countryCode.data()));
+                     SPAN_TO_TRUNCATED_CSTR(static_cast<int>(countryCode.size()), countryCode.data()));
 
 #pragma GCC diagnostic pop
 

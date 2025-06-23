@@ -379,7 +379,7 @@ CHIP_ERROR CastingServer::ReadMACAddress(TargetEndpointInfo * endpoint)
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
                     ChipLogProgress(AppServer, "Updating cache of VideoPlayers with MACAddress: %s",
-                                    InlineString(100, static_cast<int>(response.size()), response.data()));
+                                    SPAN_TO_TRUNCATED_CSTR(static_cast<int>(response.size()), response.data()));
 
 #pragma GCC diagnostic pop
 

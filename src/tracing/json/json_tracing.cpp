@@ -513,7 +513,12 @@ void JsonBackend::OutputValue(::Json::Value & value)
         chip::CharSpan line;
         while (splitter.Next(line))
         {
-            ChipLogProgress(Automation, "%.*s", static_cast<int>(line.size()), line.data());
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+
+            ChipLogProgress(Automation, "%s", SPAN_TO_TRUNCATED_CSTR(static_cast<int>(line.size()), line.data()));
+
+#pragma GCC diagnostic pop
         }
     }
 }

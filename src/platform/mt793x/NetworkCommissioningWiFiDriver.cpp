@@ -165,7 +165,7 @@ CHIP_ERROR GenioWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLe
     wifi_prov.auth_mode = WIFI_AUTH_MODE_WPA2_PSK;
 
     ChipLogProgress(NetworkProvisioning, "Setting up connection for WiFi SSID: %s",
-                    InlineString(100, static_cast<int>(ssidLen), ssid));
+                    SPAN_TO_TRUNCATED_CSTR(static_cast<int>(ssidLen), ssid));
 
     void * filogicCtx = PlatformMgrImpl().mFilogicCtx;
 

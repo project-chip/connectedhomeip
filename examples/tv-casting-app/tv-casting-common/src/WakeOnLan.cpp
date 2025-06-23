@@ -83,7 +83,7 @@ CHIP_ERROR SendWakeOnLanPacket(chip::CharSpan * MACAddress)
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
     ChipLogProgress(AppServer, "Broadcasted WoL magic packet with MACAddress %s",
-                    InlineString(100, 2 * kMACLength, MACAddress->data()));
+                    SPAN_TO_TRUNCATED_CSTR(2 * kMACLength, MACAddress->data()));
 
 #pragma GCC diagnostic pop
 
