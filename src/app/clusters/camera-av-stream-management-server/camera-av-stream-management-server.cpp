@@ -2032,7 +2032,8 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
 
         // If there are duplicate stream usages in StreamPriorities,
         // return AlreadyExists
-        if (!streamUsagePriorities.insert(streamUsage).second) {
+        if (!streamUsagePriorities.insert(streamUsage).second)
+        {
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::AlreadyExists);
             return;
         }

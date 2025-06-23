@@ -28,8 +28,8 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TypeTraits.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <vector>
 #include <set>
+#include <vector>
 
 namespace chip {
 namespace app {
