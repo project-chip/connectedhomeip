@@ -364,6 +364,42 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRDataTypeViewportStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _x1 = @(0);
+
+        _y1 = @(0);
+
+        _x2 = @(0);
+
+        _y2 = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRDataTypeViewportStruct alloc] init];
+
+    other.x1 = self.x1;
+    other.y1 = self.y1;
+    other.x2 = self.x2;
+    other.y2 = self.y2;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: x1:%@; y1:%@; x2:%@; y2:%@; >", NSStringFromClass([self class]), _x1, _y1, _x2, _y2];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRDataTypeWebRTCSessionStruct
 - (instancetype)init
 {
@@ -9477,9 +9513,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _maxBitRate = @(0);
 
-        _minFragmentLen = @(0);
+        _minKeyFrameInterval = @(0);
 
-        _maxFragmentLen = @(0);
+        _maxKeyFrameInterval = @(0);
 
         _watermarkEnabled = nil;
 
@@ -9503,8 +9539,8 @@ NS_ASSUME_NONNULL_BEGIN
     other.maxResolution = self.maxResolution;
     other.minBitRate = self.minBitRate;
     other.maxBitRate = self.maxBitRate;
-    other.minFragmentLen = self.minFragmentLen;
-    other.maxFragmentLen = self.maxFragmentLen;
+    other.minKeyFrameInterval = self.minKeyFrameInterval;
+    other.maxKeyFrameInterval = self.maxKeyFrameInterval;
     other.watermarkEnabled = self.watermarkEnabled;
     other.osdEnabled = self.osdEnabled;
     other.referenceCount = self.referenceCount;
@@ -9514,7 +9550,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: videoStreamID:%@; streamUsage:%@; videoCodec:%@; minFrameRate:%@; maxFrameRate:%@; minResolution:%@; maxResolution:%@; minBitRate:%@; maxBitRate:%@; minFragmentLen:%@; maxFragmentLen:%@; watermarkEnabled:%@; osdEnabled:%@; referenceCount:%@; >", NSStringFromClass([self class]), _videoStreamID, _streamUsage, _videoCodec, _minFrameRate, _maxFrameRate, _minResolution, _maxResolution, _minBitRate, _maxBitRate, _minFragmentLen, _maxFragmentLen, _watermarkEnabled, _osdEnabled, _referenceCount];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: videoStreamID:%@; streamUsage:%@; videoCodec:%@; minFrameRate:%@; maxFrameRate:%@; minResolution:%@; maxResolution:%@; minBitRate:%@; maxBitRate:%@; minKeyFrameInterval:%@; maxKeyFrameInterval:%@; watermarkEnabled:%@; osdEnabled:%@; referenceCount:%@; >", NSStringFromClass([self class]), _videoStreamID, _streamUsage, _videoCodec, _minFrameRate, _maxFrameRate, _minResolution, _maxResolution, _minBitRate, _maxBitRate, _minKeyFrameInterval, _maxKeyFrameInterval, _watermarkEnabled, _osdEnabled, _referenceCount];
     return descriptionString;
 }
 
@@ -9769,42 +9805,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRCameraAVStreamManagementClusterViewportStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _x1 = @(0);
-
-        _y1 = @(0);
-
-        _x2 = @(0);
-
-        _y2 = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRCameraAVStreamManagementClusterViewportStruct alloc] init];
-
-    other.x1 = self.x1;
-    other.y1 = self.y1;
-    other.x2 = self.x2;
-    other.y2 = self.y2;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: x1:%@; y1:%@; x2:%@; y2:%@; >", NSStringFromClass([self class]), _x1, _y1, _x2, _y2];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRCameraAVSettingsUserLevelManagementClusterMPTZStruct
 - (instancetype)init
 {
@@ -9871,42 +9871,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRCameraAVSettingsUserLevelManagementClusterViewportStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _x1 = @(0);
-
-        _y1 = @(0);
-
-        _x2 = @(0);
-
-        _y2 = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRCameraAVSettingsUserLevelManagementClusterViewportStruct alloc] init];
-
-    other.x1 = self.x1;
-    other.y1 = self.y1;
-    other.x2 = self.x2;
-    other.y2 = self.y2;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: x1:%@; y1:%@; x2:%@; y2:%@; >", NSStringFromClass([self class]), _x1, _y1, _x2, _y2];
-    return descriptionString;
-}
-
-@end
-
 @implementation MTRCameraAVSettingsUserLevelManagementClusterDPTZStruct
 - (instancetype)init
 {
@@ -9914,7 +9878,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _videoStreamID = @(0);
 
-        _viewport = [MTRCameraAVSettingsUserLevelManagementClusterViewportStruct new];
+        _viewport = [MTRDataTypeViewportStruct new];
     }
     return self;
 }

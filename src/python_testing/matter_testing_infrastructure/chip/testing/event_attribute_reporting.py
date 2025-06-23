@@ -126,6 +126,9 @@ class EventCallback:
     def get_size(self) -> int:
         return self._q.qsize()
 
+    def get_block(self, block: bool, timeout: int):
+        return self._q.get(block, timeout)
+
 
 class AttributeChangeCallback:
     def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor):

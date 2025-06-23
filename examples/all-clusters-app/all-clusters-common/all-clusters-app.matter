@@ -329,6 +329,13 @@ struct TestGlobalStruct {
   optional nullable TestGlobalEnum myEnum = 2;
 }
 
+struct ViewportStruct {
+  int16u x1 = 0;
+  int16u y1 = 1;
+  int16u x2 = 2;
+  int16u y2 = 3;
+}
+
 fabric_scoped struct WebRTCSessionStruct {
   int16u id = 0;
   node_id peerNodeID = 1;
@@ -1790,7 +1797,7 @@ cluster GeneralCommissioning = 48 {
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 cluster NetworkCommissioning = 49 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum NetworkCommissioningStatusEnum : enum8 {
     kSuccess = 0;
@@ -7100,8 +7107,8 @@ provisional cluster CameraAvStreamManagement = 1361 {
     VideoResolutionStruct maxResolution = 6;
     int32u minBitRate = 7;
     int32u maxBitRate = 8;
-    int16u minFragmentLen = 9;
-    int16u maxFragmentLen = 10;
+    int16u minKeyFrameInterval = 9;
+    int16u maxKeyFrameInterval = 10;
     optional boolean watermarkEnabled = 11;
     optional boolean OSDEnabled = 12;
     int8u referenceCount = 13;
@@ -7160,13 +7167,6 @@ provisional cluster CameraAvStreamManagement = 1361 {
     optional int16u maxHDRFPS = 3;
   }
 
-  shared struct ViewportStruct {
-    int16u x1 = 0;
-    int16u y1 = 1;
-    int16u x2 = 2;
-    int16u y2 = 3;
-  }
-
   readonly attribute optional int8u maxConcurrentEncoders = 0;
   readonly attribute optional int32u maxEncodedPixelRate = 1;
   readonly attribute optional VideoSensorParamsStruct videoSensorParams = 2;
@@ -7185,7 +7185,7 @@ provisional cluster CameraAvStreamManagement = 1361 {
   readonly attribute optional VideoStreamStruct allocatedVideoStreams[] = 15;
   readonly attribute optional AudioStreamStruct allocatedAudioStreams[] = 16;
   readonly attribute optional SnapshotStreamStruct allocatedSnapshotStreams[] = 17;
-  readonly attribute optional StreamUsageEnum rankedVideoStreamPrioritiesList[] = 18;
+  readonly attribute StreamUsageEnum streamUsagePriorities[] = 18;
   attribute optional boolean softRecordingPrivacyModeEnabled = 19;
   attribute optional boolean softLivestreamPrivacyModeEnabled = 20;
   readonly attribute optional boolean hardPrivacyModeOn = 21;
@@ -7240,8 +7240,8 @@ provisional cluster CameraAvStreamManagement = 1361 {
     VideoResolutionStruct maxResolution = 5;
     int32u minBitRate = 6;
     int32u maxBitRate = 7;
-    int16u minFragmentLen = 8;
-    int16u maxFragmentLen = 9;
+    int16u minKeyFrameInterval = 8;
+    int16u maxKeyFrameInterval = 9;
     optional boolean watermarkEnabled = 10;
     optional boolean OSDEnabled = 11;
   }
@@ -7343,13 +7343,6 @@ provisional cluster CameraAvSettingsUserLevelManagement = 1362 {
     int8u presetID = 0;
     char_string<32> name = 1;
     MPTZStruct settings = 2;
-  }
-
-  shared struct ViewportStruct {
-    int16u x1 = 0;
-    int16u y1 = 1;
-    int16u x2 = 2;
-    int16u y2 = 3;
   }
 
   struct DPTZStruct {
@@ -9731,13 +9724,47 @@ endpoint 1 {
   }
 
   server cluster CameraAvStreamManagement {
+    callback attribute maxConcurrentEncoders;
+    callback attribute maxEncodedPixelRate;
+    callback attribute videoSensorParams;
+    callback attribute nightVisionUsesInfrared;
+    callback attribute minViewport;
+    callback attribute rateDistortionTradeOffPoints;
     callback attribute maxContentBufferSize;
+    callback attribute microphoneCapabilities;
+    callback attribute speakerCapabilities;
+    callback attribute twoWayTalkSupport;
     callback attribute snapshotCapabilities;
     callback attribute maxNetworkBandwidth;
+    callback attribute currentFrameRate;
+    callback attribute HDRModeEnabled;
     callback attribute supportedStreamUsages;
+    callback attribute allocatedVideoStreams;
+    callback attribute allocatedAudioStreams;
     callback attribute allocatedSnapshotStreams;
+    callback attribute streamUsagePriorities;
+    callback attribute softRecordingPrivacyModeEnabled;
+    callback attribute softLivestreamPrivacyModeEnabled;
+    callback attribute hardPrivacyModeOn;
     callback attribute nightVision;
     callback attribute nightVisionIllum;
+    callback attribute viewport;
+    callback attribute speakerMuted;
+    callback attribute speakerVolumeLevel;
+    callback attribute speakerMaxLevel;
+    callback attribute speakerMinLevel;
+    callback attribute microphoneMuted;
+    callback attribute microphoneVolumeLevel;
+    callback attribute microphoneMaxLevel;
+    callback attribute microphoneMinLevel;
+    callback attribute microphoneAGCEnabled;
+    callback attribute imageRotation;
+    callback attribute imageFlipHorizontal;
+    callback attribute imageFlipVertical;
+    callback attribute localVideoRecordingEnabled;
+    callback attribute localSnapshotRecordingEnabled;
+    callback attribute statusLightEnabled;
+    callback attribute statusLightBrightness;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;

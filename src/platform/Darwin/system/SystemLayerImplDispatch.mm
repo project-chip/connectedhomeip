@@ -60,18 +60,6 @@ namespace System {
             if (ctx->block) {
                 ctx->block();
             }
-            delete ctx;
-        }
-
-        void MaybeCancelTimerCompleteBlockCallbackContext(TimerList::Node * timer)
-        {
-            VerifyOrReturn(nullptr != timer);
-
-            __auto_type & cb = timer->GetCallback();
-            VerifyOrReturn(cb.GetOnComplete() == TimerCompleteBlockCallback);
-
-            __auto_type * ctx = static_cast<TimerCompleteBlockCallbackContext *>(cb.GetAppState());
-            delete ctx;
         }
     }
 
@@ -121,7 +109,6 @@ namespace System {
 
         TimerList::Node * timer;
         while ((timer = mTimerList.PopEarliest()) != nullptr) {
-            MaybeCancelTimerCompleteBlockCallbackContext(timer);
             DisableTimer(__func__, timer);
         }
         mTimerPool.ReleaseAll();
@@ -216,6 +203,13 @@ namespace System {
                 mTimerPool.Invoke(timer);
             });
 
+            dispatch_source_set_cancel_handler(timerSource, ^{
+                VerifyOrReturn(onComplete == TimerCompleteBlockCallback);
+                VerifyOrReturn(nullptr != appState);
+
+                __auto_type * ctx = static_cast<TimerCompleteBlockCallbackContext *>(appState);
+                delete ctx; });
+
             EnableTimer(__func__, timer);
         }
 
@@ -286,7 +280,6 @@ namespace System {
         }
         VerifyOrReturn(timer != nullptr);
 
-        MaybeCancelTimerCompleteBlockCallbackContext(timer);
         DisableTimer(__func__, timer);
 
         mTimerPool.Release(timer);
@@ -324,8 +317,23 @@ namespace System {
         mExpiredTimers = mTimerList.ExtractEarlier(Clock::Timeout(1) + SystemClock().GetMonotonicTimestamp());
         TimerList::Node * timer = nullptr;
         while ((timer = mExpiredTimers.PopEarliest()) != nullptr) {
+            TimerCompleteBlockCallbackContext * context = nullptr;
+            bool shouldDeleteContext = false;
+
+            if (!HasTimerSource(timer)) {
+                __auto_type & cb = timer->GetCallback();
+                if (cb.GetOnComplete() == TimerCompleteBlockCallback) {
+                    context = static_cast<TimerCompleteBlockCallbackContext *>(cb.GetAppState());
+                    shouldDeleteContext = true;
+                }
+            }
+
             DisableTimer(__func__, timer);
             mTimerPool.Invoke(timer);
+
+            if (shouldDeleteContext) {
+                delete context;
+            }
         }
 #endif
     }

@@ -56,7 +56,7 @@ class TC_CNET_4_4(MatterBaseTest):
         feature_map = await self.read_single_attribute_check_success(cluster=cnet, attribute=attr.FeatureMap)
         if not (feature_map & cnet.Bitmaps.Feature.kWiFiNetworkInterface):
             logging.info('Device does not support WiFi on endpoint, skipping remaining steps')
-            self.skip_all_remaining_steps(2)
+            self.mark_all_remaining_steps_skipped(2)
             return
 
         self.step(2)
