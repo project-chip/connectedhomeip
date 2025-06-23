@@ -257,38 +257,13 @@ template("siwx917_sdk") {
       "SL_MATTER_GN_BUILD=1",
       "SILABS_LOG_OUT_UART=${sl_uart_log_output}",
       "SUPPORT_CPLUSPLUS=1",
+      "SLI_SI91X_LWIP_HOSTED_NETWORK_STACK=1",
     ]
 
     if (silabs_log_enabled && chip_logging) {
       defines += [ "SILABS_LOG_ENABLED=1" ]
     } else {
       defines += [ "SILABS_LOG_ENABLED=0" ]
-    }
-
-    defines += [
-      "LWIP_NETIF_API=1",
-      "SLI_SI91X_LWIP_HOSTED_NETWORK_STACK=1",
-    ]
-    if (chip_enable_wifi_ipv4) {
-      defines += [
-        "LWIP_IPV4=1",
-
-        # adds following options to provide
-        # them to .cpp source files
-        # flags ported from lwipopts file
-        # TODO: move lwipopts to one location
-        "LWIP_ARP=1",
-        "LWIP_ICMP=1",
-        "LWIP_IGMP=1",
-        "LWIP_DHCP=1",
-      ]
-    } else {
-      defines += [ "LWIP_IPV4=0" ]
-    }
-    if (lwip_ipv6) {
-      defines += [ "LWIP_IPV6=1" ]
-    } else {
-      defines += [ "LWIP_IPV6=0" ]
     }
 
     if (chip_enable_wifi_ipv4) {

@@ -1529,6 +1529,93 @@ TEST_F(TestRead, TestResubscribeAttributeTimeout)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
+//
+// This validates the re-subscription logic within ReadClient that has registered an icd token with the LIT device.
+// This achieves it by overriding the timeout for the liveness timer within ReadClient to be a smaller value than
+// the nominal max interval of the subscription. This causes the subscription to fail on the client side, triggering
+// re-subscription when device is operating as LIT and client has not registered its token in device.
+//
+TEST_F(TestRead, TestResubscribeAttributeTimeoutLITWithoutRegisteringToken)
+{
+    auto sessionHandle = GetSessionBobToAlice();
+
+    SetMRPMode(MessagingContext::MRPMode::kResponsive);
+
+    {
+        TestResubscriptionCallback callback;
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
+                              ReadClient::InteractionType::Subscribe);
+
+        callback.SetReadClient(&readClient);
+
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+
+        // Read full wildcard paths, repeat twice to ensure chunking.
+        AttributePathParams attributePathParams[1];
+        readPrepareParams.mpAttributePathParamsList    = attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(attributePathParams);
+        readPrepareParams.mIsPeerLIT                   = true;
+        readPrepareParams.mRegisteredCheckInToken      = false;
+        attributePathParams[0].mEndpointId             = kTestEndpointId;
+        attributePathParams[0].mClusterId              = Clusters::UnitTesting::Id;
+        attributePathParams[0].mAttributeId            = Clusters::UnitTesting::Attributes::Boolean::Id;
+
+        constexpr uint16_t maxIntervalCeilingSeconds = 1;
+
+        readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
+
+        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 0);
+
+        ReadHandler * readHandler = InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler->GetReportingIntervals(minInterval, maxInterval);
+
+        //
+        // Disable packet transmission, and drive IO till we have reported a re-subscription attempt.
+        //
+        //
+        GetLoopback().mNumMessagesToDrop = LoopbackTransport::kUnlimitedMessageCount;
+        GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)),
+                                    [&]() { return callback.mOnResubscriptionsAttempted > 0; });
+
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
+        EXPECT_EQ(callback.mLastError, CHIP_ERROR_TIMEOUT);
+
+        GetLoopback().mNumMessagesToDrop = 0;
+        callback.ClearCounters();
+
+        //
+        // Drive servicing IO till we have established a subscription.
+        //
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount == 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+
+        //
+        // With re-sub enabled, we shouldn't have encountered any errors
+        //
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_EQ(callback.mOnDone, 0);
+    }
+
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
+
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
 TEST_F(TestRead, TestShutdownAllSubscriptionHandlers)
 {
     auto sessionHandle = GetSessionBobToAlice();
@@ -2374,8 +2461,8 @@ TEST_F(TestRead, TestSubscribe_OnActiveModeNotification)
 
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;
-
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        readPrepareParams.mRegisteredCheckInToken    = true;
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         //
@@ -2462,8 +2549,8 @@ TEST_F(TestRead, TestSubscribe_SubGoAwayInserverOnActiveModeNotification)
 
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;
-
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        readPrepareParams.mRegisteredCheckInToken    = true;
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         //
@@ -2533,8 +2620,8 @@ TEST_F(TestRead, TestSubscribe_MismatchedSubGoAwayInserverOnActiveModeNotificati
 
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;
-
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        readPrepareParams.mRegisteredCheckInToken    = true;
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         //
@@ -2589,8 +2676,8 @@ TEST_F(TestRead, TestSubscribeFailed_OnActiveModeNotification)
 
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;
-
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        readPrepareParams.mRegisteredCheckInToken    = true;
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         GetLoopback().mNumMessagesToDrop = LoopbackTransport::kUnlimitedMessageCount;
@@ -2659,8 +2746,8 @@ TEST_F(TestRead, TestSubscribe_DynamicLITSubscription)
 
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;
-
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        readPrepareParams.mRegisteredCheckInToken    = true;
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         //
@@ -2770,8 +2857,8 @@ TEST_F(TestRead, TestSubscribe_ImmediatelyResubscriptionForLIT)
 
         readPrepareParams.mMaxIntervalCeilingSeconds = maxIntervalCeilingSeconds;
         readPrepareParams.mIsPeerLIT                 = true;
-
-        auto err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
+        readPrepareParams.mRegisteredCheckInToken    = true;
+        auto err                                     = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         EXPECT_EQ(err, CHIP_NO_ERROR);
 
         //

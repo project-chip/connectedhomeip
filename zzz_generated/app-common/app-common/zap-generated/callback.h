@@ -7885,6 +7885,18 @@ bool emberAfZoneManagementClusterRemoveZoneCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ZoneManagement::Commands::RemoveZone::DecodableType & commandData);
 /**
+ * @brief Zone Management Cluster CreateOrUpdateTrigger Command callback (from client)
+ */
+bool emberAfZoneManagementClusterCreateOrUpdateTriggerCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ZoneManagement::Commands::CreateOrUpdateTrigger::DecodableType & commandData);
+/**
+ * @brief Zone Management Cluster RemoveTrigger Command callback (from client)
+ */
+bool emberAfZoneManagementClusterRemoveTriggerCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ZoneManagement::Commands::RemoveTrigger::DecodableType & commandData);
+/**
  * @brief Push AV Stream Transport Cluster AllocatePushTransport Command callback (from client)
  */
 bool emberAfPushAvStreamTransportClusterAllocatePushTransportCallback(
@@ -8316,6 +8328,12 @@ bool emberAfUnitTestingClusterStringEchoRequestCallback(
 bool emberAfUnitTestingClusterGlobalEchoRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::UnitTesting::Commands::GlobalEchoRequest::DecodableType & commandData);
+/**
+ * @brief Unit Testing Cluster TestCheckCommandFlags Command callback (from client)
+ */
+bool emberAfUnitTestingClusterTestCheckCommandFlagsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::UnitTesting::Commands::TestCheckCommandFlags::DecodableType & commandData);
 /**
  * @brief Unit Testing Cluster TestDifferentVendorMeiRequest Command callback (from client)
  */

@@ -64,6 +64,10 @@ struct EndpointEntry
     // for endpoints other than endpoint 0).
     EndpointId parentId;
     EndpointCompositionPattern compositionPattern;
+    bool operator==(const EndpointEntry & rhs) const
+    {
+        return id == rhs.id && parentId == rhs.parentId && compositionPattern == rhs.compositionPattern;
+    }
 };
 
 enum class ClusterQualityFlags : uint32_t
@@ -108,6 +112,11 @@ enum class AttributeQualityFlags : uint32_t
     kTimed           = 0x0040, // `T` quality on attributes (writes require timed interactions)
 
     // If you add new items here, remember to change kAttrQualityBits
+};
+
+struct EventEntry
+{
+    Access::Privilege readPrivilege; // Required access level to read this event
 };
 
 struct AttributeEntry
@@ -241,6 +250,14 @@ struct AcceptedCommandEntry
     }
 
     [[nodiscard]] constexpr bool HasFlags(CommandQualityFlags f) const { return (mask.flags & to_underlying(f)) != 0; }
+
+    bool operator==(const AcceptedCommandEntry & other) const
+    {
+        return (commandId == other.commandId) && (mask.flags == other.mask.flags) &&
+            (mask.invokePrivilege == other.mask.invokePrivilege);
+    }
+
+    bool operator!=(const AcceptedCommandEntry & other) const { return !(*this == other); }
 
 private:
     // Constant used to narrow binary expressions

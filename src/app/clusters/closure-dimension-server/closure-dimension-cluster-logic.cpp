@@ -19,6 +19,7 @@
  */
 
 #include "closure-dimension-cluster-logic.h"
+#include <clusters/ClosureDimension/Metadata.h>
 #include <platform/LockTracker.h>
 
 namespace chip {
@@ -484,7 +485,7 @@ CHIP_ERROR ClusterLogic::GetFeatureMap(BitFlags<Feature> & featureMap)
 CHIP_ERROR ClusterLogic::GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    clusterRevision = kClusterRevision;
+    clusterRevision = ClosureDimension::kRevision;
     return CHIP_NO_ERROR;
 }
 
@@ -499,7 +500,15 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     // TODO: If this command is sent while the closure is in a non-compatible internal-state, a status code of
     // INVALID_IN_STATE SHALL be returned.
 
-    GenericTargetStruct target{};
+    DataModel::Nullable<GenericTargetStruct> target;
+    VerifyOrReturnError(GetTarget(target) == CHIP_NO_ERROR, Status::Failure);
+
+    // If target is null, we need to initialize to default value.
+    // This is to ensure that we can set the position, latch, and speed values in the target.
+    if (target.IsNull())
+    {
+        target.SetNonNull(GenericTargetStruct{});
+    }
 
     // If position field is present and Positioning(PS) feature is not supported, we should not set target.position value.
     if (position.HasValue() && mConformance.HasFeature(Feature::kPositioning))
@@ -525,7 +534,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
             }
         }
 
-        target.position.SetValue(position.Value());
+        target.Value().position.SetValue(position.Value());
     }
 
     // If latch field is present and MotionLatching feature is not supported, we should not set target.latch value.
@@ -533,14 +542,14 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     {
         VerifyOrReturnError(!mDelegate.IsManualLatchingNeeded(), Status::InvalidAction);
 
-        target.latch = latch;
+        target.Value().latch.SetValue(latch.Value());
     }
 
     // If speed field is present and Speed feature is not supported, we should not set target.speed value.
     if (speed.HasValue() && mConformance.HasFeature(Feature::kSpeed))
     {
         VerifyOrReturnError(speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, Status::ConstraintError);
-        target.speed = speed;
+        target.Value().speed.SetValue(speed.Value());
     }
 
     // Check if the current position is valid or else return InvalidInState
@@ -552,7 +561,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     // Target should only be set when delegate function returns status as Success. Return failure otherwise
     VerifyOrReturnError(mDelegate.HandleSetTarget(position, latch, speed) == Status::Success, Status::Failure);
 
-    VerifyOrReturnError(SetTarget(DataModel::MakeNullable(target)) == CHIP_NO_ERROR, Status::Failure);
+    VerifyOrReturnError(SetTarget(target) == CHIP_NO_ERROR, Status::Failure);
 
     return Status::Success;
 }
@@ -569,13 +578,21 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     VerifyOrReturnError(direction != StepDirectionEnum::kUnknownEnumValue, Status::ConstraintError);
     VerifyOrReturnError(numberOfSteps > 0, Status::ConstraintError);
 
-    GenericTargetStruct stepTarget{};
+    DataModel::Nullable<GenericTargetStruct> stepTarget;
+    VerifyOrReturnError(GetTarget(stepTarget) == CHIP_NO_ERROR, Status::Failure);
+
+    if (stepTarget.IsNull())
+    {
+        // If stepTarget is null, we need to initialize to default value.
+        // This is to ensure that we can set the position, latch, and speed values in the stepTarget.
+        stepTarget.SetNonNull(GenericTargetStruct{});
+    }
 
     // If speed field is present and Speed feature is not supported, we should not set stepTarget.speed value.
     if (speed.HasValue() && mConformance.HasFeature(Feature::kSpeed))
     {
         VerifyOrReturnError(speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, Status::ConstraintError);
-        stepTarget.speed = speed;
+        stepTarget.Value().speed.SetValue(speed.Value());
     }
 
     // TODO: If the server is in a state where it cannot support the command, the server SHALL respond with an
@@ -639,8 +656,8 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     // Target should only be set when delegate function returns status as Success. Return failure otherwise
     VerifyOrReturnError(mDelegate.HandleStep(direction, numberOfSteps, speed) == Status::Success, Status::Failure);
 
-    stepTarget.position.SetValue(static_cast<Percent100ths>(newPosition));
-    VerifyOrReturnError(SetTarget(DataModel::MakeNullable(stepTarget)) == CHIP_NO_ERROR, Status::Failure);
+    stepTarget.Value().position.SetValue(static_cast<Percent100ths>(newPosition));
+    VerifyOrReturnError(SetTarget(stepTarget) == CHIP_NO_ERROR, Status::Failure);
 
     return Status::Success;
 }

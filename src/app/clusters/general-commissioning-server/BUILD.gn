@@ -11,5 +11,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
 group("general-commissioning-server") {
+}
+
+# TODO: we have a dependency on GeneralCommissioning: setting a breadcrumb
+# via `GeneralCommissioning::SetBreadcrumb`. This should be decoupled when
+# GeneralCommissioning is turned into code-driven
+#
+# See https://github.com/project-chip/connectedhomeip/issues/39412
+#
+# This source set enablese other tests to share the coupling for test
+# purposes only (and breadcrumb setting in this case is a noop)
+source_set("test-only-temporary-coupling") {
+  sources = [ "TemporaryTestCoupling.cpp" ]
+  deps =
+      [ "${chip_root}/zzz_generated/app-common/clusters/GeneralCommissioning" ]
 }
