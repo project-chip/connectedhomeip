@@ -73,6 +73,7 @@ tests:
                 value: ""
 
     # Step 5
+    # Note: Unsupported with darwin-framework-tool because it automatically performs a timed invoke
     - label:
           "TH sends a valid ActiveDatasetRequest command to the DUT without a
           timed interaction"

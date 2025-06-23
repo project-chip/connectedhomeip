@@ -108,6 +108,7 @@ tests:
               type: int64u
 
     # Step 6
+    # Note: Unsupported with darwin-framework-tool because it automatically performs a timed invoke
     - label:
           "TH sends a SetPendingDatasetRequest command to the DUT without a
           timed interaction"
