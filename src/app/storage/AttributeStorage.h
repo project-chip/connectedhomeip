@@ -83,7 +83,6 @@ public:
             return { ByteSpan(reinterpret_cast<uint8_t *>(&value), sizeof(value)), Type::kPrimitive };
         }
 
-        template <typename T>
         static Value Raw(ByteSpan bytes)
         {
             return { bytes, Type::kRaw };
