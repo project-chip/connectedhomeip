@@ -124,14 +124,23 @@ void ClosureManager::CancelTimer()
 
 void ClosureManager::InitiateAction(AppEvent * event)
 {
-    Action_t action = static_cast<Action_t>(event->ClosureEvent.Action);
+    Action_t eventAction = static_cast<Action_t>(event->ClosureEvent.Action);
 
     ClosureManager & instance = ClosureManager::GetInstance();
 
-    instance.CancelTimer(); // Cancel any existing timer before starting a new action
-    instance.SetCurrentAction(action);
+    // ideally, we should not receive an event for a different action while another action is ongoing.
+    // But due to asynchronous processing of command and stop command, this can happen if stop is received
+    // after InitaiteAction event is posted.
+    // This is a safety check to ensure that we do not initiate a new action while another action is in progress.
+    // If this happens, we log an error and do not proceed with initiating the action.
+    if(eventAction != instance.GetCurrentAction()) {
+        ChipLogError(AppServer, "Got Event for %d in InitiateAction while current ongoing action is %d",
+                           static_cast<int>(eventAction), static_cast<int>(instance.GetCurrentAction()));
+    }
 
-    switch (action)
+    instance.CancelTimer(); // Cancel any existing timer before starting a new action
+
+    switch (eventAction)
     {
     case Action_t::CALIBRATE_ACTION:
         ChipLogDetail(AppServer, "Initiating calibration action");
@@ -201,6 +210,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
     event.Handler             = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
 
+    SetCurrentAction(Action_t::CALIBRATE_ACTION);
     isCalibrationInProgress = true;
     return Status::Success;
 }
@@ -211,6 +221,9 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStopCommand()
     // For simulation purposes, we will just log the stop action and contnue to handle the stop action completion.
     // In a real application, this would be replaced with actual logic to stop the closure action.
     ChipLogDetail(AppServer, "Handling Stop command for closure action");
+    CancelTimer();
+    
+    SetCurrentAction(Action_t::STOP_ACTION);
     HandleClosureActionComplete(Action_t::STOP_ACTION);
     return Status::Success;
 }
