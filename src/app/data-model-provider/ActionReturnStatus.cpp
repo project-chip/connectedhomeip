@@ -34,7 +34,7 @@ namespace {
 bool StatusIsTheSameAsError(const ClusterStatusCode & status, const CHIP_ERROR & err)
 {
     auto cluster_code = status.GetClusterSpecificCode();
-    if (!cluster_code.HasValue())
+    if (!cluster_code.has_value())
     {
         // there exist Status::Success, however that may not be encoded
         // as a CHIP_ERROR_IM_GLOBAL_STATUS_VALUE as it is just as well a CHIP_NO_ERROR.
@@ -52,7 +52,7 @@ bool StatusIsTheSameAsError(const ClusterStatusCode & status, const CHIP_ERROR &
         return false;
     }
 
-    return err == CHIP_ERROR_IM_CLUSTER_STATUS_VALUE(cluster_code.Value());
+    return err == CHIP_ERROR_IM_CLUSTER_STATUS_VALUE(*cluster_code);
 }
 
 } // namespace
@@ -98,10 +98,10 @@ CHIP_ERROR ActionReturnStatus::GetUnderlyingError() const
             return CHIP_NO_ERROR;
         }
 
-        chip::Optional<ClusterStatus> code = status->GetClusterSpecificCode();
+        std::optional<ClusterStatus> code = status->GetClusterSpecificCode();
 
-        return code.HasValue() ? CHIP_ERROR_IM_CLUSTER_STATUS_VALUE(code.Value())
-                               : CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status->GetStatus());
+        return code.has_value() ? CHIP_ERROR_IM_CLUSTER_STATUS_VALUE(*code)
+                                : CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status->GetStatus());
     }
 
     chipDie();
@@ -179,10 +179,10 @@ const char * ActionReturnStatus::c_str(ActionReturnStatus::StringStorage & stora
         }
 #endif
 
-        chip::Optional<ClusterStatus> clusterCode = status->GetClusterSpecificCode();
-        if (clusterCode.HasValue())
+        std::optional<ClusterStatus> clusterCode = status->GetClusterSpecificCode();
+        if (clusterCode.has_value())
         {
-            storage.formatBuffer.AddFormat(", Code %d", static_cast<int>(clusterCode.Value()));
+            storage.formatBuffer.AddFormat(", Code %d", static_cast<int>(*clusterCode));
         }
         return storage.formatBuffer.c_str();
     }

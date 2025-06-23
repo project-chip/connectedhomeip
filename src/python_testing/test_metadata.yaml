@@ -7,13 +7,7 @@ not_automated:
       reason: Shared code for TC_AVSM, not a standalone test
     - name: TC_AVSM_2_2.py
       reason: Camera App does not support all features required for this TC
-    - name: TC_AVSM_2_3.py
-      reason: Camera App does not support all features required for this TC
-    - name: TC_AVSM_2_4.py
-      reason: Camera App does not support all features required for this TC
     - name: TC_AVSM_2_5.py
-      reason: Camera App does not support all features required for this TC
-    - name: TC_AVSM_2_6.py
       reason: Camera App does not support all features required for this TC
     - name: TC_AVSM_2_7.py
       reason: Camera App does not support all features required for this TC
@@ -21,13 +15,15 @@ not_automated:
       reason: Camera App does not support all features required for this TC
     - name: TC_AVSM_2_9.py
       reason: Camera App does not support all features required for this TC
-    - name: TC_AVSM_2_10.py
-      reason: Camera App does not support all features required for this TC
     - name: TC_AVSM_2_11.py
       reason: Camera App does not support all features required for this TC
     - name: TC_CNET_4_2.py
       reason: It has no CI execution block, it not executed in CI
     - name: TC_CNET_4_4.py
+      reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_9.py
+      reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_12.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_15.py
       reason: It has no CI execution block, is not executed in CI
