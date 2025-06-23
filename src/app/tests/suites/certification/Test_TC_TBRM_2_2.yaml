@@ -69,11 +69,23 @@ tests:
               - name: Dataset
                 value: ""
 
+    - label:
+          "TH sends a valid ActiveDatasetRequest command to the DUT without a
+          timed interaction"
+      command: SetActiveDatasetRequest
+      arguments:
+          values:
+              - name: ActiveDataset
+                value: PIXIT.TBRM.THREAD_ACTIVE_DATASET
+      response:
+          error: NEEDS_TIMED_INTERACTION
+
     # Step 3
     - label:
           "TH sends a valid ActiveDatasetRequest command to the DUT without
           having armed the fail-safe"
       command: SetActiveDatasetRequest
+      timedInteractionTimeoutMs: 2000
       arguments:
           values:
               - name: ActiveDataset
@@ -100,6 +112,7 @@ tests:
     # Step 5
     - label: "TH sends an invalid ActiveDatasetRequest command to the DUT"
       command: SetActiveDatasetRequest
+      timedInteractionTimeoutMs: 2000
       arguments:
           values:
               - name: ActiveDataset
@@ -110,6 +123,7 @@ tests:
     # Step 6
     - label: "TH sends a valid ActiveDatasetRequest command to the DUT"
       command: SetActiveDatasetRequest
+      timedInteractionTimeoutMs: 2000
       arguments:
           values:
               - name: ActiveDataset
