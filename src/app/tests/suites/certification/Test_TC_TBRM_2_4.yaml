@@ -13,8 +13,8 @@
 # limitations under the License.
 
 name:
-    "[TC-TBRM-2.4] Verify that getting Active or Pending Dataset in the PASE
-    session results in unsupported access"
+    "[TC-TBRM-2.4] Verify that getting or setting Active or Pending Dataset in a
+    PASE session results in unsupported access"
 
 PICS:
     - TBRM.S
@@ -77,9 +77,35 @@ tests:
           error: UNSUPPORTED_ACCESS
 
     - label:
+          "TH2 send SetActiveDatasetRequest command to the DUT in PASE session"
+      identity: beta
+      command: SetActiveDatasetRequest
+      timedInteractionTimeoutMs: 2000
+      arguments:
+          values:
+              - name: ActiveDataset
+                value: "hex:0e080000000000010000"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
           "TH2 send GetPendingDatasetRequest command to the DUT in PASE session"
       identity: beta
       command: GetPendingDatasetRequest
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "TH sends a SetPendingDatasetRequest command to the DUT in PASE
+          session"
+      PICS: TBRM.S.F00
+      identity: beta
+      command: SetPendingDatasetRequest
+      timedInteractionTimeoutMs: 2000
+      arguments:
+          values:
+              - name: PendingDataset
+                value: "hex:0e080000000000010000"
       response:
           error: UNSUPPORTED_ACCESS
 
