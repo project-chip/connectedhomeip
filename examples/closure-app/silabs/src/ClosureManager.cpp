@@ -263,7 +263,6 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
 
     if (position.HasValue())
     {
-        ChipLogError(AppServer, "Updating target position for move to command");
         // Set the Closure panel target position for the panels based on the Closure position.
         // The position is represented as a TargetPositionEnum, which maps to specific positions for the panels.
         // The mapping values used below are for closure sample app.
@@ -303,14 +302,12 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
 
     if (latch.HasValue())
     {
-        ChipLogError(AppServer, "Updating target latch for move to command");
         ep2Target.latch.SetValue(latch.Value());
         ep3Target.latch.SetValue(latch.Value());
     }
 
     if (speed.HasValue())
     {
-        ChipLogError(AppServer, "Updating target speed for move to command");
         ep2Target.speed.SetValue(speed.Value());
         ep3Target.speed.SetValue(speed.Value());
     }
@@ -372,7 +369,7 @@ void ClosureManager::HandleClosureMotionAction()
     {
         instance.CancelTimer(); // Cancel any existing timer before starting a new action
         instance.SetCurrentAction(MOVE_TO_ACTION);
-        instance.StartTimer(kCountdownTimeSeconds * 100);
+        instance.StartTimer(kMotionCountdownTimeMs);
         return;
     }
 
@@ -400,7 +397,6 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         GetInstance().ep1.OnCalibrateActionComplete();
         GetInstance().ep2.OnCalibrateActionComplete();
         GetInstance().ep3.OnCalibrateActionComplete();
-        isCalibrationInProgress          = false;
         instance.isCalibrationInProgress = false;
         break;
     }

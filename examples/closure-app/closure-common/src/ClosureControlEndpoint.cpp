@@ -288,10 +288,8 @@ void ClosureControlEndpoint::UpdateCurrentStateFromTargetState()
         ChipLogError(AppServer, "Current state is null, Move to action Failed");
         return;
     }
-    else
-    {
-        currentOverallState = state.mOverallState.Value();
-    }
+    
+    currentOverallState = state.mOverallState.Value();
 
     if (state.mOverallTarget.Value().position.HasValue())
     {
