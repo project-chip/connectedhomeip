@@ -154,46 +154,40 @@ bool LightingManager::InitiateAction(int32_t aActor, Action_t aAction, uint8_t *
         action_initiated = true;
 
         new_state = kState_OnInitiated;
+        if (mOffEffectArmed)
+        {
+            CancelTimer();
+            mOffEffectArmed = false;
+        }
     }
     else if (mState == kState_OnCompleted && aAction == OFF_ACTION && mOffEffectArmed == false)
     {
         action_initiated = true;
 
         new_state = kState_OffInitiated;
+        if (mAutoTurnOffTimerArmed)
+        {
+            // If auto turn off timer has been armed and someone initiates turning off,
+            // cancel the timer and continue as normal.
+            mAutoTurnOffTimerArmed = false;
+
+            CancelTimer();
+        }
     }
     else if (aAction == LEVEL_ACTION)
     {
         action_initiated = true;
     }
 
-    if (action_initiated)
+    if (action_initiated && (aAction == ON_ACTION || aAction == OFF_ACTION))
     {
-        if (aAction != LEVEL_ACTION)
-        {
-            if (mAutoTurnOffTimerArmed && new_state == kState_OffInitiated)
-            {
-                // If auto turn off timer has been armed and someone initiates turning off,
-                // cancel the timer and continue as normal.
-                mAutoTurnOffTimerArmed = false;
+        StartTimer(ACTUATOR_MOVEMENT_PERIOS_MS);
+        mState = new_state;
+    }
 
-                CancelTimer();
-            }
-
-            if (mOffEffectArmed && new_state == kState_OnInitiated)
-            {
-                CancelTimer();
-                mOffEffectArmed = false;
-            }
-
-            StartTimer(ACTUATOR_MOVEMENT_PERIOS_MS);
-
-            // Since the timer started successfully, update the state and trigger callback
-            mState = new_state;
-        }
-        if (mActionInitiated_CB)
-        {
-            mActionInitiated_CB(aAction, aActor, aValue);
-        }
+    if (action_initiated && mActionInitiated_CB)
+    {
+        mActionInitiated_CB(aAction, aActor, aValue);
     }
 
     return action_initiated;

@@ -55,12 +55,12 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                                   value);
     }
     // WIP Apply attribute change to Light
-    else if (clusterId == LevelControl::Id && attributeId == LevelControl::Attributes::CurrentLevel::Id)
+    else if (clusterId == LevelControl::Id)
     {
         ChipLogProgress(Zcl, "Level Control attribute ID: " ChipLogFormatMEI " Type: %u Value: %u, length %u",
                         ChipLogValueMEI(attributeId), type, *value, size);
 
-        if (value != nullptr)
+        if (attributeId == LevelControl::Attributes::CurrentLevel::Id && value != nullptr)
         {
             LightMgr().InitiateAction(AppEvent::kEventType_Light, LightingManager::LEVEL_ACTION, value);
         }
