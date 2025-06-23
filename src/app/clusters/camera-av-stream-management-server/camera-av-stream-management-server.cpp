@@ -2034,7 +2034,7 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
         // return AlreadyExists
         if (!streamUsagePriorities.insert(streamUsage).second) {
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::AlreadyExists);
-            return;            
+            return;
         }
     }
 
