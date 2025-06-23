@@ -56,8 +56,7 @@ check_symbols() {
     if [[ -n "$raw_emAf_matches" ]]; then
         while IFS= read -r line; do
             # Skip if match is inside a // or /* comment
-            if ! echo "$line" | grep -q '//.*\<emAf[A-Za-z0-9_]*(' &&
-                ! echo "$line" | grep -q '/\*.*\<emAf[A-Za-z0-9_]*('; then
+            if ! echo "$line" | grep -q '//.*\<emAf[A-Za-z0-9_]*(\|/\*.*\<emAf[A-Za-z0-9_]*('; then
                 emAf_matches+="$line"$'\n'
             fi
         done <<<"$raw_emAf_matches"
