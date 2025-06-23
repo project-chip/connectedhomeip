@@ -145,18 +145,18 @@ class IsolatedNetworkNamespace:
 
         self.setup()
         if setup_app_link_up:
-            self.setup_app_link_up()
+            self.setup_app_link_up(wait_for_dad=False)
         if setup_tool_link_up:
-            self.setup_tool_link_up()
+            self.setup_tool_link_up(wait_for_dad=False)
+        self._wait_for_duplicate_address_detection()
 
+    def _wait_for_duplicate_address_detection(self):
         # IPv6 does Duplicate Address Detection even though
-        # we know ULAs provided are isolated. Wait for 'tenative'
+        # we know ULAs provided are isolated. Wait for 'tentative'
         # address to be gone.
-
         logging.info('Waiting for IPv6 DaD to complete (no tentative addresses)')
         for _ in range(100):  # wait at most 10 seconds
-            output = subprocess.check_output(['ip', 'addr'])
-            if b'tentative' not in output:
+            if 'tentative' not in subprocess.check_output(['ip', 'addr'], text=True):
                 logging.info('No more tentative addresses')
                 break
             time.sleep(0.1)
@@ -167,13 +167,17 @@ class IsolatedNetworkNamespace:
         for command in self.COMMANDS_SETUP:
             self.run(command)
 
-    def setup_app_link_up(self):
+    def setup_app_link_up(self, wait_for_dad=True):
         for command in self.COMMANDS_APP_LINK_UP:
             self.run(command)
+        if wait_for_dad:
+            self._wait_for_duplicate_address_detection()
 
-    def setup_tool_link_up(self):
+    def setup_tool_link_up(self, wait_for_dad=True):
         for command in self.COMMANDS_TOOL_LINK_UP:
             self.run(command)
+        if wait_for_dad:
+            self._wait_for_duplicate_address_detection()
 
     def run(self, command: str):
         command = command.format(app_link_name=self.app_link_name,
