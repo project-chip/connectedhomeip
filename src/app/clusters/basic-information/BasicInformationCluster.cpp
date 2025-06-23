@@ -379,7 +379,8 @@ CHIP_ERROR BasicInformationCluster::Attributes(const ConcreteClusterPath & path,
 
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(9));
 
-    if (!mEnabledOptionalAttributes.Has(OptionalBasicInformationAttributes::kDisableMandatoryUniqueIDOnPurpose)) {
+    if (!mEnabledOptionalAttributes.Has(OptionalBasicInformationAttributes::kDisableMandatoryUniqueIDOnPurpose))
+    {
         ReturnErrorOnFailure(builder.Append(UniqueID::kMetadataEntry));
     }
 
