@@ -67,11 +67,11 @@ public:
     // information on how to properly use CommandHandler::Handle to
     // perform async command handling, see the documentation for
     // CommandHandler::Handle.
-    Command(...) {
-    }
+    Command(...) {...}
+    [...]
   private:
     CommandHandler::Handle mHandle;
-    [...] // 
+    [...]  // Other member variable important for processing command
   };
   [...]
   static void DispatchCommandsAsList(intptr_t arg) {
