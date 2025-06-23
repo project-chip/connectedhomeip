@@ -764,17 +764,8 @@ void WriteHandler::MoveToState(const State aTargetState)
 DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::SubjectDescriptor & aSubject,
                                                               const ConcreteAttributePath & aPath)
 {
-    // TODO: ordering is to check writability/existence BEFORE ACL and this seems wrong, however
-    //       existing unit tests (TC_AcessChecker.py) validate that we get UnsupportedWrite instead of UnsupportedAccess
-    //
-    //       This should likely be fixed in spec (probably already fixed by
-    //       https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/9024)
-    //       and tests and implementation
-    //
-    //       Open issue that needs fixing: https://github.com/project-chip/connectedhomeip/issues/33735
 
     // 1. To make sure that we have at least some access against the concrete path.
-    // TODO should this stay as kView or as kOperate?
     Status writeAccessStatus = CheckWriteAccess(aSubject, aPath, Access::Privilege::kView);
     VerifyOrReturnValue(writeAccessStatus == Status::Success, writeAccessStatus);
 
@@ -797,7 +788,6 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     VerifyOrReturnValue(attributeEntry->GetWritePrivilege().has_value(), Status::UnsupportedWrite);
 
     // 3. Execute the ACL Access Granting Algorithm against the concrete path a second time, using the actual required_privilege
-
     writeAccessStatus = CheckWriteAccess(aSubject, aPath, *attributeEntry->GetWritePrivilege());
     VerifyOrReturnValue(writeAccessStatus == Status::Success, writeAccessStatus);
 
