@@ -15,9 +15,10 @@
 #  limitations under the License.
 #
 
-import chip.native
 import ctypes
-from ctypes import c_void_p, c_char_p, CFUNCTYPE
+from ctypes import CFUNCTYPE, c_char_p, c_void_p
+
+import chip.native
 
 lib = chip.native.GetLibraryHandle(chip.native.HandleFlags(0))
 
