@@ -35,30 +35,35 @@ from chip.testing.matter_testing import AttributeMatcher, AttributeValue
 from mobly import asserts
 
 
-class SimpleEventCallback:
-    def __init__(self, name: str, expected_cluster_id: int, expected_event_id: int, output_queue: queue.SimpleQueue):
-        self._name = name
-        self._expected_cluster_id = expected_cluster_id
-        self._expected_event_id = expected_event_id
-        self._output_queue = output_queue
+class EventAccumulator:
+    def __init__(self, *, name: Optional[str] = None, expected_cluster: Optional[ClusterObjects.Cluster] = None, expected_cluster_id: Optional[int] = None, expected_event_id: Optional[int] = None):
+        if expected_cluster:
+            self._expected_cluster = expected_cluster
+            self._expected_cluster_id = expected_cluster.id
+        elif expected_cluster_id is not None and expected_event_id is not None:
+            self._name = name
+            self._expected_cluster_id = expected_cluster_id
+            self._expected_event_id = expected_event_id
+
+        self._q: queue.Queue = queue.Queue()
 
     def __call__(self, event_result: EventReadResult, transaction: SubscriptionTransaction):
-        if (self._expected_cluster_id == event_result.Header.ClusterId and
-                self._expected_event_id == event_result.Header.EventId):
-            self._output_queue.put(event_result)
+        # """This is the subscription callback when an event is received.
+        #    It checks the event is from the expected_cluster and then posts it into the queue for later processing."""
+        if event_result.Status == Status.Success:
+            return
+
+        if event_result.Header.ClusterId != self._expected_cluster_id:
+            return
+
+        if self._expected_event_id is not None and event_result.Header.EventId != self._expected_event_id:
+            return
+
+        self._q.put(event_result)
 
     @property
-    def name(self) -> str:
+    def name(self) -> Optional[str]:
         return self._name
-
-
-class EventChangeCallback:
-    def __init__(self, expected_cluster: ClusterObjects.Cluster):
-        """This class creates a queue to store received event callbacks, that can be checked by the test script
-           expected_cluster: is the cluster from which the events are expected
-        """
-        self._q: queue.Queue = queue.Queue()
-        self._expected_cluster = expected_cluster
 
     async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30) -> Any:
         """This starts a subscription for events on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
@@ -69,14 +74,6 @@ class EventChangeCallback:
                                                       fabricFiltered=fabric_filtered, keepSubscriptions=True, autoResubscribe=False)
         self._subscription.SetEventUpdateCallback(self.__call__)
         return self._subscription
-
-    def __call__(self, res: EventReadResult, transaction: SubscriptionTransaction):
-        """This is the subscription callback when an event is received.
-           It checks the event is from the expected_cluster and then posts it into the queue for later processing."""
-        if res.Status == Status.Success and res.Header.ClusterId == self._expected_cluster.id:
-            logging.info(
-                f'Got subscription report for event on cluster {self._expected_cluster}: {res.Data}')
-            self._q.put(res)
 
     def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout_sec: float = 10.0) -> Any:
         """This function allows a test script to block waiting for the specific event to be the next event
@@ -123,6 +120,96 @@ class EventChangeCallback:
     @property
     def event_queue(self) -> queue.Queue:
         return self._q
+
+
+# class SimpleEventCallback:
+#     def __init__(self, name: str, expected_cluster_id: int, expected_event_id: int, output_queue: queue.SimpleQueue):
+#         self._name = name
+#         self._expected_cluster_id = expected_cluster_id
+#         self._expected_event_id = expected_event_id
+#         self._output_queue = output_queue
+#
+#     def __call__(self, event_result: EventReadResult, transaction: SubscriptionTransaction):
+#         if (self._expected_cluster_id == event_result.Header.ClusterId and
+#                 self._expected_event_id == event_result.Header.EventId):
+#             self._output_queue.put(event_result)
+#
+#     @property
+#     def name(self) -> str:
+#         return self._name
+#
+#
+# class EventChangeCallback:
+#     def __init__(self, expected_cluster: ClusterObjects.Cluster):
+#         """This class creates a queue to store received event callbacks, that can be checked by the test script
+#            expected_cluster: is the cluster from which the events are expected
+#         """
+#         self._q: queue.Queue = queue.Queue()
+#         self._expected_cluster = expected_cluster
+#
+#     async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30) -> Any:
+#         """This starts a subscription for events on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
+#         urgent = True
+#         self._subscription = await dev_ctrl.ReadEvent(node_id,
+#                                                       events=[(endpoint, self._expected_cluster, urgent)], reportInterval=(
+#                                                           min_interval_sec, max_interval_sec),
+#                                                       fabricFiltered=fabric_filtered, keepSubscriptions=True, autoResubscribe=False)
+#         self._subscription.SetEventUpdateCallback(self.__call__)
+#         return self._subscription
+#
+#     def __call__(self, res: EventReadResult, transaction: SubscriptionTransaction):
+#         """This is the subscription callback when an event is received.
+#            It checks the event is from the expected_cluster and then posts it into the queue for later processing."""
+#         if res.Status == Status.Success and res.Header.ClusterId == self._expected_cluster.id:
+#             logging.info(
+#                 f'Got subscription report for event on cluster {self._expected_cluster}: {res.Data}')
+#             self._q.put(res)
+#
+#     def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout_sec: float = 10.0) -> Any:
+#         """This function allows a test script to block waiting for the specific event to be the next event
+#            to arrive within a timeout (specified in seconds). It returns the event data so that the values can be checked."""
+#         logging.info(f"Waiting for {expected_event} for {timeout_sec:.1f} seconds")
+#         try:
+#             res = self._q.get(block=True, timeout=timeout_sec)
+#         except queue.Empty:
+#             asserts.fail("Failed to receive a report for the event {}".format(expected_event))
+#
+#         asserts.assert_equal(res.Header.ClusterId, expected_event.cluster_id, "Expected cluster ID not found in event report")
+#         asserts.assert_equal(res.Header.EventId, expected_event.event_id, "Expected event ID not found in event report")
+#         logging.info(f"Successfully waited for {expected_event}")
+#         return res.Data
+#
+#     def wait_for_event_expect_no_report(self, timeout_sec: float = 10.0):
+#         """This function returns if an event does not arrive within the timeout specified in seconds.
+#            If any event does arrive, an assert failure occurs."""
+#         try:
+#             res = self._q.get(block=True, timeout=timeout_sec)
+#         except queue.Empty:
+#             return
+#
+#         asserts.fail(f"Event reported when not expected {res}")
+#
+#     def get_last_event(self) -> Optional[Any]:
+#         """Flush entire queue, returning last (newest) event only."""
+#         last_event: Optional[Any] = None
+#         while True:
+#             try:
+#                 last_event = self._q.get(block=False)
+#             except queue.Empty:
+#                 return last_event
+#
+#     def flush_events(self) -> None:
+#         """Flush entire queue, returning nothing."""
+#         _ = self.get_last_event()
+#         return
+#
+#     def reset(self) -> None:
+#         """Resets state as if no events had ever been received."""
+#         self.flush_events()
+#
+#     @property
+#     def event_queue(self) -> queue.Queue:
+#         return self._q
 
 
 class AttributeChangeCallback:
