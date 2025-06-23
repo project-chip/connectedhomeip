@@ -74,7 +74,7 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
                 chip::DeviceLayer::ThreadStackMgr().ClearAllSrpHostAndServices();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
-                // Erase Matter data
+       // Erase Matter data
                 chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().DoFactoryReset();
                 // Erase Network credentials and disconnect
                 chip::DeviceLayer::ConnectivityMgr().ErasePersistentInfo();
