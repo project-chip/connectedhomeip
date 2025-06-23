@@ -30,6 +30,7 @@
 
 #include <cmath>
 #include <cstring>
+#include <set>
 
 using namespace chip;
 using namespace chip::app;
@@ -1647,6 +1648,20 @@ void CameraAVStreamMgmtServer::InvokeCommand(HandlerContext & handlerContext)
         return;
     }
 }
+bool CameraAVStreamMgmtServer::StreamPrioritiesHasDuplicates(const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities)
+{
+    std::set<Globals::StreamUsageEnum> seenStreamUsages;
+
+    for (auto streamUsage : aStreamUsagePriorities)
+    {
+        if (!seenStreamUsages.insert(streamUsage).second)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
 
 void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
                                                          const Commands::VideoStreamAllocate::DecodableType & commandData)
@@ -2011,6 +2026,10 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
     std::vector<Globals::StreamUsageEnum> rankedStreamPriorities;
     auto iter = streamPriorities.begin();
 
+    // If any video, audio or snapshot streams exist fail the command.
+    VerifyOrReturn(mAllocatedVideoStreams.empty() && mAllocatedAudioStreams.empty() && mAllocatedSnapshotStreams.empty(),
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
+
     while (iter.Next())
     {
         auto & streamUsage = iter.GetValue();
@@ -2019,6 +2038,11 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
             return;
         }
+        // If any requested value is not found in SupportedStreamUsages,
+        // return DynamicConstraintError.
+        auto it = std::find(mSupportedStreamUsages.begin(), mSupportedStreamUsages.end(), streamUsage);
+        VerifyOrReturn(it != mSupportedStreamUsages.end(),
+                       ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError));
         rankedStreamPriorities.push_back(streamUsage);
     }
 
@@ -2027,6 +2051,11 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
         return;
     }
+
+    // If there are duplicate stream usages in StreamPriorities,
+    // return AlreadyExists
+    VerifyOrReturn(!StreamPrioritiesHasDuplicates(rankedStreamPriorities),
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::AlreadyExists));
 
     CHIP_ERROR err = SetStreamUsagePriorities(rankedStreamPriorities);
 
@@ -2050,8 +2079,26 @@ void CameraAVStreamMgmtServer::HandleCaptureSnapshot(HandlerContext & ctx,
     auto & requestedResolution = commandData.requestedResolution;
     ImageSnapshot image;
 
+    if (!CheckSnapshotStreamsAvailability(ctx))
+    {
+        return;
+    }
+
+    if (!snapshotStreamID.IsNull())
+    {
+        if (!ValidateSnapshotStreamId(snapshotStreamID, ctx))
+        {
+            return;
+        }
+    }
+
     VerifyOrReturn(commandData.requestedResolution.width >= 1 && commandData.requestedResolution.height >= 1,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+
+    // If SoftLivestreamPrivacyModeEnabled or HardPrivacyModeOn, return
+    // InvalidInState.
+    VerifyOrReturn(!mSoftLivestreamPrivacyModeEnabled && !mHardPrivacyModeOn,
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState));
 
     // Call the delegate
     Status status = mDelegate.CaptureSnapshot(snapshotStreamID, requestedResolution, image);
@@ -2073,6 +2120,31 @@ void CameraAVStreamMgmtServer::HandleCaptureSnapshot(HandlerContext & ctx,
     response.resolution = image.imageRes;
     response.imageCodec = image.imageCodec;
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+}
+
+bool CameraAVStreamMgmtServer::CheckSnapshotStreamsAvailability(HandlerContext & ctx)
+{
+    if (mAllocatedSnapshotStreams.empty())
+    {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: No snapshot streams are allocated", mEndpointId);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+        return false;
+    }
+    return true;
+}
+
+bool CameraAVStreamMgmtServer::ValidateSnapshotStreamId(const DataModel::Nullable<uint16_t> & snapshotStreamID,
+                                                        HandlerContext & ctx)
+{
+    auto found = std::find_if(mAllocatedSnapshotStreams.begin(), mAllocatedSnapshotStreams.end(),
+                              [&](const SnapshotStreamStruct & s) { return s.snapshotStreamID == snapshotStreamID.Value(); });
+    if (found == mAllocatedSnapshotStreams.end())
+    {
+        ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: No snapshot stream exist by id %d", mEndpointId, snapshotStreamID.Value());
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+        return false;
+    }
+    return true;
 }
 
 } // namespace CameraAvStreamManagement
