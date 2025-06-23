@@ -12,33 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("${chip_root}/src/app/common_flags.gni")
 
-config("includes") {
-  include_dirs = [ "${chip_app_zap_dir}" ]
-}
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-source_set("attribute-storage") {
-  sources = [
-    "AttributeStorage.h",
-    "PascalString.h",
-  ]
+chip_test_suite("tests") {
+  output_name = "appStorageTests"
+
+  test_sources = [ "TestPascalString.cpp" ]
+
   public_deps = [
-    "${chip_root}/src/app:paths",
-    "${chip_root}/src/lib/core:error",
-    "${chip_root}/src/lib/support:span",
+    "${chip_root}/src/app/storage:attribute-storage",
+    "${chip_root}/src/lib/core:string-builder-adapters",
+    "${chip_root}/src/lib/support:testing",
   ]
-}
-
-source_set("fabric-table") {
-  sources = [
-    "FabricTableImpl.h",
-    "FabricTableImpl.ipp",
-    "TableEntry.h",
-  ]
-
-  deps = [ "${chip_root}/src/app" ]
-
-  public_configs = [ ":includes" ]
 }
