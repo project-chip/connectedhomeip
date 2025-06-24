@@ -260,7 +260,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
 
             # STEP 5d: Wait for CurrentState.Position to be updated to 0%
             self.step("5d")
-            if initial_state.Position > 0:
+            if initial_state.position > 0:
                 sub_handler.await_all_expected_report_matches(
                     expected_matchers=[current_position_matcher(0)], timeout_sec=timeout)
             else:
@@ -359,7 +359,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
 
             # STEP 7e: If not Resolution != 1: Wait for CurrentState.Position to be updated
             self.step("7e")
-            if (resolution != 1) or (initial_state.Position == min_position):
+            if (resolution != 1) or (initial_state.position == min_position):
                 self.mark_current_step_skipped()
             else:
                 sub_handler.await_all_expected_report_matches(
@@ -367,7 +367,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
 
             # STEP 7f: If not Resolution == 1: Wait for CurrentState.Position to be updated
             self.step("7f")
-            if (resolution == 1) or (initial_state.Position == min_position + resolution):
+            if (resolution == 1) or (initial_state.position == min_position + resolution):
                 self.mark_current_step_skipped()
             else:
                 sub_handler.await_all_expected_report_matches(

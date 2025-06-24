@@ -161,8 +161,8 @@ class TC_CLDIM_3_2(MatterBaseTest):
         # STEP 3d: If manual latching is not required, skip steps 3e to 3f
         self.step("3d")
         if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlMode.kRemoteLatching:
-            self.skip("3e")
-            self.skip("3f")
+            self.skip_step("3e")
+            self.skip_step("3f")
         else:
             # STEP 3e: Send SetTarget command with Latch=True
             self.step("3e")
