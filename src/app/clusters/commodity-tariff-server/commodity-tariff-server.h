@@ -35,6 +35,8 @@
 #include <app/reporting/reporting.h>
 #include <cstdint>
 #include <functional>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "CommodityTariffAttrsDataMgmt.h"
 
@@ -94,6 +96,8 @@ typedef uint32_t epoch_s; ///< Type alias for epoch timestamps in seconds
     X(NextTariffComponents, DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>>)
 
 /** @} */ // end of tariff_attributes
+
+using namespace chip::app::CommodityTariffAttrsDataMgmt;
 
 /**
  * @defgroup attribute_management Attribute Management Classes
@@ -216,7 +220,7 @@ public:
      */
     void TariffDataUpdate()
     {
-        TariffUpdateCtx UpdCtx = { .mFeature = mFeature };
+        TariffUpdateCtx UpdCtx = { .aEndpoint = mEndpointId, .mFeature = mFeature };
 
         if (!TariffDataUpd_Init(UpdCtx))
         {
@@ -350,6 +354,7 @@ public:
         mDelegate.SetEndpointId(aEndpointId);
         mEndpointId = aEndpointId;
         mDelegate.SetTariffUpdCb([this]() { this->TariffDataUpdatedCb(); });
+        mDelegate.SetFeatures(aFeature);
     }
 
     ~Instance() { Shutdown(); }

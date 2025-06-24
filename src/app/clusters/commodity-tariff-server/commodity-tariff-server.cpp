@@ -153,11 +153,6 @@ void Instance::ResetCurrentAttributes()
     }
 }
 
-void Instance::TariffDataUpdatedCb()
-{
-    UpdateCurrentAttrs(UpdateEventCode::TariffUpdating);
-}
-
 static uint32_t GetCurrentTimestamp(void)
 {
     System::Clock::Microseconds64 utcTimeUnix;
@@ -166,6 +161,13 @@ static uint32_t GetCurrentTimestamp(void)
     UnixEpochToChipEpochMicros(utcTimeUnix.count(), chipEpochTime);
 
     return static_cast<uint32_t>(chipEpochTime / chip::kMicrosecondsPerSecond);
+}
+
+void Instance::TariffDataUpdatedCb()
+{
+    mServerTariffAttrsCtx.AlarmTriggerTime = GetCurrentTimestamp();
+
+    UpdateCurrentAttrs(UpdateEventCode::TariffUpdating);
 }
 
 void Instance::ScheduleTariffActivation(uint32_t delay)
@@ -393,7 +395,7 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(CurrentTariffAttrsCtx & aCtx, 
 
         if ((err = mgmtObj.CreateNewValue(tempList.size())) == CHIP_NO_ERROR)
         {
-            std::copy(tempList.begin(), tempList.end(), mgmtObj.GetNewValue()->data());
+            std::copy(tempList.begin(), tempList.end(), mgmtObj.GetNewValue());
             mgmtObj.MarkAsAssigned();
             mgmtObj.UpdateBegin(nullptr, nullptr);
             mgmtObj.UpdateCommit();
@@ -436,6 +438,8 @@ static void AttrsCtxDeinit(CurrentTariffAttrsCtx & aCtx)
 void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
 {
     uint32_t timestampNow = mServerTariffAttrsCtx.AlarmTriggerTime;
+
+    assert(timestampNow);
 
     ChipLogProgress(NotSpecified, "EGW-CTC: UpdateEventCode: %x", aEvt);
 

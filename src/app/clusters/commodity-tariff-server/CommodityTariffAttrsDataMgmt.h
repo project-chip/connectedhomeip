@@ -29,6 +29,133 @@
 namespace chip {
 namespace app {
 
+namespace CommodityTariffAttrsDataMgmt {
+
+static constexpr size_t kDefaultStringValuesMaxBufLength = 128u;
+static constexpr size_t kDefaultListAttrMaxLength        = 128u;
+constexpr uint16_t kMaxCurrencyValue                     = 999; // From spec
+
+static constexpr size_t kTariffInfoMaxLabelLength      = kDefaultStringValuesMaxBufLength;
+static constexpr size_t kTariffInfoMaxProviderLength   = kDefaultStringValuesMaxBufLength;
+static constexpr size_t kTariffComponentMaxLabelLength = kDefaultStringValuesMaxBufLength;
+
+static constexpr size_t kDayEntriesAttrMaxLength       = kDefaultListAttrMaxLength;
+static constexpr size_t kDayPatternsAttrMaxLength      = kDefaultListAttrMaxLength;
+static constexpr size_t kTariffComponentsAttrMaxLength = kDefaultListAttrMaxLength;
+static constexpr size_t kTariffPeriodsAttrMaxLength    = kDefaultListAttrMaxLength;
+
+static constexpr size_t kCalendarPeriodsAttrMaxLength = 4;
+static constexpr size_t kIndividualDaysAttrMaxLength  = 50;
+
+static constexpr size_t kCalendarPeriodItemMaxDayPatternIDs = 7;
+static constexpr size_t kDayStructItemMaxDayEntryIDs        = 96;
+static constexpr size_t kDayPatternItemMaxDayEntryIDs       = kDayStructItemMaxDayEntryIDs;
+static constexpr size_t kTariffPeriodItemMaxIDs             = 20;
+static constexpr uint16_t kDayEntryDurationLimit = 1500;
+
+template <typename T>
+struct SpanCopier
+{
+    static bool Copy(const chip::Span<const T> & source, DataModel::List<const T> & destination,
+                     size_t maxElements = std::numeric_limits<size_t>::max())
+    {
+        if (source.empty())
+        {
+            destination = DataModel::List<const T>();
+            return true;
+        }
+
+        size_t elementsToCopy = std::min(source.size(), maxElements);
+        auto * buffer         = static_cast<T *>(chip::Platform::MemoryCalloc(elementsToCopy, sizeof(T)));
+
+        if (!buffer)
+        {
+            return false;
+        }
+
+        std::copy(source.begin(), source.begin() + elementsToCopy, buffer);
+        destination = DataModel::List<const T>(chip::Span<const T>(buffer, elementsToCopy));
+        return true;
+    }
+};
+
+template <>
+struct SpanCopier<char>
+{
+    static bool Copy(const chip::CharSpan & source, DataModel::Nullable<chip::CharSpan> & destination,
+                     size_t maxLength = std::numeric_limits<size_t>::max())
+    {
+        if (source.size() > maxLength)
+        {
+            return false;
+        }
+
+        if (source.empty())
+        {
+            destination.SetNull();
+            return true;
+        }
+
+        size_t bytesToCopy = std::min(source.size(), maxLength);
+        char * buffer      = static_cast<char *>(chip::Platform::MemoryCalloc(1, bytesToCopy + 1)); // +1 for null terminator
+
+        if (!buffer)
+        {
+            return false;
+        }
+
+        std::copy(source.begin(), source.begin() + bytesToCopy, buffer);
+        buffer[bytesToCopy] = '\0';
+        destination.SetNonNull(chip::CharSpan(buffer, bytesToCopy));
+        return true;
+    }
+};
+
+struct StrToSpan
+{
+    static CHIP_ERROR Copy(const std::string & source, chip::CharSpan & destination,
+                           size_t maxLength = std::numeric_limits<size_t>::max())
+    {
+        // Handle empty string case
+        if (source.empty())
+        {
+            destination = chip::CharSpan();
+            return CHIP_NO_ERROR;
+        }
+
+        // Check length limit
+        if (source.size() > maxLength)
+        {
+            return CHIP_ERROR_INVALID_STRING_LENGTH;
+        }
+
+        // Allocate memory (including null terminator)
+        char * buffer = static_cast<char *>(chip::Platform::MemoryAlloc(source.size() + 1));
+        if (buffer == nullptr)
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
+        // Copy data and null-terminate
+        memcpy(buffer, source.data(), source.size());
+        buffer[source.size()] = '\0';
+
+        // Set output span
+        destination = chip::CharSpan(buffer, source.size());
+        return CHIP_NO_ERROR;
+    }
+
+    // Optional: Memory cleanup helper
+    static void Release(chip::CharSpan & span)
+    {
+        if (!span.empty())
+        {
+            chip::Platform::MemoryFree(const_cast<char *>(span.data()));
+            span = chip::CharSpan();
+        }
+    }
+};
+
 /**
  * @class CTC_BaseDataClass
  * @tparam T The attribute value type (nullable, list, or primitive)
@@ -261,13 +388,7 @@ private:
      */
     CHIP_ERROR ValidateValue()
     {
-        CHIP_ERROR err = Validate(mNewValue);
-        if (err == CHIP_NO_ERROR)
-        {
-            mUpdateState = UpdateState::kValidated;
-        }
-
-        return err;
+        return Validate(mNewValue);
     }
 
     /**
@@ -431,7 +552,7 @@ public:
 
             if constexpr (IsValueNullable())
             {
-                mNewValue.SetNoNull(DataModel::List<PayloadType>(buffer, size));
+                mNewValue.SetNonNull(DataModel::List<PayloadType>(buffer, size));
             }
             else
             {
@@ -439,6 +560,11 @@ public:
             }
         }
         else if constexpr (IsValueNullable())
+        {
+            WrappedType tmp = WrappedType();
+            mNewValue.SetNonNull(tmp);
+        }
+        else
         {
             mNewValue = ValueType();
         }
@@ -448,22 +574,44 @@ public:
     }
 
     /**
-     * @brief Accesses the pending new value for modification
-     * @return Pointer to modifiable value if available
+     * @brief Accesses the pending new value's payload for modification
+     * @return Pointer to modifiable payload value if available
      * @retval nullptr if:
      *         - Not in kInitiated state
+     *         - Value is null (for nullable types)
+     *         - List is empty (for list types)
      *
      * @pre Must be in kInitiated state (after CreateNewValue())
      * @warning Pointer becomes invalid after UpdateCommit()/UpdateEnd()
-     * @see MarkAsAssigned()
+     * 
+     * Returns the appropriate payload pointer based on value type:
+     * - For Nullable<Int/Struct>: returns pointer to the value (mNewValue.Value())
+     * - For Nullable<List<X>>: returns pointer to list data (mNewValue.Value().data())
+     * - For List<X>: returns pointer to list data (mNewValue.data())
+     * - For primitive types: returns pointer to the value itself (&mNewValue)
      */
-    ValueType * GetNewValue()
+    auto GetNewValue() -> ExtractPayloadType_t<ValueType>*
     {
-        if (mUpdateState != UpdateState::kInitiated)
-        {
+        if (mUpdateState < UpdateState::kInitiated) {
             return nullptr;
+        }   
+
+        if constexpr (IsValueNullable()) {
+            if (mNewValue.IsNull()) {
+                return nullptr;
+            }
+            if constexpr (IsList<WrappedType>::value) {
+                return mNewValue.Value().data();
+            } else {
+                return &mNewValue.Value();
+            }
+        } 
+        else if constexpr (IsValueList()) {
+            return mNewValue.data();
+        } 
+        else {
+            return &mNewValue;
         }
-        return &mNewValue;
     }
 
     /**
@@ -692,108 +840,6 @@ protected:
     virtual void CleanupStructValue(PayloadType & aValue) { (void) aValue; }
 };
 
-template <typename T>
-struct SpanCopier
-{
-    static bool Copy(const chip::Span<const T> & source, DataModel::List<const T> & destination,
-                     size_t maxElements = std::numeric_limits<size_t>::max())
-    {
-        if (source.empty())
-        {
-            destination = DataModel::List<const T>();
-            return true;
-        }
-
-        size_t elementsToCopy = std::min(source.size(), maxElements);
-        auto * buffer         = static_cast<T *>(chip::Platform::MemoryCalloc(elementsToCopy, sizeof(T)));
-
-        if (!buffer)
-        {
-            return false;
-        }
-
-        std::copy(source.begin(), source.begin() + elementsToCopy, buffer);
-        destination = DataModel::List<const T>(chip::Span<const T>(buffer, elementsToCopy));
-        return true;
-    }
-};
-
-template <>
-struct SpanCopier<char>
-{
-    static bool Copy(const chip::CharSpan & source, DataModel::Nullable<chip::CharSpan> & destination,
-                     size_t maxLength = std::numeric_limits<size_t>::max())
-    {
-        if (source.size() > maxLength)
-        {
-            return false;
-        }
-
-        if (source.empty())
-        {
-            destination.SetNull();
-            return true;
-        }
-
-        size_t bytesToCopy = std::min(source.size(), maxLength);
-        char * buffer      = static_cast<char *>(chip::Platform::MemoryCalloc(1, bytesToCopy + 1)); // +1 for null terminator
-
-        if (!buffer)
-        {
-            return false;
-        }
-
-        std::copy(source.begin(), source.begin() + bytesToCopy, buffer);
-        buffer[bytesToCopy] = '\0';
-        destination.SetNonNull(chip::CharSpan(buffer, bytesToCopy));
-        return true;
-    }
-};
-
-struct StrToSpan
-{
-    static CHIP_ERROR Copy(const std::string & source, chip::CharSpan & destination,
-                           size_t maxLength = std::numeric_limits<size_t>::max())
-    {
-        // Handle empty string case
-        if (source.empty())
-        {
-            destination = chip::CharSpan();
-            return CHIP_NO_ERROR;
-        }
-
-        // Check length limit
-        if (source.size() > maxLength)
-        {
-            return CHIP_ERROR_INVALID_STRING_LENGTH;
-        }
-
-        // Allocate memory (including null terminator)
-        char * buffer = static_cast<char *>(chip::Platform::MemoryAlloc(source.size() + 1));
-        if (buffer == nullptr)
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-
-        // Copy data and null-terminate
-        memcpy(buffer, source.data(), source.size());
-        buffer[source.size()] = '\0';
-
-        // Set output span
-        destination = chip::CharSpan(buffer, source.size());
-        return CHIP_NO_ERROR;
-    }
-
-    // Optional: Memory cleanup helper
-    static void Release(chip::CharSpan & span)
-    {
-        if (!span.empty())
-        {
-            chip::Platform::MemoryFree(const_cast<char *>(span.data()));
-            span = chip::CharSpan();
-        }
-    }
-};
-
+} // namespace CommodityTariffAttrsDataMgmt
 } // namespace app
 } // namespace chip
