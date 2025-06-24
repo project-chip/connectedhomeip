@@ -629,7 +629,7 @@ void ChipLinuxAppMainLoop(AppMainLoopImplementation * impl)
     static chip::PersistentStorageOpKeystorese05x se05xInstance;
     static chip::CommonCaseDeviceServerInitParams initParams;
     VerifyOrDie(initParams.InitializeStaticResourcesBeforeServerInit() == CHIP_NO_ERROR);
-    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+    initParams.dataModelProvider   = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.operationalKeystore = &se05xInstance;
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED

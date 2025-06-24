@@ -15,27 +15,31 @@
  *    limitations under the License.
  */
 
-#include <lib/support/DefaultStorageKeyAllocator.h>
 #include "PersistentStorageOperationalKeystore_se05x.h"
 #include "CHIPCryptoPALHsm_se05x_utils.h"
+#include <lib/support/DefaultStorageKeyAllocator.h>
 
 namespace chip {
 
 using namespace chip::Crypto;
 
-#define CHIP_SE05x_NODE_OP_KEY_INDEX            0x7E000000
-#define CHIP_SE05x_NODE_OP_REF_KEY_TEMPLATE     {0xA5, 0xA6, 0xB5, 0xB6, 0xA5, 0xA6, 0xB5, 0xB6, 0x7E, 0x00, 0x00, 0x00}
-#define CHIP_SE05x_NODE_OP_KEY_ID_INDEX         11
-
+#define CHIP_SE05x_NODE_OP_KEY_INDEX 0x7D000010
+#define CHIP_SE05x_NODE_OP_REF_KEY_TEMPLATE                                                                                        \
+    {                                                                                                                              \
+        0xA5, 0xA6, 0xB5, 0xB6, 0xA5, 0xA6, 0xB5, 0xB6, 0xEF, 0x00, 0x00, 0x00                                                     \
+    }
+#define CHIP_SE05x_NODE_OP_KEY_ID_INDEX 11
 
 CHIP_ERROR PersistentStorageOpKeystorese05x::NewOpKeypairForFabric(FabricIndex fabricIndex,
                                                                   MutableByteSpan & outCertificateSigningRequest)
 {
     P256SerializedKeypair serializedKeypair;
     uint8_t privatekey[32] = CHIP_SE05x_NODE_OP_REF_KEY_TEMPLATE;
-    uint8_t publickey[65]  = {0x00, };
-    size_t privatekey_len  = sizeof(privatekey);
-    size_t pubkey_len      = sizeof(publickey);
+    uint8_t publickey[65]  = {
+        0x00,
+    };
+    size_t privatekey_len = sizeof(privatekey);
+    size_t pubkey_len     = sizeof(publickey);
 
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
@@ -63,7 +67,9 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::NewOpKeypairForFabric(FabricIndex f
     // This is required to ensure we pass the key id (mapping to fabric id) to CHIPCryptoPALHsm_se05x_p256.cpp NIST256 class.
     ReturnErrorOnFailure(mPendingKeypair->Deserialize(serializedKeypair));
 
-    ChipLogDetail(Crypto, "PersistentStorageOpKeystorese05x::NewOpKeypairForFabric ::Create NIST256 key in SE05x (at id = 0x%" PRIx32 ")", static_cast<uint32_t>(fabricIndex + CHIP_SE05x_NODE_OP_KEY_INDEX));
+    ChipLogDetail(Crypto,
+                  "PersistentStorageOpKeystorese05x::NewOpKeypairForFabric ::Create NIST256 key in SE05x (at id = 0x%" PRIx32 ")",
+                  static_cast<uint32_t>(fabricIndex + CHIP_SE05x_NODE_OP_KEY_INDEX));
     mPendingKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA);
     size_t csrLength = outCertificateSigningRequest.size();
     CHIP_ERROR err   = mPendingKeypair->NewCertificateSigningRequest(outCertificateSigningRequest.data(), csrLength);
@@ -84,13 +90,14 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::RemoveOpKeypairForFabric(FabricInde
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
 
-    //remove key from secure element
     uint32_t keyId = CHIP_SE05x_NODE_OP_KEY_INDEX + fabricIndex;
 
-    ChipLogDetail(Crypto, "PersistentStorageOpKeystorese05x::RemoveOpKeypairForFabric ::Delete NIST256 key in SE05x (at id = 0x%" PRIx32 ")", keyId);
+    ChipLogDetail(
+        Crypto, "PersistentStorageOpKeystorese05x::RemoveOpKeypairForFabric ::Delete NIST256 key in SE05x (at id = 0x%" PRIx32 ")",
+        keyId);
     Se05x_API_DeleteSecureObject(&((sss_se05x_session_t *) &gex_sss_chip_ctx.session)->s_ctx, keyId);
 
-    // Remove pending state if matching
+    // remove key from secure element
     if ((mPendingKeypair != nullptr) && (fabricIndex == mPendingFabricIndex))
     {
         RevertPendingKeypair();

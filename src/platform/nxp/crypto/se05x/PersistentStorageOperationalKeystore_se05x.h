@@ -33,9 +33,9 @@ namespace chip {
  */
 class PersistentStorageOpKeystorese05x : public chip::PersistentStorageOperationalKeystore
 {
-    public:
-        CHIP_ERROR NewOpKeypairForFabric(FabricIndex fabricIndex, MutableByteSpan & outCertificateSigningRequest) override;
-        CHIP_ERROR RemoveOpKeypairForFabric(FabricIndex fabricIndex) override;
+public:
+    CHIP_ERROR NewOpKeypairForFabric(FabricIndex fabricIndex, MutableByteSpan & outCertificateSigningRequest) override;
+    CHIP_ERROR RemoveOpKeypairForFabric(FabricIndex fabricIndex) override;
 };
 
 } // namespace chip

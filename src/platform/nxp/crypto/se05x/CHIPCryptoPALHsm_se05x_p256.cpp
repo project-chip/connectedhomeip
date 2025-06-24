@@ -60,7 +60,7 @@ namespace Crypto {
 
 // Uncomment the below macro to generate NIST-256 key on host,
 // in case there is a error in generating on secure element.
-//#define ENABLE_GENERATE_EC_KEY_HOST_ON_FAILURE
+// #define ENABLE_GENERATE_EC_KEY_HOST_ON_FAILURE
 
 extern CHIP_ERROR Initialize_H(P256Keypair * pk, P256PublicKey * mPublicKey, P256KeypairContext * mKeypair);
 extern CHIP_ERROR ECDSA_sign_msg_H(P256KeypairContext * mKeypair, const uint8_t * msg, const size_t msg_length,
@@ -135,9 +135,9 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     else
     {
         keyid += (mKeypair.mBytes[CRYPTO_KEYPAIR_KEYID_OFFSET] << (8 * 3) & 0xFF000000) |
-        (mKeypair.mBytes[CRYPTO_KEYPAIR_KEYID_OFFSET + 1] << (8 * 2) & 0x00FF0000) |
-        (mKeypair.mBytes[CRYPTO_KEYPAIR_KEYID_OFFSET + 2] << (8 * 1) & 0x0000FF00) |
-        (mKeypair.mBytes[CRYPTO_KEYPAIR_KEYID_OFFSET + 3] << (8 * 0) & 0x000000FF);
+            (mKeypair.mBytes[CRYPTO_KEYPAIR_KEYID_OFFSET + 1] << (8 * 2) & 0x00FF0000) |
+            (mKeypair.mBytes[CRYPTO_KEYPAIR_KEYID_OFFSET + 2] << (8 * 1) & 0x0000FF00) |
+            (mKeypair.mBytes[CRYPTO_KEYPAIR_KEYID_OFFSET + 3] << (8 * 0) & 0x000000FF);
         options = kKeyObject_Mode_Persistent;
     }
 
@@ -163,7 +163,8 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
     status = sss_key_store_generate_key(&gex_sss_chip_ctx.ks, &keyObject, 256, 0);
-    if (status != kStatus_SSS_Success) {
+    if (status != kStatus_SSS_Success)
+    {
 #ifdef ENABLE_GENERATE_EC_KEY_HOST_ON_FAILURE
         ChipLogDetail(Crypto, "se05x::Generating nist256 key on se05x failed. Generating key on host");
         CHIP_ERROR error = Initialize_H(this, &mPublicKey, &mKeypair);
