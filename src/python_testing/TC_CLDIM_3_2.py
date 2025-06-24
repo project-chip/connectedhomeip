@@ -111,6 +111,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
 
         is_positioning_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
         is_latching_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
+        is_limitation_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kLimitation
 
         # STEP 2b: If MotionLatching Feature is not supported, skip remaining steps
         self.step("2b")
@@ -121,7 +122,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
 
         # STEP 2c: Read LimitRange attribute if supported
         self.step("2c")
-        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.LimitRange):
+        if is_limitation_supported:
             limit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LimitRange)
             max_position = limit_range.max
 
@@ -177,10 +178,8 @@ class TC_CLDIM_3_2(MatterBaseTest):
 
             # STEP 3f: Verify TargetState attribute is updated
             self.step("3f")
-            if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TargetState):
-                target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
-
-                asserts.assert_equal(target_state.latch, True, "TargetState Latch is not True")
+            target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+            asserts.assert_equal(target_state.latch, True, "TargetState Latch is not True")
 
         # STEP 3g: Wait for CurrentState.Latch to be updated to True
         self.step("3g")
@@ -240,10 +239,8 @@ class TC_CLDIM_3_2(MatterBaseTest):
 
             # STEP 5d: Verify TargetState attribute is updated
             self.step("5d")
-            if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TargetState):
-                target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
-
-                asserts.assert_equal(target_state.latch, False, "TargetState Latch is not False")
+            target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+            asserts.assert_equal(target_state.latch, False, "TargetState Latch is not False")
 
         # STEP 5e: Wait for CurrentState.Latch to be updated to False
         self.step("5e")

@@ -135,6 +135,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         feature_map = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
 
         is_positioning_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
+        is_limitation_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kLimitation
         is_speed_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
 
         # STEP 2b: If Positioning Feature is not supported, skip remaining steps
@@ -146,7 +147,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
 
         # STEP 2c: Read LimitRange attribute if supported
         self.step("2c")
-        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.LimitRange):
+        if is_limitation_supported:
             limit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LimitRange)
             min_position = limit_range.min
             max_position = limit_range.max
@@ -181,10 +182,8 @@ class TC_CLDIM_3_1(MatterBaseTest):
 
             # STEP 3c: Verify TargetState attribute is updated
             self.step("3c")
-            if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TargetState):
-                target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
-
-                asserts.assert_equal(target_state.position, max_position, "TargetState Position does not match MaxPosition")
+            target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+            asserts.assert_equal(target_state.position, max_position, "TargetState Position does not match MaxPosition")
 
             # STEP 3d: Wait for CurrentState.Position to be updated to MaxPosition
             self.step("3d")
@@ -213,11 +212,9 @@ class TC_CLDIM_3_1(MatterBaseTest):
 
             # STEP 4c: Verify TargetState attribute is updated
             self.step("4c")
-            if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TargetState):
-                target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
-
-                asserts.assert_equal(target_state.speed, Globals.Enums.ThreeLevelAutoEnum.kMedium,
-                                     "TargetState Speed does not match Medium")
+            target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+            asserts.assert_equal(target_state.speed, Globals.Enums.ThreeLevelAutoEnum.kMedium,
+                                 "TargetState Speed does not match Medium")
 
             # STEP 4d: Wait for CurrentState.Speed to be updated to Medium
             self.step("4d")
@@ -237,10 +234,8 @@ class TC_CLDIM_3_1(MatterBaseTest):
 
         # STEP 5b: Verify TargetState attribute is updated
         self.step("5b")
-        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TargetState):
-            target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
-
-            asserts.assert_equal(target_state.position, min_position, "TargetState Position does not match MinPosition")
+        target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+        asserts.assert_equal(target_state.position, min_position, "TargetState Position does not match MinPosition")
 
         # STEP 5c: Wait for CurrentState.Position to be updated to MinPosition
         self.step("5c")
@@ -269,13 +264,10 @@ class TC_CLDIM_3_1(MatterBaseTest):
 
             # STEP 6c: Verify TargetState attribute is updated
             self.step("6c")
-            if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TargetState):
-                target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
-
-                asserts.assert_equal(target_state.position, max_position, "TargetState Position does not match MaxPosition")
-
-                asserts.assert_equal(target_state.speed, Globals.Enums.ThreeLevelAutoEnum.kHigh,
-                                     "TargetState Speed does not match High")
+            target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+            asserts.assert_equal(target_state.position, max_position, "TargetState Position does not match MaxPosition")
+            asserts.assert_equal(target_state.speed, Globals.Enums.ThreeLevelAutoEnum.kHigh,
+                                 "TargetState Speed does not match High")
 
             # STEP 6d: Wait for CurrentState.Position to be updated to MaxPosition and CurrentState.Speed to High
             self.step("6d")

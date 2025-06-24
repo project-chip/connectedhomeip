@@ -128,32 +128,29 @@ class TC_CLDIM_3_3(MatterBaseTest):
 
         is_positioning_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
         is_latching_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
+        is_limitation_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kLimitation
         is_speed_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
 
-        # STEP 2b: Read AttributeList attribute
+        # STEP 2b: Read LimitRange attribute if supported
         self.step("2b")
-        attribute_list = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
-
-        # STEP 2c: Read LimitRange attribute if supported
-        self.step("2c")
-        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.LimitRange):
+        if is_limitation_supported:
             limit_range = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LimitRange)
             min_position = limit_range.min
             max_position = limit_range.max
 
-        # STEP 2d: Read Resolution attribute if supported
-        self.step("2d")
+        # STEP 2c: Read Resolution attribute if supported
+        self.step("2c")
         resolution = 1  # Default resolution
-        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.Resolution):
+        if is_positioning_supported:
             resolution = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Resolution)
 
-        # STEP 2e: Establish wildcard subscription to all attributes"
-        self.step("2e")
+        # STEP 2d: Establish wildcard subscription to all attributes"
+        self.step("2d")
         sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureDimension)
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
 
-        # STEP 2f: Read CurrentState attribute
-        self.step("2f")
+        # STEP 2e: Read CurrentState attribute
+        self.step("2e")
         initial_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
         # STEP 3: Send SetTarget command with no fields
@@ -232,7 +229,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
 
         # STEP 5a: If LimitRange is unsupported, skip step 5b to 5g
         self.step("5a")
-        if (not is_positioning_supported) or (attributes.LimitRange.attribute_id not in attribute_list):
+        if (not is_positioning_supported) or (not is_limitation_supported):
             logging.info("Positioning Feature or LimitRange attribute is not supported. Skipping steps 5b to 5g.")
             self.skip_step("5b")
             self.skip_step("5c")
@@ -254,9 +251,8 @@ class TC_CLDIM_3_3(MatterBaseTest):
 
             # STEP 5c: Verify TargetState attribute is updated
             self.step("5c")
-            if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TargetState):
-                target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
-                asserts.assert_equal(target_state.position, min_position, "TargetState Position does not match MinPosition")
+            target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+            asserts.assert_equal(target_state.position, min_position, "TargetState Position does not match MinPosition")
 
             # STEP 5d: Wait for CurrentState.Position to be updated to 0%
             self.step("5d")
@@ -285,9 +281,8 @@ class TC_CLDIM_3_3(MatterBaseTest):
             # STEP 5f: Verify TargetState attribute is updated
             self.step("5f")
             if max_position < 10000:
-                if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TargetState):
-                    target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
-                    asserts.assert_equal(target_state.position, max_position, "TargetState Position does not match MaxPosition")
+                target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+                asserts.assert_equal(target_state.position, max_position, "TargetState Position does not match MaxPosition")
             else:
                 logging.info("MaxPosition not < 10000. Skipping step 5f.")
                 self.mark_current_step_skipped()
@@ -319,7 +314,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
 
         # STEP 7a: If Resolution is unsupported, skip step 7b to 7j
         self.step("7a")
-        if (not is_positioning_supported) or (attributes.Resolution.attribute_id not in attribute_list):
+        if (not is_positioning_supported):
             logging.info("Resolution attribute is not supported. Skipping steps 7b to 7j.")
             self.skip_step("7b")
             self.skip_step("7c")
@@ -348,14 +343,13 @@ class TC_CLDIM_3_3(MatterBaseTest):
 
             # STEP 7d: Verify TargetState attribute is updated
             self.step("7d")
-            if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TargetState):
-                target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+            target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
 
-                if resolution == 1:
-                    asserts.assert_equal(target_state.position, min_position, "TargetState Position does not match expected value")
-                else:
-                    asserts.assert_equal(target_state.position, min_position + resolution,
-                                         "TargetState Position does not match expected value")
+            if resolution == 1:
+                asserts.assert_equal(target_state.position, min_position, "TargetState Position does not match expected value")
+            else:
+                asserts.assert_equal(target_state.position, min_position + resolution,
+                                     "TargetState Position does not match expected value")
 
             # STEP 7e: If not Resolution != 1: Wait for CurrentState.Position to be updated
             self.step("7e")
@@ -386,14 +380,13 @@ class TC_CLDIM_3_3(MatterBaseTest):
 
             # STEP 7h: Verify TargetState attribute is updated
             self.step("7h")
-            if await self.attribute_guard(endpoint=endpoint, attribute=attributes.TargetState):
-                target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+            target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
 
-                if resolution <= 2:
-                    asserts.assert_equal(target_state.position, max_position, "TargetState Position does not match expected value")
-                else:
-                    asserts.assert_equal(target_state.position, max_position - resolution,
-                                         "TargetState Position does not match expected value")
+            if resolution <= 2:
+                asserts.assert_equal(target_state.position, max_position, "TargetState Position does not match expected value")
+            else:
+                asserts.assert_equal(target_state.position, max_position - resolution,
+                                     "TargetState Position does not match expected value")
 
             # STEP 7i: If not Resolution > 2: Wait for CurrentState.Position to be updated
             self.step("7i")
