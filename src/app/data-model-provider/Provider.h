@@ -64,7 +64,7 @@ public:
     ///       from ProviderMetadataTree (in particular IM Reads of these
     ///       attributes will the automatically filled from metadata).
     ///
-    /// When this is onvoked, caller is epxected to have already done some validations:
+    /// When this is invoked, caller is epxected to have already done some validations:
     ///    - `request.path` is a valid path inside the ProviderMetadataTree (an AttributeEntry exists)
     ///    - Attribute is readable according the the ProviderMetadataTree (AttributeEntry)
     ///
