@@ -570,7 +570,8 @@ class ClusterAttributeChangeAccumulator:
                 # Track arrival of expected attribute
                 if item.endpoint_id == endpoint and item.attribute == attribute:
                     elapsed = time.time() - start_time
-                    logging.info(f"[FC] Got attribute {attribute.__name__}, value {item.value} on endpoint {item.endpoint_id}. Elapsed {elapsed} sec.")
+                    logging.info(
+                        f"[FC] Got attribute {attribute.__name__}, value {item.value} on endpoint {item.endpoint_id}. Elapsed {elapsed} sec.")
                     return item.value
 
             except queue.Empty:

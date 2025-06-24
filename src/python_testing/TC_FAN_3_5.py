@@ -37,14 +37,11 @@
 
 import logging
 import operator
-import queue
-import time
 from typing import Any, Callable, Optional
 
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import AttributeValue
 from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
                                          has_feature, run_if_endpoint_matches)
 
@@ -432,17 +429,17 @@ class TC_FAN_3_5(MatterBaseTest):
         cmd = cluster.Commands
         sd_enum = cluster.Enums.StepDirectionEnum
         percent_setting_zero = 0
-        
+
         # Set PercentSetting to 0
         await self.write_setting(attr.PercentSetting, percent_setting_zero)
-        
+
         # Subscribe to PercentSetting attribute
         percent_setting_sub = ClusterAttributeChangeAccumulator(cluster, attr.PercentSetting)
         await percent_setting_sub.start(self.default_controller, self.dut_node_id, self.endpoint)
 
         # Send Step command with direction=Increase 
         await self.send_step_command(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True))
-        
+
         # Get the resulting PercentSetting attribute report value from the queue
         percent_setting = percent_setting_sub.get_attribute_value_from_queue(endpoint=self.endpoint)
 
@@ -509,7 +506,7 @@ class TC_FAN_3_5(MatterBaseTest):
                     asserts.fail(
                         f"[FC] The expected PercentSetting attribute value ({percent_setting_expected}) was never reached, the last reported value is ({percent_setting})."
                     )
-                    
+
             logging.info(f"[FC] percent_setting_from_queue: {self.percent_setting_from_queue}")
 
     async def lowest_off_test(self, step: Clusters.FanControl.Commands.Step, handle_current_values: bool) -> None:
@@ -706,7 +703,6 @@ class TC_FAN_3_5(MatterBaseTest):
         else:
             # If the number of PercentCurrent reports is greater or equal than the number of SpeedCurrent reports,
             # - Verify that all the expected PercentCurrent values are present in the reports
-            logging.info(f"[FC] CRASH percent_setting_report_qty: {percent_setting_report_qty}, percent_current_report_qty: {percent_current_report_qty}")
             if percent_setting_report_qty == percent_current_report_qty:
                 asserts.assert_equal(
                     percent_current_expected, percent_current_values_produced,
