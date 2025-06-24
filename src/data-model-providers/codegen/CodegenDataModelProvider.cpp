@@ -347,7 +347,8 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
     return CHIP_NO_ERROR;
 }
 
-std::optional<DataModel::AttributeEntry> CodegenDataModelProvider::FindAttributeEntry(ServerClusterInterface *cluster, const ConcreteAttributePath &path)
+std::optional<DataModel::AttributeEntry> CodegenDataModelProvider::FindAttributeEntry(ServerClusterInterface * cluster,
+                                                                                      const ConcreteAttributePath & path)
 {
     ReadOnlyBufferBuilder<DataModel::AttributeEntry> builder;
 
@@ -362,7 +363,6 @@ std::optional<DataModel::AttributeEntry> CodegenDataModelProvider::FindAttribute
     }
 
     return std::nullopt;
-
 }
 
 CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path,

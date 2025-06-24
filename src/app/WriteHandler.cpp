@@ -829,7 +829,8 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kTimed),
                         Status::NeedsTimedInteraction);
 
-    if (aPath.mDataVersion.HasValue()) {
+    if (aPath.mDataVersion.HasValue())
+    {
         DataModel::ServerClusterFinder clusterFinder(mDataModelProvider);
         std::optional<DataModel::ServerClusterEntry> cluster_entry = clusterFinder.Find(aPath);
 
