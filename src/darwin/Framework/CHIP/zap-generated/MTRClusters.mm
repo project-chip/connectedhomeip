@@ -16398,6 +16398,9 @@ using chip::System::Clock::Timeout;
     };
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
 
     using RequestType = ThreadBorderRouterManagement::Commands::SetActiveDatasetRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID
@@ -16425,6 +16428,9 @@ using chip::System::Clock::Timeout;
     };
 
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+    if (timedInvokeTimeoutMs == nil) {
+        timedInvokeTimeoutMs = @(MTR_DEFAULT_TIMED_INTERACTION_TIMEOUT_MS);
+    }
 
     using RequestType = ThreadBorderRouterManagement::Commands::SetPendingDatasetRequest::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID
