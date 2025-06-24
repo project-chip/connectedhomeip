@@ -75,7 +75,7 @@ source_set("libopenthread-ti") {
     public_deps += [ "..:libopenthread-platform" ]
     sources += [ "${openthread_root}/examples/apps/cli/cli_uart.cpp" ]
   }
-  
+
   public_configs = [
     ":openthread_ti_config",
     "${openthread_root}:openthread_config",

@@ -39,11 +39,13 @@ ti_sysconfig("sysconfig") {
     sources =
         [ "${chip_root}/examples/platform/ti/sysconfig/chip_cc2674p10.syscfg" ]
   } else if (ti_simplelink_board == "LP_EM_CC1354P10_6") {
-    sources = 
-      [ "${chip_root}/examples/platform/ti/sysconfig/chip_cc1354p10_6.syscfg" ]
+    sources = [
+      "${chip_root}/examples/platform/ti/sysconfig/chip_cc1354p10_6.syscfg",
+    ]
   } else if (ti_simplelink_board == "LP_EM_CC1354P10_1") {
-    sources = 
-      [ "${chip_root}/examples/platform/ti/sysconfig/chip_cc1354p10_1.syscfg" ]
+    sources = [
+      "${chip_root}/examples/platform/ti/sysconfig/chip_cc1354p10_1.syscfg",
+    ]
   } else if (ti_simplelink_board == "CC2674R10") {
     sources =
         [ "${chip_root}/examples/platform/ti/sysconfig/chip_cc2674r10.syscfg" ]
@@ -123,7 +125,6 @@ ti_simplelink_executable("lighting_app") {
       "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1",
     ]
   }
-
 
   include_dirs = [
     "${project_dir}",

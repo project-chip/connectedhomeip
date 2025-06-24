@@ -81,4 +81,3 @@ freertos_root = "//third_party/connectedhomeip/third_party/ti_simplelink_sdk/rep
 
 openthread_root =
     "//third_party/connectedhomeip/third_party/openthread/ot-ti/openthread"
-
