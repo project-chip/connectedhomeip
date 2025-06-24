@@ -33,7 +33,8 @@ public final class AndroidChipPlatform {
     // Order is important here: initChipStack() initializes the BLEManagerImpl, which depends on the
     // BLEManager being set.
     setBLEManager(ble);
-    // Order is important here: initChipStack() initializes the NFCCommissioningManagerImpl, which depends on the
+    // Order is important here: initChipStack() initializes the NFCCommissioningManagerImpl, which
+    // depends on the
     // NFCCommissioningManager being set.
     setNFCCommissioningManager(nfc);
     setKeyValueStoreManager(kvm);
