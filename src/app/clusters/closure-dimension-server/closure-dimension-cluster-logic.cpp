@@ -83,7 +83,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
             if (!incomingCurrentState.Value().position.Value().IsNull())
             {
                 VerifyOrReturnError(incomingCurrentState.Value().position.Value().Value() <= kPercents100thsMaxValue,
-                                CHIP_ERROR_INVALID_ARGUMENT);
+                                    CHIP_ERROR_INVALID_ARGUMENT);
             }
         }
 
@@ -400,7 +400,6 @@ CHIP_ERROR ClusterLogic::SetLatchControlModes(const BitFlags<LatchControlModesBi
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
 
     VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
 
     // If the latchControlModes is not empty, we need to set it to the new value.
     if (mState.latchControlModes != latchControlModes)
