@@ -205,6 +205,8 @@ private:
 };
 template <class T>
 Span(T * data, size_t size) -> Span<T>;
+template <class T, size_t N>
+Span(T (&databuf)[N]) -> Span<T>;
 
 inline namespace literals {
 
