@@ -295,7 +295,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         wait_for_dut_event_subscription_s = 5
         # This will throw exception if timeout is exceeded.
         await self.default_controller.WaitForActive(self.icd_nodeid, timeoutSeconds=wait_for_icd_checkin_timeout_s, stayActiveDurationMs=5000)
-        promised_active_duration_event = await cb.wait_for_event_report(event, wait_for_dut_event_subscription_s)
+        promised_active_duration_event = cb.wait_for_event_report(event, wait_for_dut_event_subscription_s)
         logging.info(f"PromisedActiveDurationEvent: {promised_active_duration_event}")
         promised_active_duration_ms = promised_active_duration_event.Data.promisedActiveDuration
 
@@ -310,7 +310,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self.step("8")
         # This will throw exception if timeout is exceeded.
         await self.default_controller.WaitForActive(self.icd_nodeid, timeoutSeconds=wait_for_icd_checkin_timeout_s, stayActiveDurationMs=5000)
-        promised_active_duration_event = await cb.wait_for_event_report(event, wait_for_dut_event_subscription_s)
+        promised_active_duration_event = cb.wait_for_event_report(event, wait_for_dut_event_subscription_s)
         logging.info(f"PromisedActiveDurationEvent: {promised_active_duration_event}")
         promised_active_duration_ms = promised_active_duration_event.Data.promisedActiveDuration
         asserts.assert_greater_equal(promised_active_duration_ms, stay_active_duration_ms,
