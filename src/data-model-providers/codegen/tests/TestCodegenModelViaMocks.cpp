@@ -2703,7 +2703,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesWrite)
     }
 }
 
-TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesWrite)
+TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRead)
 {
     TestServerClusterContext testContext;
 
