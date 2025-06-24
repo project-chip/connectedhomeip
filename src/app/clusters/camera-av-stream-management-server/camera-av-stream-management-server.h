@@ -427,7 +427,7 @@ public:
                              const AudioCapabilitiesStruct & aSpkrCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
                              const std::vector<SnapshotCapabilitiesStruct> & aSnapshotCapabilities, uint32_t aMaxNetworkBandwidth,
                              const std::vector<Globals::StreamUsageEnum> & aSupportedStreamUsages,
-                             const std::set<Globals::StreamUsageEnum> & aStreamUsagePriorities);
+                             const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities);
 
     ~CameraAVStreamMgmtServer() override;
 
@@ -537,7 +537,7 @@ public:
 
     const std::vector<SnapshotStreamStruct> & GetAllocatedSnapshotStreams() const { return mAllocatedSnapshotStreams; }
 
-    const std::set<Globals::StreamUsageEnum> & GetStreamUsagePriorities() const { return mStreamUsagePriorities; }
+    const std::vector<Globals::StreamUsageEnum> & GetStreamUsagePriorities() const { return mStreamUsagePriorities; }
 
     bool GetSoftRecordingPrivacyModeEnabled() const { return mSoftRecordingPrivacyModeEnabled; }
 
@@ -587,7 +587,7 @@ public:
 
     // Add/Remove Management functions for streams
 
-    CHIP_ERROR SetStreamUsagePriorities(const std::set<Globals::StreamUsageEnum> & newPriorities);
+    CHIP_ERROR SetStreamUsagePriorities(const std::vector<Globals::StreamUsageEnum> & newPriorities);
 
     CHIP_ERROR AddVideoStream(const VideoStreamStruct & videoStream);
 
@@ -656,7 +656,7 @@ private:
     // Managed lists
     std::vector<Globals::StreamUsageEnum> mSupportedStreamUsages;
 
-    std::set<Globals::StreamUsageEnum> mStreamUsagePriorities;
+    std::vector<Globals::StreamUsageEnum> mStreamUsagePriorities;
     std::vector<VideoStreamStruct> mAllocatedVideoStreams;
     std::vector<AudioStreamStruct> mAllocatedAudioStreams;
     std::vector<SnapshotStreamStruct> mAllocatedSnapshotStreams;
@@ -719,6 +719,8 @@ private:
     void ModifyVideoStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled, const Optional<bool> osdEnabled);
 
     void ModifySnapshotStream(const uint16_t streamID, const Optional<bool> waterMarkEnabled, const Optional<bool> osdEnabled);
+
+    bool StreamPrioritiesHasDuplicates(const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities);
 
     /**
      * @brief Inherited from CommandHandlerInterface

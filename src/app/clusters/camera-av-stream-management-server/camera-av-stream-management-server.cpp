@@ -54,7 +54,7 @@ CameraAVStreamMgmtServer::CameraAVStreamMgmtServer(
     const AudioCapabilitiesStruct & aSpeakerCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
     const std::vector<Structs::SnapshotCapabilitiesStruct::Type> & aSnapshotCapabilities, uint32_t aMaxNetworkBandwidth,
     const std::vector<Globals::StreamUsageEnum> & aSupportedStreamUsages,
-    const std::set<Globals::StreamUsageEnum> & aStreamUsagePriorities) :
+    const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities) :
     CommandHandlerInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id),
     AttributeAccessInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id), mDelegate(aDelegate),
     mEndpointId(aEndpointId), mFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs), mMaxConcurrentEncoders(aMaxConcurrentEncoders),
@@ -257,7 +257,7 @@ CameraAVStreamMgmtServer::ReadAndEncodeStreamUsagePriorities(const AttributeValu
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAVStreamMgmtServer::SetStreamUsagePriorities(const std::set<Globals::StreamUsageEnum> & newPriorities)
+CHIP_ERROR CameraAVStreamMgmtServer::SetStreamUsagePriorities(const std::vector<Globals::StreamUsageEnum> & newPriorities)
 {
     mStreamUsagePriorities = newPriorities;
     ReturnErrorOnFailure(StoreStreamUsagePriorities());
@@ -1463,9 +1463,9 @@ CHIP_ERROR CameraAVStreamMgmtServer::StoreStreamUsagePriorities()
     TLV::TLVType arrayType;
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, arrayType));
 
-    for (auto priority : mStreamUsagePriorities)
+    for (size_t i = 0; i < mStreamUsagePriorities.size(); i++)
     {
-        ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag(), priority));
+        ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag(), mStreamUsagePriorities[i]));
     }
     ReturnErrorOnFailure(writer.EndContainer(arrayType));
 
@@ -1496,7 +1496,7 @@ CHIP_ERROR CameraAVStreamMgmtServer::LoadStreamUsagePriorities()
     while ((err = reader.Next(TLV::kTLVType_UnsignedInteger, TLV::AnonymousTag())) == CHIP_NO_ERROR)
     {
         ReturnErrorOnFailure(reader.Get(streamUsage));
-        mStreamUsagePriorities.insert(streamUsage);
+        mStreamUsagePriorities.push_back(streamUsage);
     }
 
     VerifyOrReturnError(err == CHIP_ERROR_END_OF_TLV, err);
@@ -1647,6 +1647,21 @@ void CameraAVStreamMgmtServer::InvokeCommand(HandlerContext & handlerContext)
         }
         return;
     }
+}
+
+bool CameraAVStreamMgmtServer::StreamPrioritiesHasDuplicates(const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities)
+{
+    std::set<Globals::StreamUsageEnum> seenStreamUsages;
+
+    for (auto streamUsage : aStreamUsagePriorities)
+    {
+        if (!seenStreamUsages.insert(streamUsage).second)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
@@ -2009,7 +2024,7 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
 {
 
     auto & streamPriorities = commandData.streamPriorities;
-    std::set<Globals::StreamUsageEnum> streamUsagePriorities;
+    std::vector<Globals::StreamUsageEnum> streamUsagePriorities;
     auto iter = streamPriorities.begin();
 
     // If any video, audio or snapshot streams exist fail the command.
@@ -2030,13 +2045,7 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
         VerifyOrReturn(it != mSupportedStreamUsages.end(),
                        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError));
 
-        // If there are duplicate stream usages in StreamPriorities,
-        // return AlreadyExists
-        if (!streamUsagePriorities.insert(streamUsage).second)
-        {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::AlreadyExists);
-            return;
-        }
+        streamUsagePriorities.push_back(streamUsage);
     }
 
     if (iter.GetStatus() != CHIP_NO_ERROR)
@@ -2044,6 +2053,11 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
         return;
     }
+
+    // If there are duplicate stream usages in StreamPriorities,
+    // return AlreadyExists
+    VerifyOrReturn(!StreamPrioritiesHasDuplicates(streamUsagePriorities),
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::AlreadyExists));
 
     CHIP_ERROR err = SetStreamUsagePriorities(streamUsagePriorities);
 
