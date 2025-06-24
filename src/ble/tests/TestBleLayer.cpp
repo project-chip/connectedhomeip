@@ -57,10 +57,10 @@ class TestBleLayer : public BleLayer,
                      public ::testing::Test
 {
 public:
-    // Add mOnBleConnectionCompleteCalled and mOnBleConnectionErrorCalled
+    // Add mOnBleConnectionCompleteCalls and mOnBleConnectionErrorCalls
     // to check if the callbacks are invoked correctly.
-    bool mOnBleConnectionCompleteCalled = false;
-    bool mOnBleConnectionErrorCalled    = false;
+    int mOnBleConnectionCompleteCalls = 0;
+    int mOnBleConnectionErrorCalls    = 0;
 
     static void SetUpTestSuite()
     {
@@ -77,8 +77,8 @@ public:
     void SetUp() override
     {
         // Reset the connection flags before each test.
-        mOnBleConnectionCompleteCalled = false;
-        mOnBleConnectionErrorCalled    = false;
+        mOnBleConnectionCompleteCalls = 0;
+        mOnBleConnectionErrorCalls    = 0;
         ASSERT_EQ(Init(this, this, this, &DeviceLayer::SystemLayer()), CHIP_NO_ERROR);
         mBleTransport = this;
     }
@@ -139,9 +139,8 @@ public:
     ///
     // Implementation of BleLayerDelegate
 
-    // override OnBleConnectionComplete and OnBleConnectionError to set flags
-    void OnBleConnectionComplete(BLEEndPoint * endpoint) override { mOnBleConnectionCompleteCalled = true; }
-    void OnBleConnectionError(CHIP_ERROR err) override { mOnBleConnectionErrorCalled = true; }
+    void OnBleConnectionComplete(BLEEndPoint * endpoint) override { mOnBleConnectionCompleteCalls++; }
+    void OnBleConnectionError(CHIP_ERROR err) override { mOnBleConnectionErrorCalls++; }
     void OnEndPointConnectComplete(BLEEndPoint * endPoint, CHIP_ERROR err) override {}
     void OnEndPointMessageReceived(BLEEndPoint * endPoint, System::PacketBufferHandle && msg) override {}
     void OnEndPointConnectionClosed(BLEEndPoint * endPoint, CHIP_ERROR err) override {}
@@ -410,8 +409,8 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorThenError)
     // Simulate error
     BleConnectionDelegate::OnConnectionError(static_cast<BleLayer *>(this), CHIP_ERROR_CONNECTION_ABORTED);
 
-    EXPECT_FALSE(mOnBleConnectionCompleteCalled);
-    EXPECT_TRUE(mOnBleConnectionErrorCalled);
+    EXPECT_EQ(mOnBleConnectionCompleteCalls, 0);
+    EXPECT_EQ(mOnBleConnectionErrorCalls, 1);
 }
 
 // This test creats new ble connection by object and tests cancelation
@@ -424,8 +423,8 @@ TEST_F(TestBleLayer, NewBleConnectionByObjectThenCancel)
     // Cancel the connection
     ASSERT_EQ(CancelBleIncompleteConnection(), CHIP_NO_ERROR);
 
-    EXPECT_FALSE(mOnBleConnectionCompleteCalled);
-    EXPECT_FALSE(mOnBleConnectionErrorCalled);
+    EXPECT_EQ(mOnBleConnectionCompleteCalls, 0);
+    EXPECT_EQ(mOnBleConnectionErrorCalls, 0);
 }
 
 }; // namespace Ble
