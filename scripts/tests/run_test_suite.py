@@ -368,8 +368,8 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     )
 
     if sys.platform == 'linux':
-        chiptest.linux.PrepareNamespacesForTestExecution(
-            context.obj.in_unshare)
+        ns = chiptest.linux.IsolatedNetworkNamespace(
+            unshared=context.obj.in_unshare)
         paths = chiptest.linux.PathsWithNetworkNamespaces(paths)
 
     logging.info("Each test will be executed %d times" % iterations)
@@ -380,7 +380,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     def cleanup():
         apps_register.uninit()
         if sys.platform == 'linux':
-            chiptest.linux.ShutdownNamespaceForTestExecution()
+            ns.terminate()
 
     for i in range(iterations):
         logging.info("Starting iteration %d" % (i+1))
@@ -434,8 +434,7 @@ if sys.platform == 'linux':
               'network namespaces)'))
     @click.pass_context
     def cmd_shell(context):
-        chiptest.linux.PrepareNamespacesForTestExecution(
-            context.obj.in_unshare)
+        chiptest.linux.IsolatedNetworkNamespace(unshared=context.obj.in_unshare)
         os.execvpe("bash", ["bash"], os.environ.copy())
 
 
