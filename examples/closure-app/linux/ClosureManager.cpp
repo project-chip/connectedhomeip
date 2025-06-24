@@ -52,7 +52,7 @@ constexpr uint8_t kTagClosurePanelLift   = 0x00;
 constexpr uint8_t kTagClosurePanelTilt   = 0x01;
 
 // Define the list of semantic tags for the endpoint
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kClosureEndpointTagList[] = {
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kClosureEndpoint1TagList[] = {
     { .namespaceID = kNamespaceClosure,
       .tag         = kTagClosureCovering,
       .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("Closure.Covering"_span)) },
@@ -61,13 +61,13 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kClosureEndpointTag
       .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("Covering.Venetian"_span)) },
 };
 
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kClosurePanelEndpoint1TagList[] = {
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kClosurePanelEndpoint2TagList[] = {
     { .namespaceID = kNamespaceClosurePanel,
       .tag         = kTagClosurePanelLift,
       .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("ClosurePanel.Lift"_span)) },
 };
 
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kClosurePanelEndpoint2TagList[] = {
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kClosurePanelEndpoint3TagList[] = {
     { .namespaceID = kNamespaceClosurePanel,
       .tag         = kTagClosurePanelTilt,
       .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("ClosurePanel.Tilt"_span)) },
@@ -90,12 +90,12 @@ void ClosureManager::Init()
     ChipLogProgress(AppServer, "Closure Panel Endpoint 2 initialized successfully");
 
     // Set Taglist for Closure endpoints
-    SetTagList(/* endpoint= */ kClosureEndpoint,
-               Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kClosureEndpointTagList));
-    SetTagList(/* endpoint= */ kClosurePanelEndpoint1,
-               Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kClosurePanelEndpoint1TagList));
+    SetTagList(/* endpoint= */ kClosureEndpoint1,
+               Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kClosureEndpoint1TagList));
     SetTagList(/* endpoint= */ kClosurePanelEndpoint2,
                Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kClosurePanelEndpoint2TagList));
+    SetTagList(/* endpoint= */ kClosurePanelEndpoint3,
+               Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kClosurePanelEndpoint3TagList));
 
     TestEventTriggerDelegate * pTestEventDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
 
@@ -124,7 +124,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
                                                               HandleClosureActionTimer, this) == CHIP_NO_ERROR,
                         Status::Failure, ChipLogError(AppServer, "Failed to start closure action timer"));
     mCurrentAction                 = ClosureManager::Action_t::CALIBRATE_ACTION;
-    mCurrentEndpointId             = kClosureEndpoint;
+    mCurrentEndpointId             = kClosureEndpoint1;
     mIsCalibrationActionInProgress = true;
 
     ChipLogProgress(AppServer, "ClosureManager: Calibration action started for endpoint %d", mCurrentEndpointId);

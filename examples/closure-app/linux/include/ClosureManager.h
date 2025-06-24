@@ -124,15 +124,15 @@ private:
     static ClosureManager sInstance;
 
     // Endpoint ID for the main closure device
-    static constexpr chip::EndpointId kClosureEndpoint = 1;
+    static constexpr chip::EndpointId kClosureEndpoint1 = 1;
     // Endpoint ID for the first closure panel
-    static constexpr chip::EndpointId kClosurePanelEndpoint1 = 2;
+    static constexpr chip::EndpointId kClosurePanelEndpoint2 = 2;
     // Endpoint ID for the second closure panel
-    static constexpr chip::EndpointId kClosurePanelEndpoint2 = 3;
+    static constexpr chip::EndpointId kClosurePanelEndpoint3 = 3;
 
-    chip::app::Clusters::ClosureControl::ClosureControlEndpoint mClosureEndpoint{ kClosureEndpoint };
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint1{ kClosurePanelEndpoint1 };
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint2{ kClosurePanelEndpoint2 };
+    chip::app::Clusters::ClosureControl::ClosureControlEndpoint mClosureEndpoint{ kClosureEndpoint1 };
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint1{ kClosurePanelEndpoint2 };
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint2{ kClosurePanelEndpoint3 };
 
     /**
      * @brief Stores the current endpoint ID being managed or operated on.
