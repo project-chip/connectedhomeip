@@ -15,7 +15,7 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <app/storage/PascalString.h>
+#include <app/persistence/PascalString.h>
 #include <lib/core/StringBuilderAdapters.h>
 
 namespace {
@@ -136,5 +136,71 @@ TEST(TestPascalString, TestByteStringOperations)
         ASSERT_FALSE(str.SetValue(ByteSpan(toolong)));
     }
 }
+
+TEST(TestPascalString, TestNullability)
+{
+    {
+        uint8_t buffer[8] = { 0xFF, 0xFF, 1, 2, 3 };
+        ASSERT_TRUE(ShortPascalString<uint8_t>(buffer).IsNull());
+        ASSERT_TRUE(LongPascalString<uint8_t>(buffer).IsNull());
+    }
+
+    {
+        char buffer[8] = { '\xFF', '\xFF', 'a', 'b', 'c' };
+        ASSERT_TRUE(ShortPascalString<char>(buffer).IsNull());
+        ASSERT_TRUE(LongPascalString<char>(buffer).IsNull());
+    }
+
+    {
+        uint8_t buffer[8] = { 0 };
+        ShortPascalString s(buffer);
+
+        ASSERT_FALSE(s.IsNull());
+        ASSERT_EQ(s.GetLength(), 0U);
+
+        s.SetNull();
+        ASSERT_TRUE(s.IsNull());
+        ASSERT_EQ(s.GetLength(), 0U);
+
+        const uint8_t foo[] = { 1, 2, 3 };
+        ASSERT_TRUE(s.SetValue(ByteSpan(foo)));
+        ASSERT_FALSE(s.IsNull());
+        ASSERT_EQ(s.GetLength(), 3U);
+    }
+
+    {
+        uint8_t buffer[8] = { 0 };
+        LongPascalString s(buffer);
+
+        ASSERT_FALSE(s.IsNull());
+        ASSERT_EQ(s.GetLength(), 0U);
+
+        s.SetNull();
+        ASSERT_TRUE(s.IsNull());
+        ASSERT_EQ(s.GetLength(), 0U);
+
+        const uint8_t foo[] = { 1, 2, 3 };
+        ASSERT_TRUE(s.SetValue(ByteSpan(foo)));
+        ASSERT_FALSE(s.IsNull());
+        ASSERT_EQ(s.GetLength(), 3U);
+    }
+
+    {
+        char buffer[8] = { 0 };
+        LongPascalString s(buffer);
+
+        ASSERT_FALSE(s.IsNull());
+        ASSERT_EQ(s.GetLength(), 0U);
+
+        s.SetNull();
+        ASSERT_TRUE(s.IsNull());
+        ASSERT_EQ(s.GetLength(), 0U);
+
+        ASSERT_TRUE(s.SetValue("test"_span));
+        ASSERT_FALSE(s.IsNull());
+        ASSERT_EQ(s.GetLength(), 4U);
+    }
+}
+
 
 } // namespace

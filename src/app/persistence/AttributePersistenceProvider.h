@@ -40,9 +40,9 @@ enum class AttributeValueType : uint8_t
 struct AttributeValueInformation
 {
     const AttributeValueType type;
-    const size_t size; // applies to kFixedSize only
+    const uint16_t size; // applies to kFixedSize only
 
-    constexpr AttributeValueInformation(AttributeValueType t, size_t s) : type(t), size(s) {}
+    constexpr AttributeValueInformation(AttributeValueType t, uint16_t s) : type(t), size(s) {}
 
     /// Convenience to specify a type if `Fixed<uint32_t>` for example
     template <typename T>

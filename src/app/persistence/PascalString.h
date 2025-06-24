@@ -77,6 +77,7 @@ public:
         return true;
     }
     void SetNull() { (void) SetLength(kInvalidLength); }
+    bool IsNull() const { return reinterpret_cast<const uint8_t *>(mData)[0] == kInvalidLength; }
 
     bool SetValue(Span<const T> value)
     {
@@ -146,6 +147,7 @@ public:
         return true;
     }
     void SetNull() { (void) SetLength(kInvalidLength); }
+    bool IsNull() const { return Encoding::LittleEndian::Get16(reinterpret_cast<const uint8_t *>(mData)) == kInvalidLength; }
 
     bool SetValue(Span<const T> value)
     {

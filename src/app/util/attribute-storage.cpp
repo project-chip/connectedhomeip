@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "app/util/attribute-metadata.h"
 #include <app/util/attribute-storage.h>
 
 #include <app/util/attribute-storage-detail.h>
@@ -99,18 +100,12 @@ unsigned emberMetadataStructureGeneration = 0;
 // we need this data block for the defaults
 #if (defined(GENERATED_DEFAULTS) && GENERATED_DEFAULTS_COUNT)
 constexpr const uint8_t generatedDefaults[] = GENERATED_DEFAULTS;
-#define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
-    {                                                                                                                              \
-        &generatedDefaults[index]                                                                                                  \
-    }
+#define ZAP_LONG_DEFAULTS_INDEX(index) { &generatedDefaults[index] }
 #endif // GENERATED_DEFAULTS
 
 #if (defined(GENERATED_MIN_MAX_DEFAULTS) && GENERATED_MIN_MAX_DEFAULT_COUNT)
 constexpr const EmberAfAttributeMinMaxValue minMaxDefaults[] = GENERATED_MIN_MAX_DEFAULTS;
-#define ZAP_MIN_MAX_DEFAULTS_INDEX(index)                                                                                          \
-    {                                                                                                                              \
-        &minMaxDefaults[index]                                                                                                     \
-    }
+#define ZAP_MIN_MAX_DEFAULTS_INDEX(index) { &minMaxDefaults[index] }
 #endif // GENERATED_MIN_MAX_DEFAULTS
 
 #ifdef GENERATED_FUNCTION_ARRAYS
@@ -171,6 +166,22 @@ uint16_t findIndexFromEndpoint(EndpointId endpoint, bool ignoreDisabledEndpoints
 uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(EndpointId endpoint)
 {
     return findIndexFromEndpoint(endpoint, false /* ignoreDisabledEndpoints */);
+}
+
+AttributeValueInformation AttributeValueInformationFor(const EmberAfAttributeMetadata * meta)
+{
+    if (emberAfIsStringAttributeType(meta->attributeType))
+    {
+        return AttributeValueInformation::ShortPascal();
+    }
+
+    if (emberAfIsLongStringAttributeType(meta->attributeType))
+    {
+        return AttributeValueInformation::LongPascal();
+    }
+
+    // all metadata stored by ember is fixed size (except pascal string)
+    return { AttributeValueType::kFixedSize, meta->size };
 }
 
 } // anonymous namespace
@@ -1279,7 +1290,8 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, Optional<ClusterId> clusterI
                     VerifyOrDieWithMsg(attrStorage != nullptr, Zcl, "Attribute persistence needs a persistence provider");
                     MutableByteSpan bytes(attrData);
                     CHIP_ERROR err =
-                        attrStorage->ReadValue(ConcreteAttributePath(de->endpoint, cluster->clusterId, am->attributeId), am, bytes);
+                        attrStorage->ReadValue(ConcreteAttributePath(de->endpoint, cluster->clusterId, am->attributeId),
+                                               AttributeValueInformationFor(am), bytes);
                     if (err == CHIP_NO_ERROR)
                     {
                         ptr = attrData;
@@ -1405,7 +1417,8 @@ void emAfSaveAttributeToStorageIfNeeded(uint8_t * data, EndpointId endpoint, Clu
     auto * attrStorage = GetAttributePersistenceProvider();
     if (attrStorage)
     {
-        attrStorage->WriteValue(ConcreteAttributePath(endpoint, clusterId, metadata->attributeId), ByteSpan(data, dataSize));
+        attrStorage->WriteValue(ConcreteAttributePath(endpoint, clusterId, metadata->attributeId),
+                                AttributeValueInformationFor(metadata), ByteSpan(data, dataSize));
     }
     else
     {
