@@ -31,7 +31,7 @@ using namespace chip::Crypto;
 #define CHIP_SE05x_NODE_OP_KEY_ID_INDEX 11
 
 CHIP_ERROR PersistentStorageOpKeystorese05x::NewOpKeypairForFabric(FabricIndex fabricIndex,
-                                                                  MutableByteSpan & outCertificateSigningRequest)
+                                                                   MutableByteSpan & outCertificateSigningRequest)
 {
     P256SerializedKeypair serializedKeypair;
     uint8_t privatekey[32] = CHIP_SE05x_NODE_OP_REF_KEY_TEMPLATE;
@@ -62,7 +62,6 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::NewOpKeypairForFabric(FabricIndex f
     memcpy(serializedKeypair.Bytes(), &publickey, pubkey_len);
     memcpy(serializedKeypair.Bytes() + pubkey_len, &privatekey[0], privatekey_len);
     serializedKeypair.SetLength(privatekey_len + pubkey_len);
-
 
     // This is required to ensure we pass the key id (mapping to fabric id) to CHIPCryptoPALHsm_se05x_p256.cpp NIST256 class.
     ReturnErrorOnFailure(mPendingKeypair->Deserialize(serializedKeypair));

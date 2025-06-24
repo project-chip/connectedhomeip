@@ -57,7 +57,6 @@ namespace Crypto {
         0xA1, 0x44, 0x03, 0x42, 0x00,                                                                                              \
     }
 
-
 // Uncomment the below macro to generate NIST-256 key on host,
 // in case there is a error in generating on secure element.
 // #define ENABLE_GENERATE_EC_KEY_HOST_ON_FAILURE
