@@ -163,7 +163,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         # STEP 2e: Establish wildcard subscription to all attributes"
         self.step("2e")
         sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureDimension)
-        await sub_handler.start(self.default_controller, self.dut.node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
+        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
 
         # STEP 2f: Read CurrentState attribute
         self.step("2f")
@@ -183,12 +183,12 @@ class TC_CLDIM_4_1(MatterBaseTest):
 
         # STEP 3b: Wait for CurrentState.Position to be updated to MaxPosition
         self.step("3b")
-        if initial_state.Position == max_position:
+        if initial_state.position == max_position:
             logging.info("MaxPosition == 0. Skipping step 3b.")
             self.mark_current_step_skipped()
         else:
             sub_handler.await_all_expected_report_matches(
-                expected_matches=[current_position_matcher(max_position)], timeout_sec=timeout)
+                expected_matchers=[current_position_matcher(max_position)], timeout_sec=timeout)
 
         # STEP 4a: Send Step command to decrease position by 2 steps
         self.step("4a")
@@ -213,7 +213,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         self.step("4c")
         expected_position = max(max_position - 2 * step_value, min_position)
         sub_handler.await_all_expected_report_matches(
-            expected_matches=[current_position_matcher(expected_position)], timeout_sec=timeout)
+            expected_matchers=[current_position_matcher(expected_position)], timeout_sec=timeout)
 
         # STEP 4d: Send Step command to increase position by 2 steps
         self.step("4d")
@@ -236,7 +236,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         # STEP 4f: Wait for CurrentState.Position to be updated
         self.step("4f")
         sub_handler.await_all_expected_report_matches(
-            expected_matches=[current_position_matcher(max_position)], timeout_sec=timeout)
+            expected_matchers=[current_position_matcher(max_position)], timeout_sec=timeout)
 
         # STEP 5a: If Speed Feature is not supported, skip step 5b to 5d
         self.step("5a")
@@ -274,7 +274,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
             # STEP 5d: Wait for CurrentState to be updated
             self.step("5d")
             sub_handler.await_all_expected_report_matches(
-                expected_matches=[current_position_and_speed_matcher(max_position - step_value, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh)], timeout_sec=timeout)
+                expected_matchers=[current_position_and_speed_matcher(max_position - step_value, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh)], timeout_sec=timeout)
 
         # STEP 6a: If Speed Feature is not supported, skip step 6b to 6d
         self.step("6a")
@@ -312,7 +312,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
             # STEP 6d: Wait for CurrentState to be updated
             self.step("6d")
             sub_handler.await_all_expected_report_matches(
-                expected_matches=[current_position_and_speed_matcher(max_position, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kAuto)], timeout_sec=timeout)
+                expected_matchers=[current_position_and_speed_matcher(max_position, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kAuto)], timeout_sec=timeout)
 
         # STEP 7a: Send Step command to decrease position by 1 step
         self.step("7a")
@@ -368,7 +368,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         self.step("7e")
         expected_position = max(max_position - 3 * step_value, min_position)
         sub_handler.await_all_expected_report_matches(
-            expected_matches=[current_position_matcher(expected_position)], timeout_sec=timeout)
+            expected_matchers=[current_position_matcher(expected_position)], timeout_sec=timeout)
 
         # STEP 8a: Read CurrentState attribute
         self.step("8a")
@@ -396,12 +396,12 @@ class TC_CLDIM_4_1(MatterBaseTest):
 
         # STEP 8d: Wait for CurrentState to be updated
         self.step("8d")
-        if initial_state.Position == min_position:
+        if initial_state.position == min_position:
             logging.info("Initial position == MinPosition. Skipping step 8d.")
             self.mark_current_step_skipped()
         else:
             sub_handler.await_all_expected_report_matches(
-                expected_matches=[current_position_matcher(min_position)], timeout_sec=timeout)
+                expected_matchers=[current_position_matcher(min_position)], timeout_sec=timeout)
 
         # STEP 8e: Send Step command to increase position beyond MaxPosition
         self.step("8e")
@@ -426,7 +426,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         # STEP 8g: Wait for CurrentState to be updated
         self.step("8g")
         sub_handler.await_all_expected_report_matches(
-            expected_matches=[current_position_matcher(max_position)], timeout_sec=timeout)
+            expected_matchers=[current_position_matcher(max_position)], timeout_sec=timeout)
 
 
 if __name__ == "__main__":
