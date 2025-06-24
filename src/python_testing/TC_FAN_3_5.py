@@ -435,7 +435,7 @@ class TC_FAN_3_5(MatterBaseTest):
         percent_setting_sub = ClusterAttributeChangeAccumulator(cluster, attr.PercentSetting)
         await percent_setting_sub.start(self.default_controller, self.dut_node_id, self.endpoint)
 
-        # Send Step command with direction=Increase 
+        # Send Step command with direction=Increase
         await self.send_step_command(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True))
 
         # Get the resulting PercentSetting attribute report value from the queue
