@@ -43,7 +43,6 @@ void ApplicationInit()
     // Disable last fixed endpoint, which is used as a placeholder for all of the
     // supported clusters so that ZAP will generated the requisite code.
     ChipLogDetail(DeviceLayer, "TV Linux App: Warning - Fixed Content App Endpoint Not Disabled");
-    // Can't disable this without breaking CI unit tests that act upon account login cluster (only available on ep3)
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     // Install Content Apps
