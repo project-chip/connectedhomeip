@@ -43,6 +43,80 @@ using ZoneTriggerControlStruct         = Structs::ZoneTriggerControlStruct::Type
 
 class ZoneMgmtServer;
 
+struct TwoDCartesianZoneStorage : TwoDCartesianZoneStruct
+{
+    TwoDCartesianZoneStorage(){};
+
+    TwoDCartesianZoneStorage(const CharSpan & aName, ZoneUseEnum aUse, const std::vector<TwoDCartesianVertexStruct> & aVertices,
+                             Optional<CharSpan> aColor)
+    {
+        Set(aName, aUse, aVertices, aColor);
+    }
+
+    TwoDCartesianZoneStorage(const TwoDCartesianZoneStorage & aTwoDCartZone) { *this = aTwoDCartZone; }
+
+    TwoDCartesianZoneStorage & operator=(const TwoDCartesianZoneStorage & aTwoDCartZone)
+    {
+        Set(aTwoDCartZone.name, aTwoDCartZone.use, aTwoDCartZone.verticesVector, aTwoDCartZone.color);
+        return *this;
+    }
+
+    void Set(const CharSpan & aName, ZoneUseEnum aUse, const std::vector<TwoDCartesianVertexStruct> & aVertices,
+             Optional<CharSpan> aColor)
+    {
+        nameString     = std::string(aName.begin(), aName.end());
+        name           = CharSpan(nameString.c_str(), nameString.size());
+        use            = aUse;
+        verticesVector = aVertices;
+        if (aColor.HasValue())
+        {
+            colorString = std::string(aColor.Value().begin(), aColor.Value().end());
+            color       = MakeOptional(CharSpan(colorString.c_str(), colorString.size()));
+        }
+        else
+        {
+            colorString.clear();
+            color = NullOptional;
+        }
+    }
+
+private:
+    std::string nameString;
+    std::string colorString;
+    std::vector<TwoDCartesianVertexStruct> verticesVector;
+};
+
+struct ZoneInformationStorage : ZoneInformationStruct
+{
+    ZoneInformationStorage(){};
+
+    ZoneInformationStorage(const uint16_t & aZoneID, ZoneTypeEnum aZoneType, ZoneSourceEnum aZoneSource,
+                           const DataModel::Nullable<TwoDCartesianZoneStorage> & aTwoDCartZoneStorage)
+    {
+        Set(aZoneID, aZoneType, aZoneSource, aTwoDCartZoneStorage);
+    }
+
+    ZoneInformationStorage(const ZoneInformationStorage & aZoneInfoStorage) { *this = aZoneInfoStorage; }
+
+    ZoneInformationStorage & operator=(const ZoneInformationStorage & aZoneInfoStorage)
+    {
+        Set(aZoneInfoStorage.zoneID, aZoneInfoStorage.zoneType, aZoneInfoStorage.zoneSource, aZoneInfoStorage.twoDCartZoneStorage);
+        return *this;
+    }
+
+    void Set(const uint16_t & aZoneID, ZoneTypeEnum aZoneType, ZoneSourceEnum aZoneSource,
+             const DataModel::Nullable<TwoDCartesianZoneStorage> & aTwoDCartZoneStorage)
+    {
+        zoneID              = aZoneID;
+        zoneType            = aZoneType;
+        zoneSource          = aZoneSource;
+        twoDCartZoneStorage = aTwoDCartZoneStorage;
+    }
+
+private:
+    DataModel::Nullable<TwoDCartesianZoneStorage> twoDCartZoneStorage;
+};
+
 /** @brief
  *  Defines interfaces for implementing application-specific logic for various aspects of the ZoneManagement Cluster.
  *  Specifically, it defines interfaces for the command handling and loading of the allocated streams.
@@ -187,7 +261,7 @@ public:
     CHIP_ERROR SetSensitivity(uint8_t aSensitivity);
 
     // Attribute Getters
-    const std::vector<ZoneInformationStruct> & GetZones() const { return mZones; }
+    const std::vector<ZoneInformationStorage> & GetZones() const { return mZones; }
 
     const std::vector<ZoneTriggerControlStruct> & GetTriggers() const { return mTriggers; }
 
@@ -197,11 +271,11 @@ public:
     uint8_t GetSensitivity() const { return mSensitivity; }
     const TwoDCartesianVertexStruct & GetTwoDCartesianMax() const { return mTwoDCartesianMax; }
 
-    CHIP_ERROR AddZone(const ZoneInformationStruct & zone);
-    CHIP_ERROR UpdateZone(uint16_t zoneId, const ZoneInformationStruct & zone);
+    CHIP_ERROR AddZone(const ZoneInformationStorage & zone);
+    CHIP_ERROR UpdateZone(uint16_t zoneId, const ZoneInformationStorage & zone);
     CHIP_ERROR RemoveZone(uint16_t zoneId);
 
-    CHIP_ERROR AddTrigger(const ZoneTriggerControlStruct & trigger);
+    CHIP_ERROR AddOrUpdateTrigger(const ZoneTriggerControlStruct & trigger);
     CHIP_ERROR UpdateTrigger(uint16_t zoneId, const ZoneTriggerControlStruct & trigger);
     CHIP_ERROR RemoveTrigger(uint16_t zoneId);
 
@@ -222,7 +296,7 @@ private:
     const TwoDCartesianVertexStruct mTwoDCartesianMax;
     uint8_t mUserDefinedZonesCount = 0;
 
-    std::vector<ZoneInformationStruct> mZones;
+    std::vector<ZoneInformationStorage> mZones;
     std::vector<ZoneTriggerControlStruct> mTriggers;
     uint8_t mSensitivity;
 

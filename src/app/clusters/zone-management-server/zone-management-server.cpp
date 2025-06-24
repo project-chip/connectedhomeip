@@ -269,7 +269,7 @@ void ZoneMgmtServer::InvokeCommand(HandlerContext & handlerContext)
     }
 }
 
-CHIP_ERROR ZoneMgmtServer::AddZone(const ZoneInformationStruct & zone)
+CHIP_ERROR ZoneMgmtServer::AddZone(const ZoneInformationStorage & zone)
 {
     mZones.push_back(zone);
     auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
@@ -279,16 +279,30 @@ CHIP_ERROR ZoneMgmtServer::AddZone(const ZoneInformationStruct & zone)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ZoneMgmtServer::UpdateZone(uint16_t zoneId, const ZoneInformationStruct & zone)
+CHIP_ERROR ZoneMgmtServer::UpdateZone(uint16_t zoneId, const ZoneInformationStorage & zoneInfo)
 {
-    // TODO: Update zone
-    return CHIP_NO_ERROR;
+    // Find an iterator to the item with the matching ID
+    auto it =
+        std::find_if(mZones.begin(), mZones.end(), [zoneId](const ZoneInformationStorage & zone) { return zone.zoneID == zoneId; });
+
+    // If an item with the zoneID was found
+    if (it != mZones.end())
+    {
+        *it       = zoneInfo; // Replace the found item with the newItem
+        auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
+        mDelegate.OnAttributeChanged(Attributes::Zones::Id);
+        MatterReportingAttributeChangeCallback(path);
+
+        return CHIP_NO_ERROR; // Indicate success
+    }
+
+    return CHIP_ERROR_NOT_FOUND;
 }
 
 CHIP_ERROR ZoneMgmtServer::RemoveZone(uint16_t zoneId)
 {
     mZones.erase(
-        std::remove_if(mZones.begin(), mZones.end(), [&](const ZoneInformationStruct & zone) { return zone.zoneID == zoneId; }),
+        std::remove_if(mZones.begin(), mZones.end(), [&](const ZoneInformationStorage & zone) { return zone.zoneID == zoneId; }),
         mZones.end());
     auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
     mDelegate.OnAttributeChanged(Attributes::Zones::Id);
@@ -297,19 +311,26 @@ CHIP_ERROR ZoneMgmtServer::RemoveZone(uint16_t zoneId)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ZoneMgmtServer::AddTrigger(const ZoneTriggerControlStruct & trigger)
+CHIP_ERROR ZoneMgmtServer::AddOrUpdateTrigger(const ZoneTriggerControlStruct & trigger)
 {
-    mTriggers.push_back(trigger);
+    // Find an iterator to the item with the matching ID
+    auto it = std::find_if(mTriggers.begin(), mTriggers.end(),
+                           [&](const ZoneTriggerControlStruct & zoneTrigger) { return zoneTrigger.zoneID == trigger.zoneID; });
+
+    // If an item with the zoneID was found
+    if (it != mTriggers.end())
+    {
+        *it = trigger; // Replace the found item with the newItem
+    }
+    else
+    {
+        mTriggers.push_back(trigger);
+    }
+
     auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Triggers::Id);
     mDelegate.OnAttributeChanged(Attributes::Triggers::Id);
     MatterReportingAttributeChangeCallback(path);
 
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ZoneMgmtServer::UpdateTrigger(uint16_t zoneId, const ZoneTriggerControlStruct & trigger)
-{
-    // TODO: Update trigger
     return CHIP_NO_ERROR;
 }
 
@@ -330,10 +351,9 @@ Status ZoneMgmtServer::ValidateTwoDCartesianZone(const TwoDCartesianZoneDecodabl
     VerifyOrReturnError(zone.name.size() <= 32, Status::ConstraintError);
 
     size_t listCount = 0;
-    if (zone.vertices.ComputeSize(&listCount) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(listCount >= 3 && listCount <= 12, Status::ConstraintError);
-    }
+    VerifyOrReturnError(zone.vertices.ComputeSize(&listCount) == CHIP_NO_ERROR, Status::InvalidCommand);
+
+    VerifyOrReturnError(listCount >= 3 && listCount <= 12, Status::ConstraintError);
 
     if (zone.color.HasValue())
     {
@@ -366,6 +386,8 @@ void ZoneMgmtServer::HandleCreateTwoDCartesianZone(HandlerContext & ctx,
         return;
     }
 
+    std::vector<TwoDCartesianVertexStruct> twoDCartVertices;
+
     auto iter = zoneToCreate.vertices.begin();
     while (iter.Next())
     {
@@ -375,6 +397,8 @@ void ZoneMgmtServer::HandleCreateTwoDCartesianZone(HandlerContext & ctx,
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
             return;
         }
+        // Store the vertices
+        twoDCartVertices.push_back(vertex);
     }
 
     // Check the list validity
@@ -386,16 +410,20 @@ void ZoneMgmtServer::HandleCreateTwoDCartesianZone(HandlerContext & ctx,
         return;
     }
 
+    // TODO:1) Add the Duplicate check 2) Add Self-Intersecting check
+
+    // Form the TwoDCartesianZoneStorage object
     // Call the delegate
     status = mDelegate.CreateTwoDCartesianZone(zoneToCreate, zoneID);
     if (status == Status::Success)
     {
-        ZoneInformationStruct zone;
-        zone.zoneID     = zoneID;
-        zone.zoneType   = ZoneTypeEnum::kTwoDCARTZone;
-        zone.zoneSource = ZoneSourceEnum::kUser;
+        TwoDCartesianZoneStorage twoDCartZoneStorage;
+        twoDCartZoneStorage.Set(zoneToCreate.name, zoneToCreate.use, twoDCartVertices, zoneToCreate.color);
 
-        AddZone(zone);
+        ZoneInformationStorage zoneInfo;
+        zoneInfo.Set(zoneID, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, twoDCartZoneStorage);
+
+        AddZone(zoneInfo);
         mUserDefinedZonesCount++;
     }
     else
@@ -443,6 +471,8 @@ void ZoneMgmtServer::HandleUpdateTwoDCartesianZone(HandlerContext & ctx,
         return;
     }
 
+    std::vector<TwoDCartesianVertexStruct> twoDCartVertices;
+
     auto iter = zoneToUpdate.vertices.begin();
     while (iter.Next())
     {
@@ -452,6 +482,8 @@ void ZoneMgmtServer::HandleUpdateTwoDCartesianZone(HandlerContext & ctx,
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
             return;
         }
+        // Store the vertices
+        twoDCartVertices.push_back(vertex);
     }
 
     // Check the list validity
@@ -463,13 +495,19 @@ void ZoneMgmtServer::HandleUpdateTwoDCartesianZone(HandlerContext & ctx,
         return;
     }
 
+    // TODO:1) Add the Duplicate check 2) Add Self-Intersecting check
+
     // Call the delegate
     status = mDelegate.UpdateTwoDCartesianZone(zoneID, zoneToUpdate);
     if (status == Status::Success)
     {
-        ZoneInformationStruct zone;
-        // TODO: Populate zone
-        UpdateZone(zoneID, zone);
+        TwoDCartesianZoneStorage twoDCartZoneStorage;
+        twoDCartZoneStorage.Set(zoneToUpdate.name, zoneToUpdate.use, twoDCartVertices, zoneToUpdate.color);
+
+        ZoneInformationStorage zoneInfo;
+        zoneInfo.Set(zoneID, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, twoDCartZoneStorage);
+
+        UpdateZone(zoneID, zoneInfo);
     }
     else
     {
@@ -547,16 +585,7 @@ void ZoneMgmtServer::HandleCreateOrUpdateTrigger(HandlerContext & ctx,
 
     if (status == Status::Success)
     {
-        auto foundTrigger = std::find_if(mTriggers.begin(), mTriggers.end(),
-                                         [&](const ZoneTriggerControlStruct & t) { return t.zoneID == trigger.zoneID; });
-        if (foundTrigger == mTriggers.end())
-        {
-            AddTrigger(trigger);
-        }
-        else
-        {
-            UpdateTrigger(foundTrigger->zoneID, trigger);
-        }
+        AddOrUpdateTrigger(trigger);
     }
     else
     {
