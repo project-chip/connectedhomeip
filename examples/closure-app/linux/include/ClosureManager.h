@@ -29,8 +29,8 @@
 #include "ClosureControlEndpoint.h"
 #include "ClosureDimensionEndpoint.h"
 
-#include <lib/core/Optional.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/core/Optional.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 class ClosureManager
