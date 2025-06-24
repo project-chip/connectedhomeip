@@ -39,11 +39,11 @@ struct GenericOverallCurrentState : public Structs::OverallCurrentStateStruct::T
         Set(positionValue, latchValue, speedValue, secureStateValue);
     }
 
-    GenericOverallCurrentState(const GenericOverallCurrentState & overallState) { *this = overallState; }
+    GenericOverallCurrentState(const GenericOverallCurrentState & overallCurrentState) { *this = overallCurrentState; }
 
-    GenericOverallCurrentState & operator=(const GenericOverallCurrentState & overallState)
+    GenericOverallCurrentState & operator=(const GenericOverallCurrentState & overallCurrentState)
     {
-        Set(overallState.position, overallState.latch, overallState.speed, overallState.secureState);
+        Set(overallCurrentState.position, overallCurrentState.latch, overallCurrentState.speed, overallCurrentState.secureState);
         return *this;
     }
 
