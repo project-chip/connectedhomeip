@@ -32,7 +32,7 @@ public:
     bool IsArmed() const { return static_cast<bool>(mValue); }
     System::Clock::Timestamp GetFlushTime() const { return mFlushTime; }
 
-    CHIP_ERROR PrepareWrite(System::Clock::Timestamp flushTime, const AttributeValueInformation &info, const ByteSpan & value);
+    CHIP_ERROR PrepareWrite(System::Clock::Timestamp flushTime, const AttributeValueInformation & info, const ByteSpan & value);
     void Flush(AttributePersistenceProvider & persister);
 
 private:
@@ -56,7 +56,8 @@ public:
     DeferredAttributePersistenceProvider(AttributePersistenceProvider & persister,
                                          const Span<DeferredAttribute> & deferredAttributes,
                                          System::Clock::Milliseconds32 writeDelay) :
-        mPersister(persister), mDeferredAttributes(deferredAttributes), mWriteDelay(writeDelay)
+        mPersister(persister),
+        mDeferredAttributes(deferredAttributes), mWriteDelay(writeDelay)
     {}
 
     /*

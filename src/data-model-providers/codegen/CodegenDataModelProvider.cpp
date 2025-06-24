@@ -29,6 +29,8 @@
 #include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterContext.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <app/util/DataModelHandler.h>
@@ -37,8 +39,6 @@
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
-#include <app/persistence/AttributePersistenceProvider.h>
-#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <data-model-providers/codegen/EmberMetadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>

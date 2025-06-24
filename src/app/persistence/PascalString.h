@@ -141,7 +141,7 @@ public:
         {
             VerifyOrReturnError(len <= mMaxSize, false);
         }
-        auto p = reinterpret_cast<uint8_t*>(mData);
+        auto p = reinterpret_cast<uint8_t *>(mData);
         Encoding::LittleEndian::Put16(p, len);
         return true;
     }

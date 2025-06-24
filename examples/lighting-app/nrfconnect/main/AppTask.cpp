@@ -29,10 +29,10 @@
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
-#include <app/server/Dnssd.h>
-#include <app/server/Server.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/persistence/DeferredAttributePersistenceProvider.h>
+#include <app/server/Dnssd.h>
+#include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <data-model-providers/codegen/Instance.h>
