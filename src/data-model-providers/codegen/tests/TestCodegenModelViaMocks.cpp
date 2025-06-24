@@ -88,8 +88,10 @@ namespace {
 
 constexpr EventId kTestEventId = 0x321;
 
-constexpr AttributeId kAttributeIdReadOnly   = 0x3001;
-constexpr AttributeId kAttributeIdTimedWrite = 0x3002;
+constexpr AttributeId kAttributeIdReadOnly        = 0x3001;
+constexpr AttributeId kAttributeIdTimedWrite      = 0x3002;
+constexpr AttributeId kAttributeIdFakeAllowsWrite = 0x3003;
+constexpr AttributeId kAttributeIdNotSupported    = 0x3004;
 
 constexpr CommandId kMockCommandId1 = 0x1234;
 constexpr CommandId kMockCommandId2 = 0x1122;
@@ -776,6 +778,8 @@ public:
         AttributeEntry{ kAttributeIdReadOnly, BitFlags<AttributeQualityFlags>{}, Access::Privilege::kView, std::nullopt },
         AttributeEntry{ kAttributeIdTimedWrite, BitFlags<AttributeQualityFlags>{}, Access::Privilege::kView,
                         Access::Privilege::kOperate },
+        AttributeEntry{ kAttributeIdFakeAllowsWrite, BitFlags<AttributeQualityFlags>{}, Access::Privilege::kView,
+                        Access::Privilege::kOperate },
     };
 
     FakeDefaultServerCluster(const ConcreteClusterPath & path) : DefaultServerCluster(path) {}
@@ -806,6 +810,11 @@ public:
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,
                                                  AttributeValueDecoder & decoder) override
     {
+        if (request.path.mAttributeId == kAttributeIdFakeAllowsWrite)
+        {
+            uint32_t value;
+            return decoder.Decode(value);
+        }
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
@@ -2624,6 +2633,105 @@ static CHIP_ERROR ReadU32Attribute(DataModel::Provider & provider, const Concret
     VerifyOrReturnError(encodedData.attributePath == testRequest.GetRequest().path, CHIP_ERROR_INCORRECT_STATE);
 
     return chip::app::DataModel::Decode<uint32_t>(encodedData.dataReader, value);
+}
+
+TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesWrite)
+{
+    TestServerClusterContext testContext;
+
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
+    ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
+
+    const ConcreteClusterPath kTestClusterPath(kMockEndpoint1, MockClusterId(2));
+    FakeDefaultServerCluster fakeClusterServer(kTestClusterPath);
+    ServerClusterRegistration registration(fakeClusterServer);
+
+    ASSERT_EQ(model.Registry().Register(registration), CHIP_NO_ERROR);
+
+    // Write just works
+    {
+        WriteOperation test(kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kAttributeIdFakeAllowsWrite);
+        test.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+        AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);
+
+        std::optional<ActionReturnStatus> result = model.WriteAttribute(test.GetRequest(), decoder);
+        ASSERT_TRUE(result.has_value() && result->IsSuccess());
+    }
+
+    // Write with a data version works
+    {
+        WriteOperation test(kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kAttributeIdFakeAllowsWrite);
+        test.SetSubjectDescriptor(kAdminSubjectDescriptor);
+        test.SetDataVersion(MakeOptional(fakeClusterServer.GetDataVersion(kTestClusterPath)));
+
+        AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);
+
+        std::optional<ActionReturnStatus> result = model.WriteAttribute(test.GetRequest(), decoder);
+        ASSERT_TRUE(result.has_value() && result->IsSuccess());
+    }
+
+    // Write with wrong data version fails with DataVersionMismatch
+    {
+        WriteOperation test(kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kAttributeIdFakeAllowsWrite);
+        test.SetSubjectDescriptor(kAdminSubjectDescriptor);
+        test.SetDataVersion(MakeOptional(fakeClusterServer.GetDataVersion(kTestClusterPath)));
+        fakeClusterServer.TestIncreaseDataVersion();
+
+        AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);
+
+        std::optional<ActionReturnStatus> result = model.WriteAttribute(test.GetRequest(), decoder);
+        ASSERT_TRUE(result.has_value() && result->GetStatusCode().GetStatus() == Status::DataVersionMismatch);
+    }
+
+    // Write on wrong attribute fails
+    {
+        WriteOperation test(kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kAttributeIdNotSupported);
+        test.SetSubjectDescriptor(kAdminSubjectDescriptor);
+
+        AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);
+
+        std::optional<ActionReturnStatus> result = model.WriteAttribute(test.GetRequest(), decoder);
+        ASSERT_TRUE(result.has_value() && result->GetStatusCode().GetStatus() == Status::UnsupportedAttribute);
+    }
+}
+
+TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesWrite)
+{
+    TestServerClusterContext testContext;
+
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    model.SetPersistentStorageDelegate(&testContext.StorageDelegate());
+    ASSERT_EQ(model.Startup(testContext.ImContext()), CHIP_NO_ERROR);
+
+    const ConcreteClusterPath kTestClusterPath(kMockEndpoint1, MockClusterId(2));
+    FakeDefaultServerCluster fakeClusterServer(kTestClusterPath);
+    ServerClusterRegistration registration(fakeClusterServer);
+
+    ASSERT_EQ(model.Registry().Register(registration), CHIP_NO_ERROR);
+
+    // Read just works
+    {
+
+        uint32_t value;
+        ASSERT_EQ(ReadU32Attribute(
+                      model, { kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kAttributeIdFakeAllowsWrite }, value),
+                  CHIP_NO_ERROR);
+    }
+
+    // But not on invalid attributes
+    {
+
+        uint32_t value;
+        ASSERT_EQ(
+            ReadU32Attribute(model, { kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kAttributeIdNotSupported }, value),
+            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
+    }
 }
 
 TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
