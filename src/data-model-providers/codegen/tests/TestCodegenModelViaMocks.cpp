@@ -839,6 +839,10 @@ public:
             uint32_t value = kFakeClusterRevision;
             return encoder.Encode<uint32_t>(std::move(value));
         }
+        case kAttributeIdFakeAllowsWrite: {
+            uint32_t value = 0;
+            return encoder.Encode<uint32_t>(std::move(value));
+        }
         }
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
