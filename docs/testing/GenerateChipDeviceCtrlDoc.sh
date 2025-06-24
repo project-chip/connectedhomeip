@@ -30,7 +30,7 @@ pydoc-markdown -I "$PYTHONPATH" --py3 -m chip.ChipDeviceCtrl '{
       descriptive_class_title: false,
       render_toc: true,
       render_toc_title: "ChipDeviceCtrl.py API",
-      insert_header_anchors: false,
+      insert_header_anchors: true,
       add_full_prefix: false,
     }
   }' >"$1"/"$FILENAME"
