@@ -811,8 +811,8 @@ class SetupParameters:
         return SetupPayload().GenerateManualPairingCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
                                                         self.custom_flow, self.capabilities, self.version)
 
-# deprecated
-# class MatterStackState:
+# deprecated:
+# class MatterStackState: #39625
 #     def __init__(self, config: MatterTestConfig):
 #         self._logger = logger
 #         self._config = config
