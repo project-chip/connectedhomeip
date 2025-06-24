@@ -495,8 +495,12 @@ CHIP_ERROR FactoryDataProvider::GetHardwareVersionString(char * buf, size_t bufS
 CHIP_ERROR FactoryDataProvider::GetSoftwareVersionString(char * buf, size_t bufSize)
 {
     /* The FactoryDataProvider instance is registered as a DeviceInstanceInfoProvider, which requires SoftwareVersionString support.
-    This information is not stored in the factory data, as it may change after an OTA update. */
+     This information is not stored in the factory data, as it may change after an OTA update. */
     CHIP_ERROR err = ConfigurationMgr().GetSoftwareVersionString(buf, bufSize);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to get software version string from ConfigurationMgr: %s", ErrorStr(err));
+    }
     return err;
 }
 
