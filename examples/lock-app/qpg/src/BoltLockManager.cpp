@@ -22,6 +22,7 @@
 #include "AppConfig.h"
 #include "AppTask.h"
 #include <FreeRTOS.h>
+#include <lib/support/FormatUtils.h>
 
 using namespace chip;
 

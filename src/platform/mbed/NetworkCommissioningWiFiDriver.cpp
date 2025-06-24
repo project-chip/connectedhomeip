@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <lib/support/FormatUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/mbed/NetworkCommissioningDriver.h>
 
