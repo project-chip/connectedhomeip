@@ -27,7 +27,14 @@ WebRTCClient::~WebRTCClient() {}
 void WebRTCClient::createPeerConnection(const std::string & stunUrl)
 {
     rtc::Configuration config;
-    config.iceServers.emplace_back(stunUrl);
+    if (!stunUrl.empty())
+    {
+        config.iceServers.emplace_back(stunUrl);
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "No STUN server URL provided");
+    }
     pc_ = std::make_shared<rtc::PeerConnection>(config);
 
     pc_->onLocalDescription([this](rtc::Description desc) {

@@ -118,7 +118,8 @@ static_library("controller") {
   ]
 
   cflags = [ "-Wconversion" ]
-  if (chip_support_webrtc_python_bindings && current_os == "linux") {
+  if (chip_support_webrtc_python_bindings && current_os == "linux" &&
+      (current_cpu == "x64" || current_cpu == "armv64")) {
     public_deps += [ "${chip_root}/src/controller/webrtc:chip_webrtc" ]
   }
 

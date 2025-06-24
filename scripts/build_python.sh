@@ -64,7 +64,9 @@ case "$OS_TYPE" in
         ;;
 esac
 
-chip_support_webrtc_python_bindings=$chip_support_webrtc_python_bindings
+if [ -n "$chip_support_webrtc_python_bindings" ]; then
+    extra_gn_args+=("--args=chip_support_webrtc_python_bindings=true")
+fi
 
 help() {
 
