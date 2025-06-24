@@ -113,7 +113,8 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
 
     // ReadAttribute requirement is that request.path is a VALID path inside the provider
     // metadata tree. Clients are supposed to validate this (and data version and other flags)
-    VerifyOrDie(attributeMetadata != nullptr);
+    // This SHOULD NEVER HAPPEN hence the general return code (seemed preferable to VerifyOrDie)
+    VerifyOrReturnError(attributeMetadata != nullptr, Status::Failure);
 
     // Read via AAI
     std::optional<CHIP_ERROR> aai_result = TryReadViaAccessInterface(
