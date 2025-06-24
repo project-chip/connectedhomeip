@@ -17,9 +17,9 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <lib/support/FormatUtils.h>
 #include <lwip/netif.h>
 #include <lwip/tcpip.h>
-#include <lib/support/FormatUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/bouffalolab/BL616/NetworkCommissioningDriver.h>
 extern "C" {

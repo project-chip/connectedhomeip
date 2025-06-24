@@ -22,8 +22,8 @@
 #include "AppTask.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <cstring>
-#include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/FormatUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 using chip::app::DataModel::MakeNullable;
 using namespace ::chip::DeviceLayer::Internal;
