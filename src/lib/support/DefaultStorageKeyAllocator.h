@@ -266,7 +266,7 @@ public:
     // Stores the terms and conditions acceptance including terms and conditions revision, TLV encoded
     static StorageKeyName TermsAndConditionsAcceptance() { return StorageKeyName::FromConst("g/tc"); }
 
-    // TLS Clusters Certs Keys
+    // TLS Clusters Certs Keys, used by CertificateTableImpl to persist certificates for TLS clusters
 
     // Number of root certs stored in table for a given endpoint, across all fabrics.
     static StorageKeyName TlsRootCertEndpointCountKey(EndpointId endpoint)

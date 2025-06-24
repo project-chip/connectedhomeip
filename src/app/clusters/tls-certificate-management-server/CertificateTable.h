@@ -36,18 +36,32 @@ public:
     using RootCertStruct   = TlsCertificateManagement::Structs::TLSCertStruct::DecodableType;
     using ClientCertStruct = TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::DecodableType;
 
-    /// @brief a root cert along with an associated buffer for the cert payload
+    /// @brief a root cert along with an associated buffer for the cert payload. RootCertStruct has a ByteSpan,
+    /// and this wrapper ensures that the underlying buffer for the ByteSpan has an equivalent lifetime.
+    /// No other functionality from PersistentStore<> is required to be used by the implementation except the underlying buffer.
     struct BufferedRootCert
     {
-        RootCertStruct cert;
-        PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> buffer;
+        BufferedRootCert(PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> & buffer) : mBuffer(buffer) {}
+
+        RootCertStruct mCert;
+
+    private:
+        friend class CertificateTable;
+        PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> & mBuffer;
     };
 
-    /// @brief a client cert along with an associated buffer for the cert payload
+    /// @brief a client cert along with an associated buffer for the cert payload.  ClientCertStruct has a ByteSpan,
+    /// and this wrapper ensures that the underlying buffer for the ByteSpan has an equivalent lifetime.
+    /// No other functionality from PersistentStore<> is required to be used by the implementation except the underlying buffer.
     struct BufferedClientCert
     {
-        ClientCertStruct cert;
-        PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> buffer;
+        BufferedClientCert(PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> & buffer) : mBuffer(buffer) {}
+
+        ClientCertStruct mCert;
+
+    private:
+        friend class CertificateTable;
+        PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> & mBuffer;
     };
 
     CertificateTable(){};
@@ -63,10 +77,34 @@ public:
     virtual void Finish()                                        = 0;
 
     // Data
-    virtual CHIP_ERROR GetRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id, BufferedRootCert & entry)      = 0;
-    virtual CHIP_ERROR HasRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id)                                = 0;
+
+    /**
+     * @brief Loads the specified (fabric_index, certificate_id) root cert into entry; if the implementation
+     * requires a buffer to load the entry, it is provided via entry.mBuffer
+     *
+     * entry[out] the resulting loaded entry, where entry.mCert will contain the loaded certificate
+     */
+    virtual CHIP_ERROR GetRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id, BufferedRootCert & entry) = 0;
+    virtual CHIP_ERROR HasRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id)                           = 0;
+
+    /**
+     * @brief Loads the specified (fabric_index, certificate_id) client cert into entry; if the implementation
+     * requires a buffer to load the entry, it is provided via entry.mBuffer
+     *
+     * entry[out] the resulting loaded entry, where entry.mCert will contain the loaded certificate
+     */
     virtual CHIP_ERROR GetClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id, BufferedClientCert & entry) = 0;
     virtual CHIP_ERROR HasClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id)                             = 0;
+
+protected:
+    static inline PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> & GetBuffer(BufferedRootCert & bufferedCert)
+    {
+        return bufferedCert.mBuffer;
+    }
+    static inline PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> & GetBuffer(BufferedClientCert & bufferedCert)
+    {
+        return bufferedCert.mBuffer;
+    }
 };
 
 } // namespace Tls

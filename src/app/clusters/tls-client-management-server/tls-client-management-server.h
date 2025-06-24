@@ -101,7 +101,36 @@ private:
 class TlsClientManagementDelegate
 {
 public:
-    using EndpointStructType = TlsClientManagement::Structs::TLSEndpointStruct::DecodableType;
+    struct EndpointStructType : TlsClientManagement::Structs::TLSEndpointStruct::DecodableType
+    {
+        EndpointStructType() {}
+
+        EndpointStructType(const EndpointStructType & src) : TlsClientManagement::Structs::TLSEndpointStruct::DecodableType(src)
+        {
+            // Should never fail, as payload should always be the same statically-compiled size
+            SuccessOrDie(CopyHostnameFrom(src.hostname));
+        }
+        EndpointStructType & operator=(const EndpointStructType & src)
+        {
+            TlsClientManagement::Structs::TLSEndpointStruct::DecodableType::operator=(src);
+            // Should never fail, as payload should always be the same statically-compiled size
+            SuccessOrDie(CopyHostnameFrom(src.hostname));
+            return *this;
+        }
+
+        EndpointStructType & operator=(EndpointStructType &&) = delete;
+
+        inline CHIP_ERROR CopyHostnameFrom(const ByteSpan & source)
+        {
+            MutableByteSpan hostnameSpan(hostnameMem);
+            ReturnErrorOnFailure(CopySpanToMutableSpan(source, hostnameSpan));
+            hostname = hostnameSpan;
+            return CHIP_NO_ERROR;
+        }
+
+    private:
+        std::array<uint8_t, 253> hostnameMem;
+    };
 
     TlsClientManagementDelegate() = default;
 
@@ -124,12 +153,11 @@ public:
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] endpointID The EndpoitnID to find.
      * @param[out] endpoint The endpoint at the given index in the list.
-     * @param[out] hostname The memory holder for the hostname field
      * @return NOT_FOUND if no mapping is found.
      */
     virtual Protocols::InteractionModel::Status FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                            uint16_t endpointID, EndpointStructType & endpoint,
-                                                                            MutableByteSpan & hostname) const = 0;
+                                                                            uint16_t endpointID,
+                                                                            EndpointStructType & endpoint) const = 0;
 
     /**
      * @brief Appends a TLSEndpointStruct to the provisioned endpoints list maintained by the delegate.

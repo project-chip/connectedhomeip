@@ -35,7 +35,6 @@ class TlsClientManagementCommandDelegate : public TlsClientManagementDelegate
     {
         FabricIndex fabric;
         EndpointStructType payload;
-        std::array<uint8_t, 253> hostname;
     };
 
     static TlsClientManagementCommandDelegate instance;
@@ -56,13 +55,13 @@ public:
                       uint16_t & endpointID) override;
 
     Protocols::InteractionModel::Status FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                    uint16_t endpointID, EndpointStructType & endpoint,
-                                                                    MutableByteSpan & hostname) const override;
+                                                                    uint16_t endpointID,
+                                                                    EndpointStructType & endpoint) const override;
 
     Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
                                                                       uint16_t endpointID) override;
 
-    static inline TlsClientManagementCommandDelegate & getInstance() { return instance; }
+    static inline TlsClientManagementCommandDelegate & GetInstance() { return instance; }
 };
 
 } // namespace Clusters

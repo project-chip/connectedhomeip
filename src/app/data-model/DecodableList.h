@@ -308,7 +308,7 @@ public:
     }
 };
 
-template <typename X>
+template <typename X, std::enable_if_t<!DataModel::IsFabricScoped<X>::value, bool> = true>
 inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, DecodableList<X> list)
 {
     TLV::TLVType type;
@@ -319,6 +319,7 @@ inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, DecodableList<X>
     {
         ReturnErrorOnFailure(Encode(writer, TLV::AnonymousTag(), iterator.GetValue()));
     }
+    ReturnErrorOnFailure(iterator.GetStatus());
     return writer.EndContainer(type);
 }
 
@@ -333,6 +334,7 @@ inline CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag, Decodabl
     {
         ReturnErrorOnFailure(EncodeForWrite(writer, TLV::AnonymousTag(), iterator.GetValue()));
     }
+    ReturnErrorOnFailure(iterator.GetStatus());
     return writer.EndContainer(type);
 }
 
@@ -345,8 +347,9 @@ inline CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricInd
     auto iterator = list.begin();
     while (iterator.Next())
     {
-        ReturnErrorOnFailure(EncodeForRead(writer, TLV::AnonymousTag(), iterator.GetValue()));
+        ReturnErrorOnFailure(EncodeForRead(writer, TLV::AnonymousTag(), accessingFabricIndex, iterator.GetValue()));
     }
+    ReturnErrorOnFailure(iterator.GetStatus());
     return writer.EndContainer(type);
 }
 

@@ -52,7 +52,7 @@ class TC_TLSCLIENT_1_1(MatterBaseTest):
     def steps_TC_TLSCLIENT_1_1(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "Sends the ProvisionEndpoint command to the TlsCliemtNamanement cluster",
+            TestStep(2, "Sends the ProvisionEndpoint command to the TlsClientNamanement cluster",
                      "Verify that the DUT sends ProvisionEndpointResponse."),
         ]
         return steps

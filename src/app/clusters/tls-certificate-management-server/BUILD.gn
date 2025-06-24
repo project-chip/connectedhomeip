@@ -14,9 +14,14 @@
 import("//build_overrides/chip.gni")
 
 source_set("certificate-table") {
-  public = [ "CertificateTable.h" ]
+  public = [
+    "CertificateTable.h",
+    "CertificateTableImpl.h",
+  ]
 
   deps = [ "${chip_root}/src/app" ]
+
+  sources = [ "CertificateTableImpl.cpp" ]
 
   public_deps = [ "${chip_root}/src/app/storage:fabric-table" ]
 }

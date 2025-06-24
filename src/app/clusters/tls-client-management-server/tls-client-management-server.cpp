@@ -29,6 +29,7 @@
 #include <app/server/Server.h>
 #include <clusters/TlsClientManagement/Attributes.h>
 #include <clusters/TlsClientManagement/Commands.h>
+#include <clusters/TlsClientManagement/Metadata.h>
 #include <clusters/TlsClientManagement/Structs.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -89,7 +90,7 @@ CHIP_ERROR TlsClientManagementServer::Read(const ConcreteReadAttributePath & aPa
     {
     case MaxProvisioned::Id:
         return aEncoder.Encode(mMaxProvisioned);
-    case ProvisionedEndpoints::Id:
+    case ProvisionedEndpoints::Id: {
         TlsClientManagementServer * server = this;
         auto matterEndpoint                = aPath.mEndpointId;
         auto fabric                        = aEncoder.AccessingFabricIndex();
@@ -97,6 +98,9 @@ CHIP_ERROR TlsClientManagementServer::Read(const ConcreteReadAttributePath & aPa
             return server->EncodeProvisionedEndpoints(matterEndpoint, fabric, encoder);
         });
         return err;
+    }
+    case ClusterRevision::Id:
+        return aEncoder.Encode(kRevision);
     }
 
     return CHIP_NO_ERROR;
@@ -114,7 +118,7 @@ TlsClientManagementServer::EncodeProvisionedEndpoints(EndpointId matterEndpoint,
 {
     for (uint8_t i = 0; true; i++)
     {
-        TLSEndpointStruct::Type endpoint;
+        TlsClientManagementDelegate::EndpointStructType endpoint;
 
         auto err = mDelegate.GetProvisionedEndpointByIndex(matterEndpoint, fabric, i, endpoint);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
@@ -175,11 +179,10 @@ void TlsClientManagementServer::HandleFindEndpoint(HandlerContext & ctx, const C
     ChipLogDetail(Zcl, "TlsClientManagement: FindEndpoint");
 
     Commands::FindEndpointResponse::Type response;
-    std::array<uint8_t, 253> hostnameMem;
-    MutableByteSpan hostname(hostnameMem);
-    Status status = mDelegate.FindProvisionedEndpointByID(
-        ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), req.endpointID, response.endpoint, hostname);
-
+    TlsClientManagementDelegate::EndpointStructType endpoint;
+    Status status     = mDelegate.FindProvisionedEndpointByID(ctx.mRequestPath.mEndpointId,
+                                                              ctx.mCommandHandler.GetAccessingFabricIndex(), req.endpointID, endpoint);
+    response.endpoint = endpoint;
     if (status == Protocols::InteractionModel::Status::Success)
     {
         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);

@@ -18,8 +18,7 @@
 #pragma once
 #include <app/clusters/tls-certificate-management-server/CertificateTable.h>
 #include <app/storage/FabricTableImpl.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/config.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Pool.h>
 
@@ -28,17 +27,8 @@ namespace app {
 namespace Clusters {
 namespace Tls {
 
-#if defined(TLS_CLIENT_CERTIFICATE_SIZE_PER_FABRIC) && TLS_CLIENT_CERTIFICATE_SIZE_PER_FABRIC
-static constexpr uint16_t kMaxClientCertificatesPerFabric = TLS_CLIENT_CERTIFICATE_SIZE_PER_FABRIC;
-#else
-static constexpr uint16_t kMaxClientCertificatesPerFabric = CHIP_CONFIG_MAX_CLIENT_CERTS_TABLE_SIZE;
-#endif
-
-#if defined(TLS_ROOT_CERTIFICATE_SIZE_PER_FABRIC) && TLS_ROOT_CERTIFICATE_SIZE_PER_FABRIC
-static constexpr uint16_t kMaxRootCertificatesPerFabric = TLS_ROOT_CERTIFICATE_SIZE_PER_FABRIC;
-#else
-static constexpr uint16_t kMaxRootCertificatesPerFabric   = CHIP_CONFIG_MAX_ROOT_CERTS_TABLE_SIZE;
-#endif
+static constexpr uint16_t kMaxClientCertificatesPerFabric = CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE;
+static constexpr uint16_t kMaxRootCertificatesPerFabric   = CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE;
 
 inline constexpr uint16_t kUndefinedCertificateId = 0xffff;
 
@@ -50,7 +40,7 @@ static_assert(kMaxRootCertificatesPerFabric <= 254, "Per spec, kMaxRootCertifica
 // Limit is set per-fabric
 static constexpr uint16_t kMaxCertificatesPerEndpoint = UINT16_MAX;
 
-/// @brief struct used to identify a certificate ID
+/// @brief struct used to identify a certificate
 struct CertificateId
 {
     uint16_t mCertificateId = kUndefinedCertificateId;
@@ -65,19 +55,19 @@ struct CertificateId
     bool operator==(const CertificateId & other) const { return (mCertificateId == other.mCertificateId); }
 };
 
-class RootCertificateTable : public app::Storage::FabricTableImpl<CertificateId, CertificateTable::RootCertStruct, 0>
+class RootCertificateTable : public app::Storage::FabricTableImpl<CertificateId, CertificateTable::RootCertStruct>
 {
 public:
-    using Super = app::Storage::FabricTableImpl<CertificateId, CertificateTable::RootCertStruct, 0>;
+    using Super = app::Storage::FabricTableImpl<CertificateId, CertificateTable::RootCertStruct>;
 
     RootCertificateTable() : Super(kMaxRootCertificatesPerFabric, kMaxCertificatesPerEndpoint) {}
     ~RootCertificateTable() { Finish(); };
 };
 
-class ClientCertificateTable : public app::Storage::FabricTableImpl<CertificateId, CertificateTable::ClientCertStruct, 0>
+class ClientCertificateTable : public app::Storage::FabricTableImpl<CertificateId, CertificateTable::ClientCertStruct>
 {
 public:
-    using Super = app::Storage::FabricTableImpl<CertificateId, CertificateTable::ClientCertStruct, 0>;
+    using Super = app::Storage::FabricTableImpl<CertificateId, CertificateTable::ClientCertStruct>;
 
     ClientCertificateTable() : Super(kMaxClientCertificatesPerFabric, kMaxCertificatesPerEndpoint) {}
     ~ClientCertificateTable() { Finish(); };

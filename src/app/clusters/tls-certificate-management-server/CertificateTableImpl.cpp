@@ -123,7 +123,7 @@ void RootSerializer::Clear(CertificateTable::RootCertStruct & data)
     new (&data) CertificateTable::RootCertStruct();
 }
 
-template class chip::app::Storage::FabricTableImpl<CertificateId, CertificateTable::RootCertStruct, 0>;
+template class chip::app::Storage::FabricTableImpl<CertificateId, CertificateTable::RootCertStruct>;
 using RootCertFabricData = FabricEntryData<CertificateId, CertificateTable::RootCertStruct, RootSerializer::kEntryMaxBytes(),
                                            RootSerializer::kFabricMaxBytes(), kMaxRootCertificatesPerFabric>;
 
@@ -217,7 +217,7 @@ void ClientSerializer::Clear(CertificateTable::ClientCertStruct & data)
     new (&data) CertificateTable::ClientCertStruct();
 }
 
-template class chip::app::Storage::FabricTableImpl<CertificateId, CertificateTable::ClientCertStruct, 0>;
+template class chip::app::Storage::FabricTableImpl<CertificateId, CertificateTable::ClientCertStruct>;
 using ClientCertFabricData = FabricEntryData<CertificateId, CertificateTable::ClientCertStruct, ClientSerializer::kEntryMaxBytes(),
                                              ClientSerializer::kFabricMaxBytes(), kMaxClientCertificatesPerFabric>;
 
@@ -248,7 +248,7 @@ void CertificateTableImpl::SetEndpoint(EndpointId endpoint)
 CHIP_ERROR CertificateTableImpl::GetRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id, BufferedRootCert & entry)
 {
     CertificateId id(certificate_id);
-    return mRootCertificates.GetTableEntry(fabric_index, id, entry.cert, entry.buffer);
+    return mRootCertificates.GetTableEntry(fabric_index, id, entry.mCert, GetBuffer(entry));
 }
 
 CHIP_ERROR CertificateTableImpl::HasRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id)
@@ -262,7 +262,7 @@ CHIP_ERROR CertificateTableImpl::GetClientCertificateEntry(FabricIndex fabric_in
                                                            BufferedClientCert & entry)
 {
     CertificateId id(certificate_id);
-    return mClientCertificates.GetTableEntry(fabric_index, id, entry.cert, entry.buffer);
+    return mClientCertificates.GetTableEntry(fabric_index, id, entry.mCert, GetBuffer(entry));
 }
 
 CHIP_ERROR CertificateTableImpl::HasClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id)

@@ -104,19 +104,16 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
     }
 
     auto & endpointStruct = provisioned->payload;
-    MutableByteSpan hostname(provisioned->hostname);
-    CopySpanToMutableSpan(provisionReq.hostname, hostname);
-    endpointStruct.hostname = hostname;
-    endpointStruct.port     = provisionReq.port;
-    endpointStruct.caid     = provisionReq.caid;
-    endpointStruct.ccdid    = provisionReq.ccdid;
+    ReturnValueOnFailure(endpointStruct.CopyHostnameFrom(provisionReq.hostname), ClusterStatusCode(Status::ResourceExhausted));
+    endpointStruct.port  = provisionReq.port;
+    endpointStruct.caid  = provisionReq.caid;
+    endpointStruct.ccdid = provisionReq.ccdid;
 
     return ClusterStatusCode(Status::Success);
 }
 
 Status TlsClientManagementCommandDelegate::FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                       uint16_t endpointID, EndpointStructType & endpoint,
-                                                                       MutableByteSpan & hostname) const
+                                                                       uint16_t endpointID, EndpointStructType & endpoint) const
 {
     VerifyOrReturnError(matterEndpoint == EndpointId(1), Status::ConstraintError);
 
@@ -124,9 +121,7 @@ Status TlsClientManagementCommandDelegate::FindProvisionedEndpointByID(EndpointI
     {
         if (i->payload.endpointID == endpointID && i->fabric == fabric)
         {
-            CopySpanToMutableSpan(i->payload.hostname, hostname);
-            endpoint          = i->payload;
-            endpoint.hostname = hostname;
+            endpoint = i->payload;
             return Status::Success;
         }
     }
@@ -159,7 +154,7 @@ Status TlsClientManagementCommandDelegate::RemoveProvisionedEndpointByID(Endpoin
 static CertificateTableImpl gCertificateTableInstance;
 TlsClientManagementCommandDelegate TlsClientManagementCommandDelegate::instance(gCertificateTableInstance);
 static TlsClientManagementServer gTlsClientManagementClusterServerInstance = TlsClientManagementServer(
-    EndpointId(1), TlsClientManagementCommandDelegate::getInstance(), gCertificateTableInstance, kMaxProvisioned);
+    EndpointId(1), TlsClientManagementCommandDelegate::GetInstance(), gCertificateTableInstance, kMaxProvisioned);
 
 void emberAfTlsClientManagementClusterInitCallback(EndpointId matterEndpoint)
 {
