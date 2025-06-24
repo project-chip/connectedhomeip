@@ -19,7 +19,6 @@
 
 #include <app/storage/FabricTableImpl.h>
 #include <app/util/endpoint-config-api.h>
-#include <lib/support/AutoRelease.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TypeTraits.h>
 #include <stdlib.h>
@@ -794,14 +793,13 @@ void FabricTableImpl<StorageId, StorageData>::SetTableSize(uint16_t endpointTabl
 }
 
 template <class StorageId, class StorageData>
-template <size_t kEntryMaxBytes>
+template <size_t kEntryMaxBytes, class UnaryFunc>
 CHIP_ERROR FabricTableImpl<StorageId, StorageData>::IterateEntries(FabricIndex fabric, PersistentStore<kEntryMaxBytes> & store,
-                                                                   IterateFnType iterateFn)
+                                                                   UnaryFunc iterateFn)
 {
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INTERNAL);
 
     EntryIteratorImpl<kEntryMaxBytes> iterator(*this, fabric, mEndpointId, mMaxPerFabric, mMaxPerEndpoint, store);
-    AutoRelease<EntryIteratorImpl<kEntryMaxBytes>> iteratorRelease(&iterator);
     return iterateFn(iterator);
 }
 

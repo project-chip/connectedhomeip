@@ -18,7 +18,6 @@
 #pragma once
 
 #include <app/storage/TableEntry.h>
-#include <functional>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/PersistentData.h>
 #include <lib/support/TypeTraits.h>
@@ -83,12 +82,6 @@ public:
     using EntryIterator = CommonIterator<TableEntry>;
     using EntryIndex    = Data::EntryIndex;
     using Serializer    = DefaultSerializer<StorageId, StorageData>;
-
-    /**
-     * @brief a function to process an EntryIterator; the iterator parameter has a lifetime of the function call & is destroyed when
-     * the function completes.
-     */
-    using IterateFnType = std::function<CHIP_ERROR(EntryIterator & iterator)>;
 
     virtual ~FabricTableImpl() { Finish(); };
 
@@ -156,13 +149,16 @@ public:
 
     /**
      * @brief Iterates through all entries in fabric, calling iterateFn with the allocated iterator.
+     * @tparam kEntryMaxBytes size of the buffer for loading entries, should match DefaultSerializer::kEntryMaxBytes
+     * @tparam UnaryFunc a function of type std::function<CHIP_ERROR(EntryIterator & iterator)>; template arg for GCC inlining
+     * efficiency
      * @param fabric the fabric to iterate entries for
      * @param store the in-memory buffer that an entry will be read into
-     * @param iterateFn the function that will be called with the iterator; the resulting CHIP_ERROR is proxied as a result of the
-     * method
+     * @param iterateFn a function that will be called with the iterator; if this function returns an error result, iteration stops
+     * and IterateEntries returns that same error result.
      */
-    template <size_t kEntryMaxBytes>
-    CHIP_ERROR IterateEntries(FabricIndex fabric, PersistentStore<kEntryMaxBytes> & store, IterateFnType iterateFn);
+    template <size_t kEntryMaxBytes, class UnaryFunc>
+    CHIP_ERROR IterateEntries(FabricIndex fabric, PersistentStore<kEntryMaxBytes> & store, UnaryFunc iterateFn);
 
 protected:
     // This constructor is meant for test purposes, it allows to change the defined max for entries per fabric and global, which
@@ -177,8 +173,9 @@ protected:
     /**
      * @brief Implementation of an iterator over the elements in the FabricTableImpl.
      *
-     * If you would like to expose iterators in your subclass of FabricTableImpl, use this class
-     * in an ObjectPool<EntryIteratorImpl> field to allow callers to obtain an iterator.
+     * If you would like to expose iterators in your subclass of FabricTableImpl, you can:
+     * A) Use this class in an ObjectPool<EntryIteratorImpl> field to allow callers to obtain an iterator, with AutoRelease to free
+     * resources B) Use IterateEntries to allocate on stack
      */
     template <size_t kEntryMaxBytes>
     class EntryIteratorImpl : public EntryIterator
