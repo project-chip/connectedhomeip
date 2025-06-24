@@ -78,12 +78,12 @@ TEST_F(TestCommissioningWindowOpener, OpenBasicCommissioningWindow_Success)
 TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowWithPasscode_Success)
 {
     constexpr chip::NodeId kTestNodeId = 0x1234;
+    constexpr uint16_t kDiscriminator  = 3840;
+    constexpr uint32_t kSetupPIN       = 20202021U;
     constexpr chip::System::Clock::Seconds16 kTimeout(300);
-    constexpr uint16_t kDiscriminator = 3840;
-    constexpr uint32_t kSetupPIN = 20202021U;
     SetupPayload ignored;
     Callback::Callback<Controller::OnOpenCommissioningWindow> callback(OCWPasscodeCallback, this);
-    CHIP_ERROR err = 
+    CHIP_ERROR err =
         opener.OpenCommissioningWindow(kTestNodeId, kTimeout, sTestSpake2p01_IterationCount, kDiscriminator, Optional(kSetupPIN),
                                        Optional(ByteSpan(sTestSpake2p01_Salt)), &callback, ignored, false);
     EXPECT_EQ(err, CHIP_NO_ERROR);
