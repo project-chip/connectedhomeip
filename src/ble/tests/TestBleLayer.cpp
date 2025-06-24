@@ -129,7 +129,6 @@ public:
 
     ///
     // Implementation of BleLayerDelegate
-    // override OnBleConnectionComplete and OnBleConnectionError to set flags
     void OnBleConnectionComplete(BLEEndPoint * endpoint) override { mOnBleConnectionCompleteCalled = true; }
     void OnBleConnectionError(CHIP_ERROR err) override { mOnBleConnectionErrorCalled = true; }
     void OnEndPointConnectComplete(BLEEndPoint * endPoint, CHIP_ERROR err) override {}
