@@ -11,23 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/pigweed.gni")
 
-source_set("ethernet-network-diagnostics-server") {
-  sources = [
-    "ethernet-diagnostics-cluster.h",
-    "ethernet-diagnostics-logic.cpp",
-    "ethernet-diagnostics-logic.h",
-  ]
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "libTestEthernetDiangosticsCluster"
+
+  test_sources = [ "TestEthernetDiagnosticsCluster.cpp" ]
+
+  sources = []
+
+  cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/app:attribute-access",
-    "${chip_root}/src/app/data-model-provider:metadata",
-    "${chip_root}/src/app/server-cluster",
-    "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/app/clusters/ethernet-network-diagnostics-server",
+    "${chip_root}/src/app/clusters/testing",
+    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
-    "${chip_root}/zzz_generated/app-common/clusters/EthernetNetworkDiagnostics",
   ]
-  public_configs = [ "${chip_root}/src:includes" ]
 }
