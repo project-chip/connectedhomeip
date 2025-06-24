@@ -16,13 +16,13 @@
  */
 #pragma once
 
-#include "app/ConcreteAttributePath.h"
-#include "app/data-model-provider/MetadataTypes.h"
 #include <app/data-model-provider/Provider.h>
 
 #include <app/CommandHandlerInterface.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/util/af-types.h>
 #include <data-model-providers/codegen/ServerClusterInterfaceRegistry.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -132,7 +132,8 @@ private:
     std::optional<unsigned> TryFindEndpointIndex(EndpointId id) const;
 
     // try to find the given attribute entry inside a cluster interface
-    static std::optional<DataModel::AttributeEntry> FindAttributeEntry(ServerClusterInterface *cluster, const ConcreteAttributePath &path);
+    static std::optional<DataModel::AttributeEntry> FindAttributeEntry(ServerClusterInterface * cluster,
+                                                                       const ConcreteAttributePath & path);
 };
 
 } // namespace app
