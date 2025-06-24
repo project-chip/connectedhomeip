@@ -115,9 +115,9 @@ struct ClusterState
     };
 
     QuieterReportingAttribute<ElapsedS> mCountdownTime{ DataModel::NullNullable };
-    MainStateEnum mMainState                                      = MainStateEnum::kUnknownEnumValue;
+    MainStateEnum mMainState                                             = MainStateEnum::kUnknownEnumValue;
     DataModel::Nullable<GenericOverallCurrentState> mOverallCurrentState = DataModel::NullNullable;
-    DataModel::Nullable<GenericOverallTargetState> mOverallTargetState = DataModel::NullNullable;
+    DataModel::Nullable<GenericOverallTargetState> mOverallTargetState   = DataModel::NullNullable;
     BitFlags<LatchControlModesBitmap> mLatchControlModes;
 
     // CurrentErrorList attribute is not stored here. When it is necessary it will be requested from the delegate to get the current
@@ -129,7 +129,7 @@ struct ClusterState
  */
 struct ClusterInitParameters
 {
-    MainStateEnum mMainState                                      = MainStateEnum::kStopped;
+    MainStateEnum mMainState                                             = MainStateEnum::kStopped;
     DataModel::Nullable<GenericOverallCurrentState> mOverallCurrentState = DataModel::NullNullable;
 };
 
@@ -174,7 +174,7 @@ public:
     CHIP_ERROR GetOverallTargetState(DataModel::Nullable<GenericOverallTargetState> & overallTarget);
     // The delegate is expected to return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to indicate end of list
     CHIP_ERROR GetCurrentErrorList(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
-    CHIP_ERROR GetLatchControlModes(BitFlags<LatchControlModesBitmap>  & latchControlModes);
+    CHIP_ERROR GetLatchControlModes(BitFlags<LatchControlModesBitmap> & latchControlModes);
     CHIP_ERROR GetFeatureMap(BitFlags<Feature> & featureMap);
     CHIP_ERROR GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision);
 
@@ -225,7 +225,7 @@ public:
      *
      * @return CHIP_ERROR Returns CHIP_NO_ERROR on success, or an appropriate error code on failure.
      */
-    CHIP_ERROR SetLatchControlModes(const BitFlags<LatchControlModesBitmap>  & latchControlModes);
+    CHIP_ERROR SetLatchControlModes(const BitFlags<LatchControlModesBitmap> & latchControlModes);
 
     /**
      * @brief Triggers an update to report a new countdown time from application.

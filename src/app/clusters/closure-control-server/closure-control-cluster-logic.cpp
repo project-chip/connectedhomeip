@@ -233,15 +233,17 @@ CHIP_ERROR ClusterLogic::SetOverallCurrentState(const DataModel::Nullable<Generi
         const GenericOverallCurrentState & incomingOverallCurrentState = overallCurrentState.Value();
 
         // Validate the incoming Positioning value and FeatureMap conformance.
-        if (incomingOverallCurrentState.position.HasValue() )
+        if (incomingOverallCurrentState.position.HasValue())
         {
             // If the positioning member is present in the incoming OverallCurrentState, we need to check if the Positioning
             // feature is supported by the closure. If the Positioning feature is not supported, return an error.
             VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-            if(!incomingOverallCurrentState.position.Value().IsNull()) {
+            if (!incomingOverallCurrentState.position.Value().IsNull())
+            {
                 VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallCurrentState.position.Value().Value()) !=
-                                    CurrentPositionEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+                                        CurrentPositionEnum::kUnknownEnumValue,
+                                    CHIP_ERROR_INVALID_ARGUMENT);
                 VerifyOrReturnError(IsSupportedOverallCurrentStatePositioning(incomingOverallCurrentState.position.Value().Value()),
                                     CHIP_ERROR_INVALID_ARGUMENT);
             }
@@ -304,7 +306,8 @@ CHIP_ERROR ClusterLogic::SetOverallTargetState(const DataModel::Nullable<Generic
             if (!incomingOverallTargetState.position.Value().IsNull())
             {
                 VerifyOrReturnError(EnsureKnownEnumValue(incomingOverallTargetState.position.Value().Value()) !=
-                                    TargetPositionEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+                                        TargetPositionEnum::kUnknownEnumValue,
+                                    CHIP_ERROR_INVALID_ARGUMENT);
                 VerifyOrReturnError(IsSupportedOverallTargetStatePositioning(incomingOverallTargetState.position.Value().Value()),
                                     CHIP_ERROR_INVALID_ARGUMENT);
             }
@@ -414,7 +417,7 @@ CHIP_ERROR ClusterLogic::GetCurrentErrorList(const AttributeValueEncoder::ListEn
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::GetLatchControlModes(BitFlags<LatchControlModesBitmap>  & latchControlModes)
+CHIP_ERROR ClusterLogic::GetLatchControlModes(BitFlags<LatchControlModesBitmap> & latchControlModes)
 {
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
