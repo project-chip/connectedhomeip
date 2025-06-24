@@ -52,16 +52,13 @@ class EventCallback:
     def __call__(self, event_result: EventReadResult, transaction: SubscriptionTransaction):
         # """This is the subscription callback when an event is received.
         #    It checks the event is from the expected_cluster and then posts it into the queue for later processing."""
-        if event_result.Status == Status.Success:
+        if event_result.Status == Status.Success and event_result.Header.ClusterId == self._expected_cluster.id:
+            logging.info(
+                f'Got subscription report for event on cluster {self._expected_cluster}: {event_result.Data}')
+            self._q.put(event_result)
             return
-
-        if event_result.Header.ClusterId != self._expected_cluster_id:
-            return
-
-        if self._expected_event_id is not None and event_result.Header.EventId != self._expected_event_id:
-            return
-
-        self._q.put(event_result)
+        if self._expected_cluster_id == event_result.Header.ClusterId and self._expected_event_id == event_result.Header.EventId:
+            self._q.put(event_result)
 
     @property
     def name(self) -> Optional[str]:
