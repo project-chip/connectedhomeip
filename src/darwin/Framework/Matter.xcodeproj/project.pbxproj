@@ -1626,7 +1626,7 @@
 				7534D1772CF8CDDF00F64654 /* AttributePersistenceProvider.cpp */,
 			);
 			name = persistence;
-			path = util/persistence;
+			path = persistence;
 			sourceTree = "<group>";
 		};
 		7567A2082DA5ABA500D91529 /* server-cluster */ = {
