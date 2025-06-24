@@ -28,7 +28,6 @@
 
 #include "ClosureControlEndpoint.h"
 #include "ClosureDimensionEndpoint.h"
-#include <lib/core/DataModelTypes.h>
 
 class ClosureManager
 {
@@ -58,7 +57,7 @@ public:
     /**
      * @brief Handles the "Calibrate" command for the closure manager.
      *
-     * This method intiates the calibration action for the closure system. It triggers closure action timer and
+     * This method initiates the calibration action for the closure system. It triggers closure action timer and
      * updates the current action and endpoint ID accordingly.
      *
      * @return Status::Success if the calibration command is successfully processed.

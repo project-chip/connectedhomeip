@@ -20,11 +20,6 @@
 #include "ClosureManager.h"
 #include <AppMain.h>
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/server/Server.h>
-#include <app/util/attribute-storage.h>
-#include <platform/CHIPDeviceLayer.h>
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::ClosureControl;
