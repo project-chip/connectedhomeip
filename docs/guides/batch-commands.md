@@ -71,7 +71,11 @@ public:
     [...]
   private:
     CommandHandler::Handle mHandle;
-    [...]  // Other member variable important for processing command
+    [...]  // Other member variables important for processing the command.
+            // This might, generally speaking, include a deep-copy of the command payload
+            // (since that can point into network buffers that will go away before the async
+            // code runs), information about the fabric and session involved (since both might
+            // go away before the async code runs), and so on.
   };
   [...]
   static void DispatchCommandsAsList(intptr_t arg) {
