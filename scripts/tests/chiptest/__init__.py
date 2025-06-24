@@ -294,6 +294,8 @@ def target_for_name(name: str):
         return TestTarget.RVC
     if name.startswith("Test_TC_TBRM_") or name.startswith("Test_TC_THNETDIR_") or name.startswith("Test_TC_WIFINM_"):
         return TestTarget.NETWORK_MANAGER
+    if name.startswith("Test_TC_CLCTRL_") or name.startswith("Test_TC_CLDIM_"):
+        return TestTarget.CLOSURE
     return TestTarget.ALL_CLUSTERS
 
 

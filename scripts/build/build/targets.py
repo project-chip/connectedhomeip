@@ -151,6 +151,7 @@ def BuildHostTarget():
         TargetPart('terms-and-conditions', app=HostApp.TERMS_AND_CONDITIONS),
         TargetPart('camera', app=HostApp.CAMERA),
         TargetPart('camera-controller', app=HostApp.CAMERA_CONTROLLER),
+        TargetPart('closure', app=HostApp.CLOSURE),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
