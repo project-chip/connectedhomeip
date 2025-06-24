@@ -96,11 +96,8 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         return cluster->WriteAttribute(request, decoder);
     }
 
-    const EmberAfAttributeMetadata *attributeMetadata = emberAfLocateAttributeMetadata(
-        request.path.mEndpointId,
-        request.path.mClusterId,
-        request.path.mAttributeId
-    );
+    const EmberAfAttributeMetadata * attributeMetadata =
+        emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
 
     // WriteAttribute requirement is that request.path is a VALID path inside the provider
     // metadata tree. Clients are supposed to validate this (and data version and other flags)

@@ -127,6 +127,26 @@ std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataMod
     return err == CHIP_ERROR_ACCESS_DENIED ? CHIP_IM_GLOBAL_STATUS(UnsupportedAccess) : CHIP_IM_GLOBAL_STATUS(AccessRestricted);
 }
 
+/// Checks that the given attribute path corresponds to a readable attribute. If not, it
+/// will return a CHIP_IM_GLOBAL_STATUS corresponding to the error.
+std::optional<Status> ValidateAttributeIsReadable(DataModel::Provider * dataModel, const ConcreteReadAttributePath & path)
+{
+    DataModel::AttributeFinder finder(dataModel);
+
+    std::optional<DataModel::AttributeEntry> entry = finder.Find(path);
+    if (!entry.has_value())
+    {
+        return DataModel::ValidateClusterPath(dataModel, path, Status::UnsupportedAttribute);
+    }
+
+    if (!entry->GetReadPrivilege().has_value())
+    {
+        return Status::UnsupportedAttribute;
+    }
+
+    return std::nullopt;
+}
+
 DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const SubjectDescriptor & subjectDescriptor,
                                                   bool isFabricFiltered, AttributeReportIBs::Builder & reportBuilder,
                                                   const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
@@ -175,6 +195,10 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
         // Global attributes are NOT directly handled by data model providers, instead
         // the are routed through metadata.
         status = ReadGlobalAttributeFromMetadata(dataModel, readRequest.path, attributeValueEncoder);
+    }
+    else if (auto existence_status = ValidateAttributeIsReadable(dataModel, path); existence_status.has_value())
+    {
+        status = *existence_status;
     }
     else
     {
