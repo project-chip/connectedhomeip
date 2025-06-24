@@ -30,7 +30,7 @@ else()
 endif()
 
 # Export CHIP_ROOT as an environment variable to be recognized by Kconfig
-set(ENV{CHIP_ROOT} ${CHIP_ROOT})
+set(COMMON_KCONFIG_ENV_SETTINGS CHIP_ROOT=${CHIP_ROOT})
 
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(NXP_EXAMPLE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common REALPATH)

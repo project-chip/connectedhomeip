@@ -36,6 +36,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
+from chip.clusters import Globals
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
@@ -92,7 +93,7 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
         self.step(3)
         # Create a dummy stream ID, initially it will fail. And a new viewport, that will also fail
         failingvideostreamID = 5
-        smallfailingviewport = Clusters.CameraAvSettingsUserLevelManagement.Structs.ViewportStruct(x1=1, y1=10, x2=1, y2=10)
+        smallfailingviewport = Globals.Structs.ViewportStruct(x1=1, y1=10, x2=1, y2=10)
 
         self.step(4)
         # Send a dptzsetviewport for the dodgy stream
@@ -108,9 +109,8 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
 
         self.step(7)
         # Send a dptzsetviewport for the correct stream but with an invalid viewport larger than the sensor call deal with dimension viewport
-        largefailingviewport = Clusters.CameraAvSettingsUserLevelManagement.Structs.ViewportStruct(x1=0, y1=0,
-                                                                                                   x2=sensordimensions.sensorWidth+16,
-                                                                                                   y2=sensordimensions.sensorHeight+9)
+        largefailingviewport = Globals.Structs.ViewportStruct(
+            x1=0, y1=0, x2=sensordimensions.sensorWidth+16, y2=sensordimensions.sensorHeight+9)
 
         self.step(8)
         await self.send_dptz_set_viewport_command(endpoint, videoStreamID, largefailingviewport, expected_status=Status.ConstraintError)
@@ -123,17 +123,14 @@ class TC_AVSUM_2_7(MatterBaseTest, AVSUMTestBase):
         x1 = sensordimensions.sensorWidth - viewportwidth
 
         self.step(9)
-        passingviewport = Clusters.CameraAvSettingsUserLevelManagement.Structs.ViewportStruct(x1=x1, y1=0,
-                                                                                              x2=sensordimensions.sensorWidth,
-                                                                                              y2=viewportheight)
+        passingviewport = Globals.Structs.ViewportStruct(x1=x1, y1=0, x2=sensordimensions.sensorWidth, y2=viewportheight)
         self.step(10)
         await self.send_dptz_set_viewport_command(endpoint, videoStreamID, passingviewport)
 
         self.step(11)
         # Deliberately mess with the aspect ratio, ensure that the viewport setting fails.
-        failingviewport = Clusters.CameraAvSettingsUserLevelManagement.Structs.ViewportStruct(x1=x1, y1=viewportheight//2,
-                                                                                              x2=sensordimensions.sensorWidth,
-                                                                                              y2=viewportheight)
+        failingviewport = Globals.Structs.ViewportStruct(
+            x1=x1, y1=viewportheight//2, x2=sensordimensions.sensorWidth, y2=viewportheight)
         self.step(12)
         await self.send_dptz_set_viewport_command(endpoint, videoStreamID, failingviewport, expected_status=Status.ConstraintError)
 

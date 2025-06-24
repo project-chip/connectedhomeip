@@ -67,7 +67,7 @@ qpg_executable("shell_app") {
 
   defines = []
 
-  ldscript = "${qpg_sdk_root}/Libraries/Qorvo/QorvoStack/gen/QorvoStack_${qpg_target_ic}${qpg_flavour}/QorvoStack_${qpg_target_ic}${qpg_flavour}.ld"
+  ldscript = "${qpg_sdk_root}/Applications/Matter/base/gen/base_${qpg_target_ic}_development/base_${qpg_target_ic}_development.ld"
 
   inputs = [ ldscript ]
 

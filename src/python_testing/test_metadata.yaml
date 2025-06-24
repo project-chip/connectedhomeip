@@ -21,18 +21,15 @@ not_automated:
       reason: Camera App does not support all features required for this TC
     - name: TC_AVSM_2_9.py
       reason: Camera App does not support all features required for this TC
-    - name: TC_AVSM_2_10.py
-      reason: Camera App does not support all features required for this TC
     - name: TC_AVSM_2_11.py
       reason: Camera App does not support all features required for this TC
     - name: TC_CNET_4_2.py
       reason: It has no CI execution block, it not executed in CI
-    - name: TC_CNET_4_3.py
-      reason:
-          network commissioning cluster does not return expected values on linux
-          example apps -
-          https://github.com/project-chip/connectedhomeip/issues/37824
     - name: TC_CNET_4_4.py
+      reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_9.py
+      reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_12.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_15.py
       reason: It has no CI execution block, is not executed in CI
@@ -123,6 +120,28 @@ not_automated:
     - name: TC_AVSUMTestBase.py
       reason:
           Shared code for Camera AV Settings (TC_AVSUM*), not a standalone test.
+    - name: TC_WEBRTC_1_1.py
+      reason:
+          Depends on Python WebRTC bindings. Will be enabled once local tests
+          are fully verified.
+    - name: TC_WEBRTC_1_2.py
+      reason:
+          Depends on Python WebRTC bindings. Will be enabled once local tests
+          are fully verified.
+    - name: TC_WEBRTC_1_3.py
+      reason:
+          Depends on Python WebRTC bindings. Will be enabled once local tests
+          are fully verified.
+    - name: TC_WEBRTC_1_4.py
+      reason:
+          Depends on Python WebRTC bindings. Will be enabled once local tests
+          are fully verified.
+    - name: TC_WEBRTC_1_5.py
+      reason:
+          Depends on Python WebRTC bindings. Will be enabled once local tests
+          are fully verified.
+    - name: TC_WEBRTC_Utils.py
+      reason: Helper methods for WebRTC TCs, not a standalone test.
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially

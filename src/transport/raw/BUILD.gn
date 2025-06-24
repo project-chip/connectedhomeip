@@ -52,6 +52,13 @@ static_library("raw") {
     ]
   }
 
+  if (chip_enable_nfc_based_commissioning) {
+    sources += [
+      "NFC.cpp",
+      "NFC.h",
+    ]
+  }
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [

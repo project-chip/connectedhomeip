@@ -38,36 +38,57 @@ CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
 OUTPUT_ROOT="$CHIP_ROOT/out/python_lib"
 
 declare enable_ble=true
+declare enable_ipv4=true
+declare enable_wifi_paf=true
 declare chip_detail_logging=false
-declare chip_mdns
+declare chip_mdns=minimal
 declare case_retry_delta
 declare install_virtual_env
 declare clean_virtual_env=yes
 declare install_pytest_requirements=yes
 declare install_jupyterlab=no
 declare -a extra_packages
+declare -a extra_gn_args
+
+# Detect OS and set override some defaults accordingly.
+OS_TYPE="$(uname -s)"
+case "$OS_TYPE" in
+    "Darwin")
+        enable_wifi_paf=false
+        ;;
+    "Linux")
+        enable_wifi_paf=true
+        ;;
+    *)
+        enable_wifi_paf=false
+        ;;
+esac
 
 help() {
 
-    echo "Usage: $file_name [ options ... ] [ -chip_detail_logging ChipDetailLoggingValue  ] [ -chip_mdns ChipMDNSValue  ]"
+    echo "Usage: $file_name [ options ... ]"
 
     echo "General Options:
   -h, --help                Display this information.
 Input Options:
-  -b, --enable_ble          <true/false>                    Enable BLE in the controller (default=true)
+  -g, --gn_args ARGS                                        Additional verbatim arguments to pass to the gn command.
+                                                            May be specified multiple times.
+  -b, --enable_ble          <true/false>                    Enable BLE in the controller (default=$enable_ble)
+  -p, --enable_wifi_paf     <true/false>                    Enable Wi-Fi PAF discovery in the controller (default=$enable_wifi_paf)
+  -4, --enable_ipv4         <true/false>                    Enable IPv4 in the controller (default=$enable_ipv4)
   -d, --chip_detail_logging <true/false>                    Specify ChipDetailLoggingValue as true or false.
-                                                            By default it is false.
+                                                            By default it is $chip_detail_logging.
   -m, --chip_mdns           ChipMDNSValue                   Specify ChipMDNSValue as platform or minimal.
-                                                            By default it is minimal.
+                                                            By default it is $chip_mdns.
   -t --time_between_case_retries MRPActiveRetryInterval     Specify MRPActiveRetryInterval value
                                                             Default is 300 ms
   -i, --install_virtual_env <path>                          Create a virtual environment with the wheels installed
                                                             <path> represents where the virtual environment is to be created.
   -c, --clean_virtual_env  <yes|no>                         When installing a virtual environment, create/clean it first.
-                                                            Defaults to yes.
+                                                            Defaults to $clean_virtual_env.
   --include_pytest_deps  <yes|no>                           Install requirements.txt for running scripts/tests and
                                                             src/python_testing scripts.
-                                                            Defaults to yes.
+                                                            Defaults to $install_pytest_requirements.
   -j, --jupyter-lab                                         Install jupyterlab requirements.
   -E, --extra_packages PACKAGE                              Install extra Python packages from PyPI.
                                                             May be specified multiple times.
@@ -86,7 +107,23 @@ while (($#)); do
         --enable_ble | -b)
             enable_ble=$2
             if [[ "$enable_ble" != "true" && "$enable_ble" != "false" ]]; then
-                echo "chip_detail_logging should have a true/false value, not '$enable_ble'"
+                echo "enable_ble should have a true/false value, not '$enable_ble'"
+                exit
+            fi
+            shift
+            ;;
+        --enable_wifi_paf | -p)
+            enable_wifi_paf=$2
+            if [[ "$enable_wifi_paf" != "true" && "$enable_wifi_paf" != "false" ]]; then
+                echo "enable_wifi_paf should have a true/false value, not '$enable_wifi_paf'"
+                exit
+            fi
+            shift
+            ;;
+        --enable_ipv4 | -4)
+            enable_ipv4=$2
+            if [[ "$enable_ipv4" != "true" && "$enable_ipv4" != "false" ]]; then
+                echo "enable_ipv4 should have a true/false value, not '$enable_ipv4'"
                 exit
             fi
             shift
@@ -131,6 +168,10 @@ while (($#)); do
             extra_packages+=("$2")
             shift
             ;;
+        --gn_args | -g)
+            extra_gn_args+=("$2")
+            shift
+            ;;
         --pregen_dir | -z)
             pregen_dir=$2
             shift
@@ -147,8 +188,22 @@ while (($#)); do
     shift
 done
 
+# Expand extra GN args properly
+all_extra_gn_args="${extra_gn_args[@]}"
+
 # Print input values
-echo "Input values: chip_detail_logging = $chip_detail_logging , chip_mdns = \"$chip_mdns\", chip_case_retry_delta=\"$chip_case_retry_delta\", pregen_dir=\"$pregen_dir\", enable_ble=\"$enable_ble\""
+echo "Building Python environment with the following configuration:"
+echo "  chip_detail_logging=\"$chip_detail_logging\""
+echo "  chip_mdns=\"$chip_mdns\""
+echo "  chip_case_retry_delta=\"$chip_case_retry_delta\""
+echo "  pregen_dir=\"$pregen_dir\""
+echo "  enable_ble=\"$enable_ble\""
+echo "  enable_wifi_paf=\"$enable_wifi_paf\""
+echo "  enable_ipv4=\"$enable_ipv4\""
+
+if [[ -n "${all_extra_gn_args}" ]]; then
+    echo "In addition, the following extra args will added to gn command line: $all_extra_gn_args"
+fi
 
 # Ensure we have a compilation environment
 source "$CHIP_ROOT/scripts/activate.sh"
@@ -175,7 +230,7 @@ export SYSTEM_VERSION_COMPAT=0
 # Make all possible human redable tracing available.
 tracing_options="matter_log_json_payload_hex=true matter_log_json_payload_decode_full=true matter_enable_tracing_support=true"
 
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_logging=$chip_detail_logging chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg chip_config_network_layer_ble=$enable_ble chip_enable_ble=$enable_ble chip_crypto=\"boringssl\""
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_logging=$chip_detail_logging chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg chip_config_network_layer_ble=$enable_ble chip_enable_ble=$enable_ble chip_inet_config_enable_ipv4=$enable_ipv4 chip_device_config_enable_wifipaf=$enable_wifi_paf chip_crypto=\"boringssl\" $all_extra_gn_args"
 
 # Compile Python wheels
 ninja -C "$OUTPUT_ROOT" python_wheels
