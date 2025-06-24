@@ -133,7 +133,8 @@ CHIP_ERROR P256Keypair::Initialize(ECPKeyTarget key_target)
     }
     else
     {
-        keyid += (mKeypair.mBytes[CRYPTO_KEYPAIR_KEYID_OFFSET] << (8 * 3) & 0xFF000000) |
+        // Key ID is passed via mKeypair.mBytes for persistent keys
+        keyid = (mKeypair.mBytes[CRYPTO_KEYPAIR_KEYID_OFFSET] << (8 * 3) & 0xFF000000) |
             (mKeypair.mBytes[CRYPTO_KEYPAIR_KEYID_OFFSET + 1] << (8 * 2) & 0x00FF0000) |
             (mKeypair.mBytes[CRYPTO_KEYPAIR_KEYID_OFFSET + 2] << (8 * 1) & 0x0000FF00) |
             (mKeypair.mBytes[CRYPTO_KEYPAIR_KEYID_OFFSET + 3] << (8 * 0) & 0x000000FF);

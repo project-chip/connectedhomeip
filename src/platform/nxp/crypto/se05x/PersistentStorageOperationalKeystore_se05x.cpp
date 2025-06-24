@@ -23,10 +23,10 @@ namespace chip {
 
 using namespace chip::Crypto;
 
-#define CHIP_SE05x_NODE_OP_KEY_INDEX 0x7D000010
+#define CHIP_SE05x_NODE_OP_KEY_INDEX 0x7E000000
 #define CHIP_SE05x_NODE_OP_REF_KEY_TEMPLATE                                                                                        \
     {                                                                                                                              \
-        0xA5, 0xA6, 0xB5, 0xB6, 0xA5, 0xA6, 0xB5, 0xB6, 0xEF, 0x00, 0x00, 0x00                                                     \
+        0xA5, 0xA6, 0xB5, 0xB6, 0xA5, 0xA6, 0xB5, 0xB6, 0x7E, 0x00, 0x00, 0x00                                                     \
     }
 #define CHIP_SE05x_NODE_OP_KEY_ID_INDEX 11
 
@@ -40,6 +40,7 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::NewOpKeypairForFabric(FabricIndex f
     };
     size_t privatekey_len = sizeof(privatekey);
     size_t pubkey_len     = sizeof(publickey);
+    uint32_t hsmKeyId     = 0;
 
     VerifyOrReturnError(mStorage != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsValidFabricIndex(fabricIndex), CHIP_ERROR_INVALID_FABRIC_INDEX);
@@ -58,7 +59,12 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::NewOpKeypairForFabric(FabricIndex f
     mPendingKeypair = Platform::New<Crypto::P256Keypair>();
     VerifyOrReturnError(mPendingKeypair != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    privatekey[CHIP_SE05x_NODE_OP_KEY_ID_INDEX] = fabricIndex;
+    hsmKeyId = CHIP_SE05x_NODE_OP_KEY_INDEX + fabricIndex;
+    privatekey[CHIP_SE05x_NODE_OP_KEY_ID_INDEX - 3] = (hsmKeyId >> 24) & 0xFF;
+    privatekey[CHIP_SE05x_NODE_OP_KEY_ID_INDEX - 2] = (hsmKeyId >> 16) & 0xFF;
+    privatekey[CHIP_SE05x_NODE_OP_KEY_ID_INDEX - 1] = (hsmKeyId >> 8) & 0xFF;
+    privatekey[CHIP_SE05x_NODE_OP_KEY_ID_INDEX]     = (hsmKeyId >> 0) & 0xFF;
+
     memcpy(serializedKeypair.Bytes(), &publickey, pubkey_len);
     memcpy(serializedKeypair.Bytes() + pubkey_len, &privatekey[0], privatekey_len);
     serializedKeypair.SetLength(privatekey_len + pubkey_len);
@@ -68,7 +74,7 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::NewOpKeypairForFabric(FabricIndex f
 
     ChipLogDetail(Crypto,
                   "PersistentStorageOpKeystorese05x::NewOpKeypairForFabric ::Create NIST256 key in SE05x (at id = 0x%" PRIx32 ")",
-                  static_cast<uint32_t>(fabricIndex + CHIP_SE05x_NODE_OP_KEY_INDEX));
+                  hsmKeyId);
     mPendingKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA);
     size_t csrLength = outCertificateSigningRequest.size();
     CHIP_ERROR err   = mPendingKeypair->NewCertificateSigningRequest(outCertificateSigningRequest.data(), csrLength);
