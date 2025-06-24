@@ -571,63 +571,34 @@ class ClusterAttributeChangeAccumulator:
         await_sequence_of_reports(report_queue=self.attribute_queue, endpoint_id=self._endpoint_id,
                                   attribute=attribute, sequence=sequence, timeout_sec=timeout_sec)
 
-    def get_last_attribute_report_value(self, endpoint, attribute: ClusterObjects.ClusterAttributeDescriptor, timeout_sec: float = 1.0):
-        """
-        Gets the last reported value for a specific attribute within a given timeout period.
-
-        Args:
-            endpoint (int): The endpoint identifier.
-            attribute (ClusterObjects.ClusterAttributeDescriptor): The attribute for which a report will be looked for.
-            timeout_sec (float): The maximum time to wait for the report.
-
-        Returns:
-            The attribute value from the last report or None if no reports for the specified attribute were found.
-        """
+    def get_attribute_value_from_queue(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor = None, timeout_sec: float = 1.0) -> Any:
         start_time = time.time()
         elapsed = 0.0
         time_remaining = timeout_sec
 
-        logging.info(
-            f"--> Getting the last report for the {attribute.__name__} attribute on endpoint {endpoint}, waiting for {timeout_sec:.1f} seconds.")
+        # Handles cluster subcription or attribute subscription
+        attribute = attribute or self._expected_attribute
 
-        first_match_found = False
-        timestamp_utc = None
-        old_report = None
         while time_remaining > 0:
-            # Snapshot copy at the beginning of the loop. This is thread-safe based on the design
-            all_reports = self._attribute_reports
+            logging.info(f"[FC] Waiting for {timeout_sec:.1f} seconds for report.")
+            try:
+                item: AttributeValue = self.attribute_queue.get(block=True, timeout=time_remaining)
 
-            # Recompute all last-value matches
-            # Iterating in reverse order to match with the last report first
-            for report in reversed(all_reports.get(attribute, [])):
-                if report.endpoint_id == endpoint:
-                    # - Get the timestamp of the first matching attribute report
-                    # - Since multiple reports for the same attribue are possible,
-                    #   the one with a timestamp greater than the one in the first
-                    #   match is the last report, which means that a new report
-                    #   arrived during the timeout period
-                    # - If now new report arrived during the timeout period, the
-                    #   last report's value will be used
-                    if not first_match_found:
-                        timestamp_utc = report.timestamp_utc
-                        first_match_found = True
-                        old_report = report
-                    if report.timestamp_utc > timestamp_utc:
-                        logging.info(f"--> Last report for the {attribute.__name__} attribute found - value: {report.value}")
-                        return report.value
+                # Track arrival of expected attribute
+                if item.endpoint_id == endpoint and item.attribute == attribute:
+                    elapsed = time.time() - start_time
+                    logging.info(f"[FC] Got attribute {attribute.__name__}, value {item.value} on endpoint {item.endpoint_id}. Elapsed {elapsed} sec.")
+                    return item.value
+
+            except queue.Empty:
+                # No error, we update timeouts and keep going
+                pass
 
             elapsed = time.time() - start_time
             time_remaining = timeout_sec - elapsed
-            time.sleep(0.1)
 
-        # If we reach here, no new report arrived before the timeout
-        # Returning the last report's value
-        if first_match_found:
-            logging.info(f"--> Last report for the {attribute.__name__} attribute found - value: {old_report.value}")
-            return old_report.value
+        logging.info(f"[FC] Report for {attribute.__name__} not found before time-out ({timeout_sec} sec).")
 
-        # Returning None if no reports for the specified attribute were found
-        logging.info(f"--> No reports for the {attribute.__name__} attribute were found.")
         return None
 
     @property

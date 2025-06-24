@@ -37,13 +37,18 @@
 
 import logging
 import operator
+import queue
+import time
 from typing import Any, Callable, Optional
 
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing.matter_testing import AttributeValue
 from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
                                          has_feature, run_if_endpoint_matches)
+
+
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -426,21 +431,27 @@ class TC_FAN_3_5(MatterBaseTest):
         attr = cluster.Attributes
         cmd = cluster.Commands
         sd_enum = cluster.Enums.StepDirectionEnum
+        percent_setting_zero = 0
+        
+        # Set PercentSetting to 0
+        await self.write_setting(attr.PercentSetting, percent_setting_zero)
+        
+        # Subscribe to PercentSetting attribute
         percent_setting_sub = ClusterAttributeChangeAccumulator(cluster, attr.PercentSetting)
         await percent_setting_sub.start(self.default_controller, self.dut_node_id, self.endpoint)
 
-        percent_setting_zero = 0
-        await self.write_setting(attr.PercentSetting, percent_setting_zero)
+        # Send Step command with direction=Increase 
         await self.send_step_command(cmd.Step(direction=sd_enum.kIncrease, wrap=False, lowestOff=True))
-        percent_setting = percent_setting_sub.get_last_attribute_report_value(
-            self.endpoint, attr.PercentSetting, self.timeout_sec)
+        
+        # Get the resulting PercentSetting attribute report value from the queue
+        percent_setting = percent_setting_sub.get_attribute_value_from_queue(endpoint=self.endpoint)
 
-        await percent_setting_sub.cancel()
-
+        # Calculate the percent setting range per step
         percent_setting_per_step = percent_setting - percent_setting_zero
-        logging.info(f"[FC] PercentSetting range per Step: {percent_setting_per_step}")
 
         self.percent_setting_per_step = percent_setting_per_step
+        await percent_setting_sub.cancel()
+        logging.info(f"[FC] PercentSetting range per Step: {percent_setting_per_step}")
 
     def get_expected_percent_setting(self, step: Clusters.FanControl.Commands.Step) -> int:
         cluster = Clusters.FanControl
@@ -455,17 +466,26 @@ class TC_FAN_3_5(MatterBaseTest):
         cluster = Clusters.FanControl
         attr = cluster.Attributes
         percent_setting_sub = next((sub for sub in self.subscriptions if sub._expected_attribute == attr.PercentSetting), None)
+        self.percent_setting_from_queue = []
 
         # Get the expected final PercentSetting value based on the Step command parameters
         percent_setting_expected = self.get_expected_percent_setting(step)
+        if step.direction == cluster.Enums.StepDirectionEnum.kDecrease and not step.wrap and not step.lowestOff:
+            logging.info(f"[FC] Step craw: {step}, percent_setting_expected: {percent_setting_expected}")
 
         for i in range(101):
             # Send the Step command
             await self.send_step_command(step)
 
             # Read the resulting PercentSetting attribute report value from the queue
-            percent_setting = percent_setting_sub.get_last_attribute_report_value(
-                self.endpoint, attr.PercentSetting, self.timeout_sec)
+            percent_setting = percent_setting_sub.get_attribute_value_from_queue(endpoint=self.endpoint)
+
+            if percent_setting is not None:
+                percent_setting_last = percent_setting
+                self.percent_setting_from_queue.append(percent_setting)
+            else:
+                percent_setting = percent_setting_last
+
             logging.info(f"[FC] PercentSetting attribute report value: {percent_setting}")
 
             # Send extra Step command to verify that the PercentSetting
@@ -489,6 +509,8 @@ class TC_FAN_3_5(MatterBaseTest):
                     asserts.fail(
                         f"[FC] The expected PercentSetting attribute value ({percent_setting_expected}) was never reached, the last reported value is ({percent_setting})."
                     )
+                    
+            logging.info(f"[FC] percent_setting_from_queue: {self.percent_setting_from_queue}")
 
     async def lowest_off_test(self, step: Clusters.FanControl.Commands.Step, handle_current_values: bool) -> None:
         """Tests the `lowestOff` flag for the given Step command.
@@ -577,8 +599,10 @@ class TC_FAN_3_5(MatterBaseTest):
         # - Get the values of the speed oriented attributes
         for sub in self.subscriptions:
             if sub._expected_attribute == attr.PercentSetting:
-                percent_setting_report_qty = len(sub.attribute_queue.queue)
-                percent_setting_values_produced = [q.value for q in sub.attribute_queue.queue]
+                # percent_setting_report_qty = len(sub.attribute_queue.queue)
+                # percent_setting_values_produced = [q.value for q in sub.attribute_queue.queue]
+                percent_setting_report_qty = len(self.percent_setting_from_queue)
+                percent_setting_values_produced = self.percent_setting_from_queue
                 self.verify_attribute_progression(step, attr.PercentSetting, percent_setting_values_produced)
                 sub.log_queue()
             if not handle_current_values:
@@ -682,6 +706,7 @@ class TC_FAN_3_5(MatterBaseTest):
         else:
             # If the number of PercentCurrent reports is greater or equal than the number of SpeedCurrent reports,
             # - Verify that all the expected PercentCurrent values are present in the reports
+            logging.info(f"[FC] CRASH percent_setting_report_qty: {percent_setting_report_qty}, percent_current_report_qty: {percent_current_report_qty}")
             if percent_setting_report_qty == percent_current_report_qty:
                 asserts.assert_equal(
                     percent_current_expected, percent_current_values_produced,
@@ -881,15 +906,16 @@ class TC_FAN_3_5(MatterBaseTest):
             )
         if percent_current_expected is not None:
             percent_current_sub = next((sub for sub in self.subscriptions if sub._expected_attribute == attr.PercentCurrent), None)
-            percent_current = percent_current_sub.get_last_attribute_report_value(
-                self.endpoint, attr.PercentCurrent, self.timeout_sec)
+            percent_current = percent_current_sub.get_attribute_value_from_queue(endpoint=self.endpoint)
+
             asserts.assert_equal(
                 percent_current, percent_current_expected,
                 f"[FC] PercentCurrent attribute value ({percent_current}) is not equal to the expected value ({percent_current_expected})."
             )
         if speed_current_expected is not None:
             speed_current_sub = next((sub for sub in self.subscriptions if sub._expected_attribute == attr.SpeedCurrent), None)
-            speed_current = speed_current_sub.get_last_attribute_report_value(self.endpoint, attr.SpeedCurrent, self.timeout_sec)
+            speed_current = speed_current_sub.get_attribute_value_from_queue(endpoint=self.endpoint)
+
             asserts.assert_equal(
                 speed_current, speed_current_expected,
                 f"[FC] SpeedCurrent attribute value ({speed_current}) is not equal to the expected value ({speed_current_expected})."
