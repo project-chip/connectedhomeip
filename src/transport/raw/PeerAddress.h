@@ -113,34 +113,7 @@ public:
 
     bool IsMulticast() { return Type::kUdp == mTransportType && mIPAddress.IsIPv6Multicast(); }
 
-    bool operator==(const PeerAddress & other) const
-    {
-        // Compare common fields
-        if (mTransportType != other.mTransportType)
-        {
-            return false;
-        }
-
-        // Compare transport-type specific fields
-        switch (mTransportType)
-        {
-        case Type::kNfc:
-            return (mId.mNFCShortId == other.mId.mNFCShortId);
-
-        case Type::kUdp:
-        case Type::kTcp:
-            return (mIPAddress == other.mIPAddress && mPort == other.mPort && mInterface == other.mInterface);
-
-        case Type::kWiFiPAF:
-            return (mId.mRemoteId == other.mId.mRemoteId);
-
-        case Type::kBle:
-        default:
-            // For transport types with no additional fields to compare
-            return true;
-        }
-    }
-
+    bool operator==(const PeerAddress & other) const;
     bool operator!=(const PeerAddress & other) const { return !(*this == other); }
 
     /// Maximum size of the string outputes by ToString. Format is of the form:
