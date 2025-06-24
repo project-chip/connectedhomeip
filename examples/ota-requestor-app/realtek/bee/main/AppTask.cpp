@@ -244,7 +244,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 
 void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed)
 {
-    if (false == chip::DeviceManager::CHIPDeviceManager::GetInstance().IsInitDone())
+    if (!chip::DeviceManager::CHIPDeviceManager::GetInstance().IsInitDone())
     {
         return;
     }
