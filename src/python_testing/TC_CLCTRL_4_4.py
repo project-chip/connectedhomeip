@@ -45,37 +45,31 @@ from mobly import asserts
 
 def current_latch_matcher(latch: bool) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
-        if report.attribute != Clusters.ClosureControl.Attributes.OverallCurrentState or not isinstance(report.value, list):
+        if report.attribute != Clusters.ClosureControl.Attributes.OverallCurrentState:
             return False
-        for entry in report.value:
-            if entry.Latch == latch:
-                return True
-        else:
-            return False
+
+        return report.value.latch == latch
+
     return AttributeMatcher.from_callable(description=f"OverallCurrentState.Latch is {latch}", matcher=predicate)
 
 
 def current_position_matcher(position: Clusters.ClosureControl.Enums.CurrentPositionEnum) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
-        if report.attribute != Clusters.ClosureControl.Attributes.OverallCurrentState or not isinstance(report.value, list):
+        if report.attribute != Clusters.ClosureControl.Attributes.OverallCurrentState:
             return False
-        for entry in report.value:
-            if entry.Position == position:
-                return True
-        else:
-            return False
+
+    return report.value.position == position
+
     return AttributeMatcher.from_callable(description=f"OverallCurrentState.Position is {position}", matcher=predicate)
 
 
-def main_state_matcher(main_state: Clusters.ClosureControl.Enums.MainStateEnum) -> AttributeMatcher:
+def main_state_matcher(main_state: Clusters.ClosureControl.Attributes.MainState) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
-        if report.attribute != Clusters.ClosureControl.Enums.MainStateEnum or not isinstance(report.value, list):
+        if report.attribute != Clusters.ClosureControl.Attributes.MainState:
             return False
-        for entry in report.value:
-            if entry == main_state:
-                return True
-        else:
-            return False
+
+        return report.value == main_state
+
     return AttributeMatcher.from_callable(description=f"MainState is {main_state}", matcher=predicate)
 
 
@@ -110,7 +104,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             TestStep("2l", "Unlatch the device manually"),
             TestStep("2m", "Wait until a subscription report with OverallCurrentState.Latch is received",
                      "OverallCurrentState.Latch should be False"),
-            TestStep("3 ", "Read the CountdownTime attribute when no operation is in progress", "CountdownTime should be 0 or null"),
+            TestStep(3, "Read the CountdownTime attribute when no operation is in progress", "CountdownTime should be 0 or null"),
             TestStep("4a", "Read the OverallCurrentState attribute",
                      "OverallCurrentState of the ClosureControl cluster is returned by the DUT; Position field is saved as CurrentPosition"),
             TestStep("4b", "Preparing Position-State: If CurrentPosition is FullyClosed, skip steps 4c and 4d"),
@@ -166,7 +160,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
         self.step("2c")
         sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureControl)
-        await sub_handler.start(self.default_controller, self.dut.node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
+        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
         self.step("2d")
         feature_map: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
@@ -214,7 +208,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
                 self.step("2i")
                 # Check if LatchControlModes Bit 1 is 0
-                if int(bin(latch_control_modes)[1]) == 0:
+                if format(latch_control_modes, 'b')[1] == 0:
                     self.skip_step("2j")
                     self.step("2k")
                     logging.info("LatchControlModes Bit 1 is 0, unlatch device manually")
@@ -226,7 +220,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
                     logging.info("LatchControlModes Bit 1 is 1, sending MoveTo command with Latch = False")
 
                     try:
-                        await self.send_single_cmd(endpoint=endpoint, cluster=Clusters.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo({"Latch": False}))
+                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False))
                     except InteractionModelError as e:
                         asserts.assert_equal(e.status, Status.Success, f"MoveTo command with Latch = False failed: {e}")
 
@@ -234,7 +228,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
                     self.skip_step("2l")
 
                 self.step("2m")
-                sub_handler.await_all_expected_report_matches(expected_matches=[current_latch_matcher(False)], timeout_sec=timeout)
+                sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
                 logging.info("Latch is now False, proceeding with CountdownTime checks")
 
         # STEP 3: Verify the CountdownTime when no operation is in progress
@@ -264,22 +258,22 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
             self.step("4c")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cluster=Clusters.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo({"Position": Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed}))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, f"MoveTo command to FullyClosed position failed: {e}")
 
             self.step("4d")
-            sub_handler.await_all_expected_report_matches(expected_matches=[current_position_matcher(
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(
                 Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed)], timeout_sec=timeout)
 
         self.step("4e")
         try:
-            await self.send_single_cmd(endpoint=endpoint, cluster=Clusters.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo({"Position": Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen}))
+            await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen))
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, f"MoveTo command to FullyOpened position failed: {e}")
 
         self.step("4f")
-        sub_handler.await_all_expected_report_matches(expected_matches=[main_state_matcher(
+        sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(
             Clusters.ClosureControl.Enums.MainStateEnum.kMoving)], timeout_sec=timeout)
 
         self.step("4g")
@@ -289,7 +283,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         logging.info(f"CurrentCountdownTime: {current_countdown_time}")
 
         self.step("4h")
-        sub_handler.await_all_expected_report_matches(expected_matches=[main_state_matcher(
+        sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(
             Clusters.ClosureControl.Enums.MainStateEnum.kStopped)], timeout_sec=timeout)
 
         self.step("4i")
@@ -300,7 +294,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             self.step("4j")
             countdown_time_after_operation: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
             asserts.assert_equal(countdown_time_after_operation, 0,
-                                 "CountdownTime should be 0 after operation completes, got: {countdown_time_after_operation}.")
+                                 f"CountdownTime should be 0 after operation completes, got: {countdown_time_after_operation}.")
             logging.info(f"CountdownTime after operation: {countdown_time_after_operation}")
 
         # STEP 5: Verify the CountdownTime behavior when an operation is interrupted
@@ -315,7 +309,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         else:
             self.step("5b")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cluster=Clusters.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo({"Position": Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed}))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, f"MoveTo command to FullyClosed position failed: {e}")
 
@@ -327,13 +321,13 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
             self.step("5d")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cluster=Clusters.ClosureControl, command=Clusters.ClosureControl.Commands.Stop({}))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.Stop())
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Stop command failed: {e}")
             logging.info("Stop command sent, waiting for MainState to become Stopped")
 
             self.step("5e")
-            sub_handler.await_all_expected_report_matches(expected_matches=[main_state_matcher(
+            sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(
                 Clusters.ClosureControl.Enums.MainStateEnum.kStopped)], timeout_sec=timeout)
 
             self.step("5f")

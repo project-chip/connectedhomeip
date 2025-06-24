@@ -48,37 +48,31 @@ from mobly import asserts
 
 def current_latch_matcher(latch: bool) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
-        if report.attribute != Clusters.ClosureControl.Attributes.OverallCurrentState or not isinstance(report.value, list):
+        if report.attribute != Clusters.ClosureControl.Attributes.OverallCurrentState:
             return False
-        for entry in report.value:
-            if entry.Latch == latch:
-                return True
-        else:
-            return False
+
+        return report.value.latch == latch
+
     return AttributeMatcher.from_callable(description=f"OverallCurrentState.Latch is {latch}", matcher=predicate)
 
 
 def target_latch_matcher(latch: bool) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
-        if report.attribute != Clusters.ClosureControl.Attributes.OverallTargetState or not isinstance(report.value, list):
+        if report.attribute != Clusters.ClosureControl.Attributes.OverallTargetState:
             return False
-        for entry in report.value:
-            if entry.Latch == latch:
-                return True
-        else:
-            return False
+
+        return report.value.latch == latch
+
     return AttributeMatcher.from_callable(description=f"OverallTargetState.Latch is {latch}", matcher=predicate)
 
 
-def main_state_matcher(main_state: Clusters.ClosureControl.Enums.MainStateEnum) -> AttributeMatcher:
+def main_state_matcher(main_state: Clusters.ClosureControl.Attributes.MainState) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
-        if report.attribute != Clusters.ClosureControl.Enums.MainStateEnum or not isinstance(report.value, list):
+        if report.attribute != Clusters.ClosureControl.Attributes.MainState:
             return False
-        for entry in report.value:
-            if entry == main_state:
-                return True
-        else:
-            return False
+
+        return report.value == main_state
+
     return AttributeMatcher.from_callable(description=f"MainState is {main_state}", matcher=predicate)
 
 
@@ -201,7 +195,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
 
         self.step("2e")
         sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureControl)
-        await sub_handler.start(self.default_controller, self.dut.node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
+        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
         self.step("2f")
         if current_latch is False:
@@ -216,7 +210,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
 
             self.step("2g")
             # Check if LatchControlModes Bit 1 is 0
-            if int(bin(latch_control_modes)[1]) == 0:
+            if format(latch_control_modes, 'b')[1] == 0:
                 self.skip_step("2h")
                 self.step("2i")
                 logging.info("LatchControlModes Bit 1 is 0, unlatch device manually")
@@ -228,7 +222,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
                 logging.info("LatchControlModes Bit 1 is 1, sending MoveTo command with Latch = False")
 
                 try:
-                    await self.send_single_cmd(endpoint=endpoint, cluster=Clusters.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo({"Latch": False}))
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False))
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.Success, f"MoveTo command with Latch = False failed: {e}")
 
@@ -236,7 +230,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
                 self.skip_step("2j")
 
             self.step("2k")
-            sub_handler.await_all_expected_report_matches(expected_matches=[current_latch_matcher(False)], timeout_sec=timeout)
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
 
         self.step("3a")
         if latch_control_modes != 0:
@@ -249,7 +243,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
             logging.info("LatchControlModes is 0, proceeding with fully manual latch tests")
             self.step("3b")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cluster=Clusters.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo({"Latch": True}))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=True))
                 logging.error("MoveTo command with Latch = True sent successfully, but should fail due to LatchControlModes = 0")
                 asserts.assert_true(False, "Expected INVALID_IN_STATE error, but command succeeded")
             except InteractionModelError as e:
@@ -259,11 +253,11 @@ class TC_CLCTRL_4_2(MatterBaseTest):
 
             self.step("3c")
             self.wait_for_user_input(prompt_msg="Manually latch the device and press enter when done")
-            sub_handler.await_all_expected_report_matches(expected_matches=[current_latch_matcher(True)], timeout_sec=timeout)
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(True)], timeout_sec=timeout)
 
             self.step("3d")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cluster=Clusters.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo({"Latch": False}))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False))
                 logging.error("MoveTo command with Latch = False sent successfully, but should fail due to LatchControlModes = 0")
                 asserts.assert_true(False, "Expected INVALID_IN_STATE error, but command succeeded")
             except InteractionModelError as e:
@@ -272,7 +266,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
                 logging.info("Received INVALID_IN_STATE error as expected")
             self.step("3e")
             self.wait_for_user_input(prompt_msg="Manually unlatch the device and press enter when done")
-            sub_handler.await_all_expected_report_matches(expected_matches=[current_latch_matcher(False)], timeout_sec=timeout)
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
 
         self.step("4a")
         if latch_control_modes != 1:
@@ -287,24 +281,24 @@ class TC_CLCTRL_4_2(MatterBaseTest):
         else:
             self.step("4b")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cluster=Clusters.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo({"Latch": True}))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=True))
                 logging.info("MoveTo command with Latch = True sent successfully")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, f"MoveTo command with Latch = True failed: {e}")
 
             self.step("4c")
-            sub_handler.await_all_expected_report_matches(expected_matches=[target_latch_matcher(True)], timeout_sec=timeout)
+            sub_handler.await_all_expected_report_matches(expected_matchers=[target_latch_matcher(True)], timeout_sec=timeout)
             self.step("4d")
-            sub_handler.await_all_expected_report_matches(expected_matches=[main_state_matcher(
-                Clusters.ClosureControl.Enums.MainStateEnum.Moving)], timeout_sec=timeout)
+            sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(
+                Clusters.ClosureControl.Enums.MainStateEnum.kMoving)], timeout_sec=timeout)
             self.step("4e")
-            sub_handler.await_all_expected_report_matches(expected_matches=[current_latch_matcher(True)], timeout_sec=timeout)
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(True)], timeout_sec=timeout)
             self.step("4f")
-            sub_handler.await_all_expected_report_matches(expected_matches=[main_state_matcher(
-                Clusters.ClosureControl.Enums.MainStateEnum.Stopped)], timeout_sec=timeout)
+            sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(
+                Clusters.ClosureControl.Enums.MainStateEnum.kStopped)], timeout_sec=timeout)
             self.step("4g")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cluster=Clusters.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo({"Latch": False}))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False))
                 logging.error("MoveTo command with Latch = False sent successfully, but should fail due to LatchControlModes = 1")
                 asserts.assert_true(False, "Expected INVALID_IN_STATE error, but command succeeded")
             except InteractionModelError as e:
@@ -313,7 +307,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
                 logging.info("Received INVALID_IN_STATE error as expected")
             self.step("4h")
             self.wait_for_user_input(prompt_msg="Manually unlatch the device and press enter when done")
-            sub_handler.await_all_expected_report_matches(expected_matches=[current_latch_matcher(False)], timeout_sec=timeout)
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
 
         self.step("5a")
         if latch_control_modes != 2:
@@ -328,7 +322,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
         else:
             self.step("5b")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cluster=Clusters.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo({"Latch": True}))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=True))
                 logging.error("MoveTo command with Latch = True sent successfully, but should fail due to LatchControlModes = 2")
                 asserts.assert_true(False, "Expected INVALID_IN_STATE error, but command succeeded")
             except InteractionModelError as e:
@@ -338,25 +332,25 @@ class TC_CLCTRL_4_2(MatterBaseTest):
 
             self.step("5c")
             self.wait_for_user_input(prompt_msg="Manually latch the device and press enter when done")
-            sub_handler.await_all_expected_report_matches(expected_matches=[current_latch_matcher(True)], timeout_sec=timeout)
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(True)], timeout_sec=timeout)
 
             self.step("5d")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cluster=Clusters.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo({"Latch": False}))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False))
                 logging.info("MoveTo command with Latch = False sent successfully")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, f"MoveTo command with Latch = False failed: {e}")
 
             self.step("5e")
-            sub_handler.await_all_expected_report_matches(expected_matches=[target_latch_matcher(False)], timeout_sec=timeout)
+            sub_handler.await_all_expected_report_matches(expected_matchers=[target_latch_matcher(False)], timeout_sec=timeout)
             self.step("5f")
-            sub_handler.await_all_expected_report_matches(expected_matches=[main_state_matcher(
-                Clusters.ClosureControl.Enums.MainStateEnum.Moving)], timeout_sec=timeout)
+            sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(
+                Clusters.ClosureControl.Enums.MainStateEnum.kMoving)], timeout_sec=timeout)
             self.step("5g")
-            sub_handler.await_all_expected_report_matches(expected_matches=[current_latch_matcher(False)], timeout_sec=timeout)
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
             self.step("5h")
-            sub_handler.await_all_expected_report_matches(expected_matches=[main_state_matcher(
-                Clusters.ClosureControl.Enums.MainStateEnum.Stopped)], timeout_sec=timeout)
+            sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(
+                Clusters.ClosureControl.Enums.MainStateEnum.kStopped)], timeout_sec=timeout)
 
         self.step("6a")
         if latch_control_modes != 3:
@@ -374,40 +368,40 @@ class TC_CLCTRL_4_2(MatterBaseTest):
         else:
             self.step("6b")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cluster=Clusters.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo({"Latch": True}))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=True))
                 logging.info("MoveTo command with Latch = True sent successfully")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, f"MoveTo command with Latch = True failed: {e}")
 
             self.step("6c")
-            sub_handler.await_all_expected_report_matches(expected_matches=[target_latch_matcher(True)], timeout_sec=timeout)
+            sub_handler.await_all_expected_report_matches(expected_matchers=[target_latch_matcher(True)], timeout_sec=timeout)
             self.step("6d")
-            sub_handler.await_all_expected_report_matches(expected_matches=[main_state_matcher(
-                Clusters.ClosureControl.Enums.MainStateEnum.Moving)], timeout_sec=timeout)
+            sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(
+                Clusters.ClosureControl.Enums.MainStateEnum.kMoving)], timeout_sec=timeout)
             self.step("6e")
-            sub_handler.await_all_expected_report_matches(expected_matches=[current_latch_matcher(True)], timeout_sec=timeout)
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(True)], timeout_sec=timeout)
             self.step("6f")
-            sub_handler.await_all_expected_report_matches(expected_matches=[main_state_matcher(
-                Clusters.ClosureControl.Enums.MainStateEnum.Stopped)], timeout_sec=timeout)
+            sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(
+                Clusters.ClosureControl.Enums.MainStateEnum.kStopped)], timeout_sec=timeout)
 
             self.step("6g")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cluster=Clusters.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo({"Latch": False}))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False))
                 logging.info("MoveTo command with Latch = False sent successfully")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, f"MoveTo command with Latch = False failed: {e}")
 
             self.step("6h")
-            sub_handler.await_all_expected_report_matches(expected_matches=[target_latch_matcher(False)], timeout_sec=timeout)
+            sub_handler.await_all_expected_report_matches(expected_matchers=[target_latch_matcher(False)], timeout_sec=timeout)
             self.step("6i")
-            sub_handler.await_all_expected_report_matches(expected_matches=[main_state_matcher(
-                Clusters.ClosureControl.Enums.MainStateEnum.Moving)],
+            sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(
+                Clusters.ClosureControl.Enums.MainStateEnum.kMoving)],
                 timeout_sec=timeout)
             self.step("6j")
-            sub_handler.await_all_expected_report_matches(expected_matches=[current_latch_matcher(False)], timeout_sec=timeout)
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
             self.step("6k")
-            sub_handler.await_all_expected_report_matches(expected_matches=[main_state_matcher(
-                Clusters.ClosureControl.Enums.MainStateEnum.Stopped)], timeout_sec=timeout)
+            sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(
+                Clusters.ClosureControl.Enums.MainStateEnum.kStopped)], timeout_sec=timeout)
 
 
 if __name__ == "__main__":
