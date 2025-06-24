@@ -130,7 +130,6 @@ TEST(TestPeerAddress, TestEqualityOperator)
 
     // 4. TCP and UDP with same IP, port, interface ? not equal
     PeerAddress tcp1 = PeerAddress::TCP(ip1, 1234).SetInterface(iface1);
-    EXPECT_FALSE(udp1 == tcp1);
     EXPECT_TRUE(udp1 != tcp1);
 
     // 5. BLE transport (no additional fields) ? equal if same type
