@@ -20,7 +20,6 @@
 [![Linux Standalone](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20Linux%20Standalone/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-linux-standalone.yaml)
 [![Linux Standalone](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20Linux%20Standalone/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-linux-standalone.yaml)
 [![Mbed OS](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20Mbed%20OS/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-mbed.yaml)
-[![MW320](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20MW320/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-mw320.yaml)
 [![nRF Connect SDK](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20nRF%20Connect%20SDK/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-nrfconnect.yaml)
 [![Open IoT SDK](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20Open%20IoT%20SDK/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-openiotsdk.yaml)
 [![QPG](https://github.com/project-chip/connectedhomeip/workflows/Build%20example%20-%20QPG/badge.svg)](https://github.com/project-chip/connectedhomeip/actions/workflows/examples-qpg.yaml)

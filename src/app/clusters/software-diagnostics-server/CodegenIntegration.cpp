@@ -17,6 +17,7 @@
 #include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
 #include <app/static-cluster-config/SoftwareDiagnostics.h>
+#include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 using namespace chip;
@@ -24,11 +25,11 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoftwareDiagnostics;
 
-// this file is ever only included IF software diagnostics is enabled and that MUST happen only on endpoint 0
-static_assert(SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 1,
-              "Exactly one software diagnostics cluster instance may exist");
-static_assert(SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId,
-              "The software diagnostics cluster must be on endpoint 0");
+// for fixed endpoint, this file is ever only included IF software diagnostics is enabled and that MUST happen only on endpoint 0
+// the static assert is skipped in case of dynamic endpoints.
+static_assert((SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
+               SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId) ||
+              SoftwareDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 0);
 
 namespace {
 
@@ -56,20 +57,38 @@ constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId
 
 } // namespace
 
-void MatterSoftwareDiagnosticsPluginServerInitCallback()
+void emberAfSoftwareDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
-    // NOTE: Code already asserts that only kRootEndpointId is registered.
+    VerifyOrReturn(endpointId == kRootEndpointId);
     const SoftwareDiagnosticsEnabledAttributes enabledAttributes{
         .enableThreadMetrics     = IsAttributeEnabled(kRootEndpointId, Attributes::ThreadMetrics::Id),
         .enableCurrentHeapFree   = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapFree::Id),
         .enableCurrentHeapUsed   = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapUsed::Id),
         .enableCurrentWatermarks = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentHeapHighWatermark::Id),
     };
+
     gServer.Create(enabledAttributes);
-    (void) CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
+
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to register SoftwareDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
+                     err.Format());
+    }
 }
-void MatterSoftwareDiagnosticsPluginServerShutdownCallback()
+
+void emberAfSoftwareDiagnosticsClusterShutdownCallback(EndpointId endpointId)
 {
-    (void) CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
+    VerifyOrReturn(endpointId == kRootEndpointId);
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to unregister SoftwareDiagnostics on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId,
+                     err.Format());
+    }
     gServer.Destroy();
 }
+
+void MatterSoftwareDiagnosticsPluginServerInitCallback() {}
+
+void MatterSoftwareDiagnosticsPluginServerShutdownCallback() {}

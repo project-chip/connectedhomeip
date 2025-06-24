@@ -25,18 +25,6 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-static auto __attribute__((unused)) EnsureKnownEnumValue(ZoneManagement::StatusCodeEnum val)
-{
-    using EnumType = ZoneManagement::StatusCodeEnum;
-    switch (val)
-    {
-    case EnumType::kZoneNotFound:
-    case EnumType::kZoneInUse:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(ZoneManagement::ZoneEventStoppedReasonEnum val)
 {
     using EnumType = ZoneManagement::ZoneEventStoppedReasonEnum;

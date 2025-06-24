@@ -68,4 +68,25 @@ if (pw_enable_fuzz_test_targets) {
       "${dir_pw_unit_test}",
     ]
   }
+
+  chip_pw_fuzz_target("fuzz-CASE-pw") {
+    test_source = [ "FuzzCASE_PW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/app/icd/server:icd-server-config",
+      "${chip_root}/src/credentials/tests:cert_test_vectors",
+      "${chip_root}/src/crypto/tests:tests.lib",
+      "${chip_root}/src/lib/core",
+      "${chip_root}/src/lib/core:string-builder-adapters",
+      "${chip_root}/src/lib/support",
+      "${chip_root}/src/lib/support:test_utils",
+      "${chip_root}/src/lib/support:testing",
+      "${chip_root}/src/lib/support/tests:pw-test-macros",
+      "${chip_root}/src/messaging/tests:helpers",
+      "${chip_root}/src/protocols",
+      "${chip_root}/src/protocols/secure_channel",
+      "${chip_root}/src/protocols/secure_channel:check-in-counter",
+      "${chip_root}/src/transport/raw/tests:helpers",
+      "${dir_pw_unit_test}",
+    ]
+  }
 }
