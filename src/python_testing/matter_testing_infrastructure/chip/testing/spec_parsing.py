@@ -38,16 +38,19 @@ from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocat
                                          EventPathLocation, FeaturePathLocation, ProblemLocation, ProblemNotice, ProblemSeverity)
 from chip.tlv import uint
 
+# Type alias for improved readability
+ACCESS_CONTROL_PRIVILEGE_ENUM = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
+
 _PRIVILEGE_STR = {
     None: "N/A",
-    Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView: "V",
-    Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate: "O",
-    Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kManage: "M",
-    Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister: "A",
+    ACCESS_CONTROL_PRIVILEGE_ENUM.kView: "V",
+    ACCESS_CONTROL_PRIVILEGE_ENUM.kOperate: "O",
+    ACCESS_CONTROL_PRIVILEGE_ENUM.kManage: "M",
+    ACCESS_CONTROL_PRIVILEGE_ENUM.kAdminister: "A",
 }
 
 
-def to_access_code(privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum) -> str:
+def to_access_code(privilege: ACCESS_CONTROL_PRIVILEGE_ENUM) -> str:
     return _PRIVILEGE_STR.get(privilege, "")
 
 
@@ -74,13 +77,13 @@ class XmlAttribute:
     name: str
     datatype: str
     conformance: ConformanceCallable
-    read_access: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
-    write_access: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
+    read_access: ACCESS_CONTROL_PRIVILEGE_ENUM
+    write_access: ACCESS_CONTROL_PRIVILEGE_ENUM
     write_optional: bool
 
     def access_string(self):
-        read_marker = "R" if self.read_access is not Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue else ""
-        write_marker = "W" if self.write_access is not Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue else ""
+        read_marker = "R" if self.read_access is not ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue else ""
+        write_marker = "W" if self.write_access is not ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue else ""
         read_access_marker = f'{to_access_code(self.read_access)}'
         write_access_marker = f'{to_access_code(self.write_access)}'
         return f'{read_marker}{write_marker} {read_access_marker}{write_access_marker}'
@@ -94,7 +97,7 @@ class XmlCommand:
     id: int
     name: str
     conformance: ConformanceCallable
-    privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
+    privilege: ACCESS_CONTROL_PRIVILEGE_ENUM
 
     def __str__(self):
         return f'{self.name} id:0x{self.id:02X} {self.id} conformance: {str(self.conformance)} privilege: {str(self.privilege)}'
@@ -340,23 +343,23 @@ class ClusterParser:
             return False
         return access_xml.attrib['write'] == 'optional'
 
-    def parse_access(self, element_xml: ElementTree.Element, access_xml: Optional[ElementTree.Element], conformance: Optional[ConformanceCallable]) -> tuple[Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum], Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum], Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum]]:
+    def parse_access(self, element_xml: ElementTree.Element, access_xml: Optional[ElementTree.Element], conformance: Optional[ConformanceCallable]) -> tuple[Optional[ACCESS_CONTROL_PRIVILEGE_ENUM], Optional[ACCESS_CONTROL_PRIVILEGE_ENUM], Optional[ACCESS_CONTROL_PRIVILEGE_ENUM]]:
         ''' Returns a tuple of access types for read / write / invoke'''
-        def str_to_access_type(privilege_str: str) -> Optional[Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum]:
+        def str_to_access_type(privilege_str: str) -> Optional[ACCESS_CONTROL_PRIVILEGE_ENUM]:
             if privilege_str == 'view':
-                return typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView)
+                return typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kView)
             if privilege_str == 'operate':
-                return typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate)
+                return typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kOperate)
             if privilege_str == 'manage':
-                return typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kManage)
+                return typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kManage)
             if privilege_str == 'admin':
-                return typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister)
+                return typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kAdminister)
             # We don't know what this means, for now, assume no access and mark a warning
 
             location = get_location_from_element(element_xml, self._cluster_id)
             self._problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
                                                 severity=ProblemSeverity.WARNING, problem=f'Unknown access type {privilege_str}'))
-            return typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue)
+            return typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue)
 
         if access_xml is None:
             # Derived clusters can inherit their access from the base and that's fine, so don't add an error
@@ -376,18 +379,18 @@ class ClusterParser:
         try:
             read_access = str_to_access_type(access_xml.attrib['readPrivilege'])
         except KeyError:
-            read_access = typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum,
-                                      Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue)
+            read_access = typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM,
+                                      ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue)
         try:
             write_access = str_to_access_type(access_xml.attrib['writePrivilege'])
         except KeyError:
-            write_access = typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum,
-                                       Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue)
+            write_access = typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM,
+                                       ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue)
         try:
             invoke_access = str_to_access_type(access_xml.attrib['invokePrivilege'])
         except KeyError:
-            invoke_access = typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum,
-                                        Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue)
+            invoke_access = typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM,
+                                        ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue)
 
         return (read_access, write_access, invoke_access)
 
@@ -420,20 +423,20 @@ class ClusterParser:
                 conformance = or_operation([conformance, attributes[code].conformance])
             read_access, write_access, _ = self.parse_access(element, access_xml, conformance)
             write_optional = False
-            if write_access not in [None, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue]:
+            if write_access not in [None, ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue]:
                 write_optional = self.parse_write_optional(element, access_xml)
             attributes[code] = XmlAttribute(name=element.attrib['name'], datatype=datatype,
                                             conformance=conformance,
                                             read_access=read_access if read_access is not None else typing.cast(
-                                                Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue),
+                                                ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue),
                                             write_access=write_access if write_access is not None else typing.cast(
-                                                Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue),
+                                                ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue),
                                             write_optional=write_optional)
         # Add in the global attributes for the base class
         for id in GlobalAttributeIds:
             # TODO: Add data type here. Right now it's unused. We should parse this from the spec.
             attributes[uint(id)] = XmlAttribute(name=id.to_name(), datatype="", conformance=mandatory(
-            ), read_access=typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView), write_access=typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue), write_optional=False)
+            ), read_access=typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kView), write_access=typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue), write_optional=False)
         return attributes
 
     def get_command_type(self, element: ElementTree.Element) -> CommandType:
@@ -461,7 +464,7 @@ class ClusterParser:
             if conformance is not None:
                 _, _, privilege = self.parse_access(element, access_xml, conformance)
                 commands.append(XmlCommand(id=code, name=element.attrib['name'], conformance=conformance,
-                                           privilege=privilege if privilege is not None else typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue)))
+                                           privilege=privilege if privilege is not None else typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue)))
         return commands
 
     def parse_commands(self, command_type: CommandType) -> dict[uint, XmlCommand]:
@@ -478,7 +481,7 @@ class ClusterParser:
 
             _, _, privilege = self.parse_access(element, access_xml, conformance)
             commands[uint(code)] = XmlCommand(id=code, name=element.attrib['name'], conformance=conformance,
-                                              privilege=privilege if privilege is not None else typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue))
+                                              privilege=privilege if privilege is not None else typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue))
         return commands
 
     def parse_events(self) -> dict[uint, XmlEvent]:
@@ -711,10 +714,10 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
     # Remove this workaround when https://github.com/csa-data-model/projects/issues/330 is fixed
     temp_control_id = uint(Clusters.TemperatureControl.id)
     if temp_control_id in clusters and not clusters[temp_control_id].attributes:
-        view = typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum,
-                           Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView)
-        none = typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum,
-                           Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue)
+        view = typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM,
+                           ACCESS_CONTROL_PRIVILEGE_ENUM.kView)
+        none = typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM,
+                           ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue)
         clusters[temp_control_id].attributes = {
             uint(0x00): XmlAttribute(name='TemperatureSetpoint', datatype='temperature', conformance=feature(uint(0x01), 'TN'), read_access=view, write_access=none, write_optional=False),
             uint(0x01): XmlAttribute(name='MinTemperature', datatype='temperature', conformance=feature(uint(0x01), 'TN'), read_access=view, write_access=none, write_optional=False),
@@ -739,9 +742,9 @@ def build_xml_clusters(data_model_directory: Union[PrebuiltDataModelDirectory, T
                                     conformance_support.attribute(schedules_id, schedules_name)])
 
         clusters[thermostat_id].accepted_commands[atomic_request_cmd_id] = XmlCommand(
-            id=atomic_request_cmd_id, name=atomic_request_name, conformance=conformance, privilege=typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate))
+            id=atomic_request_cmd_id, name=atomic_request_name, conformance=conformance, privilege=typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kOperate))
         clusters[thermostat_id].generated_commands[atomic_response_cmd_id] = XmlCommand(
-            id=atomic_response_cmd_id, name=atomic_response_name, conformance=conformance, privilege=typing.cast(Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum, Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate))
+            id=atomic_response_cmd_id, name=atomic_response_name, conformance=conformance, privilege=typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kOperate))
         clusters[thermostat_id].command_map[atomic_request_name] = atomic_request_cmd_id
         clusters[thermostat_id].command_map[atomic_response_name] = atomic_response_cmd_id
 
@@ -767,8 +770,8 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
                 ret[id].write_access = override.write_access
 
         for attr_id, attribute in ret.items():
-            if attribute.read_access == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue and \
-               attribute.write_access == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
+            if attribute.read_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue and \
+               attribute.write_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue:
                 location = AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=attr_id)
                 problems.append(ProblemNotice(test_name='Spec XML parsing', location=location,
                                               severity=ProblemSeverity.WARNING, problem=f'Attribute {attribute.name} (ID: {attr_id}) in cluster {cluster_id} has unknown read and write access after combining base and derived values.'))
