@@ -34,7 +34,6 @@ pw_python_package("chip-testing-module") {
   inputs = [ "env_test.yaml" ]
 
   sources = [
-    "chip.testing.matter_stack_state",
     "chip/testing/__init__.py",
     "chip/testing/apps.py",
     "chip/testing/basic_composition.py",
@@ -47,6 +46,7 @@ pw_python_package("chip-testing-module") {
     "chip/testing/global_stash.py",
     "chip/testing/matchers.py",
     "chip/testing/matter_asserts.py",
+    "chip/testing/matter_stack_state.py",
     "chip/testing/matter_testing.py",
     "chip/testing/metadata.py",
     "chip/testing/pics.py",
