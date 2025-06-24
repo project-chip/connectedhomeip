@@ -56,35 +56,4 @@ void pychip_webrtc_client_add_ice_candidate(void * client, char * candidate, cha
 {
     chip::webrtc::webrtc_client_add_ice_candidate(client, candidate, mid);
 }
-
-#if 0
-void pychip_webrtc_CloseConnection(void * client)
-{
-    return chip::webrtc::ClosePeerConnection(client);
-}
-
-void pychip_webrtc_DestroyClient(void * client)
-{
-    return chip::webrtc::DestroyClient(client);
-}
-
-
-void pychip_webrtc_GetStats(void * client)
-{
-    return chip::webrtc::GetStats(client);
-}
-
-const char * pychip_webrtc_GetLocalSDP(void * client)
-{
-    return chip::webrtc::GetLocalSdp(client);
-}
-
-void pychip_webrtc_SetCallbacks(void * client, SdpOfferCallback offer_cb, SdpAnswerCallback answer_cb, IceCallback ice_cb,
-                                ErrorCallback error_cb, PeerConnectedCallback peer_connected_cb,
-                                PeerDisconnectedCallback peer_disconnected_cb, StatsCollectedCallback stats_callback)
-{
-    chip::webrtc::SetCallbacks(client, offer_cb, answer_cb, ice_cb, error_cb, peer_connected_cb, peer_disconnected_cb,
-                               stats_callback);
-}
-#endif
 }
