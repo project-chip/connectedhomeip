@@ -52,26 +52,6 @@ namespace {
 using namespace chip::app::Compatibility::Internal;
 using Protocols::InteractionModel::Status;
 
-bool ClusterContainsReadableAttribute(ServerClusterInterface * cluster, const ConcreteAttributePath & path)
-{
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> builder;
-
-    if (cluster->Attributes(path, builder) != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-
-    for (auto info : builder.TakeBuffer())
-    {
-        if (info.attributeId == path.mAttributeId)
-        {
-            return info.GetReadPrivilege().has_value();
-        }
-    }
-
-    return false;
-}
-
 /// Attempts to read via an attribute access interface (AAI)
 ///
 /// If it returns a CHIP_ERROR, then this is a FINAL result (i.e. either failure or success).
