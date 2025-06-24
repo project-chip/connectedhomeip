@@ -29,21 +29,26 @@
 #include "ClosureControlEndpoint.h"
 #include "ClosureDimensionEndpoint.h"
 
+#include <lib/core/Optional.h>
+#include <lib/core/DataModelTypes.h>
+#include <protocols/interaction_model/StatusCode.h>
+
 class ClosureManager
 {
 public:
-    enum Action_t
+    enum class ClosureAction
     {
-        CALIBRATE_ACTION = 0,
-        MOVE_TO_ACTION,
-        LATCH_ACTION,
-        STOP_ACTION,
-        SET_TARGET_ACTION,
-        STEP_ACTION,
-        PANEL_LATCH_ACTION,
+        kCalibrateAction = 0,
+        kMoveToAction,
+        kLatchAction,
+        kStopAction,
+        kSetTargetAction,
+        kStepAction,
+        kPanelLatchAction,
 
-        INVALID_ACTION
+        kInvalidAction
     };
+
     /**
      * @brief Initializes the ClosureManager.
      *
@@ -145,7 +150,7 @@ private:
      *
      * Initialized to an invalid action and updated as needed during operations.
      */
-    Action_t mCurrentAction = Action_t::INVALID_ACTION;
+    ClosureAction mCurrentAction = ClosureAction::kInvalidAction;
 
     /**
      * @brief Timer callback handler for closure actions.
@@ -166,7 +171,7 @@ private:
      *
      * @param action The action that has been completed.
      */
-    void HandleClosureActionComplete(ClosureManager::Action_t action);
+    void HandleClosureActionComplete(ClosureAction action);
 
     bool mIsCalibrationActionInProgress = false;
     bool mIsMoveToActionInProgress      = false;

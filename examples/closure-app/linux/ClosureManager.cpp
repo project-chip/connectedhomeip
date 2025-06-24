@@ -120,7 +120,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
     VerifyOrReturnValue(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kCountdownTimeSeconds),
                                                               HandleClosureActionTimer, this) == CHIP_NO_ERROR,
                         Status::Failure, ChipLogError(AppServer, "Failed to start closure action timer"));
-    mCurrentAction                 = ClosureManager::Action_t::CALIBRATE_ACTION;
+    mCurrentAction                 = ClosureAction::kCalibrateAction;
     mCurrentEndpointId             = kClosureEndpoint1;
     mIsCalibrationActionInProgress = true;
 
@@ -171,25 +171,25 @@ void ClosureManager::HandleClosureActionTimer(System::Layer * layer, void * aApp
 
     switch (manager->mCurrentAction)
     {
-    case ClosureManager::Action_t::CALIBRATE_ACTION:
-        manager->HandleClosureActionComplete(ClosureManager::Action_t::CALIBRATE_ACTION);
+    case ClosureAction::kCalibrateAction:
+        manager->HandleClosureActionComplete(ClosureAction::kCalibrateAction);
         break;
-    case ClosureManager::Action_t::STOP_ACTION:
-        manager->HandleClosureActionComplete(ClosureManager::Action_t::STOP_ACTION);
+    case ClosureAction::kStopAction:
+        manager->HandleClosureActionComplete(ClosureAction::kStopAction);
         break;
-    case ClosureManager::Action_t::MOVE_TO_ACTION:
-        manager->HandleClosureActionComplete(ClosureManager::Action_t::MOVE_TO_ACTION);
+    case ClosureAction::kMoveToAction:
+        manager->HandleClosureActionComplete(ClosureAction::kMoveToAction);
         break;
-    case ClosureManager::Action_t::LATCH_ACTION:
+    case ClosureAction::kLatchAction:
         // Add logic to handle Latch action completion
         break;
-    case ClosureManager::Action_t::SET_TARGET_ACTION:
-        manager->HandleClosureActionComplete(ClosureManager::Action_t::SET_TARGET_ACTION);
+    case ClosureAction::kSetTargetAction:
+        manager->HandleClosureActionComplete(ClosureAction::kSetTargetAction);
         break;
-    case ClosureManager::Action_t::STEP_ACTION:
-        manager->HandleClosureActionComplete(ClosureManager::Action_t::STEP_ACTION);
+    case ClosureAction::kStepAction:
+        manager->HandleClosureActionComplete(ClosureAction::kStepAction);
         break;
-    case ClosureManager::Action_t::PANEL_LATCH_ACTION:
+    case ClosureAction::kPanelLatchAction:
         // Add logic to handle Panel Latch action completion
         break;
     default:
@@ -198,12 +198,12 @@ void ClosureManager::HandleClosureActionTimer(System::Layer * layer, void * aApp
     }
 }
 
-void ClosureManager::HandleClosureActionComplete(ClosureManager::Action_t action)
+void ClosureManager::HandleClosureActionComplete(ClosureAction action)
 {
     ChipLogProgress(AppServer, "HandleClosureActionComplete called for action: %d", static_cast<int>(action));
     switch (action)
     {
-    case ClosureManager::Action_t::CALIBRATE_ACTION: {
+    case ClosureAction::kCalibrateAction: {
         mClosureEndpoint.OnCalibrateActionComplete();
         mClosurePanelEndpoint1.OnCalibrateActionComplete();
         mClosurePanelEndpoint2.OnCalibrateActionComplete();
@@ -211,7 +211,7 @@ void ClosureManager::HandleClosureActionComplete(ClosureManager::Action_t action
         break;
     }
 
-    case ClosureManager::Action_t::STOP_ACTION: {
+    case ClosureAction::kStopAction: {
         if (mIsCalibrationActionInProgress)
         {
             mClosureEndpoint.OnStopCalibrateActionComplete();
@@ -239,7 +239,7 @@ void ClosureManager::HandleClosureActionComplete(ClosureManager::Action_t action
         break;
     }
 
-    case ClosureManager::Action_t::MOVE_TO_ACTION: {
+    case ClosureAction::kMoveToAction: {
         mClosureEndpoint.OnMoveToActionComplete();
         mClosurePanelEndpoint1.OnMoveToActionComplete();
         mClosurePanelEndpoint2.OnMoveToActionComplete();
@@ -247,12 +247,12 @@ void ClosureManager::HandleClosureActionComplete(ClosureManager::Action_t action
         break;
     }
 
-    case ClosureManager::Action_t::SET_TARGET_ACTION:
+    case ClosureAction::kSetTargetAction:
         // Add logic to handle SetTarget action completion
         mIsSetTargetActionInProgress = false;
         break;
 
-    case ClosureManager::Action_t::STEP_ACTION:
+    case ClosureAction::kStepAction:
         // Add logic to handle Step action completion
         mIsStepActionInProgress = false;
         break;
@@ -261,6 +261,6 @@ void ClosureManager::HandleClosureActionComplete(ClosureManager::Action_t action
         ChipLogError(AppServer, "Invalid action received in HandleClosureAction");
         break;
     }
-    mCurrentAction     = ClosureManager::Action_t::INVALID_ACTION;
+    mCurrentAction     = ClosureAction::kInvalidAction;
     mCurrentEndpointId = chip::kInvalidEndpointId;
 }
