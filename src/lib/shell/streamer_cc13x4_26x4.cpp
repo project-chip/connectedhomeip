@@ -46,7 +46,7 @@ ssize_t streamer_cc13xx_26xx_read(streamer_t * streamer, char * buf, size_t len)
     size_t ret;
 
     ret = uartConsoleRead(buf, len);
-    
+
     return ret;
 }
 

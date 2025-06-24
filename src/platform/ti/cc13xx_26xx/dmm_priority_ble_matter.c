@@ -29,7 +29,7 @@
 /* BLE Activity */
 typedef enum
 {
-    DMM_BLE_CONNECTION    = 0x07D0,     
+    DMM_BLE_CONNECTION    = 0x07D0,
     DMM_BLE_CON_EST       = 0x03E8,
     DMM_BLE_BROADCASTING  = 0x0BB8,
     DMM_BLE_OBSERVING     = 0x0FA0,
@@ -68,7 +68,7 @@ StackActivity activityBLE_bleLthreadH[ACTIVITY_NUM_BLE*PRIORITY_NUM] =
 
 StackActivity activityThread_bleLthreadH[ACTIVITY_NUM_THREAD*PRIORITY_NUM] =
 {
-     DMM_GLOBAL_PRIORITY(DMM_THREAD_TX_DATA, DMM_StackPNormal, 80), 
+     DMM_GLOBAL_PRIORITY(DMM_THREAD_TX_DATA, DMM_StackPNormal, 80),
      DMM_GLOBAL_PRIORITY(DMM_THREAD_TX_DATA, DMM_StackPHigh, 180),
      DMM_GLOBAL_PRIORITY(DMM_THREAD_TX_DATA, DMM_StackPUrgent, 240),
 
