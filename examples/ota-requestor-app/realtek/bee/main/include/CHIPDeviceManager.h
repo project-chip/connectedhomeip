@@ -112,7 +112,7 @@ public:
      */
     CHIPDeviceManagerCallbacks * GetCHIPDeviceManagerCallbacks() { return mCB; }
 
-    bool IsInitDone() { return mIsInitDone; }
+    bool IsInitDone() const { return mIsInitDone; }
     /**
      * Use internally for registration of the ChipDeviceEvents
      */
