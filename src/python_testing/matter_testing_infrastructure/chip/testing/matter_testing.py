@@ -59,7 +59,6 @@ import chip.clusters as Clusters
 import chip.logging
 import chip.native
 import chip.testing.global_stash as global_stash
-import chip.testing.matter_global_defaults as matter_global_defaults
 from chip.ChipStack import ChipStack
 from chip.clusters import Attribute, ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
@@ -68,6 +67,7 @@ from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
 from chip.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
                                         get_setup_payload_info_config)
+from chip.testing.matter_global_defaults import _DEFAULT_ADMIN_VENDOR_ID, _DEFAULT_STORAGE_PATH, _DEFAULT_LOG_PATH, _DEFAULT_CONTROLLER_NODE_ID, _DEFAULT_DUT_NODE_ID, _DEFAULT_TRUST_ROOT_INDEX
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.pics import read_pics_from_file
 from chip.testing.runner import TestRunnerHooks, TestStep
@@ -585,7 +585,7 @@ class MatterTestConfig:
     ble_controller: Optional[int] = None
     commission_only: bool = False
 
-    admin_vendor_id: int = matter_global_defaults._DEFAULT_ADMIN_VENDOR_ID
+    admin_vendor_id: int = _DEFAULT_ADMIN_VENDOR_ID
     case_admin_subject: Optional[int] = None
     global_test_params: dict = field(default_factory=dict)
     # List of explicit tests to run by name. If empty, all tests will run
@@ -620,7 +620,7 @@ class MatterTestConfig:
     # Node ID for basic DUT
     dut_node_ids: List[int] = field(default_factory=list)
     # Node ID to use for controller/commissioner
-    controller_node_id: int = matter_global_defaults._DEFAULT_CONTROLLER_NODE_ID
+    controller_node_id: int = _DEFAULT_CONTROLLER_NODE_ID
     # CAT Tags for default controller/commissioner
     # By default, we commission with CAT tags specified for RR-1.1
     # so the cert tests can be run without re-commissioning the device
@@ -631,7 +631,7 @@ class MatterTestConfig:
     fabric_id: int = 1
 
     # "Alpha" by default
-    root_of_trust_index: int = matter_global_defaults._DEFAULT_TRUST_ROOT_INDEX
+    root_of_trust_index: int = _DEFAULT_TRUST_ROOT_INDEX
 
     # If this is set, we will reuse root of trust keys at that location
     chip_tool_credentials_path: Optional[pathlib.Path] = None
@@ -1859,7 +1859,7 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
     device_descriptors = config.qr_code_content + config.manual_code + config.discriminators
 
     if not config.dut_node_ids:
-        config.dut_node_ids = [matter_global_defaults._DEFAULT_DUT_NODE_ID]
+        config.dut_node_ids = [_DEFAULT_DUT_NODE_ID]
 
     if args.commissioning_method is None:
         return True
@@ -1931,8 +1931,8 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
         sys.exit(1)
 
     config.storage_path = pathlib.Path(
-        matter_global_defaults._DEFAULT_STORAGE_PATH) if args.storage_path is None else args.storage_path
-    config.logs_path = pathlib.Path(matter_global_defaults._DEFAULT_LOG_PATH) if args.logs_path is None else args.logs_path
+        _DEFAULT_STORAGE_PATH) if args.storage_path is None else args.storage_path
+    config.logs_path = pathlib.Path(_DEFAULT_LOG_PATH) if args.logs_path is None else args.logs_path
     config.paa_trust_store_path = args.paa_trust_store_path
     config.ble_controller = args.ble_controller
     config.pics = {} if args.PICS is None else read_pics_from_file(args.PICS)
@@ -1997,12 +1997,12 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                              metavar="CONTROLLER_ID", help="BLE controller selector, see example or platform docs for details")
     basic_group.add_argument('-N', '--controller-node-id', type=int_decimal_or_hex,
                              metavar='NODE_ID',
-                             default=matter_global_defaults._DEFAULT_CONTROLLER_NODE_ID,
-                             help='NodeID to use for initial/default controller (default: %d)' % matter_global_defaults._DEFAULT_CONTROLLER_NODE_ID)
+                             default=_DEFAULT_CONTROLLER_NODE_ID,
+                             help='NodeID to use for initial/default controller (default: %d)' % _DEFAULT_CONTROLLER_NODE_ID)
     basic_group.add_argument('-n', '--dut-node-id', '--nodeId', type=int_decimal_or_hex,
                              metavar='NODE_ID', dest='dut_node_ids', default=[],
                              help='Node ID for primary DUT communication, '
-                             'and NodeID to assign if commissioning (default: %d)' % matter_global_defaults._DEFAULT_DUT_NODE_ID, nargs="+")
+                             'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
     basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
     basic_group.add_argument('--app-pipe', type=str, default=None, help="The full path of the app to send an out-of-band command")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
@@ -2043,9 +2043,9 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                                   metavar='OPERATIONAL_DATASET_HEX',
                                   help='Thread operational dataset as a hex string for ble-thread commissioning')
 
-    commission_group.add_argument('--admin-vendor-id', action="store", type=int_decimal_or_hex, default=matter_global_defaults._DEFAULT_ADMIN_VENDOR_ID,
+    commission_group.add_argument('--admin-vendor-id', action="store", type=int_decimal_or_hex, default=_DEFAULT_ADMIN_VENDOR_ID,
                                   metavar="VENDOR_ID",
-                                  help="VendorID to use during commissioning (default 0x%04X)" % matter_global_defaults._DEFAULT_ADMIN_VENDOR_ID)
+                                  help="VendorID to use during commissioning (default 0x%04X)" % _DEFAULT_ADMIN_VENDOR_ID)
     commission_group.add_argument('--case-admin-subject', action="store", type=int_decimal_or_hex,
                                   metavar="CASE_ADMIN_SUBJECT",
                                   help="Set the CASE admin subject to an explicit value (default to commissioner Node ID)")
@@ -2071,9 +2071,9 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                               help='Fabric ID on which to operate under the root of trust')
 
     fabric_group.add_argument('-r', '--root-index', type=root_index,
-                              metavar='ROOT_INDEX_OR_NAME', default=matter_global_defaults._DEFAULT_TRUST_ROOT_INDEX,
+                              metavar='ROOT_INDEX_OR_NAME', default=_DEFAULT_TRUST_ROOT_INDEX,
                               help='Root of trust under which to operate/commission for single-fabric basic usage. '
-                              'alpha/beta/gamma are aliases for 1/2/3. Default (%d)' % matter_global_defaults._DEFAULT_TRUST_ROOT_INDEX)
+                              'alpha/beta/gamma are aliases for 1/2/3. Default (%d)' % _DEFAULT_TRUST_ROOT_INDEX)
 
     fabric_group.add_argument('-c', '--chip-tool-credentials-path', type=pathlib.Path,
                               metavar='PATH',
