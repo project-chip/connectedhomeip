@@ -128,7 +128,7 @@ std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataMod
 }
 
 /// Checks that the given attribute path corresponds to a readable attribute. If not, it
-/// will return a CHIP_IM_GLOBAL_STATUS corresponding to the error.
+/// will return the corresponding failure status.
 std::optional<Status> ValidateAttributeIsReadable(DataModel::Provider * dataModel, const ConcreteReadAttributePath & path)
 {
     DataModel::AttributeFinder finder(dataModel);
