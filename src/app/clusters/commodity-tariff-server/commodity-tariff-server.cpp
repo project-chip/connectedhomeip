@@ -183,9 +183,8 @@ void Instance::ScheduleTariffActivation(uint32_t delay)
 void Instance::ScheduleMidnightUpdate()
 {
     uint32_t now      = GetCurrentTimestamp();
-    uint32_t secondsSinceMidnight = now % kSecondsPerDay;
-    uint32_t delay  = (secondsSinceMidnight == 0) ? kSecondsPerDay 
-                                                : kSecondsPerDay - secondsSinceMidnight;
+    uint32_t secondsSinceMidnight = static_cast<uint32_t>(now % kSecondsPerDay);
+    uint32_t delay  = (secondsSinceMidnight == 0) ? static_cast<uint32_t>(kSecondsPerDay) : static_cast<uint32_t>(kSecondsPerDay - secondsSinceMidnight);
 
     // Store the exact trigger time
     mServerTariffAttrsCtx.AlarmTriggerTime = now + delay;
@@ -441,7 +440,7 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
 
     assert(timestampNow);
 
-    ChipLogProgress(NotSpecified, "EGW-CTC: UpdateEventCode: %x", aEvt);
+    ChipLogProgress(NotSpecified, "EGW-CTC: UpdateEventCode: %x", static_cast<std::underlying_type_t<UpdateEventCode>>(aEvt));
 
     switch (aEvt)
     {
@@ -497,7 +496,7 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
         [[fallthrough]];
     }
     case UpdateEventCode::DayEntryUpdating: {
-        uint16_t minutesSinceMidnight = (timestampNow % kSecondsPerDay) / 60;
+        uint16_t minutesSinceMidnight = static_cast<uint16_t>( (timestampNow % kSecondsPerDay) / 60 );
         uint16_t nextUpdInterval      = 0;
         auto & mCurrentDayEntryIDs    = mCurrentDay.Value().dayEntryIDs;
         auto [current, next] =

@@ -220,7 +220,7 @@ public:
      */
     void TariffDataUpdate()
     {
-        TariffUpdateCtx UpdCtx = { .aEndpoint = mEndpointId, .mFeature = mFeature };
+        TariffUpdateCtx UpdCtx = { .mFeature = mFeature, .aEndpoint = mEndpointId };
 
         if (!TariffDataUpd_Init(UpdCtx))
         {
