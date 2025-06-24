@@ -13,11 +13,9 @@ RUN set -x \
     && : # last line
 
 # Download Simplicity SDK v2025.6.0 (f107f75)
-RUN wget https://github.com/SiliconLabs/simplicity_sdk/releases/download/v2025.6.0/simplicity-sdk.zip -O /tmp/simplicity_sdk.zip \
-    && unzip /tmp/simplicity_sdk.zip -d /tmp/simplicity_sdk \
-    && rm -rf /tmp/simplicity_sdk.zip \
+RUN git clone --depth=1 --single-branch --branch=v2025.6.0 https://github.com/SiliconLabs/simplicity_sdk.git /tmp/simplicity_sdk \
     # Deleting files that are not needed to save space
-    && rm -rf /tmp/simplicity_sdk/protocol/flex /tmp/simplicity_sdk/protocol/z-wave /tmp/simplicity_sdk/protocol/zigbee /tmp/simplicity_sdk/protocol/wisun /tmp/simplicity_sdk/util/third_party/tensorflow_extra \
+    && rm -rf .git /tmp/simplicity_sdk/protocol/flex /tmp/simplicity_sdk/protocol/z-wave /tmp/simplicity_sdk/protocol/zigbee /tmp/simplicity_sdk/protocol/wisun /tmp/simplicity_sdk/util/third_party/tensorflow_extra \
     /tmp/simplicity_sdk/util/third_party/sqlite /tmp/simplicity_sdk/util/third_party/ot-br-posix /tmp/simplicity_sdk/util/third_party/tflite-micro /tmp/simplicity_sdk/util/third_party/tflite-fatfs /tmp/simplicity_sdk/util/third_party/unity_test_framework \
     /tmp/simplicity_sdk/platform/radio/efr32_multiphy_configurator \
     && find /tmp/simplicity_sdk/protocol/bluetooth /tmp/simplicity_sdk/platform -name "*.a" -type f -delete \
