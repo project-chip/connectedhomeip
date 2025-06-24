@@ -83,8 +83,9 @@ TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowWithPasscode_Succes
     constexpr uint32_t kSetupPIN = 20202021U;
     SetupPayload ignored;
     Callback::Callback<Controller::OnOpenCommissioningWindow> callback(OCWPasscodeCallback, this);
-    CHIP_ERROR err = opener.OpenCommissioningWindow(kTestNodeId, kTimeout, sTestSpake2p01_IterationCount, kDiscriminator, Optional(kSetupPIN),
-                                                    Optional(ByteSpan(sTestSpake2p01_Salt)), &callback, ignored, false);
+    CHIP_ERROR err = 
+        opener.OpenCommissioningWindow(kTestNodeId, kTimeout, sTestSpake2p01_IterationCount, kDiscriminator, Optional(kSetupPIN),
+                                       Optional(ByteSpan(sTestSpake2p01_Salt)), &callback, ignored, false);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 }
 
