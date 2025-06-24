@@ -21,7 +21,7 @@ import logging
 import chip
 from chip.ChipStack import ChipStack
 from chip.storage import PersistentStorage
-from matter_testing import MatterTestConfig
+from chip.testing.matter_testing import MatterTestConfig
 
 logger = logging.getLogger("matter.python_testing")
 logger.setLevel(logging.INFO)
