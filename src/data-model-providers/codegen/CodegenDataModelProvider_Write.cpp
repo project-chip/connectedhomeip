@@ -94,43 +94,14 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 {
     if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
     {
-        if (request.path.mDataVersion.HasValue())
-        {
-            VerifyOrReturnError(request.path.mDataVersion.Value() == cluster->GetDataVersion(request.path),
-                                Status::DataVersionMismatch);
-        }
-        // Attribute must be readable to allow a read request for it.
-        // ServerClusterInterface API requirement is to ensure path validity
-        std::optional<DataModel::AttributeEntry> entry = FindAttributeEntry(cluster, request.path);
-        VerifyOrReturnError(entry.has_value() && entry->GetWritePrivilege().has_value(), Status::UnsupportedAttribute);
-
         return cluster->WriteAttribute(request, decoder);
     }
 
     auto metadata = Ember::FindAttributeMetadata(request.path);
 
-    // Explicit failure in finding a suitable metadata
-    if (const Status * status = std::get_if<Status>(&metadata))
-    {
-        VerifyOrDie((*status == Status::UnsupportedEndpoint) || //
-                    (*status == Status::UnsupportedCluster) ||  //
-                    (*status == Status::UnsupportedAttribute));
-
-        // Check if this is an attribute that ember does not know about but is valid after all and
-        // adjust the return code. All these global attributes are `read only` hence the return
-        // of unsupported write.
-        //
-        // If the cluster or endpoint does not exist, though, keep that return code.
-        if ((*status == Protocols::InteractionModel::Status::UnsupportedAttribute) &&
-            IsSupportedGlobalAttributeNotInMetadata(request.path.mAttributeId))
-        {
-            return Status::UnsupportedWrite;
-        }
-
-        return *status;
-    }
-
-    const EmberAfAttributeMetadata ** attributeMetadata = std::get_if<const EmberAfAttributeMetadata *>(&metadata);
+    // WriteAttribute requeirement is that request.path is a VALID path inside the provider
+    // metadata tree. Clients are supposed to validate this (and data version and other flags)
+    const auto attributeMetadata = std::get_if<const EmberAfAttributeMetadata *>(&metadata);
     VerifyOrDie(*attributeMetadata != nullptr);
 
     // Extra check: internal requests can bypass the read only check, however global attributes

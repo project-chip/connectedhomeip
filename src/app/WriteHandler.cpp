@@ -762,7 +762,7 @@ void WriteHandler::MoveToState(const State aTargetState)
 }
 
 DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::SubjectDescriptor & aSubject,
-                                                              const ConcreteAttributePath & aPath)
+                                                              const ConcreteDataAttributePath & aPath)
 {
     // TODO: ordering is to check writability/existence BEFORE ACL and this seems wrong, however
     //       existing unit tests (TC_AcessChecker.py) validate that we get UnsupportedWrite instead of UnsupportedAccess
@@ -828,6 +828,15 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     // validate that timed write is enforced
     VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kTimed),
                         Status::NeedsTimedInteraction);
+
+    if (aPath.mDataVersion.HasValue()) {
+        DataModel::ServerClusterFinder clusterFinder(mDataModelProvider);
+        std::optional<DataModel::ServerClusterEntry> cluster_entry = clusterFinder.Find(aPath);
+
+        // path is valid based on above checks (we have an attribute entry)
+        VerifyOrDie(cluster_entry.has_value());
+        VerifyOrReturnValue(cluster_entry->dataVersion == aPath.mDataVersion.Value(), Status::DataVersionMismatch);
+    }
 
     return Status::Success;
 }
