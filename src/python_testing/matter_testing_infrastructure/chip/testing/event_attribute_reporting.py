@@ -40,7 +40,10 @@ class EventCallback:
         if expected_cluster is not None:
             self._expected_cluster = expected_cluster
             self._expected_cluster_id = expected_cluster.id
+            self._name = None
+            self._expected_event_id = None
         elif expected_cluster_id is not None and expected_event_id is not None and name is not None:
+            self._expected_cluster = None
             self._name = name
             self._expected_cluster_id = expected_cluster_id
             self._expected_event_id = expected_event_id
@@ -52,7 +55,7 @@ class EventCallback:
     def __call__(self, event_result: EventReadResult, transaction: SubscriptionTransaction):
         # """This is the subscription callback when an event is received.
         #    It checks the event is from the expected_cluster and then posts it into the queue for later processing."""
-        if event_result.Status == Status.Success and event_result.Header.ClusterId == self._expected_cluster.id:
+        if event_result.Status == Status.Success and event_result.Header.ClusterId == self._expected_cluster_id:
             logging.info(
                 f'Got subscription report for event on cluster {self._expected_cluster}: {event_result.Data}')
             self._q.put(event_result)
