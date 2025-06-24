@@ -37,7 +37,6 @@ void cc13xx_26xxLog(const char * aFormat, ...);
 #define PLAT_LOG(...) Log_printf(LogModule_App1, Log_DEBUG, __VA_ARGS__);
 #endif
 
-
 #define ACTUATOR_MOVEMENT_PERIOD_MS 1000
 
 #ifdef __cplusplus

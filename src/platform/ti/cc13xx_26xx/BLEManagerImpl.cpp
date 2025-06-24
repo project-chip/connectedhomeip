@@ -23,7 +23,7 @@
  * platform using the Texas Instruments SDK and the OpenThread stack.
  */
 
-//#define BLEMGR_DBG_LOGGING
+// #define BLEMGR_DBG_LOGGING
 
 // BLE Manager Debug Logs
 extern "C" {
@@ -435,7 +435,6 @@ CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-
 }
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
@@ -724,7 +723,7 @@ void BLEManagerImpl::UpdateAdvInterval(uint8_t advIndex)
 #endif
 }
 CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
-                                             const Ble::ChipBleUUID * charId)
+                                                   const Ble::ChipBleUUID * charId)
 {
     /* Unsupported on TI peripheral device implementation */
     return CHIP_ERROR_NOT_IMPLEMENTED;

@@ -21,12 +21,12 @@
  */
 
 #include "streamer.h"
+#include "ti_drivers_config.h"
 #include <lib/shell/Engine.h>
 #include <lib/shell/streamer.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ti/cc13xx_26xx/Logging.h>
-#include "ti_drivers_config.h"
 
 #include <ti/drivers/UART2.h>
 

@@ -50,8 +50,8 @@ extern "C" {
 #include <lib/support/CHIPPlatformMemory.h>
 
 #ifdef ENABLE_CHIP_SHELL
-#include <lib/shell/Engine.h>
 #include <ChipShellCollection.h>
+#include <lib/shell/Engine.h>
 #endif
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -406,7 +406,7 @@ void startShellTask()
         ChipLogError(DeviceLayer, "Failed to initialize shell engine!");
         return;
     }
-    xTaskCreate(matterShellTask  , "matter_shell", 2048, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(matterShellTask, "matter_shell", 2048, NULL, tskIDLE_PRIORITY + 1, NULL);
 }
 #endif
 
