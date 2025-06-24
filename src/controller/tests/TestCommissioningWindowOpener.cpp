@@ -67,21 +67,24 @@ protected:
     Controller::CommissioningWindowOpener opener = Controller::CommissioningWindowOpener(&mockController);
 };
 
-TEST_F(TestCommissioningWindowOpener, OpenBasicCommissioningWindowVerifier_Success)
+TEST_F(TestCommissioningWindowOpener, OpenBasicCommissioningWindow_Success)
 {
-    chip::System::Clock::Seconds16 timeout(300);
+    constexpr chip::NodeId kTestNodeId = 0x1234;
+    constexpr System::Clock::Seconds16 kTimeout(300);
     Callback::Callback<Controller::OnOpenBasicCommissioningWindow> callback(OCWVerifierCallback, this);
-    EXPECT_EQ(opener.OpenBasicCommissioningWindow(0x1234, timeout, &callback), CHIP_NO_ERROR);
+    EXPECT_EQ(opener.OpenBasicCommissioningWindow(kTestNodeId, kTimeout, &callback), CHIP_NO_ERROR);
 }
 
-TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowVerifier_SuccessArguments)
+TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowWithPasscode_Success)
 {
-    chip::System::Clock::Seconds16 timeout(300);
+    constexpr chip::NodeId kTestNodeId = 0x1234;
+    constexpr chip::System::Clock::Seconds16 kTimeout(300);
+    constexpr uint16_t kDiscriminator = 3840;
+    constexpr uint32_t kSetupPIN = 20202021U;
     SetupPayload ignored;
     Callback::Callback<Controller::OnOpenCommissioningWindow> callback(OCWPasscodeCallback, this);
-    CHIP_ERROR err = opener.OpenCommissioningWindow(0x1234, timeout, sTestSpake2p01_IterationCount,
-                                                    3840, Optional(20202021U), Optional(ByteSpan(sTestSpake2p01_Salt)),
-                                                    &callback, ignored, false);
+    CHIP_ERROR err = opener.OpenCommissioningWindow(kTestNodeId, kTimeout, sTestSpake2p01_IterationCount, kDiscriminator, Optional(kSetupPIN),
+                                                    Optional(ByteSpan(sTestSpake2p01_Salt)), &callback, ignored, false);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 }
 
