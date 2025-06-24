@@ -366,4 +366,11 @@ config CHIP_ENABLE_BDX_LOG_TRANSFER
 	help
 	  Enables the BDX protocol for diagnostics log transfer purposes.
 
+config CHIP_USE_OPENTHREAD_ENDPOINT
+	bool "Use OpenThread TCP/UDP stack directly"
+	depends on OPENTHREAD && !CHIP_WIFI
+	help
+	  Use OpenThread TCP/UDP stack directly instead of using Zephyr's networking layer.
+	  This option is not supported when using WiFi.
+
 endif # CHIP
