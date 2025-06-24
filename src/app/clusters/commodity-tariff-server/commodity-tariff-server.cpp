@@ -21,12 +21,9 @@
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
-#include <app/util/attribute-storage.h>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
-
-constexpr uint32_t kSecondsPerDay = chip::kSecondsPerDay; // Or directly use chip::kSecondsPerDay
 
 using namespace chip;
 using namespace chip::app;
@@ -155,11 +152,6 @@ void Instance::ResetCurrentAttributes()
     }
 }
 
-void Instance::TariffDataUpdatedCb()
-{
-    UpdateCurrentAttrs(UpdateEventCode::TariffUpdating);
-}
-
 static uint32_t GetCurrentTimestamp(void)
 {
     System::Clock::Microseconds64 utcTimeUnix;
@@ -168,6 +160,13 @@ static uint32_t GetCurrentTimestamp(void)
     UnixEpochToChipEpochMicros(utcTimeUnix.count(), chipEpochTime);
 
     return static_cast<uint32_t>(chipEpochTime / chip::kMicrosecondsPerSecond);
+}
+
+void Instance::TariffDataUpdatedCb()
+{
+    mServerTariffAttrsCtx.AlarmTriggerTime = GetCurrentTimestamp();
+
+    UpdateCurrentAttrs(UpdateEventCode::TariffUpdating);
 }
 
 void Instance::ScheduleTariffActivation(uint32_t delay)
@@ -183,9 +182,8 @@ void Instance::ScheduleTariffActivation(uint32_t delay)
 void Instance::ScheduleMidnightUpdate()
 {
     uint32_t now      = GetCurrentTimestamp();
-    uint32_t secondsSinceMidnight = now % kSecInOneDay;
-    uint32_t delay  = (secondsSinceMidnight == 0) ? kSecInOneDay 
-                                                : kSecInOneDay - secondsSinceMidnight;
+    uint32_t secondsSinceMidnight = static_cast<uint32_t>(now % kSecondsPerDay);
+    uint32_t delay  = (secondsSinceMidnight == 0) ? static_cast<uint32_t>(kSecondsPerDay) : static_cast<uint32_t>(kSecondsPerDay - secondsSinceMidnight);
 
     // Store the exact trigger time
     mServerTariffAttrsCtx.AlarmTriggerTime = now + delay;
@@ -201,13 +199,13 @@ void Instance::ScheduleMidnightUpdate()
 void Instance::ScheduleDayEntryUpdate(uint16_t minutesSinceMidnight)
 {
     uint32_t now         = GetCurrentTimestamp();
-    uint32_t secondsSinceMidnight = now % kSecInOneDay;
+    uint32_t secondsSinceMidnight = now % kSecondsPerDay;
     uint32_t triggerOffset = minutesSinceMidnight * 60;
 
     // Calculate delay considering next day if needed
     uint32_t delay = (triggerOffset > secondsSinceMidnight) 
                    ? triggerOffset - secondsSinceMidnight
-                   : kSecInOneDay - secondsSinceMidnight + triggerOffset;
+                   : kSecondsPerDay - secondsSinceMidnight + triggerOffset;
 
     // Store the exact trigger time
     mServerTariffAttrsCtx.AlarmTriggerTime = now + delay;
@@ -255,14 +253,14 @@ Structs::DayStruct::Type FindDay(CurrentTariffAttrsCtx & aCtx, uint32_t timestam
     Structs::DayStruct::Type defaultDay = { .date        = 0,
                                             .dayType     = DayTypeEnum::kUnknownEnumValue,
                                             .dayEntryIDs = DataModel::List<const uint32_t>() };
-    uint32_t DayStartTS                 = timestamp - (timestamp % kSecInOneDay);
+    uint32_t DayStartTS                 = timestamp - (timestamp % kSecondsPerDay);
 
     // First check IndividualDays
     if (!aCtx.TariffProvider->GetIndividualDays().IsNull())
     {
         for (const auto & day : aCtx.TariffProvider->GetIndividualDays().Value())
         {
-            if ((day.date >= DayStartTS) && (day.date < (DayStartTS + kSecInOneDay)))
+            if ((day.date >= DayStartTS) && (day.date < (DayStartTS + kSecondsPerDay)))
             {
                 return day;
             }
@@ -274,7 +272,7 @@ Structs::DayStruct::Type FindDay(CurrentTariffAttrsCtx & aCtx, uint32_t timestam
         for (const auto & period : aCtx.TariffProvider->GetCalendarPeriods().Value())
         {
             if (period.startDate.IsNull() ||
-                ((period.startDate.Value() >= DayStartTS) && (period.startDate.Value() < (DayStartTS + kSecInOneDay))))
+                ((period.startDate.Value() >= DayStartTS) && (period.startDate.Value() < (DayStartTS + kSecondsPerDay))))
             {
                 for (const auto & patternID : period.dayPatternIDs)
                 {
@@ -395,7 +393,7 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(CurrentTariffAttrsCtx & aCtx, 
 
         if ((err = mgmtObj.CreateNewValue(tempList.size())) == CHIP_NO_ERROR)
         {
-            std::copy(tempList.begin(), tempList.end(), mgmtObj.GetNewValue()->data());
+            std::copy(tempList.begin(), tempList.end(), mgmtObj.GetNewValue());
             mgmtObj.MarkAsAssigned();
             mgmtObj.UpdateBegin(nullptr, nullptr);
             mgmtObj.UpdateCommit();
@@ -439,7 +437,9 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
 {
     uint32_t timestampNow = mServerTariffAttrsCtx.AlarmTriggerTime;
 
-    ChipLogProgress(NotSpecified, "EGW-CTC: UpdateEventCode: %x", aEvt);
+    assert(timestampNow);
+
+    ChipLogProgress(NotSpecified, "EGW-CTC: UpdateEventCode: %x", static_cast<std::underlying_type_t<UpdateEventCode>>(aEvt));
 
     switch (aEvt)
     {
@@ -495,7 +495,7 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
         [[fallthrough]];
     }
     case UpdateEventCode::DayEntryUpdating: {
-        uint16_t minutesSinceMidnight = (timestampNow % kSecondsPerDay) / 60;
+        uint16_t minutesSinceMidnight = static_cast<uint16_t>( (timestampNow % kSecondsPerDay) / 60 );
         uint16_t nextUpdInterval      = 0;
         auto & mCurrentDayEntryIDs    = mCurrentDay.Value().dayEntryIDs;
         auto [current, next] =
