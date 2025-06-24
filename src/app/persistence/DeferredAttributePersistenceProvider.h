@@ -15,7 +15,7 @@
  */
 #pragma once
 
-#include <app/util/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 #include <system/SystemClock.h>
@@ -32,12 +32,13 @@ public:
     bool IsArmed() const { return static_cast<bool>(mValue); }
     System::Clock::Timestamp GetFlushTime() const { return mFlushTime; }
 
-    CHIP_ERROR PrepareWrite(System::Clock::Timestamp flushTime, const ByteSpan & value);
+    CHIP_ERROR PrepareWrite(System::Clock::Timestamp flushTime, const AttributeValueInformation &info, const ByteSpan & value);
     void Flush(AttributePersistenceProvider & persister);
 
 private:
     const ConcreteAttributePath mPath;
     System::Clock::Timestamp mFlushTime;
+    std::optional<AttributeValueInformation> mInfo;
     Platform::ScopedMemoryBufferWithSize<uint8_t> mValue;
 };
 
@@ -55,8 +56,7 @@ public:
     DeferredAttributePersistenceProvider(AttributePersistenceProvider & persister,
                                          const Span<DeferredAttribute> & deferredAttributes,
                                          System::Clock::Milliseconds32 writeDelay) :
-        mPersister(persister),
-        mDeferredAttributes(deferredAttributes), mWriteDelay(writeDelay)
+        mPersister(persister), mDeferredAttributes(deferredAttributes), mWriteDelay(writeDelay)
     {}
 
     /*
@@ -67,8 +67,9 @@ public:
      *
      * For other attributes, immediately pass the write operation to the decorated persister.
      */
-    CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override;
-    CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, const EmberAfAttributeMetadata * aMetadata,
+    CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const AttributeValueInformation & aInfo,
+                          const ByteSpan & aValue) override;
+    CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, const AttributeValueInformation & aInfo,
                          MutableByteSpan & aValue) override;
 
 private:

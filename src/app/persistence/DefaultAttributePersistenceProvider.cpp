@@ -13,54 +13,74 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/util/persistence/DefaultAttributePersistenceProvider.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 
-#include <app/util/ember-strings.h>
+#include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
 
 namespace chip {
 namespace app {
+namespace {
 
-CHIP_ERROR DefaultAttributePersistenceProvider::InternalReadValue(const StorageKeyName & aKey, EmberAfAttributeType aType,
-                                                                  size_t aExpectedSize, MutableByteSpan & aValue)
+constexpr uint8_t ShortPascalStringLength(const uint8_t * buffer)
 {
-    ReturnErrorOnFailure(StorageDelegateWrapper::ReadValue(aKey, aValue));
-    size_t size = aValue.size();
-    if (emberAfIsStringAttributeType(aType))
-    {
-        // Ensure that we've read enough bytes that we are not ending up with
-        // un-initialized memory.  Should have read length + 1 (for the length
-        // byte).
-        VerifyOrReturnError(size >= 1 && size - 1 >= emberAfStringLength(aValue.data()), CHIP_ERROR_INCORRECT_STATE);
-    }
-    else if (emberAfIsLongStringAttributeType(aType))
-    {
-        // Ensure that we've read enough bytes that we are not ending up with
-        // un-initialized memory.  Should have read length + 2 (for the length
-        // bytes).
-        VerifyOrReturnError(size >= 2 && size - 2 >= emberAfLongStringLength(aValue.data()), CHIP_ERROR_INCORRECT_STATE);
-    }
-    else
-    {
-        // Ensure we got the expected number of bytes for all other types.
-        VerifyOrReturnError(size == aExpectedSize, CHIP_ERROR_INVALID_ARGUMENT);
-    }
-    return CHIP_NO_ERROR;
+    // The first byte specifies the length of the string.  A length of 0xFF means
+    // the string is invalid and there is no character data.
+    return (buffer[0] == 0xFF ? 0 : buffer[0]);
 }
 
-CHIP_ERROR DefaultAttributePersistenceProvider::WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue)
+constexpr uint8_t LongPascalStringLength(const uint8_t * buffer)
+{
+    // The first two bytes specify the length of the long string.  A length of
+    // 0xFFFF means the string is invalid and there is no character data.
+    uint16_t length = Encoding::LittleEndian::Get16(buffer);
+    return (length == 0xFFFF ? 0 : length);
+}
+
+} // namespace
+
+CHIP_ERROR DefaultAttributePersistenceProvider::WriteValue(const ConcreteAttributePath & aPath,
+                                                           const AttributeValueInformation & aInfo, const ByteSpan & aValue)
 {
     return StorageDelegateWrapper::WriteValue(
         DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId), aValue);
 }
 
 CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & aPath,
-                                                          const EmberAfAttributeMetadata * aMetadata, MutableByteSpan & aValue)
+                                                          const AttributeValueInformation & aInfo, MutableByteSpan & aValue)
 {
-    return InternalReadValue(DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
-                             aMetadata->attributeType, aMetadata->size, aValue);
+    ReturnErrorOnFailure(StorageDelegateWrapper::ReadValue(
+        DefaultStorageKeyAllocator::AttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId), aValue));
+
+    const size_t size = aValue.size();
+    switch (aInfo.type)
+    {
+    case AttributeValueType::kShortPascal:
+        // Ensure that we've read enough bytes that we are not ending up with
+        // un-initialized memory.  Should have read length + 1 (for the length
+        // byte).
+        VerifyOrReturnError(size >= 1 && size - 1 >= ShortPascalStringLength(aValue.data()), CHIP_ERROR_INCORRECT_STATE);
+        break;
+    case AttributeValueType::kLongPascal:
+        // Ensure that we've read enough bytes that we are not ending up with
+        // un-initialized memory.  Should have read length + 2 (for the length
+        // bytes).
+        VerifyOrReturnError(size >= 2 && size - 2 >= LongPascalStringLength(aValue.data()), CHIP_ERROR_INCORRECT_STATE);
+        break;
+    case AttributeValueType::kFixedSize:
+        // expect a specific size
+        VerifyOrReturnError(size == aInfo.size, CHIP_ERROR_INVALID_ARGUMENT);
+        break;
+    case AttributeValueType::kVariableSize:
+        // variable size fixed every time
+        break;
+    }
+    return CHIP_NO_ERROR;
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace app

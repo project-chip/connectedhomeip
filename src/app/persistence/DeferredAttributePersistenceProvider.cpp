@@ -14,15 +14,18 @@
  *    limitations under the License.
  */
 
-#include <app/util/persistence/DeferredAttributePersistenceProvider.h>
+#include "app/persistence/AttributePersistenceProvider.h"
+#include <app/persistence/DeferredAttributePersistenceProvider.h>
 
 #include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
 namespace app {
 
-CHIP_ERROR DeferredAttribute::PrepareWrite(System::Clock::Timestamp flushTime, const ByteSpan & value)
+CHIP_ERROR DeferredAttribute::PrepareWrite(System::Clock::Timestamp flushTime, const AttributeValueInformation & info,
+                                           const ByteSpan & value)
 {
+    mInfo.emplace(info);
     mFlushTime = flushTime;
 
     if (mValue.AllocatedSize() != value.size())
@@ -38,29 +41,32 @@ CHIP_ERROR DeferredAttribute::PrepareWrite(System::Clock::Timestamp flushTime, c
 void DeferredAttribute::Flush(AttributePersistenceProvider & persister)
 {
     VerifyOrReturn(IsArmed());
-    persister.WriteValue(mPath, ByteSpan(mValue.Get(), mValue.AllocatedSize()));
+    VerifyOrReturn(mInfo.has_value());
+    persister.WriteValue(mPath, *mInfo, ByteSpan(mValue.Get(), mValue.AllocatedSize()));
     mValue.Free();
+    mInfo.reset();
 }
 
-CHIP_ERROR DeferredAttributePersistenceProvider::WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue)
+CHIP_ERROR DeferredAttributePersistenceProvider::WriteValue(const ConcreteAttributePath & aPath,
+                                                            const AttributeValueInformation & aInfo, const ByteSpan & aValue)
 {
     for (DeferredAttribute & da : mDeferredAttributes)
     {
         if (da.Matches(aPath))
         {
-            ReturnErrorOnFailure(da.PrepareWrite(System::SystemClock().GetMonotonicTimestamp() + mWriteDelay, aValue));
+            ReturnErrorOnFailure(da.PrepareWrite(System::SystemClock().GetMonotonicTimestamp() + mWriteDelay, aInfo, aValue));
             FlushAndScheduleNext();
             return CHIP_NO_ERROR;
         }
     }
 
-    return mPersister.WriteValue(aPath, aValue);
+    return mPersister.WriteValue(aPath, aInfo, aValue);
 }
 
 CHIP_ERROR DeferredAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & aPath,
-                                                           const EmberAfAttributeMetadata * aMetadata, MutableByteSpan & aValue)
+                                                           const AttributeValueInformation & aInfo, MutableByteSpan & aValue)
 {
-    return mPersister.ReadValue(aPath, aMetadata, aValue);
+    return mPersister.ReadValue(aPath, aInfo, aValue);
 }
 
 void DeferredAttributePersistenceProvider::FlushAndScheduleNext()

@@ -34,7 +34,7 @@ namespace app {
 class DefaultAttributePersistenceProvider : protected StorageDelegateWrapper, public AttributePersistenceProvider
 {
 public:
-    constexpr DefaultAttributePersistenceProvider() {}
+    constexpr DefaultAttributePersistenceProvider() = default;
 
     CHIP_ERROR Init(PersistentStorageDelegate * storage) { return StorageDelegateWrapper::Init(storage); }
 
@@ -43,10 +43,6 @@ public:
                           const ByteSpan & aValue) override;
     CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, const AttributeValueInformation & aInfo,
                          MutableByteSpan & aValue) override;
-
-private:
-    CHIP_ERROR InternalReadValue(const StorageKeyName & aKey, EmberAfAttributeType aType, size_t aExpectedSize,
-                                 MutableByteSpan & aValue);
 };
 
 } // namespace app

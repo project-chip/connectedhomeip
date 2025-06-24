@@ -32,7 +32,7 @@ namespace app {
 enum class AttributeValueType : uint8_t
 {
     kShortPascal,  // one byte prefix for size (either chars or bytes)
-    kLongPascal,   // two byte prefix for size (either chars or bytes)
+    kLongPascal,   // two byte prefix for size (either chars or bytes). Prefix is LittleEndian encoded.
     kFixedSize,    // fixed size value like uint8_t, uint16_t or float/double or similar
     kVariableSize, // variable size, no size validation done
 };
