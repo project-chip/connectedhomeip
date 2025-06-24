@@ -183,14 +183,11 @@ void ClosureManager::HandleClosureActionTimer(System::Layer * layer, void * aApp
     case ClosureAction::kLatchAction:
         // Add logic to handle Latch action completion
         break;
-    case ClosureManager::Action_t::SET_TARGET_ACTION:
-        manager->HandleClosureActionComplete(ClosureManager::Action_t::SET_TARGET_ACTION);
-        break;
     case ClosureAction::kSetTargetAction:
-        // Add logic to handle SetTarget action completion
+        manager->HandleClosureActionComplete(ClosureAction::kSetTargetAction);
         break;
     case ClosureAction::kStepAction:
-        // Add logic to handle Step action completion
+        manager->HandleClosureActionComplete(ClosureAction::kStepAction);
         break;
     case ClosureAction::kPanelLatchAction:
         // Add logic to handle Panel Latch action completion
