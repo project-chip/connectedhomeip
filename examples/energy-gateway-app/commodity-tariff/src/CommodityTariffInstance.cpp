@@ -35,17 +35,11 @@ using chip::Protocols::InteractionModel::Status;
 
 using TariffInformationStructType = DataModel::Nullable<TariffInformationStruct::Type>;
 using TariffPeriodStructType      = TariffPeriodStruct::Type;
-using TariffPeriodsListType       = DataModel::List<TariffPeriodStruct::Type>;
 using DayEntryStructType          = DayEntryStruct::Type;
-using DayEntryListType            = DataModel::List<DayEntryStruct::Type>;
 using TariffComponentStructType   = TariffComponentStruct::Type;
-using TariffComponentsListType    = DataModel::List<TariffComponentStruct::Type>;
 using DayStructType               = DayStruct::Type;
-using DayStructsListType          = DataModel::Nullable<DataModel::List<DayStructType>>;
 using DayPatternStructType        = DayPatternStruct::Type;
-using DayPatternsListType         = DataModel::List<DayPatternStructType>;
 using CalendarPeriodStructType    = CalendarPeriodStruct::Type;
-using CalendarPeriodsListType     = DataModel::Nullable<DataModel::List<CalendarPeriodStructType>>;
 
 CHIP_ERROR CommodityTariffInstance::Init()
 {
@@ -67,7 +61,7 @@ CHIP_ERROR TariffUnit_LoadFromJson(const Json::Value & json, TariffUnitDataClass
         CHIP_ERROR err = MgmtObj.CreateNewValue(0);
         if (CHIP_NO_ERROR == err)
         {
-            MgmtObj.GetNewValue()->SetNonNull(static_cast<Globals::TariffUnitEnum>(json.asUInt()));
+            *(MgmtObj.GetNewValue()) = static_cast<Globals::TariffUnitEnum>(json.asUInt());
             MgmtObj.MarkAsAssigned();
         }
 
@@ -84,7 +78,7 @@ CHIP_ERROR StartDate_LoadFromJson(const Json::Value & json, StartDateDataClass &
         CHIP_ERROR err = MgmtObj.CreateNewValue(0);
         if (CHIP_NO_ERROR == err)
         {
-            MgmtObj.GetNewValue()->SetNonNull(static_cast<uint32_t>(json.asUInt()));
+            *(MgmtObj.GetNewValue()) = static_cast<uint32_t>(json.asUInt());
             MgmtObj.MarkAsAssigned();
         }
 
@@ -101,7 +95,7 @@ CHIP_ERROR DefaultRandomizationOffset_LoadFromJson(const Json::Value & json, Def
         CHIP_ERROR err = MgmtObj.CreateNewValue(0);
         if (CHIP_NO_ERROR == err)
         {
-            MgmtObj.GetNewValue()->SetNonNull(static_cast<uint32_t>(json.asUInt()));
+            *(MgmtObj.GetNewValue()) = static_cast<int16_t>(json.asInt());
             MgmtObj.MarkAsAssigned();
         }
 
@@ -118,7 +112,7 @@ CHIP_ERROR DefaultRandomizationType_LoadFromJson(const Json::Value & json, Defau
         CHIP_ERROR err = MgmtObj.CreateNewValue(0);
         if (CHIP_NO_ERROR == err)
         {
-            MgmtObj.GetNewValue()->SetNonNull(static_cast<DayEntryRandomizationTypeEnum>(json.asUInt()));
+            *(MgmtObj.GetNewValue()) = (static_cast<DayEntryRandomizationTypeEnum>(json.asUInt()));
             MgmtObj.MarkAsAssigned();
         }
 
@@ -136,7 +130,7 @@ JsonParser<TariffInformationStruct::Type, TariffInfoDataClass, false>::ParseFrom
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (json.isMember("TariffLabel"))
     {
-        if (err == ParseLabelFromJson(json["TariffLabel"], output.tariffLabel))
+        if (CHIP_NO_ERROR != ( err = ParseLabelFromJson(json["TariffLabel"], output.tariffLabel)) )
         {
             return err;
         }
@@ -147,7 +141,7 @@ JsonParser<TariffInformationStruct::Type, TariffInfoDataClass, false>::ParseFrom
     }
     if (json.isMember("ProviderName"))
     {
-        if (err == ParseLabelFromJson(json["ProviderName"], output.providerName))
+        if (CHIP_NO_ERROR != (err = ParseLabelFromJson(json["ProviderName"], output.providerName)) )
         {
             return err;
         }
@@ -188,11 +182,11 @@ CHIP_ERROR JsonParser<TariffPeriodStructType, TariffPeriodsDataClass>::ParseFrom
     SuccessOrExit(err);
 
     // Parse DayEntryIDs
-    err = ParseIDArray(json.get("DayEntryIDs", Json::Value()), output.dayEntryIDs, kDayEntriesAttrMaxLength);
+    err = ParseIDArray(json.get("DayEntryIDs", Json::Value()), output.dayEntryIDs, CommodityTariffAttrsDataMgmt::kDayEntriesAttrMaxLength);
     SuccessOrExit(err);
 
     // Parse TariffComponentIDs
-    err = ParseIDArray(json.get("TariffComponentIDs", Json::Value()), output.tariffComponentIDs, kTariffComponentsAttrMaxLength);
+    err = ParseIDArray(json.get("TariffComponentIDs", Json::Value()), output.tariffComponentIDs, CommodityTariffAttrsDataMgmt::kTariffComponentsAttrMaxLength);
     SuccessOrExit(err);
 
 exit:
@@ -203,7 +197,7 @@ exit:
 
 CHIP_ERROR TariffPeriods_LoadFromJson(const Json::Value & json, TariffPeriodsDataClass & MgmtObj)
 {
-    return JsonParser<TariffPeriodStructType, TariffPeriodsDataClass>::LoadFromJson(json, MgmtObj, kTariffPeriodsAttrMaxLength);
+    return JsonParser<TariffPeriodStructType, TariffPeriodsDataClass>::LoadFromJson(json, MgmtObj, CommodityTariffAttrsDataMgmt::kTariffPeriodsAttrMaxLength);
 }
 
 // DayEntriesDataClass
@@ -264,11 +258,6 @@ CHIP_ERROR JsonParser<TariffComponentStructType, TariffComponentsDataClass>::Par
         { "FriendlyCredit",
           [&output](const Json::Value & v) { output.friendlyCredit                 = MakeOptional((v.isBool() ? (v.asBool()) : 0)); } },
         { "Predicted", [&output](const Json::Value & v) { output.predicted         = MakeOptional((v.isBool() ? (v.asBool()) : 0)); } },
-
-        { "Price", [](const Json::Value & v) {} },
-        { "AuxiliaryLoad", [](const Json::Value & v) {} },
-        { "PeakPeriod", [](const Json::Value & v) {} },
-        { "PowerThreshold", [](const Json::Value & v) {} },
     };
 
     if (!json.isMember("TariffComponentID"))
@@ -287,6 +276,150 @@ CHIP_ERROR JsonParser<TariffComponentStructType, TariffComponentsDataClass>::Par
         }
     }
 
+    if (json.isMember("Price"))
+    {
+        const Json::Value & priceJson = json["Price"];
+        TariffPriceStruct::Type tmp_price;
+        
+        if (priceJson.isMember("PriceType"))
+        {
+            tmp_price.priceType = static_cast<Globals::TariffPriceTypeEnum>(priceJson["PriceType"].asUInt());
+        }
+        else
+        {
+            // The PriceType is mandatory field
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        if (priceJson.isMember("Price"))
+        {
+            if (priceJson["Price"].isDouble())
+            {
+                double priceValue = priceJson["Price"].asDouble();
+                tmp_price.price = MakeOptional(static_cast<int64_t>(priceValue * 100));
+            }
+            else if (priceJson["Price"].isInt64())
+            {
+                tmp_price.price = MakeOptional(static_cast<int64_t>(priceJson["Price"].asInt64()));
+            }
+            else
+            {
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+        }
+
+        if (priceJson.isMember("PriceLevel"))
+        {
+
+            if (priceJson["PriceLevel"].isUInt())
+            {
+                tmp_price.priceLevel = MakeOptional(static_cast<int16_t>(priceJson["PriceLevel"].asUInt()));
+            }
+            else
+            {
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+        }
+
+        output.price = MakeOptional(tmp_price);          
+    }
+
+    if (json.isMember("AuxiliaryLoad"))
+    {
+        const Json::Value & auxLoadJson = json["AuxiliaryLoad"];
+        AuxiliaryLoadSwitchSettingsStruct::Type auxiliaryLoad;
+        
+        if (auxLoadJson.isMember("Number"))
+        {
+            auxiliaryLoad.number = static_cast<uint8_t>(auxLoadJson["Number"].asUInt());
+        }
+        else
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        if (auxLoadJson.isMember("RequiredState"))
+        {
+            auxiliaryLoad.requiredState = static_cast<AuxiliaryLoadSettingEnum>(auxLoadJson["RequiredState"].asUInt());
+        }
+        else
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        output.auxiliaryLoad = MakeOptional(auxiliaryLoad);          
+    }
+
+    if (json.isMember("PeakPeriod"))
+    {
+        const Json::Value & PeakPeriodJson = json["PeakPeriod"];
+        PeakPeriodStruct::Type peakPeriod;
+        
+        if (PeakPeriodJson.isMember("Severity"))
+        {
+            peakPeriod.severity = static_cast<PeakPeriodSeverityEnum>(PeakPeriodJson["Severity"].asUInt());
+        }
+        else
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        if (PeakPeriodJson.isMember("PeakPeriod"))
+        {
+            peakPeriod.peakPeriod = static_cast<uint16_t>(PeakPeriodJson["PeakPeriod"].asUInt());
+        }
+        else
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        output.peakPeriod = MakeOptional(peakPeriod);          
+    }
+
+    if (json.isMember("PowerThreshold"))
+    {
+        const Json::Value & powerThresholdJson = json["PowerThreshold"];
+        PowerThresholdStruct::Type powerThreshold;
+        
+        if (powerThresholdJson.isMember("PowerThreshold"))
+        {
+            if (powerThresholdJson["PowerThreshold"].isUInt())
+            {
+                powerThreshold.powerThreshold = MakeOptional(static_cast<int64_t>(powerThresholdJson["PowerThreshold"].asUInt()));
+            }
+            else
+            {
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+        }
+
+        if (powerThresholdJson.isMember("ApparentPowerThreshold"))
+        {
+            if (powerThresholdJson["ApparentPowerThreshold"].isUInt())
+            {
+                powerThreshold.apparentPowerThreshold = MakeOptional(static_cast<int64_t>(powerThresholdJson["ApparentPowerThreshold"].asUInt()));
+            }
+            else
+            {
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+        }
+
+        if (powerThresholdJson.isMember("PowerThresholdSource"))
+        {
+            if (powerThresholdJson["PowerThresholdSource"].isUInt())
+            {
+                powerThreshold.powerThresholdSource = MakeNullable(static_cast<PowerThresholdSourceEnum>(powerThresholdJson["PowerThresholdSource"].asUInt()));
+            }
+            else
+            {
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+        }
+
+        output.powerThreshold = MakeOptional(powerThreshold);          
+    }
+
     if (!tempLabel.IsNull())
     {
         output.label = MakeOptional(tempLabel);
@@ -298,7 +431,7 @@ CHIP_ERROR JsonParser<TariffComponentStructType, TariffComponentsDataClass>::Par
 CHIP_ERROR TariffComponents_LoadFromJson(const Json::Value & json, TariffComponentsDataClass & MgmtObj)
 {
     return JsonParser<TariffComponentStructType, TariffComponentsDataClass>::LoadFromJson(json, MgmtObj,
-                                                                                          kTariffComponentsAttrMaxLength);
+                                                                                          CommodityTariffAttrsDataMgmt::kTariffComponentsAttrMaxLength);
 }
 
 // DayPatternsDataClass
@@ -308,11 +441,38 @@ CHIP_ERROR JsonParser<DayPatternStructType, DayPatternsDataClass>::ParseFromJson
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Required fields check
+    // Helper function to parse hex string
+    auto parseHexString = [](const std::string & hexStr) -> std::optional<uint8_t> {
+        if (!hexStr.empty() && hexStr.size() >= 3 && 
+            hexStr[0] == '0' && (hexStr[1] != 'x' || hexStr[1] != 'X')) {
+            return static_cast<uint8_t>(std::stoul(hexStr.substr(2), nullptr, 16));
+        }
+
+        return std::nullopt;
+    };
+
+    // Required fields check with hex string support
     auto checkRequired = [&](const std::string & key, auto & dest, auto converter) -> CHIP_ERROR {
-        if (!json.isMember(key) || !json[key].isUInt())
+        if (!json.isMember(key)) {
             return CHIP_ERROR_INVALID_ARGUMENT;
-        dest = converter(json[key].asUInt());
+        }
+
+        if (key == "DaysOfWeek" && json[key].isString()) {
+            // Special handling for hex string
+            auto hexValue = parseHexString(json[key].asString());
+            if (!hexValue) {
+                return CHIP_ERROR_INVALID_ARGUMENT;
+            }
+            dest = converter(*hexValue);
+        } 
+        else if (json[key].isUInt()) {
+            // Original numeric handling
+            dest = converter(json[key].asUInt());
+        }
+        else {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        
         return CHIP_NO_ERROR;
     };
 
@@ -324,7 +484,7 @@ CHIP_ERROR JsonParser<DayPatternStructType, DayPatternsDataClass>::ParseFromJson
     });
     SuccessOrExit(err);
 
-    err = ParseIDArray(json.get("DayEntryIDs", Json::Value()), output.dayEntryIDs, kDayEntriesAttrMaxLength);
+    err = ParseIDArray(json.get("DayEntryIDs", Json::Value()), output.dayEntryIDs, CommodityTariffAttrsDataMgmt::kDayEntriesAttrMaxLength);
     SuccessOrExit(err);
 exit:
     return err;
@@ -332,19 +492,82 @@ exit:
 
 CHIP_ERROR DayPatterns_LoadFromJson(const Json::Value & json, DayPatternsDataClass & MgmtObj)
 {
-    return JsonParser<DayPatternStructType, DayPatternsDataClass>::LoadFromJson(json, MgmtObj, kDayPatternsAttrMaxLength);
+    return JsonParser<DayPatternStructType, DayPatternsDataClass>::LoadFromJson(json, MgmtObj, CommodityTariffAttrsDataMgmt::kDayPatternsAttrMaxLength);
 }
 
 // IndividualDaysDataClass
+template <>
+CHIP_ERROR JsonParser<DayStructType, IndividualDaysDataClass>::ParseFromJson(const Json::Value & json,
+                                                                                 DayStructType & output)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // Required fields check
+    auto checkRequired = [&](const std::string & key, auto & dest, auto converter) -> CHIP_ERROR {
+        if (!json.isMember(key) || !json[key].isUInt())
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        dest = converter(json[key].asUInt());
+        return CHIP_NO_ERROR;
+    };
+
+    err = checkRequired("Date", output.date, [](auto v) { return static_cast<uint32_t>(v);; });
+    SuccessOrExit(err);
+
+    err = checkRequired("DayType", output.dayType, [](auto v) {
+        return static_cast<DayTypeEnum>(v);
+    });
+    SuccessOrExit(err);
+
+    err = ParseIDArray(json.get("DayEntryIDs", Json::Value()), output.dayEntryIDs, CommodityTariffAttrsDataMgmt::kDayEntriesAttrMaxLength);
+    SuccessOrExit(err);
+exit:
+    return err;
+}
+
 CHIP_ERROR IndividualDays_LoadFromJson(const Json::Value & json, IndividualDaysDataClass & MgmtObj)
 {
-    return CHIP_NO_ERROR;
+    return JsonParser<DayStructType, IndividualDaysDataClass>::LoadFromJson(json, MgmtObj, CommodityTariffAttrsDataMgmt::kIndividualDaysAttrMaxLength);
 }
 
 // CalendarPeriodsDataClass
+template <>
+CHIP_ERROR JsonParser<CalendarPeriodStructType, CalendarPeriodsDataClass>::ParseFromJson(const Json::Value & json,
+                                                                                 CalendarPeriodStructType & output)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint32_t startDateVal = 0;
+
+    if (json.isMember("StartDate"))
+    {
+        if (json["StartDate"].isUInt())
+        {
+            startDateVal = json["StartDate"].asUInt();
+
+            if (startDateVal > 0)
+            {
+                output.startDate.SetNonNull(static_cast<uint32_t>(startDateVal));
+            }
+        }
+        else
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+    }
+
+    if (startDateVal == 0)
+    {
+        output.startDate.SetNull();
+    }
+
+    err = ParseIDArray(json.get("DayPatternIDs", Json::Value()), output.dayPatternIDs, CommodityTariffAttrsDataMgmt::kCalendarPeriodItemMaxDayPatternIDs);
+    SuccessOrExit(err);
+exit:
+    return err;
+}
+
 CHIP_ERROR CalendarPeriods_LoadFromJson(const Json::Value & json, CalendarPeriodsDataClass & MgmtObj)
 {
-    return CHIP_NO_ERROR;
+    return JsonParser<CalendarPeriodStructType, CalendarPeriodsDataClass>::LoadFromJson(json, MgmtObj, CommodityTariffAttrsDataMgmt::kCalendarPeriodsAttrMaxLength);
 }
 } // namespace JSON_Utilities
 
@@ -443,6 +666,7 @@ CHIP_ERROR CommodityTariffDelegate::LoadTariffData(const Json::Value & root)
 
 bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & UpdCtx)
 {
+    bool DayEntriesData_is_available = false;
 
     if (!GetTariffInfo_MgmtObj().IsValid())
     {
@@ -504,8 +728,9 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
         }
     }
 
-    if (GetIndividualDays_MgmtObj().IsValid())
+    if ( GetIndividualDays_MgmtObj().IsValid() && (GetIndividualDays_MgmtObj().GetNewValue() != nullptr) )
     {
+        
         assert(!UpdCtx.IndividualDaysDayEntryIDs.empty()); // Something went wrong if IndividualDays has no DE IDs
 
         // Checks that all ID_DE_IDs are in main DE list:
@@ -521,10 +746,11 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
                 return false; // If same item from ID list has found in DP list
             }
         }
+
+        DayEntriesData_is_available = true;
     }
 
-    //
-    if (GetCalendarPeriods_MgmtObj().IsValid())
+    if ( GetCalendarPeriods_MgmtObj().IsValid() && ( GetCalendarPeriods_MgmtObj().GetNewValue() != nullptr) )
     {
         assert(!UpdCtx.CalendarPeriodsDayPatternIDs.empty()); // Something went wrong if CP has no DP IDs
 
@@ -536,6 +762,14 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
                 return false; // The item not found in original list
             }
         }
+
+        DayEntriesData_is_available = true;
+    }
+    
+    if(!DayEntriesData_is_available)
+    {
+        ChipLogError(NotSpecified, "Both IndividualDays and CalendarPeriods are not present!");
+        return false;
     }
 
     return true;

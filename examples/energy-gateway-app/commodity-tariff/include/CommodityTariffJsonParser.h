@@ -22,6 +22,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
+using namespace chip::app::CommodityTariffAttrsDataMgmt;
 
 namespace JSON_Utilities {
 template <typename StructType, typename DataClass, bool IsList = true>
@@ -112,12 +113,14 @@ public:
             tempList.push_back(entry);
         }
 
-        if ((err = mgmtObj.CreateNewValue(tempList.size())) == CHIP_NO_ERROR)
+        if ( (err == CHIP_NO_ERROR) && 
+             ((err = mgmtObj.CreateNewValue(tempList.size())) == CHIP_NO_ERROR) )
         {
-            std::copy(tempList.begin(), tempList.end(), mgmtObj.GetNewValue()->data());
+            std::copy(tempList.begin(), tempList.end(), mgmtObj.GetNewValue());
             mgmtObj.MarkAsAssigned();
         }
-        else
+
+        if (err != CHIP_NO_ERROR)
         {
             for (auto & entry : tempList)
                 mgmtObj.CleanupExtEntry(entry);
@@ -140,7 +143,7 @@ public:
 
         if ((err = mgmtObj.CreateNewValue(0)) == CHIP_NO_ERROR)
         {
-            mgmtObj.GetNewValue()->SetNonNull(output);
+            *(mgmtObj.GetNewValue()) = output;
             mgmtObj.MarkAsAssigned();
         }
 
