@@ -379,7 +379,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             logging.info(f"CurrentSpeed: {current_speed}")
 
             self.step("6c")
-            if current_speed == CClusters.Globals.Enums.ThreeLevelAutoEnum.kHigh:
+            if current_speed == Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh:
                 logging.info("CurrentSpeed is High, skipping steps 6d and 6e")
                 self.skip_step("6d")
                 self.skip_step("6e")

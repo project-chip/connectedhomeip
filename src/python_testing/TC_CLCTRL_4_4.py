@@ -58,7 +58,7 @@ def current_position_matcher(position: Clusters.ClosureControl.Enums.CurrentPosi
         if report.attribute != Clusters.ClosureControl.Attributes.OverallCurrentState:
             return False
 
-    return report.value.position == position
+        return report.value.position == position
 
     return AttributeMatcher.from_callable(description=f"OverallCurrentState.Position is {position}", matcher=predicate)
 
