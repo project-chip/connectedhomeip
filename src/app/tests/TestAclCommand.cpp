@@ -96,22 +96,17 @@ public:
     bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override { return false; }
 } gDeviceTypeResolver;
 
-} // namespace
-
-namespace chip {
-namespace app {
-
-class MockCommandSenderCallback : public CommandSender::Callback
+class MockCommandSenderCallback : public app::CommandSender::Callback
 {
 public:
-    void OnError(const chip::app::CommandSender * apCommandSender, CHIP_ERROR aError) override
+    void OnError(const app::CommandSender * apCommandSender, CHIP_ERROR aError) override
     {
         ChipLogError(Controller, "OnError happens with %" CHIP_ERROR_FORMAT, aError.Format());
         mError = aError;
         onErrorCalledTimes++;
         mError = aError;
     }
-    void OnDone(chip::app::CommandSender * apCommandSender) override { onFinalCalledTimes++; }
+    void OnDone(app::CommandSender * apCommandSender) override { onFinalCalledTimes++; }
 
     void ResetCounter()
     {
@@ -123,6 +118,11 @@ public:
     int onFinalCalledTimes = 0;
     CHIP_ERROR mError      = CHIP_NO_ERROR;
 } mockCommandSenderDelegate;
+
+} // namespace
+
+namespace chip {
+namespace app {
 
 class TestAclCommand : public Test::AppContext
 {

@@ -43,6 +43,7 @@
 
 namespace {
 using namespace chip;
+using namespace chip::app;
 using namespace chip::Access;
 using namespace chip::Test;
 
@@ -128,10 +129,6 @@ public:
     chip::app::StatusIB mLastStatusReceived;
     CHIP_ERROR mError = CHIP_NO_ERROR;
 };
-} // namespace
-
-namespace chip {
-namespace app {
 
 class TestWriteClientCallback : public WriteClient::Callback
 {
@@ -157,6 +154,10 @@ public:
     StatusIB mLastErrorReason;
     CHIP_ERROR mError = CHIP_NO_ERROR;
 };
+} // namespace
+
+namespace chip {
+namespace app {
 
 class TestAclAttribute : public Test::AppContext
 {
