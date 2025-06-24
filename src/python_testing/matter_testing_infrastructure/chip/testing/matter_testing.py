@@ -17,6 +17,7 @@
 
 import argparse
 import asyncio
+import builtins
 import inspect
 import json
 import logging
@@ -57,13 +58,15 @@ from time import sleep
 import chip.clusters as Clusters
 import chip.logging
 import chip.native
-from chip import discovery
-from chip.clusters import Attribute
-from chip.clusters import ClusterObjects as ClusterObjects
+import chip.testing.global_stash as global_stash
+from chip.ChipStack import ChipStack
+from chip.clusters import Attribute, ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
-from chip.testing.commissioning import CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices
+from chip.storage import PersistentStorage
+from chip.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
+                                        get_setup_payload_info_config)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.matter_stack_state import MatterStackState
 from chip.testing.pics import read_pics_from_file
@@ -808,7 +811,7 @@ class SetupParameters:
         return SetupPayload().GenerateManualPairingCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
                                                         self.custom_flow, self.capabilities, self.version)
 
-# Deprecated: MatterStackState into its own file #39625
+# deprecated
 # class MatterStackState:
 #     def __init__(self, config: MatterTestConfig):
 #         self._logger = logger
