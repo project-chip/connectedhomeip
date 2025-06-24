@@ -21,6 +21,7 @@
 #include "wiced_bt_event.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/FormatUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
 LockManager LockManager::sLock;

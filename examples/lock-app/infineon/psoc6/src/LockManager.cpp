@@ -25,6 +25,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <cstring>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/FormatUtils.h>
 #include <platform/Infineon/PSOC6/PSOC6Config.h>
 
 LockManager LockManager::sLock;

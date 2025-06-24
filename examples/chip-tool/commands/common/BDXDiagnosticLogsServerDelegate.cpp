@@ -18,6 +18,8 @@
 
 #include "BDXDiagnosticLogsServerDelegate.h"
 
+#include <lib/support/FormatUtils.h>
+
 #include <string>
 #include <unistd.h>
 

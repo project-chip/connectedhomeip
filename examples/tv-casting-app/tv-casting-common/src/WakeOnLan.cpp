@@ -17,6 +17,7 @@
  */
 
 #include "WakeOnLan.h"
+#include <lib/support/FormatUtils.h>
 
 constexpr int kBroadcastOption    = 1;
 constexpr int kWoLMagicPacketSize = 102;

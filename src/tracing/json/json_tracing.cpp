@@ -21,7 +21,7 @@
 #include <lib/address_resolve/TracingStructs.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/StringBuilder.h>
+#include <lib/support/FormatUtils.h>
 #include <lib/support/StringSplitter.h>
 #include <log_json/log_json_build_config.h>
 #include <tracing/metric_event.h>

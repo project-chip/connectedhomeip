@@ -84,27 +84,6 @@ namespace Logging {
 // Log redirection
 using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, const char * msg, va_list args);
 
-/**
- * @def INLINE_STRING(BUFSIZE, LEN, DATA)
- *
- * @brief
- *   A null-terminated string that can be used inplace for logging purposes.
- *
- */
-#define INLINE_STRING(BUFSIZE, LEN, DATA) chip::StringBuilder<BUFSIZE>().AddFormat("%.*s", LEN, DATA).c_str()
-
-/**
- * @def SPAN_TO_TRUNCATED_CSTR(LEN, DATA)
- *
- * @brief
- *   A null-terminated string that can be used inplace with buffer size 100 for logging purposes.
- *   This is used to represent a non null-terminated string as null-terminated string that can be used inplace.
- *   A buffer size of 100 should be enough since this is used to format individual values or fields.
- *   If the buffer size is not enough the value will be truncated, no risk of buffer overflow.
- *
- */
-#define SPAN_TO_TRUNCATED_CSTR(LEN, DATA) INLINE_STRING(100, LEN, DATA)
-
 #if CHIP_ERROR_LOGGING
 /**
  * @def ChipLogError(MOD, MSG, ...)

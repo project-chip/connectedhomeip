@@ -18,6 +18,7 @@
 
 #include "OTAImageProcessorImpl.h"
 #include <lib/support/CHIPMemString.h>
+#include <lib/support/FormatUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 

@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <lib/support/FormatUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/bouffalolab/BL602/NetworkCommissioningDriver.h>
 #include <wifi_mgmr_ext.h>

@@ -24,6 +24,7 @@
 #include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <controller/CHIPCluster.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/FormatUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/OTAImageProcessor.h>
