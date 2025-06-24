@@ -202,5 +202,4 @@ TEST(TestPascalString, TestNullability)
     }
 }
 
-
 } // namespace
