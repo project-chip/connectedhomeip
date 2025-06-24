@@ -79,8 +79,6 @@ CHIP_ERROR DefaultAttributePersistenceProvider::ReadValue(const ConcreteAttribut
         break;
     }
     return CHIP_NO_ERROR;
-
-    return CHIP_NO_ERROR;
 }
 
 } // namespace app
