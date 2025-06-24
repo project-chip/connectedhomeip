@@ -513,25 +513,25 @@ void GeneralDiagnosticsServer::OnNetworkFaultsDetect(const GeneralFaults<kMaxNet
 } // namespace app
 } // namespace chip
 
-void MatterGeneralDiagnosticsPluginServerInitCallback()
-{
-    BootReasonEnum bootReason;
+// void MatterGeneralDiagnosticsPluginServerInitCallback()
+// {
+//     BootReasonEnum bootReason;
 
-    AttributeAccessInterfaceRegistry::Instance().Register(&gGeneralDiagnosticsInstance);
-    CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gGeneralDiagnosticsInstance);
+//     AttributeAccessInterfaceRegistry::Instance().Register(&gGeneralDiagnosticsInstance);
+//     CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(&gGeneralDiagnosticsInstance);
 
-    ConnectivityMgr().SetDelegate(&gGeneralDiagnosticsInstance);
+//     ConnectivityMgr().SetDelegate(&gGeneralDiagnosticsInstance);
 
-    if (GetDiagnosticDataProvider().GetBootReason(bootReason) == CHIP_NO_ERROR)
-    {
-        GeneralDiagnosticsServer::Instance().OnDeviceReboot(bootReason);
-    }
-}
+//     if (GetDiagnosticDataProvider().GetBootReason(bootReason) == CHIP_NO_ERROR)
+//     {
+//         GeneralDiagnosticsServer::Instance().OnDeviceReboot(bootReason);
+//     }
+// }
 
-void MatterGeneralDiagnosticsPluginServerShutdownCallback()
-{
-    ConnectivityMgr().SetDelegate(nullptr);
+// void MatterGeneralDiagnosticsPluginServerShutdownCallback()
+// {
+//     ConnectivityMgr().SetDelegate(nullptr);
 
-    AttributeAccessInterfaceRegistry::Instance().Unregister(&gGeneralDiagnosticsInstance);
-    CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(&gGeneralDiagnosticsInstance);
-}
+//     AttributeAccessInterfaceRegistry::Instance().Unregister(&gGeneralDiagnosticsInstance);
+//     CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(&gGeneralDiagnosticsInstance);
+// }

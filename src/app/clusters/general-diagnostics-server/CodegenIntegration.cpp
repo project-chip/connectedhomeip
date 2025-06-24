@@ -15,10 +15,11 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
+// #include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-logic.h>
 #include <app/static-cluster-config/GeneralDiagnostics.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -94,3 +95,38 @@ void emberAfGeneralDiagnosticsClusterShutdownCallback(EndpointId endpointId) {
 void MatterGeneralDiagnosticsPluginServerInitCallback() {}
 
 void MatterGeneralDiagnosticsPluginServerShutdownCallback() {}
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace GeneralDiagnostics {
+    void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason) {
+        if (gServer.IsConstructed()) {
+            gServer.Cluster().OnDeviceReboot(bootReason);
+        } 
+    }
+
+    void GlobalNotifyHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
+                                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current) {
+        if (gServer.IsConstructed()) {
+            gServer.Cluster().OnHardwareFaultsDetect(previous, current);
+        } 
+    }
+
+    void GlobalNotifyRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
+                             const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current) {
+        if (gServer.IsConstructed()) {
+            gServer.Cluster().OnRadioFaultsDetect(previous, current);
+        } 
+    }
+
+    void GlobalNotifyNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
+                               const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current) {
+        if (gServer.IsConstructed()) {
+            gServer.Cluster().OnNetworkFaultsDetect(previous, current);
+        }
+    }
+}
+}
+}
+}
