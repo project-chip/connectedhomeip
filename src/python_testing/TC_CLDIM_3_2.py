@@ -138,7 +138,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
 
         # STEP 3a: If manual latching is required, skip steps 3b and 3c
         self.step("3a")
-        if latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlMode.kRemoteLatching:
+        if latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
             logging.info("Manual latching is required. Skipping steps 3b and 3c.")
             self.skip_step("3b")
             self.skip_step("3c")
@@ -160,7 +160,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
 
         # STEP 3d: If manual latching is not required, skip steps 3e to 3f
         self.step("3d")
-        if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlMode.kRemoteLatching:
+        if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
             self.skip_step("3e")
             self.skip_step("3f")
         else:
@@ -212,7 +212,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
 
         # STEP 5a: If manual latching is required, unlatch device manually
         self.step("5a")
-        if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlMode.kRemoteLatching:
+        if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
             test_step = "Manual unlatch the device"
             self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when ready.")
         else:
@@ -221,7 +221,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
 
         # STEP 5b: If manual latching is not required, skip steps 5c to 5d
         self.step("5b")
-        if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlMode.kRemoteLatching:
+        if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
             logging.info("Manual latching is not required. Skipping steps 5c to 5d.")
             self.skip_step("5c")
             self.skip_step("5d")
