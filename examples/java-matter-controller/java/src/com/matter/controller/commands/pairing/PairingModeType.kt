@@ -26,5 +26,5 @@ enum class PairingModeType {
   SOFT_AP,
   ALREADY_DISCOVERED,
   ON_NETWORK,
-  NFC                   /* Indicates if NFC-based Commissioning is supported */
+  NFC /* Indicates if NFC-based Commissioning is supported */
 }
