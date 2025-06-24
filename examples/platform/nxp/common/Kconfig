@@ -1,19 +1,19 @@
 #
-#    Copyright (c) 2025 Project CHIP Authors
+#Copyright(c) 2025 Project CHIP Authors
 #
-#    Licensed under the Apache License, Version 2.0 (the "License");
-#    you may not use this file except in compliance with the License.
-#    You may obtain a copy of the License at
+#Licensed under the Apache License, Version 2.0(the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
 #
-#        http://www.apache.org/licenses/LICENSE-2.0
+#http: // www.apache.org/licenses/LICENSE-2.0
 #
-#    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS,
-#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#    See the License for the specific language governing permissions and
-#    limitations under the License.
+#Unless required by applicable law or agreed to in writing, software
+#distributed under the License is distributed on an "AS IS" BASIS,
+#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#See the License for the specific language governing permissions and
+#limitations under the License.
 #
-# Common NXP Application Kconfig
+#Common NXP Application Kconfig
 
 menu "Matter application configuration"
 
@@ -139,19 +139,19 @@ choice CHIP_APP_BUTTON_REGISTRATION_SELECTION
 
     config CHIP_APP_BUTTON_REGISTRATION_APP_ONLY
         select CHIP_APP_BUTTON_APP
-        bool "App Button Registration App and BLE Implementation"
+        bool "App Button Registration of App Implementation"
         help
             Enable button registration app implementation only.
 
 endchoice # CHIP_APP_BUTTON_REGISTRATION_SELECTION
 
 if  CHIP_APP_BUTTON
-    config CHIP_APP_BUTTON_HANDLE_SDK_PREDEFINED
-        int "App button handle is predefined within the SDK"
-        default 1 if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
-        default 0
+    config CHIP_APP_BUTTON_HANDLE_SDK_NOT_PREDEFINED
+        bool "App button handle is not predefined within the SDK"
+        default n if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+        default y
         help
-            App button handle is predefined within the SDK
+            App button handle is not predefined within the SDK
 
     config CHIP_APP_BUTTON_WITH_TIMER
         bool "App Button with Timer"
@@ -159,7 +159,6 @@ if  CHIP_APP_BUTTON
             Enable application custom button behavior with timer.
 
     config CHIP_APP_BUTTON_APP
-        select CHIP_APP_BUTTON_HANDLE_SDK_PREDEFINED
         bool "App Button Custom"
         help
             Enable application custom button behavior.

@@ -135,23 +135,22 @@ target_include_directories(app PRIVATE
 )
 
 if (CONFIG_CHIP_APP_BUTTON_REGISTRATION_DEFAULT)
-    target_sources(app PRIVATE
-        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonRegistrationDefault.cpp
-        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonManager.cpp
-    )
+    set(button_registration_source ButtonRegistrationDefault.cpp)
 elseif(CONFIG_CHIP_APP_BUTTON_REGISTRATION_APP_AND_BLE)
-    target_sources(app PRIVATE
-        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonRegistrationAppAndBle.cpp
-        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonManager.cpp
-    )
+    set(button_registration_source ButtonRegistrationAppAndBle.cpp)
 elseif(CONFIG_CHIP_APP_BUTTON_REGISTRATION_APP_ONLY)
-    target_sources(app PRIVATE
-        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonRegistrationAppOnly.cpp
-        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonManager.cpp
-    )
+    set(button_registration_source ButtonRegistrationAppOnly.cpp)
 else ()
+    set(button_registration_source ButtonRegistrationEmpty.cpp)
+endif()
+
+target_sources(app PRIVATE
+    ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/${button_registration_source}
+)
+
+if (NOT CONFIG_CHIP_APP_BUTTON_REGISTRATION_EMPTY)
     target_sources(app PRIVATE
-        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonRegistrationEmpty.cpp
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/matter_button/source/ButtonManager.cpp
     )
 endif()
 
