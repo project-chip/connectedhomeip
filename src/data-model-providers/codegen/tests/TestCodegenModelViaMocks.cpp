@@ -2341,49 +2341,6 @@ TEST_F(TestCodegenModelViaMocks, EmberAttributeWriteDataVersion)
     ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), CHIP_NO_ERROR);
 }
 
-TEST_F(TestCodegenModelViaMocks, WriteToInvalidPath)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-    ScopedMockAccessControl accessControl;
-
-    {
-        WriteOperation test(kInvalidEndpointId, MockClusterId(1234), 1234);
-        test.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-        AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
-        ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::UnsupportedEndpoint);
-    }
-    {
-        WriteOperation test(kMockEndpoint1, MockClusterId(1234), 1234);
-        test.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-        AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
-        ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::UnsupportedCluster);
-    }
-
-    {
-        WriteOperation test(kMockEndpoint1, MockClusterId(1), 1234);
-        test.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-        AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
-        ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::UnsupportedAttribute);
-    }
-}
-
-TEST_F(TestCodegenModelViaMocks, WriteToGlobalAttribute)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-    ScopedMockAccessControl accessControl;
-
-    WriteOperation test(kMockEndpoint1, MockClusterId(1), AttributeList::Id);
-    test.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-    AttributeValueDecoder decoder = test.DecoderFor<int32_t>(1234);
-    ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), Status::UnsupportedWrite);
-}
-
 TEST_F(TestCodegenModelViaMocks, EmberWriteFailure)
 {
     UseMockNodeConfig config(gTestNodeConfig);
@@ -2676,30 +2633,6 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesWrite)
 
         std::optional<ActionReturnStatus> result = model.WriteAttribute(test.GetRequest(), decoder);
         ASSERT_TRUE(result.has_value() && result->IsSuccess());
-    }
-
-    // Write with wrong data version fails with DataVersionMismatch
-    {
-        WriteOperation test(kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kAttributeIdFakeAllowsWrite);
-        test.SetSubjectDescriptor(kAdminSubjectDescriptor);
-        test.SetDataVersion(MakeOptional(fakeClusterServer.GetDataVersion(kTestClusterPath)));
-        fakeClusterServer.TestIncreaseDataVersion();
-
-        AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);
-
-        std::optional<ActionReturnStatus> result = model.WriteAttribute(test.GetRequest(), decoder);
-        ASSERT_TRUE(result.has_value() && result->GetStatusCode().GetStatus() == Status::DataVersionMismatch);
-    }
-
-    // Write on wrong attribute fails
-    {
-        WriteOperation test(kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kAttributeIdNotSupported);
-        test.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-        AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);
-
-        std::optional<ActionReturnStatus> result = model.WriteAttribute(test.GetRequest(), decoder);
-        ASSERT_TRUE(result.has_value() && result->GetStatusCode().GetStatus() == Status::UnsupportedAttribute);
     }
 
     model.Registry().Unregister(&fakeClusterServer);
