@@ -2270,7 +2270,7 @@ void BLEManagerImpl::UpdateBLERPA(void)
     // Read the current RPA.
     pRpaNew = GAP_GetDevAddress(FALSE);
 
-    if (!memcmp(pRpaNew, sInstance.rpa, B_ADDR_LEN))
+    if (memcmp(pRpaNew, sInstance.rpa, B_ADDR_LEN))
     {
         memcpy(sInstance.rpa, pRpaNew, B_ADDR_LEN);
         BLEMGR_LOG("BLE RP Address: %x:%x:%x:%x:%x:%x", pRpaNew[5], pRpaNew[4], pRpaNew[3], pRpaNew[2], pRpaNew[1], pRpaNew[0]);
