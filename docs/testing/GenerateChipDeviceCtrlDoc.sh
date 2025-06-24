@@ -31,8 +31,6 @@ pydoc-markdown -I "$PYTHONPATH" --py3 -m chip.ChipDeviceCtrl '{
       render_toc: true,
       render_toc_title: "ChipDeviceCtrl.py API",
       insert_header_anchors: true,
-      add_full_prefix: false,
+      add_full_prefix: true,
     }
   }' >"$1"/"$FILENAME"
-
-awk '/\(\#chip.ChipDeviceCtrl/ {gsub(/\./, "", $0)} 1' "$1/$FILENAME" >"$1"/tmp && mv "$1"/tmp "$1/$FILENAME"
