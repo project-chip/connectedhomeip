@@ -48,26 +48,6 @@ namespace {
 using namespace chip::app::Compatibility::Internal;
 using Protocols::InteractionModel::Status;
 
-bool ClusterContainsWritableAttribute(ServerClusterInterface * cluster, const ConcreteAttributePath & path)
-{
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> builder;
-
-    if (cluster->Attributes(path, builder) != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-
-    for (auto info : builder.TakeBuffer())
-    {
-        if (info.attributeId == path.mAttributeId)
-        {
-            return info.GetWritePrivilege().has_value();
-        }
-    }
-
-    return false;
-}
-
 class ContextAttributesChangeListener : public AttributesChangedListener
 {
 public:
@@ -119,7 +99,11 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
             VerifyOrReturnError(request.path.mDataVersion.Value() == cluster->GetDataVersion(request.path),
                                 Status::DataVersionMismatch);
         }
-        VerifyOrReturnError(ClusterContainsWritableAttribute(cluster, request.path), Status::UnsupportedAttribute);
+        // Attribute must be readable to allow a read request for it.
+        // ServerClusterInterface API requirement is to ensure path validity
+        std::optional<DataModel::AttributeEntry> entry = FindAttributeEntry(cluster, request.path);
+        VerifyOrReturnError(entry.has_value() && entry->GetWritePrivilege().has_value(), Status::UnsupportedAttribute);
+
         return cluster->WriteAttribute(request, decoder);
     }
 

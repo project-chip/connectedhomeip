@@ -16,6 +16,8 @@
  */
 #pragma once
 
+#include "app/ConcreteAttributePath.h"
+#include "app/data-model-provider/MetadataTypes.h"
 #include <app/data-model-provider/Provider.h>
 
 #include <app/CommandHandlerInterface.h>
@@ -128,6 +130,9 @@ private:
 
     /// Find the index of the given endpoint id
     std::optional<unsigned> TryFindEndpointIndex(EndpointId id) const;
+
+    // try to find the given attribute entry inside a cluster interface
+    static std::optional<DataModel::AttributeEntry> FindAttributeEntry(ServerClusterInterface *cluster, const ConcreteAttributePath &path);
 };
 
 } // namespace app

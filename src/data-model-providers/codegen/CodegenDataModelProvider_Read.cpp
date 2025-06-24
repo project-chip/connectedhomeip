@@ -124,7 +124,11 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
 
     if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
     {
-        VerifyOrReturnError(ClusterContainsReadableAttribute(cluster, request.path), Status::UnsupportedAttribute);
+        // Attribute must be readable to allow a read request for it.
+        // Subscriptions and read request may send invalid values to paths and Attribute path expansion. Such validations
+        // are not done by callers however ServerClusterInterface API requirement is to ensure path validity
+        std::optional<DataModel::AttributeEntry> entry = FindAttributeEntry(cluster, request.path);
+        VerifyOrReturnError(entry.has_value() && entry->GetReadPrivilege().has_value(), Status::UnsupportedAttribute);
         return cluster->ReadAttribute(request, encoder);
     }
 
