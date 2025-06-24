@@ -18,6 +18,7 @@ source_set("persistence") {
   sources = [
     "AttributePersistenceProvider.cpp",
     "AttributePersistenceProvider.h",
+    "PascalString.h",
   ]
 
   public_deps = [

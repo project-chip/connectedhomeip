@@ -33,7 +33,7 @@
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
-#include <app/util/persistence/DefaultAttributePersistenceProvider.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -45,7 +45,7 @@
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/support/TypeTraits.h>
 
-#include <app/util/persistence/DeferredAttributePersistenceProvider.h>
+#include <app/persistence/DeferredAttributePersistenceProvider.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
