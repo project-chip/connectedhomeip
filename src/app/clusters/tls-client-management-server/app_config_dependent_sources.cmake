@@ -16,8 +16,6 @@
 TARGET_SOURCES(
         ${APP_TARGET}
         PRIVATE
-        "${CHIP_APP_BASE_DIR}/clusters/tls-certificate-management-server/CertificateTableImpl.cpp"
-        "${CHIP_APP_BASE_DIR}/clusters/tls-certificate-management-server/CertificateTableImpl.h"
         "${CLUSTER_DIR}/tls-client-management-server.cpp"
         "${CLUSTER_DIR}/tls-client-management-server.h"
 )
