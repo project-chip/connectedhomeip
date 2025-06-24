@@ -203,6 +203,9 @@ private:
     pointer mDataBuf;
     size_t mDataLen;
 };
+
+// Template deduction guides to allow construction of Span from a pointer or
+// array without having to specify the type of the entries explicitly.
 template <class T>
 Span(T * data, size_t size) -> Span<T>;
 template <class T, size_t N>
