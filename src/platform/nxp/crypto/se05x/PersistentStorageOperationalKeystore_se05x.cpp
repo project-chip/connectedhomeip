@@ -59,7 +59,7 @@ CHIP_ERROR PersistentStorageOpKeystorese05x::NewOpKeypairForFabric(FabricIndex f
     mPendingKeypair = Platform::New<Crypto::P256Keypair>();
     VerifyOrReturnError(mPendingKeypair != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    hsmKeyId = CHIP_SE05x_NODE_OP_KEY_INDEX + fabricIndex;
+    hsmKeyId                                        = CHIP_SE05x_NODE_OP_KEY_INDEX + fabricIndex;
     privatekey[CHIP_SE05x_NODE_OP_KEY_ID_INDEX - 3] = (hsmKeyId >> 24) & 0xFF;
     privatekey[CHIP_SE05x_NODE_OP_KEY_ID_INDEX - 2] = (hsmKeyId >> 16) & 0xFF;
     privatekey[CHIP_SE05x_NODE_OP_KEY_ID_INDEX - 1] = (hsmKeyId >> 8) & 0xFF;
