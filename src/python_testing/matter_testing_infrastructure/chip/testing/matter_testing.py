@@ -17,7 +17,6 @@
 
 import argparse
 import asyncio
-import builtins
 import inspect
 import json
 import logging
@@ -59,12 +58,10 @@ import chip.clusters as Clusters
 import chip.logging
 import chip.native
 import chip.testing.global_stash as global_stash
-from chip.ChipStack import ChipStack
 from chip.clusters import Attribute, ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
-from chip.storage import PersistentStorage
 from chip.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
                                         get_setup_payload_info_config)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
