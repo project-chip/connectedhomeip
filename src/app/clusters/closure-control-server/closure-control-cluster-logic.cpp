@@ -454,7 +454,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleStop()
     // A status code of SUCCESS SHALL always be returned, regardless if it is in above states or not.
     if ((state == MainStateEnum::kCalibrating) || (state == MainStateEnum::kMoving) || (state == MainStateEnum::kWaitingForMotion))
     {
-        // Set the MainState to 'Stopped' only if the delegate call to HandleMoveToCommand is successful.
+        // Set the MainState to 'Stopped' only if the delegate call to HandleStopCommand is successful.
         Status status = mDelegate.HandleStopCommand();
         VerifyOrReturnValue(status == Status::Success, status);
 
@@ -470,9 +470,17 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
 {
     VerifyOrDieWithMsg(mIsInitialized, AppServer, "MoveTo Command called before Initialization of closure");
 
-    GenericOverallTargetState target;
-
     VerifyOrReturnError(position.HasValue() || latch.HasValue() || speed.HasValue(), Status::InvalidCommand);
+
+    DataModel::Nullable<GenericOverallTargetState> overallTargetState;
+    VerifyOrReturnError(GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR, Status::Failure);
+
+    if (overallTargetState.IsNull())
+    {
+        // If overallTargetState is null, we need to initialize to default value.
+        // This is to ensure that we can set the position, latch, and speed values in the overallTargetState.
+        overallTargetState.SetNonNull(GenericOverallTargetState{});
+    }
 
     if (position.HasValue())
     {
@@ -480,7 +488,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
 
         if (mConformance.HasFeature(Feature::kPositioning))
         {
-            target.position = position;
+            overallTargetState.Value().position.SetValue(DataModel::MakeNullable(position.Value()));
         }
     }
 
@@ -492,7 +500,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
             return Status::InvalidInState;
         }
 
-        target.latch = latch;
+        overallTargetState.Value().latch.SetValue(DataModel::MakeNullable(latch.Value()));
     }
 
     if (speed.HasValue())
@@ -501,7 +509,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
 
         if (mConformance.HasFeature(Feature::kSpeed))
         {
-            target.speed = speed;
+            overallTargetState.Value().speed.SetValue(speed.Value());
         }
     }
 
@@ -529,7 +537,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
                             ChipLogError(AppServer, "MoveTo Command: Failed to set MainState to kWaitingForMotion"));
     }
 
-    VerifyOrReturnError(SetOverallTargetState(DataModel::MakeNullable(target)) == CHIP_NO_ERROR, Status::Failure);
+    VerifyOrReturnError(SetOverallTargetState(overallTargetState) == CHIP_NO_ERROR, Status::Failure);
 
     return Status::Success;
 }
