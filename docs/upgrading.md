@@ -2,6 +2,18 @@
 
 ## API changes and code migration
 
+### `AttributePersistenceProvider`
+
+`AttributePersistenceProvider` was moved to `src/app/persistence` and its
+interface has updated:
+
+- Metadata about the attribute was added to both read and write
+- Metadata for write was changed from ember specific information (which
+  may have more data like default values or other flags) to focus
+  on format and size
+
+See <https://github.com/project-chip/connectedhomeip/pull/39693> for changes
+
 ### `CommandHandler`
 
 `CommandHandler` ability to directly invoke `Prepare/TLV-Write/Finish` cycles
@@ -68,13 +80,13 @@ independent of the InteractionModelEngine class.
 
 The following replacements exist:
 
--   `chip::app::InteractionModelEngine::RegisterCommandHandler` replaced by
+- `chip::app::InteractionModelEngine::RegisterCommandHandler` replaced by
     `chip::app::CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler`
--   `chip::app::InteractionModelEngine::UnregisterCommandHandler` replaced by
+- `chip::app::InteractionModelEngine::UnregisterCommandHandler` replaced by
     `chip::app::CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler`
--   `chip::app::InteractionModelEngine::FindCommandHandler` replaced by
+- `chip::app::InteractionModelEngine::FindCommandHandler` replaced by
     `chip::app::CommandHandlerInterfaceRegistry::Instance().GetCommandHandler`
--   `chip::app::InteractionModelEngine::UnregisterCommandHandlers` replaced by
+- `chip::app::InteractionModelEngine::UnregisterCommandHandlers` replaced by
     `chip::app::CommandHandlerInterfaceRegistry::Instance().UnregisterAllCommandHandlersForEndpoint`
 
 ### AttributeAccessInterface registration and removal
@@ -84,13 +96,13 @@ A new object exists for the attribute access interface registry, accessible as
 
 Replacements for methods are:
 
--   `registerAttributeAccessOverride` replaced by
+- `registerAttributeAccessOverride` replaced by
     `chip::app::AttributeAccessInterfaceRegistry::Instance().Register`
--   `unregisterAttributeAccessOverride` replaced by
+- `unregisterAttributeAccessOverride` replaced by
     `chip::app::AttributeAccessInterfaceRegistry::Instance().Unregister`
--   `unregisterAllAttributeAccessOverridesForEndpoint` replaced by
+- `unregisterAllAttributeAccessOverridesForEndpoint` replaced by
     `chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAllForEndpoint`
--   `chip::app::GetAttributeAccessOverride` replaced by
+- `chip::app::GetAttributeAccessOverride` replaced by
     `chip::app::AttributeAccessInterfaceRegistry::Instance().Get`
 
 ### `ServerInitParams::dataModelProvider` in `Server::Init` and `FactoryInitParams`
