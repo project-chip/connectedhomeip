@@ -2701,6 +2701,9 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesWrite)
         std::optional<ActionReturnStatus> result = model.WriteAttribute(test.GetRequest(), decoder);
         ASSERT_TRUE(result.has_value() && result->GetStatusCode().GetStatus() == Status::UnsupportedAttribute);
     }
+
+    model.Registry().Unregister(&fakeClusterServer);
+    model.Shutdown();
 }
 
 TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRead)
@@ -2736,6 +2739,9 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRead)
             ReadU32Attribute(model, { kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kAttributeIdNotSupported }, value),
             CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     }
+
+    model.Registry().Unregister(&fakeClusterServer);
+    model.Shutdown();
 }
 
 TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
