@@ -260,6 +260,20 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
             binary="chip-camera-app",
         )
     )
+    targets.append(
+        ApplicationTarget(
+            key="JF_CONTROL_APP",
+            target=f"{target_prefix}-jf-control-app",
+            binary="jfc-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="JF_ADMIN_APP",
+            target=f"{target_prefix}-jf-admin-app",
+            binary="jfa-app",
+        )
+    )
 
     return targets
 
