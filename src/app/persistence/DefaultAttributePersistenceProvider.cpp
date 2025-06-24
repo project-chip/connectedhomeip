@@ -32,7 +32,7 @@ constexpr uint8_t ShortPascalStringLength(const uint8_t * buffer)
     return (buffer[0] == 0xFF ? 0 : buffer[0]);
 }
 
-constexpr uint8_t LongPascalStringLength(const uint8_t * buffer)
+uint8_t LongPascalStringLength(const uint8_t * buffer)
 {
     // The first two bytes specify the length of the long string.  A length of
     // 0xFFFF means the string is invalid and there is no character data.
