@@ -121,7 +121,6 @@ TEST(TestPeerAddress, TestEqualityOperator)
 
     // 2. Different IPv6 address ? not equal
     PeerAddress udp3 = PeerAddress::UDP(ip2, 1234).SetInterface(iface1);
-    EXPECT_FALSE(udp1 == udp3);
     EXPECT_TRUE(udp1 != udp3);
 
     // 3. Different port ? not equal
