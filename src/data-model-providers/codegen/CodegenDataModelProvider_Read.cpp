@@ -17,7 +17,6 @@
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 #include <optional>
-#include <variant>
 
 #include <access/AccessControl.h>
 #include <access/Privilege.h>
@@ -37,7 +36,6 @@
 #include <app/util/endpoint-config-api.h>
 #include <app/util/odd-sized-integers.h>
 #include <data-model-providers/codegen/EmberAttributeDataBuffer.h>
-#include <data-model-providers/codegen/EmberMetadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
@@ -104,33 +102,23 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::ReadAttribute(const Data
 
     if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
     {
-        // Attribute must be readable to allow a read request for it.
-        // Subscriptions and read request may send invalid values to paths and Attribute path expansion. Such validations
-        // are not done by callers however ServerClusterInterface API requirement is to ensure path validity
-        std::optional<DataModel::AttributeEntry> entry = FindAttributeEntry(cluster, request.path);
-        VerifyOrReturnError(entry.has_value() && entry->GetReadPrivilege().has_value(), Status::UnsupportedAttribute);
         return cluster->ReadAttribute(request, encoder);
     }
 
-    auto metadata = Ember::FindAttributeMetadata(request.path);
+    const EmberAfAttributeMetadata *attributeMetadata = emberAfLocateAttributeMetadata(
+        request.path.mEndpointId,
+        request.path.mClusterId,
+        request.path.mAttributeId
+    );
 
-    // Explicit failure in finding a suitable metadata
-    if (const Status * status = std::get_if<Status>(&metadata))
-    {
-        VerifyOrDie((*status == Status::UnsupportedEndpoint) || //
-                    (*status == Status::UnsupportedCluster) ||  //
-                    (*status == Status::UnsupportedAttribute));
-        return *status;
-    }
+    // ReadAttribute requirement is that request.path is a VALID path inside the provider
+    // metadata tree. Clients are supposed to validate this (and data version and other flags)
+    VerifyOrDie(attributeMetadata != nullptr);
 
     // Read via AAI
     std::optional<CHIP_ERROR> aai_result = TryReadViaAccessInterface(
         request.path, AttributeAccessInterfaceRegistry::Instance().Get(request.path.mEndpointId, request.path.mClusterId), encoder);
     VerifyOrReturnError(!aai_result.has_value(), *aai_result);
-
-    const EmberAfAttributeMetadata * attributeMetadata = std::get<const EmberAfAttributeMetadata *>(metadata);
-    // We can only get a status or metadata.
-    VerifyOrDie(attributeMetadata != nullptr);
 
     // At this point, we have to use ember directly to read the data.
     EmberAfAttributeSearchRecord record;

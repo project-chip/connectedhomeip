@@ -91,7 +91,6 @@ constexpr EventId kTestEventId = 0x321;
 constexpr AttributeId kAttributeIdReadOnly        = 0x3001;
 constexpr AttributeId kAttributeIdTimedWrite      = 0x3002;
 constexpr AttributeId kAttributeIdFakeAllowsWrite = 0x3003;
-constexpr AttributeId kAttributeIdNotSupported    = 0x3004;
 
 constexpr CommandId kMockCommandId1 = 0x1234;
 constexpr CommandId kMockCommandId2 = 0x1122;
@@ -1416,63 +1415,6 @@ TEST_F(TestCodegenModelViaMocks, CommandHandlerInterfaceCommandHandling)
     ASSERT_TRUE(generatedCommands.data_equal(Span<const CommandId>(expectedGeneratedCommands)));
 }
 
-TEST_F(TestCodegenModelViaMocks, ReadForInvalidGlobalAttributePath)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-    ScopedMockAccessControl accessControl;
-
-    {
-        ReadOperation testRequest(kEndpointIdThatIsMissing, MockClusterId(1), AttributeList::Id);
-        testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-        std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
-        ASSERT_EQ(model.ReadAttribute(testRequest.GetRequest(), *encoder), Status::UnsupportedEndpoint);
-    }
-
-    {
-        ReadOperation testRequest(kMockEndpoint1, kInvalidClusterId, AttributeList::Id);
-        testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-        std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
-        ASSERT_EQ(model.ReadAttribute(testRequest.GetRequest(), *encoder), Status::UnsupportedCluster);
-    }
-}
-
-TEST_F(TestCodegenModelViaMocks, EmberAttributeInvalidRead)
-{
-    UseMockNodeConfig config(gTestNodeConfig);
-    CodegenDataModelProviderWithContext model;
-    ScopedMockAccessControl accessControl;
-
-    // Invalid attribute
-    {
-        ReadOperation testRequest(kMockEndpoint1, MockClusterId(1), MockAttributeId(10));
-        testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
-
-        std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
-        ASSERT_EQ(model.ReadAttribute(testRequest.GetRequest(), *encoder), Status::UnsupportedAttribute);
-    }
-
-    // Invalid cluster
-    {
-        ReadOperation testRequest(kMockEndpoint1, MockClusterId(100), MockAttributeId(1));
-        testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
-        std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
-
-        ASSERT_EQ(model.ReadAttribute(testRequest.GetRequest(), *encoder), Status::UnsupportedCluster);
-    }
-
-    // Invalid endpoint
-    {
-        ReadOperation testRequest(kEndpointIdThatIsMissing, MockClusterId(1), MockAttributeId(1));
-        testRequest.SetSubjectDescriptor(kAdminSubjectDescriptor);
-        std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
-
-        ASSERT_EQ(model.ReadAttribute(testRequest.GetRequest(), *encoder), Status::UnsupportedEndpoint);
-    }
-}
-
 TEST_F(TestCodegenModelViaMocks, AccessInterfaceUnsupportedRead)
 {
     UseMockNodeConfig config(gTestNodeConfig);
@@ -2662,15 +2604,6 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRead)
         ASSERT_EQ(ReadU32Attribute(
                       model, { kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kAttributeIdFakeAllowsWrite }, value),
                   CHIP_NO_ERROR);
-    }
-
-    // But not on invalid attributes
-    {
-
-        uint32_t value;
-        ASSERT_EQ(
-            ReadU32Attribute(model, { kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kAttributeIdNotSupported }, value),
-            CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
     }
 
     model.Registry().Unregister(&fakeClusterServer);
