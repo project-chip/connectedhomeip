@@ -81,7 +81,8 @@ public:
 
     bool SetValue(Span<const T> value)
     {
-        if (!SetLength(value.size()))
+        VerifyOrReturnValue(value.size() < kInvalidLength, false);
+        if (!SetLength(static_cast<uint8_t>(value.size())))
         {
             return false;
         }
@@ -151,7 +152,8 @@ public:
 
     bool SetValue(Span<const T> value)
     {
-        if (!SetLength(value.size()))
+        VerifyOrReturnValue(value.size() < kInvalidLength, false);
+        if (!SetLength(static_cast<uint16_t>(value.size())))
         {
             return false;
         }
