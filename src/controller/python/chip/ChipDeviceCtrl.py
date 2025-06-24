@@ -307,6 +307,7 @@ class CommissionableNode(discovery.CommissionableNode):
         '''
         # mypy errors ignored due to coroutine returned without await.
         # Fixing this typing error risks affecting existing functionality.
+        # TODO:  Explore proper typing for dynamic attributes in ChipDeviceCtrl.py #618
         return self._devCtrl.CommissionOnNetwork(  # type: ignore[return-value]
             nodeId, setupPinCode, filterType=discovery.FilterType.INSTANCE_NAME, filter=self.instanceName)
 
@@ -838,6 +839,9 @@ class ChipDeviceControllerBase():
         '''
         Establish a PASE session over BLE.
 
+        Warning: This method attempts to establish a new PASE session, even if an open session already exists. 
+        For safer session management that reuses existing sessions, see `FindOrEstablishPASESession`.
+
         Args:
             discriminator (int): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
             setupPinCode (int): The setup pin code of the device.
@@ -854,6 +858,9 @@ class ChipDeviceControllerBase():
     async def EstablishPASESessionIP(self, ipaddr: str, setupPinCode: int, nodeid: int, port: int = 0) -> None:
         '''
         Establish a PASE session over IP.
+
+        Warning: This method attempts to establish a new PASE session, even if an open session already exists. 
+        For safer session management that reuses existing sessions, see `FindOrEstablishPASESession`.
 
         Args:
             ipaddr (str): IP address.
@@ -873,9 +880,12 @@ class ChipDeviceControllerBase():
         '''
         Establish a PASE session using setUpCode.
 
+        Warning: This method attempts to establish a new PASE session, even if an open session already exists. 
+        For safer session management that reuses existing sessions, see `FindOrEstablishPASESession`.
+
         Args:
             setUpCode (str): The setup code of the device.
-            nodeid (int): Node id of the device.
+            nodeid (int):  The node ID assigned to the device for the PASE session.
 
         Returns:
             None
@@ -904,7 +914,9 @@ class ChipDeviceControllerBase():
         Simulates a failure on a specific stage of the test commissioner.
 
         Args:
-            stage (int): The commissioning to simulate.
+            stage (int): The commissioning stage where failure will be simulated.
+                         This corresponds to the enum `CommissioningStage` (e.g. kError, kSecurePairing, etc.). For full details
+                         ref https://github.com/project-chip/connectedhomeip/blob/master/src/controller/CommissioningDelegate.h
 
         Returns:
             bool: True if the failure simulate success, False if not.
@@ -917,7 +929,9 @@ class ChipDeviceControllerBase():
         Simulates a failure on report of the test commissioner.
 
         Args:
-            stage (int): The commissioning to simulate.
+            stage (int): The commissioning stage where failure will be simulated.
+                         This corresponds to the enum `CommissioningStage` (e.g. kError, kSecurePairing, etc.). For full details
+                         ref https://github.com/project-chip/connectedhomeip/blob/master/src/controller/CommissioningDelegate.h
 
         Returns:
             bool: True if the failure simulate success, False if not.
@@ -930,7 +944,9 @@ class ChipDeviceControllerBase():
         Premature complete of the test commissioner.
 
         Args:
-            stage (int): The commissioning to simulate.
+            stage (int): The commissioning stage after a premature completion is simulated.
+                         This corresponds to the enum `CommissioningStage` (e.g. kError, kSecurePairing, etc.). For full details
+                         ref https://github.com/project-chip/connectedhomeip/blob/master/src/controller/CommissioningDelegate.h
 
         Returns:
             bool: True if the premature complete success, False if not.
@@ -1735,6 +1751,7 @@ class ChipDeviceControllerBase():
     # mypy errors ignored due to valid use of dynamic types and flexible tuple formats
     # Fixing these typing errors is a high risk to affect existing functionality.
     # these mismatches are intentional and safe within the current logic
+    # TODO:  Explore proper typing for dynamic attributes in ChipDeviceCtrl.py #618
     def _parseAttributePathTuple(self, pathTuple: typing.Union[
         None,  # Empty tuple, all wildcard
         typing.Tuple[int],  # Endpoint
@@ -1787,6 +1804,7 @@ class ChipDeviceControllerBase():
         # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
         # Fixing these typing errors is a high risk to affect existing functionality.
         # These mismatches are intentional and safe within the current logic.
+        # TODO:  Explore proper typing for dynamic attributes in ChipDeviceCtrl.py #618
         if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[arg-type]
             cluster = pathTuple[1]
         else:
@@ -1816,6 +1834,7 @@ class ChipDeviceControllerBase():
             # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
             # Fixing these typing errors is a high risk to affect existing functionality.
             # These mismatches are intentional and safe within the current logic.
+            # TODO:  Explore proper typing for dynamic attributes in ChipDeviceCtrl.py #618
             if isinstance(pathTuple, int):
                 return ClusterAttribute.EventPath(EndpointId=pathTuple)
             elif issubclass(pathTuple, ClusterObjects.Cluster):  # type: ignore[arg-type]
@@ -1833,6 +1852,7 @@ class ChipDeviceControllerBase():
                 # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
                 # Fixing these typing errors is a high risk to affect existing functionality.
                 # These mismatches are intentional and safe within the current logic.
+                # TODO:  Explore proper typing for dynamic attributes in ChipDeviceCtrl.py #618
                 if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[arg-type]
                     return ClusterAttribute.EventPath.from_cluster(
                         EndpointId=pathTuple[0],    # type: ignore[arg-type]
@@ -1944,6 +1964,7 @@ class ChipDeviceControllerBase():
         # A single tuple is passed intentionally (not a list), as expected by the method logic.
         # Fixing these typing errors is a high risk to affect existing functionality.
         # These mismatches are intentional and safe within the current logic.
+        # TODO:  Explore proper typing for dynamic attributes in ChipDeviceCtrl.py #618
 
         eventLoop = asyncio.get_running_loop()
         future = eventLoop.create_future()
