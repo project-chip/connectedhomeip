@@ -261,18 +261,18 @@ class TC_CLDIM_3_2(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.InvalidInState, "Unexpected status returned")
 
-        # STEP 5a: If manual latching is required, unlatch device manually
+        # STEP 5a: If manual unlatching is required, unlatch device manually
         self.step("5a")
-        if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
+        if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
             test_step = "Manual unlatch the device"
             self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when ready.")
         else:
             logging.info("Manual latching is not required. Skipping step.")
             self.mark_current_step_skipped()
 
-        # STEP 5b: If manual latching is not required, skip steps 5c to 5d
+        # STEP 5b: If manual unlatching is not required, skip steps 5c to 5d
         self.step("5b")
-        if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
+        if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
             logging.info("Manual latching is not required. Skipping steps 5c to 5d.")
             self.skip_step("5c")
             self.skip_step("5d")
