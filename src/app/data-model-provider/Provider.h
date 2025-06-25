@@ -66,7 +66,7 @@ public:
     ///
     /// When this is invoked, caller is epxected to have already done some validations:
     ///    - `request.path` is a valid path inside the ProviderMetadataTree (an AttributeEntry exists)
-    ///    - Attribute is readable according the the ProviderMetadataTree (AttributeEntry)
+    ///    - Attribute is readable according to the ProviderMetadataTree/AttributeEntry data
     ///
     /// Return value notes:
     ///   ActionReturnStatus::IsOutOfSpaceEncodingResponse
@@ -81,7 +81,7 @@ public:
     ///    - cluster `data version` has been checked for the incoming request if applicable
     ///    - validation of ACL/timed interaction flags/writability, if those checks are desired.
     ///    - `request.path` is a valid path inside the ProviderMetadataTree (an AttributeEntry exists)
-    ///    - Attribute is writable according the the ProviderMetadataTree (AttributeEntry)
+    ///    - Attribute is writable according to the ProviderMetadataTree/AttributeEntry data
     virtual ActionReturnStatus WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder) = 0;
 
     ///   Indicates the start/end of a series of list operations. This function will be called either before the first

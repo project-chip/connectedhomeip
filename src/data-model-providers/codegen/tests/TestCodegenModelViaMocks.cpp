@@ -856,7 +856,7 @@ public:
     }
 
     Access::Privilege mEventInfoFakePrivilege = Access::Privilege::kView;
-}; // namespace
+};
 
 template <typename T, EmberAfAttributeType ZclType>
 void TestEmberScalarTypeRead(typename NumericAttributeTraits<T>::WorkingType value)
