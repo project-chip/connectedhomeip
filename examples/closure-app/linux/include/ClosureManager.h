@@ -16,14 +16,6 @@
  *    limitations under the License.
  */
 
-/*
- * @class ClosureManager
- * @brief Manages the initialization and operations related to closure and
- *        closure panel endpoints in the application.
- *
- * @note This class is part of the closure application example
- */
-
 #pragma once
 
 #include "ClosureControlEndpoint.h"

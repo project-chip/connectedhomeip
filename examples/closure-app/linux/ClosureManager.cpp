@@ -163,31 +163,31 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
 
 void ClosureManager::HandleClosureActionTimer(System::Layer * layer, void * aAppState)
 {
-    ClosureManager * manager = reinterpret_cast<ClosureManager *>(aAppState);
+    // Mark aAppState as unused to avoid compiler warnings
+    // Will be used in closure dimension cluster Commands
+    (void)aAppState;
 
-    VerifyOrReturn(manager != nullptr, ChipLogError(AppServer, "HandleClosureActionTimer called with null manager"));
+    ClosureManager & instance = ClosureManager::GetInstance();
 
-    ChipLogProgress(AppServer, "HandleClosureActionTimer called for action: %d", static_cast<int>(manager->mCurrentAction));
-
-    switch (manager->mCurrentAction)
+    switch (instance.mCurrentAction)
     {
     case ClosureAction::kCalibrateAction:
-        manager->HandleClosureActionComplete(ClosureAction::kCalibrateAction);
+        instance.HandleClosureActionComplete(ClosureAction::kCalibrateAction);
         break;
     case ClosureAction::kStopAction:
-        manager->HandleClosureActionComplete(ClosureAction::kStopAction);
+        // Add logic to handle Stop action completion
         break;
     case ClosureAction::kMoveToAction:
-        manager->HandleClosureActionComplete(ClosureAction::kMoveToAction);
+        // Add logic to handle MoveTo action completion
         break;
     case ClosureAction::kLatchAction:
         // Add logic to handle Latch action completion
         break;
     case ClosureAction::kSetTargetAction:
-        manager->HandleClosureActionComplete(ClosureAction::kSetTargetAction);
+        // Add logic to handle SetTarget action completion
         break;
     case ClosureAction::kStepAction:
-        manager->HandleClosureActionComplete(ClosureAction::kStepAction);
+        // Add logic to handle Step action completion
         break;
     case ClosureAction::kPanelLatchAction:
         // Add logic to handle Panel Latch action completion
@@ -201,6 +201,7 @@ void ClosureManager::HandleClosureActionTimer(System::Layer * layer, void * aApp
 void ClosureManager::HandleClosureActionComplete(ClosureAction action)
 {
     ChipLogProgress(AppServer, "HandleClosureActionComplete called for action: %d", static_cast<int>(action));
+
     switch (action)
     {
     case ClosureAction::kCalibrateAction: {
