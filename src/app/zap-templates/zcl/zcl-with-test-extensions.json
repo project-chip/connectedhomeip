@@ -295,6 +295,8 @@
             "TxErrCount",
             "CollisionCount",
             "OverrunCount"
+            "FeatureMap",
+            "ClusterRevision"            
         ],
         "General Commissioning": [
             "RegulatoryConfig",
