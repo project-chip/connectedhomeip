@@ -551,8 +551,8 @@ class TC_SwitchTests(MatterBaseTest):
         # - TH expects report of CurrentPosition 1, followed by a report of Current Position 0.
         logging.info(
             f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for CurrentPosition to go {switch_pressed_position}, then 0.")
-        await_sequence_of_reports(report_queue=attrib_listener.attribute_queue, endpoint_id=endpoint_id, attribute=cluster.Attributes.CurrentPosition, sequence=[
-                                  switch_pressed_position, 0], timeout_sec=post_prompt_settle_delay_seconds)
+        attrib_listener.await_sequence_of_reports(attribute=cluster.Attributes.CurrentPosition, sequence=[
+                                                  switch_pressed_position, 0], timeout_sec=post_prompt_settle_delay_seconds)
 
         # - TH expects at least InitialPress with NewPosition = 1
         logging.info(f"Starting to wait for {post_prompt_settle_delay_seconds:.1f} seconds for InitialPress event.")
