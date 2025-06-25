@@ -61,7 +61,7 @@ def main(log_level, rules, idl_path):
 
     lint_rules = []
     logging.info("Loading rules from %s" % rules)
-    lint_rules.extend(CreateParser(rules).parse())
+    lint_rules.extend(CreateParser().parse(open(rules, 'rt').read()))
 
     logging.info("Parsing idl from %s" % idl_path)
     idl_tree = matter_idl_parser.CreateParser().parse(
@@ -100,7 +100,7 @@ def parser(log_level, filename=None):
     )
 
     logging.info("Starting to parse ...")
-    data = CreateParser(filename).parse()
+    data = CreateParser().parse(open(filename, 'rt').read())
     logging.info("Parse completed")
 
     logging.info("Data:")

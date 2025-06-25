@@ -36,6 +36,12 @@ chip_enable_ota_requestor = true
 
 chip_openthread_ftd = true
 
+#NOTE: LwIP is no longer supported, these options must stay the same
+chip_system_config_use_openthread_inet_endpoints = true
+chip_with_lwip = false
+chip_enable_openthread = true
+chip_inet_config_enable_tcp_endpoint = false
+
 ot_ti_lib_dir = ""
 openthread_external_platform =
     "${chip_root}/third_party/openthread/platforms/ti:libopenthread-ti"

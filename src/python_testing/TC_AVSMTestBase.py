@@ -102,7 +102,7 @@ class AVSMTestBase:
         )
         logger.info(f"Rx'd MicrophoneCapabilities: {aMicrophoneCapabilities}")
         aStreamUsagePriorities = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePrioritiesList
+            endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
         logger.info(f"Rx'd StreamUsagePriorities : {aStreamUsagePriorities}")
         asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
