@@ -56,12 +56,10 @@ class TC_AVSM_2_6(MatterBaseTest, AVSMTestBase):
     def steps_TC_AVSM_2_6(self) -> list[TestStep]:
         return [
             TestStep("precondition", "DUT commissioned and preconditions", is_commissioning=True),
-            TestStep(
-                1, "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on TH_SERVER", "Verify ADO is supported."
-            ),
+            TestStep(1, "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on DUT", "Verify ADO is supported."),
             TestStep(
                 2,
-                "TH reads AllocatedAudioStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedAudioStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated audio streams in the list is 1. Store StreamID as aStreamIDToDelete.",
             ),
             TestStep(
@@ -76,7 +74,7 @@ class TC_AVSM_2_6(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 5,
-                "TH reads AllocatedAudioStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedAudioStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated audio streams in the list is 0.",
             ),
         ]
