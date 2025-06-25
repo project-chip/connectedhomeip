@@ -171,7 +171,12 @@ constexpr osThreadAttr_t kMainTaskAttr = { .name       = "main",
                                            .cb_size    = 0U,
                                            .stack_mem  = NULL,
                                            .stack_size = kMainTaskStackSize,
-                                           .priority   = osPriorityRealtime7 };
+#ifdef SLI_SI91X_MCU_INTERFACE
+                                           .priority = osPriorityRealtime4
+#else
+                                           .priority = osPriorityRealtime7
+#endif // SLI_SI91X_MCU_INTERFACE
+};
 osThreadId_t sMainTaskHandle;
 static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 

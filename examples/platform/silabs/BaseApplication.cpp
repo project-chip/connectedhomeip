@@ -871,10 +871,16 @@ void BaseApplication::ScheduleFactoryReset()
 void BaseApplication::DoProvisioningReset()
 {
     PlatformMgr().ScheduleWork([](intptr_t) {
+        // Force the KeyMap update to make sure nvm3 is updated before anything happens.
+        // If the device reboots before the timer update happens, "shadow" keys are left in nvm3 causing a reduction of the
+        // overall available nvm3 - similar to a memory leak.
+        // FactoryResetThreadStack forces a reboot which was causing a memory loss.
+        chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().ForceKeyMapSave();
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         ConfigurationManagerImpl::GetDefaultInstance().ClearThreadStack();
         ThreadStackMgrImpl().FactoryResetThreadStack();
-        ThreadStackMgr().InitThreadStack();
+        // Triggers a reboot - nothing gets executed after this
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
