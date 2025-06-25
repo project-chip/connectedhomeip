@@ -68,6 +68,7 @@ struct TwoDCartesianZoneStorage : TwoDCartesianZoneStruct
         name           = CharSpan(nameString.c_str(), nameString.size());
         use            = aUse;
         verticesVector = aVertices;
+        vertices       = DataModel::List<TwoDCartesianVertexStruct>(verticesVector.data(), verticesVector.size());
         if (aColor.HasValue())
         {
             colorString = std::string(aColor.Value().begin(), aColor.Value().end());
@@ -139,7 +140,7 @@ public:
      *   produced; otherwise, the command SHALL be rejected with an appropriate
      *   error.
      */
-    virtual Protocols::InteractionModel::Status CreateTwoDCartesianZone(const TwoDCartesianZoneDecodableStruct & zone,
+    virtual Protocols::InteractionModel::Status CreateTwoDCartesianZone(const TwoDCartesianZoneStorage & zone,
                                                                         uint16_t & outZoneID) = 0;
 
     /**
@@ -152,8 +153,7 @@ public:
      *   @return Success if the update is successful; otherwise, the command SHALL be
      *   rejected with an appropriate error.
      */
-    virtual Protocols::InteractionModel::Status UpdateTwoDCartesianZone(uint16_t zoneID,
-                                                                        const TwoDCartesianZoneDecodableStruct & zone) = 0;
+    virtual Protocols::InteractionModel::Status UpdateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStorage & zone) = 0;
 
     /**
      *    @brief Command Delegate for the removal of a TwoDCartesianZone for a given zoneID.

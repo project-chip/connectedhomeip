@@ -171,9 +171,9 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
 
     BitFlags<ZoneManagement::OptionalAttribute> zoneMgmtOptionalAttrs;
     // Hardcode these initialization params for now. TODO: Define HAL interfaces
-    uint8_t appMaxZones                           = 8;  // Spec: min 1
-    uint8_t appMaxUserDefinedZones                = 5;  // Spec: min 5
-    uint8_t sensitivityMax                        = 10; // Spec: 2 to 10
+    uint8_t appMaxZones                           = mCameraDevice->GetCameraHALInterface().GetMaxZones();
+    uint8_t appMaxUserDefinedZones                = mCameraDevice->GetCameraHALInterface().GetMaxUserDefinedZones();
+    uint8_t sensitivityMax                        = mCameraDevice->GetCameraHALInterface().GetSensitivityMax();
     TwoDCartesianVertexStruct appTwoDCartesianMax = {};
     appTwoDCartesianMax.x                         = sensorParams.sensorWidth - 1;
     appTwoDCartesianMax.y                         = sensorParams.sensorHeight - 1;
