@@ -1,0 +1,296 @@
+#
+#   Copyright (c) 2024-2025 Project CHIP Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+rsource "../cmake/Kconfig.matter.common"
+rsource "../cmake/Kconfig.matter.nxp"
+rsource "../cmake/Kconfig.openthread.common"
+rsource "../../../third_party/nxp/nxp_matter_support/cmake/Kconfig"
+
+if CHIP
+
+choice CHIP_NXP_PLATFORM_SELECTION
+	prompt "CHIP NXP platform selection"
+	config CHIP_NXP_PLATFORM_RW61X
+		bool "RW61x platform"
+		depends on MCUX_HW_DEVICE_RW612 || MCUX_HW_DEVICE_RW610
+		help
+			NXP RW61x platform.
+		    
+	config CHIP_NXP_PLATFORM_RT1170
+		bool "RT1170 platform"
+		depends on MCUX_HW_DEVICE_MIMXRT1171 || MCUX_HW_DEVICE_MIMXRT1172 || MCUX_HW_DEVICE_MIMXRT1173 || MCUX_HW_DEVICE_MIMXRT1175 || MCUX_HW_DEVICE_MIMXRT1176
+		help
+			NXP RT1170 platform.
+		
+	config CHIP_NXP_PLATFORM_RT1060
+		bool "RT1060 platform"
+		depends on MCUX_HW_DEVICE_MIMXRT1061 || MCUX_HW_DEVICE_MIMXRT1062
+		help
+			NXP RT1060 platform.
+
+	config CHIP_NXP_PLATFORM_K32W1
+		bool "k32w1 platform"
+		depends on MCUX_HW_DEVICE_K32W1480
+		help
+			NXP k32w1 platform.
+
+	config CHIP_NXP_PLATFORM_MCXW71
+		bool "mcxw71 platform"
+		depends on MCUX_HW_DEVICE_MCXW716C
+		help
+			NXP mcxw71 platform.
+
+	config CHIP_NXP_PLATFORM_MCXW72
+		bool "mcxw72 platform"
+		depends on MCUX_HW_DEVICE_MCXW727C
+		help
+			NXP mcxw72 platform.
+
+endchoice # CHIP_NXP_PLATFORM_SELECTION
+
+config CHIP_NXP_PLATFORM_FOLDER_NAME
+	string "NXP platform folder name"
+	default "rt/rw61x" if CHIP_NXP_PLATFORM_RW61X
+	default "rt/rt1170" if CHIP_NXP_PLATFORM_RT1170
+	default "rt/rt1060" if CHIP_NXP_PLATFORM_RT1060
+	default "mcxw71_k32w1" if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71
+	default "mcxw72" if CHIP_NXP_PLATFORM_MCXW72
+	default "not specified"
+	help
+		Defines the platform folder name to be used.
+
+config CHIP_NXP_DEVICE_LAYER
+	string "NXP device layer"
+	default "nxp/mcxw71_k32w1" if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71
+	default "nxp/common"
+
+# Invisible symbol to get the platform family name
+config CHIP_NXP_PLATFORM_FAMILY
+	string
+	default "mcxw71_k32w1" if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	default "rt" if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1060 || CHIP_NXP_PLATFORM_RT1170
+
+choice CHIP_NVM_COMPONENT
+	prompt "NVM component selection"
+	default CHIP_NVM_COMPONENT_NVS
+	
+	config CHIP_NVM_COMPONENT_NVS
+		bool "NVS"
+		help
+			Use NVS component to store CHIP data.
+
+	config CHIP_NVM_COMPONENT_LITTLEFS
+		bool "LittleFS"
+		help
+			Use LittleFS component to store CHIP data.
+		
+	config CHIP_NVM_COMPONENT_KEYSTORAGE
+		bool "Key Storage"
+		help
+			Use the KeyStorage component to store CHIP data.
+
+	config CHIP_NVM_COMPONENT_NVMFWK
+		bool "NVM Framework"
+		help
+			Use the NVM Framework component to store CHIP data.
+endchoice	
+
+choice CHIP_CRYPTO
+	prompt "CHIP Crypto selection"
+	default CHIP_CRYPTO_MBEDTLS if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT1060
+	default CHIP_CRYPTO_PLATFORM if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	
+	config CHIP_CRYPTO_MBEDTLS
+		bool "CHIP MbedTLS crypto"
+		help
+			Enables the implementation of the Matter cryptographic operations that is
+			based on the mbedTLS crypto API.
+	
+	config CHIP_CRYPTO_PLATFORM
+		bool "CHIP platform crypto"
+		help
+			Enables the implementation of the Matter cryptographic operations that is
+			based on the platform crypto API.
+
+	config CHIP_CRYPTO_PSA
+		bool "CHIP PSA crypto"
+		help
+			Enables the implementation of the Matter cryptographic operations that is
+			based on the PSA crypto API.
+endchoice
+
+config CHIP_USE_GENERATED_CONFIG
+	bool "Use generated config"
+	default y
+	help
+		Use the generated macro configs for CHIP configuration.
+
+config BT
+	bool "Enable BLE"
+	default y
+	help
+		Enable BLE support.
+
+config NET_L2_OPENTHREAD
+	bool "Enable Thread support"
+	default n
+	help
+	  Enable OT support.
+
+config CHIP_DEVICE_USE_ZEPHYR_BLE
+	bool "Use Zephyr BLE implementation"
+	depends on BT
+	default y if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1060 || CHIP_NXP_PLATFORM_RT1170
+	help
+		Use Zephyr implementation for BLE manager.
+
+config CHIP_WIFI
+	bool "Enable NXP Wi-Fi support"
+	help
+		Enable Matter-over-Wi-Fi.
+
+config CHIP_ETHERNET
+	bool "Enable NXP ethernet support"
+	help
+		Enable Matter-over-ethernet.
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MINIMUM_INTERVAL
+	int "Define the minimum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 500
+	help
+		Specifies the minimum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL
+	int "Define the maximum connection recovery time interval in milliseconds"
+	depends on CHIP_WIFI
+	default 3600000 # 1 hour
+	help
+		Specifies the maximum connection recovery interval (in milliseconds).
+
+config CHIP_WIFI_CONNECTION_RECOVERY_MAX_RETRIES_NUMBER
+	int "Define the maximum amount of connection recovery occurrences"
+	depends on CHIP_WIFI
+	default 0
+	help
+		Specifies the maximum number of connection recovery attempts.
+		If set to 0, no limitation is applied and attempts
+		to recover the connection are performed indefinitely.
+
+config CHIP_WIFI_CONNECTION_RECOVERY_JITTER
+	int "Define the connection recovery jitter in milliseconds"
+	depends on CHIP_WIFI
+	default 2000
+	help
+		Specifies the maximum connection recovery jitter interval (in milliseconds).
+		Once the wait time reaches the current maximum value (defined by CHIP_WIFI_CONNECTION_RECOVERY_MAXIMUM_INTERVAL),
+		a random jitter interval is added to it to avoid periodicity. The random jitter is selected
+		within range [-JITTER; +JITTER].
+
+# Thread network features
+
+if NET_L2_OPENTHREAD
+
+endif # NET_L2_OPENTHREAD
+
+config CHIP_IPV4
+	bool "IPv4 support for Matter"
+	default n if CHIP_NET_L2_OPENTHREAD && !CHIP_WIFI
+	default y
+	help
+		If disabled, it allows to build NXP SDK application
+		with IPv4 support independently of the Matter stack still
+		running over IPv6.
+
+# App specific
+
+config NETWORK_LAYER_BLE
+	bool "Should be replaced by CONFIG_BT. Keep it for backwards compatibility"
+	default y if BT
+	help
+		Will be deprecated once application files replace CONFIG_NETWORK_LAYER_BLE with CONFIG_BT
+
+config OPERATIONAL_KEYSTORE
+	bool "Use custom implementation of operational keystore"
+	default y if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	help
+		"Use custom implementation of operational keystore"
+
+config LOW_POWER
+	bool "Should be replaced by CONFIG_NXP_USE_LOW_POWER. Keep it for backwards compatibility"
+	default y if NXP_USE_LOW_POWER
+	help
+		Will be deprecated once application files replace CONFIG_LOW_POWER with CONFIG_NXP_USE_LOW_POWER
+
+choice THREAD_DEVICE_TYPE_SELECTION
+	prompt "Thread device type selection based on ConnectivityManager::ThreadDeviceType enum"
+	default ROUTER if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT1060
+	default FULL_END_DEVICE
+	config ROUTER
+		bool "Router"
+	config FULL_END_DEVICE
+		bool "Full end device"
+	config MINIMAL_END_DEVICE
+		bool "Minimal end device"
+	config SLEEPY_END_DEVICE
+		bool "Sleepy end device"
+	config SYNCHRONIZED_SLEEPY_END_DEVICE
+		bool "Synchronized sleepy end device"
+endchoice
+
+config THREAD_DEVICE_TYPE
+	string "Thread device type registered with the connectivity manager"
+	default "kThreadDeviceType_Router" if ROUTER
+	default "kThreadDeviceType_FullEndDevice" if FULL_END_DEVICE
+	default "kThreadDeviceType_MinimalEndDevice" if MINIMAL_END_DEVICE
+	default "kThreadDeviceType_SleepyEndDevice" if SLEEPY_END_DEVICE
+	default "kThreadDeviceType_SynchronizedSleepyEndDevice" if SYNCHRONIZED_SLEEPY_END_DEVICE
+	help
+		Thread device type registered with the connectivity manager
+
+config CHIP_OTA_IMAGE_PROCESSOR_HEADER
+	string "Header for OTA image processor implementation"
+	default "platform/nxp/common/ota/OTAImageProcessorImpl.h"
+	help
+		Header for OTA image processor implementation.
+		(Macro value is in quotes.)
+
+config CHIP_OTA_POSTED_OPERATIONS_IN_IDLE
+	bool "Use Posted Operations in Idle task for OTA Image Processing"
+	default y if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1060 || CHIP_NXP_PLATFORM_RT1170
+	depends on CHIP_OTA_REQUESTOR
+	help
+		When processing the OTA image, the write/erase operations will be posted and only resumed in the context of the Idle task.
+
+if CHIP_OTA_REQUESTOR
+
+config CHIP_OTA_ENCRYPTION
+	bool "OTA with encryption"
+	help
+		When enabled, the OTA image processor expects the image to be encrypted with AES, 
+		so it will attempt to decrypt each block before storing it in flash.
+
+config CHIP_OTA_ENCRYPTION_KEY
+	string "OTA encryption key"
+	depends on CHIP_OTA_ENCRYPTION
+	default "1234567890ABCDEFA1B2C3D4E5F6F1B4"
+	help
+		Defines the key used for encrypting the OTA image. 
+		This key is reused to perform an AES decryption of the OTA image.
+
+endif # CHIP_OTA_REQUESTOR
+
+endif # CHIP

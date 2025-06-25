@@ -33,11 +33,7 @@
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     0x0000001F, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
-    /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
-    /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
-    /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
     /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: view */ \
@@ -50,12 +46,6 @@
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: view */ \
@@ -76,11 +66,7 @@
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     0x00000000, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
-    /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
-    /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
-    /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     0x00000000, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     0x00000001, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
     /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: view */ \
@@ -93,12 +79,6 @@
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: view */ \
@@ -119,11 +99,7 @@
     /* Cluster: Level Control, Attribute: StartUpCurrentLevel, Privilege: view */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: Basic Information, Attribute: NodeLabel, Privilege: view */ \
-    /* Cluster: Basic Information, Attribute: Location, Privilege: view */ \
-    /* Cluster: Basic Information, Attribute: LocalConfigDisabled, Privilege: view */ \
     /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
-    /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: view */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
     /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: view */ \
@@ -136,12 +112,6 @@
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeRunningHours, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: LifetimeEnergyConsumed, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: OperationMode, Privilege: view */ \
-    /* Cluster: Pump Configuration and Control, Attribute: ControlMode, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: view */ \
@@ -373,6 +343,7 @@
     0x00000031, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
     0x00000033, /* Cluster: General Diagnostics, Command: TestEventTrigger, Privilege: manage */ \
+    0x00000033, /* Cluster: General Diagnostics, Command: PayloadTestRequest, Privilege: manage */ \
     0x00000034, /* Cluster: Software Diagnostics, Command: ResetWatermarks, Privilege: manage */ \
     0x00000035, /* Cluster: Thread Network Diagnostics, Command: ResetCounts, Privilege: manage */ \
     0x00000037, /* Cluster: Ethernet Network Diagnostics, Command: ResetCounts, Privilege: manage */ \
@@ -400,6 +371,7 @@
     0x00000062, /* Cluster: Scenes Management, Command: RemoveScene, Privilege: manage */ \
     0x00000062, /* Cluster: Scenes Management, Command: RemoveAllScenes, Privilege: manage */ \
     0x00000062, /* Cluster: Scenes Management, Command: StoreScene, Privilege: manage */ \
+    0x00000062, /* Cluster: Scenes Management, Command: CopyScene, Privilege: manage */ \
     0x00000201, /* Cluster: Thermostat, Command: AtomicRequest, Privilege: manage */ \
     0xFFF1FC06, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     0xFFF1FC06, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
@@ -423,6 +395,7 @@
     0x00000006, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
     0x00000008, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
     0x00000000, /* Cluster: General Diagnostics, Command: TestEventTrigger, Privilege: manage */ \
+    0x00000003, /* Cluster: General Diagnostics, Command: PayloadTestRequest, Privilege: manage */ \
     0x00000000, /* Cluster: Software Diagnostics, Command: ResetWatermarks, Privilege: manage */ \
     0x00000000, /* Cluster: Thread Network Diagnostics, Command: ResetCounts, Privilege: manage */ \
     0x00000000, /* Cluster: Ethernet Network Diagnostics, Command: ResetCounts, Privilege: manage */ \
@@ -450,6 +423,7 @@
     0x00000002, /* Cluster: Scenes Management, Command: RemoveScene, Privilege: manage */ \
     0x00000003, /* Cluster: Scenes Management, Command: RemoveAllScenes, Privilege: manage */ \
     0x00000004, /* Cluster: Scenes Management, Command: StoreScene, Privilege: manage */ \
+    0x00000040, /* Cluster: Scenes Management, Command: CopyScene, Privilege: manage */ \
     0x000000FE, /* Cluster: Thermostat, Command: AtomicRequest, Privilege: manage */ \
     0x00000000, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     0x00000001, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \
@@ -473,6 +447,7 @@
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Command: ConnectNetwork, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Command: ReorderNetwork, Privilege: administer */ \
     chip::Access::Privilege::kManage, /* Cluster: General Diagnostics, Command: TestEventTrigger, Privilege: manage */ \
+    chip::Access::Privilege::kManage, /* Cluster: General Diagnostics, Command: PayloadTestRequest, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Software Diagnostics, Command: ResetWatermarks, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Thread Network Diagnostics, Command: ResetCounts, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Ethernet Network Diagnostics, Command: ResetCounts, Privilege: manage */ \
@@ -500,6 +475,7 @@
     chip::Access::Privilege::kManage, /* Cluster: Scenes Management, Command: RemoveScene, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Scenes Management, Command: RemoveAllScenes, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Scenes Management, Command: StoreScene, Privilege: manage */ \
+    chip::Access::Privilege::kManage, /* Cluster: Scenes Management, Command: CopyScene, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Thermostat, Command: AtomicRequest, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Fault Injection, Command: FailAtFault, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Fault Injection, Command: FailRandomlyAtFault, Privilege: manage */ \

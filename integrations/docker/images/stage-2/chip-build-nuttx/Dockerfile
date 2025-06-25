@@ -14,7 +14,7 @@ RUN set -x \
 # Download and build g++-13
 RUN set -x \
     && ! test -d /opt/nuttx/gcc-13 \
-    && wget -P gcc_build https://ftp.tsukuba.wide.ad.jp/software/gcc/releases/gcc-13.1.0/gcc-13.1.0.tar.gz \
+    && wget -P gcc_build https://mirrorservice.org/sites/sourceware.org/pub/gcc/releases/gcc-13.1.0/gcc-13.1.0.tar.gz \
     && cd gcc_build \
     && tar xzf gcc-13.1.0.tar.gz \
     && cd gcc-13.1.0 \

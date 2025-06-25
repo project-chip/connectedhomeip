@@ -19,7 +19,7 @@
 #include "AppTask.h"
 #include "LEDWidget.h"
 #include <DFUManager.h>
-#include <app/server/OnboardingCodesUtil.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>

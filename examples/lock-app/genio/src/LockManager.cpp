@@ -132,10 +132,10 @@ bool LockManager::ReadConfigValues()
 {
     size_t outLen;
     MT793XConfig::ReadConfigValueBin(MT793XConfig::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUsers),
-                                     sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
+                                     sizeof(EmberAfPluginDoorLockUserInfo) * MATTER_ARRAY_SIZE(mLockUsers), outLen);
 
     MT793XConfig::ReadConfigValueBin(MT793XConfig::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
-                                     sizeof(EmberAfPluginDoorLockCredentialInfo) * ArraySize(mLockCredentials), outLen);
+                                     sizeof(EmberAfPluginDoorLockCredentialInfo) * MATTER_ARRAY_SIZE(mLockCredentials), outLen);
 
     MT793XConfig::ReadConfigValueBin(MT793XConfig::kConfigKey_LockUserName, reinterpret_cast<uint8_t *>(mUserNames),
                                      sizeof(mUserNames), outLen);

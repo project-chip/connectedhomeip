@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Push AV Server</title>
+    <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="top-level">
+        <a href="/ui/streams">Streams</a>
+        <a href="/ui/certificates">Certificates</a>
+    </nav>
+    <div class="left-bar">
+        <h2>Certificates</h2>
+        <h3>Server</h3>
+        <ul>
+            {% for cert_name in certs['server'] %}
+            <li><a href="/ui/certificates/server/{{cert_name}}">{{cert_name}}</a></li>
+            {% endfor %}
+        </ul>
+        <h3>Clients</h3>
+        <ul>
+            {% for cert_name in certs['device'] %}
+            <li><a href="/ui/certificates/device/{{cert_name}}">{{cert_name}}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="center">
+
+    </div>
+</body>
+
+</html>

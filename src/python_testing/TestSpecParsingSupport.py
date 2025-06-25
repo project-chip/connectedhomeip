@@ -21,7 +21,7 @@ import chip.clusters as Clusters
 import jinja2
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.matter_testing import MatterBaseTest, ProblemNotice, default_matter_test_main
-from chip.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, SpecParsingException, XmlCluster,
+from chip.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, XmlCluster,
                                        add_cluster_data_from_xml, build_xml_clusters, check_clusters_for_unknown_commands,
                                        combine_derived_clusters_with_base, get_data_model_directory)
 from mobly import asserts
@@ -33,9 +33,10 @@ CLUSTER_ID = 0x0BEE
 CLUSTER_NAME = "TestCluster"
 ATTRIBUTE_NAME = "TestAttribute"
 ATTRIBUTE_ID = 0x0000
+COMMAND_ID = 0x0F
 
 
-def single_attribute_cluster_xml(read_access: str, write_access: str, write_supported: str):
+def single_attribute_cluster_xml(read_access: str, write_access: str, write_supported: str, invoke_access: str):
     xml_cluster = f'<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="{CLUSTER_ID}" name="{CLUSTER_NAME}" revision="3">'
     revision_table = ('<revisionHistory>'
                       '<revision revision="1" summary="Initial Release"/>'
@@ -55,12 +56,20 @@ def single_attribute_cluster_xml(read_access: str, write_access: str, write_supp
                  '<mandatoryConform/>'
                  '</attribute>'
                  '</attributes>')
+    invoke_access_str = f'invokePrivilege="{invoke_access}"' if invoke_access is not None else ""
+    command = ('<commands>'
+               f'<command id="{COMMAND_ID}" name="Cmd" direction="commandToServer" response="Y">'
+               f'<access {invoke_access_str}/>'
+               '<mandatoryConform/>'
+               '</command>'
+               '</commands>')
 
     return (f'{xml_cluster}'
             f'{revision_table}'
             f'{id_table}'
             f'{classification}'
             f'{attribute}'
+            f'{command}'
             '</cluster>')
 
 
@@ -213,7 +222,9 @@ ALIASED_CLUSTERS = (
     '  </revisionHistory>'
     '  <clusterIds>'
     '    <clusterId id="0xFFFE" name="Test Alias1"/>'
-    '    <clusterId id="0xFFFD" name="Test Alias2"/>'
+    '    <clusterId id="0xFFFD" name="Test Alias2">'
+    '      <provisionalConform/>'
+    '    </clusterId>'
     '  </clusterIds>'
     '  <classification hierarchy="base" role="application" picsCode="BASE" scope="Endpoint"/>'
     '  <commands>'
@@ -251,39 +262,52 @@ PROVISIONAL_CLUSTER_TEMPLATE = """
 class TestSpecParsingSupport(MatterBaseTest):
     def setup_class(self):
         super().setup_class()
-        self.spec_xml_clusters, self.spec_problems = build_xml_clusters()
+        # Latest fully certified build
+        self.spec_xml_clusters, self.spec_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
         self.all_spec_clusters = set([(id, c.name, c.pics) for id, c in self.spec_xml_clusters.items()])
 
     def test_build_xml_override(self):
         # checks that the 1.3 spec (default) does not contain in-progress clusters and the TOT does
-        tot_xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.kMaster)
-        one_three_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
-        one_four_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
-        asserts.assert_greater(len(set(tot_xml_clusters.keys()) - set(one_three_clusters.keys())),
+        one_four_two_xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
+        one_three_clusters, one_three_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
+        one_four_clusters, one_four_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
+        one_four_one_clusters, one_four_one_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
+
+        # We know 1.3, 1.4 and 1.4.1 are clear of errors, ensure it stays that way.
+        asserts.assert_equal(len(one_three_problems), 0, "Unexpected problems found on 1.3 cluster parsing")
+        asserts.assert_equal(len(one_four_problems), 0, "Unexpected problems found on 1.4 cluster parsing")
+        asserts.assert_equal(len(one_four_one_problems), 0, "Unexpected problems found on 1.4.1 cluster parsing")
+
+        asserts.assert_greater(len(set(one_four_two_xml_clusters.keys()) - set(one_three_clusters.keys())),
                                0, "Master dir does not contain any clusters not in 1.3")
-        asserts.assert_greater(len(set(tot_xml_clusters.keys()) - set(one_four_clusters.keys())),
-                               0, "Master dir does not contain any clusters not in 1.4")
+        asserts.assert_equal(len(set(one_four_two_xml_clusters.keys()) - set(one_four_clusters.keys())),
+                             0, "1.4.2 contains clusters not in 1.4")
         asserts.assert_greater(len(set(one_four_clusters.keys()) - set(one_three_clusters.keys())),
                                0, "1.4 dir does not contain any clusters not in 1.3")
+        asserts.assert_equal(len(one_four_clusters.keys()), len(one_four_one_clusters.keys()),
+                             "1.4 and 1.4.1 do not contain the same clusters")
         # only the pulse width modulation cluster was removed post 1.3
-        asserts.assert_equal(set(one_three_clusters.keys()) - set(tot_xml_clusters.keys()),
-                             set([Clusters.PulseWidthModulation.id]), "There are some 1.3 clusters that are not included in the TOT spec")
-        asserts.assert_equal(set(one_four_clusters.keys())-set(tot_xml_clusters.keys()),
-                             set(), "There are some 1.4 clusters that are not included in the TOT spec")
+        one_four_removed = set([Clusters.PulseWidthModulation.id])
+        asserts.assert_equal(set(one_three_clusters.keys()) - set(one_four_clusters.keys()),
+                             one_four_removed, "There are some 1.3 clusters that are unexpectedly not included in the 1.4 spec")
+        # Ballast and all the proxy clusters are being removed in 1.5
+        one_five_removed = set([Clusters.BallastConfiguration.id, Clusters.ProxyConfiguration.id,
+                               Clusters.ProxyDiscovery.id, Clusters.ProxyValid.id])
+        asserts.assert_equal(set(one_four_clusters.keys())-set(one_four_two_xml_clusters.keys()),
+                             one_five_removed, "There are some 1.4 clusters that are unexpectedly not included in the TOT spec")
+        asserts.assert_equal(set(one_three_clusters.keys())-set(one_four_two_xml_clusters.keys()),
+                             one_four_removed.union(one_five_removed), "There are some 1.3 clusters that are unexpectedly not included in the TOT spec")
 
         str_path = get_data_model_directory(PrebuiltDataModelDirectory.k1_4, DataModelLevel.kCluster)
         string_override_check, problems = build_xml_clusters(str_path)
 
         asserts.assert_count_equal(string_override_check.keys(), self.spec_xml_clusters.keys(), "Mismatched cluster generation")
 
-        with asserts.assert_raises(SpecParsingException):
-            build_xml_clusters("baddir")
-
     def test_spec_parsing_access(self):
         strs = [None, 'view', 'operate', 'manage', 'admin']
         for read in strs:
             for write in strs:
-                xml = single_attribute_cluster_xml(read, write, "true")
+                xml = single_attribute_cluster_xml(read, write, "true", None)
                 xml_cluster = parse_cluster(xml)
                 asserts.assert_is_not_none(xml_cluster.attributes, "No attributes found in cluster")
                 asserts.assert_is_not_none(xml_cluster.attribute_map, "No attribute map found in cluster")
@@ -294,10 +318,19 @@ class TestSpecParsingSupport(MatterBaseTest):
                                      get_access_enum_from_string(read), "Unexpected read access")
                 asserts.assert_equal(xml_cluster.attributes[ATTRIBUTE_ID].write_access,
                                      get_access_enum_from_string(write), "Unexpected write access")
+        for invoke in strs:
+            xml = single_attribute_cluster_xml(None, None, "true", invoke)
+            xml_cluster = parse_cluster(xml)
+            asserts.assert_is_not_none(xml_cluster.accepted_commands, "No commands found in cluster")
+            asserts.assert_is_not_none(xml_cluster.command_map, "No command map found in cluster")
+            asserts.assert_true(COMMAND_ID in xml_cluster.accepted_commands.keys(),
+                                "Did not find test command in XmlCluster.accepted_commands")
+            asserts.assert_equal(xml_cluster.accepted_commands[COMMAND_ID].privilege,
+                                 get_access_enum_from_string(invoke), "Unexpected invoke privilege")
 
     def test_write_optional(self):
         for write_support in ['true', 'optional']:
-            xml = single_attribute_cluster_xml('view', 'view', write_support)
+            xml = single_attribute_cluster_xml('view', 'view', write_support, None)
             xml_cluster = parse_cluster(xml)
             asserts.assert_is_not_none(xml_cluster.attributes, "No attributes found in cluster")
             asserts.assert_is_not_none(xml_cluster.attribute_map, "No attribute map found in cluster")
@@ -399,6 +432,10 @@ class TestSpecParsingSupport(MatterBaseTest):
         asserts.assert_true((0xFFFE, 'Test Alias1') in ids, "Unable to find Test Alias1 cluster in parsed clusters")
         asserts.assert_true((0xFFFD, 'Test Alias2') in ids, "Unable to find Test Alias2 cluster in parsed clusters")
 
+        # Test Alias2 is marked as provisional, and TestAlias1 is not
+        asserts.assert_false(clusters[0xFFFE].is_provisional, "Test Alias1 is marked as provisional and should not be")
+        asserts.assert_true(clusters[0xFFFD].is_provisional, "Test Alias2 is not marked as provisional and should be")
+
     def test_known_aliased_clusters(self):
         known_aliased_clusters = set([(0x040C, 'Carbon Monoxide Concentration Measurement', 'CMOCONC'),
                                       (0x040D, 'Carbon Dioxide Concentration Measurement', 'CDOCONC'),
@@ -463,19 +500,19 @@ class TestSpecParsingSupport(MatterBaseTest):
         asserts.assert_false(clusters[id].is_provisional, "Non-provisional cluster marked as provisional")
 
     def test_atomic_thermostat(self):
-        tot_xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.kMaster)
+        one_four_two_xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
         one_three_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
         one_four_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
 
-        asserts.assert_in("Atomic Request", tot_xml_clusters[Clusters.Thermostat.id].command_map,
+        asserts.assert_in("Atomic Request", one_four_two_xml_clusters[Clusters.Thermostat.id].command_map,
                           "Atomic request not found on thermostat command map")
-        request_id = tot_xml_clusters[Clusters.Thermostat.id].command_map["Atomic Request"]
-        asserts.assert_in(request_id, tot_xml_clusters[Clusters.Thermostat.id].accepted_commands.keys(),
+        request_id = one_four_two_xml_clusters[Clusters.Thermostat.id].command_map["Atomic Request"]
+        asserts.assert_in(request_id, one_four_two_xml_clusters[Clusters.Thermostat.id].accepted_commands.keys(),
                           "Atomic request not found in thermostat accepted command list")
 
         asserts.assert_in("Atomic Response", one_four_clusters[Clusters.Thermostat.id].command_map,
                           "Atomic response not found in the thermostat command map")
-        response_id = tot_xml_clusters[Clusters.Thermostat.id].command_map["Atomic Response"]
+        response_id = one_four_two_xml_clusters[Clusters.Thermostat.id].command_map["Atomic Response"]
         asserts.assert_in(response_id, one_four_clusters[Clusters.Thermostat.id].generated_commands.keys(),
                           "Atomic response not found in thermostat generated command list")
 

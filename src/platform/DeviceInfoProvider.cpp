@@ -82,11 +82,16 @@ CHIP_ERROR DeviceInfoProvider::AppendUserLabel(EndpointId endpoint, const UserLa
 {
     size_t length;
 
-    // Increase the size of UserLabelList by 1
+    // Fetch current list length
     ReturnErrorOnFailure(GetUserLabelLength(endpoint, length));
-    ReturnErrorOnFailure(SetUserLabelLength(endpoint, length + 1));
 
-    // Append the user label at the end of UserLabelList
+    if (length >= kMaxUserLabelListLength)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    // Add the new entry to the list
+    ReturnErrorOnFailure(SetUserLabelLength(endpoint, length + 1));
     ReturnErrorOnFailure(SetUserLabelAt(endpoint, length, label));
 
     return CHIP_NO_ERROR;

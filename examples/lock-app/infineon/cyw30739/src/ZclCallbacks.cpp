@@ -19,6 +19,7 @@
 
 #include "LockManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/Nullable.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/logging/CHIPLogging.h>

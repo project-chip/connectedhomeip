@@ -17,6 +17,7 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
@@ -25,21 +26,23 @@ import matter.tlv.TlvWriter
 class WebRTCTransportProviderClusterWebRTCSessionStruct(
   val id: UInt,
   val peerNodeID: ULong,
-  val peerFabricIndex: UInt,
-  val streamType: UInt,
+  val peerEndpointID: UInt,
+  val streamUsage: UInt,
   val videoStreamID: UInt?,
   val audioStreamID: UInt?,
-  val metadataOptions: UInt,
+  val metadataEnabled: Optional<Boolean>,
+  val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("WebRTCTransportProviderClusterWebRTCSessionStruct {\n")
     append("\tid : $id\n")
     append("\tpeerNodeID : $peerNodeID\n")
-    append("\tpeerFabricIndex : $peerFabricIndex\n")
-    append("\tstreamType : $streamType\n")
+    append("\tpeerEndpointID : $peerEndpointID\n")
+    append("\tstreamUsage : $streamUsage\n")
     append("\tvideoStreamID : $videoStreamID\n")
     append("\taudioStreamID : $audioStreamID\n")
-    append("\tmetadataOptions : $metadataOptions\n")
+    append("\tmetadataEnabled : $metadataEnabled\n")
+    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -48,8 +51,8 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_ID), id)
       put(ContextSpecificTag(TAG_PEER_NODE_ID), peerNodeID)
-      put(ContextSpecificTag(TAG_PEER_FABRIC_INDEX), peerFabricIndex)
-      put(ContextSpecificTag(TAG_STREAM_TYPE), streamType)
+      put(ContextSpecificTag(TAG_PEER_ENDPOINT_ID), peerEndpointID)
+      put(ContextSpecificTag(TAG_STREAM_USAGE), streamUsage)
       if (videoStreamID != null) {
         put(ContextSpecificTag(TAG_VIDEO_STREAM_ID), videoStreamID)
       } else {
@@ -60,19 +63,24 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
       } else {
         putNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
       }
-      put(ContextSpecificTag(TAG_METADATA_OPTIONS), metadataOptions)
+      if (metadataEnabled.isPresent) {
+        val optmetadataEnabled = metadataEnabled.get()
+        put(ContextSpecificTag(TAG_METADATA_ENABLED), optmetadataEnabled)
+      }
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_ID = 1
-    private const val TAG_PEER_NODE_ID = 2
-    private const val TAG_PEER_FABRIC_INDEX = 3
-    private const val TAG_STREAM_TYPE = 4
-    private const val TAG_VIDEO_STREAM_ID = 5
-    private const val TAG_AUDIO_STREAM_ID = 6
-    private const val TAG_METADATA_OPTIONS = 7
+    private const val TAG_ID = 0
+    private const val TAG_PEER_NODE_ID = 1
+    private const val TAG_PEER_ENDPOINT_ID = 2
+    private const val TAG_STREAM_USAGE = 3
+    private const val TAG_VIDEO_STREAM_ID = 4
+    private const val TAG_AUDIO_STREAM_ID = 5
+    private const val TAG_METADATA_ENABLED = 6
+    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
       tlvTag: Tag,
@@ -81,8 +89,8 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
       tlvReader.enterStructure(tlvTag)
       val id = tlvReader.getUInt(ContextSpecificTag(TAG_ID))
       val peerNodeID = tlvReader.getULong(ContextSpecificTag(TAG_PEER_NODE_ID))
-      val peerFabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_PEER_FABRIC_INDEX))
-      val streamType = tlvReader.getUInt(ContextSpecificTag(TAG_STREAM_TYPE))
+      val peerEndpointID = tlvReader.getUInt(ContextSpecificTag(TAG_PEER_ENDPOINT_ID))
+      val streamUsage = tlvReader.getUInt(ContextSpecificTag(TAG_STREAM_USAGE))
       val videoStreamID =
         if (!tlvReader.isNull()) {
           tlvReader.getUInt(ContextSpecificTag(TAG_VIDEO_STREAM_ID))
@@ -97,18 +105,25 @@ class WebRTCTransportProviderClusterWebRTCSessionStruct(
           tlvReader.getNull(ContextSpecificTag(TAG_AUDIO_STREAM_ID))
           null
         }
-      val metadataOptions = tlvReader.getUInt(ContextSpecificTag(TAG_METADATA_OPTIONS))
+      val metadataEnabled =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_METADATA_ENABLED))) {
+          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_METADATA_ENABLED)))
+        } else {
+          Optional.empty()
+        }
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
       return WebRTCTransportProviderClusterWebRTCSessionStruct(
         id,
         peerNodeID,
-        peerFabricIndex,
-        streamType,
+        peerEndpointID,
+        streamUsage,
         videoStreamID,
         audioStreamID,
-        metadataOptions,
+        metadataEnabled,
+        fabricIndex,
       )
     }
   }

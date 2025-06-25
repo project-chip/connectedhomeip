@@ -23,6 +23,10 @@
 
 // ---- EVSE Example App Config ----
 
+#if SL_MATTER_CONFIG_ENABLE_EXAMPLE_EVSE_DEVICE
 #define APP_TASK_NAME "EVSE"
+#else
+#define APP_TASK_NAME "W-Heater"
+#endif
 
-#define BLE_DEV_NAME "SiLabs-EVSE"
+#define BLE_DEV_NAME "SL-" APP_TASK_NAME

@@ -34,11 +34,11 @@
 #include <DeviceInfoProviderImpl.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/Instance.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #if CONFIG_BOOTLOADER_MCUBOOT
 #include <OTAUtil.h>
@@ -160,6 +160,9 @@ class AppFabricTableDelegate : public FabricTable::Delegate
                 {
                     ChipLogError(DeviceLayer, "Storage clearance failed: %d", status);
                 }
+#ifdef CONFIG_TFLM_FEATURE
+                AppTask::MicroSpeechProcessStop();
+#endif
             }
         }
     }
@@ -270,6 +273,10 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     InitPwms();
 
     InitButtons();
+
+#ifdef CONFIG_TFLM_FEATURE
+    mThreadStateChangedEventCaptured = false;
+#endif
 
     // Initialize function button timer
     k_timer_init(&sFactoryResetTimer, &AppTask::FactoryResetTimerTimeoutCallback, nullptr);
@@ -424,7 +431,7 @@ void AppTaskCommon::InitPwms()
 
     LinkPwms(pwmManager);
 
-#if CONFIG_WS2812_STRIP
+#if CONFIG_WS2812_STRIP_GPIO_TELINK
     pwmManager.linkBackend(Ws2812Strip::getInstance());
 #elif CONFIG_PWM
     pwmManager.linkBackend(PwmPool::getInstance());
@@ -437,7 +444,7 @@ void AppTaskCommon::LinkPwms(PwmManager & pwmManager)
 {
 #if CONFIG_BOARD_TLSR9118BDK40D_V1 && CONFIG_PWM // TLSR9118BDK40D_V1 EVK supports single LED PWM channel
     pwmManager.linkPwm(PwmManager::EAppPwm_Red, 0);
-#elif CONFIG_WS2812_STRIP
+#elif CONFIG_WS2812_STRIP_GPIO_TELINK
     pwmManager.linkPwm(PwmManager::EAppPwm_Red, 0);
     pwmManager.linkPwm(PwmManager::EAppPwm_Green, 1);
     pwmManager.linkPwm(PwmManager::EAppPwm_Blue, 2);
@@ -446,7 +453,7 @@ void AppTaskCommon::LinkPwms(PwmManager & pwmManager)
     pwmManager.linkPwm(PwmManager::EAppPwm_Red, 1);
     pwmManager.linkPwm(PwmManager::EAppPwm_Green, 2);
     pwmManager.linkPwm(PwmManager::EAppPwm_Blue, 3);
-#endif // CONFIG_WS2812_STRIP
+#endif
 }
 
 void AppTaskCommon::InitButtons(void)
@@ -722,6 +729,22 @@ void AppTaskCommon::SetExampleButtonCallbacks(EventHandler aAction_CB)
     ExampleActionEventHandler = aAction_CB;
 }
 
+#ifdef CONFIG_TFLM_FEATURE
+void AppTaskCommon::TriggerMicroSpeechCallback()
+{
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_Timer;
+    event.Handler = TriggerMicroSpeechEventHandler;
+    GetAppTask().PostEvent(&event);
+}
+
+void AppTaskCommon::TriggerMicroSpeechEventHandler(AppEvent * aEvent)
+{
+    LOG_INF("**************TriggerMicroSpeechEventHandler**************");
+    AppTask::MicroSpeechProcessStart();
+}
+#endif
+
 void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* arg */)
 {
     switch (event->Type)
@@ -729,10 +752,10 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
     case DeviceEventType::kCHIPoBLEAdvertisingChange:
         sHaveBLEConnections = ConnectivityMgr().NumBLEConnections() != 0;
         UpdateStatusLED();
-#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+#ifdef CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD
         if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Started)
         {
-            if (NFCMgr().IsTagEmulationStarted())
+            if (NFCOnboardingPayloadMgr().IsTagEmulationStarted())
             {
                 LOG_INF("NFC Tag emulation is already started");
             }
@@ -743,9 +766,17 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
         }
         else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
         {
-            NFCMgr().StopTagEmulation();
+            NFCOnboardingPayloadMgr().StopTagEmulation();
         }
 #endif
+        break;
+    case DeviceEventType::kCHIPoBLEConnectionClosed:
+        if (Internal::BLEMgrImpl().NeedToResetFailSafeTimer())
+        {
+            LOG_INF("BLE disconnected during commissioning.");
+            Internal::BLEMgrImpl().ClearResetFailSafeTimerFlag();
+            Server::GetInstance().GetFailSafeContext().ForceFailSafeTimerExpiry();
+        }
         break;
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     case DeviceEventType::kDnssdInitialized:
@@ -765,6 +796,22 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
         sIsNetworkProvisioned = ConnectivityMgr().IsThreadProvisioned();
         sIsNetworkEnabled     = ConnectivityMgr().IsThreadEnabled();
         sIsNetworkAttached    = ConnectivityMgr().IsThreadAttached();
+#ifdef CONFIG_TFLM_FEATURE
+        if (sIsNetworkProvisioned && sIsNetworkAttached)
+        {
+            if (GetAppTask().GetThreadStateChangedEventCapturedFlag() == false)
+            {
+                LOG_INF("**************TriggerMicroSpeechCallback invoked**************");
+                GetAppTask().SetThreadStateChangedEventCapturedFlag();
+                AppTaskCommon::TriggerMicroSpeechCallback();
+            }
+            else
+            {
+                LOG_INF("**************TriggerMicroSpeechCallback skipped**************");
+            }
+        }
+#endif
+
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
     case DeviceEventType::kWiFiConnectivityChange:
         sIsNetworkProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();

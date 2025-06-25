@@ -22,7 +22,6 @@
 
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Dnssd.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/RawKeySessionKeystore.h>
@@ -31,6 +30,7 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/NodeId.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <credentials/DeviceAttestationConstructor.h>
 #include <credentials/DeviceAttestationVendorReserved.h>
@@ -159,7 +159,12 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     // Initialize device attestation verifier
     // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
     const Credentials::AttestationTrustStore * testingRootStore = Credentials::GetTestAttestationTrustStore();
-    SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+    Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+    auto * dacVerifier = GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked);
+
+    VerifyOrDie(dacVerifier != nullptr);
+    dacVerifier->EnableVerboseLogs(true);
+    SetDeviceAttestationVerifier(dacVerifier);
 
     Platform::ScopedMemoryBuffer<uint8_t> noc;
     VerifyOrReturnError(noc.Alloc(Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);

@@ -21,6 +21,9 @@ set -e
 # Print CHIP logs on stdout
 dlogutil CHIP &
 
+# Override the default value to account for slower execution on QEMU.
+export CHIP_TEST_EVENT_LOOP_HANDLER_MAX_DURATION_MS=1000
+
 # Set the correct path for .gcda files
 export GCOV_PREFIX=/mnt/chip
 export GCOV_PREFIX_STRIP=5

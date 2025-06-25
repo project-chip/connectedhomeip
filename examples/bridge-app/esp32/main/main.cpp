@@ -24,9 +24,9 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/reporting/reporting.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
+#include <bridged-actions-stub.h>
 #include <common/Esp32AppServer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -35,6 +35,7 @@
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/ZclString.h>
 #include <platform/ESP32/ESP32Utils.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/InteractionModelEngine.h>
 #include <app/server/Server.h>
@@ -59,6 +60,9 @@ chip::DeviceLayer::ESP32DeviceInfoProvider gExampleDeviceInfoProvider;
 #else
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
+
+std::unique_ptr<chip::app::Clusters::Actions::ActionsDelegateImpl> sActionsDelegateImpl;
+std::unique_ptr<chip::app::Clusters::Actions::ActionsServer> sActionsServer;
 } // namespace
 
 extern const char TAG[] = "bridge-app";
@@ -145,10 +149,10 @@ DECLARE_DYNAMIC_CLUSTER(OnOff::Id, onOffAttrs, ZAP_CLUSTER_MASK(SERVER), onOffIn
 // Declare Bridged Light endpoint
 DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
 
-DataVersion gLight1DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gLight2DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gLight3DataVersions[ArraySize(bridgedLightClusters)];
-DataVersion gLight4DataVersions[ArraySize(bridgedLightClusters)];
+DataVersion gLight1DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gLight2DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gLight3DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
+DataVersion gLight4DataVersions[MATTER_ARRAY_SIZE(bridgedLightClusters)];
 
 /* REVISION definitions:
  */
@@ -349,14 +353,6 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
     }
 }
 
-bool emberAfActionsClusterInstantActionCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                const Actions::Commands::InstantAction::DecodableType & commandData)
-{
-    // No actions are implemented, just return status NotFound.
-    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::NotFound);
-    return true;
-}
-
 const EmberAfDeviceType gRootDeviceTypes[]          = { { DEVICE_TYPE_ROOT_NODE, DEVICE_VERSION_DEFAULT } };
 const EmberAfDeviceType gAggregateNodeDeviceTypes[] = { { DEVICE_TYPE_BRIDGE, DEVICE_VERSION_DEFAULT } };
 
@@ -401,6 +397,20 @@ static void InitServer(intptr_t context)
     // Re-add Light 2 -- > will be mapped to ZCL endpoint 7
     AddDeviceEndpoint(&gLight2, &bridgedLightEndpoint, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes),
                       Span<DataVersion>(gLight2DataVersions), 1);
+}
+
+void emberAfActionsClusterInitCallback(EndpointId endpoint)
+{
+    VerifyOrReturn(endpoint == 1,
+                   ChipLogError(Zcl, "Actions cluster delegate is not implemented for endpoint with id %d.", endpoint));
+    VerifyOrReturn(emberAfContainsServer(endpoint, app::Clusters::Actions::Id) == true,
+                   ChipLogError(Zcl, "Endpoint %d does not support Actions cluster.", endpoint));
+    VerifyOrReturn(!sActionsDelegateImpl && !sActionsServer);
+
+    sActionsDelegateImpl = std::make_unique<app::Clusters::Actions::ActionsDelegateImpl>();
+    sActionsServer       = std::make_unique<app::Clusters::Actions::ActionsServer>(endpoint, *sActionsDelegateImpl.get());
+
+    sActionsServer->Init();
 }
 
 extern "C" void app_main()

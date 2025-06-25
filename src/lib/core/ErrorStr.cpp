@@ -142,12 +142,16 @@ DLL_EXPORT void RegisterErrorFormatter(ErrorFormatter * errFormatter)
 DLL_EXPORT void DeregisterErrorFormatter(ErrorFormatter * errFormatter)
 {
     // Remove the formatter if present
-    for (ErrorFormatter ** lfp = &sErrorFormatterList; *lfp != nullptr; lfp = &(*lfp)->Next)
+    for (ErrorFormatter ** lfp = &sErrorFormatterList; *lfp != nullptr;)
     {
         // Remove the formatter from the global list, if found.
         if (*lfp == errFormatter)
         {
             *lfp = errFormatter->Next;
+        }
+        else
+        {
+            lfp = &(*lfp)->Next;
         }
     }
 }

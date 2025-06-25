@@ -176,3 +176,14 @@ void emberAfFanControlClusterInitCallback(EndpointId endpoint)
     AttributeAccessInterfaceRegistry::Instance().Register(mFanControlManager);
     FanControl::SetDefaultDelegate(endpoint, mFanControlManager);
 }
+
+void emberAfFanControlClusterShutdownCallback(EndpointId endpoint)
+{
+    FanControl::SetDefaultDelegate(endpoint, nullptr);
+    AttributeAccessInterfaceRegistry::Instance().Unregister(mFanControlManager);
+    if (mFanControlManager)
+    {
+        delete mFanControlManager;
+    }
+    mFanControlManager = nullptr;
+}

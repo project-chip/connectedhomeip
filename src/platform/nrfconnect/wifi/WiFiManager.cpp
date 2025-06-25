@@ -500,6 +500,8 @@ void WiFiManager::ConnectHandler(Platform::UniquePtr<uint8_t> data, size_t lengt
                 }
 
                 delegate->OnAssociationFailureDetected(associationFailureCause, reason);
+
+                ChipLogError(DeviceLayer, "WiFi connection failure. Cause: %d, reason: %d", associationFailureCause, reason);
             }
         }
         else // The connection has been established successfully.

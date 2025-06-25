@@ -53,28 +53,10 @@ supported functionalities in terms of clusters, commands and attributes:
 For more information on the different implementations of the CHIP device
 controller, see [README.md](../../../controller/README.md)
 
-# Automatic conversion process
-
-The process of automatic conversion of test files depends on the
-[ZAP](https://github.com/project-chip/zap) tool.
-
-Each of the CHIP device controller implementations uses a dedicated template
-translating the tests into an appropriate format.
-
-| Controllers | Template                                                                                                                                               |
-| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| POSIX CLI   | [examples/chip-tool/templates/partials/test_cluster.zapt](../../../../examples/chip-tool/templates/partials/test_cluster.zapt)                         |
-| Darwin CLI  | [examples/darwin-framework-tool/templates/partials/test_cluster.zapt](../../../../examples/darwin-framework-tool/templates/partials/test_cluster.zapt) |
-| iOS         | [src/darwin/Framework/CHIP/templates/partials/test_cluster.zapt](../../../../src/darwin/Framework/CHIP/templates/partials/test_cluster.zapt)           |
-| Python      |                                                                                                                                                        |
-| Android     |                                                                                                                                                        |
-
-These dedicated templates share a common
-[script](../../zap-templates/common/ClusterTestGeneration.js) which augments the
-test file with the content of the ZAP database built from the
-[definition files](../../zap-templates/zcl) of the specification.
-
 # Lists
+
+TODO: This documentation needs to be fixed to document the YAML format, instead
+of describing the no-longer-used ZAP generation machinery from YAML.
 
 This common script exposes the result of the analysis in the form of multiple
 lists accessible from the dedicated template files.
@@ -170,19 +152,20 @@ properties:
 
 ##### Property: [_constraints_](../../../../src/app/tests/suites/TestConstraints.yaml)
 
-| Name        | Description                                                 | Required               |
-| ----------- | ----------------------------------------------------------- | ---------------------- |
-| hasValue    | If true, must have value. If false, must not have value.    | No (If other provided) |
-| minValue    | Minimum value to expect from the command response.          | No (If other provided) |
-| maxValue    | Maximum value to expect from the command response.          | No (If other provided) |
-| notValue    | Validate the the value is not what is provided.             | No (If other provided) |
-| minLength   | Minimum length of the response parameter.                   | No (If other provided) |
-| maxLength   | Maximum length of the string parameter.                     | No (If other provided) |
-| startsWith  | Condition is which will validate what a string starts with. | No (If other provided) |
-| endsWith    | Condition is which will validate what a string ends with.   | No (If other provided) |
-| isLowerCase | Validates if the char_string is lower case.                 | No (If other provided) |
-| isUpperCase | Validates if the char_string is upper case.                 | No (If other provided) |
-| isHexString | Checks whether the char_string is a hex string.             | No (If other provided) |
+| Name          | Description                                                 | Required               |
+| ------------- | ----------------------------------------------------------- | ---------------------- |
+| hasValue      | If true, must have value. If false, must not have value.    | No (If other provided) |
+| minValue      | Minimum value to expect from the command response.          | No (If other provided) |
+| maxValue      | Maximum value to expect from the command response.          | No (If other provided) |
+| notValue      | Validate the the value is not what is provided.             | No (If other provided) |
+| minLength     | Minimum length of the response parameter.                   | No (If other provided) |
+| maxLength     | Maximum length of the string parameter.                     | No (If other provided) |
+| startsWith    | Condition is which will validate what a string starts with. | No (If other provided) |
+| endsWith      | Condition is which will validate what a string ends with.   | No (If other provided) |
+| isLowerCase   | Validates if the char_string is lower case.                 | No (If other provided) |
+| isUpperCase   | Validates if the char_string is upper case.                 | No (If other provided) |
+| isHexString   | Checks whether the char_string is a hex string.             | No (If other provided) |
+| isSetOfValues | Uses a order-independent compare on the list contents.      | No (If other provided) |
 
 Note: The hasValue constraint is only applied to optional fields. The other
 constraints are ignored for optional fields that do not have a value.

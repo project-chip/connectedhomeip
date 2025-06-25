@@ -30,7 +30,7 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --tests test_TC_IDM_10_2
+#       --tests test_TC_IDM_10_2 test_TC_IDM_10_6 test_TC_DESC_2_3
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -46,17 +46,56 @@ from chip.testing.conformance import ConformanceDecision, conformance_allowed
 from chip.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttributeIds, cluster_id_type,
                                                device_type_id_type, is_valid_device_type_id)
 from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
-                                         MatterBaseTest, ProblemNotice, ProblemSeverity, async_test_body, default_matter_test_main)
-from chip.testing.spec_parsing import CommandType, build_xml_clusters, build_xml_device_types
+                                         MatterBaseTest, ProblemNotice, ProblemSeverity, TestStep, async_test_body,
+                                         default_matter_test_main)
+from chip.testing.spec_parsing import CommandType, XmlDeviceType
 from chip.tlv import uint
+
+
+def get_supersets(xml_device_types: dict[int, XmlDeviceType]) -> list[set[int]]:
+    ''' Returns a list of the sets of device type id that each constitute a single superset.
+
+        Endpoints can have multiple application device types from a single line, even with skips, but cannot have multiple
+        higher-level device types that map to a lower level endpoint
+        Ex. Color temperature light is a superset of dimmable light, which is a superset of on/off light
+        If there were another device type (ex Blinkable light) that were a superset of on/off light, the following
+        would be acceptable
+        - Blinkable light + on/off
+        - Dimmable light + on/off
+        - Color temperature light + dimmable light + on/off
+        - Color temperature light + on/off (skipping middle device type)
+        But the following would not be acceptable
+        - Blinkable light + dimmable light
+        - Blinkable light + dimmable light + on/off
+        Because it's not clear to clients whether the endpoint should be treated as a Blinkable light or dimmable light,
+        even if both can be an on/off light
+
+        This means that we need to know that all the devices come from a single line of device types, rather than that they
+        all belong to one tree
+        To do this, we need to identify the top-level device type and generate the list of acceptable children
+    '''
+
+    device_types_that_have_supersets = set([dt.superset_of_device_type_id for dt in xml_device_types.values()]) - {0}
+
+    # Ex. in the above example, the top level device types would be blinkable light and color temperature light
+    # because they are supersets of other things, but have no device types that are supersets of them.
+    top_level_device_types = [id for id, dt in xml_device_types.items(
+    ) if dt.superset_of_device_type_id != 0 and id not in device_types_that_have_supersets]
+    supersets: list[set[int]] = []
+    for top in top_level_device_types:
+        line: set[int] = set()
+        dt = top
+        while dt != 0 and dt not in line:
+            line.add(dt)
+            dt = xml_device_types[dt].superset_of_device_type_id
+        supersets.append(line)
+    return supersets
 
 
 class DeviceConformanceTests(BasicCompositionTests):
     async def setup_class_helper(self):
         await super().setup_class_helper()
-        self.xml_clusters, self.problems = build_xml_clusters()
-        self.xml_device_types, problems = build_xml_device_types()
-        self.problems.extend(problems)
+        self.build_spec_xmls()
 
     def _get_device_type_id(self, device_type_name: str) -> int:
         id = [id for id, dt in self.xml_device_types.items() if dt.name.lower() == device_type_name.lower()]
@@ -68,9 +107,9 @@ class DeviceConformanceTests(BasicCompositionTests):
         # Currently this is just NIM. We may later be able to pull this from the device type scrape using the ManagedAclAllowed condition,
         # but these are not currently exposed directly by the device.
         allowed_ids = [self._get_device_type_id('network infrastructure manager')]
-        for endpoint in self.endpoints_tlv.values():
+        for endpoint in self.endpoints.values():
             desc = Clusters.Descriptor
-            device_types = [dt.deviceType for dt in endpoint[desc.id][desc.Attributes.DeviceTypeList.attribute_id]]
+            device_types = [dt.deviceType for dt in endpoint[desc][desc.Attributes.DeviceTypeList]]
             if set(allowed_ids).intersection(set(device_types)):
                 # TODO: it's unclear if this needs to be present on every endpoint. Right now, this assumes one is sufficient.
                 return True
@@ -117,7 +156,7 @@ class DeviceConformanceTests(BasicCompositionTests):
         # TODO: Remove this once we have a scrape without items not going to the test events
         # These are clusters that weren't part of the 1.3 or 1.4 spec that landed in the SDK before the branch cut
         # They're not marked provisional, but are present in the ToT spec under an ifdef.
-        provisional_cluster_ids.extend([Clusters.DemandResponseLoadControl.id])
+        provisional_cluster_ids.extend([])
 
         for endpoint_id, endpoint in self.endpoints_tlv.items():
             for cluster_id, cluster in endpoint.items():
@@ -142,10 +181,10 @@ class DeviceConformanceTests(BasicCompositionTests):
                     cluster[GlobalAttributeIds.GENERATED_COMMAND_LIST_ID]
 
                 # Feature conformance checking
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
+                                                 attribute_id=GlobalAttributeIds.FEATURE_MAP_ID)
                 feature_masks = [1 << i for i in range(32) if feature_map & (1 << i)]
                 for f in feature_masks:
-                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
-                                                     attribute_id=GlobalAttributeIds.FEATURE_MAP_ID)
                     if cluster_id == Clusters.AccessControl.id and f == Clusters.AccessControl.Bitmaps.Feature.kManagedDevice:
                         # Managed ACL is treated as a special case because it is only allowed if other endpoints support NIM and disallowed otherwise.
                         if not self._has_device_type_supporting_macl():
@@ -229,7 +268,6 @@ class DeviceConformanceTests(BasicCompositionTests):
                     success = False
                 problems.extend(feature_choice_problems + attribute_choice_problems + command_choice_problem)
 
-        print(f'success = {success}')
         return success, problems
 
     def check_revisions(self, ignore_in_progress: bool):
@@ -273,6 +311,35 @@ class DeviceConformanceTests(BasicCompositionTests):
 
         return success, problems
 
+    def check_device_type_revisions(self) -> tuple[bool, list[ProblemNotice]]:
+        success = True
+        problems = []
+
+        def record_error(location, problem):
+            nonlocal success
+            problems.append(ProblemNotice("IDM-10.6", location, ProblemSeverity.ERROR, problem, ""))
+            success = False
+
+        for endpoint_id, endpoint in self.endpoints.items():
+            if Clusters.Descriptor not in endpoint:
+                # Descriptor cluster presence checked in 10.5
+                continue
+
+            standard_device_types = [x for x in endpoint[Clusters.Descriptor]
+                                     [Clusters.Descriptor.Attributes.DeviceTypeList] if device_type_id_type(x.deviceType) == DeviceTypeIdType.kStandard]
+            for device_type in standard_device_types:
+                device_type_id = device_type.deviceType
+                if device_type_id not in self.xml_device_types.keys():
+                    # problem recorded in 10.5
+                    continue
+                expected_revision = self.xml_device_types[device_type_id].revision
+                actual_revision = device_type.revision
+                if expected_revision != actual_revision:
+                    location = ClusterPathLocation(endpoint_id=endpoint_id, cluster_id=Clusters.Descriptor.id)
+                    record_error(
+                        location, f"Expected Device type revision for device type {device_type_id} {self.xml_device_types[device_type_id].name} on endpoint {endpoint_id} does not match revision on DUT. Expected: {expected_revision} DUT: {actual_revision}")
+        return success, problems
+
     def check_device_type(self, fail_on_extra_clusters: bool = True, allow_provisional: bool = False) -> tuple[bool, list[ProblemNotice]]:
         success = True
         problems = []
@@ -311,13 +378,6 @@ class DeviceConformanceTests(BasicCompositionTests):
                     record_error(location=location, problem='Unknown device type ID in standard range')
                     continue
 
-                if device_type_id not in self.xml_device_types.keys():
-                    location = DeviceTypePathLocation(device_type_id=device_type_id)
-                    record_error(location=location, problem='Unknown device type')
-                    continue
-
-                # TODO: check revision. Possibly in another test?
-
                 xml_device = self.xml_device_types[device_type_id]
                 # IDM 10.1 checks individual clusters for validity,
                 # so here we can ignore checks for invalid and manufacturer clusters.
@@ -353,6 +413,36 @@ class DeviceConformanceTests(BasicCompositionTests):
 
         return success, problems
 
+    def check_root_endpoint_for_application_device_types(self) -> list[ProblemNotice]:
+        problems = []
+        device_types = [d.deviceType for d in self.endpoints[0][Clusters.Descriptor][Clusters.Descriptor.Attributes.DeviceTypeList]]
+
+        for d in device_types:
+            if self.xml_device_types[d].classification_class.lower() == 'simple':
+                location = DeviceTypePathLocation(device_type_id=d)
+                problems.append(ProblemNotice("TC-DESC-2.3", location, ProblemSeverity.ERROR,
+                                f"Application device type {self.xml_device_types[d].name} found on EP0"))
+
+        return problems
+
+    def check_all_application_device_types_superset(self) -> list[ProblemNotice]:
+        problems = []
+        supersets = get_supersets(self.xml_device_types)
+        for endpoint_num, endpoint in self.endpoints.items():
+            all_device_type_ids = [dt.deviceType for dt in endpoint[Clusters.Descriptor]
+                                   [Clusters.Descriptor.Attributes.DeviceTypeList]]
+            application_device_type_ids = set([
+                dt for dt in all_device_type_ids if self.xml_device_types[dt].classification_class == 'simple'])
+            if len(application_device_type_ids) <= 1:
+                continue
+            if any([application_device_type_ids.issubset(superset) for superset in supersets]):
+                continue
+
+            location = AttributePathLocation(3, Clusters.Descriptor.id, Clusters.Descriptor.Attributes.DeviceTypeList.attribute_id)
+            problems.append(ProblemNotice('TC-DESC-2.3', location=location, severity=ProblemSeverity.ERROR,
+                            problem=f"Multiple non-superset application device types found on EP {endpoint_num} ({application_device_type_ids})"))
+        return problems
+
 
 class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
     @async_test_body
@@ -384,6 +474,38 @@ class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
         self.problems.extend(problems)
         if not success:
             self.fail_current_test("Problems with Device type conformance on one or more endpoints")
+
+    def test_TC_IDM_10_6(self):
+        success, problems = self.check_device_type_revisions()
+        self.problems.extend(problems)
+        if not success:
+            self.fail_current_test("Problems with Device type revisions on one or more endpoints")
+
+    def steps_TC_DESC_2_3(self):
+        return [TestStep(0, "TH performs a wildcard read of all attributes on all endpoints on the device"),
+                TestStep(1, "TH checks the Root node endpoint and ensures no application device types are listed",
+                         "No Application device types on EP0"),
+                TestStep(2, "For each non-root endpoint on the device, TH checks the DeviceTypeList of the Descriptor cluster and verifies that all the listed application device types are part of the same superset, and that no two device types are unrelated supersets of any device type."),
+                TestStep(3, "Fail test if either of the above steps failed.")]
+        # TODO: add check that at least one endpoint has an application endpoint or an aggregator
+
+    def desc_TC_DESC_2_3(self):
+        return "[TC-DESC-2.3] Test for superset application device types"
+
+    def test_TC_DESC_2_3(self):
+        self.step(0)  # done in setup class
+        problems = []
+
+        self.step(1)
+        problems.extend(self.check_root_endpoint_for_application_device_types())
+
+        self.step(2)
+        problems.extend(self.check_all_application_device_types_superset())
+
+        self.step(3)
+        self.problems.extend(problems)
+        if problems:
+            self.fail_current_test("One or more application device type endpoint violations")
 
 
 if __name__ == "__main__":

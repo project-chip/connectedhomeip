@@ -133,6 +133,16 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
     gHepaFilterInstance->Init();
 }
 
+void emberAfActivatedCarbonFilterMonitoringClusterShutdownCallback(chip::EndpointId endpoint)
+{
+    ActivatedCarbonFilterMonitoring::Shutdown();
+}
+
+void emberAfHepaFilterMonitoringClusterShutdownCallback(chip::EndpointId endpoint)
+{
+    HepaFilterMonitoring::Shutdown();
+}
+
 CHIP_ERROR ImmutableReplacementProductListManager::Next(ReplacementProductStruct & item)
 {
     if (mIndex >= kReplacementProductListMaxSize)

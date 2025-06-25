@@ -81,6 +81,32 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
 
+public:
+    // Generic network status checkers
+    bool IsIPv6NetworkEnabled()
+    {
+        return false
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+            || IsThreadEnabled()
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+            || IsWiFiStationEnabled()
+#endif
+            ;
+    };
+
+    bool IsIPv6NetworkProvisioned()
+    {
+        return false
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+            || IsThreadProvisioned()
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+            || IsWiFiStationProvisioned()
+#endif
+            ;
+    }
+
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
 

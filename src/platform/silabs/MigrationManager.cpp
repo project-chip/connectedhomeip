@@ -40,6 +40,7 @@ static migrationData_t migrationTable[] = {
     { .migrationGroup = 1, .migrationFunc = MigrateKvsMap },
     { .migrationGroup = 2, .migrationFunc = MigrateDacProvider },
     { .migrationGroup = 3, .migrationFunc = MigrateCounterConfigs },
+    { .migrationGroup = 4, .migrationFunc = MigrateHardwareVersion },
     // add any additional migration neccesary. migrationGroup should stay equal if done in the same commit or increment by 1 for
     // each new entry.
 };
@@ -62,6 +63,20 @@ void MigrationManager::applyMigrations()
     }
     SilabsConfig::WriteConfigValue(SilabsConfig::kConfigKey_MigrationCounter, completedMigrationGroup);
 }
+
+void MigrationManager::MigrateUint16(uint32_t old_key, uint32_t new_key)
+{
+    uint16_t value = 0;
+    if (SilabsConfig::ConfigValueExists(old_key) && (CHIP_NO_ERROR == SilabsConfig::ReadConfigValue(old_key, value)))
+    {
+        if (CHIP_NO_ERROR == SilabsConfig::WriteConfigValue(new_key, value))
+        {
+            // Free memory of old key location
+            SilabsConfig::ClearConfigValue(old_key);
+        }
+    }
+}
+
 void MigrationManager::MigrateUint32(uint32_t old_key, uint32_t new_key)
 {
     uint32_t value = 0;
@@ -88,6 +103,33 @@ MigrationManager & MigrationManager::GetMigrationInstance()
 {
     static MigrationManager sMigrationManager;
     return sMigrationManager;
+}
+
+void MigrateDacProvider(void)
+{
+    constexpr uint32_t kOldKey_Creds_KeyId      = SilabsConfigKey(SilabsConfig::kMatterConfig_KeyBase, 0x21);
+    constexpr uint32_t kOldKey_Creds_Base_Addr  = SilabsConfigKey(SilabsConfig::kMatterConfig_KeyBase, 0x22);
+    constexpr uint32_t kOldKey_Creds_DAC_Offset = SilabsConfigKey(SilabsConfig::kMatterConfig_KeyBase, 0x23);
+    constexpr uint32_t kOldKey_Creds_DAC_Size   = SilabsConfigKey(SilabsConfig::kMatterConfig_KeyBase, 0x24);
+    constexpr uint32_t kOldKey_Creds_PAI_Size   = SilabsConfigKey(SilabsConfig::kMatterConfig_KeyBase, 0x26);
+    constexpr uint32_t kOldKey_Creds_PAI_Offset = SilabsConfigKey(SilabsConfig::kMatterConfig_KeyBase, 0x25);
+    constexpr uint32_t kOldKey_Creds_CD_Offset  = SilabsConfigKey(SilabsConfig::kMatterConfig_KeyBase, 0x27);
+    constexpr uint32_t kOldKey_Creds_CD_Size    = SilabsConfigKey(SilabsConfig::kMatterConfig_KeyBase, 0x28);
+
+    MigrationManager::MigrateUint32(kOldKey_Creds_KeyId, SilabsConfig::kConfigKey_Creds_KeyId);
+    MigrationManager::MigrateUint32(kOldKey_Creds_Base_Addr, SilabsConfig::kConfigKey_Creds_Base_Addr);
+    MigrationManager::MigrateUint32(kOldKey_Creds_DAC_Offset, SilabsConfig::kConfigKey_Creds_DAC_Offset);
+    MigrationManager::MigrateUint32(kOldKey_Creds_DAC_Size, SilabsConfig::kConfigKey_Creds_DAC_Size);
+    MigrationManager::MigrateUint32(kOldKey_Creds_PAI_Offset, SilabsConfig::kConfigKey_Creds_PAI_Offset);
+    MigrationManager::MigrateUint32(kOldKey_Creds_PAI_Size, SilabsConfig::kConfigKey_Creds_PAI_Size);
+    MigrationManager::MigrateUint32(kOldKey_Creds_CD_Offset, SilabsConfig::kConfigKey_Creds_CD_Offset);
+    MigrationManager::MigrateUint32(kOldKey_Creds_CD_Size, SilabsConfig::kConfigKey_Creds_CD_Size);
+}
+
+void MigrateHardwareVersion(void)
+{
+    constexpr uint32_t kOldKey_HardwareVersion = SilabsConfigKey(SilabsConfig::kMatterConfig_KeyBase, 0x08);
+    MigrationManager::MigrateUint16(kOldKey_HardwareVersion, SilabsConfig::kConfigKey_HardwareVersion);
 }
 
 } // namespace Silabs

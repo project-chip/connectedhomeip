@@ -20,13 +20,6 @@
 #define APP_CONFIG_H
 
 // ---- Lock Example App Config ----
-#define APP_TASK_NAME "APP"
-#define APP_LOCK_BUTTON BTN_SW4
-#define APP_FUNCTION_BUTTON BTN_SW5
-#define APP_LOCK_JAMMED_BUTTON BTN_SW1
-
-#define SYSTEM_STATE_LED LED_GREEN
-#define LOCK_STATE_LED LED_WHITE
 
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.

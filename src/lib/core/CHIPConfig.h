@@ -232,6 +232,39 @@
 #endif // CHIP_CONFIG_HKDF_KEY_HANDLE_CONTEXT_SIZE
 
 /**
+ * @def CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE
+ *
+ * @brief
+ *   Base of the PSA key identifier range used by Matter.
+ *
+ * Cryptographic keys stored in the PSA Internal Trusted Storage must have
+ * a user-assigned identifer from the range PSA_KEY_ID_USER_MIN to
+ * PSA_KEY_ID_USER_MAX. This option allows to override the base used to derive
+ * key identifiers used by Matter to avoid overlapping with other firmware
+ * components that also use PSA crypto API. The default value was selected
+ * not to interfere with OpenThread's default base that is 0x20000.
+ *
+ * Note that volatile keys like ephemeral keys used for ECDH have identifiers
+ * auto-assigned by the PSA backend.
+ */
+#ifndef CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE
+#define CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE 0x30000
+#endif // CHIP_CONFIG_CRYPTO_PSA_KEY_ID_BASE
+
+/**
+ * @def CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END
+ *
+ * @brief
+ *   End of the PSA key identifier range used by Matter.
+ *
+ * This setting establishes the maximum limit for the key range specific to Matter, in order to
+ * prevent any overlap with other firmware components that also employ the PSA crypto API.
+ */
+#ifndef CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END
+#define CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END 0x3FFFF
+#endif // CHIP_CONFIG_CRYPTO_PSA_KEY_ID_END
+
+/**
  *  @def CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS
  *
  *  @brief
@@ -1015,6 +1048,17 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND
+ *
+ * @brief If true, VerifyOrDie() built with @c CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+ *        generates a short message that includes only the source code location,
+ *        without the condition that fails.
+ */
+#ifndef CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND
+#define CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND 0
+#endif
+
+/**
  * @def CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES
  *
  * @brief Number of devices a controller can be simultaneously connected to
@@ -1082,7 +1126,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
+ * @def CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC
  *
  * @brief Defines the number of groups key sets supported per fabric, see Group Key Management Cluster in specification.
  *
@@ -1185,6 +1229,18 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT
 #define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+ *
+ * If set to 1, the `Extension` attribute of the ACL Cluster will be enabled
+ * and supported. This attribute is optional and costly to implement. It is required by
+ * some device types, so some applications must enable it in their CHIPProjectConfig.h
+ * as an override.
+ */
+#ifndef CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 0
 #endif
 
 /**
@@ -1855,6 +1911,34 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_TEST_GOOGLETEST
 #define CHIP_CONFIG_TEST_GOOGLETEST 0
 #endif // CHIP_CONFIG_TEST_GOOGLETEST
+
+/**
+ *  @def CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+ *
+ *  @brief
+ *    Enables code for collecting and sending analytic related events for MRP
+ *
+ * The purpose of this macro is to prevent compiling code related to MRP analytics
+ * for devices that are not interested interested to save on flash.
+ */
+
+#ifndef CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+#define CHIP_CONFIG_MRP_ANALYTICS_ENABLED 0
+#endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
+
+/**
+ *  @def CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+ *
+ *  @brief
+ *    Enables EndpointUniqueId attribute for the endpoint in descriptor cluster
+ *
+ * The purpose of this macro is to prevent compiling code related to EndpointUniqueId
+ * for devices that are not interested to support this optional attribute in descriptor cluster by
+ * overriding this macro in project specific configuration.
+ */
+#ifndef CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+#define CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID 0
+#endif // CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
 
 /**
  * @}

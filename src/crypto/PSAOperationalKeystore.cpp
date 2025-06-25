@@ -27,7 +27,8 @@ namespace Crypto {
 
 PSAOperationalKeystore::PersistentP256Keypair::PersistentP256Keypair(FabricIndex fabricIndex)
 {
-    ToPsaContext(mKeypair).key_id = MakeOperationalKeyId(fabricIndex);
+    VerifyOrReturn(IsValidFabricIndex(fabricIndex));
+    ToPsaContext(mKeypair).key_id = GetPSAKeyAllocator().GetOpKeyId(fabricIndex);
     mInitialized                  = true;
 }
 
@@ -70,6 +71,7 @@ CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Generate()
     psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_MESSAGE);
     psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_PERSISTENT);
     psa_set_key_id(&attributes, GetKeyId());
+    GetPSAKeyAllocator().UpdateKeyAttributes(attributes);
 
     status = psa_generate_key(&attributes, &keyId);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
@@ -153,6 +155,7 @@ CHIP_ERROR PSAOperationalKeystore::PersistentP256Keypair::Deserialize(P256Serial
     psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_SIGN_MESSAGE);
     psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_PERSISTENT);
     psa_set_key_id(&attributes, GetKeyId());
+    GetPSAKeyAllocator().UpdateKeyAttributes(attributes);
 
     status = psa_import_key(&attributes, input.ConstBytes() + mPublicKey.Length(), kP256_PrivateKey_Length, &keyId);
     VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);

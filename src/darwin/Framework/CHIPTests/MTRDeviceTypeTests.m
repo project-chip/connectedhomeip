@@ -15,12 +15,9 @@
  */
 
 #import <Matter/Matter.h>
-
-// system dependencies
 #import <XCTest/XCTest.h>
 
 @interface MTRDeviceTypeTests : XCTestCase
-
 @end
 
 @implementation MTRDeviceTypeTests
@@ -55,13 +52,33 @@
     XCTAssertTrue(deviceType.isUtility);
 }
 
-- (void)testRootNodeID
+- (void)testPowerSource
 {
     __auto_type * deviceType = [MTRDeviceType deviceTypeForID:@(MTRDeviceTypeIDTypePowerSourceID)];
     XCTAssertNotNil(deviceType);
     XCTAssertEqualObjects(deviceType.id, @(0x0011));
     XCTAssertEqualObjects(deviceType.name, @"Power Source");
     XCTAssertTrue(deviceType.isUtility);
+}
+
+- (void)testEqualityAndCopying
+{
+    __auto_type * a1 = [MTRDeviceType deviceTypeForID:@(MTRDeviceTypeIDTypeMicrowaveOvenID)];
+    XCTAssertNotNil(a1);
+    XCTAssertTrue([a1 isEqual:a1]);
+    XCTAssertFalse([a1 isEqual:nil]);
+    XCTAssertFalse([a1 isEqual:@(MTRDeviceTypeIDTypeMicrowaveOvenID)]);
+
+    __auto_type * a2 = [MTRDeviceType deviceTypeForID:@(MTRDeviceTypeIDTypeMicrowaveOvenID)];
+    XCTAssertNotNil(a2);
+    XCTAssertEqual(a1.hash, a2.hash);
+    XCTAssertTrue([a1 isEqual:a2]);
+    XCTAssertTrue([a2 isEqual:a1]);
+
+    __auto_type * b = [MTRDeviceType deviceTypeForID:@(MTRDeviceTypeIDTypePowerSourceID)];
+    XCTAssertNotNil(b);
+    XCTAssertFalse([a1 isEqual:b]);
+    XCTAssertFalse([b isEqual:a1]);
 }
 
 @end

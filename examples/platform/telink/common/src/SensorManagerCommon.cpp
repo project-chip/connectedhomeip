@@ -119,7 +119,7 @@ CHIP_ERROR SensorManager::GetTempAndHumMeasurValue(int16_t * pTempMeasured, uint
     /* Temperature simulation is used */
     static uint8_t nbOfRepetition = 0;
     static uint8_t simulatedIndex = 0;
-    if (simulatedIndex >= ArraySize(mSimulatedTemp))
+    if (simulatedIndex >= MATTER_ARRAY_SIZE(mSimulatedTemp))
     {
         simulatedIndex = 0;
     }

@@ -18,6 +18,7 @@
 
 #include "DeviceInstanceInfoProviderImpl.h"
 
+#include <lib/core/Global.h>
 #include <platform/Darwin/PosixConfig.h>
 
 namespace chip {
@@ -31,6 +32,15 @@ CHIP_ERROR DeviceInstanceInfoProviderImpl::GetVendorId(uint16_t & vendorId)
 CHIP_ERROR DeviceInstanceInfoProviderImpl::GetProductId(uint16_t & productId)
 {
     return Internal::PosixConfig::ReadConfigValue(Internal::PosixConfig::kConfigKey_ProductId, productId);
+}
+
+namespace {
+AtomicGlobal<DeviceInstanceInfoProviderImpl> gInstance;
+} // namespace
+
+DeviceInstanceInfoProviderImpl & DeviceInstanceInfoProviderMgrImpl()
+{
+    return gInstance.get();
 }
 
 } // namespace DeviceLayer

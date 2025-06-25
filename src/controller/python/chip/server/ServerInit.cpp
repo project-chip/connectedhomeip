@@ -18,9 +18,9 @@
 #include <platform/PlatformManager.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <data-model-providers/codegen/Instance.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -182,7 +182,6 @@ PyChipError pychip_server_native_init()
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
-    // ChipLogProgress(NotSpecified, "emberAfPostAttributeChangeCallback()");
     if (gPythonServerDelegate.mPostAttributeChangeCallback != nullptr)
     {
         // ChipLogProgress(NotSpecified, "callback %p", gPythonServerDelegate.mPostAttributeChangeCallback);

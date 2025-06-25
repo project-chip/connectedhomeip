@@ -1,11 +1,4 @@
-/***************************************************************************//**
- * GCC Linker script for Silicon Labs devices
- *******************************************************************************
- * # License
- * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
- *******************************************************************************
- *
- * SPDX-License-Identifier: Zlib
+/* 
  *
  * The licensor of this software is Silicon Laboratories Inc.
  *
@@ -39,9 +32,10 @@ SECTIONS
 	.text :
 	{
 		KEEP(*(.isr_vector))
-     	KEEP(*(.reset_handler))
+		. = ALIGN(32);
+		KEEP(*(.reset_handler))
 		*(EXCLUDE_FILE(*sl_si91x_bus.c.o *sl_si91x_driver.c.o *sli_si91x_multithreaded.c.o *rsi_hal_mcu_m4_ram.c.o *rsi_hal_mcu_m4_rom.c.o *rsi_deepsleep_soc.c.o *croutine.c.o *event_groups.c.o *list.c.o *queue.c.o *stream_buffer.c.o *tasks.c.o *timers.c.o *cmsis_os2.c.o *freertos_umm_malloc_host.c.o *malloc_buffers.c.o *sl_rsi_utility.c.o *port.c.o *sl_sleeptimer.c.o *sl_sleeptimer_hal_si91x_sysrtc.c.o *rsi_sysrtc.c.o *sl_si91x_low_power_tickless_mode.c.o *heap_*.c.o *sl_core_cortexm.c.o) .text*)
-		
+
     /* .ctors */
     *crtbegin.o(.ctors)
     *crtbegin?.o(.ctors)
@@ -104,13 +98,13 @@ SECTIONS
 
 	__exidx_end = .;
 	__etext = .;
-	
+
 	/* _sidata is used in coide startup code */
 	_sidata = __etext; 
 
   /* Start placing output sections which are loaded into RAM */
   . = ORIGIN(ram);
-  
+
   .noinit . (NOLOAD):
   {
     *(.noinit*);
@@ -151,6 +145,9 @@ SECTIONS
     *rsi_sysrtc.c.o(.text*)
     *sl_si91x_low_power_tickless_mode.c.o(.text*)
     *sl_core_cortexm.c.o(.text*)
+
+    /* ipmu calibration data */
+    *(.common_ipmu_ram*)
 
     . = ALIGN(4);
     /* preinit data */
@@ -225,20 +222,20 @@ SECTIONS
 		_end = __end__;
 		KEEP(*(.heap*))	
 		. = ORIGIN(ram) + LENGTH(ram);
-  		
+
 		__HeapLimit = .;			
   } > ram
   
 	__heap_size = __HeapLimit - __HeapBase;
   __ram_end__ = 0x400 + 0x4fc00;
   __main_flash_end__ = 0x8202000 + 0x1fe000;
-  
+
 	   /* This is where we handle flash storage blocks. We use dummy sections for finding the configured
    * block sizes and then "place" them at the end of flash when the size is known. */
   .internal_storage (DSECT) : {
     KEEP(*(.internal_storage*))
   } > rom
-  
+
 
   .nvm (DSECT) : {
     KEEP(*(.simee*))

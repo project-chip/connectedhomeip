@@ -11,5 +11,5 @@ Python CHIP controller library from a shell. To learn more about the Python CHIP
 Controller and the REPL, how to build it and use its commands and advanced
 features, read the following guides:
 
--   [Working with Python CHIP Controller](../../../docs/guides/python_chip_controller_building.md)
--   [Using Python CHIP Controller advanced features](../../../docs/guides/python_chip_controller_advanced_usage.md)
+-   [Working with Python CHIP Controller](../../../docs/development_controllers/chip-repl/python_chip_controller_building.md)
+-   [Using Python CHIP Controller advanced features](../../../docs/development_controllers/chip-repl/python_chip_controller_advanced_usage.md)

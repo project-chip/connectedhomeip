@@ -49,6 +49,14 @@ private:
 
     void OnDockedHandler();
 
+    void OnEmptyingDustBinHandler();
+
+    void OnCleaningMopHandler();
+
+    void OnFillingWaterTankHandler();
+
+    void OnUpdatingMapsHandler();
+
     void OnChargerFoundHandler();
 
     void OnLowChargeHandler();

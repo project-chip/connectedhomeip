@@ -14,20 +14,24 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "AttestationKey.h"
-#include "ProvisionEncoder.h"
-#include "ProvisionStorage.h"
 #include <algorithm>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <headers/AttestationKey.h>
+#include <headers/ProvisionEncoder.h>
+#include <headers/ProvisionStorage.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/silabs/SilabsConfig.h>
 #include <string.h>
-#ifdef OTA_ENCRYPTION_ENABLE
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
-#endif // OTA_ENCRYPTION_ENABLE
+#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
+
+#if !(SL_MATTER_GN_BUILD || defined(SL_PROVISION_GENERATOR))
+#include <sl_matter_provision_config.h>
+#endif
 
 using namespace chip::Credentials;
 
@@ -480,6 +484,28 @@ CHIP_ERROR Storage::GetPersistentUniqueId(uint8_t * value, size_t max, size_t & 
     return Flash::Get(Parameters::ID::kPersistentUniqueId, value, max, size);
 }
 
+CHIP_ERROR Storage::SetSoftwareVersionString(const char * value, size_t len)
+{
+    return Flash::Set(Parameters::ID::kSwVersionStr, value, len);
+}
+
+CHIP_ERROR Storage::GetSoftwareVersionString(char * value, size_t max)
+{
+    size_t size    = 0;
+    CHIP_ERROR err = Flash::Get(Parameters::ID::kSwVersionStr, value, max, size);
+
+#if defined(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING)
+    if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
+    {
+        VerifyOrReturnError(value != nullptr, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(max > strlen(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+        Platform::CopyString(value, max, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+        err = CHIP_NO_ERROR;
+    }
+#endif
+    return err;
+}
+
 //
 // CommissionableDataProvider
 //
@@ -578,13 +604,13 @@ CHIP_ERROR Storage::GetCertificationDeclaration(MutableByteSpan & value)
 {
     size_t size    = 0;
     CHIP_ERROR err = (Flash::Get(Parameters::ID::kCertification, value.data(), value.size(), size));
-#ifdef CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
+#ifdef SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
     {
         // Example CD
         return Examples::GetExampleDACProvider()->GetCertificationDeclaration(value);
     }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
+#endif // SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     ReturnErrorOnFailure(err);
     value.reduce_size(size);
     return CHIP_NO_ERROR;
@@ -599,13 +625,13 @@ CHIP_ERROR Storage::GetProductAttestationIntermediateCert(MutableByteSpan & valu
 {
     size_t size    = 0;
     CHIP_ERROR err = (Flash::Get(Parameters::ID::kPaiCert, value.data(), value.size(), size));
-#ifdef CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
+#ifdef SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
     {
         // Example PAI
         return Examples::GetExampleDACProvider()->GetProductAttestationIntermediateCert(value);
     }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
+#endif // SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     ReturnErrorOnFailure(err);
     value.reduce_size(size);
     return CHIP_NO_ERROR;
@@ -620,13 +646,13 @@ CHIP_ERROR Storage::GetDeviceAttestationCert(MutableByteSpan & value)
 {
     size_t size    = 0;
     CHIP_ERROR err = (Flash::Get(Parameters::ID::kDacCert, value.data(), value.size(), size));
-#ifdef CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
+#ifdef SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
     {
         // Example DAC
         return Examples::GetExampleDACProvider()->GetDeviceAttestationCert(value);
     }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
+#endif // SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     ReturnErrorOnFailure(err);
     value.reduce_size(size);
     return CHIP_NO_ERROR;
@@ -649,20 +675,27 @@ CHIP_ERROR Storage::GetDeviceAttestationCSR(uint16_t vid, uint16_t pid, const Ch
 
 CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, MutableByteSpan & signature)
 {
-    AttestationKey key;
     uint8_t temp[kDeviceAttestationKeySizeMax] = { 0 };
     size_t size                                = 0;
     CHIP_ERROR err                             = Flash::Get(Parameters::ID::kDacKey, temp, sizeof(temp), size);
-#ifdef CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
+#ifdef SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
     {
         // Example DAC key
         return Examples::GetExampleDACProvider()->SignWithDeviceAttestationKey(message, signature);
     }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_EXAMPLE_CREDENTIALS
+#endif // SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     ReturnErrorOnFailure(err);
+#ifdef SL_MBEDTLS_USE_TINYCRYPT
+    uint8_t key_buffer[kDeviceAttestationKeySizeMax] = { 0 };
+    MutableByteSpan private_key(key_buffer);
+    AttestationKey::Unwrap(temp, size, private_key);
+    return AttestationKey::SignMessageWithKey((const uint8_t *) key_buffer, message, signature);
+#else
+    AttestationKey key;
     ReturnErrorOnFailure(key.Import(temp, size));
     return key.SignMessage(message, signature);
+#endif // SL_MBEDTLS_USE_TINYCRYPT
 }
 
 //
@@ -712,22 +745,31 @@ CHIP_ERROR Storage::GetProvisionRequest(bool & value)
     // return Flash::Set(Parameters::ID::kProvisionRequest, value);
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
-#if OTA_ENCRYPTION_ENABLE
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
 CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
-#endif // OTA_ENCRYPTION_ENABLE
+#endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
 
-CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
+CHIP_ERROR Storage::SetTestEventTriggerKey(const ByteSpan & value)
 {
+    // TODO: Implement this function if needed.
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
+CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
+{
+#ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+    // TODO: Implement Getter
+    // Adding the same return twice to have the function structure
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
+}
+
 } // namespace Provision
-
-void MigrateDacProvider(void) {}
-
 } // namespace Silabs
 } // namespace DeviceLayer
 } // namespace chip

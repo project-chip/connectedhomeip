@@ -20,4 +20,12 @@
 
 #pragma once
 
-void ResetCommissionee(MTRBaseDevice * device, dispatch_queue_t queue, XCTestCase * testcase, uint16_t commandTimeout);
+NS_ASSUME_NONNULL_BEGIN
+
+void ResetCommissionee(MTRBaseDevice * device, dispatch_queue_t queue, XCTestCase * _Nullable testcase, uint16_t commandTimeout);
+
+// MTRBaseDevice does not expose its node ID, so for now just allow callers to
+// pass that in out-of-band.
+void ResetCommissioneeWithNodeID(MTRBaseDevice * device, dispatch_queue_t queue, XCTestCase * _Nullable testcase, uint16_t commandTimeout, NSNumber * _Nullable nodeID);
+
+NS_ASSUME_NONNULL_END

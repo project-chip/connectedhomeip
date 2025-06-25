@@ -38,7 +38,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * @brief Returns a copy of the public key for the keypair.
  */
-- (SecKeyRef)copyPublicKey MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+- (SecKeyRef)copyPublicKey CF_RETURNS_RETAINED MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
 /**
  * @brief Returns public key for the keypair without adding a reference. DEPRECATED - please use copyPublicKey, otherwise this will leak.

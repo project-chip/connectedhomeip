@@ -39,6 +39,9 @@
 #if CHIP_DEVICE_LAYER_TARGET_BL702
 #include <platform/bouffalolab/BL702/NetworkCommissioningDriver.h>
 #endif
+#if CHIP_DEVICE_LAYER_TARGET_BL616
+#include <platform/bouffalolab/BL616/NetworkCommissioningDriver.h>
+#endif
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -118,7 +121,9 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
 
     if (val != kWiFiStationMode_ApplicationControlled)
     {
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
         DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
 
     if (mWiFiStationMode != val)

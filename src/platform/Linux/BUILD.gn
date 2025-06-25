@@ -27,6 +27,12 @@ if (chip_enable_openthread) {
   import("//build_overrides/ot_br_posix.gni")
 }
 
+if (chip_enable_nfc_based_commissioning) {
+  pkg_config("nfc_commissioning_config") {
+    packages = [ "libpcsclite" ]
+  }
+}
+
 if (chip_mdns == "platform") {
   pkg_config("avahi_client_config") {
     packages = [ "avahi-client" ]
@@ -70,6 +76,8 @@ static_library("Linux") {
   ]
 
   deps = [
+    "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/common:ids",
     "${chip_root}/src/app/icd/server:icd-server-config",
     "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/setup_payload",
@@ -110,6 +118,14 @@ static_library("Linux") {
 
   public_configs = []
 
+  if (chip_enable_nfc_based_commissioning) {
+    sources += [
+      "NFCCommissioningManagerImpl.cpp",
+      "NFCCommissioningManagerImpl.h",
+    ]
+    public_configs += [ ":nfc_commissioning_config" ]
+  }
+
   if (chip_mdns == "platform") {
     sources += [
       "DnssdImpl.cpp",
@@ -134,6 +150,7 @@ static_library("Linux") {
       "ThreadStackManagerImpl.h",
     ]
 
+    deps += [ "${chip_root}/src/app:app_config" ]
     public_deps += [ "dbus/openthread" ]
   }
 
@@ -145,6 +162,10 @@ static_library("Linux") {
 
   if (chip_enable_ble) {
     public_deps += [ "dbus/bluez" ]
+  }
+
+  if (chip_device_config_enable_wifipaf) {
+    public_deps += [ "${chip_root}/src/wifipaf" ]
   }
 }
 

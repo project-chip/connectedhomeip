@@ -125,6 +125,11 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     jclass controllerExceptionCls;
     err = JniReferences::GetInstance().GetLocalClassRef(env, "chip/devicecontroller/ChipDeviceControllerException",
                                                         controllerExceptionCls);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Controller, "Fail to create local ref for ChipDeviceControllerException");
+        return JNI_ERR;
+    }
     SuccessOrExit(err = sChipDeviceControllerExceptionCls.Init(controllerExceptionCls));
 
     ChipLogProgress(Controller, "Java class references loaded.");

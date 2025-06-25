@@ -18,14 +18,13 @@
 
 #include <pw_unit_test/framework.h>
 
-#include "app-common/zap-generated/ids/Attributes.h"
-#include "app-common/zap-generated/ids/Clusters.h"
-#include "app/ClusterStateCache.h"
-#include "app/ConcreteAttributePath.h"
-#include "protocols/interaction_model/Constants.h"
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <app/BufferedReadCallback.h>
+#include <app/ClusterStateCache.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/data-model/Decode.h>
@@ -33,11 +32,13 @@
 #include <app/util/DataModelHandler.h>
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/UnitTestUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <protocols/interaction_model/Constants.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -73,7 +74,7 @@ protected:
         VerifyOrReturn(!HasFailure()); // Stop if parent had a failure.
 
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
-        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
+        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
     }
 
@@ -153,10 +154,11 @@ TEST_F(TestEventCaching, TestBasicCaching)
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
 
     // Initialize the ember side server logic
+    engine->SetDataModelProvider(CodegenDataModelProviderInstance(nullptr /* delegate */));
     InitDataModelHandler();
 
     // Register our fake dynamic endpoint.
-    DataVersion dataVersionStorage[ArraySize(testEndpointClusters)];
+    DataVersion dataVersionStorage[MATTER_ARRAY_SIZE(testEndpointClusters)];
     emberAfSetDynamicEndpoint(0, kTestEndpointId, &testEndpoint, Span<DataVersion>(dataVersionStorage));
 
     chip::EventNumber firstEventNumber;

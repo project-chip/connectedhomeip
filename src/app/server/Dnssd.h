@@ -24,6 +24,7 @@
 #include <app/icd/server/ICDStateObserver.h>
 #include <app/server/CommissioningModeProvider.h>
 #include <credentials/FabricTable.h>
+#include <inet/InetConfig.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/dnssd/Advertiser.h>
@@ -46,11 +47,16 @@ public:
         return instance;
     }
 
-    /// Sets the secure Matter port
-    void SetSecuredPort(uint16_t port) { mSecuredPort = port; }
+    /// Sets the secure Matter IPv6 port
+    void SetSecuredIPv6Port(uint16_t port) { mSecuredIPv6Port = port; }
+
+#if INET_CONFIG_ENABLE_IPV4
+    /// Sets the secure Matter IPv4 port.
+    void SetSecuredIPv4Port(uint16_t port) { mSecuredIPv4Port = port; }
+#endif // INET_CONFIG_ENABLE_IPV4
 
     /// Gets the secure Matter port
-    uint16_t GetSecuredPort() const { return mSecuredPort; }
+    uint16_t GetSecuredPort() const { return mSecuredIPv6Port; }
 
     /// Sets the unsecure Matter port
     void SetUnsecuredPort(uint16_t port) { mUnsecuredPort = port; }
@@ -96,6 +102,10 @@ public:
 
     void SetICDManager(ICDManager * manager) { mICDManager = manager; };
 #endif
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    void SetTCPServerEnabled(bool serverEnabled) { mTCPServerEnabled = serverEnabled; };
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     /// Start operational advertising
     CHIP_ERROR AdvertiseOperational();
@@ -164,13 +174,25 @@ private:
     // Our randomly-generated fallback "MAC address", in case we don't have a real one.
     uint8_t mFallbackMAC[chip::DeviceLayer::ConfigurationManager::kPrimaryMACAddressLength] = { 0 };
 
-    void GetPrimaryOrFallbackMACAddress(chip::MutableByteSpan mac);
+    void GetPrimaryOrFallbackMACAddress(MutableByteSpan & mac);
 
     //
     // Check if we have any valid operational credentials present in the fabric table and return true
     // if we do.
     //
     bool HaveOperationalCredentials();
+
+    // Check whether the secured IPv4 port matches the secured IPv6 port.  If it
+    // does not, we should not advertise our IPv4 bits, because we can only
+    // advertise one port number.
+    bool SecuredIPv4PortMatchesIPv6Port() const
+    {
+#if INET_CONFIG_ENABLE_IPV4
+        return mSecuredIPv4Port == mSecuredIPv6Port;
+#else
+        return false;
+#endif // INET_CONFIG_ENABLE_IPV4
+    }
 
     FabricTable * mFabricTable                             = nullptr;
     CommissioningModeProvider * mCommissioningModeProvider = nullptr;
@@ -179,7 +201,14 @@ private:
     ICDManager * mICDManager = nullptr;
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
-    uint16_t mSecuredPort          = CHIP_PORT;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    bool mTCPServerEnabled = true;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
+    uint16_t mSecuredIPv6Port = CHIP_PORT;
+#if INET_CONFIG_ENABLE_IPV4
+    uint16_t mSecuredIPv4Port = CHIP_PORT;
+#endif // INET_CONFIG_ENABLE_IPV4
     uint16_t mUnsecuredPort        = CHIP_UDC_PORT;
     Inet::InterfaceId mInterfaceId = Inet::InterfaceId::Null();
 

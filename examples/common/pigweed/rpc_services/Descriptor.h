@@ -52,7 +52,7 @@ public:
             // TODO: Need to update the Pigweed proto definition to actually represent this
             //       as a list of device types.
             //
-            chip_rpc_DeviceType out{ .device_type = deviceTypeList.data()[0].deviceId };
+            chip_rpc_DeviceType out{ .device_type = deviceTypeList.data()[0].deviceTypeId };
             writer.Write(out);
         }
 

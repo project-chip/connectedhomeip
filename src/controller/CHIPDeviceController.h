@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2024 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -478,7 +478,7 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController,
 {
 public:
     DeviceCommissioner();
-    ~DeviceCommissioner() override;
+    ~DeviceCommissioner() override {}
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     /**
@@ -730,6 +730,7 @@ public:
      */
     void CloseBleConnection();
 #endif
+
     /**
      * @brief
      *   Discover all devices advertising as commissionable.
@@ -816,6 +817,7 @@ public:
 
     Optional<CommissioningParameters> GetCommissioningParameters()
     {
+        // TODO: Return a non-optional const & to avoid a copy, mDefaultCommissioner is never null
         return mDefaultCommissioner == nullptr ? NullOptional : MakeOptional(mDefaultCommissioner->GetCommissioningParameters());
     }
 
@@ -960,6 +962,9 @@ private:
     static void OnSetRegulatoryConfigResponse(
         void * context,
         const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data);
+    static void OnSetTCAcknowledgementsResponse(
+        void * context,
+        const chip::app::Clusters::GeneralCommissioning::Commands::SetTCAcknowledgementsResponse::DecodableType & data);
     static void OnSetUTCError(void * context, CHIP_ERROR error);
     static void
     OnSetTimeZoneResponse(void * context,
@@ -1063,6 +1068,11 @@ private:
     CHIP_ERROR ParseTimeSyncInfo(ReadCommissioningInfo & info);
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
+#if (CHIP_CONFIG_ENABLE_READ_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC)
+    CHIP_ERROR ParseJFAdministratorInfo(ReadCommissioningInfo & info);
+    CHIP_ERROR ValidateJFAdminNOC(const ByteSpan & adminNOC);
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
     static CHIP_ERROR
     ConvertFromOperationalCertStatus(chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum err);
 
@@ -1110,6 +1120,10 @@ private:
     Credentials::AttestationVerificationResult mAttestationResult;
     Platform::UniquePtr<Credentials::DeviceAttestationVerifier::AttestationDeviceInfo> mAttestationDeviceInfo;
     Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier = nullptr;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    chip::Optional<chip::Crypto::P256PublicKey> mTrustedIcacPublicKeyB;
+#endif
 };
 
 } // namespace Controller

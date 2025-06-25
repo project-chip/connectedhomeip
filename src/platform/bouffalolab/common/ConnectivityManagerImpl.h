@@ -46,6 +46,7 @@ enum
 {
     kWiFiOnInitDone = DeviceEventType::kRange_PublicPlatformSpecific,
     kWiFiOnScanDone,
+    kWiFiOnConnecting,
     kWiFiOnConnected,
     kGotIpAddress,
     kGotIpv6Address,

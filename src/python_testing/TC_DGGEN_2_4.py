@@ -40,9 +40,8 @@ import logging
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
-from chip.testing.matter_testing import (MatterBaseTest, async_test_body, default_matter_test_main,
-                                         matter_epoch_us_from_utc_datetime, utc_datetime_from_matter_epoch_us,
-                                         utc_datetime_from_posix_time_ms)
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.timeoperations import utc_datetime_from_matter_epoch_us, utc_datetime_from_posix_time_ms, utc_time_in_matter_epoch
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -104,7 +103,7 @@ class TC_DGGEN_2_4(MatterBaseTest):
 
             self.print_step("1b", "Write current time to DUT")
             # Get current time in the correct format to set via command.
-            th_utc = matter_epoch_us_from_utc_datetime(desired_datetime=None)
+            th_utc = utc_time_in_matter_epoch(desired_datetime=None)
 
             await self.set_time_in_timesync(th_utc)
 

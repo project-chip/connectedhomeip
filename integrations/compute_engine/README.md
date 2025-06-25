@@ -1,29 +1,33 @@
-## Startup Script of Compute Engine
+## Google Cloud Compute Engine
 
-A startup script is a file that contains commands that run when a virtual
-machine instance boots. Compute Engine provides support for running startup
-scripts on Linux and Windows virtual machines.
+We have setup a Virtual Machine on
+[Google Cloud](https://cloud.google.com/products/compute) to generate both the
+[Matter SDK coverage report](https://matter-build-automation.ue.r.appspot.com)
+and the
+[Matter SDK Conformance report](https://matter-build-automation.ue.r.appspot.com/conformance_report.html).
 
-### Create a virtual machine instance using startup script
+### The Matter SDK Virtual Machine and the "startup-script.sh"
 
-The `startup-script.sh` could be used as the startup script of a virtual machine
-instance which run Matter coverage report and publish the result via an App
-Engine service.
+We created a VM named `matter-build-coverage`. The machine configuration is
+located
+[here](https://pantheon.corp.google.com/compute/instancesDetail/zones/us-central1-a/instances/matter-build-coverage?inv=1&invt=AbnAfg&project=matter-build-automation).
+Reach out to Google team members if you need to make changes to this VM.
 
-You can create a virtual machine instance by using the gcloud compute instances
-create command with the `--metadata-from-file` flag.
+This virtual machine is scheduled to run daily, starting at 11:45PM and stopping
+at 2am. During boot, the machine runs the `startup-script.sh`.
 
-```
-gcloud compute instances create VM_NAME \
-  --image-project=PROJECT_NAME \
-  --image-family=ubuntu-22.04 \
-  --metadata-from-file=startup-script=FILE_PATH
-```
+The `startup-script.sh` script contains commands to checkout the SDK repository
+and create both the SDK coverage report and conformance report. The startup
+script uses `scripts/build_coverage.sh` to generate the coverage report and
+`scripts/examples/conformance_report.py` to generate the conformance report. The
+resulting HTML files are published via an App Engine service and available here
+([coverage report](https://matter-build-automation.ue.r.appspot.com/),
+[conformance report](https://matter-build-automation.ue.r.appspot.com/conformance_report.html)).
 
-Replace the following:
+### Making Changes to "startup-script.sh"
 
-`PROJECT_NAME`: the name of the project host the virtual machine instance
-
-`VM_NAME`: the name of the virtual machine instance
-
-`FILE_PATH`: the relative path to the startup script file
+If you make changes to `startup-script.sh`, make sure you go to the
+[VM configuration](https://pantheon.corp.google.com/compute/instancesDetail/zones/us-central1-a/instances/matter-build-coverage?inv=1&invt=AbnAfg&project=matter-build-automation),
+click `edit` and update the startup script in the `Automation` text box, to
+reflect your changes. The script in the Matter SDK repo is just a copy of the
+configuration in the VM.

@@ -52,6 +52,7 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/SetupDiscriminator.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceEvent.h>
@@ -1249,11 +1250,12 @@ CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Ble
     conId = static_cast<BLEConnection *>(g_hash_table_lookup(mConnectionMap, conId->peerAddr));
     VerifyOrExit(conId != BLE_CONNECTION_UNINITIALIZED, ChipLogError(DeviceLayer, "Failed to find connection info"));
 
-    ret = bt_gatt_set_value(mGattCharC2Handle, Uint8::to_const_char(pBuf->Start()), pBuf->DataLength());
+    VerifyOrReturnError(CanCastTo<int>(pBuf->DataLength()), CHIP_ERROR_INTERNAL);
+    ret = bt_gatt_set_value(mGattCharC2Handle, Uint8::to_const_char(pBuf->Start()), static_cast<int>(pBuf->DataLength()));
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_set_value() failed: %s", get_error_message(ret)));
 
     ChipLogProgress(DeviceLayer, "Sending indication for CHIPoBLE RX characteristic (con %s, len %u)", conId->peerAddr,
-                    pBuf->DataLength());
+                    static_cast<int>(pBuf->DataLength()));
 
     ret = bt_gatt_server_notify_characteristic_changed_value(
         mGattCharC2Handle,
@@ -1283,11 +1285,12 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const B
                  ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid characteristic ID"));
     VerifyOrExit(conId->gattCharC1Handle != nullptr, ChipLogError(DeviceLayer, "Char C1 is null"));
 
-    ret = bt_gatt_set_value(conId->gattCharC1Handle, Uint8::to_const_char(pBuf->Start()), pBuf->DataLength());
+    VerifyOrReturnError(CanCastTo<int>(pBuf->DataLength()), CHIP_ERROR_INTERNAL);
+    ret = bt_gatt_set_value(conId->gattCharC1Handle, Uint8::to_const_char(pBuf->Start()), static_cast<int>(pBuf->DataLength()));
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_set_value() failed: %s", get_error_message(ret)));
 
     ChipLogProgress(DeviceLayer, "Sending Write Request for CHIPoBLE TX characteristic (con %s, len %u)", conId->peerAddr,
-                    pBuf->DataLength());
+                    static_cast<int>(pBuf->DataLength()));
 
     ret = bt_gatt_client_write_value(conId->gattCharC1Handle, WriteCompletedCb, conId);
     VerifyOrExit(ret == BT_ERROR_NONE,

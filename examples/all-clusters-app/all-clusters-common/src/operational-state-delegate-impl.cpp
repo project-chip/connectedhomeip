@@ -215,3 +215,8 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 
     gOperationalStateInstance->Init();
 }
+
+void emberAfOperationalStateClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    OperationalState::Shutdown();
+}

@@ -166,3 +166,4 @@ void WiFiNetworkManagementServer::HandleNetworkPassphraseRequest(HandlerContext 
 } // namespace chip
 
 void MatterWiFiNetworkManagementPluginServerInitCallback() {}
+void MatterWiFiNetworkManagementPluginServerShutdownCallback() {}

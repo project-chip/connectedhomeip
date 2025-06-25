@@ -26,14 +26,15 @@
 # You will get step_* calls as appropriate in between the test_start and test_stop calls if the test is not skipped.
 
 import sys
+from pathlib import Path
 from typing import Optional
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
 from chip.testing.matter_testing import (MatterBaseTest, MatterTestConfig, async_test_body, has_attribute, has_cluster, has_feature,
                                          run_if_endpoint_matches, run_on_singleton_matching_endpoint, should_run_test_on_endpoint)
+from chip.testing.runner import MockTestRunner
 from mobly import asserts
-from MockTestRunner import MockTestRunner
 
 
 def get_clusters(endpoints: list[int]) -> Attribute.AsyncReadTransaction.ReadResponse:
@@ -216,7 +217,8 @@ class TestDecorators(MatterBaseTest):
 def main():
     failures = []
     hooks = DecoratorTestRunnerHooks()
-    test_runner = MockTestRunner('TestDecorators.py', 'TestDecorators', 'test_checkers')
+    test_runner = MockTestRunner(Path(__file__).parent / 'TestDecorators.py',
+                                 'TestDecorators', 'test_checkers')
     read_resp = get_clusters([0, 1])
     ok = test_runner.run_test_with_mock_read(read_resp, hooks)
     if not ok:

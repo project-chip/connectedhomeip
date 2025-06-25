@@ -88,6 +88,9 @@ struct MCConnectionExampleView: View {
                 viewModel.connect(selectedCastingPlayer: self.selectedCastingPlayer, useCommissionerGeneratedPasscode: self.useCommissionerGeneratedPasscode)
             }
         })
+        .onDisappear(perform: {
+            viewModel.cancelConnectionAttempt(selectedCastingPlayer: self.selectedCastingPlayer)
+        })
     }
 }
 

@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    Copyright 2023 NXP
+ *    Copyright 2023, 2025 NXP
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -53,9 +53,6 @@ extern "C" {
 #define GetMinimumEverFreeHeapSize xPortGetMinimumEverFreeHeapSize
 #endif // NXP_USE_MML
 
-// Not implement into the SDK
-// extern "C" void xPortResetHeapMinimumEverFreeHeapSize(void);
-
 namespace chip {
 namespace DeviceLayer {
 
@@ -103,14 +100,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWatermarks()
 
 #if NXP_USE_MML
     MEM_ResetFreeHeapSizeLowWaterMark();
-
-    return CHIP_NO_ERROR;
 #else
-    // Not implement into the SDK
-    // xPortResetHeapMinimumEverFreeHeapSize();
-
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    xPortResetHeapMinimumEverFreeHeapSize();
 #endif
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)
@@ -370,12 +363,14 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
 {
-#ifdef CONFIG_WIFI_GET_LOG
-    wlan_pkt_stats_t stats;
-    int ret = wlan_get_log(&stats);
+#if CONFIG_WIFI_GET_LOG
+    wlan_stats_t stats;
+    wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
+
+    int ret = wlan_get_stats(&stats, bss_type);
     if (ret == WM_SUCCESS)
     {
-        beaconLostCount = stats.bcn_miss_cnt - mBeaconLostCount;
+        beaconLostCount = stats.sta_mgmt.beacons_miss;
         return CHIP_NO_ERROR;
     }
 #endif /* CONFIG_WIFI_GET_LOG */
@@ -384,12 +379,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconL
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
 {
-#ifdef CONFIG_WIFI_GET_LOG
-    wlan_pkt_stats_t stats;
-    int ret = wlan_get_log(&stats);
+#if CONFIG_WIFI_GET_LOG
+    wlan_stats_t stats;
+    wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
+    int ret                = wlan_get_stats(&stats, bss_type);
     if (ret == WM_SUCCESS)
     {
-        beaconRxCount = stats.bcn_rcv_cnt - mBeaconRxCount;
+        beaconRxCount = stats.sta_mgmt.beacons_rx;
         return CHIP_NO_ERROR;
     }
 #endif /* CONFIG_WIFI_GET_LOG */
@@ -398,12 +394,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxC
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
 {
-#ifdef CONFIG_WIFI_GET_LOG
-    wlan_pkt_stats_t stats;
-    int ret = wlan_get_log(&stats);
+#if CONFIG_WIFI_GET_LOG
+    wlan_stats_t stats;
+    wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
+    int ret                = wlan_get_stats(&stats, bss_type);
     if (ret == WM_SUCCESS)
     {
-        packetMulticastRxCount = stats.mcast_rx_frame - mPacketMulticastRxCount;
+        packetMulticastRxCount = stats.multicast.tx;
         return CHIP_NO_ERROR;
     }
 #endif /* CONFIG_WIFI_GET_LOG */
@@ -412,12 +409,13 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & 
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
 {
-#ifdef CONFIG_WIFI_GET_LOG
-    wlan_pkt_stats_t stats;
-    int ret = wlan_get_log(&stats);
+#if CONFIG_WIFI_GET_LOG
+    wlan_stats_t stats;
+    wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
+    int ret                = wlan_get_stats(&stats, bss_type);
     if (ret == WM_SUCCESS)
     {
-        packetMulticastTxCount = stats.mcast_tx_frame - mPacketMulticastTxCount;
+        packetMulticastTxCount = stats.multicast.tx;
         return CHIP_NO_ERROR;
     }
 #endif /* CONFIG_WIFI_GET_LOG */
@@ -426,27 +424,28 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & 
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
 {
-#ifdef CONFIG_WIFI_GET_LOG
-    wlan_pkt_stats_t stats;
-    int ret = wlan_get_log(&stats);
+#if CONFIG_WIFI_GET_LOG
+    wlan_stats_t stats;
+    wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
+    int ret                = wlan_get_stats(&stats, bss_type);
     if (ret == WM_SUCCESS)
     {
-        packetUnicastTxCount = stats.tx_frame - mPacketUnicastTxCount;
+        packetUnicastTxCount = stats.unicast.tx;
         return CHIP_NO_ERROR;
     }
 #endif /* CONFIG_WIFI_GET_LOG */
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-#if SDK_2_16_100
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
 {
-#ifdef CONFIG_WIFI_GET_LOG
-    wlan_pkt_stats_t stats;
-    int ret = wlan_get_log(&stats);
+#if CONFIG_WIFI_GET_LOG
+    wlan_stats_t stats;
+    wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
+    int ret                = wlan_get_stats(&stats, bss_type);
     if (ret == WM_SUCCESS)
     {
-        packetUnicastRxCount = stats.rx_unicast_cnt - mPacketUnicastRxCount;
+        packetUnicastRxCount = stats.unicast.rx;
         return CHIP_NO_ERROR;
     }
 #endif /* CONFIG_WIFI_GET_LOG */
@@ -455,36 +454,26 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & pa
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCount)
 {
-#ifdef CONFIG_WIFI_GET_LOG
-    wlan_pkt_stats_t stats;
-    int ret = wlan_get_log(&stats);
+#if CONFIG_WIFI_GET_LOG
+    wlan_stats_t stats;
+    wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
+    int ret                = wlan_get_stats(&stats, bss_type);
     if (ret == WM_SUCCESS)
     {
-        overrunCount = (stats.tx_overrun_cnt + stats.rx_overrun_cnt) - mOverrunCount;
+        overrunCount = (stats.overrun.tx + stats.overrun.rx);
         return CHIP_NO_ERROR;
     }
 #endif /* CONFIG_WIFI_GET_LOG */
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-#endif
-
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts(void)
 {
-#ifdef CONFIG_WIFI_GET_LOG
-    wlan_pkt_stats_t stats;
-    int ret = wlan_get_log(&stats);
+#if CONFIG_WIFI_GET_LOG
+    wlan_bss_type bss_type = WLAN_BSS_TYPE_STA;
+    int ret                = wlan_reset_stats(bss_type);
     if (ret == WM_SUCCESS)
     {
-        mPacketUnicastTxCount   = stats.tx_frame;
-        mPacketMulticastTxCount = stats.mcast_tx_frame;
-        mPacketMulticastRxCount = stats.mcast_rx_frame;
-        mBeaconRxCount          = stats.bcn_rcv_cnt;
-        mBeaconLostCount        = stats.bcn_miss_cnt;
-#if SDK_2_16_100
-        mPacketUnicastRxCount = stats.rx_unicast_cnt;
-        mOverrunCount         = stats.tx_overrun_cnt + stats.rx_overrun_cnt;
-#endif
         return CHIP_NO_ERROR;
     }
 #endif /* CONFIG_WIFI_GET_LOG */
@@ -492,6 +481,45 @@ CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts(void)
 }
 
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_WPA */
+
+#if CONFIG_CHIP_ETHERNET
+CHIP_ERROR DiagnosticDataProviderImpl::GetEthPHYRate(app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+CHIP_ERROR DiagnosticDataProviderImpl::GetEthFullDuplex(bool & fullDuplex)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+CHIP_ERROR DiagnosticDataProviderImpl::GetEthTimeSinceReset(uint64_t & timeSinceReset)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+CHIP_ERROR DiagnosticDataProviderImpl::GetEthPacketRxCount(uint64_t & packetRxCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+CHIP_ERROR DiagnosticDataProviderImpl::GetEthPacketTxCount(uint64_t & packetTxCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+CHIP_ERROR DiagnosticDataProviderImpl::GetEthTxErrCount(uint64_t & txErrCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+CHIP_ERROR DiagnosticDataProviderImpl::GetEthCollisionCount(uint64_t & collisionCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+CHIP_ERROR DiagnosticDataProviderImpl::GetEthOverrunCount(uint64_t & overrunCount)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+CHIP_ERROR DiagnosticDataProviderImpl::ResetEthNetworkDiagnosticsCounts()
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+#endif
 
 DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
 {

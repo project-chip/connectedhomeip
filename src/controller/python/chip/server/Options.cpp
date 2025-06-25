@@ -37,7 +37,7 @@ enum
     kDeviceOption_Thread    = 0x1002,
 };
 
-OptionDef sDeviceOptionDefs[] = { { "ble-device", kArgumentRequired, kDeviceOption_BleDevice },
+OptionDef sDeviceOptionDefs[] = { { "ble-controller", kArgumentRequired, kDeviceOption_BleDevice },
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
                                   { "wifi", kNoArgument, kDeviceOption_WiFi },
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -46,8 +46,8 @@ OptionDef sDeviceOptionDefs[] = { { "ble-device", kArgumentRequired, kDeviceOpti
 #endif // CHIP_ENABLE_OPENTHREAD
                                   {} };
 
-const char sDeviceOptionHelp[] = "  --ble-device <number>\n"
-                                 "       The device number for CHIPoBLE, without 'hci' prefix, can be found by hciconfig.\n"
+const char sDeviceOptionHelp[] = "  --ble-controller <selector>\n"
+                                 "       BLE controller selector, see example or platform docs for details\n"
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
                                  "\n"
                                  "  --wifi\n"

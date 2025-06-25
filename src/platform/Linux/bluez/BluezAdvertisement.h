@@ -27,7 +27,7 @@
 #include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
 #include <platform/GLibTypeDeleter.h>
-#include <platform/Linux/dbus/bluez/DbusBluez.h>
+#include <platform/Linux/dbus/bluez/DBusBluez.h>
 
 #include "BluezEndpoint.h"
 #include "Types.h"

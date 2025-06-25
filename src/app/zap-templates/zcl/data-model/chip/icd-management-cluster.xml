@@ -74,7 +74,6 @@ limitations under the License.
     <features>
       <feature bit="0" code="CIP" name="CheckInProtocolSupport" summary="Device supports attributes and commands for the Check-In Protocol support.">
         <otherwiseConform>
-          <provisionalConform/>
           <mandatoryConform>
             <feature name="LITS"/>
           </mandatoryConform>
@@ -83,7 +82,6 @@ limitations under the License.
       </feature>
       <feature bit="1" code="UAT" name="UserActiveModeTrigger" summary="Device supports the user active mode trigger feature.">
         <otherwiseConform>
-          <provisionalConform/>
           <mandatoryConform>
             <feature name="LITS"/>
           </mandatoryConform>
@@ -92,13 +90,11 @@ limitations under the License.
       </feature>
       <feature bit="2" code="LITS" name="LongIdleTimeSupport" summary="Device supports operating as a Long Idle Time ICD.">
         <otherwiseConform>
-          <provisionalConform/>
           <optionalConform/>
         </otherwiseConform>
       </feature>
       <feature bit="3" code="DSLS" name="DynamicSitLitSupport" summary="Device supports dynamic switching from SIT to LIT operating modes.">
         <otherwiseConform>
-          <provisionalConform/>
           <optionalConform>
             <feature name="LITS"/>
           </optionalConform>
@@ -132,26 +128,23 @@ limitations under the License.
         <feature name="CIP"/>
       </mandatoryConform>
     </attribute>
-    <attribute side="server" code="0x06" name="UserActiveModeTriggerHint" define="USER_ACTIVE_MODE_TRIGGER_HINT" type="UserActiveModeTriggerBitmap" optional="true" apiMaturity="provisional">
+    <attribute side="server" code="0x06" name="UserActiveModeTriggerHint" define="USER_ACTIVE_MODE_TRIGGER_HINT" type="UserActiveModeTriggerBitmap" optional="true">
       <otherwiseConform>
-        <provisionalConform/>
         <mandatoryConform>
           <feature name="UAT"/>
         </mandatoryConform>
       </otherwiseConform>
     </attribute>
-    <attribute side="server" code="0x07" name="UserActiveModeTriggerInstruction" define="USER_ACTIVE_MODE_TRIGGER_INSTRUCTION" type="char_string" length="128" optional="true" apiMaturity="provisional">
-      <provisionalConform/>
+    <attribute side="server" code="0x07" name="UserActiveModeTriggerInstruction" define="USER_ACTIVE_MODE_TRIGGER_INSTRUCTION" type="char_string" length="128" optional="true">
     </attribute>
-    <attribute side="server" code="0x08" name="OperatingMode" define="OPERATING_MODE" type="OperatingModeEnum" default="0" optional="true" apiMaturity="provisional">
+    <attribute side="server" code="0x08" name="OperatingMode" define="OPERATING_MODE" type="OperatingModeEnum" default="0" optional="true">
       <otherwiseConform>
-        <provisionalConform/>
         <mandatoryConform>
           <feature name="LITS"/>
         </mandatoryConform>
       </otherwiseConform>
     </attribute>
-    <attribute side="server" code="0x09" name="MaximumCheckInBackOff" define="MAXIMUM_CHECK_IN_BACK_OFF" type="int32u" default="1" max="64800" optional="true" apiMaturity="provisional">
+    <attribute side="server" code="0x09" name="MaximumCheckInBackOff" define="MAXIMUM_CHECK_IN_BACK_OFF" type="int32u" default="1" max="64800" optional="true">
       <mandatoryConform>
         <feature name="CIP"/>
       </mandatoryConform>

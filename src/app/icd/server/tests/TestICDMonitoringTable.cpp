@@ -26,6 +26,10 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 
+#if CHIP_CRYPTO_PSA
+#include <crypto/CHIPCryptoPALPSA.h>
+#endif
+
 using namespace chip;
 using namespace chip::app::Clusters::IcdManagement;
 
@@ -65,7 +69,30 @@ constexpr uint8_t kKeyBuffer3a[] = {
     0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f
 };
 
-TEST(TestICDMonitoringTable, TestEntryAssignationOverload)
+struct TestICDMonitoringTable : public ::testing::Test
+{
+    void SetUp() override
+    {
+#if CHIP_CRYPTO_PSA
+        ASSERT_EQ(psa_crypto_init(), PSA_SUCCESS);
+#endif
+    }
+
+    void ValidateHmac128(const Crypto::Hmac128KeyHandle & saved, const Crypto::Hmac128KeyHandle & loaded)
+    {
+#if CHIP_CRYPTO_PSA
+        EXPECT_NE(saved.As<psa_key_id_t>(), loaded.As<psa_key_id_t>());
+        EXPECT_GE(loaded.As<psa_key_id_t>(), to_underlying(Crypto::KeyIdBase::ICDKeyRangeStart));
+        EXPECT_LE(loaded.As<psa_key_id_t>(), to_underlying(Crypto::KeyIdBase::Maximum));
+#else
+        EXPECT_EQ(memcmp(saved.As<Crypto::Symmetric128BitsKeyByteArray>(), loaded.As<Crypto::Symmetric128BitsKeyByteArray>(),
+                         sizeof(Crypto::Symmetric128BitsKeyByteArray)),
+                  0);
+#endif
+    }
+};
+
+TEST_F(TestICDMonitoringTable, TestEntryAssignationOverload)
 {
     TestSessionKeystoreImpl keystore;
     ICDMonitoringEntry entry(&keystore);
@@ -100,7 +127,7 @@ TEST(TestICDMonitoringTable, TestEntryAssignationOverload)
     EXPECT_TRUE(entry2.IsKeyEquivalent(ByteSpan(kKeyBuffer1a)));
 }
 
-TEST(TestICDMonitoringTable, TestEntryMaximumSize)
+TEST_F(TestICDMonitoringTable, TestEntryMaximumSize)
 {
     TestPersistentStorageDelegate storage;
     TestSessionKeystoreImpl keystore;
@@ -114,7 +141,7 @@ TEST(TestICDMonitoringTable, TestEntryMaximumSize)
     EXPECT_EQ(CHIP_NO_ERROR, table.Set(0, entry));
 }
 
-TEST(TestICDMonitoringTable, TestEntryKeyFunctions)
+TEST_F(TestICDMonitoringTable, TestEntryKeyFunctions)
 {
     TestSessionKeystoreImpl keystore;
     ICDMonitoringEntry entry(&keystore);
@@ -140,7 +167,7 @@ TEST(TestICDMonitoringTable, TestEntryKeyFunctions)
     EXPECT_EQ(entry.DeleteKey(), CHIP_NO_ERROR);
 }
 
-TEST(TestICDMonitoringTable, TestSaveAndLoadRegistrationValue)
+TEST_F(TestICDMonitoringTable, TestSaveAndLoadRegistrationValue)
 {
     TestPersistentStorageDelegate storage;
     TestSessionKeystoreImpl keystore;
@@ -178,9 +205,7 @@ TEST(TestICDMonitoringTable, TestSaveAndLoadRegistrationValue)
     EXPECT_EQ(kClientNodeId12, entry.monitoredSubject);
     EXPECT_EQ(ClientTypeEnum::kPermanent, entry.clientType);
     EXPECT_TRUE(entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1a)));
-    EXPECT_EQ(memcmp(entry1.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
-                     entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray)),
-              0);
+    ValidateHmac128(entry1.hmacKeyHandle, entry.hmacKeyHandle);
 
     // Retrieve second entry
     EXPECT_EQ(CHIP_NO_ERROR, loading.Get(1, entry));
@@ -189,9 +214,7 @@ TEST(TestICDMonitoringTable, TestSaveAndLoadRegistrationValue)
     EXPECT_EQ(kClientNodeId11, entry.monitoredSubject);
     EXPECT_EQ(ClientTypeEnum::kEphemeral, entry.clientType);
     EXPECT_TRUE(entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
-    EXPECT_EQ(memcmp(entry2.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
-                     entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray)),
-              0);
+    ValidateHmac128(entry2.hmacKeyHandle, entry.hmacKeyHandle);
 
     // No more entries
     EXPECT_EQ(CHIP_ERROR_NOT_FOUND, loading.Get(2, entry));
@@ -213,9 +236,7 @@ TEST(TestICDMonitoringTable, TestSaveAndLoadRegistrationValue)
     EXPECT_EQ(kClientNodeId11, entry.monitoredSubject);
     EXPECT_EQ(ClientTypeEnum::kEphemeral, entry.clientType);
     EXPECT_TRUE(entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
-    EXPECT_EQ(memcmp(entry2.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
-                     entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray)),
-              0);
+    ValidateHmac128(entry2.hmacKeyHandle, entry.hmacKeyHandle);
 
     // Retrieve second entry
     EXPECT_EQ(CHIP_NO_ERROR, loading.Get(1, entry));
@@ -224,12 +245,10 @@ TEST(TestICDMonitoringTable, TestSaveAndLoadRegistrationValue)
     EXPECT_EQ(kClientNodeId11, entry.monitoredSubject);
     EXPECT_EQ(ClientTypeEnum::kPermanent, entry.clientType);
     EXPECT_TRUE(entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1b)));
-    EXPECT_EQ(memcmp(entry4.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
-                     entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray)),
-              0);
+    ValidateHmac128(entry4.hmacKeyHandle, entry.hmacKeyHandle);
 }
 
-TEST(TestICDMonitoringTable, TestSaveAllInvalidRegistrationValues)
+TEST_F(TestICDMonitoringTable, TestSaveAllInvalidRegistrationValues)
 {
     TestPersistentStorageDelegate storage;
     TestSessionKeystoreImpl keystore;
@@ -271,7 +290,7 @@ TEST(TestICDMonitoringTable, TestSaveAllInvalidRegistrationValues)
     EXPECT_EQ(CHIP_ERROR_INVALID_ARGUMENT, table.Set(0, entry5));
 }
 
-TEST(TestICDMonitoringTable, TestSaveLoadRegistrationValueForMultipleFabrics)
+TEST_F(TestICDMonitoringTable, TestSaveLoadRegistrationValueForMultipleFabrics)
 {
     TestPersistentStorageDelegate storage;
     TestSessionKeystoreImpl keystore;
@@ -314,9 +333,7 @@ TEST(TestICDMonitoringTable, TestSaveLoadRegistrationValueForMultipleFabrics)
     EXPECT_EQ(kClientNodeId11, entry.checkInNodeID);
     EXPECT_EQ(kClientNodeId12, entry.monitoredSubject);
     EXPECT_TRUE(entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1a)));
-    EXPECT_EQ(memcmp(entry1.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
-                     entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray)),
-              0);
+    ValidateHmac128(entry1.hmacKeyHandle, entry.hmacKeyHandle);
 
     // Retrieve fabric1, second entry
     EXPECT_EQ(CHIP_NO_ERROR, table1.Get(1, entry));
@@ -324,9 +341,7 @@ TEST(TestICDMonitoringTable, TestSaveLoadRegistrationValueForMultipleFabrics)
     EXPECT_EQ(kClientNodeId12, entry.checkInNodeID);
     EXPECT_EQ(kClientNodeId11, entry.monitoredSubject);
     EXPECT_TRUE(entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1b)));
-    EXPECT_EQ(memcmp(entry2.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
-                     entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray)),
-              0);
+    ValidateHmac128(entry2.hmacKeyHandle, entry.hmacKeyHandle);
 
     // Retrieve fabric2, first entry
     EXPECT_EQ(CHIP_NO_ERROR, table2.Get(0, entry));
@@ -334,12 +349,10 @@ TEST(TestICDMonitoringTable, TestSaveLoadRegistrationValueForMultipleFabrics)
     EXPECT_EQ(kClientNodeId21, entry.checkInNodeID);
     EXPECT_EQ(kClientNodeId22, entry.monitoredSubject);
     EXPECT_TRUE(entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
-    EXPECT_EQ(memcmp(entry3.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
-                     entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray)),
-              0);
+    ValidateHmac128(entry3.hmacKeyHandle, entry.hmacKeyHandle);
 }
 
-TEST(TestICDMonitoringTable, TestDeleteValidEntryFromStorage)
+TEST_F(TestICDMonitoringTable, TestDeleteValidEntryFromStorage)
 {
     TestPersistentStorageDelegate storage;
     TestSessionKeystoreImpl keystore;
@@ -379,9 +392,7 @@ TEST(TestICDMonitoringTable, TestDeleteValidEntryFromStorage)
     EXPECT_EQ(kClientNodeId11, entry.checkInNodeID);
     EXPECT_EQ(kClientNodeId12, entry.monitoredSubject);
     EXPECT_TRUE(entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1a)));
-    EXPECT_EQ(memcmp(entry1.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
-                     entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray)),
-              0);
+    ValidateHmac128(entry1.hmacKeyHandle, entry.hmacKeyHandle);
 
     // Retrieve second entry (not modified)
     EXPECT_EQ(CHIP_NO_ERROR, table1.Get(1, entry));
@@ -389,9 +400,7 @@ TEST(TestICDMonitoringTable, TestDeleteValidEntryFromStorage)
     EXPECT_EQ(kClientNodeId12, entry.checkInNodeID);
     EXPECT_EQ(kClientNodeId11, entry.monitoredSubject);
     EXPECT_TRUE(entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
-    EXPECT_EQ(memcmp(entry2.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
-                     entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray)),
-              0);
+    ValidateHmac128(entry2.hmacKeyHandle, entry.hmacKeyHandle);
 
     // Remove (existing)
     EXPECT_EQ(CHIP_NO_ERROR, table1.Remove(0));
@@ -405,9 +414,7 @@ TEST(TestICDMonitoringTable, TestDeleteValidEntryFromStorage)
     EXPECT_EQ(kClientNodeId12, entry.checkInNodeID);
     EXPECT_EQ(kClientNodeId11, entry.monitoredSubject);
     EXPECT_TRUE(entry.IsKeyEquivalent(ByteSpan(kKeyBuffer2a)));
-    EXPECT_EQ(memcmp(entry2.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
-                     entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray)),
-              0);
+    ValidateHmac128(entry2.hmacKeyHandle, entry.hmacKeyHandle);
 
     // Retrieve fabric2, first entry
     EXPECT_EQ(CHIP_NO_ERROR, table2.Get(0, entry));
@@ -415,9 +422,7 @@ TEST(TestICDMonitoringTable, TestDeleteValidEntryFromStorage)
     EXPECT_EQ(kClientNodeId21, entry.checkInNodeID);
     EXPECT_EQ(kClientNodeId22, entry.monitoredSubject);
     EXPECT_TRUE(entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1b)));
-    EXPECT_EQ(memcmp(entry3.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
-                     entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray)),
-              0);
+    ValidateHmac128(entry3.hmacKeyHandle, entry.hmacKeyHandle);
 
     // Remove all (fabric 1)
     EXPECT_EQ(CHIP_NO_ERROR, table1.RemoveAll());
@@ -429,9 +434,7 @@ TEST(TestICDMonitoringTable, TestDeleteValidEntryFromStorage)
     EXPECT_EQ(kClientNodeId21, entry.checkInNodeID);
     EXPECT_EQ(kClientNodeId22, entry.monitoredSubject);
     EXPECT_TRUE(entry.IsKeyEquivalent(ByteSpan(kKeyBuffer1b)));
-    EXPECT_EQ(memcmp(entry3.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(),
-                     entry.hmacKeyHandle.As<Crypto::Symmetric128BitsKeyByteArray>(), sizeof(Crypto::Symmetric128BitsKeyByteArray)),
-              0);
+    ValidateHmac128(entry3.hmacKeyHandle, entry.hmacKeyHandle);
 
     // Remove all (fabric 2)
     EXPECT_EQ(CHIP_NO_ERROR, table2.RemoveAll());

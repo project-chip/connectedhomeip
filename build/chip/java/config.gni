@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-java_path = getenv("JAVA_PATH")
+java_home = getenv("JAVA_HOME")
 declare_args() {
   java_matter_controller_dependent_paths = []
 
@@ -24,15 +24,15 @@ declare_args() {
   matter_enable_tlv_decoder_api = true
 
   matter_enable_java_compilation = false
-  if (java_path != "" && (current_os == "linux" || current_os == "mac")) {
-    java_matter_controller_dependent_paths += [ "${java_path}/include/" ]
+  if (java_home != "" && (current_os == "linux" || current_os == "mac")) {
+    java_matter_controller_dependent_paths += [ "${java_home}/include/" ]
 
     if (current_os == "mac") {
       java_matter_controller_dependent_paths +=
-          [ "${java_path}/include/darwin/" ]
+          [ "${java_home}/include/darwin/" ]
     } else {
       java_matter_controller_dependent_paths +=
-          [ "${java_path}/include/linux/" ]
+          [ "${java_home}/include/linux/" ]
     }
 
     matter_enable_java_generated_api = false

@@ -12,7 +12,7 @@ bash -c 'echo -e "\nCONFIG_ESP_INSIGHTS_ENABLED=n\nCONFIG_ENABLE_ESP_INSIGHTS_TR
 
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light-rpc/sdkconfig.defaults
-idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light-rpc reconfigure'
+idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light-rpc -DIDF_TARGET=esp32 reconfigure'
 
 rm -f examples/lighting-app/esp32/sdkconfig
 

@@ -55,6 +55,12 @@ class OperationalCredentialsCluster(
 
   class NOCResponse(val statusCode: UByte, val fabricIndex: UByte?, val debugText: String?)
 
+  class SignVIDVerificationResponse(
+    val fabricIndex: UByte,
+    val fabricBindingVersion: UByte,
+    val signature: ByteArray,
+  )
+
   class NOCsAttribute(val value: List<OperationalCredentialsClusterNOCStruct>)
 
   sealed class NOCsAttributeSubscriptionState {
@@ -107,16 +113,6 @@ class OperationalCredentialsCluster(
     data class Error(val exception: Exception) : AcceptedCommandListAttributeSubscriptionState()
 
     object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
-  }
-
-  class EventListAttribute(val value: List<UInt>)
-
-  sealed class EventListAttributeSubscriptionState {
-    data class Success(val value: List<UInt>) : EventListAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : EventListAttributeSubscriptionState()
-
-    object SubscriptionEstablished : EventListAttributeSubscriptionState()
   }
 
   class AttributeListAttribute(val value: List<UInt>)
@@ -658,6 +654,120 @@ class OperationalCredentialsCluster(
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun setVIDVerificationStatement(
+    vendorID: UShort?,
+    VIDVerificationStatement: ByteArray?,
+    vvsc: ByteArray?,
+    timedInvokeTimeout: Duration? = null,
+  ) {
+    val commandId: UInt = 12u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_VENDOR_ID_REQ: Int = 0
+    vendorID?.let { tlvWriter.put(ContextSpecificTag(TAG_VENDOR_ID_REQ), vendorID) }
+
+    val TAG_VID_VERIFICATION_STATEMENT_REQ: Int = 1
+    VIDVerificationStatement?.let {
+      tlvWriter.put(
+        ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT_REQ),
+        VIDVerificationStatement,
+      )
+    }
+
+    val TAG_VVSC_REQ: Int = 2
+    vvsc?.let { tlvWriter.put(ContextSpecificTag(TAG_VVSC_REQ), vvsc) }
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun signVIDVerificationRequest(
+    fabricIndex: UByte,
+    clientChallenge: ByteArray,
+    timedInvokeTimeout: Duration? = null,
+  ): SignVIDVerificationResponse {
+    val commandId: UInt = 13u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_FABRIC_INDEX_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_FABRIC_INDEX_REQ), fabricIndex)
+
+    val TAG_CLIENT_CHALLENGE_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_CLIENT_CHALLENGE_REQ), clientChallenge)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_FABRIC_INDEX: Int = 0
+    var fabricIndex_decoded: UByte? = null
+
+    val TAG_FABRIC_BINDING_VERSION: Int = 1
+    var fabricBindingVersion_decoded: UByte? = null
+
+    val TAG_SIGNATURE: Int = 2
+    var signature_decoded: ByteArray? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_FABRIC_INDEX)) {
+        fabricIndex_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_FABRIC_BINDING_VERSION)) {
+        fabricBindingVersion_decoded = tlvReader.getUByte(tag)
+      }
+
+      if (tag == ContextSpecificTag(TAG_SIGNATURE)) {
+        signature_decoded = tlvReader.getByteArray(tag)
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (fabricIndex_decoded == null) {
+      throw IllegalStateException("fabricIndex not found in TLV")
+    }
+
+    if (fabricBindingVersion_decoded == null) {
+      throw IllegalStateException("fabricBindingVersion not found in TLV")
+    }
+
+    if (signature_decoded == null) {
+      throw IllegalStateException("signature not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return SignVIDVerificationResponse(
+      fabricIndex_decoded,
+      fabricBindingVersion_decoded,
+      signature_decoded,
+    )
   }
 
   suspend fun readNOCsAttribute(): NOCsAttribute {
@@ -1390,101 +1500,6 @@ class OperationalCredentialsCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(AcceptedCommandListAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readEventListAttribute(): EventListAttribute {
-    val ATTRIBUTE_ID: UInt = 65530u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Eventlist attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UInt> =
-      buildList<UInt> {
-        tlvReader.enterArray(AnonymousTag)
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUInt(AnonymousTag))
-        }
-        tlvReader.exitContainer()
-      }
-
-    return EventListAttribute(decodedValue)
-  }
-
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<EventListAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 65530u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            EventListAttributeSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Eventlist attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UInt> =
-            buildList<UInt> {
-              tlvReader.enterArray(AnonymousTag)
-              while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUInt(AnonymousTag))
-              }
-              tlvReader.exitContainer()
-            }
-
-          emit(EventListAttributeSubscriptionState.Success(decodedValue))
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(EventListAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

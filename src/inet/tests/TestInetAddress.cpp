@@ -37,7 +37,7 @@
 #include <lwip/init.h>
 #include <lwip/ip_addr.h>
 
-#elif CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#elif CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 #include <inet/arpa-inet-compatibility.h>
 #include <openthread/icmp6.h>
 #include <openthread/ip6.h>
@@ -746,7 +746,7 @@ void CheckAddress(const IPAddressContext & inContext, const IPAddress & inAddres
     // Convert the address to a string and compare it to the control string.
 
     inAddress.ToString(lAddressBuffer);
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     // Embedded openthread stack otIp6AddressFromString format the string as a uncompressed IPV6
     // example ff01::1 is formatted has ff01:0:0:0:0:0:0:1
     // But the IPV6 address From string API (otIp6AddressFromString) handle both compressed and uncompressed format.
@@ -806,7 +806,7 @@ TEST_F(TestInetAddress, TestCheckToString)
         SetupIPAddress(lAddress, lCurrent);
 
         lAddress.ToString(lAddressBuffer);
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
         // Embedded openthread stack otIp6AddressFromString format the string as a uncompressed IPV6
         // So ff01::1 is formatted has ff01:0:0:0:0:0:0:1
         // But the IPV6 address From string API (otIp6AddressFromString) handle both compressed and uncompressed format.
@@ -821,7 +821,7 @@ TEST_F(TestInetAddress, TestCheckToString)
         CheckAddressString(lAddressBuffer, uncompressedAddrStr);
 #else
         CheckAddressString(lAddressBuffer, lCurrent->mAddr.mAddrString);
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#endif // CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
         ++lCurrent;
     }
 }
@@ -1040,7 +1040,7 @@ TEST_F(TestInetAddress, TestCheckToIPv6)
 #if LWIP_IPV6_SCOPES
         ip_addr_1.zone = 0;
 #endif
-#elif CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#elif CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
         otIp6Address ip_addr_1 = { 0 }, ip_addr_2 = { 0 };
         memcpy(ip_addr_1.mFields.m32, addr, sizeof(addr));
 #else
@@ -1079,7 +1079,7 @@ TEST_F(TestInetAddress, TestCheckFromIPv6)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         ip6_addr_t ip_addr;
         memcpy(ip_addr.addr, addr, sizeof(addr));
-#elif CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#elif CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
         otIp6Address ip_addr;
         memcpy(ip_addr.mFields.m32, addr, sizeof(addr));
 #else
@@ -1228,8 +1228,8 @@ TEST_F(TestInetAddress, TestCheckFromIPv4)
  */
 TEST_F(TestInetAddress, TestCheckFromSocket)
 {
-#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
-    // This test is not supported LWIP or OPEN_THREAD_ENDPOINT stacks.
+#if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    // This test is not supported LWIP or OPENTHREAD_ENDPOINT stacks.
 #else // CHIP_SYSTEM_CONFIG_USE_LWIP
     IPAddressExpandedContextIterator lCurrent = pTestContext->mIPAddressExpandedContextRange.mBegin;
     IPAddressExpandedContextIterator lEnd     = pTestContext->mIPAddressExpandedContextRange.mEnd;
@@ -1284,7 +1284,7 @@ TEST_F(TestInetAddress, TestCheckFromSocket)
 
         ++lCurrent;
     }
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 }
 
 /**

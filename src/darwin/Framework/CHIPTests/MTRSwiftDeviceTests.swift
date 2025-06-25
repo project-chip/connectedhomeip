@@ -1,9 +1,6 @@
 import Matter
-import XCTest
 
 // This should eventually grow into a Swift copy of MTRDeviceTests
-
-// Fixture: chip-all-clusters-app --KVS "$(mktemp -t chip-test-kvs)" --interface-id -1
 
 struct DeviceConstants {
     static let testVendorID = 0xFFF1
@@ -102,11 +99,14 @@ class MTRSwiftDeviceTestDelegate : NSObject, MTRDeviceDelegate {
     }
 }
 
-class MTRSwiftDeviceTests : XCTestCase {
+class MTRSwiftDeviceTests : MTRTestCase {
     static override func setUp()
     {
         super.setUp()
-
+        
+        let started = self.startApp(withName: "all-clusters", arguments: [], payload: PairingConstants.onboardingPayload)
+        XCTAssertTrue(started);
+        
         let factory = MTRDeviceControllerFactory.sharedInstance()
         
         let storage = MTRTestStorage()
@@ -163,8 +163,7 @@ class MTRSwiftDeviceTests : XCTestCase {
     }
     
     static override func tearDown() {
-        ResetCommissionee(sConnectedDevice, DispatchQueue.main, nil, UInt16(DeviceConstants.timeoutInSeconds))
-
+        XCTAssertNotNil(sConnectedDevice)
         let controller = sController
         XCTAssertNotNil(controller)
         controller!.shutdown()

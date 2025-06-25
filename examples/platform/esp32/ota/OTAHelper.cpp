@@ -171,7 +171,7 @@ void OTARequestorCommands::Register()
 
     };
 
-    sSubShell.RegisterCommands(subCommands, ArraySize(subCommands));
+    sSubShell.RegisterCommands(subCommands, MATTER_ARRAY_SIZE(subCommands));
 
     // Register the root `OTA Requestor` command in the top-level shell.
     static const shell_command_t otaRequestorCommand = { &OTARequestorHandler, "OTARequestor", "OTA Requestor commands" };

@@ -57,16 +57,21 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     TaskHandle_t backup_eventLoopTask;
 
     otRadio_opt_t opt;
+    opt.byte = 0;
 
-    opt.byte            = 0;
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
+    opt.bf.isFtd = true;
+#else
+    opt.bf.isFtd = false;
+#endif
     opt.bf.isCoexEnable = true;
+#endif
 
     ot_utils_init();
 
     ot_alarmInit();
     ot_radioInit(opt);
-
-    ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     // Initialize LwIP.

@@ -31,8 +31,8 @@ config("openthread_efr32_config") {
   include_dirs = [
     "${sl_ot_efr32_root}",
     "${chip_root}/examples/platform/efr32",
-    "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}",
-    "${sdk_support_root}/matter/efr32/${silabs_family}/${silabs_board}/config",
+    "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}",
+    "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}/config",
     "${sl_ot_platform_abstraction}/include",
     "${sl_ot_platform_abstraction}/rtos",
   ]
@@ -74,7 +74,7 @@ source_set("libopenthread-efr32") {
     "${sl_ot_efr32_root}/system.c",
 
     # Temporary file until the files in the SI SDK is fixed
-    "${sdk_support_root}/protocol/openthread/platform-abstraction/efr32/radio.c",
+    "${matter_support_root}/sdk-copies/protocol/openthread/platform-abstraction/efr32/radio.c",
   ]
 
   include_dirs = [ "${openthread_root}/examples/platforms/utils" ]

@@ -73,10 +73,8 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
         mServer->GetBleLayerObject()->CloseAllBleConnections();
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-        DeviceLayer::ConnectivityManager::WiFiPAFAdvertiseParam args;
-        args.enable  = false;
-        args.ExtCmds = nullptr;
-        DeviceLayer::ConnectivityMgr().SetWiFiPAFAdvertisingEnabled(args);
+        chip::WiFiPAF::WiFiPAFLayer::GetWiFiPAFLayer().Shutdown(
+            [](uint32_t id, WiFiPAF::WiFiPafRole role) { DeviceLayer::ConnectivityMgr().WiFiPAFShutdown(id, role); });
 #endif
     }
     else if (event->Type == DeviceLayer::DeviceEventType::kFailSafeTimerExpired)

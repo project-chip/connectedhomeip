@@ -22,20 +22,6 @@ if (chip_crypto == "platform") {
   import("//build_overrides/mbedtls.gni")
 }
 
-source_set("public_headers") {
-  sources = [
-    "CHIPCryptoPAL.h",
-    "OperationalKeystore.h",
-  ]
-
-  public_deps = [
-    "${chip_root}/src/lib/asn1",
-    "${chip_root}/src/lib/core",
-    "${chip_root}/src/lib/support",
-    "${nlassert_root}:nlassert",
-  ]
-}
-
 static_library("nxp_crypto_lib") {
   sources = [
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPALHost.cpp",
@@ -48,13 +34,15 @@ static_library("nxp_crypto_lib") {
     "${chip_root}/src/platform/nxp/crypto/se05x/CHIPCryptoPAL_HostFallBack.cpp",
   ]
 
-  public_deps = [ ":public_headers" ]
   deps = [ "${chip_root}/${nxp_crypto_mw_root}:se05x" ]
 
   external_mbedtls = current_os == "zephyr"
 
   if (!external_mbedtls) {
-    public_deps += [ "${mbedtls_root}:mbedtls" ]
+    public_deps = [
+      "${chip_root}/src/crypto",
+      "${mbedtls_root}:mbedtls",
+    ]
   }
 
   include_dirs = [

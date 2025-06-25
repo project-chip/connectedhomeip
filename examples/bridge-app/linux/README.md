@@ -10,6 +10,9 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 
 -   [Matter Linux Bridge Example](#matter-linux-bridge-example)
     -   [Theory of Operation](#theory-of-operation)
+        -   [Dynamic Endpoints](#dynamic-endpoints)
+        -   [Limitations](#limitations)
+        -   [Bridge Implementation Example](#bridge-implementation-example)
     -   [Building](#building)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
 
@@ -45,10 +48,10 @@ defined:
     definition.
 
 -   All attributes defined with these macros will be configured as
-    `ATTRIBUTE_MASK_EXTERNAL_STORAGE` in the ZCL database and therefore will
-    rely on the application to maintain storage for the attribute. Consequently,
-    reads or writes to these attributes must be handled within the application
-    by the `emberAfExternalAttributeWriteCallback` and
+    `MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE` in the ZCL database and therefore
+    will rely on the application to maintain storage for the attribute.
+    Consequently, reads or writes to these attributes must be handled within the
+    application by the `emberAfExternalAttributeWriteCallback` and
     `emberAfExternalAttributeReadCallback` functions. See the bridge
     application's `main.cpp` for an example of this implementation.
 
@@ -147,33 +150,18 @@ is simulated with the value/label pair `"room"`/`[light name]`.
 
     -   [Optional] Plug USB Bluetooth dongle
 
-        -   Plug USB Bluetooth dongle and find its bluetooth device number. The
-            number after `hci` is the bluetooth device number, `1` in this
-            example.
+        -   Plug USB Bluetooth dongle and find its bluetooth controller selector
+            as described in
+            [Linux BLE Settings](/platforms/linux/ble_settings.md).
 
-            ```sh
-            $ hciconfig
-            hci1:	Type: Primary  Bus: USB
-                BD Address: 00:1A:7D:AA:BB:CC  ACL MTU: 310:10  SCO MTU: 64:8
-                UP RUNNING PSCAN ISCAN
-                RX bytes:20942 acl:1023 sco:0 events:1140 errors:0
-                TX bytes:16559 acl:1011 sco:0 commands:121 errors:0
+    -   Run Linux Bridge Example App
 
-            hci0:	Type: Primary  Bus: UART
-                BD Address: B8:27:EB:AA:BB:CC  ACL MTU: 1021:8  SCO MTU: 64:1
-                UP RUNNING PSCAN ISCAN
-                RX bytes:8609495 acl:14 sco:0 events:217484 errors:0
-                TX bytes:92185 acl:20 sco:0 commands:5259 errors:0
-            ```
+        ```sh
+        cd ~/connectedhomeip/examples/bridge-app/linux
+        sudo out/debug/chip-bridge-app --ble-controller [bluetooth controller number]
+        # In this example, the device we want to use is hci1
+        sudo out/debug/chip-bridge-app --ble-controller 1
+        ```
 
-        -   Run Linux Bridge Example App
-
-            ```sh
-            cd ~/connectedhomeip/examples/bridge-app/linux
-            sudo out/debug/chip-bridge-app --ble-device [bluetooth device number]
-            # In this example, the device we want to use is hci1
-            sudo out/debug/chip-bridge-app --ble-device 1
-            ```
-
-        -   Test the device using ChipDeviceController on your laptop /
-            workstation etc.
+    -   Test the device using ChipDeviceController on your laptop / workstation
+        etc.

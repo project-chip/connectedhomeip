@@ -26,6 +26,7 @@
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 
 #include <type_traits>
 #include <utility>
@@ -218,10 +219,11 @@ public:
         return *this;
     }
 
-    ~ScopedMemoryBufferWithSize() { mCount = 0; }
-
     // return the size as count of elements
     inline size_t AllocatedSize() const { return mCount; }
+
+    chip::Span<T> Span() { return chip::Span<T>(this->Get(), AllocatedSize()); }
+    chip::Span<const T> Span() const { return chip::Span<T>(this->Get(), AllocatedSize()); }
 
     void Free()
     {

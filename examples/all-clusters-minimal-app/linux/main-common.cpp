@@ -21,7 +21,6 @@
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/server/Server.h>
-#include <app/util/att-storage.h>
 #include <lib/support/CHIPMem.h>
 #include <new>
 #include <platform/PlatformManager.h>

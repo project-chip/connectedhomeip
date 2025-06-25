@@ -22,9 +22,7 @@ from asyncio.futures import Future
 from ctypes import CFUNCTYPE, POINTER, c_char_p, c_size_t, c_uint8, c_uint16, c_uint64, c_void_p, py_object
 from typing import Callable, Optional
 
-import chip
-from chip.native import PyChipError
-
+from ..native import GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChipError
 from . import BdxTransfer
 
 c_uint8_p = POINTER(c_uint8)
@@ -121,7 +119,7 @@ def _PrepareForBdxTransfer(future: Future, data: Optional[bytes]) -> PyChipError
 
     Returns the CHIP_ERROR result from the C++ side.
     '''
-    handle = chip.native.GetLibraryHandle()
+    handle = GetLibraryHandle()
     transaction = AsyncTransferObtainedTransaction(future=future, event_loop=asyncio.get_running_loop(), data=data)
 
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
@@ -163,7 +161,7 @@ def AcceptTransferAndReceiveData(transfer: c_void_p, dataReceivedClosure: Callab
 
     Returns an error if one is encountered while accepting the transfer.
     '''
-    handle = chip.native.GetLibraryHandle()
+    handle = GetLibraryHandle()
     complete_transaction = AsyncTransferCompletedTransaction(future=transferComplete, event_loop=asyncio.get_running_loop())
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(dataReceivedClosure))
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(complete_transaction))
@@ -184,7 +182,7 @@ def AcceptTransferAndSendData(transfer: c_void_p, data: bytearray, transferCompl
 
     Returns an error if one is encountered while accepting the transfer.
     '''
-    handle = chip.native.GetLibraryHandle()
+    handle = GetLibraryHandle()
     complete_transaction = AsyncTransferCompletedTransaction(future=transferComplete, event_loop=asyncio.get_running_loop())
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(complete_transaction))
     res = builtins.chipStack.Call(
@@ -200,17 +198,17 @@ async def RejectTransfer(transfer: c_void_p):
 
     Returns an error if one is encountered while rejecting the transfer.
     '''
-    handle = chip.native.GetLibraryHandle()
+    handle = GetLibraryHandle()
     return await builtins.chipStack.CallAsyncWithResult(
         lambda: handle.pychip_Bdx_RejectTransfer(transfer)
     )
 
 
 def Init():
-    handle = chip.native.GetLibraryHandle()
+    handle = GetLibraryHandle()
     # Uses one of the type decorators as an indicator for everything being initialized.
     if not handle.pychip_Bdx_ExpectBdxTransfer.argtypes:
-        setter = chip.native.NativeLibraryHandleMethodArguments(handle)
+        setter = NativeLibraryHandleMethodArguments(handle)
 
         setter.Set('pychip_Bdx_ExpectBdxTransfer',
                    PyChipError, [py_object])

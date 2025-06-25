@@ -238,8 +238,8 @@ class TC_ICDM_2_1(MatterBaseTest):
             uatHintInstructionDepedentBitmap = uat(
                 userActiveModeTriggerHint) & kUatInstructionDependentBitMask
 
-        asserts.assert_less_equal(
-            self.set_bits_count(uatHintInstructionDepedentBitmap), 1, "UserActiveModeTriggerHint has more than 1 bit that is dependent on the UserActiveModeTriggerInstruction")
+            asserts.assert_less_equal(
+                self.set_bits_count(uatHintInstructionDepedentBitmap), 1, "UserActiveModeTriggerHint has more than 1 bit that is dependent on the UserActiveModeTriggerInstruction")
 
         # Valdate UserActiveModeTriggerInstruction
         self.step(9)
@@ -268,7 +268,7 @@ class TC_ICDM_2_1(MatterBaseTest):
                 pattern = re.compile(r'^[0-9A-F]{6}$')
                 asserts.assert_true(pattern.match(userActiveModeTriggerInstruction),
                                     "UserActiveModeTriggerInstruction is not in the correct format for the associated UserActiveModeTriggerHint")
-        else:
+        elif self.check_pics("ICDM.S.A0006"):
             # Check if the UserActiveModeTriggerInstruction was required
             asserts.assert_false(uatHintInstructionDepedentBitmap in kUatInstructionMandatoryBitMask,
                                  "UserActiveModeTriggerHint requires the UserActiveModeTriggerInstruction")
