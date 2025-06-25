@@ -34,16 +34,16 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import json
 import logging
 import time
-import json
 from typing import Any, Optional
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.interaction_model import Status, InteractionModelError
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main, AttributeMatcher, AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback)
+from chip.interaction_model import InteractionModelError, Status
+from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback,
+                                         MatterBaseTest, TestStep, async_test_body, default_matter_test_main)
 from mobly import asserts
 
 
