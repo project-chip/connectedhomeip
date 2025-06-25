@@ -35,7 +35,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from random import randrange
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
