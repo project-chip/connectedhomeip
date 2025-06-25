@@ -48,7 +48,7 @@ from typing import Optional
 import chip.clusters as Clusters
 import nest_asyncio
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.event_attribute_reporting import AttributeCallback
 from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, default_matter_test_main,
                                          has_command, run_if_endpoint_matches)
 from chip.testing.pics import accepted_cmd_pics_str
@@ -594,7 +594,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
                                  "Expected CONSTRAINT_ERROR for SetVIDVerificationStatement with VIDVerificationStatement too large")
 
         with test_step(9, description="Establish a subscription to Operational Credentials cluster on endpoint 0 from TH1 fabric client, with MinIntervalFloor=0, MaxIntervalCeiling=30"):
-            attrib_listener = ClusterAttributeChangeAccumulator(opcreds)
+            attrib_listener = AttributeCallback(expected_cluster=opcreds)
             await attrib_listener.start(th1_dev_ctrl, th1_dut_node_id, endpoint=0, min_interval_sec=0, max_interval_sec=30)
 
         with test_step(10, description="Invoke SetVIDVerificationStatement with maximum-sized VVSC and VIDVerificationStatement present and setting VID to 0x6a01 on TH2's fabric, outside fail-safe. Verify VIDVerificationStatement, VVSC and VID updates are correct. Verify subscription received the updated values."):

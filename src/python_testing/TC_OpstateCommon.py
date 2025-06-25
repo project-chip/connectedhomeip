@@ -27,7 +27,7 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator, EventCallback
+from chip.testing.event_attribute_reporting import AttributeCallback, EventCallback
 from chip.testing.matter_testing import TestStep
 from mobly import asserts
 
@@ -1254,7 +1254,7 @@ class TC_OPSTATE_BASE():
         # Note that this does a subscribe-all instead of subscribing only to the CountdownTime attribute.
         # To-Do: Update the TP to subscribe-all.
         self.step(2)
-        sub_handler = ClusterAttributeChangeAccumulator(cluster)
+        sub_handler = AttributeCallback(expected_cluster=cluster)
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint)
 
         self.step(3)
