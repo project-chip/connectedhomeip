@@ -17,11 +17,11 @@
 
 import builtins
 import logging
+from typing import TYPE_CHECKING
 
 import chip
 from chip.ChipStack import ChipStack
 from chip.storage import PersistentStorage
-from typing import TYPE_CHECKING
 
 logger = logging.getLogger("matter.python_testing")
 logger.setLevel(logging.INFO)
