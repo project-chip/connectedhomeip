@@ -377,6 +377,8 @@ void ZoneMgmtServer::HandleCreateTwoDCartesianZone(HandlerContext & ctx,
         return;
     }
 
+    VerifyOrReturn(mZones.size() < mMaxZones, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+
     VerifyOrReturn(mUserDefinedZonesCount < mMaxUserDefinedZones,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted));
 
@@ -413,13 +415,13 @@ void ZoneMgmtServer::HandleCreateTwoDCartesianZone(HandlerContext & ctx,
     // TODO:1) Add the Duplicate check 2) Add Self-Intersecting check
 
     // Form the TwoDCartesianZoneStorage object
+    TwoDCartesianZoneStorage twoDCartZoneStorage;
+    twoDCartZoneStorage.Set(zoneToCreate.name, zoneToCreate.use, twoDCartVertices, zoneToCreate.color);
+
     // Call the delegate
-    status = mDelegate.CreateTwoDCartesianZone(zoneToCreate, zoneID);
+    status = mDelegate.CreateTwoDCartesianZone(twoDCartZoneStorage, zoneID);
     if (status == Status::Success)
     {
-        TwoDCartesianZoneStorage twoDCartZoneStorage;
-        twoDCartZoneStorage.Set(zoneToCreate.name, zoneToCreate.use, twoDCartVertices, zoneToCreate.color);
-
         ZoneInformationStorage zoneInfo;
         zoneInfo.Set(zoneID, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, twoDCartZoneStorage);
 
@@ -497,13 +499,13 @@ void ZoneMgmtServer::HandleUpdateTwoDCartesianZone(HandlerContext & ctx,
 
     // TODO:1) Add the Duplicate check 2) Add Self-Intersecting check
 
+    TwoDCartesianZoneStorage twoDCartZoneStorage;
+    twoDCartZoneStorage.Set(zoneToUpdate.name, zoneToUpdate.use, twoDCartVertices, zoneToUpdate.color);
+
     // Call the delegate
-    status = mDelegate.UpdateTwoDCartesianZone(zoneID, zoneToUpdate);
+    status = mDelegate.UpdateTwoDCartesianZone(zoneID, twoDCartZoneStorage);
     if (status == Status::Success)
     {
-        TwoDCartesianZoneStorage twoDCartZoneStorage;
-        twoDCartZoneStorage.Set(zoneToUpdate.name, zoneToUpdate.use, twoDCartVertices, zoneToUpdate.color);
-
         ZoneInformationStorage zoneInfo;
         zoneInfo.Set(zoneID, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, twoDCartZoneStorage);
 
@@ -578,7 +580,7 @@ void ZoneMgmtServer::HandleCreateOrUpdateTrigger(HandlerContext & ctx,
     }
 
     // TODO: ZoneUse check after TwoDCartesianStruct lands in
-    // ZoneInformationStruct(Spec PR #11732)
+    // ZoneInformationStruct(SDK aligned with Spec PR #11732)
 
     // Call the delegate
     Status status = mDelegate.CreateOrUpdateTrigger(trigger);
