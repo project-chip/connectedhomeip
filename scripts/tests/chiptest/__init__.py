@@ -231,7 +231,9 @@ def _GetDarwinFrameworkToolUnsupportedTests() -> Set[str]:
         "Test_TC_SC_4_1",  # darwin-framework-tool does not support dns-sd commands.
         "Test_TC_SC_5_2",  # darwin-framework-tool does not support group commands.
         "Test_TC_S_2_3",  # darwin-framework-tool does not support group commands.
-        "Test_TC_THNETDIR_2_2",  # darwin-framework-tool does not support negative timed-invoke tests
+        "Test_TC_THNETDIR_2_2",  # darwin-framework-tool does not support negative timed-invoke tests (#39673)
+        "Test_TC_TBRM_2_2",  # darwin-framework-tool does not support negative timed-invoke tests (#39673)
+        "Test_TC_TBRM_2_3",  # darwin-framework-tool does not support negative timed-invoke tests (#39673)
     }
 
 
