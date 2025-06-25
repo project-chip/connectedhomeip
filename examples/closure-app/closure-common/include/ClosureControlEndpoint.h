@@ -157,7 +157,7 @@ public:
 
     /**
      * @brief Returns the endpoint ID associated with this Closure Control endpoint.
-     * 
+     *
      * @return EndpointId The endpoint ID.
      */
     EndpointId GetEndpoint() const { return mEndpoint; }
