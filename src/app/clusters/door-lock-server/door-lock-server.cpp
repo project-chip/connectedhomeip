@@ -559,9 +559,8 @@ void DoorLockServer::getUserCommandHandler(chip::app::CommandHandler * commandOb
                         "Found user in storage: "
                         "[userIndex=%d,userName=\"%s\",userStatus=%u,userType=%u"
                         ",credentialRule=%u,createdBy=%u,modifiedBy=%u]",
-                        userIndex, StringOf(user.userName).c_str(),
-                        to_underlying(user.userStatus), to_underlying(user.userType), to_underlying(user.credentialRule),
-                        user.createdBy, user.lastModifiedBy);
+                        userIndex, StringOf(user.userName).c_str(), to_underlying(user.userStatus), to_underlying(user.userType),
+                        to_underlying(user.credentialRule), user.createdBy, user.lastModifiedBy);
 
         response.userName.SetNonNull(user.userName);
         if (0xFFFFFFFFU != user.userUniqueId)
