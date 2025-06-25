@@ -112,9 +112,9 @@ public:
      * This method processes the SetTarget command, allowing the caller to specify a target position,
      * latch state, and speed for the closure panel at the given endpoint.
      *
-     * @param[in] pos      Optional target position as a percentage in hundredths (0-10000).
-     * @param[in] latch    Optional latch state (true to latch, false to unlatch).
-     * @param[in] speed    Optional speed setting as a ThreeLevelAutoEnum value.
+     * @param[in] position  Optional target position as a percentage in hundredths (0-10000).
+     * @param[in] latch     Optional latch state (true to latch, false to unlatch).
+     * @param[in] speed     Optional speed setting as a ThreeLevelAutoEnum value.
      * @param[in] endpointId The endpoint identifier for the closure panel.
      *
      * @return chip::Protocols::InteractionModel::Status
@@ -122,10 +122,10 @@ public:
      *         or an appropriate error status otherwise.
      */
     chip::Protocols::InteractionModel::Status OnSetTargetCommand(
-                        const chip::Optional<chip::Percent100ths> & pos, 
+                        const chip::Optional<chip::Percent100ths> & position, 
                         const chip::Optional<bool> & latch, 
                         const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
-                        chip::EndpointId endpointId);
+                        const chip::EndpointId endpointId);
 
     /**
      * @brief Sets the current action being performed by the closure device.
@@ -149,10 +149,12 @@ public:
 private:
     static ClosureManager sClosureMgr;
     osTimerId_t mClosureTimer;
+
     bool isCalibrationInProgress = false;
     bool isMoveToInProgress = false;
     bool isStopInProgress = false;
     bool isSetTargetInProgress = false;
+
     Action_t mCurrentAction      = Action_t::INVALID_ACTION;
     chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
 
