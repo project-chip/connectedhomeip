@@ -120,16 +120,6 @@ public:
      * @brief Handles the completion of a calibration action.
      *
      * This method is called when the calibration process is finished.
-     * It should update the internal state of the closure control endpoint to reflect the
-     * completion of the calibration action, resets the countdown timer and generates
-     * a motion completed event.
-     */
-    void OnCalibrateActionComplete();
-
-    /**
-     * @brief Handles the completion of a calibration action.
-     *
-     * This method is called when the calibration process is finished.
      * It should update the internal state of the closure dimension endpoint to reflect
      * the completion of the calibration action, resets the countdown timer and generates
      * a motion completed event.
@@ -159,15 +149,6 @@ private:
     ClosureDimensionDelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
-
-    /**
-     * @brief Updates the target state to match the current state.
-     *
-     * This method synchronizes the target state variable with the current state,
-     * ensuring that any changes in the current state are reflected in the target state.
-     * Typically used to reset or align the target state after a stop action.
-     */
-    void UpdateTargetStateFromCurrentState();
 };
 
 } // namespace ClosureDimension

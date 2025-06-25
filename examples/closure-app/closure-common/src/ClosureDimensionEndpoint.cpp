@@ -67,9 +67,8 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
 
 void ClosureDimensionEndpoint::OnStopMotionActionComplete()
 {
-    // When the stop motion action is complete, we update the target state to match the current state.
-    // This ensures that the target reflects the last known position and state of the closure dimension.
-    UpdateTargetStateFromCurrentState();
+    VerifyOrReturn(mLogic.SetTarget(DataModel::NullNullable) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set target to null in OnStopMotionActionComplete"));
 }
 
 void ClosureDimensionEndpoint::OnStopCalibrateActionComplete()
@@ -93,35 +92,4 @@ void ClosureDimensionEndpoint::OnCalibrateActionComplete()
 void ClosureDimensionEndpoint::OnMoveToActionComplete()
 {
     // This function should handle closure dimension state updation after MoveTo Action.
-}
-
-void ClosureDimensionEndpoint::UpdateTargetStateFromCurrentState()
-{
-    DataModel::Nullable<GenericCurrentStateStruct> currentState;
-
-    VerifyOrReturn(mLogic.GetCurrentState(currentState) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to get current state in UpdateTargetStateFromCurrentState"));
-
-    if (currentState.IsNull())
-    {
-        VerifyOrReturn(mLogic.SetTarget(DataModel::NullNullable) == CHIP_NO_ERROR,
-                       ChipLogError(AppServer, "Failed to set target to null in UpdateTargetStateFromCurrentState"));
-        return;
-    }
-
-    DataModel::Nullable<GenericTargetStruct> target;
-    VerifyOrReturn(mLogic.GetTarget(target) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to get target in UpdateTargetStateFromCurrentState"));
-
-    if (target.IsNull())
-    {
-        target.SetNonNull(GenericTargetStruct());
-    }
-
-    target.Value().position = currentState.Value().position;
-    target.Value().latch    = currentState.Value().latch;
-    target.Value().speed    = currentState.Value().speed;
-
-    VerifyOrReturn(mLogic.SetTarget(target) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to set target in UpdateTargetStateFromCurrentState"));
 }
