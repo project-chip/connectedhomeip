@@ -252,7 +252,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             if attributes.OverallCurrentState.attribute_id in attribute_list:
                 overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
                 logging.info(f"OverallCurrentState: {overall_current_state}")
-                if overall_current_state == None:
+                if overall_current_state is None:
                     logging.error("OverallCurrentState is None")
 
                 CurrentLatch = overall_current_state.latch
@@ -267,7 +267,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             if attributes.LatchControlModes.attribute_id in attribute_list:
                 LatchControlModes = await self.read_clctrl_attribute_expect_success(endpoint, attributes.LatchControlModes)
                 logging.info(f"LatchControlModes: {LatchControlModes}")
-                if LatchControlModes == None:
+                if LatchControlModes is None:
                     logging.error("LatchControlModes is None")
             else:
                 asserts.assert_true(False, "LatchControlModes attribute is not supported.")
@@ -351,7 +351,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             if attributes.OverallCurrentState.attribute_id in attribute_list:
                 overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
                 logging.info(f"OverallCurrentState: {overall_current_state}")
-                if overall_current_state == None:
+                if overall_current_state is None:
                     logging.error("OverallCurrentState is None")
 
                 CurrentPosition = overall_current_state.position
@@ -568,7 +568,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             if attributes.OverallCurrentState.attribute_id in attribute_list:
                 overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
                 logging.info(f"OverallCurrentState: {overall_current_state}")
-                if overall_current_state == None:
+                if overall_current_state is None:
                     logging.error("OverallCurrentState is None")
 
                 asserts.assert_in(overall_current_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum,
