@@ -471,8 +471,6 @@ JNI_METHOD(void, setServiceResolveListener)
         // Save the java listener (for later use)
         mJListenerObject     = env->NewWeakGlobalRef(jListenerObject);
         jclass listenerClass = env->GetObjectClass(jListenerObject);
-
-        jclass listenerClass = env->GetObjectClass(jListenerObject);
         if (listenerClass != nullptr)
         {
             mServiceResolveListener =
@@ -489,5 +487,4 @@ JNI_METHOD(void, setServiceResolveListener)
             env->ExceptionClear();
         }
     }
-}
 }
