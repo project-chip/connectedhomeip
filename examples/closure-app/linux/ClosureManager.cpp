@@ -131,7 +131,11 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
 
 chip::Protocols::InteractionModel::Status ClosureManager::OnStopCommand()
 {
-    // Add logic to handle the Stop command
+    // Cancel any existing timer for closure action
+    DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
+    mCurrentAction     = ClosureAction::kStopAction;
+    mCurrentEndpointId = kClosureEndpoint1;
+    HandleClosureActionComplete(mCurrentAction);
     return Status::Success;
 }
 
@@ -175,7 +179,7 @@ void ClosureManager::HandleClosureActionTimer(System::Layer * layer, void * aApp
         instance.HandleCalibrateActionComplete();
         break;
     case ClosureAction::kStopAction:
-        // Add logic to handle Stop action completion
+        // This will never be called as Stop action is made synchronous
         break;
     case ClosureAction::kMoveToAction:
         // Add logic to handle MoveTo action completion
