@@ -319,7 +319,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
                     cmd=Clusters.Objects.ClosureDimension.Commands.Step(
                         direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease,
                         numberOfSteps=1,
-                        speed=Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh
+                        speed=Globals.Enums.ThreeLevelAutoEnum.kHigh
                     ),
                     endpoint=endpoint
                 )
@@ -332,13 +332,13 @@ class TC_CLDIM_4_1(MatterBaseTest):
             expected_position = max_position - step_value
             asserts.assert_equal(target_state.position, expected_position, "TargetState Position is not updated correctly")
 
-            asserts.assert_equal(target_state.speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh,
+            asserts.assert_equal(target_state.speed, Globals.Enums.ThreeLevelAutoEnum.kHigh,
                                  "TargetState Speed is not High")
 
             # STEP 5d: Wait for CurrentState to be updated
             self.step("5d")
             sub_handler.await_all_expected_report_matches(
-                expected_matchers=[current_position_and_speed_matcher(max_position - step_value, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kHigh)], timeout_sec=timeout)
+                expected_matchers=[current_position_and_speed_matcher(max_position - step_value, Globals.Enums.ThreeLevelAutoEnum.kHigh)], timeout_sec=timeout)
 
         # STEP 6a: If Speed Feature is not supported, skip step 6b to 6d
         self.step("6a")
@@ -356,7 +356,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
                     cmd=Clusters.Objects.ClosureDimension.Commands.Step(
                         direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease,
                         numberOfSteps=1,
-                        speed=Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kAuto
+                        speed=Globals.Enums.ThreeLevelAutoEnum.kAuto
                     ),
                     endpoint=endpoint
                 )
@@ -369,13 +369,13 @@ class TC_CLDIM_4_1(MatterBaseTest):
             expected_position = max_position
             asserts.assert_equal(target_state.position, expected_position, "TargetState Position is not updated correctly")
 
-            asserts.assert_equal(target_state.speed, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kAuto,
+            asserts.assert_equal(target_state.speed, Globals.Enums.ThreeLevelAutoEnum.kAuto,
                                  "TargetState Speed is not Auto")
 
             # STEP 6d: Wait for CurrentState to be updated
             self.step("6d")
             sub_handler.await_all_expected_report_matches(
-                expected_matchers=[current_position_and_speed_matcher(max_position, Clusters.ClosureDimension.Enums.ThreeLevelAutoEnum.kAuto)], timeout_sec=timeout)
+                expected_matchers=[current_position_and_speed_matcher(max_position, Globals.Enums.ThreeLevelAutoEnum.kAuto)], timeout_sec=timeout)
 
         # STEP 7a: Send Step command to decrease position by 1 step
         self.step("7a")
