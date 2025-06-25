@@ -182,16 +182,22 @@ void ClosureControlEndpoint::OnStopMotionActionComplete()
     // and the closure is not fully closed or fully opened.
     auto position = MakeOptional(DataModel::MakeNullable(PositioningEnum::kPartiallyOpened));
 
+    // Set the OverallState latch to False as motion was in progress and latch will be disengaged.
+    auto latch = MakeOptional(DataModel::MakeNullable(false));
+
     DataModel::Nullable<GenericOverallState> overallState;
     mLogic.GetOverallState(overallState);
+
     if (overallState.IsNull())
     {
-        overallState.SetNonNull(GenericOverallState(position, NullOptional, NullOptional, NullOptional));
+        overallState.SetNonNull(GenericOverallState(position, latch, NullOptional, NullOptional));
     }
     else
     {
         overallState.Value().positioning = position;
+        overallState.Value().latch       = latch;
     }
+
     VerifyOrReturn(mLogic.SetOverallState(overallState) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to set overall state in OnStopMotionActionComplete"));
 
@@ -221,37 +227,6 @@ void ClosureControlEndpoint::OnCalibrateActionComplete()
 void ClosureControlEndpoint::OnMoveToActionComplete()
 {
     // This function should handle closure control state updation after completion of Motion Action.
-}
-
-TargetPositionEnum ClosureControlEndpoint::MapCurrentPositionToTargetPosition(PositioningEnum positioning)
-{
-    TargetPositionEnum targetPosition = TargetPositionEnum::kUnknownEnumValue;
-
-    switch (positioning)
-    {
-    case PositioningEnum::kFullyClosed:
-        targetPosition = TargetPositionEnum::kCloseInFull;
-        break;
-    case PositioningEnum::kFullyOpened:
-        targetPosition = TargetPositionEnum::kOpenInFull;
-        break;
-    case PositioningEnum::kPartiallyOpened:
-        targetPosition = TargetPositionEnum::kUnknownEnumValue;
-        break;
-    case PositioningEnum::kOpenedForPedestrian:
-        targetPosition = TargetPositionEnum::kPedestrian;
-        break;
-    case PositioningEnum::kOpenedForVentilation:
-        targetPosition = TargetPositionEnum::kVentilation;
-        break;
-    case PositioningEnum::kOpenedAtSignature:
-        targetPosition = TargetPositionEnum::kSignature;
-        break;
-    default:
-        ChipLogDetail(AppServer, "Unknown PositioningEnum value: %d", static_cast<int>(positioning));
-        break;
-    }
-    return targetPosition;
 }
 
 void ClosureControlEndpoint::UpdateTargetStateFromCurrentState()
@@ -320,4 +295,35 @@ void ClosureControlEndpoint::UpdateTargetStateFromCurrentState()
 
     VerifyOrReturn(mLogic.SetOverallTarget(overallTarget) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to set overall target in UpdateTargetStateFromCurrentState"));
+}
+
+TargetPositionEnum ClosureControlEndpoint::MapCurrentPositionToTargetPosition(PositioningEnum positioning)
+{
+    TargetPositionEnum targetPosition = TargetPositionEnum::kUnknownEnumValue;
+
+    switch (positioning)
+    {
+    case PositioningEnum::kFullyClosed:
+        targetPosition = TargetPositionEnum::kCloseInFull;
+        break;
+    case PositioningEnum::kFullyOpened:
+        targetPosition = TargetPositionEnum::kOpenInFull;
+        break;
+    case PositioningEnum::kPartiallyOpened:
+        targetPosition = TargetPositionEnum::kUnknownEnumValue;
+        break;
+    case PositioningEnum::kOpenedForPedestrian:
+        targetPosition = TargetPositionEnum::kPedestrian;
+        break;
+    case PositioningEnum::kOpenedForVentilation:
+        targetPosition = TargetPositionEnum::kVentilation;
+        break;
+    case PositioningEnum::kOpenedAtSignature:
+        targetPosition = TargetPositionEnum::kSignature;
+        break;
+    default:
+        ChipLogDetail(AppServer, "Unknown PositioningEnum value: %d", static_cast<int>(positioning));
+        break;
+    }
+    return targetPosition;
 }
