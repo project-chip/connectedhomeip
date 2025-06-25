@@ -12,19 +12,19 @@ namespace Clusters {
 namespace WebRTCTransportRequestor {
 namespace Commands {
 namespace Offer {
-inline constexpr CommandId Id = 0x00000001;
+inline constexpr CommandId Id = 0x00000000;
 } // namespace Offer
 
 namespace Answer {
-inline constexpr CommandId Id = 0x00000002;
+inline constexpr CommandId Id = 0x00000001;
 } // namespace Answer
 
 namespace ICECandidates {
-inline constexpr CommandId Id = 0x00000003;
+inline constexpr CommandId Id = 0x00000002;
 } // namespace ICECandidates
 
 namespace End {
-inline constexpr CommandId Id = 0x00000004;
+inline constexpr CommandId Id = 0x00000003;
 } // namespace End
 
 } // namespace Commands

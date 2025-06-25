@@ -76,6 +76,7 @@ def generate_vid_verification_statement(fabric_index: int) -> bytes:
 
 class TC_RR_1_1(MatterBaseTest):
     def setup_class(self):
+        super().setup_class()
         self._pseudo_random_generator = random.Random(1234)
         self._subscriptions = []
 
@@ -83,6 +84,7 @@ class TC_RR_1_1(MatterBaseTest):
         logging.info("Teardown: shutting down all subscription to avoid racy callbacks")
         for subscription in self._subscriptions:
             subscription.Shutdown()
+        super().teardown_class()
 
     @async_test_body
     async def test_TC_RR_1_1(self):
@@ -149,6 +151,10 @@ class TC_RR_1_1(MatterBaseTest):
         asserts.assert_greater_equal(capability_minima.caseSessionsPerFabric, 3)
 
         fabric_table_entries_to_check: dict[int, FabricTableEntryToCheck] = {}
+        await self._populate_wildcard()
+        supports_vid_verification = Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement.command_id in self.stored_global_wildcard.attributes[
+            0][Clusters.OperationalCredentials][Clusters.OperationalCredentials.Attributes.AcceptedCommandList]
+        logging.info(f"Device supports VID verification: {supports_vid_verification}")
 
         # Step 1: Commission 5 fabrics with maximized NOC chains. 1a and 1b have already been completed at this time.
         logging.info(f"Step 1: use existing fabric to configure new fabrics so that total is {num_fabrics_to_commission} fabrics")
@@ -198,10 +204,14 @@ class TC_RR_1_1(MatterBaseTest):
         asserts.assert_not_equal(commissioned_fabric_count, 1, "TH Error: failed to add fabric for testing TH.")
 
         # Step 1c - Set VIDVerificationStatement for initial fabric.
-        logging.info("Step 1c, Set VIDVerificationStatmeent for initial fabric")
         current_fabric_index = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
-        vid_verification_statement = generate_vid_verification_statement(current_fabric_index)
-        await self.send_single_cmd(cmd=Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement(VIDVerificationStatement=vid_verification_statement))
+        vid_verification_statement = b''
+        if supports_vid_verification:
+            logging.info("Step 1c, Set VIDVerificationStatmeent for initial fabric")
+            vid_verification_statement = generate_vid_verification_statement(current_fabric_index)
+            await self.send_single_cmd(cmd=Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement(VIDVerificationStatement=vid_verification_statement))
+        else:
+            logging.info("Skipping VID verification as this is not supported on the device")
 
         fabric_table_entries_to_check[current_fabric_index] = FabricTableEntryToCheck(
             fabric_id=dev_ctrl.fabricId, node_id=self.dut_node_id, vid_verifification_statement=vid_verification_statement, root_public_key=dev_ctrl.rootPublicKeyBytes)
@@ -246,8 +256,10 @@ class TC_RR_1_1(MatterBaseTest):
             fabric_index = await self.read_single_attribute_check_success(dev_ctrl=new_admin_ctrl, node_id=new_node_id, cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
 
             # Set VIDVerification Statement after joining the fabric.
-            vid_verification_statement = generate_vid_verification_statement(fabric_index)
-            await self.send_single_cmd(dev_ctrl=new_admin_ctrl, node_id=new_node_id, cmd=Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement(VIDVerificationStatement=vid_verification_statement))
+            vid_verification_statement = b''
+            if supports_vid_verification:
+                vid_verification_statement = generate_vid_verification_statement(fabric_index)
+                await self.send_single_cmd(dev_ctrl=new_admin_ctrl, node_id=new_node_id, cmd=Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement(VIDVerificationStatement=vid_verification_statement))
 
             fabric_table_entries_to_check[fabric_index] = FabricTableEntryToCheck(
                 fabric_id=new_admin_ctrl.fabricId, node_id=new_node_id, vid_verifification_statement=vid_verification_statement, root_public_key=new_admin_ctrl.rootPublicKeyBytes)
@@ -291,9 +303,9 @@ class TC_RR_1_1(MatterBaseTest):
 
         for fabric in fabric_table:
             expected_entry = fabric_table_entries_to_check[fabric.fabricIndex]
-
-            asserts.assert_equal(fabric.VIDVerificationStatement, expected_entry.vid_verifification_statement,
-                                 f"VID Verification statement for FabricIndex {fabric.fabricIndex} must be correct")
+            if supports_vid_verification:
+                asserts.assert_equal(fabric.VIDVerificationStatement, expected_entry.vid_verifification_statement,
+                                     f"VID Verification statement for FabricIndex {fabric.fabricIndex} must be correct")
             asserts.assert_equal(fabric.nodeID, expected_entry.node_id,
                                  f"Node ID for FabricIndex {fabric.fabricIndex} must be correct")
             asserts.assert_equal(fabric.fabricID, expected_entry.fabric_id,

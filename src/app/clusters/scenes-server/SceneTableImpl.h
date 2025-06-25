@@ -23,7 +23,6 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/CommonIterator.h>
 #include <lib/support/PersistentData.h>
 #include <lib/support/Pool.h>
 
@@ -61,7 +60,7 @@ public:
     DefaultSceneTableImpl() : Super(kMaxScenesPerFabric, kMaxScenesPerEndpoint) {}
     ~DefaultSceneTableImpl() { Finish(); };
 
-    CHIP_ERROR Init(PersistentStorageDelegate * storage) override;
+    CHIP_ERROR Init(PersistentStorageDelegate & storage) override;
     void Finish() override;
 
     // Scene count

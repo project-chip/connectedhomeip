@@ -42,8 +42,7 @@ from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
 from chip.native import PyChipError
-from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
-                                                                       default_matter_test_main)
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from support_modules.cadmin_support import CADMINSupport
 

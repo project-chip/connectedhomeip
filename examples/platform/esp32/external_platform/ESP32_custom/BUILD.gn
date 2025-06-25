@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
@@ -24,11 +25,13 @@ declare_args() {
   chip_use_factory_data_provider = false
   chip_use_device_info_provider = false
   chip_config_software_version_number = 0
-  chip_enable_chipoble = true
-  chip_bt_nimble_enabled = true
-  chip_bt_bluedroid_enabled = true
+  chip_enable_chipoble = false
+  chip_bt_nimble_enabled = false
+  chip_bt_bluedroid_enabled = false
   chip_max_discovered_ip_addresses = 5
+  chip_enable_ble_controller = false
   chip_enable_route_hook = false
+  chip_memory_alloc_mode = "default"
 }
 
 buildconfig_header("custom_buildconfig") {
@@ -48,6 +51,7 @@ buildconfig_header("custom_buildconfig") {
     "CHIP_DEVICE_LAYER_TARGET_ESP32=1",
     "CHIP_DEVICE_LAYER_TARGET=ESP32_custom",
     "CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER=1",
+    "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_chipoble}",
     "BLE_PLATFORM_CONFIG_INCLUDE=<external_platform/ESP32_custom/BlePlatformConfig.h>",
     "CHIP_DEVICE_PLATFORM_CONFIG_INCLUDE=<external_platform/ESP32_custom/CHIPDevicePlatformConfig.h>",
     "CHIP_PLATFORM_CONFIG_INCLUDE=<external_platform/ESP32_custom/CHIPPlatformConfig.h>",
@@ -110,23 +114,46 @@ static_library("ESP32_custom") {
     "${chip_root}/src/platform:platform_base",
   ]
 
+  if (chip_config_memory_management == "platform") {
+    if (chip_memory_alloc_mode == "internal") {
+      sources += [ "CHIPMem-PlatformInternal.cpp" ]
+    } else if (chip_memory_alloc_mode == "external") {
+      sources += [ "CHIPMem-PlatformExternal.cpp" ]
+    } else {
+      sources += [ "CHIPMem-PlatformDefault.cpp" ]
+    }
+  }
+
+  if (chip_enable_ble) {
+    sources += [ "BLEManagerImpl.h" ]
+    if (chip_enable_ble_controller) {
+      sources += [ "ChipDeviceScanner.h" ]
+    }
+
+    if (chip_bt_nimble_enabled) {
+      sources += [ "nimble/BLEManagerImpl.cpp" ]
+      if (chip_enable_ble_controller) {
+        sources += [
+          "nimble/ChipDeviceScanner.cpp",
+          "nimble/blecent.h",
+          "nimble/misc.c",
+          "nimble/peer.c",
+        ]
+      }
+    }
+    if (chip_bt_bluedroid_enabled) {
+      sources += [ "bluedroid/BLEManagerImpl.cpp" ]
+      if (chip_enable_ble_controller) {
+        sources += [ "bluedroid/ChipDeviceScanner.cpp" ]
+      }
+    }
+  }
+
   if (chip_enable_ota_requestor) {
     sources += [
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
     ]
-  }
-
-  if (chip_enable_chipoble) {
-    sources += [ "BLEManagerImpl.h" ]
-  }
-
-  if (chip_bt_nimble_enabled) {
-    sources += [ "nimble/BLEManagerImpl.cpp" ]
-  }
-
-  if (chip_bt_bluedroid_enabled) {
-    sources += [ "bluedroid/BLEManagerImpl.cpp" ]
   }
 
   if (chip_enable_wifi) {

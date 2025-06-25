@@ -417,6 +417,26 @@ config("runtime_default") {
   if (sysroot != "") {
     cflags += [ "--sysroot=${sysroot}" ]
     ldflags += [ "--sysroot=${sysroot}" ]
+
+    if (is_clang && current_os == "linux" &&
+        (current_cpu == "arm" || current_cpu == "arm64")) {
+      # The sysroot for linux-arm* targets contains an incompatible libunwind that
+      # conflicts with the one from the LLVM toolchain.
+      #
+      # To solve this, we provide the direct path to the correct libunwind.a
+      # from the pigweed toolchain. This forces the linker to use this exact
+      # file, completely bypassing any library search paths for libunwind.
+
+      if (current_cpu == "arm64") {
+        ldflags += [ rebase_path(
+                "$pw_env_setup_CIPD_PIGWEED/lib/aarch64-unknown-linux-gnu/libunwind.a",
+                root_build_dir) ]
+      } else {  # arm
+        ldflags += [ rebase_path(
+                "$pw_env_setup_CIPD_PIGWEED/lib/armv7-unknown-linux-gnueabihf/libunwind.a",
+                root_build_dir) ]
+      }
+    }
   }
 
   cflags += runtime_library_cflags
@@ -676,5 +696,11 @@ config("link_as_needed") {
   # ld64.lld on clang used by Apple does not have a --as-needed option
   if (current_os != "mac" && current_os != "ios") {
     ldflags = [ "-Wl,--as-needed" ]
+  }
+}
+
+config("arc_default") {
+  if (current_os == "mac" || current_os == "ios") {
+    cflags = [ "-fobjc-arc" ]
   }
 }

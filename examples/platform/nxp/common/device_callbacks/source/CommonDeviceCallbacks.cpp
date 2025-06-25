@@ -173,14 +173,6 @@ void chip::NXP::App::CommonDeviceCallbacks::OnSessionEstablished(chip::DeviceLay
 #if CHIP_ENABLE_OPENTHREAD
 void chip::NXP::App::CommonDeviceCallbacks::OnComissioningComplete(const chip::DeviceLayer::ChipDeviceEvent * event)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    if (!ConnectivityMgr().IsWiFiStationConnected() && ConnectivityMgr().IsThreadProvisioned())
-    {
-        // Set WIFI cluster interface attribute to disable.
-        app::Clusters::NetworkCommissioning::Attributes::InterfaceEnabled::Set(0, 0);
-    }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
-
 #if CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
     /*
      * If a transceiver supporting a multiprotocol scenario is used, a check of the provisioning state is required,

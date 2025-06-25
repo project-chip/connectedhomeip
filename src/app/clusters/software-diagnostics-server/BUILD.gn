@@ -26,6 +26,21 @@ source_set("software-fault-listener") {
   public_configs = [ "${chip_root}/src:includes" ]
 }
 
-group("software-diagnostics-server") {
-  public_deps = [ ":software-fault-listener" ]
+source_set("software-diagnostics-server") {
+  sources = [
+    "software-diagnostics-cluster.h",
+    "software-diagnostics-logic.cpp",
+    "software-diagnostics-logic.h",
+  ]
+
+  public_deps = [
+    ":software-fault-listener",
+    "${chip_root}/src/app:attribute-access",
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/zzz_generated/app-common/clusters/SoftwareDiagnostics",
+  ]
+  public_configs = [ "${chip_root}/src:includes" ]
 }

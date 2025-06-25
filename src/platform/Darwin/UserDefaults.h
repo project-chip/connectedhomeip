@@ -23,8 +23,6 @@
 namespace chip {
 namespace Platform {
 
-std::optional<uint16_t> GetUserDefaultDnssdSRPTimeoutInMSecs();
-
 std::optional<System::Clock::Milliseconds16> GetUserDefaultBDXThrottleIntervalForThread();
 
 std::optional<uint8_t> GetUserDefaultBDXThreadFramesPerBlock();

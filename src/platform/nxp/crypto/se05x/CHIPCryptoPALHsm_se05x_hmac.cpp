@@ -61,7 +61,7 @@ CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const u
 
     VerifyOrReturnError(keyid != kKeyId_NotInitialized, CHIP_ERROR_HSM);
 
-    VerifyOrReturnError(se05x_sessionOpen() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(se05x_session_open() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(gex_sss_chip_ctx.ks.session != NULL, CHIP_ERROR_INTERNAL);
 
     sss_status_t status = sss_key_object_init(&keyObject, &gex_sss_chip_ctx.ks);

@@ -1232,6 +1232,18 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+ *
+ * If set to 1, the `Extension` attribute of the ACL Cluster will be enabled
+ * and supported. This attribute is optional and costly to implement. It is required by
+ * some device types, so some applications must enable it in their CHIPProjectConfig.h
+ * as an override.
+ */
+#ifndef CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 0
+#endif
+
+/**
  * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT
  *
  * Support flexible copy in the example access control implementation.

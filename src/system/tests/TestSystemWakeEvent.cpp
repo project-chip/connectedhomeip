@@ -36,7 +36,7 @@
 
 using namespace chip::System;
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
 namespace chip {
 namespace System {
@@ -151,4 +151,4 @@ TEST_F(TestSystemWakeEvent, TestClose)
 }
 } // namespace
 
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_DISPATCH

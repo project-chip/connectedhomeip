@@ -19,6 +19,7 @@
 #ifdef MATTER_DM_PLUGIN_CHANNEL_SERVER
 #include "ChannelManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/reporting/reporting.h>
 #include <app/util/config.h>
 
 #include <iostream>
@@ -28,6 +29,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Channel;
 using namespace chip::Uint8;
 
@@ -182,6 +184,7 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
         mCurrentChannel      = mChannels[iMatchedChannel];
         mCurrentChannelIndex = iMatchedChannel;
         helper.Success(response);
+        MatterReportingAttributeChangeCallback(mEndpoint, Channel::Id, Channel::Attributes::CurrentChannel::Id);
     }
 }
 
@@ -198,6 +201,7 @@ bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, c
             {
                 mCurrentChannelIndex = index;
                 mCurrentChannel      = channel;
+                MatterReportingAttributeChangeCallback(mEndpoint, Channel::Id, Channel::Attributes::CurrentChannel::Id);
                 return true;
             }
         }
@@ -221,6 +225,7 @@ bool ChannelManager::HandleSkipChannel(const int16_t & count)
 
     mCurrentChannelIndex = static_cast<uint16_t>(newChannelIndex);
     mCurrentChannel      = mChannels[mCurrentChannelIndex];
+    MatterReportingAttributeChangeCallback(mEndpoint, Channel::Id, Channel::Attributes::CurrentChannel::Id);
     return true;
 }
 

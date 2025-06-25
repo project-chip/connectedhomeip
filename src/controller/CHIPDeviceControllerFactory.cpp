@@ -197,6 +197,10 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
                                                         ,
                                                         Transport::WiFiPAFListenParameters()
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+                                                            ,
+                                                        Transport::NfcListenParameters(nullptr)
+#endif
                                                             ));
 
     // TODO(#16231): All the new'ed state above/below in this method is never properly released or null-checked!

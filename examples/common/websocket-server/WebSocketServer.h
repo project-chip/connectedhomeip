@@ -30,10 +30,12 @@ class WebSocketServer : public WebSocketServerDelegate
 public:
     CHIP_ERROR Run(chip::Optional<uint16_t> port, WebSocketServerDelegate * delegate);
     void Send(const char * msg);
+    void Stop();
 
     bool OnWebSocketMessageReceived(char * msg) override;
 
 private:
     bool mRunning;
+    struct lws_context * mContext       = nullptr;
     WebSocketServerDelegate * mDelegate = nullptr;
 };

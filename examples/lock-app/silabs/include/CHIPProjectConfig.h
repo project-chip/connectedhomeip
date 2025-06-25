@@ -137,3 +137,8 @@ static constexpr uint8_t kNumCredentialTypes         = 6;
  * Number of CredentialStructs attached to a user.
  */
 #define DOOR_LOCK_USER_CREDENTIALS_BUFFER_LENGTH SilabsDoorLockConfig::ResourceRanges::kMaxCredentialSize
+
+// Enable `Extension` attribute of ACL Cluster as required by door locks
+#ifndef CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
+#endif

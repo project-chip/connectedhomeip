@@ -78,6 +78,7 @@ public:
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
     CHIP_ERROR EndpointUniqueID(EndpointId endpointId, MutableCharSpan & epUniqueId) override;
 #endif
+    CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) override;
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;

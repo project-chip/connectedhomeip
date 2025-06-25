@@ -137,7 +137,7 @@ void Instance::SetCookTimeSec(uint32_t cookTimeSec)
 
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    ChipLogError(Zcl, "Microwave Oven Control: Reading");
+    ChipLogDetail(Zcl, "Microwave Oven Control: Reading");
     switch (aPath.mAttributeId)
     {
     case MicrowaveOvenControl::Attributes::CookTime::Id:

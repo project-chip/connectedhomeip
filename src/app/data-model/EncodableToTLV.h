@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/data-model/Encode.h>
+#include <app/data-model/FabricScoped.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
 
@@ -32,8 +33,13 @@ class EncodableToTLV
 public:
     virtual ~EncodableToTLV() = default;
 
-    virtual CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex aAccessingFabricIndex) const = 0;
-    virtual CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const                                    = 0;
+    virtual CHIP_ERROR EncodeTo(FabricAwareTLVWriter & writer, TLV::Tag tag) const
+    {
+        // By default, just ignore the fabric index.  Implementations that care
+        // about it should override as needed.
+        return EncodeTo(writer.mTLVWriter, tag);
+    }
+    virtual CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const = 0;
 };
 
 /// An `EncodableToTLV` that uses `DataModel::Encode` to encode things in one call.
@@ -51,11 +57,6 @@ public:
     /// LIFETIME NOTE: uses a reference to value, so value must live longer than
     ///                this object.
     EncodableType(const T & value) : mValue(value) {}
-
-    CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex aAccessingFabricIndex) const override
-    {
-        return DataModel::EncodeForRead(writer, tag, aAccessingFabricIndex, mValue);
-    }
 
     CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override { return DataModel::Encode(writer, tag, mValue); }
 

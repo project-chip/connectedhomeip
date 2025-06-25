@@ -30,8 +30,10 @@ from typing import Any, Optional
 import chip.clusters as Clusters
 import chip.clusters.ClusterObjects
 import chip.tlv
+from chip.ChipDeviceCtrl import ChipDeviceController
 from chip.clusters.Attribute import ValueDecodeFailure
 from chip.testing.conformance import ConformanceException
+from chip.testing.matter_testing import MatterTestConfig, ProblemNotice
 from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
 from mobly import asserts
 
@@ -125,6 +127,18 @@ def MatterTlvToJson(tlv_data: dict[int, Any]) -> dict[str, Any]:
 
 
 class BasicCompositionTests:
+    # These attributes are initialized/provided by the inheriting test class (MatterBaseTest)
+    # or its setup process. Providing type hints here for mypy.
+    default_controller: ChipDeviceController
+    matter_test_config: MatterTestConfig
+    user_params: dict[str, Any]
+    dut_node_id: int
+    problems: list[ProblemNotice]
+    endpoints: dict[int, Any]  # Wildcard read result
+    endpoints_tlv: dict[int, Any]  # Wildcard read result (raw TLV)
+    xml_clusters: dict[int, Any]
+    xml_device_types: dict[int, Any]
+
     def get_code(self, dev_ctrl):
         created_codes = []
         for idx, discriminator in enumerate(self.matter_test_config.discriminators):
@@ -154,7 +168,7 @@ class BasicCompositionTests:
 
     async def setup_class_helper(self, allow_pase: bool = True):
         dev_ctrl = self.default_controller
-        self.problems = []
+        self.problems: list[ProblemNotice] = []
 
         dump_device_composition_path: Optional[str] = self.user_params.get("dump_device_composition_path", None)
 
@@ -181,7 +195,7 @@ class BasicCompositionTests:
             except asyncio.CancelledError:
                 pass
 
-        wildcard_read = (await dev_ctrl.Read(node_id, [()]))
+        wildcard_read = (await dev_ctrl.Read(node_id, [()]))  # type: ignore[list-item]
 
         # ======= State kept for use by all tests =======
         # All endpoints in "full object" indexing format
@@ -204,23 +218,33 @@ class BasicCompositionTests:
 
     def get_test_name(self) -> str:
         """Return the function name of the caller. Used to create logging entries."""
-        return sys._getframe().f_back.f_code.co_name
+        # Handle potential None from sys._getframe().f_back
+        frame = sys._getframe().f_back
+        if frame is None:
+            # This case is highly unlikely in normal execution but satisfies mypy
+            return "<unknown_test>"
+        return frame.f_code.co_name
 
-    def fail_current_test(self, msg: Optional[str] = None):
+    def fail_current_test(self, msg: Optional[str] = None) -> typing.NoReturn:  # type: ignore[misc]
         if not msg:
             # Without a message, just log the last problem seen
             asserts.fail(msg=self.problems[-1].problem)
         else:
             asserts.fail(msg)
 
-    def _get_dm(self) -> PrebuiltDataModelDirectory:
+    def _get_dm(self) -> PrebuiltDataModelDirectory:  # type: ignore[return]
+        # mypy doesn't understand that asserts.fail always raises a TestFailure
         try:
             spec_version = self.endpoints[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
         except KeyError:
             asserts.fail(
                 "Specification Version not found on device - ensure device bas a basic information cluster on EP0 supporting Specification Version")
         try:
-            return dm_from_spec_version(spec_version)
+            dm = dm_from_spec_version(spec_version)
+            if dm is None:
+                # Handle case where dm_from_spec_version returns None, although the current implementation raises an exception.
+                asserts.fail("Could not determine data model from specification version.")
+            return dm
         except ConformanceException as e:
             asserts.fail(f"Unable to identify specification version: {e}")
 

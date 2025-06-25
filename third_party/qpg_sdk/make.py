@@ -20,4 +20,4 @@
 import subprocess
 import sys
 
-subprocess.run(['make', '-j'] + sys.argv[1:], check=True)
+subprocess.run(['make'] + sys.argv[1:], check=True)

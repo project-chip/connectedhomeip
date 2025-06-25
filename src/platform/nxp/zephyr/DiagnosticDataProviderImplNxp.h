@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,17 +28,6 @@
 namespace chip {
 namespace DeviceLayer {
 
-struct WiFiStatistics
-{
-    uint32_t beaconLostCount        = 0;
-    uint32_t beaconRxCount          = 0;
-    uint32_t packetMulticastRxCount = 0;
-    uint32_t packetMulticastTxCount = 0;
-    uint32_t packetUnicastRxCount   = 0;
-    uint32_t packetUnicastTxCount   = 0;
-    uint64_t overrunCount           = 0;
-};
-
 class DiagnosticDataProviderImplNxp : public DiagnosticDataProviderImpl
 {
 public:
@@ -63,7 +52,6 @@ public:
 
 private:
     DiagnosticDataProviderImplNxp() = default;
-    WiFiStatistics mOldStats;
 };
 
 DiagnosticDataProvider & GetDiagnosticDataProviderImpl();

@@ -32,12 +32,11 @@ inline constexpr DataModel::AttributeEntry
     kMetadataEntry(MPTZPresets::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace MPTZPresets
-namespace DPTZRelativeMove {
+namespace DPTZStreams {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(DPTZRelativeMove::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+    kMetadataEntry(DPTZStreams::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
-} // namespace DPTZRelativeMove
+} // namespace DPTZStreams
 namespace ZoomMax {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ZoomMax::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);

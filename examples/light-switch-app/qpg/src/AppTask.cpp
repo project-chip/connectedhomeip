@@ -22,7 +22,6 @@
 using namespace ::chip;
 
 #include "gpSched.h"
-#include "qvIO.h"
 
 #include "AppConfig.h"
 #include "AppEvent.h"
@@ -32,7 +31,6 @@ using namespace ::chip;
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/TestEventTriggerDelegate.h>
-#include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/server/Dnssd.h>
@@ -43,9 +41,9 @@ using namespace ::chip;
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
-#if defined(QORVO_QPINCFG_ENABLE)
+#include "ButtonHandler.h"
+#include "StatusLed.h"
 #include "qPinCfg.h"
-#endif // QORVO_QPINCFG_ENABLE
 
 #include <inet/EndPointStateOpenThread.h>
 
@@ -68,6 +66,7 @@ using namespace ::chip::DeviceLayer;
 #define SWITCH_BUTTON_PRESSED 1
 #define SWITCH_BUTTON_UNPRESSED 0
 
+#define APP_TASK_NAME "APP"
 #define APP_TASK_STACK_SIZE (2 * 1024)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
@@ -79,7 +78,7 @@ TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
 
 bool sIsThreadProvisioned     = false;
-bool sIsThreadEnabled         = false;
+bool sIsThreadAttached        = false;
 bool sHaveBLEConnections      = false;
 bool sIsBLEAdvertisingEnabled = false;
 bool sIsMultipressOngoing     = false;
@@ -98,6 +97,9 @@ StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+const uint8_t StatusLedGpios[] = QPINCFG_STATUS_LED;
+const ButtonConfig_t buttons[] = QPINCFG_BUTTONS;
 } // namespace
 
 AppTask AppTask::sAppTask;
@@ -206,23 +208,20 @@ void AppTask::InitServer(intptr_t arg)
 {
     static chip::CommonCaseDeviceServerInitParams initParams;
 
-    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
-
     chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
     nativeParams.lockCb                = LockOpenThreadTask;
     nativeParams.unlockCb              = UnlockOpenThreadTask;
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 
-    // Use GenericFaultTestEventTriggerHandler to inject faults
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
-    static GenericFaultTestEventTriggerHandler sFaultTestEventTriggerHandler{};
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
-    VerifyOrDie(sTestEventTriggerDelegate.AddHandler(&sFaultTestEventTriggerHandler) == CHIP_NO_ERROR);
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider        = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
+
+    gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     chip::Server::GetInstance().Init(initParams);
 
@@ -246,16 +245,16 @@ void AppTask::OpenCommissioning(intptr_t arg)
 
 CHIP_ERROR AppTask::Init()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    const qResult_t res = qPinCfg_Init(NULL);
 
-#if defined(QORVO_QPINCFG_ENABLE)
-    qResult_t res = Q_OK;
-    res           = qPinCfg_Init(NULL);
     if (res != Q_OK)
     {
         ChipLogError(NotSpecified, "qPinCfg_Init failed: %d", res);
     }
-#endif // QORVO_QPINCFG_ENABLE
+
+    StatusLed_Init(StatusLedGpios, Q_ARRAY_SIZE(StatusLedGpios), true);
+
     PlatformMgr().AddEventHandler(MatterEventHandler, 0);
 
     ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
@@ -269,11 +268,10 @@ CHIP_ERROR AppTask::Init()
 
     SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
 
-    SwitchMgr().Init();
     UpdateClusterState();
 
     // Setup button handler
-    qvIO_SetBtnCallback(ButtonEventHandler);
+    ButtonHandler_Init(buttons, Q_ARRAY_SIZE(buttons), BUTTON_LOW, ButtonEventHandler);
 
     DeviceLayer::PlatformMgr().ScheduleWork(InitBindingManager);
 
@@ -282,7 +280,7 @@ CHIP_ERROR AppTask::Init()
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
     sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
-    sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
+    sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
     sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
     sIsBLEAdvertisingEnabled = ConnectivityMgr().IsBLEAdvertisingEnabled();
     UpdateLEDs();
@@ -326,7 +324,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
 
     switch (btnIdx)
     {
-    case APP_FUNCTION1_BUTTON: {
+    case APP_LEVEL_BUTTON: {
         if (!btnPressed)
         {
             return;
@@ -336,7 +334,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
         button_event.Handler = SwitchMgr().LevelHandler;
         break;
     }
-    case APP_FUNCTION2_SWITCH: {
+    case APP_SWITCH_BUTTON: {
         if (!btnPressed)
         {
             ChipLogDetail(NotSpecified, "Switch button released");
@@ -390,7 +388,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
         }
         break;
     }
-    case APP_FUNCTION3_BUTTON: {
+    case APP_COLOR_BUTTON: {
         if (!btnPressed)
         {
             return;
@@ -399,7 +397,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
         button_event.Handler = SwitchMgr().ColorHandler;
         break;
     }
-    case APP_FUNCTION4_BUTTON: {
+    case APP_TOGGLE_BUTTON: {
         if (!btnPressed)
         {
             return;
@@ -409,7 +407,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
         button_event.Handler = SwitchMgr().ToggleHandler;
         break;
     }
-    case APP_FUNCTION5_BUTTON: {
+    case APP_FUNCTION_BUTTON: {
         button_event.Handler = FunctionHandler;
         break;
     }
@@ -449,7 +447,7 @@ void AppTask::LongPressTimeoutHandler(chip::System::Layer * aLayer, void * aAppS
     ChipLogDetail(NotSpecified, "LongPressTimeoutHandler");
 
     // if the button is still pressed after threshold time, this is a LongPress, otherwise jsut ignore it
-    if (sSwitchButtonState == SWITCH_BUTTON_PRESSED)
+    if (sSwitchButtonState == SWITCH_BUTTON_PRESSED && sIsMultipressOngoing == false)
     {
         sLongPressDetected       = true;
         AppEvent longpress_event = {};
@@ -516,9 +514,9 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
         // Turn off all LEDs before starting blink to make sure blink is
         // co-ordinated.
-        qvIO_LedSet(SYSTEM_STATE_LED, false);
+        StatusLed_SetLed(SYSTEM_STATE_LED, false);
 
-        qvIO_LedBlink(SYSTEM_STATE_LED, 500, 500);
+        StatusLed_BlinkLed(SYSTEM_STATE_LED, 500, 500);
     }
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {
@@ -530,7 +528,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
 void AppTask::FunctionHandler(AppEvent * aEvent)
 {
-    if (aEvent->ButtonEvent.ButtonIdx != APP_FUNCTION5_BUTTON)
+    if (aEvent->ButtonEvent.ButtonIdx != APP_FUNCTION_BUTTON)
     {
         return;
     }
@@ -655,34 +653,34 @@ void AppTask::UpdateLEDs(void)
 {
     // If system has "full connectivity", keep the LED On constantly.
     //
-    // If thread and service provisioned, but not attached to the thread network
-    // yet OR no connectivity to the service OR subscriptions are not fully
+    // If thread attached to the thread network and service provisioned
+    // OR no connectivity to the service OR subscriptions are not fully
     // established THEN blink the LED Off for a short period of time.
     //
     // If the system has ble connection(s) uptill the stage above, THEN blink
     // the LEDs at an even rate of 100ms.
     //
     // Otherwise, turn the LED OFF.
-    if (sIsThreadProvisioned && sIsThreadEnabled)
+    if (sIsThreadProvisioned && sIsThreadAttached)
     {
-        qvIO_LedSet(SYSTEM_STATE_LED, true);
+        StatusLed_SetLed(SYSTEM_STATE_LED, true);
     }
-    else if (sIsThreadProvisioned && !sIsThreadEnabled)
+    else if (sIsThreadProvisioned && !sIsThreadAttached)
     {
-        qvIO_LedBlink(SYSTEM_STATE_LED, 950, 50);
+        StatusLed_BlinkLed(SYSTEM_STATE_LED, 950, 50);
     }
     else if (sHaveBLEConnections)
     {
-        qvIO_LedBlink(SYSTEM_STATE_LED, 100, 100);
+        StatusLed_BlinkLed(SYSTEM_STATE_LED, 100, 100);
     }
     else if (sIsBLEAdvertisingEnabled)
     {
-        qvIO_LedBlink(SYSTEM_STATE_LED, 50, 50);
+        StatusLed_BlinkLed(SYSTEM_STATE_LED, 50, 50);
     }
     else
     {
         // not commissioned yet
-        qvIO_LedSet(SYSTEM_STATE_LED, false);
+        StatusLed_SetLed(SYSTEM_STATE_LED, false);
     }
 }
 
@@ -697,7 +695,7 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
     }
 
     case DeviceEventType::kThreadConnectivityChange: {
-        sIsThreadEnabled = (event->ThreadConnectivityChange.Result == kConnectivity_Established);
+        sIsThreadAttached = (event->ThreadConnectivityChange.Result == kConnectivity_Established);
         UpdateLEDs();
         break;
     }

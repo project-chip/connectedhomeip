@@ -37,3 +37,6 @@
 
 // -------------------- Test Configuration --------------------
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
+
+// Enable `Extension` attribute of ACL Cluster as required by door locks
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1

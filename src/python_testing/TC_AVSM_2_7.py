@@ -38,6 +38,7 @@
 import logging
 
 import chip.clusters as Clusters
+from chip.clusters import Globals
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
@@ -65,8 +66,8 @@ class TC_AVSM_2_7(MatterBaseTest):
             ),
             TestStep(
                 3,
-                "TH reads RankedVideoStreamPrioritiesList attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
-                "Store this value in aRankedStreamPriorities.",
+                "TH reads StreamUsagePriorities attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
+                "Store this value in aStreamUsagePriorities.",
             ),
             TestStep(
                 4,
@@ -90,7 +91,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             ),
             TestStep(
                 8,
-                "TH sets StreamUsage from aRankedStreamPriorities. TH sets VideoCodec, MinResolution, MaxResolution, MinBitRate, MaxBitRate conforming with aRateDistortionTradeOffPoints. TH sets MinFrameRate, MaxFrameRate conforming with aVideoSensorParams. TH sets the MinFragmentLen and MaxFragmentLen = 4000. TH sends the VideoStreamAllocate command with these arguments.",
+                "TH sets StreamUsage from aStreamUsagePriorities. TH sets VideoCodec, MinResolution, MaxResolution, MinBitRate, MaxBitRate conforming with aRateDistortionTradeOffPoints. TH sets MinFrameRate, MaxFrameRate conforming with aVideoSensorParams. TH sets the MinKeyFrameInterval and MaxKeyFrameInterval = 4000. TH sends the VideoStreamAllocate command with these arguments.",
                 "DUT responds with VideoStreamAllocateResponse command with a valid VideoStreamID.",
             ),
             TestStep(
@@ -100,8 +101,8 @@ class TC_AVSM_2_7(MatterBaseTest):
             ),
             TestStep(
                 10,
-                "TH sends the VideoStreamAllocate command with the same arguments from step 7 except StreamUsage set to a value not in aRankedStreamPriorities.",
-                "DUT responds with a CONSTRAINT_ERROR status code.",
+                "TH sends the VideoStreamAllocate command with the same arguments from step 7 except StreamUsage set to a value not in aStreamUsagePriorities.",
+                "DUT responds with a INVALID IN STATE status code.",
             ),
             TestStep(
                 11,
@@ -125,7 +126,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             ),
             TestStep(
                 15,
-                "TH sends the VideoStreamAllocate command with the same arguments from step 7 except MinFragmentLen > MaxFragmentLen.",
+                "TH sends the VideoStreamAllocate command with the same arguments from step 7 except MinKeyFrameInterval > MaxKeyFrameInterval.",
                 "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
         ]
@@ -148,6 +149,10 @@ class TC_AVSM_2_7(MatterBaseTest):
         vdoSupport = aFeatureMap & cluster.Bitmaps.Feature.kVideo
         asserts.assert_equal(vdoSupport, cluster.Bitmaps.Feature.kVideo, "Video Feature is not supported.")
 
+        # Check for watermark and OSD features
+        watermark = True if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) != 0 else None
+        osd = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
+
         self.step(2)
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
@@ -156,10 +161,10 @@ class TC_AVSM_2_7(MatterBaseTest):
         asserts.assert_equal(len(aAllocatedVideoStreams), 0, "The number of allocated video streams in the list is not 0")
 
         self.step(3)
-        aRankedStreamPriorities = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.RankedVideoStreamPrioritiesList
+        aStreamUsagePriorities = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
-        logger.info(f"Rx'd RankedVideoStreamPrioritiesList: {aRankedStreamPriorities}")
+        logger.info(f"Rx'd StreamUsagePriorities: {aStreamUsagePriorities}")
 
         self.step(4)
         aRateDistortionTradeOffPoints = await self.read_single_attribute_check_success(
@@ -187,12 +192,12 @@ class TC_AVSM_2_7(MatterBaseTest):
 
         self.step(8)
         try:
-            asserts.assert_greater(len(aRankedStreamPriorities), 0, "RankedVideoStreamPrioritiesList is empty")
+            asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
             asserts.assert_greater(len(aRateDistortionTradeOffPoints), 0, "RateDistortionTradeOffPoints is empty")
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
-                streamUsage=aRankedStreamPriorities[0],
+                streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=15,  # An acceptable value for min frame rate
+                minFrameRate=30,  # An acceptable value for min frame rate
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewport,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -200,8 +205,10 @@ class TC_AVSM_2_7(MatterBaseTest):
                 ),
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                minFragmentLen=4000,
-                maxFragmentLen=4000,
+                minKeyFrameInterval=4000,
+                maxKeyFrameInterval=4000,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             logger.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")
@@ -222,13 +229,13 @@ class TC_AVSM_2_7(MatterBaseTest):
         self.step(10)
         try:
             notSupportedStreamUsage = next(
-                (e for e in cluster.Enums.StreamUsageEnum if e not in aRankedStreamPriorities),
-                cluster.Enums.StreamUsageEnum.kUnknownEnumValue,
+                (e for e in Globals.Enums.StreamUsageEnum if e not in aStreamUsagePriorities),
+                Globals.Enums.StreamUsageEnum.kUnknownEnumValue,
             )
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=notSupportedStreamUsage,
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=15,  # An acceptable value for min frame rate
+                minFrameRate=30,  # An acceptable value for min frame rate
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewport,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -236,26 +243,28 @@ class TC_AVSM_2_7(MatterBaseTest):
                 ),
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                minFragmentLen=4000,
-                maxFragmentLen=4000,
+                minKeyFrameInterval=4000,
+                maxKeyFrameInterval=4000,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             asserts.assert_true(
                 False,
-                "Unexpected success when expecting CONSTRAIN_ERROR due to StreamUsage set to a value not in aRankedStreamPriorities",
+                "Unexpected success when expecting INVALID_IN_STATE due to StreamUsage set to a value not in aStreamUsagePriorities",
             )
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
-                Status.ConstraintError,
-                "Unexpected error returned when expecting CONSTRAIN_ERROR due to StreamUsage set to a value not in aRankedStreamPriorities",
+                Status.InvalidInState,
+                "Unexpected error returned when expecting InvalidInState due to StreamUsage set to a value not in aStreamUsagePriorities",
             )
             pass
 
         self.step(11)
         try:
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
-                streamUsage=aRankedStreamPriorities[0],
+                streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
                 minFrameRate=0,
                 maxFrameRate=aVideoSensorParams.maxFPS,
@@ -265,8 +274,10 @@ class TC_AVSM_2_7(MatterBaseTest):
                 ),
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                minFragmentLen=4000,
-                maxFragmentLen=4000,
+                minKeyFrameInterval=4000,
+                maxKeyFrameInterval=4000,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             asserts.assert_true(
@@ -283,7 +294,7 @@ class TC_AVSM_2_7(MatterBaseTest):
         self.step(12)
         try:
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
-                streamUsage=aRankedStreamPriorities[0],
+                streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
                 minFrameRate=16,
                 maxFrameRate=15,
@@ -293,8 +304,10 @@ class TC_AVSM_2_7(MatterBaseTest):
                 ),
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                minFragmentLen=4000,
-                maxFragmentLen=4000,
+                minKeyFrameInterval=4000,
+                maxKeyFrameInterval=4000,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             asserts.assert_true(False, "Unexpected success when expecting CONSTRAIN_ERROR due to MinFrameRate > MaxFrameRate")
@@ -309,9 +322,9 @@ class TC_AVSM_2_7(MatterBaseTest):
         self.step(13)
         try:
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
-                streamUsage=aRankedStreamPriorities[0],
+                streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=15,  # An acceptable value for min frame rate
+                minFrameRate=30,  # An acceptable value for min frame rate
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewport,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -319,8 +332,10 @@ class TC_AVSM_2_7(MatterBaseTest):
                 ),
                 minBitRate=0,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                minFragmentLen=4000,
-                maxFragmentLen=4000,
+                minKeyFrameInterval=4000,
+                maxKeyFrameInterval=4000,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             asserts.assert_true(
@@ -337,9 +352,9 @@ class TC_AVSM_2_7(MatterBaseTest):
         self.step(14)
         try:
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
-                streamUsage=aRankedStreamPriorities[0],
+                streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=15,  # An acceptable value for min frame rate
+                minFrameRate=30,  # An acceptable value for min frame rate
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewport,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -347,8 +362,10 @@ class TC_AVSM_2_7(MatterBaseTest):
                 ),
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate + 1,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                minFragmentLen=4000,
-                maxFragmentLen=4000,
+                minKeyFrameInterval=4000,
+                maxKeyFrameInterval=4000,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             asserts.assert_true(False, "Unexpected success when expecting CONSTRAIN_ERROR due to MinBitRate > MaxBitRate")
@@ -363,9 +380,9 @@ class TC_AVSM_2_7(MatterBaseTest):
         self.step(15)
         try:
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
-                streamUsage=aRankedStreamPriorities[0],
+                streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=15,  # An acceptable value for min frame rate
+                minFrameRate=30,  # An acceptable value for min frame rate
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewport,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -373,16 +390,19 @@ class TC_AVSM_2_7(MatterBaseTest):
                 ),
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate + 1,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                minFragmentLen=4000 + 1,
-                maxFragmentLen=4000,
+                minKeyFrameInterval=4000 + 1,
+                maxKeyFrameInterval=4000,
+                watermarkEnabled=watermark,
+                OSDEnabled=osd
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-            asserts.assert_true(False, "Unexpected success when expecting CONSTRAIN_ERROR due to MinFragmentLen > MaxFragmentLen")
+            asserts.assert_true(
+                False, "Unexpected success when expecting CONSTRAIN_ERROR due to MinKeyFrameInterval > MaxKeyFrameInterval")
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
                 Status.ConstraintError,
-                "Unexpected error returned when expecting CONSTRAIN_ERROR due to MinFragmentLen > MaxFragmentLen",
+                "Unexpected error returned when expecting CONSTRAIN_ERROR due to MinKeyFrameInterval > MaxKeyFrameInterval",
             )
             pass
 

@@ -176,7 +176,7 @@ RgbColor_t CTToRgb(CtColor_t ct)
         }
         else
         {
-            b = 138.5177312231 * log(ctCentiKelvin - 10) - 305.0447927307;
+            b = 138.5177312231f * logf(ctCentiKelvin - 10) - 305.0447927307f;
         }
     }
     rgb.r = (uint8_t) clamp(r, 0, 255);

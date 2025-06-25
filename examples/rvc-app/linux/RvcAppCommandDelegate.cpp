@@ -73,6 +73,22 @@ void RvcAppCommandHandler::HandleCommand(intptr_t context)
     {
         self->OnDockedHandler();
     }
+    else if (name == "EmptyingDustBin")
+    {
+        self->OnEmptyingDustBinHandler();
+    }
+    else if (name == "CleaningMop")
+    {
+        self->OnCleaningMopHandler();
+    }
+    else if (name == "FillingWaterTank")
+    {
+        self->OnFillingWaterTankHandler();
+    }
+    else if (name == "UpdatingMaps")
+    {
+        self->OnUpdatingMapsHandler();
+    }
     else if (name == "ChargerFound")
     {
         self->OnChargerFoundHandler();
@@ -148,6 +164,26 @@ void RvcAppCommandHandler::OnChargingHandler()
 void RvcAppCommandHandler::OnDockedHandler()
 {
     mRvcDevice->HandleDockedMessage();
+}
+
+void RvcAppCommandHandler::OnEmptyingDustBinHandler()
+{
+    mRvcDevice->HandleEmptyingDustBinMessage();
+}
+
+void RvcAppCommandHandler::OnCleaningMopHandler()
+{
+    mRvcDevice->HandleCleaningMopMessage();
+}
+
+void RvcAppCommandHandler::OnFillingWaterTankHandler()
+{
+    mRvcDevice->HandleFillingWaterTankMessage();
+}
+
+void RvcAppCommandHandler::OnUpdatingMapsHandler()
+{
+    mRvcDevice->HandleUpdatingMapsMessage();
 }
 
 void RvcAppCommandHandler::OnChargerFoundHandler()

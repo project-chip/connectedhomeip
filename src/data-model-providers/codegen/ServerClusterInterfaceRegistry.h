@@ -52,10 +52,16 @@ struct ServerClusterRegistration
 template <typename SERVER_CLUSTER>
 struct RegisteredServerCluster
 {
+    template <typename... Args>
+    RegisteredServerCluster(Args &&... args) : cluster(std::forward<Args>(args)...), registration(cluster)
+    {}
+
+    [[nodiscard]] constexpr ServerClusterRegistration & Registration() { return registration; }
+    [[nodiscard]] constexpr SERVER_CLUSTER & Cluster() { return cluster; }
+
+private:
     SERVER_CLUSTER cluster;
     ServerClusterRegistration registration;
-
-    RegisteredServerCluster() : registration(cluster) {}
 };
 
 /// Lazy-construction of a RegisteredServerCluster to allow at-runtime lifetime management

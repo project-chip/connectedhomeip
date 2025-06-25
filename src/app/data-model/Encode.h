@@ -137,22 +137,6 @@ CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag, const X & x)
 /*
  * @brief
  *
- * A way to encode fabric-scoped structs for a write that omits encoding the containing fabric index field.
- */
-template <typename X,
-          typename std::enable_if_t<std::is_class<X>::value &&
-                                        std::is_same<decltype(std::declval<X>().EncodeForWrite(std::declval<TLV::TLVWriter &>(),
-                                                                                               std::declval<TLV::Tag>())),
-                                                     CHIP_ERROR>::value,
-                                    X> * = nullptr>
-CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, const X & x)
-{
-    return x.EncodeForWrite(writer, tag);
-}
-
-/*
- * @brief
- *
  * A way to encode fabric-scoped structs for a read that always encodes the containing fabric index field.
  *
  * An accessing fabric index must be passed in to permit including/omitting sensitive fields based on a match with the fabric index
@@ -169,28 +153,6 @@ template <typename X,
 CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex, const X & x)
 {
     return x.EncodeForRead(writer, tag, accessingFabricIndex);
-}
-
-/*
- * @brief
- *
- * This specific variant that encodes cluster objects (like non fabric-scoped structs, commands, events) to TLV
- * depends on the presence of an Encode method on the object. The signature of that method
- * is as follows:
- *
- * CHIP_ERROR <Object>::Encode(TLVWriter &writer, TLV::Tag tag) const;
- *
- *
- */
-template <typename X,
-          typename std::enable_if_t<
-              std::is_class<X>::value &&
-                  std::is_same<decltype(std::declval<X>().Encode(std::declval<TLV::TLVWriter &>(), std::declval<TLV::Tag>())),
-                               CHIP_ERROR>::value,
-              X> * = nullptr>
-CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex, const X & x)
-{
-    return x.Encode(writer, tag);
 }
 
 /*
@@ -289,6 +251,31 @@ CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex acce
 #endif // !defined(__clang__)
     return EncodeForRead(writer, tag, accessingFabricIndex, x.Value());
 #pragma GCC diagnostic pop
+}
+
+// Should this be declared in a separate header?
+struct FabricAwareTLVWriter
+{
+    FabricAwareTLVWriter(TLV::TLVWriter & writer, FabricIndex accessingFabricIndex) :
+        mTLVWriter(writer), mAccessingFabricIndex(accessingFabricIndex)
+    {}
+
+    operator TLV::TLVWriter &() { return mTLVWriter; }
+
+    TLV::TLVWriter & mTLVWriter;
+    const FabricIndex mAccessingFabricIndex;
+};
+
+/**
+ * @brief
+ *
+ * Encodes a response command payload. This is a templated function to allow
+ * specializations to be created as needed to customize the behavior.
+ */
+template <typename PayloadType>
+CHIP_ERROR EncodeResponseCommandPayload(FabricAwareTLVWriter & writer, TLV::Tag tag, const PayloadType & payload)
+{
+    return payload.Encode(writer, tag);
 }
 
 } // namespace DataModel

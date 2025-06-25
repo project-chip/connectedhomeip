@@ -46,12 +46,26 @@ bool AVSettingsUserLevelManagementDelegate::CanChangeMPTZ()
     return true;
 }
 
-bool AVSettingsUserLevelManagementDelegate::IsValidVideoStreamID(uint16_t aVideoStreamID)
+void AVSettingsUserLevelManagementDelegate::VideoStreamAllocated(uint16_t aStreamID)
 {
-    // The server needs to verify that the provided Video Stream ID is valid and known and subject to digital modification
-    // The camera app needs to also have an instance of AV Stream Management, querying that to determine validity of the provided
-    // id.
-    return true;
+    // The app needs to invoke this whenever the AV Stream Manager allocates a video stream; this informs the server of the
+    // id that is now subject to DPTZ, and the default viewport of the device
+    Globals::Structs::ViewportStruct::Type viewport = { 0, 0, 1920, 1080 };
+    this->GetServer()->AddMoveCapableVideoStream(aStreamID, viewport);
+}
+
+void AVSettingsUserLevelManagementDelegate::VideoStreamDeallocated(uint16_t aStreamID)
+{
+    // The app needs to invoke this whenever the AV Stream Manager deallocates a video stream; this informs the server of the
+    // deallocated id that is now not subject to DPTZ
+    this->GetServer()->RemoveMoveCapableVideoStream(aStreamID);
+}
+
+void AVSettingsUserLevelManagementDelegate::DefaultViewportUpdated(Globals::Structs::ViewportStruct::Type aViewport)
+{
+    // The app needs to invoke this whenever the AV Stream Manager updates the device level default Viewport.  This informs
+    // the server of the new viewport that shall be appled to all known streams.
+    this->GetServer()->UpdateMoveCapableVideoStreams(aViewport);
 }
 
 Status AVSettingsUserLevelManagementDelegate::MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt,
@@ -99,7 +113,8 @@ Status AVSettingsUserLevelManagementDelegate::MPTZRemovePreset(uint8_t aPreset)
     return Status::Success;
 }
 
-Status AVSettingsUserLevelManagementDelegate::DPTZSetViewport(uint16_t aVideoStreamID, Structs::ViewportStruct::Type aViewport)
+Status AVSettingsUserLevelManagementDelegate::DPTZSetViewport(uint16_t aVideoStreamID,
+                                                              Globals::Structs::ViewportStruct::Type aViewport)
 {
     // The Cluster implementation has ensured that the videoStreamID represents a valid stream.
     // The application needs to interact with its instance of AVStreamManagement to access the stream, validate the viewport
@@ -109,12 +124,17 @@ Status AVSettingsUserLevelManagementDelegate::DPTZSetViewport(uint16_t aVideoStr
 }
 
 Status AVSettingsUserLevelManagementDelegate::DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
-                                                               Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta)
+                                                               Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta,
+                                                               Globals::Structs::ViewportStruct::Type & aViewport)
 {
     // The Cluster implementation has ensured that the videoStreamID represents a valid stream.
-    // The application needs to interact with its instance of AVStreamManagement to access the stream, validate the viewport
-    // and set the new values for the viewpoort based on the pixel movement requested
+    // The application needs to interact with its instance of AVStreamManagement to access the stream, validate
+    // new dimensions after application of the deltas, and set the new values for the viewport based on the pixel movement
+    // requested
+    // The passed in viewport is empty, and needs to be populated by the delegate with the value of the viewport after
+    // applying all deltas within the constraints of the sensor.
     //
+    aViewport = { 0, 0, 1920, 1080 };
     return Status::Success;
 }
 
@@ -124,9 +144,9 @@ CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadMPTZPresets(std::vector<MP
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadDPTZRelativeMove(std::vector<uint16_t> dptzRelativeMove)
+CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadDPTZStreams(std::vector<DPTZStruct> & dptzStreams)
 {
-    dptzRelativeMove.clear();
+    dptzStreams.clear();
     return CHIP_NO_ERROR;
 }
 
@@ -156,7 +176,7 @@ void emberAfCameraAvSettingsUserLevelManagementClusterInitCallback(chip::Endpoin
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPosition,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kMaxPresets,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPresets,
-        CameraAvSettingsUserLevelManagement::OptionalAttributes::kDptzRelativeMove,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kDptzStreams,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kZoomMax,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMin,
         CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMax,

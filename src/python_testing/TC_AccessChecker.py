@@ -55,6 +55,7 @@ from enum import Enum, auto
 from typing import Optional
 
 import chip.clusters as Clusters
+from chip.clusters.Attribute import ValueDecodeFailure
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
@@ -175,8 +176,8 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
         for cluster_id in all_clusters:
             location = ClusterPathLocation(endpoint_id=0, cluster_id=cluster_id)
             if cluster_id not in self.xml_clusters:
-                # TODO: Upgrade from warning when the spec XML stabilizes
-                self.record_warning(test_name="Access Checker", location=location, problem="Cluster not present in spec data")
+                self.record_error(test_name="Access Checker", location=location, problem="Cluster not present in spec data")
+                self.success = False
                 continue
             if cluster_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES:
                 self.record_error(test_name="Access Checker", location=location, problem="Unknown cluster")
@@ -188,8 +189,9 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             for attribute_id in attrs[cluster_id]:
                 location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
                 if attribute_id not in xml_cluster.attributes.keys():
-                    self.record_warning(test_name="Access Checker", location=location,
-                                        problem="Cluster attribute not found in spec XML")
+                    self.record_error(test_name="Access Checker", location=location,
+                                      problem="Cluster attribute not found in spec XML")
+                    self.success = False
                     continue
                 if attribute_id not in Clusters.ClusterObjects.ALL_ATTRIBUTES[cluster_id]:
                     self.record_error(test_name="Access Checker", location=location,
@@ -200,8 +202,9 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             for command_id in cmds[cluster_id]:
                 location = CommandPathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, command_id=command_id)
                 if command_id not in xml_cluster.accepted_commands.keys():
-                    self.record_warning(test_name="Access Checker", location=location,
-                                        problem="Cluster command not found in spec XML")
+                    self.record_error(test_name="Access Checker", location=location,
+                                      problem="Cluster command not found in spec XML")
+                    self.success = False
                     continue
                 if command_id not in Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id]:
                     self._record_error(test_name="Access Checker", location=location,
@@ -219,6 +222,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             logging.warn('WARNING: Skipping OTA cluster check for CI. THIS IS DISALLOWED FOR CERTIFICATION')
             return
 
+        logging.info(f'Testing commands on {xml_cluster.name} at privilege {privilege}')
         for command_id in checkable_commands(cluster_id, device_cluster_data, xml_cluster):
             spec_requires = xml_cluster.accepted_commands[command_id].privilege
             command = Clusters.ClusterObjects.ALL_ACCEPTED_COMMANDS[cluster_id][command_id]
@@ -229,6 +233,8 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                 # no side effects. Commands are checked with admin privilege in their cluster tests. The error that
                 # may be let through here is if the spec requires operate and the implementation requires admin.
                 continue
+            logging.info(
+                f'  Testing command {xml_cluster.accepted_commands[command_id].name} from cluster {xml_cluster.name} - at privilege {privilege}, requires {spec_requires}')
             try:
                 timed = None
                 if command.must_use_timed_invoke:
@@ -240,11 +246,15 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
                 self.record_error(test_name=name, location=location,
                                   problem=f"Unexpected success sending command {command} with privilege {privilege}")
                 self.success = False
+                logging.info('      Received unexpected SUCCESS')
             except InteractionModelError as e:
                 if e.status != Status.UnsupportedAccess:
                     self.record_error(test_name=name, location=location,
                                       problem=f'Unexpected error sending command {command} with privilege {privilege} - expected UNSUPPORTED_ACCESS, got {e.status}')
                     self.success = False
+                    logging.info(f'      Received unexpected error {e}')
+                else:
+                    logging.info('      Received expected error')
 
     async def _run_read_access_test_for_cluster_privilege(self, endpoint_id, cluster_id, device_cluster_data, xml_cluster: XmlCluster, privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum):
         # TODO: This assumes all attributes are readable. Which they are currently. But we don't have a general way to mark otherwise.
@@ -279,6 +289,11 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             # Because we read everything with admin, we should have this in the wildcard read
             # This will only not work if we end up with write-only attributes. We do not currently have any of these.
             val = wildcard_read.attributes[endpoint_id][cluster_class][attribute]
+            if isinstance(val, ValueDecodeFailure):
+                self.record_error(test_name=test_name, location=location,
+                                  problem=f"Attribute {attribute} returned a read error {val} - unable to write current value")
+                self.success = False
+                continue
             if isinstance(val, list):
                 # Use an empty list for writes in case the list is large and does not fit
                 val = []
@@ -355,8 +370,8 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
 
     def steps_TC_ACE_2_1(self):
         steps = [TestStep("precondition", "DUT is commissioned", is_commissioning=True),
-                 TestStep(1, "TH_commissioner performs a wildcard read"),
-                 TestStep(2, "TH_commissioner reads the ACL attribute"),
+                 TestStep(1, "TH_commissioner performs a wildcard read (done during test setup)"),
+                 TestStep(2, "TH_commissioner reads the ACL attribute (done during test setup)"),
                  TestStep(3, "Repeat steps 3a and 3b for each permission level")]
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
         privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]
@@ -376,8 +391,8 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
 
     def steps_TC_ACE_2_2(self):
         steps = [TestStep("precondition", "DUT is commissioned", is_commissioning=True),
-                 TestStep(1, "TH_commissioner performs a wildcard read"),
-                 TestStep(2, "TH_commissioner reads the ACL attribute"),
+                 TestStep(1, "TH_commissioner performs a wildcard read (done during test setup)"),
+                 TestStep(2, "TH_commissioner reads the ACL attribute (done during test setup)"),
                  TestStep(3, "TH_commissioner grants TH_second_controller admin permission"),
                  TestStep(4, "TH_second_controller performs a wildcard read"),
                  TestStep(5, "Repeat steps 5a and 5b for each permission level")]
@@ -399,8 +414,8 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
 
     def steps_TC_ACE_2_3(self):
         steps = [TestStep("precondition", "DUT is commissioned", is_commissioning=True),
-                 TestStep(1, "TH_commissioner performs a wildcard read"),
-                 TestStep(2, "TH_commissioner reads the ACL attribute"),
+                 TestStep(1, "TH_commissioner performs a wildcard read (done during test setup)"),
+                 TestStep(2, "TH_commissioner reads the ACL attribute (done during test setup)"),
                  TestStep(3, "Repeat steps 3a and 3b for each permission level")]
         enum = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
         privilege_enum = [p for p in enum if p != enum.kUnknownEnumValue]

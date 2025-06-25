@@ -16,8 +16,12 @@
  *    limitations under the License.
  */
 
+#if !defined(GP_APP_DIVERSITY_POWERCYCLECOUNTING)
+#error This application requires powercycle counting.
+#endif
+
 #include "gpSched.h"
-#include "qvIO.h"
+#include "powercycle_counting.h"
 
 #include "AppConfig.h"
 #include "AppEvent.h"
@@ -26,14 +30,19 @@
 
 #include <setup_payload/OnboardingCodesUtil.h>
 
+#include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
-#include <data-model-providers/codegen/Instance.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
+
+#include "ButtonHandler.h"
+#include "StatusLed.h"
+#include "qPinCfg.h"
 
 #include <inet/EndPointStateOpenThread.h>
 
@@ -52,11 +61,15 @@ using namespace ::chip::DeviceLayer;
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
+
+#define APP_TASK_NAME "APP"
 #define APP_TASK_STACK_SIZE (2 * 1024)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 #define SECONDS_IN_HOUR (3600)                                              // we better keep this 3600
 #define TOTAL_OPERATIONAL_HOURS_SAVE_INTERVAL_SECONDS (1 * SECONDS_IN_HOUR) // increment every hour
+
+#define NMBR_OF_RESETS_BLE_ADVERTISING (3)
 
 namespace {
 TaskHandle_t sAppTaskHandle;
@@ -67,6 +80,10 @@ bool sIsThreadEnabled         = false;
 bool sHaveBLEConnections      = false;
 bool sIsBLEAdvertisingEnabled = false;
 
+// NOTE! This key is for test/certification only and should not be available in production devices!
+uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                                                                                   0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+
 uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
 
 StaticQueue_t sAppEventQueueStruct;
@@ -75,6 +92,9 @@ StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+
+const uint8_t StatusLedGpios[] = QPINCFG_STATUS_LED;
+const ButtonConfig_t buttons[] = QPINCFG_BUTTONS;
 } // namespace
 
 AppTask AppTask::sAppTask;
@@ -175,7 +195,6 @@ void AppTask::InitServer(intptr_t arg)
 {
     static chip::CommonCaseDeviceServerInitParams initParams;
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
@@ -185,6 +204,11 @@ void AppTask::InitServer(intptr_t arg)
     nativeParams.unlockCb              = UnlockOpenThreadTask;
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+
+    static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
+    VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
+    (void) initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
     chip::Server::GetInstance().Init(initParams);
 
@@ -202,7 +226,15 @@ void AppTask::OpenCommissioning(intptr_t arg)
 
 CHIP_ERROR AppTask::Init()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    const qResult_t res = qPinCfg_Init(NULL);
+
+    if (res != Q_OK)
+    {
+        ChipLogError(NotSpecified, "qPinCfg_Init failed: %d", res);
+    }
+
+    StatusLed_Init(StatusLedGpios, Q_ARRAY_SIZE(StatusLedGpios), true);
 
     PlatformMgr().AddEventHandler(MatterEventHandler, 0);
 
@@ -226,7 +258,7 @@ CHIP_ERROR AppTask::Init()
     }
 
     // Setup button handler
-    qvIO_SetBtnCallback(ButtonEventHandler);
+    ButtonHandler_Init(buttons, Q_ARRAY_SIZE(buttons), BUTTON_LOW, ButtonEventHandler);
 
     // Log device configuration
     ConfigurationMgr().LogDeviceConfig();
@@ -302,7 +334,7 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, bool btnPressed)
         }
         break;
     }
-    case APP_FUNCTION5_BUTTON: {
+    case APP_FUNCTION_BUTTON: {
         /* In this example, this button is for triggering OTA or factory reset*/
         button_event.Handler = FunctionHandler;
         break;
@@ -381,9 +413,9 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
         // Turn off all LEDs before starting blink to make sure blink is
         // co-ordinated.
-        qvIO_LedSet(SYSTEM_STATE_LED, false);
+        StatusLed_SetLed(SYSTEM_STATE_LED, false);
 
-        qvIO_LedBlink(SYSTEM_STATE_LED, 500, 500);
+        StatusLed_BlinkLed(SYSTEM_STATE_LED, 500, 500);
     }
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {
@@ -395,7 +427,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
 void AppTask::FunctionHandler(AppEvent * aEvent)
 {
-    if (aEvent->ButtonEvent.ButtonIdx != APP_FUNCTION5_BUTTON)
+    if (aEvent->ButtonEvent.ButtonIdx != APP_FUNCTION_BUTTON)
     {
         return;
     }
@@ -510,24 +542,24 @@ void AppTask::UpdateLEDs(void)
     // Otherwise, turn the LED OFF.
     if (sIsThreadProvisioned && sIsThreadEnabled)
     {
-        qvIO_LedSet(SYSTEM_STATE_LED, true);
+        StatusLed_SetLed(SYSTEM_STATE_LED, true);
     }
     else if (sIsThreadProvisioned && !sIsThreadEnabled)
     {
-        qvIO_LedBlink(SYSTEM_STATE_LED, 950, 50);
+        StatusLed_BlinkLed(SYSTEM_STATE_LED, 950, 50);
     }
     else if (sHaveBLEConnections)
     {
-        qvIO_LedBlink(SYSTEM_STATE_LED, 100, 100);
+        StatusLed_BlinkLed(SYSTEM_STATE_LED, 100, 100);
     }
     else if (sIsBLEAdvertisingEnabled)
     {
-        qvIO_LedBlink(SYSTEM_STATE_LED, 50, 50);
+        StatusLed_BlinkLed(SYSTEM_STATE_LED, 50, 50);
     }
     else
     {
         // not commissioned yet
-        qvIO_LedSet(SYSTEM_STATE_LED, false);
+        StatusLed_SetLed(SYSTEM_STATE_LED, false);
     }
 }
 
@@ -568,4 +600,22 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent * event, intptr_t)
     default:
         break;
     }
+}
+
+extern "C" {
+void gpAppFramework_Reset_cbTriggerResetCountCompleted(void)
+{
+    uint8_t resetCount = gpAppFramework_Reset_GetResetCount();
+
+    ChipLogProgress(NotSpecified, "%d resets so far", resetCount);
+    if (resetCount >= NMBR_OF_RESETS_BLE_ADVERTISING)
+    {
+        // Open commissioning if no fabric was available
+        if (chip::Server::GetInstance().GetFabricTable().FabricCount() == 0)
+        {
+            ChipLogProgress(NotSpecified, "No fabrics, starting commissioning.");
+            AppTask::OpenCommissioning((intptr_t) 0);
+        }
+    }
+}
 }

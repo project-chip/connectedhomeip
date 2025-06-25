@@ -53,10 +53,14 @@ class TC_AVSUM_2_6(MatterBaseTest, AVSUMTestBase):
             TestStep(2, "Read the value of MaxPresets, fail if unsupported."),
             TestStep(3, "Read the value of MPTZPresets, fail if unsupported"),
             TestStep(4, "Send a MPTZRemovePreset for a value larger than MaxPresets, verify failure"),
-            TestStep(5, "If MPTZPresets is not empty, send MPTZRemovePreset for the first item in the list. Verify it has been removed. End the test case"),
-            TestStep(6, "If MPTZPresets is empty, via the MPTZSavePreset command, create a new saved preset with PresetID of MaxPresets, name of 'newpreset'"),
-            TestStep(7, "Read the value of MPTZPresets. Ensure it has an entry for a PresetID of MaxPresets with a name 'newpreset' that matches the saved MPTZPosition"),
-            TestStep(8, "Via MPTZRemovePreset remove the saved preset. Verify that this is no longer present in MPTZPresets. "),
+            TestStep(5, "If MPTZPresets is not empty, send MPTZRemovePreset for the first item in the list. Verify it has been removed. Otherwise skip to step 8."),
+            TestStep(6, "Read MPTZPresets, verify the entry has been removed."),
+            TestStep(7, "Repeat step 5, sending a MPTZRemovePreset command for the already removed preset. Verify failurre. End the test case."),
+            TestStep(8, "If MPTZPresets is empty, via the MPTZSavePreset command, create a new saved preset with PresetID of MaxPresets, name of 'newpreset'"),
+            TestStep(9, "Read the value of MPTZPresets. Ensure it has an entry for a PresetID of MaxPresets with a name 'newpreset' that matches the saved MPTZPosition"),
+            TestStep(10, "Via MPTZRemovePreset remove the saved preset."),
+            TestStep(11, "Read MPTZPresets, verify this is empty."),
+            TestStep(12, "Repeat step 10, sending a MPTZRemovePreset command for a PresetID of MaxPresets. Verify failure."),
         ]
         return steps
 
@@ -89,40 +93,54 @@ class TC_AVSUM_2_6(MatterBaseTest, AVSUMTestBase):
         self.step(4)
         await self.send_remove_preset_command(endpoint, max_presets_dut+1, expected_status=Status.ConstraintError)
 
-        self.step(5)
         if mptz_presets_dut:
             # Save the presetID of the first preset in the list
             presetID = mptz_presets_dut[0].presetID
 
+            self.step(5)
             # Remove that preset
             await self.send_remove_preset_command(endpoint, presetID)
 
             # Re-read the attribute
+            self.step(6)
             mptz_presets_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPresets)
             notFound = True
             for mptzpreset in mptz_presets_dut:
                 if mptzpreset.presetID == presetID:
                     notFound = False
                     break
-
             asserts.assert_true(notFound, "Preset not removed despite invocation of MPTZRemovePreset")
-            self.skip_all_remaining_steps(6)
+
+            # Repeat removal of already removed value, verify Not Found
+            self.step(7)
+            await self.send_remove_preset_command(endpoint, presetID, expected_status=Status.NotFound)
+
+            self.mark_all_remaining_steps_skipped(8)
             return
 
-        self.step(6)
+        self.skip_step(5)
+        self.skip_step(6)
+        self.skip_step(7)
+        self.step(8)
         # No existing values, create one and then make sure we can delete it
-        await self.send_save_presets_command(endpoint, name="newpreset", presetID=max_presets_dut)
+        await self.send_save_preset_command(endpoint, name="newpreset", presetID=max_presets_dut)
         mptz_presets_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPresets)
 
-        self.step(7)
+        self.step(9)
         # Verify the first entry is what we sent
         asserts.assert_equal(mptz_presets_dut[0].presetID, max_presets_dut, "Saved Preset ID does not natch the provided preset")
 
-        self.step(8)
+        self.step(10)
         # Remove and verify empty
         await self.send_remove_preset_command(endpoint, max_presets_dut)
         mptz_presets_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPresets)
+
+        self.step(11)
         asserts.assert_true(not mptz_presets_dut, "Added Preset not removed despite invocation of MPTZRemovePreset")
+
+        # Repeat removal of already removed value, verify Not Found
+        self.step(12)
+        await self.send_remove_preset_command(endpoint, max_presets_dut, expected_status=Status.NotFound)
 
 
 if __name__ == "__main__":

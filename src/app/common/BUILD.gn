@@ -26,7 +26,8 @@ source_set("attribute-type") {
 }
 
 source_set("global-ids") {
-  sources = [ "GlobalIds.h" ]
+  sources =
+      [ "${chip_root}/zzz_generated/app-common/clusters/shared/GlobalIds.h" ]
 
   deps = [ "${chip_root}/src/lib/core:types" ]
 }

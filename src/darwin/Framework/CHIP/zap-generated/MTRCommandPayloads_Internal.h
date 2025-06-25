@@ -2098,6 +2098,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRZoneManagementClusterCreateOrUpdateTriggerParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRZoneManagementClusterRemoveTriggerParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
 @interface MTRCameraAVStreamManagementClusterAudioStreamAllocateParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -2921,6 +2933,12 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRUnitTestingClusterGlobalEchoRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRUnitTestingClusterTestCheckCommandFlagsParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 

@@ -116,7 +116,6 @@ private:
     bool _IsWiFiStationProvisioned(void);
     void _ClearWiFiStationProvision(void);
     CHIP_ERROR _GetAndLogWiFiStatsCounters(void);
-    bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
 
@@ -219,11 +218,6 @@ inline bool ConnectivityManagerImpl::_IsWiFiAPApplicationControlled(void)
     return mWiFiAPMode == kWiFiAPMode_ApplicationControlled;
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-
-inline bool ConnectivityManagerImpl::_CanStartWiFiScan()
-{
-    return mWiFiStationState != kWiFiStationState_Connecting;
-}
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 

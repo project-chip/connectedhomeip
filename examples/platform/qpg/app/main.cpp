@@ -35,9 +35,12 @@
 #include "clearbox_testing_hooks.h"
 #endif
 
+#if defined(QPG6200)
+#include "gpNvm.h"
+#endif // QPG6200
+
 // Qorvo CHIP library
 #include "qvCHIP.h"
-#include "qvIO.h"
 
 // CHIP includes
 #include <lib/support/CHIPMem.h>
@@ -52,6 +55,12 @@
 #if defined(ENABLE_CHIP_SHELL) && ENABLE_CHIP_SHELL
 #include "shell_common/shell.h"
 #endif // ENABLE_CHIP_SHELL
+/* access CHIP_CRYPTO_PSA */
+#include "crypto/CryptoBuildConfig.h"
+#if CHIP_CRYPTO_PSA
+#include "psa/crypto.h"
+#include "psa/crypto_se.h"
+#endif
 
 // Application level logic
 #include "AppTask.h"
@@ -85,16 +94,18 @@ void Application_Init(void)
 {
     CHIP_ERROR error;
 
-#if defined(GP_APP_DIVERSITY_CLEARBOX_TESTING_HOOK_APPLICATION_INIT)
-    GP_CLEARBOX_TESTING_APPLICATION_INIT_HOOK;
-#endif
-
 #if defined(GP_APP_DIVERSITY_POWERCYCLECOUNTING)
     gpAppFramework_Reset_Init();
 #endif
 
-    /* Initialize IO */
-    qvIO_Init();
+#if CHIP_CRYPTO_PSA
+    psa_status_t psa_error = psa_crypto_init();
+    if (psa_error)
+    {
+        ChipLogError(NotSpecified, "psa_crypto_init failed");
+        return;
+    }
+#endif
 
     /* Initialize CHIP stack */
     error = CHIP_Init();
@@ -122,6 +133,11 @@ void Application_Init(void)
         ChipLogError(NotSpecified, "GetAppTask().StartAppTask() failed");
         return;
     }
+
+#if defined(GP_APP_DIVERSITY_CLEARBOX_TESTING_HOOK_APPLICATION_INIT)
+    /* After init calls so errors there cause the hook not to be run */
+    GP_CLEARBOX_TESTING_APPLICATION_INIT_HOOK;
+#endif
 }
 
 void ChipEventHandler(const ChipDeviceEvent * aEvent, intptr_t /* arg */)
@@ -186,16 +202,16 @@ CHIP_ERROR CHIP_Init(void)
 
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_SSED) && CHIP_DEVICE_CONFIG_ENABLE_SSED
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SynchronizedSleepyEndDevice);
-    qvIO_EnableSleep(true);
+    qvCHIP_EnableSleep(true);
 #elif CHIP_DEVICE_CONFIG_ENABLE_SED
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
-    qvIO_EnableSleep(true);
+    qvCHIP_EnableSleep(true);
 #elif CHIP_DEVICE_CONFIG_THREAD_FTD
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
-    qvIO_EnableSleep(false);
+    qvCHIP_DisableSleepAlwaysForDevice();
 #else
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
-    qvIO_EnableSleep(false);
+    qvCHIP_DisableSleepAlwaysForDevice();
 #endif
     if (ret != CHIP_NO_ERROR)
     {

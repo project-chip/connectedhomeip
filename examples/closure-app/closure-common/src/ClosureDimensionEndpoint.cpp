@@ -17,6 +17,7 @@
  */
 
 #include <ClosureDimensionEndpoint.h>
+#include <ClosureManager.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -26,16 +27,20 @@ using namespace chip::app::Clusters::ClosureDimension;
 
 using Protocols::InteractionModel::Status;
 
-Status PrintOnlyDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
-                                          const Optional<Globals::ThreeLevelAutoEnum> & speed)
+namespace {
+constexpr Percent100ths kFullClosedTargetPosition = 10000; // Default target position in 100ths of a percent
+} // namespace
+
+Status ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
+                                                 const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     ChipLogProgress(AppServer, "HandleSetTarget");
     // Add the SetTarget handling logic here
     return Status::Success;
 }
 
-Status PrintOnlyDelegate::HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
-                                     const Optional<Globals::ThreeLevelAutoEnum> & speed)
+Status ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
+                                            const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     ChipLogProgress(AppServer, "HandleStep");
     // Add the Step handling logic here
@@ -58,4 +63,28 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
     ReturnErrorOnFailure(mLogic.Init(conformance, clusterInitParameters));
     ReturnErrorOnFailure(mInterface.Init());
     return CHIP_NO_ERROR;
+}
+
+void ClosureDimensionEndpoint::OnStopMotionActionComplete()
+{
+    // This function should handle closure dimension state updation after stopping of motion Action.
+}
+
+void ClosureDimensionEndpoint::OnStopCalibrateActionComplete()
+{
+    // This function should handle closure dimension state updation after stopping of calibration Action.
+}
+
+void ClosureDimensionEndpoint::OnCalibrateActionComplete()
+{
+    DataModel::Nullable<GenericCurrentStateStruct> currentState(GenericCurrentStateStruct(
+        MakeOptional(kFullClosedTargetPosition), MakeOptional(true), MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
+    DataModel::Nullable<GenericTargetStruct> target{ DataModel::NullNullable };
+    mLogic.SetCurrentState(currentState);
+    mLogic.SetTarget(target);
+}
+
+void ClosureDimensionEndpoint::OnMoveToActionComplete()
+{
+    // This function should handle closure dimension state updation after MoveTo Action.
 }

@@ -157,8 +157,8 @@ class Runner:
                 break
             # dependencies MUST NOT be done
             s.kill()
-            raise Exception("Unexpected return %d for %r" %
-                            (process.returncode, userdata))
+            raise Exception("Unexpected return %d for %r/%r" %
+                            (process.returncode, process, userdata))
 
         if s.returncode != 0:
             if wait.timed_out:

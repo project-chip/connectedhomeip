@@ -35,6 +35,19 @@ target_include_directories(app PRIVATE
                            ${TELINK_COMMON}/app/include
                            ${TELINK_COMMON}/zephyr_ext)
 
+if(CONFIG_TFLM_FEATURE)
+  target_include_directories(app PRIVATE
+                             src
+                             src/tflm/micro_speech
+                             src/tflm/models
+                             ${ZEPHYR_BASE}/../modules/lib/tflite-micro-telink
+                             ${ZEPHYR_BASE}/../modules/lib/tflite-micro-telink/third_party/ruy
+                             ${ZEPHYR_BASE}/../modules/lib/tflite-micro-telink/third_party/gemmlowp
+                             ${ZEPHYR_BASE}/../modules/lib/tflite-micro-telink/third_party/flatbuffers/include
+                             ${ZEPHYR_BASE}/../modules/lib/tflite-micro-telink/third_party/kissfft/tools
+                             ${ZEPHYR_BASE}/../modules/lib/tflite-micro-telink/third_party/kissfft)
+endif()
+
 target_sources(app PRIVATE
                src/AppTask.cpp
                src/ZclCallbacks.cpp
@@ -49,6 +62,21 @@ target_sources(app PRIVATE
                ${TELINK_COMMON}/zephyr_ext/zephyr_key_pool.c
                ${TELINK_COMMON}/zephyr_ext/zephyr_led_pool.c
                ${TELINK_COMMON}/zephyr_ext/zephyr_ws2812.c)
+
+if(CONFIG_TFLM_FEATURE)
+  target_sources(app PRIVATE
+                 src/tflm/audio/app_audio.c
+                 src/tflm/audio/app_codec.c
+                 src/tflm/audio/audio_common.c
+                 src/tflm/models/audio_preprocessor_int8_model_data.cpp
+                 src/tflm/models/audio_preprocessor_int8_model_data.h
+                 src/tflm/models/micro_speech_quantized_model_data.cpp
+                 src/tflm/models/micro_speech_quantized_model_data.h
+                 src/tflm/micro_speech/micro_model_settings.h
+                 src/tflm/micro_speech/tflite_micro_micro_speech.cpp
+                 src/tflm/micro_speech/tflite_micro_micro_speech.h
+                 src/tflm/errno_stub.c)
+endif()
 
 chip_configure_data_model(app
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lighting-common/lighting-app.zap

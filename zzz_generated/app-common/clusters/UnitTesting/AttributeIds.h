@@ -4,7 +4,7 @@
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
 
-#include <app/common/GlobalIds.h>
+#include <clusters/shared/GlobalIds.h>
 #include <lib/core/DataModelTypes.h>
 
 namespace chip {
@@ -364,10 +364,6 @@ namespace NullableGlobalStruct {
 inline constexpr AttributeId Id = 0x00004034;
 } // namespace NullableGlobalStruct
 
-namespace MeiInt8u {
-inline constexpr AttributeId Id = 0xFFF24F01;
-} // namespace MeiInt8u
-
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList
@@ -387,6 +383,10 @@ inline constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
 namespace ClusterRevision {
 inline constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
+
+namespace MeiInt8u {
+inline constexpr AttributeId Id = 0xFFF24F01;
+} // namespace MeiInt8u
 
 } // namespace Attributes
 } // namespace UnitTesting

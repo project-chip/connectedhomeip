@@ -125,17 +125,11 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetUpTime(uint64_t & upTime)
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
 {
-    uint64_t upTime = 0;
-
-    if (GetUpTime(upTime) == CHIP_NO_ERROR)
+    uint32_t totalHours = 0;
+    if (ConfigurationMgr().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
     {
-        uint32_t totalHours = 0;
-        if (ConfigurationMgr().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
-        {
-            VerifyOrReturnError(upTime / 3600 <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-            totalOperationalHours = totalHours + static_cast<uint32_t>(upTime / 3600);
-            return CHIP_NO_ERROR;
-        }
+        totalOperationalHours = totalHours;
+        return CHIP_NO_ERROR;
     }
 
     return CHIP_ERROR_INVALID_TIME;
@@ -189,18 +183,107 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
     ifp->name                      = Span<const char>(threadNetworkName, strlen(threadNetworkName));
-    ifp->isOperational             = true;
+    ifp->type                      = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kThread;
+    ifp->isOperational             = ThreadStackMgrImpl().IsThreadAttached();
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();
-    ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kThread;
-    uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
-    ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
-    ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
-#else
-    ifp->isOperational = false;
-    ifp->type          = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kUnspecified;
-#endif
+
+    ThreadStackMgrImpl().GetPrimary802154MACAddress(ifp->MacAddress);
+    ifp->hardwareAddress = ByteSpan(ifp->MacAddress, kMaxHardwareAddrSize);
+
+    // The Thread implementation has only 1 interface and is IPv6-only
+    Inet::InterfaceAddressIterator interfaceAddressIterator;
+    uint8_t ipv6AddressesCount = 0;
+    while (interfaceAddressIterator.HasCurrent() && ipv6AddressesCount < kMaxIPv6AddrCount)
+    {
+        Inet::IPAddress ipv6Address;
+        if (interfaceAddressIterator.GetAddress(ipv6Address) == CHIP_NO_ERROR)
+        {
+            memcpy(ifp->Ipv6AddressesBuffer[ipv6AddressesCount], ipv6Address.Addr, kMaxIPv6AddrSize);
+            ifp->Ipv6AddressSpans[ipv6AddressesCount] = ByteSpan(ifp->Ipv6AddressesBuffer[ipv6AddressesCount]);
+            ipv6AddressesCount++;
+        }
+        interfaceAddressIterator.Next();
+    }
+
+    ifp->IPv6Addresses = app::DataModel::List<ByteSpan>(ifp->Ipv6AddressSpans, ipv6AddressesCount);
+
     *netifpp = ifp;
+#else
+    NetworkInterface * head = NULL;
+    for (Inet::InterfaceIterator interfaceIterator; interfaceIterator.HasCurrent(); interfaceIterator.Next())
+    {
+        interfaceIterator.GetInterfaceName(ifp->Name, Inet::InterfaceId::kMaxIfNameLength);
+        ifp->name          = CharSpan::fromCharString(ifp->Name);
+        ifp->isOperational = true;
+        app::Clusters::GeneralDiagnostics::InterfaceTypeEnum interfaceType;
+        CHIP_ERROR err = interfaceIterator.GetInterfaceType(interfaceType);
+        if (err == CHIP_NO_ERROR || err == CHIP_ERROR_NOT_IMPLEMENTED)
+        {
+            switch (interfaceType)
+            {
+            case Inet::InterfaceType::Unknown:
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kUnspecified;
+                break;
+            case Inet::InterfaceType::WiFi:
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
+                break;
+            case Inet::InterfaceType::Ethernet:
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kEthernet;
+                break;
+            case Inet::InterfaceType::Thread:
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kThread;
+                break;
+            case Inet::InterfaceType::Cellular:
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kCellular;
+                break;
+            default:
+                ifp->type = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kWiFi;
+                break;
+            }
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Failed to get interface type");
+        }
+
+        ifp->offPremiseServicesReachableIPv4.SetNull();
+        ifp->offPremiseServicesReachableIPv6.SetNull();
+
+        uint8_t addressSize;
+        if (interfaceIterator.GetHardwareAddress(ifp->MacAddress, addressSize, sizeof(ifp->MacAddress)) != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to get network hardware address");
+        }
+        else
+        {
+            ifp->hardwareAddress = ByteSpan(ifp->MacAddress, addressSize);
+        }
+
+        // Assuming IPv6-only support
+        Inet::InterfaceAddressIterator interfaceAddressIterator;
+        uint8_t ipv6AddressesCount = 0;
+        while (interfaceAddressIterator.HasCurrent() && ipv6AddressesCount < kMaxIPv6AddrCount)
+        {
+            if (interfaceAddressIterator.GetInterfaceId() == interfaceIterator.GetInterfaceId())
+            {
+                chip::Inet::IPAddress ipv6Address;
+                if (interfaceAddressIterator.GetAddress(ipv6Address) == CHIP_NO_ERROR)
+                {
+                    memcpy(ifp->Ipv6AddressesBuffer[ipv6AddressesCount], ipv6Address.Addr, kMaxIPv6AddrSize);
+                    ifp->Ipv6AddressSpans[ipv6AddressesCount] = ByteSpan(ifp->Ipv6AddressesBuffer[ipv6AddressesCount]);
+                    ipv6AddressesCount++;
+                }
+            }
+            interfaceAddressIterator.Next();
+        }
+
+        ifp->IPv6Addresses = chip::app::DataModel::List<chip::ByteSpan>(ifp->Ipv6AddressSpans, ipv6AddressesCount);
+        head               = ifp;
+    }
+    *netifpp = head;
+#endif
+
     return CHIP_NO_ERROR;
 }
 
