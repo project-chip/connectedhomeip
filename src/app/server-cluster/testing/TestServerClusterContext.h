@@ -16,10 +16,10 @@
  */
 #pragma once
 
-#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/data-model-provider/ActionContext.h>
 #include <app/data-model-provider/Context.h>
 #include <app/data-model-provider/Provider.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterContext.h>
 #include <app/server-cluster/testing/EmptyProvider.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
