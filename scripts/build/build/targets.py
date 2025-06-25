@@ -152,6 +152,8 @@ def BuildHostTarget():
         TargetPart('camera', app=HostApp.CAMERA),
         TargetPart('camera-controller', app=HostApp.CAMERA_CONTROLLER),
         TargetPart('closure', app=HostApp.CLOSURE),
+        TargetPart('jf-control-app', app=HostApp.JF_CONTROL),
+        TargetPart('jf-admin-app', app=HostApp.JF_ADMIN),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
