@@ -89,7 +89,6 @@ ti_simplelink_executable("lock_app") {
 
   sources = [
     "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
-    "${chip_root}/src/app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.cpp",
     "${project_dir}/src/AppTask.cpp",
     "${project_dir}/src/LockManager.cpp",
     "${project_dir}/src/ZclCallbacks.cpp",
