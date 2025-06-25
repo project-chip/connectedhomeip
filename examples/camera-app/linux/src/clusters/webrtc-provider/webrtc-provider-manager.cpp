@@ -443,7 +443,15 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
         // TODO: Lookup the sessionID to get the Video/Audio StreamID
         ReleaseAudioVideoStreams();
 
+        mMediaController->UnregisterTransport(mWebrtcTransportMap[sessionId].get());
         mWebrtcTransportMap.erase(sessionId);
+    }
+
+    if (mPeerConnection)
+    {
+        ChipLogProgress(Camera, "Closing peer connection: %u", sessionId);
+        mPeerConnection->close();
+        mPeerConnection.reset();
     }
 
     if (mCurrentSessionId == sessionId)
