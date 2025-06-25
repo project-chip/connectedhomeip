@@ -18,15 +18,12 @@ on:
     push:
         branches:
             - master
-            - "v*-branch"
+            - 'v*-branch'
     pull_request:
     merge_group:
 
 concurrency:
-    group:
-        ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
-        'pull_request' && github.event.number) || (github.event_name ==
-        'workflow_dispatch' && github.run_number) || github.sha }}
+    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
 env:
@@ -50,13 +47,13 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  platform: linux
+                platform: linux
 
             - name: Set up environment for size reports
               uses: ./.github/actions/setup-size-reports
               if: ${{ !env.ACT }}
               with:
-                  gh-context: ${{ toJson(github) }}
+                gh-context: ${{ toJson(github) }}
 
             - name: Build Standalone cert tool
               run: |
@@ -251,19 +248,9 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug camera-controller \
                     out/linux-x64-camera-controller/chip-camera-controller \
-                    /tmp/bloat_reports/
-            - name: Build example Closure AppAdd commentMore actions
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target linux-x64-closure \
-                        build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    linux debug closure-app \
-                    out/linux-x64-closure/closure-app \
-                    /tmp/bloat_reports/
+                    /tmp/bloat_reports/                                                     
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}
               with:
-                  platform-name: Linux-Standalone
+                platform-name: Linux-Standalone
