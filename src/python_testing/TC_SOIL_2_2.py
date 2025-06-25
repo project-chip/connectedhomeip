@@ -96,6 +96,12 @@ class TC_SOIL_2_2(MatterBaseTest):
         if self.is_pics_sdk_ci_only:
             # Simulate a change in soil moisture. Pick a random value between min_bound and max_bound
             irand = randrange(min_bound, max_bound)
+
+            while irand == measurement:
+                # In the case it picks the same value as is currently is the measurement,
+                # continue to pick until that is not the case
+                irand = randrange(min_bound, max_bound)
+
             logging.info(f"Simulated soil moisture value: {irand}")
             self.write_to_app_pipe({"Name": "SetSimulatedSoilMoisture", "SoilMoistureValue": irand, "EndpointId": endpoint})
 
