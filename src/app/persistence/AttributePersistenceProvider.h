@@ -94,25 +94,5 @@ public:
                                  MutableByteSpan & aValue) = 0;
 };
 
-/**
- * Instance getter for the global AttributePersistenceProvider.
- *
- * Callers have to externally synchronize usage of this function.
- *
- * @return The global AttributePersistenceProvider.  This must never be null.
- */
-AttributePersistenceProvider * GetAttributePersistenceProvider();
-
-/**
- * Instance setter for the global AttributePersistenceProvider.
- *
- * Callers have to externally synchronize usage of this function.
- *
- * If the `provider` is nullptr, the value is not changed.
- *
- * @param[in] aProvider the AttributePersistenceProvider implementation to use.
- */
-void SetAttributePersistenceProvider(AttributePersistenceProvider * aProvider);
-
 } // namespace app
 } // namespace chip
