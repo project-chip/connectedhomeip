@@ -407,12 +407,14 @@ class PushAvServer:
         self.router.add_api_route("/streams", self.create_stream, methods=["POST"], status_code=201)
         self.router.add_api_route("/streams", self.list_streams, methods=["GET"])
         self.router.add_api_route("/streams/probe/{stream_id}/{file_path:path}", self.ffprobe_check, methods=["GET"])
-        self.router.add_api_route("/streams/{stream_id}/{manifest}.mpd", self.manifest_upload, methods=["PUT"])
+
         # TODO Rename API names to use fragment instead of segment (as this is what is actually being uploaded)
+        self.router.add_api_route("/streams/{stream_id}/{manifest}.mpd", self.manifest_upload, methods=["PUT"])
         self.router.add_api_route("/streams/{stream_id}/segment{segment_no}/{track_name}/clip{frag_no}.{frag_ext}",
-                                  self.segment_strict_upload, methods=["PUT"], status_code=202)
+                                  self.segment_strict_cmaf_upload, methods=["PUT"], status_code=202)
         self.router.add_api_route("/streams/{stream_id}/{file_path:path}",
                                   self.segment_any_upload, methods=["PUT"], status_code=202)
+
         self.router.add_api_route("/streams/{stream_id}/{file_path:path}", self.segment_download, methods=["GET"])
         self.router.add_api_route("/certs", self.list_certs, methods=["GET"], status_code=200)
         self.router.add_api_route("/certs/{hierarchy}/{name}", self.certificate_details, methods=["GET"], status_code=200)
@@ -480,6 +482,7 @@ class PushAvServer:
         last_stream = int(dirs[-1].name) if len(dirs) > 0 else 0
         stream_id = last_stream + 1
 
+        # TODO Add option to specify Interface-1, Interface-2 DASH, or I2-HLS to improve the strict mode
         p = self.wd.mkdir("streams", str(stream_id))
         stream = {"stream_id": stream_id, "strict_mode": self.strict_mode}
 
@@ -498,25 +501,37 @@ class PushAvServer:
 
         return {"streams": streams}
 
-    async def manifest_upload(self, stream_id: int, manifest: str, req: Request):
-        """The DASH manifest is uploaded onto the base path without any file path"""
+    async def _handle_upload(self, dst: Path, req: Request):
+        """ Handle an upload, sending content to disk at 'dst'.
 
-        # Here we assume that no camera will upload an index.mpd file on their own.
-        # That is something that may not be true, in which case we would have to add
-        # another layer of abstraction on the file system where we can store the mpd
-        # file and the camera direct uploads.
-        return await self.segment_any_upload("index.mpd", stream_id, req)
-
-    async def segment_any_upload(self, file_path: str, stream_id: int, req: Request):
-        """Extract the parsed version of a client certificate.
-        See https://docs.python.org/3/library/ssl.html#ssl.SSLSocket.getpeercert
+        Extract the parsed version of a client certificate via a patched TLS
+        extension. See https://docs.python.org/3/library/ssl.html#ssl.SSLSocket.getpeercert
         for the exact content.
         """
+
         cert_details = req.scope["extensions"]["ssl"]["client_certificate"]
 
-        logging.debug(f"segment_any_upload. stream_id={stream_id} file_path:{file_path}")
+        with open(dst.with_suffix(dst.suffix + ".crt"), "w") as f:
+            f.write(json.dumps(cert_details))
 
+        with open(dst, "wb") as f:
+            async for chunk in req.stream():
+                f.write(chunk)
+
+        return Response(status_code=202)
+
+    async def manifest_upload(self, stream_id: int, manifest: str, req: Request):
+        """The DASH manifest is uploaded onto the base path without any file path"""
+        self._read_stream_details(stream_id)
+
+        dst = self.wd.mkdir("streams", str(stream_id), f"{manifest}.mpd", is_file=True)
+
+        return await self._handle_upload(dst, req)
+
+    async def segment_any_upload(self, file_path: str, stream_id: int, req: Request):
+        logging.debug(f"segment_any_upload. stream_id={stream_id} file_path:{file_path}")
         stream = self._read_stream_details(stream_id)
+
         logging.debug(f"stream details = {stream}")
         if stream.get('strict_mode', False):
             raise HTTPException(404, "Wrong path. Fragments should follow Matter's specificied path.")
@@ -524,33 +539,17 @@ class PushAvServer:
         logging.debug("processing to store fiel via any_upload")
         dst = self.wd.mkdir("streams", str(stream_id), file_path, is_file=True)
 
-        with open(dst.with_suffix(dst.suffix + ".crt"), "w") as f:
-            f.write(json.dumps(cert_details))
+        return await self._handle_upload(dst, req)
 
-        with open(dst, "wb") as f:
-            async for chunk in req.stream():
-                f.write(chunk)
-
-        return Response(status_code=202)
-
-    async def segment_strict_upload(self, stream_id: int, segment_no: int, track_name: str, frag_no: int, frag_ext: str, req: Request):
+    async def segment_strict_cmaf_upload(self, stream_id: int, segment_no: int, track_name: str, frag_no: int, frag_ext: str, req: Request):
         logging.debug(
             f"segment_strict_upload. stream_id={stream_id} segment_no={segment_no}, track_name={track_name}, frag_no={frag_no}, frag_ext={frag_ext}")
         self._read_stream_details(stream_id)
 
-        cert_details = req.scope["extensions"]["ssl"]["client_certificate"]
-
         dst = self.wd.mkdir("streams", str(stream_id), f"segment{segment_no}",
                             track_name, f"clip{frag_no}.{frag_ext}", is_file=True)
 
-        with open(dst.with_suffix(dst.suffix + ".crt"), "w") as f:
-            f.write(json.dumps(cert_details))
-
-        with open(dst, "wb") as f:
-            async for chunk in req.stream():
-                f.write(chunk)
-
-        return Response(status_code=202)
+        return await self._handle_upload(dst, req)
 
     def ffprobe_check(self, stream_id: int, file_path: str):
 
