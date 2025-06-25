@@ -21,9 +21,9 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <app/clusters/network-commissioning/NetworkCommissioningDriverDelegate.h>
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <app/clusters/network-commissioning/network-commissioning.h>
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <platform/telink/wifi/TelinkWiFiDriver.h>
 #endif
 
@@ -52,7 +52,8 @@ app::Clusters::NetworkCommissioning::Instance sWiFiCommissioningInstance(0, &(Ne
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD
-app::Clusters::NetworkDriverObj<NetworkCommissioning::GenericThreadDriver> threadNetworkDriver(0 /*endpointId*/);
+app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver>
+    sThreadNetworkDriver(0 /*endpointId*/);
 #endif // CHIP_ENABLE_OPENTHREAD
 
 #ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
@@ -174,7 +175,7 @@ int main(void)
         goto exit;
     }
 
-    threadNetworkDriver.Init();
+    sThreadNetworkDriver.Init();
 
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
     sWiFiCommissioningInstance.Init();

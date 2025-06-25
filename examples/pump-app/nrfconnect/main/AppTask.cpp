@@ -26,7 +26,6 @@
 #include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/TestEventTriggerDelegate.h>
-#include <app/clusters/network-commissioning/NetworkCommissioningDriverDelegate.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Server.h>
@@ -96,7 +95,7 @@ chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
 #endif
 
 #ifdef CONFIG_NET_L2_OPENTHREAD
-chip::app::Clusters::NetworkDriverObj<DeviceLayer::NetworkCommissioning::GenericThreadDriver> threadNetworkDriver(0 /*endpointId*/);
+NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(0 /*endpointId*/);
 #endif
 } // namespace
 
@@ -149,7 +148,7 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 
-    threadNetworkDriver.Init();
+    sThreadNetworkDriver.Init();
 #elif !defined(CONFIG_WIFI_NRF70)
     return CHIP_ERROR_INTERNAL;
 #endif

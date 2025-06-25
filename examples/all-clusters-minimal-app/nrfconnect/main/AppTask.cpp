@@ -26,7 +26,6 @@
 #include <data-model-providers/codegen/Instance.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
-#include <app/clusters/network-commissioning/NetworkCommissioningDriverDelegate.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
@@ -82,7 +81,8 @@ chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
 #endif
 
 #ifdef CONFIG_NET_L2_OPENTHREAD
-app::Clusters::NetworkDriverObj<DeviceLayer::NetworkCommissioning::GenericThreadDriver> threadNetworkDriver(0 /*endpointId*/);
+app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver>
+    sThreadNetworkDriver(0 /*endpointId*/);
 #endif
 } // namespace
 
@@ -138,7 +138,7 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 
-    threadNetworkDriver.Init();
+    sThreadNetworkDriver.Init();
 
     // Initialize LEDs
     LEDWidget::InitGpio();

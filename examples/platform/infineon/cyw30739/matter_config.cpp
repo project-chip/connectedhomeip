@@ -36,7 +36,6 @@
 #ifdef BOARD_ENABLE_I2C
 #include "wiced_hal_i2c.h"
 #endif
-#include <app/clusters/network-commissioning/NetworkCommissioningDriverDelegate.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Server.h>
@@ -82,7 +81,7 @@ static UnprovisionedOptigaFactoryDataProvider sFactoryDataProvider;
 static FactoryDataProvider sFactoryDataProvider;
 #endif /* BOARD_USE_OPTIGA */
 
-Clusters::NetworkDriverObj<NetworkCommissioning::GenericThreadDriver> threadNetworkDriver(0 /*endpointId*/);
+Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(0 /*endpointId*/);
 
 // NOTE! This key is for test/certification only and should not be available in production devices!
 uint8_t sTestEventTriggerEnableKey[chip::TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
@@ -128,7 +127,7 @@ CHIP_ERROR CYW30739MatterConfig::InitOpenThread(void)
         printf("ERROR SetThreadDeviceType %ld\n", err.AsInteger());
     }
 
-    threadNetworkDriver.Init();
+    sThreadNetworkDriver.Init();
     printf("Starting thread task\n");
     ReturnLogErrorOnFailure(ThreadStackMgr().StartThreadTask());
 

@@ -37,7 +37,7 @@
 /*Matter includes*/
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/network-commissioning/NetworkCommissioningDriverDelegate.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -94,7 +94,7 @@ static uint8_t NvmButtonStateCpt = 0;
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
 #if CHIP_ENABLE_OPENTHREAD
-Clusters::NetworkDriverObj<DeviceLayer::NetworkCommissioning::GenericThreadDriver> threadNetworkDriver(0 /*endpointId*/);
+Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(0 /*endpointId*/);
 #endif // CHIP_ENABLE_OPENTHREAD
 
 CHIP_ERROR AppTask::StartAppTask()
@@ -141,7 +141,7 @@ CHIP_ERROR AppTask::Init()
 
     ThreadStackMgr().InitThreadStack();
     ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
-    threadNetworkDriver.Init();
+    sThreadNetworkDriver.Init();
 
     PlatformMgr().AddEventHandler(MatterEventHandler, 0);
 

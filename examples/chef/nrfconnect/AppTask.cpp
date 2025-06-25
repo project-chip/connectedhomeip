@@ -30,7 +30,6 @@
 
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/identify-server/identify-server.h>
-#include <app/clusters/network-commissioning/NetworkCommissioningDriverDelegate.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/Instance.h>
@@ -86,7 +85,7 @@ bool sIsSitModeRequested = false;
 #endif
 
 #ifdef CONFIG_NET_L2_OPENTHREAD
-app::Clusters::NetworkDriverObj<DeviceLayer::NetworkCommissioning::GenericThreadDriver> threadNetworkDriver(0 /*endpointId*/);
+Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(0 /*endpointId*/);
 #endif
 } // namespace
 
@@ -167,7 +166,7 @@ CHIP_ERROR AppTask::Init()
         return err;
     }
 
-    threadNetworkDriver.Init();
+    sThreadNetworkDriver.Init();
 #else
     return CHIP_ERROR_INTERNAL;
 #endif // CONFIG_NET_L2_OPENTHREAD

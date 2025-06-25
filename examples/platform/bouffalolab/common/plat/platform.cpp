@@ -73,7 +73,6 @@
 #endif
 #endif
 
-#include <app/clusters/network-commissioning/NetworkCommissioningDriverDelegate.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 
 #include <AppTask.h>
@@ -92,7 +91,7 @@ chip::app::Clusters::NetworkCommissioning::Instance
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-app::Clusters::NetworkDriverObj<NetworkCommissioning::GenericThreadDriver> threadNetworkDriver(0 /* Endpoint Id */);
+Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(0 /*endpointId*/);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE
@@ -256,7 +255,7 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
     ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice));
 #endif
 #endif
-    threadNetworkDriver.Init();
+    sThreadNetworkDriver.Init();
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
