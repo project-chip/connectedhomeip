@@ -7867,12 +7867,6 @@ bool emberAfZoneManagementClusterUpdateTwoDCartesianZoneCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ZoneManagement::Commands::UpdateTwoDCartesianZone::DecodableType & commandData);
 /**
- * @brief Zone Management Cluster GetTwoDCartesianZone Command callback (from client)
- */
-bool emberAfZoneManagementClusterGetTwoDCartesianZoneCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZone::DecodableType & commandData);
-/**
  * @brief Zone Management Cluster RemoveZone Command callback (from client)
  */
 bool emberAfZoneManagementClusterRemoveZoneCallback(
