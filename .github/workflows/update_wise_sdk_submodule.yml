@@ -26,7 +26,7 @@ jobs:
         run: |
           cd third_party/senscomm/scm1612s/wise-sdk && git fetch origin && git reset --hard origin/master && cd ../../../../
         
-      - name: CHeckin wise
+      - name: Checkin
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
