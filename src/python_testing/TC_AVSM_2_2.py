@@ -55,43 +55,66 @@ class TC_AVSM_2_2(MatterBaseTest):
     def steps_TC_AVSM_2_2(self) -> list[TestStep]:
         return [
             TestStep("precondition", "Commissioning, already done", is_commissioning=True),
-            TestStep(
-                1, "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on TH_SERVER", "Verify SNP is supported"
-            ),
+            TestStep(1, "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on DUT", "Verify SNP is supported"),
             TestStep(
                 2,
-                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated snapshot streams in the list is 0.",
             ),
             TestStep(
                 3,
-                "TH reads SnapshotCapabilities attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
+                "TH reads SnapshotCapabilities attribute from CameraAVStreamManagement Cluster on DUT.",
                 "Store this value in aSnapshotCapabilities.",
             ),
             TestStep(
                 4,
-                "TH sends the SnapshotStreamAllocate command with valid values of ImageCodec, MaxFrameRate, MinResolution=MaxResolution=Resolution from aSnapshotCapabilities and Quality set to 90.",
-                "DUT responds with SnapshotStreamAllocateResponse command with a valid SnapshotStreamID.",
+                "If WMARK is supported, TH sets it’s local aWatermark to True, otherwise this is Null",
+                "",
             ),
             TestStep(
                 5,
-                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
-                "Verify the number of allocated snapshot streams in the list is 1.",
+                "If OSD is supported, TH sets its local aOSD to True, otherwise this is Null",
+                "",
             ),
             TestStep(
                 6,
-                "TH sends the SnapshotStreamAllocate command with values from step 3 except with MaxFrameRate set to 0(outside of valid range).",
-                "DUT responds with a CONSTRAINT_ERROR status code.",
+                "TH sends the SnapshotStreamAllocate command with valid values of ImageCodec, MaxFrameRate, MinResolution=MaxResolution=Resolution from aSnapshotCapabilities, WatermarkEnabled to aWatermark, OSDEnabled to aOSD, and Quality set to 90.",
+                "DUT responds with SnapshotStreamAllocateResponse command with a valid SnapshotStreamID.",
             ),
             TestStep(
                 7,
-                "TH sends the SnapshotStreamAllocate command with values from step 3 except with Quality set to 101(outside of valid range).",
-                "DUT responds with a CONSTRAINT_ERROR status code.",
+                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT",
+                "Verify the number of allocated snapshot streams in the list is 1.",
             ),
             TestStep(
                 8,
-                "TH sends the SnapshotStreamAllocate command with values from step 3 except with ImageCodec set to 10(outside of valid range).",
-                "DUT responds with a CONSTRAINT_ERROR status code.",
+                "TH sends the SnapshotStreamAllocate command with values from step 6 except with MaxFrameRate set to 0(outside of valid range).",
+                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
+            ),
+            TestStep(
+                9,
+                "TH sends the SnapshotStreamAllocate command with values from step 6 except with Quality set to 0(below valid range).",
+                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
+            ),
+            TestStep(
+                10,
+                "TH sends the SnapshotStreamAllocate command with values from step 6 except with Quality set to 101(above valid range).",
+                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
+            ),
+            TestStep(
+                11,
+                "TH sends the SnapshotStreamAllocate command with values from step 6 except with ImageCodec set to 10(outside of valid range).",
+                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
+            ),
+            TestStep(
+                12,
+                "TH sends the SnapshotStreamAllocate command with values from step 6 except with MinResolution set to {0,0} (outside of valid range).",
+                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
+            ),
+            TestStep(
+                13,
+                "TH sends the SnapshotStreamAllocate command with values from step 6 except with MaxResolution set to {0,0} (outside of valid range).",
+                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
             ),
         ]
 
@@ -127,6 +150,16 @@ class TC_AVSM_2_2(MatterBaseTest):
         logger.info(f"Rx'd SnapshotCapabilities: {aSnapshotCapabilities}")
 
         self.step(4)
+        aWatermark = None
+        if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) > 0:
+            aWatermark = True
+
+        self.step(5)
+        aOSD = None
+        if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) > 0:
+            aOSD = True
+
+        self.step(6)
         asserts.assert_greater(len(aSnapshotCapabilities), 0, "SnapshotCapabilities list is empty")
         try:
             snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
@@ -135,6 +168,8 @@ class TC_AVSM_2_2(MatterBaseTest):
                 minResolution=aSnapshotCapabilities[0].resolution,
                 maxResolution=aSnapshotCapabilities[0].resolution,
                 quality=90,
+                watermarkEnabled=aWatermark,
+                OSDEnabled=aOSD,
             )
             snpStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
             logger.info(f"Rx'd SnapshotStreamAllocateResponse: {snpStreamAllocateResponse}")
@@ -145,14 +180,14 @@ class TC_AVSM_2_2(MatterBaseTest):
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
 
-        self.step(5)
+        self.step(7)
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
         logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 1, "The number of allocated snapshot streams in the list is not 1.")
 
-        self.step(6)
+        self.step(8)
         try:
             snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
                 imageCodec=aSnapshotCapabilities[0].imageCodec,
@@ -160,20 +195,46 @@ class TC_AVSM_2_2(MatterBaseTest):
                 minResolution=aSnapshotCapabilities[0].resolution,
                 maxResolution=aSnapshotCapabilities[0].resolution,
                 quality=90,
+                watermarkEnabled=aWatermark,
+                OSDEnabled=aOSD,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
             asserts.assert_true(
-                False, "Unexpected success when expecting CONSTRAINT_ERROR due to MaxFrameRate set to 0(outside of valid range)"
+                False,
+                "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to MaxFrameRate set to 0(outside of valid range)",
             )
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
-                Status.ConstraintError,
-                "Unexpected status returned when expecting CONSTRAINT_ERROR due to MaxFrameRate set to 0(outside of valid range)",
+                Status.DynamicConstraintError,
+                "Unexpected status returned when expecting DYNAMIC_CONSTRAINT_ERROR due to MaxFrameRate set to 0(outside of valid range)",
             )
             pass
 
-        self.step(7)
+        self.step(9)
+        try:
+            snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
+                imageCodec=aSnapshotCapabilities[0].imageCodec,
+                maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
+                minResolution=aSnapshotCapabilities[0].resolution,
+                maxResolution=aSnapshotCapabilities[0].resolution,
+                quality=0,
+                watermarkEnabled=aWatermark,
+                OSDEnabled=aOSD,
+            )
+            await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
+            asserts.assert_true(
+                False, "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to Quality set to 0(below valid range)"
+            )
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status,
+                Status.DynamicConstraintError,
+                "Unexpected status returned when expecting DYNAMIC_CONSTRAINT_ERROR due to Quality set to 0(below valid range)",
+            )
+            pass
+
+        self.step(10)
         try:
             snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
                 imageCodec=aSnapshotCapabilities[0].imageCodec,
@@ -181,20 +242,22 @@ class TC_AVSM_2_2(MatterBaseTest):
                 minResolution=aSnapshotCapabilities[0].resolution,
                 maxResolution=aSnapshotCapabilities[0].resolution,
                 quality=101,
+                watermarkEnabled=aWatermark,
+                OSDEnabled=aOSD,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
             asserts.assert_true(
-                False, "Unexpected success when expecting CONSTRAINT_ERROR due to Quality set to 101(outside of valid range)"
+                False, "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to Quality set to 101(above valid range)."
             )
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
-                Status.ConstraintError,
-                "Unexpected status returned when expecting CONSTRAINT_ERROR due to Quality set to 101(outside of valid range)",
+                Status.DynamicConstraintError,
+                "Unexpected status returned when expecting DYNAMIC_CONSTRAINT_ERROR due to Quality set to 101(above valid range).",
             )
             pass
 
-        self.step(8)
+        self.step(11)
         try:
             snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
                 imageCodec=cluster.Enums.ImageCodecEnum.extend_enum_if_value_doesnt_exist(10),
@@ -202,16 +265,67 @@ class TC_AVSM_2_2(MatterBaseTest):
                 minResolution=aSnapshotCapabilities[0].resolution,
                 maxResolution=aSnapshotCapabilities[0].resolution,
                 quality=90,
+                watermarkEnabled=aWatermark,
+                OSDEnabled=aOSD,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
             asserts.assert_true(
-                False, "Unexpected success when expecting CONSTRAINT_ERROR due to ImageCodec set to 10(outside of valid range)"
+                False,
+                "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to ImageCodec set to 10(outside of valid range)",
             )
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
-                Status.ConstraintError,
-                "Unexpected status returned when expecting CONSTRAINT_ERROR due to ImageCodec set to 10(outside of valid range)",
+                Status.DynamicConstraintError,
+                "Unexpected status returned when expecting DYNAMIC_CONSTRAINT_ERROR due to ImageCodec set to 10(outside of valid range)",
+            )
+            pass
+
+        self.step(12)
+        try:
+            snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
+                imageCodec=aSnapshotCapabilities[0].imageCodec,
+                maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
+                minResolution=cluster.Structs.VideoResolutionStruct(width=0, height=0),
+                maxResolution=aSnapshotCapabilities[0].resolution,
+                quality=90,
+                watermarkEnabled=aWatermark,
+                OSDEnabled=aOSD,
+            )
+            await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
+            asserts.assert_true(
+                False,
+                "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to MinResolution set to {0,0} (outside of valid range).",
+            )
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status,
+                Status.DynamicConstraintError,
+                "Unexpected status returned when expecting DYNAMIC_CONSTRAINT_ERROR due to MinResolution set to {0,0} (outside of valid range).",
+            )
+            pass
+
+        self.step(13)
+        try:
+            snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
+                imageCodec=aSnapshotCapabilities[0].imageCodec,
+                maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
+                minResolution=aSnapshotCapabilities[0].resolution,
+                maxResolution=cluster.Structs.VideoResolutionStruct(width=0, height=0),
+                quality=90,
+                watermarkEnabled=aWatermark,
+                OSDEnabled=aOSD,
+            )
+            await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
+            asserts.assert_true(
+                False,
+                "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to MaxResolution set to {0,0} (outside of valid range).",
+            )
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status,
+                Status.DynamicConstraintError,
+                "Unexpected status returned when expecting DYNAMIC_CONSTRAINT_ERROR due to MaxResolution set to {0,0} (outside of valid range).",
             )
             pass
 
