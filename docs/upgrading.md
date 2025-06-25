@@ -64,7 +64,7 @@ commandHandler->AddResponse(path, kReplyCommandId, replyEncoder);
 ### Decoupling of `CommandHandlerInterface` from EmberTestCodegenModelViaMocks.cpp:1513:77 Metadata
 
 CommandHandler Interface was coupled with Ember data in ways that caused bugs if
-not setup correctly, updates were made for decoupling, now this data is provided
+not set up correctly, updates were made for decoupling, now this data is provided
 
 With this the interfaces
 [`CommandHandlerInterface::RetrieveGeneratedCommands`](#enumerateacceptedcommands-to-retrieveacceptedcommands),
@@ -76,7 +76,7 @@ go through some changes, a shim is provided to make the transition simpler
 ##### EnumerateGeneratedCommands to RetrieveGeneratedCommands
 
 Changed the old callback based iteration into a ListBuilder based approach for
-the Enumeration of Generated Commands
+the enumeration of generated commands
 
 `CommandHandlerInterface::EnumerateGeneratedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)`
 becomes
@@ -104,8 +104,8 @@ Changes for implementation
 ##### EnumerateAcceptedCommands to RetrieveAcceptedCommands
 
 Changed the old callback based iteration into a ListBuilder based approach for
-the Enumeration of Accepted Commands The new Interface allows for the full
-metadata lookup
+the enumeration of accepted commands. The new Interface allows for the full
+metadata lookup.
 
 `CommandHandlerInterface::EnumerateAcceptedCommands(const ConcreteClusterPath & cluster, CommandIdCallback callback, void * context)`
 becomes
@@ -154,7 +154,7 @@ overflow when appending a single element, this function never allocates.
 #### Backwards compatibility
 
 If the changes above are too high friction for upgrading, we provide a shim that
-allow implementing these changes with a very minimal change. It adds a little
+allows implementing these changes with a very minimal change. It adds a little
 extra code size compared to the code above but should be decent for most cases.
 
 To use this shim just replace inheriting from CommandHandlerInterface with
@@ -216,6 +216,3 @@ To use default attribute persistence, you need to pass in a
 changes in [36658](https://github.com/project-chip/connectedhomeip/pull/36658)
 ).
 
-```
-
-```

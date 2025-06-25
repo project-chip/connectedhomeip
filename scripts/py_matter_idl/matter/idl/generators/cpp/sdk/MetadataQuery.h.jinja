@@ -1,7 +1,7 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
 // This file provides a function to query into the MetadataProviders without 
-// instansiating but the necessary Metadata
+// instantiating any unnecessary metadata.
 //
 // based on {{input_name}}
 #pragma once
@@ -20,9 +20,7 @@ namespace DataModel {
 
 // Implements a search for the AcceptedCommandEntry in multiple clusters
 // If no Clusters are provided it will search all clusters
-// Replacement for old Accepted Command Entry from Ember metadata using the ClusterMetadataProvider
-// Provided for legacy compatibility
-// We provide this function for convenience, however it is not expected to be used long-term
+// We provide this function for convenience, however it is not expected to be used long-term.
 template <ClusterId... TClusterIds>
 DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(ClusterId id, CommandId command)
 {

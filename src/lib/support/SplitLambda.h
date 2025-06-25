@@ -16,8 +16,8 @@ struct SplitLambdaCallerImpl<TReturn (TLambda::*)(TArgs...) const>
 
 } // namespace detail
 
-/// @brief Helper Object to use Lambdas through C-Like APIs where context is split from the callback
-///        This incurs no runtime code execution just keeps everything typesafe
+/// @brief Helper Object to use Lambdas through C-Like APIs where context is split from the callback.
+///        This incurs no runtime code execution; just keeps everything typesafe.
 /// @tparam TLambda
 /// @example
 ///     /* FunctionAPI */

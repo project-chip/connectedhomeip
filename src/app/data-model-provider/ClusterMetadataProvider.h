@@ -24,7 +24,7 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
-// This template will be specialized for each cluster type generated through idl_codegen
+// This template will be specialized for each cluster type, in generated code.
 template <class TypeInfo, ClusterId cluster>
 struct ClusterMetadataProvider
 {
