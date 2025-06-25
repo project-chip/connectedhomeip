@@ -26,7 +26,6 @@ chip_device_platform = "scm1612s"
 
 lwip_platform = "scm1612s"
 
-chip_mdns = "platform"
 chip_inet_config_enable_ipv4 = true
 
 chip_build_libshell = true

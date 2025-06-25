@@ -31,14 +31,13 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/senscomm/scm1612s/SCM1612SConfig.h>
 
-#ifdef __no_stub__
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-#ifdef MT793X_PORTING
-#include "wfx_host_events.h"
-#endif /* MT793X_PORTING */
-#endif
-#endif /* __no_stub__ */
 #include "stdio.h"
+
+#include "wise_event_loop.h"
+#include "wise_wifi_types.h"
+#include "wise_err.h"
+#include "wise_system.h"
+#include "scm_wifi.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -242,26 +241,31 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
     PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
 
-#ifdef __no_stub__
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
     ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
-#ifdef MT793X_PORTING
-    wfx_clear_wifi_provision();
-#endif /* MT793X_PORTING */
+
+    scm_wifi_clear_config(WIFI_IF_STA);
+    scm_fs_clear_all_config_value();
+
+    SCM1612SConfig::FactoryResetConfig();
+
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
-    NVIC_SystemReset();
-#endif /* __no_stub__ */
+    wise_restart();
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
-#ifdef __no_stub__
-    if (wifi_get_mac_addr_from_efuse(1, buf) < 0)
+    uint8_t *mac_addr = NULL;
+    scm_wifi_get_wlan_mac(&mac_addr, 0);
+
+    if (mac_addr)
+        memcpy(buf, mac_addr, 6);
+    else
         return CHIP_ERROR_INTERNAL;
-#endif /* __no_stub__ */
+
     return CHIP_NO_ERROR;
 }
 

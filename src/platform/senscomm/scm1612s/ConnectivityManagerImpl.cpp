@@ -42,12 +42,6 @@
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.cpp>
 #endif
 
-#ifdef __no_stub__
-#include "filogic.h"
-#include "mdns.h"
-#include "mt7933_pos.h"
-#endif /* __no_stub__ */
-
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;

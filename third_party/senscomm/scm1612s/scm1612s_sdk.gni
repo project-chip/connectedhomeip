@@ -47,7 +47,12 @@ template("scm1612s_sdk_sources") {
     }
     include_dirs += [ "${scm1612s_project_dir}/include" ]
 
-    defines = []
+    defines = [
+      #"MBEDTLS_CONFIG_FILE=\"SCM1612S-mbedtls-config.h\"",
+      "MBEDTLS_ECDSA_C",
+      "MBEDTLS_X509_CSR_WRITE_C",
+      "MBEDTLS_X509_CREATE_C",
+    ]
     if (defined(invoker.defines)) {
       defines += invoker.defines
     }

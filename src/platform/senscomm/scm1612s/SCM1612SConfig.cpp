@@ -32,6 +32,12 @@
 #include <lib/core/CHIPEncoding.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
 
+#include "wise_event_loop.h"
+#include "wise_event.h"
+#include "scm_fs.h"
+#include "scm_wifi.h"
+#include "wise_wifi_types.h"
+
 #include "FreeRTOS.h"
 #ifdef __no_stub__
 #include "nvdm.h"
@@ -114,164 +120,111 @@ static SemaphoreHandle_t nvdm_sem;
 static StaticSemaphore_t nvdm_sem_struct;
 #endif /* __no_stub__ */
 
+#define CONFIG_DIR "/config"
+#define CONFIG_PATH_MAX 128
+
+
 CHIP_ERROR SCM1612SConfig::Init()
 {
-#ifdef __no_stub__
-    CHIP_ERROR err;
-    nvdm_status_t nvdm_status;
-
-    nvdm_sem = xSemaphoreCreateBinaryStatic(&nvdm_sem_struct);
-
-    if (nvdm_sem == NULL)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    nvdm_status = nvdm_init();
-    err         = MapNvdmStatus(nvdm_status);
-    SuccessOrExit(err);
-
-exit:
-    OnExit();
-#endif /* __no_stub__ */
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR SCM1612SConfig::ReadConfigValue(Key key, bool & val)
 {
-#ifdef __no_stub__
-    CHIP_ERROR err;
-    uint32_t intVal;
-    uint32_t len = sizeof(bool);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint8_t value = 0;
 
-    if (pdFALSE == xSemaphoreTake(nvdm_sem, pdMS_TO_TICKS(NVDM_SEM_TIMEOUT_MS)))
-    {
-        err = CHIP_ERROR_TIMEOUT;
-        SuccessOrExit(err);
+    int read_len = scm_fs_read_config_value(key.Namespace, key.Name, (char *)&value, sizeof(value));
+    if (read_len < 0) {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    } else if (read_len != sizeof(value)) {
+        return CHIP_ERROR_READ_FAILED;
     }
 
-    // Get NVDM item
-    err = MapNvdmStatus(nvdm_read_data_item(key.Namespace, key.Name, (uint8_t *) &intVal, &len));
-    SuccessOrExit(err);
-
-    val = (intVal != 0);
-
-exit:
-    OnExit();
-    return err;
-#else /* __no_stub__ */
-    val = false;
+    val = (value != 0);
     return CHIP_NO_ERROR;
-#endif /* __no_stub__ */
 }
 
 CHIP_ERROR SCM1612SConfig::ReadConfigValue(Key key, uint32_t & val)
 {
-#ifdef __no_stub__
-    CHIP_ERROR err;
-    uint32_t len = sizeof(uint32_t);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint32_t value = 0;
 
-    if (pdFALSE == xSemaphoreTake(nvdm_sem, pdMS_TO_TICKS(NVDM_SEM_TIMEOUT_MS)))
+    int read_len = scm_fs_read_config_value(key.Namespace, key.Name, (char *)&value, sizeof(value));
+    if (read_len < 0)
     {
-        err = CHIP_ERROR_TIMEOUT;
-        SuccessOrExit(err);
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
-
-    if (key.Namespace == SCM1612SConfig::kConfigKey_SetupDiscriminator.Namespace &&
-        key.Name == SCM1612SConfig::kConfigKey_SetupDiscriminator.Name)
+    else if (read_len != sizeof(value))
     {
-        uint8_t mac_addr[WIFI_MAC_ADDRESS_LENGTH] = { 0 };
-        auto mFilogicCtx                          = PlatformMgrImpl().mFilogicCtx;
-
-        filogic_wifi_mac_addr_get_sync(mFilogicCtx, FILOGIC_WIFI_OPMODE_STA, mac_addr);
-
-        val = (*(reinterpret_cast<uint32_t *>(mac_addr))) & 0xFFF;
-        err = CHIP_NO_ERROR;
+        err = CHIP_ERROR_READ_FAILED;
     }
     else
     {
-        // Get NVDM item
-        err = MapNvdmStatus(nvdm_read_data_item(key.Namespace, key.Name, (uint8_t *) &val, &len));
-        SuccessOrExit(err);
+        val = value;
     }
-exit:
-    OnExit();
+
     return err;
-#else /* __no_stub__ */
-    val = 0;
-    return CHIP_NO_ERROR;
-#endif /* __no_stub__ */
 }
 
 CHIP_ERROR SCM1612SConfig::ReadConfigValue(Key key, uint64_t & val)
 {
-#ifdef __no_stub__
-    CHIP_ERROR err;
-    uint32_t len = sizeof(uint64_t);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint64_t value = 0;
 
-    if (pdFALSE == xSemaphoreTake(nvdm_sem, pdMS_TO_TICKS(NVDM_SEM_TIMEOUT_MS)))
+    int read_len = scm_fs_read_config_value(key.Namespace, key.Name, (char *)&value, sizeof(value));
+    if (read_len < 0)
     {
-        err = CHIP_ERROR_TIMEOUT;
-        SuccessOrExit(err);
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    else if (read_len != sizeof(value))
+    {
+        err = CHIP_ERROR_READ_FAILED;
+    }
+    else
+    {
+        val = value;
     }
 
-    // Get NVDM item
-    err = MapNvdmStatus(nvdm_read_data_item(key.Namespace, key.Name, (uint8_t *) &val, &len));
-    SuccessOrExit(err);
-
-exit:
-    OnExit();
     return err;
-#else /* __no_stub__ */
-    val = 0;
-    return CHIP_NO_ERROR;
-#endif /* __no_stub__ */
 }
 
 CHIP_ERROR SCM1612SConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-#ifdef __no_stub__
-    CHIP_ERROR err;
-    outLen = bufSize;
-    if (pdFALSE == xSemaphoreTake(nvdm_sem, pdMS_TO_TICKS(NVDM_SEM_TIMEOUT_MS)))
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (buf == nullptr || bufSize == 0)
     {
-        err = CHIP_ERROR_TIMEOUT;
-        SuccessOrExit(err);
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    // Get NVDM item
-    err = MapNvdmStatus(nvdm_read_data_item(key.Namespace, key.Name, (uint8_t *) buf, (uint32_t *) &outLen));
-    SuccessOrExit(err);
+    int read_len = scm_fs_read_config_value(key.Namespace, key.Name, buf, bufSize);
+    if (read_len < 0)
+    {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
 
-exit:
-    OnExit();
-    return err;
-#else /* __no_stub__ */
+    outLen = static_cast<size_t>(read_len);
+
     return CHIP_NO_ERROR;
-#endif /* __no_stub__ */
 }
 
 CHIP_ERROR SCM1612SConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-#ifdef __no_stub__
-    CHIP_ERROR err;
-    outLen = bufSize;
-    if (pdFALSE == xSemaphoreTake(nvdm_sem, pdMS_TO_TICKS(NVDM_SEM_TIMEOUT_MS)))
+    if (buf == nullptr || bufSize == 0)
     {
-        err = CHIP_ERROR_TIMEOUT;
-        SuccessOrExit(err);
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    // Get NVDM item
-    err = MapNvdmStatus(nvdm_read_data_item(key.Namespace, key.Name, (uint8_t *) buf, (uint32_t *) &outLen));
-    SuccessOrExit(err);
+    int read_len = scm_fs_read_config_value(key.Namespace, key.Name, reinterpret_cast<char *>(buf), bufSize);
+    if (read_len < 0)
+    {
+        return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
 
-exit:
-    OnExit();
-    return err;
-#else /* __no_stub__ */
+    outLen = static_cast<size_t>(read_len);
+
     return CHIP_NO_ERROR;
-#endif /* __no_stub__ */
 }
 
 CHIP_ERROR SCM1612SConfig::ReadConfigValueCounter(uint8_t counterIdx, uint32_t & val)
@@ -282,72 +235,31 @@ CHIP_ERROR SCM1612SConfig::ReadConfigValueCounter(uint8_t counterIdx, uint32_t &
 
 CHIP_ERROR SCM1612SConfig::WriteConfigValue(Key key, bool val)
 {
-#ifdef __no_stub__
-    CHIP_ERROR err;
-    uint32_t intVal = val ? 1 : 0;
-    uint32_t len    = sizeof(bool);
+    uint8_t value = val ? 1 : 0;
 
-    if (pdFALSE == xSemaphoreTake(nvdm_sem, pdMS_TO_TICKS(NVDM_SEM_TIMEOUT_MS)))
-    {
-        err = CHIP_ERROR_TIMEOUT;
-        SuccessOrExit(err);
-    }
+    int written = scm_fs_write_config_value(key.Namespace, key.Name, (const char *)&value, sizeof(value));
+    if (written != sizeof(value))
+        return CHIP_ERROR_WRITE_FAILED;
 
-    // Set NVDM item
-    err = MapNvdmStatus(nvdm_write_data_item(key.Namespace, key.Name, NVDM_DATA_ITEM_TYPE_RAW_DATA, (uint8_t *) &intVal, len));
-    SuccessOrExit(err);
-exit:
-    OnExit();
-    return err;
-#else /* __no_stub__ */
     return CHIP_NO_ERROR;
-#endif /* __no_stub__ */
 }
 
 CHIP_ERROR SCM1612SConfig::WriteConfigValue(Key key, uint32_t val)
 {
-#ifdef __no_stub__
-    CHIP_ERROR err;
-    uint32_t len = sizeof(uint32_t);
+    int written = scm_fs_write_config_value(key.Namespace, key.Name, (const char *)&val, sizeof(val));
+    if (written != sizeof(val))
+        return CHIP_ERROR_WRITE_FAILED;
 
-    if (pdFALSE == xSemaphoreTake(nvdm_sem, pdMS_TO_TICKS(NVDM_SEM_TIMEOUT_MS)))
-    {
-        err = CHIP_ERROR_TIMEOUT;
-        SuccessOrExit(err);
-    }
-
-    // Set NVDM item
-    err = MapNvdmStatus(nvdm_write_data_item(key.Namespace, key.Name, NVDM_DATA_ITEM_TYPE_RAW_DATA, (uint8_t *) &val, len));
-    SuccessOrExit(err);
-exit:
-    OnExit();
-    return err;
-#else /* __no_stub__ */
     return CHIP_NO_ERROR;
-#endif /* __no_stub__ */
 }
 
 CHIP_ERROR SCM1612SConfig::WriteConfigValue(Key key, uint64_t val)
 {
-#ifdef __no_stub__
-    CHIP_ERROR err;
-    uint32_t len = sizeof(uint64_t);
+    int written = scm_fs_write_config_value(key.Namespace, key.Name, (const char *)&val, sizeof(val));
+    if (written != sizeof(val))
+        return CHIP_ERROR_WRITE_FAILED;
 
-    if (pdFALSE == xSemaphoreTake(nvdm_sem, pdMS_TO_TICKS(NVDM_SEM_TIMEOUT_MS)))
-    {
-        err = CHIP_ERROR_TIMEOUT;
-        SuccessOrExit(err);
-    }
-
-    // Set NVDM item
-    err = MapNvdmStatus(nvdm_write_data_item(key.Namespace, key.Name, NVDM_DATA_ITEM_TYPE_RAW_DATA, (uint8_t *) &val, len));
-    SuccessOrExit(err);
-exit:
-    OnExit();
-    return err;
-#else /* __no_stub__ */
     return CHIP_NO_ERROR;
-#endif /* __no_stub__ */
 }
 
 CHIP_ERROR SCM1612SConfig::WriteConfigValueStr(Key key, const char * str)
@@ -357,46 +269,34 @@ CHIP_ERROR SCM1612SConfig::WriteConfigValueStr(Key key, const char * str)
 
 CHIP_ERROR SCM1612SConfig::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-#ifdef __no_stub__
-    CHIP_ERROR err;
-
-    if (pdFALSE == xSemaphoreTake(nvdm_sem, pdMS_TO_TICKS(NVDM_SEM_TIMEOUT_MS)))
+    if (str == nullptr || strLen == 0)
     {
-        err = CHIP_ERROR_TIMEOUT;
-        SuccessOrExit(err);
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    // Set NVDM item
-    err = MapNvdmStatus(nvdm_write_data_item(key.Namespace, key.Name, NVDM_DATA_ITEM_TYPE_STRING, (uint8_t *) str, strLen));
-    SuccessOrExit(err);
-exit:
-    OnExit();
-    return err;
-#else /* __no_stub__ */
+    int written = scm_fs_write_config_value(key.Namespace, key.Name, str, static_cast<int>(strLen));
+    if (written != static_cast<int>(strLen))
+    {
+        return CHIP_ERROR_WRITE_FAILED;
+    }
+
     return CHIP_NO_ERROR;
-#endif /* __no_stub__ */
 }
 
 CHIP_ERROR SCM1612SConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-#ifdef __no_stub__
-    CHIP_ERROR err;
-
-    if (pdFALSE == xSemaphoreTake(nvdm_sem, pdMS_TO_TICKS(NVDM_SEM_TIMEOUT_MS)))
+    if (data == nullptr || dataLen == 0)
     {
-        err = CHIP_ERROR_TIMEOUT;
-        SuccessOrExit(err);
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    // Set NVDM item
-    err = MapNvdmStatus(nvdm_write_data_item(key.Namespace, key.Name, NVDM_DATA_ITEM_TYPE_RAW_DATA, (uint8_t *) data, dataLen));
-    SuccessOrExit(err);
-exit:
-    OnExit();
-    return err;
-#else /* __no_stub__ */
+    int written = scm_fs_write_config_value(key.Namespace, key.Name, reinterpret_cast<const char *>(data), static_cast<int>(dataLen));
+    if (written != static_cast<int>(dataLen))
+    {
+        return CHIP_ERROR_WRITE_FAILED;
+    }
+
     return CHIP_NO_ERROR;
-#endif /* __no_stub__ */
 }
 
 CHIP_ERROR SCM1612SConfig::WriteConfigValueCounter(uint8_t counterIdx, uint32_t val)
@@ -406,127 +306,45 @@ CHIP_ERROR SCM1612SConfig::WriteConfigValueCounter(uint8_t counterIdx, uint32_t 
 
 CHIP_ERROR SCM1612SConfig::ClearConfigValue(Key key)
 {
-#ifdef __no_stub__
-    CHIP_ERROR err;
-
-    if (pdFALSE == xSemaphoreTake(nvdm_sem, pdMS_TO_TICKS(NVDM_SEM_TIMEOUT_MS)))
+    if (strcmp(key.Namespace, "chip-factory") == 0)
     {
-        err = CHIP_ERROR_TIMEOUT;
-        SuccessOrExit(err);
+        const char * configPartitionPath = "/config";
+        if (scm_fs_unmount(configPartitionPath) < 0)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+        if (scm_fs_format(configPartitionPath) < 0)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+
+        return CHIP_NO_ERROR;
     }
 
-    // Delete NVDM item
-    err = MapNvdmStatus(nvdm_delete_data_item(key.Namespace, key.Name));
-    SuccessOrExit(err);
-exit:
-    OnExit();
-    return err;
-#else /* __no_stub__ */
-    return CHIP_NO_ERROR;
-#endif /* __no_stub__ */
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 bool SCM1612SConfig::ConfigValueExists(Key key)
 {
-#ifdef __no_stub__
-    CHIP_ERROR err;
-    char group_name[32];
-    char data_item_name[32];
-    bool ret = false;
-    if (pdFALSE == xSemaphoreTake(nvdm_sem, pdMS_TO_TICKS(NVDM_SEM_TIMEOUT_MS)))
-    {
-        err = CHIP_ERROR_TIMEOUT;
-        SuccessOrExit(err);
-    }
-
-    // Query NVDM item
-    nvdm_query_begin();
-    while (nvdm_query_next_group_name(group_name) == NVDM_STATUS_OK)
-    {
-        if (!strcmp(group_name, key.Namespace))
-        {
-            while (nvdm_query_next_data_item_name(data_item_name) == NVDM_STATUS_OK)
-            {
-                if (!strcmp(data_item_name, key.Name))
-                {
-                    ret = true;
-                }
-            }
-        }
-    }
-    nvdm_query_end();
-
-exit:
-    OnExit();
-    return ret;
-#else /* __no_stub__ */
-    return false;
-#endif /* __no_stub__ */
+    return (scm_fs_exists_config_value(key.Namespace, key.Name) == 0);
 }
 
 CHIP_ERROR SCM1612SConfig::FactoryResetConfig(void)
 {
-#ifdef __no_stub__
-    CHIP_ERROR err;
+    const char * configPartitionPath = "/config";
 
-    if (pdFALSE == xSemaphoreTake(nvdm_sem, pdMS_TO_TICKS(NVDM_SEM_TIMEOUT_MS)))
+    if (scm_fs_unmount(configPartitionPath) < 0)
     {
-        err = CHIP_ERROR_TIMEOUT;
-        SuccessOrExit(err);
+        return CHIP_ERROR_INTERNAL;
     }
 
-    // Deletes all 'Config' type objects
-    // Note- 'Factory' and 'Counter' type are NOT deleted.
-    err = MapNvdmStatus(nvdm_delete_group(kConfigNamespace_ChipConfig));
-    SuccessOrExit(err);
-exit:
-    OnExit();
-    return err;
-#else /* __no_stub__ */
+    if (scm_fs_format(configPartitionPath) < 0)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
     return CHIP_NO_ERROR;
-#endif /* __no_stub__ */
 }
-
-#ifdef __no_stub__
-CHIP_ERROR SCM1612SConfig::MapNvdmStatus(nvdm_status_t nvdm_status)
-{
-    CHIP_ERROR err;
-
-    //    NVDM_STATUS_INVALID_PARAMETER = -5,  /**< The user parameter is invalid. */
-    //    NVDM_STATUS_ITEM_NOT_FOUND = -4,     /**< The data item wasn't found by the NVDM. */
-    //    NVDM_STATUS_INSUFFICIENT_SPACE = -3, /**< No space is available in the flash. */
-    //    NVDM_STATUS_INCORRECT_CHECKSUM = -2, /**< The NVDM found a checksum error when reading the data item. */
-    //    NVDM_STATUS_ERROR = -1,              /**< An unknown error occurred. */
-    //    NVDM_STATUS_OK = 0,                  /**< The operation was successful. */
-
-    switch (nvdm_status)
-    {
-    case NVDM_STATUS_OK:
-        err = CHIP_NO_ERROR;
-        break;
-    case NVDM_STATUS_ITEM_NOT_FOUND:
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-        break;
-    case NVDM_STATUS_INCORRECT_CHECKSUM:
-        err = CHIP_ERROR_INTEGRITY_CHECK_FAILED;
-        break;
-    case NVDM_STATUS_INSUFFICIENT_SPACE:
-        err = CHIP_ERROR_BUFFER_TOO_SMALL;
-        break;
-    case NVDM_STATUS_INVALID_PARAMETER:
-        err = CHIP_ERROR_INVALID_ARGUMENT;
-        break;
-    case NVDM_STATUS_ERROR:
-        err = CHIP_ERROR_INTERNAL;
-        break;
-    default:
-        err = CHIP_ERROR_INTERNAL;
-        break;
-    }
-
-    return err;
-}
-#endif /* __no_stub__ */
 
 void SCM1612SConfig::RunConfigUnitTest()
 {
@@ -536,9 +354,7 @@ void SCM1612SConfig::RunConfigUnitTest()
 
 void SCM1612SConfig::OnExit()
 {
-#ifdef __no_stub__
-    xSemaphoreGive(nvdm_sem);
-#endif /* __no_stub__ */
+    return;
 }
 
 } // namespace Internal

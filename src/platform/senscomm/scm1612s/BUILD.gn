@@ -42,8 +42,8 @@ static_library("scm1612s") {
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
 #    "DnssdContexts.cpp",
-    "DnssdImpl.cpp",
-    "DnssdImpl.h",
+#    "DnssdImpl.cpp",
+#    "DnssdImpl.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
@@ -67,7 +67,10 @@ if (chip_enable_ota_requestor) {
   # "${chip_root}/src/app:app_config",
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
-  deps = [ "${chip_root}/src/platform/logging:headers" ]
+  deps = [
+      "${chip_root}/src/lib/dnssd:platform_header",
+      "${chip_root}/src/platform/logging:headers",
+    ]
 
   # mDNS
   if (chip_mdns == "platform") {
