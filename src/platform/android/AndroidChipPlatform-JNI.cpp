@@ -68,7 +68,7 @@ JniGlobalReference sJavaLogCallbackObject;
 // Java object containing the listener to notify when a service is resolved.
 // It can be used by an Android application to be notified when the
 //  Operational discovery is done.
-jobject mJListenerObject;
+jobject mJListenerObject = nullptr;
 jmethodID mServiceResolveListener = nullptr;
 
 } // namespace
