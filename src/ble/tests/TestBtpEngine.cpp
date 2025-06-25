@@ -304,17 +304,16 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendInsufficientHeadroom)
     EXPECT_EQ(packet1->DataLength(), packet1->MaxDataLength());
 }
 
-
 // Test that the initial value of the last received sequence number is zero.
 TEST_F(TestBtpEngine, LastReceivedSequenceNumberInitial)
 {
-    EXPECT_EQ(mBtpEngine.GetLastReceivedSequenceNumber(),0);
+    EXPECT_EQ(mBtpEngine.GetLastReceivedSequenceNumber(), 0);
 }
 
 // Test that the initial value of the newest unacknowledged sent sequence number is zero.
 TEST_F(TestBtpEngine, NewestUnackedSentSequenceNumberInitial)
 {
-    EXPECT_EQ(mBtpEngine.GetNewestUnackedSentSequenceNumber(),0);
+    EXPECT_EQ(mBtpEngine.GetNewestUnackedSentSequenceNumber(), 0);
 }
 
 // Test that sending a packet updates the unacknowledged sequence number correctly,
@@ -334,7 +333,7 @@ TEST_F(TestBtpEngine, NewestUnackedSentSequenceNumberSend)
 
     // Confirm that there is unacknowledged data.
     EXPECT_TRUE(mBtpEngine.HasUnackedData());
-    
+
     // Prepare an acknowledgment packet for sequence number 0.
     uint8_t ackData[] = {
         to_underlying(BtpEngine::HeaderFlags::kFragmentAck),
@@ -343,7 +342,7 @@ TEST_F(TestBtpEngine, NewestUnackedSentSequenceNumberSend)
     };
 
     auto ackPacket = System::PacketBufferHandle::NewWithData(ackData, sizeof(ackData));
-    
+
     SequenceNumber_t seqNum;
     bool didRecieveAck;
 
