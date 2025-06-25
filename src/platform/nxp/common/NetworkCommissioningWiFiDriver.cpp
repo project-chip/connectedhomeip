@@ -19,8 +19,8 @@
 
 #include "NetworkCommissioningDriver.h"
 #include <lib/support/CodeUtils.h>
-#include <lib/support/StringFormatting.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/StringFormatting.h>
 #include <wlan.h>
 
 using namespace ::chip;
