@@ -554,6 +554,37 @@ class ClusterAttributeChangeAccumulator:
         await_sequence_of_reports(report_queue=self.attribute_queue, endpoint_id=self._endpoint_id,
                                   attribute=attribute, sequence=sequence, timeout_sec=timeout_sec)
 
+    def get_attribute_value_from_queue(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor = None, timeout_sec: float = 1.0) -> Any:
+        start_time = time.time()
+        elapsed = 0.0
+        time_remaining = timeout_sec
+
+        # Handles cluster subcription or attribute subscription
+        attribute = attribute or self._expected_attribute
+
+        while time_remaining > 0:
+            logging.info(f"[FC] Waiting for {timeout_sec:.1f} seconds for report.")
+            try:
+                item: AttributeValue = self.attribute_queue.get(block=True, timeout=time_remaining)
+
+                # Track arrival of expected attribute
+                if item.endpoint_id == endpoint and item.attribute == attribute:
+                    elapsed = time.time() - start_time
+                    logging.info(
+                        f"[FC] Got attribute {attribute.__name__}, value {item.value} on endpoint {item.endpoint_id}. Elapsed {elapsed} sec.")
+                    return item.value
+
+            except queue.Empty:
+                # No error, we update timeouts and keep going
+                pass
+
+            elapsed = time.time() - start_time
+            time_remaining = timeout_sec - elapsed
+
+        logging.info(f"[FC] Report for {attribute.__name__} not found before time-out ({timeout_sec} sec).")
+
+        return None
+
     @property
     def attribute_queue(self) -> queue.Queue:
         return self._q
@@ -567,6 +598,23 @@ class ClusterAttributeChangeAccumulator:
     def attribute_reports(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, AttributeValue]:
         with self._lock:
             return self._attribute_reports.copy()
+
+    def log_queue(self) -> None:
+        str = f"[FC] {len(self._q.queue)} attributes in the queue: ["
+        for attr_val in self._q.queue:
+            if isinstance(attr_val.value, Enum):
+                enum_class_name = type(attr_val.value).__name__
+                enum_item_name = attr_val.value.name
+                val_str = f"{enum_class_name}.{enum_item_name}: {attr_val.value}"
+            else:
+                val_str = attr_val.value
+
+            if attr_val == self._q.queue[-1]:
+                str += f"{attr_val.attribute.__name__}={val_str}"
+            else:
+                str += f"{attr_val.attribute.__name__}={val_str}, "
+        str += "]"
+        logging.info(f"{str}")
 
     def get_last_report(self) -> Optional[Any]:
         """Flush entire queue, returning last (newest) report only."""
@@ -1468,6 +1516,37 @@ class MatterBaseTest(base_test.BaseTestClass):
                 None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)]), timeout=60)
             self.stored_global_wildcard = await global_wildcard
 
+    async def cluster_guard(self, endpoint: int, cluster: ClusterObjects.Cluster, skip_step: bool = True):
+        """Similar to attribute_guard. While the `skip_step` argument is set to True (default), and after
+           checking a condition it returns False, it marks the test step as skipped; if it returns True,
+           the test step is executed.
+           If the `skip_step` argument is set to False, no test step is skipped, and the function will
+           return True or False depending on the condition.
+           For example can be used to check if a test step should be run:
+
+              self.step("1")
+              if await self.cluster_guard(condition1_needs_to_be_true_to_execute):
+                  # executes step 1
+
+              self.step("2")
+              if await self.cluster_guard(condition2_needs_to_be_false_to_skip_step):
+                  # skip step 2
+
+              self.step("3")
+              if await self.cluster_guard(Clusters.FanControl, skip_step=False):
+                  # handle logic if True
+
+              self.step("4")
+              if await self.cluster_guard(Clusters.DoorLock, skip_step=False):
+                  # handle logic if False
+           """
+        await self._populate_wildcard()
+        cluster_condition = _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint, cluster=cluster)
+        if not cluster_condition:
+            if skip_step:
+                self.mark_current_step_skipped()
+        return cluster_condition
+
     async def attribute_guard(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor):
         """Similar to pics_guard above, except checks a condition and if False marks the test step as skipped and
            returns False using attributes against attributes_list, otherwise returns True.
@@ -2171,6 +2250,7 @@ _get_all_matching_endpoints = decorators._get_all_matching_endpoints
 _has_feature = decorators._has_feature
 _has_command = decorators._has_command
 _has_attribute = decorators._has_attribute
+_has_cluster = decorators._has_cluster
 
 default_matter_test_main = runner.default_matter_test_main
 get_test_info = runner.get_test_info
