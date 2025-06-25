@@ -29,7 +29,7 @@
 
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-#include <app/util/persistence/DefaultAttributePersistenceProvider.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <data-model-providers/codegen/Instance.h>
 
 #include <app/TestEventTriggerDelegate.h>
