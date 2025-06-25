@@ -423,6 +423,10 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId,
         }
     }
 
+    // Schedule sending Ice Candidates when remote candidates are received. This keeps the exchange simple
+    MoveToState(State::SendingICECandidates);
+    ScheduleICECandidatesSend();
+
     return CHIP_NO_ERROR;
 }
 
