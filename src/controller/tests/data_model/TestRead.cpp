@@ -67,6 +67,10 @@ const MockNodeConfig & TestMockNodeConfig()
                 Clusters::UnitTesting::Attributes::Int16u::Id,
                 Clusters::UnitTesting::Attributes::ListFabricScoped::Id,
                 Clusters::UnitTesting::Attributes::ListStructOctetString::Id,
+                kPerpetualAttributeid,
+            }),
+            MockClusterConfig(kPerpetualClusterId, {
+                ClusterRevision::Id, FeatureMap::Id, 1
             }),
         }),
         MockEndpointConfig(kMockEndpoint1, {
