@@ -733,7 +733,8 @@ AttestationVerificationResult DefaultDACVerifier::ValidateCertificateDeclaration
     {
         ChipLogProgress(NotSpecified, "Device certification declaration details:");
         ChipLogProgress(NotSpecified, "--> VID: 0x%04X", cdContent.vendorId);
-        // TODO: Figure out how to log the product_id_array, which is not in cdContent.
+        // TODO (https://github.com/project-chip/connectedhomeip/issues/39714): Figure out how to
+        // log the product_id_array, which is not in cdContent.
         ChipLogProgress(NotSpecified, "--> Device type ID: " ChipLogFormatMEI, ChipLogValueMEI(cdContent.deviceTypeId));
         ChipLogProgress(NotSpecified, "--> Certification type: %d (%s)", cdContent.certificationType,
                         CertificationTypeAsString(static_cast<CertificationType>(cdContent.certificationType)));
