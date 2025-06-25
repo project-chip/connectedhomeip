@@ -13364,18 +13364,22 @@ public static class ZoneManagementClusterZoneInformationStruct {
   public Integer zoneID;
   public Integer zoneType;
   public Integer zoneSource;
+  public Optional<ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct> twoDCartesianZone;
   private static final long ZONE_ID_ID = 0L;
   private static final long ZONE_TYPE_ID = 1L;
   private static final long ZONE_SOURCE_ID = 2L;
+  private static final long TWO_D_CARTESIAN_ZONE_ID = 3L;
 
   public ZoneManagementClusterZoneInformationStruct(
     Integer zoneID,
     Integer zoneType,
-    Integer zoneSource
+    Integer zoneSource,
+    Optional<ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct> twoDCartesianZone
   ) {
     this.zoneID = zoneID;
     this.zoneType = zoneType;
     this.zoneSource = zoneSource;
+    this.twoDCartesianZone = twoDCartesianZone;
   }
 
   public StructType encodeTlv() {
@@ -13383,6 +13387,7 @@ public static class ZoneManagementClusterZoneInformationStruct {
     values.add(new StructElement(ZONE_ID_ID, new UIntType(zoneID)));
     values.add(new StructElement(ZONE_TYPE_ID, new UIntType(zoneType)));
     values.add(new StructElement(ZONE_SOURCE_ID, new UIntType(zoneSource)));
+    values.add(new StructElement(TWO_D_CARTESIAN_ZONE_ID, twoDCartesianZone.<BaseTLVType>map((nonOptionaltwoDCartesianZone) -> nonOptionaltwoDCartesianZone.encodeTlv()).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -13394,6 +13399,7 @@ public static class ZoneManagementClusterZoneInformationStruct {
     Integer zoneID = null;
     Integer zoneType = null;
     Integer zoneSource = null;
+    Optional<ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct> twoDCartesianZone = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ZONE_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -13410,12 +13416,18 @@ public static class ZoneManagementClusterZoneInformationStruct {
           UIntType castingValue = element.value(UIntType.class);
           zoneSource = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == TWO_D_CARTESIAN_ZONE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          twoDCartesianZone = Optional.of(ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct.decodeTlv(castingValue));
+        }
       }
     }
     return new ZoneManagementClusterZoneInformationStruct(
       zoneID,
       zoneType,
-      zoneSource
+      zoneSource,
+      twoDCartesianZone
     );
   }
 
@@ -13431,6 +13443,9 @@ public static class ZoneManagementClusterZoneInformationStruct {
     output.append("\n");
     output.append("\tzoneSource: ");
     output.append(zoneSource);
+    output.append("\n");
+    output.append("\ttwoDCartesianZone: ");
+    output.append(twoDCartesianZone);
     output.append("\n");
     output.append("}\n");
     return output.toString();
