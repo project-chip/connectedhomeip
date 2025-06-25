@@ -165,7 +165,7 @@ void ClosureManager::HandleClosureActionTimer(System::Layer * layer, void * aApp
 {
     // Mark aAppState as unused to avoid compiler warnings
     // Will be used in closure dimension cluster Commands
-    (void)aAppState;
+    (void) aAppState;
 
     ClosureManager & instance = ClosureManager::GetInstance();
 
