@@ -63,7 +63,12 @@
 #endif
 
 // Application level logic
+#include "AppConfig.h"
+#if BASE_APP_BUILD
+#include "BaseAppTask.h"
+#else
 #include "AppTask.h"
+#endif
 #include "ota.h"
 
 using namespace ::chip;
@@ -120,14 +125,19 @@ void Application_Init(void)
     ChipLogProgress(NotSpecified, "Qorvo " APP_NAME " Launching");
     ChipLogProgress(NotSpecified, "============================");
 
-    error = GetAppTask().Init();
+#if BASE_APP_BUILD
+    BaseAppTask & appTask = BaseAppTask::GetAppTask();
+#else
+    AppTask & appTask = AppTask::GetAppTask();
+#endif
+    error = appTask.Init();
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "GetAppTask().Init() failed");
         return;
     }
 
-    error = GetAppTask().StartAppTask();
+    error = appTask.StartAppTask();
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(NotSpecified, "GetAppTask().StartAppTask() failed");

@@ -13364,18 +13364,22 @@ public static class ZoneManagementClusterZoneInformationStruct {
   public Integer zoneID;
   public Integer zoneType;
   public Integer zoneSource;
+  public Optional<ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct> twoDCartesianZone;
   private static final long ZONE_ID_ID = 0L;
   private static final long ZONE_TYPE_ID = 1L;
   private static final long ZONE_SOURCE_ID = 2L;
+  private static final long TWO_D_CARTESIAN_ZONE_ID = 3L;
 
   public ZoneManagementClusterZoneInformationStruct(
     Integer zoneID,
     Integer zoneType,
-    Integer zoneSource
+    Integer zoneSource,
+    Optional<ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct> twoDCartesianZone
   ) {
     this.zoneID = zoneID;
     this.zoneType = zoneType;
     this.zoneSource = zoneSource;
+    this.twoDCartesianZone = twoDCartesianZone;
   }
 
   public StructType encodeTlv() {
@@ -13383,6 +13387,7 @@ public static class ZoneManagementClusterZoneInformationStruct {
     values.add(new StructElement(ZONE_ID_ID, new UIntType(zoneID)));
     values.add(new StructElement(ZONE_TYPE_ID, new UIntType(zoneType)));
     values.add(new StructElement(ZONE_SOURCE_ID, new UIntType(zoneSource)));
+    values.add(new StructElement(TWO_D_CARTESIAN_ZONE_ID, twoDCartesianZone.<BaseTLVType>map((nonOptionaltwoDCartesianZone) -> nonOptionaltwoDCartesianZone.encodeTlv()).orElse(new EmptyType())));
 
     return new StructType(values);
   }
@@ -13394,6 +13399,7 @@ public static class ZoneManagementClusterZoneInformationStruct {
     Integer zoneID = null;
     Integer zoneType = null;
     Integer zoneSource = null;
+    Optional<ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct> twoDCartesianZone = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == ZONE_ID_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -13410,12 +13416,18 @@ public static class ZoneManagementClusterZoneInformationStruct {
           UIntType castingValue = element.value(UIntType.class);
           zoneSource = castingValue.value(Integer.class);
         }
+      } else if (element.contextTagNum() == TWO_D_CARTESIAN_ZONE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          twoDCartesianZone = Optional.of(ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct.decodeTlv(castingValue));
+        }
       }
     }
     return new ZoneManagementClusterZoneInformationStruct(
       zoneID,
       zoneType,
-      zoneSource
+      zoneSource,
+      twoDCartesianZone
     );
   }
 
@@ -13431,6 +13443,9 @@ public static class ZoneManagementClusterZoneInformationStruct {
     output.append("\n");
     output.append("\tzoneSource: ");
     output.append(zoneSource);
+    output.append("\n");
+    output.append("\ttwoDCartesianZone: ");
+    output.append(twoDCartesianZone);
     output.append("\n");
     output.append("}\n");
     return output.toString();
@@ -13628,8 +13643,8 @@ public static class CameraAvStreamManagementClusterVideoStreamStruct {
   public ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution;
   public Long minBitRate;
   public Long maxBitRate;
-  public Integer minFragmentLen;
-  public Integer maxFragmentLen;
+  public Integer minKeyFrameInterval;
+  public Integer maxKeyFrameInterval;
   public Optional<Boolean> watermarkEnabled;
   public Optional<Boolean> OSDEnabled;
   public Integer referenceCount;
@@ -13642,8 +13657,8 @@ public static class CameraAvStreamManagementClusterVideoStreamStruct {
   private static final long MAX_RESOLUTION_ID = 6L;
   private static final long MIN_BIT_RATE_ID = 7L;
   private static final long MAX_BIT_RATE_ID = 8L;
-  private static final long MIN_FRAGMENT_LEN_ID = 9L;
-  private static final long MAX_FRAGMENT_LEN_ID = 10L;
+  private static final long MIN_KEY_FRAME_INTERVAL_ID = 9L;
+  private static final long MAX_KEY_FRAME_INTERVAL_ID = 10L;
   private static final long WATERMARK_ENABLED_ID = 11L;
   private static final long OSD_ENABLED_ID = 12L;
   private static final long REFERENCE_COUNT_ID = 13L;
@@ -13658,8 +13673,8 @@ public static class CameraAvStreamManagementClusterVideoStreamStruct {
     ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution,
     Long minBitRate,
     Long maxBitRate,
-    Integer minFragmentLen,
-    Integer maxFragmentLen,
+    Integer minKeyFrameInterval,
+    Integer maxKeyFrameInterval,
     Optional<Boolean> watermarkEnabled,
     Optional<Boolean> OSDEnabled,
     Integer referenceCount
@@ -13673,8 +13688,8 @@ public static class CameraAvStreamManagementClusterVideoStreamStruct {
     this.maxResolution = maxResolution;
     this.minBitRate = minBitRate;
     this.maxBitRate = maxBitRate;
-    this.minFragmentLen = minFragmentLen;
-    this.maxFragmentLen = maxFragmentLen;
+    this.minKeyFrameInterval = minKeyFrameInterval;
+    this.maxKeyFrameInterval = maxKeyFrameInterval;
     this.watermarkEnabled = watermarkEnabled;
     this.OSDEnabled = OSDEnabled;
     this.referenceCount = referenceCount;
@@ -13691,8 +13706,8 @@ public static class CameraAvStreamManagementClusterVideoStreamStruct {
     values.add(new StructElement(MAX_RESOLUTION_ID, maxResolution.encodeTlv()));
     values.add(new StructElement(MIN_BIT_RATE_ID, new UIntType(minBitRate)));
     values.add(new StructElement(MAX_BIT_RATE_ID, new UIntType(maxBitRate)));
-    values.add(new StructElement(MIN_FRAGMENT_LEN_ID, new UIntType(minFragmentLen)));
-    values.add(new StructElement(MAX_FRAGMENT_LEN_ID, new UIntType(maxFragmentLen)));
+    values.add(new StructElement(MIN_KEY_FRAME_INTERVAL_ID, new UIntType(minKeyFrameInterval)));
+    values.add(new StructElement(MAX_KEY_FRAME_INTERVAL_ID, new UIntType(maxKeyFrameInterval)));
     values.add(new StructElement(WATERMARK_ENABLED_ID, watermarkEnabled.<BaseTLVType>map((nonOptionalwatermarkEnabled) -> new BooleanType(nonOptionalwatermarkEnabled)).orElse(new EmptyType())));
     values.add(new StructElement(OSD_ENABLED_ID, OSDEnabled.<BaseTLVType>map((nonOptionalOSDEnabled) -> new BooleanType(nonOptionalOSDEnabled)).orElse(new EmptyType())));
     values.add(new StructElement(REFERENCE_COUNT_ID, new UIntType(referenceCount)));
@@ -13713,8 +13728,8 @@ public static class CameraAvStreamManagementClusterVideoStreamStruct {
     ChipStructs.CameraAvStreamManagementClusterVideoResolutionStruct maxResolution = null;
     Long minBitRate = null;
     Long maxBitRate = null;
-    Integer minFragmentLen = null;
-    Integer maxFragmentLen = null;
+    Integer minKeyFrameInterval = null;
+    Integer maxKeyFrameInterval = null;
     Optional<Boolean> watermarkEnabled = Optional.empty();
     Optional<Boolean> OSDEnabled = Optional.empty();
     Integer referenceCount = null;
@@ -13764,15 +13779,15 @@ public static class CameraAvStreamManagementClusterVideoStreamStruct {
           UIntType castingValue = element.value(UIntType.class);
           maxBitRate = castingValue.value(Long.class);
         }
-      } else if (element.contextTagNum() == MIN_FRAGMENT_LEN_ID) {
+      } else if (element.contextTagNum() == MIN_KEY_FRAME_INTERVAL_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          minFragmentLen = castingValue.value(Integer.class);
+          minKeyFrameInterval = castingValue.value(Integer.class);
         }
-      } else if (element.contextTagNum() == MAX_FRAGMENT_LEN_ID) {
+      } else if (element.contextTagNum() == MAX_KEY_FRAME_INTERVAL_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          maxFragmentLen = castingValue.value(Integer.class);
+          maxKeyFrameInterval = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == WATERMARK_ENABLED_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
@@ -13801,8 +13816,8 @@ public static class CameraAvStreamManagementClusterVideoStreamStruct {
       maxResolution,
       minBitRate,
       maxBitRate,
-      minFragmentLen,
-      maxFragmentLen,
+      minKeyFrameInterval,
+      maxKeyFrameInterval,
       watermarkEnabled,
       OSDEnabled,
       referenceCount
@@ -13840,11 +13855,11 @@ public static class CameraAvStreamManagementClusterVideoStreamStruct {
     output.append("\tmaxBitRate: ");
     output.append(maxBitRate);
     output.append("\n");
-    output.append("\tminFragmentLen: ");
-    output.append(minFragmentLen);
+    output.append("\tminKeyFrameInterval: ");
+    output.append(minKeyFrameInterval);
     output.append("\n");
-    output.append("\tmaxFragmentLen: ");
-    output.append(maxFragmentLen);
+    output.append("\tmaxKeyFrameInterval: ");
+    output.append(maxKeyFrameInterval);
     output.append("\n");
     output.append("\twatermarkEnabled: ");
     output.append(watermarkEnabled);
@@ -14813,6 +14828,67 @@ public static class CameraAvSettingsUserLevelManagementClusterMPTZPresetStruct {
     return output.toString();
   }
 }
+public static class CameraAvSettingsUserLevelManagementClusterDPTZStruct {
+  public Integer videoStreamID;
+  public ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct viewport;
+  private static final long VIDEO_STREAM_ID_ID = 0L;
+  private static final long VIEWPORT_ID = 1L;
+
+  public CameraAvSettingsUserLevelManagementClusterDPTZStruct(
+    Integer videoStreamID,
+    ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct viewport
+  ) {
+    this.videoStreamID = videoStreamID;
+    this.viewport = viewport;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(VIDEO_STREAM_ID_ID, new UIntType(videoStreamID)));
+    values.add(new StructElement(VIEWPORT_ID, viewport.encodeTlv()));
+
+    return new StructType(values);
+  }
+
+  public static CameraAvSettingsUserLevelManagementClusterDPTZStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer videoStreamID = null;
+    ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct viewport = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == VIDEO_STREAM_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          videoStreamID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == VIEWPORT_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
+          StructType castingValue = element.value(StructType.class);
+          viewport = ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct.decodeTlv(castingValue);
+        }
+      }
+    }
+    return new CameraAvSettingsUserLevelManagementClusterDPTZStruct(
+      videoStreamID,
+      viewport
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("CameraAvSettingsUserLevelManagementClusterDPTZStruct {\n");
+    output.append("\tvideoStreamID: ");
+    output.append(videoStreamID);
+    output.append("\n");
+    output.append("\tviewport: ");
+    output.append(viewport);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class CameraAvSettingsUserLevelManagementClusterViewportStruct {
   public Integer x1;
   public Integer y1;
@@ -14899,67 +14975,6 @@ public static class CameraAvSettingsUserLevelManagementClusterViewportStruct {
     output.append("\n");
     output.append("\ty2: ");
     output.append(y2);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class CameraAvSettingsUserLevelManagementClusterDPTZStruct {
-  public Integer videoStreamID;
-  public ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct viewport;
-  private static final long VIDEO_STREAM_ID_ID = 0L;
-  private static final long VIEWPORT_ID = 1L;
-
-  public CameraAvSettingsUserLevelManagementClusterDPTZStruct(
-    Integer videoStreamID,
-    ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct viewport
-  ) {
-    this.videoStreamID = videoStreamID;
-    this.viewport = viewport;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(VIDEO_STREAM_ID_ID, new UIntType(videoStreamID)));
-    values.add(new StructElement(VIEWPORT_ID, viewport.encodeTlv()));
-
-    return new StructType(values);
-  }
-
-  public static CameraAvSettingsUserLevelManagementClusterDPTZStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Integer videoStreamID = null;
-    ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct viewport = null;
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == VIDEO_STREAM_ID_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          videoStreamID = castingValue.value(Integer.class);
-        }
-      } else if (element.contextTagNum() == VIEWPORT_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Struct) {
-          StructType castingValue = element.value(StructType.class);
-          viewport = ChipStructs.CameraAvSettingsUserLevelManagementClusterViewportStruct.decodeTlv(castingValue);
-        }
-      }
-    }
-    return new CameraAvSettingsUserLevelManagementClusterDPTZStruct(
-      videoStreamID,
-      viewport
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("CameraAvSettingsUserLevelManagementClusterDPTZStruct {\n");
-    output.append("\tvideoStreamID: ");
-    output.append(videoStreamID);
-    output.append("\n");
-    output.append("\tviewport: ");
-    output.append(viewport);
     output.append("\n");
     output.append("}\n");
     return output.toString();

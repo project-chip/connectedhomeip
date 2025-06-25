@@ -2962,7 +2962,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         self.CheckIsActive()
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetDACRevocationSetPath(
-                c_char_p(str.encode(dacRevocationSetPath) if dacRevocationSetPath else None))
+                c_char_p(str.encode(dacRevocationSetPath) if dacRevocationSetPath else ""))
         ).raise_on_error()
 
 

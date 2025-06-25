@@ -12574,27 +12574,20 @@ class ChipClusters:
             },
             0x00000003: {
                 "commandId": 0x00000003,
-                "commandName": "GetTwoDCartesianZone",
-                "args": {
-                    "zoneID": "int",
-                },
-            },
-            0x00000005: {
-                "commandId": 0x00000005,
                 "commandName": "RemoveZone",
                 "args": {
                     "zoneID": "int",
                 },
             },
-            0x00000006: {
-                "commandId": 0x00000006,
+            0x00000004: {
+                "commandId": 0x00000004,
                 "commandName": "CreateOrUpdateTrigger",
                 "args": {
                     "trigger": "ZoneTriggerControlStruct",
                 },
             },
-            0x00000007: {
-                "commandId": 0x00000007,
+            0x00000005: {
+                "commandId": 0x00000005,
                 "commandName": "RemoveTrigger",
                 "args": {
                     "zoneID": "int",
@@ -12712,8 +12705,8 @@ class ChipClusters:
                     "maxResolution": "VideoResolutionStruct",
                     "minBitRate": "int",
                     "maxBitRate": "int",
-                    "minFragmentLen": "int",
-                    "maxFragmentLen": "int",
+                    "minKeyFrameInterval": "int",
+                    "maxKeyFrameInterval": "int",
                     "watermarkEnabled": "bool",
                     "OSDEnabled": "bool",
                 },
@@ -12890,7 +12883,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000012: {
-                "attributeName": "RankedVideoStreamPrioritiesList",
+                "attributeName": "StreamUsagePriorities",
                 "attributeId": 0x00000012,
                 "type": "int",
                 "reportable": True,

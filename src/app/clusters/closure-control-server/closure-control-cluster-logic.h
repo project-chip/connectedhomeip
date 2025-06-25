@@ -173,6 +173,8 @@ public:
     CHIP_ERROR GetOverallTarget(DataModel::Nullable<GenericOverallTarget> & overallTarget);
     // The delegate is expected to return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to indicate end of list
     CHIP_ERROR GetCurrentErrorList(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
+    CHIP_ERROR GetFeatureMap(BitFlags<Feature> & featureMap);
+    CHIP_ERROR GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision);
 
     /**
      * @brief Set OverallTarget.
@@ -185,6 +187,18 @@ public:
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
     CHIP_ERROR SetOverallState(const DataModel::Nullable<GenericOverallState> & overallState);
+
+    /**
+     * @brief Set OverallTarget.
+     *
+     * @param[in] overallTarget OverallTarget Position, Latch and Speed.
+     *
+     * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     */
+    CHIP_ERROR SetOverallTarget(const DataModel::Nullable<GenericOverallTarget> & overallTarget);
 
     /**
      * @brief Sets the main state of the cluster.
@@ -278,7 +292,7 @@ public:
      * @param[in] EngageValue will indicate if the actuator is Engaged or Disengaged
      *
      * @return CHIP_NO_ERROR if the event is generated successfull
-     *         CHIP_NO_ERROR if hte ManuallyOperable feature is not supported.
+     *         CHIP_NO_ERROR if the ManuallyOperable feature is not supported.
      *         Returns an appropriate error code if event generation fails
      */
     CHIP_ERROR GenerateEngageStateChangedEvent(const bool engageValue);
@@ -374,18 +388,6 @@ private:
     {
         return SetCountdownTime(countdownTime, false);
     }
-
-    /**
-     * @brief Set OverallTarget.
-     *
-     * @param[in] overallTarget OverallTarget Position, Latch and Speed.
-     *
-     * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
-     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
-     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     */
-    CHIP_ERROR SetOverallTarget(const DataModel::Nullable<GenericOverallTarget> & overallTarget);
 };
 
 } // namespace ClosureControl

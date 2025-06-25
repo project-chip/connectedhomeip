@@ -151,6 +151,8 @@ def BuildHostTarget():
         TargetPart('terms-and-conditions', app=HostApp.TERMS_AND_CONDITIONS),
         TargetPart('camera', app=HostApp.CAMERA),
         TargetPart('camera-controller', app=HostApp.CAMERA_CONTROLLER),
+        TargetPart('jf-control-app', app=HostApp.JF_CONTROL),
+        TargetPart('jf-admin-app', app=HostApp.JF_ADMIN),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -814,7 +816,6 @@ def BuildTelinkTarget():
     target.AppendModifier('thread-analyzer', thread_analyzer_config=True)
     target.AppendModifier('precompiled-ot', precompiled_ot_config=True)
     target.AppendModifier('tflm', tflm_config=True)
-    target.AppendModifier('newlib', newlib_libc_config=True)
 
     return target
 
