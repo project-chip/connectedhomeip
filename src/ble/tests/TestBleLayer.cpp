@@ -32,17 +32,19 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
+#include <lib/support/SetupDiscriminator.h>
 
 #define _CHIP_BLE_BLE_H
 #include <ble/BleApplicationDelegate.h>
 #include <ble/BleLayer.h>
 #include <ble/BleLayerDelegate.h>
 #include <ble/BlePlatformDelegate.h>
+#include <ble/BleConnectionDelegate.h>
 
 namespace chip {
 namespace Ble {
 
-namespace {
+namespace { 
 
 constexpr ChipBleUUID uuidZero{};
 
@@ -52,6 +54,7 @@ class TestBleLayer : public BleLayer,
                      private BleApplicationDelegate,
                      private BleLayerDelegate,
                      private BlePlatformDelegate,
+                     private BleConnectionDelegate,
                      public ::testing::Test
 {
 public:
@@ -150,6 +153,12 @@ public:
     {
         return CHIP_NO_ERROR;
     }
+
+    ///
+    // Implementation of BleConnectionDelegate
+    void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override {}
+    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override {}
+    CHIP_ERROR CancelConnection() override { return CHIP_NO_ERROR; }
 
 private:
     unsigned int mNumConnection = 0;
@@ -383,5 +392,29 @@ TEST_F(TestBleLayer, ExceedBleConnectionEndPointLimit)
     EXPECT_FALSE(HandleWriteReceivedCapabilitiesRequest(connObj));
 }
 
+TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsIncorrectState) {
+    SetupDiscriminator discriminators[] = {SetupDiscriminator(), SetupDiscriminator()};
+    Span<const SetupDiscriminator> discriminatorsSpan(discriminators, 2);
+
+    auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {};
+    auto OnError = [](void * appState, CHIP_ERROR err) {};
+
+    EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_ERROR_INCORRECT_STATE);
+}
+
+
+TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoBleTransportLayer) {
+    SetupDiscriminator discriminators[] = {SetupDiscriminator(), SetupDiscriminator()};
+    Span<const SetupDiscriminator> discriminatorsSpan(discriminators, 2);
+    mBleTransport = nullptr;
+
+
+    auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {};
+    auto OnError = [](void * appState, CHIP_ERROR err) {};
+
+    EXPECT_FALSE(mBleTransport);
+    EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_ERROR_INCORRECT_STATE);
+}
+  
 }; // namespace Ble
 }; // namespace chip
