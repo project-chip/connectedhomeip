@@ -18,13 +18,16 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${CLOSURE_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --timeout 30
+#       --endpoint 1
+#       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -32,12 +35,57 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from random import choice
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from chip.interaction_model import Status, InteractionModelError
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
+                                         default_matter_test_main, AttributeMatcher, AttributeValue, ClusterAttributeChangeAccumulator)
 from mobly import asserts
+
+
+def main_state_matcher(main_state: Clusters.ClosureControl.Enums.MainStateEnum) -> AttributeMatcher:
+    def predicate(report: AttributeValue) -> bool:
+        if report.attribute != Clusters.ClosureControl.Attributes.MainState:
+            return False
+        if report.value == main_state:
+            return True
+        else:
+            return False
+    return AttributeMatcher.from_callable(description=f"MainState is {main_state}", matcher=predicate)
+
+
+def current_position_matcher(current_position: Clusters.ClosureControl.Enums.CurrentPositionEnum) -> AttributeMatcher:
+    def predicate(report: AttributeValue) -> bool:
+        if report.attribute != Clusters.ClosureControl.Attributes.OverallCurrentState:
+            return False
+        if report.value.position == current_position:
+            return True
+        else:
+            return False
+    return AttributeMatcher.from_callable(description=f"OverallCurrentState.Position is {current_position}", matcher=predicate)
+
+
+def current_speed_matcher(current_speed: Clusters.Globals.Enums.ThreeLevelAutoEnum) -> AttributeMatcher:
+    def predicate(report: AttributeValue) -> bool:
+        if report.attribute != Clusters.ClosureControl.Attributes.OverallCurrentState:
+            return False
+        if report.value.speed == current_speed:
+            return True
+        else:
+            return False
+    return AttributeMatcher.from_callable(description=f"OverallCurrentState.speed is {current_speed}", matcher=predicate)
+
+
+def current_latch_matcher(current_latch: bool) -> AttributeMatcher:
+    def predicate(report: AttributeValue) -> bool:
+        if report.attribute != Clusters.ClosureControl.Attributes.OverallCurrentState:
+            return False
+        if report.value.latch == current_latch:
+            return True
+        else:
+            return False
+    return AttributeMatcher.from_callable(description=f"OverallCurrentState.Latch is {current_latch}", matcher=predicate)
 
 
 class TC_CLCTRL_4_1(MatterBaseTest):
@@ -53,64 +101,84 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
             TestStep("2a", "TH reads from the DUT the (0xFFFC) FeatureMap attribute."),
             TestStep("2b", "If the PS feature is not supported on the cluster, skip remaining steps and end test case."),
-            TestStep("2c", "TH reads from the DUT the (0xFFFB) AttributeList attribute."),
-            TestStep("3a", "TH sends command MoveTo with Position = Signature."),
-            TestStep("3b", "If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute."),
-            TestStep("3c", "TH waits for PIXIT.CLCTRL.FullMotionDuration seconds."),
-            TestStep("3d", "If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute."),
-            TestStep("3e", "If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute."),
-            TestStep("4a", "If VT feature is not supported on the cluster, skip steps 4b to 4f."),
-            TestStep("4b", "TH sends command MoveTo with Position = Ventilation."),
-            TestStep("4c", "If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute."),
-            TestStep("4d", "TH waits for PIXIT.CLCTRL.FullMotionDuration seconds."),
-            TestStep("4e", "If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute."),
-            TestStep("4f", "If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute."),
-            TestStep("5a", "If PD feature is not supported on the cluster, skip steps 5b to 5f."),
-            TestStep("5b", "TH sends command MoveTo with Position = Pedestrian."),
-            TestStep("5c", "If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute."),
-            TestStep("5d", "TH waits for PIXIT.CLCTRL.FullMotionDuration seconds."),
-            TestStep("5e", "If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute."),
-            TestStep("5f", "If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute."),
-            TestStep("6a", "TH sends command MoveTo with Position = OpenInFull."),
-            TestStep("6b", "If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute."),
-            TestStep("6c", "TH waits for PIXIT.CLCTRL.FullMotionDuration seconds."),
-            TestStep("6d", "If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute."),
-            TestStep("6e", "If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute."),
-            TestStep("7a", "TH sends command MoveTo with Position = CloseInFull."),
-            TestStep("7b", "If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute."),
-            TestStep("7c", "TH waits for PIXIT.CLCTRL.FullMotionDuration seconds."),
-            TestStep("7d", "If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute."),
-            TestStep("7e", "If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute."),
-            TestStep("8a", "If SP feature is not supported on the cluster, skip steps 8b to 8g."),
-            TestStep("8b", "TH sends command MoveTo with Speed = High."),
-            TestStep("8c", "If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute."),
-            TestStep("8d", "If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute."),
-            TestStep("8e", "TH sends command MoveTo with Speed = Low."),
-            TestStep("8f", "If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute."),
-            TestStep("8g", "If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute."),
-            TestStep("9a", "If PT feature is not supported on the cluster, skip steps 9b to 9f."),
-            TestStep("9b", "TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Protected(5) Test Event."),
-            TestStep("9c", "If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute."),
-            TestStep("9d", "TH sends command MoveTo with Position = CloseInFull."),
-            TestStep("9e", "TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear."),
-            TestStep("9f", "If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute."),
-            TestStep("10a", "If MO feature is not supported on the cluster, skip steps 10b to 10f."),
-            TestStep("10b", "TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Disengaged(6) Test Event."),
-            TestStep("10c", "If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute."),
-            TestStep("10d", "TH sends command MoveTo with Position = CloseInFull."),
-            TestStep("10e", "TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear."),
-            TestStep("10f", "If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute."),
-            TestStep("11a", "If IS feature is not supported on the cluster, skip steps 11b to 11k."),
-            TestStep("11b", "TH sends command MoveTo with Position = OpenInFull."),
-            TestStep("11c", "If attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute."),
-            TestStep("11d", "TH waits for 2 seconds."),
-            TestStep("11e", "If attribute is supported on the cluster, TH reads from the DUT the OverallState attribute."),
-            TestStep("11f", "If attribute is supported on the cluster, TH reads from the DUT the MainState attribute."),
-            TestStep("11g", "TH sends command MoveTo with Position = CloseInFull."),
-            TestStep("11h", "If attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute."),
-            TestStep("11i", "TH waits for 2 seconds."),
-            TestStep("11j", "If attribute is supported on the cluster, TH reads from the DUT the OverallState attribute."),
-            TestStep("11k", "If attribute is supported on the cluster, TH reads from the DUT the MainState attribute."),
+            TestStep("2c", "TH reads TestEventTrigger attribute from the General Diagnostic Cluster."),
+            TestStep("2d", "TH reads from the DUT the (0xFFFB) AttributeList attribute."),
+            TestStep("2e", "TH establishes a wildcard subscription to all attributes on the Closure Control Cluster, with MinIntervalFloor = 0, MaxIntervalCeiling = 30 and KeepSubscriptions = false."),
+            TestStep("3a", "If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute."),
+            TestStep("3b", "If CurrentPosition = FullyClosed, skip steps 3c to 3d."),
+            TestStep("3c", "TH sends command MoveTo with Position = MoveToFullyClosed."),
+            TestStep("3d", "Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed."),
+            TestStep("3e", "If the SP feature is not supported on the cluster, skip steps 3f to 3i."),
+            TestStep("3f", "If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute."),
+            TestStep("3g", "If CurrentSpeed = Low, skip steps 3h to 3i."),
+            TestStep("3h", "TH sends command MoveTo with Speed = Low."),
+            TestStep("3i", "Wait until TH receives a subscription report with OverallCurrentState.Speed = Low."),
+            TestStep("3j", "If the LT feature is not supported on the cluster, skip steps 3k to 5e."),
+            TestStep("3k", "If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute."),
+            TestStep("3l", "If the attribute is supported on the cluster, TH reads from the DUT the LatchControlModes attribute."),
+            TestStep("3m", "If CurrentLatch = True, skip steps 3n to 3r."),
+            TestStep("3n", "If LatchControlModes Bit 0 = 0 (RemoteLatching = False), skip step 3o."),
+            TestStep("3o", "TH sends command MoveTo with Latch = True."),
+            TestStep("3p", "If LatchControlModes Bit 0 = 1 (RemoteLatching = True), skip step 3q."),
+            TestStep("3q", "Latch the DUT manually to set OverallCurrentState.Latch to True."),
+            TestStep("3r", "If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute."),
+            TestStep("3s", "If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute."),
+            TestStep("4a", "TH sends command MoveTo with Position = MoveToFullyOpen."),
+            TestStep("5a", "If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip step 5b."),
+            TestStep("5b", "TH sends command MoveTo with Latch = False."),
+            TestStep("5c", "If LatchControlModes Bit 1 = 1 (RemoteUnlatching = True), skip step 5d."),
+            TestStep("5d", "Unlatch the DUT manually to set OverallCurrentState.Latch to False."),
+            TestStep("5e", "Wait until TH receives a subscription report with OverallCurrentState.Latch = False."),
+            TestStep("6a", "TH sends command MoveTo with Position = MoveToSignaturePosition."),
+            TestStep("6b", "If the attribute is supported on the cluster, TH reads from the DUT the OverallTargetState attribute."),
+            TestStep("6c", "Wait until TH receives a subscription report with OverallCurrentState.Position = OpenedAtSignature."),
+            TestStep("6d", "Wait until TH receives a subscription report with MainState = Stopped."),
+            TestStep("7a", "If VT feature is not supported on the cluster, skip steps 7b to 7e."),
+            TestStep("7b", "TH sends command MoveTo with Position = MoveToVentilationPosition."),
+            TestStep("7c", "If the attribute is supported on the cluster, TH reads from the DUT the OverallTargetState attribute."),
+            TestStep("7d", "Wait until TH receives a subscription report with OverallCurrentState.Position = OpenedForVentilation."),
+            TestStep("7e", "Wait until TH receives a subscription report with MainState = Stopped."),
+            TestStep("8a", "If PD feature is not supported on the cluster, skip steps 8b to 8e."),
+            TestStep("8b", "TH sends command MoveTo with Position = MoveToPedestrianPosition."),
+            TestStep("8c", "If the attribute is supported on the cluster, TH reads from the DUT the OverallTargetState attribute."),
+            TestStep("8d", "Wait until TH receives a subscription report with OverallCurrentState.Position = OpenedForPedestrian."),
+            TestStep("8e", "Wait until TH receives a subscription report with MainState = Stopped."),
+            TestStep("9a", "TH sends command MoveTo with Position = MoveToFullyOpen."),
+            TestStep("9b", "If the attribute is supported on the cluster, TH reads from the DUT the OverallTargetState attribute."),
+            TestStep("9c", "Wait until TH receives a subscription report with OverallCurrentState.Position = FullyOpened."),
+            TestStep("9d", "Wait until TH receives a subscription report with MainState = Stopped."),
+            TestStep("10a", "TH sends command MoveTo with Position = MoveToFullyClosed."),
+            TestStep("10b", "If the attribute is supported on the cluster, TH reads from the DUT the OverallTargetState attribute."),
+            TestStep("10c", "Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed."),
+            TestStep("10d", "Wait until TH receives a subscription report with MainState = Stopped."),
+            TestStep("11a", "If SP feature is not supported on the cluster, skip steps 11b to 11g."),
+            TestStep("11b", "TH sends command MoveTo with Speed = High."),
+            TestStep("11c", "If the attribute is supported on the cluster, TH reads from the DUT the OverallTargetState attribute."),
+            TestStep("11d", "Wait until TH receives a subscription report with OverallCurrentState.Speed = High."),
+            TestStep("11e", "TH sends command MoveTo with Speed = Low."),
+            TestStep("11f", "If the attribute is supported on the cluster, TH reads from the DUT the OverallTargetState attribute."),
+            TestStep("11g", "Wait until TH receives a subscription report with OverallCurrentState.Speed = Low."),
+            TestStep("12a", "If PT feature is not supported on the cluster, skip steps 12b to 12f."),
+            TestStep("12b", "TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Protected Test Event."),
+            TestStep("12c", "If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute."),
+            TestStep("12d", "TH sends command MoveTo with Position = MoveToFullyOpen."),
+            TestStep("12e", "TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear."),
+            TestStep("12f", "If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute."),
+            TestStep("13a", "If MO feature is not supported on the cluster, skip steps 13b to 13f."),
+            TestStep("13b", "TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Disengaged Test Event."),
+            TestStep("13c", "If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute."),
+            TestStep("13d", "TH sends command MoveTo with Position = MoveToFullyOpen."),
+            TestStep("13e", "TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear."),
+            TestStep("13f", "If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute."),
+            TestStep("14a", "If IS feature is not supported on the cluster, skip steps 14b to 14i."),
+            TestStep("14b", "TH sends command MoveTo with Position = MoveToFullyOpen."),
+            TestStep("14c", "If attribute is supported on the cluster, TH reads from the DUT the OverallTargetState attribute."),
+            TestStep("14d", "Wait until TH receives a subscription report with OverallCurrentState.Position = FullyOpened."),
+            TestStep("14e", "Wait until TH receives a subscription report with MainState = Stopped."),
+            TestStep("14f", "TH sends command MoveTo with Position = MoveToFullyClosed."),
+            TestStep("14g", "If attribute is supported on the cluster, TH reads from the DUT the OverallTargetState attribute."),
+            TestStep("14h", "Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed."),
+            TestStep("14i", "Wait until TH receives a subscription report with MainState = Stopped."),
         ]
         return steps
 
@@ -123,7 +191,9 @@ class TC_CLCTRL_4_1(MatterBaseTest):
     @async_test_body
     async def test_TC_CLCTRL_4_1(self):
         endpoint = self.get_endpoint(default=1)
-        is_skipped = False
+        dev_controller = self.default_controller
+        attributes = Clusters.ClosureControl.Attributes
+        timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
         self.step(1)
@@ -132,16 +202,16 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         # STEP 2a: TH reads from the DUT the (0xFFFC) FeatureMap attribute
         self.step("2a")
 
-        feature_map = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
+        feature_map = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
         logging.info(f"FeatureMap: {feature_map}")
-        is_ps_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPosition
+        is_ps_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPositioning
         is_vt_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kVentilation
         is_pd_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPedestrian
         is_sp_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kSpeed
-        is_pt_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kProtected
-        is_mo_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotion
-        is_is_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kIs
-        is_lt_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kLatch
+        is_pt_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kProtection
+        is_mo_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kManuallyOperable
+        is_is_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kInstantaneous
+        is_lt_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
 
         # STEP 2b: If the PS feature is not supported on the cluster, skip remaining steps and end test case
         self.step("2b")
@@ -156,885 +226,841 @@ class TC_CLCTRL_4_1(MatterBaseTest):
 
             return
 
-        # STEP 2c: TH reads from the DUT the (0xFFFB) AttributeList attribute
+        # STEP 2c: TH reads TestEventTriggerEnabled attribute from the General Diagnostic Cluster
         self.step("2c")
+
+        logging.info("Checking if TestEventTrigger attribute is enabled")
+        self.check_test_event_triggers_enabled()
+
+        # STEP 2d: TH reads from the DUT the (0xFFFB) AttributeList attribute
+        self.step("2d")
 
         attribute_list = await self.read_clctrl_attribute_expect_success(endpoint, attributes.AttributeList)
         logging.info(f"AttributeList: {attribute_list}")
 
-        # STEP 3a: TH sends command MoveTo with Position = Signature
+        # STEP 2e: TH establishes a wildcard subscription to all attributes on the Closure Control Cluster, with MinIntervalFloor = 0, MaxIntervalCeiling = 30 and KeepSubscriptions = false
+        self.step("2e")
+
+        sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureControl)
+        await sub_handler.start(dev_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
+
+        # STEP 3a: If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute
         self.step("3a")
 
-        try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                position=Clusters.ClosureControl.Bitmaps.Position.kSignature,
-            ))
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status, Status.Success, "Unexpected error returned")
-            pass
+        if attributes.OverallCurrentState.attribute_id in attribute_list:
+            overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
+            logging.info(f"OverallCurrentState: {overall_current_state}")
 
-        # STEP 3b: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
+            if overall_current_state == None:
+                logging.error("OverallCurrentState is None")
+
+            CurrentPosition = overall_current_state.position
+            asserts.assert_in(CurrentPosition, Clusters.ClosureControl.Enums.CurrentPositionEnum,
+                              "OverallCurrentState.position is not in the expected range")
+        else:
+            asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
+            return
+
+        # STEP 3b: If CurrentPosition = FullyClosed, skip steps 3c to 3d
         self.step("3b")
 
-        if attributes.OverallTarget.attribute_id in attribute_list:
-            overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTarget)
-            logging.info(f"OverallTarget: {overall_target}")
-            asserts.assert_equal(overall_target.Position, Clusters.ClosureControl.Bitmaps.OverallTarget.kSignature,
-                                 "OverallTarget.Position is not Signature")
-            if is_lt_feature_supported:
-                asserts.assert_false(overall_target.Latch, "OverallTarget.Latch is not False")
-            if is_sp_feature_supported:
-                asserts.assert_range(overall_target.Speed, Clusters.ClosureControl.Bitmaps.Speed.kLow,
-                                     Clusters.ClosureControl.Bitmaps.Speed.kAuto, "OverallTarget.Speed is out of range")
+        if CurrentPosition == Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed:
+            logging.info("CurrentPosition is FullyClosed, skipping steps 3c to 3d")
+
+            # Skipping steps 3c and 3d
+            self.skip_step("3c")
+            self.skip_step("3d")
         else:
-            asserts.assert_true(False, "OverallTarget attribute is not supported.")
-            return
+            # STEP 3c: TH sends command MoveTo with Position = MoveToFullyClosed
+            self.step("3c")
 
-        # STEP 3c: TH waits for PIXIT.CLCTRL.FullMotionDuration seconds
-        self.step("3c")
+            sub_handler.reset()
+            try:
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                pass
 
-        full_motion_duration = self.matter_test_config.get("PIXIT.CLCTRL.FullMotionDuration", 0)
-        if full_motion_duration is None:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is not defined")
-            return
-        if full_motion_duration < 0:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is negative")
-            return
-        if full_motion_duration > 0:
-            logging.info(f"Waiting for {full_motion_duration} seconds")
-            await self.wait(full_motion_duration)
-        else:
-            logging.info("FullMotionDuration is 0, skipping wait")
+            # STEP 3d: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed
+            self.step("3d")
 
-        # STEP 3d: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
-        self.step("3d")
+            logging.info("Waiting for OverallCurrentState.Position to be FullyClosed")
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed)],
+                                                          timeout_sec=timeout)
 
-        if attributes.OverallState.attribute_id in attribute_list:
-            overall_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallState)
-            logging.info(f"OverallState: {overall_state}")
-            asserts.assert_equal(overall_state.Position, Clusters.ClosureControl.Bitmaps.OverallState.kSignature,
-                                 "OverallState.Position is not Signature")
-            if is_lt_feature_supported:
-                asserts.assert_false(overall_state.Latch, "OverallState.Latch is not False")
-            if is_sp_feature_supported:
-                asserts.assert_range(overall_state.Speed, 0, 3, "OverallState.Speed is out of range")
-            if overall_state.SecureState != NullValue:
-                asserts.assert_false(overall_state.SecureState, "OverallState.SecureState is not False")
-            else:
-                logging.info("SecureState is NULL.")
-        else:
-            asserts.assert_true(False, "OverallState attribute is not supported.")
-            return
-
-        # STEP 3e: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
+        # STEP 3e: If the SP feature is not supported on the cluster, skip steps 3f to 3i
         self.step("3e")
 
-        if attributes.MainState.attribute_id in attribute_list:
-            main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            logging.info(f"MainState: {main_state}")
-            is_stopped = mainstate == Clusters.ClosureControl.Bitmaps.MainState.kStopped
-            asserts.assert_true(is_stopped, "MainState is not in the expected state")
-            if is_stopped:
-                logging.info("MainState is in the stopped state")
+        if not is_sp_feature_supported:
+            logging.info("Speed feature not supported, skipping steps 3f to 3i")
+
+            # Skipping steps 3f to 3i
+            self.skip_step("3f")
+            self.skip_step("3g")
+            self.skip_step("3h")
+            self.skip_step("3i")
         else:
-            asserts.assert_true(False, "MainState attribute is not supported.")
-            return
+            logging.info("Speed feature supported.")
 
-        # STEP 4a: If VT feature is not supported on the cluster, skip steps 4b to 4f
-        self.step("4a")
-        if not is_vt_feature_supported:
-            logging.info("Ventilation feature not supported, skipping steps 4b to 4f")
-            is_skipped = True
+            # STEP 3f: If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute
+            self.step("3f")
 
-        # STEP 4b: TH sends command MoveTo with Position = Ventilation
-        self.step("4b")
+            if attributes.OverallCurrentState.attribute_id in attribute_list:
+                overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
+                logging.info(f"OverallCurrentState: {overall_current_state}")
+                if overall_current_state == None:
+                    logging.error("OverallCurrentState is None")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                position=Clusters.ClosureControl.Bitmaps.Position.kVentilation,
-            ))
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status, Status.Success, "Unexpected error returned")
-            pass
-
-        # STEP 4c: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
-        self.step("4c")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        if attributes.OverallTarget.attribute_id in attribute_list:
-            overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTarget)
-            logging.info(f"OverallTarget: {overall_target}")
-            asserts.assert_equal(overall_target.Position, Clusters.ClosureControl.Bitmaps.OverallTarget.kVentilation,
-                                 "OverallTarget.Position is not Ventilation")
-            if is_lt_feature_supported:
-                asserts.assert_false(overall_target.Latch, "OverallTarget.Latch is not False")
-            if is_sp_feature_supported:
-                asserts.assert_range(overall_target.Speed, 0, 3, "OverallTarget.Speed is out of range")
-        else:
-            asserts.assert_true(False, "OverallTarget attribute is not supported.")
-            return
-
-        # STEP 4d: TH waits for PIXIT.CLCTRL.FullMotionDuration seconds
-        self.step("4d")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        logging.info(f"Waiting for {full_motion_duration} seconds")
-        await self.wait(full_motion_duration)
-
-        # STEP 4e: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
-        self.step("4e")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        if attributes.OverallState.attribute_id in attribute_list:
-            overall_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallState)
-            logging.info(f"OverallState: {overall_state}")
-            asserts.assert_equal(overall_state.Position, Clusters.ClosureControl.Bitmaps.OverallState.kVentilation,
-                                 "OverallState.Position is not Ventilation")
-            if is_lt_feature_supported:
-                asserts.assert_false(overall_state.Latch, "OverallState.Latch is not False")
-            if is_sp_feature_supported:
-                asserts.assert_range(overall_state.Speed, 0, 3, "OverallState.Speed is out of range")
-            if overall_state.SecureState != NullValue:
-                asserts.assert_false(overall_state.SecureState, "OverallState.SecureState is not False")
+                CurrentSpeed = overall_current_state.speed
+                asserts.assert_in(CurrentSpeed, Clusters.Globals.Enums.ThreeLevelAutoEnum,
+                                  "OverallCurrentState.speed is not in the expected range")
             else:
-                logging.info("SecureState is NULL.")
-        else:
-            asserts.assert_true(False, "OverallState attribute is not supported.")
-            return
+                asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
+                return
 
-        # STEP 4f: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
-        self.step("4f")
+            # STEP 3g: If CurrentSpeed = Low, skip steps 3h to 3i
+            self.step("3g")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            is_skipped = False
-            return
-        if attributes.MainState.attribute_id in attribute_list:
-            main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            logging.info(f"MainState: {main_state}")
-            is_stopped = mainstate == Clusters.ClosureControl.Bitmaps.MainState.kStopped
-            asserts.assert_true(is_stopped, "MainState is not in the expected state")
-            if is_stopped:
-                logging.info("MainState is in the stopped state")
-        else:
-            asserts.assert_true(False, "MainState attribute is not supported.")
-            return
-        is_skipped = False
+            if CurrentSpeed == Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow:
+                logging.info("CurrentSpeed is Low, skipping steps 3h to 3i")
 
-        # STEP 5a: If PD feature is not supported on the cluster, skip steps 5b to 5f
-        self.step("5a")
-
-        if not is_pd_feature_supported:
-            logging.info("Pedestrian feature not supported, skipping steps 5b to 5f")
-            is_skipped = True
-
-        # STEP 5b: TH sends command MoveTo with Position = Pedestrian
-        self.step("5b")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                position=Clusters.ClosureControl.Bitmaps.Position.kPedestrian,
-            ))
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status, Status.Success, "Unexpected error returned")
-            pass
-
-        # STEP 5c: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
-        self.step("5c")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        if attributes.OverallTarget.attribute_id in attribute_list:
-            overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTarget)
-            logging.info(f"OverallTarget: {overall_target}")
-            asserts.assert_equal(overall_target.Position, Clusters.ClosureControl.Bitmaps.OverallTarget.kPedestrian,
-                                 "OverallTarget.Position is not Pedestrian")
-            if is_lt_feature_supported:
-                asserts.assert_false(overall_target.Latch, "OverallTarget.Latch is not False")
-            if is_sp_feature_supported:
-                asserts.assert_range(overall_target.Speed, 0, 3, "OverallTarget.Speed is out of range")
-        else:
-            asserts.assert_true(False, "OverallTarget attribute is not supported.")
-            return
-
-        # STEP 5d: TH waits for PIXIT.CLCTRL.FullMotionDuration seconds
-        self.step("5d")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-
-        logging.info(f"Waiting for {full_motion_duration} seconds")
-        await self.wait(full_motion_duration)
-
-        # STEP 5e: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
-        self.step("5e")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        if attributes.OverallState.attribute_id in attribute_list:
-            overall_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallState)
-            logging.info(f"OverallState: {overall_state}")
-            asserts.assert_equal(overall_state.Position, Clusters.ClosureControl.Bitmaps.OverallState.kPedestrian,
-                                 "OverallState.Position is not Pedestrian")
-            if is_lt_feature_supported:
-                asserts.assert_false(overall_state.Latch, "OverallState.Latch is not False")
-            if is_sp_feature_supported:
-                asserts.assert_range(overall_state.Speed, 0, 3, "OverallState.Speed is out of range")
-            if overall_state.SecureState != NullValue:
-                asserts.assert_false(overall_state.SecureState, "OverallState.SecureState is not False")
+                # Skipping steps 3h and 3i
+                self.skip_step("3h")
+                self.skip_step("3i")
             else:
-                logging.info("SecureState is NULL.")
+                logging.info("CurrentSpeed is not Low, proceeding to steps 3h and 3i")
+
+                # STEP 3h: TH sends command MoveTo with Speed = Low
+                self.step("3h")
+
+                sub_handler.reset()
+                try:
+                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                        speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow
+                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                except InteractionModelError as e:
+                    asserts.assert_equal(
+                        e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                    pass
+
+                # STEP 3i: Wait until TH receives a subscription report with OverallCurrentState.Speed = Low
+                self.step("3i")
+
+                logging.info("Waiting for OverallCurrentState.Speed to be Low")
+                sub_handler.await_all_expected_report_matches(expected_matchers=[current_speed_matcher(Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow)],
+                                                              timeout_sec=timeout)
+
+        # STEP 3j: If the LT feature is not supported on the cluster, skip steps 3k to 5e
+        self.step("3j")
+
+        if is_lt_feature_supported:
+            logging.info("Motion Latching feature supported.")
+
+            # STEP 3k: If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute
+            self.step("3k")
+
+            if attributes.OverallCurrentState.attribute_id in attribute_list:
+                overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
+                logging.info(f"OverallCurrentState: {overall_current_state}")
+                if overall_current_state == None:
+                    logging.error("OverallCurrentState is None")
+
+                CurrentLatch = overall_current_state.latch
+                asserts.assert_in(CurrentLatch, [True, False], "OverallCurrentState.latch is not in the expected range")
+            else:
+                asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
+                return
+
+            # STEP 3l: If the attribute is supported on the cluster, TH reads from the DUT the LatchControlModes attribute
+            self.step("3l")
+
+            if attributes.LatchControlModes.attribute_id in attribute_list:
+                LatchControlModes = await self.read_clctrl_attribute_expect_success(endpoint, attributes.LatchControlModes)
+                logging.info(f"LatchControlModes: {LatchControlModes}")
+
+                if LatchControlModes == None:
+                    logging.error("LatchControlModes is None")
+            else:
+                asserts.assert_true(False, "LatchControlModes attribute is not supported.")
+                return
+
+            # STEP 3m: If CurrentLatch = True, skip steps 3n to 3r
+            self.step("3m")
+
+            if CurrentLatch:
+                logging.info("CurrentLatch is True, skipping steps 3n to 3r")
+
+                # Skipping steps 3n to 3r
+                self.skip_step("3n")
+                self.skip_step("3o")
+                self.skip_step("3p")
+                self.skip_step("3q")
+                self.skip_step("3r")
+            else:
+                logging.info("CurrentLatch is False, proceeding to steps 3n to 3r")
+
+                # STEP 3n: If LatchControlModes Bit 0 = 0 (RemoteLatching = False), skip step 3o
+                self.step("3n")
+                if (int(bin(LatchControlModes), 2) & 1) == 1:
+                    logging.info("RemoteLatching is True, proceeding to step 3o")
+
+                    # STEP 3o: TH sends command MoveTo with Latch = True
+                    self.step("3o")
+
+                    try:
+                        await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                            latch=True
+                        ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                    except InteractionModelError as e:
+                        asserts.assert_equal(
+                            e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                        pass
+                    self.step("3p")
+                    self.skip_step("3q")
+                elif (int(bin(LatchControlModes), 2) & 1) == 0:
+                    self.skip_step("3o")
+                    # STEP 3p: If LatchControlModes Bit 0 = 1 (RemoteLatching = True), skip step 3q
+                    self.step("3p")
+
+                    logging.info("RemoteLatching is False, proceeding to step 3q")
+
+                    # STEP 3q: Latch the DUT manually to set OverallCurrentState.Latch to True
+                    self.step("3q")
+
+                    logging.info("Latch the DUT manually to set OverallCurrentState.Latch to True")
+                    # Simulating manual latching by waiting for user input
+                    input("Press Enter after latching the DUT...")
+                    logging.info("Manual latching completed.")
+
+                # STEP 3r: If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute
+                self.step("3r")
+
+                if attributes.OverallCurrentState.attribute_id in attribute_list:
+                    overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
+                    logging.info(f"OverallCurrentState: {overall_current_state}")
+
+                    if overall_current_state == None:
+                        logging.error("OverallCurrentState is None")
+
+                    asserts.assert_true(overall_current_state.latch, "OverallCurrentState.latch is not True")
+                else:
+                    asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
+                    return
+
+            # STEP 3s: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
+            self.step("3s")
+
+            if attributes.MainState.attribute_id in attribute_list:
+                main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
+                logging.info(f"MainState: {main_state}")
+                asserts.assert_true(main_state == Clusters.ClosureControl.Enums.MainStateEnum.kStopped,
+                                    "MainState is not in the expected state")
+            else:
+                asserts.assert_true(False, "MainState attribute is not supported.")
+                return
+
+            # STEP 4a: TH sends command MoveTo with Position = MoveToFullyOpen
+            self.step("4a")
+
+            try:
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.InvalidAction, f"The MoveTo command sends an incorrect state: {e.status}")
+                pass
+
+            # STEP 5a: If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip step 5b
+            self.step("5a")
+
+            sub_handler.reset()
+            if (int(bin(LatchControlModes), 2) & (1 << 1)) == 2:
+                logging.info("RemoteUnlatching is True, proceeding to step 5b")
+
+                # STEP 5b: TH sends command MoveTo with Latch = False
+                self.step("5b")
+
+                try:
+                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                        latch=False
+                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                except InteractionModelError as e:
+                    asserts.assert_equal(
+                        e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                    pass
+
+                self.step("5c")
+                self.skip_step("5d")
+            elif (int(bin(LatchControlModes), 2) & (1 << 1)) == 0:
+                self.skip_step("5b")
+
+                # STEP 5c: If LatchControlModes Bit 1 = 1 (RemoteUnlatching = True), skip step 5d
+                self.step("5c")
+
+                logging.info("RemoteUnlatching is False, proceeding to step 5d")
+
+                # STEP 5d: Unlatch the DUT manually to set OverallCurrentState.Latch to False
+                self.step("5d")
+
+                logging.info("Unlatch the DUT manually to set OverallCurrentState.Latch to False")
+                # Simulating manual unlatching by waiting for user input
+                input("Press Enter after unlatching the DUT...")
+                logging.info("Manual unlatching completed.")
+
+            # STEP 5e: Wait until TH receives a subscription report with OverallCurrentState.Latch = False
+            self.step("5e")
+
+            logging.info("Waiting for OverallCurrentState.Latch to be False")
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)],
+                                                          timeout_sec=timeout)
         else:
-            asserts.assert_true(False, "OverallState attribute is not supported.")
-            return
+            logging.info("Motion Latching feature not supported, skipping steps 3k to 5e")
 
-        # STEP 5f: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
-        self.step("5f")
+            # Skipping steps 3k to 5e
+            self.skip_step("3k")
+            self.skip_step("3l")
+            self.skip_step("3m")
+            self.skip_step("3n")
+            self.skip_step("3o")
+            self.skip_step("3p")
+            self.skip_step("3q")
+            self.skip_step("3r")
+            self.skip_step("5a")
+            self.skip_step("5b")
+            self.skip_step("5c")
+            self.skip_step("5d")
+            self.skip_step("5e")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            is_skipped = False
-            return
-        if attributes.MainState.attribute_id in attribute_list:
-            main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            logging.info(f"MainState: {main_state}")
-            is_stopped = mainstate == Clusters.ClosureControl.Bitmaps.MainState.kStopped
-            asserts.assert_true(is_stopped, "MainState is not in the expected state")
-            if is_stopped:
-                logging.info("MainState is in the stopped state")
-        else:
-            asserts.assert_true(False, "MainState attribute is not supported.")
-            return
-        is_skipped = False
-
-        # STEP 6a: TH sends command MoveTo with Position = OpenInFull
+        # STEP 6a: TH sends command MoveTo with Position = MoveToSignaturePosition
         self.step("6a")
 
+        sub_handler.reset()
         try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                position=Clusters.ClosureControl.Bitmaps.Position.kOpenInFull,
-            ))
+            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToSignaturePosition,
+            ), endpoint=endpoint, timedRequestTimeoutMs=1000)
         except InteractionModelError as e:
             asserts.assert_equal(
-                e.status, Status.Success, "Unexpected error returned")
+                e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
             pass
 
-        # STEP 6b: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
+        # STEP 6b: If the attribute is supported on the cluster, TH reads from the DUT the OverallTargetState attribute
         self.step("6b")
 
-        if attributes.OverallTarget.attribute_id in attribute_list:
-            overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTarget)
-            logging.info(f"OverallTarget: {overall_target}")
-            asserts.assert_equal(overall_target.Position, Clusters.ClosureControl.Bitmaps.OverallTarget.kOpenInFull,
-                                 "OverallTarget.Position is not OpenInFull")
-            if is_lt_feature_supported:
-                asserts.assert_false(overall_target.Latch, "OverallTarget.Latch is not False")
-            if is_sp_feature_supported:
-                asserts.assert_range(overall_target.Speed, 0, 3, "OverallTarget.Speed is out of range")
+        if attributes.OverallTargetState.attribute_id in attribute_list:
+            overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
+            logging.info(f"OverallTargetState: {overall_target}")
+            asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToSignaturePosition,
+                                 "OverallTarget.position is not MoveToSignaturePosition")
         else:
-            asserts.assert_true(False, "OverallTarget attribute is not supported.")
+            asserts.assert_true(False, "OverallTargetState attribute is not supported.")
             return
 
-        # STEP 6c: TH waits for PIXIT.CLCTRL.FullMotionDuration seconds
+        # STEP 6c: Wait until TH receives a subscription report with OverallCurrentState.Position = OpenedAtSignature
         self.step("6c")
 
-        logging.info(f"Waiting for {full_motion_duration} seconds")
-        await self.wait(full_motion_duration)
+        logging.info("Waiting for OverallCurrentState.Position to be OpenedAtSignature")
+        sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kOpenedAtSignature)],
+                                                      timeout_sec=timeout)
 
-        # STEP 6d: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
+        # STEP 6d: Wait until TH receives a subscription report with MainState = Stopped
         self.step("6d")
 
-        if attributes.OverallState.attribute_id in attribute_list:
-            overall_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallState)
-            logging.info(f"OverallState: {overall_state}")
-            asserts.assert_equal(overall_state.Position, Clusters.ClosureControl.Bitmaps.OverallState.kOpenInFull,
-                                 "OverallState.Position is not OpenInFull")
-            if is_lt_feature_supported:
-                asserts.assert_false(overall_state.Latch, "OverallState.Latch is not False")
-            if is_sp_feature_supported:
-                asserts.assert_range(overall_state.Speed, 0, 3, "OverallState.Speed is out of range")
-            if overall_state.SecureState != NullValue:
-                asserts.assert_false(overall_state.SecureState, "OverallState.SecureState is not False")
-            else:
-                logging.info("SecureState is NULL.")
-        else:
-            asserts.assert_true(False, "OverallState attribute is not supported.")
-            return
+        logging.info("Waiting for MainState to be Stopped")
+        sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(Clusters.ClosureControl.Enums.MainStateEnum.kStopped)],
+                                                      timeout_sec=timeout)
 
-        # STEP 6e: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
-        self.step("6e")
-
-        if attributes.MainState.attribute_id in attribute_list:
-            main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            logging.info(f"MainState: {main_state}")
-            is_stopped = mainstate == Clusters.ClosureControl.Bitmaps.MainState.kStopped
-            asserts.assert_true(is_stopped, "MainState is not in the expected state")
-            if is_stopped:
-                logging.info("MainState is in the stopped state")
-        else:
-            asserts.assert_true(False, "MainState attribute is not supported.")
-            return
-
-        # STEP 7a: TH sends command MoveTo with Position = CloseInFull
+        # STEP 7a: If VT feature is not supported on the cluster, skip steps 7b to 7e
         self.step("7a")
 
-        try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                position=Clusters.ClosureControl.Bitmaps.Position.kCloseInFull,
-            ))
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status, Status.Success, "Unexpected error returned")
-            pass
+        if not is_vt_feature_supported:
+            logging.info("Ventilation feature not supported, skipping steps 7b to 7e")
 
-        # STEP 7b: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
-        self.step("7b")
-
-        if attributes.OverallTarget.attribute_id in attribute_list:
-            overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTarget)
-            logging.info(f"OverallTarget: {overall_target}")
-            asserts.assert_equal(overall_target.Position, Clusters.ClosureControl.Bitmaps.OverallTarget.kCloseInFull,
-                                 "OverallTarget.Position is not CloseInFull")
-            if is_lt_feature_supported:
-                asserts.assert_false(overall_target.Latch, "OverallTarget.Latch is not False")
-            if is_sp_feature_supported:
-                asserts.assert_range(overall_target.Speed, 0, 3, "OverallTarget.Speed is out of range")
+            # Skipping steps 7b to 7e
+            self.skip_step("7b")
+            self.skip_step("7c")
+            self.skip_step("7d")
+            self.skip_step("7e")
         else:
-            asserts.assert_true(False, "OverallTarget attribute is not supported.")
-            return
+            # STEP 7b: TH sends command MoveTo with Position = MoveToVentilationPosition
+            self.step("7b")
 
-        # STEP 7c: TH waits for PIXIT.CLCTRL.FullMotionDuration seconds
-        self.step("7c")
+            sub_handler.reset()
+            try:
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToVentilationPosition,
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                pass
 
-        logging.info(f"Waiting for {full_motion_duration} seconds")
-        await self.wait(full_motion_duration)
+            # STEP 7c: If the attribute is supported on the cluster, TH reads from the DUT the OverallTargetState attribute
+            self.step("7c")
 
-        # STEP 7d: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
-        self.step("7d")
-
-        if attributes.OverallState.attribute_id in attribute_list:
-            overall_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallState)
-            logging.info(f"OverallState: {overall_state}")
-            asserts.assert_equal(overall_state.Position, Clusters.ClosureControl.Bitmaps.OverallState.kCloseInFull,
-                                 "OverallState.Position is not CloseInFull")
-            if is_lt_feature_supported:
-                asserts.assert_false(overall_state.Latch, "OverallState.Latch is not False")
-            if is_sp_feature_supported:
-                asserts.assert_range(overall_state.Speed, 0, 3, "OverallState.Speed is out of range")
-            if overall_state.SecureState != NullValue:
-                asserts.assert_true(overall_state.SecureState, "OverallState.SecureState is not True")
+            if attributes.OverallTargetState.attribute_id in attribute_list:
+                overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
+                logging.info(f"OverallTargetState: {overall_target}")
+                asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToVentilationPosition,
+                                     "OverallTargetState.position is not MoveToVentilationPosition")
             else:
-                logging.info("SecureState is NULL.")
-        else:
-            asserts.assert_true(False, "OverallState attribute is not supported.")
-            return
+                asserts.assert_true(False, "OverallTargetState attribute is not supported.")
+                return
 
-        # STEP 7e: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
-        self.step("7e")
+            # STEP 7d: Wait until TH receives a subscription report with OverallCurrentState.Position = OpenedForVentilation
+            self.step("7d")
 
-        if attributes.MainState.attribute_id in attribute_list:
-            main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            logging.info(f"MainState: {main_state}")
-            is_stopped = mainstate == Clusters.ClosureControl.Bitmaps.MainState.kStopped
-            asserts.assert_true(is_stopped, "MainState is not in the expected state")
-            if is_stopped:
-                logging.info("MainState is in the stopped state")
-        else:
-            asserts.assert_true(False, "MainState attribute is not supported.")
-            return
+            logging.info("Waiting for OverallCurrentState.Position to be OpenedForVentilation")
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kOpenedForVentilation)],
+                                                          timeout_sec=timeout)
 
-        # STEP 8a: If SP feature is not supported on the cluster, skip steps 8b to 8g
+            # STEP 7e: Wait until TH receives a subscription report with MainState = Stopped
+            self.step("7e")
+
+            logging.info("Waiting for MainState to be Stopped")
+            sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(Clusters.ClosureControl.Enums.MainStateEnum.kStopped)],
+                                                          timeout_sec=timeout)
+
+        # STEP 8a: If PD feature is not supported on the cluster, skip steps 8b to 8e
         self.step("8a")
 
-        if not is_sp_feature_supported:
-            logging.info("Speed feature not supported, skipping steps 8b to 8g")
-            is_skipped = True
+        if not is_pd_feature_supported:
+            logging.info("Pedestrian feature not supported, skipping steps 8b to 8e")
 
-        # STEP 8b: TH sends command MoveTo with Speed = High
-        self.step("8b")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                speed=Clusters.ClosureControl.Bitmaps.Speed.kHigh,
-            ))
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status, Status.Success, "Unexpected error returned")
-            pass
-
-        # STEP 8c: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
-        self.step("8c")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        if attributes.OverallTarget.attribute_id in attribute_list:
-            overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTarget)
-            logging.info(f"OverallTarget: {overall_target}")
-            asserts.assert_equal(overall_target.Position, Clusters.ClosureControl.Bitmaps.Position.kCloseInFull,
-                                 "OverallTarget.Position is not CloseInFull")
-            asserts.assert_equal(overall_target.Speed, Clusters.ClosureControl.Bitmaps.Speed.kHigh,
-                                 "OverallTarget.Speed is not High")
-            if is_lt_feature_supported:
-                asserts.assert_false(overall_target.Latch, "OverallTarget.Latch is not False")
+            # Skipping steps 8b to 8e
+            self.skip_step("8b")
+            self.skip_step("8c")
+            self.skip_step("8d")
+            self.skip_step("8e")
         else:
-            asserts.assert_true(False, "OverallTarget attribute is not supported.")
-            return
+            # STEP 8b: TH sends command MoveTo with Position = MoveToPedestrianPosition
+            self.step("8b")
 
-        # STEP 8d: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
-        self.step("8d")
+            sub_handler.reset()
+            try:
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToPedestrianPosition,
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                pass
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        if attributes.OverallState.attribute_id in attribute_list:
-            overall_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallState)
-            logging.info(f"OverallState: {overall_state}")
-            asserts.assert_equal(overall_state.Position, Clusters.ClosureControl.Bitmaps.Position.kCloseInFull,
-                                 "OverallState.Position is not CloseInFull")
-            asserts.assert_equal(overall_state.Speed, Clusters.ClosureControl.Bitmaps.Speed.kHigh, "OverallState.Speed is not High")
-            if is_lt_feature_supported:
-                asserts.assert_false(overall_state.Latch, "OverallState.Latch is not False")
-            if overall_state.SecureState != NullValue:
-                asserts.assert_true(overall_state.SecureState, "OverallState.SecureState is not True")
+            # STEP 8c: If the attribute is supported on the cluster, TH reads from the DUT the OverallTargetState attribute
+            self.step("8c")
+
+            if attributes.OverallTargetState.attribute_id in attribute_list:
+                overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
+                logging.info(f"OverallTargetState: {overall_target}")
+                asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToPedestrianPosition,
+                                     "OverallTarget.position is not MoveToPedestrianPosition")
             else:
-                logging.info("SecureState is NULL.")
-        else:
-            asserts.assert_true(False, "OverallState attribute is not supported.")
-            return
+                asserts.assert_true(False, "OverallTargetState attribute is not supported.")
+                return
 
-        # STEP 8e: TH sends command MoveTo with Speed = Low
-        self.step("8e")
+            # STEP 8d: Wait until TH receives a subscription report with OverallCurrentState.Position = OpenedForPedestrian
+            self.step("8d")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                speed=Clusters.ClosureControl.Bitmaps.Speed.kLow,
-            ))
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status, Status.Success, "Unexpected error returned")
-            pass
+            logging.info("Waiting for OverallCurrentState.Position to be OpenedForPedestrian")
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kOpenedForPedestrian)],
+                                                          timeout_sec=timeout)
 
-        # STEP 8f: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
-        self.step("8f")
+            # STEP 8e: Wait until TH receives a subscription report with MainState = Stopped
+            self.step("8e")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        if attributes.OverallTarget.attribute_id in attribute_list:
-            overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTarget)
-            logging.info(f"OverallTarget: {overall_target}")
-            asserts.assert_equal(overall_target.Position, Clusters.ClosureControl.Bitmaps.Position.kCloseInFull,
-                                 "OverallTarget.Position is not CloseInFull")
-            asserts.assert_equal(overall_target.Speed, Clusters.ClosureControl.Bitmaps.Speed.kLow, "OverallTarget.Speed is not Low")
-            if is_lt_feature_supported:
-                asserts.assert_false(overall_target.Latch, "OverallTarget.Latch is not False")
-        else:
-            asserts.assert_true(False, "OverallTarget attribute is not supported.")
-            return
+            logging.info("Waiting for MainState to be Stopped")
+            sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(Clusters.ClosureControl.Enums.MainStateEnum.kStopped)],
+                                                          timeout_sec=timeout)
 
-        # STEP 8g: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
-        self.step("8g")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            is_skipped = False
-            return
-        if attributes.OverallState.attribute_id in attribute_list:
-            overall_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallState)
-            logging.info(f"OverallState: {overall_state}")
-            asserts.assert_equal(overall_state.Position, Clusters.ClosureControl.Bitmaps.Position.kCloseInFull,
-                                 "OverallState.Position is not CloseInFull")
-            asserts.assert_equal(overall_state.Speed, Clusters.ClosureControl.Bitmaps.Speed.kLow, "OverallState.Speed is not Low")
-            if is_lt_feature_supported:
-                asserts.assert_false(overall_state.Latch, "OverallState.Latch is not False")
-            if overall_state.SecureState != NullValue:
-                asserts.assert_true(overall_state.SecureState, "OverallState.SecureState is not True")
-            else:
-                logging.info("SecureState is NULL.")
-        else:
-            asserts.assert_true(False, "OverallState attribute is not supported.")
-            return
-        is_skipped = False
-
-        # STEP 9a: If PT feature is not supported on the cluster, skip steps 9b to 9f
+        # STEP 9a: TH sends command MoveTo with Position = MoveToFullyOpen
         self.step("9a")
 
-        if not is_pt_feature_supported:
-            logging.info("Position feature not supported, skipping steps 9b to 9f")
-            is_skipped = True
+        sub_handler.reset()
+        try:
+            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
+            ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+            pass
 
-        # STEP 9b: TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Protected(5) Test Event
+        # STEP 9b: If the attribute is supported on the cluster, TH reads from the DUT the OverallTargetState attribute
         self.step("9b")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
+        if attributes.OverallTargetState.attribute_id in attribute_list:
+            overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
+            logging.info(f"OverallTarget: {overall_target}")
+            asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
+                                 "OverallTargetState.position is not MoveToFullyOpen")
+        else:
+            asserts.assert_true(False, "OverallTargetState attribute is not supported.")
             return
-        try:
-            await self.send_command(endpoint=0, cluster=Clusters.Objects.GeneralDiagnostics, command=Clusters.GeneralDiagnostics.Commands.TestEventTrigger, arguments=Clusters.GeneralDiagnostics.TestEventTriggerRequest(
-                enabled_key=self.matter_test_config.get("PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY"),
-                event_trigger=self.matter_test_config.get("PIXIT.CLCTRL.TEST_EVENT_TRIGGER"),
-            ))
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status, Status.Success, "Unexpected error returned")
-            pass
 
-        # STEP 9c: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
+        # STEP 9c: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyOpened
         self.step("9c")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        if attributes.MainState.attribute_id in attribute_list:
-            main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            logging.info(f"MainState: {main_state}")
-            asserts.assert_equal(main_state, Clusters.ClosureControl.Bitmaps.MainState.kProtected, "MainState is not Protected")
-        else:
-            asserts.assert_true(False, "MainState attribute is not supported.")
-            return
+        logging.info("Waiting for OverallCurrentState.Position to be FullyOpened")
+        sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyOpened)],
+                                                      timeout_sec=timeout)
 
-        # STEP 9d: TH sends command MoveTo with Position = CloseInFull
+        # STEP 9d: Wait until TH receives a subscription report with MainState = Stopped
         self.step("9d")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                position=Clusters.ClosureControl.Bitmaps.Position.kCloseInFull,
-            ))
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status, Status.Success, "Unexpected error returned")
-            pass
-        # Check if the command was sent invalid state
-        if e.status == Status.INVALID_STATE:
-            logging.info("Command MoveTo is invalid while MainState is Protected")
-        else:
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
+        logging.info("Waiting for MainState to be Stopped")
+        sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(Clusters.ClosureControl.Enums.MainStateEnum.kStopped)],
+                                                      timeout_sec=timeout)
 
-        # STEP 9e: TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear
-        self.step("9e")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=0, cluster=Clusters.Objects.GeneralDiagnostics, command=Clusters.GeneralDiagnostics.Commands.TestEventTrigger, arguments=Clusters.GeneralDiagnostics.TestEventTriggerRequest(
-                enabled_key=self.matter_test_config.get("PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY"),
-                event_trigger=self.matter_test_config.get("PIXIT.CLCTRL.TEST_EVENT_TRIGGER"),
-            ))
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status, Status.Success, "Unexpected error returned")
-            pass
-
-        # STEP 9f: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
-        self.step("9f")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            is_skipped = False
-            return
-        if attributes.MainState.attribute_id in attribute_list:
-            main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            logging.info(f"MainState: {main_state}")
-            is_stopped = mainstate == Clusters.ClosureControl.Bitmaps.MainState.kStopped
-            asserts.assert_true(is_stopped, "MainState is not in the expected state")
-            if is_stopped:
-                logging.info("MainState is in the stopped state")
-        else:
-            asserts.assert_true(False, "MainState attribute is not supported.")
-            return
-        is_skipped = False
-
-        # STEP 10a: If MO feature is not supported on the cluster, skip steps 10b to 10f
+        # STEP 10a: TH sends command MoveTo with Position = MoveToFullyClosed
         self.step("10a")
 
-        if not is_mo_feature_supported:
-            logging.info("Motor Open feature not supported, skipping steps 10b to 10f")
-            is_skipped = True
+        sub_handler.reset()
+        try:
+            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
+            ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+            pass
 
-        # STEP 10b: TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Disengaged(6) Test Event
+        # STEP 10b: If the attribute is supported on the cluster, TH reads from the DUT the OverallTargetState attribute
         self.step("10b")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
+        if attributes.OverallTargetState.attribute_id in attribute_list:
+            overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
+            logging.info(f"OverallTargetState: {overall_target}")
+            asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
+                                 "OverallTargetState.position is not MoveToFullyClosed")
+        else:
+            asserts.assert_true(False, "OverallTargetState attribute is not supported.")
             return
-        try:
-            await self.send_command(endpoint=0, cluster=Clusters.Objects.GeneralDiagnostics, command=Clusters.GeneralDiagnostics.Commands.TestEventTrigger, arguments=Clusters.GeneralDiagnostics.TestEventTriggerRequest(
-                enabled_key=self.matter_test_config.get("PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY"),
-                event_trigger=self.matter_test_config.get("PIXIT.CLCTRL.TEST_EVENT_TRIGGER"),
-            ))
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status, Status.Success, "Unexpected error returned")
-            pass
 
-        # STEP 10c: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
+        # STEP 10c: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed
         self.step("10c")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        if attributes.MainState.attribute_id in attribute_list:
-            main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            logging.info(f"MainState: {main_state}")
-            asserts.assert_equal(main_state, Clusters.ClosureControl.Bitmaps.MainState.kDisengaged, "MainState is not Disengaged")
-        else:
-            asserts.assert_true(False, "MainState attribute is not supported.")
-            return
+        logging.info("Waiting for OverallCurrentState.Position to be FullyClosed")
+        sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed)],
+                                                      timeout_sec=timeout)
 
-        # STEP 10d: TH sends command MoveTo with Position = CloseInFull
+        # STEP 10d: Wait until TH receives a subscription report with MainState = Stopped
         self.step("10d")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                position=Clusters.ClosureControl.Bitmaps.Position.kCloseInFull,
-            ))
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status, Status.Success, "Unexpected error returned")
-            pass
+        logging.info("Waiting for MainState to be Stopped")
+        sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(Clusters.ClosureControl.Enums.MainStateEnum.kStopped)],
+                                                      timeout_sec=timeout)
 
-        # STEP 10e: TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear
-        self.step("10e")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=0, cluster=Clusters.Objects.GeneralDiagnostics, command=Clusters.GeneralDiagnostics.Commands.TestEventTrigger, arguments=Clusters.GeneralDiagnostics.TestEventTriggerRequest(
-                enabled_key=self.matter_test_config.get("PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY"),
-                event_trigger=self.matter_test_config.get("PIXIT.CLCTRL.TEST_EVENT_TRIGGER"),
-            ))
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status, Status.Success, "Unexpected error returned")
-            pass
-
-        # STEP 10f: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
-        self.step("10f")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            is_skipped = False
-            return
-        if attributes.MainState.attribute_id in attribute_list:
-            main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            logging.info(f"MainState: {main_state}")
-            is_stopped = mainstate == Clusters.ClosureControl.Bitmaps.MainState.kStopped
-            asserts.assert_true(is_stopped, "MainState is not in the expected state")
-            if is_stopped:
-                logging.info("MainState is in the stopped state")
-        else:
-            asserts.assert_true(False, "MainState attribute is not supported.")
-            return
-        is_skipped = False
-
-        # STEP 11a: If IS feature is not supported on the cluster, skip steps 11b to 11k
+        # STEP 11a: If SP feature is not supported on the cluster, skip steps 11b to 11f
         self.step("11a")
 
-        if not is_is_feature_supported:
-            logging.info("Instantaneous feature not supported, skipping steps 11b to 11k")
-            is_skipped = True
+        if not is_sp_feature_supported:
+            logging.info("Speed feature not supported, skipping steps 11b to 11f")
 
-        # STEP 11b: TH sends command MoveTo with Position = OpenInFull
-        self.step("11b")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                position=Clusters.ClosureControl.Bitmaps.Position.kOpenInFull,
-            ))
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status, Status.Success, "Unexpected error returned")
-            pass
-
-        # STEP 11c: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
-        self.step("11c")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        if attributes.OverallTarget.attribute_id in attribute_list:
-            overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTarget)
-            logging.info(f"OverallTarget: {overall_target}")
-            asserts.assert_equal(overall_target.Position, Clusters.ClosureControl.Bitmaps.Position.kOpenInFull,
-                                 "OverallTarget.Position is not OpenInFull")
-            if is_lt_feature_supported:
-                asserts.assert_false(overall_target.Latch, "OverallTarget.Latch is not False")
-            if is_sp_feature_supported:
-                asserts.assert_range(overall_target.Speed, 0, 3, "OverallTarget.Speed is out of range")
+            # Skipping steps 11b to 11f
+            self.skip_step("11b")
+            self.skip_step("11c")
+            self.skip_step("11d")
+            self.skip_step("11e")
+            self.skip_step("11f")
         else:
-            asserts.assert_true(False, "OverallTarget attribute is not supported.")
-            return
+            # STEP 11b: TH sends command MoveTo with Speed = High
+            self.step("11b")
 
-        # STEP 11d: TH waits for 2 seconds
-        self.step("11d")
+            sub_handler.reset()
+            try:
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                    speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                pass
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        await self.wait(2)
-        logging.info("Waiting for 2 seconds")
+            # STEP 11c: If the attribute is supported on the cluster, TH reads from the DUT the OverallTargetState attribute
+            self.step("11c")
 
-        # STEP 11e: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
-        self.step("11e")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        if attributes.OverallState.attribute_id in attribute_list:
-            overall_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallState)
-            logging.info(f"OverallState: {overall_state}")
-            asserts.assert_equal(overall_state.Position, Clusters.ClosureControl.Bitmaps.OverallState.kOpenInFull,
-                                 "OverallState.Position is not OpenInFull")
-            if is_lt_feature_supported:
-                asserts.assert_false(overall_state.Latch, "OverallState.Latch is not False")
-            if is_sp_feature_supported:
-                asserts.assert_range(overall_state.Speed, 0, 3, "OverallState.Speed is out of range")
-            if overall_state.SecureState != NullValue:
-                asserts.assert_false(overall_state.SecureState, "OverallState.SecureState is not False")
+            if attributes.OverallTargetState.attribute_id in attribute_list:
+                overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
+                logging.info(f"OverallTarget: {overall_target}")
+                asserts.assert_equal(overall_target.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh,
+                                     "OverallTargetState.speed is not High")
             else:
-                logging.info("SecureState is NULL.")
-        else:
-            asserts.assert_true(False, "OverallState attribute is not supported.")
-            return
+                asserts.assert_true(False, "OverallTargetState attribute is not supported.")
+                return
 
-        # STEP 11f: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
-        self.step("11f")
+            # STEP 11d: Wait until TH receives a subscription report with OverallCurrentState.Speed = High
+            self.step("11d")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        if attributes.MainState.attribute_id in attribute_list:
-            main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            logging.info(f"MainState: {main_state}")
-            is_stopped = mainstate == Clusters.ClosureControl.Bitmaps.MainState.kStopped
-            asserts.assert_true(is_stopped, "MainState is not in the expected state")
-            if is_stopped:
-                logging.info("MainState is in the stopped state")
-        else:
-            asserts.assert_true(False, "MainState attribute is not supported.")
-            return
+            logging.info("Waiting for OverallCurrentState.Speed to be High")
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_speed_matcher(Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh)],
+                                                          timeout_sec=timeout)
 
-        # STEP 11g: TH sends command MoveTo with Position = CloseInFull
-        self.step("11g")
+            # STEP 11e: TH sends command MoveTo with Speed = Low
+            self.step("11e")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                position=Clusters.ClosureControl.Bitmaps.Position.kCloseInFull,
-            ))
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status, Status.Success, "Unexpected error returned")
-            pass
+            sub_handler.reset()
+            try:
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                    speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                pass
 
-        # STEP 11h: If the attribute is supported on the cluster, TH reads from the DUT the OverallTaget attribute
-        self.step("11h")
+            # STEP 11f: If the attribute is supported on the cluster, TH reads from the DUT the OverallTargetState attribute
+            self.step("11f")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        if attributes.OverallTarget.attribute_id in attribute_list:
-            overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTarget)
-            logging.info(f"OverallTarget: {overall_target}")
-            asserts.assert_equal(overall_target.Position, Clusters.ClosureControl.Bitmaps.Position.kCloseInFull,
-                                 "OverallTarget.Position is not CloseInFull")
-            if is_lt_feature_supported:
-                asserts.assert_false(overall_target.Latch, "OverallTarget.Latch is not False")
-            if is_sp_feature_supported:
-                asserts.assert_range(overall_target.Speed, 0, 3, "OverallTarget.Speed is out of range")
-        else:
-            asserts.assert_true(False, "OverallTarget attribute is not supported.")
-            return
-
-        # STEP 11i: TH waits for 2 seconds
-        self.step("11i")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        await self.wait(2)
-        logging.info("Waiting for 2 seconds")
-
-        # STEP 11j: If the attribute is supported on the cluster, TH reads from the DUT the OverallState attribute
-        self.step("11j")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        if attributes.OverallState.attribute_id in attribute_list:
-            overall_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallState)
-            logging.info(f"OverallState: {overall_state}")
-            asserts.assert_equal(overall_state.Position, Clusters.ClosureControl.Bitmaps.OverallState.kCloseInFull,
-                                 "OverallState.Position is not CloseInFull")
-            if is_lt_feature_supported:
-                asserts.assert_false(overall_state.Latch, "OverallState.Latch is not False")
-            if is_sp_feature_supported:
-                asserts.assert_range(overall_state.Speed, 0, 3, "OverallState.Speed is out of range")
-            if overall_state.SecureState != NullValue:
-                asserts.assert_true(overall_state.SecureState, "OverallState.SecureState is not True")
+            if attributes.OverallTargetState.attribute_id in attribute_list:
+                overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
+                logging.info(f"OverallTargetState: {overall_target}")
+                asserts.assert_equal(overall_target.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow,
+                                     "OverallTargetState.speed is not Low")
             else:
-                logging.info("SecureState is NULL.")
-        else:
-            asserts.assert_true(False, "OverallState attribute is not supported.")
-            return
+                asserts.assert_true(False, "OverallTargetState attribute is not supported.")
+                return
 
-        # STEP 11k: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
-        self.step("11k")
+            # STEP 11g: Wait until TH receives a subscription report with OverallCurrentState.Speed = High
+            self.step("11g")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            is_skipped = False
-            return
-        if attributes.MainState.attribute_id in attribute_list:
-            main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
-            logging.info(f"MainState: {main_state}")
-            is_stopped = mainstate == Clusters.ClosureControl.Bitmaps.MainState.kStopped
-            asserts.assert_true(is_stopped, "MainState is not in the expected state")
-            if is_stopped:
-                logging.info("MainState is in the stopped state")
+            logging.info("Waiting for OverallCurrentState.Speed to be Low")
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_speed_matcher(Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow)],
+                                                          timeout_sec=timeout)
+
+        # STEP 12a: If PT feature is not supported on the cluster, skip steps 12b to 12f
+        self.step("12a")
+
+        if is_pt_feature_supported:
+            # STEP 12b: TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Protected Test Event
+            self.step("12b")
+
+            try:
+                await self.send_test_event_triggers(eventTrigger=0x0104000000000001)  # Protected
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
+                pass
+
+            # STEP 12c: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
+            self.step("12c")
+
+            if attributes.MainState.attribute_id in attribute_list:
+                main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
+                logging.info(f"MainState: {main_state}")
+                asserts.assert_equal(main_state, Clusters.ClosureControl.Enums.MainStateEnum.kProtected,
+                                     "MainState is not Protected")
+            else:
+                asserts.assert_true(False, "MainState attribute is not supported.")
+                return
+
+            # STEP 12d: TH sends command MoveTo with Position = MoveToFullyOpen
+            self.step("12d")
+
+            try:
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.InvalidInState, f"The MoveTo command sends an incorrect state: {e.status}")
+                pass
+
+            # STEP 12e: TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear
+            self.step("12e")
+
+            try:
+                await self.send_test_event_triggers(eventTrigger=0x0104000000000004)  # Test Event Clear
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
+                pass
+
+            # STEP 12f: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
+            self.step("12f")
+
+            if attributes.MainState.attribute_id in attribute_list:
+                main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
+                logging.info(f"MainState: {main_state}")
+                is_stopped = main_state == Clusters.ClosureControl.Enums.MainStateEnum.kStopped
+                asserts.assert_true(is_stopped, "MainState is not in the expected state")
+                if is_stopped:
+                    logging.info("MainState is in the stopped state")
+            else:
+                asserts.assert_true(False, "MainState attribute is not supported.")
+                return
         else:
-            asserts.assert_true(False, "MainState attribute is not supported.")
-            return
-        is_skipped = False
+            logging.info("Position feature not supported, skipping steps 12b to 12f")
+            self.skip_step("12b")
+            self.skip_step("12c")
+            self.skip_step("12d")
+            self.skip_step("12e")
+            self.skip_step("12f")
+
+        # STEP 13: If MO feature is not supported on the cluster, skip steps 13b to 13f
+        self.step("13a")
+
+        if is_mo_feature_supported:
+            # STEP 13b: TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Disengaged Test Event
+            self.step("13b")
+
+            try:
+                await self.send_test_event_triggers(eventTrigger=0x0104000000000002)  # Disengaged
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
+                pass
+
+            # STEP 13c: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
+            self.step("13c")
+
+            if attributes.MainState.attribute_id in attribute_list:
+                main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
+                logging.info(f"MainState: {main_state}")
+                asserts.assert_equal(main_state, Clusters.ClosureControl.Enums.MainStateEnum.kDisengaged,
+                                     "MainState is not Disengaged")
+            else:
+                asserts.assert_true(False, "MainState attribute is not supported.")
+                return
+
+            # STEP 13d: TH sends command MoveTo with Position = MoveToFullyOpen
+            self.step("13d")
+
+            try:
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.InvalidInState, f"The MoveTo command sends an incorrect state: {e.status}")
+                pass
+
+            # STEP 13e: TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear
+            self.step("13e")
+
+            try:
+                await self.send_test_event_triggers(eventTrigger=0x0104000000000004)  # Test Event Clear
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
+                pass
+
+            # STEP 13f: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
+            self.step("13f")
+
+            if attributes.MainState.attribute_id in attribute_list:
+                main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
+                logging.info(f"MainState: {main_state}")
+                is_stopped = main_state == Clusters.ClosureControl.Enums.MainStateEnum.kStopped
+                asserts.assert_true(is_stopped, "MainState is not in the expected state")
+                if is_stopped:
+                    logging.info("MainState is in the stopped state")
+            else:
+                asserts.assert_true(False, "MainState attribute is not supported.")
+                return
+        else:
+            logging.info("ManuallyOperable feature not supported, skipping steps 13b to 13f")
+            self.skip_step("13b")
+            self.skip_step("13c")
+            self.skip_step("13d")
+            self.skip_step("13e")
+            self.skip_step("13f")
+
+        # STEP 14a: If IS feature is not supported on the cluster, skip steps 14b to 14i
+        self.step("14a")
+
+        if is_is_feature_supported:
+            # STEP 14b: TH sends command MoveTo with Position = MoveToFullyOpen
+            self.step("14b")
+
+            sub_handler.reset()
+            try:
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                    postion=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                pass
+
+            # STEP 14c: If the attribute is supported on the cluster, TH reads from the DUT the OverallTargetState attribute
+            self.step("14c")
+
+            if attributes.OverallTargetState.attribute_id in attribute_list:
+                overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
+                logging.info(f"OverallTargetState: {overall_target}")
+                asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
+                                     "OverallTargetState.position is not MoveToFullyOpen")
+            else:
+                asserts.assert_true(False, "OverallTargetState attribute is not supported.")
+                return
+
+            # STEP 14d: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyOpened.
+            self.step("14d")
+
+            logging.info("Waiting for OverallCurrentState.Position to be FullyOpened")
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyOpened)],
+                                                          timeout_sec=timeout)
+
+            # STEP 14e: Wait until TH receives a subscription report with MainState = Stopped.
+            self.step("14e")
+
+            logging.info("Waiting for MainState to be Stopped")
+            sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(Clusters.ClosureControl.Enums.MainStateEnum.kStopped)],
+                                                          timeout_sec=timeout)
+
+            # STEP 14f: TH sends command MoveTo with Position = MoveToFullyClosed
+            self.step("14f")
+
+            sub_handler.reset()
+            try:
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                pass
+
+            # STEP 14g: If the attribute is supported on the cluster, TH reads from the DUT the OverallTargetState attribute
+            self.step("14g")
+
+            if attributes.OverallTargetState.attribute_id in attribute_list:
+                overall_target = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallTargetState)
+                logging.info(f"OverallTarget: {overall_target}")
+                asserts.assert_equal(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
+                                     "OverallTargetState.position is not MoveToFullyClosed")
+            else:
+                asserts.assert_true(False, "OverallTargetState attribute is not supported.")
+                return
+
+            # STEP 14h: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed.
+            self.step("14h")
+
+            logging.info("Waiting for OverallCurrentState.Position to be FullyClosed")
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed)],
+                                                          timeout_sec=timeout)
+
+            # STEP 14i: Wait until TH receives a subscription report with MainState = Stopped.
+            self.step("14i")
+
+            logging.info("Waiting for MainState to be Stopped")
+            sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(Clusters.ClosureControl.Enums.MainStateEnum.kStopped)],
+                                                          timeout_sec=timeout)
+
+        else:
+            logging.info("Instantaneous feature not supported, skipping steps 14b to 14i")
+            self.skip_step("14b")
+            self.skip_step("14c")
+            self.skip_step("14d")
+            self.skip_step("14e")
+            self.skip_step("14f")
+            self.skip_step("14g")
+            self.skip_step("14h")
+            self.skip_step("14i")
 
 
 if __name__ == "__main__":

@@ -18,13 +18,16 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${CLOSURE_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --timeout 30
+#       --endpoint 1
+#       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -32,12 +35,38 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from random import choice
+import time
+import json
+from typing import Any, Optional
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from chip.interaction_model import Status, InteractionModelError
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body,
+                                         default_matter_test_main, AttributeMatcher, AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback)
 from mobly import asserts
+
+
+def current_position_matcher(current_position: Clusters.ClosureControl.Enums.CurrentPositionEnum) -> AttributeMatcher:
+    def predicate(report: AttributeValue) -> bool:
+        if report.attribute != Clusters.ClosureControl.Attributes.OverallCurrentState:
+            return False
+        if report.value.position == current_position:
+            return True
+        else:
+            return False
+    return AttributeMatcher.from_callable(description=f"OverallCurrentState.Position is {current_position}", matcher=predicate)
+
+
+def current_latch_matcher(current_latch: bool) -> AttributeMatcher:
+    def predicate(report: AttributeValue) -> bool:
+        if report.attribute != Clusters.ClosureControl.Attributes.OverallCurrentState:
+            return False
+        if report.value.latch == current_latch:
+            return True
+        else:
+            return False
+    return AttributeMatcher.from_callable(description=f"OverallCurrentState.Latch is {current_latch}", matcher=predicate)
 
 
 class TC_CLCTRL_6_1(MatterBaseTest):
@@ -85,60 +114,67 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
             TestStep("2a", "TH reads from the DUT the (0xFFFC) FeatureMap attribute."),
             TestStep("2b", "TH reads TestEventTriggerEnabled attribute from General Diagnostics Cluster."),
-            TestStep("3a", "Set up a subscription to the OperationalError event."),
-            TestStep("3b", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_ENABLE_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Error(3) Test Event."),
-            TestStep("3c", "Verify that the DUT has emitted the OperationalError event."),
-            TestStep("3d", "TH reads from the DUT the CurrentErrorList attribute."),
-            TestStep("3e", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_ENABLE_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear."),
-            TestStep("4a", "If PS feature is not supported on the cluster or IS feature is supported on the cluster, skip steps 4b to 4g."),
-            TestStep("4b", "TH sends command MoveTo with Position = OpenInFull."),
-            TestStep("4c", "TH waits for PIXIT.CLCTRL.FullMotionDuration seconds."),
-            TestStep("4d", "Set up a subscription to the MovementCompleted event."),
-            TestStep("4e", "TH sends command MoveTo with Position = CloseInFull."),
-            TestStep("4f", "Verify that the DUT has emitted the MovementCompleted event."),
-            TestStep("4g", "TH reads from the DUT the Mainstate attribute."),
-            TestStep("5a", "If MO feature is not supported on the cluster, skip steps 5b to 5f."),
-            TestStep("5b", "Set up a subscription to the EngagedStateChanged event."),
-            TestStep("5c", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_ENABLE_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Disengaged(6) Test Event."),
-            TestStep("5d", "Verify that the DUT has emitted the EngagedStateChanged event."),
-            TestStep("5e", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_ENABLE_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear."),
-            TestStep("5f", "Verify that the DUT has emitted the EngagedStateChanged event."),
-            TestStep("6", "Set up a subscription to the SecureStateChanged event."),
-            TestStep("7a", "If LT feature is supported on the cluster or PS feature is not supported on the cluster, skip steps 7b to 7g."),
-            TestStep("7b", "TH sends command MoveTo with Position = CloseInFull."),
-            TestStep("7c", "TH waits for PIXIT.CLCTRL.FullMotionDuration seconds."),
-            TestStep("7d", "TH sends command MoveTo with Position = OpenInFull."),
-            TestStep("7e", "Verify that the DUT has emitted the SecureStateChanged event."),
-            TestStep("7f", "TH sends command MoveTo with Position = CloseInFull."),
-            TestStep("7g", "Verify that the DUT has emitted the SecureStateChanged event."),
-            TestStep("8a", "If LT feature is not supported on the cluster or PS feature is supported on the cluster, skip steps 8b to 8m."),
-            TestStep("8b", "TH sends command MoveTo to DUT with Latch = False."),
-            TestStep("8c", "TH waits for PIXIT.CLCTRL.LatchingDuration seconds."),
-            TestStep("8d", "If !CLCTRL.M.ManualLatching, skip steps 8e to 8f."),
-            TestStep("8e", "Latch the DUT manually to set OverallState.Latch to True."),
-            TestStep("8f", "Verify that the DUT has emitted the SecureStateChanged event."),
-            TestStep("8g", "If CLCTRL.M.ManualLatching, skip steps 8h to 8j."),
-            TestStep("8h", "TH sends command MoveTo to DUT with Latch = True."),
-            TestStep("8i", "TH waits for PIXIT.CLCTRL.LatchingDuration seconds."),
-            TestStep("8j", "Verify that the DUT has emitted the SecureStateChanged event."),
-            TestStep("8k", "TH sends command MoveTo with Latch = False."),
-            TestStep("8l", "TH waits for PIXIT.CLCTRL.LatchingDuration seconds."),
-            TestStep("8m", "Verify that the DUT has emitted the SecureStateChanged event."),
-            TestStep("9a", "If LT feature is not supported on the cluster or PS feature is not supported on the cluster, skip steps 9b to 9o."),
-            TestStep("9b", "TH sends command MoveTo with Position = OpenInFull and Latch = False."),
-            TestStep("9c", "TH waits for PIXIT.CLCTRL.FullMotionDuration or PIXIT.CLCTRL.LatchingDuration seconds, the longer duration is chosen."),
-            TestStep("9d", "If !CLCTRL.M.ManualLatching, skip steps 9e to 9h."),
-            TestStep("9e", "TH sends command MoveTo with Position = CloseInFull."),
-            TestStep("9f", "TH waits for PIXIT.CLCTRL.FullMotionDuration seconds."),
-            TestStep("9g", "Latch the DUT manually to set OverallState.Latch to True."),
-            TestStep("9h", "Verify that the DUT has emitted the SecureStateChanged event."),
-            TestStep("9i", "If CLCTRL.M.ManualLatching, skip steps 9j to 9l."),
-            TestStep("9j", "TH sends command MoveTo with Position = CloseInFull and Latch = True."),
-            TestStep("9k", "TH waits for PIXIT.CLCTRL.FullMotionDuration or PIXIT.CLCTRL.LatchingDuration seconds, the longer duration is chosen."),
+            TestStep("2c", "TH reads from the DUT the (0xFFFB) AttributeList attribute."),
+            TestStep("2d", "TH establishes a wildcard subscription to all attributes on the Closure Control Cluster, with MinIntervalFloor = 0, MaxIntervalCeiling = 30 and KeepSubscriptions = false."),
+            TestStep("3a", "If the LT feature is not supported on the cluster, skip steps 3b to 3i."),
+            TestStep("3b", "If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState.Latch attribute."),
+            TestStep("3c", "If the attribute is supported on the cluster, TH reads from the DUT the LatchControlModes attribute."),
+            TestStep("3d", "If CurrentLatch = False, skip steps 3e to 3i."),
+            TestStep("3e", "If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip step 3f."),
+            TestStep("3f", "TH sends command MoveTo with Latch = False."),
+            TestStep("3g", "If LatchControlModes Bit 1 = 1 (RemoteUnlatching = True), skip step 3h."),
+            TestStep("3h", "Unlatch the DUT manually to set OverallCurrentState.Latch to False."),
+            TestStep("3i", "Wait until TH receives a subscription report with OverallCurrentState.Latch."),
+            TestStep("3j", "If the PS feature is not supported on the cluster, skip steps 3k to 3n."),
+            TestStep("3k", "If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute."),
+            TestStep("3l", "If CurrentPosition = FullyClosed, skip steps 3m to 3n."),
+            TestStep("3m", "TH sends command MoveTo with Position = MoveToFullyClosed."),
+            TestStep("3n", "Wait until TH receives a subscription report with OverallCurrentState.Position."),
+            TestStep("4a", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_ENABLE_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Error(3) Test Event."),
+            TestStep("4b", "Verify that the DUT has emitted the OperationalError event."),
+            TestStep("4c", "TH reads from the DUT the CurrentErrorList attribute."),
+            TestStep("4d", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_ENABLE_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear."),
+            TestStep("5a", "If PS feature is not supported on the cluster or IS feature is supported on the cluster, skip steps 5b to 5f."),
+            TestStep("5b", "TH sends command MoveTo with Position = MoveToFullyOpen."),
+            TestStep("5c", "Wait until TH receives a subscription report with OverallCurrentState.Position = FullyOpened."),
+            TestStep("5d", "TH sends command MoveTo with Position = MoveToFullyClosed."),
+            TestStep("5e", "Verify that the DUT has emitted the MovementCompleted event."),
+            TestStep("5f", "TH reads from the DUT the Mainstate attribute."),
+            TestStep("6a", "If MO feature is not supported on the cluster, skip steps 6b to 6e."),
+            TestStep("6b", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_ENABLE_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Disengaged(6) Test Event."),
+            TestStep("6c", "Verify that the DUT has emitted the EngageStateChanged event."),
+            TestStep("6d", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_ENABLE_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear."),
+            TestStep("6e", "Verify that the DUT has emitted the EngageStateChanged event."),
+            TestStep("7a", "If LT feature is supported on the cluster or PS feature is not supported on the cluster, skip steps 7b to 7f."),
+            TestStep("7b", "If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute."),
+            TestStep("7c", "TH sends command MoveTo with Position = MoveToFullyOpen."),
+            TestStep("7d", "Verify that the DUT has emitted the SecureStateChanged event."),
+            TestStep("7e", "TH sends command MoveTo with Position = MoveToFullyClosed."),
+            TestStep("7f", "Verify that the DUT has emitted the SecureStateChanged event."),
+            TestStep("8a", "If LT feature is not supported on the cluster or PS feature is supported on the cluster, skip steps 8b to 8l."),
+            TestStep("8b", "If LatchControlModes Bit 0 = 0 (RemoteLatching = False), skip step 8c."),
+            TestStep("8c", "TH sends command MoveTo with Latch = True."),
+            TestStep("8d", "If LatchControlModes Bit 0 = 1 (RemoteLatching = True), skip step 8e."),
+            TestStep("8e", "Latch the DUT manually to set OverallCurrentState.Latch to True."),
+            TestStep("8f", "Wait until TH receives a subscription report with OverallCurrentState.Latch = True."),
+            TestStep("8g", "Verify that the DUT has emitted the SecureStateChanged event."),
+            TestStep("8h", "If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip step 8i."),
+            TestStep("8i", "TH sends command MoveTo with Latch = False."),
+            TestStep("8j", "If LatchControlModes Bit 1 = 1 (RemoteUnlatching = True), skip step 8k."),
+            TestStep("8k", "Unlatch the DUT manually to set OverallCurrentState.Latch to False."),
+            TestStep("8l", "Verify that the DUT has emitted the SecureStateChanged event."),
+            TestStep("9a", "If LT feature is not supported on the cluster or PS feature is not supported on the cluster, skip steps 9b to 9l."),
+            TestStep("9b", "If LatchControlModes Bit 0 = 0 (RemoteLatching = False), skip step 9c."),
+            TestStep("9c", "TH sends command MoveTo with Latch = True."),
+            TestStep("9d", "If LatchControlModes Bit 0 = 1 (RemoteLatching = True), skip step 9e."),
+            TestStep("9e", "Latch the DUT manually to set OverallCurrentState.Latch to True."),
+            TestStep("9f", "Verify that the DUT has emitted the SecureStateChanged event."),
+            TestStep("9g", "If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip step 9h."),
+            TestStep("9h", "TH sends command MoveTo with Latch = False."),
+            TestStep("9i", "If LatchControlModes Bit 1 = 1 (RemoteUnlatching = True), skip step 9j."),
+            TestStep("9j", "Unlatch the DUT manually to set OverallCurrentState.Latch to False."),
+            TestStep("9k", "TH sends command MoveTo with Position = MoveToFullyOpen."),
             TestStep("9l", "Verify that the DUT has emitted the SecureStateChanged event."),
-            TestStep("9m", "TH sends command MoveTo with Position = OpenInFull and Latch = False."),
-            TestStep("9n", "TH waits for PIXIT.CLCTRL.FullMotionDuration or PIXIT.CLCTRL.LatchingDuration seconds, the longer duration is chosen."),
-            TestStep("9o", "Verify that the DUT has emitted the SecureStateChanged event."),
         ]
         return steps
 
@@ -151,8 +187,9 @@ class TC_CLCTRL_6_1(MatterBaseTest):
     @async_test_body
     async def test_TC_CLCTRL_6_1(self):
         endpoint = self.get_endpoint(default=1)
-        is_skipped = False
-        is_manual_latching_skipped = False
+        dev_controller = self.default_controller
+        attributes = Clusters.ClosureControl.Attributes
+        timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
         self.step(1)
@@ -163,1172 +200,663 @@ class TC_CLCTRL_6_1(MatterBaseTest):
         self.step("2a")
 
         # Read the FeatureMap attribute
-        feature_map = await self.read_boolcfg_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
-        # Check if the FeatureMap attribute was read successfully
-        if not type_matches(feature_map.status, Status.SUCCESS):
-            logging.error(f"Failed to read FeatureMap attribute: {feature_map.status}")
-            return
-        else:
-            logging.info("FeatureMap attribute read successfully")
-            logging.info(f"FeatureMap: {feature_map}")
-            is_ps_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPosition
-            is_mo_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotion
-            is_is_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kIs
-            is_lt_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kLatch
+        feature_map = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
+        logging.info(f"FeatureMap: {feature_map}")
+        is_ps_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPositioning
+        is_mo_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kManuallyOperable
+        is_is_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kInstantaneous
+        is_lt_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
 
         # STEP 2b: TH reads TestEventTriggerEnabled attribute from General Diagnostics Cluster
         self.step("2b")
 
-        try:
-            await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.GeneralDiagnostic, attribute=Clusters.GeneralDiagnostic.Attributes.TestEventTriggersEnabled)
-        except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the attribute was read successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to read TestEventTriggersEnabled attribute: {e.status}")
-            return
-        else:
-            logging.info("TestEventTriggersEnabled attribute read successfully")
+        logging.info("Checking if TestEventTrigger attribute is enabled")
+        self.check_test_event_triggers_enabled()
 
-        # Check if the attribute is enabled
-        test_event_triggers_enabled = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.GeneralDiagnostic, attribute=Clusters.GeneralDiagnostic.Attributes.TestEventTriggersEnabled)
-        if test_event_triggers_enabled is NullValue:
-            logging.error("Failed to read TestEventTriggersEnabled attribute")
-            return
-        else:
-            asserts.assert_true(test_event_triggers_enabled ==
-                                Clusters.GeneralDiagnostic.Bitmaps.TestEventTriggersEnabled.kEnabled, "TestEventTriggersEnabled is not enabled")
-            if test_event_triggers_enabled == Clusters.GeneralDiagnostic.Bitmaps.TestEventTriggersEnabled.kEnabled:
-                logging.info("TestEventTriggersEnabled is enabled")
-        # Check if the attribute was read successfully
-        if not type_matches(test_event_triggers_enabled.status, Status.SUCCESS):
-            logging.error(f"Failed to read TestEventTriggersEnabled attribute: {test_event_triggers_enabled.status}")
-            return
+        # STEP 2c: TH reads from the DUT the (0xFFFB) AttributeList attribute
+        self.step("2c")
 
-        # STEP 3a: Set up a subscription to the OperationalError event
+        attribute_list = await self.read_clctrl_attribute_expect_success(endpoint, attributes.AttributeList)
+        logging.info(f"AttributeList: {attribute_list}")
+
+        # STEP 2d: TH establishes a wildcard subscription to all attributes and events on the Closure Control Cluster, with MinIntervalFloor = 0, MaxIntervalCeiling = 30 and KeepSubscriptions = false
+        self.step("2d")
+
+        sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureControl)
+        await sub_handler.start(dev_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
+
+        event_sub_handler = EventChangeCallback(Clusters.ClosureControl)
+        await event_sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint)
+
+        # STEP 3a: If the LT feature is not supported on the cluster, skip steps 3b to 3i.
         self.step("3a")
 
-        # Subscribe to the OperationalError event
-        self.subscribe_event(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl,
-                             event=Clusters.ClosureControl.Events.OperationalError)
-        # Check if the subscription was successful
-        if not type_matches(self.status, Status.SUCCESS):
-            logging.error(f"Failed to subscribe to OperationalError event: {self.status}")
-            return
-        else:
-            logging.info("Subscribed to OperationalError event successfully")
+        if not is_lt_feature_supported:
+            logging.info("Motion Latching feature not supported, skipping steps 3b to 3i")
 
-        # STEP 3b: TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_ENABLE_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Error(3) Test Event
-        self.step("3b")
+            # Skipping steps 3b to 3i
+            self.skip_step("3b")
+            self.skip_step("3c")
+            self.skip_step("3d")
+            self.skip_step("3e")
+            self.skip_step("3f")
+            self.skip_step("3g")
+            self.skip_step("3h")
+            self.skip_step("3i")
+        else:
+            logging.info("Motion Latching feature supported.")
+
+            # STEP 3b: If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState.Latch attribute
+            self.step("3b")
+
+            if attributes.OverallCurrentState.attribute_id in attribute_list:
+                overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
+                logging.info(f"OverallCurrentState: {overall_current_state}")
+                if overall_current_state == None:
+                    logging.error("OverallCurrentState is None")
+
+                CurrentLatch = overall_current_state.latch
+                asserts.assert_in(CurrentLatch, [True, False], "OverallCurrentState.latch is not in the expected range")
+            else:
+                asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
+                return
+
+            # STEP 3c: If the attribute is supported on the cluster, TH reads from the DUT the LatchControlModes attribute
+            self.step("3c")
+
+            if attributes.LatchControlModes.attribute_id in attribute_list:
+                LatchControlModes = await self.read_clctrl_attribute_expect_success(endpoint, attributes.LatchControlModes)
+                logging.info(f"LatchControlModes: {LatchControlModes}")
+                if LatchControlModes == None:
+                    logging.error("LatchControlModes is None")
+            else:
+                asserts.assert_true(False, "LatchControlModes attribute is not supported.")
+                return
+
+            # STEP 3d: If CurrentLatch = False, skip steps 3e to 3i
+            self.step("3d")
+
+            if not CurrentLatch:
+                logging.info("CurrentLatch is False, skipping steps 3e to 3i")
+
+                # Skipping steps 3e to 3i
+                self.skip_step("3e")
+                self.skip_step("3f")
+                self.skip_step("3g")
+                self.skip_step("3h")
+                self.skip_step("3i")
+            else:
+                logging.info("CurrentLatch is True, proceeding to steps 3e to 3i")
+
+                # STEP 3e: If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip step 3f
+                self.step("3e")
+
+                if (int(bin(LatchControlModes), 2) & (1 << 1)) == 2:
+                    logging.info("RemoteUnlatching is True, proceeding to step 3f")
+
+                    # STEP 3f: TH sends command MoveTo with Latch = False
+                    self.step("3f")
+
+                    sub_handler.reset()
+                    try:
+                        await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                            latch=False
+                        ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                    except InteractionModelError as e:
+                        asserts.assert_equal(
+                            e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                        pass
+                    self.step("3g")
+                    self.skip_step("3h")
+                elif (int(bin(LatchControlModes), 2) & (1 << 1)) == 0:
+                    self.skip_step("3f")
+
+                    # STEP 3g: If LatchControlModes Bit 1 = 1 (RemoteUnlatching = True), skip step 3h
+                    self.step("3g")
+
+                    logging.info("RemoteUnlatching is False, proceeding to step 3h")
+
+                    # STEP 3h: Unlatch the DUT manually to set OverallCurrentState.Latch to False
+                    self.step("3h")
+
+                    logging.info("Unlatch the DUT manually to set OverallCurrentState.Latch to False")
+                    # Simulating manual unlatching by waiting for user input
+                    input("Press Enter after unlatching the DUT...")
+                    logging.info("Manual unlatching completed.")
+
+                # STEP 3i: Wait until TH receives a subscription report with OverallCurrentState.Latch.
+                self.step("3i")
+
+                logging.info("Waiting for OverallCurrentState.Latch to be False")
+                sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)],
+                                                              timeout_sec=timeout)
+
+        # STEP 3j: If the PS feature is not supported on the cluster, skip steps 3k to 3n.
+        self.step("3j")
+
+        if not is_ps_feature_supported:
+            logging.info("Positioning feature not supported, skipping steps 3k to 3n")
+
+            # Skipping steps 3k to 3n
+            self.skip_step("3k")
+            self.skip_step("3l")
+            self.skip_step("3m")
+            self.skip_step("3n")
+        else:
+            logging.info("Positioning feature supported.")
+
+            # STEP 3k: If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute
+            self.step("3k")
+
+            if attributes.OverallCurrentState.attribute_id in attribute_list:
+                overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
+                logging.info(f"OverallCurrentState: {overall_current_state}")
+                if overall_current_state == None:
+                    logging.error("OverallCurrentState is None")
+
+                CurrentPosition = overall_current_state.position
+                asserts.assert_in(CurrentPosition, Clusters.ClosureControl.Enums.CurrentPositionEnum,
+                                  "OverallCurrentState.position is not in the expected range")
+            else:
+                asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
+                return
+
+            # STEP 3l: If CurrentPosition = FullyClosed, skip steps 3m to 3n
+            self.step("3l")
+
+            if CurrentPosition == Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed:
+                logging.info("CurrentPosition is FullyClosed, skipping steps 3m to 3n")
+
+                # Skipping steps 3m and 3n
+                self.skip_step("3m")
+                self.skip_step("3n")
+            else:
+                # STEP 3m: TH sends command MoveTo with Position = MoveToFullyClosed
+                self.step("3m")
+
+                sub_handler.reset()
+                try:
+                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                        position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
+                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                except InteractionModelError as e:
+                    asserts.assert_equal(
+                        e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                    pass
+
+                # STEP 3n: Wait until TH receives a subscription report with OverallCurrentState.Position.
+                self.step("3n")
+
+                logging.info("Waiting for OverallCurrentState.Position to be FullyClosed")
+                sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed)],
+                                                              timeout_sec=timeout)
+
+        # STEP 4a: TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_ENABLE_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Error(3) Test Event
+        self.step("4a")
+
+        event_sub_handler.reset()
 
         try:
-            await self.send_command(endpoint=0, cluster=Clusters.Objects.GeneralDiagnostic, command=Clusters.GeneralDiagnostic.Commands.TestEventTrigger, arguments=Clusters.GeneralDiagnostic.TestEventTriggerRequest(
-                enable_key=Clusters.GeneralDiagnostic.Bitmaps.EnableKey.kTestEventTriggerKey,
-                event_trigger=Clusters.GeneralDiagnostic.Bitmaps.EventTrigger.kMainStateError,
-            ))
+            await self.send_test_event_triggers(eventTrigger=0x0104000000000000)  # Error
         except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command TestEventTrigger: {e.status}")
-            return
-        else:
-            logging.info("Command TestEventTrigger sent successfully")
+            asserts.assert_equal(
+                e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
+            pass
 
-        # STEP 3c: Verify that the DUT has emitted the OperationalError event
-        self.step("3c")
+        # STEP 4b: Verify that the DUT has emitted the OperationalError event
+        self.step("4b")
 
         # Wait for the OperationalError event to be emitted
-        event = await self.wait_for_event(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, event=Clusters.ClosureControl.Events.OperationalError)
-        # Check if the event was received successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to receive OperationalError event: {event.status}")
-            return
-        else:
-            logging.info("OperationalError event received successfully")
-        # Check if the event data is correct
-        if event.data.count == 0:
-            logging.error(f"Unexpected event data count: {event.data.count}")
-            return
-        else:
-            logging.info("Event data is correct")
-        # Check if the event was emitted successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to emit OperationalError event: {event.status}")
-            return
-        else:
-            logging.info("OperationalError event emitted successfully")
+        data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.OperationalError, timeout_sec=timeout)
+        logging.info(f"-> OperationalError event last received: {data.errorState}")
 
-        # STEP 3d: TH reads from the DUT the CurrentErrorList attribute
-        self.step("3d")
+        asserts.assert_not_equal(data.errorState, [], "The CurrentErrorList attribute is empty.")
+
+        # STEP 4c: TH reads from the DUT the CurrentErrorList attribute
+        self.step("4c")
 
         # Read the CurrentErrorList attribute
         current_error_list = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, attribute=Clusters.ClosureControl.Attributes.CurrentErrorList)
-        # Check if the attribute was read successfully
-        if not type_matches(current_error_list.status, Status.SUCCESS):
-            logging.error(f"Failed to read CurrentErrorList attribute: {current_error_list.status}")
-            return
-        else:
-            logging.info("CurrentErrorList attribute read successfully")
-        # Check if the attribute data is correct
-        if current_error_list.count == 0:
-            logging.error(f"Unexpected attribute count: {current_error_list.count}")
-            return
-        else:
-            logging.info("Attribute data is correct")
+        asserts.assert_not_equal(current_error_list, [], "The CurrentErrorList attribute is empty.")
 
-        # STEP 3e: TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_ENABLE_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear
-        self.step("3e")
-
-        try:
-            await self.send_command(endpoint=0, cluster=Clusters.Objects.GeneralDiagnostic, command=Clusters.GeneralDiagnostic.Commands.TestEventTrigger, arguments=Clusters.GeneralDiagnostic.TestEventTriggerRequest(
-                enable_key=Clusters.GeneralDiagnostic.Bitmaps.EnableKey.kTestEventTriggerKey,
-                event_trigger=Clusters.GeneralDiagnostic.Bitmaps.EventTrigger.kMainStateClear,
-            ))
-        except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command TestEventTrigger: {e.status}")
-            return
-        else:
-            logging.info("Command TestEventTrigger sent successfully")
-
-        # STEP 4a: If PS feature is not supported on the cluster or IS feature is supported on the cluster, skip steps 4b to 4g
-        self.step("4a")
-
-        if not is_ps_feature_supported or is_is_feature_supported:
-            logging.info("Skipping steps 4b to 4g")
-            is_skipped = True
-
-        # STEP 4b: TH sends command MoveTo with Position = OpenInFull
-        self.step("4b")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                position=Clusters.ClosureControl.Bitmaps.Position.kOpenInFull,
-            ))
-        except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
-        else:
-            logging.info("Command MoveTo sent successfully")
-
-        # STEP 4c: TH waits for PIXIT.CLCTRL.FullMotionDuration seconds
-        self.step("4c")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        # Wait for the FullMotionDuration seconds
-        full_motion_duration = self.get_parameter("PIXIT.CLCTRL.FullMotionDuration")
-        if full_motion_duration is None:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is not set")
-            return
-        if full_motion_duration < 0:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is negative")
-            return
-        if full_motion_duration > 0:
-            logging.info(f"Waiting for {full_motion_duration} seconds")
-            sleep(full_motion_duration)
-        else:
-            logging.info("FullMotionDuration is 0, skipping wait")
-
-        # STEP 4d: Set up a subscription to the MovementCompleted event
+        # STEP 4d: TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_ENABLE_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear
         self.step("4d")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-
-        # Subscribe to the MovementCompleted event
-        self.subscribe_event(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl,
-                             event=Clusters.ClosureControl.Events.MovementCompleted)
-        # Check if the subscription was successful
-        if not type_matches(self.status, Status.SUCCESS):
-            logging.error(f"Failed to subscribe to MovementCompleted event: {self.status}")
-            return
-        else:
-            logging.info("Subscribed to MovementCompleted event successfully")
-
-        # STEP 4e: TH sends command MoveTo with Position = CloseInFull
-        self.step("4e")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
         try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                position=Clusters.ClosureControl.Bitmaps.Position.kCloseInFull,
-            ))
+            await self.send_test_event_triggers(eventTrigger=0x0104000000000004)  # Test Event Clear
         except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
-        else:
-            logging.info("Command MoveTo sent successfully")
+            asserts.assert_equal(
+                e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
+            pass
 
-        # STEP 4f: Verify that the DUT has emitted the MovementCompleted event
-        self.step("4f")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        # Wait for the MovementCompleted event to be emitted
-        event = await self.wait_for_event(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, event=Clusters.ClosureControl.Events.MovementCompleted)
-        # Check if the event was received successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to receive MovementCompleted event: {event.status}")
-            return
-        else:
-            logging.info("MovementCompleted event received successfully")
-
-        # STEP 4g: TH reads from the DUT the Mainstate attribute
-        self.step("4g")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            is_skipped = False
-            return
-        # Read the Mainstate attribute
-        mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
-        if mainstate is NullValue:
-            logging.error("Failed to read MainState attribute")
-            return
-        else:
-            # Check if the MainState attribute has the expected values
-            is_stopped = mainstate == Clusters.ClosureControl.Bitmaps.MainState.kStopped
-            asserts.assert_true(is_stopped, "MainState is not in the expected state")
-            if is_stopped:
-                logging.info("MainState is in the stopped state")
-        # Check if the MainState attribute was read successfully
-        if not type_matches(mainstate.status, Status.SUCCESS):
-            logging.error(f"Failed to read MainState attribute: {mainstate.status}")
-            return
-
-        is_skipped = False
-
-        # STEP 5a: If MO feature is not supported on the cluster, skip steps 5b to 5f
+        # STEP 5a: If PS feature is not supported on the cluster or IS feature is supported on the cluster, skip steps 4b to 4g
         self.step("5a")
 
+        if not is_ps_feature_supported or is_is_feature_supported:
+            logging.info("Positioning feature supported or Instantaneous feature not supported, skipping steps 5b to 5f")
+
+            # Skipping steps 5b to 5f
+            self.skip_step("5b")
+            self.skip_step("5c")
+            self.skip_step("5d")
+            self.skip_step("5e")
+            self.skip_step("5f")
+        else:
+            logging.info("Positioning feature not supported and Instantaneous feature supported processing steps 5b to 5f.")
+
+            # STEP 5b: TH sends command MoveTo with Position = MoveToFullyOpen
+            self.step("5b")
+
+            sub_handler.reset()
+            try:
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                pass
+
+            # STEP 5c: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyOpened.
+            self.step("5c")
+
+            logging.info("Waiting for OverallCurrentState.Position to be FullyOpened and OverallCurrentState.SecureState to be False")
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyOpened)],
+                                                          timeout_sec=timeout)
+
+            # STEP 5d: TH sends command MoveTo with Position = MoveToFullyClosed
+            self.step("5d")
+
+            event_sub_handler.reset()
+            try:
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                pass
+
+            # STEP 5e: Verify that the DUT has emitted the MovementCompleted event.
+            self.step("5e")
+
+            # Wait for the MovementCompleted event to be emitted
+            event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.MovementCompleted, timeout_sec=timeout)
+
+            # STEP 5f: TH reads from the DUT the MainState attribute
+            self.step("5f")
+
+            if attributes.MainState.attribute_id in attribute_list:
+                main_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.MainState)
+                logging.info(f"MainState: {main_state}")
+                asserts.assert_true(main_state == Clusters.ClosureControl.Enums.MainStateEnum.kStopped,
+                                    "MainState is not in the expected state")
+            else:
+                asserts.assert_true(False, "MainState attribute is not supported.")
+                return
+
+        # STEP 6a: If MO feature is not supported on the cluster, skip steps 6b to 6e
+        self.step("6a")
+
         if not is_mo_feature_supported:
-            logging.info("Skipping steps 5b to 5f")
-            is_skipped = True
+            logging.info("Manual Operable feature not supported, skipping steps 6b to 6e")
 
-        # STEP 5b: Set up a subscription to the EngagedStateChanged event
-        self.step("5b")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        # Subscribe to the EngagedStateChanged event
-        self.subscribe_event(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl,
-                             event=Clusters.ClosureControl.Events.EngagedStateChanged)
-        # Check if the subscription was successful
-        if not type_matches(self.status, Status.SUCCESS):
-            logging.error(f"Failed to subscribe to EngagedStateChanged event: {self.status}")
-            return
+            # Skipping steps 6b to 6e
+            self.skip_step("6b")
+            self.skip_step("6c")
+            self.skip_step("6d")
+            self.skip_step("6e")
         else:
-            logging.info("Subscribed to EngagedStateChanged event successfully")
+            logging.info("Manual Operable feature supported processing steps 6b to 6e.")
 
-        # STEP 5c: TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_ENABLE_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Disengaged(6) Test Event
-        self.step("5c")
+            # STEP 6b: TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_ENABLE_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Disengaged(6) Test Event
+            self.step("6b")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=0, cluster=Clusters.Objects.GeneralDiagnostic, command=Clusters.GeneralDiagnostic.Commands.TestEventTrigger, arguments=Clusters.GeneralDiagnostic.TestEventTriggerRequest(
-                enable_key=Clusters.GeneralDiagnostic.Bitmaps.EnableKey.kTestEventTriggerKey,
-                event_trigger=Clusters.GeneralDiagnostic.Bitmaps.EventTrigger.kMainStateDisengaged,
-            ))
-        except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command TestEventTrigger: {e.status}")
-            return
-        else:
-            logging.info("Command TestEventTrigger sent successfully")
+            event_sub_handler.reset()
+            try:
+                await self.send_test_event_triggers(eventTrigger=0x0104000000000002)  # Disengaged
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
+                pass
 
-        # STEP 5d: Verify that the DUT has emitted the EngagedStateChanged event
-        self.step("5d")
+            # STEP 6c: Verify that the DUT has emitted the EngageStateChanged event
+            self.step("6c")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        # Wait for the EngagedStateChanged event to be emitted
-        event = await self.wait_for_event(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, event=Clusters.ClosureControl.Events.EngagedStateChanged)
-        # Check if the event was received successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to receive EngagedStateChanged event: {event.status}")
-            return
-        else:
-            logging.info("EngagedStateChanged event received successfully")
-        # Check if the event data is correct
-        if event.data == True:
-            logging.error(f"Unexpected event data: {event.data}")
-            return
-        else:
-            logging.info("Event data is correct")
-        # Check if the event was emitted successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to emit EngagedStateChanged event: {event.status}")
-            return
-        else:
-            logging.info("EngagedStateChanged event emitted successfully")
+            # Wait for the EngageStateChanged event to be emitted
+            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.EngageStateChanged, timeout_sec=timeout)
 
-        # STEP 5e: TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_ENABLE_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear
-        self.step("5e")
+            asserts.assert_false(data.engageValue, f"Unexpected event data: {data.engageValue}")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=0, cluster=Clusters.Objects.GeneralDiagnostic, command=Clusters.GeneralDiagnostic.Commands.TestEventTrigger, arguments=Clusters.GeneralDiagnostic.TestEventTriggerRequest(
-                enable_key=Clusters.GeneralDiagnostic.Bitmaps.EnableKey.kTestEventTriggerKey,
-                event_trigger=Clusters.GeneralDiagnostic.Bitmaps.EventTrigger.kMainStateClear,
-            ))
-        except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command TestEventTrigger: {e.status}")
-            return
-        else:
-            logging.info("Command TestEventTrigger sent successfully")
+            # STEP 6d: TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_ENABLE_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear
+            self.step("6d")
 
-        # STEP 5f: Verify that the DUT has emitted the EngagedStateChanged event
-        self.step("5f")
+            event_sub_handler.reset()
+            try:
+                await self.send_test_event_triggers(eventTrigger=0x0104000000000004)  # Test Event Clear
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
+                pass
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            is_skipped = False
-            return
-        # Wait for the EngagedStateChanged event to be emitted
-        event = await self.wait_for_event(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, event=Clusters.ClosureControl.Events.EngagedStateChanged)
-        # Check if the event was received successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to receive EngagedStateChanged event: {event.status}")
-            return
-        else:
-            logging.info("EngagedStateChanged event received successfully")
-        # Check if the event data is correct
-        if event.data == False:
-            logging.error(f"Unexpected event data: {event.data}")
-            return
-        else:
-            logging.info("Event data is correct")
-        # Check if the event was emitted successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to emit EngagedStateChanged event: {event.status}")
-            return
-        else:
-            logging.info("EngagedStateChanged event emitted successfully")
+            # STEP 6e: Verify that the DUT has emitted the EngageStateChanged event
+            self.step("6e")
 
-        is_skipped = False
+            # Wait for the EngageStateChanged event to be emitted
+            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.EngageStateChanged, timeout_sec=timeout)
 
-        # STEP 6: Set up a subscription to the SecureStateChanged event
-        self.step("6")
+            asserts.assert_true(data.engageValue, f"Unexpected event data: {data.engageValue}")
 
-        # Subscribe to the SecureStateChanged event
-        self.subscribe_event(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl,
-                             event=Clusters.ClosureControl.Events.SecureStateChanged)
-        # Check if the subscription was successful
-        if not type_matches(self.status, Status.SUCCESS):
-            logging.error(f"Failed to subscribe to SecureStateChanged event: {self.status}")
-            return
-        else:
-            logging.info("Subscribed to SecureStateChanged event successfully")
-
-        # STEP 7a: If LT feature is supported on the cluster or PS feature is not supported on the cluster, skip steps 7b to 7g
+        # STEP 7a: If LT feature is supported on the cluster or PS feature is not supported on the cluster, skip steps 7b to 7f
         self.step("7a")
 
         if is_lt_feature_supported or not is_ps_feature_supported:
-            logging.info("Skipping steps 7b to 7g")
-            is_skipped = True
+            logging.info("Positioning feature not supported or Motion Latching feature supported, skipping steps 7b to 7f")
 
-        # STEP 7b: TH sends command MoveTo with Position = CloseInFull
-        self.step("7b")
+            # Skipping steps 7b to 7f
+            self.skip_step("7b")
+            self.skip_step("7c")
+            self.skip_step("7d")
+            self.skip_step("7e")
+            self.skip_step("7f")
+        else:
+            logging.info("Positioning feature supported and Motion Latching feature not supported processing steps 7b to 7f.")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                position=Clusters.ClosureControl.Bitmaps.Position.kCloseInFull,
-            ))
-        except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
+            # STEP 7b: If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute
+            self.step("7b")
+
+            if attributes.OverallCurrentState.attribute_id in attribute_list:
+                overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
+                logging.info(f"OverallCurrentState: {overall_current_state}")
+                if overall_current_state == None:
+                    logging.error("OverallCurrentState is None")
+
+                asserts.assert_in(overall_current_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum,
+                                  "OverallCurrentState.position is not in the expected range")
+                asserts.assert_equal(overall_current_state.position,
+                                     Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed, "The DUT is in an incorrect position.")
+                asserts.assert_true(overall_current_state.secureState, "The DUT is in an incorrect secure state.")
             else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
-        else:
-            logging.info("Command MoveTo sent successfully")
-
-        # STEP 7c: TH waits for PIXIT.CLCTRL.FullMotionDuration seconds
-        self.step("7c")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        # Wait for the FullMotionDuration seconds
-        full_motion_duration = self.get_parameter("PIXIT.CLCTRL.FullMotionDuration")
-        if full_motion_duration is None:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is not set")
-            return
-        if full_motion_duration < 0:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is negative")
-            return
-        if full_motion_duration > 0:
-            logging.info(f"Waiting for {full_motion_duration} seconds")
-            sleep(full_motion_duration)
-        else:
-            logging.info("FullMotionDuration is 0, skipping wait")
-
-        # STEP 7d: TH sends command MoveTo with Position = OpenInFull
-        self.step("7d")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                position=Clusters.ClosureControl.Bitmaps.Position.kOpenInFull,
-            ))
-        except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
+                asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
                 return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
-        else:
-            logging.info("Command MoveTo sent successfully")
 
-        # STEP 7e: Verify that the DUT has emitted the SecureStateChanged event
-        self.step("7e")
+            # STEP 7c: TH sends command MoveTo with Position = MoveToFullyOpen.
+            self.step("7c")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        # Wait for the SecureStateChanged event to be emitted
-        event = await self.wait_for_event(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, event=Clusters.ClosureControl.Events.SecureStateChanged)
-        # Check if the event was received successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to receive SecureStateChanged event: {event.status}")
-            return
-        else:
-            logging.info("SecureStateChanged event received successfully")
-        # Check if the event data is correct
-        if event.data == True:
-            logging.error(f"Unexpected event data: {event.data}")
-            return
-        else:
-            logging.info("Event data is correct")
-        # Check if the event was emitted successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to emit SecureStateChanged event: {event.status}")
-            return
-        else:
-            logging.info("SecureStateChanged event emitted successfully")
+            event_sub_handler.reset()
+            try:
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                pass
 
-        # STEP 7f: TH sends command MoveTo with Position = CloseInFull
-        self.step("7f")
+            # STEP 7d: Verify that the DUT has emitted the SecureStateChanged event
+            self.step("7d")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                position=Clusters.ClosureControl.Bitmaps.Position.kCloseInFull,
-            ))
-        except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
-        else:
-            logging.info("Command MoveTo sent successfully")
+            # Wait for the SecureStateChanged event to be emitted
+            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
 
-        # STEP 7g: Verify that the DUT has emitted the SecureStateChanged event
-        self.step("7g")
+            asserts.assert_false(data.secureValue, f"Unexpected event data: {data.secureValue}")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            is_skipped = False
-            return
-        # Wait for the SecureStateChanged event to be emitted
-        event = await self.wait_for_event(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, event=Clusters.ClosureControl.Events.SecureStateChanged)
-        # Check if the event was received successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to receive SecureStateChanged event: {event.status}")
-            return
-        else:
-            logging.info("SecureStateChanged event received successfully")
-        # Check if the event data is correct
-        if event.data == False:
-            logging.error(f"Unexpected event data: {event.data}")
-            return
-        else:
-            logging.info("Event data is correct")
-        # Check if the event was emitted successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to emit SecureStateChanged event: {event.status}")
-            return
-        else:
-            logging.info("SecureStateChanged event emitted successfully")
+            # STEP 7e: TH sends command MoveTo with Position = MoveToFullyClosed.
+            self.step("7e")
 
-        is_skipped = False
+            event_sub_handler.reset()
+            try:
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                pass
 
-        # STEP 8a: If LT feature is not supported on the cluster or PS feature is supported on the cluster, skip steps 8b to 8m
+            # STEP 7f: Verify that the DUT has emitted the SecureStateChanged event
+            self.step("7f")
+
+            # Wait for the SecureStateChanged event to be emitted
+            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
+
+            asserts.assert_true(data.secureValue, f"Unexpected event data: {data.secureValue}")
+
+        # STEP 8a: If LT feature is not supported on the cluster or PS feature is supported on the cluster, skip steps 8b to 8l
         self.step("8a")
 
         if not is_lt_feature_supported or is_ps_feature_supported:
-            logging.info("Skipping steps 8b to 8m")
-            is_skipped = True
+            logging.info("Positioning feature supported or Motion Latching feature not supported, skipping steps 8b to 8l")
 
-        # STEP 8b: TH sends command MoveTo to DUT with Latch = False
-        self.step("8b")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                latch=False,
-            ))
-        except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
+            # Skipping steps 8b to 8l
+            self.skip_step("8b")
+            self.skip_step("8c")
+            self.skip_step("8d")
+            self.skip_step("8e")
+            self.skip_step("8f")
+            self.skip_step("8g")
+            self.skip_step("8h")
+            self.skip_step("8i")
+            self.skip_step("8j")
+            self.skip_step("8k")
+            self.skip_step("8l")
         else:
-            logging.info("Command MoveTo sent successfully")
+            logging.info("Positioning feature not supported and Motion Latching feature supported processing steps 8b to 8l.")
+            sub_handler.reset()
+            event_sub_handler.reset()
 
-        # STEP 8c: TH waits for PIXIT.CLCTRL.LatchingDuration seconds
-        self.step("8c")
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        # Wait for the LatchingDuration seconds
-        latching_duration = self.get_parameter("PIXIT.CLCTRL.LatchingDuration")
-        if latching_duration is None:
-            logging.error("PIXIT.CLCTRL.LatchingDuration is not set")
-            return
-        if latching_duration < 0:
-            logging.error("PIXIT.CLCTRL.LatchingDuration is negative")
-            return
-        if latching_duration > 0:
-            logging.info(f"Waiting for {latching_duration} seconds")
-            sleep(latching_duration)
-        else:
-            logging.info("LatchingDuration is 0, skipping wait")
+            # STEP 8b: If LatchControlModes Bit 0 = 0 (RemoteLatching = False), skip step 8c
+            self.step("8b")
+            if (int(bin(LatchControlModes), 2) & 1) == 1:
+                logging.info("RemoteLatching is True, proceeding to step 8c")
 
-        # STEP 8d: If !CLCTRL.M.ManualLatching, skip steps 8e to 8f
-        self.step("8d")
+                # STEP 8c: TH sends command MoveTo with Latch = True
+                self.step("8c")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
+                try:
+                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                        latch=True
+                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                except InteractionModelError as e:
+                    asserts.assert_equal(
+                        e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                    pass
+                self.step("8d")
+                self.skip_step("8e")
+            elif (int(bin(LatchControlModes), 2) & 1) == 0:
+                self.skip_step("8c")
+                # STEP 8d: If LatchControlModes Bit 0 = 1 (RemoteLatching = True), skip step 8e
+                self.step("8d")
 
-        manual_latching = self.check_pics('CLCTRL.M.ManualLatching')
-        if not manual_latching:
-            logging.info("Skipping steps 8e to 8f")
-            is_manual_latching_skipped = True
+                logging.info("RemoteLatching is False, proceeding to step 8e")
 
-        # STEP 8e: Latch the DUT manually to set OverallState.Latch to True
-        self.step("8e")
+                # STEP 8e: Latch the DUT manually to set OverallCurrentState.Latch to True
+                self.step("8e")
 
-        if is_skipped == True or is_manual_latching_skipped == True:
-            logging.info("Test step skipped")
-            return
+                logging.info("Latch the DUT manually to set OverallCurrentState.Latch to True")
+                # Simulating manual latching by waiting for user input
+                input("Press Enter after latching the DUT...")
+                logging.info("Manual latching completed.")
 
-        # Latch the DUT manually
-        self._ask_for_manual_latching(endpoint, latched=True)
+            # STEP 8f: Wait until TH receives a subscription report with OverallCurrentState.Latch = True
+            self.step("8f")
 
-        # Check if the DUT was latched successfully
-        if not type_matches(self.status, Status.SUCCESS):
-            logging.error(f"Failed to latch DUT: {self.status}")
-            return
-        else:
-            logging.info("DUT latched successfully")
+            logging.info("Waiting for OverallCurrentState.Latch to be True")
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(True)],
+                                                          timeout_sec=timeout)
 
-        # STEP 8f: Verify that the DUT has emitted the SecureStateChanged event
-        self.step("8f")
+            # STEP 8g: Verify that the DUT has emitted the SecureStateChanged event
+            self.step("8g")
 
-        if is_skipped == True or is_manual_latching_skipped == True:
-            logging.info("Test step skipped")
-            is_manual_latching_skipped = False
-            return
+            # Wait for the SecureStateChanged event to be emitted
+            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
 
-        # Wait for the SecureStateChanged event to be emitted
-        event = await self.wait_for_event(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, event=Clusters.ClosureControl.Events.SecureStateChanged)
-        # Check if the event was received successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to receive SecureStateChanged event: {event.status}")
-            return
-        else:
-            logging.info("SecureStateChanged event received successfully")
-        # Check if the event data is correct
-        if event.data == False:
-            logging.error(f"Unexpected event data: {event.data}")
-            return
-        else:
-            logging.info("Event data is correct")
-        # Check if the event was emitted successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to emit SecureStateChanged event: {event.status}")
-            return
-        else:
-            logging.info("SecureStateChanged event emitted successfully")
-        is_manual_latching_skipped = False
+            asserts.assert_true(data.secureValue, f"Unexpected event data: {data.secureValue}")
 
-        # STEP 8g: If CLCTRL.M.ManualLatching, skip steps 8h to 8j
-        self.step("8g")
+            # STEP 8h: If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip step 8i
+            self.step("8h")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        if manual_latching:
-            logging.info("Skipping steps 8h to 8j")
-            is_manual_latching_skipped = True
+            event_sub_handler.reset()
 
-        # STEP 8h: TH sends command MoveTo to DUT with Latch = True
-        self.step("8h")
+            if (int(bin(LatchControlModes), 2) & (1 << 1)) == 2:
+                logging.info("RemoteUnlatching is True, proceeding to step 8i")
 
-        if is_skipped == True or is_manual_latching_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                latch=True,
-            ))
-        except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(self.status, Status.SUCCESS):
-            logging.error(f"Failed to send command MoveTo: {self.status}")
-            return
-        else:
-            logging.info("Command MoveTo sent successfully")
+                # STEP 8i: TH sends command MoveTo with Latch = False
+                self.step("8i")
 
-        # STEP 8i: TH waits for PIXIT.CLCTRL.LatchingDuration seconds
-        self.step("8i")
+                try:
+                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                        latch=False
+                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                except InteractionModelError as e:
+                    asserts.assert_equal(
+                        e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                    pass
+                self.step("8j")
+                self.skip_step("8k")
+            elif (int(bin(LatchControlModes), 2) & (1 << 1)) == 0:
+                self.skip_step("8i")
 
-        if is_skipped == True or is_manual_latching_skipped == True:
-            logging.info("Test step skipped")
-            return
-        # Wait for the LatchingDuration seconds
-        latching_duration = self.get_parameter("PIXIT.CLCTRL.LatchingDuration")
-        if latching_duration is None:
-            logging.error("PIXIT.CLCTRL.LatchingDuration is not set")
-            return
-        if latching_duration < 0:
-            logging.error("PIXIT.CLCTRL.LatchingDuration is negative")
-            return
-        if latching_duration > 0:
-            logging.info(f"Waiting for {latching_duration} seconds")
-            sleep(latching_duration)
-        else:
-            logging.info("LatchingDuration is 0, skipping wait")
+                # STEP 8j: If LatchControlModes Bit 1 = 1 (RemoteUnlatching = True), skip step 8k
+                self.step("8j")
 
-        # STEP 8j: Verify that the DUT has emitted the SecureStateChanged event
-        self.step("8j")
+                logging.info("RemoteUnlatching is False, proceeding to step 8k")
 
-        if is_skipped == True or is_manual_latching_skipped == True:
-            logging.info("Test step skipped")
-            is_manual_latching_skipped = False
-            return
-        # Wait for the SecureStateChanged event to be emitted
-        event = await self.wait_for_event(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, event=Clusters.ClosureControl.Events.SecureStateChanged)
-        # Check if the event was received successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to receive SecureStateChanged event: {event.status}")
-            return
-        else:
-            logging.info("SecureStateChanged event received successfully")
-        # Check if the event data is correct
-        if event.data == False:
-            logging.error(f"Unexpected event data: {event.data}")
-            return
-        else:
-            logging.info("Event data is correct")
-        # Check if the event was emitted successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to emit SecureStateChanged event: {event.status}")
-            return
-        else:
-            logging.info("SecureStateChanged event emitted successfully")
-        is_manual_latching_skipped = False
+                # STEP 8k: Unlatch the DUT manually to set OverallCurrentState.Latch to False
+                self.step("8k")
 
-        # STEP 8k: TH sends command MoveTo to DUT with Latch = False
-        self.step("8k")
+                logging.info("Unlatch the DUT manually to set OverallCurrentState.Latch to False")
+                # Simulating manual unlatching by waiting for user input
+                input("Press Enter after unlatching the DUT...")
+                logging.info("Manual unlatching completed.")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                latch=False,
-            ))
-        except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
-        else:
-            logging.info("Command MoveTo sent successfully")
+            # STEP 8l: Verify that the DUT has emitted the SecureStateChanged event
+            self.step("8l")
 
-        # STEP 8l: TH waits for PIXIT.CLCTRL.LatchingDuration seconds
-        self.step("8l")
+            # Wait for the SecureStateChanged event to be emitted
+            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        # Wait for the LatchingDuration seconds
-        latching_duration = self.get_parameter("PIXIT.CLCTRL.LatchingDuration")
-        if latching_duration is None:
-            logging.error("PIXIT.CLCTRL.LatchingDuration is not set")
-            return
-        if latching_duration < 0:
-            logging.error("PIXIT.CLCTRL.LatchingDuration is negative")
-            return
-        if latching_duration > 0:
-            logging.info(f"Waiting for {latching_duration} seconds")
-            sleep(latching_duration)
-        else:
-            logging.info("LatchingDuration is 0, skipping wait")
+            asserts.assert_false(data.secureValue, f"Unexpected event data: {data.secureValue}")
 
-        # STEP 8m: Verify that the DUT has emitted the SecureStateChanged event
-        self.step("8m")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            is_skipped = False
-            return
-        # Wait for the SecureStateChanged event to be emitted
-        event = await self.wait_for_event(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, event=Clusters.ClosureControl.Events.SecureStateChanged)
-        # Check if the event was received successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to receive SecureStateChanged event: {event.status}")
-            return
-        else:
-            logging.info("SecureStateChanged event received successfully")
-        # Check if the event data is correct
-        if event.data == True:
-            logging.error(f"Unexpected event data: {event.data}")
-            return
-        else:
-            logging.info("Event data is correct")
-        # Check if the event was emitted successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to emit SecureStateChanged event: {event.status}")
-            return
-        else:
-            logging.info("SecureStateChanged event emitted successfully")
-        is_skipped = False
-
-        # STEP 9a: If LT feature is not supported on the cluster or PS feature is not supported on the cluster, skip steps 9b to 9o
+        # STEP 9a: If LT feature is not supported on the cluster or PS feature is not supported on the cluster, skip steps 9b to 9l
         self.step("9a")
 
         if not is_lt_feature_supported or not is_ps_feature_supported:
-            logging.info("Skipping steps 9b to 9o")
-            is_skipped = True
+            logging.info("Positioning feature not supported or Motion Latching feature not supported, skipping steps 9b to 9l")
 
-        # STEP 9b: TH sends command MoveTo to DUT with Position = OpenInFull and Latch = False
-        self.step("9b")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                position=Clusters.ClosureControl.Bitmaps.Position.kOpenInFull,
-                latch=False,
-            ))
-        except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
+            # Skipping steps 9b to 9l
+            self.skip_step("9b")
+            self.skip_step("9c")
+            self.skip_step("9d")
+            self.skip_step("9e")
+            self.skip_step("9f")
+            self.skip_step("9g")
+            self.skip_step("9h")
+            self.skip_step("9i")
+            self.skip_step("9j")
+            self.skip_step("9k")
+            self.skip_step("9l")
         else:
-            logging.info("Command MoveTo sent successfully")
+            logging.info("Positioning feature supported and Motion Latching feature supported processing steps 9b to 9l.")
+            event_sub_handler.reset()
 
-        # STEP 9c: TH waits for PIXIT.CLCTRL.FullMotionDuration or PIXIT.CLCTRL.LatchingDuration seconds, the longer duration is chosen.
-        self.step("9c")
+            # STEP 9b: If LatchControlModes Bit 0 = 0 (RemoteLatching = False), skip step 9c
+            self.step("9b")
+            if (int(bin(LatchControlModes), 2) & 1) == 1:
+                logging.info("RemoteLatching is True, proceeding to step 9c")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        # Wait for the FullMotionDuration or LatchingDuration seconds
-        full_motion_duration = self.get_parameter("PIXIT.CLCTRL.FullMotionDuration")
-        latching_duration = self.get_parameter("PIXIT.CLCTRL.LatchingDuration")
-        if full_motion_duration is None:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is not set")
-            return
-        if latching_duration is None:
-            logging.error("PIXIT.CLCTRL.LatchingDuration is not set")
-            return
-        if full_motion_duration < 0:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is negative")
-            return
-        if latching_duration < 0:
-            logging.error("PIXIT.CLCTRL.LatchingDuration is negative")
-            return
-        if full_motion_duration > 0 or latching_duration > 0:
-            if full_motion_duration > latching_duration:
-                logging.info(f"Waiting for {full_motion_duration} seconds")
-                sleep(full_motion_duration)
-            else:
-                logging.info(f"Waiting for {latching_duration} seconds")
-                sleep(latching_duration)
-        else:
-            logging.info("FullMotionDuration and LatchingDuration are 0, skipping wait")
+                # STEP 9c: TH sends command MoveTo with Latch = True
+                self.step("9c")
 
-        # STEP 9d: If !CLCTRL.M.ManualLatching, skip steps 9e to 9h
-        self.step("9d")
+                try:
+                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                        latch=True
+                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                except InteractionModelError as e:
+                    asserts.assert_equal(
+                        e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                    pass
+                self.step("9d")
+                self.skip_step("9e")
+            elif (int(bin(LatchControlModes), 2) & 1) == 0:
+                self.skip_step("9c")
+                # STEP 9d: If LatchControlModes Bit 0 = 1 (RemoteLatching = True), skip step 9e
+                self.step("9d")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        if not manual_latching:
-            logging.info("Skipping steps 9e to 9h")
-            is_manual_latching_skipped = True
+                logging.info("RemoteLatching is False, proceeding to step 9e")
 
-        # STEP 9e: TH sends command MoveTo to DUT with Position = CloseInFull
-        self.step("9e")
+                # STEP 9e: Latch the DUT manually to set OverallCurrentState.Latch to True
+                self.step("9e")
 
-        if is_skipped == True or is_manual_latching_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                position=Clusters.ClosureControl.Bitmaps.Position.kCloseInFull,
-            ))
-        except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
-        else:
-            logging.info("Command MoveTo sent successfully")
+                logging.info("Latch the DUT manually to set OverallCurrentState.Latch to True")
+                # Simulating manual latching by waiting for user input
+                input("Press Enter after latching the DUT...")
+                logging.info("Manual latching completed.")
 
-        # STEP 9f: TH waits for PIXIT.CLCTRL.FullMotionDuration seconds
-        self.step("9f")
+            # STEP 9f: Verify that the DUT has emitted the SecureStateChanged event
+            self.step("9f")
 
-        if is_skipped == True or is_manual_latching_skipped == True:
-            logging.info("Test step skipped")
-            return
-        # Wait for the FullMotionDuration seconds
-        full_motion_duration = self.get_parameter("PIXIT.CLCTRL.FullMotionDuration")
-        if full_motion_duration is None:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is not set")
-            return
-        if full_motion_duration < 0:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is negative")
-            return
-        if full_motion_duration > 0:
-            logging.info(f"Waiting for {full_motion_duration} seconds")
-            sleep(full_motion_duration)
-        else:
-            logging.info("FullMotionDuration is 0, skipping wait")
+            # Wait for the SecureStateChanged event to be emitted
+            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
 
-        # STEP 9g: Latch the DUT manually to set OverallState.Latch to True
-        self.step("9g")
+            asserts.assert_true(data.secureValue, f"Unexpected event data: {data.secureValue}")
 
-        if is_skipped == True or is_manual_latching_skipped == True:
-            logging.info("Test step skipped")
-            return
-        # Latch the DUT manually
-        self._ask_for_manual_latching(endpoint, latched=True)
-        # Check if the DUT was latched successfully
-        if not type_matches(self.status, Status.SUCCESS):
-            logging.error(f"Failed to latch DUT: {self.status}")
-            return
-        else:
-            logging.info("DUT latched successfully")
+            # STEP 9g: If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip step 9h
+            self.step("9g")
 
-        # STEP 9h: Verify that the DUT has emitted the SecureStateChanged event
-        self.step("9h")
+            event_sub_handler.reset()
 
-        if is_skipped == True or is_manual_latching_skipped == True:
-            logging.info("Test step skipped")
-            is_manual_latching_skipped = False
-            return
-        # Wait for the SecureStateChanged event to be emitted
-        event = await self.wait_for_event(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, event=Clusters.ClosureControl.Events.SecureStateChanged)
-        # Check if the event was received successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to receive SecureStateChanged event: {event.status}")
-            return
-        else:
-            logging.info("SecureStateChanged event received successfully")
-        # Check if the event data is correct
-        if event.data == False:
-            logging.error(f"Unexpected event data: {event.data}")
-            return
-        else:
-            logging.info("Event data is correct")
-        # Check if the event was emitted successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to emit SecureStateChanged event: {event.status}")
-            return
-        else:
-            logging.info("SecureStateChanged event emitted successfully")
-        is_manual_latching_skipped = False
+            if (int(bin(LatchControlModes), 2) & (1 << 1)) == 2:
+                logging.info("RemoteUnlatching is True, proceeding to step 9h")
 
-        # STEP 9i: If CLCTRL.M.ManualLatching, skip steps 9j to 9l
-        self.step("9i")
+                # STEP 9h: TH sends command MoveTo with Latch = False
+                self.step("9h")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        if manual_latching:
-            logging.info("Skipping steps 9j to 9l")
-            is_manual_latching_skipped = True
+                try:
+                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                        latch=False
+                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                except InteractionModelError as e:
+                    asserts.assert_equal(
+                        e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                    pass
+                self.step("9i")
+                self.skip_step("9j")
+            elif (int(bin(LatchControlModes), 2) & (1 << 1)) == 0:
+                self.skip_step("9h")
 
-        # STEP 9j: TH sends command MoveTo to DUT with Position = CloseInFull and Latch = True
-        self.step("9j")
+                # STEP 9i: If LatchControlModes Bit 1 = 1 (RemoteUnlatching = True), skip step 9j
+                self.step("9i")
 
-        if is_skipped == True or is_manual_latching_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                position=Clusters.ClosureControl.Bitmaps.Position.kCloseInFull,
-                latch=True,
-            ))
-        except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
-        else:
-            logging.info("Command MoveTo sent successfully")
+                logging.info("RemoteUnlatching is False, proceeding to step 9j")
 
-        # STEP 9k: TH waits for PIXIT.CLCTRL.FullMotionDuration or PIXIT.CLCTRL.LatchingDuration seconds, the longer duration is chosen.
-        self.step("9k")
+                # STEP 9j: Unlatch the DUT manually to set OverallCurrentState.Latch to False
+                self.step("9j")
 
-        if is_skipped == True or is_manual_latching_skipped == True:
-            logging.info("Test step skipped")
-            return
-        # Wait for the FullMotionDuration or LatchingDuration seconds
-        full_motion_duration = self.get_parameter("PIXIT.CLCTRL.FullMotionDuration")
-        latching_duration = self.get_parameter("PIXIT.CLCTRL.LatchingDuration")
-        if full_motion_duration is None:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is not set")
-            return
-        if latching_duration is None:
-            logging.error("PIXIT.CLCTRL.LatchingDuration is not set")
-            return
-        if full_motion_duration < 0:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is negative")
-            return
-        if latching_duration < 0:
-            logging.error("PIXIT.CLCTRL.LatchingDuration is negative")
-            return
-        if full_motion_duration > 0 or latching_duration > 0:
-            if full_motion_duration > latching_duration:
-                logging.info(f"Waiting for {full_motion_duration} seconds")
-                sleep(full_motion_duration)
-            else:
-                logging.info(f"Waiting for {latching_duration} seconds")
-                sleep(latching_duration)
-        else:
-            logging.info("FullMotionDuration and LatchingDuration are 0, skipping wait")
+                logging.info("Unlatch the DUT manually to set OverallCurrentState.Latch to False")
+                # Simulating manual unlatching by waiting for user input
+                input("Press Enter after unlatching the DUT...")
+                logging.info("Manual unlatching completed.")
 
-        # STEP 9l: Verify that the DUT has emitted the SecureStateChanged event
-        self.step("9l")
+            # STEP 9k: TH sends command MoveTo with Position = MoveToFullyOpen.
+            self.step("9k")
 
-        if is_skipped == True or is_manual_latching_skipped == True:
-            logging.info("Test step skipped")
-            is_manual_latching_skipped = False
-            is_skipped = False
-            return
-        # Wait for the SecureStateChanged event to be emitted
-        event = await self.wait_for_event(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, event=Clusters.ClosureControl.Events.SecureStateChanged)
-        # Check if the event was received successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to receive SecureStateChanged event: {event.status}")
-            return
-        else:
-            logging.info("SecureStateChanged event received successfully")
-        # Check if the event data is correct
-        if event.data == False:
-            logging.error(f"Unexpected event data: {event.data}")
-            return
-        else:
-            logging.info("Event data is correct")
-        # Check if the event was emitted successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to emit SecureStateChanged event: {event.status}")
-            return
-        else:
-            logging.info("SecureStateChanged event emitted successfully")
-        is_manual_latching_skipped = False
+            try:
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                    position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                pass
 
-        # STEP 9m: TH sends command MoveTo to DUT with Position = OpenInFull and Latch = False
-        self.step("9m")
+            # STEP 9l: Verify that the DUT has emitted the SecureStateChanged event
+            self.step("9l")
 
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        try:
-            await self.send_command(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, command=Clusters.ClosureControl.Commands.MoveTo, arguments=Clusters.ClosureControl.MoveToRequest(
-                position=Clusters.ClosureControl.Bitmaps.Position.kOpenInFull,
-                latch=False,
-            ))
-        except InteractionModelError as e:
-            if e.status == Status.UNSUPPORTED_CLUSTER:
-                logging.info("Test step skipped")
-                return
-            else:
-                raise
-        # Check if the command was sent successfully
-        if not type_matches(e.status, Status.SUCCESS):
-            logging.error(f"Failed to send command MoveTo: {e.status}")
-            return
-        else:
-            logging.info("Command MoveTo sent successfully")
+            # Wait for the SecureStateChanged event to be emitted
+            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
 
-        # STEP 9n: TH waits for PIXIT.CLCTRL.FullMotionDuration or PIXIT.CLCTRL.LatchingDuration seconds, the longer duration is chosen.
-        self.step("9n")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            return
-        # Wait for the FullMotionDuration or LatchingDuration seconds
-        full_motion_duration = self.get_parameter("PIXIT.CLCTRL.FullMotionDuration")
-        latching_duration = self.get_parameter("PIXIT.CLCTRL.LatchingDuration")
-        if full_motion_duration is None:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is not set")
-            return
-        if latching_duration is None:
-            logging.error("PIXIT.CLCTRL.LatchingDuration is not set")
-            return
-        if full_motion_duration < 0:
-            logging.error("PIXIT.CLCTRL.FullMotionDuration is negative")
-            return
-        if latching_duration < 0:
-            logging.error("PIXIT.CLCTRL.LatchingDuration is negative")
-            return
-        if full_motion_duration > 0 or latching_duration > 0:
-            if full_motion_duration > latching_duration:
-                logging.info(f"Waiting for {full_motion_duration} seconds")
-                sleep(full_motion_duration)
-            else:
-                logging.info(f"Waiting for {latching_duration} seconds")
-                sleep(latching_duration)
-        else:
-            logging.info("FullMotionDuration and LatchingDuration are 0, skipping wait")
-
-        # STEP 9o: Verify that the DUT has emitted the SecureStateChanged event
-        self.step("9o")
-
-        if is_skipped == True:
-            logging.info("Test step skipped")
-            is_skipped = False
-            return
-        # Wait for the SecureStateChanged event to be emitted
-        event = await self.wait_for_event(endpoint=endpoint, cluster=Clusters.Objects.ClosureControl, event=Clusters.ClosureControl.Events.SecureStateChanged)
-        # Check if the event was received successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to receive SecureStateChanged event: {event.status}")
-            return
-        else:
-            logging.info("SecureStateChanged event received successfully")
-        # Check if the event data is correct
-        if event.data == True:
-            logging.error(f"Unexpected event data: {event.data}")
-            return
-        else:
-            logging.info("Event data is correct")
-        # Check if the event was emitted successfully
-        if not type_matches(event.status, Status.SUCCESS):
-            logging.error(f"Failed to emit SecureStateChanged event: {event.status}")
-            return
-        else:
-            logging.info("SecureStateChanged event emitted successfully")
-        is_skipped = False
+            asserts.assert_false(data.secureValue, f"Unexpected event data: {data.secureValue}")
 
 
 if __name__ == "__main__":
