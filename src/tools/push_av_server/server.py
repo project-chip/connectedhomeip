@@ -409,7 +409,7 @@ class PushAvServer:
         self.router.add_api_route("/streams/probe/{stream_id}/{file_path:path}", self.ffprobe_check, methods=["GET"])
 
         # TODO Rename API names to use fragment instead of segment (as this is what is actually being uploaded)
-        self.router.add_api_route("/streams/{stream_id}/{manifest}.mpd", self.manifest_upload, methods=["PUT"])
+        self.router.add_api_route("/streams/{stream_id}/{manifest}.{ext}", self.manifest_upload, methods=["PUT"])
         self.router.add_api_route("/streams/{stream_id}/segment{segment_no}/{track_name}/clip{frag_no}.{frag_ext}",
                                   self.segment_strict_cmaf_upload, methods=["PUT"], status_code=202)
         self.router.add_api_route("/streams/{stream_id}/{file_path:path}",
@@ -520,11 +520,15 @@ class PushAvServer:
 
         return Response(status_code=202)
 
-    async def manifest_upload(self, stream_id: int, manifest: str, req: Request):
+    async def manifest_upload(self, stream_id: int, manifest: str, ext: str, req: Request):
         """The DASH manifest is uploaded onto the base path without any file path"""
-        self._read_stream_details(stream_id)
+        stream = self._read_stream_details(stream_id)
 
-        dst = self.wd.mkdir("streams", str(stream_id), f"{manifest}.mpd", is_file=True)
+        if stream.get('strict_mode', False):
+            if ext not in ['mpd', 'm3u8']:
+                raise HTTPException(404, "Unsupported manifest object extension")
+
+        dst = self.wd.mkdir("streams", str(stream_id), f"{manifest}.{ext}", is_file=True)
 
         return await self._handle_upload(dst, req)
 
