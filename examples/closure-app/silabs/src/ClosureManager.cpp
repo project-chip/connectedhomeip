@@ -131,7 +131,6 @@ void ClosureManager::InitiateAction(AppEvent * event)
     ClosureManager & instance = ClosureManager::GetInstance();
 
     instance.CancelTimer(); // Cancel any existing timer before starting a new action
-    instance.SetCurrentAction(action);
 
     switch (action)
     {
@@ -170,6 +169,7 @@ void ClosureManager::TimerEventHandler(void * timerCbArg)
     AppEvent event;
     event.Type                = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action = closureManager->GetCurrentAction();
+    event.ClosureEvent.EndpointId = closureManager->mCurrentActionEndpointId;
     event.Handler             = HandleClosureActionCompleteEvent;
     AppTask::GetAppTask().PostEvent(&event);
 }
@@ -263,9 +263,8 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
 
     if (position.HasValue())
     {
-        // Set the Closure panel target position for the panels based on the Closure position.
-        // The position is represented as a TargetPositionEnum, which maps to specific positions for the panels.
-        // The mapping values used below are for closure sample app.
+        // Set the Closure panel target position for the panels based on the MoveTo Command position.
+        // For Sample App,TargetPositionEnum is mapped to specific positions for the panels.
         chip::Percent100ths ep2Position;
         chip::Percent100ths ep3Position;
 
@@ -320,12 +319,16 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
                         ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
 
     // Post an event to initiate the move to action asynchronously.
+    // MoveTo Command can only be initiated from Closure Control Endpoint (Endpoint 1).
     AppEvent event;
     event.Type                = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action = MOVE_TO_ACTION;
+    event.ClosureEvent.EndpointId = ep1.GetEndpoint();
     event.Handler             = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
 
+    SetCurrentAction(MOVE_TO_ACTION);
+    mCurrentActionEndpointId = ep1.GetEndpoint();
     isMoveToInProgress = true;
     return Status::Success;
 }
@@ -369,6 +372,7 @@ void ClosureManager::HandleClosureMotionAction()
     {
         instance.CancelTimer(); // Cancel any existing timer before starting a new action
         instance.SetCurrentAction(MOVE_TO_ACTION);
+        instance.mCurrentActionEndpointId = instance.ep1.GetEndpoint();
         instance.StartTimer(kMotionCountdownTimeMs);
         return;
     }
@@ -378,6 +382,7 @@ void ClosureManager::HandleClosureMotionAction()
         instance.CancelTimer(); // Cancel any existing timer before starting a new action
         ChipLogProgress(AppServer, "Starting latch action timer");
         instance.SetCurrentAction(LATCH_ACTION);
+        instance.mCurrentActionEndpointId = instance.ep1.GetEndpoint();
         instance.StartTimer(kLatchCountdownTimeMs);
     }
     else

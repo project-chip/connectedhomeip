@@ -155,6 +155,13 @@ public:
      */
     void OnMoveToActionComplete();
 
+    /**
+     * @brief Returns the endpoint ID associated with this Closure Control endpoint.
+     * 
+     * @return EndpointId The endpoint ID.
+     */
+    EndpointId GetEndpoint() const { return mEndpoint; }
+
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
     MatterContext mContext;
@@ -162,9 +169,7 @@ private:
     ClusterLogic mLogic;
     Interface mInterface;
 
-    void UpdateTargetStateFromCurrentState();
     void UpdateCurrentStateFromTargetState();
-    void MapCurrentPositioningToTargetPosition(PositioningEnum positioning, TargetPositionEnum & targetPosition);
     PositioningEnum MapTargetPositionToCurrentPositioning(TargetPositionEnum value);
 };
 
