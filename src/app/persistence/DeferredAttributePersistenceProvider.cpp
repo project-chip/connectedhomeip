@@ -22,10 +22,8 @@
 namespace chip {
 namespace app {
 
-CHIP_ERROR DeferredAttribute::PrepareWrite(System::Clock::Timestamp flushTime, const AttributeValueInformation & info,
-                                           const ByteSpan & value)
+CHIP_ERROR DeferredAttribute::PrepareWrite(System::Clock::Timestamp flushTime, const ByteSpan & value)
 {
-    mInfo.emplace(info);
     mFlushTime = flushTime;
 
     if (mValue.AllocatedSize() != value.size())
@@ -41,32 +39,28 @@ CHIP_ERROR DeferredAttribute::PrepareWrite(System::Clock::Timestamp flushTime, c
 void DeferredAttribute::Flush(AttributePersistenceProvider & persister)
 {
     VerifyOrReturn(IsArmed());
-    VerifyOrReturn(mInfo.has_value());
-    persister.WriteValue(mPath, *mInfo, ByteSpan(mValue.Get(), mValue.AllocatedSize()));
+    persister.WriteValue(mPath, ByteSpan(mValue.Get(), mValue.AllocatedSize()));
     mValue.Free();
-    mInfo.reset();
 }
 
-CHIP_ERROR DeferredAttributePersistenceProvider::WriteValue(const ConcreteAttributePath & aPath,
-                                                            const AttributeValueInformation & aInfo, const ByteSpan & aValue)
+CHIP_ERROR DeferredAttributePersistenceProvider::WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue)
 {
     for (DeferredAttribute & da : mDeferredAttributes)
     {
         if (da.Matches(aPath))
         {
-            ReturnErrorOnFailure(da.PrepareWrite(System::SystemClock().GetMonotonicTimestamp() + mWriteDelay, aInfo, aValue));
+            ReturnErrorOnFailure(da.PrepareWrite(System::SystemClock().GetMonotonicTimestamp() + mWriteDelay, aValue));
             FlushAndScheduleNext();
             return CHIP_NO_ERROR;
         }
     }
 
-    return mPersister.WriteValue(aPath, aInfo, aValue);
+    return mPersister.WriteValue(aPath, aValue);
 }
 
-CHIP_ERROR DeferredAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & aPath,
-                                                           const AttributeValueInformation & aInfo, MutableByteSpan & aValue)
+CHIP_ERROR DeferredAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue)
 {
-    return mPersister.ReadValue(aPath, aInfo, aValue);
+    return mPersister.ReadValue(aPath, aValue);
 }
 
 void DeferredAttributePersistenceProvider::FlushAndScheduleNext()

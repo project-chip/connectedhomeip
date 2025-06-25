@@ -22,49 +22,11 @@ namespace chip {
 namespace app {
 
 /**
- * Describes the type of an attribute stored in persistent storage.
- *
- * Attribute types supported:
- *   - Pascal strings: one or two byte prefixes
- *   - Fixed size scalars (i.e. known size of data)
- *   - Variable size buffers (i.e. opaque bytes)
- */
-enum class AttributeValueType : uint8_t
-{
-    kShortPascal,  // one byte prefix for size (either chars or bytes)
-    kLongPascal,   // two byte prefix for size (either chars or bytes). Prefix is LittleEndian encoded.
-    kFixedSize,    // fixed size value like uint8_t, uint16_t or float/double or similar
-    kVariableSize, // variable size, no size validation done
-};
-
-struct AttributeValueInformation
-{
-    const AttributeValueType type;
-    const uint16_t size; // applies to kFixedSize only
-
-    constexpr AttributeValueInformation(AttributeValueType t, uint16_t s) : type(t), size(s) {}
-
-    /// Convenience to specify a type if `Fixed<uint32_t>` for example
-    template <typename T>
-    static constexpr AttributeValueInformation Fixed()
-    {
-        return { AttributeValueType::kFixedSize, sizeof(T) };
-    }
-
-    static constexpr AttributeValueInformation ShortPascal() { return { AttributeValueType::kShortPascal, 0 }; }
-    static constexpr AttributeValueInformation LongPascal() { return { AttributeValueType::kLongPascal, 0 }; }
-    static constexpr AttributeValueInformation VariableSize() { return { AttributeValueType::kVariableSize, 0 }; }
-};
-
-/**
  * Interface for persisting attribute values.
  *
  * COMPATIBILITY NOTE:
  *   - This generally is assumed to write under a different key space from
  *     SafeAttributePersistenceProvider.
- *
- * TODO: Determine why SafeAttributePersistenceProvider exists compared
- *       to this interface.
  */
 class AttributePersistenceProvider
 {
@@ -77,21 +39,17 @@ public:
      * list) to non-volatile memory.
      *
      * @param [in] aPath the attribute path for the data being written.
-     * @param [in] aInfo the information about the encoding of the attribute data
      * @param [in] aValue the data to write.
      */
-    virtual CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const AttributeValueInformation & aInfo,
-                                  const ByteSpan & aValue) = 0;
+    virtual CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) = 0;
 
     /**
      * Read an attribute value from non-volatile memory.
      *
      * @param [in]     aPath the attribute path for the data being persisted.
-     * @param [in]     aInfo the information about the encoding of the attribute data
      * @param [in,out] aValue where to place the data.
      */
-    virtual CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, const AttributeValueInformation & aInfo,
-                                 MutableByteSpan & aValue) = 0;
+    virtual CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue) = 0;
 };
 
 } // namespace app

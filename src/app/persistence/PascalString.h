@@ -18,6 +18,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
 #include <algorithm>
@@ -90,6 +91,13 @@ public:
         return true;
     }
 
+    static bool IsValid(Span<const T> span)
+    {
+        VerifyOrReturnValue(span.size() >= 1, false);
+        uint16_t len = *static_cast<const uint8_t *>(span.data());
+        return len == kInvalidLength || (len <= span.size() - 1);
+    }
+
 private:
     T * mData;
     const uint8_t mMaxSize;
@@ -159,6 +167,13 @@ public:
         }
         memcpy(mData + 2, value.data(), value.size());
         return true;
+    }
+
+    static bool IsValid(Span<const T> span)
+    {
+        VerifyOrReturnValue(span.size() >= 2, false);
+        uint16_t len = Encoding::LittleEndian::Get16(reinterpret_cast<const uint8_t *>(span.data()));
+        return len == kInvalidLength || (len <= span.size() - 2);
     }
 
 private:

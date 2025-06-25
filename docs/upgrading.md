@@ -7,10 +7,10 @@
 `AttributePersistenceProvider` was moved to `src/app/persistence` and its
 interface has updated:
 
--   Metadata about the attribute was added to both read and write
--   Metadata for write was changed from ember specific information (which may
-    have more data like default values or other flags) to focus on format and
-    size
+-   Read/write operate over pure buffers, without type information
+
+Callers will validate data validity on read instead of relying on data
+validation by the persistence provider.
 
 See <https://github.com/project-chip/connectedhomeip/pull/39693> for changes
 

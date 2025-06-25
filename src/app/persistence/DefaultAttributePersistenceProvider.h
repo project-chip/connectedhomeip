@@ -39,10 +39,8 @@ public:
     CHIP_ERROR Init(PersistentStorageDelegate * storage) { return StorageDelegateWrapper::Init(storage); }
 
     // AttributePersistenceProvider implementation.
-    CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const AttributeValueInformation & aInfo,
-                          const ByteSpan & aValue) override;
-    CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, const AttributeValueInformation & aInfo,
-                         MutableByteSpan & aValue) override;
+    CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override;
+    CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue) override;
 };
 
 } // namespace app

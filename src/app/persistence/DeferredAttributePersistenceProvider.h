@@ -32,13 +32,12 @@ public:
     bool IsArmed() const { return static_cast<bool>(mValue); }
     System::Clock::Timestamp GetFlushTime() const { return mFlushTime; }
 
-    CHIP_ERROR PrepareWrite(System::Clock::Timestamp flushTime, const AttributeValueInformation & info, const ByteSpan & value);
+    CHIP_ERROR PrepareWrite(System::Clock::Timestamp flushTime, const ByteSpan & value);
     void Flush(AttributePersistenceProvider & persister);
 
 private:
     const ConcreteAttributePath mPath;
     System::Clock::Timestamp mFlushTime;
-    std::optional<AttributeValueInformation> mInfo;
     Platform::ScopedMemoryBufferWithSize<uint8_t> mValue;
 };
 
@@ -68,10 +67,8 @@ public:
      *
      * For other attributes, immediately pass the write operation to the decorated persister.
      */
-    CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const AttributeValueInformation & aInfo,
-                          const ByteSpan & aValue) override;
-    CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, const AttributeValueInformation & aInfo,
-                         MutableByteSpan & aValue) override;
+    CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override;
+    CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue) override;
 
 private:
     void FlushAndScheduleNext();

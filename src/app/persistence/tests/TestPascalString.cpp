@@ -202,4 +202,50 @@ TEST(TestPascalString, TestNullability)
     }
 }
 
+TEST(TestPascalString, TestIsValid)
+{
+    {
+        uint8_t buff[] = { 3, 0, 0 };
+        ASSERT_FALSE(ShortPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+        buff[0] = 254;
+        ASSERT_FALSE(ShortPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+
+        buff[0] = 255; // null string
+        ASSERT_TRUE(ShortPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+
+        buff[0] = 2;
+        ASSERT_TRUE(ShortPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+        buff[0] = 1;
+        ASSERT_TRUE(ShortPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+    }
+
+    {
+        uint8_t buff[] = { 4, 0, 0, 0, 0 };
+        ASSERT_FALSE(LongPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+        buff[0] = 254;
+        ASSERT_FALSE(LongPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+
+        buff[0] = 255;
+        ASSERT_FALSE(LongPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+
+        buff[1] = 255;
+        ASSERT_TRUE(LongPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+
+        buff[0] = 0;
+        ASSERT_FALSE(LongPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+
+        buff[1] = 0;
+        ASSERT_TRUE(LongPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+
+        buff[0] = 1;
+        ASSERT_TRUE(LongPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+
+        buff[0] = 2;
+        ASSERT_TRUE(LongPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+
+        buff[0] = 3;
+        ASSERT_TRUE(LongPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+    }
+}
+
 } // namespace
