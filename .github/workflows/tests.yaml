@@ -298,7 +298,7 @@ jobs:
                 # Disable TSAN bug reporting, as it reports tons of (hopefully) false positives.
                 # The reason for that is BlueZ and WPA supplicant integration which involves GIO
                 # globals (glib internals) that TSAN does not understand...
-                TSAN_OPTIONS="report_bugs=0"
+                TSAN_OPTIONS: report_bugs=0
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
