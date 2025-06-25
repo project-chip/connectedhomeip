@@ -19,11 +19,10 @@ server.
 We have patched the webserver we use to actually include TLS information as an
 extension. Because of this, we need to patch the hypercorn dependency before
 running the server. This is done with the following command (assuming it is run
-from this repo root folder):
+from a shell with virtual env enabled):
 
 ```sh
-$ export VIRTUAL_ENV_DIRECTORY=.venv
-$ patch -d $VIRTUAL_ENV_DIRECTORY < src/tools/push_av_server/hypercorn.patch
+$ patch -d $VIRTUAL_ENV < src/tools/push_av_server/hypercorn.patch
 ```
 
 ## Example
