@@ -58,12 +58,12 @@ class TC_AVSM_2_9(MatterBaseTest, AVSMTestBase):
             TestStep("precondition", "DUT commissioned and preconditions", is_commissioning=True),
             TestStep(
                 1,
-                "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on TH_SERVER",
-                "Verify VDO is supported.",
+                "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on DUT",
+                "Verify VDO is supported. Do not run if not.",
             ),
             TestStep(
                 2,
-                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated video streams in the list is 1. Store StreamID as aStreamIDToDelete.",
             ),
             TestStep(
@@ -78,7 +78,7 @@ class TC_AVSM_2_9(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 5,
-                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated video streams in the list is 0.",
             ),
         ]
