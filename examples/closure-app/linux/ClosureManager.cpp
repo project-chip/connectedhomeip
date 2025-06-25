@@ -172,7 +172,7 @@ void ClosureManager::HandleClosureActionTimer(System::Layer * layer, void * aApp
     switch (instance.mCurrentAction)
     {
     case ClosureAction::kCalibrateAction:
-        instance.HandleClosureActionComplete(ClosureAction::kCalibrateAction);
+        instance.HandleCalibrateActionComplete();
         break;
     case ClosureAction::kStopAction:
         // Add logic to handle Stop action completion
@@ -198,70 +198,34 @@ void ClosureManager::HandleClosureActionTimer(System::Layer * layer, void * aApp
     }
 }
 
-void ClosureManager::HandleClosureActionComplete(ClosureAction action)
+void ClosureManager::HandleCalibrateActionComplete()
 {
-    ChipLogProgress(AppServer, "HandleClosureActionComplete called for action: %d", static_cast<int>(action));
+    ChipLogProgress(AppServer, "HandleCalibrateActionComplete called");
 
-    switch (action)
-    {
-    case ClosureAction::kCalibrateAction: {
-        mClosureEndpoint1.OnCalibrateActionComplete();
-        mClosurePanelEndpoint2.OnCalibrateActionComplete();
-        mClosurePanelEndpoint3.OnCalibrateActionComplete();
-        mIsCalibrationActionInProgress = false;
-        break;
-    }
+    mClosureEndpoint1.OnCalibrateActionComplete();
+    mClosurePanelEndpoint2.OnCalibrateActionComplete();
+    mClosurePanelEndpoint3.OnCalibrateActionComplete();
+    mIsCalibrationActionInProgress = false;
+    mCurrentAction                 = ClosureAction::kInvalidAction;
+    mCurrentEndpointId             = chip::kInvalidEndpointId;
+}
 
-    case ClosureAction::kStopAction: {
-        if (mIsCalibrationActionInProgress)
-        {
-            mClosureEndpoint1.OnStopCalibrateActionComplete();
-            mClosurePanelEndpoint2.OnStopCalibrateActionComplete();
-            mClosurePanelEndpoint3.OnStopCalibrateActionComplete();
-            mIsCalibrationActionInProgress = false;
-        }
-        else if (mIsMoveToActionInProgress)
-        {
-            mClosureEndpoint1.OnStopMotionActionComplete();
-            mClosurePanelEndpoint2.OnStopMotionActionComplete();
-            mClosurePanelEndpoint3.OnStopMotionActionComplete();
-            mIsMoveToActionInProgress = false;
-        }
-        else if (mIsSetTargetActionInProgress)
-        {
-            // Add logic to handle stopping SetTarget action
-            mIsSetTargetActionInProgress = false;
-        }
-        else if (mIsStepActionInProgress)
-        {
-            // Add logic to handle stopping Step action
-            mIsStepActionInProgress = false;
-        }
-        break;
-    }
+void ClosureManager::HandleStopActionComplete()
+{
+    // Add logic to handle Stop action completion
+}
 
-    case ClosureAction::kMoveToAction: {
-        mClosureEndpoint1.OnMoveToActionComplete();
-        mClosurePanelEndpoint2.OnMoveToActionComplete();
-        mClosurePanelEndpoint3.OnMoveToActionComplete();
-        mIsMoveToActionInProgress = false;
-        break;
-    }
+void ClosureManager::HandleMoveToActionComplete()
+{
+    // Add logic to handle MoveTo action completion
+}
 
-    case ClosureAction::kSetTargetAction:
-        // Add logic to handle SetTarget action completion
-        mIsSetTargetActionInProgress = false;
-        break;
+void ClosureManager::HandleSetTargetActionComplete()
+{
+    // Add logic to handle SetTarget action completion
+}
 
-    case ClosureAction::kStepAction:
-        // Add logic to handle Step action completion
-        mIsStepActionInProgress = false;
-        break;
-
-    default:
-        ChipLogError(AppServer, "Invalid action received in HandleClosureAction");
-        break;
-    }
-    mCurrentAction     = ClosureAction::kInvalidAction;
-    mCurrentEndpointId = chip::kInvalidEndpointId;
+void ClosureManager::HandleStepActionComplete()
+{
+    // Add logic to handle Step action completion
 }

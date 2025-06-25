@@ -28,7 +28,7 @@
 class ClosureManager
 {
 public:
-    enum class ClosureAction
+    enum class ClosureAction : uint8_t
     {
         kCalibrateAction = 0,
         kMoveToAction,
@@ -61,6 +61,17 @@ public:
      */
     chip::Protocols::InteractionModel::Status OnCalibrateCommand();
 
+    /**
+     * @brief Handles the "MoveTo" command for the closure manager.
+     *
+     * This method initiates the move to command for the closure system, allowing it to move
+     * to a specified position with an optional latch and speed setting.
+     *
+     * @param position The target position to move to.
+     * @param latch Optional parameter indicating whether to latch the closure.
+     * @param speed Optional speed setting for the move action.
+     * @return Status::Success if the move to command is successfully processed.
+     */
     chip::Protocols::InteractionModel::Status
     OnMoveToCommand(const chip::Optional<chip::app::Clusters::ClosureControl::TargetPositionEnum> & position,
                     const chip::Optional<bool> & latch,
@@ -156,14 +167,54 @@ private:
     static void HandleClosureActionTimer(chip::System::Layer * layer, void * aAppState);
 
     /**
-     * @brief Handles the completion of a closure action.
+     * @brief Handles the completion of a Calibrate action.
      *
-     * This method is called when a closure-related action (such as calibrate, move, or stop)
-     * has finished executing, allowing for any necessary cleanup or state updates.
+     * This method is called when a calibrate action has finished executing.
+     * It is responsible for handling necessary cleanup or endpoint state updates.
      *
      * @param action The action that has been completed.
      */
-    void HandleClosureActionComplete(ClosureAction action);
+    void HandleCalibrateActionComplete();
+
+    /**
+     * @brief Handles the completion of a MoveTo action.
+     *
+     * This method is called when a move-to action has finished executing.
+     * It is responsible for handling necessary cleanup or endpoint state updates.
+     *
+     * @param action The action that has been completed.
+     */
+    void HandleMoveToActionComplete();
+
+    /**
+     * @brief Handles the completion of a Stop action.
+     *
+     * This method is called when a stop action has finished executing.
+     * It is responsible for handling necessary cleanup or endpoint state updates.
+     *
+     * @param action The action that has been completed.
+     */
+    void HandleStopActionComplete();
+
+    /**
+     * @brief Handles the completion of a SetTarget action.
+     *
+     * This method is called when a set target action has finished executing.
+     * It is responsible for handling necessary cleanup or endpoint state updates.
+     *
+     * @param action The action that has been completed.
+     */
+    void HandleSetTargetActionComplete();
+
+    /**
+     * @brief Handles the completion of a Step action.
+     *
+     * This method is called when a step action has finished executing.
+     * It is responsible for handling necessary cleanup or endpoint state updates.
+     *
+     * @param action The action that has been completed.
+     */
+    void HandleStepActionComplete();
 
     bool mIsCalibrationActionInProgress = false;
     bool mIsMoveToActionInProgress      = false;
