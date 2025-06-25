@@ -223,7 +223,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
     AppEvent event;
     event.Type                = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action = CALIBRATE_ACTION;
-    event.ClosureEvent.EndpointId = ep1.GetEndpointId(); 
+    event.ClosureEvent.EndpointId = ep1.GetEndpointId();
     event.Handler             = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
 
@@ -240,7 +240,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStopCommand()
     // For simulation purposes, we will just log the stop action and contnue to handle the stop action completion.
     // In a real application, this would be replaced with actual logic to stop the closure action.
     ChipLogDetail(AppServer, "Handling Stop command for closure action");
-    
+
     CancelTimer();
 
     SetCurrentAction(Action_t::STOP_ACTION);

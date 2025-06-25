@@ -109,7 +109,7 @@ public:
 
     /**
      * @brief Handles the completion of the stop calibration action.
-     * 
+     *
      * This function is called when the calibration action has been stopped.
      * It should update the internal state of the closure dimension endpoint to reflect the
      * stopping of the calibration action.
