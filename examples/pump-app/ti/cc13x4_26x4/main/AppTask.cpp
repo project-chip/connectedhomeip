@@ -100,7 +100,8 @@ static LED_Handle sAppGreenHandle;
 static Button_Handle sAppLeftHandle;
 static Button_Handle sAppRightHandle;
 
-Cluster::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(0 /*endpointId*/);
+Clusters::NetworkCommissioning::InstanceAndDriver<DeviceLayer::NetworkCommissioning::GenericThreadDriver>
+    sThreadNetworkDriver(0 /*endpointId*/);
 
 AppTask AppTask::sAppTask;
 
