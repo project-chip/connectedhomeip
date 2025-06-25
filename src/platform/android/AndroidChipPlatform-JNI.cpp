@@ -469,7 +469,7 @@ JNI_METHOD(void, setServiceResolveListener)
         // Set the listener
 
         // Save the java listener (for later use)
-        mJListenerObject = env->NewGlobalRef(jListenerObject);
+mJListenerObject = env->NewWeakGlobalRef(jListenerObject);
         jclass listenerClass = env->GetObjectClass(jListenerObject);
 
 jclass listenerClass = env->GetObjectClass(jListenerObject);
