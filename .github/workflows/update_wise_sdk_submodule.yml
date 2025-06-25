@@ -24,7 +24,7 @@ jobs:
 
       - name: Update submodule
         run: |
-          cd third_party/senscomm/scm1612s/wise-sdk && git fetch origin && git reset --hard origin/master && cd ../../../../
+          cd third_party/senscomm/scm1612s/wise-sdk && git fetch origin && git co master && git reset --hard origin/master && cd ../../../../
         
       - name: Checkin
         run: |
