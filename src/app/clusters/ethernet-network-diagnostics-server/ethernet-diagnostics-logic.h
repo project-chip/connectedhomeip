@@ -30,14 +30,11 @@ namespace Clusters {
 struct EthernetDiagnosticsEnabledAttributes
 {
     bool enableCarrierDetect : 1;
-    bool enableCollisionCount : 1;
     bool enableFullDuplex : 1;
-    bool enableOverrunCount : 1;
-    bool enablePacketRxCount : 1;
-    bool enablePacketTxCount : 1;
+    bool enablePacketCount : 1;
     bool enablePHYRate : 1;
     bool enableTimeSinceReset : 1;
-    bool enableTxErrCount : 1;
+    bool enableErrCount : 1;
 };
 
 /// Type-safe implementation for callbacks for the EthernetDiagnostics server
@@ -97,23 +94,6 @@ protected:
     {
         return DeviceLayer::GetDiagnosticDataProvider();
     }
-};
-
-/// Minimal class that uses an injected diagnostics provider (i.e. uses RAM but is unit testable)
-class InjectedDiagnosticsEthernetDiagnosticsLogic : public EthernetDiagnosticsLogic
-{
-public:
-    InjectedDiagnosticsEthernetDiagnosticsLogic(DeviceLayer::DiagnosticDataProvider & provider,
-                                                const EthernetDiagnosticsEnabledAttributes enabledAttributes) :
-        EthernetDiagnosticsLogic(enabledAttributes),
-        mProvider(provider)
-    {}
-
-protected:
-    [[nodiscard]] DeviceLayer::DiagnosticDataProvider & GetDiagnosticDataProvider() const override { return mProvider; }
-
-private:
-    DeviceLayer::DiagnosticDataProvider & mProvider;
 };
 
 } // namespace Clusters

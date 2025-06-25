@@ -87,54 +87,9 @@ CHIP_ERROR EthernetDiagnosticsLogic::ReadCarrierDetect(AttributeValueEncoder & e
 
 BitFlags<EthernetNetworkDiagnostics::Feature> EthernetDiagnosticsLogic::GetFeatureMap() const
 {
-    BitFlags<EthernetNetworkDiagnostics::Feature> featureMap;
-
-    // Check PacketCounts feature - enabled if either Rx or Tx packet counts are supported
-    if ((mEnabledAttributes.enablePacketRxCount || mEnabledAttributes.enablePacketTxCount))
-    {
-        uint64_t tempValue;
-        bool supportsPacketCounts = false;
-
-        if (mEnabledAttributes.enablePacketRxCount &&
-            GetDiagnosticDataProvider().GetEthPacketRxCount(tempValue) != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            supportsPacketCounts = true;
-        }
-        else if (mEnabledAttributes.enablePacketTxCount &&
-                 GetDiagnosticDataProvider().GetEthPacketTxCount(tempValue) != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            supportsPacketCounts = true;
-        }
-
-        featureMap.Set(EthernetNetworkDiagnostics::Feature::kPacketCounts, supportsPacketCounts);
-    }
-
-    // Check ErrorCounts feature - enabled if any error count attributes are supported
-    if ((mEnabledAttributes.enableTxErrCount || mEnabledAttributes.enableCollisionCount || mEnabledAttributes.enableOverrunCount))
-    {
-        uint64_t tempValue;
-        bool supportsErrorCounts = false;
-
-        if (mEnabledAttributes.enableTxErrCount &&
-            GetDiagnosticDataProvider().GetEthTxErrCount(tempValue) != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            supportsErrorCounts = true;
-        }
-        else if (mEnabledAttributes.enableCollisionCount &&
-                 GetDiagnosticDataProvider().GetEthCollisionCount(tempValue) != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            supportsErrorCounts = true;
-        }
-        else if (mEnabledAttributes.enableOverrunCount &&
-                 GetDiagnosticDataProvider().GetEthOverrunCount(tempValue) != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-        {
-            supportsErrorCounts = true;
-        }
-
-        featureMap.Set(EthernetNetworkDiagnostics::Feature::kErrorCounts, supportsErrorCounts);
-    }
-
-    return featureMap;
+    return BitFlags<EthernetNetworkDiagnostics::Feature>()
+        .Set(EthernetNetworkDiagnostics::Feature::kPacketCounts, mEnabledAttributes.enablePacketCount)
+        .Set(EthernetNetworkDiagnostics::Feature::kErrorCounts, mEnabledAttributes.enableErrCount);
 }
 
 CHIP_ERROR EthernetDiagnosticsLogic::AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
@@ -154,52 +109,32 @@ CHIP_ERROR EthernetDiagnosticsLogic::AcceptedCommands(ReadOnlyBufferBuilder<Data
 
 CHIP_ERROR EthernetDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
-    // ensure we have space for all attributes. We may add at most 9 attributes (all optional)
-    ReturnErrorOnFailure(builder.EnsureAppendCapacity(9 + DefaultServerCluster::GlobalAttributes().size()));
-
-    if (mEnabledAttributes.enableCarrierDetect)
+    struct Mapping
     {
-        ReturnErrorOnFailure(builder.Append(Attributes::CarrierDetect::kMetadataEntry));
-    }
+        const bool enable;
+        const DataModel::AttributeEntry & entry;
+    };
 
-    if (mEnabledAttributes.enableCollisionCount)
-    {
-        ReturnErrorOnFailure(builder.Append(Attributes::CollisionCount::kMetadataEntry));
-    }
+    const Mapping mappings[] = {
+        { mEnabledAttributes.enableCarrierDetect, Attributes::CarrierDetect::kMetadataEntry },
+        { mEnabledAttributes.enableErrCount, Attributes::CollisionCount::kMetadataEntry },
+        { mEnabledAttributes.enableFullDuplex, Attributes::FullDuplex::kMetadataEntry },
+        { mEnabledAttributes.enableErrCount, Attributes::OverrunCount::kMetadataEntry },
+        { mEnabledAttributes.enablePacketCount, Attributes::PacketRxCount::kMetadataEntry },
+        { mEnabledAttributes.enablePacketCount, Attributes::PacketTxCount::kMetadataEntry },
+        { mEnabledAttributes.enablePHYRate, Attributes::PHYRate::kMetadataEntry },
+        { mEnabledAttributes.enableTimeSinceReset, Attributes::TimeSinceReset::kMetadataEntry },
+        { mEnabledAttributes.enableErrCount, Attributes::TxErrCount::kMetadataEntry },
+    };
 
-    if (mEnabledAttributes.enableFullDuplex)
-    {
-        ReturnErrorOnFailure(builder.Append(Attributes::FullDuplex::kMetadataEntry));
-    }
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(std::size(mappings) + DefaultServerCluster::GlobalAttributes().size()));
 
-    if (mEnabledAttributes.enableOverrunCount)
+    for (const auto & m : mappings)
     {
-        ReturnErrorOnFailure(builder.Append(Attributes::OverrunCount::kMetadataEntry));
-    }
-
-    if (mEnabledAttributes.enablePacketRxCount)
-    {
-        ReturnErrorOnFailure(builder.Append(Attributes::PacketRxCount::kMetadataEntry));
-    }
-
-    if (mEnabledAttributes.enablePacketTxCount)
-    {
-        ReturnErrorOnFailure(builder.Append(Attributes::PacketTxCount::kMetadataEntry));
-    }
-
-    if (mEnabledAttributes.enablePHYRate)
-    {
-        ReturnErrorOnFailure(builder.Append(Attributes::PHYRate::kMetadataEntry));
-    }
-
-    if (mEnabledAttributes.enableTimeSinceReset)
-    {
-        ReturnErrorOnFailure(builder.Append(Attributes::TimeSinceReset::kMetadataEntry));
-    }
-
-    if (mEnabledAttributes.enableTxErrCount)
-    {
-        ReturnErrorOnFailure(builder.Append(Attributes::TxErrCount::kMetadataEntry));
+        if (m.enable)
+        {
+            ReturnErrorOnFailure(builder.Append(m.entry));
+        }
     }
 
     return builder.AppendElements(DefaultServerCluster::GlobalAttributes());

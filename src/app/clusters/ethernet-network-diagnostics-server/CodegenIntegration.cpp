@@ -63,14 +63,11 @@ void emberAfEthernetNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
 
     const EthernetDiagnosticsEnabledAttributes enabledAttributes{
         .enableCarrierDetect  = IsAttributeEnabled(kRootEndpointId, Attributes::CarrierDetect::Id),
-        .enableCollisionCount = IsAttributeEnabled(kRootEndpointId, Attributes::CollisionCount::Id),
         .enableFullDuplex     = IsAttributeEnabled(kRootEndpointId, Attributes::FullDuplex::Id),
-        .enableOverrunCount   = IsAttributeEnabled(kRootEndpointId, Attributes::OverrunCount::Id),
-        .enablePacketRxCount  = IsAttributeEnabled(kRootEndpointId, Attributes::PacketRxCount::Id),
-        .enablePacketTxCount  = IsAttributeEnabled(kRootEndpointId, Attributes::PacketTxCount::Id),
+        .enablePacketCount    = IsAttributeEnabled(kRootEndpointId, Attributes::PacketRxCount::Id),
         .enablePHYRate        = IsAttributeEnabled(kRootEndpointId, Attributes::PHYRate::Id),
         .enableTimeSinceReset = IsAttributeEnabled(kRootEndpointId, Attributes::TimeSinceReset::Id),
-        .enableTxErrCount     = IsAttributeEnabled(kRootEndpointId, Attributes::TxErrCount::Id),
+        .enableErrCount       = IsAttributeEnabled(kRootEndpointId, Attributes::TxErrCount::Id),
     };
 
     gServer.Create(enabledAttributes);
