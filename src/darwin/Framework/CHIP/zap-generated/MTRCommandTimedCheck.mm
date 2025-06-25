@@ -1005,6 +1005,12 @@ static BOOL CommandNeedsTimedInvokeInThreadBorderRouterManagementCluster(Attribu
 {
     using namespace Clusters::ThreadBorderRouterManagement;
     switch (aAttributeId) {
+    case Commands::SetActiveDatasetRequest::Id: {
+        return YES;
+    }
+    case Commands::SetPendingDatasetRequest::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }
