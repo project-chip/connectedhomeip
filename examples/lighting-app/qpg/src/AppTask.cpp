@@ -36,6 +36,7 @@
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
+#include <app/persistence/DeferredAttributePersistenceProvider.h>
 #include <app/server/Server.h>
 
 using namespace ::chip;
