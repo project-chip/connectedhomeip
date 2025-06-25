@@ -156,15 +156,6 @@ public:
      */
     void OnMoveToActionComplete();
 
-        /**
-     * @brief Handles the completion of a set target action.
-     *
-     * This function is called when a set target action has finished executing.
-     * It should update the internal state of the closure control endpoint to reflect the
-     * completion of the set target action.
-     */
-    void OnSetTargetActionComplete();
-
     /**
      * @brief Callback for when a step action is completed.
      *
@@ -174,12 +165,28 @@ public:
      */
     void OnStepActionComplete();
 
+    /**
+     * @brief Retrieves the endpoint identifier associated with this instance.
+     *
+     * @return The endpoint ID (EndpointId) for this instance.
+     */
+    EndpointId GetEndpoint() const { return mEndpoint; }
+
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
     MatterContext mContext;
     ClosureDimensionDelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
+
+    /**
+     * @brief Updates the current state from the target state.
+     *
+     * This function retrieves the current state and updates it based on the target state.
+     * It ensures that the current state reflects the latest target position, latch status,
+     * and speed settings.
+     */
+    void UpdateCurrentStateFromTargetState();
 };
 
 } // namespace ClosureDimension

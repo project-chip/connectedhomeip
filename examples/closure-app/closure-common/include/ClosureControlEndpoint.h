@@ -156,15 +156,6 @@ public:
     void OnMoveToActionComplete();
 
     /**
-     * @brief Handles the completion of a set target action.
-     *
-     * This function is called when a set target action has finished executing.
-     * It should update the internal state of the closure control endpoint to reflect the
-     * completion of the set target action.
-     */
-    void OnSetTargetActionComplete();
-
-    /**
      * @brief Callback for when a step action is completed.
      *
      * This function is called when a step action has been completed.
@@ -188,6 +179,25 @@ private:
     ClosureControlDelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
+
+    /**
+     * @brief Updates the target state based on the current state of the closure control endpoint.
+     *
+     * This function retrieves the current state of the closure control endpoint and updates
+     * the target state accordingly. It ensures that the target state reflects the latest
+     * positioning and other relevant attributes.
+     */
+    void UpdateTargetStateFromCurrentState();
+
+    /**
+     * @brief Maps the current positioning to a target position.
+     *
+     * This function converts the current positioning state to a corresponding target position.
+     *
+     * @param currentPositioning The current positioning state to be mapped.
+     * @return TargetPositionEnum The mapped target position.
+     */
+    TargetPositionEnum MapCurrentPositioningToTargetPosition(PositioningEnum currentPositioning);
 };
 
 } // namespace ClosureControl
