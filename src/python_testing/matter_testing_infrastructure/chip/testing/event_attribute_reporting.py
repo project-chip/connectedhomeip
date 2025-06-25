@@ -135,10 +135,10 @@ class AttributeCallback:
         self._expected_cluster = expected_cluster
         self._expected_attribute = expected_attribute
         self._subscription = None
-        self._lock = threading.Lock()
         self._q = queue.Queue()
         self._endpoint_id = 0
         if expected_cluster is not None:
+            self._lock = threading.Lock()
             self.reset()
 
     def reset(self):
@@ -181,14 +181,18 @@ class AttributeCallback:
             pass
 
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
-        """This is the subscription callback when an attribute report is received.
-           It checks the report is from the expected_cluster and then posts it into the queue for later processing."""
+        # """This is the subscription callback when an attribute report is received.
+        #    It checks the report is from the expected_cluster and then posts it into the queue for later processing."""
         valid_report = False
         if path.ClusterType == self._expected_cluster:
             if self._expected_attribute is not None:
                 valid_report = path.ClusterId == self._expected_attribute.cluster_id
             else:
                 valid_report = True
+        elif path.AttributeType == self._expected_attribute:
+            logging.debug(f"[AttributeChangeCallback] Attribute update callback for {path.AttributeType}")
+            q = (path, transaction)
+            self._q.put(q)
 
         if valid_report:
             data = transaction.GetAttribute(path)
