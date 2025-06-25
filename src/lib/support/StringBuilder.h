@@ -121,7 +121,7 @@ StringBuilder<N> StringOf(const char * data, size_t length)
 }
 
 /// Build a c-style string of an unsigned char* and length that can be used inplace
-/// Only printable characters will be added
+/// Only printable elements will be added
 /// Default buffer size is 256
 template <size_t N = 256>
 StringBuilder<N> StringOf(const unsigned char * data, size_t length)
@@ -144,6 +144,23 @@ StringBuilder<N> StringOf(const CharSpan & span)
 {
     chip::StringBuilder<N> builder;
     builder.AddFormat("%.*s", static_cast<int>(span.size()), span.data());
+    return builder;
+}
+
+/// Build a c-style string of a ByteSpan that can be used inplace
+/// Only printable elements will be added
+/// Default buffer size is 256
+template <size_t N = 256>
+StringBuilder<N> StringOf(const ByteSpan & span)
+{
+    chip::StringBuilder<N> builder;
+    for (size_t i = 0; i < span.size(); ++i)
+    {
+        if (std::isprint(span[i]))
+        {
+            builder.Add(span[i]);
+        }
+    }
     return builder;
 }
 
