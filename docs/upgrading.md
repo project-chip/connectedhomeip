@@ -9,6 +9,14 @@ interface has updated:
 
 -   Read/write operate over pure buffers, without type information
 
+This update was done so that the interface is decoupled from ember and metadata
+types. The reasons for this approach:
+
+-   simpler/more modular code (easier to maintain)
+-   Have more generic storage support (including variable size data)
+-   Ability to preserve backwards compatibility with existing products without
+    increasing flash size by adding additional abstraction layers
+
 Callers will validate data validity on read instead of relying on data
 validation by the persistence provider.
 
