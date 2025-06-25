@@ -231,11 +231,7 @@
             "CurrentDayEntry",
             "NextDayEntry"
         ],
-        "Commodity Metering": [
-            "MeteredQuantity",
-            "MeteredQuantityTimestamp",
-            "MeasurementType"
-        ],
+        "Commodity Metering": ["MeteredQuantity", "MeteredQuantityTimestamp"],
         "Descriptor": ["ClusterRevision", "FeatureMap"],
         "Device Energy Management": [
             "ESAType",

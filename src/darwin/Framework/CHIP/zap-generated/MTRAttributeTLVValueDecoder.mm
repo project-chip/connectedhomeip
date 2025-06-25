@@ -20700,8 +20700,8 @@ static id _Nullable DecodeAttributeValueForCommodityMeteringCluster(AttributeId 
         }
         return value;
     }
-    case Attributes::MeasurementType::Id: {
-        using TypeInfo = Attributes::MeasurementType::TypeInfo;
+    case Attributes::TariffUnit::Id: {
+        using TypeInfo = Attributes::TariffUnit::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -20711,7 +20711,7 @@ static id _Nullable DecodeAttributeValueForCommodityMeteringCluster(AttributeId 
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [NSNumber numberWithUnsignedShort:chip::to_underlying(cppValue.Value())];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value())];
         }
         return value;
     }

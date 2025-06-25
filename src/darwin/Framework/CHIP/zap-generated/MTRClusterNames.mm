@@ -8961,8 +8961,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"MeteredQuantityTimestamp";
             break;
 
-        case MTRAttributeIDTypeClusterCommodityMeteringAttributeMeasurementTypeID:
-            result = @"MeasurementType";
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeTariffUnitID:
+            result = @"TariffUnit";
             break;
 
         case MTRAttributeIDTypeClusterCommodityMeteringAttributeGeneratedCommandListID:
