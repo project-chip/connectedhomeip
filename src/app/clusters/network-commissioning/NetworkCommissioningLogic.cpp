@@ -30,9 +30,9 @@
 #include <app/server/Server.h>
 #include <credentials/CHIPCert.h>
 #include <lib/core/CHIPConfig.h>
-#include <lib/support/StringFormatting.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/SortUtils.h>
+#include <lib/support/StringFormatting.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <optional>
 #include <platform/CHIPDeviceConfig.h>
