@@ -34,9 +34,9 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/on-off-server/on-off-server.h>
-#include <app/server/Server.h>
 #include <app/persistence/AttributePersistenceProviderInstance.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
+#include <app/server/Server.h>
 
 using namespace ::chip;
 using namespace ::chip::app;
