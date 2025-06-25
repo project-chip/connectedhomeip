@@ -106,7 +106,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
                                        "CurrentState is not of expected type")
             if is_positioning_supported:
                 asserts.assert_true(current_state.position is NullValue or (0 <= current_state.position <=
-                                    10000), "Position is not in the expected range [0:10000]")
+                                    10000), "Position is not NullValue or not in the expected range [0:100.00]")
             if is_latching_supported:
                 asserts.assert_true(isinstance(current_state.latch, bool) or current_state.latch is NullValue,
                                     "Latch is not a boolean or NullValue")
@@ -121,7 +121,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
                                        "TargetState is not of expected type")
             if is_positioning_supported:
                 asserts.assert_true(target_state.position is NullValue or (0 <= target_state.position <= 10000),
-                                    "Position is not NullValue or not in the expected range [0:10000]")
+                                    "Position is not NullValue or not in the expected range [0:100.00]")
             if is_latching_supported:
                 asserts.assert_true(isinstance(target_state.latch, bool) or target_state.latch is NullValue,
                                     "Latch is not a boolean or NullValue")
@@ -145,7 +145,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
 
         # STEP 7: Read Unit attribute
         self.step(7)
-        unit = -1  # Unknown value
+        unit = None
         if is_unit_supported:
             unit = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Unit)
             asserts.assert_is_instance(unit, Clusters.ClosureDimension.Enums.ClosureUnitEnum, "Unit is not of expected type")
@@ -161,7 +161,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
                 asserts.assert_true(0 <= unit <= 1, "Unit is unknown - cannot check UnitRange")
 
                 if unit == 0:
-                    asserts.assert_true(0 <= unit_range.min, "UnitRange.min is not in the expected range [0:32767]")
+                    asserts.assert_true(0 <= unit_range.min, "UnitRange.min is not larger than or equal to zero")
                     asserts.assert_true(unit_range.min <= unit_range.max <= 32767,
                                         "UnitRange.max is not in the expected range [UnitRange.Min:32767]")
 
