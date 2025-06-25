@@ -41,7 +41,7 @@ import time
 
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, MatterTestConfig, TestStep, async_test_body, default_matter_test_main
-from matter_testing_infrastructure.chip.testing.matter_stack_state import MatterStackState
+from chip.testing.matter_stack_state import MatterStackState
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
