@@ -304,4 +304,56 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendInsufficientHeadroom)
     EXPECT_EQ(packet1->DataLength(), packet1->MaxDataLength());
 }
 
+
+// Test that the initial value of the last received sequence number is zero.
+TEST_F(TestBtpEngine, LastReceivedSequenceNumberInitial)
+{
+    EXPECT_EQ(mBtpEngine.GetLastReceivedSequenceNumber(),0);
+}
+
+// Test that the initial value of the newest unacknowledged sent sequence number is zero.
+TEST_F(TestBtpEngine, NewestUnackedSentSequenceNumberInitial)
+{
+    EXPECT_EQ(mBtpEngine.GetNewestUnackedSentSequenceNumber(),0);
+}
+
+// Test that sending a packet updates the unacknowledged sequence number correctly,
+// and that receiving an acknowledgment updates the state as expected.
+TEST_F(TestBtpEngine, NewestUnackedSentSequenceNumberSend)
+{
+    // Create a 1-byte packet and fill it with data.
+    auto packet0 = System::PacketBufferHandle::New(10);
+    packet0->SetDataLength(1);
+    auto * data0 = packet0->Start();
+    ASSERT_NE(data0, nullptr);
+    std::iota(data0, data0 + 1, 0);
+
+    // Send the packet and check that the newest unacked sent sequence number is 0.
+    EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), false));
+    EXPECT_EQ(mBtpEngine.GetNewestUnackedSentSequenceNumber(), 0);
+
+    // Confirm that there is unacknowledged data.
+    EXPECT_TRUE(mBtpEngine.HasUnackedData());
+    
+    // Prepare an acknowledgment packet for sequence number 0.
+    uint8_t ackData[] = {
+        to_underlying(BtpEngine::HeaderFlags::kFragmentAck),
+        0x00,
+        0x01,
+    };
+
+    auto ackPacket = System::PacketBufferHandle::NewWithData(ackData, sizeof(ackData));
+    
+    SequenceNumber_t seqNum;
+    bool didRecieveAck;
+
+    // Handle the acknowledgment and verify the result.
+    EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(ackPacket), seqNum, didRecieveAck), CHIP_NO_ERROR);
+    EXPECT_TRUE(didRecieveAck);
+    EXPECT_EQ(seqNum, 0);
+
+    // After acknowledgment, the newest unacked sent sequence number should still be 0 (no new sends).
+    EXPECT_EQ(mBtpEngine.GetNewestUnackedSentSequenceNumber(), 0);
+}
+
 } // namespace
