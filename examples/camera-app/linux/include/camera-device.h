@@ -62,6 +62,9 @@ static constexpr uint16_t kVideoSensorWidthPixels    = 1920;    // 1080p resolut
 static constexpr uint16_t kVideoSensorHeightPixels   = 1080;    // 1080p resolution
 static constexpr uint16_t kMinImageRotation          = 0;
 static constexpr uint16_t kMaxImageRotation          = 359; // Spec constraint
+static constexpr uint8_t kMaxZones                   = 10;  // Spec has min 1
+static constexpr uint8_t kMaxUserDefinedZones        = 6;   // Spec has min 5
+static constexpr uint8_t kSensitivityMax             = 10;  // Spec has 2 to 10
 
 #define INVALID_SPKR_LEVEL (0)
 
@@ -262,6 +265,12 @@ public:
     int16_t GetTiltMax() override;
 
     uint8_t GetZoomMax() override;
+
+    uint8_t GetMaxZones() override { return kMaxZones; }
+
+    uint8_t GetMaxUserDefinedZones() override { return kMaxUserDefinedZones; }
+
+    uint8_t GetSensitivityMax() override { return kSensitivityMax; }
 
     CameraError SetPan(int16_t aPan) override;
     CameraError SetTilt(int16_t aTilt) override;
