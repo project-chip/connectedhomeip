@@ -143,7 +143,6 @@ private:
     ClusterLogic mLogic;
     Interface mInterface;
 
-    void UpdateTargetStateFromCurrentState();
     void UpdateCurrentStateFromTargetState();
 };
 
