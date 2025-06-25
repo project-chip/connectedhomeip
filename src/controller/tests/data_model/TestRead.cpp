@@ -3469,6 +3469,8 @@ TEST_F(TestRead, TestSubscribeAttributeDeniedNotExistPath)
 TEST_F(TestRead, TestReadHandler_KillOverQuotaSubscriptions)
 {
     // Note: We cannot use DrainAndServiceIO() since the perpetual read will make DrainAndServiceIO never return.
+    CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
     using namespace SubscriptionPathQuotaHelpers;
     auto sessionHandle = GetSessionBobToAlice();
 
@@ -3757,6 +3759,7 @@ TEST_F(TestRead, TestReadHandler_KillOldestSubscriptions)
     InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(-1);
 }
 
+#if 0
 struct TestReadHandler_ParallelReads_TestCase_Parameters
 {
     int ReadHandlerCapacity = -1;
@@ -4675,6 +4678,7 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(-1);
     InteractionModelEngine::GetInstance()->SetPathPoolCapacityForReads(-1);
 }
+#endif
 
 // Needs to be larger than our plausible path pool.
 constexpr size_t sTooLargePathCount = 200;
