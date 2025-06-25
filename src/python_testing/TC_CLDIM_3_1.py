@@ -44,6 +44,17 @@ from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, Clust
 from mobly import asserts
 
 
+def current_latch_matcher(latch: bool) -> AttributeMatcher:
+    def predicate(report: AttributeValue) -> bool:
+        if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
+            return False
+        if report.value.latch == latch:
+            return True
+        else:
+            return False
+    return AttributeMatcher.from_callable(description=f"CurrentState.Latch is {latch}", matcher=predicate)
+
+
 def current_position_matcher(position: int) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
@@ -93,6 +104,13 @@ class TC_CLDIM_3_1(MatterBaseTest):
             TestStep("2c", "Read LimitRange attribute"),
             TestStep("2d", "Establish wilcard subscription to all attributes"),
             TestStep("2e", "Read CurrentState attribute"),
+            TestStep("2f", "If Latching feature not supported or state is unlatched, skip steps 2g ti 2l"),
+            TestStep("2g", "Read LatchControlModes attribute"),
+            TestStep("2h", "If LatchControlModes is manual unlatching, skip step 2i"),
+            TestStep("2i", "Send SetTarget command with Latch=False"),
+            TestStep("2j", "If LatchControlModes is remote unlatching, skip step 2k"),
+            TestStep("2k", "Manually unlatch the device"),
+            TestStep("2l", "Wait for CurrentState.Latched to be False"),
             TestStep("3a", "If Position = MaxPosition, skip steps 3b to 3d"),
             TestStep("3b", "Set Position to MaxPosition"),
             TestStep("3c", "Verify TargetState attribute is updated"),
@@ -135,6 +153,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         feature_map = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
 
         is_positioning_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
+        is_latching_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
         is_limitation_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kLimitation
         is_speed_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
 
@@ -160,6 +179,54 @@ class TC_CLDIM_3_1(MatterBaseTest):
         # STEP 2e: Read CurrentState attribute
         self.step("2e")
         initial_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+
+        # STEP 2f: If Latching feature is not supported or state is unlatched, skip steps 2g to 2l
+        self.step("2f")
+        if (not is_latching_supported) or (not initial_state.latch):
+            logging.info("Latching feature is not supported or state is unlatched. Skipping steps 2g to 2l.")
+            self.skip_step("2g")
+            self.skip_step("2h")
+            self.skip_step("2i")
+            self.skip_step("2j")
+            self.skip_step("2k")
+            self.skip_step("2l")
+        else:
+            # STEP 2g: Read LatchControlModes attribute
+            self.step("2g")
+            latch_control_modes = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
+
+            # STEP 2h: If LatchControlModes is manual unlatching, skip step 2i
+            self.step("2h")
+            if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
+                logging.info("LatchControlModes is manual unlatching. Skipping step 2i.")
+                self.skip_step("2i")
+            else:
+                # STEP 2i: Send SetTarget command with Latch=False
+                self.step("2i")
+                sub_handler.reset()
+                try:
+                    await self.send_single_cmd(
+                        cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=False),
+                        endpoint=endpoint
+                    )
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+
+            # STEP 2j: If LatchControlModes is remote unlatching, skip step 2k
+            self.step("2j")
+            if latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
+                logging.info("LatchControlModes is remote unlatching. Skipping step 2k.")
+                self.skip_step("2k")
+            else:
+                # STEP 2k: Manually unlatch the device
+                self.step("2k")
+                test_step = "Manual unlatch the device"
+                self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when ready.")
+
+            # STEP 2l: Wait for CurrentState.Latched to be False
+            self.step("2l")
+            sub_handler.await_all_expected_report_matches(
+                expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
 
         # STEP 3a: If Position = MaxPosition, skip steps 3b to 3d
         self.step("3a")
