@@ -1,0 +1,35 @@
+name: Update wise-sdk submdule
+
+on:
+    
+  workflow_dispatch:
+    
+  repository_dispatch:
+    types: wise-sdk-update
+      
+jobs:
+
+  update-wise-sdk:
+  
+    runs-on: ubuntu-latest
+    
+    steps:
+    
+      - name: Checkout connectedhomeip
+        uses: actions/checkout@v3
+        with:
+           ref: senscomm
+           submodules: recursive
+           token: ${{ secrets.PARENT_REPO_TOKEN }} 
+
+      - name: Update submodule
+        run: |
+          cd third_party/senscomm/scm1612s/wise-sdk && git fetch origin && git reset --hard origin/master && cd ../../../../
+        
+      - name: CHeckin wise
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add third_party/senscomm/scm1612s/wise-sdk
+          git commit -m "Update wise-sdk"
+          git push origin senscomm
