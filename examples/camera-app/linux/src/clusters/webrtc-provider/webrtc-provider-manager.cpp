@@ -369,8 +369,14 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    mPeerConnection->setRemoteDescription(sdpAnswer);
+    if (mWebrtcTransportMap.find(sessionId) == mWebrtcTransportMap.end())
+    {
+        mWebrtcTransportMap[sessionId] =
+            std::unique_ptr<WebrtcTransport>(new WebrtcTransport(sessionId, mPeerId.GetNodeId(), mPeerConnection));
+    }
+    AcquireAudioVideoStreams();
 
+    mPeerConnection->setRemoteDescription(sdpAnswer);
     MoveToState(State::SendingICECandidates);
     ScheduleICECandidatesSend();
 
