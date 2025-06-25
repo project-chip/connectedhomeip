@@ -224,7 +224,7 @@ void ClosureManager::HandleClosureActionComplete(ClosureAction action)
         {
             mClosureEndpoint1.OnStopMotionActionComplete();
             mClosurePanelEndpoint2.OnStopMotionActionComplete();
-            mClosurePanelEndpoint3.OnStopMotionActionComplete();    
+            mClosurePanelEndpoint3.OnStopMotionActionComplete();
             mIsMoveToActionInProgress = false;
         }
         else if (mIsSetTargetActionInProgress)
