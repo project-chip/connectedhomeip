@@ -150,6 +150,7 @@ silabs_executable("lighting_app") {
 
   deps = [
     ":sdk",
+    "${chip_root}/src/app/clusters/on-off-server:on-off-common",
     "${chip_root}/src/platform/logging:default",
     app_data_model,
   ]
