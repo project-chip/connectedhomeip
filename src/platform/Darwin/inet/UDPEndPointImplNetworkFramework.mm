@@ -215,7 +215,7 @@ namespace Inet {
         // address itself, so we must copy the scope from the incoming packet
         // to ensure later replies are sent out on the same link.
         if (aPacketInfo.SrcAddress.IsIPv6LinkLocal()) {
-            __auto_type in6 = reinterpret_cast<const struct sockaddr_in6 *>(srcAddress);
+            auto in6 = reinterpret_cast<const struct sockaddr_in6 *>(srcAddress);
             uint32_t interfaceIndex = static_cast<uint32_t>(in6->sin6_scope_id);
             aPacketInfo.Interface = InterfaceId(interfaceIndex);
         }
