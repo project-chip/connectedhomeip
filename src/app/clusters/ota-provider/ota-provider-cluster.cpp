@@ -19,7 +19,6 @@
 #include <clusters/OtaSoftwareUpdateProvider/Commands.h>
 #include <clusters/OtaSoftwareUpdateProvider/Ids.h>
 #include <clusters/OtaSoftwareUpdateProvider/Metadata.h>
-#include <lib/support/StringFormatting.h>
 #include <optional>
 
 namespace chip {
@@ -208,13 +207,7 @@ OtaProviderLogic::QueryImage(const ConcreteCommandPath & commandPath,
     }
     if (location.HasValue())
     {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-
-        ChipLogDetail(Zcl, "  Location: %s",
-                      SPAN_TO_TRUNCATED_CSTR(static_cast<int>(location.Value().size()), location.Value().data()));
-
-#pragma GCC diagnostic pop
+        ChipLogDetail(Zcl, "  Location: %s", StringOf(location.Value()).c_str());
     }
     if (requestorCanConsent.HasValue())
     {

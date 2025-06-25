@@ -21,7 +21,6 @@
 
 #include "app/clusters/bindings/BindingManager.h"
 #include <app/server/Dnssd.h>
-#include <lib/support/StringFormatting.h>
 
 using namespace chip;
 using namespace chip::Controller;
@@ -375,15 +374,8 @@ CHIP_ERROR CastingServer::ReadMACAddress(TargetEndpointInfo * endpoint)
                 if (response.data() != nullptr && response.size() > 0)
                 {
                     videoPlayerInfo->SetMACAddress(response);
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-
                     ChipLogProgress(AppServer, "Updating cache of VideoPlayers with MACAddress: %s",
-                                    SPAN_TO_TRUNCATED_CSTR(static_cast<int>(response.size()), response.data()));
-
-#pragma GCC diagnostic pop
-
+                                    StringOf(response).c_str());
                     CHIP_ERROR error = CastingServer::GetInstance()->mPersistenceManager.AddVideoPlayer(videoPlayerInfo);
                     if (error != CHIP_NO_ERROR)
                     {

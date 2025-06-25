@@ -24,7 +24,6 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <data-model-providers/codegen/Instance.h>
-#include <lib/support/StringFormatting.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/OnboardingCodesUtil.h>
@@ -471,10 +470,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 bool AppTask::OnUpdateAvailableHandler(void * context, uint32_t softwareVersion, chip::CharSpan softwareVersionString)
 {
     AppTask * appTask = reinterpret_cast<AppTask *>(context);
-    ChipLogProgress(NotSpecified, "\tNew update available: \t %s [%d]",
-                    SPAN_TO_TRUNCATED_CSTR(static_cast<int>(softwareVersionString.size()), softwareVersionString.data()),
-                    softwareVersion);
-
+    ChipLogProgress(NotSpecified, "\tNew update available: \t %s [%d]", StringOf(softwareVersionString).c_str(), softwareVersion);
     ChipLogProgress(NotSpecified, "\tDo you want to download new update?");
     ChipLogProgress(NotSpecified, "\tRespond by pressing the button");
     ChipLogProgress(NotSpecified, "\t%10s%10s", "BUTTON0", "BUTTON1");

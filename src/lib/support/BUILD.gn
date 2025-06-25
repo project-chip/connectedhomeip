@@ -242,7 +242,6 @@ static_library("support") {
     "StateMachine.h",
     "StringBuilder.cpp",
     "StringBuilder.h",
-    "StringFormatting.h",
     "StringSplitter.h",
     "TemporaryFileStream.h",
     "ThreadOperationalDataset.cpp",

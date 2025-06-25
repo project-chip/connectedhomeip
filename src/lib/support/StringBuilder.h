@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <cctype>
 #include <nlassert.h>
 
 #include "BufferWriter.h"
@@ -46,6 +47,15 @@ public:
     {
         char buff[32];
         snprintf(buff, sizeof(buff), "%d", value);
+        buff[sizeof(buff) - 1] = 0;
+        return Add(buff);
+    }
+
+    /// Append an unsigned char
+    StringBuilderBase & Add(unsigned char value)
+    {
+        char buff[32];
+        snprintf(buff, sizeof(buff), "%c", value);
         buff[sizeof(buff) - 1] = 0;
         return Add(buff);
     }
@@ -99,5 +109,42 @@ public:
 private:
     char mBuffer[kSize];
 };
+
+/// Build a c-style string of a char* and length that can be used inplace
+/// Default buffer size is 256
+template<size_t N = 256>
+StringBuilder<N> StringOf(const char *data, size_t length)
+{
+    chip::StringBuilder<N> builder;
+    builder.AddFormat("%.*s", static_cast<int>(length), data);
+    return builder;
+}
+
+/// Build a c-style string of an unsigned char* and length that can be used inplace
+/// Only printable characters will be added
+/// Default buffer size is 256
+template<size_t N = 256>
+StringBuilder<N> StringOf(const unsigned char *data, size_t length)
+{
+    chip::StringBuilder<N> builder;
+    for (size_t i = 0; i < length; ++i)
+    {
+        if (std::isprint(*(data + i)))
+        {
+            builder.Add(*(data + i));
+        }
+    }
+    return builder;
+}
+
+/// Build a c-style string of a CharSpan that can be used inplace
+/// Default buffer size is 256
+template<size_t N = 256>
+StringBuilder<N> StringOf(const CharSpan& span)
+{
+    chip::StringBuilder<N> builder;
+    builder.AddFormat("%.*s", static_cast<int>(span.size()), span.data());
+    return builder;
+}
 
 } // namespace chip

@@ -18,7 +18,6 @@
 #include <credentials/CHIPCert.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/StringFormatting.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 
@@ -219,7 +218,7 @@ void LinuxWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
     if (network.UsingPDC())
     {
         ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: ConnectNetwork (PDC) '%s'",
-                        SPAN_TO_TRUNCATED_CSTR(static_cast<int>(network.ssidLen), network.ssid));
+                        StringOf(network.ssid, network.ssidLen).c_str());
         err = ConnectivityMgrImpl().ConnectWiFiNetworkWithPDCAsync(
             ByteSpan(network.ssid, network.ssidLen), ByteSpan(network.networkIdentity, network.networkIdentityLen),
             ByteSpan(network.clientIdentity, network.clientIdentityLen), *network.clientIdentityKeypair, callback);
@@ -228,7 +227,7 @@ void LinuxWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     {
         ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: ConnectNetwork '%s'",
-                        SPAN_TO_TRUNCATED_CSTR(static_cast<int>(network.ssidLen), network.ssid));
+                        StringOf(network.ssid, network.ssidLen).c_str());
 
         err = ConnectivityMgrImpl().ConnectWiFiNetworkAsync(ByteSpan(network.ssid, network.ssidLen),
                                                             ByteSpan(network.credentials, network.credentialsLen), callback);

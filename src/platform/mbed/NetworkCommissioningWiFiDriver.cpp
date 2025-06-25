@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-#include <lib/support/StringFormatting.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/mbed/NetworkCommissioningDriver.h>
 
@@ -257,8 +256,7 @@ void WiFiDriverImpl::ConnectNetwork(ByteSpan networkId, ConnectCallback * callba
     VerifyOrExit(mWiFiInterface != nullptr, status = Status::kUnknownError);
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), status = Status::kNetworkIDNotFound);
     VerifyOrExit(mConnectCallback == nullptr, status = Status::kUnknownError);
-    ChipLogProgress(NetworkProvisioning, "Mbed WiFi driver connect network: SSID: %s",
-                    SPAN_TO_TRUNCATED_CSTR(static_cast<int>(networkId.size()), networkId.data()));
+    ChipLogProgress(NetworkProvisioning, "Mbed WiFi driver connect network: SSID: %s", StringOf(networkId).c_str());
 
     mConnectCallback = callback;
     ConnectivityMgrImpl().AddTask(OnConnectNetwork, 0);
@@ -277,8 +275,7 @@ void WiFiDriverImpl::DisconnectNetwork(ByteSpan networkId)
 {
     VerifyOrReturn(mWiFiInterface != nullptr, ChipLogError(DeviceLayer, "Wifi network not available"));
     VerifyOrReturn(NetworkMatch(mStagingNetwork, networkId), ChipLogError(DeviceLayer, "Network not found"));
-    ChipLogProgress(NetworkProvisioning, "Mbed WiFi driver disconnect network: SSID: %s",
-                    SPAN_TO_TRUNCATED_CSTR(static_cast<int>(networkId.size()), networkId.data()));
+    ChipLogProgress(NetworkProvisioning, "Mbed WiFi driver disconnect network: SSID: %s", StringOf(networkId).c_str());
 
     // Disconnect Wifi network
     auto error = mWiFiInterface->disconnect();

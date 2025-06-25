@@ -21,7 +21,7 @@
 #include <lib/address_resolve/TracingStructs.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/StringFormatting.h>
+#include <lib/support/StringBuilder.h>
 #include <lib/support/StringSplitter.h>
 #include <log_json/log_json_build_config.h>
 #include <tracing/metric_event.h>
@@ -513,12 +513,7 @@ void JsonBackend::OutputValue(::Json::Value & value)
         chip::CharSpan line;
         while (splitter.Next(line))
         {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-
-            ChipLogProgress(Automation, "%s", SPAN_TO_TRUNCATED_CSTR(static_cast<int>(line.size()), line.data()));
-
-#pragma GCC diagnostic pop
+            ChipLogProgress(Automation, "%s", StringOf(line).c_str());
         }
     }
 }

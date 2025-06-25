@@ -33,7 +33,6 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/StringFormatting.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -834,13 +833,8 @@ bool Instance::AddSupportedMap(uint32_t aMapId, const CharSpan & aMapName)
         // the name cannot be the same as an existing map
         if (entry.IsNameEqual(aMapName))
         {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-
             ChipLogError(Zcl, "AddSupportedMapRaw %" PRIu32 " - A map already exists with same name '%s'", aMapId,
-                         SPAN_TO_TRUNCATED_CSTR(static_cast<int>(entry.GetName().size()), entry.GetName().data()));
-
-#pragma GCC diagnostic pop
+                         StringOf(entry.GetName()).c_str());
             return false;
         }
 
@@ -902,13 +896,8 @@ bool Instance::RenameSupportedMap(uint32_t aMapId, const CharSpan & newMapName)
 
         if (entry.IsNameEqual(newMapName))
         {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-
             ChipLogError(Zcl, "RenameSupportedMap %" PRIu32 " - map already exists with same name '%s'", aMapId,
-                         SPAN_TO_TRUNCATED_CSTR(static_cast<int>(entry.GetName().size()), entry.GetName().data()));
-
-#pragma GCC diagnostic pop
+                         StringOf(entry.GetName()).c_str());
             return false;
         }
 
@@ -1034,13 +1023,7 @@ bool Instance::AddSelectedArea(uint32_t & aSelectedArea)
 
     if (!mDelegate->IsSetSelectedAreasAllowed(locationStatusText))
     {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-
-        ChipLogError(Zcl, "AddSelectedAreaRaw %" PRIu32 " - %s", aSelectedArea,
-                     SPAN_TO_TRUNCATED_CSTR(static_cast<int>(locationStatusText.size()), locationStatusText.data()));
-
-#pragma GCC diagnostic pop
+        ChipLogError(Zcl, "AddSelectedAreaRaw %" PRIu32 " - %s", aSelectedArea, StringOf(locationStatusText).c_str());
         return false;
     }
 

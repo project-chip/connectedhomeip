@@ -24,7 +24,6 @@
 #include <FreeRTOS.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <cstring>
-#include <lib/support/StringFormatting.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Infineon/PSOC6/PSOC6Config.h>
 
@@ -338,7 +337,7 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
                   "Found occupied user "
                   "[endpoint=%d,name=\"%s\",credentialsCount=%u,uniqueId=%lx,type=%u,credentialRule=%u,"
                   "createdBy=%d,lastModifiedBy=%d]",
-                  endpointId, SPAN_TO_TRUNCATED_CSTR(static_cast<int>(user.userName.size()), user.userName.data()),
+                  endpointId, StringOf(user.userName).c_str(),
                   user.credentials.size(), user.userUniqueId, to_underlying(user.userType), to_underlying(user.credentialRule),
                   user.createdBy, user.lastModifiedBy);
 

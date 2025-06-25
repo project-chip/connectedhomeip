@@ -24,7 +24,6 @@
 #include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <controller/CHIPCluster.h>
 #include <lib/core/CHIPEncoding.h>
-#include <lib/support/StringFormatting.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
 #include <platform/OTAImageProcessor.h>
@@ -62,13 +61,7 @@ static void LogQueryImageResponse(const QueryImageResponse::DecodableType & resp
     }
     if (response.imageURI.HasValue())
     {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-
-        ChipLogDetail(SoftwareUpdate, "  imageURI: %s",
-                      SPAN_TO_TRUNCATED_CSTR(static_cast<int>(response.imageURI.Value().size()), response.imageURI.Value().data()));
-
-#pragma GCC diagnostic pop
+        ChipLogDetail(SoftwareUpdate, "  imageURI: %s", StringOf(response.imageURI.Value()).c_str());
     }
     if (response.softwareVersion.HasValue())
     {
@@ -76,14 +69,7 @@ static void LogQueryImageResponse(const QueryImageResponse::DecodableType & resp
     }
     if (response.softwareVersionString.HasValue())
     {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-
-        ChipLogDetail(SoftwareUpdate, "  softwareVersionString: %s",
-                      SPAN_TO_TRUNCATED_CSTR(static_cast<int>(response.softwareVersionString.Value().size()),
-                                             response.softwareVersionString.Value().data()));
-
-#pragma GCC diagnostic pop
+        ChipLogDetail(SoftwareUpdate, "  softwareVersionString: %s", StringOf(response.softwareVersionString.Value()).c_str());
     }
     if (response.updateToken.HasValue())
     {

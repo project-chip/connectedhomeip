@@ -18,8 +18,6 @@
 
 #include "BDXDiagnosticLogsServerDelegate.h"
 
-#include <lib/support/StringFormatting.h>
-
 #include <string>
 #include <unistd.h>
 
@@ -97,15 +95,8 @@ void LogFileDesignator(const char * prefix, const chip::CharSpan & fileDesignato
 {
 #if CHIP_PROGRESS_LOGGING
     auto size = static_cast<uint16_t>(fileDesignator.size());
-    auto data = fileDesignator.data();
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-
-    ChipLogProgress(chipTool, "%s (%u): %s", prefix, size, SPAN_TO_TRUNCATED_CSTR(static_cast<int>(size), data));
-
-#pragma GCC diagnostic pop
-
+    ChipLogProgress(chipTool, "%s (%u): %s", prefix, size, StringOf(fileDesignator).c_str());
 #endif // CHIP_PROGRESS_LOGGING
 
     if (CHIP_NO_ERROR != error)

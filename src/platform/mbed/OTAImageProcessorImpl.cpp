@@ -18,7 +18,6 @@
 
 #include "OTAImageProcessorImpl.h"
 #include <lib/support/CHIPMemString.h>
-#include <lib/support/StringFormatting.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -192,7 +191,7 @@ int OTAImageProcessorImpl::MemoryTest()
             }
         }
 
-        ChipLogProgress(SoftwareUpdate, " %s", SPAN_TO_TRUNCATED_CSTR(static_cast<int>(buffer_size - i), &buffer[i]));
+        ChipLogProgress(SoftwareUpdate, " %s", StringOf(&buffer[i], buffer_size - i).c_str());
     }
     ChipLogProgress(SoftwareUpdate, "---\n");
 

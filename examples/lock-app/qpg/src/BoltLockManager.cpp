@@ -22,7 +22,6 @@
 #include "AppConfig.h"
 #include "AppTask.h"
 #include <FreeRTOS.h>
-#include <lib/support/StringFormatting.h>
 
 using namespace chip;
 
@@ -168,8 +167,7 @@ bool BoltLockManager::ValidatePIN(const Optional<ByteSpan> & pinCode, OperationE
     {
         return true;
     }
-    ChipLogProgress(Zcl, "ValidatePIN %s",
-                    SPAN_TO_TRUNCATED_CSTR(static_cast<int>(pinCode.Value().size()), pinCode.Value().data()));
+    ChipLogProgress(Zcl, "ValidatePIN %s", StringOf(pinCode.Value()).c_str());
 
     // Check the PIN code
     for (const auto & credential : mCredentials)

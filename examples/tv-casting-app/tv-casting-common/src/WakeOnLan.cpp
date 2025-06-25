@@ -17,7 +17,6 @@
  */
 
 #include "WakeOnLan.h"
-#include <lib/support/StringFormatting.h>
 
 constexpr int kBroadcastOption    = 1;
 constexpr int kWoLMagicPacketSize = 102;
@@ -79,15 +78,8 @@ CHIP_ERROR SendWakeOnLanPacket(chip::CharSpan * MACAddress)
         close(sockfd);
         return CHIP_ERROR_INCORRECT_STATE;
     }
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-
     ChipLogProgress(AppServer, "Broadcasted WoL magic packet with MACAddress %s",
-                    SPAN_TO_TRUNCATED_CSTR(2 * kMACLength, MACAddress->data()));
-
-#pragma GCC diagnostic pop
-
+                    chip::StringOf(MACAddress->data(), 2 * kMACLength).c_str());
     close(sockfd);
     return CHIP_NO_ERROR;
 }
