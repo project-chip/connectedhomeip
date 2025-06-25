@@ -344,6 +344,15 @@ public:
         virtual int16_t GetTiltMin() = 0;
         virtual int16_t GetTiltMax() = 0;
         virtual uint8_t GetZoomMax() = 0;
+
+        // Get the maximum number of zones supported by camera.
+        virtual uint8_t GetMaxZones() = 0;
+
+        // Get the maximum number of user-defined zones supported by camera.
+        virtual uint8_t GetMaxUserDefinedZones() = 0;
+
+        // Get the maximum sensitivity level supported by camera.
+        virtual uint8_t GetSensitivityMax() = 0;
     };
 
     virtual CameraHALInterface & GetCameraHALInterface() = 0;
