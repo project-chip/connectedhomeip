@@ -31,7 +31,7 @@ if TYPE_CHECKING:
 
 
 class MatterStackState:
-    def __init__(self, config: MatterTestConfig):
+    def __init__(self, config: 'MatterTestConfig'):
         self._logger = logger
         self._config = config
 
