@@ -3759,7 +3759,6 @@ TEST_F(TestRead, TestReadHandler_KillOldestSubscriptions)
     InteractionModelEngine::GetInstance()->SetPathPoolCapacityForSubscriptions(-1);
 }
 
-#if 0
 struct TestReadHandler_ParallelReads_TestCase_Parameters
 {
     int ReadHandlerCapacity = -1;
@@ -3819,6 +3818,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
 
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
@@ -3862,6 +3863,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
 
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -3901,6 +3904,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -3946,6 +3951,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -3995,6 +4002,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback readCallbackForOversizedRead;
             TestPerpetualListReadCallback backgroundReadCallback;
             std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -4047,6 +4056,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback readCallbackForOversizedRead;
             TestPerpetualListReadCallback backgroundReadCallback;
             std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          ReadClient::InteractionType::Read, &backgroundReadCallback, readClients);
@@ -4102,6 +4113,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback;
             std::vector<std::unique_ptr<ReadClient>> readClients;
 
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          ReadClient::InteractionType::Read, &backgroundReadCallback, readClients);
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
@@ -4147,6 +4160,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
@@ -4195,6 +4210,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest + 1,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -4248,6 +4265,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback3;
             std::vector<std::unique_ptr<ReadClient>> readClients;
 
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -4299,6 +4318,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback3;
             std::vector<std::unique_ptr<ReadClient>> readClients;
 
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
             EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
             EstablishReadOrSubscriptions(GetSessionAliceToBob(), 1, 1, AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -4347,6 +4368,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback2;
             TestPerpetualListReadCallback backgroundReadCallback3;
             std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -4398,6 +4421,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
 
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
             EstablishReadOrSubscriptions(GetSessionBobToAlice(), 1, InteractionModelEngine::kMinSupportedPathsPerReadRequest,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
@@ -4444,6 +4469,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
 
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
             EstablishReadOrSubscriptions(GetSessionCharlieToDavid(), 1, 1,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
                                          ReadClient::InteractionType::Read, &backgroundReadCallback1, readClients);
@@ -4485,6 +4512,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionCharlieToDavid(), 1, 1,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -4528,6 +4557,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionCharlieToDavid(), 1, 1,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -4577,6 +4608,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback1;
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
+
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
 
             EstablishReadOrSubscriptions(GetSessionCharlieToDavid(), 3,
                                          InteractionModelEngine::kMinSupportedPathsPerReadRequest - 1,
@@ -4628,6 +4661,8 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
             TestPerpetualListReadCallback backgroundReadCallback2;
             std::vector<std::unique_ptr<ReadClient>> readClients;
 
+            CustomDataModel::EnableInfiniteReads scopedInfiniteReads;
+
             EstablishReadOrSubscriptions(GetSessionCharlieToDavid(), 2,
                                          InteractionModelEngine::kMinSupportedPathsPerReadRequest - 1,
                                          AttributePathParams(kTestEndpointId, kPerpetualClusterId, 1),
@@ -4678,7 +4713,6 @@ TEST_F(TestRead, TestReadHandler_ParallelReads)
     InteractionModelEngine::GetInstance()->SetHandlerCapacityForReads(-1);
     InteractionModelEngine::GetInstance()->SetPathPoolCapacityForReads(-1);
 }
-#endif
 
 // Needs to be larger than our plausible path pool.
 constexpr size_t sTooLargePathCount = 200;
