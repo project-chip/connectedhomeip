@@ -117,7 +117,7 @@ public:
     static void CommonDeviceEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
 private:
-    mIsInitDone                      = false;
+    bool mIsInitDone                 = false;
     CHIPDeviceManagerCallbacks * mCB = nullptr;
     CHIPDeviceManager() {}
 };
