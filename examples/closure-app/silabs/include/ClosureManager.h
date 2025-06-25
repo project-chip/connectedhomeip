@@ -123,7 +123,7 @@ private:
     bool isCalibrationInProgress = false;
     bool isMoveToInProgress      = false;
 
-    Action_t mCurrentAction = Action_t::INVALID_ACTION;
+    Action_t mCurrentAction                   = Action_t::INVALID_ACTION;
     chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
 
     // Define the endpoint ID for the Closure

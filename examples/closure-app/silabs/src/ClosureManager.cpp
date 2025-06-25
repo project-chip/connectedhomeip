@@ -170,10 +170,10 @@ void ClosureManager::TimerEventHandler(void * timerCbArg)
     // once sClosureTimer expires. Post an event to apptask queue with the actual handler
     // so that the event can be handled in the context of the apptask.
     AppEvent event;
-    event.Type                = AppEvent::kEventType_Closure;
-    event.ClosureEvent.Action = closureManager->GetCurrentAction();
+    event.Type                    = AppEvent::kEventType_Closure;
+    event.ClosureEvent.Action     = closureManager->GetCurrentAction();
     event.ClosureEvent.EndpointId = closureManager->mCurrentActionEndpointId;
-    event.Handler             = HandleClosureActionCompleteEvent;
+    event.Handler                 = HandleClosureActionCompleteEvent;
     AppTask::GetAppTask().PostEvent(&event);
 }
 
@@ -221,10 +221,10 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
     // Post an event to initiate the calibration action asynchronously.
     // Calibration can be only initiated from Closure Endpoint 1, so we set the endpoint ID to ep1.
     AppEvent event;
-    event.Type                = AppEvent::kEventType_Closure;
-    event.ClosureEvent.Action = CALIBRATE_ACTION;
+    event.Type                    = AppEvent::kEventType_Closure;
+    event.ClosureEvent.Action     = CALIBRATE_ACTION;
     event.ClosureEvent.EndpointId = ep1.GetEndpointId();
-    event.Handler             = InitiateAction;
+    event.Handler                 = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
 
     SetCurrentAction(Action_t::CALIBRATE_ACTION);

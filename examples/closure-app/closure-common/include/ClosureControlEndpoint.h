@@ -160,10 +160,7 @@ public:
      *
      * @return The EndpointId of this Closure Control endpoint.
      */
-    EndpointId GetEndpointId() const
-    {
-        return mEndpoint;
-    }
+    EndpointId GetEndpointId() const { return mEndpoint; }
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
