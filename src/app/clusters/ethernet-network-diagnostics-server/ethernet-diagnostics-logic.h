@@ -66,7 +66,7 @@ public:
 
     /// Returns acceptable attributes for the given Diagnostics data provider:
     ///   - ALWAYS includes global attributes
-    ///   - adds heap/watermark depending on feature flags and if the interface supports it.
+    ///   - adds ResetCounts depending on feature flags and if the interface supports it.
     CHIP_ERROR Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
 
     /// Determines what commands are supported
