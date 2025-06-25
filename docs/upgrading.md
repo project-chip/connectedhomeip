@@ -7,20 +7,24 @@
 `AttributePersistenceProvider` was moved to `src/app/persistence` and its
 interface has updated:
 
--   Read/write operate over pure buffers, without type information
+- Read/write operate over pure buffers, without type information
 
 This update was done so that the interface is decoupled from ember and metadata
 types. The reasons for this approach:
 
--   simpler/more modular code (easier to maintain)
--   Have more generic storage support (including variable size data)
--   Ability to preserve backwards compatibility with existing products without
+- simpler/more modular code (easier to maintain)
+- Have more generic storage support (including variable size data)
+- Ability to preserve backwards compatibility with existing products without
     increasing flash size by adding additional abstraction layers
 
 Callers will validate data validity on read instead of relying on data
 validation by the persistence provider.
 
-See <https://github.com/project-chip/connectedhomeip/pull/39693> for changes
+See <https://github.com/project-chip/connectedhomeip/pull/39693> for changes.
+
+The only change is that the `EmberAfAttributeMetadata` argument is
+not passed in anymore into `Read` and implementations are expected
+to just return the opaque data stored.
 
 ### `CommandHandler`
 
@@ -88,13 +92,13 @@ independent of the InteractionModelEngine class.
 
 The following replacements exist:
 
--   `chip::app::InteractionModelEngine::RegisterCommandHandler` replaced by
+- `chip::app::InteractionModelEngine::RegisterCommandHandler` replaced by
     `chip::app::CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler`
--   `chip::app::InteractionModelEngine::UnregisterCommandHandler` replaced by
+- `chip::app::InteractionModelEngine::UnregisterCommandHandler` replaced by
     `chip::app::CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler`
--   `chip::app::InteractionModelEngine::FindCommandHandler` replaced by
+- `chip::app::InteractionModelEngine::FindCommandHandler` replaced by
     `chip::app::CommandHandlerInterfaceRegistry::Instance().GetCommandHandler`
--   `chip::app::InteractionModelEngine::UnregisterCommandHandlers` replaced by
+- `chip::app::InteractionModelEngine::UnregisterCommandHandlers` replaced by
     `chip::app::CommandHandlerInterfaceRegistry::Instance().UnregisterAllCommandHandlersForEndpoint`
 
 ### AttributeAccessInterface registration and removal
@@ -104,13 +108,13 @@ A new object exists for the attribute access interface registry, accessible as
 
 Replacements for methods are:
 
--   `registerAttributeAccessOverride` replaced by
+- `registerAttributeAccessOverride` replaced by
     `chip::app::AttributeAccessInterfaceRegistry::Instance().Register`
--   `unregisterAttributeAccessOverride` replaced by
+- `unregisterAttributeAccessOverride` replaced by
     `chip::app::AttributeAccessInterfaceRegistry::Instance().Unregister`
--   `unregisterAllAttributeAccessOverridesForEndpoint` replaced by
+- `unregisterAllAttributeAccessOverridesForEndpoint` replaced by
     `chip::app::AttributeAccessInterfaceRegistry::Instance().UnregisterAllForEndpoint`
--   `chip::app::GetAttributeAccessOverride` replaced by
+- `chip::app::GetAttributeAccessOverride` replaced by
     `chip::app::AttributeAccessInterfaceRegistry::Instance().Get`
 
 ### `ServerInitParams::dataModelProvider` in `Server::Init` and `FactoryInitParams`
