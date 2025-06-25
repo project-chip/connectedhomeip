@@ -56,54 +56,79 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
 
     def steps_TC_AVSM_2_10(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "DUT commissioned and preconditions", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
             TestStep(
                 1,
                 "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on DUT",
-                "Verify SNP is supported.",
+                "Verify SNP is supported. Do not run if not.",
             ),
             TestStep(
                 2,
-                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT",
-                "Verify the number of allocated snapshot streams in the list is 1. Store StreamID as aStreamID.",
+                "TH sends the CaptureSnapshot command with SnapshotStreamID set to Null.",
+                "DUT responds with NOT_FOUND status code.",
             ),
             TestStep(
                 3,
+                "TH reads SnapshotCapabilities attribute from CameraAVStreamManagement Cluster on DUT.",
+                "Store this value in aSnapshotCapabilities.",
+            ),
+            TestStep(
+                4,
+                "If WMARK is supported, TH sets it’s local aWatermark to True, otherwise this is Null",
+                "",
+            ),
+            TestStep(
+                5,
+                "If OSD is supported, TH sets its local aOSD to True, otherwise this is Null",
+                "",
+            ),
+            TestStep(
+                6,
+                "TH sends the SnapshotStreamAllocate command with valid values of ImageCodec, MaxFrameRate, MinResolution=MaxResolution=Resolution from aSnapshotCapabilities, WatermarkEnabled to aWatermark, OSDEnabled to aOSD, and Quality set to 90.",
+                "DUT responds with SnapshotStreamAllocateResponse command. Ensure: * the response has a valid SnapshotStreamID, store this as myStreamID. * the provided ImageCodec is the same as that provided in the allocation in step 6",
+            ),
+            TestStep(
+                7,
+                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT",
+                "Verify the number of allocated snapshot streams in the list is 1.",
+            ),
+            TestStep(
+                8,
                 "TH sends the CaptureSnapshot command with SnapshotStreamID set to aStreamID.",
                 "DUT responds with CaptureSnapshotResponse command with the image in the Data field.",
             ),
             TestStep(
-                4,
+                9,
                 "TH sends the CaptureSnapshot command with SnapshotStreamID set to aStreamID + 1.",
                 "DUT responds with NOT_FOUND status code.",
             ),
             TestStep(
-                5,
-                "TH sends the CaptureSnapshot command with SnapshotStreamID set to Null",
+                10,
+                "TH sends the CaptureSnapshot command with SnapshotStreamID set to Null.",
                 "DUT responds with CaptureSnapshotResponse command with the image in the Data field.",
             ),
             TestStep(
-                6,
-                "If DUT supports Privacy feature, TH writes SoftLivestreamPrivacyModeEnabled = true on DUT",
+                11,
+                "If DUT supports Privacy feature, TH writes attribute SoftLivestreamPrivacyModeEnabled = true in the CameraAVStreamManagement Cluster on DUT",
                 "DUT responds with a SUCCESS status code.",
             ),
             TestStep(
-                7,
+                12,
                 "TH sends the CaptureSnapshot command with SnapshotStreamID set to aStreamID.",
                 "DUT responds with INVALID_IN_STATE status code.",
             ),
             TestStep(
-                8,
+                13,
                 "TH sends the SnapshotStreamDeallocate command with SnapshotStreamID set to aStreamID.",
                 "DUT responds with a SUCCESS status code.",
             ),
             TestStep(
-                9,
+                14,
                 "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated snapshot streams in the list is 0.",
             ),
             TestStep(
-                10,
+                15,
                 "TH sends the CaptureSnapshot command with SnapshotStreamID set to Null.",
                 "DUT responds with NOT_FOUND status code.",
             ),
@@ -120,7 +145,6 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
 
         self.step("precondition")
         # Commission DUT - already done
-        await self.precondition_one_allocated_snapshot_stream()
 
         self.step(1)
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
@@ -130,6 +154,56 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
         self.privacySupport = (aFeatureMap & cluster.Bitmaps.Feature.kPrivacy) > 0
 
         self.step(2)
+        captureSnapshotCmd = commands.CaptureSnapshot(
+            requestedResolution=cluster.Structs.VideoResolutionStruct(width=640, height=480)
+        )
+        try:
+            captureSnapshotResponse = await self.send_single_cmd(
+                cmd=captureSnapshotCmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD
+            )
+            asserts.assert_true(False, "Unexpected success when expecting NOT_FOUND due to SnapshotStreamID set to Null")
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status, Status.NotFound, "Unexpected error returned when expecting NOT_FOUND due to SnapshotStreamID set to Null"
+            )
+            pass
+
+        self.step(3)
+        aSnapshotCapabilities = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.SnapshotCapabilities
+        )
+        logger.info(f"Rx'd SnapshotCapabilities: {aSnapshotCapabilities}")
+        asserts.assert_is_not_none(aSnapshotCapabilities, "SnapshotCapabilities is Null")
+        asserts.assert_greater(len(aSnapshotCapabilities), 0, "SnapshotCapabilities list is empty")
+
+        self.step(4)
+        aWatermark = True if (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) != 0 else None
+
+        self.step(5)
+        aOSD = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
+
+        self.step(6)
+        try:
+            snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
+                imageCodec=aSnapshotCapabilities[0].imageCodec,
+                maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
+                minResolution=aSnapshotCapabilities[0].resolution,
+                maxResolution=aSnapshotCapabilities[0].resolution,
+                quality=90,
+                watermarkEnabled=aWatermark,
+                OSDEnabled=aOSD,
+            )
+            snpStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
+            logger.info(f"Rx'd SnapshotStreamAllocateResponse: {snpStreamAllocateResponse}")
+            asserts.assert_is_not_none(
+                snpStreamAllocateResponse.snapshotStreamID, "SnapshotStreamAllocateResponse does not contain StreamID"
+            )
+            # TODO check if the provided ImageCodec is the same as that provided in the allocation in step 6
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            pass
+
+        self.step(7)
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
@@ -138,12 +212,13 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
         aStreamID = aAllocatedSnapshotStreams[0].snapshotStreamID
         aResolution = aAllocatedSnapshotStreams[0].minResolution
 
-        self.step(3)
+        self.step(8)
         try:
             captureSnapshotResponse = await self.send_single_cmd(
                 cmd=commands.CaptureSnapshot(snapshotStreamID=aStreamID, requestedResolution=aResolution),
                 endpoint=endpoint,
-                payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+                payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
+            )
             logger.info(f"Rx'd CaptureSnapshotResponse: {captureSnapshotResponse}")
             asserts.assert_greater(len(captureSnapshotResponse.data), 0, "Image data returned by CaptureSnapshotResponse is empty")
             asserts.assert_equal(
@@ -158,16 +233,16 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
                 captureSnapshotResponse.resolution.height, 0, "Image height returned by CaptureSnapshotResponse is <= 0"
             )
         except InteractionModelError as e:
-            # TODO: Fail the test if this is reached, once the test infrastructure supports snapshot capture
-            logger.error(f"Snapshot capture is not supported: {e}")
+            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
 
-        self.step(4)
+        self.step(9)
         try:
             await self.send_single_cmd(
                 cmd=commands.CaptureSnapshot(snapshotStreamID=aStreamID + 1, requestedResolution=aResolution),
                 endpoint=endpoint,
-                payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+                payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
+            )
             asserts.assert_true(False, "Unexpected success when expecting NOT_FOUND due to snapshotStreamID set to aStreamID + 1")
         except InteractionModelError as e:
             asserts.assert_equal(
@@ -177,10 +252,13 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             )
             pass
 
-        self.step(5)
+        self.step(10)
         try:
             captureSnapshotResponse = await self.send_single_cmd(
-                cmd=commands.CaptureSnapshot(requestedResolution=aResolution), endpoint=endpoint)
+                cmd=commands.CaptureSnapshot(requestedResolution=aResolution),
+                endpoint=endpoint,
+                payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
+            )
             logger.info(f"Rx'd CaptureSnapshotResponse: {captureSnapshotResponse}")
             asserts.assert_greater(len(captureSnapshotResponse.data), 0, "Image data returned by CaptureSnapshotResponse is empty")
             asserts.assert_equal(
@@ -195,21 +273,20 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
                 captureSnapshotResponse.resolution.height, 0, "Image height returned by CaptureSnapshotResponse is <= 0"
             )
         except InteractionModelError as e:
-            # TODO: Fail the test if this is reached, once the test infrastructure supports snapshot capture
-            logger.error(f"Snapshot capture is not supported: {e}")
+            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
 
         if self.privacySupport:
-            self.step(6)
-            result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(True),
-                                                       endpoint_id=endpoint)
+            self.step(11)
+            result = await self.write_single_attribute(attr.SoftLivestreamPrivacyModeEnabled(True), endpoint_id=endpoint)
             asserts.assert_equal(result, Status.Success, "Error when trying to write SoftLivestreamPrivacyModeEnabled")
             logger.info(f"Tx'd : SoftLivestreamPrivacyModeEnabled{True}")
 
-            self.step(7)
+            self.step(12)
             try:
                 await self.send_single_cmd(
-                    cmd=commands.CaptureSnapshot(snapshotStreamID=aStreamID, requestedResolution=aResolution), endpoint=endpoint)
+                    cmd=commands.CaptureSnapshot(snapshotStreamID=aStreamID, requestedResolution=aResolution), endpoint=endpoint
+                )
                 asserts.assert_true(False, "Unexpected success when expecting INVALID_IN_STATE due to SoftPrivacy mode set to On")
             except InteractionModelError as e:
                 asserts.assert_equal(
@@ -220,28 +297,28 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
                 pass
 
         else:
-            self.skip_step(6)
-            self.skip_step(7)
+            self.skip_step(11)
+            self.skip_step(12)
 
-        self.step(8)
+        self.step(13)
         try:
             await self.send_single_cmd(endpoint=endpoint, cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=aStreamID))
         except InteractionModelError as e:
-            asserts.fail(
-                f"Expected SnapshotStreamDeallocate to succeed, but it failed with status: {e.status}")
+            asserts.fail(f"Expected SnapshotStreamDeallocate to succeed, but it failed with status: {e.status}")
             pass
 
-        self.step(9)
+        self.step(14)
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
         logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 0, "The number of allocated snapshot streams in the list is not 0.")
 
-        self.step(10)
+        self.step(15)
         try:
             captureSnapshotResponse = await self.send_single_cmd(
-                cmd=commands.CaptureSnapshot(requestedResolution=aResolution), endpoint=endpoint)
+                cmd=commands.CaptureSnapshot(requestedResolution=aResolution), endpoint=endpoint
+            )
             asserts.assert_true(False, "Unexpected success when expecting NOT_FOUND due to 0 allocated snapshot streams")
         except InteractionModelError as e:
             asserts.assert_equal(
