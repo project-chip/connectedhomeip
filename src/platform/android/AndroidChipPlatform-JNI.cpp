@@ -472,11 +472,19 @@ JNI_METHOD(void, setServiceResolveListener)
         mJListenerObject = env->NewGlobalRef(jListenerObject);
         jclass listenerClass = env->GetObjectClass(jListenerObject);
 
-        mServiceResolveListener = env->GetMethodID(listenerClass, "onServiceResolve", "(Ljava/lang/String;Ljava/lang/String;)V");
-        if (mServiceResolveListener == nullptr)
-        {
-            ChipLogError(Controller, "Failed to access listener 'onServiceResolve' method");
-            env->ExceptionClear();
+jclass listenerClass = env->GetObjectClass(jListenerObject);
+if (listenerClass != nullptr)
+{
+    mServiceResolveListener = env->GetMethodID(listenerClass, "onServiceResolve", "(Ljava/lang/String;Ljava/lang/String;)V");
+    if (mServiceResolveListener == nullptr)
+    {
+        ChipLogError(Controller, "Failed to access listener 'onServiceResolve' method");
+        env->ExceptionClear();
+    }
+} else {
+    ChipLogError(Controller, "Failed to get listener class");
+    env->ExceptionClear();
+}
         }
     }
 
