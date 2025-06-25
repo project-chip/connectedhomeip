@@ -131,10 +131,6 @@ class EventCallback:
 
 
 class AttributeCallback:
-    # def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor):
-    #     self._output = queue.Queue()
-    #     self._expected_attribute = expected_attribute
-
     def __init__(self, expected_cluster: ClusterObjects.Cluster = None, expected_attribute: ClusterObjects.ClusterAttributeDescriptor = None):
         self._expected_cluster = expected_cluster
         self._expected_attribute = expected_attribute
@@ -142,7 +138,8 @@ class AttributeCallback:
         self._lock = threading.Lock()
         self._q = queue.Queue()
         self._endpoint_id = 0
-        self.reset()
+        if expected_cluster is not None:
+            self.reset()
 
     def reset(self):
         with self._lock:
