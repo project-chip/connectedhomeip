@@ -38,7 +38,6 @@
 #include <clusters/GeneralCommissioning/Metadata.h>
 #include <clusters/GeneralCommissioning/Structs.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/StringFormatting.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
@@ -516,14 +515,7 @@ void GeneralCommissioningGlobalInstance::HandleSetRegulatoryConfig(HandlerContex
 
     if (countryCode.size() != ConfigurationManager::kMaxLocationLength)
     {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-
-        ChipLogError(Zcl, "Invalid country code: '%s'",
-                     SPAN_TO_TRUNCATED_CSTR(static_cast<int>(countryCode.size()), countryCode.data()));
-
-#pragma GCC diagnostic pop
-
+        ChipLogError(Zcl, "Invalid country code: '%s'", StringOf(countryCode).c_str());
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
         return;
     }

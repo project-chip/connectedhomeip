@@ -17,7 +17,6 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/StringFormatting.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 #include <platform/silabs/SilabsConfig.h>
@@ -161,8 +160,7 @@ CHIP_ERROR SlWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, 
 
     wifiConfig.security = WFX_SEC_WPA2;
 
-    ChipLogProgress(NetworkProvisioning, "Setting up connection for WiFi SSID: %s",
-                    SPAN_TO_TRUNCATED_CSTR(static_cast<int>(ssidLen), ssid));
+    ChipLogProgress(NetworkProvisioning, "Setting up connection for WiFi SSID: %s", StringOf(ssid, ssidLen).c_str());
     // Configure the WFX WiFi interface.
     WifiInterface::GetInstance().SetWifiCredentials(wifiConfig);
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));

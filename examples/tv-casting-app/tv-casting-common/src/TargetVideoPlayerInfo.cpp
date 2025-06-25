@@ -18,7 +18,6 @@
 #include "TargetVideoPlayerInfo.h"
 
 #include <app/server/Server.h>
-#include <lib/support/StringFormatting.h>
 
 using namespace chip;
 
@@ -169,13 +168,7 @@ void TargetVideoPlayerInfo::PrintInfo()
                     ChipLogValueX64(mNodeId), mFabricIndex);
     if (mMACAddress.size() > 0)
     {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-
-        ChipLogProgress(NotSpecified, "  MACAddress=%s",
-                        SPAN_TO_TRUNCATED_CSTR(static_cast<int>(mMACAddress.size()), mMACAddress.data()));
-
-#pragma GCC diagnostic pop
+        ChipLogProgress(NotSpecified, "  MACAddress=%s", StringOf(mMACAddress).c_str());
     }
 
     for (auto & endpointInfo : mEndpoints)

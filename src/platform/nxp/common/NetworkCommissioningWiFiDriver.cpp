@@ -20,7 +20,6 @@
 #include "NetworkCommissioningDriver.h"
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/StringFormatting.h>
 #include <wlan.h>
 
 using namespace ::chip;
@@ -228,8 +227,7 @@ void NXPWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callbac
     CHIP_ERROR err          = CHIP_NO_ERROR;
     Status networkingStatus = Status::kSuccess;
 
-    ChipLogProgress(NetworkProvisioning, "Connecting to WiFi network: SSID: %s",
-                    SPAN_TO_TRUNCATED_CSTR(static_cast<int>(networkId.size()), networkId.data()));
+    ChipLogProgress(NetworkProvisioning, "Connecting to WiFi network: SSID: %s", StringOf(networkId).c_str());
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);

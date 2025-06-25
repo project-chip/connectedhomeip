@@ -36,7 +36,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/StringFormatting.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -556,18 +555,13 @@ void DoorLockServer::getUserCommandHandler(chip::app::CommandHandler * commandOb
     // appclusters, 5.2.4.36: we should not set user-specific fields to non-null if the user status is set to Available
     if (UserStatusEnum::kAvailable != user.userStatus)
     {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-
         ChipLogProgress(Zcl,
                         "Found user in storage: "
                         "[userIndex=%d,userName=\"%s\",userStatus=%u,userType=%u"
                         ",credentialRule=%u,createdBy=%u,modifiedBy=%u]",
-                        userIndex, SPAN_TO_TRUNCATED_CSTR(static_cast<int>(user.userName.size()), user.userName.data()),
+                        userIndex, StringOf(user.userName).c_str(),
                         to_underlying(user.userStatus), to_underlying(user.userType), to_underlying(user.credentialRule),
                         user.createdBy, user.lastModifiedBy);
-
-#pragma GCC diagnostic pop
 
         response.userName.SetNonNull(user.userName);
         if (0xFFFFFFFFU != user.userUniqueId)
@@ -2001,37 +1995,23 @@ ClusterStatusCode DoorLockServer::createUser(chip::EndpointId endpointId, chip::
     if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, creatorFabricIdx, creatorFabricIdx, newUserName, newUserUniqueId,
                                       newUserStatus, newUserType, newCredentialRule, newCredentials, newTotalCredentials))
     {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-
         ChipLogProgress(Zcl,
                         "[createUser] Unable to create user: app error "
                         "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%u,"
                         "userType=%u,credentialRule=%u,totalCredentials=%u]",
-                        endpointId, creatorFabricIdx, userIndex,
-                        SPAN_TO_TRUNCATED_CSTR(static_cast<int>(newUserName.size()), newUserName.data()), newUserUniqueId,
+                        endpointId, creatorFabricIdx, userIndex, StringOf(newUserName).c_str(), newUserUniqueId,
                         to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule),
                         static_cast<unsigned int>(newTotalCredentials));
-
-#pragma GCC diagnostic pop
-
         return ClusterStatusCode(Status::Failure);
     }
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
     ChipLogProgress(Zcl,
                     "[createUser] User created "
                     "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%u,"
                     "userType=%u,credentialRule=%u,totalCredentials=%u]",
-                    endpointId, creatorFabricIdx, userIndex,
-                    SPAN_TO_TRUNCATED_CSTR(static_cast<int>(newUserName.size()), newUserName.data()), newUserUniqueId,
+                    endpointId, creatorFabricIdx, userIndex, StringOf(newUserName).c_str(), newUserUniqueId,
                     to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule),
                     static_cast<unsigned int>(newTotalCredentials));
-
-#pragma GCC diagnostic pop
-
     sendRemoteLockUserChange(endpointId, LockDataTypeEnum::kUserIndex, DataOperationTypeEnum::kAdd, sourceNodeId, creatorFabricIdx,
                              userIndex, userIndex);
 
@@ -2088,35 +2068,21 @@ Status DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::FabricIndex
                                       newUserStatus, newUserType, newCredentialRule, user.credentials.data(),
                                       user.credentials.size()))
     {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-
         ChipLogError(Zcl,
                      "[modifyUser] Unable to modify the user: app error "
                      "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%u"
                      ",userType=%u,credentialRule=%u]",
-                     endpointId, modifierFabricIndex, userIndex,
-                     SPAN_TO_TRUNCATED_CSTR(static_cast<int>(newUserName.size()), newUserName.data()), newUserUniqueId,
+                     endpointId, modifierFabricIndex, userIndex, StringOf(newUserName).c_str(), newUserUniqueId,
                      to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule));
-
-#pragma GCC diagnostic pop
-
         return Status::Failure;
     }
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 
     ChipLogProgress(Zcl,
                     "[modifyUser] User modified "
                     "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32
                     ",userStatus=%u,userType=%u,credentialRule=%u]",
-                    endpointId, modifierFabricIndex, userIndex,
-                    SPAN_TO_TRUNCATED_CSTR(static_cast<int>(newUserName.size()), newUserName.data()), newUserUniqueId,
+                    endpointId, modifierFabricIndex, userIndex, StringOf(newUserName).c_str(), newUserUniqueId,
                     to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule));
-
-#pragma GCC diagnostic pop
-
     sendRemoteLockUserChange(endpointId, LockDataTypeEnum::kUserIndex, DataOperationTypeEnum::kModify, sourceNodeId,
                              modifierFabricIndex, userIndex, userIndex);
 

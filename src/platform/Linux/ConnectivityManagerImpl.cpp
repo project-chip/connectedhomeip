@@ -19,7 +19,6 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <lib/support/StringFormatting.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DeviceControlServer.h>
@@ -2166,7 +2165,7 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
         ChipLogError(DeviceLayer, "Got a network with bssid not equals to 6");
     }
     ChipLogDetail(DeviceLayer, "Network Found: %s (%s) Signal:%d",
-                  SPAN_TO_TRUNCATED_CSTR(int(ssidLen), StringOrNullMarker((const gchar *) ssidStr)), bssidStr, signal);
+                  StringOf(StringOrNullMarker((const gchar *) ssidStr), ssidLen).c_str(), bssidStr, signal);
 
     // A flag for enterprise encryption option to avoid returning open for these networks by mistake
     // TODO: The following code will mistakenly recognize WEP encryption as OPEN network, this should be fixed by reading

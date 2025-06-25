@@ -28,7 +28,6 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/StringFormatting.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
 
@@ -101,7 +100,7 @@ void InvokeContentLauncherLaunchURL(matter::casting::memory::Strong<matter::cast
         request, nullptr,
         [](void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type::ResponseType & response) {
             ChipLogProgress(AppServer, "LaunchURL Success with response.data: %s",
-                            SPAN_TO_TRUNCATED_CSTR(static_cast<int>(response.data.Value().size()), response.data.Value().data()));
+                            StringOf(response.data.Value()).c_str());
         },
         [](void * context, CHIP_ERROR error) {
             ChipLogError(AppServer, "LaunchURL Failure with err %" CHIP_ERROR_FORMAT, error.Format());

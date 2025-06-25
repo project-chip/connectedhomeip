@@ -17,7 +17,6 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
-#include <lib/support/StringFormatting.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/webos/NetworkCommissioningDriver.h>
 
@@ -157,8 +156,7 @@ void LinuxWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
 
-    ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: SSID: %s",
-                    SPAN_TO_TRUNCATED_CSTR(static_cast<int>(networkId.size()), networkId.data()));
+    ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: SSID: %s", StringOf(networkId).c_str());
 
     err = ConnectivityMgrImpl().ConnectWiFiNetworkAsync(ByteSpan(mStagingNetwork.ssid, mStagingNetwork.ssidLen),
                                                         ByteSpan(mStagingNetwork.credentials, mStagingNetwork.credentialsLen),

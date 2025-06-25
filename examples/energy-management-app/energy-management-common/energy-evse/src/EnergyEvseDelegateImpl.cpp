@@ -21,7 +21,6 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/EventLogging.h>
 #include <app/SafeAttributePersistenceProvider.h>
-#include <lib/support/StringFormatting.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -606,15 +605,7 @@ Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
     }
 
     mVehicleID = MakeNullable(static_cast<CharSpan>(destinationString));
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-
-    ChipLogDetail(AppServer, "VehicleID updated %s",
-                  SPAN_TO_TRUNCATED_CSTR(static_cast<int>(mVehicleID.Value().size()), mVehicleID.Value().data()));
-
-#pragma GCC diagnostic pop
-
+    ChipLogDetail(AppServer, "VehicleID updated %s", StringOf(mVehicleID.Value()).c_str());
     MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, VehicleID::Id);
 
     return Status::Success;

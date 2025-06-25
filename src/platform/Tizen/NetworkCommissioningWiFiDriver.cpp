@@ -23,7 +23,6 @@
 #include <lib/core/ErrorStr.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
-#include <lib/support/StringFormatting.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/KeyValueStoreManager.h>

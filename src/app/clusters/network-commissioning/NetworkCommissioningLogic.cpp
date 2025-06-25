@@ -32,7 +32,6 @@
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/SortUtils.h>
-#include <lib/support/StringFormatting.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <optional>
 #include <platform/CHIPDeviceConfig.h>
@@ -667,15 +666,8 @@ NetworkCommissioningLogic::HandleConnectNetwork(CommandHandler & handler, const 
 std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleNonConcurrentConnectNetwork()
 {
     ByteSpan nonConcurrentNetworkID = ByteSpan(mConnectingNetworkID, mConnectingNetworkIDLen);
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wformat-nonliteral"
-
     ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Network SSID=%s",
-                    SPAN_TO_TRUNCATED_CSTR(mConnectingNetworkIDLen, mConnectingNetworkID));
-
-#pragma GCC diagnostic pop
-
+                    StringOf(mConnectingNetworkID, mConnectingNetworkIDLen).c_str());
     mpWirelessDriver->ConnectNetwork(nonConcurrentNetworkID, this);
     return std::nullopt;
 }
