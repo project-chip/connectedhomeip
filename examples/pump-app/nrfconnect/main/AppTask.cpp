@@ -95,7 +95,7 @@ chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
 #endif
 
 #ifdef CONFIG_NET_L2_OPENTHREAD
-NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(0 /*endpointId*/);
+Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(0 /*endpointId*/);
 #endif
 } // namespace
 

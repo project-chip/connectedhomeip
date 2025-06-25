@@ -122,7 +122,7 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #endif
 
 #if CONFIG_NET_L2_OPENTHREAD
-app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver>
+app::Clusters::NetworkCommissioning::InstanceAndDriver<DeviceLayer::NetworkCommissioning::GenericThreadDriver>
     sThreadNetworkDriver(0 /*endpointId*/);
 #endif
 
