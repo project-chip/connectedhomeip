@@ -126,9 +126,9 @@ private:
     // Endpoint ID for the second closure panel
     static constexpr chip::EndpointId kClosurePanelEndpoint3 = 3;
 
-    chip::app::Clusters::ClosureControl::ClosureControlEndpoint mClosureEndpoint{ kClosureEndpoint1 };
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint1{ kClosurePanelEndpoint2 };
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint2{ kClosurePanelEndpoint3 };
+    chip::app::Clusters::ClosureControl::ClosureControlEndpoint mClosureEndpoint1{ kClosureEndpoint1 };
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint2{ kClosurePanelEndpoint2 };
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint3{ kClosurePanelEndpoint3 };
 
     /**
      * @brief Stores the current endpoint ID being managed or operated on.

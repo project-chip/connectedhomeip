@@ -77,14 +77,14 @@ ClosureManager ClosureManager::sInstance;
 
 void ClosureManager::Init()
 {
-    VerifyOrDie(mClosureEndpoint.Init() == CHIP_NO_ERROR);
+    VerifyOrDie(mClosureEndpoint1.Init() == CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Closure Control Endpoint initialized successfully");
-
-    VerifyOrDie(mClosurePanelEndpoint1.Init() == CHIP_NO_ERROR);
-    ChipLogProgress(AppServer, "Closure Panel Endpoint 1 initialized successfully");
 
     VerifyOrDie(mClosurePanelEndpoint2.Init() == CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Closure Panel Endpoint 2 initialized successfully");
+
+    VerifyOrDie(mClosurePanelEndpoint3.Init() == CHIP_NO_ERROR);
+    ChipLogProgress(AppServer, "Closure Panel Endpoint 3 initialized successfully");
 
     // Set Taglist for Closure endpoints
     SetTagList(/* endpoint= */ kClosureEndpoint1,
@@ -98,7 +98,7 @@ void ClosureManager::Init()
 
     if (pTestEventDelegate != nullptr)
     {
-        CHIP_ERROR err = pTestEventDelegate->AddHandler(&mClosureEndpoint.GetDelegate());
+        CHIP_ERROR err = pTestEventDelegate->AddHandler(&mClosureEndpoint1.GetDelegate());
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Failed to add handler for delegate: %s", chip::ErrorStr(err));
@@ -205,9 +205,9 @@ void ClosureManager::HandleClosureActionComplete(ClosureAction action)
     switch (action)
     {
     case ClosureAction::kCalibrateAction: {
-        mClosureEndpoint.OnCalibrateActionComplete();
-        mClosurePanelEndpoint1.OnCalibrateActionComplete();
+        mClosureEndpoint1.OnCalibrateActionComplete();
         mClosurePanelEndpoint2.OnCalibrateActionComplete();
+        mClosurePanelEndpoint3.OnCalibrateActionComplete();
         mIsCalibrationActionInProgress = false;
         break;
     }
@@ -215,16 +215,16 @@ void ClosureManager::HandleClosureActionComplete(ClosureAction action)
     case ClosureAction::kStopAction: {
         if (mIsCalibrationActionInProgress)
         {
-            mClosureEndpoint.OnStopCalibrateActionComplete();
-            mClosurePanelEndpoint1.OnStopCalibrateActionComplete();
+            mClosureEndpoint1.OnStopCalibrateActionComplete();
             mClosurePanelEndpoint2.OnStopCalibrateActionComplete();
+            mClosurePanelEndpoint3.OnStopCalibrateActionComplete();
             mIsCalibrationActionInProgress = false;
         }
         else if (mIsMoveToActionInProgress)
         {
-            mClosureEndpoint.OnStopMotionActionComplete();
-            mClosurePanelEndpoint1.OnStopMotionActionComplete();
+            mClosureEndpoint1.OnStopMotionActionComplete();
             mClosurePanelEndpoint2.OnStopMotionActionComplete();
+            mClosurePanelEndpoint3.OnStopMotionActionComplete();    
             mIsMoveToActionInProgress = false;
         }
         else if (mIsSetTargetActionInProgress)
@@ -241,9 +241,9 @@ void ClosureManager::HandleClosureActionComplete(ClosureAction action)
     }
 
     case ClosureAction::kMoveToAction: {
-        mClosureEndpoint.OnMoveToActionComplete();
-        mClosurePanelEndpoint1.OnMoveToActionComplete();
+        mClosureEndpoint1.OnMoveToActionComplete();
         mClosurePanelEndpoint2.OnMoveToActionComplete();
+        mClosurePanelEndpoint3.OnMoveToActionComplete();
         mIsMoveToActionInProgress = false;
         break;
     }
