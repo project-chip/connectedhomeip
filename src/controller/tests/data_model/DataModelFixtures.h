@@ -124,14 +124,14 @@ public:
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
 
-    struct EnableInfiniteReads {
+    struct EnableInfiniteReads
+    {
         EnableInfiniteReads() { Instance().mAllowInfiniteReads = true; }
         ~EnableInfiniteReads() { Instance().mAllowInfiniteReads = false; }
     };
 
 private:
     bool mAllowInfiniteReads = false;
-
 };
 
 } // namespace DataModelTests
