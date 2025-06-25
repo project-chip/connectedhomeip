@@ -17,7 +17,6 @@
  */
 
 #include "DataModelFixtures.h"
-#include "lib/core/CHIPError.h"
 
 #include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/cluster-objects.h>
