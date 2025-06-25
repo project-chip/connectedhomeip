@@ -1915,23 +1915,23 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
 
     VerifyOrReturn(commandData.imageCodec != ImageCodecEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid image codec", mEndpointId);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
     });
 
     VerifyOrReturn(commandData.maxFrameRate > 0, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid maxFrameRate", mEndpointId);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
     });
 
     VerifyOrReturn(commandData.minResolution.width >= 1 && commandData.minResolution.height >= 1,
-                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError));
 
     VerifyOrReturn(commandData.maxResolution.width >= 1 && commandData.maxResolution.height >= 1,
-                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError));
 
     VerifyOrReturn(commandData.quality > 0 && commandData.quality <= kMaxImageQualityMetric, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid image quality", mEndpointId);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
     });
 
     SnapshotStreamStruct snapshotStreamArgs;
