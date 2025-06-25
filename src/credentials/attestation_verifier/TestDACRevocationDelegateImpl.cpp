@@ -19,7 +19,7 @@
 #include <credentials/attestation_verifier/TestDACRevocationDelegateImpl.h>
 #include <lib/support/Base64.h>
 #include <lib/support/BytesToHex.h>
-#include <lib/support/FormatUtils.h>
+#include <lib/support/StringFormatting.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <algorithm>

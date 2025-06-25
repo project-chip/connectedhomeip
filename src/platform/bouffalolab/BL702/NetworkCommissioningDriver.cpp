@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include <lib/support/FormatUtils.h>
+#include <lib/support/StringFormatting.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/bouffalolab/BL702/NetworkCommissioningDriver.h>
 #include <platform/bouffalolab/BL702/wifi_mgmr_portable.h>

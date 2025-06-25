@@ -38,7 +38,7 @@
 #include <clusters/GeneralCommissioning/Metadata.h>
 #include <clusters/GeneralCommissioning/Structs.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/FormatUtils.h>
+#include <lib/support/StringFormatting.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>

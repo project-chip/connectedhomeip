@@ -21,7 +21,7 @@
 
 #include "app/clusters/bindings/BindingManager.h"
 #include <app/server/Dnssd.h>
-#include <lib/support/FormatUtils.h>
+#include <lib/support/StringFormatting.h>
 
 using namespace chip;
 using namespace chip::Controller;

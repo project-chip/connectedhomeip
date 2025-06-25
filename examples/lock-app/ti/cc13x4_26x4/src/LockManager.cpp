@@ -25,7 +25,7 @@
 #include <FreeRTOS.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <cstring>
-#include <lib/support/FormatUtils.h>
+#include <lib/support/StringFormatting.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 LockManager LockManager::sLock;

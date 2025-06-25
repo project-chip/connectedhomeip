@@ -19,7 +19,7 @@
 #include <clusters/OtaSoftwareUpdateProvider/Commands.h>
 #include <clusters/OtaSoftwareUpdateProvider/Ids.h>
 #include <clusters/OtaSoftwareUpdateProvider/Metadata.h>
-#include <lib/support/FormatUtils.h>
+#include <lib/support/StringFormatting.h>
 #include <optional>
 
 namespace chip {

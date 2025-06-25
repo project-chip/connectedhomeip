@@ -19,7 +19,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/config.h>
 #include <cstring>
-#include <lib/support/FormatUtils.h>
+#include <lib/support/StringFormatting.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
