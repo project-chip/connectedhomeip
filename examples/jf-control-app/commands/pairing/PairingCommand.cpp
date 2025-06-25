@@ -77,7 +77,7 @@ CHIP_ERROR PairingCommand::RunCommand()
     // Check if the Anchor Administrator is not already commissioned.
     if (anchorNodeId == chip::kUndefinedNodeId)
     {
-        // The Anchor Administrator is not already commissions, check if the mAnchor option is set.
+        // The Anchor Administrator is not already commissioned, check if the mAnchor option is set.
         // If the --anchor option is not set, we cannot proceed unless we commission the Anchor Administrator first.
         if (!mAnchor.ValueOr(false))
         {
