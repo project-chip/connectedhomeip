@@ -68,7 +68,7 @@ JniGlobalReference sJavaLogCallbackObject;
 // Java object containing the listener to notify when a service is resolved.
 // It can be used by an Android application to be notified when the
 //  Operational discovery is done.
-jobject mJListenerObject = nullptr;
+jobject mJListenerObject          = nullptr;
 jmethodID mServiceResolveListener = nullptr;
 
 } // namespace
@@ -461,7 +461,7 @@ JNI_METHOD(void, setServiceResolveListener)
     if (jListenerObject == nullptr)
     {
         // Disable the listener
-        mJListenerObject = nullptr;
+        mJListenerObject        = nullptr;
         mServiceResolveListener = nullptr;
     }
     else
@@ -469,24 +469,25 @@ JNI_METHOD(void, setServiceResolveListener)
         // Set the listener
 
         // Save the java listener (for later use)
-mJListenerObject = env->NewWeakGlobalRef(jListenerObject);
+        mJListenerObject     = env->NewWeakGlobalRef(jListenerObject);
         jclass listenerClass = env->GetObjectClass(jListenerObject);
 
-jclass listenerClass = env->GetObjectClass(jListenerObject);
-if (listenerClass != nullptr)
-{
-    mServiceResolveListener = env->GetMethodID(listenerClass, "onServiceResolve", "(Ljava/lang/String;Ljava/lang/String;)V");
-    if (mServiceResolveListener == nullptr)
-    {
-        ChipLogError(Controller, "Failed to access listener 'onServiceResolve' method");
-        env->ExceptionClear();
-    }
-} else {
-    ChipLogError(Controller, "Failed to get listener class");
-    env->ExceptionClear();
-}
+        jclass listenerClass = env->GetObjectClass(jListenerObject);
+        if (listenerClass != nullptr)
+        {
+            mServiceResolveListener =
+                env->GetMethodID(listenerClass, "onServiceResolve", "(Ljava/lang/String;Ljava/lang/String;)V");
+            if (mServiceResolveListener == nullptr)
+            {
+                ChipLogError(Controller, "Failed to access listener 'onServiceResolve' method");
+                env->ExceptionClear();
+            }
+        }
+        else
+        {
+            ChipLogError(Controller, "Failed to get listener class");
+            env->ExceptionClear();
         }
     }
-
-
+}
 }
