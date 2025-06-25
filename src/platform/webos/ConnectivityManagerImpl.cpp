@@ -40,7 +40,7 @@
 #include <sys/types.h>
 
 #include <lib/support/CodeUtils.h>
-#include <lib/support/FormatUtils.h>
+#include <lib/support/StringFormatting.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>

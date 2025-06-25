@@ -29,7 +29,7 @@
 #include <clusters/BasicInformation/Metadata.h>
 #include <clusters/BasicInformation/Structs.h>
 #include <lib/core/CHIPConfig.h>
-#include <lib/support/FormatUtils.h>
+#include <lib/support/StringFormatting.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DeviceInstanceInfoProvider.h>

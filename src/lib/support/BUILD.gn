@@ -211,7 +211,7 @@ static_library("support") {
     "FixedBufferAllocator.cpp",
     "FixedBufferAllocator.h",
     "Fold.h",
-    "FormatUtils.h",
+    "StringFormatting.h",
     "FunctionTraits.h",
     "IniEscaping.cpp",
     "IniEscaping.h",

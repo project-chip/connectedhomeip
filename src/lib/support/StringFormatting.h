@@ -2,8 +2,6 @@
 
 #include "StringBuilder.h"
 
-namespace chip {
-
 /**
  * @def INLINE_STRING(BUFSIZE, LEN, DATA)
  *
@@ -23,5 +21,3 @@ namespace chip {
  *
  */
 #define SPAN_TO_TRUNCATED_CSTR(LEN, DATA) INLINE_STRING(256, LEN, DATA)
-
-} // namespace chip

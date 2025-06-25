@@ -33,7 +33,7 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/FormatUtils.h>
+#include <lib/support/StringFormatting.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <protocols/interaction_model/StatusCode.h>
 

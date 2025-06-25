@@ -18,7 +18,7 @@
 #include "TargetVideoPlayerInfo.h"
 
 #include <app/server/Server.h>
-#include <lib/support/FormatUtils.h>
+#include <lib/support/StringFormatting.h>
 
 using namespace chip;
 
