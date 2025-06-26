@@ -93,7 +93,7 @@ public:
     Span<T> Content() { return { mData + PREFIX_LEN, GetLength() }; }
     Span<const T> Content() const { return { mData + PREFIX_LEN, GetLength() }; }
 
-    /// Accesses the "PASCAL" string (i.e. valid data including the string perfix)
+    /// Accesses the "PASCAL" string (i.e. valid data including the string prefix)
     Span<const T> PascalContent() const { return { mData, static_cast<size_t>(GetLength() + PREFIX_LEN) }; }
 
     /// Access to the full buffer. does NOT take into account current size
