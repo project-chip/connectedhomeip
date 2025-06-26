@@ -20,9 +20,9 @@ This module contains global variables that are used across several scripts and c
 """
 from typing import final
 
-_DEFAULT_ADMIN_VENDOR_ID: final = 0xFFF1
-_DEFAULT_STORAGE_PATH: final = "admin_storage.json"
-_DEFAULT_LOG_PATH: final = "/tmp/matter_testing/logs"
-_DEFAULT_CONTROLLER_NODE_ID: final = 112233
-_DEFAULT_DUT_NODE_ID: final = 0x12344321
-_DEFAULT_TRUST_ROOT_INDEX: final = 1
+DEFAULT_ADMIN_VENDOR_ID: final = 0xFFF1
+DEFAULT_STORAGE_PATH: final = "admin_storage.json"
+DEFAULT_LOG_PATH: final = "/tmp/matter_testing/logs"
+DEFAULT_CONTROLLER_NODE_ID: final = 112233
+DEFAULT_DUT_NODE_ID: final = 0x12344321
+DEFAULT_TRUST_ROOT_INDEX: final = 1
