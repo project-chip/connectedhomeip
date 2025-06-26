@@ -49,13 +49,12 @@ inline bool operator==(const Span<const uint32_t> & a, const Span<const uint32_t
     return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
 }
 
-inline bool operator==(const Structs::MeteredQuantityStruct::Type & lhs,
-                       const Structs::MeteredQuantityStruct::Type & rhs)
+inline bool operator==(const Structs::MeteredQuantityStruct::Type & lhs, const Structs::MeteredQuantityStruct::Type & rhs)
 {
     return (lhs.tariffComponentIDs == rhs.tariffComponentIDs) && (lhs.quantity == rhs.quantity);
 }
 
-template<typename T>
+template <typename T>
 bool NullableListEqual(const DataModel::Nullable<DataModel::List<T>> & a, const DataModel::Nullable<DataModel::List<T>> & b)
 {
     if (a.IsNull() || b.IsNull())
@@ -80,10 +79,8 @@ bool NullableListEqual(const DataModel::Nullable<DataModel::List<T>> & a, const 
 template <typename T>
 struct SpanCopier
 {
-    static bool Copy(const chip::Span<const T> & source, 
-                     DataModel::List<const T> & destination,
-                     Platform::ScopedMemoryBuffer<T> * bufferOut,
-                     size_t maxElements = std::numeric_limits<size_t>::max())
+    static bool Copy(const chip::Span<const T> & source, DataModel::List<const T> & destination,
+                     Platform::ScopedMemoryBuffer<T> * bufferOut, size_t maxElements = std::numeric_limits<size_t>::max())
     {
         if (source.empty())
         {
@@ -92,7 +89,6 @@ struct SpanCopier
         }
 
         size_t elementsToCopy = std::min(source.size(), maxElements);
-
 
         if (!bufferOut->Calloc(elementsToCopy))
         {
@@ -125,12 +121,13 @@ void Instance::Shutdown()
 }
 
 CHIP_ERROR CopyMeteredQuantityEntry(Structs::MeteredQuantityStruct::Type & dest,
-                             Platform::ScopedMemoryBuffer<uint32_t> * destTariffComponentIDsBuffer,
-                             const Structs::MeteredQuantityStruct::Type & src)
+                                    Platform::ScopedMemoryBuffer<uint32_t> * destTariffComponentIDsBuffer,
+                                    const Structs::MeteredQuantityStruct::Type & src)
 {
     dest.quantity = src.quantity;
-    
-    if (!SpanCopier<uint32_t>::Copy(src.tariffComponentIDs, dest.tariffComponentIDs, destTariffComponentIDsBuffer, kMaxTariffComponentIDsPerMeteredQuantityEntry))
+
+    if (!SpanCopier<uint32_t>::Copy(src.tariffComponentIDs, dest.tariffComponentIDs, destTariffComponentIDsBuffer,
+                                    kMaxTariffComponentIDsPerMeteredQuantityEntry))
     {
         return CHIP_ERROR_NO_MEMORY;
     }
@@ -162,7 +159,7 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
 
     const size_t len = newValue.IsNull() ? 0 : newValue.Value().size();
 
-    if (!newValue.IsNull() && len )
+    if (!newValue.IsNull() && len)
     {
         if (!mOwnedMeteredQuantityStructBuffer.Calloc(len))
         {
@@ -173,12 +170,11 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
         {
             // Deep copy each MeteredQuantityStruct in the newValue list
             ReturnLogErrorOnFailure(CopyMeteredQuantityEntry(
-                mOwnedMeteredQuantityStructBuffer[idx], 
-                mOwnedMeteredQuantityTariffComponentIDsBuffer[idx],
-                newValue.Value()[idx]));
+                mOwnedMeteredQuantityStructBuffer[idx], mOwnedMeteredQuantityTariffComponentIDsBuffer[idx], newValue.Value()[idx]));
         }
 
-        mMeteredQuantity = MakeNullable(DataModel::List<Structs::MeteredQuantityStruct::Type>(mOwnedMeteredQuantityStructBuffer.Get(), len));
+        mMeteredQuantity =
+            MakeNullable(DataModel::List<Structs::MeteredQuantityStruct::Type>(mOwnedMeteredQuantityStructBuffer.Get(), len));
     }
     else
     {
@@ -248,7 +244,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case MeteredQuantityTimestamp::Id:
         ReturnErrorOnFailure(aEncoder.Encode(GetMeteredQuantityTimestamp()));
         break;
-    
+
     case TariffUnit::Id:
         ReturnErrorOnFailure(aEncoder.Encode(GetTariffUnit()));
         break;

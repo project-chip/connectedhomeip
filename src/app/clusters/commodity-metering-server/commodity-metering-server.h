@@ -34,23 +34,24 @@ namespace Clusters {
 namespace CommodityMetering {
 
 // Some constraints for lists limitation ( does'nt defined in spec )
-constexpr uint8_t kMaxMeteredQuantityEntries  = 128;
+constexpr uint8_t kMaxMeteredQuantityEntries                    = 128;
 constexpr uint8_t kMaxTariffComponentIDsPerMeteredQuantityEntry = 128;
 
 class Instance : public AttributeAccessInterface
 {
 public:
-    Instance(const EndpointId & aEndpointId) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id), mEndpointId(aEndpointId)
-    {}
+    Instance(const EndpointId & aEndpointId) : AttributeAccessInterface(MakeOptional(aEndpointId), Id), mEndpointId(aEndpointId) {}
     ~Instance() override;
 
     CHIP_ERROR Init();
     void Shutdown();
 
     // Attribute Accessors
-    const DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> & GetMeteredQuantity() const { return mMeteredQuantity; }
-    const DataModel::Nullable<uint32_t> & GetMeteredQuantityTimestamp() const { return mMeteredQuantityTimestamp; }    
+    const DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> & GetMeteredQuantity() const
+    {
+        return mMeteredQuantity;
+    }
+    const DataModel::Nullable<uint32_t> & GetMeteredQuantityTimestamp() const { return mMeteredQuantityTimestamp; }
     const Globals::TariffUnitEnum & GetTariffUnit() const { return mTariffUnit; }
 
     // Internal Application API to set attribute values
@@ -65,10 +66,11 @@ private:
     Globals::TariffUnitEnum mTariffUnit;
 
     CHIP_ERROR CopyMeteredQuantityEntry(Structs::MeteredQuantityStruct::Type & dest,
-                             Platform::ScopedMemoryBuffer<uint32_t> * destTariffComponentIDsBuffer,
-                             const Structs::MeteredQuantityStruct::Type & src);
+                                        Platform::ScopedMemoryBuffer<uint32_t> * destTariffComponentIDsBuffer,
+                                        const Structs::MeteredQuantityStruct::Type & src);
 
-    Platform::ScopedMemoryBuffer<uint32_t> mOwnedMeteredQuantityTariffComponentIDsBuffer[kMaxMeteredQuantityEntries][kMaxTariffComponentIDsPerMeteredQuantityEntry];
+    Platform::ScopedMemoryBuffer<uint32_t>
+        mOwnedMeteredQuantityTariffComponentIDsBuffer[kMaxMeteredQuantityEntries][kMaxTariffComponentIDsPerMeteredQuantityEntry];
     Platform::ScopedMemoryBuffer<Structs::MeteredQuantityStruct::Type> mOwnedMeteredQuantityStructBuffer;
 
     EndpointId mEndpointId = 0;
