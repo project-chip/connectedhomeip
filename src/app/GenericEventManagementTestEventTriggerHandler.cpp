@@ -17,8 +17,6 @@
  */
 
 #include "GenericEventManagementTestEventTriggerHandler.h"
-
-#include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
 #include <platform/GeneralFaults.h>
 
 namespace chip {
@@ -41,8 +39,7 @@ CHIP_ERROR GenericEventManagementTestEventTriggerHandler::HandleFillUpEventLoggi
     constexpr uint8_t kHardwareFaultCountForCriticalBuffer = 10;
     for (uint8_t i = 0; i < kHardwareFaultCountForCriticalBuffer; i++)
     {
-        // GeneralDiagnosticsServer::Instance().OnHardwareFaultsDetect(hardwareFaults, hardwareFaults);
-        GeneralDiagnostics::GlobalNotifyHardwareFaultsDetect(hardwareFaults, hardwareFaults);
+        mGeneralDiagnosticsCluster->OnHardwareFaultsDetect(hardwareFaults, hardwareFaults);
     }
 
     /* Fill up the info logging buffer. */
