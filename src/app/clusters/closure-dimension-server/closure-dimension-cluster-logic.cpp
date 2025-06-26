@@ -401,7 +401,6 @@ CHIP_ERROR ClusterLogic::SetLatchControlModes(const BitFlags<LatchControlModesBi
 
     VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-    // If the latchControlModes is not empty, we need to set it to the new value.
     if (mState.latchControlModes != latchControlModes)
     {
         mState.latchControlModes = latchControlModes;
