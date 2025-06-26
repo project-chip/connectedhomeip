@@ -18,8 +18,8 @@
 
 #include <CommodityMeteringInstance.h>
 #include <app/clusters/commodity-metering-server/CommodityMeteringTestEventTriggerHandler.h>
-#include <cstdint>
 #include <array>
+#include <cstdint>
 
 using namespace chip;
 using namespace chip::app;
@@ -27,78 +27,77 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CommodityMetering;
 
 namespace MeteredQuantitySamples {
-    // Define component arrays as constexpr
-    namespace Sample1 {
-        static constexpr uint32_t TariffComponents1[] = {0x5001, 0x5003};
-        static constexpr uint32_t TariffComponents2[] = {0x5002, 0x5003, 0x5004};
-        
-        // Non-constexpr storage for the actual data
-        static const Structs::MeteredQuantityStruct::Type Data[] = {
-            { DataModel::List<const uint32_t>(TariffComponents1, sizeof(TariffComponents1)/sizeof(TariffComponents1[0])), 3500 },
-            { DataModel::List<const uint32_t>(TariffComponents2, sizeof(TariffComponents2)/sizeof(TariffComponents2[0])), -2000 }
-        };
-    }
+// Define component arrays as constexpr
+namespace Sample1 {
+static constexpr uint32_t TariffComponents1[] = { 0x5001, 0x5003 };
+static constexpr uint32_t TariffComponents2[] = { 0x5002, 0x5003, 0x5004 };
 
-    namespace Sample2 {
-        static constexpr uint32_t TariffComponents1[] = {0x6001};
-        static constexpr uint32_t TariffComponents2[] = {0x6002, 0x6003};
-        
-        static const Structs::MeteredQuantityStruct::Type Data[] = {
-            { DataModel::List<const uint32_t>(TariffComponents1, sizeof(TariffComponents1)/sizeof(TariffComponents1[0])), 4200 },
-            { DataModel::List<const uint32_t>(TariffComponents2, sizeof(TariffComponents2)/sizeof(TariffComponents2[0])), -1500 }
-        };
-    }
-}
+// Non-constexpr storage for the actual data
+static const Structs::MeteredQuantityStruct::Type Data[] = {
+    { DataModel::List<const uint32_t>(TariffComponents1, sizeof(TariffComponents1) / sizeof(TariffComponents1[0])), 3500 },
+    { DataModel::List<const uint32_t>(TariffComponents2, sizeof(TariffComponents2) / sizeof(TariffComponents2[0])), -2000 }
+};
+} // namespace Sample1
+
+namespace Sample2 {
+static constexpr uint32_t TariffComponents1[] = { 0x6001 };
+static constexpr uint32_t TariffComponents2[] = { 0x6002, 0x6003 };
+
+static const Structs::MeteredQuantityStruct::Type Data[] = {
+    { DataModel::List<const uint32_t>(TariffComponents1, sizeof(TariffComponents1) / sizeof(TariffComponents1[0])), 4200 },
+    { DataModel::List<const uint32_t>(TariffComponents2, sizeof(TariffComponents2) / sizeof(TariffComponents2[0])), -1500 }
+};
+} // namespace Sample2
+} // namespace MeteredQuantitySamples
 
 namespace {
 
 class OldCommodityMeteringAttributes
 {
 private:
-    Instance * mInstance                           = nullptr;
+    Instance * mInstance = nullptr;
 
     DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> mMeteredQuantity;
     DataModel::Nullable<uint32_t> mMeteredQuantityTimestamp;
     Globals::TariffUnitEnum mTariffUnit;
 
-
     DataModel::List<Structs::MeteredQuantityStruct::Type> GetMeteredQuantityDataSample(uint8_t presetIdx)
     {
-        switch (presetIdx) {
-            case 0:
-                return DataModel::List<Structs::MeteredQuantityStruct::Type>(
-                    const_cast<Structs::MeteredQuantityStruct::Type*>(MeteredQuantitySamples::Sample1::Data),
-                    sizeof(MeteredQuantitySamples::Sample1::Data)/sizeof(MeteredQuantitySamples::Sample1::Data[0])
-                );
-            case 1:
-                return DataModel::List<Structs::MeteredQuantityStruct::Type>(
-                    const_cast<Structs::MeteredQuantityStruct::Type*>(MeteredQuantitySamples::Sample2::Data),
-                    sizeof(MeteredQuantitySamples::Sample2::Data)/sizeof(MeteredQuantitySamples::Sample2::Data[0])
-                );
-            default:
-                return DataModel::List<Structs::MeteredQuantityStruct::Type>();
+        switch (presetIdx)
+        {
+        case 0:
+            return DataModel::List<Structs::MeteredQuantityStruct::Type>(
+                const_cast<Structs::MeteredQuantityStruct::Type *>(MeteredQuantitySamples::Sample1::Data),
+                sizeof(MeteredQuantitySamples::Sample1::Data) / sizeof(MeteredQuantitySamples::Sample1::Data[0]));
+        case 1:
+            return DataModel::List<Structs::MeteredQuantityStruct::Type>(
+                const_cast<Structs::MeteredQuantityStruct::Type *>(MeteredQuantitySamples::Sample2::Data),
+                sizeof(MeteredQuantitySamples::Sample2::Data) / sizeof(MeteredQuantitySamples::Sample2::Data[0]));
+        default:
+            return DataModel::List<Structs::MeteredQuantityStruct::Type>();
         }
     }
 
     void SaveMeteredQuantity(const DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> & newValue)
     {
         // Clear existing data if any
-        mMeteredQuantity.SetNull(); 
+        mMeteredQuantity.SetNull();
 
         if (!newValue.IsNull())
         {
             const auto & sourceList = newValue.Value();
-            const size_t count = sourceList.size(); 
+            const size_t count      = sourceList.size();
 
             if (count > 0)
             {
                 // Allocate memory for the new list
-                auto * newList = static_cast<Structs::MeteredQuantityStruct::Type *>(Platform::MemoryCalloc(count, sizeof(Structs::MeteredQuantityStruct::Type)));
+                auto * newList = static_cast<Structs::MeteredQuantityStruct::Type *>(
+                    Platform::MemoryCalloc(count, sizeof(Structs::MeteredQuantityStruct::Type)));
                 if (newList == nullptr)
                 {
                     ChipLogError(Zcl, "Failed to allocate memory for MeteredQuantity");
                     return;
-                }   
+                }
 
                 // Copy each element
                 for (size_t i = 0; i < count; i++)
@@ -119,22 +118,17 @@ private:
 
                     // Create new entry
                     newList[i] = Structs::MeteredQuantityStruct::Type{
-                        DataModel::List<const uint32_t>(components, src.tariffComponentIDs.size()),
-                        src.quantity
+                        DataModel::List<const uint32_t>(components, src.tariffComponentIDs.size()), src.quantity
                     };
-                }   
+                }
 
                 // Create the new list
-                mMeteredQuantity = DataModel::MakeNullable(
-                    DataModel::List<Structs::MeteredQuantityStruct::Type>(newList, count)
-                );
+                mMeteredQuantity = DataModel::MakeNullable(DataModel::List<Structs::MeteredQuantityStruct::Type>(newList, count));
             }
             else
             {
                 // Empty list case
-                mMeteredQuantity = DataModel::MakeNullable(
-                    DataModel::List<Structs::MeteredQuantityStruct::Type>()
-                );
+                mMeteredQuantity = DataModel::MakeNullable(DataModel::List<Structs::MeteredQuantityStruct::Type>());
             }
         }
     }
@@ -147,10 +141,10 @@ private:
             {
                 if (!item.tariffComponentIDs.empty())
                 {
-                    Platform::MemoryFree(const_cast<uint32_t*>(item.tariffComponentIDs.data()));
+                    Platform::MemoryFree(const_cast<uint32_t *>(item.tariffComponentIDs.data()));
                 }
             }
-            Platform::MemoryFree(const_cast<Structs::MeteredQuantityStruct::Type*>(mMeteredQuantity.Value().data()));
+            Platform::MemoryFree(const_cast<Structs::MeteredQuantityStruct::Type *>(mMeteredQuantity.Value().data()));
             mMeteredQuantity.SetNull();
         }
     }
@@ -160,8 +154,8 @@ private:
         mInstance = GetInstance();
         VerifyOrDieWithMsg(mInstance, AppServer, "CommodityMetering instance is null");
         SaveMeteredQuantity(mInstance->GetMeteredQuantity());
-        mMeteredQuantityTimestamp = mInstance->GetMeteredQuantityTimestamp();        
-        mTariffUnit = mInstance->GetTariffUnit();
+        mMeteredQuantityTimestamp = mInstance->GetMeteredQuantityTimestamp();
+        mTariffUnit               = mInstance->GetTariffUnit();
     }
 
     void ClearAttributes()
@@ -210,7 +204,7 @@ private:
     }
 
 public:
-    OldCommodityMeteringAttributes() {};
+    OldCommodityMeteringAttributes(){};
     ~OldCommodityMeteringAttributes() = default;
 
     void Update()

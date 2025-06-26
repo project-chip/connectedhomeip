@@ -34,8 +34,7 @@ void emberAfCommodityMeteringClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gCommodityMeteringCluster == nullptr);
-    gCommodityMeteringCluster =
-        std::make_unique<Instance>(endpointId);
+    gCommodityMeteringCluster = std::make_unique<Instance>(endpointId);
     gCommodityMeteringCluster->Init();
 }
 
