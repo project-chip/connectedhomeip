@@ -34,13 +34,9 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import json
 import logging
-import time
-from typing import Any, Optional
 
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback,
                                          MatterBaseTest, TestStep, async_test_body, default_matter_test_main)
@@ -76,38 +72,6 @@ class TC_CLCTRL_6_1(MatterBaseTest):
 
     def desc_TC_CLCTRL_6_1(self) -> str:
         return "[TC_CLCTRL_6_1] Event Functionality with DUT as Server"
-
-    def setup_test(self):
-        super().setup_test()
-        self.is_ci = self._use_button_simulator()
-
-    def _ask_for_manual_latching(self, endpoint_id: int, latched: bool):
-        if not self._use_button_simulator():
-            self.wait_for_user_input(prompt_msg=f"Latch the DUT manually to set OverallState.Latch to True.")
-        else:
-            self._send_latching_named_pipe_command(endpoint_id, latched)
-
-    def _send_named_pipe_command(self, command_dict: dict[str, Any]):
-        app_pid = self.matter_test_config.app_pid
-        if app_pid == 0:
-            asserts.fail("The --app-pid flag must be set when usage of button simulation named pipe is required (e.g. CI)")
-
-        app_pipe = f"/tmp/chip_all_clusters_fifo_{app_pid}"
-        command = json.dumps(command_dict)
-
-        # Sends an out-of-band command to the sample app
-        with open(app_pipe, "w") as outfile:
-            logging.info(f"Sending named pipe command to {app_pipe}: '{command}'")
-            outfile.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests may be flaky).
-        time.sleep(0.1)
-
-    def _use_button_simulator(self) -> bool:
-        return self.check_pics("PICS_SDK_CI_ONLY") or self.user_params.get("use_button_simulator", False)
-
-    def _send_latching_named_pipe_command(self, endpoint_id: int, latched: bool):
-        command_dict = {"Name": "SimulateLatching", "EndpointId": endpoint_id, "latched": latched}
-        self._send_named_pipe_command(command_dict)
 
     def steps_TC_CLCTRL_6_1(self) -> list[TestStep]:
         steps = [
