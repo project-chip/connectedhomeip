@@ -352,8 +352,8 @@ std::optional<ActionReturnStatus> EnsureFailsafeIsArmed(FabricIndex fabricIndex)
 /// is not armed for the given fabric index.
 ///
 /// This just wraps EnsureFailsafeIsArmed with a one-liner for check & return.
-#define RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(fabricIndex)                                                                                          \
-    if (std::optional<ActionReturnStatus> status = EnsureFailsafeIsArmed(fabricIndex); status.has_value())                            \
+#define RETURN_ERROR_STATUS_IF_FAILSAFE_NOT_ARMED(fabricIndex)                                                                     \
+    if (std::optional<ActionReturnStatus> status = EnsureFailsafeIsArmed(fabricIndex); status.has_value())                         \
     {                                                                                                                              \
         return status;                                                                                                             \
     }                                                                                                                              \
@@ -770,6 +770,10 @@ exit:
     {
         ChipLogError(Zcl, "QueryIdentity failed: %" CHIP_ERROR_FORMAT, err.Format());
         return Protocols::InteractionModel::Status::Failure;
+    }
+    if (status != Protocols::InteractionModel::Status::Success)
+    {
+        return status;
     }
     // response was sent if error is CHIP_NO_ERROR
     return std::nullopt;
