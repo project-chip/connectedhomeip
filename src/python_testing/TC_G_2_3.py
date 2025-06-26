@@ -170,19 +170,8 @@ class TC_G_2_3(MatterBaseTest):
         ]
         asserts.assert_true(len(matched_entries) > 0, f"No GroupTable entry found with groupId={expected_group_id}")
 
-        # Verify if is supported groupName feature
-        feature_map: int = await self.read_single_attribute(
-            dev_ctrl=th1,
-            node_id=self.dut_node_id,
-            endpoint=self.matter_test_config.endpoint,
-            attribute=Clusters.Groups.Attributes.FeatureMap
-        )
-
-        name_feature_bit: int = 0
-        group_name_supported: bool = (feature_map & (1 << name_feature_bit)) != 0
-
         self.step("2b")
-        if group_name_supported:
+        if await self.feature_guard(endpoint=self.matter_test_config.endpoint, cluster=Clusters.Groups, feature_int=Clusters.Groups.Bitmaps.Feature.kGroupNames):
             group_found = False
             for group in groupTableList:
                 if group.groupName == kGroupNameGp2:
@@ -207,7 +196,7 @@ class TC_G_2_3(MatterBaseTest):
         asserts.assert_true(found, f"groupId {kGroupId3} not found in GroupTable")
 
         self.step("4b")
-        if group_name_supported:
+        if await self.feature_guard(endpoint=self.matter_test_config.endpoint, cluster=Clusters.Groups, feature_int=Clusters.Groups.Bitmaps.Feature.kGroupNames):
             group_found = False
             for group in groupTableList:
                 if group.groupName == kGroupNameGp3:
@@ -270,7 +259,7 @@ class TC_G_2_3(MatterBaseTest):
         asserts.assert_is_not_none(matching_entry, f"GroupId 0x{kGroupId6:04X} not found in GroupTable attribute")
 
         self.step("11b")
-        if group_name_supported:
+        if await self.feature_guard(endpoint=self.matter_test_config.endpoint, cluster=Clusters.Groups, feature_int=Clusters.Groups.Bitmaps.Feature.kGroupNames):
             group_found = False
             for group in groupTableList:
                 if group.groupName == kGroupNameGp6:
@@ -296,7 +285,7 @@ class TC_G_2_3(MatterBaseTest):
                             f"Expected GroupId {kGroupId7} not found in DUT GroupTable: {received_group_ids}")
 
         self.step("14")
-        if group_name_supported:
+        if await self.feature_guard(endpoint=self.matter_test_config.endpoint, cluster=Clusters.Groups, feature_int=Clusters.Groups.Bitmaps.Feature.kGroupNames):
             group_found = False
             for group in groupTableList:
                 if group.groupName == kGroupNameGp7:
