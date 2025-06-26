@@ -604,7 +604,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
                 ChipLogProgress(JointFabric, "trustedIcacPublicKeyB[%li] = %02X", i,
                                 request.trustedIcacPublicKeyB.bytes[i]);
             }
-        
+
             auto call = rpcClient.TransferOwnership(request, OnOwnershipTransferDone);
             if (!call.active())
             {
@@ -784,8 +784,8 @@ void PairingCommand::OnDeviceAttestationCompleted(Controller::DeviceCommissioner
 }
 
 void PairingCommand::OnProgressUpdate(
-    chip::Controller::JCM::JCMDeviceCommissioner & commissioner, 
-    chip::Controller::JCM::JCMTrustVerificationStage stage, 
+    chip::Controller::JCM::JCMDeviceCommissioner & commissioner,
+    chip::Controller::JCM::JCMTrustVerificationStage stage,
     chip::Controller::JCM::JCMTrustVerificationInfo & info,
     chip::Controller::JCM::JCMTrustVerificationError error)
 {
@@ -793,7 +793,7 @@ void PairingCommand::OnProgressUpdate(
 }
 
 void PairingCommand::OnAskUserForConsent(
-    chip::Controller::JCM::JCMDeviceCommissioner & commissioner, 
+    chip::Controller::JCM::JCMDeviceCommissioner & commissioner,
     chip::Controller::JCM::JCMTrustVerificationInfo & info)
 {
     ChipLogProgress(Controller, "Asking user for consent for vendor ID: %u", info.adminVendorId);
@@ -802,7 +802,7 @@ void PairingCommand::OnAskUserForConsent(
 }
 
 void PairingCommand::OnVerifyVendorId(
-    chip::Controller::JCM::JCMDeviceCommissioner & commissioner, 
+    chip::Controller::JCM::JCMDeviceCommissioner & commissioner,
     chip::Controller::JCM::JCMTrustVerificationInfo & info)
 {
     ChipLogProgress(Controller, "Performing vendor ID verification for vendor ID: %u", info.adminVendorId);

@@ -61,7 +61,7 @@ class PairingCommand : public CHIPCommand,
                        public chip::Controller::DeviceDiscoveryDelegate,
                        public chip::Controller::JCM::JCMTrustVerificationDelegate,
                        public chip::Credentials::DeviceAttestationDelegate
-                      
+
 {
 public:
     PairingCommand(const char * commandName, PairingMode mode, PairingNetworkType networkType,
@@ -253,13 +253,13 @@ public:
                                       chip::Credentials::AttestationVerificationResult attestationResult) override;
 
     /////////// JCMTrustVerificationDelegate /////////
-    void OnProgressUpdate(chip::Controller::JCM::JCMDeviceCommissioner & commissioner, 
-                          chip::Controller::JCM::JCMTrustVerificationStage stage, 
-                          chip::Controller::JCM::JCMTrustVerificationInfo & info, 
+    void OnProgressUpdate(chip::Controller::JCM::JCMDeviceCommissioner & commissioner,
+                          chip::Controller::JCM::JCMTrustVerificationStage stage,
+                          chip::Controller::JCM::JCMTrustVerificationInfo & info,
                           chip::Controller::JCM::JCMTrustVerificationError error);
-    void OnAskUserForConsent(chip::Controller::JCM::JCMDeviceCommissioner & commissioner, 
+    void OnAskUserForConsent(chip::Controller::JCM::JCMDeviceCommissioner & commissioner,
                              chip::Controller::JCM::JCMTrustVerificationInfo & info);
-    void OnVerifyVendorId(chip::Controller::JCM::JCMDeviceCommissioner & commissioner, 
+    void OnVerifyVendorId(chip::Controller::JCM::JCMDeviceCommissioner & commissioner,
                           chip::Controller::JCM::JCMTrustVerificationInfo & info);
 
 private:
