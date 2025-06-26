@@ -1158,6 +1158,30 @@ CameraError CameraDevice::SetZoom(uint8_t aZoom)
     return CameraError::SUCCESS;
 }
 
+CameraError CameraDevice::SetDetectionSensitivity(uint8_t aSensitivity)
+{
+    mDetectionSensitivity = aSensitivity;
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::CreateZoneTrigger(const ZoneTriggerControlStruct & zoneTrigger)
+{
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::UpdateZoneTrigger(const ZoneTriggerControlStruct & zoneTrigger)
+{
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneID)
+{
+
+    return CameraError::SUCCESS;
+}
+
 void CameraDevice::InitializeVideoStreams()
 {
     // Create single video stream with typical supported parameters

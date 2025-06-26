@@ -292,11 +292,9 @@ CHIP_ERROR ZoneMgmtServer::UpdateZone(uint16_t zoneId, const ZoneInformationStor
         auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
         mDelegate.OnAttributeChanged(Attributes::Zones::Id);
         MatterReportingAttributeChangeCallback(path);
-
-        return CHIP_NO_ERROR; // Indicate success
     }
 
-    return CHIP_ERROR_NOT_FOUND;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ZoneMgmtServer::RemoveZone(uint16_t zoneId)
@@ -311,39 +309,57 @@ CHIP_ERROR ZoneMgmtServer::RemoveZone(uint16_t zoneId)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ZoneMgmtServer::AddOrUpdateTrigger(const ZoneTriggerControlStruct & trigger)
+Status ZoneMgmtServer::AddOrUpdateTrigger(const ZoneTriggerControlStruct & trigger)
 {
     // Find an iterator to the item with the matching ID
-    auto it = std::find_if(mTriggers.begin(), mTriggers.end(),
-                           [&](const ZoneTriggerControlStruct & zoneTrigger) { return zoneTrigger.zoneID == trigger.zoneID; });
+    auto foundTrigger = std::find_if(mTriggers.begin(), mTriggers.end(), [&](const ZoneTriggerControlStruct & zoneTrigger) {
+        return zoneTrigger.zoneID == trigger.zoneID;
+    });
 
-    // If an item with the zoneID was found
-    if (it != mTriggers.end())
+    Status status;
+    // If an item with the zoneID was not found
+    if (foundTrigger == mTriggers.end())
     {
-        *it = trigger; // Replace the found item with the newItem
+        // Call the delegate
+        status = mDelegate.CreateTrigger(trigger);
+        if (status == Status::Success)
+        {
+            mTriggers.push_back(trigger);
+        }
     }
     else
     {
-        mTriggers.push_back(trigger);
+        status = mDelegate.UpdateTrigger(trigger);
+        if (status == Status::Success)
+        {
+            *foundTrigger = trigger; // Replace the found item with the newItem
+        }
     }
 
-    auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Triggers::Id);
-    mDelegate.OnAttributeChanged(Attributes::Triggers::Id);
-    MatterReportingAttributeChangeCallback(path);
+    if (status == Status::Success)
+    {
+        auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Triggers::Id);
+        mDelegate.OnAttributeChanged(Attributes::Triggers::Id);
+        MatterReportingAttributeChangeCallback(path);
+    }
 
-    return CHIP_NO_ERROR;
+    return status;
 }
 
-CHIP_ERROR ZoneMgmtServer::RemoveTrigger(uint16_t zoneId)
+Status ZoneMgmtServer::RemoveTrigger(uint16_t zoneId)
 {
-    mTriggers.erase(std::remove_if(mTriggers.begin(), mTriggers.end(),
-                                   [&](const ZoneTriggerControlStruct & trigger) { return trigger.zoneID == zoneId; }),
-                    mTriggers.end());
-    auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Triggers::Id);
-    mDelegate.OnAttributeChanged(Attributes::Triggers::Id);
-    MatterReportingAttributeChangeCallback(path);
+    Status status = mDelegate.RemoveTrigger(zoneId);
+    if (status == Status::Success)
+    {
+        mTriggers.erase(std::remove_if(mTriggers.begin(), mTriggers.end(),
+                                       [&](const ZoneTriggerControlStruct & trigger) { return trigger.zoneID == zoneId; }),
+                        mTriggers.end());
+        auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Triggers::Id);
+        mDelegate.OnAttributeChanged(Attributes::Triggers::Id);
+        MatterReportingAttributeChangeCallback(path);
+    }
 
-    return CHIP_NO_ERROR;
+    return status;
 }
 
 Status ZoneMgmtServer::ValidateTwoDCartesianZone(const TwoDCartesianZoneDecodableStruct & zone)
@@ -423,7 +439,7 @@ void ZoneMgmtServer::HandleCreateTwoDCartesianZone(HandlerContext & ctx,
     if (status == Status::Success)
     {
         ZoneInformationStorage zoneInfo;
-        zoneInfo.Set(zoneID, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, twoDCartZoneStorage);
+        zoneInfo.Set(zoneID, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, MakeOptional(twoDCartZoneStorage));
 
         AddZone(zoneInfo);
         mUserDefinedZonesCount++;
@@ -507,7 +523,7 @@ void ZoneMgmtServer::HandleUpdateTwoDCartesianZone(HandlerContext & ctx,
     if (status == Status::Success)
     {
         ZoneInformationStorage zoneInfo;
-        zoneInfo.Set(zoneID, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, twoDCartZoneStorage);
+        zoneInfo.Set(zoneID, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, MakeOptional(twoDCartZoneStorage));
 
         UpdateZone(zoneID, zoneInfo);
     }
@@ -571,7 +587,7 @@ void ZoneMgmtServer::HandleCreateOrUpdateTrigger(HandlerContext & ctx,
     ZoneTriggerControlStruct trigger = commandData.trigger;
 
     auto foundZone =
-        std::find_if(mZones.begin(), mZones.end(), [&](const ZoneInformationStruct & z) { return z.zoneID == trigger.zoneID; });
+        std::find_if(mZones.begin(), mZones.end(), [&](const ZoneInformationStorage & z) { return z.zoneID == trigger.zoneID; });
     if (foundZone == mZones.end())
     {
         ChipLogError(Zcl, "ZoneMgmt[ep=%d]: No zone exists by id %d", mEndpointId, trigger.zoneID);
@@ -579,23 +595,15 @@ void ZoneMgmtServer::HandleCreateOrUpdateTrigger(HandlerContext & ctx,
         return;
     }
 
-    // TODO: ZoneUse check after TwoDCartesianStruct lands in
-    // ZoneInformationStruct(SDK aligned with Spec PR #11732)
-
-    // Call the delegate
-    Status status = mDelegate.CreateOrUpdateTrigger(trigger);
-
-    if (status == Status::Success)
+    if (foundZone->twoDCartZoneStorage.HasValue() && foundZone->twoDCartZoneStorage.Value().use != ZoneUseEnum::kMotion)
     {
-        AddOrUpdateTrigger(trigger);
-    }
-    else
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
         return;
     }
 
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
+    Status status = AddOrUpdateTrigger(trigger);
+
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
 void ZoneMgmtServer::HandleRemoveTrigger(HandlerContext & ctx, const Commands::RemoveTrigger::DecodableType & commandData)
@@ -611,9 +619,9 @@ void ZoneMgmtServer::HandleRemoveTrigger(HandlerContext & ctx, const Commands::R
         return;
     }
 
-    // Call the delegate
-    Status status = mDelegate.RemoveTrigger(zoneID);
+    Status status = RemoveTrigger(zoneID);
 
+    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
     if (status == Status::Success)
     {
         RemoveTrigger(zoneID);
