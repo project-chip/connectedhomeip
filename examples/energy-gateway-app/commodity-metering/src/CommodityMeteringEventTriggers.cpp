@@ -151,7 +151,7 @@ private:
                     Platform::MemoryFree(const_cast<uint32_t*>(item.tariffComponentIDs.data()));
                 }
             }
-            Platform::Delete(const_cast<Structs::MeteredQuantityStruct::Type*>(mMeteredQuantity.Value().data()));
+            Platform::MemoryFree(const_cast<Structs::MeteredQuantityStruct::Type*>(mMeteredQuantity.Value().data()));
             mMeteredQuantity.SetNull();
         }
     }
