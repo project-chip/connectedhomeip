@@ -14,11 +14,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h>
 #include <app/static-cluster-config/PushAvStreamTransport.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
 
 #include <cstdint>
 
@@ -32,7 +32,8 @@ namespace {
 
 static constexpr size_t kPushAvStreamTransportFixedClusterCount =
     PushAvStreamTransport::StaticApplicationConfig::kFixedClusterConfig.size();
-static constexpr size_t kPushAvStreamTransportMaxClusterCount = kPushAvStreamTransportFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
+static constexpr size_t kPushAvStreamTransportMaxClusterCount =
+    kPushAvStreamTransportFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
 LazyRegisteredServerCluster<PushAvStreamTransport::PushAvStreamTransportServer> gServers[kPushAvStreamTransportMaxClusterCount];
 
@@ -66,14 +67,13 @@ void emberAfPushAvStreamTransportClusterInitCallback(EndpointId endpointId)
         ChipLogError(AppServer, "Failed to get feature map for endpoint %u", endpointId);
         rawFeatureMap = 0;
     }
-    ChipLogProgress(AppServer, "Registering Push AV Stream Transport on endpoint %u, %d", endpointId,arrayIndex);
-    gServers[arrayIndex].Create(endpointId,BitFlags<PushAvStreamTransport::Feature>(rawFeatureMap));
+    ChipLogProgress(AppServer, "Registering Push AV Stream Transport on endpoint %u, %d", endpointId, arrayIndex);
+    gServers[arrayIndex].Create(endpointId, BitFlags<PushAvStreamTransport::Feature>(rawFeatureMap));
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServers[arrayIndex].Registration());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to register OTA on endpoint %u: %" CHIP_ERROR_FORMAT, endpointId, err.Format());
     }
-
 }
 
 void emberAfPushAvStreamTransportClusterShutdownCallback(EndpointId endpointId)
@@ -110,7 +110,7 @@ void SetDelegate(EndpointId endpointId, PushAvStreamTransportDelegate * delegate
     {
         return;
     }
-    gServers[arrayIndex].Cluster().SetDelegate(endpointId,delegate);
+    gServers[arrayIndex].Cluster().SetDelegate(endpointId, delegate);
     gServers[arrayIndex].Cluster().Init();
 }
 

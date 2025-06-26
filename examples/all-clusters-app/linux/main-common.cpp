@@ -35,13 +35,13 @@
 #include "operational-state-delegate-impl.h"
 #include "oven-modes.h"
 #include "oven-operational-state-delegate.h"
+#include "push-av-stream-transport-delegate-impl.h"
 #include "resource-monitoring-delegates.h"
 #include "rvc-modes.h"
 #include "rvc-operational-state-delegate-impl.h"
 #include "tcc-mode.h"
 #include "thermostat-delegate-impl.h"
 #include "water-heater-mode.h"
-#include "push-av-stream-transport-delegate-impl.h"
 
 #include <Options.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -51,11 +51,11 @@
 #include <app/clusters/laundry-dryer-controls-server/laundry-dryer-controls-server.h>
 #include <app/clusters/laundry-washer-controls-server/laundry-washer-controls-server.h>
 #include <app/clusters/mode-base-server/mode-base-server.h>
+#include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
 #include <app/clusters/thermostat-server/thermostat-server.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/unit-localization-server/unit-localization-server.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
-#include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CHIPMem.h>
