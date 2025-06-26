@@ -69,35 +69,6 @@ Status ClosureControlDelegate::HandleStopCommand()
     return ClosureManager::GetInstance().OnStopCommand();
 }
 
-void ClosureControlDelegate::ClearErrorList()
-{
-    mCurrentErrorCount = 0;
-}
-
-CHIP_ERROR ClosureControlDelegate::AddErrorToCurrentErrorList(ClosureErrorEnum error)
-{
-    // Check for duplicates
-    for (size_t i = 0; i < mCurrentErrorCount; ++i)
-    {
-        VerifyOrReturnError(mCurrentErrorList[i] != error, CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED,
-                            ChipLogError(AppServer, "Error already exists in the list"));
-    }
-    VerifyOrReturnError(mCurrentErrorCount < kMaxErrorCount, CHIP_ERROR_PROVIDER_LIST_EXHAUSTED,
-                        ChipLogError(AppServer, "Error list is full"));
-    mCurrentErrorList[mCurrentErrorCount++] = error;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ClosureControlDelegate::GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError)
-{
-    if (index >= mCurrentErrorCount)
-    {
-        return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-    }
-    closureError = mCurrentErrorList[index];
-    return CHIP_NO_ERROR;
-}
-
 bool ClosureControlDelegate::IsReadyToMove()
 {
     // This function should return true if the closure is ready to move.
@@ -149,14 +120,14 @@ CHIP_ERROR ClosureControlDelegate::HandleEventTrigger(uint64_t eventTrigger)
         break;
     case ClosureControlTestEventTrigger::kMainStateIsError:
         ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kError));
-        ReturnErrorOnFailure(AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor));
+        ReturnErrorOnFailure(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor));
         break;
     case ClosureControlTestEventTrigger::kMainStateIsDisengaged:
         ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kDisengaged));
         break;
     case ClosureControlTestEventTrigger::kClearEvent:
         ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kStopped));
-        ClearErrorList();
+        logic->ClearCurrentErrorList();
         break;
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
