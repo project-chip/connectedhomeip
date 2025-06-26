@@ -145,7 +145,7 @@ private:
             to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kSeekingCharger)),
         OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kCharging)),
         OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kDocked)),
-        OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kRunningWhileBeeping, "RunningWhileBeeping"_span)),
+        OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kRunningWhileBeeping), "RunningWhileBeeping"_span),
     };
 
     RvcOperationalState::ChefRvcOperationalStateEnum mCurrentRunningState = RvcOperationalState::ChefRvcOperationalStateEnum::kRunning;
