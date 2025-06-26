@@ -148,7 +148,7 @@ private:
             {
                 if (!item.tariffComponentIDs.empty())
                 {
-                    Platform::Delete(const_cast<uint32_t*>(item.tariffComponentIDs.data()));
+                    Platform::MemoryFree(const_cast<uint32_t*>(item.tariffComponentIDs.data()));
                 }
             }
             Platform::Delete(const_cast<Structs::MeteredQuantityStruct::Type*>(mMeteredQuantity.Value().data()));
