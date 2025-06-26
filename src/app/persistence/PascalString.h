@@ -139,7 +139,7 @@ public:
     {
         VerifyOrReturnValue(span.size() >= PREFIX_LEN, false);
         LengthType len = PascalPrefixOperations<PREFIX_LEN>::GetLength(span.data());
-        return len == kInvalidLength || (len + PREFIX_LEN <= span.size());
+        return len == kInvalidLength || (static_cast<size_t>(len + PREFIX_LEN) <= span.size());
     }
 
 private:
