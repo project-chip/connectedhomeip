@@ -38,6 +38,7 @@
 #endif
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
+#include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 #include <app/server/Server.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <data-model-providers/codegen/Instance.h>
@@ -237,6 +238,9 @@ void CYW30739MatterConfig::InitApp(void)
 #endif
 
     // Init Matter Server
+    const Clusters::GeneralDiagnosticsEnabledAttributes enabledAttributes = Clusters::GeneralDiagnosticsEnabledAttributes();
+    Clusters::GeneralDiagnosticsCluster cluster(enabledAttributes);
+    sEventManagementTestEventTriggerHandler.SetGeneralDiagnosticsClusterInstance(&cluster);
     chip::Server::GetInstance().Init(initParams);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
