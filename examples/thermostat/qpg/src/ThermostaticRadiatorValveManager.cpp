@@ -51,11 +51,10 @@ Int16 (*resultGetFunction)(void) = NULL;
 
 #define DEGREE_FAHRENHEIT_CONVERSION(x) (int) ((float) x * 1.8) + 3200 // in unit of 0.01
 
-#define DURATION_1SECOND 1000 // 1000 mseconds
-#define DURATION_1MIN 60 * DURATION_1SECOND
-#define TRV_MEASUREMENT_PERIOD DURATION_1MIN
+#define ONE_SECOND_MS 1000 // 1000 mseconds
+#define ONE_MIN_MS 60 * ONE_SECOND_MS
+#define TRV_MEASUREMENT_PERIOD ONE_MIN_MS
 
-#define ONE_SECOND_US 1000000UL
 #define QPG_THERMOSTATIC_ENDPOINT_ID (1)
 
 static void DelayInit(void)
@@ -202,7 +201,7 @@ void ThermostaticRadiatorValveManager::TimerEventHandler(TimerHandle_t xTimer)
     event.TimerEvent.Context = thermostaticRadiatorValve;
     event.Handler            = PeriodicTimerEventHandler;
 
-    GetAppTask().PostEvent(&event);
+    AppTask::GetAppTask().PostEvent(&event);
 }
 
 /* periodic event handler */
@@ -238,7 +237,7 @@ int16_t ThermostaticRadiatorValveManager::GetLocalTemperature()
     // measure temperature through ADC peripheral
     // ADC_GetTemperatureValue(&temp);
 
-    ChipLogProgress(NotSpecified, "GetLocalTemperature (0.01 degC) - %d", temp);
+    ChipLogDetail(NotSpecified, "GetLocalTemperature (0.01 degC) - %d", temp);
 
     return (int16_t) temp;
 }

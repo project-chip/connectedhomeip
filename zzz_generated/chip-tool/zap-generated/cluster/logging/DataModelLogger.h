@@ -1085,9 +1085,6 @@ LogValue(const char * label, size_t indent,
          const chip::app::Clusters::ZoneManagement::Commands::CreateTwoDCartesianZoneResponse::DecodableType & value);
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
-         const chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZoneResponse::DecodableType & value);
-static CHIP_ERROR
-LogValue(const char * label, size_t indent,
          const chip::app::Clusters::CameraAvStreamManagement::Commands::AudioStreamAllocateResponse::DecodableType & value);
 static CHIP_ERROR
 LogValue(const char * label, size_t indent,
