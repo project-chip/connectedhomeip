@@ -204,6 +204,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=True),
                     endpoint=endpoint
                 )
+                asserts.fail("Expected InvalidInState error, but no exception occurred.")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.InvalidInState, "Unexpected status returned")
 
@@ -248,6 +249,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
                         direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease, numberOfSteps=1),
                     endpoint=endpoint
                 )
+                asserts.fail("Expected InvalidInState error, but no exception occurred.")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.InvalidInState, "Unexpected status returned")
 
@@ -259,6 +261,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=max_position),
                     endpoint=endpoint
                 )
+                asserts.fail("Expected InvalidInState error, but no exception occurred.")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.InvalidInState, "Unexpected status returned")
 
