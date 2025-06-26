@@ -28,7 +28,7 @@ namespace Clusters {
 
 class GeneralDiagnosticsCluster : public DefaultServerCluster {
 public:
-    GeneralDiagnosticsCluster(GeneralDiagnosticsEnabledAttributes attributes) : 
+    GeneralDiagnosticsCluster(GeneralDiagnosticsEnabledAttributes attributes) :
         DefaultServerCluster({kRootEndpointId, GeneralDiagnostics::Id}),
         mLogic(attributes)
     {}
@@ -63,7 +63,7 @@ public:
      */
     void OnNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
                                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
-    
+
 private:
     template <typename T>
     CHIP_ERROR EncodeValue(T value, CHIP_ERROR readError, AttributeValueEncoder & encoder);
