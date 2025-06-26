@@ -19,7 +19,6 @@
 #include "GenericEventManagementTestEventTriggerHandler.h"
 
 #include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
-// #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <platform/GeneralFaults.h>
 
 namespace chip {
