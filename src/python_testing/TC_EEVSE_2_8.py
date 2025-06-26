@@ -44,11 +44,12 @@ import logging
 
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable
-from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
 logger = logging.getLogger(__name__)
+cluster = Clusters.EnergyEvse
 
 
 class TC_EEVSE_2_8(MatterBaseTest, EEVSEBaseTestHelper):
@@ -78,7 +79,7 @@ class TC_EEVSE_2_8(MatterBaseTest, EEVSEBaseTestHelper):
 
         return steps
 
-    @async_test_body
+    @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kPlugAndCharge))
     async def test_TC_EEVSE_2_8(self):
 
         self.step("1")
