@@ -313,14 +313,14 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
             server_list = read_request.tlvAttributes[endpoint][cluster_obj.cluster_id][
                 cluster.Attributes.ServerList.attribute_id]
-            asserts.assert_equal(server_list, sorted([x.id for x in self.endpoints[endpoint]]))
+            asserts.assert_equal(sorted(server_list), sorted([x.id for x in self.endpoints[endpoint]]))
         else:
             cluster_ids = list(read_request.tlvAttributes[endpoint].keys())
             asserts.assert_in(cluster_obj.id, cluster_ids)
 
             server_list = read_request.tlvAttributes[endpoint][cluster_obj.id][
                 Clusters.Descriptor.Attributes.ServerList.attribute_id]
-            asserts.assert_equal(server_list, sorted([x.id for x in self.endpoints[endpoint]]))
+            asserts.assert_equal(sorted(server_list), sorted([x.id for x in self.endpoints[endpoint]]))
 
     async def verify_cluster_path(self, read_request: dict, cluster: ClusterObjects.Cluster):
         """Verify read response for a cluster path.
