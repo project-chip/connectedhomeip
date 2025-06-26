@@ -167,9 +167,9 @@ void ClosureManager::TimerEventHandler(void * timerCbArg)
     // once sClosureTimer expires. Post an event to apptask queue with the actual handler
     // so that the event can be handled in the context of the apptask.
     AppEvent event;
-    event.Type                    = AppEvent::kEventType_Closure;
-    event.ClosureEvent.Action     = closureManager->GetCurrentAction();
-    event.Handler                 = HandleClosureActionCompleteEvent;
+    event.Type                = AppEvent::kEventType_Closure;
+    event.ClosureEvent.Action = closureManager->GetCurrentAction();
+    event.Handler             = HandleClosureActionCompleteEvent;
     AppTask::GetAppTask().PostEvent(&event);
 }
 
@@ -321,13 +321,13 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
     // Post an event to initiate the move to action asynchronously.
     // MoveTo Command can only be initiated from Closure Control Endpoint (Endpoint 1).
     AppEvent event;
-    event.Type                    = AppEvent::kEventType_Closure;
-    event.ClosureEvent.Action     = MOVE_TO_ACTION;
-    event.Handler                 = InitiateAction;
+    event.Type                = AppEvent::kEventType_Closure;
+    event.ClosureEvent.Action = MOVE_TO_ACTION;
+    event.Handler             = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
 
     SetCurrentAction(MOVE_TO_ACTION);
-    isMoveToInProgress       = true;
+    isMoveToInProgress = true;
     return Status::Success;
 }
 
