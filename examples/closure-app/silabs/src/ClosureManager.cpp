@@ -228,7 +228,7 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
 void ClosureManager::HandleClosureActionComplete(Action_t action)
 {
     ClosureManager & instance = ClosureManager::GetInstance();
-    
+
     switch (action)
     {
     case Action_t::CALIBRATE_ACTION: {
@@ -314,8 +314,8 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
     return Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(const Optional<Percent100ths> & position, 
-                                                                             const Optional<bool> & latch, 
+chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(const Optional<Percent100ths> & position,
+                                                                             const Optional<bool> & latch,
                                                                              const Optional<Globals::ThreeLevelAutoEnum> & speed,
                                                                              const chip::EndpointId endpointId)
 {
@@ -387,7 +387,7 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
 
   VerifyOrReturn(epState.target.HasValue(), ChipLogError(AppServer, "EndPoint %d target is not set", endpointId));
   VerifyOrReturn(epState.currentState.HasValue(), ChipLogError(AppServer, "EndPoint %d current state is not set", endpointId));
-  
+
   bool panelTargetReached = false;
 
   if(UpdatePanelCurrentStateToNextPosition(epState, currentState))

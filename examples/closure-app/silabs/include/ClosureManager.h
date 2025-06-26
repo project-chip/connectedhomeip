@@ -91,7 +91,7 @@ public:
      */
     chip::Protocols::InteractionModel::Status OnMoveToCommand(
                     const chip::Optional<chip::app::Clusters::ClosureControl::TargetPositionEnum> position,
-                    const chip::Optional<bool> latch, 
+                    const chip::Optional<bool> latch,
                     const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> speed);
 
     /**
@@ -121,8 +121,8 @@ public:
      *         or an appropriate error status otherwise.
      */
     chip::Protocols::InteractionModel::Status OnSetTargetCommand(
-                        const chip::Optional<chip::Percent100ths> & position, 
-                        const chip::Optional<bool> & latch, 
+                        const chip::Optional<chip::Percent100ths> & position,
+                        const chip::Optional<bool> & latch,
                         const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
                         const chip::EndpointId endpointId);
 
@@ -224,7 +224,7 @@ private:
      * @brief Handles the action to set the target position of the panel for a panel endpoint.
      *
      * This method manages the state transitions and actions for closure endpoints (such as panels or doors)
-     * during a motion event. It updates the current positions of endpoints 2/3 to next position. 
+     * during a motion event. It updates the current positions of endpoints 2/3 to next position.
      * It also triggers
      *       - Timer for SetTarget action completion if the target position is not reached
      *       - Timer for Panel Latch action if needed
