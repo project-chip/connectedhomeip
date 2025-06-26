@@ -106,11 +106,10 @@ private:
                     const auto & src = sourceList[i];
 
                     // Allocate memory for tariffComponentIDs
-                    auto * components = static_cast<uint32_t *>(Platform::MemoryCalloc(src.tariffComponentIDs.size(), sizeof(uint32_t)));
                     if (components == nullptr)
                     {
                         // Clean up previously allocated memory
-                        Platform::Delete(newList);
+                        Platform::MemoryFree(newList); // Use MemoryFree instead of Delete
                         ChipLogError(Zcl, "Failed to allocate memory for tariffComponentIDs");
                         return;
                     }
