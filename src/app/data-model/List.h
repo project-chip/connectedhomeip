@@ -66,40 +66,19 @@ struct List : public Span<T>
         return (*this);
     }
 
+    /*
+     * For API compatibility with DecodableList::ComputeSize
+     */
+    CHIP_ERROR ComputeSize(size_t & size) const
+    {
+        size = this->size();
+        return CHIP_NO_ERROR;
+    }
+
     //
     // A list is deemed fabric scoped if the type of its elements is as well.
     //
     static constexpr bool kIsFabricScoped = DataModel::IsFabricScoped<T>::value;
-
-    template <typename F>
-    __attribute__((always_inline)) CHIP_ERROR Iterate(F iterateFn) const
-    {
-        for (const auto & item : *this)
-        {
-            bool breakLoop = false;
-            ReturnErrorOnFailure(iterateFn(item, breakLoop));
-            if (breakLoop)
-            {
-                break;
-            }
-        }
-        return CHIP_NO_ERROR;
-    }
-
-    template <typename F>
-    __attribute__((always_inline)) CHIP_ERROR Iterate(F iterateFn)
-    {
-        for (const auto & item : *this)
-        {
-            bool breakLoop = false;
-            ReturnErrorOnFailure(iterateFn(item, breakLoop));
-            if (breakLoop)
-            {
-                break;
-            }
-        }
-        return CHIP_NO_ERROR;
-    }
 };
 
 // Template deduction guides to allow construction of List from a pointer or
