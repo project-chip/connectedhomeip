@@ -60,8 +60,11 @@ RvcOperationalState::ChefRvcOperationalStateEnum getShouldBeRunningState(uint32_
     {
         state = RvcOperationalState::ChefRvcOperationalStateEnum::kRunning;
     }
-    VerifyOrDieWithMsg(RvcOperationalState::IsRunningState(state), "IsRunningState is not True for state: %d.",
-                       to_underlying(state));
+    if (!RvcOperationalState::IsRunningState(state))
+    {
+        ChipLogError(DeviceLayer, "IsRunningState is not True for state: %d. Returning kRunning.", to_underlying(state));
+        return RvcOperationalState::ChefRvcOperationalStateEnum::kRunning;
+    }
     return state;
 }
 }
