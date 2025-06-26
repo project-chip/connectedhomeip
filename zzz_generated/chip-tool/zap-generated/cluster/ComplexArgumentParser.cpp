@@ -4325,6 +4325,9 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("OverallCurrentStateStruct.secureState", "secureState",
+                                                                  value.isMember("secureState")));
+
     char labelWithMember[kMaxLabelLength];
     if (value.isMember("position"))
     {
@@ -4347,11 +4350,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("speed");
 
-    if (value.isMember("secureState"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "secureState");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.secureState, value["secureState"]));
-    }
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "secureState");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.secureState, value["secureState"]));
     valueCopy.removeMember("secureState");
 
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);

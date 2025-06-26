@@ -270,7 +270,7 @@ CHIP_ERROR ClusterLogic::SetOverallCurrentState(const DataModel::Nullable<Generi
         }
 
         // Validate the incoming SecureState FeatureMap conformance.
-        if (incomingOverallCurrentState.secureState.HasValue())
+        if (incomingOverallCurrentState.secureState.IsNull())
         {
             // If the secureState member is present in the OverallCurrentState, we need to check if the Speed feature is
             // supported by the closure. If the Speed feature is not supported, return an error.
