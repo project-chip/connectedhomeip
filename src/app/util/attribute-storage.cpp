@@ -541,6 +541,14 @@ const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpo
 
 static uint8_t * singletonAttributeLocation(const EmberAfAttributeMetadata * am)
 {
+    // Newer clang-tidy complains about things here, however this is old code
+    // that was not really touched.
+    //
+    // What clang-tidy claims is that attribute metadta may be invalid
+    // however attribute metadata is code-generated so it will not be
+    // arbitrary data that could cause errors
+    //
+    // NOLINTBEGIN(clang-analyzer-security.ArrayBound)
     const EmberAfAttributeMetadata * m = &(generatedAttributes[0]);
     uint16_t index                     = 0;
     while (m < am)
@@ -552,6 +560,7 @@ static uint8_t * singletonAttributeLocation(const EmberAfAttributeMetadata * am)
         m++;
     }
     return (uint8_t *) (singletonAttributeData + index);
+    // NOLINTEND(clang-analyzer-security.ArrayBound)
 }
 
 // This function does mem copy, but smartly, which means that if the type is a
