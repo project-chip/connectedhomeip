@@ -389,13 +389,13 @@ class TC_AVSM_2_7(MatterBaseTest):
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             asserts.assert_true(
-                False, "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to MinFrameRate set to 0(outside of valid range)"
+                False, "Unexpected success when expecting CONSTRAINT_ERROR due to MinFrameRate set to 0(outside of valid range)"
             )
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
-                Status.DynamicConstraintError,
-                "Unexpected error returned when expecting DYNAMIC_CONSTRAINT_ERROR due to MinFrameRate set to 0(outside of valid range)",
+                Status.ConstraintError,
+                "Unexpected error returned when expecting CONSTRAINT_ERROR due to MinFrameRate set to 0(outside of valid range)",
             )
             pass
 
@@ -419,12 +419,12 @@ class TC_AVSM_2_7(MatterBaseTest):
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             asserts.assert_true(
-                False, "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to MinFrameRate > MaxFrameRate")
+                False, "Unexpected success when expecting CONSTRAINT_ERROR due to MinFrameRate > MaxFrameRate")
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
-                Status.DynamicConstraintError,
-                "Unexpected error returned when expecting DYNAMIC_CONSTRAINT_ERROR due to MinFrameRate > MaxFrameRate",
+                Status.ConstraintError,
+                "Unexpected error returned when expecting CONSTRAINT_ERROR due to MinFrameRate > MaxFrameRate",
             )
             pass
 
@@ -448,13 +448,13 @@ class TC_AVSM_2_7(MatterBaseTest):
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             asserts.assert_true(
-                False, "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to MinBitRate set to 0(outside of valid range)"
+                False, "Unexpected success when expecting CONSTRAINT_ERROR due to MinBitRate set to 0(outside of valid range)"
             )
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
-                Status.DynamicConstraintError,
-                "Unexpected error returned when expecting DYNAMIC_CONSTRAINT_ERROR due to MinBitRate set to 0(outside of valid range)",
+                Status.ConstraintError,
+                "Unexpected error returned when expecting CONSTRAINT_ERROR due to MinBitRate set to 0(outside of valid range)",
             )
             pass
 
@@ -477,12 +477,12 @@ class TC_AVSM_2_7(MatterBaseTest):
                 OSDEnabled=osd
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-            asserts.assert_true(False, "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to MinBitRate > MaxBitRate")
+            asserts.assert_true(False, "Unexpected success when expecting CONSTRAINT_ERROR due to MinBitRate > MaxBitRate")
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
-                Status.DynamicConstraintError,
-                "Unexpected error returned when expecting DYNAMIC_CONSTRAINT_ERROR due to MinBitRate > MaxBitRate",
+                Status.ConstraintError,
+                "Unexpected error returned when expecting CONSTRAINT_ERROR due to MinBitRate > MaxBitRate",
             )
             pass
 
@@ -506,12 +506,12 @@ class TC_AVSM_2_7(MatterBaseTest):
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
             asserts.assert_true(
-                False, "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to MinKeyFrameInterval > MaxKeyFrameInterval")
+                False, "Unexpected success when expecting CONSTRAINT_ERROR due to MinKeyFrameInterval > MaxKeyFrameInterval")
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
-                Status.DynamicConstraintError,
-                "Unexpected error returned when expecting DYNAMIC_CONSTRAINT_ERROR due to MinKeyFrameInterval > MaxKeyFrameInterval",
+                Status.ConstraintError,
+                "Unexpected error returned when expecting CONSTRAINT_ERROR due to MinKeyFrameInterval > MaxKeyFrameInterval",
             )
             pass
 
@@ -539,8 +539,8 @@ class TC_AVSM_2_7(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
-                Status.DynamicConstraintError,
-                "Unexpected error returned when expecting DYNAMIC_CONSTRAINT_ERROR due to invalid codec",
+                Status.ConstraintError,
+                "Unexpected error returned when expecting CONSTRAINT_ERROR due to invalid codec",
             )
             pass
 

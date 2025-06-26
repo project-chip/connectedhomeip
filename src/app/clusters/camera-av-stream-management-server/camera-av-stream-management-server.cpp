@@ -1685,30 +1685,30 @@ void CameraAVStreamMgmtServer::HandleVideoStreamAllocate(HandlerContext & ctx,
 
     VerifyOrReturn(commandData.streamUsage != Globals::StreamUsageEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid stream usage", mEndpointId);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
     VerifyOrReturn(commandData.videoCodec != VideoCodecEnum::kUnknownEnumValue, {
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: Invalid video codec", mEndpointId);
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError);
     });
 
     VerifyOrReturn(commandData.minFrameRate >= 1 && commandData.minFrameRate <= commandData.maxFrameRate &&
                        commandData.maxFrameRate >= 1,
-                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError));
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
     VerifyOrReturn(commandData.minResolution.width >= 1 && commandData.minResolution.height >= 1,
-                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError));
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
     VerifyOrReturn(commandData.maxResolution.width >= 1 && commandData.maxResolution.height >= 1,
-                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError));
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
     VerifyOrReturn(commandData.minBitRate >= 1 && commandData.minBitRate <= commandData.maxBitRate && commandData.maxBitRate >= 1,
-                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError));
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
     VerifyOrReturn(commandData.minKeyFrameInterval <= commandData.maxKeyFrameInterval &&
                        commandData.maxKeyFrameInterval <= kMaxKeyFrameIntervalMaxValue,
-                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError));
+                   ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
 
     bool streamUsageSupported = std::find_if(mStreamUsagePriorities.begin(), mStreamUsagePriorities.end(),
                                              [&commandData](const Globals::StreamUsageEnum & entry) {
