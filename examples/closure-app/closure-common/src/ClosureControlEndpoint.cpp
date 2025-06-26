@@ -193,15 +193,15 @@ void ClosureControlEndpoint::OnStepActionComplete()
     // Set the OverallState position to PartiallyOpened as motion has been stopped
     // and the closure is not fully closed or fully opened.
     auto position = MakeOptional(DataModel::MakeNullable(PositioningEnum::kPartiallyOpened));
-    
+
     DataModel::Nullable<GenericOverallState> overallState;
-    DataModel::Nullable<GenericOverallTarget> overallTarget; 
+    DataModel::Nullable<GenericOverallTarget> overallTarget;
     mLogic.GetOverallState(overallState);
     mLogic.GetOverallTarget(overallTarget);
 
     if (overallState.IsNull())
     {
-        overallState.SetNonNull(GenericOverallState(position, NullOptional, NullOptional, NullOptional)); 
+        overallState.SetNonNull(GenericOverallState(position, NullOptional, NullOptional, NullOptional));
     } else
     {
         overallState.Value().positioning = position;

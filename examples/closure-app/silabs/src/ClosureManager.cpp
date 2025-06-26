@@ -220,7 +220,7 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
 void ClosureManager::HandleClosureActionComplete(Action_t action)
 {
     ClosureManager & instance = ClosureManager::GetInstance();
-    
+
     switch (action)
     {
     case Action_t::CALIBRATE_ACTION: {
@@ -245,10 +245,10 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         {
             instance.ep2.OnStepActionComplete();
         }
-        else if (instance.mCurrentActionEndpointId == instance.ep3.GetEndpoint())      
+        else if (instance.mCurrentActionEndpointId == instance.ep3.GetEndpoint())
         {
             instance.ep3.OnStepActionComplete();
-        }           
+        }
         instance.isStepActionInProgress = false;
         break;
     default:
@@ -320,7 +320,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(
     }
 
     ep1Target.Value().position = NullOptional; // Reset position to Null
-    
+
     VerifyOrReturnValue(ep1.GetLogic().SetOverallTarget(ep1Target) == CHIP_NO_ERROR, Status::Failure,
                       ChipLogError(AppServer, "Failed to set overall target for Step command"));
 
@@ -328,7 +328,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(
     event.Type              = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action = PANEL_STEP_ACTION;
     event.ClosureEvent.EndpointId = endpointId;
-    event.Handler           = InitiateAction;   
+    event.Handler           = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
 
     SetCurrentAction(PANEL_STEP_ACTION);
@@ -343,12 +343,12 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * ep = (endpointId == instance.ep2.GetDelegate().GetEndpoint()) ? &instance.ep2 
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * ep = (endpointId == instance.ep2.GetDelegate().GetEndpoint()) ? &instance.ep2
                                                                           : &instance.ep3;
 
     chip::app::Clusters::ClosureDimension::ClusterState epState = ep->GetLogic().GetState();
     StepDirectionEnum stepDirection = ep->GetDelegate().GetStepCommandTargetDirection();
-  
+
 
     DataModel::Nullable<GenericCurrentStateStruct> currentState = DataModel::NullNullable;
 

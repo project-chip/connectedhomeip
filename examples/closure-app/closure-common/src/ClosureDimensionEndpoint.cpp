@@ -106,7 +106,7 @@ void ClosureDimensionEndpoint::UpdateCurrentStateFromTargetState()
     }
 
     if (state.currentState.IsNull())
-    {   
+    {
         ChipLogError(AppServer, "Current state is null, Move to action Failed");
         return;
     }

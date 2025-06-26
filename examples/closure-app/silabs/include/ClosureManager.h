@@ -102,7 +102,7 @@ public:
      *         or an appropriate error status otherwise.
      */
     chip::Protocols::InteractionModel::Status OnStopCommand();
-    
+
     /**
      * @brief Handles the Step command for the ClosureDimension cluster.
      *
@@ -116,8 +116,8 @@ public:
      * @return chip::Protocols::InteractionModel::Status Status of the command execution.
      */
     chip::Protocols::InteractionModel::Status OnStepCommand(
-        const chip::app::Clusters::ClosureDimension::StepDirectionEnum & direction, 
-        const uint16_t & numberOfSteps, 
+        const chip::app::Clusters::ClosureDimension::StepDirectionEnum & direction,
+        const uint16_t & numberOfSteps,
         const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
         const chip::EndpointId & endpointId);
 
