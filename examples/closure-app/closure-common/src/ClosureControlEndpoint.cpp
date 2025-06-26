@@ -201,7 +201,6 @@ void ClosureControlEndpoint::OnStopMotionActionComplete()
     VerifyOrReturn(mLogic.SetOverallState(overallState) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to set overall state in OnStopMotionActionComplete"));
 
-
     DataModel::Nullable<GenericOverallTarget> overallTarget;
     mLogic.GetOverallTarget(overallTarget);
 
