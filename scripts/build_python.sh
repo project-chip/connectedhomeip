@@ -175,9 +175,6 @@ while (($#)); do
     shift
 done
 
-# Expand extra GN args properly
-all_extra_gn_args="${extra_gn_args[@]}"
-
 # Print input values
 echo "Building Python environment with the following configuration:"
 echo "  chip_detail_logging=\"$chip_detail_logging\""
@@ -185,13 +182,13 @@ echo "  chip_mdns=\"$chip_mdns\""
 echo "  chip_case_retry_delta=\"$chip_case_retry_delta\""
 echo "  pregen_dir=\"$pregen_dir\""
 echo "  enable_ble=\"$enable_ble\""
-if [[ $wifi_paf_config != "" ]]; then
+if [[ -n $wifi_paf_config ]]; then
     echo "  $wifi_paf_config"
 fi
 echo "  enable_ipv4=\"$enable_ipv4\""
 
-if [[ -n "${all_extra_gn_args}" ]]; then
-    echo "In addition, the following extra args will added to gn command line: $all_extra_gn_args"
+if [[ ${#extra_gn_args[@]} -gt 0 ]]; then
+    echo "In addition, the following extra args will added to gn command line: ${extra_gn_args[@]}"
 fi
 
 # Ensure we have a compilation environment
@@ -219,7 +216,13 @@ export SYSTEM_VERSION_COMPAT=0
 # Make all possible human redable tracing available.
 tracing_options="matter_log_json_payload_hex=true matter_log_json_payload_decode_full=true matter_enable_tracing_support=true"
 
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_logging=$chip_detail_logging chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg chip_config_network_layer_ble=$enable_ble chip_enable_ble=$enable_ble chip_inet_config_enable_ipv4=$enable_ipv4${wifi_paf_config:+ $wifi_paf_config} chip_crypto=\"boringssl\" $all_extra_gn_args"
+declare -a gn_args=("$tracing_options" "chip_detail_logging=$chip_detail_logging" "chip_project_config_include_dirs=[\"//config/python\"]" "$chip_mdns_arg" "$chip_case_retry_arg" "$pregen_dir_arg" "chip_config_network_layer_ble=$enable_ble" "chip_enable_ble=$enable_ble" "chip_inet_config_enable_ipv4=$enable_ipv4" "chip_crypto=\"boringssl\"")
+if [[ -n $wifi_paf_config ]]; then
+    args+=("$wifi_paf_config")
+fi
+gn_args+=extra_gn_args
+
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="${gn_args[@]}"
 
 # Compile Python wheels
 ninja -C "$OUTPUT_ROOT" python_wheels
