@@ -800,6 +800,13 @@
         ],
         "Unit Localization": ["TemperatureUnit"],
         "Zone Management": ["TwoDCartesianMax"],
+        "TLS Certificate Management": [
+            "ClusterRevision",
+            "MaxRootCertificates",
+            "ProvisionedRootCertificates",
+            "MaxClientCertificates",
+            "ProvisionedClientCertificates"
+        ],
         "TLS Client Management": ["ClusterRevision", "MaxProvisioned"],
         "Thermostat": [
             "MaxThermostatSuggestions",

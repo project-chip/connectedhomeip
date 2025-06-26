@@ -660,4 +660,35 @@ class ObjectPool<T, N, ObjectPoolMem::kHeap> : public HeapObjectPool<T>
 };
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
+/// RAII class for pool allocation that guarantees that ReleaseObject() will be called.
+/// This is effectively a simple unique_ptr, except calling pool.ReleaseObject instead of delete
+template <typename Releasable, typename PoolT>
+class PoolAutoRelease
+{
+public:
+    PoolAutoRelease(PoolT & pool, Releasable * releasable) : mReleasable(releasable), mPool(pool) {}
+    ~PoolAutoRelease() { Release(); }
+
+    // Not copyable or movable
+    PoolAutoRelease(const PoolAutoRelease &)             = delete;
+    PoolAutoRelease(const PoolAutoRelease &&)            = delete;
+    PoolAutoRelease & operator=(const PoolAutoRelease &) = delete;
+
+    inline Releasable * operator->() { return mReleasable; }
+    inline const Releasable * operator->() const { return mReleasable; }
+
+    inline bool IsNull() const { return mReleasable == nullptr; }
+
+    void Release()
+    {
+        VerifyOrReturn(mReleasable != nullptr);
+        mPool.ReleaseObject(mReleasable);
+        mReleasable = nullptr;
+    }
+
+private:
+    Releasable * mReleasable = nullptr;
+    PoolT & mPool;
+};
+
 } // namespace chip

@@ -809,7 +809,7 @@ FabricTableImpl<StorageId, StorageData>::EntryIteratorImpl<kEntryMaxBytes>::Entr
     FabricTableImpl & provider, FabricIndex fabricIdx, EndpointId endpoint, uint16_t maxPerFabric, uint16_t maxPerEndpoint,
     PersistentStore<kEntryMaxBytes> & store) :
     mProvider(provider),
-    mFabric(fabricIdx), mEndpoint(endpoint), mMaxPerFabric(maxPerFabric), mMaxPerEndpoint(maxPerEndpoint), mStore(store)
+    mStore(store), mFabric(fabricIdx), mEndpoint(endpoint), mMaxPerFabric(maxPerFabric), mMaxPerEndpoint(maxPerEndpoint)
 {
     using TypedFabricEntryData = FabricEntryData<StorageId, StorageData, Serializer::kEntryMaxBytes(),
                                                  Serializer::kFabricMaxBytes(), Serializer::kMaxPerFabric()>;

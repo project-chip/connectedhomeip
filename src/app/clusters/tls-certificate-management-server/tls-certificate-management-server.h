@@ -1,0 +1,255 @@
+/*
+ *
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#pragma once
+
+#include "CertificateTable.h"
+#include <app/AttributeAccessInterface.h>
+#include <app/CommandHandlerInterface.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/reporting/reporting.h>
+#include <clusters/TlsCertificateManagement/Commands.h>
+#include <clusters/TlsCertificateManagement/Structs.h>
+#include <lib/core/CHIPError.h>
+#include <protocols/interaction_model/StatusCode.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+
+class TlsCertificateManagementDelegate;
+
+class TlsCertificateManagementServer : private AttributeAccessInterface, private CommandHandlerInterface
+{
+public:
+    /**
+     * Creates a TlsCertificateManagement server instance. The Init() function needs to be called for this instance to be registered
+     * and called by the interaction model at the appropriate times.
+     * @param endpointId The endpoint on which this cluster exists. This must match the zap configuration.
+     * @param delegate A reference to the delegate to be used by this server.
+     * @param certificateTable A reference to the certificate table for looking up certificates
+     * @param maxRootCertificates The maximum number of root certificates which can be provisioned
+     * @param maxClientCertificates The maximum number of client certificates which can be provisioned
+     * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
+     */
+    TlsCertificateManagementServer(EndpointId endpointId, TlsCertificateManagementDelegate & delegate,
+                                   Tls::CertificateTable & certificateTable, uint8_t maxRootCertificates,
+                                   uint8_t maxClientCertificates);
+    ~TlsCertificateManagementServer();
+
+    /**
+     * Initialise the TLS Certificate Management server instance.
+     * @return Returns an error  if the CommandHandler or AttributeHandler registration fails.
+     */
+    CHIP_ERROR Init();
+
+    /**
+     * Shuts down the TLS Certificate Management server instance.
+     * @return Returns an error if the destruction fails.
+     */
+    CHIP_ERROR Finish();
+
+    // Attribute Getters
+
+    /**
+     * @return The MaxRootCertificates attribute.
+     */
+    uint8_t GetMaxRootCertificates() const;
+
+    /**
+     * @return The MaxClientCertificates attribute.
+     */
+    uint8_t GetMaxClientCertificates() const;
+
+    /**
+     * @return The endpoint ID.
+     */
+    EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
+
+private:
+    TlsCertificateManagementDelegate & mDelegate;
+    Tls::CertificateTable & mCertificateTable;
+
+    // Attribute local storage
+    uint8_t mMaxRootCertificates;
+    uint8_t mMaxClientCertificates;
+
+    // AttributeAccessInterface
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+
+    // CommandHandlerInterface
+    void InvokeCommand(HandlerContext & ctx) override;
+    void HandleProvisionRootCertificate(HandlerContext & ctx,
+                                        const TlsCertificateManagement::Commands::ProvisionRootCertificate::DecodableType & req);
+    void HandleFindRootCertificate(HandlerContext & ctx,
+                                   const TlsCertificateManagement::Commands::FindRootCertificate::DecodableType & req);
+    void HandleLookupRootCertificate(HandlerContext & ctx,
+                                     const TlsCertificateManagement::Commands::LookupRootCertificate::DecodableType & req);
+    void HandleRemoveRootCertificate(HandlerContext & ctx,
+                                     const TlsCertificateManagement::Commands::RemoveRootCertificate::DecodableType & req);
+
+    void HandleGenerateClientCsr(HandlerContext & ctx, const TlsCertificateManagement::Commands::TLSClientCSR::DecodableType & req);
+    void
+    HandleProvisionClientCertificate(HandlerContext & ctx,
+                                     const TlsCertificateManagement::Commands::ProvisionClientCertificate::DecodableType & req);
+    void HandleFindClientCertificate(HandlerContext & ctx,
+                                     const TlsCertificateManagement::Commands::FindClientCertificate::DecodableType & req);
+    void HandleLookupClientCertificate(HandlerContext & ctx,
+                                       const TlsCertificateManagement::Commands::LookupClientCertificate::DecodableType & req);
+    void HandleRemoveClientCertificate(HandlerContext & ctx,
+                                       const TlsCertificateManagement::Commands::RemoveClientCertificate::DecodableType & req);
+
+    // Encodes all provisioned root certificates
+    CHIP_ERROR EncodeProvisionedRootCertificates(EndpointId matterEndpoint, FabricIndex fabric,
+                                                 const AttributeValueEncoder::ListEncodeHelper & encoder);
+    // Encodes all provisioned client certificates
+    CHIP_ERROR EncodeProvisionedClientCertificates(EndpointId matterEndpoint, FabricIndex fabric,
+                                                   const AttributeValueEncoder::ListEncodeHelper & encoder);
+};
+
+/** @brief
+ *  Defines methods for implementing application-specific logic for the TlsCertificateManagement Cluster.
+ */
+class TlsCertificateManagementDelegate
+{
+public:
+    using RootCertStructType             = TlsCertificateManagement::Structs::TLSCertStruct::DecodableType;
+    using ClientCertStructType           = TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::DecodableType;
+    using ProvisionRootCertificateType   = TlsCertificateManagement::Commands::ProvisionRootCertificate::DecodableType;
+    using ProvisionClientCertificateType = TlsCertificateManagement::Commands::ProvisionClientCertificate::DecodableType;
+    using ClientCsrType                  = TlsCertificateManagement::Commands::TLSClientCSR::DecodableType;
+    using ClientCsrResponseType          = TlsCertificateManagement::Commands::TLSClientCSRResponse::Type;
+
+    TlsCertificateManagementDelegate() = default;
+
+    virtual ~TlsCertificateManagementDelegate() = default;
+
+    using LoadedRootCertificateCallback   = std::function<CHIP_ERROR(Tls::CertificateTable::RootCertStruct & cert)>;
+    using LoadedClientCertificateCallback = std::function<CHIP_ERROR(Tls::CertificateTable::ClientCertStruct & cert)>;
+    using GeneratedCsrCallback            = std::function<Protocols::InteractionModel::Status(ClientCsrResponseType & cert)>;
+
+    /**
+     * @brief Appends a root certificate to the provisioned root certificates list maintained by the delegate.
+     *        The delegate must ensure it makes a copy of the provided request and data, if any.
+     *
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric the certificate is associated with
+     * @param[in] provisionReq The request data specifying the root certificate to be provisioned
+     * @param[out] outCaid a reference to the TLSCAID variable that is to contain the ID of the provisioned root cert.
+     *
+     * @return CHIP_NO_ERROR if the certificate was appended to the list successfully.
+     * @return CHIP_ERROR if there was an error adding the certificate.
+     */
+    virtual Protocols::InteractionModel::ClusterStatusCode ProvisionRootCert(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                             const ProvisionRootCertificateType & provisionReq,
+                                                                             Tls::TLSCAID & outCaid) = 0;
+
+    /**
+     * @brief Executes loadedCallback for each root certificate. The certificate passed to loadedCallback has a guaranteed lifetime
+     * of the method call.
+     *
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric the certificate is associated with
+     * @param[in] loadedCallback lambda to execute for each certificate.  If this function returns an error result,
+     * iteration stops and returns that same error result.
+     */
+    virtual CHIP_ERROR LoadedRootCerts(EndpointId matterEndpoint, FabricIndex fabric,
+                                       LoadedRootCertificateCallback loadedCallback) const = 0;
+
+    /**
+     * @brief Finds the TLSCertStruct with the given fingerprint
+     *
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fingerprint The fingerprint of the root certificate to find.
+     * @param[out] loadedCallback The lambda to execute with the loaded root cert.
+     * @return NotFound if no mapping is found.
+     */
+    virtual Protocols::InteractionModel::Status LookupRootCert(EndpointId matterEndpoint, FabricIndex fabric,
+                                                               const ByteSpan & fingerprint,
+                                                               LoadedRootCertificateCallback loadedCallback) const = 0;
+
+    /**
+     * @brief Generates a client certificate signing request (CSR)
+     *
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fingerprint The fingerprint of the root certificate to find.
+     * @param[out] loadedCallback The lambda to execute with the generated client CSR.
+     * @return NotFound if no mapping is found.
+     */
+    virtual Protocols::InteractionModel::Status GenerateClientCsr(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                  const ClientCsrType & request,
+                                                                  GeneratedCsrCallback loadedCallback) const = 0;
+
+    /**
+     * @brief Appends a client certificate to the provisioned client certificates list maintained by the delegate.
+     *        The delegate must ensure it makes a copy of the provided request and data, if any.
+     *
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric the endpoint is associated with
+     * @param[in] provisionReq The request data specifying the client certificate to be provisioned
+     *
+     * @return CHIP_NO_ERROR if the certificate was appended to the list successfully.
+     * @return CHIP_ERROR if there was an error adding the certificate.
+     */
+    virtual Protocols::InteractionModel::ClusterStatusCode
+    ProvisionClientCert(EndpointId matterEndpoint, FabricIndex fabric, const ProvisionClientCertificateType & provisionReq) = 0;
+
+    /**
+     * @brief Executes loadedCallback for each root certificate.  The certificate passed to loadedCallback has a guaranteed lifetime
+     of the method call.
+     *
+     * @param[in] loadedCallback lambda to execute with allocated memory for client certificate loading.  If this function returns
+     an error result,
+                                                                                                            * iteration stops and
+     returns that same error result.
+
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric the certificate is associated with
+     */
+    virtual CHIP_ERROR LoadedClientCerts(EndpointId matterEndpoint, FabricIndex fabric,
+                                         LoadedClientCertificateCallback loadedCallback) const = 0;
+
+    /**
+     * @brief Finds the TLSClientCertificateDetailStruct with the given fingerprint
+     *
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fingerprint The fingerprint of the client certificate to find.
+     * @param[out] loadedCallback The lambda to execute with the loaded client cert.
+     * @return NotFound if no mapping is found.
+     */
+    virtual Protocols::InteractionModel::Status LookupClientCert(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                 const ByteSpan & fingerprint,
+                                                                 LoadedClientCertificateCallback loadedCallback) const = 0;
+
+protected:
+    friend class TlsCertificateManagementServer;
+
+    TlsCertificateManagementServer * mTlsCertificateManagementServer = nullptr;
+
+    // sets the TlsCertificateManagement Server pointer
+    void SetTlsCertificateManagementServer(TlsCertificateManagementServer * tlsCertificateManagementServer)
+    {
+        mTlsCertificateManagementServer = tlsCertificateManagementServer;
+    }
+    TlsCertificateManagementServer * GetTlsCertificateManagementServer() const { return mTlsCertificateManagementServer; }
+};
+
+} // namespace Clusters
+} // namespace app
+} // namespace chip

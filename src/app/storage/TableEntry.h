@@ -19,6 +19,7 @@
  */
 #pragma once
 
+#include <cstdint>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/TypeTraits.h>
 

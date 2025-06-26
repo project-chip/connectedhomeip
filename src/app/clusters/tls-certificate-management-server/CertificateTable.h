@@ -18,7 +18,10 @@
 
 #pragma once
 
+#include <app/storage/TableEntry.h>
 #include <clusters/TlsCertificateManagement/Structs.h>
+#include <functional>
+#include <lib/support/CommonIterator.h>
 #include <lib/support/PersistentData.h>
 
 namespace chip {
@@ -26,8 +29,10 @@ namespace app {
 namespace Clusters {
 namespace Tls {
 
-using TLSCAID  = uint16_t;
-using TLSCCDID = uint16_t;
+using TLSCAID                              = uint16_t;
+using TLSCCDID                             = uint16_t;
+static constexpr uint16_t kMaxRootCertId   = 65534;
+static constexpr uint16_t kMaxClientCertId = 65534;
 
 /// @brief CertificateTable is meant as an interface between the TLS clusters and certificates.
 class CertificateTable
@@ -35,6 +40,9 @@ class CertificateTable
 public:
     using RootCertStruct   = TlsCertificateManagement::Structs::TLSCertStruct::DecodableType;
     using ClientCertStruct = TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::DecodableType;
+
+    using IterateRootCertFnType   = std::function<CHIP_ERROR(CommonIterator<RootCertStruct> & iterator)>;
+    using IterateClientCertFnType = std::function<CHIP_ERROR(CommonIterator<ClientCertStruct> & iterator)>;
 
     /// @brief a root cert along with an associated buffer for the cert payload. RootCertStruct has a ByteSpan,
     /// and this wrapper ensures that the underlying buffer for the ByteSpan has a long-enough lifetime.
@@ -87,6 +95,7 @@ public:
      */
     virtual CHIP_ERROR GetRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id, BufferedRootCert & entry) = 0;
     virtual CHIP_ERROR HasRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id)                           = 0;
+    virtual CHIP_ERROR IterateRootEntries(FabricIndex fabric, BufferedRootCert & store, IterateRootCertFnType iterateFn)   = 0;
 
     /**
      * @brief Loads the specified (fabric_index, certificate_id) client cert into entry; if the implementation
@@ -96,6 +105,7 @@ public:
      */
     virtual CHIP_ERROR GetClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id, BufferedClientCert & entry) = 0;
     virtual CHIP_ERROR HasClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id)                             = 0;
+    virtual CHIP_ERROR IterateClientEntries(FabricIndex fabric, BufferedClientCert & store, IterateClientCertFnType iterateFn)  = 0;
 
 protected:
     static inline PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> & GetBuffer(BufferedRootCert & bufferedCert)
@@ -110,5 +120,12 @@ protected:
 
 } // namespace Tls
 } // namespace Clusters
+
+namespace DataModel {
+CHIP_ERROR Encode(TLV::TLVWriter & writer, const Clusters::Tls::CertificateTable::ClientCertStruct & data);
+CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex,
+                         const Clusters::Tls::CertificateTable::ClientCertStruct & data);
+} // namespace DataModel
+
 } // namespace app
 } // namespace chip
