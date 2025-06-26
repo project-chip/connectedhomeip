@@ -216,28 +216,28 @@ void ClosureManager::HandleCalibrateActionComplete()
 
 void ClosureManager::HandleStopActionComplete()
 {
-  // Add logic to handle Stop action completion
-  ChipLogProgress(AppServer, "HandleStopActionComplete called");
-  if (mIsCalibrationActionInProgress)
-  {
-    ChipLogDetail(AppServer, "Stopping calibration action");
-    mClosureEndpoint1.OnStopCalibrateActionComplete();
-    mClosurePanelEndpoint2.OnStopCalibrateActionComplete();
-    mClosurePanelEndpoint3.OnStopCalibrateActionComplete();
-    mIsCalibrationActionInProgress = false;
-  }
-  else if (mIsMoveToActionInProgress)
-  {
-    ChipLogDetail(AppServer, "Stopping move to action");
-    mClosureEndpoint1.OnStopMotionActionComplete();
-    mClosurePanelEndpoint2.OnStopMotionActionComplete();
-    mClosurePanelEndpoint3.OnStopMotionActionComplete();
-    mIsMoveToActionInProgress = false;
-  }
-  else
-  {
-      ChipLogDetail(AppServer, "No action in progress to stop");
-  }
+    // Add logic to handle Stop action completion
+    ChipLogProgress(AppServer, "HandleStopActionComplete called");
+    if (mIsCalibrationActionInProgress)
+    {
+        ChipLogDetail(AppServer, "Stopping calibration action");
+        mClosureEndpoint1.OnStopCalibrateActionComplete();
+        mClosurePanelEndpoint2.OnStopCalibrateActionComplete();
+        mClosurePanelEndpoint3.OnStopCalibrateActionComplete();
+        mIsCalibrationActionInProgress = false;
+    }
+    else if (mIsMoveToActionInProgress)
+    {
+        ChipLogDetail(AppServer, "Stopping move to action");
+        mClosureEndpoint1.OnStopMotionActionComplete();
+        mClosurePanelEndpoint2.OnStopMotionActionComplete();
+        mClosurePanelEndpoint3.OnStopMotionActionComplete();
+        mIsMoveToActionInProgress = false;
+    }
+    else
+    {
+        ChipLogDetail(AppServer, "No action in progress to stop");
+    }
 }
 
 void ClosureManager::HandleMoveToActionComplete()

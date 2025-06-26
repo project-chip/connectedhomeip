@@ -161,7 +161,6 @@ private:
     ClosureControlDelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
-
 };
 
 } // namespace ClosureControl
