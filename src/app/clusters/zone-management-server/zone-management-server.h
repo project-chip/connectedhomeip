@@ -81,7 +81,6 @@ struct TwoDCartesianZoneStorage : TwoDCartesianZoneStruct
         }
     }
 
-private:
     std::string nameString;
     std::string colorString;
     std::vector<TwoDCartesianVertexStruct> verticesVector;
@@ -92,7 +91,7 @@ struct ZoneInformationStorage : ZoneInformationStruct
     ZoneInformationStorage(){};
 
     ZoneInformationStorage(const uint16_t & aZoneID, ZoneTypeEnum aZoneType, ZoneSourceEnum aZoneSource,
-                           const DataModel::Nullable<TwoDCartesianZoneStorage> & aTwoDCartZoneStorage)
+                           const Optional<TwoDCartesianZoneStorage> & aTwoDCartZoneStorage)
     {
         Set(aZoneID, aZoneType, aZoneSource, aTwoDCartZoneStorage);
     }
@@ -106,7 +105,7 @@ struct ZoneInformationStorage : ZoneInformationStruct
     }
 
     void Set(const uint16_t & aZoneID, ZoneTypeEnum aZoneType, ZoneSourceEnum aZoneSource,
-             const DataModel::Nullable<TwoDCartesianZoneStorage> & aTwoDCartZoneStorage)
+             const Optional<TwoDCartesianZoneStorage> & aTwoDCartZoneStorage)
     {
         zoneID              = aZoneID;
         zoneType            = aZoneType;
@@ -114,8 +113,7 @@ struct ZoneInformationStorage : ZoneInformationStruct
         twoDCartZoneStorage = aTwoDCartZoneStorage;
     }
 
-private:
-    DataModel::Nullable<TwoDCartesianZoneStorage> twoDCartZoneStorage;
+    Optional<TwoDCartesianZoneStorage> twoDCartZoneStorage;
 };
 
 /** @brief
@@ -166,14 +164,24 @@ public:
     virtual Protocols::InteractionModel::Status RemoveZone(uint16_t zoneID) = 0;
 
     /**
-     *    @brief Command Delegate for creation/update of a ZoneTrigger.
+     *    @brief Command Delegate for creation of a ZoneTrigger.
      *
      *   @param[in]  zoneTrigger    Structure with parameters for defining a ZoneTriggerControl.
      *
-     *   @return Success if the creation/update is successful; otherwise, the command SHALL be
+     *   @return Success if the creation is successful; otherwise, the command SHALL be
      *   rejected with an appropriate error.
      */
-    virtual Protocols::InteractionModel::Status CreateOrUpdateTrigger(const ZoneTriggerControlStruct & zoneTrigger) = 0;
+    virtual Protocols::InteractionModel::Status CreateTrigger(const ZoneTriggerControlStruct & zoneTrigger) = 0;
+
+    /**
+     *    @brief Command Delegate for update of a ZoneTrigger.
+     *
+     *   @param[in]  zoneTrigger    Structure with parameters for defining a ZoneTriggerControl.
+     *
+     *   @return Success if the update is successful; otherwise, the command SHALL be
+     *   rejected with an appropriate error.
+     */
+    virtual Protocols::InteractionModel::Status UpdateTrigger(const ZoneTriggerControlStruct & zoneTrigger) = 0;
 
     /**
      *    @brief Command Delegate for the removal of a ZoneTrigger for a given zoneID.
@@ -275,9 +283,8 @@ public:
     CHIP_ERROR UpdateZone(uint16_t zoneId, const ZoneInformationStorage & zone);
     CHIP_ERROR RemoveZone(uint16_t zoneId);
 
-    CHIP_ERROR AddOrUpdateTrigger(const ZoneTriggerControlStruct & trigger);
-    CHIP_ERROR UpdateTrigger(uint16_t zoneId, const ZoneTriggerControlStruct & trigger);
-    CHIP_ERROR RemoveTrigger(uint16_t zoneId);
+    Protocols::InteractionModel::Status AddOrUpdateTrigger(const ZoneTriggerControlStruct & trigger);
+    Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneId);
 
     // Send Zone events
     Protocols::InteractionModel::Status GenerateZoneTriggerredEvent(uint16_t zoneID, ZoneEventTriggeredReasonEnum triggerReason);
