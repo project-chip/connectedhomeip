@@ -363,75 +363,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                               read_request.tlvAttributes[endpoint][Clusters.Descriptor.id],
                               "AttributeList not in output")
 
-    async def _setup_device_info(self):
-        """Set up device information by reading descriptor cluster attributes."""
-        try:
-            # Read descriptor cluster attributes instead of wildcard read
-            descriptor_read = await self.default_controller.Read(
-                self.dut_node_id,
-                [(0, Clusters.Descriptor, Clusters.Descriptor.Attributes.ServerList),
-                 (0, Clusters.Descriptor, Clusters.Descriptor.Attributes.PartsList)])
-
-            # Store the endpoints information
-            self.endpoints = {}
-
-            # Process endpoint 0
-            endpoint0_data = {}
-            server_list = None
-            parts_list = None
-
-            for tlv_data in descriptor_read.tlvAttributes[0][Clusters.Descriptor.id].items():
-                if tlv_data[0] == Clusters.Descriptor.Attributes.ServerList.attribute_id:
-                    server_list = tlv_data[1]
-                    endpoint0_data[Clusters.Descriptor.Attributes.ServerList] = server_list
-                elif tlv_data[0] == Clusters.Descriptor.Attributes.PartsList.attribute_id:
-                    parts_list = tlv_data[1]
-                    endpoint0_data[Clusters.Descriptor.Attributes.PartsList] = parts_list
-
-            # Store all clusters for endpoint 0
-            self.endpoints[0] = {}
-            for cluster_id in server_list:
-                cluster = ClusterObjects.ALL_CLUSTERS.get(cluster_id)
-                if cluster:
-                    self.endpoints[0][cluster] = {}
-
-            # Add descriptor cluster data
-            self.endpoints[0][Clusters.Descriptor] = endpoint0_data
-
-            # If there are additional endpoints, read their descriptor clusters
-            if parts_list:
-                for endpoint in parts_list:
-                    if endpoint != 0:  # Skip endpoint 0 as we already have it
-                        endpoint_read = await self.default_controller.Read(
-                            self.dut_node_id,
-                            [(endpoint, Clusters.Descriptor, Clusters.Descriptor.Attributes.ServerList)])
-
-                        endpoint_data = {}
-                        endpoint_server_list = None
-
-                        for tlv_data in endpoint_read.tlvAttributes[endpoint][Clusters.Descriptor.id].items():
-                            if tlv_data[0] == Clusters.Descriptor.Attributes.ServerList.attribute_id:
-                                endpoint_server_list = tlv_data[1]
-                                endpoint_data[Clusters.Descriptor.Attributes.ServerList] = endpoint_server_list
-
-                        # Store all clusters for this endpoint
-                        self.endpoints[endpoint] = {}
-                        for cluster_id in endpoint_server_list:
-                            cluster = ClusterObjects.ALL_CLUSTERS.get(cluster_id)
-                            if cluster:
-                                self.endpoints[endpoint][cluster] = {}
-
-                        # Add descriptor cluster data
-                        self.endpoints[endpoint][Clusters.Descriptor] = endpoint_data
-
-            logging.info(f"Device endpoints: {self.endpoints}")
-            for endpoint, clusters in self.endpoints.items():
-                logging.info(f"Endpoint {endpoint} clusters: {[c.id for c in clusters.keys()]}")
-
-        except ChipStackError as e:
-            logging.error(f"Failed to set up device info: {str(e)}")
-            raise
-
     async def _read_single_attribute(self, **kwargs):
         return await self.verify_attribute_read([(kwargs['endpoint'], kwargs['attribute'])])
 
@@ -745,8 +676,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
     @async_test_body
     async def test_TC_IDM_2_2(self):
-        # Test Setup with targeted read
-        await self._setup_device_info()
+        # Test Setup with robust endpoint/cluster discovery
+        await self.setup_class_helper(allow_pase=False)
 
         # Step 1: TH sends the Read Request Message to the DUT to read one attribute on a given cluster and endpoint
         self.step(1)
