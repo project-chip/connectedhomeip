@@ -332,7 +332,7 @@ TEST_F(TestBtpEngine, NewestUnackedSentSequenceNumberSend)
     EXPECT_EQ(mBtpEngine.GetNewestUnackedSentSequenceNumber(), 0);
 
     // Confirm that there is unacknowledged data.
-    EXPECT_TRUE(mBtpEngine.HasUnackedData());
+    EXPECT_TRUE(mBtpEngine.ExpectingAck());
 
     // Prepare an acknowledgment packet for sequence number 0.
     uint8_t ackData[] = {
@@ -351,6 +351,8 @@ TEST_F(TestBtpEngine, NewestUnackedSentSequenceNumberSend)
     EXPECT_TRUE(didRecieveAck);
     EXPECT_EQ(seqNum, 0);
 
+    // After acknowledgment, we are no longer expecting an ack
+    EXPECT_FALSE(mBtpEngine.ExpectingAck());
     // After acknowledgment, the newest unacked sent sequence number should still be 0 (no new sends).
     EXPECT_EQ(mBtpEngine.GetNewestUnackedSentSequenceNumber(), 0);
 }
