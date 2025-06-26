@@ -53,12 +53,6 @@ enum class ChefRvcOperationalStateEnum : uint8_t
     kRunningWhileBeeping = 0x81,
 };
 
-
-bool IsRunningState(ChefRvcOperationalStateEnum operationalState) {
-    return (operationalState == ChefRvcOperationalStateEnum::kRunning) ||
-        (operationalState == ChefRvcOperationalStateEnum::kRunningWhileBeeping);
-}
-
 // This is an application level delegate to handle operational state commands according to the specific business logic.
 class RvcOperationalStateDelegate : public RvcOperationalState::Delegate
 {
