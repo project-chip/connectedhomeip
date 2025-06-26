@@ -142,7 +142,6 @@ private:
     ClosureDimensionDelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
-
 };
 
 } // namespace ClosureDimension
