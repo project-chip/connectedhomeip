@@ -128,7 +128,7 @@ public:
     bool SetValue(Span<const T> value)
     {
         VerifyOrReturnValue(value.size() < kInvalidLength, false);
-        VerifyOrReturnValue(SetLength(value.size()), false);
+        VerifyOrReturnValue(SetLength(static_cast<LengthType>(value.size())), false);
         memcpy(mData + PREFIX_LEN, value.data(), value.size());
         return true;
     }
