@@ -81,7 +81,7 @@ TEST(TestPascalString, TestByteStringOperations)
     uint8_t buffer[8] = { 0 };
 
     {
-        ShortPascalString<uint8_t> str(buffer);
+        ShortPascalBytes str(buffer);
 
         ASSERT_TRUE(str.SetLength(0));
         ASSERT_TRUE(str.Content().empty());
@@ -109,7 +109,7 @@ TEST(TestPascalString, TestByteStringOperations)
     }
 
     {
-        LongPascalString<uint8_t> str(buffer);
+        LongPascalBytes str(buffer);
 
         ASSERT_TRUE(str.SetLength(0));
         ASSERT_TRUE(str.Content().empty());
@@ -141,19 +141,19 @@ TEST(TestPascalString, TestNullability)
 {
     {
         uint8_t buffer[8] = { 0xFF, 0xFF, 1, 2, 3 };
-        ASSERT_TRUE(ShortPascalString<uint8_t>(buffer).IsNull());
-        ASSERT_TRUE(LongPascalString<uint8_t>(buffer).IsNull());
+        ASSERT_TRUE(ShortPascalBytes(buffer).IsNull());
+        ASSERT_TRUE(LongPascalBytes(buffer).IsNull());
     }
 
     {
         char buffer[8] = { '\xFF', '\xFF', 'a', 'b', 'c' };
-        ASSERT_TRUE(ShortPascalString<char>(buffer).IsNull());
-        ASSERT_TRUE(LongPascalString<char>(buffer).IsNull());
+        ASSERT_TRUE(ShortPascalString(buffer).IsNull());
+        ASSERT_TRUE(LongPascalString(buffer).IsNull());
     }
 
     {
         uint8_t buffer[8] = { 0 };
-        ShortPascalString s(buffer);
+        ShortPascalBytes s(buffer);
 
         ASSERT_FALSE(s.IsNull());
         ASSERT_EQ(s.GetLength(), 0U);
@@ -170,7 +170,7 @@ TEST(TestPascalString, TestNullability)
 
     {
         uint8_t buffer[8] = { 0 };
-        LongPascalString s(buffer);
+        LongPascalBytes s(buffer);
 
         ASSERT_FALSE(s.IsNull());
         ASSERT_EQ(s.GetLength(), 0U);
@@ -206,45 +206,45 @@ TEST(TestPascalString, TestIsValid)
 {
     {
         uint8_t buff[] = { 3, 0, 0 };
-        ASSERT_FALSE(ShortPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+        ASSERT_FALSE(ShortPascalBytes::IsValid(ByteSpan(buff)));
         buff[0] = 254;
-        ASSERT_FALSE(ShortPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+        ASSERT_FALSE(ShortPascalBytes::IsValid(ByteSpan(buff)));
 
         buff[0] = 255; // null string
-        ASSERT_TRUE(ShortPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+        ASSERT_TRUE(ShortPascalBytes::IsValid(ByteSpan(buff)));
 
         buff[0] = 2;
-        ASSERT_TRUE(ShortPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+        ASSERT_TRUE(ShortPascalBytes::IsValid(ByteSpan(buff)));
         buff[0] = 1;
-        ASSERT_TRUE(ShortPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+        ASSERT_TRUE(ShortPascalBytes::IsValid(ByteSpan(buff)));
     }
 
     {
         uint8_t buff[] = { 4, 0, 0, 0, 0 };
-        ASSERT_FALSE(LongPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+        ASSERT_FALSE(LongPascalBytes::IsValid(ByteSpan(buff)));
         buff[0] = 254;
-        ASSERT_FALSE(LongPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+        ASSERT_FALSE(LongPascalBytes::IsValid(ByteSpan(buff)));
 
         buff[0] = 255;
-        ASSERT_FALSE(LongPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+        ASSERT_FALSE(LongPascalBytes::IsValid(ByteSpan(buff)));
 
         buff[1] = 255;
-        ASSERT_TRUE(LongPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+        ASSERT_TRUE(LongPascalBytes::IsValid(ByteSpan(buff)));
 
         buff[0] = 0;
-        ASSERT_FALSE(LongPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+        ASSERT_FALSE(LongPascalBytes::IsValid(ByteSpan(buff)));
 
         buff[1] = 0;
-        ASSERT_TRUE(LongPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+        ASSERT_TRUE(LongPascalBytes::IsValid(ByteSpan(buff)));
 
         buff[0] = 1;
-        ASSERT_TRUE(LongPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+        ASSERT_TRUE(LongPascalBytes::IsValid(ByteSpan(buff)));
 
         buff[0] = 2;
-        ASSERT_TRUE(LongPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+        ASSERT_TRUE(LongPascalBytes::IsValid(ByteSpan(buff)));
 
         buff[0] = 3;
-        ASSERT_TRUE(LongPascalString<uint8_t>::IsValid(ByteSpan(buff)));
+        ASSERT_TRUE(LongPascalBytes::IsValid(ByteSpan(buff)));
     }
 }
 
