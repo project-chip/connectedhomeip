@@ -19,7 +19,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h>
+#include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
 #include <fstream>
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
@@ -31,11 +31,6 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::PushAvStreamTransport;
 using chip::Protocols::InteractionModel::Status;
-
-// Global pointer to overall PushAV Stream Transport implementing the Cluster delegate.
-std::unique_ptr<PushAvStreamTransportManager> sPushAvStramTransportInstance;
-// Global pointer to PushAV Stream Transport Server SDK cluster;
-std::unique_ptr<PushAvStreamTransportServer> sPushAvStramTransportClusterServerInstance;
 
 Protocols::InteractionModel::Status
 PushAvStreamTransportManager::AllocatePushTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID)
@@ -181,31 +176,7 @@ PushAvStreamTransportManager::LoadCurrentConnections(std::vector<TransportConfig
 CHIP_ERROR
 PushAvStreamTransportManager::PersistentAttributesLoadedCallback()
 {
-    ChipLogProgress(Zcl, "Persistent attributes loaded");
+    ChipLogProgress(Zcl, "Push AV Stream Transport Persistent attributes loaded");
 
     return CHIP_NO_ERROR;
-}
-
-void emberAfPushAvStreamTransportClusterInitCallback(EndpointId endpoint)
-{
-    VerifyOrReturn(
-        endpoint == 1, // this cluster is only enabled for endpoint 1.
-        ChipLogError(Zcl, "Push AV Stream Transport cluster delegate is not implemented for endpoint with id %d.", endpoint));
-
-    VerifyOrReturn(!sPushAvStramTransportInstance && !sPushAvStramTransportClusterServerInstance);
-
-    sPushAvStramTransportInstance = std::make_unique<PushAvStreamTransportManager>();
-    sPushAvStramTransportInstance->Init();
-
-    BitFlags<Feature> features;
-
-    sPushAvStramTransportClusterServerInstance =
-        std::make_unique<PushAvStreamTransportServer>(*sPushAvStramTransportInstance.get(), endpoint, features);
-    sPushAvStramTransportClusterServerInstance->Init();
-}
-
-void emberAfPushAvStreamTransportClusterShutdownCallback(EndpointId endpoint)
-{
-    sPushAvStramTransportClusterServerInstance = nullptr;
-    sPushAvStramTransportInstance              = nullptr;
 }

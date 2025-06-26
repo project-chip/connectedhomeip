@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  "push-av-stream-transport-server.cpp",
-  "push-av-stream-transport-server.h",
+  "CodegenIntegration.cpp",
+  "CodegenIntegration.h",
 ]

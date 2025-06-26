@@ -41,6 +41,7 @@
 #include "tcc-mode.h"
 #include "thermostat-delegate-impl.h"
 #include "water-heater-mode.h"
+#include "push-av-stream-transport-delegate-impl.h"
 
 #include <Options.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -54,6 +55,7 @@
 #include <app/clusters/time-synchronization-server/time-synchronization-server.h>
 #include <app/clusters/unit-localization-server/unit-localization-server.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
+#include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CHIPMem.h>
@@ -87,6 +89,7 @@ Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupporte
 Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
 Clusters::ValveConfigurationAndControl::ValveControlDelegate sValveDelegate;
 Clusters::TimeSynchronization::ExtendedTimeSyncDelegate sTimeSyncDelegate;
+Clusters::PushAvStreamTransport::PushAvStreamTransportManager gPushAvStreamTransportManager;
 
 // Please refer to https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces
 constexpr const uint8_t kNamespaceCommon   = 7;
@@ -200,6 +203,9 @@ void ApplicationInit()
                     Clusters::UnitLocalization::TempUnitEnum::kFahrenheit) == CHIP_NO_ERROR);
 
     Clusters::WaterHeaterManagement::WhmApplicationInit(chip::EndpointId(1));
+
+    ChipLogProgress(AppServer, "Setting Push AV Stream Transport delegate");
+    Clusters::PushAvStreamTransport::SetDelegate(chip::EndpointId(1), &gPushAvStreamTransportManager);
 
     SetTagList(/* endpoint= */ 0, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));
