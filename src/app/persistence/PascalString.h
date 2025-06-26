@@ -74,7 +74,7 @@ public:
     PascalBuffer(const PascalBuffer &) = default;
 
     template <size_t N>
-    PascalBuffer(T (&data)[N]) : mData(data), mMaxSize(N - 1)
+    PascalBuffer(T (&data)[N]) : mData(data), mMaxSize(N - PREFIX_LEN)
     {
         static_assert(N > 0);
         static_assert(N <= kInvalidLength);
