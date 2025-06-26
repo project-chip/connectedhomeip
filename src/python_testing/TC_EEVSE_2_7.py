@@ -44,14 +44,16 @@ import logging
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
 logger = logging.getLogger(__name__)
+cluster = Clusters.EnergyEvse
 
 
 class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
+
     """This test case verifies the primary functionality of the Energy EVSE Cluster server
      with the optional SoCReporting feature supported. This test case can also verify the
      interaction between SoCReporting and ChargingPreferences features if ChargingPreferences
@@ -174,10 +176,9 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
 
         return steps
 
-    @async_test_body
+    @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kSoCReporting))
     async def test_TC_EEVSE_2_7(self):
         endpoint = self.get_endpoint()
-        cluster = Clusters.EnergyEvse
 
         self.step("1")
         # Commission DUT - already done
@@ -190,7 +191,11 @@ class TC_EEVSE_2_7(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("2")
         feature_map = await self.read_evse_attribute_expect_success(attribute="FeatureMap")
-        logger.info(f"FeatureMap: {feature_map}")
+        soc_reporting_supported = (feature_map & Clusters.EnergyEvse.Bitmaps.Feature.kSoCReporting) > 0
+        charging_preferences_supported = (feature_map & Clusters.EnergyEvse.Bitmaps.Feature.kChargingPreferences) > 0
+
+        logger.info(
+            f"Received FeatureMap: {feature_map:#x} = SoCReporting ({soc_reporting_supported}), ChargingPreferences ({charging_preferences_supported})")
 
         self.step("3")
         await self.check_test_event_triggers_enabled()
