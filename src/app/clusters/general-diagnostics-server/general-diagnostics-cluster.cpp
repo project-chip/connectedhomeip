@@ -93,7 +93,7 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
         return encoder.Encode(GeneralDiagnostics::kRevision);
     }
     }
-    return CHIP_NO_ERROR;    
+    return CHIP_NO_ERROR;
 }
 
 std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsCluster::InvokeCommand(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments, CommandHandler * handler) {
