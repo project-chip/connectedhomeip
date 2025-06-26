@@ -141,23 +141,23 @@ public:
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fabric The fabric to query against
      * @param[in] index The index of the endpoint in the list.
-     * @param[out] endpoint The endpoint at the given index in the list.
+     * @param[out] outEndpoint The endpoint at the given index in the list.
      * @return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if the index is out of range for the preset types list.
      */
     virtual CHIP_ERROR GetProvisionedEndpointByIndex(EndpointId matterEndpoint, FabricIndex fabric, size_t index,
-                                                     EndpointStructType & endpoint) const = 0;
+                                                     EndpointStructType & outEndpoint) const = 0;
 
     /**
      * @brief Finds the TLSEndpointStruct with the given EndpointID
      *
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] endpointID The EndpoitnID to find.
-     * @param[out] endpoint The endpoint at the given index in the list.
+     * @param[out] outEndpoint The endpoint at the given index in the list.
      * @return NOT_FOUND if no mapping is found.
      */
     virtual Protocols::InteractionModel::Status FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
                                                                             uint16_t endpointID,
-                                                                            EndpointStructType & endpoint) const = 0;
+                                                                            EndpointStructType & outEndpoint) const = 0;
 
     /**
      * @brief Appends a TLSEndpointStruct to the provisioned endpoints list maintained by the delegate.

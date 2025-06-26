@@ -34,7 +34,7 @@ using namespace chip::app::Clusters::TlsClientManagement;
 using namespace Protocols::InteractionModel;
 
 CHIP_ERROR TlsClientManagementCommandDelegate::GetProvisionedEndpointByIndex(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                             size_t index, EndpointStructType & endpoint) const
+                                                                             size_t index, EndpointStructType & outEndpoint) const
 {
     VerifyOrReturnError(matterEndpoint == EndpointId(1), CHIP_ERROR_INTERNAL);
 
@@ -45,7 +45,7 @@ CHIP_ERROR TlsClientManagementCommandDelegate::GetProvisionedEndpointByIndex(End
         {
             if (fabricI++ == index)
             {
-                endpoint = item.payload;
+                outEndpoint = item.payload;
                 return CHIP_NO_ERROR;
             }
         }
@@ -70,6 +70,9 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
         return ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kClientCertificateNotFound);
     }
 
+    VerifyOrReturnError(!provisionReq.endpointID.IsNull() || mProvisioned.size() < mTlsClientManagementServer->GetMaxProvisioned(),
+                        ClusterStatusCode(Status::ResourceExhausted));
+
     // Find existing value to update & check for port/name collisions
     Provisioned * provisioned = nullptr;
     for (auto & item : mProvisioned)
@@ -88,9 +91,6 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
 
     if (provisionReq.endpointID.IsNull())
     {
-        VerifyOrReturnError(mProvisioned.size() < mTlsClientManagementServer->GetMaxProvisioned(),
-                            ClusterStatusCode(Status::ResourceExhausted));
-
         provisioned           = &mProvisioned.emplace_back();
         auto & endpointStruct = provisioned->payload;
 
@@ -104,7 +104,7 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
     }
 
     auto & endpointStruct = provisioned->payload;
-    ReturnValueOnFailure(endpointStruct.CopyHostnameFrom(provisionReq.hostname), ClusterStatusCode(Status::ResourceExhausted));
+    ReturnValueOnFailure(endpointStruct.CopyHostnameFrom(provisionReq.hostname), ClusterStatusCode(Status::ConstraintError));
     endpointStruct.port  = provisionReq.port;
     endpointStruct.caid  = provisionReq.caid;
     endpointStruct.ccdid = provisionReq.ccdid;
@@ -113,7 +113,7 @@ ClusterStatusCode TlsClientManagementCommandDelegate::ProvisionEndpoint(
 }
 
 Status TlsClientManagementCommandDelegate::FindProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                       uint16_t endpointID, EndpointStructType & endpoint) const
+                                                                       uint16_t endpointID, EndpointStructType & outEndpoint) const
 {
     VerifyOrReturnError(matterEndpoint == EndpointId(1), Status::ConstraintError);
 
@@ -121,7 +121,7 @@ Status TlsClientManagementCommandDelegate::FindProvisionedEndpointByID(EndpointI
     {
         if (i->payload.endpointID == endpointID && i->fabric == fabric)
         {
-            endpoint = i->payload;
+            outEndpoint = i->payload;
             return Status::Success;
         }
     }
