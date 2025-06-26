@@ -30,8 +30,8 @@ static_library("platform") {
   public_configs = [ ":${target_name}-config" ]
 
   deps = [
-    "${chip_root}/src/app/clusters/general-diagnostics-server:general-diagnostics-server",
     "${chip_root}/src/app:generic-test-event-trigger-handler",
+    "${chip_root}/src/app/clusters/general-diagnostics-server:general-diagnostics-server",
     app_data_model,
   ]
 }
