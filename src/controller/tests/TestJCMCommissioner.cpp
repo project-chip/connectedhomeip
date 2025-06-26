@@ -30,9 +30,6 @@
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <transport/SecureSession.h>
 #include <transport/SecureSessionTable.h>
-
-#include <credentials/tests/CHIPCert_test_vectors.h>
-
 #include <pw_unit_test/framework.h>
 
 using namespace chip;
