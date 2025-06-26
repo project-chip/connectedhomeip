@@ -56,13 +56,20 @@ class TC_PAVST_2_2(MatterBaseTest):
 
     def steps_TC_PAVST_2_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT", "Verify the number of PushAV Connections in the list is 0. If not 0, issue DeAllocatePushAVTransport with `ConnectionID to remove any connections."),
-            TestStep(2, "TH Reads SupportedFormats attribute from PushAV Stream Transport Cluster on DUT", "Store value as aSupportedFormats."),
-            TestStep(3, "TH Reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT", "Verify that list is not empty. Store value as aAllocatedVideoStreams."),
-            TestStep(4, "TH Reads AllocatedAudioStreams attribute from CameraAVStreamManagement Cluster on DUT", "Verify that list is not empty. Store value as aAllocatedAudioStreams."),
-            TestStep(5, "TH sends the AllocatePushTransport command with valid parameters", "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID, TransportOptions, and TransportStatus in the TransportConfigurationStruct."),
-            TestStep(6, "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT over a MRP-based secure session", "Verify the number of PushAV Connections is 1. Verify that the TransportOptions field in the TransportConfiguration struct is absent."),
-            TestStep(7, "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT over a large payload session", "Verify the number of PushAV Connections is 1. Verify that the TransportOptions field in the TransportConfiguration struct is present."),
+            TestStep(1, "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT",
+                     "Verify the number of PushAV Connections in the list is 0. If not 0, issue DeAllocatePushAVTransport with `ConnectionID to remove any connections."),
+            TestStep(2, "TH Reads SupportedFormats attribute from PushAV Stream Transport Cluster on DUT",
+                     "Store value as aSupportedFormats."),
+            TestStep(3, "TH Reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
+                     "Verify that list is not empty. Store value as aAllocatedVideoStreams."),
+            TestStep(4, "TH Reads AllocatedAudioStreams attribute from CameraAVStreamManagement Cluster on DUT",
+                     "Verify that list is not empty. Store value as aAllocatedAudioStreams."),
+            TestStep(5, "TH sends the AllocatePushTransport command with valid parameters",
+                     "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID, TransportOptions, and TransportStatus in the TransportConfigurationStruct."),
+            TestStep(6, "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT over a MRP-based secure session",
+                     "Verify the number of PushAV Connections is 1. Verify that the TransportOptions field in the TransportConfiguration struct is absent."),
+            TestStep(7, "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT over a large payload session",
+                     "Verify the number of PushAV Connections is 1. Verify that the TransportOptions field in the TransportConfiguration struct is present."),
         ]
 
     @async_test_body
@@ -77,8 +84,8 @@ class TC_PAVST_2_2(MatterBaseTest):
 
         self.step(1)
         transport_configs = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections
-                )
+            endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections
+        )
         for config in transport_configs:
             if config.ConnectionID != 0:
                 try:
@@ -89,34 +96,34 @@ class TC_PAVST_2_2(MatterBaseTest):
 
         self.step(2)
         aSupportedFormats = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedContainerFormats
-                )
+            endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedContainerFormats
+        )
         asserts.assert_not_equal(len(supported_formats), 0, "SupportedFormats must not be empty")
-        
+
         self.step(3)
-        aAllocatedVideoStreams = await self.read_single_attribute_check_success( 
-                endpoint=endpoint, cluster=avcluster, attribute=avattr.AllocatedVideoStreams
-                )
+        aAllocatedVideoStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=avcluster, attribute=avattr.AllocatedVideoStreams
+        )
         asserts.assert_not_equal(len(allocated_video_streams), 0, "AllocatedVideoStreams must not be empty")
 
         self.step(4)
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=avcluster, attribute=avattr.AllocatedAudioStreams
-                )
+            endpoint=endpoint, cluster=avcluster, attribute=avattr.AllocatedAudioStreams
+        )
         asserts.assert_not_equal(len(allocated_audio_streams), 0, "AllocatedAudioStreams must not be empty")
 
         self.step(5)
         response = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
-            #TransportOptions=
-            {"streamUsage":0,
-             "videoStreamID":1,
-             "audioStreamID":1,
-             "endpointID":1,
-             "url":"https://localhost:1234/streams/1",
-             "triggerOptions":{"triggerType":2},
-             "ingestMethod":0,
-             "containerFormat":0,
-             "containerOptions":{"containerType":0},
+            # TransportOptions=
+            {"streamUsage": 0,
+             "videoStreamID": 1,
+             "audioStreamID": 1,
+             "endpointID": 1,
+             "url": "https://localhost:1234/streams/1",
+             "triggerOptions": {"triggerType": 2},
+             "ingestMethod": 0,
+             "containerFormat": 0,
+             "containerOptions": {"containerType": 0},
              }), endpoint=endpoint)
 
         self.step(6)
@@ -124,12 +131,13 @@ class TC_PAVST_2_2(MatterBaseTest):
             endpoint=endpoint, cluster=pvcluster, attribute=pvcluster.Attributes.CurrentConnections
         )
         asserts.assert_equal(len(current_connections), 1, "Expected exactly one connection")
-        
+
         self.step(7)
         transport_configs = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections
-                )
+            endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections
+        )
         asserts.assert_equal(len(transport_configs), 1, "TransportConfigurations must be 1")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
