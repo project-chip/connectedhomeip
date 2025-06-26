@@ -14,7 +14,7 @@ types. The reasons for this approach:
 
 -   simpler/more modular code (easier to maintain)
 -   Have more generic storage support (including variable size data)
--   Ability to preserve backwards compatibility with existing products without
+-   Ability to preserve backward compatibility with existing products without
     increasing flash size by adding additional abstraction layers
 
 Callers will validate data validity on read instead of relying on data
