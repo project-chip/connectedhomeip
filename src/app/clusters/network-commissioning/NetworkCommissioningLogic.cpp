@@ -865,7 +865,7 @@ void NetworkCommissioningLogic::OnFinished(Status status, CharSpan debugText, Th
     auto commandHandle    = commandHandleRef.Get();
     if (commandHandle == nullptr)
     {
-        // When the platform shut down, interaction model engine will invalidate all commandHandle to avoid dangling references.
+        // When the platform shuts down, interaction model engine will invalidate all commandHandle to avoid dangling references.
         // We may receive the callback after it and should make it noop.
         return;
     }
@@ -891,7 +891,7 @@ void NetworkCommissioningLogic::OnFinished(Status status, CharSpan debugText, Wi
     auto commandHandle    = commandHandleRef.Get();
     if (commandHandle == nullptr)
     {
-        // When the platform shut down, interaction model engine will invalidate all commandHandle to avoid dangling references.
+        // When the platform shuts down, interaction model engine will invalidate all commandHandle to avoid dangling references.
         // We may receive the callback after it and should make it noop.
         return;
     }
