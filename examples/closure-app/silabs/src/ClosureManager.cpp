@@ -241,14 +241,14 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         // This should handle the completion of a move to action.
         break;
     case Action_t::PANEL_STEP_ACTION:
-        instance.ep1.OnStepActionComplete();
+        instance.ep1.OnPanelMotionActionComplete();
         if (instance.mCurrentActionEndpointId == instance.ep2.GetEndpoint())
         {
-            instance.ep2.OnStepActionComplete();
+            instance.ep2.OnPanelMotionActionComplete();
         }
         else if (instance.mCurrentActionEndpointId == instance.ep3.GetEndpoint())
         {
-            instance.ep3.OnStepActionComplete();
+            instance.ep3.OnPanelMotionActionComplete();
         }
         instance.isStepActionInProgress = false;
         break;
