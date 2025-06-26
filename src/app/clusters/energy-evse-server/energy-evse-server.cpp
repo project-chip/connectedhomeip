@@ -426,7 +426,7 @@ Status Instance::ValidateTargets(
                 if (!targetStruct.targetSoC.HasValue())
                 {
                     ChipLogError(AppServer, "kSoCReporting is supported but TargetSoC does not have a value");
-                    return Status::Failure;
+                    return Status::InvalidCommand;
                 }
 
                 if (targetStruct.targetSoC.Value() > 100)
