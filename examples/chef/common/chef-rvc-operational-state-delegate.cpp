@@ -328,6 +328,10 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
                 ChipLogError(DeviceLayer, "Failed to update running state to %d at RunningTime = %d: %" CHIP_ERROR_FORMAT,
                              to_underlying(newRunningState), gRvcOperationalStateDelegate->mRunningTime, err.Format());
             }
+            else
+            {
+                state = newRunningState;
+            }
         }
     }
     else if (state == RvcOperationalState::ChefRvcOperationalStateEnum::kPaused)
