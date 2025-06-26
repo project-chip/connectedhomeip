@@ -37,23 +37,29 @@ struct PascalPrefixOperations;
 template <>
 struct PascalPrefixOperations<1>
 {
-    static size_t GetLength(const uint8_t * buffer) { return *buffer; }
-    static void SetLength(uint8_t * buffer, size_t size) { *buffer = static_cast<uint8_t>(size); }
+    using LengthType = uint8_t;
+    static constexpr LengthType kInvalidLength = 0xFF;
+
+    static LengthType GetLength(const uint8_t * buffer) { return *buffer; }
+    static void SetLength(uint8_t * buffer, LengthType size) { *buffer = static_cast<uint8_t>(size); }
 
     // Casts for chars as well
-    static size_t GetLength(const char * buffer) { return GetLength(Uint8::from_const_char(buffer)); }
-    static void SetLength(char * buffer, size_t size) { SetLength(Uint8::from_char(buffer), size); }
+    static LengthType GetLength(const char * buffer) { return GetLength(Uint8::from_const_char(buffer)); }
+    static void SetLength(char * buffer, LengthType size) { SetLength(Uint8::from_char(buffer), size); }
 };
 
 template <>
 struct PascalPrefixOperations<2>
 {
-    static size_t GetLength(const uint8_t * buffer) { return Encoding::LittleEndian::Get16(buffer); }
-    static void SetLength(uint8_t * buffer, size_t size) { Encoding::LittleEndian::Put16(buffer, static_cast<uint16_t>(size)); }
+    using LengthType = uint16_t;
+    static constexpr LengthType kInvalidLength = 0xFFFF;
+
+    static LengthType GetLength(const uint8_t * buffer) { return Encoding::LittleEndian::Get16(buffer); }
+    static void SetLength(uint8_t * buffer, LengthType size) { Encoding::LittleEndian::Put16(buffer, size); }
 
     // Casts for chars as well
-    static size_t GetLength(const char * buffer) { return GetLength(Uint8::from_const_char(buffer)); }
-    static void SetLength(char * buffer, size_t size) { SetLength(Uint8::from_char(buffer), size); }
+    static LengthType GetLength(const char * buffer) { return GetLength(Uint8::from_const_char(buffer)); }
+    static void SetLength(char * buffer, LengthType size) { SetLength(Uint8::from_char(buffer), size); }
 };
 
 /// Interprets a byte buffer as a pascal buffer:
@@ -67,7 +73,9 @@ template <typename T, uint8_t PREFIX_LEN>
 class PascalBuffer
 {
 public:
-    static constexpr size_t kInvalidLength = (1 << (8 * PREFIX_LEN)) - 1;
+    using LengthType = typename PascalPrefixOperations<PREFIX_LEN>::LengthType;
+    static constexpr LengthType kInvalidLength = PascalPrefixOperations<PREFIX_LEN>::kInvalidLength;
+
     static_assert(sizeof(T) == 1);
 
     PascalBuffer(PascalBuffer &&)      = default;
@@ -92,18 +100,18 @@ public:
     /// and includes the "size prefix"
     Span<T> Buffer() { return { mData, static_cast<size_t>(mMaxSize + PREFIX_LEN) }; }
 
-    size_t GetLength() const
+    LengthType GetLength() const
     {
-        const size_t length = PascalPrefixOperations<PREFIX_LEN>::GetLength(mData);
+        const LengthType length = PascalPrefixOperations<PREFIX_LEN>::GetLength(mData);
         if (length == kInvalidLength)
         {
             return 0;
         }
-        return std::min<size_t>(mMaxSize, length);
+        return std::min<LengthType>(mMaxSize, length);
     }
 
     // Returns true if the length was valid and could be set
-    bool SetLength(size_t len)
+    bool SetLength(LengthType len)
     {
         if (len != kInvalidLength)
         {
@@ -130,13 +138,13 @@ public:
     static bool IsValid(Span<const T> span)
     {
         VerifyOrReturnValue(span.size() >= PREFIX_LEN, false);
-        size_t len = PascalPrefixOperations<PREFIX_LEN>::GetLength(span.data());
+        LengthType len = PascalPrefixOperations<PREFIX_LEN>::GetLength(span.data());
         return len == kInvalidLength || (len + PREFIX_LEN <= span.size());
     }
 
 private:
     T * mData;
-    const size_t mMaxSize;
+    const LengthType mMaxSize;
 };
 
 using ShortPascalString = PascalBuffer<char, 1>;
