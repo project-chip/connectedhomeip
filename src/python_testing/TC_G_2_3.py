@@ -43,7 +43,7 @@ from typing import List
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 
 
@@ -76,42 +76,42 @@ class TC_G_2_3(MatterBaseTest):
         return [TestStep(0, "Comissioning, already done", is_commissioning=True),
                 TestStep("1a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT on EP0 using a key that is pre-installed on the TH. GroupKeySet fields are as follows:"),
                 TestStep("1b", "TH writes the GroupKeyMap attribute in the GroupKeyManagement cluster of DUT on EP0 with maxgroups entries binding GroupId(0x0002 to (maxgroups+1)) with GroupKeySetID 1"),
-                TestStep("1c", "TH cleans up the groups by sending the RemoveAllGroups command to the DUT on PIXIT.G.ENDPOINT"),
-                TestStep("1d", "TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT as unicast with the following fields : 1. GroupID as 0x0002 2. GroupName as Gp2"),
+                TestStep("1c", "TH cleans up the groups by sending the RemoveAllGroups command to the DUT on Groups cluster endpoint"),
+                TestStep("1d", "TH sends AddGroup command to DUT on Groups cluster endpoint as unicast with the following fields : 1. GroupID as 0x0002 2. GroupName as Gp2"),
                 TestStep("2a", "TH reads GroupTable attribute from the GroupKeyManagement cluster from DUT on EP0"),
                 TestStep("2b", "If the GN feature is supported, verify that the GroupTable contains an entry with the GroupName as Gp2"),
-                TestStep("3", "TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT as unicast with the following fields : 1. GroupID as 0x0003 2. GroupName as Gp3"),
+                TestStep("3", "TH sends AddGroup command to DUT on Groups cluster endpoint as unicast with the following fields : 1. GroupID as 0x0003 2. GroupName as Gp3"),
                 TestStep("4a", "TH reads GroupTable attribute from the GroupKeyManagement cluster from DUT on EP0"),
-                TestStep("4b", "Verify that the GroupTable contains an entry with the GroupName as Gp3"),
-                TestStep("5", "TH sends GetGroupMembership command to DUT on PIXIT.G.ENDPOINT with the following fields : GroupList as NULL"),
+                TestStep("4b", "If the GN feature is supported, verify that the GroupTable contains an entry with the GroupName as Gp3"),
+                TestStep("5", "TH sends GetGroupMembership command to DUT on Groups cluster endpoint with the following fields : GroupList as NULL"),
                 TestStep(
-                    "6", "TH sends GetGroupMembership command to DUT on PIXIT.G.ENDPOINT with the following fields : GroupList as [0x0002]"),
+                    "6", "TH sends GetGroupMembership command to DUT on Groups cluster endpoint with the following fields : GroupList as [0x0002]"),
                 TestStep(
-                    "7", "TH sends GetGroupMembership command to DUT on PIXIT.G.ENDPOINT as unicast with the following fields: GroupList as [0x0002, 0x0003]"),
-                TestStep("8", "TH sends RemoveAllGroups command to DUT on PIXIT.G.ENDPOINT as unicast method"),
+                    "7", "TH sends GetGroupMembership command to DUT on Groups cluster endpoint as unicast with the following fields: GroupList as [0x0002, 0x0003]"),
+                TestStep("8", "TH sends RemoveAllGroups command to DUT on Groups cluster endpoint as unicast method"),
                 TestStep("9a", "TH writes the GroupKeyMap attribute in the GroupKeyManagement cluster of DUT on EP0 to binds GroupId(0x0006 to 0x0006 + maxgroups-1 ) with GroupKeySetID 1"),
-                TestStep("9b", "TH sends Identify command to DUT on PIXIT.G.ENDPOINT with the IdentifyTime as (0x0078) 120 seconds"),
+                TestStep("9b", "TH sends Identify command to DUT on Groups cluster endpoint with the IdentifyTime as (0x0078) 120 seconds"),
                 TestStep("9c", "TH reads immediately IdentifyTime attribute from DUT"),
-                TestStep("10", "TH sends AddGroupIfIdentifying command to DUT on PIXIT.G.ENDPOINT as unicast method with the following fields: GroupID as 0x0006, GroupName as Gp6"),
+                TestStep("10", "TH sends AddGroupIfIdentifying command to DUT on Groups cluster endpoint as unicast method with the following fields: GroupID as 0x0006, GroupName as Gp6"),
                 TestStep("11a", "TH reads GroupTable attribute from the GroupKeyManagement cluster of DUT on EP0"),
-                TestStep("11b", "Verify DUT responds with provided GroupName as Gp6 associated with the PIXIT.G.ENDPOINT"),
-                TestStep("12", "TH sends AddGroupIfIdentifying command to DUT on PIXIT.G.ENDPOINT as unicast method with the following fields: GroupID as 0x0007, Groupname as Gp7"),
+                TestStep("11b", "If the GN feature is supported, verify DUT responds with provided GroupName as Gp6 associated with the Groups cluster endpoint"),
+                TestStep("12", "TH sends AddGroupIfIdentifying command to DUT on Groups cluster endpoint as unicast method with the following fields: GroupID as 0x0007, Groupname as Gp7"),
                 TestStep("13", "TH reads GroupTable attribute from the GroupKeyManagement cluster from DUT on EP0"),
-                TestStep("14", "Verify DUT responds with provided GroupName as Gp7 associated with the PIXIT.G.ENDPOINT"),
-                TestStep("15", "TH sends AddGroupIfIdentifying command to DUT PIXIT.G.ENDPOINT with (maxgroups - 2) groups, incrementing the GroupId each time starting from 0x0008"),
+                TestStep("14", "If the GN feature is supported, verify DUT responds with provided GroupName as Gp7 associated with the Groups cluster endpoint"),
+                TestStep("15", "TH sends AddGroupIfIdentifying command to DUT on Groups cluster endpoint with (maxgroups - 2) groups, incrementing the GroupId each time starting from 0x0008"),
                 TestStep("16a", "TH binds GroupId( 0x0006 + maxgroups to 0x0006 + maxgroups+1) with GroupKeySetID 1"),
-                TestStep("16b", "TH sends AddGroupIfIdentifying command to DUT PIXIT.G.ENDPOINT once as unicast method with different GroupID"),
+                TestStep("16b", "TH sends AddGroupIfIdentifying command to DUT on Groups cluster endpoint once as unicast method with different GroupID"),
                 TestStep("17", "TH reads GroupTable attribute from the GroupKeyManagement cluster from DUT on EP0"),
-                TestStep("18", "TH sends RemoveAllGroups command to DUT on PIXIT.G.ENDPOINT as unicast method"),
-                TestStep("19a", "TH sends AddGroupIfIdentifying command to DUT on PIXIT.G.ENDPOINT as unicast method with the following fields: GroupID as 0x0000 GroupName as Gp45"),
-                TestStep("19b", "TH sends AddGroupIfIdentifying command to DUT on PIXIT.G.ENDPOINT as unicast method with the following fields: GroupID as 0x0006 + maxgroups GroupName as Gp123456789123456"),
-                TestStep("20", "TH sends AddGroupIfIdentifying command to DUT on PIXIT.G.ENDPOINT as unicast method with the following fields: GroupId as 0x0046 GroupName as Gp46"),
-                TestStep("21a", "TH sends Identify command to DUT on PIXIT.G.ENDPOINT with the IdentifyTime as 0x0000 (stop identifying)"),
+                TestStep("18", "TH sends RemoveAllGroups command to DUT on Groups cluster endpoint as unicast method"),
+                TestStep("19a", "TH sends AddGroupIfIdentifying command to DUT on Groups cluster endpoint as unicast method with the following fields: GroupID as 0x0000 GroupName as Gp45"),
+                TestStep("19b", "TH sends AddGroupIfIdentifying command to DUT on Groups cluster endpoint as unicast method with the following fields: GroupID as 0x0006 + maxgroups GroupName as Gp123456789123456"),
+                TestStep("20", "TH sends AddGroupIfIdentifying command to DUT on Groups cluster endpoint as unicast method with the following fields: GroupId as 0x0046 GroupName as Gp46"),
+                TestStep("21a", "TH sends Identify command to DUT on Groups cluster endpoint with the IdentifyTime as 0x0000 (stop identifying)"),
                 TestStep("21b", "TH reads immediately IdentifyTime attribute from DUT"),
-                TestStep("22", "TH sends AddGroupIfIdentifying command to DUT on PIXIT.G.ENDPOINT as unicast method with the following fields: GroupId as 0x0004 GroupName as Gp4"),
+                TestStep("22", "TH sends AddGroupIfIdentifying command to DUT on Groups cluster endpoint as unicast method with the following fields: GroupId as 0x0004 GroupName as Gp4"),
                 TestStep("23", "TH reads GroupTable attribute from the GroupKeyManagement cluster of DUT on EP0")]
 
-    @async_test_body
+    @run_if_endpoint_matches(has_cluster(Clusters.Groups))
     async def test_TC_G_2_3(self):
         if self.matter_test_config.endpoint is None:
             self.matter_test_config.endpoint = 0
@@ -153,10 +153,9 @@ class TC_G_2_3(MatterBaseTest):
         self.step("1d")
         kGroupId2 = 2
         kGroupNameGp2 = "Gp2"
-        groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
-            dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
         result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(kGroupId2, kGroupNameGp2))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0002 failed")
+        asserts.assert_equal(result.groupID, kGroupId2, "Returned Group ID is incorrect")
 
         self.step("2a")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
