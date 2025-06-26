@@ -79,7 +79,6 @@ qpg_executable("lighting_app") {
     "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
     "${chip_root}/src/app/persistence:deferred",
     "${chip_root}/src/app/persistence:singleton",
-    "${chip_root}/src/app/util/persistence:deferred",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
