@@ -156,7 +156,7 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
         app::DataModel::DecodableList<CommandId> v;
         EXPECT_EQ(app::DataModel::Decode(*apData, v), CHIP_NO_ERROR);
         size_t arraySize   = 0;
-        auto iterateStatus = v.Iterate([&](auto &, bool &) -> CHIP_ERROR { return CHIP_ERROR_INTERNAL; });
+        auto iterateStatus = v.for_each([&](auto &, bool &) -> CHIP_ERROR { return CHIP_ERROR_INTERNAL; });
         EXPECT_EQ(iterateStatus, CHIP_NO_ERROR);
         EXPECT_EQ(v.ComputeSize(arraySize), CHIP_NO_ERROR);
         EXPECT_EQ(arraySize, 0u);
@@ -166,7 +166,7 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
         app::DataModel::DecodableList<CommandId> v;
         EXPECT_EQ(app::DataModel::Decode(*apData, v), CHIP_NO_ERROR);
         size_t arraySize   = 0;
-        auto iterateStatus = v.Iterate([&](auto &, bool &) -> CHIP_ERROR { return CHIP_ERROR_INTERNAL; });
+        auto iterateStatus = v.for_each([&](auto &, bool &) -> CHIP_ERROR { return CHIP_ERROR_INTERNAL; });
         EXPECT_EQ(iterateStatus, CHIP_NO_ERROR);
         EXPECT_EQ(v.ComputeSize(arraySize), CHIP_NO_ERROR);
         EXPECT_EQ(arraySize, 0u);

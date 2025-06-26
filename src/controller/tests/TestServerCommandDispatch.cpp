@@ -288,7 +288,7 @@ void TestServerCommandDispatch::TestDataResponseHelper(const EmberAfEndpointType
     auto onSuccessCb = [&onSuccessWasCalled](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
                                              const auto & dataResponse) {
         uint8_t i          = 0;
-        auto iterateStatus = dataResponse.arg1.Iterate([&](auto & item, bool &) -> CHIP_ERROR {
+        auto iterateStatus = dataResponse.arg1.for_each([&](auto & item, bool &) -> CHIP_ERROR {
             EXPECT_EQ(item.a, i);
             EXPECT_FALSE(item.b);
             EXPECT_EQ(item.c.a, i);
@@ -323,7 +323,7 @@ void TestServerCommandDispatch::TestDataResponseHelper(const EmberAfEndpointType
     auto readSuccessCb = [&onSuccessWasCalled, aExpectSuccess](const ConcreteDataAttributePath &,
                                                                const DataModel::DecodableList<CommandId> & commandList) {
         auto count         = 0;
-        auto iterateStatus = commandList.Iterate([&](auto & item, bool &) -> CHIP_ERROR {
+        auto iterateStatus = commandList.for_each([&](auto & item, bool &) -> CHIP_ERROR {
             // We only expect 0 or 1 command ids here.
             EXPECT_EQ(count, 0);
             EXPECT_EQ(item, Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id);

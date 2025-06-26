@@ -122,7 +122,7 @@ private:
         DataModelLogger::LogString(label, indent, std::to_string(count) + " entries");
 
         size_t i           = 0;
-        auto iterateStatus = value.Iterate([&](auto & entry, bool &) -> CHIP_ERROR {
+        auto iterateStatus = value.for_each([&](auto & entry, bool &) -> CHIP_ERROR {
             ++i;
             std::string itemLabel = std::string("[") + std::to_string(i) + "]";
             ReturnErrorOnFailure(DataModelLogger::LogValue(itemLabel.c_str(), indent + 1, entry));
@@ -166,7 +166,7 @@ private:
         DataModelLogger::LogString(label, indent, std::to_string(count) + " entries");
 
         size_t i           = 0;
-        auto iterateStatus = value.Iterate([&](auto & entry, bool &) -> CHIP_ERROR {
+        auto iterateStatus = value.for_each([&](auto & entry, bool &) -> CHIP_ERROR {
             ++i;
             std::string index = std::string("[") + std::to_string(i) + "]";
             std::string item  = std::to_string(entry) + " (" + ClusterIdToText(entry) + ")";
@@ -188,7 +188,7 @@ private:
         DataModelLogger::LogString(label, indent, std::to_string(count) + " entries");
 
         size_t i           = 0;
-        auto iterateStatus = value.Iterate([&](auto & entry, bool &) -> CHIP_ERROR {
+        auto iterateStatus = value.for_each([&](auto & entry, bool &) -> CHIP_ERROR {
             ++i;
             std::string index = std::string("[") + std::to_string(i) + "]";
             std::string item  = std::to_string(entry) + " (" + AttributeIdToText(cluster, entry) + ")";
@@ -211,7 +211,7 @@ private:
         DataModelLogger::LogString(label, indent, std::to_string(count) + " entries");
 
         size_t i           = 0;
-        auto iterateStatus = value.Iterate([&](auto & entry, bool &) -> CHIP_ERROR {
+        auto iterateStatus = value.for_each([&](auto & entry, bool &) -> CHIP_ERROR {
             ++i;
             std::string index = std::string("[") + std::to_string(i) + "]";
             std::string item  = std::to_string(entry) + " (" + AcceptedCommandIdToText(cluster, entry) + ")";
@@ -234,7 +234,7 @@ private:
         DataModelLogger::LogString(label, indent, std::to_string(count) + " entries");
 
         size_t i           = 0;
-        auto iterateStatus = value.Iterate([&](auto & entry, bool &) -> CHIP_ERROR {
+        auto iterateStatus = value.for_each([&](auto & entry, bool &) -> CHIP_ERROR {
             ++i;
             std::string index = std::string("[") + std::to_string(i) + "]";
             std::string item  = std::to_string(entry) + " (" + GeneratedCommandIdToText(cluster, entry) + ")";

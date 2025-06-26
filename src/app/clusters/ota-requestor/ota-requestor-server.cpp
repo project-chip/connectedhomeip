@@ -122,7 +122,7 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::WriteDefaultOtaProviders(const 
 
         ReturnErrorOnFailure(requestor->ClearDefaultOtaProviderList(aDecoder.AccessingFabricIndex()));
 
-        return list.Iterate([&](auto & entry, bool &) -> CHIP_ERROR { return requestor->AddDefaultOtaProvider(entry); });
+        return list.for_each([&](auto & entry, bool &) -> CHIP_ERROR { return requestor->AddDefaultOtaProvider(entry); });
     }
 
     switch (aPath.mListOp)

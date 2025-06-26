@@ -256,7 +256,7 @@ DefaultSceneHandlerImpl::SerializeAdd(EndpointId endpoint, const ExtensionFieldS
     VerifyOrReturnError(pairTotal <= MATTER_ARRAY_SIZE(aVPairs), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     uint8_t pairCount  = 0;
-    auto iterateStatus = extensionFieldSet.attributeValueList.Iterate([&](auto & currentPair, bool &) -> CHIP_ERROR {
+    auto iterateStatus = extensionFieldSet.attributeValueList.for_each([&](auto & currentPair, bool &) -> CHIP_ERROR {
         AttributeValuePairType & mutablePair = aVPairs[pairCount];
         mutablePair                          = currentPair;
         ReturnErrorOnFailure(ValidateAttributePath(endpoint, extensionFieldSet.clusterID, mutablePair));
@@ -282,7 +282,7 @@ CHIP_ERROR DefaultSceneHandlerImpl::Deserialize(EndpointId endpoint, ClusterId c
     VerifyOrReturnError(pairTotal <= MATTER_ARRAY_SIZE(mAVPairs), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     uint8_t pairCount  = 0;
-    auto iterateStatus = attributeValueList.Iterate([&](auto & currentPair, bool &) -> CHIP_ERROR {
+    auto iterateStatus = attributeValueList.for_each([&](auto & currentPair, bool &) -> CHIP_ERROR {
         mAVPairs[pairCount] = currentPair;
         pairCount++;
         return CHIP_NO_ERROR;

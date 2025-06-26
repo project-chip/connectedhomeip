@@ -229,7 +229,7 @@ public:
         VerifyOrReturnError(attributeCount <= kScenableAttributeCount, CHIP_ERROR_BUFFER_TOO_SMALL);
 
         bool inserted      = false;
-        auto iterateStatus = attributeValueList.Iterate([&](auto & decodePair, bool &) -> CHIP_ERROR {
+        auto iterateStatus = attributeValueList.for_each([&](auto & decodePair, bool &) -> CHIP_ERROR {
             VerifyOrReturnError(decodePair.attributeID == Attributes::CurrentMode::Id, CHIP_ERROR_INVALID_ARGUMENT);
             VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
             ReturnErrorOnFailure(mSceneEndpointStatePairs.InsertPair(

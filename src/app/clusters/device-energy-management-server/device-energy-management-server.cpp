@@ -661,7 +661,7 @@ void Instance::HandleModifyForecastRequest(HandlerContext & ctx, const Commands:
     }
 
     // Check the various values in the slot structures
-    auto iterateStatus = slotAdjustments.Iterate([&](auto & slotAdjustment, bool &) -> CHIP_ERROR {
+    auto iterateStatus = slotAdjustments.for_each([&](auto & slotAdjustment, bool &) -> CHIP_ERROR {
         // Check for an invalid slotIndex
         if (slotAdjustment.slotIndex >= forecast.Value().slots.size())
         {
@@ -749,7 +749,7 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
     }
 
     // Check for invalid power levels and whether the constraint time/duration is in the past
-    auto iterateStatus = constraints.Iterate([&](auto & constraint, bool & breakLoop) -> CHIP_ERROR {
+    auto iterateStatus = constraints.for_each([&](auto & constraint, bool & breakLoop) -> CHIP_ERROR {
         // Check to see if this constraint is in the past
         if (constraint.startTime < currentUtcTime)
         {
@@ -810,7 +810,7 @@ void Instance::HandleRequestConstraintBasedForecast(HandlerContext & ctx,
     // Check for overlappping elements
     Structs::ConstraintsStruct::DecodableType prevConstraint;
     bool first    = true;
-    iterateStatus = constraints.Iterate([&](auto & constraint, bool &) -> CHIP_ERROR {
+    iterateStatus = constraints.for_each([&](auto & constraint, bool &) -> CHIP_ERROR {
         if (first)
         {
             // Get the first constraint

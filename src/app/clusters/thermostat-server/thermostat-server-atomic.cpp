@@ -111,7 +111,7 @@ bool CountAttributeRequests(const DataModel::DecodableList<chip::AttributeId> at
     attributeRequestCount = 0;
     requestedPresets      = false;
     requestedSchedules    = false;
-    auto iterateStatus    = attributeRequests.Iterate([&](auto & attributeId, bool &) -> CHIP_ERROR {
+    auto iterateStatus    = attributeRequests.for_each([&](auto & attributeId, bool &) -> CHIP_ERROR {
         switch (attributeId)
         {
         case Presets::Id:
@@ -158,7 +158,7 @@ Status BuildAttributeStatuses(const EndpointId endpoint, const DataModel::Decoda
         attributeStatuses[i].statusCode  = 0;
     }
     size_t index       = 0;
-    auto iterateStatus = attributeRequests.Iterate([&](auto & attributeId, bool &) -> CHIP_ERROR {
+    auto iterateStatus = attributeRequests.for_each([&](auto & attributeId, bool &) -> CHIP_ERROR {
         for (size_t i = 0; i < index; ++i)
         {
             auto & attributeStatus = attributeStatuses[i];
@@ -408,7 +408,7 @@ void ThermostatAttrAccess::BeginAtomicWrite(CommandHandler * commandObj, const C
     }
 
     auto maximumTimeout = System::Clock::Milliseconds16(0);
-    auto iterateStatus  = commandData.attributeRequests.Iterate([&](auto & attributeId, bool &) -> CHIP_ERROR {
+    auto iterateStatus  = commandData.attributeRequests.for_each([&](auto & attributeId, bool &) -> CHIP_ERROR {
         switch (attributeId)
         {
         case Presets::Id:

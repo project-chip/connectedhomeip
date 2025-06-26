@@ -568,7 +568,7 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
     uint8_t i = 0;
     InitTimeZone();
 
-    auto iterateStatus = tzL.Iterate([&](auto & newTz, bool &) -> CHIP_ERROR {
+    auto iterateStatus = tzL.for_each([&](auto & newTz, bool &) -> CHIP_ERROR {
         auto & tzStore = mTimeZoneObj.timeZoneList[i];
         if (newTz.offset < -43200 || newTz.offset > 50400)
         {
@@ -677,7 +677,7 @@ CHIP_ERROR TimeSynchronizationServer::SetDSTOffset(const DataModel::DecodableLis
     size_t i = 0;
     InitDSTOffset();
 
-    auto iterateStatus = dstL.Iterate([&](auto & newDst, bool &) -> CHIP_ERROR {
+    auto iterateStatus = dstL.for_each([&](auto & newDst, bool &) -> CHIP_ERROR {
         mDstOffsetObj.dstOffsetList[i++] = newDst;
         return CHIP_NO_ERROR;
     });

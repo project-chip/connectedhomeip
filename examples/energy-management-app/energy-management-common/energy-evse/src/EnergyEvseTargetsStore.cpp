@@ -264,7 +264,7 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
     // Iterate across the list of new schedules. For each schedule, iterate through the existing Target
     // (mChargingTargetSchedulesList) working out how to merge the new schedule.
 
-    return newChargingTargetSchedules.Iterate([&](auto & newChargingTargetSchedule, bool &) -> CHIP_ERROR {
+    return newChargingTargetSchedules.for_each([&](auto & newChargingTargetSchedule, bool &) -> CHIP_ERROR {
         uint8_t newBitmask =
             newChargingTargetSchedule.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(kAllTargetDaysMask));
 

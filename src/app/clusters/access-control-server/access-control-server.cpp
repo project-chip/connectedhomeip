@@ -313,7 +313,7 @@ CHIP_ERROR AccessControlAttribute::WriteExtension(const ConcreteDataAttributePat
         else if (count == 1)
         {
             bool processed     = false;
-            auto iterateStatus = list.Iterate([&](auto & item, bool &) -> CHIP_ERROR {
+            auto iterateStatus = list.for_each([&](auto & item, bool &) -> CHIP_ERROR {
                 if (processed)
                 {
                     // Expected only 1 item
@@ -389,7 +389,7 @@ CHIP_ERROR AccessControlAttribute::WriteImpl(const ConcreteDataAttributePath & a
 
 CHIP_ERROR AccessControlAttribute::IsValidAclEntryList(const DataModel::DecodableList<AclStorage::DecodableEntry> & list)
 {
-    return list.Iterate([&](auto & validation, bool &) -> CHIP_ERROR {
+    return list.for_each([&](auto & validation, bool &) -> CHIP_ERROR {
         VerifyOrReturnError(validation.GetEntry().IsValid(), CHIP_ERROR_INVALID_ARGUMENT);
         return CHIP_NO_ERROR;
     });
@@ -419,7 +419,7 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(const ConcreteDataAttributePath & aP
         ReturnErrorOnFailure(IsValidAclEntryList(list));
 
         size_t i           = 0;
-        auto iterateStatus = list.Iterate([&](auto & value, bool &) -> CHIP_ERROR {
+        auto iterateStatus = list.for_each([&](auto & value, bool &) -> CHIP_ERROR {
             CHIP_ERROR result;
             if (i < oldCount)
             {
@@ -687,13 +687,13 @@ bool emberAfAccessControlClusterReviewFabricRestrictionsCallback(
 
     uint64_t token;
     std::vector<AccessRestrictionProvider::Entry> entries;
-    auto iterateStatus = commandData.arl.Iterate([&](auto & entryValue, bool &) -> CHIP_ERROR {
+    auto iterateStatus = commandData.arl.for_each([&](auto & entryValue, bool &) -> CHIP_ERROR {
         AccessRestrictionProvider::Entry entry;
         entry.fabricIndex    = commandObj->GetAccessingFabricIndex();
         entry.endpointNumber = entryValue.endpoint;
         entry.clusterId      = entryValue.cluster;
 
-        auto innerIterateStatus = entryValue.restrictions.Iterate([&](auto & restrictionValue, bool &) -> CHIP_ERROR {
+        auto innerIterateStatus = entryValue.restrictions.for_each([&](auto & restrictionValue, bool &) -> CHIP_ERROR {
             AccessRestrictionProvider::Restriction restriction;
             auto convertResult = ArlEncoder::Convert(restrictionValue.type, restriction.restrictionType);
             if (convertResult != CHIP_NO_ERROR)

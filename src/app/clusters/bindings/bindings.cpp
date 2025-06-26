@@ -97,7 +97,7 @@ CHIP_ERROR CheckValidBindingList(const EndpointId localEndpoint, const Decodable
                                  FabricIndex accessingFabricIndex)
 {
     size_t listSize    = 0;
-    auto iterateStatus = bindingList.Iterate([&](auto & item, bool &) -> CHIP_ERROR {
+    auto iterateStatus = bindingList.for_each([&](auto & item, bool &) -> CHIP_ERROR {
         VerifyOrReturnError(IsValidBinding(localEndpoint, item), CHIP_IM_GLOBAL_STATUS(ConstraintError));
         listSize++;
         return CHIP_NO_ERROR;
@@ -228,7 +228,7 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
 
         // Add new entries
         auto err =
-            newBindingList.Iterate([&](auto & item, bool &) -> CHIP_ERROR { return CreateBindingEntry(item, path.mEndpointId); });
+            newBindingList.for_each([&](auto & item, bool &) -> CHIP_ERROR { return CreateBindingEntry(item, path.mEndpointId); });
 
         // If this was not caused by a list operation, OnListWriteEnd is not going to be triggered
         // so a notification is sent here.

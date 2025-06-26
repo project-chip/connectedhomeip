@@ -244,7 +244,7 @@ struct GroupMembershipResponse
                 {
                     while (mIterator && mIterator->Next(mapping))
                     {
-                        auto iterateStatus = mCommandData.groupList.Iterate([&](auto & groupId, bool & breakLoop) -> CHIP_ERROR {
+                        auto iterateStatus = mCommandData.groupList.for_each([&](auto & groupId, bool & breakLoop) -> CHIP_ERROR {
                             if (mapping.endpoint_id == mEndpoint && mapping.group_id == groupId)
                             {
                                 ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag(), mapping.group_id));

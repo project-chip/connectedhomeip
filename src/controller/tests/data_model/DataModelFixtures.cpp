@@ -362,7 +362,7 @@ ActionReturnStatus CustomDataModel::WriteAttribute(const WriteAttributeRequest &
                 ReturnErrorOnFailure(decoder.Decode(value));
 
                 listStructOctetStringElementCount = 0;
-                return value.Iterate([&](auto & item, bool &) -> CHIP_ERROR {
+                return value.for_each([&](auto & item, bool &) -> CHIP_ERROR {
                     VerifyOrReturnError(item.member1 == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
                     listStructOctetStringElementCount++;
                     return CHIP_NO_ERROR;
@@ -401,7 +401,7 @@ ActionReturnStatus CustomDataModel::WriteAttribute(const WriteAttributeRequest &
 
             ReturnErrorOnFailure(invalidSubjectDescriptorDecoder.Decode(value));
 
-            ReturnErrorOnFailure(value.Iterate([&](auto &, bool &) -> CHIP_ERROR { return CHIP_NO_ERROR; }));
+            ReturnErrorOnFailure(value.for_each([&](auto &, bool &) -> CHIP_ERROR { return CHIP_NO_ERROR; }));
         }
         else if (request.path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
         {

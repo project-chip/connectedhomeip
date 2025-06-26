@@ -158,35 +158,35 @@ TEST_F(TestWifiResponseEncoding, TestSuccessEncode)
         ASSERT_TRUE(response.wiFiScanResults.HasValue());
         std::vector<WiFiInterfaceScanResultStruct::DecodableType> items;
 
-        response.wiFiScanResults.Value().Iterate([&](auto & value, bool &) -> CHIP_ERROR {
-            {
-                items.push_back(value);
-                return CHIP_NO_ERROR;
-            });
+        auto iterateStatus = response.wiFiScanResults.Value().for_each([&](auto & value, bool &) -> CHIP_ERROR {
+            items.push_back(value);
+            return CHIP_NO_ERROR;
+        });
+        ASSERT_EQ(iterateStatus, CHIP_NO_ERROR);
 
-            // assert expectations:
-            //   - values exist
-            //   - Order is preserved (we assume drivers already sort the order so
-            //     responses preserve order)
-            //
-            //   Actual spec requirement:
-            //
-            //   The order in which results are reported is implementation-specific.
-            //   Results SHOULD be reported in decreasing RSSI order, even if RSSI
-            //   is not reported in the response, to maximize the likelihood that
-            //   most likely to be reachable elements are included within the
-            //   size limits of the response
-            ASSERT_EQ(items.size(), 3u);
+        // assert expectations:
+        //   - values exist
+        //   - Order is preserved (we assume drivers already sort the order so
+        //     responses preserve order)
+        //
+        //   Actual spec requirement:
+        //
+        //   The order in which results are reported is implementation-specific.
+        //   Results SHOULD be reported in decreasing RSSI order, even if RSSI
+        //   is not reported in the response, to maximize the likelihood that
+        //   most likely to be reachable elements are included within the
+        //   size limits of the response
+        ASSERT_EQ(items.size(), 3u);
 
-            ASSERT_EQ(items[0].rssi, 10);
-            ASSERT_EQ(items[0].channel, 123);
+        ASSERT_EQ(items[0].rssi, 10);
+        ASSERT_EQ(items[0].channel, 123);
 
-            ASSERT_EQ(items[1].rssi, 20);
-            ASSERT_EQ(items[1].channel, 321);
+        ASSERT_EQ(items[1].rssi, 20);
+        ASSERT_EQ(items[1].channel, 321);
 
-            ASSERT_EQ(items[2].rssi, 15);
-            ASSERT_EQ(items[2].channel, 100);
+        ASSERT_EQ(items[2].rssi, 15);
+        ASSERT_EQ(items[2].channel, 100);
     }
-    }
+}
 
 } // namespace

@@ -231,7 +231,7 @@ TEST_F(TestRead, TestReadAttributeResponse)
     auto onSuccessCb = [&onSuccessCbInvoked](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         uint8_t i = 0;
         EXPECT_TRUE(attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
-        auto iterateStatus = dataResponse.Iterate([&](auto & item, bool &) -> CHIP_ERROR {
+        auto iterateStatus = dataResponse.for_each([&](auto & item, bool &) -> CHIP_ERROR {
             EXPECT_EQ(item.member1, i);
             i++;
             return CHIP_NO_ERROR;

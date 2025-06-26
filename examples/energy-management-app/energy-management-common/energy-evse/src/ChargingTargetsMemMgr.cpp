@@ -114,9 +114,20 @@ CHIP_ERROR ChargingTargetsMemMgr::AllocAndCopy()
 
     return CHIP_NO_ERROR;
 }
+CHIP_ERROR
+ChargingTargetsMemMgr::AllocAndCopy(const DataModel::List<const Structs::ChargingTargetStruct::Type> & chargingTargets)
+{
+    return AllocAndCopyInternal(chargingTargets);
+}
 
 CHIP_ERROR
 ChargingTargetsMemMgr::AllocAndCopy(const DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> & chargingTargets)
+{
+    return AllocAndCopyInternal(chargingTargets);
+}
+
+template <class ListType> // List<T> or DecodableList<T>
+CHIP_ERROR ChargingTargetsMemMgr::AllocAndCopyInternal(const ListType & chargingTargets)
 {
     // NOTE: ChargingTargetsMemMgr::PrepareDaySchedule() must be called as specified in the class comments in
     // ChargingTargetsMemMgr.h before this method can be called.
@@ -138,7 +149,7 @@ ChargingTargetsMemMgr::AllocAndCopy(const DataModel::DecodableList<Structs::Char
 
         uint16_t idx = 0;
 
-        return chargingTargets.Iterate([&](auto & chargingTarget, bool &) -> CHIP_ERROR {
+        return chargingTargets.for_each([&](auto & chargingTarget, bool &) -> CHIP_ERROR {
             // Check that the idx is still valid
             VerifyOrReturnError(idx < mNumDailyChargingTargets, CHIP_ERROR_INCORRECT_STATE);
 

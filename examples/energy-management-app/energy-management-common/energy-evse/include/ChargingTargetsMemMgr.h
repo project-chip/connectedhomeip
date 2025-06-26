@@ -148,6 +148,9 @@ private:
     EnergyEvse::Structs::ChargingTargetStruct::Type mDailyChargingTargets[kEvseTargetsMaxTargetsPerDay];
     uint16_t mChargingTargetSchedulesIdx;
     uint16_t mNumDailyChargingTargets;
+
+    template <class ListType>
+    CHIP_ERROR AllocAndCopyInternal(const ListType & chargingTargets);
 };
 
 } // namespace EnergyEvse

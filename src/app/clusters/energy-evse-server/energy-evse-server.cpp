@@ -390,7 +390,7 @@ Status Instance::ValidateTargets(
 
     uint8_t dayOfWeekBitmap = 0;
 
-    auto iterateStatus = chargingTargetSchedules.Iterate([&](auto & entry, bool &) -> CHIP_ERROR {
+    auto iterateStatus = chargingTargetSchedules.for_each([&](auto & entry, bool &) -> CHIP_ERROR {
         uint8_t bitmask = entry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(0x7F));
         ChipLogProgress(AppServer, "DayOfWeekForSequence = 0x%02x", bitmask);
 
@@ -403,7 +403,7 @@ Status Instance::ValidateTargets(
         dayOfWeekBitmap |= bitmask; // add this day Of week to the previously seen days
 
         uint8_t innerIdx = 0;
-        return entry.chargingTargets.Iterate([&](auto & targetStruct, bool &) -> CHIP_ERROR {
+        return entry.chargingTargets.for_each([&](auto & targetStruct, bool &) -> CHIP_ERROR {
             uint16_t minutesPastMidnight = targetStruct.targetTimeMinutesPastMidnight;
             ChipLogProgress(AppServer, "[%d] MinutesPastMidnight : %d", innerIdx,
                             static_cast<short unsigned int>(minutesPastMidnight));

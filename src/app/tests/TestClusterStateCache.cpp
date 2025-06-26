@@ -440,7 +440,7 @@ private:
             case AttributeInstruction::kAttributeD:
                 ChipLogProgress(DataManagement, "\t\t -- Validating D (Cluster Obj)");
 
-                auto iterateStatus = clusterValue.listStructOctetString.Iterate([&](auto & value, bool &) -> CHIP_ERROR {
+                auto iterateStatus = clusterValue.listStructOctetString.for_each([&](auto & value, bool &) -> CHIP_ERROR {
                     EXPECT_EQ(value.member1, instruction.mInstructionId);
                     return CHIP_NO_ERROR;
                 });

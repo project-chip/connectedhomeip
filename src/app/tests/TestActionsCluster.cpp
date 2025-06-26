@@ -423,39 +423,36 @@ TEST_F(TestActionsCluster, TestEndpointListAttributeAccess)
     CHIP_ERROR err = list.Decode(attrDataReader);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    int endpoints = 0;
-    list.Iterate([&](auto & endpointList, bool &) -> CHIP_ERROR {
-        if (endpoints++ == 0)
+    auto iter = list.begin();
+    EXPECT_TRUE(iter.Next());
+    Clusters::Actions::Structs::EndpointListStruct::DecodableType endpointList = iter.GetValue();
+    EXPECT_EQ(endpointList.endpointListID, 1);
+    EXPECT_TRUE(strncmp(endpointList.name.data(), "FirstList", endpointList.name.size()) == 0);
+    EXPECT_EQ(endpointList.type, EndpointListTypeEnum::kOther);
+    auto it   = endpointList.endpoints.begin();
+    uint8_t i = 0;
+    while (it.Next())
+    {
+        if (i < 2)
         {
-            EXPECT_EQ(endpointList.endpointListID, 1);
-            EXPECT_TRUE(strncmp(endpointList.name.data(), "FirstList", endpointList.name.size()) == 0);
-            EXPECT_EQ(endpointList.type, EndpointListTypeEnum::kOther);
-            uint8_t i = 0;
-            endpointList.endpoints.Iterate([&](auto & value, bool &) -> CHIP_ERROR {
-                if (i < 2)
-                {
-                    EXPECT_EQ(endpoints1[i++], value);
-                }
-                return CHIP_NO_ERROR;
-            });
+            EXPECT_EQ(endpoints1[i++], it.GetValue());
         }
-        else if (endpoints++ == 1)
+    }
+
+    EXPECT_TRUE(iter.Next());
+    endpointList = iter.GetValue();
+    EXPECT_EQ(endpointList.endpointListID, 2);
+    EXPECT_TRUE(strncmp(endpointList.name.data(), "SecondList", endpointList.name.size()) == 0);
+    EXPECT_EQ(endpointList.type, EndpointListTypeEnum::kOther);
+    it = endpointList.endpoints.begin();
+    i  = 0;
+    while (it.Next())
+    {
+        if (i < 3)
         {
-            EXPECT_EQ(endpointList.endpointListID, 2);
-            EXPECT_TRUE(strncmp(endpointList.name.data(), "SecondList", endpointList.name.size()) == 0);
-            EXPECT_EQ(endpointList.type, EndpointListTypeEnum::kOther);
-            i = 0;
-            endpointList.endpoints.Iterate([&](auto & value, bool &) -> CHIP_ERROR {
-                if (i < 3)
-                {
-                    EXPECT_EQ(endpoints2[i++], value);
-                }
-                return CHIP_NO_ERROR;
-            });
+            EXPECT_EQ(endpoints2[i++], it.GetValue());
         }
-        return CHIP_NO_ERROR;
-    });
-    EXPECT_EQ(endpoints, 2);
+    }
 }
 
 } // namespace app

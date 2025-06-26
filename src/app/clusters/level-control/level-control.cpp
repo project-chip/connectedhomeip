@@ -221,7 +221,7 @@ public:
         uint8_t level = 0;
         // TODO : Uncomment when frequency is supported by the level control cluster
         // uint16_t frequency;
-        auto iterateStatus = attributeValueList.Iterate([&](auto & decodePair, bool &) -> CHIP_ERROR {
+        auto iterateStatus = attributeValueList.for_each([&](auto & decodePair, bool &) -> CHIP_ERROR {
             // If attribute ID was encoded, checks which attribute from LC cluster is there
             switch (decodePair.attributeID)
             {

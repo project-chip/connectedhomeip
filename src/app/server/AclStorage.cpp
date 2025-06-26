@@ -250,7 +250,7 @@ CHIP_ERROR AclStorage::DecodableEntry::Unstage()
 
     if (!mStagingEntry.subjects.IsNull())
     {
-        auto iterateStatus = mStagingEntry.subjects.Value().Iterate([&](auto & value, bool &) -> CHIP_ERROR {
+        auto iterateStatus = mStagingEntry.subjects.Value().for_each([&](auto & value, bool &) -> CHIP_ERROR {
             StagingSubject tmp = { .nodeId = value, .authMode = mStagingEntry.authMode };
             NodeId subject;
             ReturnErrorOnFailure(Convert(tmp, subject));
@@ -261,7 +261,7 @@ CHIP_ERROR AclStorage::DecodableEntry::Unstage()
 
     if (!mStagingEntry.targets.IsNull())
     {
-        auto iterateStatus = mStagingEntry.targets.Value().Iterate([&](auto & value, bool &) -> CHIP_ERROR {
+        auto iterateStatus = mStagingEntry.targets.Value().for_each([&](auto & value, bool &) -> CHIP_ERROR {
             Target target;
             ReturnErrorOnFailure(Convert(value, target));
             return mEntry.AddTarget(nullptr, target);

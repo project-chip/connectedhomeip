@@ -118,7 +118,7 @@ TEST_F(TestCommands, TestDataResponse)
     auto onSuccessCb = [&onSuccessWasCalled](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
                                              const auto & dataResponse) {
         uint8_t i          = 0;
-        auto iterateStatus = dataResponse.arg1.Iterate([&](auto & item, bool &) -> CHIP_ERROR {
+        auto iterateStatus = dataResponse.arg1.for_each([&](auto & item, bool &) -> CHIP_ERROR {
             EXPECT_EQ(item.a, i);
             EXPECT_FALSE(item.b);
             EXPECT_EQ(item.c.a, i);

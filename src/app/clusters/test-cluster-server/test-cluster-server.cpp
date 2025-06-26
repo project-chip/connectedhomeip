@@ -339,7 +339,7 @@ CHIP_ERROR TestAttrAccess::WriteListInt8uAttribute(const ConcreteDataAttributePa
 
         uint8_t index      = 0;
         gListUint8DataLen  = 0;
-        auto iterateStatus = list.Iterate([&](auto & entry, bool &) -> CHIP_ERROR {
+        auto iterateStatus = list.for_each([&](auto & entry, bool &) -> CHIP_ERROR {
             VerifyOrReturnError(index < kAttributeListLength, CHIP_ERROR_BUFFER_TOO_SMALL);
             gListUint8Data[index++] = entry;
             return CHIP_NO_ERROR;
@@ -382,7 +382,7 @@ CHIP_ERROR TestAttrAccess::WriteListOctetStringAttribute(const ConcreteDataAttri
 
         uint8_t index           = 0;
         gListOctetStringDataLen = 0;
-        auto iterateStatus      = list.Iterate([&](auto & entry, bool &) -> CHIP_ERROR {
+        auto iterateStatus      = list.for_each([&](auto & entry, bool &) -> CHIP_ERROR {
             VerifyOrReturnError(index < kAttributeListLength, CHIP_ERROR_BUFFER_TOO_SMALL);
             VerifyOrReturnError(entry.size() <= kAttributeEntryLength, CHIP_ERROR_BUFFER_TOO_SMALL);
             memcpy(gListOctetStringData[index].Data(), entry.data(), entry.size());
@@ -435,7 +435,7 @@ CHIP_ERROR TestAttrAccess::WriteListLongOctetStringAttribute(const ConcreteDataA
         ReturnErrorOnFailure(aDecoder.Decode(list));
 
         gListLongOctetStringLen = 0;
-        return list.Iterate([&](auto & entry, bool &) -> CHIP_ERROR {
+        return list.for_each([&](auto & entry, bool &) -> CHIP_ERROR {
             VerifyOrReturnError(entry.size() == sizeof(sLongOctetStringBuf) - 1, CHIP_ERROR_BUFFER_TOO_SMALL);
             VerifyOrReturnError(memcmp(entry.data(), sLongOctetStringBuf, entry.size()) == 0, CHIP_ERROR_INVALID_ARGUMENT);
             gListLongOctetStringLen++;
@@ -481,7 +481,7 @@ CHIP_ERROR TestAttrAccess::WriteListStructOctetStringAttribute(const ConcreteDat
         ReturnErrorOnFailure(aDecoder.Decode(list));
 
         uint8_t index      = 0;
-        auto iterateStatus = list.Iterate([&](auto & entry, bool &) -> CHIP_ERROR {
+        auto iterateStatus = list.for_each([&](auto & entry, bool &) -> CHIP_ERROR {
             VerifyOrReturnError(index < kAttributeListLength, CHIP_ERROR_BUFFER_TOO_SMALL);
             VerifyOrReturnError(entry.member2.size() <= kAttributeEntryLength, CHIP_ERROR_BUFFER_TOO_SMALL);
             memcpy(gListOperationalCert[index].Data(), entry.member2.data(), entry.member2.size());
@@ -572,8 +572,8 @@ CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(const C
             ReturnErrorOnFailure(value.nullableList.Value().ComputeSize(count));
             VerifyOrReturnError(count <= MATTER_ARRAY_SIZE(gSimpleEnums), CHIP_ERROR_INVALID_ARGUMENT);
             gSimpleEnumCount   = 0;
-            auto iterateStatus = value.nullableList.Value().Iterate([&](auto & value, bool &) -> CHIP_ERROR {
-                gSimpleEnums[gSimpleEnumCount++] = value;
+            auto iterateStatus = value.nullableList.Value().for_each([&](auto & entry, bool &) -> CHIP_ERROR {
+                gSimpleEnums[gSimpleEnumCount++] = entry;
                 return CHIP_NO_ERROR;
             });
             ReturnErrorOnFailure(iterateStatus);
@@ -672,7 +672,7 @@ CHIP_ERROR TestAttrAccess::WriteListFabricScopedListEntry(const Structs::TestFab
     gListFabricScopedAttributeValue[index].fabricSensitiveInt8u  = entry.fabricSensitiveInt8u;
 
     size_t i           = 0;
-    auto iterateStatus = entry.fabricSensitiveInt8uList.Iterate([&](auto & intValue, bool &) -> CHIP_ERROR {
+    auto iterateStatus = entry.fabricSensitiveInt8uList.for_each([&](auto & intValue, bool &) -> CHIP_ERROR {
         VerifyOrReturnError(i < kFabricSensitiveIntListLength, CHIP_ERROR_BUFFER_TOO_SMALL);
         gListFabricScoped_fabricSensitiveInt8uList[index][i++] = intValue;
         return CHIP_NO_ERROR;
@@ -730,7 +730,7 @@ CHIP_ERROR TestAttrAccess::WriteListFabricScopedAttribute(const ConcreteDataAttr
         ReturnErrorOnFailure(list.ComputeSize(size));
 
         auto iterateStatus =
-            list.Iterate([&](auto & entry, bool &) -> CHIP_ERROR { return WriteListFabricScopedListEntry(entry, dstIndex++); });
+            list.for_each([&](auto & entry, bool &) -> CHIP_ERROR { return WriteListFabricScopedListEntry(entry, dstIndex++); });
         ReturnErrorOnFailure(iterateStatus);
 
         gListFabricScopedAttributeLen = dstIndex;
@@ -857,7 +857,7 @@ bool emberAfUnitTestingClusterTestListStructArgumentRequestCallback(
     Commands::TestListStructArgumentRequest::DecodableType const & commandData)
 {
     bool shouldReturnTrue = true;
-    auto iterateStatus    = commandData.arg1.Iterate([&](auto & structValue, bool &) -> CHIP_ERROR {
+    auto iterateStatus    = commandData.arg1.for_each([&](auto & structValue, bool &) -> CHIP_ERROR {
         shouldReturnTrue = shouldReturnTrue && structValue.b;
         return CHIP_NO_ERROR;
     });
@@ -915,7 +915,7 @@ bool emberAfUnitTestingClusterTestListInt8UArgumentRequestCallback(
 {
     bool shouldReturnTrue = true;
 
-    auto iterateStatus = commandData.arg1.Iterate([&](auto & value, bool &) -> CHIP_ERROR {
+    auto iterateStatus = commandData.arg1.for_each([&](auto & value, bool &) -> CHIP_ERROR {
         shouldReturnTrue = shouldReturnTrue && (value != 0);
         return CHIP_NO_ERROR;
     });
@@ -935,7 +935,7 @@ bool emberAfUnitTestingClusterTestNestedStructListArgumentRequestCallback(
 {
     bool shouldReturnTrue = commandData.arg1.c.b;
 
-    auto iterateStatus = commandData.arg1.d.Iterate([&](auto & structValue, bool &) -> CHIP_ERROR {
+    auto iterateStatus = commandData.arg1.d.for_each([&](auto & structValue, bool &) -> CHIP_ERROR {
         shouldReturnTrue = shouldReturnTrue && structValue.b;
         return CHIP_NO_ERROR;
     });
@@ -955,10 +955,10 @@ bool emberAfUnitTestingClusterTestListNestedStructListArgumentRequestCallback(
 {
     bool shouldReturnTrue = true;
 
-    auto iterateStatus = commandData.arg1.Iterate([&](auto & structValue, bool &) -> CHIP_ERROR {
+    auto iterateStatus = commandData.arg1.for_each([&](auto & structValue, bool &) -> CHIP_ERROR {
         shouldReturnTrue = shouldReturnTrue && structValue.c.b;
 
-        return structValue.d.Iterate([&](auto & subStructValue, bool &) -> CHIP_ERROR {
+        return structValue.d.for_each([&](auto & subStructValue, bool &) -> CHIP_ERROR {
             shouldReturnTrue = shouldReturnTrue && subStructValue.b;
             return CHIP_NO_ERROR;
         });
@@ -991,7 +991,7 @@ bool emberAfUnitTestingClusterTestListInt8UReverseRequestCallback(
         size_t cur = count;
         Platform::ScopedMemoryBuffer<uint8_t> responseBuf;
         VerifyOrExit(responseBuf.Calloc(count), );
-        auto iterateStatus = commandData.arg1.Iterate([&](auto & value, bool & breakLoop) -> CHIP_ERROR {
+        auto iterateStatus = commandData.arg1.for_each([&](auto & value, bool & breakLoop) -> CHIP_ERROR {
             responseBuf[cur - 1] = value;
             if (--cur <= 0)
             {

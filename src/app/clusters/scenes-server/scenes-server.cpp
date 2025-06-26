@@ -395,7 +395,7 @@ void AddSceneParse(CommandHandlerInterface::HandlerContext & ctx, const CommandD
     }
 
     // Goes through all EFS in command
-    auto iterateStatus = req.extensionFieldSetStructs.Iterate([&](auto & fieldSet, bool & breakLoop) -> CHIP_ERROR {
+    auto iterateStatus = req.extensionFieldSetStructs.for_each([&](auto & fieldSet, bool & breakLoop) -> CHIP_ERROR {
         scenes::ExtensionFieldSet tempEFS;
         tempEFS.mID = fieldSet.clusterID;
 

@@ -2629,7 +2629,7 @@ CHIP_ERROR DeviceCommissioner::ParseFabrics(ReadCommissioningInfo & info)
             Fabrics::TypeInfo::DecodableType fabrics;
             ReturnErrorOnFailure(this->mAttributeCache->Get<Fabrics::TypeInfo>(path, fabrics));
             // this is a best effort attempt to find a matching fabric, so no error checking on iter
-            auto iterateStatus = fabrics.Iterate([&](auto & fabricDescriptor, bool &) -> CHIP_ERROR {
+            auto iterateStatus = fabrics.for_each([&](auto & fabricDescriptor, bool &) -> CHIP_ERROR {
                 ChipLogProgress(Controller,
                                 "DeviceCommissioner::OnDone - fabric.vendorId=0x%04X fabric.fabricId=0x" ChipLogFormatX64
                                 " fabric.nodeId=0x" ChipLogFormatX64,

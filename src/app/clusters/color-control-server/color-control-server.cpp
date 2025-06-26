@@ -208,7 +208,7 @@ public:
         uint8_t loopDirectionValue = 0x00;
         uint16_t loopTimeValue     = 0x0019; // Default loop time value according to spec
 
-        auto iterateStatus = attributeValueList.Iterate([&](auto & decodePair, bool &) -> CHIP_ERROR {
+        auto iterateStatus = attributeValueList.for_each([&](auto & decodePair, bool &) -> CHIP_ERROR {
             switch (decodePair.attributeID)
             {
             case Attributes::CurrentX::Id:
