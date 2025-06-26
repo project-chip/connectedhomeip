@@ -184,5 +184,5 @@ void ClosureControlEndpoint::OnCalibrateActionComplete()
 
 void ClosureControlEndpoint::OnMoveToActionComplete()
 {
-    // This function should handle closure control state updation after completion of Motion Action
+    // This function should handle closure control state updation after completion of Motion Action.
 }

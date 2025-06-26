@@ -208,12 +208,6 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
             instance.HandleClosureActionComplete(instance.GetCurrentAction());
         });
         break;
-    case Action_t::LATCH_ACTION:
-        PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager & instance = ClosureManager::GetInstance();
-            instance.HandleClosureActionComplete(instance.GetCurrentAction());
-        });
-        break;
     case Action_t::SET_TARGET_ACTION:
         PlatformMgr().ScheduleWork([](intptr_t) {
             ClosureManager & instance = ClosureManager::GetInstance();

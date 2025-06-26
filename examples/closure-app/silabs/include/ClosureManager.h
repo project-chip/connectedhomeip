@@ -40,7 +40,6 @@ public:
         MOVE_TO_ACTION,
         STOP_MOTION_ACTION,
         STOP_CALIBRATE_ACTION,
-        LATCH_ACTION,
         SET_TARGET_ACTION,
         PANEL_LATCH_ACTION,
 
@@ -225,10 +224,10 @@ private:
      * @brief Handles the action to set the target position of the panel for a panel endpoint.
      *
      * This method manages the state transitions and actions for closure endpoints (such as panels or doors)
-     * during a motion event. It updates the current positions of endpoints 2 and 3 to next position. 
+     * during a motion event. It updates the current positions of endpoints 2/3 to next position. 
      * It also triggers
      *       - Timer for SetTarget action completion if the target position is not reached
-     *       - Timer for Panel Latch action if needed based on the current state of the closure.
+     *       - Timer for Panel Latch action if needed
      *       - HandleMotionActionComplete to finalize the motion action when the target is reached.
      *
      * @param endpointId The identifier of the endpoint for which the panel target action should be handled.
