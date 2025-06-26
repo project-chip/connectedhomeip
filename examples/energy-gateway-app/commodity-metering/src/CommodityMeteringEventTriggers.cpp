@@ -18,11 +18,37 @@
 
 #include <CommodityMeteringInstance.h>
 #include <app/clusters/commodity-metering-server/CommodityMeteringTestEventTriggerHandler.h>
+#include <cstdint>
+#include <array>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CommodityMetering;
+
+namespace MeteredQuantitySamples {
+    // Define component arrays as constexpr
+    namespace Sample1 {
+        static constexpr uint32_t TariffComponents1[] = {0x5001, 0x5003};
+        static constexpr uint32_t TariffComponents2[] = {0x5002, 0x5003, 0x5004};
+        
+        // Non-constexpr storage for the actual data
+        static const Structs::MeteredQuantityStruct::Type Data[] = {
+            { DataModel::List<const uint32_t>(TariffComponents1, sizeof(TariffComponents1)/sizeof(TariffComponents1[0])), 3500 },
+            { DataModel::List<const uint32_t>(TariffComponents2, sizeof(TariffComponents2)/sizeof(TariffComponents2[0])), -2000 }
+        };
+    }
+
+    namespace Sample2 {
+        static constexpr uint32_t TariffComponents1[] = {0x6001};
+        static constexpr uint32_t TariffComponents2[] = {0x6002, 0x6003};
+        
+        static const Structs::MeteredQuantityStruct::Type Data[] = {
+            { DataModel::List<const uint32_t>(TariffComponents1, sizeof(TariffComponents1)/sizeof(TariffComponents1[0])), 4200 },
+            { DataModel::List<const uint32_t>(TariffComponents2, sizeof(TariffComponents2)/sizeof(TariffComponents2[0])), -1500 }
+        };
+    }
+}
 
 namespace {
 
@@ -30,142 +56,119 @@ class OldCommodityMeteringAttributes
 {
 private:
     Instance * mInstance                           = nullptr;
-    static constexpr size_t kMaximumStringSize     = 64;
-    char mPointOfDeliveryBuf[kMaximumStringSize]   = {};
-    char mMeterSerialNumberBuf[kMaximumStringSize] = {};
-    char mProtocolVersionBuf[kMaximumStringSize]   = {};
-    DataModel::Nullable<MeterTypeEnum> mMeterType;
-    DataModel::Nullable<CharSpan> mPointOfDelivery;
-    DataModel::Nullable<CharSpan> mMeterSerialNumber;
-    DataModel::Nullable<CharSpan> mProtocolVersion;
-    DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> mPowerThreshold;
 
-    struct DataPresets_s
+    DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> mMeteredQuantity;
+    DataModel::Nullable<uint32_t> mMeteredQuantityTimestamp;
+    Globals::TariffUnitEnum mTariffUnit;
+
+
+    DataModel::List<Structs::MeteredQuantityStruct::Type> GetMeteredQuantityDataSample(uint8_t presetIdx)
     {
-        DataModel::Nullable<MeterTypeEnum> meterType;
-        DataModel::Nullable<CharSpan> pointOfDelivery;
-        DataModel::Nullable<CharSpan> meterSerialNumber;
-        DataModel::Nullable<CharSpan> protocolVersion;
-        DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> powerThreshold;
-    };
-
-    static constexpr uint8_t kMaxPresetItems = 2u;
-    uint8_t mPresetsIdx;
-
-    const DataPresets_s TestsDataPresets[kMaxPresetItems] = {
-        { .meterType         = DataModel::MakeNullable(MeterTypeEnum::kUtility),
-          .pointOfDelivery   = DataModel::MakeNullable(CharSpan::fromCharString("Test delivery point")),
-          .meterSerialNumber = DataModel::MakeNullable(CharSpan::fromCharString("TST-123456789")),
-          .protocolVersion   = DataModel::MakeNullable(CharSpan::fromCharString("1.2.3")),
-          .powerThreshold    = DataModel::MakeNullable(Globals::Structs::PowerThresholdStruct::Type(
-              { Optional<int64_t>(2400000), Optional<int64_t>(120), Globals::PowerThresholdSourceEnum::kContract })) },
-        { .meterType         = DataModel::MakeNullable(MeterTypeEnum::kPrivate),
-          .pointOfDelivery   = DataModel::MakeNullable(CharSpan::fromCharString("New delivery point")),
-          .meterSerialNumber = DataModel::MakeNullable(CharSpan::fromCharString("NEW-987654321")),
-          .protocolVersion   = DataModel::MakeNullable(CharSpan::fromCharString("3.4.5")),
-          .powerThreshold    = DataModel::MakeNullable(Globals::Structs::PowerThresholdStruct::Type(
-              { Optional<int64_t>(4800000), Optional<int64_t>(240), Globals::PowerThresholdSourceEnum::kRegulator })) }
-    };
-
-    static bool NullableCharSpansEqual(const DataModel::Nullable<CharSpan> & a, const DataModel::Nullable<CharSpan> & b)
-    {
-        if (a.IsNull() && b.IsNull())
-        {
-            return true;
-        }
-
-        if (!a.IsNull() && !b.IsNull())
-        {
-            return a.Value().data_equal(b.Value());
-        }
-
-        return false;
-    }
-
-    void SavePointOfDelivery(const DataModel::Nullable<CharSpan> & newValue)
-    {
-        if (NullableCharSpansEqual(newValue, mPointOfDelivery))
-        {
-            return;
-        }
-
-        if (!mPointOfDelivery.IsNull())
-        {
-            mPointOfDelivery.SetNull();
-        }
-
-        if (!newValue.IsNull())
-        {
-            const size_t len = newValue.IsNull()               ? 0
-                : newValue.Value().size() < kMaximumStringSize ? newValue.Value().size()
-                                                               : kMaximumStringSize;
-            memmove(mPointOfDeliveryBuf, newValue.Value().data(), len);
-            mPointOfDelivery = DataModel::MakeNullable(CharSpan(mPointOfDeliveryBuf, len));
+        switch (presetIdx) {
+            case 0:
+                return DataModel::List<Structs::MeteredQuantityStruct::Type>(
+                    const_cast<Structs::MeteredQuantityStruct::Type*>(MeteredQuantitySamples::Sample1::Data),
+                    sizeof(MeteredQuantitySamples::Sample1::Data)/sizeof(MeteredQuantitySamples::Sample1::Data[0])
+                );
+            case 1:
+                return DataModel::List<Structs::MeteredQuantityStruct::Type>(
+                    const_cast<Structs::MeteredQuantityStruct::Type*>(MeteredQuantitySamples::Sample2::Data),
+                    sizeof(MeteredQuantitySamples::Sample2::Data)/sizeof(MeteredQuantitySamples::Sample2::Data[0])
+                );
+            default:
+                return DataModel::List<Structs::MeteredQuantityStruct::Type>();
         }
     }
 
-    void SaveMeterSerialNumber(const DataModel::Nullable<CharSpan> & newValue)
+    void SaveMeteredQuantity(const DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> & newValue)
     {
-        if (NullableCharSpansEqual(newValue, mMeterSerialNumber))
-        {
-            return;
-        }
-
-        if (!mMeterSerialNumber.IsNull())
-        {
-            mMeterSerialNumber.SetNull();
-        }
+        // Clear existing data if any
+        mMeteredQuantity.SetNull(); 
 
         if (!newValue.IsNull())
         {
-            const size_t len = newValue.IsNull()               ? 0
-                : newValue.Value().size() < kMaximumStringSize ? newValue.Value().size()
-                                                               : kMaximumStringSize;
-            memmove(mMeterSerialNumberBuf, newValue.Value().data(), len);
-            mMeterSerialNumber = DataModel::MakeNullable(CharSpan(mMeterSerialNumberBuf, len));
+            const auto & sourceList = newValue.Value();
+            const size_t count = sourceList.size(); 
+
+            if (count > 0)
+            {
+                // Allocate memory for the new list
+                auto * newList = static_cast<Structs::MeteredQuantityStruct::Type *>(Platform::MemoryCalloc(count, sizeof(Structs::MeteredQuantityStruct::Type)));
+                if (newList == nullptr)
+                {
+                    ChipLogError(Zcl, "Failed to allocate memory for MeteredQuantity");
+                    return;
+                }   
+
+                // Copy each element
+                for (size_t i = 0; i < count; i++)
+                {
+                    const auto & src = sourceList[i];
+
+                    // Allocate memory for tariffComponentIDs
+                    auto * components = static_cast<uint32_t *>(Platform::MemoryCalloc(src.tariffComponentIDs.size(), sizeof(uint32_t)));
+                    if (components == nullptr)
+                    {
+                        // Clean up previously allocated memory
+                        Platform::Delete(newList);
+                        ChipLogError(Zcl, "Failed to allocate memory for tariffComponentIDs");
+                        return;
+                    }
+
+                    // Copy component IDs
+                    std::copy(src.tariffComponentIDs.begin(), src.tariffComponentIDs.end(), components);
+
+                    // Create new entry
+                    newList[i] = Structs::MeteredQuantityStruct::Type{
+                        DataModel::List<const uint32_t>(components, src.tariffComponentIDs.size()),
+                        src.quantity
+                    };
+                }   
+
+                // Create the new list
+                mMeteredQuantity = DataModel::MakeNullable(
+                    DataModel::List<Structs::MeteredQuantityStruct::Type>(newList, count)
+                );
+            }
+            else
+            {
+                // Empty list case
+                mMeteredQuantity = DataModel::MakeNullable(
+                    DataModel::List<Structs::MeteredQuantityStruct::Type>()
+                );
+            }
         }
     }
 
-    void SaveProtocolVersion(const DataModel::Nullable<CharSpan> & newValue)
+    void ClearMeteredQuantity()
     {
-        if (NullableCharSpansEqual(newValue, mProtocolVersion))
+        if (!mMeteredQuantity.IsNull())
         {
-            return;
-        }
-
-        if (!mProtocolVersion.IsNull())
-        {
-            mProtocolVersion.SetNull();
-        }
-
-        if (!newValue.IsNull())
-        {
-            const size_t len = newValue.IsNull()               ? 0
-                : newValue.Value().size() < kMaximumStringSize ? newValue.Value().size()
-                                                               : kMaximumStringSize;
-            memmove(mProtocolVersionBuf, newValue.Value().data(), len);
-            mProtocolVersion = DataModel::MakeNullable(CharSpan(mProtocolVersionBuf, len));
+            for (auto & item : mMeteredQuantity.Value())
+            {
+                if (!item.tariffComponentIDs.empty())
+                {
+                    Platform::Delete(const_cast<uint32_t*>(item.tariffComponentIDs.data()));
+                }
+            }
+            Platform::Delete(const_cast<Structs::MeteredQuantityStruct::Type*>(mMeteredQuantity.Value().data()));
+            mMeteredQuantity.SetNull();
         }
     }
 
     void SaveAttributes()
     {
         mInstance = GetInstance();
-        VerifyOrDieWithMsg(mInstance, AppServer, "Meter Identification instance is null");
-        mMeterType = mInstance->GetMeterType();
-        SavePointOfDelivery(mInstance->GetPointOfDelivery());
-        SaveMeterSerialNumber(mInstance->GetMeterSerialNumber());
-        SaveProtocolVersion(mInstance->GetProtocolVersion());
-        mPowerThreshold = mInstance->GetPowerThreshold();
+        VerifyOrDieWithMsg(mInstance, AppServer, "CommodityMetering instance is null");
+        SaveMeteredQuantity(mInstance->GetMeteredQuantity());
+        mMeteredQuantityTimestamp = mInstance->GetMeteredQuantityTimestamp();        
+        mTariffUnit = mInstance->GetTariffUnit();
     }
 
     void ClearAttributes()
     {
-        mPointOfDelivery.SetNull();
-        mMeterSerialNumber.SetNull();
-        mProtocolVersion.SetNull();
-        mMeterType.SetNull();
-        mPowerThreshold.SetNull();
+        ClearMeteredQuantity();
+        mMeteredQuantityTimestamp.SetNull();
         mInstance = nullptr;
     }
 
@@ -173,27 +176,42 @@ private:
     {
         if (mInstance)
         {
-            mInstance->SetMeterType(mMeterType);
-            mInstance->SetPointOfDelivery(mPointOfDelivery);
-            mInstance->SetMeterSerialNumber(mMeterSerialNumber);
-            mInstance->SetProtocolVersion(mProtocolVersion);
-            mInstance->SetPowerThreshold(mPowerThreshold);
+            mInstance->SetMeteredQuantity(mMeteredQuantity);
+            mInstance->SetMeteredQuantityTimestamp(mMeteredQuantityTimestamp);
+            mInstance->SetTariffUnit(mTariffUnit);
         }
     }
 
-    void UpdAttrsByPresetIdx()
+    void UpdAttrs()
     {
-        mInstance->SetMeterType(TestsDataPresets[mPresetsIdx].meterType);
-        mInstance->SetPointOfDelivery(TestsDataPresets[mPresetsIdx].pointOfDelivery);
-        mInstance->SetMeterSerialNumber(TestsDataPresets[mPresetsIdx].meterSerialNumber);
-        mInstance->SetProtocolVersion(TestsDataPresets[mPresetsIdx].protocolVersion);
-        mInstance->SetPowerThreshold(TestsDataPresets[mPresetsIdx].powerThreshold);
+        uint32_t matterEpoch = 0;
 
-        mPresetsIdx = !mPresetsIdx;
+        CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(matterEpoch);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Support, "UpdAttrs() could not get time");
+        }
+
+        mMeteredQuantityTimestamp = DataModel::MakeNullable(matterEpoch);
+
+        if (mTariffUnit == Globals::TariffUnitEnum::kKWh)
+        {
+            mTariffUnit = Globals::TariffUnitEnum::kKVAh;
+        }
+        else
+        {
+            mTariffUnit = Globals::TariffUnitEnum::kKWh;
+        }
+
+        auto MQListSample = GetMeteredQuantityDataSample(static_cast<uint8_t>(mTariffUnit == Globals::TariffUnitEnum::kKWh));
+
+        mInstance->SetMeteredQuantity(MakeNullable(MQListSample));
+        mInstance->SetMeteredQuantityTimestamp(mMeteredQuantityTimestamp);
+        mInstance->SetTariffUnit(mTariffUnit);
     }
 
 public:
-    OldCommodityMeteringAttributes() { mPresetsIdx = 0; };
+    OldCommodityMeteringAttributes() {};
     ~OldCommodityMeteringAttributes() = default;
 
     void Update()
@@ -203,7 +221,7 @@ public:
             SaveAttributes();
         }
 
-        UpdAttrsByPresetIdx();
+        UpdAttrs();
     }
 
     void Clear()
@@ -223,11 +241,11 @@ bool HandleCommodityMeteringTestEventTrigger(uint64_t eventTrigger)
     switch (trigger)
     {
     case CommodityMeteringTrigger::kAttributesValueUpdate:
-        ChipLogProgress(Support, "[MTRID-Test-Event] => Attributes value update");
+        ChipLogProgress(Support, "[CommodityMetering-Test-Event] => Attributes value update");
         mOldCommodityMeteringAttributes.Update();
         break;
     case CommodityMeteringTrigger::kAttributesValueUpdateClear:
-        ChipLogProgress(Support, "[MTRID-Test-Event] => Attributes value clear");
+        ChipLogProgress(Support, "[CommodityMetering-Test-Event] => Attributes value clear");
         mOldCommodityMeteringAttributes.Clear();
         break;
     default:
