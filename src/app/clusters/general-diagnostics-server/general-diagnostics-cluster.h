@@ -16,9 +16,9 @@
  */
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-logic.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <clusters/GeneralDiagnostics/ClusterId.h>
 #include <platform/GeneralFaults.h>
 
@@ -26,18 +26,20 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-class GeneralDiagnosticsCluster : public DefaultServerCluster {
+class GeneralDiagnosticsCluster : public DefaultServerCluster
+{
 public:
     GeneralDiagnosticsCluster(GeneralDiagnosticsEnabledAttributes attributes) :
-        DefaultServerCluster({kRootEndpointId, GeneralDiagnostics::Id}),
-        mLogic(attributes)
+        DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }), mLogic(attributes)
     {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
-    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments, CommandHandler * handler) override;
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override;
 
-     /**
+    /**
      * @brief
      *   Called after the current device is rebooted.
      */
@@ -75,8 +77,7 @@ private:
 
 protected:
     GeneralDiagnosticsLogic mLogic;
-
 };
-}
-}
-}
+} // namespace Clusters
+} // namespace app
+} // namespace chip
