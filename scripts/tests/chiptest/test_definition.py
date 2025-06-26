@@ -220,6 +220,7 @@ class ApplicationPaths:
                 self.fabric_bridge_app, self.ota_provider_app, self.ota_requestor_app,
                 self.tv_app, self.bridge_app, self.lit_icd_app,
                 self.microwave_oven_app, self.chip_repl_yaml_tester_cmd,
+                self.chip_tool_with_python_cmd, self.rvc_app, self.network_manager_app]
 
     def items_with_key(self):
         """
