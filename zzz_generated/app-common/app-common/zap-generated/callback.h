@@ -7873,17 +7873,23 @@ bool emberAfZoneManagementClusterUpdateTwoDCartesianZoneCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ZoneManagement::Commands::UpdateTwoDCartesianZone::DecodableType & commandData);
 /**
- * @brief Zone Management Cluster GetTwoDCartesianZone Command callback (from client)
- */
-bool emberAfZoneManagementClusterGetTwoDCartesianZoneCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZone::DecodableType & commandData);
-/**
  * @brief Zone Management Cluster RemoveZone Command callback (from client)
  */
 bool emberAfZoneManagementClusterRemoveZoneCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ZoneManagement::Commands::RemoveZone::DecodableType & commandData);
+/**
+ * @brief Zone Management Cluster CreateOrUpdateTrigger Command callback (from client)
+ */
+bool emberAfZoneManagementClusterCreateOrUpdateTriggerCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ZoneManagement::Commands::CreateOrUpdateTrigger::DecodableType & commandData);
+/**
+ * @brief Zone Management Cluster RemoveTrigger Command callback (from client)
+ */
+bool emberAfZoneManagementClusterRemoveTriggerCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ZoneManagement::Commands::RemoveTrigger::DecodableType & commandData);
 /**
  * @brief Push AV Stream Transport Cluster AllocatePushTransport Command callback (from client)
  */
@@ -8316,6 +8322,12 @@ bool emberAfUnitTestingClusterStringEchoRequestCallback(
 bool emberAfUnitTestingClusterGlobalEchoRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::UnitTesting::Commands::GlobalEchoRequest::DecodableType & commandData);
+/**
+ * @brief Unit Testing Cluster TestCheckCommandFlags Command callback (from client)
+ */
+bool emberAfUnitTestingClusterTestCheckCommandFlagsCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::UnitTesting::Commands::TestCheckCommandFlags::DecodableType & commandData);
 /**
  * @brief Unit Testing Cluster TestDifferentVendorMeiRequest Command callback (from client)
  */

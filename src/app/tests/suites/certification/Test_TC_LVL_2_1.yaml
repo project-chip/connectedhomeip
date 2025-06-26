@@ -62,6 +62,8 @@ tests:
           saveAs: MinLevelValue
           constraints:
               type: int8u
+              minValue: 1
+              maxValue: 254
 
     - label: "Step 3b: TH reads the MinLevel attribute from the DUT"
       PICS: LVL.S.A0002 && !LVL.S.F01
@@ -137,7 +139,7 @@ tests:
               minValue: 0
               maxValue: 65535
 
-    - label: "Step 7: TH reads the MaxFrequency attribute from the DUT"
+    - label: "Step 7a: TH reads the MaxFrequency attribute from the DUT"
       PICS: LVL.S.A0006
       command: "readAttribute"
       attribute: "MaxFrequency"
