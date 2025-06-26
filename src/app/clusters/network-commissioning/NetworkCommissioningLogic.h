@@ -142,12 +142,12 @@ public:
         return 0;
     }
 
-    BitMask<chip::DeviceLayer::NetworkCommissioning::ThreadCapabilities> GetThreadCapabilities() const
+    BitMask<DeviceLayer::NetworkCommissioning::ThreadCapabilities> GetThreadCapabilities() const
     {
 #if (CHIP_DEVICE_CONFIG_ENABLE_THREAD)
         if (mFeatureFlags.Has(NetworkCommissioning::Feature::kThreadNetworkInterface))
         {
-            return mpDriver.Get<chip::DeviceLayer::NetworkCommissioning::ThreadDriver *>()->GetSupportedThreadFeatures();
+            return mpDriver.Get<DeviceLayer::NetworkCommissioning::ThreadDriver *>()->GetSupportedThreadFeatures();
         }
 #endif
         return {};
