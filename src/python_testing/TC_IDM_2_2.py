@@ -849,7 +849,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                              "Session does not have associated TCP connection")
         asserts.assert_equal(device.sessionAllowsLargePayload, True,
                              "Session does not support large payloads")
-        read_chunks = await self.default_controller.ReadAttribute(self.dut_node_id, ([]),
+        await self.default_controller.ReadAttribute(self.dut_node_id, ([]),
                                                                   payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
 
         # Note: The SuppressResponse field verification is handled at the transport layer
