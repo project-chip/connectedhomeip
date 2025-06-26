@@ -530,7 +530,7 @@ class TC_IDM_4_2(MatterBaseTest):
             [(0, node_label_attr(value=new_node_label_write))]
         )
 
-        node_label_update_cb.wait_for_report()
+        node_label_update_cb.wait_for_attribute_report()
 
         # Save the time that the report is received
         t_update_sec = time.time()

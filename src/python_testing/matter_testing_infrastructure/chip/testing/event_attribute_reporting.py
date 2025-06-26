@@ -190,7 +190,7 @@ class AttributeCallback:
             else:
                 valid_report = True
         elif path.AttributeType == self._expected_attribute:
-            logging.debug(f"[AttributeChangeCallback] Attribute update callback for {path.AttributeType}")
+            logging.info(f"[AttributeCallback] Attribute update callback for {path.AttributeType}")
             q = (path, transaction)
             self._q.put(q)
 
@@ -204,7 +204,7 @@ class AttributeCallback:
                 self._attribute_report_counts[path.AttributeType] += 1
                 self._attribute_reports[path.AttributeType].append(value)
 
-    def wait_for_report(self):
+    def wait_for_attribute_report(self):
         try:
             path, transaction = self._q.get(block=True, timeout=10)
         except queue.Empty:
