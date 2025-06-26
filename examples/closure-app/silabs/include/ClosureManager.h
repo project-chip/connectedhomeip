@@ -115,11 +115,10 @@ public:
      * @param endpointId The endpoint on which to perform the operation.
      * @return chip::Protocols::InteractionModel::Status Status of the command execution.
      */
-    chip::Protocols::InteractionModel::Status OnStepCommand(
-        const chip::app::Clusters::ClosureDimension::StepDirectionEnum & direction,
-        const uint16_t & numberOfSteps,
-        const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
-        const chip::EndpointId & endpointId);
+    chip::Protocols::InteractionModel::Status
+    OnStepCommand(const chip::app::Clusters::ClosureDimension::StepDirectionEnum & direction, const uint16_t & numberOfSteps,
+                  const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
+                  const chip::EndpointId & endpointId);
 
     /**
      * @brief Sets the current action being performed by the closure device.
@@ -140,9 +139,9 @@ private:
     osTimerId_t mClosureTimer;
 
     bool isCalibrationInProgress = false;
-    bool isStepActionInProgress = false;
+    bool isStepActionInProgress  = false;
 
-    Action_t mCurrentAction      = Action_t::INVALID_ACTION;
+    Action_t mCurrentAction                   = Action_t::INVALID_ACTION;
     chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
 
     // Define the endpoint ID for the Closure

@@ -202,7 +202,8 @@ void ClosureControlEndpoint::OnStepActionComplete()
     if (overallState.IsNull())
     {
         overallState.SetNonNull(GenericOverallState(position, NullOptional, NullOptional, NullOptional));
-    } else
+    }
+    else
     {
         overallState.Value().positioning = position;
     }

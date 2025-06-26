@@ -34,7 +34,7 @@ using namespace chip::app::Clusters::ClosureControl;
 using namespace chip::app::Clusters::ClosureDimension;
 
 namespace {
-constexpr uint32_t kCountdownTimeSeconds = 10;
+constexpr uint32_t kCountdownTimeSeconds  = 10;
 constexpr ElapsedS kMotionCountdownTimeMs = 1000;
 
 // Define the Namespace and Tag for the endpoint
@@ -291,10 +291,10 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
     return Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(
-    const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
-    const Optional<Globals::ThreeLevelAutoEnum> & speed,
-    const chip::EndpointId & endpointId)
+chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const StepDirectionEnum & direction,
+                                                                        const uint16_t & numberOfSteps,
+                                                                        const Optional<Globals::ThreeLevelAutoEnum> & speed,
+                                                                        const chip::EndpointId & endpointId)
 {
     if (isStepActionInProgress && mCurrentActionEndpointId != endpointId)
     {
@@ -312,7 +312,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(
     DataModel::Nullable<GenericOverallTarget> ep1Target;
 
     VerifyOrReturnValue(ep1.GetLogic().GetOverallTarget(ep1Target) == CHIP_NO_ERROR, Status::Failure,
-                      ChipLogError(AppServer, "Failed to get overall target for Step command"));
+                        ChipLogError(AppServer, "Failed to get overall target for Step command"));
 
     if (ep1Target.IsNull())
     {
@@ -322,13 +322,13 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(
     ep1Target.Value().position = NullOptional; // Reset position to Null
 
     VerifyOrReturnValue(ep1.GetLogic().SetOverallTarget(ep1Target) == CHIP_NO_ERROR, Status::Failure,
-                      ChipLogError(AppServer, "Failed to set overall target for Step command"));
+                        ChipLogError(AppServer, "Failed to set overall target for Step command"));
 
     AppEvent event;
-    event.Type              = AppEvent::kEventType_Closure;
-    event.ClosureEvent.Action = PANEL_STEP_ACTION;
+    event.Type                    = AppEvent::kEventType_Closure;
+    event.ClosureEvent.Action     = PANEL_STEP_ACTION;
     event.ClosureEvent.EndpointId = endpointId;
-    event.Handler           = InitiateAction;
+    event.Handler                 = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
 
     SetCurrentAction(PANEL_STEP_ACTION);
@@ -343,17 +343,16 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * ep = (endpointId == instance.ep2.GetDelegate().GetEndpoint()) ? &instance.ep2
-                                                                          : &instance.ep3;
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * ep =
+        (endpointId == instance.ep2.GetDelegate().GetEndpoint()) ? &instance.ep2 : &instance.ep3;
 
     chip::app::Clusters::ClosureDimension::ClusterState epState = ep->GetLogic().GetState();
-    StepDirectionEnum stepDirection = ep->GetDelegate().GetStepCommandTargetDirection();
-
+    StepDirectionEnum stepDirection                             = ep->GetDelegate().GetStepCommandTargetDirection();
 
     DataModel::Nullable<GenericCurrentStateStruct> currentState = DataModel::NullNullable;
 
     chip::Percent100ths currentPosition = epState.currentState.Value().position.Value();
-    chip::Percent100ths targetPosition = epState.target.Value().position.Value();
+    chip::Percent100ths targetPosition  = epState.target.Value().position.Value();
 
     bool panelTargetReached = (currentState.Value().position.Value() != epState.target.Value().position.Value());
 
@@ -375,8 +374,8 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
         currentState.SetNonNull().Set(
             MakeOptional(nextCurrentPosition),
             epState.currentState.Value().latch.HasValue() ? MakeOptional(epState.currentState.Value().latch.Value()) : NullOptional,
-            epState.currentState.Value().speed.HasValue() ? MakeOptional(epState.currentState.Value().speed.Value()) : NullOptional
-        );
+            epState.currentState.Value().speed.HasValue() ? MakeOptional(epState.currentState.Value().speed.Value())
+                                                          : NullOptional);
 
         ep->GetLogic().SetCurrentState(currentState);
 

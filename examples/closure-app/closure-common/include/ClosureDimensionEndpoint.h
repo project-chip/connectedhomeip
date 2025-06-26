@@ -47,8 +47,7 @@ using Protocols::InteractionModel::Status;
 class ClosureDimensionDelegate : public DelegateBase
 {
 public:
-    ClosureDimensionDelegate(EndpointId endpoint) : mEndpoint(endpoint)
-    {}
+    ClosureDimensionDelegate(EndpointId endpoint) : mEndpoint(endpoint) {}
 
     // Override for the DelegateBase Virtual functions
     Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
@@ -73,8 +72,9 @@ public:
      * @brief Function to save the target direction of the step command.
      */
     void SetStepCommandTargetDirection(StepDirectionEnum direction) { mStepCommandTargetDirection = direction; }
+
 private:
-    EndpointId mEndpoint = kInvalidEndpointId;
+    EndpointId mEndpoint                          = kInvalidEndpointId;
     StepDirectionEnum mStepCommandTargetDirection = StepDirectionEnum::kUnknownEnumValue;
 };
 
