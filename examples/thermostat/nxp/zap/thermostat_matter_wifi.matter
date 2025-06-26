@@ -2203,7 +2203,6 @@ endpoint 0 {
     handle command ScanNetworks;
     handle command ScanNetworksResponse;
     handle command AddOrUpdateWiFiNetwork;
-    handle command AddOrUpdateThreadNetwork;
     handle command RemoveNetwork;
     handle command NetworkConfigResponse;
     handle command ConnectNetwork;
@@ -2345,7 +2344,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_thermostat = 769, version 1;
+  device type ma_thermostat = 769, version 4;
 
 
   server cluster Identify {
@@ -2417,7 +2416,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x3;
-    ram      attribute clusterRevision default = 8;
+    ram      attribute clusterRevision default = 9;
 
     handle command SetpointRaiseLower;
   }
