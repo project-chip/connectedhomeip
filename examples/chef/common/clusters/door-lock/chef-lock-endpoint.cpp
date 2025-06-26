@@ -103,7 +103,7 @@ bool LockEndpoint::GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & u
                   "Found occupied user "
                   "[endpoint=%d,adjustedIndex=%hu,name=\"%s\",credentialsCount=%u,uniqueId=%x,type=%u,credentialRule=%u,"
                   "createdBy=%d,lastModifiedBy=%d]",
-                  mEndpointId, adjustedUserIndex, StringBuilder(user.userName).c_str(),
+                  mEndpointId, adjustedUserIndex, chip::StringBuilder(user.userName).c_str(),
                   static_cast<unsigned int>(user.credentials.size()), user.userUniqueId, to_underlying(user.userType),
                   to_underlying(user.credentialRule), user.createdBy, user.lastModifiedBy);
 
@@ -119,7 +119,7 @@ bool LockEndpoint::SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::
         "Lock App: LockEndpoint::SetUser "
         "[endpoint=%d,userIndex=%u,creator=%d,modifier=%d,userName=\"%s\",uniqueId=%" PRIx32 ",userStatus=%u,userType=%u,"
         "credentialRule=%u,credentials=%p,totalCredentials=%u]",
-        mEndpointId, userIndex, creator, modifier, StringBuilder(userName).c_str(), uniqueId, to_underlying(userStatus),
+        mEndpointId, userIndex, creator, modifier, chip::StringBuilder(userName).c_str(), uniqueId, to_underlying(userStatus),
         to_underlying(usertype), to_underlying(credentialRule), credentials, static_cast<unsigned int>(totalCredentials));
 
     auto adjustedUserIndex = static_cast<uint16_t>(userIndex - 1);
