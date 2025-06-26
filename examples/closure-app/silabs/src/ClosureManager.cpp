@@ -376,11 +376,11 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
         }
 
         // Set the new state once
-        currentState.Set(
-            MakeOptional(nextCurrentPosition),
-            epState.currentState.Value().latch.HasValue() ? MakeOptional(epState.currentState.Value().latch.Value()) : NullOptional,
-            epState.currentState.Value().speed.HasValue() ? MakeOptional(epState.currentState.Value().speed.Value())
-                                                          : NullOptional);
+        currentState.Set(MakeOptional(nextCurrentPosition),
+                         epState.currentState.Value().latch.HasValue() ? MakeOptional(epState.currentState.Value().latch.Value())
+                                                                       : NullOptional,
+                         epState.currentState.Value().speed.HasValue() ? MakeOptional(epState.currentState.Value().speed.Value())
+                                                                       : NullOptional);
 
         ep->GetLogic().SetCurrentState(DataModel::MakeNullable(currentState));
 
