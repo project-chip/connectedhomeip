@@ -165,6 +165,7 @@ template("qpg_executable") {
           rebase_path(qpg_sdk_root, root_build_dir) +
               "/Tools/Binaries/se_firmware_release_xp4002_seuc_upgrade.hex",
         ]
+        ota_header_options += [ "--xp400x" ]
       }
 
       # Use build-time overrules in OTA header creation
