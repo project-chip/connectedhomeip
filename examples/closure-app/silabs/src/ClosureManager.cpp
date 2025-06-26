@@ -173,7 +173,7 @@ void ClosureManager::TimerEventHandler(void * timerCbArg)
     event.Type                    = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action     = closureManager->GetCurrentAction();
     event.ClosureEvent.EndpointId = closureManager->mCurrentActionEndpointId;
-    event.Handler             = HandleClosureActionCompleteEvent;
+    event.Handler                 = HandleClosureActionCompleteEvent;
     AppTask::GetAppTask().PostEvent(&event);
 }
 
