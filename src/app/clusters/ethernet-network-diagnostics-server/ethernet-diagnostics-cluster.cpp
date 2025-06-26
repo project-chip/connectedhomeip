@@ -41,12 +41,6 @@ CHIP_ERROR ReadPHYRate(DeviceLayer::DiagnosticDataProvider & provider, Attribute
     if (provider.GetEthPHYRate(value) == CHIP_NO_ERROR)
     {
         pHYRate.SetNonNull(value);
-        ChipLogProgress(Zcl, "The current nominal, usable speed at the top of the physical layer of the Node: %d",
-                        chip::to_underlying(value));
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "The Ethernet interface is not currently configured or operational");
     }
 
     return encoder.Encode(pHYRate);
@@ -60,7 +54,6 @@ CHIP_ERROR ReadFullDuplex(DeviceLayer::DiagnosticDataProvider & provider, Attrib
     if (provider.GetEthFullDuplex(value) == CHIP_NO_ERROR)
     {
         fullDuplex.SetNonNull(value);
-        ChipLogProgress(Zcl, "The full-duplex operating status of Node: %d", value);
     }
     else
     {
@@ -78,8 +71,6 @@ CHIP_ERROR ReadCarrierDetect(DeviceLayer::DiagnosticDataProvider & provider, Att
     if (provider.GetEthCarrierDetect(value) == CHIP_NO_ERROR)
     {
         carrierDetect.SetNonNull(value);
-        ChipLogProgress(Zcl, "The status of the Carrier Detect control signal present on the ethernet network interface: %d",
-                        value);
     }
     else
     {
@@ -89,7 +80,8 @@ CHIP_ERROR ReadCarrierDetect(DeviceLayer::DiagnosticDataProvider & provider, Att
     return encoder.Encode(carrierDetect);
 }
 
-BitFlags<EthernetNetworkDiagnostics::Feature> GetFeatureMap(const EthernetDiagnosticsEnabledAttributes & enabledAttributes)
+constexpr BitFlags<EthernetNetworkDiagnostics::Feature>
+GetFeatureMap(const EthernetDiagnosticsEnabledAttributes & enabledAttributes)
 {
     return BitFlags<EthernetNetworkDiagnostics::Feature>()
         .Set(EthernetNetworkDiagnostics::Feature::kPacketCounts, enabledAttributes.enablePacketCount)
@@ -120,6 +112,10 @@ EthernetDiagnosticsServerCluster::EthernetDiagnosticsServerCluster(DeviceLayer::
 DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                               AttributeValueEncoder & encoder)
 {
+    // Handle numeric attributes inline
+    uint64_t value;
+    CHIP_ERROR err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+
     switch (request.path.mAttributeId)
     {
     case EthernetNetworkDiagnostics::Attributes::PHYRate::Id:
@@ -128,36 +124,24 @@ DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(co
         return ReadFullDuplex(mProvider, encoder);
     case EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id:
         return ReadCarrierDetect(mProvider, encoder);
-    case EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id: {
-        uint64_t value;
-        CHIP_ERROR err = mProvider.GetEthTimeSinceReset(value);
-        return EncodeValue(value, err, encoder);
-    }
-    case EthernetNetworkDiagnostics::Attributes::PacketRxCount::Id: {
-        uint64_t value;
-        CHIP_ERROR err = mProvider.GetEthPacketRxCount(value);
-        return EncodeValue(value, err, encoder);
-    }
-    case EthernetNetworkDiagnostics::Attributes::PacketTxCount::Id: {
-        uint64_t value;
-        CHIP_ERROR err = mProvider.GetEthPacketTxCount(value);
-        return EncodeValue(value, err, encoder);
-    }
-    case EthernetNetworkDiagnostics::Attributes::TxErrCount::Id: {
-        uint64_t value;
-        CHIP_ERROR err = mProvider.GetEthTxErrCount(value);
-        return EncodeValue(value, err, encoder);
-    }
-    case EthernetNetworkDiagnostics::Attributes::CollisionCount::Id: {
-        uint64_t value;
-        CHIP_ERROR err = mProvider.GetEthCollisionCount(value);
-        return EncodeValue(value, err, encoder);
-    }
-    case EthernetNetworkDiagnostics::Attributes::OverrunCount::Id: {
-        uint64_t value;
-        CHIP_ERROR err = mProvider.GetEthOverrunCount(value);
-        return EncodeValue(value, err, encoder);
-    }
+    case EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id:
+        err = mProvider.GetEthTimeSinceReset(value);
+        break;
+    case EthernetNetworkDiagnostics::Attributes::PacketRxCount::Id:
+        err = mProvider.GetEthPacketRxCount(value);
+        break;
+    case EthernetNetworkDiagnostics::Attributes::PacketTxCount::Id:
+        err = mProvider.GetEthPacketTxCount(value);
+        break;
+    case EthernetNetworkDiagnostics::Attributes::TxErrCount::Id:
+        err = mProvider.GetEthTxErrCount(value);
+        break;
+    case EthernetNetworkDiagnostics::Attributes::CollisionCount::Id:
+        err = mProvider.GetEthCollisionCount(value);
+        break;
+    case EthernetNetworkDiagnostics::Attributes::OverrunCount::Id:
+        err = mProvider.GetEthOverrunCount(value);
+        break;
     case Globals::Attributes::FeatureMap::Id:
         return encoder.Encode(GetFeatureMap(mEnabledAttributes).Raw());
     case Globals::Attributes::ClusterRevision::Id:
@@ -165,6 +149,8 @@ DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(co
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
+
+    return EncodeValue(value, err, encoder);
 }
 
 std::optional<DataModel::ActionReturnStatus>

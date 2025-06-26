@@ -18,15 +18,11 @@
 
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/EthernetNetworkDiagnostics/ClusterId.h>
-#include <clusters/EthernetNetworkDiagnostics/Commands.h>
 #include <clusters/EthernetNetworkDiagnostics/Enums.h>
-#include <clusters/EthernetNetworkDiagnostics/Events.h>
 #include <clusters/EthernetNetworkDiagnostics/Metadata.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/Span.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <protocols/interaction_model/StatusCode.h>
-#include <sys/types.h>
 
 namespace chip {
 namespace app {
