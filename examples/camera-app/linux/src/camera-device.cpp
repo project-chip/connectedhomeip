@@ -325,6 +325,9 @@ CameraDevice::CameraDevice()
 
     // Set the CameraDevice interface in WebRTCManager
     mWebRTCProviderManager.SetCameraDevice(this);
+
+    // Set the CameraDevice interface in ZoneManager
+    mZoneManager.SetCameraDevice(this);
 }
 
 CameraDevice::~CameraDevice()
