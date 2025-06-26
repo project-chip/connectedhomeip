@@ -41,15 +41,6 @@ source_set("interactions") {
   public_deps = [ "${chip_root}/src/app" ]
 }
 
-source_set("jcm") {
-  sources = [
-    "JCMCommissioner.cpp",
-    "JCMCommissioner.h",
-    "JCMTrustVerification.h",
-  ]
-  public_deps = [ "${chip_root}/src/app" ]
-}
-
 static_library("controller") {
   output_name = "libChipController"
 
@@ -78,6 +69,7 @@ static_library("controller") {
     "DeviceDiscoveryDelegate.h",
     "DevicePairingDelegate.h",
     "ExampleOperationalCredentialsIssuer.h",
+    "JCMTrustVerification.h",
     "SetUpCodePairer.h",
   ]
 
@@ -129,4 +121,15 @@ static_library("controller") {
   cflags = [ "-Wconversion" ]
 
   public_configs = [ "${chip_root}/src:includes" ]
+}
+
+source_set("jcm") {
+  sources = [
+    "JCMCommissioner.cpp",
+    "JCMCommissioner.h",
+  ]
+  public_deps = [
+    "${chip_root}/src/app",
+    "${chip_root}/src/controller:controller",
+  ]
 }
