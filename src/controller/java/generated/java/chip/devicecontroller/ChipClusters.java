@@ -51201,9 +51201,6 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void setActiveDatasetRequest(DefaultClusterCallback callback, byte[] activeDataset, Optional<Long> breadcrumb) {
-      setActiveDatasetRequest(callback, activeDataset, breadcrumb, 0);
-    }
 
     public void setActiveDatasetRequest(DefaultClusterCallback callback, byte[] activeDataset, Optional<Long> breadcrumb, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
@@ -51225,9 +51222,6 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void setPendingDatasetRequest(DefaultClusterCallback callback, byte[] pendingDataset) {
-      setPendingDatasetRequest(callback, pendingDataset, 0);
-    }
 
     public void setPendingDatasetRequest(DefaultClusterCallback callback, byte[] pendingDataset, int timedInvokeTimeoutMs) {
       final long commandId = 4L;
