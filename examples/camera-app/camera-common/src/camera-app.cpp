@@ -170,7 +170,6 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         ZoneManagement::Feature::kUserDefined, ZoneManagement::Feature::kFocusZones);
 
     BitFlags<ZoneManagement::OptionalAttribute> zoneMgmtOptionalAttrs;
-    // Hardcode these initialization params for now. TODO: Define HAL interfaces
     uint8_t appMaxZones                           = mCameraDevice->GetCameraHALInterface().GetMaxZones();
     uint8_t appMaxUserDefinedZones                = mCameraDevice->GetCameraHALInterface().GetMaxUserDefinedZones();
     uint8_t sensitivityMax                        = mCameraDevice->GetCameraHALInterface().GetSensitivityMax();
@@ -182,6 +181,8 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     mZoneMgmtServerPtr = std::make_unique<ZoneMgmtServer>(mCameraDevice->GetZoneManagementDelegate(), mEndpoint, zoneMgmtFeatures,
                                                           zoneMgmtOptionalAttrs, appMaxUserDefinedZones, appMaxZones,
                                                           sensitivityMax, appTwoDCartesianMax);
+
+    mZoneMgmtServerPtr->SetSensitivity(mCameraDevice->GetCameraHALInterface().GetDetectionSensitivity());
 }
 
 void CameraApp::InitializeCameraAVStreamMgmt()

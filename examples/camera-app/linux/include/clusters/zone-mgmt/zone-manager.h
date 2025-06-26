@@ -48,7 +48,9 @@ public:
 
     Protocols::InteractionModel::Status RemoveZone(uint16_t zoneID) override;
 
-    Protocols::InteractionModel::Status CreateOrUpdateTrigger(const ZoneTriggerControlStruct & zoneTrigger) override;
+    Protocols::InteractionModel::Status CreateTrigger(const ZoneTriggerControlStruct & zoneTrigger) override;
+
+    Protocols::InteractionModel::Status UpdateTrigger(const ZoneTriggerControlStruct & zoneTrigger) override;
 
     Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneID) override;
 

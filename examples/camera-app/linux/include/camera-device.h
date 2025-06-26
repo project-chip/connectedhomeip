@@ -272,6 +272,16 @@ public:
 
     uint8_t GetSensitivityMax() override { return kSensitivityMax; }
 
+    uint8_t GetDetectionSensitivity() override { return mDetectionSensitivity; }
+
+    CameraError SetDetectionSensitivity(uint8_t aSensitivity) override;
+
+    CameraError CreateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) override;
+
+    CameraError UpdateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) override;
+
+    CameraError RemoveZoneTrigger(uint16_t zoneID) override;
+
     CameraError SetPan(int16_t aPan) override;
     CameraError SetTilt(int16_t aTilt) override;
     CameraError SetZoom(uint8_t aZoom) override;
@@ -336,6 +346,7 @@ private:
     uint16_t mImageRotation                = kMinImageRotation;
     bool mImageFlipHorizontal              = false;
     bool mImageFlipVertical                = false;
+    uint8_t mDetectionSensitivity          = (1 + kSensitivityMax) / 2; // Average over the range
 
     std::vector<StreamUsageEnum> mStreamUsagePriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
 };
