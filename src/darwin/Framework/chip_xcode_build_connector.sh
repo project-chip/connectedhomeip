@@ -187,9 +187,9 @@ esac
     )
 }
 
-[[ $CHIP_USE_NETWORK_FRAMEWORK == YES ]] && {
+[[ $CHIP_USE_NETWORK_FRAMEWORK == NO ]] && {
     args+=(
-        'chip_system_config_use_network_framework=true'
+        'chip_system_config_use_network_framework=false'
     )
 }
 
