@@ -29,8 +29,8 @@ namespace ClosureControl {
 using namespace Protocols::InteractionModel;
 
 namespace {
-    // Variable to track the current error count for the cluster logic.
-    size_t mCurrentErrorCount = 0;
+// Variable to track the current error count for the cluster logic.
+size_t mCurrentErrorCount = 0;
 } // namespace
 
 /*
