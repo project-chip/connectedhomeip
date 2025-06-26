@@ -50,11 +50,11 @@ enum class ChefRvcOperationalStateEnum : uint8_t
 
     // Custom manufacturer-range operational state. Pretend we are running in a state that
     // beeps really loud to annoy everyone.
-    kRunningWhileBeeping = 0x81;
+    kRunningWhileBeeping = 0x81,
 };
 
 
-bool IsRunningState(ChefRvcOperationalStateEnum operationalState) const {
+bool IsRunningState(ChefRvcOperationalStateEnum operationalState) {
     return (operationalState == ChefRvcOperationalStateEnum::kRunning) ||
         (operationalState == ChefRvcOperationalStateEnum::kRunningWhileBeeping);
 }
