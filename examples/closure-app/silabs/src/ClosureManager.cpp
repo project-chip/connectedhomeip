@@ -349,12 +349,17 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
     chip::app::Clusters::ClosureDimension::ClusterState epState = ep->GetLogic().GetState();
     StepDirectionEnum stepDirection                             = ep->GetDelegate().GetStepCommandTargetDirection();
 
-    DataModel::Nullable<GenericCurrentStateStruct> currentState = DataModel::NullNullable;
+    GenericCurrentStateStruct currentState;
+
+    VerifyOrReturn(!epState.currentState.IsNull() && epState.currentState.Value().position.HasValue(),
+                   ChipLogError(AppServer, "Current state is null, Step action Failed"));
+    VerifyOrReturn(!epState.target.IsNull() && epState.target.Value().position.HasValue(),
+                   ChipLogError(AppServer, "Target state is null, Step action Failed"));
 
     chip::Percent100ths currentPosition = epState.currentState.Value().position.Value();
     chip::Percent100ths targetPosition  = epState.target.Value().position.Value();
 
-    bool panelTargetReached = (currentState.Value().position.Value() != epState.target.Value().position.Value());
+    bool panelTargetReached = (currentPosition == targetPosition);
 
     if (!panelTargetReached)
     {
@@ -371,13 +376,13 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
         }
 
         // Set the new state once
-        currentState.SetNonNull().Set(
+        currentState.Set(
             MakeOptional(nextCurrentPosition),
             epState.currentState.Value().latch.HasValue() ? MakeOptional(epState.currentState.Value().latch.Value()) : NullOptional,
             epState.currentState.Value().speed.HasValue() ? MakeOptional(epState.currentState.Value().speed.Value())
                                                           : NullOptional);
 
-        ep->GetLogic().SetCurrentState(currentState);
+        ep->GetLogic().SetCurrentState(DataModel::MakeNullable(currentState));
 
         instance.CancelTimer(); // Cancel any existing timer before starting a new action
         instance.SetCurrentAction(PANEL_STEP_ACTION);

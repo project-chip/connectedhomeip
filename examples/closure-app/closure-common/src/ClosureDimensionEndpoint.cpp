@@ -110,10 +110,8 @@ void ClosureDimensionEndpoint::UpdateCurrentStateFromTargetState()
         ChipLogError(AppServer, "Current state is null, Move to action Failed");
         return;
     }
-    else
-    {
-        currentState = state.currentState.Value();
-    }
+    
+    currentState = state.currentState.Value();
 
     auto updateFieldIfPresent = [](auto & targetField, auto & currentField) {
         if (targetField.HasValue())
