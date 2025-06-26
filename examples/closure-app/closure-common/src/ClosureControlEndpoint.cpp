@@ -201,8 +201,24 @@ void ClosureControlEndpoint::OnStopMotionActionComplete()
     VerifyOrReturn(mLogic.SetOverallState(overallState) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to set overall state in OnStopMotionActionComplete"));
 
-    VerifyOrReturn(mLogic.SetOverallTarget(DataModel::NullNullable) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to set overall target to NullNullable in OnStopMotionActionComplete"));
+    
+    DataModel::Nullable<GenericOverallTarget> overallTarget;
+    mLogic.GetOverallTarget(overallTarget);
+
+    // Set the OverallTarget latch to False as motion was in progress and latch will be disengaged.
+    if (overallTarget.IsNull())
+    {
+        overallTarget.SetNonNull(GenericOverallTarget(NullOptional, MakeOptional(false), NullOptional));
+    }
+    else
+    {
+        // Clear the position in OverallTarget as motion is stopped and we don't have a target position anymore.
+        overallTarget.Value().position.ClearValue();
+        overallTarget.Value().latch.SetValue(false);
+    }
+
+    VerifyOrReturn(mLogic.SetOverallTarget(overallTarget) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set overall target in OnStopMotionActionComplete"));
 
     VerifyOrReturn(mLogic.SetCountdownTimeFromDelegate(0) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to set countdown time to 0 in OnStopMotionActionComplete"));

@@ -67,8 +67,23 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
 
 void ClosureDimensionEndpoint::OnStopMotionActionComplete()
 {
-    VerifyOrReturn(mLogic.SetTarget(DataModel::NullNullable) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to set target to null in OnStopMotionActionComplete"));
+    DataModel::Nullable<GenericTargetStruct> target;
+    mLogic.GetTarget(target);
+
+    // Set the OverallTarget latch to False as motion was in progress and latch will be disengaged.
+    if (target.IsNull())
+    {
+        target.SetNonNull(GenericTargetStruct(NullOptional, MakeOptional(false), NullOptional));
+    }
+    else
+    {
+        // Target Position is not relevant when motion is stopped.
+        target.Value().position.ClearValue();
+        target.Value().latch.SetValue(false);
+    }
+
+    VerifyOrReturn(mLogic.SetTarget(target) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set target in OnStopMotionActionComplete"));
 }
 
 void ClosureDimensionEndpoint::OnStopCalibrateActionComplete()
