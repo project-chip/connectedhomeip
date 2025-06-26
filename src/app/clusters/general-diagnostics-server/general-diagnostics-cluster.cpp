@@ -15,11 +15,11 @@
  *    limitations under the License.
  */
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-logic.h>
-#include <app/server/Server.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <app-common/zap-generated/cluster-objects.h>
+#include <app/server/Server.h>
 #include <clusters/GeneralDiagnostics/ClusterId.h>
 #include <clusters/GeneralDiagnostics/Metadata.h>
 
@@ -31,7 +31,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder) {
+DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                                       AttributeValueEncoder & encoder)
+{
     using namespace Attributes;
     switch (request.path.mAttributeId)
     {
@@ -96,7 +98,10 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
     return CHIP_NO_ERROR;
 }
 
-std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsCluster::InvokeCommand(const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments, CommandHandler * handler) {
+std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsCluster::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                                      chip::TLV::TLVReader & input_arguments,
+                                                                                      CommandHandler * handler)
+{
     using namespace Commands;
 
     switch (request.path.mCommandId)
@@ -121,7 +126,8 @@ std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsCluster::InvokeCo
     }
 }
 
-void GeneralDiagnosticsCluster::OnDeviceReboot(BootReasonEnum bootReason) {
+void GeneralDiagnosticsCluster::OnDeviceReboot(BootReasonEnum bootReason)
+{
     VerifyOrReturn(mContext != nullptr);
     NotifyAttributeChanged(BootReason::Id);
 
@@ -131,51 +137,53 @@ void GeneralDiagnosticsCluster::OnDeviceReboot(BootReasonEnum bootReason) {
 }
 
 void GeneralDiagnosticsCluster::OnHardwareFaultsDetect(const GeneralFaults<kMaxHardwareFaults> & previous,
-                            const GeneralFaults<kMaxHardwareFaults> & current) {
+                                                       const GeneralFaults<kMaxHardwareFaults> & current)
+{
     VerifyOrReturn(mContext != nullptr);
     NotifyAttributeChanged(ActiveHardwareFaults::Id);
 
     // Record HardwareFault event
     DataModel::List<const HardwareFaultEnum> currentList(reinterpret_cast<const HardwareFaultEnum *>(current.data()),
-                                                            current.size());
+                                                         current.size());
     DataModel::List<const HardwareFaultEnum> previousList(reinterpret_cast<const HardwareFaultEnum *>(previous.data()),
-                                                            previous.size());
+                                                          previous.size());
     Events::HardwareFaultChange::Type event{ currentList, previousList };
 
     (void) mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
 }
 
 void GeneralDiagnosticsCluster::OnRadioFaultsDetect(const GeneralFaults<kMaxRadioFaults> & previous,
-                            const GeneralFaults<kMaxRadioFaults> & current) {
+                                                    const GeneralFaults<kMaxRadioFaults> & current)
+{
     VerifyOrReturn(mContext != nullptr);
     NotifyAttributeChanged(ActiveRadioFaults::Id);
 
     // Record RadioFault event
     DataModel::List<const RadioFaultEnum> currentList(reinterpret_cast<const RadioFaultEnum *>(current.data()), current.size());
-    DataModel::List<const RadioFaultEnum> previousList(reinterpret_cast<const RadioFaultEnum *>(previous.data()),
-                                                        previous.size());
+    DataModel::List<const RadioFaultEnum> previousList(reinterpret_cast<const RadioFaultEnum *>(previous.data()), previous.size());
     Events::RadioFaultChange::Type event{ currentList, previousList };
 
     (void) mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
 }
 
 void GeneralDiagnosticsCluster::OnNetworkFaultsDetect(const GeneralFaults<kMaxNetworkFaults> & previous,
-                            const GeneralFaults<kMaxNetworkFaults> & current) {
+                                                      const GeneralFaults<kMaxNetworkFaults> & current)
+{
     VerifyOrReturn(mContext != nullptr);
     NotifyAttributeChanged(ActiveNetworkFaults::Id);
 
     // Record NetworkFault event
-    DataModel::List<const NetworkFaultEnum> currentList(reinterpret_cast<const NetworkFaultEnum *>(current.data()),
-                                                        current.size());
+    DataModel::List<const NetworkFaultEnum> currentList(reinterpret_cast<const NetworkFaultEnum *>(current.data()), current.size());
     DataModel::List<const NetworkFaultEnum> previousList(reinterpret_cast<const NetworkFaultEnum *>(previous.data()),
-                                                            previous.size());
+                                                         previous.size());
     Events::NetworkFaultChange::Type event{ currentList, previousList };
 
     (void) mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
 }
 
 template <typename T>
-CHIP_ERROR GeneralDiagnosticsCluster::EncodeValue(T value, CHIP_ERROR readError, AttributeValueEncoder & encoder) {
+CHIP_ERROR GeneralDiagnosticsCluster::EncodeValue(T value, CHIP_ERROR readError, AttributeValueEncoder & encoder)
+{
     if (readError == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
         value = {};
@@ -188,16 +196,21 @@ CHIP_ERROR GeneralDiagnosticsCluster::EncodeValue(T value, CHIP_ERROR readError,
 }
 
 template <typename T>
-CHIP_ERROR GeneralDiagnosticsCluster::EncodeListOfValues(T valueList, CHIP_ERROR readError, AttributeValueEncoder & aEncoder){
-    if (readError == CHIP_NO_ERROR) {
+CHIP_ERROR GeneralDiagnosticsCluster::EncodeListOfValues(T valueList, CHIP_ERROR readError, AttributeValueEncoder & aEncoder)
+{
+    if (readError == CHIP_NO_ERROR)
+    {
         readError = aEncoder.EncodeList([&valueList](const auto & encoder) -> CHIP_ERROR {
-            for (auto value : valueList) {
+            for (auto value : valueList)
+            {
                 ReturnErrorOnFailure(encoder.Encode(value));
             }
 
             return CHIP_NO_ERROR;
         });
-    } else {
+    }
+    else
+    {
         readError = aEncoder.EncodeEmptyList();
     }
 
@@ -219,6 +232,6 @@ bool GeneralDiagnosticsCluster::IsTestEventTriggerEnabled()
     return true;
 }
 
-}
-}
-}
+} // namespace Clusters
+} // namespace app
+} // namespace chip

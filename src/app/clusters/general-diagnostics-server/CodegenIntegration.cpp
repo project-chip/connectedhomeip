@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 
+#include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-logic.h>
 #include <app/static-cluster-config/GeneralDiagnostics.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
-#include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -32,7 +32,7 @@ static_assert((GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.
               GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 0);
 
 namespace {
-    LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gServer;
+LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gServer;
 
 } // namespace
 
@@ -56,17 +56,18 @@ constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId
     return false;
 }
 
-void emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpointId) {
+void emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
+{
     VerifyOrReturn(endpointId == kRootEndpointId);
     const GeneralDiagnosticsEnabledAttributes enabledAttributes{
-        .enableNetworkInterfaces = IsAttributeEnabled(endpointId, Attributes::NetworkInterfaces::Id),
-        .enableRebootCount = IsAttributeEnabled(endpointId, Attributes::RebootCount::Id),
-        .enableUpTime = IsAttributeEnabled(endpointId, Attributes::UpTime::Id),
-        .enableTotalOperationalHours = IsAttributeEnabled(endpointId, Attributes::TotalOperationalHours::Id),
-        .enableBootReason = IsAttributeEnabled(endpointId, Attributes::BootReason::Id),
-        .enableActiveHardwareFaults = IsAttributeEnabled(endpointId, Attributes::ActiveHardwareFaults::Id),
-        .enableActiveRadioFaults = IsAttributeEnabled(endpointId, Attributes::ActiveRadioFaults::Id),
-        .enableActiveNetworkFaults = IsAttributeEnabled(endpointId, Attributes::ActiveNetworkFaults::Id),
+        .enableNetworkInterfaces        = IsAttributeEnabled(endpointId, Attributes::NetworkInterfaces::Id),
+        .enableRebootCount              = IsAttributeEnabled(endpointId, Attributes::RebootCount::Id),
+        .enableUpTime                   = IsAttributeEnabled(endpointId, Attributes::UpTime::Id),
+        .enableTotalOperationalHours    = IsAttributeEnabled(endpointId, Attributes::TotalOperationalHours::Id),
+        .enableBootReason               = IsAttributeEnabled(endpointId, Attributes::BootReason::Id),
+        .enableActiveHardwareFaults     = IsAttributeEnabled(endpointId, Attributes::ActiveHardwareFaults::Id),
+        .enableActiveRadioFaults        = IsAttributeEnabled(endpointId, Attributes::ActiveRadioFaults::Id),
+        .enableActiveNetworkFaults      = IsAttributeEnabled(endpointId, Attributes::ActiveNetworkFaults::Id),
         .enableTestEventTriggersEnabled = IsAttributeEnabled(endpointId, Attributes::TestEventTriggersEnabled::Id),
     };
 
@@ -80,7 +81,8 @@ void emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpointId) {
     }
 }
 
-void emberAfGeneralDiagnosticsClusterShutdownCallback(EndpointId endpointId) {
+void emberAfGeneralDiagnosticsClusterShutdownCallback(EndpointId endpointId)
+{
     VerifyOrReturn(endpointId == kRootEndpointId);
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
     if (err != CHIP_NO_ERROR)
@@ -99,33 +101,41 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace GeneralDiagnostics {
-    void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason) {
-        if (gServer.IsConstructed()) {
-            gServer.Cluster().OnDeviceReboot(bootReason);
-        }
+void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason)
+{
+    if (gServer.IsConstructed())
+    {
+        gServer.Cluster().OnDeviceReboot(bootReason);
     }
+}
 
-    void GlobalNotifyHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
-                                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current) {
-        if (gServer.IsConstructed()) {
-            gServer.Cluster().OnHardwareFaultsDetect(previous, current);
-        }
+void GlobalNotifyHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
+                                      const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current)
+{
+    if (gServer.IsConstructed())
+    {
+        gServer.Cluster().OnHardwareFaultsDetect(previous, current);
     }
+}
 
-    void GlobalNotifyRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
-                             const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current) {
-        if (gServer.IsConstructed()) {
-            gServer.Cluster().OnRadioFaultsDetect(previous, current);
-        }
+void GlobalNotifyRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
+                                   const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current)
+{
+    if (gServer.IsConstructed())
+    {
+        gServer.Cluster().OnRadioFaultsDetect(previous, current);
     }
+}
 
-    void GlobalNotifyNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
-                               const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current) {
-        if (gServer.IsConstructed()) {
-            gServer.Cluster().OnNetworkFaultsDetect(previous, current);
-        }
+void GlobalNotifyNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
+                                     const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current)
+{
+    if (gServer.IsConstructed())
+    {
+        gServer.Cluster().OnNetworkFaultsDetect(previous, current);
     }
 }
-}
-}
-}
+} // namespace GeneralDiagnostics
+} // namespace Clusters
+} // namespace app
+} // namespace chip
