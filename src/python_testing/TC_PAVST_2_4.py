@@ -56,12 +56,18 @@ class TC_PAVST_2_4(MatterBaseTest):
 
     def steps_TC_PAVST_2_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "TH1 executes step 1-5 of TC-PAVST-2.3 to allocate a PushAV transport.", "Verify successful completion of all steps."),
-            TestStep(2, "TH1 Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT over a large-payload session", "Verify the number of PushAV Connections in the list is 1. Store the TransportOptions and ConnectionID in the corresponding TransportConfiguration as aTransportOptions and aConnectionID."),
-            TestStep(3, "TH1 sends the ModifyPushTransport command with ConnectionID != aConnectionID.", "DUT responds with NOT_FOUND status code."),
-            TestStep(4, "TH2 sends the ModifyPushTransport command with ConnectionID = aConnectionID.", "DUT responds with NOT_FOUND status code."),
-            TestStep(5, "TH1 sends the ModifyPushTransport command with ConnectionID = aConnectionID and aTransportOptions, with ExpiryTime incremented by 120 in aTransportOptions.", "DUT responds with SUCCESS status code."),
-            TestStep(6, "TH1 Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT over a large-payload session", "Verify that ConnectionID == aConnectionID and ExpiryTime in TransportConfiguration.TransportOptions is incremented by 120."),
+            TestStep(1, "TH1 executes step 1-5 of TC-PAVST-2.3 to allocate a PushAV transport.",
+                     "Verify successful completion of all steps."),
+            TestStep(2, "TH1 Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT over a large-payload session",
+                     "Verify the number of PushAV Connections in the list is 1. Store the TransportOptions and ConnectionID in the corresponding TransportConfiguration as aTransportOptions and aConnectionID."),
+            TestStep(3, "TH1 sends the ModifyPushTransport command with ConnectionID != aConnectionID.",
+                     "DUT responds with NOT_FOUND status code."),
+            TestStep(4, "TH2 sends the ModifyPushTransport command with ConnectionID = aConnectionID.",
+                     "DUT responds with NOT_FOUND status code."),
+            TestStep(5, "TH1 sends the ModifyPushTransport command with ConnectionID = aConnectionID and aTransportOptions, with ExpiryTime incremented by 120 in aTransportOptions.",
+                     "DUT responds with SUCCESS status code."),
+            TestStep(6, "TH1 Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT over a large-payload session",
+                     "Verify that ConnectionID == aConnectionID and ExpiryTime in TransportConfiguration.TransportOptions is incremented by 120."),
         ]
 
     @async_test_body
@@ -76,8 +82,8 @@ class TC_PAVST_2_4(MatterBaseTest):
 
         self.step(1)
         transport_configs = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections
-                )
+            endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections
+        )
         for config in transport_configs:
             if config.ConnectionID != 0:
                 try:
@@ -87,46 +93,45 @@ class TC_PAVST_2_4(MatterBaseTest):
                     asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
         aSupportedFormats = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedContainerFormats
-                )
+            endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedContainerFormats
+        )
 
-        aAllocatedVideoStreams = await self.read_single_attribute_check_success( 
-                endpoint=endpoint, cluster=avcluster, attribute=avattr.AllocatedVideoStreams
-                )
+        aAllocatedVideoStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=avcluster, attribute=avattr.AllocatedVideoStreams
+        )
 
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=avcluster, attribute=avattr.AllocatedAudioStreams
-                )
+            endpoint=endpoint, cluster=avcluster, attribute=avattr.AllocatedAudioStreams
+        )
 
         response = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
-            #TransportOptions=
-            {"streamUsage":0,
-             "videoStreamID":1,
-             "audioStreamID":1,
-             "endpointID":1,
-             "url":"https://localhost:1234/streams/1",
-             "triggerOptions":{"triggerType":2},
-             "ingestMethod":0,
-             "containerFormat":0,
-             "containerOptions":{"containerType":0},
-             "expiryTime":50,
+            # TransportOptions=
+            {"streamUsage": 0,
+             "videoStreamID": 1,
+             "audioStreamID": 1,
+             "endpointID": 1,
+             "url": "https://localhost:1234/streams/1",
+             "triggerOptions": {"triggerType": 2},
+             "ingestMethod": 0,
+             "containerFormat": 0,
+             "containerOptions": {"containerType": 0},
+             "expiryTime": 50,
              }), endpoint=endpoint)
-
 
         self.step(2)
         transport_configs = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections
-                )
+            endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections
+        )
         asserts.assert_equal(len(transport_configs), 1, "TransportConfigurations must be 1")
-        
+
         aConnectionID = transport_configs.ConnectionID
-        aTransportOptions  = transport_configs.TransportOptions
+        aTransportOptions = transport_configs.TransportOptions
 
         self.step(3)
         try:
             await self.send_single_cmd(cmd=cluster.Commands.FindTransport(
                 ConnectionID=aConnectionID+1),
-                                       endpoint=endpoint)
+                endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Notfound, "Unexpected error returned")
 
@@ -137,16 +142,17 @@ class TC_PAVST_2_4(MatterBaseTest):
         try:
             await self.send_single_cmd(cmd=cluster.Commands.FindTransport(
                 ConnectionID=aConnectionID),
-                                       endpoint=endpoint)
+                endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Expected success")
 
         self.step(6)
         response = self.send_single_cmd(cmd=cluster.Commands.FindTransport(
             ConnectionID=Null),
-                                        endpoint=endpoint)
-        #response.TransportConfiguration 
+            endpoint=endpoint)
+        # response.TransportConfiguration
         # Add code specific to step 6
+
 
 if __name__ == "__main__":
     default_matter_test_main()

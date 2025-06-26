@@ -53,8 +53,10 @@ class TC_PAVST_2_1(MatterBaseTest):
     def steps_TC_PAVST_2_1(self) -> list[TestStep]:
         return [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "TH reads from the DUT the SupportedFormats attribute.", "Verify that the DUT response contains a list of SupportedFormatsStruct entries. For each entry in the list, verify that the ContainerFormat is a defined ContainerFormatEnum value and the IngestMethod is a defined IngestMethodEnum value."),
-            TestStep(3, "TH reads from the DUT the CurrentConnections attribute.", "Verify that the DUT response contains a list of TransportConfigurationStruct entries. For each entry in the list, verify that the TransportStatus is a defined TransportStatusEnum value."),
+            TestStep(2, "TH reads from the DUT the SupportedFormats attribute.",
+                     "Verify that the DUT response contains a list of SupportedFormatsStruct entries. For each entry in the list, verify that the ContainerFormat is a defined ContainerFormatEnum value and the IngestMethod is a defined IngestMethodEnum value."),
+            TestStep(3, "TH reads from the DUT the CurrentConnections attribute.",
+                     "Verify that the DUT response contains a list of TransportConfigurationStruct entries. For each entry in the list, verify that the TransportStatus is a defined TransportStatusEnum value."),
         ]
 
     @async_test_body
@@ -84,6 +86,7 @@ class TC_PAVST_2_1(MatterBaseTest):
             asserts.assert_not_equal(len(transport_configs), 0, "TransportConfigurations must not be empty!")
             for config in transport_configs:
                 asserts.assert_not_equal(config.TransportStatus, 0, "TransportStatus must be a defined value!")
+
 
 if __name__ == "__main__":
     default_matter_test_main()
