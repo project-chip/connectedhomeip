@@ -59,12 +59,11 @@ LogProvider::~LogProvider()
     }
 }
 
-CHIP_ERROR LogProvider::Init(uint8_t * endUserBuffer, size_t endUserBufferSize, uint8_t * retrievalBuffer,
-                             size_t retrievalBufferSize)
+CHIP_ERROR LogProvider::Init(LogProviderInit & providerInit)
 {
-    mRetrievalBuffer = retrievalBuffer;
-    mBufferSize      = retrievalBufferSize;
-    mStorageInstance = new CircularDiagnosticBuffer(endUserBuffer, endUserBufferSize);
+    mRetrievalBuffer = providerInit.retrievalBuffer;
+    mBufferSize      = providerInit.retrievalBufferSize;
+    mStorageInstance = new CircularDiagnosticBuffer(providerInit.endUserBuffer, providerInit.endUserBufferSize);
     if (mStorageInstance == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;

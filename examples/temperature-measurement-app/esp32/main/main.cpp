@@ -139,8 +139,14 @@ extern "C" void app_main()
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
 {
-    auto & logProvider = LogProvider::GetInstance();
-    logProvider.Init(endUserBuffer, CONFIG_END_USER_BUFFER_SIZE, retrievalBuffer, CONFIG_RETRIEVAL_BUFFER_SIZE);
+    auto & logProvider                        = LogProvider::GetInstance();
+    LogProvider::LogProviderInit providerInit = {
+        .endUserBuffer       = endUserBuffer,
+        .endUserBufferSize   = CONFIG_END_USER_BUFFER_SIZE,
+        .retrievalBuffer     = retrievalBuffer,
+        .retrievalBufferSize = CONFIG_RETRIEVAL_BUFFER_SIZE,
+    };
+    logProvider.Init(providerInit);
     DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
 }
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE

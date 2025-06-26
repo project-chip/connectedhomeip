@@ -42,8 +42,16 @@ namespace DiagnosticLogs {
 class LogProvider : public DiagnosticLogsProviderDelegate
 {
 public:
+    struct LogProviderInit
+    {
+        uint8_t * endUserBuffer;
+        size_t endUserBufferSize;
+        uint8_t * retrievalBuffer;
+        size_t retrievalBufferSize;
+    };
+
     static inline LogProvider & GetInstance() { return sInstance; }
-    CHIP_ERROR Init(uint8_t * endUserBuffer, size_t endUserBufferSize, uint8_t * retrievalBuffer, size_t retrievalBufferSize);
+    CHIP_ERROR Init(LogProviderInit & init);
     /////////// DiagnosticLogsProviderDelegate Interface /////////
     CHIP_ERROR StartLogCollection(IntentEnum intent, LogSessionHandle & outHandle, Optional<uint64_t> & outTimeStamp,
                                   Optional<uint64_t> & outTimeSinceBoot) override;
@@ -64,6 +72,7 @@ private:
     CircularDiagnosticBuffer * mStorageInstance = nullptr;
     uint8_t * mRetrievalBuffer                  = nullptr;
     size_t mBufferSize                          = 0;
+
     struct CrashLogContext
     {
 #if defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
