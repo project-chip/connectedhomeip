@@ -186,7 +186,7 @@ void ClosureControlEndpoint::OnMoveToActionComplete()
     // This function should handle closure control state updation after completion of Motion Action.
 }
 
-void ClosureControlEndpoint::OnStepActionComplete()
+void ClosureControlEndpoint::OnPanelMotionActionComplete()
 {
     mLogic.SetMainState(MainStateEnum::kStopped);
 
@@ -208,10 +208,20 @@ void ClosureControlEndpoint::OnStepActionComplete()
         overallState.Value().positioning = position;
     }
 
-    if (!overallTarget.IsNull() && overallTarget.Value().latch.HasValue())
-    {
-        // If the target position was FullyClosed, we set it to PartiallyOpened.
-        overallState.Value().latch.SetValue(DataModel::MakeNullable(overallTarget.Value().latch.Value()));
+    // Set latch and speed to their target values if they are set in the overall target.
+    if (!overallTarget.IsNull()) {
+
+        if (overallTarget.Value().latch.HasValue())
+        {
+            // If the target position was FullyClosed, we set it to PartiallyOpened.
+            overallState.Value().latch.SetValue(DataModel::MakeNullable(overallTarget.Value().latch.Value()));
+        }
+
+        if (overallTarget.Value().speed.HasValue())
+        {
+            // If the target speed was Auto, we set it to Auto.
+            overallState.Value().speed.SetValue(DataModel::MakeNullable(overallTarget.Value().speed.Value()));
+        }
     }
     mLogic.SetOverallState(overallState);
 

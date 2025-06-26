@@ -347,17 +347,29 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * ep =
-        (endpointId == instance.ep2.GetDelegate().GetEndpoint()) ? &instance.ep2 : &instance.ep3;
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * ep = nullptr;
+    if (endpointId == instance.ep2.GetEndpoint())
+    {
+        ep = &instance.ep2;
+    }
+    else if (endpointId == instance.ep3.GetEndpoint())
+    {
+        ep = &instance.ep3;
+    }
+    else
+    {
+        ChipLogError(AppServer, "HandlePanelSetTargetAction called with invalid endpointId: %u", endpointId);
+        return;
+    }
 
     chip::app::Clusters::ClosureDimension::ClusterState epState = ep->GetLogic().GetState();
     StepDirectionEnum stepDirection                             = ep->GetDelegate().GetStepCommandTargetDirection();
     GenericCurrentStateStruct currentState;
 
     VerifyOrReturn(!epState.currentState.IsNull() && epState.currentState.Value().position.HasValue(),
-                   ChipLogError(AppServer, "Current state is null, Step action Failed"));
+                   ChipLogError(AppServer, "Current state or position is null, Step action Failed"));
     VerifyOrReturn(!epState.target.IsNull() && epState.target.Value().position.HasValue(),
-                   ChipLogError(AppServer, "Target state is null, Step action Failed"));
+                   ChipLogError(AppServer, "Target state or position is null, Step action Failed"));
 
     chip::Percent100ths currentPosition = epState.currentState.Value().position.Value();
     chip::Percent100ths targetPosition  = epState.target.Value().position.Value();

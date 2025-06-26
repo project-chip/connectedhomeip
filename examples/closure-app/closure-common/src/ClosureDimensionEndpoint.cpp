@@ -89,7 +89,7 @@ void ClosureDimensionEndpoint::OnMoveToActionComplete()
     // This function should handle closure dimension state updation after MoveTo Action.
 }
 
-void ClosureDimensionEndpoint::OnStepActionComplete()
+void ClosureDimensionEndpoint::OnPanelMotionActionComplete()
 {
     UpdateCurrentStateFromTargetState();
 }

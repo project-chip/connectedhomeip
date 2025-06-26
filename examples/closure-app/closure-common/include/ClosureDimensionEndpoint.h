@@ -158,13 +158,13 @@ public:
     void OnMoveToActionComplete();
 
     /**
-     * @brief Callback for when a step action is completed.
+     * @brief Callback for when a panel motion action is completed.
      *
-     * This function is called when a step action has been completed.
+     * This function is called when a panel motion action has been completed.
      * It should update the internal state of the closure control endpoint to reflect
-     * the completion of the step action.
+     * the completion of the panel motion action.
      */
-    void OnStepActionComplete();
+    void OnPanelMotionActionComplete();
 
     /**
      * @brief Retrieves the endpoint identifier associated with this instance.
