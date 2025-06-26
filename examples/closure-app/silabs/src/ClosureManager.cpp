@@ -364,7 +364,20 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
 void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
 {
   ClosureManager & instance = ClosureManager::GetInstance();
-  chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * ep = (endpointId == instance.ep2.GetEndpoint()) ? &instance.ep2 : &instance.ep3;
+  chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * ep = nullptr;
+  if (endpointId == instance.ep2.GetEndpoint())
+  {
+    ep = &instance.ep2;
+  }
+  else if (endpointId == instance.ep3.GetEndpoint())
+  {
+    ep = &instance.ep3;
+  }
+  else
+  {
+    ChipLogError(AppServer, "HandlePanelSetTargetAction called with invalid endpointId: %u", endpointId);
+    return;
+  }
 
   chip::app::Clusters::ClosureDimension::ClusterState epState = ep->GetLogic().GetState();
   DataModel::Nullable<GenericCurrentStateStruct> currentState = DataModel::NullNullable;
