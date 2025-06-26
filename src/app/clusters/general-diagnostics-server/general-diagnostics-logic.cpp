@@ -24,7 +24,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-CHIP_ERROR GeneralDiagnosticsLogic::ReadNetworkInterfaces(AttributeValueEncoder & aEncoder){
+CHIP_ERROR GeneralDiagnosticsLogic::ReadNetworkInterfaces(AttributeValueEncoder & aEncoder)
+{
     CHIP_ERROR err = CHIP_NO_ERROR;
     DeviceLayer::NetworkInterface * netifs;
 
@@ -49,8 +50,8 @@ CHIP_ERROR GeneralDiagnosticsLogic::ReadNetworkInterfaces(AttributeValueEncoder 
     return err;
 }
 
-DataModel::ActionReturnStatus GeneralDiagnosticsLogic::HandleTestEventTrigger(
-                                                              const GeneralDiagnostics::Commands::TestEventTrigger::DecodableType & commandData)
+DataModel::ActionReturnStatus
+GeneralDiagnosticsLogic::HandleTestEventTrigger(const GeneralDiagnostics::Commands::TestEventTrigger::DecodableType & commandData)
 {
     auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
     if (triggerDelegate == nullptr)
@@ -61,7 +62,10 @@ DataModel::ActionReturnStatus GeneralDiagnosticsLogic::HandleTestEventTrigger(
     return triggerDelegate->HandleEventTriggers(commandData.eventTrigger);
 }
 
-std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsLogic::HandleTimeSnapshot(CommandHandler & handler, const ConcreteCommandPath & commandPath, const GeneralDiagnostics::Commands::TimeSnapshot::DecodableType & commandData) {
+std::optional<DataModel::ActionReturnStatus>
+GeneralDiagnosticsLogic::HandleTimeSnapshot(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                            const GeneralDiagnostics::Commands::TimeSnapshot::DecodableType & commandData)
+{
     ChipLogError(Zcl, "Received TimeSnapshot command!");
 
     GeneralDiagnostics::Commands::TimeSnapshotResponse::Type response;
@@ -92,7 +96,10 @@ std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsLogic::HandleTime
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsLogic::HandlePayloadTestRequest(CommandHandler & handler, const ConcreteCommandPath & commandPath, const GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType & commandData) {
+std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsLogic::HandlePayloadTestRequest(
+    CommandHandler & handler, const ConcreteCommandPath & commandPath,
+    const GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType & commandData)
+{
     // Max allowed is 2048.
     if (commandData.count > 2048)
     {
@@ -123,7 +130,8 @@ std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsLogic::HandlePayl
     return std::nullopt;
 }
 
-TestEventTriggerDelegate * GeneralDiagnosticsLogic::GetTriggerDelegateOnMatchingKey(ByteSpan enableKey){
+TestEventTriggerDelegate * GeneralDiagnosticsLogic::GetTriggerDelegateOnMatchingKey(ByteSpan enableKey)
+{
     if (enableKey.size() != TestEventTriggerDelegate::kEnableKeyLength)
     {
         return nullptr;
@@ -144,7 +152,8 @@ TestEventTriggerDelegate * GeneralDiagnosticsLogic::GetTriggerDelegateOnMatching
     return triggerDelegate;
 }
 
-bool GeneralDiagnosticsLogic::IsByteSpanAllZeros(const ByteSpan & byteSpan){
+bool GeneralDiagnosticsLogic::IsByteSpanAllZeros(const ByteSpan & byteSpan)
+{
     for (unsigned char it : byteSpan)
     {
         if (it != 0)
@@ -155,6 +164,6 @@ bool GeneralDiagnosticsLogic::IsByteSpanAllZeros(const ByteSpan & byteSpan){
     return true;
 }
 
-}
-}
-}
+} // namespace Clusters
+} // namespace app
+} // namespace chip

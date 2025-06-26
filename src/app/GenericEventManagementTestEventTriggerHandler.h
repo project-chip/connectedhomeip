@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 #include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 
 namespace chip {
 namespace app {
@@ -27,13 +27,15 @@ namespace app {
 class GenericEventManagementTestEventTriggerHandler : public TestEventTriggerHandler
 {
 public:
-    GenericEventManagementTestEventTriggerHandler(chip::app::Clusters::GeneralDiagnosticsCluster * generalDiagnosticsClusterInstance) : mGeneralDiagnosticsCluster(generalDiagnosticsClusterInstance) {}
+    GenericEventManagementTestEventTriggerHandler(
+        chip::app::Clusters::GeneralDiagnosticsCluster * generalDiagnosticsClusterInstance) :
+        mGeneralDiagnosticsCluster(generalDiagnosticsClusterInstance)
+    {}
 
-    chip::app::Clusters::GeneralDiagnosticsCluster* GetGeneralDiagnosticsClusterInstance() {
-        return mGeneralDiagnosticsCluster;
-    }
+    chip::app::Clusters::GeneralDiagnosticsCluster * GetGeneralDiagnosticsClusterInstance() { return mGeneralDiagnosticsCluster; }
 
-    void SetGeneralDiagnosticsClusterInstance(chip::app::Clusters::GeneralDiagnosticsCluster* generalDiagnosticsClusterInstance){
+    void SetGeneralDiagnosticsClusterInstance(chip::app::Clusters::GeneralDiagnosticsCluster * generalDiagnosticsClusterInstance)
+    {
         mGeneralDiagnosticsCluster = generalDiagnosticsClusterInstance;
     }
 
@@ -42,7 +44,7 @@ protected:
 
 private:
     void FillUpEventLoggingBufferWithFakeSoftwareFault(size_t bufferSize);
-    virtual void TriggerSoftwareFaultEvent(const char * faultRecordString) = 0;
+    virtual void TriggerSoftwareFaultEvent(const char * faultRecordString)      = 0;
     chip::app::Clusters::GeneralDiagnosticsCluster * mGeneralDiagnosticsCluster = nullptr;
 };
 

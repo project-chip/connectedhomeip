@@ -17,12 +17,12 @@
 #pragma once
 
 #include <app/AttributeValueEncoder.h>
+#include <app/TestEventTriggerDelegate.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <lib/core/CHIPError.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/GeneralFaults.h>
-#include <app/TestEventTriggerDelegate.h>
 
 using namespace chip::app::Clusters::GeneralDiagnostics;
 using namespace chip::app::Clusters::GeneralDiagnostics::Attributes;
@@ -45,30 +45,47 @@ struct GeneralDiagnosticsEnabledAttributes
     bool enableTestEventTriggersEnabled : 1;
 };
 
-class GeneralDiagnosticsLogic {
+class GeneralDiagnosticsLogic
+{
 public:
-    GeneralDiagnosticsLogic(const GeneralDiagnosticsEnabledAttributes enabledAttributes) : mEnabledAttributes(enabledAttributes){}
+    GeneralDiagnosticsLogic(const GeneralDiagnosticsEnabledAttributes enabledAttributes) : mEnabledAttributes(enabledAttributes) {}
     ~GeneralDiagnosticsLogic() = default;
 
     CHIP_ERROR GetRebootCount(uint16_t & rebotCount) const { return GetDiagnosticDataProvider().GetRebootCount(rebotCount); }
-    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) const { return GetDiagnosticDataProvider().GetTotalOperationalHours(totalOperationalHours); }
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) const
+    {
+        return GetDiagnosticDataProvider().GetTotalOperationalHours(totalOperationalHours);
+    }
     CHIP_ERROR GetBootReason(BootReasonEnum & bootReason) const { return GetDiagnosticDataProvider().GetBootReason(bootReason); }
-    CHIP_ERROR GetActiveHardwareFaults(GeneralFaults<DeviceLayer::kMaxHardwareFaults> & hardwareFaults) const { return GetDiagnosticDataProvider().GetActiveHardwareFaults(hardwareFaults); }
-    CHIP_ERROR GetActiveRadioFaults(GeneralFaults<DeviceLayer::kMaxRadioFaults> & radioFaults) const { return GetDiagnosticDataProvider().GetActiveRadioFaults(radioFaults); }
-    CHIP_ERROR GetActiveNetworkFaults(GeneralFaults<DeviceLayer::kMaxNetworkFaults> & networkFaults) const { return GetDiagnosticDataProvider().GetActiveNetworkFaults(networkFaults); }
+    CHIP_ERROR GetActiveHardwareFaults(GeneralFaults<DeviceLayer::kMaxHardwareFaults> & hardwareFaults) const
+    {
+        return GetDiagnosticDataProvider().GetActiveHardwareFaults(hardwareFaults);
+    }
+    CHIP_ERROR GetActiveRadioFaults(GeneralFaults<DeviceLayer::kMaxRadioFaults> & radioFaults) const
+    {
+        return GetDiagnosticDataProvider().GetActiveRadioFaults(radioFaults);
+    }
+    CHIP_ERROR GetActiveNetworkFaults(GeneralFaults<DeviceLayer::kMaxNetworkFaults> & networkFaults) const
+    {
+        return GetDiagnosticDataProvider().GetActiveNetworkFaults(networkFaults);
+    }
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
 
-    DataModel::ActionReturnStatus HandleTestEventTrigger(const GeneralDiagnostics::Commands::TestEventTrigger::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus> HandleTimeSnapshot(CommandHandler & handler, const ConcreteCommandPath & commandPath, const GeneralDiagnostics::Commands::TimeSnapshot::DecodableType & commandData);
-    std::optional<DataModel::ActionReturnStatus> HandlePayloadTestRequest(CommandHandler & handler, const ConcreteCommandPath & commandPath, const GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType & commandData);
+    DataModel::ActionReturnStatus
+    HandleTestEventTrigger(const GeneralDiagnostics::Commands::TestEventTrigger::DecodableType & commandData);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleTimeSnapshot(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                       const GeneralDiagnostics::Commands::TimeSnapshot::DecodableType & commandData);
+    std::optional<DataModel::ActionReturnStatus>
+    HandlePayloadTestRequest(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                             const GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType & commandData);
 
 private:
     TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(ByteSpan enableKey);
     bool IsByteSpanAllZeros(const ByteSpan & byteSpan);
     const GeneralDiagnosticsEnabledAttributes mEnabledAttributes;
-
 };
 
-}
-}
-}
+} // namespace Clusters
+} // namespace app
+} // namespace chip

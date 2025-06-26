@@ -21,17 +21,17 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace GeneralDiagnostics {
-    void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason);
+void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason);
 
-    void GlobalNotifyHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
-                                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current);
+void GlobalNotifyHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
+                                      const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current);
 
-    void GlobalNotifyRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
-                             const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current);
+void GlobalNotifyRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
+                                   const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current);
 
-    void GlobalNotifyNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
-                               const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
-}
-}
-}
-}
+void GlobalNotifyNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
+                                     const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
+} // namespace GeneralDiagnostics
+} // namespace Clusters
+} // namespace app
+} // namespace chip
