@@ -125,9 +125,6 @@ public:
      */
     void HandleGoHomeCommandCallback(OperationalState::GenericOperationalError & err) override;
 
-    bool IsDerivedClusterStatePauseCompatible(uint8_t aState) override { return IsRunningState(static_cast<ChefRvcOperationalStateEnum>(aState)); };
-    bool IsDerivedClusterStateResumeCompatible(uint8_t aState) override { return IsRunningState(static_cast<ChefRvcOperationalStateEnum>(aState)); };
-
     void SetCurrentRunningState(RvcOperationalState::ChefRvcOperationalStateEnum RunningState) { mCurrentRunningState = RunningState; };
 
     uint32_t mRunningTime = 0;
