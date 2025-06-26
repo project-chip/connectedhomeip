@@ -2240,6 +2240,7 @@ MTR_PROVISIONALLY_AVAILABLE
 @property (nonatomic, copy) NSNumber * _Nonnull zoneID MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull zoneType MTR_PROVISIONALLY_AVAILABLE;
 @property (nonatomic, copy) NSNumber * _Nonnull zoneSource MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) MTRZoneManagementClusterTwoDCartesianZoneStruct * _Nullable twoDCartesianZone MTR_PROVISIONALLY_AVAILABLE;
 @end
 
 MTR_PROVISIONALLY_AVAILABLE
