@@ -185,8 +185,8 @@ public:
      * @param[in] endpointID The ID of the endpoint to remove.
      * @return NOT_FOUND if no mapping is found.
      */
-    virtual Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                              uint16_t endpointID) = 0;
+    virtual Protocols::InteractionModel::ClusterStatusCode
+    RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID) = 0;
 
 protected:
     friend class TlsClientManagementServer;

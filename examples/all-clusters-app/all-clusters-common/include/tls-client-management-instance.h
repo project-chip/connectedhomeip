@@ -58,8 +58,8 @@ public:
                                                                     uint16_t endpointID,
                                                                     EndpointStructType & endpoint) const override;
 
-    Protocols::InteractionModel::Status RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                      uint16_t endpointID) override;
+    Protocols::InteractionModel::ClusterStatusCode RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                                 uint16_t endpointID) override;
 
     static inline TlsClientManagementCommandDelegate & GetInstance() { return instance; }
 };

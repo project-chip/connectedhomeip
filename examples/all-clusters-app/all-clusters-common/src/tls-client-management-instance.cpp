@@ -129,10 +129,10 @@ Status TlsClientManagementCommandDelegate::FindProvisionedEndpointByID(EndpointI
     return Status::NotFound;
 }
 
-Status TlsClientManagementCommandDelegate::RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                         uint16_t endpointID)
+ClusterStatusCode TlsClientManagementCommandDelegate::RemoveProvisionedEndpointByID(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                                    uint16_t endpointID)
 {
-    VerifyOrReturnError(matterEndpoint == EndpointId(1), Status::ConstraintError);
+    VerifyOrReturnError(matterEndpoint == EndpointId(1), ClusterStatusCode(Status::ConstraintError));
 
     auto i = mProvisioned.begin();
     for (; i != mProvisioned.end(); i++)
@@ -144,11 +144,15 @@ Status TlsClientManagementCommandDelegate::RemoveProvisionedEndpointByID(Endpoin
     }
     if (i == mProvisioned.end() || i->fabric != fabric)
     {
-        return Status::NotFound;
+        return ClusterStatusCode(Status::NotFound);
+    }
+    if (i->payload.status == TLSEndpointStatusEnum::kInUse)
+    {
+        return ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kEndpointInUse);
     }
     mProvisioned.erase(i);
 
-    return Status::Success;
+    return ClusterStatusCode(Status::Success);
 }
 
 static CertificateTableImpl gCertificateTableInstance;

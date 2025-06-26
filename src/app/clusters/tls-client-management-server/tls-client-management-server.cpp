@@ -197,8 +197,8 @@ void TlsClientManagementServer::HandleRemoveEndpoint(HandlerContext & ctx, const
 {
     ChipLogDetail(Zcl, "TlsClientManagement: RemoveEndpoint");
 
-    Status status = mDelegate.RemoveProvisionedEndpointByID(ctx.mRequestPath.mEndpointId,
-                                                            ctx.mCommandHandler.GetAccessingFabricIndex(), req.endpointID);
+    auto status = mDelegate.RemoveProvisionedEndpointByID(ctx.mRequestPath.mEndpointId,
+                                                          ctx.mCommandHandler.GetAccessingFabricIndex(), req.endpointID);
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 
