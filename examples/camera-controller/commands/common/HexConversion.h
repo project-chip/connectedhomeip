@@ -19,8 +19,8 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/BytesToHex.h>
-#include <lib/support/StringBuilder.h>
 #include <lib/support/Span.h>
+#include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 /**

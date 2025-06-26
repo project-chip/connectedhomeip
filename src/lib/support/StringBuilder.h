@@ -108,10 +108,7 @@ public:
     StringBuilder() : StringBuilderBase(mBuffer, kSize) {}
 
     /// Constructor for char * and length
-    StringBuilder(const char * data, size_t length) : StringBuilder()
-    {
-        AddFormat("%.*s", static_cast<int>(length), data);
-    }
+    StringBuilder(const char * data, size_t length) : StringBuilder() { AddFormat("%.*s", static_cast<int>(length), data); }
 
     /// Constructor for uint8_t * and length
     /// Only printable elements will be added
@@ -127,10 +124,7 @@ public:
     }
 
     /// Constructor for CharSpan
-    StringBuilder(const CharSpan & span) : StringBuilder()
-    {
-        AddFormat("%.*s", static_cast<int>(span.size()), span.data());
-    }
+    StringBuilder(const CharSpan & span) : StringBuilder() { AddFormat("%.*s", static_cast<int>(span.size()), span.data()); }
 
     /// Constructor for ByteSpan
     /// Only printable elements will be added

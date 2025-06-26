@@ -19,8 +19,8 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/BytesToHex.h>
-#include <lib/support/StringBuilder.h>
 #include <lib/support/Span.h>
+#include <lib/support/StringBuilder.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 /**
@@ -41,7 +41,8 @@ CHIP_ERROR HexToBytes(chip::CharSpan hex, F bufferAllocator, size_t * octetCount
 
     if (hex.size() % 2 != 0)
     {
-        ChipLogError(chipTool, "Error while encoding '%s' as an octet string: Odd number of characters.", chip::StringBuilder(hex).c_str());
+        ChipLogError(chipTool, "Error while encoding '%s' as an octet string: Odd number of characters.",
+                     chip::StringBuilder(hex).c_str());
         return CHIP_ERROR_INVALID_STRING_LENGTH;
     }
 
