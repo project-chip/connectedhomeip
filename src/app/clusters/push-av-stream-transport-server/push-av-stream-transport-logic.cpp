@@ -25,6 +25,7 @@
 #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-logic.h>
 #include <app/reporting/reporting.h>
 #include <app/util/util.h>
+#include <assert.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -136,22 +137,13 @@ PushAvStreamTransportServerLogic::UpsertStreamTransportConnection(const Transpor
 PushAvStreamTransportServerLogic::UpsertResultEnum
 PushAvStreamTransportServerLogic::UpsertTimerAppState(std::shared_ptr<PushAVStreamTransportDeallocateCallbackContext> timerAppState)
 {
-    UpsertResultEnum result;
     auto it = std::find_if(mTimerContexts.begin(), mTimerContexts.end(),
                            [id = timerAppState->connectionID](const auto & existing) { return existing->connectionID == id; });
 
-    if (it != mTimerContexts.end())
-    {
-        *it    = timerAppState;
-        result = UpsertResultEnum::kUpdated;
-    }
-    else
-    {
-        mTimerContexts.push_back(timerAppState);
-        result = UpsertResultEnum::kInserted;
-    }
+    assert(it == mTimerContexts.end());
 
-    return result;
+    mTimerContexts.push_back(timerAppState);
+    return UpsertResultEnum::kInserted;
 }
 
 void PushAvStreamTransportServerLogic::RemoveStreamTransportConnection(const uint16_t transportConnectionId)

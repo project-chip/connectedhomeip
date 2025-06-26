@@ -73,7 +73,7 @@ DataModel::ActionReturnStatus PushAvStreamTransportServer::ReadAttribute(const D
 {
     VerifyOrDie(request.path.mClusterId == PushAvStreamTransport::Id);
 
-    ChipLogProgress(Zcl, "Push AV Stream Transport[ep=%d]: Reading Attribute %d", request.path.mEndpointId,
+    ChipLogProgress(Zcl, "Push AV Stream Transport[ep=%d]: Reading Attribute %" PRIu32, request.path.mEndpointId,
                     request.path.mAttributeId);
 
     switch (request.path.mAttributeId)
