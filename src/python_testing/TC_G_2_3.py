@@ -94,10 +94,12 @@ class TC_G_2_3(MatterBaseTest):
                 TestStep("9c", "TH reads immediately IdentifyTime attribute from DUT"),
                 TestStep("10", "TH sends AddGroupIfIdentifying command to DUT on Groups cluster endpoint as unicast method with the following fields: GroupID as 0x0006, GroupName as Gp6"),
                 TestStep("11a", "TH reads GroupTable attribute from the GroupKeyManagement cluster of DUT on EP0"),
-                TestStep("11b", "If the GN feature is supported, verify DUT responds with provided GroupName as Gp6 associated with the Groups cluster endpoint"),
+                TestStep(
+                    "11b", "If the GN feature is supported, verify DUT responds with provided GroupName as Gp6 associated with the Groups cluster endpoint"),
                 TestStep("12", "TH sends AddGroupIfIdentifying command to DUT on Groups cluster endpoint as unicast method with the following fields: GroupID as 0x0007, Groupname as Gp7"),
                 TestStep("13", "TH reads GroupTable attribute from the GroupKeyManagement cluster from DUT on EP0"),
-                TestStep("14", "If the GN feature is supported, verify DUT responds with provided GroupName as Gp7 associated with the Groups cluster endpoint"),
+                TestStep(
+                    "14", "If the GN feature is supported, verify DUT responds with provided GroupName as Gp7 associated with the Groups cluster endpoint"),
                 TestStep("15", "TH sends AddGroupIfIdentifying command to DUT on Groups cluster endpoint with (maxgroups - 2) groups, incrementing the GroupId each time starting from 0x0008"),
                 TestStep("16a", "TH binds GroupId( 0x0006 + maxgroups to 0x0006 + maxgroups+1) with GroupKeySetID 1"),
                 TestStep("16b", "TH sends AddGroupIfIdentifying command to DUT on Groups cluster endpoint once as unicast method with different GroupID"),
