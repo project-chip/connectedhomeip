@@ -19,6 +19,7 @@ import("//build_overrides/mbedtls.gni")
 
 import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
+import("${chip_root}/src/platform/silabs/multi-ota/args.gni")
 import("silabs_board.gni")
 
 declare_args() {
@@ -80,11 +81,6 @@ declare_args() {
 
   # Use SLC generated files
   slc_reuse_files = false
-
-  # Multi-chip OTA
-  chip_enable_multi_ota_requestor = false
-  chip_enable_multi_ota_encryption = false
-  chip_enable_ota_custom_tlv_testing = false
 
   # Factory Provision storage
   use_provision_flash_storage = wifi_soc
@@ -549,16 +545,6 @@ template("efr32_sdk") {
         "SL_OPENTHREAD_ENABLE_APP_TASK=0",
         "SL_OPENTHREAD_ENABLE_CLI_TASK=0",
       ]
-    }
-
-    if (chip_enable_multi_ota_requestor) {
-      if (chip_enable_multi_ota_encryption) {
-        defines += [ "SL_MATTER_ENABLE_OTA_ENCRYPTION=1" ]
-      }
-
-      if (chip_enable_ota_custom_tlv_testing) {
-        defines += [ "OTA_TEST_CUSTOM_TLVS=1" ]
-      }
     }
 
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {

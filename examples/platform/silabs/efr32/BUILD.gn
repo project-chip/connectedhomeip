@@ -18,6 +18,7 @@ import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/icd/icd.gni")
 import("${chip_root}/src/lib/lib.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/silabs/multi-ota/args.gni")
 import("${silabs_sdk_build_root}/efr32_sdk.gni")
 import("${silabs_sdk_build_root}/silabs_board.gni")
 
@@ -108,10 +109,6 @@ config("efr32-common-config") {
 
   if (enable_heap_monitoring) {
     defines += [ "HEAP_MONITORING" ]
-  }
-
-  if (chip_enable_multi_ota_requestor) {
-    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_MULTI_OTA_REQUESTOR=1" ]
   }
 
   ldflags = [

@@ -93,7 +93,7 @@ private:
     OTAImageHeaderParser mHeaderParser;
     OTATlvProcessor * mCurrentProcessor = nullptr;
     OTADataAccumulator mAccumulator;
-    std::map<uint32_t, OTATlvProcessor *> mProcessorMap;
+    std::map<OTAProcessorTag, OTATlvProcessor *> mProcessorMap;
 };
 
 } // namespace chip

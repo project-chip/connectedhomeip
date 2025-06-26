@@ -28,8 +28,8 @@ using namespace ::chip::DeviceLayer::Internal;
 static chip::OTAMultiImageProcessorImpl gImageProcessor;
 
 #if SL_WIFI && !SLI_SI91X_MCU_INTERFACE
-#include <platform/silabs/wifi/ncp/spi_multiplex.h>
-#endif // SL_WIFI
+#include <platform/silabs/wifi/ncp/spi_multiplex.h> //nogncheck
+#endif                                              // SL_WIFI
 
 extern "C" {
 #ifdef SLI_SI91X_MCU_INTERFACE
@@ -189,14 +189,14 @@ CHIP_ERROR OTAMultiImageProcessorImpl::SelectProcessor(ByteSpan & block)
     ReturnErrorOnFailure(reader.Read32(&header.tag).StatusCode());
     ReturnErrorOnFailure(reader.Read32(&header.length).StatusCode());
 
-    auto pair = mProcessorMap.find(header.tag);
+    auto pair = mProcessorMap.find(static_cast<OTAProcessorTag>(header.tag));
     if (pair == mProcessorMap.end())
     {
         ChipLogError(SoftwareUpdate, "There is no registered processor for tag: %lu", header.tag);
         return CHIP_OTA_PROCESSOR_NOT_REGISTERED;
     }
 
-    ChipLogDetail(SoftwareUpdate, "Selected processor with tag: %lu", pair->first);
+    ChipLogDetail(SoftwareUpdate, "Selected processor with tag: %lu", static_cast<uint32_t>(pair->first));
     mCurrentProcessor = pair->second;
     mCurrentProcessor->SetLength(header.length);
     mCurrentProcessor->SetWasSelected(true);
@@ -208,14 +208,14 @@ CHIP_ERROR OTAMultiImageProcessorImpl::RegisterProcessor(OTAProcessorTag tag, OT
 {
     VerifyOrReturnError(processor->IsValidTag(tag), CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(SoftwareUpdate, "Invalid processor tag: %lu", static_cast<uint32_t>(tag)));
-    auto pair = mProcessorMap.find(static_cast<uint32_t>(tag));
+    auto pair = mProcessorMap.find(tag);
     if (pair != mProcessorMap.end())
     {
         ChipLogError(SoftwareUpdate, "A processor for tag %lu is already registered.", static_cast<uint32_t>(tag));
         return CHIP_OTA_PROCESSOR_ALREADY_REGISTERED;
     }
 
-    mProcessorMap.insert({ static_cast<uint32_t>(tag), processor });
+    mProcessorMap.insert({ tag, processor });
 
     return CHIP_NO_ERROR;
 }

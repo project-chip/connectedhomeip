@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/silabs/multi-ota/args.gni")
 import("${chip_root}/third_party/silabs/efr32_sdk.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 import("${matter_support_root}/provision/args.gni")
@@ -139,7 +140,11 @@ static_library("efr32") {
   }
 
   if (chip_enable_multi_ota_requestor) {
-    public_deps += [ "${silabs_platform_dir}/multi-ota:multi-ota" ]
+    if (use_SiWx917) {
+      public_deps += [ "${silabs_platform_dir}/multi-ota:multi-ota-efr32-ncp" ]
+    } else {
+      public_deps += [ "${silabs_platform_dir}/multi-ota:multi-ota-efr32" ]
+    }
   } else if (chip_enable_ota_requestor) {
     sources += [
       "${silabs_platform_dir}/OTAImageProcessorImpl.h",

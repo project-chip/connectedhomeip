@@ -44,9 +44,9 @@ CHIP_ERROR chip::OTAMultiImageProcessorImpl::ProcessDescriptor(void * descriptor
 
 CHIP_ERROR chip::OTAMultiImageProcessorImpl::OtaHookInit()
 {
-    static chip::OTAFactoryDataProcessor sFactoryDataProcessor;
-
     auto & imageProcessor = chip::OTAMultiImageProcessorImpl::GetDefaultInstance();
+
+    static chip::OTAFactoryDataProcessor sFactoryDataProcessor;
     sFactoryDataProcessor.RegisterDescriptorCallback(ProcessDescriptor);
     ReturnErrorOnFailure(imageProcessor.RegisterProcessor(OTAProcessorTag::kFactoryDataProcessor, &sFactoryDataProcessor));
 

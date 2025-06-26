@@ -16,11 +16,11 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/silabs/multi-ota/args.gni")
 import("${chip_root}/src/platform/silabs/wifi/args.gni")
 import("${chip_root}/third_party/silabs/SiWx917_sdk.gni")
 import("${chip_root}/third_party/silabs/silabs_board.gni")
 import("${matter_support_root}/provision/args.gni")
-
 silabs_platform_dir = "${chip_root}/src/platform/silabs"
 
 assert(chip_device_platform == "SiWx917")
@@ -84,7 +84,7 @@ static_library("SiWx917") {
   ]
 
   if (chip_enable_multi_ota_requestor) {
-    public_deps += [ "${silabs_platform_dir}/multi-ota:multi-ota" ]
+    public_deps += [ "${silabs_platform_dir}/multi-ota:multi-ota-siwx" ]
   } else if (chip_enable_ota_requestor) {
     sources += [
       "${silabs_platform_dir}/OTAImageProcessorImpl.h",
