@@ -170,8 +170,9 @@ void ClosureManager::TimerEventHandler(void * timerCbArg)
     // once sClosureTimer expires. Post an event to apptask queue with the actual handler
     // so that the event can be handled in the context of the apptask.
     AppEvent event;
-    event.Type                = AppEvent::kEventType_Closure;
-    event.ClosureEvent.Action = closureManager->GetCurrentAction();
+    event.Type                    = AppEvent::kEventType_Closure;
+    event.ClosureEvent.Action     = closureManager->GetCurrentAction();
+    event.ClosureEvent.EndpointId = closureManager->mCurrentActionEndpointId;
     event.Handler             = HandleClosureActionCompleteEvent;
     AppTask::GetAppTask().PostEvent(&event);
 }
@@ -267,10 +268,13 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
 
     // Post an event to initiate the calibration action asynchronously.
     AppEvent event;
-    event.Type                = AppEvent::kEventType_Closure;
-    event.ClosureEvent.Action = CALIBRATE_ACTION;
-    event.Handler             = InitiateAction;
+    event.Type                    = AppEvent::kEventType_Closure;
+    event.ClosureEvent.Action     = CALIBRATE_ACTION;
+    event.ClosureEvent.EndpointId = ep1.GetEndpoint();
+    event.Handler                 = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
+    SetCurrentAction(CALIBRATE_ACTION);
+    mCurrentActionEndpointId = ep1.GetEndpoint();
 
     isCalibrationInProgress = true;
     return Status::Success;
@@ -348,7 +352,6 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
 
     chip::app::Clusters::ClosureDimension::ClusterState epState = ep->GetLogic().GetState();
     StepDirectionEnum stepDirection                             = ep->GetDelegate().GetStepCommandTargetDirection();
-
     GenericCurrentStateStruct currentState;
 
     VerifyOrReturn(!epState.currentState.IsNull() && epState.currentState.Value().position.HasValue(),
@@ -358,9 +361,9 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
 
     chip::Percent100ths currentPosition = epState.currentState.Value().position.Value();
     chip::Percent100ths targetPosition  = epState.target.Value().position.Value();
-
+    ChipLogProgress(AppServer, "Current Position: %d, Target Position: %d", currentPosition, targetPosition);
     bool panelTargetReached = (currentPosition == targetPosition);
-
+    ChipLogProgress(AppServer, "Panel Target Reached: %s", panelTargetReached ? "true" : "false");
     if (!panelTargetReached)
     {
         chip::Percent100ths nextCurrentPosition;
