@@ -25,13 +25,8 @@
 #pragma once
 
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
-#ifdef __no_stub__
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include "wifi_api_ex.h"
-#endif
 
-#include "filogic.h"
-#endif /* __no_stub__ */
+#include "wise_event_loop.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -52,16 +47,10 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 #endif
 
 public:
-#ifdef __no_stub__
     // ===== Platform-specific members that may be accessed directly by the application.
-    static void FilogicEventHandler(void * c, filogic_async_event_id_t event, filogic_async_event_data * data);
-#endif /* __no_stub__ */
+    static wise_err_t WiseEventHandler(void * ctx, system_event_t * event);
 
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
-
-#ifdef __no_stub__
-    void * mFilogicCtx;
-#endif /* __no_stub__ */
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.

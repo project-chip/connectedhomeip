@@ -31,6 +31,7 @@ crtend_o = "${crtbegin_dir}/crtend.o"
 # Add includes, cflags, asmflags, etc in config
 config("scm1612s_sdk_config") {
     include_dirs = [
+        "${scm1612s_sdk_root}/api/include",
         "${scm1612s_sdk_root}/include",
         "${scm1612s_sdk_root}/include/generated",
         "${scm1612s_sdk_root}/include/hal/ndsv5",
@@ -91,6 +92,8 @@ config("scm1612s_sdk_config") {
       "-Wl,--wrap=free",
       "-Wl,--wrap=realloc",
       "-Wl,--wrap=calloc",
+      "-Wl,--wrap=vsnprintf",
+      "-Wl,--wrap=vsprintf",
       "-Wl,--wrap=printf",
       "-Wl,--wrap=vprintf",
       "-Wl,--wrap=sprintf",

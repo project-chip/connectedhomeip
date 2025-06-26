@@ -24,9 +24,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/BLEManager.h>
-#ifdef __no_stub__
-#include <platform/mt793x/NetworkCommissioningWiFiDriver.h>
-#endif /* __no_stub__ */
+#include <platform/senscomm/scm1612s/NetworkCommissioningWiFiDriver.h>
 
 #ifdef __no_stub__
 #include <lwip/dns.h>
@@ -121,97 +119,87 @@ void ConnectivityManagerImpl::ChangeWiFiAPState(WiFiAPState newState)
 
 void ConnectivityManagerImpl::_OnWiFiPlatformEvent(const ChipDeviceEvent * event)
 {
-    if (event->Type != DeviceEventType::kMtkWiFiEvent)
+    if (event->Type != DeviceEventType::kSCMSystemEvent)
         return;
 
+    ChipLogProgress(DeviceLayer, "%s WiFi event %d", __func__, event->Platform.SCMSystemEvent.event.event_id);
+
+    switch (event->Platform.SCMSystemEvent.event.event_id)
+    {
+    case SYSTEM_EVENT_SCAN_DONE:
+        ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_SCAN_DONE");
 #ifdef __no_stub__
-    ChipLogProgress(DeviceLayer, "%s WiFi event %s", __func__, filogic_event_to_name(event->Platform.FilogicEvent.event));
-
-    const filogic_async_event_data * event_data;
-    bool hadIPv4Conn = mFlags.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
-    bool hadIPv6Conn = mFlags.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
-
-    event_data = &event->Platform.MtkWiFiEvent.event_data;
-
-    if (event_data->event_id == FILOGIC_WIFI_INIT_OK)
-    {
-        if (FILOGIC_WIFI_PORT_STA == event_data->u.wifi_init.port)
+        NetworkCommissioning::WiseWiFiDriver::GetInstance().OnScanWiFiNetworkDone();
+#endif /* __no_stub__*/
+        break;
+    case SYSTEM_EVENT_STA_START:
+        ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_STA_START");
+        DriveStationState();
+        break;
+    case SYSTEM_EVENT_STA_CONNECTED:
+        ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_STA_CONNECTED");
+        if (mWiFiStationState == kWiFiStationState_Connecting)
         {
-            mWiFiStationState = kWiFiStationState_NotConnected;
-            DriveStationState();
+            ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
         }
-        else if (FILOGIC_WIFI_PORT_AP == event_data->u.wifi_init.port)
-        {
-            ConfigureWiFiAP();
-            ChangeWiFiAPState(kWiFiAPState_Activating);
-        }
-        else
-            assert(0);
-    }
-    else if (event_data->event_id == FILOGIC_AP_START_OK)
-    {
-        ChangeWiFiAPState(kWiFiAPState_Active);
-    }
-    else if (event_data->event_id == FILOGIC_SET_OPMODE_OK)
-    {
-        if (event_data->u.wifi_opmode.opmode == WIFI_MODE_STA_ONLY)
-            ChangeWiFiStationState(kWiFiStationState_NotConnected);
-        else if (event_data->u.wifi_opmode.opmode == WIFI_MODE_AP_ONLY)
-            ChangeWiFiAPState(kWiFiAPState_Active);
-        else
-            assert(0);
-    }
-    else if (event_data->event_id == FILOGIC_AP_STATION_CONNECTED)
-    {
-        MaintainOnDemandWiFiAP();
-    }
-    else if (event_data->event_id == FILOGIC_AP_STATION_DISCONNECTED)
-    {
-    }
-    else if (event_data->event_id == FILOGIC_STA_DISCONNECTED_FROM_AP)
-    {
+        DriveStationState();
+        break;
+    case SYSTEM_EVENT_STA_DISCONNECTED:
+        ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_STA_DISCONNECTED");
+#ifdef __no_stub__
+        NetworkCommissioning::WiseWiFiDriver::GetInstance().SetLastDisconnectReason(event);
+#endif /* __no_stub__ */
         if (mWiFiStationState == kWiFiStationState_Connecting)
         {
             ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
         }
         DriveStationState();
-    }
-    else if (!hadIPv4Conn && event_data->event_id == FILOGIC_STA_IPV4_ADDR_READY)
-    {
-        if (mWiFiStationState == kWiFiStationState_Connecting)
-        {
-            ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
-        }
-
-        ChipLogProgress(DeviceLayer, "ip addr: %s", event_data->u.ipv4_str.addr);
+        break;
+    case SYSTEM_EVENT_STA_STOP:
+        ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_STA_STOP");
         DriveStationState();
-        UpdateInternetConnectivityState(TRUE, hadIPv6Conn, event_data->u.ipv4_str.addr);
-    }
-
-    if (!hadIPv6Conn && event_data->event_id == FILOGIC_STA_IPV6_ADDR_READY)
-    {
-        if (mWiFiStationState == kWiFiStationState_Connecting)
-        {
-            ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
-        }
-
-        const char * addrv6 = (const char *) &event_data->u.ipv6_str.addr[0];
-        ChipLogProgress(DeviceLayer, "ip addr: %s", addrv6);
-
-        DriveStationState();
-
-        UpdateInternetConnectivityState(hadIPv4Conn, TRUE, event_data->u.ipv6_str.addr);
-    }
-    else if (event->Platform.FilogicEvent.event == FILOGIC_STA_CONNECTED_TO_AP)
-    {
-        ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_CONNECTED");
-        if (mWiFiStationState == kWiFiStationState_Connecting)
-        {
-            ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
-        }
-        DriveStationState();
-    }
+        break;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
+    case SYSTEM_EVENT_AP_START:
+        ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_AP_START");
+        ChangeWiFiAPState(kWiFiAPState_Active);
+        DriveAPState();
+        break;
+    case SYSTEM_EVENT_AP_STOP:
+        ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_AP_STOP");
+        ChangeWiFiAPState(kWiFiAPState_NotActive);
+        DriveAPState();
+        break;
+    case SYSTEM_EVENT_AP_STACONNECTED:
+        ChipLogProgress(DeviceLayer, "WIFI_EVENT_AP_STACONNECTED");
+        MaintainOnDemandWiFiAP();
+        break;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
+    case SYSTEM_EVENT_STA_GOT_IP:
+        ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_STA_GOT_IP");
+#ifdef __no_stub__
+        OnStationIPv4AddressAvailable(event->Platform.SCMSystemEvent.Data.IpGotIp);
 #endif /* __no_stub__ */
+        break;
+    case SYSTEM_EVENT_STA_LOST_IP:
+        ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_STA_LOST_IP");
+#ifdef __no_stub__
+        OnStationIPv4AddressLost();
+#endif /* __no_stub__ */
+        break;
+    case SYSTEM_EVENT_GOT_IP6:
+        ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_GOT_IP6");
+#ifdef __no_stub__
+        if (strcmp(esp_netif_get_ifkey(event->Platform.ESPSystemEvent.Data.IpGotIp6.esp_netif),
+                   ESP32Utils::kDefaultWiFiStationNetifKey) == 0)
+        {
+            OnStationIPv6AddressAvailable(event->Platform.ESPSystemEvent.Data.IpGotIp6);
+        }
+#endif /* __no_stub__ */
+        break;
+    default:
+        break;
+    }
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI

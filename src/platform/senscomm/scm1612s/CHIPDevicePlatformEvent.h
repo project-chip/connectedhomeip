@@ -19,7 +19,7 @@
 /**
  *    @file
  *          Defines platform-specific event types and data for the Chip
- *          Device Layer on MT793x platforms using MT793x SDK.
+ *          Device Layer on scm1612s platform using wise-sdk.
  */
 
 #pragma once
@@ -27,14 +27,7 @@
 #include <CHIPDevicePlatformConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 
-#ifdef __no_stub__
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include "wifi_api_ex.h"
-#endif
-#include "filogic.h"
-
-#define MTK_EVENT_BUF_LEN 40
-#endif /* __no_stub__ */
+#include "wise_event_loop.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -42,56 +35,68 @@ namespace DeviceLayer {
 namespace DeviceEventType {
 
 /**
- * Enumerates MT793x platform-specific event types that are visible to the
+ * Enumerates scm1612s platform-specific event types that are visible to the
  * application.
  */
 enum PublicPlatformSpecificEventTypes
 {
-    /* None currently defined */
+    kSCMSystemEvent = kRange_PublicPlatformSpecific,
 };
 
+#if CONFIG_ENABLE_SCM1612S_BLE_CONTROLLER
 /**
- * Enumerates MT793x platform-specific event types that are internal to the
+ * Enumerates scm1612s platform-specific event types that are internal to the
  * Chip Device Layer.
  */
 enum InternalPlatformSpecificEventTypes
 {
-    kMtkFilogicEvent = kRange_InternalPlatformSpecific,
-    kMtkWiFiEvent    = kRange_InternalPlatformSpecific + 1,
-    kMtkIPEvent      = kRange_InternalPlatformSpecific + 2,
+    kPlatformSCMEvent = kRange_InternalPlatformSpecific,
+    kPlatformSCMBLECentralConnected,
+    kPlatformSCMBLECentralConnectFailed,
+    kPlatformSCMBLEWriteComplete,
+    kPlatformSCMBLESubscribeOpComplete,
+    kPlatformSCMBLEIndicationReceived,
 };
 
+#endif
 } // namespace DeviceEventType
 
 /**
- * Represents platform-specific event information for MT793x platforms.
+ * Represents platform-specific event information for scm1612s platforms.
  */
 struct ChipDevicePlatformEvent final
 {
-#ifdef __no_stub__
     union
     {
         struct
         {
-            filogic_async_event_id_t event;
-            uint8_t payload[MTK_EVENT_BUF_LEN];
-            uint32_t length;
-        } FilogicEvent;
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
+            system_event_t event;
+        } SCMSystemEvent;
+#if CONFIG_ENABLE_SCM1612S_BLE_CONTROLLER
         struct
         {
-            filogic_async_event_data event_data;
-        } MtkWiFiEvent;
+            BLE_CONNECTION_OBJECT mConnection;
+        } BLECentralConnected;
+        struct
+        {
+            CHIP_ERROR mError;
+        } BLECentralConnectFailed;
+        struct
+        {
+            BLE_CONNECTION_OBJECT mConnection;
+        } BLEWriteComplete;
+        struct
+        {
+            BLE_CONNECTION_OBJECT mConnection;
+            bool mIsSubscribed;
+        } BLESubscribeOpComplete;
+        struct
+        {
+            BLE_CONNECTION_OBJECT mConnection;
+            chip::System::PacketBuffer * mData;
+        } BLEIndicationReceived;
 #endif
-        struct
-        {
-            wifi_event_t event;
-            uint8_t * payload;
-            uint32_t length;
-        } MtkIPEvent;
     };
-#endif /* __no_stub__ */
 };
 }; // namespace DeviceLayer
 } // namespace chip

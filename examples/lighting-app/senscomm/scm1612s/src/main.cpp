@@ -90,6 +90,8 @@ void scm1612sLog(const char * aFormat, ...)
     printf("\n");
 }
 
+/* XXX: Use chip::Logging::Platform::LogV instead. */
+#if 0
 void scm1612sLogRedirectCallback(const char * module, uint8_t category, const char * msg, va_list args)
 {
     int len;
@@ -105,6 +107,7 @@ void scm1612sLogRedirectCallback(const char * module, uint8_t category, const ch
         free(buf);
     }
 }
+#endif
 
 /***************************************************************************
  * Button Callback
@@ -129,7 +132,10 @@ void vStartRunning(void)
 {
     CHIP_ERROR error;
 
+/* XXX: Use chip::Logging::Platform::LogV instead. */
+#if 0
     chip::Logging::SetLogRedirectCallback(scm1612sLogRedirectCallback);
+#endif
 
     assert(chip::Platform::MemoryInit() == CHIP_NO_ERROR);
 
