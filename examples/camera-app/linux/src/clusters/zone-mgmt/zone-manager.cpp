@@ -78,16 +78,40 @@ Protocols::InteractionModel::Status ZoneManager::RemoveZone(uint16_t zoneID)
     return Status::Success;
 }
 
-Protocols::InteractionModel::Status ZoneManager::CreateOrUpdateTrigger(const ZoneTriggerControlStruct & zoneTrigger)
+Protocols::InteractionModel::Status ZoneManager::CreateTrigger(const ZoneTriggerControlStruct & zoneTrigger)
 {
+    if (mCameraDevice->GetCameraHALInterface().CreateZoneTrigger(zoneTrigger) == CameraError::SUCCESS)
+    {
+        return Status::Success;
+    }
+    else
+    {
+        return Status::Failure;
+    }
+}
 
-    return Status::Success;
+Protocols::InteractionModel::Status ZoneManager::UpdateTrigger(const ZoneTriggerControlStruct & zoneTrigger)
+{
+    if (mCameraDevice->GetCameraHALInterface().UpdateZoneTrigger(zoneTrigger) == CameraError::SUCCESS)
+    {
+        return Status::Success;
+    }
+    else
+    {
+        return Status::Failure;
+    }
 }
 
 Protocols::InteractionModel::Status ZoneManager::RemoveTrigger(uint16_t zoneID)
 {
-
-    return Status::Success;
+    if (mCameraDevice->GetCameraHALInterface().RemoveZoneTrigger(zoneID) == CameraError::SUCCESS)
+    {
+        return Status::Success;
+    }
+    else
+    {
+        return Status::Failure;
+    }
 }
 
 void ZoneManager::OnAttributeChanged(AttributeId attributeId)
@@ -97,6 +121,7 @@ void ZoneManager::OnAttributeChanged(AttributeId attributeId)
     switch (attributeId)
     {
     case Sensitivity::Id: {
+        mCameraDevice->GetCameraHALInterface().SetDetectionSensitivity(GetZoneMgmtServer()->GetSensitivity());
         break;
     }
     default:

@@ -353,6 +353,21 @@ public:
 
         // Get the maximum sensitivity level supported by camera.
         virtual uint8_t GetSensitivityMax() = 0;
+
+        // Get/Set the Zone Detection sensitivity(1 to SensitivityMax)
+        virtual uint8_t GetDetectionSensitivity()                         = 0;
+        virtual CameraError SetDetectionSensitivity(uint8_t aSensitivity) = 0;
+
+        // Create a zone trigger
+        virtual CameraError
+        CreateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) = 0;
+
+        // Update a zone trigger
+        virtual CameraError
+        UpdateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) = 0;
+
+        // Remove a zone trigger
+        virtual CameraError RemoveZoneTrigger(uint16_t zoneID) = 0;
     };
 
     virtual CameraHALInterface & GetCameraHALInterface() = 0;
