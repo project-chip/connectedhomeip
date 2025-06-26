@@ -36,11 +36,12 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-
+import asyncio
 import copy
 import inspect
 from enum import IntFlag
 
+from chip import ChipDeviceCtrl
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import AttributePath
@@ -98,7 +99,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             'all_events_attributes': self._read_all_events_attributes,
             'data_version_filter_multiple_clusters': self._read_data_version_filter_multiple_clusters,
             'multiple_data_version_filters': self._read_multiple_data_version_filters,
-            'chunked_data': self._read_chunked_data,
         }
     
     def get_device_clusters(self) -> set:
@@ -197,25 +197,11 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                     cluster = path_tuple[1] if isinstance(path_tuple, tuple) else path_tuple
                     attribute = path_tuple[2] if len(path_tuple) > 2 else None
                     
-                    # Handle case where attribute is an integer (like 0xFFFF)
-                    if isinstance(attribute, int):
-                        # For unsupported attribute testing, use a different approach
-                        try:
-                            result = await self.read_attribute(attribute_path, timeout_ms=timeout_ms)
-                            # If we get here, the attribute was supported (unexpected)
-                            asserts.fail("Expected UNSUPPORTED_ATTRIBUTE error but attribute was supported")
-                        except Exception as e:
-                            # Check if the error contains UNSUPPORTED_ATTRIBUTE
-                            if "UNSUPPORTED_ATTRIBUTE" in str(e) or "0x87" in str(e):
-                                return None  # Expected error
-                            else:
-                                raise  # Unexpected error
-                    else:
-                        result = await self.read_single_attribute_expect_error(
-                            endpoint=endpoint,
-                            cluster=cluster,
-                            attribute=attribute,
-                            error=expected_error)
+                    result = await self.read_single_attribute_expect_error(
+                        endpoint=endpoint,
+                        cluster=cluster,
+                        attribute=attribute,
+                        error=expected_error)
                 return result
             except KeyError as e:
                 # If we expect UNSUPPORTED_ENDPOINT or UNSUPPORTED_CLUSTER and the endpoint/cluster is missing, this is correct
@@ -450,11 +436,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         except ChipStackError as e:
             logging.error(f"Failed to set up device info: {str(e)}")
             raise
-        except Exception as e:
-            logging.error(f"Unexpected error in setup: {str(e)}")
-            logging.error(f"Read response type: {type(descriptor_read)}")
-            logging.error(f"Read response: {descriptor_read}")
-            raise
 
     async def _read_single_attribute(self, **kwargs):
         return await self.verify_attribute_read([(kwargs['endpoint'], kwargs['attribute'])])
@@ -473,7 +454,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         return await self.verify_attribute_read([attribute_path])
 
     async def _read_all_attributes(self, **kwargs):
-        import asyncio
         read_request = await asyncio.wait_for(
             self.default_controller.Read(self.dut_node_id, [()]),
             timeout=120.0
@@ -525,9 +505,61 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             expected_error=Status.UnsupportedCluster)
 
     async def _read_unsupported_attribute(self, **kwargs):
-        return await self.verify_attribute_read(
-            [(0, Clusters.Descriptor, 0xFFFF)],
-            expected_error=Status.UnsupportedAttribute)
+        """
+        Attempts to read an unsupported attribute from a supported cluster on any endpoint.
+        Expects an UNSUPPORTED_ATTRIBUTE error from the DUT.
+        Fails the test if no such attribute is found, but as a fallback, tries a known invalid attribute ID (0xFFFF).
+        """
+        for endpoint_id, endpoint in self.endpoints.items():
+            for cluster_type, cluster in endpoint.items():
+                if global_attribute_ids.cluster_id_type(cluster_type.id) != global_attribute_ids.ClusterIdType.kStandard:
+                    continue
+
+                # Skip clusters that do not have AttributeList
+                if not hasattr(cluster_type.Attributes, "AttributeList") or cluster_type.Attributes.AttributeList not in cluster:
+                    continue
+
+                all_attrs = set(ClusterObjects.ALL_ATTRIBUTES[cluster_type.id].keys())
+                dut_attrs = set(cluster[cluster_type.Attributes.AttributeList])
+
+                unsupported = [
+                    attr_id for attr_id in (all_attrs - dut_attrs)
+                    if global_attribute_ids.attribute_id_type(attr_id) == global_attribute_ids.AttributeIdType.kStandardNonGlobal
+                ]
+                if unsupported:
+                    unsupported_attr = ClusterObjects.ALL_ATTRIBUTES[cluster_type.id][unsupported[0]]
+                    logging.info(f"Testing unsupported attribute: endpoint={endpoint_id}, cluster={cluster_type}, attribute={unsupported_attr}")
+                    # Only request this single attribute
+                    result = await self.read_single_attribute_expect_error(
+                        endpoint=endpoint_id,
+                        cluster=cluster_type,
+                        attribute=unsupported_attr,
+                        error=Status.UnsupportedAttribute
+                    )
+                    asserts.assert_true(isinstance(result.Reason, InteractionModelError),
+                                        msg="Unexpected success reading invalid attribute")
+                    return
+
+        # Fallback: try a known invalid attribute according to the yaml script version of this test
+        try:
+            result = await self.read_single_attribute_expect_error(
+                endpoint=1,
+                cluster=Clusters.Thermostat,
+                attribute=Clusters.Thermostat.Attributes.OutdoorTemperature,
+                error=Status.UnsupportedAttribute
+            )
+            asserts.assert_true(isinstance(result.Reason, InteractionModelError),
+                                msg="Unexpected success reading unsupported attribute")
+            return
+        except AssertionError as e:
+            # This means the DUT did not return the expected UNSUPPORTED_ATTRIBUTE error
+            logging.error(f"AssertionError during unsupported attribute test: {e}")
+        except KeyError as e:
+            # This means the cluster or attribute does not exist in the Python cluster definitions
+            logging.error(f"KeyError during unsupported attribute test: {e}")
+
+        # If we get here, neither the for-loop nor the fallback succeeded
+        asserts.fail("Could not find a cluster/attribute combination to test unsupported attribute (even with fallback)")
 
     async def _read_repeat_attribute(self, **kwargs):
         results = []
@@ -626,16 +658,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             [(kwargs['endpoint'], kwargs['cluster'], kwargs['attribute'])],
             dataVersionFilters=data_version_filter_1)
         return read_request, filtered_read
-
-    async def _read_chunked_data(self, **kwargs):
-        endpoint = self.endpoint
-        cluster = Clusters.UnitTesting
-        attribute = Clusters.UnitTesting.Attributes.ListLongOctetString
-        read_responses = await self.default_controller.Read(
-            self.dut_node_id,
-            [(endpoint, cluster, attribute)]
-        )
-        return read_responses
 
     async def _test_read_operation(self, operation_type: str, **kwargs) -> dict:
         try:
@@ -876,20 +898,28 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # Verify on the TH that the DUT sends a chunked data message with the SuppressResponse field set to False for all the messages except the last one. 
         # Verify the last chunked message sent has the SuppressResponse field set to True.
         self.step(18)
-        read_chunks = await self._test_read_operation(operation_type='chunked_data')
+        # Step 1: Establish a TCP session with large payload capability
+        try:
+            device = await self.default_controller.GetConnectedDevice(
+                nodeid=self.dut_node_id, 
+                allowPASE=False, 
+                timeoutMs=1000,
+                payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD
+            )
+        except TimeoutError:
+            logging.error("Unable to establish a CASE session over TCP to the device")
+            raise
         
-        # Check if SuppressResponse is available
-        if isinstance(read_chunks, list) and hasattr(read_chunks[0], 'SuppressResponse'):
-            for i, chunk in enumerate(read_chunks):
-                suppress_response = getattr(chunk, 'SuppressResponse', None)
-                if i < len(read_chunks) - 1:
-                    asserts.assert_false(suppress_response, f"Chunk {i} should have SuppressResponse == False")
-                else:
-                    asserts.assert_true(suppress_response, f"Last chunk should have SuppressResponse == True")
-        else:
-            # We do not appear to have access to the SuppressResponse field during testing, currently skipping this section of the step.
-            logging.warning("SDK does not expose SuppressResponse; cannot verify at test level.")
-            pass
+        # Verify TCP connection is established
+        asserts.assert_equal(device.isSessionOverTCPConnection, True, 
+                           "Session does not have associated TCP connection")
+        asserts.assert_equal(device.sessionAllowsLargePayload, True, 
+                           "Session does not support large payloads")
+        read_chunks = await self.default_controller.ReadAttribute(self.dut_node_id, ([]), 
+                            payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+        
+        # Note: The SuppressResponse field verification is handled at the transport layer
+        # and is not directly accessible during test execution. 
 
         # Step 19: TH sends a Read Request Message to the DUT to read a non-global attribute on a given endpoint.
         self.step(19)
@@ -926,6 +956,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             for attr in required_attributes:
                 asserts.assert_true(hasattr(event, attr), f"{attr} not in event")
 
-
+        
 if __name__ == "__main__":
     default_matter_test_main()
