@@ -545,15 +545,14 @@ CHIP_ERROR ThreadStackManagerImpl::_GetAndLogThreadTopologyFull()
 
 CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
 {
-     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
 
     // The ExtendedAddress d-bus property from otbr-agent is defined to not emit changed signals.
     // This means the generated api, which uses a caching proxy underneath, will not obtain a value
     // and will always return NULL. In order to retrieve the value in this case, we must directly
     // call the Get function to get it, then we manually cache locally since it does not change.
-    if (std::all_of(mExtendedAddress, mExtendedAddress + sizeof(mExtendedAddress),
-                     [](uint8_t v) { return v == 0; }))
-     {
+    if (std::all_of(mExtendedAddress, mExtendedAddress + sizeof(mExtendedAddress), [](uint8_t v) { return v == 0; }))
+    {
         GAutoPtr<GError> err;
         GAutoPtr<GVariant> response(g_dbus_proxy_call_sync(G_DBUS_PROXY(mProxy.get()), "org.freedesktop.DBus.Properties.Get",
                                                            g_variant_new("(ss)", "io.openthread.BorderRouter", "ExtendedAddress"),
@@ -599,10 +598,10 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
         else
         {
             ChipLogError(DeviceLayer, "ERROR: Property 'ExtendedAddress' returned unexpected type: %s",
-                    g_variant_get_type_string(value.get()));
+                         g_variant_get_type_string(value.get()));
             return CHIP_ERROR_KEY_NOT_FOUND;
         }
-     }
+    }
 
     memcpy(buf, mExtendedAddress, sizeof(mExtendedAddress));
     return CHIP_NO_ERROR;
