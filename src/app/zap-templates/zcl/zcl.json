@@ -231,7 +231,7 @@
             "CurrentDayEntry",
             "NextDayEntry"
         ],
-        "Commodity Metering": ["MeteredQuantityTimestamp", "TariffUnit"],
+        "Commodity Metering": [],
         "Descriptor": ["ClusterRevision", "FeatureMap"],
         "Device Energy Management": [
             "ESAType",
