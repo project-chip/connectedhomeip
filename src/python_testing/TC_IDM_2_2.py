@@ -850,7 +850,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         asserts.assert_equal(device.sessionAllowsLargePayload, True,
                              "Session does not support large payloads")
         await self.default_controller.ReadAttribute(self.dut_node_id, ([]),
-                                                                  payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+                                                    payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
 
         # Note: The SuppressResponse field verification is handled at the transport layer
         # and is not directly accessible during test execution.
