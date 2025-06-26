@@ -29,7 +29,8 @@ namespace ClosureControl {
 using namespace Protocols::InteractionModel;
 
 namespace {
-constexpr uint8_t kCurrentErrorListSize = 10;
+    // Variable to track the current error count for the cluster logic.
+    size_t mCurrentErrorCount = 0;
 } // namespace
 
 /*
@@ -352,11 +353,30 @@ CHIP_ERROR ClusterLogic::SetLatchControlModes(const BitFlags<LatchControlModesBi
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::SetCurrentErrorList(ClosureErrorEnum error)
+CHIP_ERROR ClusterLogic::AddErrorToCurrentErrorList(ClosureErrorEnum error)
 {
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(EnsureKnownEnumValue(error) != ClosureErrorEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
-    return mDelegate.AddErrorToCurrentErrorList(error);
+    // Check for duplicates
+    for (size_t i = 0; i < mCurrentErrorCount; ++i)
+    {
+        VerifyOrReturnError(mState.mCurrentErrorList[i] != error, CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED,
+                            ChipLogError(AppServer, "Error already exists in the list"));
+    }
+    VerifyOrReturnError(mCurrentErrorCount < kCurrentErrorListMaxSize, CHIP_ERROR_PROVIDER_LIST_EXHAUSTED,
+                        ChipLogError(AppServer, "Error list is full"));
+    mState.mCurrentErrorList[mCurrentErrorCount++] = error;
+    mMatterContext.MarkDirty(Attributes::CurrentErrorList::Id);
+    return CHIP_NO_ERROR;
+}
+
+void ClusterLogic::ClearCurrentErrorList()
+{
+    assertChipStackLockedByCurrentThread();
+    VerifyOrDieWithMsg(mIsInitialized, AppServer, "ClearCurrentErrorList called before Initialization of closure");
+
+    mCurrentErrorCount = 0;
+    mMatterContext.MarkDirty(Attributes::CurrentErrorList::Id);
 }
 
 // TODO: Move the CountdownTime handling to Delegate
@@ -401,26 +421,12 @@ CHIP_ERROR ClusterLogic::GetOverallTargetState(DataModel::Nullable<GenericOveral
 
 CHIP_ERROR ClusterLogic::GetCurrentErrorList(const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    // List can contain at most only 10 Error
-    for (size_t i = 0; i < kCurrentErrorListSize; i++)
+    for (size_t i = 0; i < mCurrentErrorCount; i++)
     {
-        ClosureErrorEnum error;
-
-        CHIP_ERROR err = mDelegate.GetCurrentErrorAtIndex(i, error);
-
-        // Convert CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to CHIP_NO_ERROR
-        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-        {
-            return CHIP_NO_ERROR;
-        }
-
-        // Return for other errors occurred apart from CHIP_ERROR_PROVIDER_LIST_EXHAUSTED
-        ReturnErrorOnFailure(err);
-
+        ClosureErrorEnum error = mState.mCurrentErrorList[i];
         // Encode the error
         ReturnErrorOnFailure(encoder.Encode(error));
     }
-
     return CHIP_NO_ERROR;
 }
 

@@ -55,9 +55,6 @@ public:
                                                             const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
     Protocols::InteractionModel::Status HandleCalibrateCommand() override;
 
-    CHIP_ERROR AddErrorToCurrentErrorList(ClosureErrorEnum error) override;
-    void ClearErrorList() override;
-    CHIP_ERROR GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError) override;
     bool IsReadyToMove() override;
     bool IsManualLatchingNeeded() override;
     ElapsedS GetCalibrationCountdownTime() override;
@@ -74,10 +71,6 @@ public:
 
 private:
     ClusterLogic * mLogic;
-    // As per the spec, the maximum allowed error count is 10.
-    static constexpr size_t kMaxErrorCount = 10;
-    ClosureErrorEnum mCurrentErrorList[kMaxErrorCount];
-    size_t mCurrentErrorCount = 0;
 };
 
 /**

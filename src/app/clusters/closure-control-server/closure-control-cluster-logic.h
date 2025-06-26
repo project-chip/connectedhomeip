@@ -41,6 +41,8 @@ enum class OptionalAttributeEnum : uint32_t
 {
     kCountdownTime = 0x1
 };
+// As per the spec, the maximum allowed CurrentErrorList size is 10.
+constexpr int kCurrentErrorListMaxSize = 10;
 
 /**
  * @brief Structure is used to configure and validate the Cluster configuration.
@@ -243,16 +245,21 @@ public:
     }
 
     /**
-     * @brief Sets the current error list.
+     * @brief Adds error to current error list.
      *
      * @param[in] error The error to be added to the current error list.
      *
      * @return CHIP_NO_ERROR if the error was added successfully.
      *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     *         Other CHIP_ERROR codes as returned by the delegate.
      */
-    CHIP_ERROR SetCurrentErrorList(ClosureErrorEnum error);
+    CHIP_ERROR AddErrorToCurrentErrorList(ClosureErrorEnum error);
+
+    /**
+     * @brief Clears the current error list.
+     *        This method should be called whenever the current error list needs to be reset.
+     */
+    void ClearCurrentErrorList();
 
     /**
      *  @brief Calls delegate HandleStopCommand function after validating MainState, parameters and conformance.
