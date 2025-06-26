@@ -24,13 +24,13 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-CHIP_ERROR GeneralDiagnosticsLogic::ReadNetworkInterfaces(AttributeValueEncoder & encoder){
+CHIP_ERROR GeneralDiagnosticsLogic::ReadNetworkInterfaces(AttributeValueEncoder & aEncoder){
     CHIP_ERROR err = CHIP_NO_ERROR;
     DeviceLayer::NetworkInterface * netifs;
 
     if (GetDiagnosticDataProvider().GetNetworkInterfaces(&netifs) == CHIP_NO_ERROR)
     {
-        err = encoder.EncodeList([&netifs](const auto & encoder) -> CHIP_ERROR {
+        err = aEncoder.EncodeList([&netifs](const auto & encoder) -> CHIP_ERROR {
             for (DeviceLayer::NetworkInterface * ifp = netifs; ifp != nullptr; ifp = ifp->Next)
             {
                 ReturnErrorOnFailure(encoder.Encode(*ifp));
@@ -43,7 +43,7 @@ CHIP_ERROR GeneralDiagnosticsLogic::ReadNetworkInterfaces(AttributeValueEncoder 
     }
     else
     {
-        err = encoder.EncodeEmptyList();
+        err = aEncoder.EncodeEmptyList();
     }
 
     return err;

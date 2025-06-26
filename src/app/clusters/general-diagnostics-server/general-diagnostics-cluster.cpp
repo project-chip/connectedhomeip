@@ -188,9 +188,9 @@ CHIP_ERROR GeneralDiagnosticsCluster::EncodeValue(T value, CHIP_ERROR readError,
 }
 
 template <typename T>
-CHIP_ERROR GeneralDiagnosticsCluster::EncodeListOfValues(T valueList, CHIP_ERROR readError, AttributeValueEncoder & encoder){
+CHIP_ERROR GeneralDiagnosticsCluster::EncodeListOfValues(T valueList, CHIP_ERROR readError, AttributeValueEncoder & aEncoder){
     if (readError == CHIP_NO_ERROR) {
-        readError = encoder.EncodeList([&valueList](const auto & encoder) -> CHIP_ERROR {
+        readError = aEncoder.EncodeList([&valueList](const auto & encoder) -> CHIP_ERROR {
             for (auto value : valueList) {
                 ReturnErrorOnFailure(encoder.Encode(value));
             }
@@ -198,7 +198,7 @@ CHIP_ERROR GeneralDiagnosticsCluster::EncodeListOfValues(T valueList, CHIP_ERROR
             return CHIP_NO_ERROR;
         });
     } else {
-        readError = encoder.EncodeEmptyList();
+        readError = aEncoder.EncodeEmptyList();
     }
 
     return readError;

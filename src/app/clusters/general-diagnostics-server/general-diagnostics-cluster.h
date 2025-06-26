@@ -68,7 +68,7 @@ private:
     CHIP_ERROR EncodeValue(T value, CHIP_ERROR readError, AttributeValueEncoder & encoder);
 
     template <typename T>
-    CHIP_ERROR EncodeListOfValues(T valueList, CHIP_ERROR readError, AttributeValueEncoder & encoder);
+    CHIP_ERROR EncodeListOfValues(T valueList, CHIP_ERROR readError, AttributeValueEncoder & aEncoder);
 
     bool IsTestEventTriggerEnabled();
 
