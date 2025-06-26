@@ -566,12 +566,12 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
 
         Percent100ths resolution;
         VerifyOrReturnError(GetResolution(resolution) == CHIP_NO_ERROR, Status::Failure,
-                                ChipLogError(AppServer, "Unable to get Resolution value in SetTargetCommand"));
+                            ChipLogError(AppServer, "Unable to get Resolution value in SetTargetCommand"));
         // Check if position.Value() is an integer multiple of resolution, else round to nearest valid value
         if (position.Value() % resolution != 0)
         {
-            Percent100ths roundedPosition = static_cast<Percent100ths>(
-                ((position.Value() + resolution / 2) / resolution) * resolution);
+            Percent100ths roundedPosition =
+                static_cast<Percent100ths>(((position.Value() + resolution / 2) / resolution) * resolution);
             ChipLogProgress(AppServer, "Rounding position from %u to nearest valid value %u based on resolution %u",
                             position.Value(), roundedPosition, resolution);
             position.SetValue(roundedPosition);
