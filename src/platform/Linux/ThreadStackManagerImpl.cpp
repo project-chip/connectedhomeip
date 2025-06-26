@@ -568,7 +568,7 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
         if (response == nullptr)
         {
             ChipLogError(DeviceLayer, "openthread: failed to get a response for ExtendedAddress property");
-            return CHIP_ERROR_INTERNAL;
+            return CHIP_ERROR_KEY_NOT_FOUND;
         }
 
         GAutoPtr<GVariant> tupleContent(g_variant_get_child_value(response.get(), 0));
@@ -576,7 +576,7 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
         if (tupleContent == nullptr)
         {
             ChipLogError(DeviceLayer, "openthread: failed to find tuple in ExtendedAddress response");
-            return CHIP_ERROR_INTERNAL;
+            return CHIP_ERROR_KEY_NOT_FOUND;
         }
 
         GAutoPtr<GVariant> value(g_variant_get_variant(tupleContent.get()));
@@ -584,7 +584,7 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
         if (value == nullptr)
         {
             ChipLogError(DeviceLayer, "openthread: failed to find tuple value in ExtendedAddress response");
-            return CHIP_ERROR_INTERNAL;
+            return CHIP_ERROR_KEY_NOT_FOUND;
         }
 
         if (g_variant_is_of_type(value.get(), G_VARIANT_TYPE_UINT64))
@@ -600,6 +600,7 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
         {
             ChipLogError(DeviceLayer, "ERROR: Property 'ExtendedAddress' returned unexpected type: %s",
                     g_variant_get_type_string(value.get()));
+            return CHIP_ERROR_KEY_NOT_FOUND;
         }
      }
 
