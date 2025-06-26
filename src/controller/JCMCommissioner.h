@@ -83,7 +83,15 @@ public:
      * @param verified A boolean indicating whether the vendor ID verification was successful (true) or not (false).
      */
     void ContinueAfterVendorIDVerification(bool verified);
-   
+
+    /*
+     * GetJCMTrustVerificationInfo is a method that returns the JCM trust verification information.
+     */
+     JCMTrustVerificationInfo & GetJCMTrustVerificationInfo()
+    {
+       return mInfo;
+    }
+
 protected:
     // Override ParseExtraCommissioningInfo to parse JCM administrator info
     CHIP_ERROR ParseExtraCommissioningInfo(ReadCommissioningInfo & info, const CommissioningParameters & params) override;

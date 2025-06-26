@@ -21,7 +21,6 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
-#include <app/tests/test-interaction-model-api.h>
 #include <credentials/CHIPCert.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>
