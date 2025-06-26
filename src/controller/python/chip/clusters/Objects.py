@@ -41031,6 +41031,10 @@ class ThreadBorderRouterManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=typing.Optional[uint]),
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
             activeDataset: bytes = b""
             breadcrumb: typing.Optional[uint] = None
 
@@ -41047,6 +41051,10 @@ class ThreadBorderRouterManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="pendingDataset", Tag=0, Type=bytes),
                     ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
 
             pendingDataset: bytes = b""
 
@@ -45707,11 +45715,13 @@ class ZoneManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="zoneID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="zoneType", Tag=1, Type=ZoneManagement.Enums.ZoneTypeEnum),
                         ClusterObjectFieldDescriptor(Label="zoneSource", Tag=2, Type=ZoneManagement.Enums.ZoneSourceEnum),
+                        ClusterObjectFieldDescriptor(Label="twoDCartesianZone", Tag=3, Type=typing.Optional[ZoneManagement.Structs.TwoDCartesianZoneStruct]),
                     ])
 
             zoneID: 'uint' = 0
             zoneType: 'ZoneManagement.Enums.ZoneTypeEnum' = 0
             zoneSource: 'ZoneManagement.Enums.ZoneSourceEnum' = 0
+            twoDCartesianZone: 'typing.Optional[ZoneManagement.Structs.TwoDCartesianZoneStruct]' = None
 
         @dataclass
         class ZoneTriggerControlStruct(ClusterObject):
@@ -45786,41 +45796,9 @@ class ZoneManagement(Cluster):
             zone: ZoneManagement.Structs.TwoDCartesianZoneStruct = field(default_factory=lambda: ZoneManagement.Structs.TwoDCartesianZoneStruct())
 
         @dataclass
-        class GetTwoDCartesianZone(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000550
-            command_id: typing.ClassVar[int] = 0x00000003
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'GetTwoDCartesianZoneResponse'
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="zoneID", Tag=0, Type=typing.Union[None, Nullable, uint]),
-                    ])
-
-            zoneID: typing.Union[None, Nullable, uint] = None
-
-        @dataclass
-        class GetTwoDCartesianZoneResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000550
-            command_id: typing.ClassVar[int] = 0x00000004
-            is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[typing.Optional[str]] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="zones", Tag=0, Type=typing.List[ZoneManagement.Structs.TwoDCartesianZoneStruct]),
-                    ])
-
-            zones: typing.List[ZoneManagement.Structs.TwoDCartesianZoneStruct] = field(default_factory=lambda: [])
-
-        @dataclass
         class RemoveZone(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000550
-            command_id: typing.ClassVar[int] = 0x00000005
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -45836,7 +45814,7 @@ class ZoneManagement(Cluster):
         @dataclass
         class CreateOrUpdateTrigger(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000550
-            command_id: typing.ClassVar[int] = 0x00000006
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -45852,7 +45830,7 @@ class ZoneManagement(Cluster):
         @dataclass
         class RemoveTrigger(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000550
-            command_id: typing.ClassVar[int] = 0x00000007
+            command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 

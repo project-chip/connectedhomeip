@@ -51201,9 +51201,6 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void setActiveDatasetRequest(DefaultClusterCallback callback, byte[] activeDataset, Optional<Long> breadcrumb) {
-      setActiveDatasetRequest(callback, activeDataset, breadcrumb, 0);
-    }
 
     public void setActiveDatasetRequest(DefaultClusterCallback callback, byte[] activeDataset, Optional<Long> breadcrumb, int timedInvokeTimeoutMs) {
       final long commandId = 3L;
@@ -51225,9 +51222,6 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void setPendingDatasetRequest(DefaultClusterCallback callback, byte[] pendingDataset) {
-      setPendingDatasetRequest(callback, pendingDataset, 0);
-    }
 
     public void setPendingDatasetRequest(DefaultClusterCallback callback, byte[] pendingDataset, int timedInvokeTimeoutMs) {
       final long commandId = 4L;
@@ -56878,42 +56872,12 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void getTwoDCartesianZone(GetTwoDCartesianZoneResponseCallback callback, @Nullable Optional<Integer> zoneID) {
-      getTwoDCartesianZone(callback, zoneID, 0);
-    }
-
-    public void getTwoDCartesianZone(GetTwoDCartesianZoneResponseCallback callback, @Nullable Optional<Integer> zoneID, int timedInvokeTimeoutMs) {
-      final long commandId = 3L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long zoneIDFieldID = 0L;
-      BaseTLVType zoneIDtlvValue = zoneID != null ? zoneID.<BaseTLVType>map((nonOptionalzoneID) -> new UIntType(nonOptionalzoneID)).orElse(new EmptyType()) : new NullType();
-      elements.add(new StructElement(zoneIDFieldID, zoneIDtlvValue));
-
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          final long zonesFieldID = 0L;
-          ArrayList<ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct> zones = null;
-          for (StructElement element: invokeStructValue.value()) {
-            if (element.contextTagNum() == zonesFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.Array) {
-                ArrayType castingValue = element.value(ArrayType.class);
-                zones = castingValue.map((elementcastingValue) -> ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct.decodeTlv(elementcastingValue));
-              }
-            }
-          }
-          callback.onSuccess(zones);
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
     public void removeZone(DefaultClusterCallback callback, Integer zoneID) {
       removeZone(callback, zoneID, 0);
     }
 
     public void removeZone(DefaultClusterCallback callback, Integer zoneID, int timedInvokeTimeoutMs) {
-      final long commandId = 5L;
+      final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long zoneIDFieldID = 0L;
@@ -56933,7 +56897,7 @@ public class ChipClusters {
     }
 
     public void createOrUpdateTrigger(DefaultClusterCallback callback, ChipStructs.ZoneManagementClusterZoneTriggerControlStruct trigger, int timedInvokeTimeoutMs) {
-      final long commandId = 6L;
+      final long commandId = 4L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long triggerFieldID = 0L;
@@ -56953,7 +56917,7 @@ public class ChipClusters {
     }
 
     public void removeTrigger(DefaultClusterCallback callback, Integer zoneID, int timedInvokeTimeoutMs) {
-      final long commandId = 7L;
+      final long commandId = 5L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long zoneIDFieldID = 0L;
@@ -56970,10 +56934,6 @@ public class ChipClusters {
 
     public interface CreateTwoDCartesianZoneResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer zoneID);
-    }
-
-    public interface GetTwoDCartesianZoneResponseCallback extends BaseClusterCallback {
-      void onSuccess(ArrayList<ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct> zones);
     }
 
     public interface ZonesAttributeCallback extends BaseAttributeCallback {
