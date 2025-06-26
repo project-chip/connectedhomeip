@@ -473,37 +473,10 @@ void CHIPCommand::ShutdownCommissioner(const CommissionerIdentity & key)
     mCommissioners[key].get()->Shutdown();
 }
 
-struct TrustVerificationDelegate : public JCMTrustVerificationDelegate
-{
-    void OnProgressUpdate(JCMDeviceCommissioner & commissioner, JCMTrustVerificationStage stage, JCMTrustVerificationInfo & info,
-                          JCMTrustVerificationError error) override
-    {
-        ChipLogProgress(Controller, "JCM: Trust Verification progress: %d", static_cast<int>(stage));
-    }
-
-    void OnAskUserForConsent(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info)
-    {
-        ChipLogProgress(Controller, "Asking user for consent for vendor ID: %u", info.adminVendorId);
-
-        commissioner.ContinueAfterUserConsent(true);
-    }
-
-    void OnVerifyVendorId(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info)
-    {
-        ChipLogProgress(Controller, "Performing vendor ID verification for vendor ID: %u", info.adminVendorId);
-
-        commissioner.ContinueAfterVendorIDVerification(true);
-    }
-};
-
 CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, chip::FabricId fabricId)
 {
     auto deviceCommissioner = std::make_unique<JCMDeviceCommissioner>();
     static JCMAutoCommissioner sAutoCommissioner;
-    static TrustVerificationDelegate sTrustVerificationDelegate;
-
-    // Register a single TrustVerificationDelegate per commissioner identity
-    deviceCommissioner->RegisterTrustVerificationDelegate(&sTrustVerificationDelegate);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
     VerifyOrReturnError(chip::CanCastTo<uint16_t>(CHIP_UDC_PORT + fabricId), CHIP_ERROR_INVALID_ARGUMENT);

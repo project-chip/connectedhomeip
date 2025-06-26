@@ -515,9 +515,9 @@ void JCMDeviceCommissioner::OnTrustVerificationComplete(JCMTrustVerificationErro
 
 void JCMDeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus)
 {
-    mInfo.Cleanup();
-
     DeviceCommissioner::CleanupCommissioning(proxy, nodeId, completionStatus);
+
+    mInfo.Cleanup();
 }
 
 /*

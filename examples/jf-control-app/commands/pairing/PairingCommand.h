@@ -21,6 +21,7 @@
 #include "../common/CHIPCommand.h"
 #include <controller/CommissioningDelegate.h>
 #include <controller/CurrentFabricRemover.h>
+#include <controller/JCMCommissioner.h>
 
 #include <commands/common/CredentialIssuerCommands.h>
 #include <lib/support/Span.h>
@@ -58,7 +59,9 @@ constexpr char kAnchorNodeIdKey[] = "AnchorNodeId";
 class PairingCommand : public CHIPCommand,
                        public chip::Controller::DevicePairingDelegate,
                        public chip::Controller::DeviceDiscoveryDelegate,
+                       public chip::Controller::JCM::JCMTrustVerificationDelegate,
                        public chip::Credentials::DeviceAttestationDelegate
+                      
 {
 public:
     PairingCommand(const char * commandName, PairingMode mode, PairingNetworkType networkType,
@@ -248,6 +251,16 @@ public:
     void OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner * deviceCommissioner, chip::DeviceProxy * device,
                                       const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
                                       chip::Credentials::AttestationVerificationResult attestationResult) override;
+
+    /////////// JCMTrustVerificationDelegate /////////
+    void OnProgressUpdate(chip::Controller::JCM::JCMDeviceCommissioner & commissioner, 
+                          chip::Controller::JCM::JCMTrustVerificationStage stage, 
+                          chip::Controller::JCM::JCMTrustVerificationInfo & info, 
+                          chip::Controller::JCM::JCMTrustVerificationError error);
+    void OnAskUserForConsent(chip::Controller::JCM::JCMDeviceCommissioner & commissioner, 
+                             chip::Controller::JCM::JCMTrustVerificationInfo & info);
+    void OnVerifyVendorId(chip::Controller::JCM::JCMDeviceCommissioner & commissioner, 
+                          chip::Controller::JCM::JCMTrustVerificationInfo & info);
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);
