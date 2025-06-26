@@ -89,10 +89,9 @@ public:
      * @param speed Optional speed setting for the movement, represented as a ThreeLevelAutoEnum.
      * @return chip::Protocols::InteractionModel::Status Status of the command handling operation.
      */
-    chip::Protocols::InteractionModel::Status OnMoveToCommand(
-                    const chip::Optional<chip::app::Clusters::ClosureControl::TargetPositionEnum> position,
-                    const chip::Optional<bool> latch,
-                    const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> speed);
+    chip::Protocols::InteractionModel::Status
+    OnMoveToCommand(const chip::Optional<chip::app::Clusters::ClosureControl::TargetPositionEnum> position,
+                    const chip::Optional<bool> latch, const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> speed);
 
     /**
      * @brief Handles the Stop command for the Closure.
@@ -120,11 +119,10 @@ public:
      *         Returns Status::Success if the SetTarget command is handled successfully,
      *         or an appropriate error status otherwise.
      */
-    chip::Protocols::InteractionModel::Status OnSetTargetCommand(
-                        const chip::Optional<chip::Percent100ths> & position,
-                        const chip::Optional<bool> & latch,
-                        const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
-                        const chip::EndpointId endpointId);
+    chip::Protocols::InteractionModel::Status
+    OnSetTargetCommand(const chip::Optional<chip::Percent100ths> & position, const chip::Optional<bool> & latch,
+                       const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
+                       const chip::EndpointId endpointId);
 
     /**
      * @brief Sets the current action being performed by the closure device.
@@ -145,9 +143,9 @@ private:
     osTimerId_t mClosureTimer;
 
     bool isCalibrationInProgress = false;
-    bool isSetTargetInProgress = false;
+    bool isSetTargetInProgress   = false;
 
-    Action_t mCurrentAction      = Action_t::INVALID_ACTION;
+    Action_t mCurrentAction                   = Action_t::INVALID_ACTION;
     chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
 
     // Define the endpoint ID for the Closure

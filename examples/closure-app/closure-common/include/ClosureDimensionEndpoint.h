@@ -62,6 +62,7 @@ public:
      * @return The endpoint ID (EndpointId) for this instance.
      */
     EndpointId GetEndpoint() const { return mEndpoint; }
+
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
 };
