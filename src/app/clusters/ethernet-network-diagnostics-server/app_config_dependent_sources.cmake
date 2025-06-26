@@ -24,6 +24,5 @@ TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
     "${CLUSTER_DIR}/ethernet-diagnostics-cluster.h"
-    "${CLUSTER_DIR}/ethernet-diagnostics-logic.cpp"
-    "${CLUSTER_DIR}/ethernet-diagnostics-logic.h"
+    "${CLUSTER_DIR}/ethernet-diagnostics-cluster.cpp"
 )

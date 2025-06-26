@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 #include <app/clusters/ethernet-network-diagnostics-server/ethernet-diagnostics-cluster.h>
-#include <app/clusters/ethernet-network-diagnostics-server/ethernet-diagnostics-logic.h>
 #include <app/static-cluster-config/EthernetNetworkDiagnostics.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
+#include <platform/DiagnosticDataProvider.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -33,7 +33,7 @@ static_assert((EthernetNetworkDiagnostics::StaticApplicationConfig::kFixedCluste
 
 namespace {
 
-LazyRegisteredServerCluster<EthernetDiagnosticsServerCluster<DeviceLayerEthernetDiagnosticsLogic>> gServer;
+LazyRegisteredServerCluster<EthernetDiagnosticsServerCluster> gServer;
 
 // compile-time evaluated method if "is <EP>::EthernetNetworkDiagnostics::<ATTR>" enabled
 constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
@@ -70,7 +70,7 @@ void emberAfEthernetNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
         .enableErrCount       = IsAttributeEnabled(kRootEndpointId, Attributes::TxErrCount::Id),
     };
 
-    gServer.Create(enabledAttributes);
+    gServer.Create(DeviceLayer::GetDiagnosticDataProvider(), enabledAttributes);
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
     if (err != CHIP_NO_ERROR)

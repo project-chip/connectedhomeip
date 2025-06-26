@@ -16,7 +16,6 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/ethernet-network-diagnostics-server/ethernet-diagnostics-cluster.h>
-#include <app/clusters/ethernet-network-diagnostics-server/ethernet-diagnostics-logic.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
@@ -44,20 +43,21 @@ struct TestEthernetDiagnosticsCluster : public ::testing::Test
 
 TEST_F(TestEthernetDiagnosticsCluster, CompileTest)
 {
-    const EthernetDiagnosticsEnabledAttributes enabledAttributes{
-        .enableCarrierDetect  = false,
-        .enableCollisionCount = false,
-        .enableFullDuplex     = false,
-        .enableOverrunCount   = false,
-        .enablePacketRxCount  = false,
-        .enablePacketTxCount  = false,
-        .enablePHYRate        = false,
-        .enableTimeSinceReset = false,
-        .enableTxErrCount     = false,
+    class NullProvider : public DeviceLayer::DiagnosticDataProvider
+    {
     };
 
-    // The cluster should compile for any logic
-    EthernetDiagnosticsServerCluster<DeviceLayerEthernetDiagnosticsLogic> cluster(enabledAttributes);
+    const EthernetDiagnosticsEnabledAttributes enabledAttributes{
+        .enableCarrierDetect  = false,
+        .enableFullDuplex     = false,
+        .enablePacketCount    = false,
+        .enablePHYRate        = false,
+        .enableTimeSinceReset = false,
+        .enableErrCount       = false,
+    };
+
+    NullProvider nullProvider;
+    EthernetDiagnosticsServerCluster cluster(nullProvider, enabledAttributes);
 
     // Essentially say "code executes"
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, EthernetNetworkDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
@@ -72,29 +72,27 @@ TEST_F(TestEthernetDiagnosticsCluster, AttributesTest)
         };
         const EthernetDiagnosticsEnabledAttributes enabledAttributes{
             .enableCarrierDetect  = false,
-            .enableCollisionCount = false,
             .enableFullDuplex     = false,
-            .enableOverrunCount   = false,
-            .enablePacketRxCount  = false,
-            .enablePacketTxCount  = false,
+            .enablePacketCount    = false,
             .enablePHYRate        = false,
             .enableTimeSinceReset = false,
-            .enableTxErrCount     = false,
+            .enableErrCount       = false,
         };
+
         NullProvider nullProvider;
-        InjectedDiagnosticsEthernetDiagnosticsLogic diag(nullProvider, enabledAttributes);
+        EthernetDiagnosticsServerCluster cluster(nullProvider, enabledAttributes);
 
         // without any enabled attributes, no commands are accepted
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        ASSERT_EQ(diag.AcceptedCommands(commandsBuilder), CHIP_NO_ERROR);
+        ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, EthernetNetworkDiagnostics::Id), commandsBuilder),
+                  CHIP_NO_ERROR);
         ASSERT_EQ(commandsBuilder.TakeBuffer().size(), 0u);
-
-        ASSERT_EQ(diag.GetFeatureMap(), BitFlags<EthernetNetworkDiagnostics::Feature>{});
 
         // Everything is unimplemented, so attributes are just the global ones.
         // This is really not a useful cluster, but possible...
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-        ASSERT_EQ(diag.Attributes(attributesBuilder), CHIP_NO_ERROR);
+        ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, EthernetNetworkDiagnostics::Id), attributesBuilder),
+                  CHIP_NO_ERROR);
 
         ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), DefaultServerCluster::GlobalAttributes()));
     }
@@ -112,21 +110,19 @@ TEST_F(TestEthernetDiagnosticsCluster, AttributesTest)
 
         const EthernetDiagnosticsEnabledAttributes enabledAttributes{
             .enableCarrierDetect  = false,
-            .enableCollisionCount = false,
             .enableFullDuplex     = false,
-            .enableOverrunCount   = false,
-            .enablePacketRxCount  = true,
-            .enablePacketTxCount  = false,
+            .enablePacketCount    = true,
             .enablePHYRate        = false,
             .enableTimeSinceReset = false,
-            .enableTxErrCount     = false,
+            .enableErrCount       = false,
         };
 
         ResetCountsProvider resetCountsProvider;
-        InjectedDiagnosticsEthernetDiagnosticsLogic diag(resetCountsProvider, enabledAttributes);
+        EthernetDiagnosticsServerCluster cluster(resetCountsProvider, enabledAttributes);
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        ASSERT_EQ(diag.AcceptedCommands(commandsBuilder), CHIP_NO_ERROR);
+        ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, EthernetNetworkDiagnostics::Id), commandsBuilder),
+                  CHIP_NO_ERROR);
 
         ReadOnlyBuffer<DataModel::AcceptedCommandEntry> commands = commandsBuilder.TakeBuffer();
         ASSERT_EQ(commands.size(), 1u);
@@ -134,16 +130,15 @@ TEST_F(TestEthernetDiagnosticsCluster, AttributesTest)
         ASSERT_EQ(commands[0].GetInvokePrivilege(),
                   EthernetNetworkDiagnostics::Commands::ResetCounts::kMetadataEntry.GetInvokePrivilege());
 
-        ASSERT_EQ(diag.GetFeatureMap(),
-                  BitFlags<EthernetNetworkDiagnostics::Feature>{ EthernetNetworkDiagnostics::Feature::kPacketCounts });
-
-        // Test with PacketRxCount enabled
+        // Test with PacketCount enabled
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-        ASSERT_EQ(diag.Attributes(attributesBuilder), CHIP_NO_ERROR);
+        ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, EthernetNetworkDiagnostics::Id), attributesBuilder),
+                  CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
         ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.AppendElements({ EthernetNetworkDiagnostics::Attributes::PacketRxCount::kMetadataEntry }),
+        ASSERT_EQ(expectedBuilder.AppendElements({ EthernetNetworkDiagnostics::Attributes::PacketRxCount::kMetadataEntry,
+                                                   EthernetNetworkDiagnostics::Attributes::PacketTxCount::kMetadataEntry }),
                   CHIP_NO_ERROR);
 
         ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
@@ -202,21 +197,19 @@ TEST_F(TestEthernetDiagnosticsCluster, AttributesTest)
 
         const EthernetDiagnosticsEnabledAttributes enabledAttributes{
             .enableCarrierDetect  = true,
-            .enableCollisionCount = true,
             .enableFullDuplex     = true,
-            .enableOverrunCount   = true,
-            .enablePacketRxCount  = true,
-            .enablePacketTxCount  = true,
+            .enablePacketCount    = true,
             .enablePHYRate        = true,
             .enableTimeSinceReset = true,
-            .enableTxErrCount     = true,
+            .enableErrCount       = true,
         };
 
         AllProvider allProvider;
-        InjectedDiagnosticsEthernetDiagnosticsLogic diag(allProvider, enabledAttributes);
+        EthernetDiagnosticsServerCluster cluster(allProvider, enabledAttributes);
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        ASSERT_EQ(diag.AcceptedCommands(commandsBuilder), CHIP_NO_ERROR);
+        ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kRootEndpointId, EthernetNetworkDiagnostics::Id), commandsBuilder),
+                  CHIP_NO_ERROR);
 
         ReadOnlyBuffer<DataModel::AcceptedCommandEntry> commands = commandsBuilder.TakeBuffer();
         ASSERT_EQ(commands.size(), 1u);
@@ -224,13 +217,10 @@ TEST_F(TestEthernetDiagnosticsCluster, AttributesTest)
         ASSERT_EQ(commands[0].GetInvokePrivilege(),
                   EthernetNetworkDiagnostics::Commands::ResetCounts::kMetadataEntry.GetInvokePrivilege());
 
-        BitFlags<EthernetNetworkDiagnostics::Feature> expectedFeatures{ EthernetNetworkDiagnostics::Feature::kPacketCounts,
-                                                                        EthernetNetworkDiagnostics::Feature::kErrorCounts };
-        ASSERT_EQ(diag.GetFeatureMap(), expectedFeatures);
-
         // Test all ethernet-specific attributes
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
-        ASSERT_EQ(diag.Attributes(attributesBuilder), CHIP_NO_ERROR);
+        ASSERT_EQ(cluster.Attributes(ConcreteClusterPath(kRootEndpointId, EthernetNetworkDiagnostics::Id), attributesBuilder),
+                  CHIP_NO_ERROR);
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
         ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
@@ -249,25 +239,24 @@ TEST_F(TestEthernetDiagnosticsCluster, AttributesTest)
 
         ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 
-        // Test that the provider methods are working correctly by checking the underlying provider
-        uint64_t value = 0;
-
-        EXPECT_EQ(diag.GetTimeSinceReset(value), CHIP_NO_ERROR);
+        // Test that the provider methods are working correctly by directly accessing the provider
+        uint64_t value;
+        EXPECT_EQ(allProvider.GetEthTimeSinceReset(value), CHIP_NO_ERROR);
         EXPECT_EQ(value, 123u);
 
-        EXPECT_EQ(diag.GetPacketRxCount(value), CHIP_NO_ERROR);
+        EXPECT_EQ(allProvider.GetEthPacketRxCount(value), CHIP_NO_ERROR);
         EXPECT_EQ(value, 234u);
 
-        EXPECT_EQ(diag.GetPacketTxCount(value), CHIP_NO_ERROR);
+        EXPECT_EQ(allProvider.GetEthPacketTxCount(value), CHIP_NO_ERROR);
         EXPECT_EQ(value, 345u);
 
-        EXPECT_EQ(diag.GetTxErrCount(value), CHIP_NO_ERROR);
+        EXPECT_EQ(allProvider.GetEthTxErrCount(value), CHIP_NO_ERROR);
         EXPECT_EQ(value, 456u);
 
-        EXPECT_EQ(diag.GetCollisionCount(value), CHIP_NO_ERROR);
+        EXPECT_EQ(allProvider.GetEthCollisionCount(value), CHIP_NO_ERROR);
         EXPECT_EQ(value, 567u);
 
-        EXPECT_EQ(diag.GetOverrunCount(value), CHIP_NO_ERROR);
+        EXPECT_EQ(allProvider.GetEthOverrunCount(value), CHIP_NO_ERROR);
         EXPECT_EQ(value, 678u);
 
         EthernetNetworkDiagnostics::PHYRateEnum phyRate;
