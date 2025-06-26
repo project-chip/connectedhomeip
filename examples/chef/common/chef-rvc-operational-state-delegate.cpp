@@ -282,8 +282,8 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
     RvcOperationalStateDelegate * delegate = reinterpret_cast<RvcOperationalStateDelegate *>(data);
 
     OperationalState::Instance * instance = gRvcOperationalStateInstance.get();
-    OperationalState::ChefRvcOperationalStateEnum state =
-        static_cast<OperationalState::ChefRvcOperationalStateEnum>(instance->GetCurrentOperationalState());
+    RvcOperationalState::ChefRvcOperationalStateEnum state =
+        static_cast<RvcOperationalState::ChefRvcOperationalStateEnum>(instance->GetCurrentOperationalState());
 
     if (!RvcOperationalState::IsRunningState(state) &&
         state !=
@@ -324,7 +324,7 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
             }
         }
     }
-    else if (state == OperationalState::ChefRvcOperationalStateEnum::kPaused)
+    else if (state == RvcOperationalState::ChefRvcOperationalStateEnum::kPaused)
     {
         gRvcOperationalStateDelegate->mPausedTime++;
     }
@@ -349,7 +349,7 @@ static void onOperationalStateTimerTick(System::Layer * systemLayer, void * data
         (void) DeviceLayer::SystemLayer().CancelTimer(onOperationalStateTimerTick, delegate);
 
         CHIP_ERROR err = gRvcOperationalStateInstance->SetOperationalState(
-            to_underlying(OperationalState::ChefRvcOperationalStateEnum::kStopped));
+            to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kStopped));
         if (err == CHIP_NO_ERROR)
         {
             OperationalState::GenericOperationalError current_err(to_underlying(OperationalState::ErrorStateEnum::kNoError));
@@ -408,7 +408,7 @@ chip::Protocols::InteractionModel::Status chefRvcOperationalStateWriteCallback(c
         uint8_t m            = static_cast<uint8_t>(buffer[0]);
         CHIP_ERROR err       = gRvcOperationalStateInstance->SetOperationalState(m);
 
-        if (currentState == to_underlying(OperationalState::ChefRvcOperationalStateEnum::kStopped) &&
+        if (currentState == to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kStopped) &&
             RvcOperationalState::IsRunningState(static_cast<ChefRvcOperationalStateEnum>(m)))
         {
             gRvcOperationalStateDelegate->mCountdownTime.SetNonNull(
