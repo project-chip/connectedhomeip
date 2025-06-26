@@ -329,7 +329,10 @@ exit:
 
 void ConnectivityManagerImpl::OnStationConnected()
 {
-    NetworkCommissioning::SlWiFiDriver::GetInstance().OnConnectWiFiNetwork();
+    NetworkCommissioning::SlWiFiDriver * nwDriver = NetworkCommissioning::SlWiFiDriver::GetInstance();
+    // Cannot use the driver if the instance is not initialized.
+    VerifyOrDie(nwDriver != nullptr); // should never be null
+    nwDriver->OnConnectWiFiNetwork();
 
     UpdateInternetConnectivityState();
     // Alert other components of the new state.
@@ -362,7 +365,11 @@ void ConnectivityManagerImpl::ChangeWiFiStationState(WiFiStationState newState)
         ChipLogProgress(DeviceLayer, "WiFi station state change: %s -> %s", WiFiStationStateToStr(mWiFiStationState),
                         WiFiStationStateToStr(newState));
         mWiFiStationState = newState;
-        NetworkCommissioning::SlWiFiDriver::GetInstance().UpdateNetworkingStatus();
+
+        NetworkCommissioning::SlWiFiDriver * nwDriver = NetworkCommissioning::SlWiFiDriver::GetInstance();
+        // Cannot use the driver if the instance is not initialized.
+        VerifyOrDie(nwDriver != nullptr); // should never be null
+        nwDriver->UpdateNetworkingStatus();
     }
 }
 
@@ -378,7 +385,7 @@ void ConnectivityManagerImpl::UpdateInternetConnectivityState(void)
     if (mWiFiStationState == kWiFiStationState_Connected)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
-        haveIPv4Conn = WifiInterface::GetIstance().HasAnIPv4Address();
+        haveIPv4Conn = WifiInterface::GetInstance().HasAnIPv4Address();
 #endif /* CHIP_DEVICE_CONFIG_ENABLE_IPV4 */
         haveIPv6Conn = WifiInterface::GetInstance().HasAnIPv6Address();
     }

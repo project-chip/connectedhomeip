@@ -50,9 +50,25 @@ namespace Inet {
 
             InterfaceId GetInterfaceId() const { return InterfaceId(static_cast<InterfaceId::PlatformType>(mInterfaceId)); };
 
+            bool IsIPv6() const { return mAddressType == IPAddressType::kIPv6; }
+
+#if INET_CONFIG_ENABLE_IPV4
+            bool IsIPv4() const
+            {
+                return mAddressType == IPAddressType::kIPv4;
+            }
+#endif
+
             CHIP_ERROR StartMonitorInterfaces(OnInterfaceChanges interfaceChangesBlock);
             CHIP_ERROR StartMonitorPaths(OnPathChange pathChangeBlock);
             void Stop();
+
+        protected:
+            // We use mLivenessTracker to indicate to blocks that close over us that
+            // we've been destroyed.  This is needed because we're not a refcounted
+            // object, so the blocks can't keep us alive; they just close over the
+            // raw pointer to "this".
+            std::shared_ptr<bool> mLivenessTracker;
 
         private:
             nw_path_monitor_t CreatePathMonitor(nw_interface_type_t type, nw_path_monitor_update_handler_t handler, bool once);
@@ -64,12 +80,6 @@ namespace Inet {
             // with un-registration if we never get Init() called.
             uint32_t mInterfaceId = kDNSServiceInterfaceIndexLocalOnly;
             IPAddressType mAddressType;
-
-            // We use mLivenessTracker to indicate to blocks that close over us that
-            // we've been destroyed.  This is needed because we're not a refcounted
-            // object, so the blocks can't keep us alive; they just close over the
-            // raw pointer to "this".
-            std::shared_ptr<bool> mLivenessTracker;
 
             dispatch_queue_t mWorkQueue = nullptr;
         };

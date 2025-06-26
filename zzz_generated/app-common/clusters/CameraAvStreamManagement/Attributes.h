@@ -272,7 +272,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AllocatedSnapshotStreams
-namespace RankedVideoStreamPrioritiesList {
+namespace StreamUsagePriorities {
 struct TypeInfo
 {
     using Type             = chip::app::DataModel::List<const chip::app::Clusters::Globals::StreamUsageEnum>;
@@ -280,10 +280,10 @@ struct TypeInfo
     using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::StreamUsageEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RankedVideoStreamPrioritiesList::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::StreamUsagePriorities::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace RankedVideoStreamPrioritiesList
+} // namespace StreamUsagePriorities
 namespace SoftRecordingPrivacyModeEnabled {
 struct TypeInfo
 {
@@ -347,9 +347,9 @@ struct TypeInfo
 namespace Viewport {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::CameraAvStreamManagement::Structs::ViewportStruct::Type;
-    using DecodableType    = chip::app::Clusters::CameraAvStreamManagement::Structs::ViewportStruct::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::CameraAvStreamManagement::Structs::ViewportStruct::DecodableType &;
+    using Type             = chip::app::Clusters::Globals::Structs::ViewportStruct::Type;
+    using DecodableType    = chip::app::Clusters::Globals::Structs::ViewportStruct::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::Globals::Structs::ViewportStruct::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CameraAvStreamManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Viewport::Id; }
@@ -606,7 +606,7 @@ struct TypeInfo
         Attributes::AllocatedVideoStreams::TypeInfo::DecodableType allocatedVideoStreams;
         Attributes::AllocatedAudioStreams::TypeInfo::DecodableType allocatedAudioStreams;
         Attributes::AllocatedSnapshotStreams::TypeInfo::DecodableType allocatedSnapshotStreams;
-        Attributes::RankedVideoStreamPrioritiesList::TypeInfo::DecodableType rankedVideoStreamPrioritiesList;
+        Attributes::StreamUsagePriorities::TypeInfo::DecodableType streamUsagePriorities;
         Attributes::SoftRecordingPrivacyModeEnabled::TypeInfo::DecodableType softRecordingPrivacyModeEnabled = static_cast<bool>(0);
         Attributes::SoftLivestreamPrivacyModeEnabled::TypeInfo::DecodableType softLivestreamPrivacyModeEnabled =
             static_cast<bool>(0);

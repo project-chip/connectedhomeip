@@ -62,7 +62,8 @@ class TC_OPCREDS_3_1(MatterBaseTest):
                 await dev_ctrl.EstablishPASESessionIP(ipaddr=a, setupPinCode=setupPinCode,
                                                       nodeid=nodeid, port=device.port)
                 break
-            except ChipStackError:
+            except ChipStackError:  # chipstack-ok: This disables ChipStackError linter check. Expected fullback behavior when trying multiple IPs, failures are tolerated to continue with next address
+                # assert_raises is not applicable since failure is not fatal here
                 continue
         try:
             dev_ctrl.GetConnectedDeviceSync(nodeid=nodeid, allowPASE=True, timeoutMs=1000)

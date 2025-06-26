@@ -268,16 +268,6 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision()
     }
 }
 
-bool ConnectivityManagerImpl::_CanStartWiFiScan()
-{
-    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-
-    bool ret = mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED &&
-        mWpaSupplicant.scanState == GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
-
-    return ret;
-}
-
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

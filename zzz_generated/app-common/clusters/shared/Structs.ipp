@@ -217,50 +217,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 
 } // namespace MeasurementAccuracyStruct
 
-namespace ViewportStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kX1), x1);
-    encoder.Encode(to_underlying(Fields::kY1), y1);
-    encoder.Encode(to_underlying(Fields::kX2), x2);
-    encoder.Encode(to_underlying(Fields::kY2), y2);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        uint8_t __context_tag = 0;
-        CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
-        ReturnErrorOnFailure(err);
-
-        if (__context_tag == to_underlying(Fields::kX1))
-        {
-            err = DataModel::Decode(reader, x1);
-        }
-        else if (__context_tag == to_underlying(Fields::kY1))
-        {
-            err = DataModel::Decode(reader, y1);
-        }
-        else if (__context_tag == to_underlying(Fields::kX2))
-        {
-            err = DataModel::Decode(reader, x2);
-        }
-        else if (__context_tag == to_underlying(Fields::kY2))
-        {
-            err = DataModel::Decode(reader, y2);
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-
-} // namespace ViewportStruct
-
 namespace ApplicationStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -822,6 +778,50 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace TestGlobalStruct
+
+namespace ViewportStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kX1), x1);
+    encoder.Encode(to_underlying(Fields::kY1), y1);
+    encoder.Encode(to_underlying(Fields::kX2), x2);
+    encoder.Encode(to_underlying(Fields::kY2), y2);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kX1))
+        {
+            err = DataModel::Decode(reader, x1);
+        }
+        else if (__context_tag == to_underlying(Fields::kY1))
+        {
+            err = DataModel::Decode(reader, y1);
+        }
+        else if (__context_tag == to_underlying(Fields::kX2))
+        {
+            err = DataModel::Decode(reader, x2);
+        }
+        else if (__context_tag == to_underlying(Fields::kY2))
+        {
+            err = DataModel::Decode(reader, y2);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace ViewportStruct
 
 namespace WebRTCSessionStruct {
 CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
