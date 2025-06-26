@@ -79,7 +79,7 @@ CHIP_ERROR SendWakeOnLanPacket(chip::CharSpan * MACAddress)
         return CHIP_ERROR_INCORRECT_STATE;
     }
     ChipLogProgress(AppServer, "Broadcasted WoL magic packet with MACAddress %s",
-                    chip::StringOf(MACAddress->data(), 2 * kMACLength).c_str());
+                    chip::StringBuilder(MACAddress->data(), 2 * kMACLength).c_str());
     close(sockfd);
     return CHIP_NO_ERROR;
 }

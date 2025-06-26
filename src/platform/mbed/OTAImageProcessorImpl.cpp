@@ -191,7 +191,7 @@ int OTAImageProcessorImpl::MemoryTest()
             }
         }
 
-        ChipLogProgress(SoftwareUpdate, " %s", StringOf(&buffer[i], buffer_size - i).c_str());
+        ChipLogProgress(SoftwareUpdate, " %s", StringBuilder(&buffer[i], buffer_size - i).c_str());
     }
     ChipLogProgress(SoftwareUpdate, "---\n");
 

@@ -288,13 +288,13 @@ bool TestDACRevocationDelegateImpl::IsCertificateRevoked(const ByteSpan & certDe
     std::string issuerName;
 
     VerifyOrReturnValue(CHIP_NO_ERROR == GetIssuerNameBase64Str(certDer, issuerName), false);
-    ChipLogDetail(NotSpecified, "Issuer: %s", StringOf(issuerName.data(), issuerName.size()).c_str());
+    ChipLogDetail(NotSpecified, "Issuer: %s", StringBuilder(issuerName.data(), issuerName.size()).c_str());
 
     VerifyOrReturnValue(CHIP_NO_ERROR == GetSerialNumberHexStr(certDer, serialNumber), false);
-    ChipLogDetail(NotSpecified, "Serial Number: %s", StringOf(serialNumber.data(), serialNumber.size()).c_str());
+    ChipLogDetail(NotSpecified, "Serial Number: %s", StringBuilder(serialNumber.data(), serialNumber.size()).c_str());
 
     VerifyOrReturnValue(CHIP_NO_ERROR == GetAKIDHexStr(certDer, akid), false);
-    ChipLogDetail(NotSpecified, "AKID: %s", StringOf(akid.data(), akid.size()).c_str());
+    ChipLogDetail(NotSpecified, "AKID: %s", StringBuilder(akid.data(), akid.size()).c_str());
 
     return IsEntryInRevocationSet(akid, issuerName, serialNumber);
 }

@@ -834,7 +834,7 @@ bool Instance::AddSupportedMap(uint32_t aMapId, const CharSpan & aMapName)
         if (entry.IsNameEqual(aMapName))
         {
             ChipLogError(Zcl, "AddSupportedMapRaw %" PRIu32 " - A map already exists with same name '%s'", aMapId,
-                         StringOf(entry.GetName()).c_str());
+                         StringBuilder(entry.GetName()).c_str());
             return false;
         }
 
@@ -897,7 +897,7 @@ bool Instance::RenameSupportedMap(uint32_t aMapId, const CharSpan & newMapName)
         if (entry.IsNameEqual(newMapName))
         {
             ChipLogError(Zcl, "RenameSupportedMap %" PRIu32 " - map already exists with same name '%s'", aMapId,
-                         StringOf(entry.GetName()).c_str());
+                         StringBuilder(entry.GetName()).c_str());
             return false;
         }
 
@@ -1023,7 +1023,7 @@ bool Instance::AddSelectedArea(uint32_t & aSelectedArea)
 
     if (!mDelegate->IsSetSelectedAreasAllowed(locationStatusText))
     {
-        ChipLogError(Zcl, "AddSelectedAreaRaw %" PRIu32 " - %s", aSelectedArea, StringOf(locationStatusText).c_str());
+        ChipLogError(Zcl, "AddSelectedAreaRaw %" PRIu32 " - %s", aSelectedArea, StringBuilder(locationStatusText).c_str());
         return false;
     }
 
