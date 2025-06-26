@@ -67,12 +67,12 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
 
 void ClosureDimensionEndpoint::OnStopMotionActionComplete()
 {
-    // This function should handle closure dimension state updation after stop Action.
+    // This function should handle closure dimension state updation after stopping of motion Action.
 }
 
 void ClosureDimensionEndpoint::OnStopCalibrateActionComplete()
 {
-    // Current state and target are set to null after calibration is stopped to indicate an unknown state.
+    // This function should handle closure dimension state updation after stopping of calibration Action.
 }
 
 void ClosureDimensionEndpoint::OnCalibrateActionComplete()
