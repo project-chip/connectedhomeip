@@ -332,7 +332,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self.step("10")
         self.th_icd_server.resume()
         await self.default_controller.WaitForActive(self.icd_nodeid, timeoutSeconds=wait_for_icd_checkin_timeout_s, stayActiveDurationMs=5000)
-        promised_active_duration_event_data = await cb.wait_for_event_report(event, wait_for_dut_event_subscription_s)
+        promised_active_duration_event_data = cb.wait_for_event_report(event, wait_for_dut_event_subscription_s)
         logging.info(f"PromisedActiveDurationEvent.Data: {promised_active_duration_event_data}")
         promised_active_duration_ms = promised_active_duration_event_data.promisedActiveDuration
         asserts.assert_equal(cb.get_size(), 0, "More than one event received from DUT")
@@ -374,7 +374,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
 
         self.step("18")
         await self.default_controller.WaitForActive(self.icd_nodeid, timeoutSeconds=wait_for_icd_checkin_timeout_s, stayActiveDurationMs=5000)
-        promised_active_duration_event_data = await cb.wait_for_event_report(event, wait_for_dut_event_subscription_s)
+        promised_active_duration_event_data = cb.wait_for_event_report(event, wait_for_dut_event_subscription_s)
         logging.info(f"PromisedActiveDurationEvent.Data: {promised_active_duration_event_data}")
         promised_active_duration_ms = promised_active_duration_event_data.promisedActiveDuration
         asserts.assert_equal(cb.get_size(), 0, "More than one event received from DUT")
