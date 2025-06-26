@@ -52,7 +52,7 @@ public:
     Span<T> Content() { return { mData + 1, GetLength() }; }
     Span<const T> Content() const { return { mData + 1, GetLength() }; }
 
-    /// Accesses the "PASCAL" string (i.e. valid data includint the string perfix)
+    /// Accesses the "PASCAL" string (i.e. valid data including the string perfix)
     Span<const T> PascalContent() const { return { mData, static_cast<size_t>(GetLength() + 1) }; }
 
     /// Access to the full buffer. does NOT take into account current size
@@ -128,7 +128,7 @@ public:
     Span<T> Content() { return { mData + 2, GetLength() }; }
     Span<const T> Content() const { return { mData + 2, GetLength() }; }
 
-    /// Accesses the "PASCAL" string (i.e. valid data includint the string perfix)
+    /// Accesses the "PASCAL" string (i.e. valid data including the string perfix)
     Span<const T> PascalContent() const { return { mData, static_cast<size_t>(GetLength() + 2) }; }
 
     /// Access to the full buffer. does NOT take into account current size
