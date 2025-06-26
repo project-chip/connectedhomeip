@@ -31,6 +31,86 @@ namespace Clusters {
 
 using namespace chip::app::Clusters::EthernetNetworkDiagnostics;
 
+namespace {
+
+CHIP_ERROR ReadPHYRate(DeviceLayer::DiagnosticDataProvider & provider, AttributeValueEncoder & encoder)
+{
+    EthernetNetworkDiagnostics::Attributes::PHYRate::TypeInfo::Type pHYRate;
+    auto value = EthernetNetworkDiagnostics::PHYRateEnum::kRate10M;
+
+    if (provider.GetEthPHYRate(value) == CHIP_NO_ERROR)
+    {
+        pHYRate.SetNonNull(value);
+        ChipLogProgress(Zcl, "The current nominal, usable speed at the top of the physical layer of the Node: %d",
+                        chip::to_underlying(value));
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "The Ethernet interface is not currently configured or operational");
+    }
+
+    return encoder.Encode(pHYRate);
+}
+
+CHIP_ERROR ReadFullDuplex(DeviceLayer::DiagnosticDataProvider & provider, AttributeValueEncoder & encoder)
+{
+    EthernetNetworkDiagnostics::Attributes::FullDuplex::TypeInfo::Type fullDuplex;
+    bool value = false;
+
+    if (provider.GetEthFullDuplex(value) == CHIP_NO_ERROR)
+    {
+        fullDuplex.SetNonNull(value);
+        ChipLogProgress(Zcl, "The full-duplex operating status of Node: %d", value);
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "The Ethernet interface is not currently configured or operational");
+    }
+
+    return encoder.Encode(fullDuplex);
+}
+
+CHIP_ERROR ReadCarrierDetect(DeviceLayer::DiagnosticDataProvider & provider, AttributeValueEncoder & encoder)
+{
+    EthernetNetworkDiagnostics::Attributes::CarrierDetect::TypeInfo::Type carrierDetect;
+    bool value = false;
+
+    if (provider.GetEthCarrierDetect(value) == CHIP_NO_ERROR)
+    {
+        carrierDetect.SetNonNull(value);
+        ChipLogProgress(Zcl, "The status of the Carrier Detect control signal present on the ethernet network interface: %d",
+                        value);
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "The Ethernet interface is not currently configured or operational");
+    }
+
+    return encoder.Encode(carrierDetect);
+}
+
+BitFlags<EthernetNetworkDiagnostics::Feature> GetFeatureMap(const EthernetDiagnosticsEnabledAttributes & enabledAttributes)
+{
+    return BitFlags<EthernetNetworkDiagnostics::Feature>()
+        .Set(EthernetNetworkDiagnostics::Feature::kPacketCounts, enabledAttributes.enablePacketCount)
+        .Set(EthernetNetworkDiagnostics::Feature::kErrorCounts, enabledAttributes.enableErrCount);
+}
+
+CHIP_ERROR EncodeValue(uint64_t value, CHIP_ERROR readError, AttributeValueEncoder & encoder)
+{
+    if (readError == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    {
+        value = 0;
+    }
+    else if (readError != CHIP_NO_ERROR)
+    {
+        return readError;
+    }
+    return encoder.Encode(value);
+}
+
+} // anonymous namespace
+
 EthernetDiagnosticsServerCluster::EthernetDiagnosticsServerCluster(DeviceLayer::DiagnosticDataProvider & provider,
                                                                    const EthernetDiagnosticsEnabledAttributes & enabledAttributes) :
     DefaultServerCluster({ kRootEndpointId, EthernetNetworkDiagnostics::Id }),
@@ -43,11 +123,11 @@ DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(co
     switch (request.path.mAttributeId)
     {
     case EthernetNetworkDiagnostics::Attributes::PHYRate::Id:
-        return ReadPHYRate(encoder);
+        return ReadPHYRate(mProvider, encoder);
     case EthernetNetworkDiagnostics::Attributes::FullDuplex::Id:
-        return ReadFullDuplex(encoder);
+        return ReadFullDuplex(mProvider, encoder);
     case EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id:
-        return ReadCarrierDetect(encoder);
+        return ReadCarrierDetect(mProvider, encoder);
     case EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id: {
         uint64_t value;
         CHIP_ERROR err = mProvider.GetEthTimeSinceReset(value);
@@ -79,7 +159,7 @@ DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(co
         return EncodeValue(value, err, encoder);
     }
     case Globals::Attributes::FeatureMap::Id:
-        return encoder.Encode(GetFeatureMap().Raw());
+        return encoder.Encode(GetFeatureMap(mEnabledAttributes).Raw());
     case Globals::Attributes::ClusterRevision::Id:
         return encoder.Encode(EthernetNetworkDiagnostics::kRevision);
     default:
@@ -94,7 +174,12 @@ EthernetDiagnosticsServerCluster::InvokeCommand(const DataModel::InvokeRequest &
     switch (request.path.mCommandId)
     {
     case EthernetNetworkDiagnostics::Commands::ResetCounts::Id:
-        return mProvider.ResetEthNetworkDiagnosticsCounts();
+        // TODO:[#39725] This should properly handle the return value from ResetEthNetworkDiagnosticsCounts().
+        // However, for bug-for-bug compatibility with old code, we ignore the return value.
+        // The old implementation would drop the error to the floor and always return success,
+        // even when the provider returns CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE.
+        (void) mProvider.ResetEthNetworkDiagnosticsCounts();
+        return Protocols::InteractionModel::Status::Success;
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
@@ -103,7 +188,7 @@ EthernetDiagnosticsServerCluster::InvokeCommand(const DataModel::InvokeRequest &
 CHIP_ERROR EthernetDiagnosticsServerCluster::AcceptedCommands(const ConcreteClusterPath & path,
                                                               ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    BitFlags<EthernetNetworkDiagnostics::Feature> featureMap = GetFeatureMap();
+    BitFlags<EthernetNetworkDiagnostics::Feature> featureMap = GetFeatureMap(mEnabledAttributes);
 
     if (featureMap.Has(EthernetNetworkDiagnostics::Feature::kPacketCounts) ||
         featureMap.Has(EthernetNetworkDiagnostics::Feature::kErrorCounts))
@@ -150,82 +235,6 @@ CHIP_ERROR EthernetDiagnosticsServerCluster::Attributes(const ConcreteClusterPat
     }
 
     return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
-}
-
-CHIP_ERROR EthernetDiagnosticsServerCluster::ReadPHYRate(AttributeValueEncoder & encoder) const
-{
-    EthernetNetworkDiagnostics::Attributes::PHYRate::TypeInfo::Type pHYRate;
-    auto value = EthernetNetworkDiagnostics::PHYRateEnum::kRate10M;
-
-    if (mProvider.GetEthPHYRate(value) == CHIP_NO_ERROR)
-    {
-        pHYRate.SetNonNull(value);
-        ChipLogProgress(Zcl, "The current nominal, usable speed at the top of the physical layer of the Node: %d",
-                        chip::to_underlying(value));
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "The Ethernet interface is not currently configured or operational");
-    }
-
-    return encoder.Encode(pHYRate);
-}
-
-CHIP_ERROR EthernetDiagnosticsServerCluster::ReadFullDuplex(AttributeValueEncoder & encoder) const
-{
-    EthernetNetworkDiagnostics::Attributes::FullDuplex::TypeInfo::Type fullDuplex;
-    bool value = false;
-
-    if (mProvider.GetEthFullDuplex(value) == CHIP_NO_ERROR)
-    {
-        fullDuplex.SetNonNull(value);
-        ChipLogProgress(Zcl, "The full-duplex operating status of Node: %d", value);
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "The Ethernet interface is not currently configured or operational");
-    }
-
-    return encoder.Encode(fullDuplex);
-}
-
-CHIP_ERROR EthernetDiagnosticsServerCluster::ReadCarrierDetect(AttributeValueEncoder & encoder) const
-{
-    EthernetNetworkDiagnostics::Attributes::CarrierDetect::TypeInfo::Type carrierDetect;
-    bool value = false;
-
-    if (mProvider.GetEthCarrierDetect(value) == CHIP_NO_ERROR)
-    {
-        carrierDetect.SetNonNull(value);
-        ChipLogProgress(Zcl, "The status of the Carrier Detect control signal present on the ethernet network interface: %d",
-                        value);
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "The Ethernet interface is not currently configured or operational");
-    }
-
-    return encoder.Encode(carrierDetect);
-}
-
-BitFlags<EthernetNetworkDiagnostics::Feature> EthernetDiagnosticsServerCluster::GetFeatureMap() const
-{
-    return BitFlags<EthernetNetworkDiagnostics::Feature>()
-        .Set(EthernetNetworkDiagnostics::Feature::kPacketCounts, mEnabledAttributes.enablePacketCount)
-        .Set(EthernetNetworkDiagnostics::Feature::kErrorCounts, mEnabledAttributes.enableErrCount);
-}
-
-CHIP_ERROR EthernetDiagnosticsServerCluster::EncodeValue(uint64_t value, CHIP_ERROR readError, AttributeValueEncoder & encoder)
-{
-    if (readError == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
-    {
-        value = 0;
-    }
-    else if (readError != CHIP_NO_ERROR)
-    {
-        return readError;
-    }
-    return encoder.Encode(value);
 }
 
 } // namespace Clusters

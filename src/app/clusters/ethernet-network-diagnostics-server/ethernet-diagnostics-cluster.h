@@ -63,12 +63,6 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
 private:
-    CHIP_ERROR ReadPHYRate(AttributeValueEncoder & encoder) const;
-    CHIP_ERROR ReadFullDuplex(AttributeValueEncoder & encoder) const;
-    CHIP_ERROR ReadCarrierDetect(AttributeValueEncoder & encoder) const;
-    BitFlags<EthernetNetworkDiagnostics::Feature> GetFeatureMap() const;
-    CHIP_ERROR EncodeValue(uint64_t value, CHIP_ERROR readError, AttributeValueEncoder & encoder);
-
     DeviceLayer::DiagnosticDataProvider & mProvider;
     const EthernetDiagnosticsEnabledAttributes mEnabledAttributes;
 };
