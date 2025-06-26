@@ -209,7 +209,8 @@ void ClosureControlEndpoint::OnPanelMotionActionComplete()
     }
 
     // Set latch and speed to their target values if they are set in the overall target.
-    if (!overallTarget.IsNull()) {
+    if (!overallTarget.IsNull())
+    {
 
         if (overallTarget.Value().latch.HasValue())
         {
