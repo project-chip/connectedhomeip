@@ -185,3 +185,25 @@ void ClosureControlEndpoint::OnMoveToActionComplete()
 {
     // This function should handle closure control state updation after completion of Motion Action.
 }
+
+void ClosureControlEndpoint::OnSetTargetActionComplete()
+{
+    ClusterState clusterState = mLogic.GetState();
+
+    auto overallState = clusterState.mOverallState;
+
+    overallState.SetNonNull().Set(
+    MakeOptional(DataModel::MakeNullable(PositioningEnum::kPartiallyOpened)),
+    clusterState.mOverallTarget.Value().latch.HasValue()
+        ? MakeOptional(DataModel::MakeNullable(clusterState.mOverallTarget.Value().latch.Value()))
+        : NullOptional,
+    clusterState.mOverallTarget.Value().speed.HasValue()
+        ? MakeOptional(DataModel::MakeNullable(clusterState.mOverallTarget.Value().speed.Value()))
+        : NullOptional,
+    clusterState.mOverallState.Value().secureState.HasValue()
+        ? MakeOptional(DataModel::MakeNullable(clusterState.mOverallState.Value().secureState.Value().Value()))
+        : NullOptional
+    );
+
+    mLogic.SetOverallState(overallState);
+}

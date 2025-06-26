@@ -148,7 +148,38 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
                                                                              const Optional<Globals::ThreeLevelAutoEnum> & speed,
                                                                              const chip::EndpointId endpointId)
 {
-    // Add logic to handle the SetTarget command
+    // Set OverallTarget to null
+    DataModel::Nullable<GenericOverallTarget> target;
+    VerifyOrReturnValue(mClosureEndpoint1.GetLogic().GetOverallTarget(target) == CHIP_NO_ERROR, Status::Failure,
+                        ChipLogError(AppServer, "Failed to get overall target for SetTarget command"));
+    if (target.IsNull())
+    {
+        target.SetNonNull(GenericOverallTarget{});
+    }
+
+    target.Value().position = NullOptional; // Reset position to null
+
+    if (latch.HasValue())
+    {
+        // ChipLogError(AppServer, "Updating target latch for SetTarget command");
+        target.Value().latch = latch;
+    }
+
+    if (speed.HasValue())
+    {
+        // ChipLogError(AppServer, "Updating target speed for SetTarget command");
+        target.Value().speed = speed;
+    }
+
+    VerifyOrReturnValue(mClosureEndpoint1.GetLogic().SetOverallTarget(target) == CHIP_NO_ERROR, Status::Failure, 
+                        ChipLogError(AppServer, "Failed to set overall target for SetTarget command"));
+
+    (void) DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
+
+    mCurrentAction     = ClosureAction::kSetTargetAction;
+    mCurrentEndpointId = endpointId;
+    (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(1), HandleClosureActionTimer, this);
+    mIsSetTargetActionInProgress = true;
     return Status::Success;
 }
 
@@ -184,13 +215,13 @@ void ClosureManager::HandleClosureActionTimer(System::Layer * layer, void * aApp
         // Add logic to handle Latch action completion
         break;
     case ClosureAction::kSetTargetAction:
-        // Add logic to handle SetTarget action completion
+        instance.HandleSetTargetAction();
         break;
     case ClosureAction::kStepAction:
         // Add logic to handle Step action completion
         break;
     case ClosureAction::kPanelLatchAction:
-        // Add logic to handle Panel Latch action completion
+        instance.HandleClosureActionComplete(instance.mCurrentAction);
         break;
     default:
         ChipLogError(AppServer, "Invalid action received in HandleClosureActionTimer");

@@ -47,7 +47,7 @@ using Protocols::InteractionModel::Status;
 class ClosureDimensionDelegate : public DelegateBase
 {
 public:
-    ClosureDimensionDelegate() {}
+    ClosureDimensionDelegate(EndpointId endpoint) : mEndpoint(endpoint) {}
 
     // Override for the DelegateBase Virtual functions
     Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
@@ -55,6 +55,9 @@ public:
     Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                       const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
     bool IsManualLatchingNeeded() override { return false; }
+    EndpointId GetEndpoint() const { return mEndpoint; }
+private:
+    EndpointId mEndpoint = kInvalidEndpointId;
 };
 
 /**
@@ -74,7 +77,7 @@ class ClosureDimensionEndpoint
 {
 public:
     ClosureDimensionEndpoint(EndpointId endpoint) :
-        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
+        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(endpoint), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
     {}
 
     /**
@@ -135,6 +138,15 @@ public:
      * a motion completed event.
      */
     void OnMoveToActionComplete();
+
+    /**
+     * @brief Handles the completion of a SetTarget action.
+     * 
+     * This function is called when the SetTarget action has been completed.
+     * It should update the internal state of the closure dimension endpoint to reflect
+     * the completion of the SetTarget action.
+     */
+    void OnSetTargetActionComplete();
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;

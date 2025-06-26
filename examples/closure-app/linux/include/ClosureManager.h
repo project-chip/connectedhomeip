@@ -208,6 +208,13 @@ public:
      */
     void HandleStepActionComplete();
 
+    /**
+     * @brief Handles the completion of a SetTarget action.
+     * 
+     * This method is called when the SetTarget action timer is expired.
+     */
+    void HandleSetTargetAction();
+
     bool mIsCalibrationActionInProgress = false;
     bool mIsMoveToActionInProgress      = false;
     bool mIsSetTargetActionInProgress   = false;
