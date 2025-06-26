@@ -192,40 +192,37 @@ void ClosureControlEndpoint::OnMoveToActionComplete()
 
 void ClosureControlEndpoint::UpdateCurrentStateFromTargetState()
 {
-    ClusterState state = mLogic.GetState();
-    GenericOverallState currentOverallState{};
+    DataModel::Nullable<GenericOverallState> overallState;
+    DataModel::Nullable<GenericOverallTarget> overallTarget;
 
-    if (state.mOverallTarget.IsNull())
+    VerifyOrReturn(mLogic.GetOverallState(overallState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get overall state from logic"));
+    VerifyOrReturn(mLogic.GetOverallTarget(overallTarget) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get overall target from logic"));
+
+   VerifyOrReturn(!overallTarget.IsNull(),
+                   ChipLogError(AppServer, "Current overall target is null, Move to action Failed"));
+    VerifyOrReturn(!overallState.IsNull(),
+                   ChipLogError(AppServer, "Current overall state is null, Move to action Failed"));
+
+
+    if (overallTarget.Value().position.HasValue())
     {
-        ChipLogError(AppServer, "Target is null, Move to action Failed");
-        return;
+        PositioningEnum currentPositioning = MapTargetPositionToCurrentPositioning(overallTarget.Value().position.Value());
+        overallState.Value().positioning.SetValue(MakeNullable(currentPositioning));
     }
 
-    if (state.mOverallState.IsNull())
+    if (overallTarget.Value().latch.HasValue())
     {
-        ChipLogError(AppServer, "Current state is null, Move to action Failed");
-        return;
+        overallState.Value().latch.SetValue(MakeNullable(overallTarget.Value().latch.Value()));
     }
 
-    currentOverallState = state.mOverallState.Value();
-
-    if (state.mOverallTarget.Value().position.HasValue())
+    if (overallTarget.Value().speed.HasValue())
     {
-        PositioningEnum currentPositioning = MapTargetPositionToCurrentPositioning(state.mOverallTarget.Value().position.Value());
-        currentOverallState.positioning.SetValue(MakeNullable(currentPositioning));
+        overallState.Value().speed.SetValue(MakeNullable(overallTarget.Value().speed.Value()));
     }
 
-    if (state.mOverallTarget.Value().latch.HasValue())
-    {
-        currentOverallState.latch.SetValue(MakeNullable(state.mOverallTarget.Value().latch.Value()));
-    }
-
-    if (state.mOverallTarget.Value().speed.HasValue())
-    {
-        currentOverallState.speed.SetValue(MakeNullable(state.mOverallTarget.Value().speed.Value()));
-    }
-
-    mLogic.SetOverallState(DataModel::MakeNullable(currentOverallState));
+    mLogic.SetOverallState(overallState);
 }
 
 PositioningEnum ClosureControlEndpoint::MapTargetPositionToCurrentPositioning(TargetPositionEnum value)

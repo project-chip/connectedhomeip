@@ -91,22 +91,14 @@ void ClosureDimensionEndpoint::OnMoveToActionComplete()
 
 void ClosureDimensionEndpoint::UpdateCurrentStateFromTargetState()
 {
-    ClusterState state = mLogic.GetState();
-    GenericCurrentStateStruct currentState{};
-
-    if (state.target.IsNull())
-    {
-        ChipLogError(AppServer, "Target is null, Move to action Failed");
-        return;
-    }
-
-    if (state.currentState.IsNull())
-    {
-        ChipLogError(AppServer, "Current state is null, Move to action Failed");
-        return;
-    }
-
-    currentState = state.currentState.Value();
+    DataModel::Nullable<GenericCurrentStateStruct> currentState;
+    DataModel::Nullable<GenericTargetStruct> target;
+    VerifyOrReturn(mLogic.GetCurrentState(currentState) == CHIP_NO_ERROR,
+                     ChipLogError(AppServer, "Failed to get current state, Updating CurrentState From TargetState Failed"));
+    VerifyOrReturn(mLogic.GetTarget(target) == CHIP_NO_ERROR,
+                     ChipLogError(AppServer, "Failed to get target state, Updating CurrentState From TargetState Failed"));
+    VerifyOrReturn(!target.IsNull(), ChipLogError(AppServer, "Target state is null, Updating CurrentState From TargetState Failed"));
+    VerifyOrReturn(!currentState.IsNull(), ChipLogError(AppServer, "Current state is null, Updating CurrentState From TargetState Failed"));
 
     auto updateFieldIfPresent = [](auto & targetField, auto & currentField) {
         if (targetField.HasValue())
@@ -115,9 +107,9 @@ void ClosureDimensionEndpoint::UpdateCurrentStateFromTargetState()
         }
     };
 
-    updateFieldIfPresent(state.target.Value().position, currentState.position);
-    updateFieldIfPresent(state.target.Value().latch, currentState.latch);
-    updateFieldIfPresent(state.target.Value().speed, currentState.speed);
+    updateFieldIfPresent(target.Value().position, currentState.Value().position);
+    updateFieldIfPresent(target.Value().latch, currentState.Value().latch);
+    updateFieldIfPresent(target.Value().speed, currentState.Value().speed);
 
-    mLogic.SetCurrentState(DataModel::MakeNullable(currentState));
+    mLogic.SetCurrentState(currentState);
 }

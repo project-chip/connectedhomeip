@@ -215,14 +215,16 @@ private:
      * towards the target position, ensuring it does not overshoot the target. It also preserves the latch and speed
      * values if they are set in the current state.
      *
-     * @param[in]  epState      The current cluster state of the closure dimension endpoint.
-     * @param[out] currentState The updated current state struct reflecting the next position.
+     * @param currentState The current state of the closure panel.
+     * @param targetState The target state of the closure panel.
+     * @param nextCurrentState A reference to a Nullable object that will be updated with the next current state.
      * @return true if the current state need to be updated to the next position,
      *         false if the target position is already reached or update to next position failed.
      */
     bool UpdatePanelCurrentStateToNextPosition(
-        const chip::app::Clusters::ClosureDimension::ClusterState & panelState,
-        chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::GenericCurrentStateStruct> & currentState);
+        const chip::app::Clusters::ClosureDimension::GenericCurrentStateStruct & currentState,
+        const chip::app::Clusters::ClosureDimension::GenericTargetStruct & targetState,
+        chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::GenericCurrentStateStruct> & nextCurrentState);
 
     /**
      * @brief Determines if a latch action is needed based on the current and target closure states.
@@ -230,8 +232,7 @@ private:
      * This function checks the provided closure state to decide whether a latch action should be performed.
      * The latch action is needed if target and state latch values differ.
      *
-     * @param epState The current closure cluster state, containing both the overall target and state.
      * @return true if a latch action is needed, false otherwise.
      */
-    bool IsClosureLatchActionNeeded(const chip::app::Clusters::ClosureControl::ClusterState & epState);
+    bool IsClosureLatchActionNeeded();
 };

@@ -169,7 +169,20 @@ private:
     ClusterLogic mLogic;
     Interface mInterface;
 
+    /**
+     * @brief Updates the current state of the closure control endpoint from the target state.
+     *
+     * This function retrieves the target state and updates the current state accordingly.
+     * It ensures that the current state reflects the latest target position, latch status, and speed.
+     */
     void UpdateCurrentStateFromTargetState();
+    
+    /**
+     * @brief Maps a TargetPositionEnum value to the corresponding PositioningEnum value.
+     *
+     * @param value The TargetPositionEnum value to be mapped.
+     * @return PositioningEnum The corresponding PositioningEnum value.
+     */
     PositioningEnum MapTargetPositionToCurrentPositioning(TargetPositionEnum value);
 };
 
