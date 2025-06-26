@@ -17,11 +17,13 @@
 
 #include <app/clusters/tls-certificate-management-server/CertificateTableImpl.h>
 #include <app/storage/FabricTableImpl.ipp>
+#include <app/storage/TableEntry.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <stdlib.h>
 
 using namespace chip;
 using namespace chip::app::Storage;
+using namespace chip::app::Storage::Data;
 using namespace chip::app::Clusters::Tls;
 using namespace chip::app::Clusters::TlsCertificateManagement::Structs;
 
@@ -29,6 +31,33 @@ using RootSerializer   = DefaultSerializer<CertificateId, CertificateTable::Root
 using ClientSerializer = DefaultSerializer<CertificateId, CertificateTable::ClientCertStruct>;
 
 typedef uint8_t IntermediateCertIndex;
+
+namespace chip {
+namespace app {
+namespace DataModel {
+CHIP_ERROR Encode(TLV::TLVWriter & writer, const CertificateTable::ClientCertStruct & data)
+{
+    // TLSClientCertificateDetailStruct has an array, doesn't implement Encode; copy-pasted here
+    // from TLSClientCertificateDetailStruct::Type::Encode
+
+    using chip::app::Clusters::TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::Fields;
+    TLV::TLVType container;
+    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kCcdid), data.ccdid));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kClientCertificate), data.clientCertificate));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(Fields::kIntermediateCertificates), data.intermediateCertificates));
+    // Fields::kFabricIndex filled from table in GetClientCertificateEntry
+    return writer.EndContainer(container);
+}
+CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex,
+                         const Clusters::Tls::CertificateTable::ClientCertStruct & data)
+{
+    return Encode(writer, data);
+}
+} // namespace DataModel
+} // namespace app
+} // namespace chip
 
 namespace {
 /// @brief Tags Used to serialize certificates so they can be stored in flash memory;
@@ -191,18 +220,7 @@ CHIP_ERROR ClientSerializer::DeserializeId(TLV::TLVReader & reader, CertificateI
 template <>
 CHIP_ERROR ClientSerializer::SerializeData(TLV::TLVWriter & writer, const CertificateTable::ClientCertStruct & data)
 {
-    // TLSClientCertificateDetailStruct has an array, doesn't implement Encode; copy-pasted here
-    // from TLSClientCertificateDetailStruct::Type::Encode
-
-    using chip::app::Clusters::TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::Fields;
-    TLV::TLVType container;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kCcdid), data.ccdid));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kClientCertificate), data.clientCertificate));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(Fields::kIntermediateCertificates), data.intermediateCertificates));
-    // Fields::kFabricIndex filled from table in GetClientCertificateEntry
-    return writer.EndContainer(container);
+    return DataModel::Encode(writer, data);
 }
 
 template <>
@@ -258,6 +276,14 @@ CHIP_ERROR CertificateTableImpl::HasRootCertificateEntry(FabricIndex fabric_inde
     return mRootCertificates.FindTableEntry(fabric_index, id, unused);
 }
 
+CHIP_ERROR CertificateTableImpl::IterateRootEntries(FabricIndex fabric, BufferedRootCert & store, IterateRootCertFnType iterateFn)
+{
+    return mRootCertificates.IterateEntries(fabric, GetBuffer(store), [&](auto & iter) {
+        TableEntryDataConvertingIterator<CertificateId, RootCertStruct> innerIter(iter);
+        return iterateFn(innerIter);
+    });
+}
+
 CHIP_ERROR CertificateTableImpl::GetClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id,
                                                            BufferedClientCert & entry)
 {
@@ -270,4 +296,13 @@ CHIP_ERROR CertificateTableImpl::HasClientCertificateEntry(FabricIndex fabric_in
     CertificateId id(certificate_id);
     EntryIndex unused;
     return mClientCertificates.FindTableEntry(fabric_index, id, unused);
+}
+
+CHIP_ERROR CertificateTableImpl::IterateClientEntries(FabricIndex fabric, BufferedClientCert & store,
+                                                      IterateClientCertFnType iterateFn)
+{
+    return mClientCertificates.IterateEntries(fabric, GetBuffer(store), [&](auto & iter) {
+        TableEntryDataConvertingIterator<CertificateId, ClientCertStruct> innerIter(iter);
+        return iterateFn(innerIter);
+    });
 }

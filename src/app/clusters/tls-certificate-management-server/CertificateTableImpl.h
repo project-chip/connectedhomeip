@@ -82,13 +82,15 @@ public:
     CHIP_ERROR Init(PersistentStorageDelegate & storage) override;
     void Finish() override;
 
-    void SetEndpoint(EndpointId endpoint);
+    void SetEndpoint(EndpointId endpoint) override;
 
     // Data
     CHIP_ERROR GetRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id, BufferedRootCert & entry) override;
     CHIP_ERROR HasRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id) override;
+    CHIP_ERROR IterateRootEntries(FabricIndex fabric, BufferedRootCert & store, IterateRootCertFnType iterateFn) override;
     CHIP_ERROR GetClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id, BufferedClientCert & entry) override;
     CHIP_ERROR HasClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id) override;
+    CHIP_ERROR IterateClientEntries(FabricIndex fabric, BufferedClientCert & store, IterateClientCertFnType iterateFn) override;
 
 private:
     RootCertificateTable mRootCertificates;
