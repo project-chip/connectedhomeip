@@ -16,12 +16,9 @@
 #
 
 import ctypes
-from ctypes import c_char_p, c_uint32, c_void_p
+from ctypes import c_char_p, c_void_p
 
 import chip.native
-from chip.webrtc.types import (ErrorCallback_t, IceCallback_t, PeerConnectedCallback_t, PeerDisconnectedCallback_t,
-                               SdpAnswerCallback_t, SdpOfferCallback_t, StatsCallback_t)
-
 
 def _GetWebRTCLibraryHandle() -> ctypes.CDLL:
     """ Get the native library handle with webrtc method initialization.
