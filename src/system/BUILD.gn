@@ -255,6 +255,10 @@ static_library("system") {
     # or
     #    - SystemLayerImplDispatch.mm
     #    - SystemLayerImplDispatch.h
+    # or
+    #    - SystemLayerImplZephyr.h
+    #    - SystemLayerImplZephyr.cpp
+
     if (chip_system_config_use_dispatch) {
       sources += [ "${chip_root}/src/platform/Darwin/system/SystemLayerImpl${chip_system_config_event_loop}.h" ]
     } else {
