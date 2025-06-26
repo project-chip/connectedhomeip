@@ -94,11 +94,13 @@ void ClosureDimensionEndpoint::UpdateCurrentStateFromTargetState()
     DataModel::Nullable<GenericCurrentStateStruct> currentState;
     DataModel::Nullable<GenericTargetStruct> target;
     VerifyOrReturn(mLogic.GetCurrentState(currentState) == CHIP_NO_ERROR,
-                     ChipLogError(AppServer, "Failed to get current state, Updating CurrentState From TargetState Failed"));
+                   ChipLogError(AppServer, "Failed to get current state, Updating CurrentState From TargetState Failed"));
     VerifyOrReturn(mLogic.GetTarget(target) == CHIP_NO_ERROR,
-                     ChipLogError(AppServer, "Failed to get target state, Updating CurrentState From TargetState Failed"));
-    VerifyOrReturn(!target.IsNull(), ChipLogError(AppServer, "Target state is null, Updating CurrentState From TargetState Failed"));
-    VerifyOrReturn(!currentState.IsNull(), ChipLogError(AppServer, "Current state is null, Updating CurrentState From TargetState Failed"));
+                   ChipLogError(AppServer, "Failed to get target state, Updating CurrentState From TargetState Failed"));
+    VerifyOrReturn(!target.IsNull(),
+                   ChipLogError(AppServer, "Target state is null, Updating CurrentState From TargetState Failed"));
+    VerifyOrReturn(!currentState.IsNull(),
+                   ChipLogError(AppServer, "Current state is null, Updating CurrentState From TargetState Failed"));
 
     auto updateFieldIfPresent = [](auto & targetField, auto & currentField) {
         if (targetField.HasValue())

@@ -200,11 +200,8 @@ void ClosureControlEndpoint::UpdateCurrentStateFromTargetState()
     VerifyOrReturn(mLogic.GetOverallTarget(overallTarget) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to get overall target from logic"));
 
-   VerifyOrReturn(!overallTarget.IsNull(),
-                   ChipLogError(AppServer, "Current overall target is null, Move to action Failed"));
-    VerifyOrReturn(!overallState.IsNull(),
-                   ChipLogError(AppServer, "Current overall state is null, Move to action Failed"));
-
+    VerifyOrReturn(!overallTarget.IsNull(), ChipLogError(AppServer, "Current overall target is null, Move to action Failed"));
+    VerifyOrReturn(!overallState.IsNull(), ChipLogError(AppServer, "Current overall state is null, Move to action Failed"));
 
     if (overallTarget.Value().position.HasValue())
     {

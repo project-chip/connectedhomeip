@@ -248,22 +248,22 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
     // - Endpoint 2: Represents the Closure Dimension Cluster for the first panel.
     // - Endpoint 3: Represents the Closure Dimension Cluster for the second panel.
 
-    //For sample app, MoveTo command to Fullopen , will set target position of both panels to 0
-    // MoveTo command to Fullclose will set target position of both panels to 10000
-    // We simulate harware action by using timer for 1 sec and updating the current state of the panels after the timer expires.
-    // till we reach the target position.
+    // For sample app, MoveTo command to Fullopen , will set target position of both panels to 0
+    //  MoveTo command to Fullclose will set target position of both panels to 10000
+    //  We simulate harware action by using timer for 1 sec and updating the current state of the panels after the timer expires.
+    //  till we reach the target position.
     DataModel::Nullable<GenericCurrentStateStruct> ep2CurrentState;
     VerifyOrReturnValue(ep2.GetLogic().GetCurrentState(ep2CurrentState) == CHIP_NO_ERROR, Status::Failure,
-                       ChipLogError(AppServer, "Failed to get current state for Endpoint 2"));
+                        ChipLogError(AppServer, "Failed to get current state for Endpoint 2"));
     DataModel::Nullable<GenericCurrentStateStruct> ep3CurrentState;
     VerifyOrReturnValue(ep3.GetLogic().GetCurrentState(ep3CurrentState) == CHIP_NO_ERROR, Status::Failure,
-                       ChipLogError(AppServer, "Failed to get current state for Endpoint 3"));
+                        ChipLogError(AppServer, "Failed to get current state for Endpoint 3"));
     DataModel::Nullable<GenericTargetStruct> ep2TargetState;
     VerifyOrReturnValue(ep2.GetLogic().GetTarget(ep2TargetState) == CHIP_NO_ERROR, Status::Failure,
-                       ChipLogError(AppServer, "Failed to get target state for Endpoint 2"));
+                        ChipLogError(AppServer, "Failed to get target state for Endpoint 2"));
     DataModel::Nullable<GenericTargetStruct> ep3TargetState;
     VerifyOrReturnValue(ep3.GetLogic().GetTarget(ep3TargetState) == CHIP_NO_ERROR, Status::Failure,
-                       ChipLogError(AppServer, "Failed to get target state for Endpoint 3"));
+                        ChipLogError(AppServer, "Failed to get target state for Endpoint 3"));
 
     VerifyOrReturnValue(!ep2CurrentState.IsNull(), Status::Failure,
                         ChipLogError(AppServer, "MoveToCommand failed due to Null value Current state on Endpoint 2"));
@@ -371,7 +371,6 @@ void ClosureManager::HandleClosureMotionAction()
     VerifyOrReturn(!ep3TargetState.IsNull(),
                    ChipLogError(AppServer, "MoveToCommand failed due to Null value Target state on Endpoint 3"));
 
-
     DataModel::Nullable<GenericCurrentStateStruct> nextCurrentState = DataModel::NullNullable;
 
     bool isEndPoint2TargetReached = false;
@@ -382,8 +381,8 @@ void ClosureManager::HandleClosureMotionAction()
     {
         instance.ep2.GetLogic().SetCurrentState(nextCurrentState);
         isEndPoint2TargetReached = (nextCurrentState.Value().position.Value() == ep2TargetState.Value().position.Value());
-        ChipLogProgress(AppServer, "EndPoint 2 Current Position: %d, Target Position: %d", nextCurrentState.Value().position.Value(),
-                        ep2TargetState.Value().position.Value());
+        ChipLogProgress(AppServer, "EndPoint 2 Current Position: %d, Target Position: %d",
+                        nextCurrentState.Value().position.Value(), ep2TargetState.Value().position.Value());
     }
 
     // Get the Next Current State to be set for the endpoint 3, if target postion is not reached.
@@ -392,8 +391,8 @@ void ClosureManager::HandleClosureMotionAction()
         // Update the current state for Endpoint 3
         instance.ep3.GetLogic().SetCurrentState(nextCurrentState);
         isEndPoint3TargetReached = (nextCurrentState.Value().position.Value() == ep3TargetState.Value().position.Value());
-        ChipLogProgress(AppServer, "EndPoint 3 Current Position: %d, Target Position: %d", nextCurrentState.Value().position.Value(),
-                        ep3TargetState.Value().position.Value());
+        ChipLogProgress(AppServer, "EndPoint 3 Current Position: %d, Target Position: %d",
+                        nextCurrentState.Value().position.Value(), ep3TargetState.Value().position.Value());
     }
 
     // Check if both endpoints have reached their target positions
@@ -513,10 +512,9 @@ bool ClosureManager::UpdatePanelCurrentStateToNextPosition(const GenericCurrentS
         return false; // No update needed
     }
 
-    nextCurrentState.SetNonNull().Set(
-        MakeOptional(nextCurrentPosition),
-        currentState.latch.HasValue() ? MakeOptional(currentState.latch.Value()) : NullOptional,
-        currentState.speed.HasValue() ? MakeOptional(currentState.speed.Value()) : NullOptional);
+    nextCurrentState.SetNonNull().Set(MakeOptional(nextCurrentPosition),
+                                      currentState.latch.HasValue() ? MakeOptional(currentState.latch.Value()) : NullOptional,
+                                      currentState.speed.HasValue() ? MakeOptional(currentState.speed.Value()) : NullOptional);
     return true;
 }
 
@@ -526,10 +524,10 @@ bool ClosureManager::IsClosureLatchActionNeeded()
 
     DataModel::Nullable<GenericOverallState> ep1OverallState;
     VerifyOrReturnValue(epState.ep1.GetLogic().GetOverallState(ep1OverallState) == CHIP_NO_ERROR, false,
-                       ChipLogError(AppServer, "Failed to get overall state for Endpoint 1 in IsClosureLatchActionNeeded"));
+                        ChipLogError(AppServer, "Failed to get overall state for Endpoint 1 in IsClosureLatchActionNeeded"));
     DataModel::Nullable<GenericOverallTarget> ep1OverallTarget;
     VerifyOrReturnValue(epState.ep1.GetLogic().GetOverallTarget(ep1OverallTarget) == CHIP_NO_ERROR, false,
-                       ChipLogError(AppServer, "Failed to get overall target for Endpoint 1 in IsClosureLatchActionNeeded"));
+                        ChipLogError(AppServer, "Failed to get overall target for Endpoint 1 in IsClosureLatchActionNeeded"));
 
     // Latch action not needed if OverallTarget is null or latch is not set
     if (ep1OverallTarget.IsNull() || !ep1OverallTarget.Value().latch.HasValue())
@@ -539,8 +537,7 @@ bool ClosureManager::IsClosureLatchActionNeeded()
     }
 
     // latch action needed if OverallState is null or latch is not set and OverallTarget has latch set
-    if (ep1OverallState.IsNull() || !ep1OverallState.Value().latch.HasValue() ||
-        ep1OverallState.Value().latch.Value().IsNull())
+    if (ep1OverallState.IsNull() || !ep1OverallState.Value().latch.HasValue() || ep1OverallState.Value().latch.Value().IsNull())
     {
         ChipLogError(AppServer,
                      "Latch action needed as OverallState is null or latch is not set, while OverallTarget has latch set");
