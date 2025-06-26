@@ -21,9 +21,10 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libTestPushAVStreamTransport"
 
-  test_sources = [ "TestPushAVStreamTransportCluster.cpp",
-                   "TestPushAVStreamTransportStorage.cpp",
-                   ]
+  test_sources = [
+    "TestPushAVStreamTransportCluster.cpp",
+    "TestPushAVStreamTransportStorage.cpp",
+  ]
 
   sources = []
 
