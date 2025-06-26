@@ -82,15 +82,20 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
             //  feature is supported by the closure. If the Positioning feature is not supported, return an error.
             VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
+            bool targetPositionReached = false;
+
             if( !incomingCurrentState.Value().position.Value().IsNull() )
             {
                 VerifyOrReturnError(incomingCurrentState.Value().position.Value().Value() <= kPercents100thsMaxValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
+
+                targetPositionReached = (!mState.targetState.IsNull() && mState.targetState.Value().position == incomingCurrentState.Value().position);
             }
 
-            auto now       = System::SystemClock().GetMonotonicTimestamp();
-            
-            if (TargetReached)
+            auto now  = System::SystemClock().GetMonotonicTimestamp();
+
+
+            if (targetPositionReached)
             {
                 // if target position is reached, we need to report the current state.
                 auto predicate = [](const decltype(quietReportableCurrentStatePosition)::SufficientChangePredicateCandidate &) -> bool {
