@@ -320,3 +320,5 @@ class CommissionDeviceTest(base_test.BaseTestClass):
     @default_controller.setter
     def default_controller(self, tmp_default_controller):
         self._default_controller = tmp_default_controller
+
+# TODO: Move SetupParameters into commissioning.py
