@@ -559,7 +559,7 @@ void DoorLockServer::getUserCommandHandler(chip::app::CommandHandler * commandOb
                         "Found user in storage: "
                         "[userIndex=%d,userName=\"%s\",userStatus=%u,userType=%u"
                         ",credentialRule=%u,createdBy=%u,modifiedBy=%u]",
-                        userIndex, StringOf(user.userName).c_str(), to_underlying(user.userStatus), to_underlying(user.userType),
+                        userIndex, StringBuilder(user.userName).c_str(), to_underlying(user.userStatus), to_underlying(user.userType),
                         to_underlying(user.credentialRule), user.createdBy, user.lastModifiedBy);
 
         response.userName.SetNonNull(user.userName);
@@ -1998,7 +1998,7 @@ ClusterStatusCode DoorLockServer::createUser(chip::EndpointId endpointId, chip::
                         "[createUser] Unable to create user: app error "
                         "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%u,"
                         "userType=%u,credentialRule=%u,totalCredentials=%u]",
-                        endpointId, creatorFabricIdx, userIndex, StringOf(newUserName).c_str(), newUserUniqueId,
+                        endpointId, creatorFabricIdx, userIndex, StringBuilder(newUserName).c_str(), newUserUniqueId,
                         to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule),
                         static_cast<unsigned int>(newTotalCredentials));
         return ClusterStatusCode(Status::Failure);
@@ -2008,7 +2008,7 @@ ClusterStatusCode DoorLockServer::createUser(chip::EndpointId endpointId, chip::
                     "[createUser] User created "
                     "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%u,"
                     "userType=%u,credentialRule=%u,totalCredentials=%u]",
-                    endpointId, creatorFabricIdx, userIndex, StringOf(newUserName).c_str(), newUserUniqueId,
+                    endpointId, creatorFabricIdx, userIndex, StringBuilder(newUserName).c_str(), newUserUniqueId,
                     to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule),
                     static_cast<unsigned int>(newTotalCredentials));
     sendRemoteLockUserChange(endpointId, LockDataTypeEnum::kUserIndex, DataOperationTypeEnum::kAdd, sourceNodeId, creatorFabricIdx,
@@ -2071,7 +2071,7 @@ Status DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::FabricIndex
                      "[modifyUser] Unable to modify the user: app error "
                      "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32 ",userStatus=%u"
                      ",userType=%u,credentialRule=%u]",
-                     endpointId, modifierFabricIndex, userIndex, StringOf(newUserName).c_str(), newUserUniqueId,
+                     endpointId, modifierFabricIndex, userIndex, StringBuilder(newUserName).c_str(), newUserUniqueId,
                      to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule));
         return Status::Failure;
     }
@@ -2080,7 +2080,7 @@ Status DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::FabricIndex
                     "[modifyUser] User modified "
                     "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%" PRIx32
                     ",userStatus=%u,userType=%u,credentialRule=%u]",
-                    endpointId, modifierFabricIndex, userIndex, StringOf(newUserName).c_str(), newUserUniqueId,
+                    endpointId, modifierFabricIndex, userIndex, StringBuilder(newUserName).c_str(), newUserUniqueId,
                     to_underlying(newUserStatus), to_underlying(newUserType), to_underlying(newCredentialRule));
     sendRemoteLockUserChange(endpointId, LockDataTypeEnum::kUserIndex, DataOperationTypeEnum::kModify, sourceNodeId,
                              modifierFabricIndex, userIndex, userIndex);

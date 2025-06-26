@@ -99,69 +99,54 @@ private:
     }
 };
 
-/// a preallocated sized string builder
-template <size_t kSize>
+/// A preallocated sized string builder
+/// Default buffer size is 256
+template <size_t kSize = 256>
 class StringBuilder : public StringBuilderBase
 {
 public:
     StringBuilder() : StringBuilderBase(mBuffer, kSize) {}
 
+    /// Constructor for char * and length
+    StringBuilder(const char * data, size_t length) : StringBuilder()
+    {
+        AddFormat("%.*s", static_cast<int>(length), data);
+    }
+
+    /// Constructor for uint8_t * and length
+    /// Only printable elements will be added
+    StringBuilder(const uint8_t * data, size_t length) : StringBuilder()
+    {
+        for (size_t i = 0; i < length; ++i)
+        {
+            if (std::isprint(data[i]))
+            {
+                Add(data[i]);
+            }
+        }
+    }
+
+    /// Constructor for CharSpan
+    StringBuilder(const CharSpan & span) : StringBuilder()
+    {
+        AddFormat("%.*s", static_cast<int>(span.size()), span.data());
+    }
+
+    /// Constructor for ByteSpan
+    /// Only printable elements will be added
+    StringBuilder(const ByteSpan & span) : StringBuilder()
+    {
+        for (size_t i = 0; i < span.size(); ++i)
+        {
+            if (std::isprint(span[i]))
+            {
+                Add(span[i]);
+            }
+        }
+    }
+
 private:
     char mBuffer[kSize];
 };
-
-/// Build a c-style string of a char * and length that can be used inplace
-/// Default buffer size is 256
-template <size_t N = 256>
-StringBuilder<N> StringOf(const char * data, size_t length)
-{
-    StringBuilder<N> builder;
-    builder.AddFormat("%.*s", static_cast<int>(length), data);
-    return builder;
-}
-
-/// Build a c-style string of an uint8_t * and length that can be used inplace
-/// Only printable elements will be added
-/// Default buffer size is 256
-template <size_t N = 256>
-StringBuilder<N> StringOf(const uint8_t * data, size_t length)
-{
-    StringBuilder<N> builder;
-    for (size_t i = 0; i < length; ++i)
-    {
-        if (std::isprint(data[i]))
-        {
-            builder.Add(data[i]);
-        }
-    }
-    return builder;
-}
-
-/// Build a c-style string of a CharSpan that can be used inplace
-/// Default buffer size is 256
-template <size_t N = 256>
-StringBuilder<N> StringOf(const CharSpan & span)
-{
-    StringBuilder<N> builder;
-    builder.AddFormat("%.*s", static_cast<int>(span.size()), span.data());
-    return builder;
-}
-
-/// Build a c-style string of a ByteSpan that can be used inplace
-/// Only printable elements will be added
-/// Default buffer size is 256
-template <size_t N = 256>
-StringBuilder<N> StringOf(const ByteSpan & span)
-{
-    StringBuilder<N> builder;
-    for (size_t i = 0; i < span.size(); ++i)
-    {
-        if (std::isprint(span[i]))
-        {
-            builder.Add(span[i]);
-        }
-    }
-    return builder;
-}
 
 } // namespace chip
