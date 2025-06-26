@@ -100,8 +100,8 @@ private:
 };
 
 /// A preallocated sized string builder
-/// Default buffer size is 256
-template <size_t kSize = 256>
+/// Default buffer size is 257
+template <size_t kSize = 257>
 class StringBuilder : public StringBuilderBase
 {
 public:
