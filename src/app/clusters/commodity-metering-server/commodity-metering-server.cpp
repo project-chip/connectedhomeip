@@ -30,26 +30,81 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::Globals;
+using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::app::Clusters::CommodityMetering;
 using namespace chip::app::Clusters::CommodityMetering::Attributes;
 
 using chip::Protocols::InteractionModel::Status;
-namespace {
-bool NullableCharSpanEqual(const DataModel::Nullable<CharSpan> & a, const DataModel::Nullable<CharSpan> & b)
-{
-    if (a.IsNull() || b.IsNull())
-    {
-        return a.IsNull() == b.IsNull();
-    }
-
-    return a.Value().data_equal(b.Value());
-}
-} // namespace
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace CommodityMetering {
+
+namespace {
+
+inline bool operator==(const Span<const uint32_t> & a, const Span<const uint32_t> & b)
+{
+    return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
+}
+
+inline bool operator==(const Structs::MeteredQuantityStruct::Type & lhs,
+                       const Structs::MeteredQuantityStruct::Type & rhs)
+{
+    return (lhs.tariffComponentIDs == rhs.tariffComponentIDs) && (lhs.quantity == rhs.quantity);
+}
+
+template<typename T>
+bool NullableListEqual(const DataModel::Nullable<DataModel::List<T>> & a, const DataModel::Nullable<DataModel::List<T>> & b)
+{
+    if (a.IsNull() || b.IsNull())
+    {
+        return a.IsNull() == b.IsNull();
+    }
+    else if (a.Value().size() == b.Value().size())
+    {
+        for (size_t i = 0; i < a.Value().size(); i++)
+        {
+            if (a.Value()[i] == b.Value()[i])
+            {
+                continue;
+            }
+            return false;
+        }
+        return true;
+    }
+    return false;
+}
+
+template <typename T>
+struct SpanCopier
+{
+    static bool Copy(const chip::Span<const T> & source, 
+                     DataModel::List<const T> & destination,
+                     Platform::ScopedMemoryBuffer<T> * bufferOut,
+                     size_t maxElements = std::numeric_limits<size_t>::max())
+    {
+        if (source.empty())
+        {
+            destination = DataModel::List<const T>();
+            return true;
+        }
+
+        size_t elementsToCopy = std::min(source.size(), maxElements);
+
+
+        if (!bufferOut->Calloc(elementsToCopy))
+        {
+            return false;
+        }
+
+        std::copy(source.begin(), source.begin() + elementsToCopy, bufferOut->Get());
+        destination = DataModel::List<const T>(chip::Span<const T>(bufferOut->Get(), elementsToCopy));
+        return true;
+    }
+};
+} // namespace
 
 Instance::~Instance()
 {
@@ -58,11 +113,8 @@ Instance::~Instance()
 
 CHIP_ERROR Instance::Init()
 {
-    mMeterType.SetNull();
-    mPointOfDelivery.SetNull();
-    mMeterSerialNumber.SetNull();
-    mProtocolVersion.SetNull();
-    mPowerThreshold.SetNull();
+    mMeteredQuantity.SetNull();
+    mMeteredQuantityTimestamp.SetNull();
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
@@ -72,178 +124,136 @@ void Instance::Shutdown()
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
-bool Instance::HasFeature(const Feature & aFeature) const
+CHIP_ERROR CopyMeteredQuantityEntry(Structs::MeteredQuantityStruct::Type & dest,
+                             Platform::ScopedMemoryBuffer<uint32_t> * destTariffComponentIDsBuffer,
+                             const Structs::MeteredQuantityStruct::Type & src)
 {
-    return mFeature.Has(aFeature);
-}
-
-CHIP_ERROR Instance::SetMeterType(const DataModel::Nullable<MeterTypeEnum> & newValue)
-{
-    if (newValue == mMeterType)
+    dest.quantity = src.quantity;
+    
+    if (!SpanCopier<uint32_t>::Copy(src.tariffComponentIDs, dest.tariffComponentIDs, destTariffComponentIDsBuffer, kMaxTariffComponentIDsPerMeteredQuantityEntry))
     {
-        return CHIP_NO_ERROR;
+        return CHIP_ERROR_NO_MEMORY;
     }
-    if (!newValue.IsNull() && MeterTypeEnum::kUnknownEnumValue == EnsureKnownEnumValue(newValue.Value()))
-    {
-        return CHIP_ERROR_INVALID_INTEGER_VALUE;
-    }
-    mMeterType = newValue;
 
-    MatterReportingAttributeChangeCallback(mEndpointId, CommodityMetering::Id, MeterType::Id);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::SetPointOfDelivery(const DataModel::Nullable<CharSpan> & newValue)
+CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> & newValue)
 {
-    if (NullableCharSpanEqual(newValue, mPointOfDelivery))
+    assertChipStackLockedByCurrentThread();
+
+    if (NullableListEqual<Structs::MeteredQuantityStruct::Type>(newValue, mMeteredQuantity))
     {
         return CHIP_NO_ERROR;
+    }
+
+    if (mOwnedMeteredQuantityStructBuffer.Get() != nullptr)
+    {
+        mOwnedMeteredQuantityStructBuffer.Free();
+    }
+
+    for (size_t idx = 0; idx < kMaxMeteredQuantityEntries; idx++)
+    {
+        if (mOwnedMeteredQuantityTariffComponentIDsBuffer[idx]->Get() != nullptr)
+        {
+            mOwnedMeteredQuantityTariffComponentIDsBuffer[idx]->Free();
+        }
     }
 
     const size_t len = newValue.IsNull() ? 0 : newValue.Value().size();
-    if (sizeof(mPointOfDeliveryBuf) < len)
-    {
-        return CHIP_ERROR_INVALID_STRING_LENGTH;
-    }
 
-    if (!newValue.IsNull())
+    if (!newValue.IsNull() && len )
     {
-        memmove(mPointOfDeliveryBuf, newValue.Value().data(), len);
-        mPointOfDelivery = MakeNullable(CharSpan(mPointOfDeliveryBuf, len));
+        if (!mOwnedMeteredQuantityStructBuffer.Calloc(len))
+        {
+            return CHIP_ERROR_NO_MEMORY;
+        }
+
+        for (size_t idx = 0; idx < len; idx++)
+        {
+            // Deep copy each MeteredQuantityStruct in the newValue list
+            ReturnLogErrorOnFailure(CopyMeteredQuantityEntry(
+                mOwnedMeteredQuantityStructBuffer[idx], 
+                mOwnedMeteredQuantityTariffComponentIDsBuffer[idx],
+                newValue.Value()[idx]));
+        }
+
+        mMeteredQuantity = MakeNullable(DataModel::List<Structs::MeteredQuantityStruct::Type>(mOwnedMeteredQuantityStructBuffer.Get(), len));
     }
     else
     {
-        mPointOfDelivery.SetNull();
+        mMeteredQuantity.SetNull();
     }
 
-    MatterReportingAttributeChangeCallback(mEndpointId, CommodityMetering::Id, PointOfDelivery::Id);
+    MatterReportingAttributeChangeCallback(mEndpointId, CommodityMetering::Id, MeteredQuantity::Id);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::SetMeterSerialNumber(const DataModel::Nullable<CharSpan> & newValue)
+CHIP_ERROR Instance::SetMeteredQuantityTimestamp(DataModel::Nullable<uint32_t> newValue)
 {
-    if (NullableCharSpanEqual(newValue, mMeterSerialNumber))
+    DataModel::Nullable<uint32_t> oldValue = mMeteredQuantityTimestamp;
+
+    mMeteredQuantityTimestamp = newValue;
+    if (oldValue != newValue)
     {
-        return CHIP_NO_ERROR;
+        if (newValue.IsNull())
+        {
+            ChipLogDetail(AppServer, "MeteredQuantityTimestamp updated to Null");
+        }
+        else
+        {
+            ChipLogDetail(AppServer, "MeteredQuantityTimestamp updated to %lu",
+                          static_cast<unsigned long int>(mMeteredQuantityTimestamp.Value()));
+        }
+
+        mMeteredQuantityTimestamp = newValue;
+
+        MatterReportingAttributeChangeCallback(mEndpointId, CommodityMetering::Id, MeteredQuantityTimestamp::Id);
     }
 
-    const size_t len = newValue.IsNull() ? 0 : newValue.Value().size();
-    if (sizeof(mPointOfDeliveryBuf) < len)
-    {
-        return CHIP_ERROR_INVALID_STRING_LENGTH;
-    }
-
-    if (!newValue.IsNull())
-    {
-        memmove(mMeterSerialNumberBuf, newValue.Value().data(), len);
-        mMeterSerialNumber = MakeNullable(CharSpan(mMeterSerialNumberBuf, len));
-    }
-    else
-    {
-        mMeterSerialNumber.SetNull();
-    }
-
-    MatterReportingAttributeChangeCallback(mEndpointId, CommodityMetering::Id, MeterSerialNumber::Id);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::SetProtocolVersion(const DataModel::Nullable<CharSpan> & newValue)
+CHIP_ERROR Instance::SetTariffUnit(TariffUnitEnum newValue)
 {
-    if (NullableCharSpanEqual(newValue, mProtocolVersion))
+    TariffUnitEnum oldValue = mTariffUnit;
+
+    if (EnsureKnownEnumValue(newValue) == TariffUnitEnum::kUnknownEnumValue)
     {
-        return CHIP_NO_ERROR;
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
-    const size_t len = newValue.IsNull() ? 0 : newValue.Value().size();
-    if (sizeof(mPointOfDeliveryBuf) < len)
+    mTariffUnit = newValue;
+    if (oldValue != newValue)
     {
-        return CHIP_ERROR_INVALID_STRING_LENGTH;
+        ChipLogDetail(AppServer, "Endpoint: %d - mTariffUnit updated to %d", mEndpointId, to_underlying(mTariffUnit));
+        MatterReportingAttributeChangeCallback(mEndpointId, CommodityMetering::Id, TariffUnit::Id);
     }
 
-    if (!newValue.IsNull())
-    {
-        memmove(mProtocolVersionBuf, newValue.Value().data(), len);
-        mProtocolVersion = MakeNullable(CharSpan(mProtocolVersionBuf, len));
-    }
-    else
-    {
-        mProtocolVersion.SetNull();
-    }
-
-    MatterReportingAttributeChangeCallback(mEndpointId, CommodityMetering::Id, ProtocolVersion::Id);
-    return CHIP_NO_ERROR;
-}
-
-bool operator==(const Globals::Structs::PowerThresholdStruct::Type & a, const Globals::Structs::PowerThresholdStruct::Type & b)
-{
-    return a.powerThreshold == b.powerThreshold && a.apparentPowerThreshold == b.apparentPowerThreshold &&
-        a.powerThresholdSource == b.powerThresholdSource;
-}
-
-CHIP_ERROR Instance::SetPowerThreshold(const DataModel::Nullable<Globals::Structs::PowerThresholdStruct::Type> & newValue)
-{
-    if (newValue.IsNull())
-    {
-        if (mPowerThreshold.IsNull())
-        {
-            return CHIP_NO_ERROR;
-        }
-
-        mPowerThreshold.SetNull();
-    }
-    else
-    {
-        if (!mPowerThreshold.IsNull() && mPowerThreshold.Value() == newValue.Value())
-        {
-            return CHIP_NO_ERROR;
-        }
-
-        if (!newValue.Value().powerThresholdSource.IsNull() &&
-            Globals::PowerThresholdSourceEnum::kUnknownEnumValue ==
-                EnsureKnownEnumValue(newValue.Value().powerThresholdSource.Value()))
-        {
-            return CHIP_ERROR_INVALID_INTEGER_VALUE;
-        }
-
-        mPowerThreshold.SetNonNull(newValue.Value());
-    }
-
-    MatterReportingAttributeChangeCallback(mEndpointId, CommodityMetering::Id, PowerThreshold::Id);
     return CHIP_NO_ERROR;
 }
 
 // AttributeAccessInterface
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    ChipLogProgress(Zcl, "Meter Indication read attr %" PRIu32 " on endpoint %" PRIu32, static_cast<uint32_t>(aPath.mAttributeId),
+    ChipLogProgress(Zcl, "Commodity Metering read attr %" PRIu32 " on endpoint %" PRIu32, static_cast<uint32_t>(aPath.mAttributeId),
                     static_cast<uint32_t>(mEndpointId));
 
     switch (aPath.mAttributeId)
     {
-    case FeatureMap::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(mFeature));
-        break;
-    case MeterType::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(GetMeterType()));
+    case MeteredQuantity::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(GetMeteredQuantity()));
         break;
 
-    case PointOfDelivery::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(GetPointOfDelivery()));
+    case MeteredQuantityTimestamp::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(GetMeteredQuantityTimestamp()));
+        break;
+    
+    case TariffUnit::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(GetTariffUnit()));
         break;
 
-    case MeterSerialNumber::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(GetMeterSerialNumber()));
-        break;
-
-    case ProtocolVersion::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(GetProtocolVersion()));
-        break;
-
-    case PowerThreshold::Id:
-        if (HasFeature(Feature::kPowerThreshold))
-            ReturnErrorOnFailure(aEncoder.Encode(GetPowerThreshold()));
-        else
-            return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    default:
         break;
     }
     return CHIP_NO_ERROR;

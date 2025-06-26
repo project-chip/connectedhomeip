@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <stddef.h>
 
 #include <lib/core/Optional.h>
@@ -32,36 +33,45 @@ namespace app {
 namespace Clusters {
 namespace CommodityMetering {
 
+// Some constraints for lists limitation ( does'nt defined in spec )
+constexpr uint8_t kMaxMeteredQuantityEntries  = 128;
+constexpr uint8_t kMaxTariffComponentIDsPerMeteredQuantityEntry = 128;
+
 class Instance : public AttributeAccessInterface
 {
 public:
-    Instance(const EndpointId & aEndpointId, const BitMask<Feature> & aFeature) :
-        AttributeAccessInterface(MakeOptional(aEndpointId), Id), mEndpointId(aEndpointId), mFeature(aFeature)
+    Instance(const EndpointId & aEndpointId) :
+        AttributeAccessInterface(MakeOptional(aEndpointId), Id), mEndpointId(aEndpointId)
     {}
     ~Instance() override;
 
     CHIP_ERROR Init();
     void Shutdown();
 
-    bool HasFeature(const Feature & aFeature) const;
-
     // Attribute Accessors
     const DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> & GetMeteredQuantity() const { return mMeteredQuantity; }
-    const DataModel::<uint32_t> & GetMeteredQuantityTimestamp() const { return mMeteredQuantityTimestamp; }    
-    const DataModel::Nullable<Globals::TariffUnitEnum> & GetTariffUnit() const { return mTariffUnit; }
+    const DataModel::Nullable<uint32_t> & GetMeteredQuantityTimestamp() const { return mMeteredQuantityTimestamp; }    
+    const Globals::TariffUnitEnum & GetTariffUnit() const { return mTariffUnit; }
 
     // Internal Application API to set attribute values
     CHIP_ERROR SetMeteredQuantity(const DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> & value);
-    CHIP_ERROR SetMeteredQuantityTimestamp(const DataModel::<uint32_t> & value);
-    CHIP_ERROR SetTariffUnit(const DataModel::Nullable<Globals::TariffUnitEnum> & value);
+    CHIP_ERROR SetMeteredQuantityTimestamp(DataModel::Nullable<uint32_t>);
+    CHIP_ERROR SetTariffUnit(Globals::TariffUnitEnum);
 
 private:
     // Attribute storage
-    DataModel::Nullable<Globals::TariffUnitEnum> mTariffUnit;
-    DataModel::Nullable<uint32_t> mMeteredQuantityTimestamp;
     DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> mMeteredQuantity;
+    DataModel::Nullable<uint32_t> mMeteredQuantityTimestamp;
+    Globals::TariffUnitEnum mTariffUnit;
+
+    CHIP_ERROR CopyMeteredQuantityEntry(Structs::MeteredQuantityStruct::Type & dest,
+                             Platform::ScopedMemoryBuffer<uint32_t> * destTariffComponentIDsBuffer,
+                             const Structs::MeteredQuantityStruct::Type & src);
+
+    Platform::ScopedMemoryBuffer<uint32_t> mOwnedMeteredQuantityTariffComponentIDsBuffer[kMaxMeteredQuantityEntries][kMaxTariffComponentIDsPerMeteredQuantityEntry];
+    Platform::ScopedMemoryBuffer<Structs::MeteredQuantityStruct::Type> mOwnedMeteredQuantityStructBuffer;
+
     EndpointId mEndpointId = 0;
-    BitMask<Feature> mFeature;
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
