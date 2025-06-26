@@ -40536,6 +40536,128 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_0_zoneSourceClassName.c_str(),
                                                                            newElement_0_zoneSourceCtorSignature.c_str(),
                                                                            jninewElement_0_zoneSource, newElement_0_zoneSource);
+                jobject newElement_0_twoDCartesianZone;
+                if (!entry_0.twoDCartesianZone.HasValue())
+                {
+                    chip::JniReferences::GetInstance().CreateOptional(nullptr, newElement_0_twoDCartesianZone);
+                }
+                else
+                {
+                    jobject newElement_0_twoDCartesianZoneInsideOptional;
+                    jobject newElement_0_twoDCartesianZoneInsideOptional_name;
+                    LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                        entry_0.twoDCartesianZone.Value().name, newElement_0_twoDCartesianZoneInsideOptional_name));
+                    jobject newElement_0_twoDCartesianZoneInsideOptional_use;
+                    std::string newElement_0_twoDCartesianZoneInsideOptional_useClassName     = "java/lang/Integer";
+                    std::string newElement_0_twoDCartesianZoneInsideOptional_useCtorSignature = "(I)V";
+                    jint jninewElement_0_twoDCartesianZoneInsideOptional_use =
+                        static_cast<jint>(entry_0.twoDCartesianZone.Value().use);
+                    chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
+                        newElement_0_twoDCartesianZoneInsideOptional_useClassName.c_str(),
+                        newElement_0_twoDCartesianZoneInsideOptional_useCtorSignature.c_str(),
+                        jninewElement_0_twoDCartesianZoneInsideOptional_use, newElement_0_twoDCartesianZoneInsideOptional_use);
+                    jobject newElement_0_twoDCartesianZoneInsideOptional_vertices;
+                    chip::JniReferences::GetInstance().CreateArrayList(newElement_0_twoDCartesianZoneInsideOptional_vertices);
+
+                    auto iter_newElement_0_twoDCartesianZoneInsideOptional_vertices_4 =
+                        entry_0.twoDCartesianZone.Value().vertices.begin();
+                    while (iter_newElement_0_twoDCartesianZoneInsideOptional_vertices_4.Next())
+                    {
+                        auto & entry_4 = iter_newElement_0_twoDCartesianZoneInsideOptional_vertices_4.GetValue();
+                        jobject newElement_4;
+                        jobject newElement_4_x;
+                        std::string newElement_4_xClassName     = "java/lang/Integer";
+                        std::string newElement_4_xCtorSignature = "(I)V";
+                        jint jninewElement_4_x                  = static_cast<jint>(entry_4.x);
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_4_xClassName.c_str(),
+                                                                                   newElement_4_xCtorSignature.c_str(),
+                                                                                   jninewElement_4_x, newElement_4_x);
+                        jobject newElement_4_y;
+                        std::string newElement_4_yClassName     = "java/lang/Integer";
+                        std::string newElement_4_yCtorSignature = "(I)V";
+                        jint jninewElement_4_y                  = static_cast<jint>(entry_4.y);
+                        chip::JniReferences::GetInstance().CreateBoxedObject<jint>(newElement_4_yClassName.c_str(),
+                                                                                   newElement_4_yCtorSignature.c_str(),
+                                                                                   jninewElement_4_y, newElement_4_y);
+
+                        {
+                            jclass twoDCartesianVertexStructStructClass_5;
+                            err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                                env, "chip/devicecontroller/ChipStructs$ZoneManagementClusterTwoDCartesianVertexStruct",
+                                twoDCartesianVertexStructStructClass_5);
+                            if (err != CHIP_NO_ERROR)
+                            {
+                                ChipLogError(Zcl,
+                                             "Could not find class ChipStructs$ZoneManagementClusterTwoDCartesianVertexStruct");
+                                return nullptr;
+                            }
+
+                            jmethodID twoDCartesianVertexStructStructCtor_5;
+                            err = chip::JniReferences::GetInstance().FindMethod(
+                                env, twoDCartesianVertexStructStructClass_5, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                                &twoDCartesianVertexStructStructCtor_5);
+                            if (err != CHIP_NO_ERROR || twoDCartesianVertexStructStructCtor_5 == nullptr)
+                            {
+                                ChipLogError(
+                                    Zcl, "Could not find ChipStructs$ZoneManagementClusterTwoDCartesianVertexStruct constructor");
+                                return nullptr;
+                            }
+
+                            newElement_4 = env->NewObject(twoDCartesianVertexStructStructClass_5,
+                                                          twoDCartesianVertexStructStructCtor_5, newElement_4_x, newElement_4_y);
+                        }
+                        chip::JniReferences::GetInstance().AddToList(newElement_0_twoDCartesianZoneInsideOptional_vertices,
+                                                                     newElement_4);
+                    }
+                    jobject newElement_0_twoDCartesianZoneInsideOptional_color;
+                    if (!entry_0.twoDCartesianZone.Value().color.HasValue())
+                    {
+                        chip::JniReferences::GetInstance().CreateOptional(nullptr,
+                                                                          newElement_0_twoDCartesianZoneInsideOptional_color);
+                    }
+                    else
+                    {
+                        jobject newElement_0_twoDCartesianZoneInsideOptional_colorInsideOptional;
+                        LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(
+                            entry_0.twoDCartesianZone.Value().color.Value(),
+                            newElement_0_twoDCartesianZoneInsideOptional_colorInsideOptional));
+                        chip::JniReferences::GetInstance().CreateOptional(
+                            newElement_0_twoDCartesianZoneInsideOptional_colorInsideOptional,
+                            newElement_0_twoDCartesianZoneInsideOptional_color);
+                    }
+
+                    {
+                        jclass twoDCartesianZoneStructStructClass_3;
+                        err = chip::JniReferences::GetInstance().GetLocalClassRef(
+                            env, "chip/devicecontroller/ChipStructs$ZoneManagementClusterTwoDCartesianZoneStruct",
+                            twoDCartesianZoneStructStructClass_3);
+                        if (err != CHIP_NO_ERROR)
+                        {
+                            ChipLogError(Zcl, "Could not find class ChipStructs$ZoneManagementClusterTwoDCartesianZoneStruct");
+                            return nullptr;
+                        }
+
+                        jmethodID twoDCartesianZoneStructStructCtor_3;
+                        err = chip::JniReferences::GetInstance().FindMethod(
+                            env, twoDCartesianZoneStructStructClass_3, "<init>",
+                            "(Ljava/lang/String;Ljava/lang/Integer;Ljava/util/ArrayList;Ljava/util/Optional;)V",
+                            &twoDCartesianZoneStructStructCtor_3);
+                        if (err != CHIP_NO_ERROR || twoDCartesianZoneStructStructCtor_3 == nullptr)
+                        {
+                            ChipLogError(Zcl,
+                                         "Could not find ChipStructs$ZoneManagementClusterTwoDCartesianZoneStruct constructor");
+                            return nullptr;
+                        }
+
+                        newElement_0_twoDCartesianZoneInsideOptional = env->NewObject(
+                            twoDCartesianZoneStructStructClass_3, twoDCartesianZoneStructStructCtor_3,
+                            newElement_0_twoDCartesianZoneInsideOptional_name, newElement_0_twoDCartesianZoneInsideOptional_use,
+                            newElement_0_twoDCartesianZoneInsideOptional_vertices,
+                            newElement_0_twoDCartesianZoneInsideOptional_color);
+                    }
+                    chip::JniReferences::GetInstance().CreateOptional(newElement_0_twoDCartesianZoneInsideOptional,
+                                                                      newElement_0_twoDCartesianZone);
+                }
 
                 {
                     jclass zoneInformationStructStructClass_1;
@@ -40551,15 +40673,17 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     jmethodID zoneInformationStructStructCtor_1;
                     err = chip::JniReferences::GetInstance().FindMethod(
                         env, zoneInformationStructStructClass_1, "<init>",
-                        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V", &zoneInformationStructStructCtor_1);
+                        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;)V",
+                        &zoneInformationStructStructCtor_1);
                     if (err != CHIP_NO_ERROR || zoneInformationStructStructCtor_1 == nullptr)
                     {
                         ChipLogError(Zcl, "Could not find ChipStructs$ZoneManagementClusterZoneInformationStruct constructor");
                         return nullptr;
                     }
 
-                    newElement_0 = env->NewObject(zoneInformationStructStructClass_1, zoneInformationStructStructCtor_1,
-                                                  newElement_0_zoneID, newElement_0_zoneType, newElement_0_zoneSource);
+                    newElement_0 =
+                        env->NewObject(zoneInformationStructStructClass_1, zoneInformationStructStructCtor_1, newElement_0_zoneID,
+                                       newElement_0_zoneType, newElement_0_zoneSource, newElement_0_twoDCartesianZone);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }
@@ -41709,20 +41833,20 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 chip::JniReferences::GetInstance().CreateBoxedObject<jlong>(newElement_0_maxBitRateClassName.c_str(),
                                                                             newElement_0_maxBitRateCtorSignature.c_str(),
                                                                             jninewElement_0_maxBitRate, newElement_0_maxBitRate);
-                jobject newElement_0_minFragmentLen;
-                std::string newElement_0_minFragmentLenClassName     = "java/lang/Integer";
-                std::string newElement_0_minFragmentLenCtorSignature = "(I)V";
-                jint jninewElement_0_minFragmentLen                  = static_cast<jint>(entry_0.minFragmentLen);
+                jobject newElement_0_minKeyFrameInterval;
+                std::string newElement_0_minKeyFrameIntervalClassName     = "java/lang/Integer";
+                std::string newElement_0_minKeyFrameIntervalCtorSignature = "(I)V";
+                jint jninewElement_0_minKeyFrameInterval                  = static_cast<jint>(entry_0.minKeyFrameInterval);
                 chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                    newElement_0_minFragmentLenClassName.c_str(), newElement_0_minFragmentLenCtorSignature.c_str(),
-                    jninewElement_0_minFragmentLen, newElement_0_minFragmentLen);
-                jobject newElement_0_maxFragmentLen;
-                std::string newElement_0_maxFragmentLenClassName     = "java/lang/Integer";
-                std::string newElement_0_maxFragmentLenCtorSignature = "(I)V";
-                jint jninewElement_0_maxFragmentLen                  = static_cast<jint>(entry_0.maxFragmentLen);
+                    newElement_0_minKeyFrameIntervalClassName.c_str(), newElement_0_minKeyFrameIntervalCtorSignature.c_str(),
+                    jninewElement_0_minKeyFrameInterval, newElement_0_minKeyFrameInterval);
+                jobject newElement_0_maxKeyFrameInterval;
+                std::string newElement_0_maxKeyFrameIntervalClassName     = "java/lang/Integer";
+                std::string newElement_0_maxKeyFrameIntervalCtorSignature = "(I)V";
+                jint jninewElement_0_maxKeyFrameInterval                  = static_cast<jint>(entry_0.maxKeyFrameInterval);
                 chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                    newElement_0_maxFragmentLenClassName.c_str(), newElement_0_maxFragmentLenCtorSignature.c_str(),
-                    jninewElement_0_maxFragmentLen, newElement_0_maxFragmentLen);
+                    newElement_0_maxKeyFrameIntervalClassName.c_str(), newElement_0_maxKeyFrameIntervalCtorSignature.c_str(),
+                    jninewElement_0_maxKeyFrameInterval, newElement_0_maxKeyFrameInterval);
                 jobject newElement_0_watermarkEnabled;
                 if (!entry_0.watermarkEnabled.HasValue())
                 {
@@ -41798,7 +41922,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                         videoStreamStructStructClass_1, videoStreamStructStructCtor_1, newElement_0_videoStreamID,
                         newElement_0_streamUsage, newElement_0_videoCodec, newElement_0_minFrameRate, newElement_0_maxFrameRate,
                         newElement_0_minResolution, newElement_0_maxResolution, newElement_0_minBitRate, newElement_0_maxBitRate,
-                        newElement_0_minFragmentLen, newElement_0_maxFragmentLen, newElement_0_watermarkEnabled,
+                        newElement_0_minKeyFrameInterval, newElement_0_maxKeyFrameInterval, newElement_0_watermarkEnabled,
                         newElement_0_OSDEnabled, newElement_0_referenceCount);
                 }
                 chip::JniReferences::GetInstance().AddToList(value, newElement_0);
@@ -42134,8 +42258,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::RankedVideoStreamPrioritiesList::Id: {
-            using TypeInfo = Attributes::RankedVideoStreamPrioritiesList::TypeInfo;
+        case Attributes::StreamUsagePriorities::Id: {
+            using TypeInfo = Attributes::StreamUsagePriorities::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

@@ -17333,6 +17333,46 @@ static id _Nullable DecodeAttributeValueForZoneManagementCluster(AttributeId aAt
                 newElement_0.zoneID = [NSNumber numberWithUnsignedShort:entry_0.zoneID];
                 newElement_0.zoneType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.zoneType)];
                 newElement_0.zoneSource = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.zoneSource)];
+                if (entry_0.twoDCartesianZone.HasValue()) {
+                    newElement_0.twoDCartesianZone = [MTRZoneManagementClusterTwoDCartesianZoneStruct new];
+                    newElement_0.twoDCartesianZone.name = AsString(entry_0.twoDCartesianZone.Value().name);
+                    if (newElement_0.twoDCartesianZone.name == nil) {
+                        CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                        *aError = err;
+                        return nil;
+                    }
+                    newElement_0.twoDCartesianZone.use = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.twoDCartesianZone.Value().use)];
+                    { // Scope for our temporary variables
+                        auto * array_4 = [NSMutableArray new];
+                        auto iter_4 = entry_0.twoDCartesianZone.Value().vertices.begin();
+                        while (iter_4.Next()) {
+                            auto & entry_4 = iter_4.GetValue();
+                            MTRZoneManagementClusterTwoDCartesianVertexStruct * newElement_4;
+                            newElement_4 = [MTRZoneManagementClusterTwoDCartesianVertexStruct new];
+                            newElement_4.x = [NSNumber numberWithUnsignedShort:entry_4.x];
+                            newElement_4.y = [NSNumber numberWithUnsignedShort:entry_4.y];
+                            [array_4 addObject:newElement_4];
+                        }
+                        CHIP_ERROR err = iter_4.GetStatus();
+                        if (err != CHIP_NO_ERROR) {
+                            *aError = err;
+                            return nil;
+                        }
+                        newElement_0.twoDCartesianZone.vertices = array_4;
+                    }
+                    if (entry_0.twoDCartesianZone.Value().color.HasValue()) {
+                        newElement_0.twoDCartesianZone.color = AsString(entry_0.twoDCartesianZone.Value().color.Value());
+                        if (newElement_0.twoDCartesianZone.color == nil) {
+                            CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
+                            *aError = err;
+                            return nil;
+                        }
+                    } else {
+                        newElement_0.twoDCartesianZone.color = nil;
+                    }
+                } else {
+                    newElement_0.twoDCartesianZone = nil;
+                }
                 [array_0 addObject:newElement_0];
             }
             CHIP_ERROR err = iter_0.GetStatus();
@@ -17790,8 +17830,8 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
                 newElement_0.maxResolution.height = [NSNumber numberWithUnsignedShort:entry_0.maxResolution.height];
                 newElement_0.minBitRate = [NSNumber numberWithUnsignedInt:entry_0.minBitRate];
                 newElement_0.maxBitRate = [NSNumber numberWithUnsignedInt:entry_0.maxBitRate];
-                newElement_0.minFragmentLen = [NSNumber numberWithUnsignedShort:entry_0.minFragmentLen];
-                newElement_0.maxFragmentLen = [NSNumber numberWithUnsignedShort:entry_0.maxFragmentLen];
+                newElement_0.minKeyFrameInterval = [NSNumber numberWithUnsignedShort:entry_0.minKeyFrameInterval];
+                newElement_0.maxKeyFrameInterval = [NSNumber numberWithUnsignedShort:entry_0.maxKeyFrameInterval];
                 if (entry_0.watermarkEnabled.HasValue()) {
                     newElement_0.watermarkEnabled = [NSNumber numberWithBool:entry_0.watermarkEnabled.Value()];
                 } else {
@@ -17897,8 +17937,8 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
         }
         return value;
     }
-    case Attributes::RankedVideoStreamPrioritiesList::Id: {
-        using TypeInfo = Attributes::RankedVideoStreamPrioritiesList::TypeInfo;
+    case Attributes::StreamUsagePriorities::Id: {
+        using TypeInfo = Attributes::StreamUsagePriorities::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -17985,8 +18025,8 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        MTRCameraAVStreamManagementClusterViewportStruct * _Nonnull value;
-        value = [MTRCameraAVStreamManagementClusterViewportStruct new];
+        MTRDataTypeViewportStruct * _Nonnull value;
+        value = [MTRDataTypeViewportStruct new];
         value.x1 = [NSNumber numberWithUnsignedShort:cppValue.x1];
         value.y1 = [NSNumber numberWithUnsignedShort:cppValue.y1];
         value.x2 = [NSNumber numberWithUnsignedShort:cppValue.x2];
@@ -18284,7 +18324,7 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
                 MTRCameraAVSettingsUserLevelManagementClusterDPTZStruct * newElement_0;
                 newElement_0 = [MTRCameraAVSettingsUserLevelManagementClusterDPTZStruct new];
                 newElement_0.videoStreamID = [NSNumber numberWithUnsignedShort:entry_0.videoStreamID];
-                newElement_0.viewport = [MTRCameraAVSettingsUserLevelManagementClusterViewportStruct new];
+                newElement_0.viewport = [MTRDataTypeViewportStruct new];
                 newElement_0.viewport.x1 = [NSNumber numberWithUnsignedShort:entry_0.viewport.x1];
                 newElement_0.viewport.y1 = [NSNumber numberWithUnsignedShort:entry_0.viewport.y1];
                 newElement_0.viewport.x2 = [NSNumber numberWithUnsignedShort:entry_0.viewport.x2];

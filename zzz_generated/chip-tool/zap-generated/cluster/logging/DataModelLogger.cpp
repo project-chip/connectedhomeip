@@ -395,6 +395,47 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 }
 
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const chip::app::Clusters::Globals::Structs::ViewportStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("X1", indent + 1, value.x1);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'X1'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Y1", indent + 1, value.y1);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Y1'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("X2", indent + 1, value.x2);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'X2'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Y2", indent + 1, value.y2);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Y2'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -640,47 +681,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'AccuracyRanges'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::detail::Structs::ViewportStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("X1", indent + 1, value.x1);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'X1'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Y1", indent + 1, value.y1);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Y1'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("X2", indent + 1, value.x2);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'X2'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Y2", indent + 1, value.y2);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Y2'");
             return err;
         }
     }
@@ -5567,6 +5567,14 @@ DataModelLogger::LogValue(const char * label, size_t indent,
             return err;
         }
     }
+    {
+        CHIP_ERROR err = LogValue("TwoDCartesianZone", indent + 1, value.twoDCartesianZone);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TwoDCartesianZone'");
+            return err;
+        }
+    }
     DataModelLogger::LogString(indent, "}");
 
     return CHIP_NO_ERROR;
@@ -5734,18 +5742,18 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("MinFragmentLen", indent + 1, value.minFragmentLen);
+        CHIP_ERROR err = LogValue("MinKeyFrameInterval", indent + 1, value.minKeyFrameInterval);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MinFragmentLen'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MinKeyFrameInterval'");
             return err;
         }
     }
     {
-        CHIP_ERROR err = LogValue("MaxFragmentLen", indent + 1, value.maxFragmentLen);
+        CHIP_ERROR err = LogValue("MaxKeyFrameInterval", indent + 1, value.maxKeyFrameInterval);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxFragmentLen'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MaxKeyFrameInterval'");
             return err;
         }
     }
@@ -11601,14 +11609,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 {
     DataModelLogger::LogString(label, indent, "{");
     ReturnErrorOnFailure(DataModelLogger::LogValue("zoneID", indent + 1, value.zoneID));
-    DataModelLogger::LogString(indent, "}");
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const ZoneManagement::Commands::GetTwoDCartesianZoneResponse::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("zones", indent + 1, value.zones));
     DataModelLogger::LogString(indent, "}");
     return CHIP_NO_ERROR;
 }
@@ -20761,10 +20761,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("AllocatedSnapshotStreams", 1, value);
         }
-        case CameraAvStreamManagement::Attributes::RankedVideoStreamPrioritiesList::Id: {
+        case CameraAvStreamManagement::Attributes::StreamUsagePriorities::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::Globals::StreamUsageEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("RankedVideoStreamPrioritiesList", 1, value);
+            return DataModelLogger::LogValue("StreamUsagePriorities", 1, value);
         }
         case CameraAvStreamManagement::Attributes::SoftRecordingPrivacyModeEnabled::Id: {
             bool value;
@@ -20792,7 +20792,7 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             return DataModelLogger::LogValue("NightVisionIllum", 1, value);
         }
         case CameraAvStreamManagement::Attributes::Viewport::Id: {
-            chip::app::Clusters::CameraAvStreamManagement::Structs::ViewportStruct::DecodableType value;
+            chip::app::Clusters::Globals::Structs::ViewportStruct::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("Viewport", 1, value);
         }
@@ -22906,11 +22906,6 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             ZoneManagement::Commands::CreateTwoDCartesianZoneResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CreateTwoDCartesianZoneResponse", 1, value);
-        }
-        case ZoneManagement::Commands::GetTwoDCartesianZoneResponse::Id: {
-            ZoneManagement::Commands::GetTwoDCartesianZoneResponse::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GetTwoDCartesianZoneResponse", 1, value);
         }
         }
         break;

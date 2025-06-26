@@ -28,7 +28,10 @@
 
 #include <unordered_map>
 
-namespace Camera {
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace WebRTCTransportProvider {
 
 using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
 using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
@@ -36,7 +39,7 @@ using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandi
 using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
 using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
 
-class WebRTCProviderManager : public chip::app::Clusters::WebRTCTransportProvider::Delegate
+class WebRTCProviderManager : public Delegate
 {
 public:
     WebRTCProviderManager() :
@@ -70,6 +73,16 @@ public:
                                    const chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & audioStreamId) override;
 
     void SetCameraDevice(CameraDeviceInterface * aCameraDevice);
+
+    CHIP_ERROR ValidateVideoStreamID(uint16_t videoStreamId) override;
+
+    CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) override;
+
+    CHIP_ERROR IsPrivacyModeActive(bool & isActive) override;
+
+    bool HasAllocatedVideoStreams() override;
+
+    bool HasAllocatedAudioStreams() override;
 
 private:
     enum class CommandType : uint8_t
@@ -147,4 +160,7 @@ private:
     CameraDeviceInterface * mCameraDevice = nullptr;
 };
 
-} // namespace Camera
+} // namespace WebRTCTransportProvider
+} // namespace Clusters
+} // namespace app
+} // namespace chip

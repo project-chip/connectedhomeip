@@ -30,12 +30,16 @@
 
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/util/attribute-storage.h>
 #include <data-model-providers/codegen/Instance.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#ifdef CONFIG_NET_L2_OPENTHREAD
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#endif
 #ifdef CONFIG_CHIP_CRYPTO_PSA
 #include <crypto/PSAOperationalKeystore.h>
 #endif
@@ -60,8 +64,10 @@ k_timer sFunctionTimer;
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
+#ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
 Identify sIdentify = { kIdentifyEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler,
                        Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator };
+#endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
 
 LEDWidget sStatusLED;
 LEDWidget sIdentifyLED;
@@ -76,6 +82,10 @@ chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
 
 #ifdef CONFIG_CHIP_ICD_DSLS_SUPPORT
 bool sIsSitModeRequested = false;
+#endif
+
+#ifdef CONFIG_NET_L2_OPENTHREAD
+Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(0 /*endpointId*/);
 #endif
 } // namespace
 
@@ -155,6 +165,8 @@ CHIP_ERROR AppTask::Init()
         ChipLogError(AppServer, "ConnectivityMgr().SetThreadDeviceType() failed");
         return err;
     }
+
+    sThreadNetworkDriver.Init();
 #else
     return CHIP_ERROR_INTERNAL;
 #endif // CONFIG_NET_L2_OPENTHREAD
@@ -233,6 +245,7 @@ CHIP_ERROR AppTask::StartApp()
     return CHIP_NO_ERROR;
 }
 
+#ifdef MATTER_DM_PLUGIN_IDENTIFY_SERVER
 void AppTask::IdentifyStartHandler(Identify *)
 {
     AppEvent event;
@@ -248,6 +261,7 @@ void AppTask::IdentifyStopHandler(Identify *)
     event.Handler = [](const AppEvent &) { sIdentifyLED.Set(false); };
     PostEvent(event);
 }
+#endif // MATTER_DM_PLUGIN_IDENTIFY_SERVER
 
 void AppTask::ButtonEventHandler(uint32_t buttonState, uint32_t hasChanged)
 {
