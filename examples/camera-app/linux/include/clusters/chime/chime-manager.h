@@ -30,10 +30,10 @@ public:
     ChimeManager() {}
 
     // Chime Delegate methods
-    CHIP_ERROR GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, chip::MutableCharSpan & name);
-    CHIP_ERROR GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID);
+    CHIP_ERROR GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, chip::MutableCharSpan & name) override;
+    CHIP_ERROR GetChimeIDByIndex(uint8_t chimeIndex, uint8_t & chimeID) override;
 
-    chip::Protocols::InteractionModel::Status PlayChimeSound();
+    chip::Protocols::InteractionModel::Status PlayChimeSound() override;
 
 private:
     using ChimeSoundStructType = chip::app::Clusters::Chime::Structs::ChimeSoundStruct::Type;

@@ -9335,6 +9335,8 @@ NS_ASSUME_NONNULL_BEGIN
         _zoneType = @(0);
 
         _zoneSource = @(0);
+
+        _twoDCartesianZone = nil;
     }
     return self;
 }
@@ -9346,13 +9348,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.zoneID = self.zoneID;
     other.zoneType = self.zoneType;
     other.zoneSource = self.zoneSource;
+    other.twoDCartesianZone = self.twoDCartesianZone;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; zoneType:%@; zoneSource:%@; >", NSStringFromClass([self class]), _zoneID, _zoneType, _zoneSource];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; zoneType:%@; zoneSource:%@; twoDCartesianZone:%@; >", NSStringFromClass([self class]), _zoneID, _zoneType, _zoneSource, _twoDCartesianZone];
     return descriptionString;
 }
 
