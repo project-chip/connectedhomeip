@@ -169,7 +169,6 @@ void ClosureManager::TimerEventHandler(void * timerCbArg)
     AppEvent event;
     event.Type                    = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action     = closureManager->GetCurrentAction();
-    event.ClosureEvent.EndpointId = closureManager->mCurrentActionEndpointId;
     event.Handler                 = HandleClosureActionCompleteEvent;
     AppTask::GetAppTask().PostEvent(&event);
 }
@@ -226,6 +225,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
     event.ClosureEvent.Action = CALIBRATE_ACTION;
     event.Handler             = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
+    SetCurrentAction(CALIBRATE_ACTION);
 
     isCalibrationInProgress = true;
     return Status::Success;
@@ -323,12 +323,10 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
     AppEvent event;
     event.Type                    = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action     = MOVE_TO_ACTION;
-    event.ClosureEvent.EndpointId = ep1.GetEndpoint();
     event.Handler                 = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
 
     SetCurrentAction(MOVE_TO_ACTION);
-    mCurrentActionEndpointId = ep1.GetEndpoint();
     isMoveToInProgress       = true;
     return Status::Success;
 }
@@ -366,13 +364,12 @@ void ClosureManager::HandleClosureMotionAction()
 
     bool closureTargetReached = isEndPoint2TargetReached && isEndPoint3TargetReached;
 
-    ChipLogProgress(AppServer, "Motion progress possible: %s", closureTargetReached ? "true" : "false");
+    ChipLogProgress(AppServer, "Motion progress possible: %s", closureTargetReached ? "false" : "true");
 
     if (!closureTargetReached)
     {
         instance.CancelTimer(); // Cancel any existing timer before starting a new action
         instance.SetCurrentAction(MOVE_TO_ACTION);
-        instance.mCurrentActionEndpointId = instance.ep1.GetEndpoint();
         instance.StartTimer(kMotionCountdownTimeMs);
         return;
     }
@@ -382,7 +379,6 @@ void ClosureManager::HandleClosureMotionAction()
         instance.CancelTimer(); // Cancel any existing timer before starting a new action
         ChipLogProgress(AppServer, "Starting latch action timer");
         instance.SetCurrentAction(LATCH_ACTION);
-        instance.mCurrentActionEndpointId = instance.ep1.GetEndpoint();
         instance.StartTimer(kLatchCountdownTimeMs);
     }
     else
