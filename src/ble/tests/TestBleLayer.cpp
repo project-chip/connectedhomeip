@@ -54,7 +54,7 @@ class TestBleLayer : public BleLayer,
                      private BleApplicationDelegate,
                      private BleLayerDelegate,
                      private BlePlatformDelegate,
-                     private BleConnectionDelegate,
+                     public BleConnectionDelegate,
                      public ::testing::Test
 {
 public:
@@ -392,6 +392,17 @@ TEST_F(TestBleLayer, ExceedBleConnectionEndPointLimit)
     EXPECT_FALSE(HandleWriteReceivedCapabilitiesRequest(connObj));
 }
 
+// This test creats new ble connection by discriminator and simulates error
+// TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorThenError)
+// {
+//     // Start new connection
+//     EXPECT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), static_cast<BleLayer *>(this)), CHIP_NO_ERROR);
+
+//     // Simulate error
+//     BleConnectionDelegate::OnConnectionError(static_cast<BleLayer *>(this), CHIP_ERROR_CONNECTION_ABORTED);
+// }
+
+
 TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsIncorrectState) {
     SetupDiscriminator discriminators[] = {SetupDiscriminator(), SetupDiscriminator()};
     Span<const SetupDiscriminator> discriminatorsSpan(discriminators, 2);
@@ -402,18 +413,18 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsIncorrectState) {
     EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_ERROR_INCORRECT_STATE);
 }
 
-
 TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoBleTransportLayer) {
     SetupDiscriminator discriminators[] = {SetupDiscriminator(), SetupDiscriminator()};
     Span<const SetupDiscriminator> discriminatorsSpan(discriminators, 2);
-    mBleTransport = nullptr;
 
+    mConnectionDelegate = this;
+    mBleTransport = nullptr;
 
     auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {};
     auto OnError = [](void * appState, CHIP_ERROR err) {};
 
-    EXPECT_FALSE(mBleTransport);
     EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_ERROR_INCORRECT_STATE);
+
 }
   
 }; // namespace Ble

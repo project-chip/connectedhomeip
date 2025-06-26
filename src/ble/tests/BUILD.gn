@@ -21,6 +21,7 @@ chip_test_suite("tests") {
   output_name = "libBleLayerTests"
 
   test_sources = [
+    "BleLayerAccess.h",
     "TestBleErrorStr.cpp",
     "TestBleLayer.cpp",
     "TestBleUUID.cpp",
