@@ -138,6 +138,8 @@ not_automated:
       reason: Helper methods for WebRTC TCs, not a standalone test.
     - name: TC_CHIMETestBase.py
       reason: Shared code for the Chime Cluster, not a standalone test.
+    - name: TC_CLDIM_2_1.py
+      reason: Closure app on master branch does not support this test script yet.
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
