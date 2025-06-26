@@ -180,13 +180,13 @@ CHIP_ERROR ValidateDataContent(ByteSpan span, const EmberAfAttributeMetadata * a
 {
     if (emberAfIsStringAttributeType(am->attributeType))
     {
-        VerifyOrReturnValue(Storage::ShortPascalString<uint8_t>::IsValid(span), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnValue(Storage::ShortPascalBytes::IsValid(span), CHIP_ERROR_INCORRECT_STATE);
         return CHIP_NO_ERROR;
     }
 
     if (emberAfIsLongStringAttributeType(am->attributeType))
     {
-        VerifyOrReturnValue(Storage::LongPascalString<uint8_t>::IsValid(span), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnValue(Storage::LongPascalBytes::IsValid(span), CHIP_ERROR_INCORRECT_STATE);
         return CHIP_NO_ERROR;
     }
 
