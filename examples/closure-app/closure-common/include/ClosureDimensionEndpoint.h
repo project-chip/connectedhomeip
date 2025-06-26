@@ -152,24 +152,12 @@ public:
      */
     void OnMoveToActionComplete();
 
-        /**
-     * @brief Handles the completion of a set target action.
-     *
-     * This function is called when a set target action has finished executing.
-     * It should update the internal state of the closure control endpoint to reflect the
-     * completion of the set target action.
-     */
-    void OnSetTargetActionComplete();
-
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
     MatterContext mContext;
     ClosureDimensionDelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
-
-    void UpdateTargetStateFromCurrentState();
-    void UpdateCurrentStateFromTargetState();
 };
 
 } // namespace ClosureDimension

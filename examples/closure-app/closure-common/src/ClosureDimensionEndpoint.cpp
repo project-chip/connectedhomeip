@@ -86,45 +86,5 @@ void ClosureDimensionEndpoint::OnCalibrateActionComplete()
 
 void ClosureDimensionEndpoint::OnMoveToActionComplete()
 {
-    UpdateCurrentStateFromTargetState();
-}
-
-void ClosureDimensionEndpoint::OnSetTargetActionComplete()
-{
-    UpdateCurrentStateFromTargetState();
-}
-
-void ClosureDimensionEndpoint::UpdateCurrentStateFromTargetState()
-{
-    ClusterState state = mLogic.GetState();
-    GenericCurrentStateStruct currentState{};
-
-    if (state.target.IsNull())
-    {
-        ChipLogError(AppServer, "Target is null, Move to action Failed");
-        return;
-    }
-
-    if (state.currentState.IsNull())
-    {   
-        ChipLogError(AppServer, "Current state is null, Move to action Failed");
-        return;
-    }
-    else
-    {
-        currentState = state.currentState.Value();
-    }
-
-    auto updateFieldIfPresent = [](auto & targetField, auto & currentField) {
-        if (targetField.HasValue())
-        {
-            currentField.SetValue(targetField.Value());
-        }
-    };
-
-    updateFieldIfPresent(state.target.Value().position, currentState.position);
-    updateFieldIfPresent(state.target.Value().latch, currentState.latch);
-    updateFieldIfPresent(state.target.Value().speed, currentState.speed);
-
-    mLogic.SetCurrentState(DataModel::MakeNullable(currentState));
+    // This function should handle closure dimension state updation after MoveTo Action.
 }
