@@ -35,7 +35,8 @@ Status ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> &
                                                  const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     ChipLogProgress(AppServer, "HandleSetTarget");
-    return ClosureManager::GetInstance().OnSetTargetCommand(pos, latch, speed, GetEndpoint());
+    // Add the SetTarget handling logic here
+    return Status::Success;
 }
 
 Status ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,

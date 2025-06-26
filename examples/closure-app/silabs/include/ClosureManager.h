@@ -40,9 +40,6 @@ public:
         MOVE_TO_ACTION,
         STOP_MOTION_ACTION,
         STOP_CALIBRATE_ACTION,
-        LATCH_ACTION,
-        PANEL_SET_TARGET_ACTION,
-        PANEL_LATCH_ACTION,
         PANEL_STEP_ACTION,
 
         INVALID_ACTION
@@ -105,27 +102,6 @@ public:
      *         or an appropriate error status otherwise.
      */
     chip::Protocols::InteractionModel::Status OnStopCommand();
-
-    /**
-     * @brief Handles the SetTarget command for a closure panel.
-     *
-     * This method processes the SetTarget command, allowing the caller to specify a target position,
-     * latch state, and speed for the closure panel at the given panel endpoint.
-     *
-     * @param[in] pos      Optional target position as a percentage in hundredths (0-10000).
-     * @param[in] latch    Optional latch state (true to latch, false to unlatch).
-     * @param[in] speed    Optional speed setting as a ThreeLevelAutoEnum value.
-     * @param[in] endpointId The endpoint identifier for the closure panel.
-     *
-     * @return chip::Protocols::InteractionModel::Status
-     *         Returns Status::Success if the Stop command is handled successfully,
-     *         or an appropriate error status otherwise.
-     */
-    chip::Protocols::InteractionModel::Status OnSetTargetCommand(
-                        const chip::Optional<chip::Percent100ths> & pos, 
-                        const chip::Optional<bool> & latch, 
-                        const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
-                        chip::EndpointId endpointId);
     
     /**
      * @brief Handles the Step command for the ClosureDimension cluster.

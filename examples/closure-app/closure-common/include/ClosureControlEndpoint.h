@@ -164,7 +164,6 @@ public:
      */
     void OnStepActionComplete();
 
-
     /**
      * @brief Retrieves the endpoint identifier associated with ClusterLogic instance.
      *

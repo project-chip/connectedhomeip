@@ -195,7 +195,9 @@ void ClosureControlEndpoint::OnStepActionComplete()
     auto position = MakeOptional(DataModel::MakeNullable(PositioningEnum::kPartiallyOpened));
     
     DataModel::Nullable<GenericOverallState> overallState;
+    DataModel::Nullable<GenericOverallTarget> overallTarget; 
     mLogic.GetOverallState(overallState);
+    mLogic.GetOverallTarget(overallTarget);
 
     if (overallState.IsNull())
     {
@@ -204,86 +206,14 @@ void ClosureControlEndpoint::OnStepActionComplete()
     {
         overallState.Value().positioning = position;
     }
-    mLogic.SetOverallState(overallState);
 
-    UpdateTargetStateFromCurrentState();
+    if (!overallTarget.IsNull() && overallTarget.Value().latch.HasValue())
+    {
+        // If the target position was FullyClosed, we set it to PartiallyOpened.
+        overallState.Value().latch.SetValue(DataModel::MakeNullable(overallTarget.Value().latch.Value()));
+    }
+    mLogic.SetOverallState(overallState);
 
     mLogic.SetCountdownTimeFromDelegate(0);
     mLogic.GenerateMovementCompletedEvent();
-}
-
-void ClosureControlEndpoint::UpdateTargetStateFromCurrentState()
-{
-    DataModel::Nullable<GenericOverallState> overallState;
-    mLogic.GetOverallState(overallState);
-
-    if (overallState.IsNull())
-    {
-         mLogic.SetOverallTarget(DataModel::NullNullable);
-         return;
-    }
-
-    DataModel::Nullable<GenericOverallTarget> overallTarget;
-    mLogic.GetOverallTarget(overallTarget);
-
-    if (overallTarget.IsNull())
-    {
-        overallTarget.SetNonNull(GenericOverallTarget());
-    }
-
-    if (overallState.Value().positioning.HasValue() && 
-            !overallState.Value().positioning.Value().IsNull()) 
-    {
-        PositioningEnum positioning = overallState.Value().positioning.Value().Value();
-        TargetPositionEnum targetPosition = MapCurrentPositioningToTargetPosition(positioning);
-    
-        if (targetPosition == TargetPositionEnum::kUnknownEnumValue)
-        {
-            // If the target position is unknown, we set the position field of overallTarget to NullNullable.
-            overallTarget.Value().position = NullOptional;
-        } else {
-            overallTarget.Value().position.SetValue(targetPosition);
-        }
-    }
-
-    // Assign latch only if present and not null
-    if (overallState.Value().latch.HasValue() && !overallState.Value().latch.Value().IsNull())
-    {
-        overallTarget.Value().latch.SetValue(overallState.Value().latch.Value().Value());
-    }
-    else
-    {
-        overallTarget.Value().latch.ClearValue();
-    }
-
-    // Assign speed only if present and not null
-    if (overallState.Value().speed.HasValue() && !overallState.Value().speed.Value().IsNull())
-    {
-        overallTarget.Value().speed.SetValue(overallState.Value().speed.Value().Value());
-    }
-    else
-    {
-        overallTarget.Value().speed.ClearValue();
-    }
-
-    mLogic.SetOverallTarget(overallTarget);
-}
-
-TargetPositionEnum ClosureControlEndpoint::MapCurrentPositioningToTargetPosition(PositioningEnum value)
-{
-    switch (value)
-    {
-    case PositioningEnum::kFullyClosed:
-        return TargetPositionEnum::kCloseInFull;
-    case PositioningEnum::kFullyOpened:
-        return TargetPositionEnum::kOpenInFull;
-    case PositioningEnum::kOpenedForPedestrian:
-        return TargetPositionEnum::kPedestrian;
-    case PositioningEnum::kOpenedForVentilation:
-        return TargetPositionEnum::kVentilation;
-    case PositioningEnum::kOpenedAtSignature:
-        return TargetPositionEnum::kSignature;
-    default:
-        return TargetPositionEnum::kUnknownEnumValue;
-    }
 }

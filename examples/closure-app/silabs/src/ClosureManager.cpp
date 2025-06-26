@@ -35,6 +35,7 @@ using namespace chip::app::Clusters::ClosureDimension;
 
 namespace {
 constexpr uint32_t kCountdownTimeSeconds = 10;
+constexpr ElapsedS kMotionCountdownTimeMs = 1000;
 
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
@@ -130,7 +131,6 @@ void ClosureManager::InitiateAction(AppEvent * event)
     ClosureManager & instance = ClosureManager::GetInstance();
 
     instance.CancelTimer(); // Cancel any existing timer before starting a new action
-    instance.SetCurrentAction(action);
 
     switch (action)
     {
@@ -148,24 +148,13 @@ void ClosureManager::InitiateAction(AppEvent * event)
         break;
     case Action_t::MOVE_TO_ACTION:
         ChipLogDetail(AppServer, "Initiating move to action");
-        // For Closure sample app, Motion action is simulated with a timer with rate
-        // of 10% change of position per second.
-        // In a real application, this would be replaced with actual move to logic.
-        instance.StartTimer(kCountdownTimeSeconds * 100);
-        break;
-    case Action_t::PANEL_SET_TARGET_ACTION:
-        ChipLogDetail(AppServer, "Initiating set target action");
-        // Timer used in sample application to simulate the set target process.
-        // In a real application, this would be replaced with actual logic to set
-        // the target position of the closure.
-        instance.StartTimer(kCountdownTimeSeconds * 100);
         break;
     case Action_t::PANEL_STEP_ACTION:
         ChipLogDetail(AppServer, "Initiating step action");
         // Timer used in sample application to simulate the step action process.
         // In a real application, this would be replaced with actual logic to perform
         // a step action on the closure.
-        instance.StartTimer(kCountdownTimeSeconds * 100);
+        instance.StartTimer(kMotionCountdownTimeMs);
         break;
     default:
         ChipLogDetail(AppServer, "Invalid action received in InitiateAction");
@@ -217,24 +206,6 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
             instance.HandleClosureActionComplete(instance.GetCurrentAction());
         });
         break;
-    case Action_t::LATCH_ACTION:
-        PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager & instance = ClosureManager::GetInstance();
-            instance.HandleClosureActionComplete(instance.GetCurrentAction());
-        });
-        break;
-    case Action_t::PANEL_SET_TARGET_ACTION:
-        PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager & instance = ClosureManager::GetInstance();
-            instance.HandleClosureActionComplete(instance.GetCurrentAction());
-        });
-        break;
-    case Action_t::PANEL_LATCH_ACTION:
-        PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager & instance = ClosureManager::GetInstance();
-            instance.HandleClosureActionComplete(instance.GetCurrentAction());
-        });
-        break;
     case Action_t::PANEL_STEP_ACTION:
         PlatformMgr().ScheduleWork([](intptr_t) {
             ClosureManager & instance = ClosureManager::GetInstance();
@@ -260,16 +231,13 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         break;
     }
     case Action_t::STOP_MOTION_ACTION:
+        // This should handle the completion of a stop motion action.
         break;
-    case Action_t::STOP_CALIBRATE_ACTION:  
+    case Action_t::STOP_CALIBRATE_ACTION:
+        // This should handle the completion of a stop calibration action.
         break;
     case Action_t::MOVE_TO_ACTION:
-        break;
-    case Action_t::LATCH_ACTION:
-        break;
-    case Action_t::PANEL_SET_TARGET_ACTION:
-        break;
-    case Action_t::PANEL_LATCH_ACTION:
+        // This should handle the completion of a move to action.
         break;
     case Action_t::PANEL_STEP_ACTION:
         instance.ep1.OnStepActionComplete();
@@ -289,6 +257,7 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
     }
     // Reset the current action after handling the closure action
     instance.SetCurrentAction(Action_t::INVALID_ACTION);
+    instance.mCurrentActionEndpointId = kInvalidEndpointId;
 }
 
 chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
@@ -362,6 +331,9 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(
     event.Handler           = InitiateAction;   
     AppTask::GetAppTask().PostEvent(&event);
 
+    SetCurrentAction(PANEL_STEP_ACTION);
+    mCurrentActionEndpointId = endpointId;
+
     isStepActionInProgress = true;
 
     return Status::Success;
@@ -382,39 +354,39 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
 
     chip::Percent100ths currentPosition = epState.currentState.Value().position.Value();
     chip::Percent100ths targetPosition = epState.target.Value().position.Value();
-    chip::Percent100ths nextCurrentPosition;
 
-    // Compute the next position
-    if (stepDirection == StepDirectionEnum::kIncrease)
-    {
-        nextCurrentPosition = std::min(static_cast<chip::Percent100ths>(currentPosition + epState.stepValue), targetPosition);
-    }
-    else
-    {
-        nextCurrentPosition = std::max(static_cast<chip::Percent100ths>(currentPosition - epState.stepValue), targetPosition);
-    }
-
-    // Set the new state once
-    currentState.SetNonNull().Set(
-        MakeOptional(nextCurrentPosition),
-        epState.currentState.Value().latch.HasValue() ? MakeOptional(epState.currentState.Value().latch.Value()) : NullOptional,
-        epState.currentState.Value().speed.HasValue() ? MakeOptional(epState.currentState.Value().speed.Value()) : NullOptional
-    );
-
-    ep->GetLogic().SetCurrentState(currentState);
-    epState = ep->GetLogic().GetState(); // Refresh if needed later
     bool panelTargetReached = (currentState.Value().position.Value() != epState.target.Value().position.Value());
 
     if (!panelTargetReached)
     {
+        chip::Percent100ths nextCurrentPosition;
+
+        // Compute the next position
+        if (stepDirection == StepDirectionEnum::kIncrease)
+        {
+            nextCurrentPosition = std::min(static_cast<chip::Percent100ths>(currentPosition + epState.stepValue), targetPosition);
+        }
+        else
+        {
+            nextCurrentPosition = std::max(static_cast<chip::Percent100ths>(currentPosition - epState.stepValue), targetPosition);
+        }
+
+        // Set the new state once
+        currentState.SetNonNull().Set(
+            MakeOptional(nextCurrentPosition),
+            epState.currentState.Value().latch.HasValue() ? MakeOptional(epState.currentState.Value().latch.Value()) : NullOptional,
+            epState.currentState.Value().speed.HasValue() ? MakeOptional(epState.currentState.Value().speed.Value()) : NullOptional
+        );
+
+        ep->GetLogic().SetCurrentState(currentState);
+
         instance.CancelTimer(); // Cancel any existing timer before starting a new action
         instance.SetCurrentAction(PANEL_STEP_ACTION);
         instance.mCurrentActionEndpointId = endpointId;
-        instance.StartTimer(kCountdownTimeSeconds * 100);
+        instance.StartTimer(kMotionCountdownTimeMs);
+
         return;
     }
-    else
-    {
-        instance.HandleClosureActionComplete(PANEL_STEP_ACTION);
-    }
+
+    instance.HandleClosureActionComplete(PANEL_STEP_ACTION);
 }
