@@ -30,7 +30,7 @@ namespace JCM {
 
 struct JCMTrustVerificationInfo
 {
-    EndpointId adminEndpointId = kInvalidEndpointId;
+    EndpointId adminEndpointId   = kInvalidEndpointId;
     FabricIndex adminFabricIndex = kUndefinedFabricIndex;
 
     VendorId adminVendorId;

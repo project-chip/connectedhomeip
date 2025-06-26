@@ -61,7 +61,8 @@ CHIP_ERROR PairingCommand::SetAnchorNodeId(NodeId value)
 
 CHIP_ERROR PairingCommand::RunCommand()
 {
-    chip::Controller::JCM::JCMDeviceCommissioner & commissioner = static_cast<chip::Controller::JCM::JCMDeviceCommissioner &>(CurrentCommissioner());
+    chip::Controller::JCM::JCMDeviceCommissioner & commissioner =
+        static_cast<chip::Controller::JCM::JCMDeviceCommissioner &>(CurrentCommissioner());
     commissioner.RegisterPairingDelegate(this);
     commissioner.RegisterTrustVerificationDelegate(this);
     chip::CASEAuthTag administratorCAT   = GetAdminCATWithVersion(CHIP_CONFIG_ADMINISTRATOR_CAT_INITIAL_VERSION);
@@ -585,7 +586,8 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
             memset(&request, 0, sizeof(request));
             request.node_id = nodeId;
             request.jcm     = mJCM.ValueOr(false);
-            chip::Controller::JCM::JCMDeviceCommissioner & commissioner = static_cast<chip::Controller::JCM::JCMDeviceCommissioner &>(CurrentCommissioner());
+            chip::Controller::JCM::JCMDeviceCommissioner & commissioner =
+                static_cast<chip::Controller::JCM::JCMDeviceCommissioner &>(CurrentCommissioner());
             chip::Controller::JCM::JCMTrustVerificationInfo & info = commissioner.GetJCMTrustVerificationInfo();
             /* extract and save the public key of the peer Admin ICAC */
             err = Credentials::ExtractPublicKeyFromChipCert(info.adminICAC.GetSpan(), adminICACPKSpan);
@@ -601,8 +603,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 
             for (size_t i = 0; i < Crypto::kP256_PublicKey_Length; ++i)
             {
-                ChipLogProgress(JointFabric, "trustedIcacPublicKeyB[%li] = %02X", i,
-                                request.trustedIcacPublicKeyB.bytes[i]);
+                ChipLogProgress(JointFabric, "trustedIcacPublicKeyB[%li] = %02X", i, request.trustedIcacPublicKeyB.bytes[i]);
             }
 
             auto call = rpcClient.TransferOwnership(request, OnOwnershipTransferDone);
@@ -783,27 +784,24 @@ void PairingCommand::OnDeviceAttestationCompleted(Controller::DeviceCommissioner
     }
 }
 
-void PairingCommand::OnProgressUpdate(
-    chip::Controller::JCM::JCMDeviceCommissioner & commissioner,
-    chip::Controller::JCM::JCMTrustVerificationStage stage,
-    chip::Controller::JCM::JCMTrustVerificationInfo & info,
-    chip::Controller::JCM::JCMTrustVerificationError error)
+void PairingCommand::OnProgressUpdate(chip::Controller::JCM::JCMDeviceCommissioner & commissioner,
+                                      chip::Controller::JCM::JCMTrustVerificationStage stage,
+                                      chip::Controller::JCM::JCMTrustVerificationInfo & info,
+                                      chip::Controller::JCM::JCMTrustVerificationError error)
 {
     ChipLogProgress(Controller, "JCM: Trust Verification progress: %d", static_cast<int>(stage));
 }
 
-void PairingCommand::OnAskUserForConsent(
-    chip::Controller::JCM::JCMDeviceCommissioner & commissioner,
-    chip::Controller::JCM::JCMTrustVerificationInfo & info)
+void PairingCommand::OnAskUserForConsent(chip::Controller::JCM::JCMDeviceCommissioner & commissioner,
+                                         chip::Controller::JCM::JCMTrustVerificationInfo & info)
 {
     ChipLogProgress(Controller, "Asking user for consent for vendor ID: %u", info.adminVendorId);
 
     commissioner.ContinueAfterUserConsent(true);
 }
 
-void PairingCommand::OnVerifyVendorId(
-    chip::Controller::JCM::JCMDeviceCommissioner & commissioner,
-    chip::Controller::JCM::JCMTrustVerificationInfo & info)
+void PairingCommand::OnVerifyVendorId(chip::Controller::JCM::JCMDeviceCommissioner & commissioner,
+                                      chip::Controller::JCM::JCMTrustVerificationInfo & info)
 {
     ChipLogProgress(Controller, "Performing vendor ID verification for vendor ID: %u", info.adminVendorId);
 

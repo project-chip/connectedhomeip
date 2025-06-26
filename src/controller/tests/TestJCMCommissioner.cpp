@@ -28,9 +28,9 @@
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
+#include <pw_unit_test/framework.h>
 #include <transport/SecureSession.h>
 #include <transport/SecureSessionTable.h>
-#include <pw_unit_test/framework.h>
 
 using namespace chip;
 using namespace chip::Controller;
