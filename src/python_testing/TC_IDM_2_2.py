@@ -751,27 +751,27 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # Step 1: TH sends the Read Request Message to the DUT to read one attribute on a given cluster and endpoint
         self.step(1)
         await self._test_read_operation(operation_type='single_attribute',
-                                                        endpoint=self.endpoint,
-                                                        cluster=Clusters.Descriptor,
-                                                        attribute=Clusters.Descriptor.Attributes.ServerList)
+                                        endpoint=self.endpoint,
+                                        cluster=Clusters.Descriptor,
+                                        attribute=Clusters.Descriptor.Attributes.ServerList)
 
         # Step 2: TH sends the Read Request Message to the DUT to read all attributes on a given cluster and Endpoint
         self.step(2)
         await self._test_read_operation(operation_type='all_cluster_attributes',
-                                                        endpoint=self.endpoint,
-                                                        cluster=Clusters.Descriptor)
+                                        endpoint=self.endpoint,
+                                        cluster=Clusters.Descriptor)
 
         # Step 3: TH sends the Read Request Message to the DUT to read an attribute from a cluster at all Endpoints
         self.step(3)
         await self._test_read_operation(operation_type='attribute_all_endpoints',
-                                                        cluster=Clusters.Descriptor,
-                                                        attribute=Clusters.Descriptor.Attributes.ServerList)
+                                        cluster=Clusters.Descriptor,
+                                        attribute=Clusters.Descriptor.Attributes.ServerList)
 
         # Step 4: TH sends the Read Request Message to the DUT to read a global attribute from all clusters at that Endpoint
         self.step(4)
         await self._test_read_operation(operation_type='global_attribute',
-                                                        endpoint=self.endpoint,
-                                                        attribute_id=global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID)
+                                        endpoint=self.endpoint,
+                                        attribute_id=global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID)
 
         # Step 5: TH sends the Read Request Message to the DUT to read all attributes from all clusters on all Endpoints
         self.step(5)
@@ -780,17 +780,17 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # Step 6: TH sends the Read Request Message to the DUT to read a global attribute from all clusters at all Endpoints
         self.step(6)
         await self._test_read_operation(operation_type='global_attribute_all_endpoints',
-                                                        attribute_id=global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID)
+                                        attribute_id=global_attribute_ids.GlobalAttributeIds.ATTRIBUTE_LIST_ID)
 
         # Step 7: TH sends the Read Request Message to the DUT to read all attributes from a cluster at all Endpoints
         self.step(7)
         await self._test_read_operation(operation_type='cluster_all_endpoints',
-                                                        cluster=Clusters.Descriptor)
+                                        cluster=Clusters.Descriptor)
 
         # Step 8: TH sends the Read Request Message to the DUT to read all attributes from all clusters at one Endpoint
         self.step(8)
         await self._test_read_operation(operation_type='endpoint_all_clusters',
-                                                        endpoint=self.endpoint)
+                                        endpoint=self.endpoint)
 
         # Step 9: TH sends the Read Request Message to the DUT to read any attribute to an unsupported Endpoint
         self.step(9)
@@ -807,10 +807,10 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # Step 12: TH sends the Read Request Message to the DUT to read an attribute. Repeat the above steps 3 times.
         self.step(12)
         await self._test_read_operation(operation_type='repeat_attribute',
-                                                          endpoint=self.endpoint,
-                                                          cluster=Clusters.Descriptor,
-                                                          attribute=Clusters.Descriptor.Attributes.ServerList,
-                                                          repeat_count=3)
+                                        endpoint=self.endpoint,
+                                        cluster=Clusters.Descriptor,
+                                        attribute=Clusters.Descriptor.Attributes.ServerList,
+                                        repeat_count=3)
 
         # Step 13: TH sends a Read Request Message to the DUT to read a particular attribute with the DataVersionFilter Field not set.
         # TH sends a second read request to the same cluster with the
@@ -830,7 +830,9 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         # Step 14: TH sends a Read Request Message to the DUT to read a particular attribute with the DataVersionFilter Field not set.
         # DUT sends back the attribute value with the DataVersion of the cluster. TH sends a write request to the same cluster to write to any attribute.
-        # TH sends a second read request to read an attribute from the same cluster with the DataVersionFilter Field set with the dataversion value received before.
+        # TH sends a second read request to read an attribute from the same
+        # cluster with the DataVersionFilter Field set with the dataversion value
+        # received before.
         self.step(14)
         read_request14, filtered_read14 = await self._test_read_operation(operation_type='data_version_filter',
                                                                           endpoint=self.endpoint,
@@ -847,7 +849,9 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         # Step 15: TH sends a Read Request Message to the DUT to read all attributes on a cluster with the DataVersionFilter Field not set.
         # DUT sends back the all the attribute values with the DataVersion of the cluster. TH sends a write request to the same cluster to write to any attribute.
-        # TH sends a second read request to read all the attributes from the same cluster with the DataVersionFilter Field set with the dataversion value received before.
+        # TH sends a second read request to read all the attributes from the same
+        # cluster with the DataVersionFilter Field set with the dataversion value
+        # received before.
         self.step(15)
         read_request15, filtered_read15 = await self._test_read_operation(operation_type='data_version_filter',
                                                                           endpoint=self.endpoint,
@@ -923,13 +927,13 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         # Step 19: TH sends a Read Request Message to the DUT to read a non-global attribute on a given endpoint.
         self.step(19)
         await self._test_read_operation(operation_type='non_global_attribute',
-                                                   endpoint=self.endpoint,
-                                                   attribute=Clusters.Descriptor.Attributes.ServerList)
+                                        endpoint=self.endpoint,
+                                        attribute=Clusters.Descriptor.Attributes.ServerList)
 
         # Step 20: TH sends a Read Request Message to the DUT to read a non-global attribute on all endpoints.
         self.step(20)
         await self._test_read_operation(operation_type='non_global_attribute',
-                                                   attribute=Clusters.Descriptor.Attributes.ServerList)
+                                        attribute=Clusters.Descriptor.Attributes.ServerList)
 
         # Step 21: TH should have access to only a single cluster at one Endpoint.
         # TH sends a Read Request Message to the DUT to read all attributes from all clusters at Endpoint1
