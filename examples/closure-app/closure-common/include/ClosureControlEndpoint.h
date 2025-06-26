@@ -176,7 +176,7 @@ private:
      * It ensures that the current state reflects the latest target position, latch status, and speed.
      */
     void UpdateCurrentStateFromTargetState();
-    
+
     /**
      * @brief Maps a TargetPositionEnum value to the corresponding PositioningEnum value.
      *

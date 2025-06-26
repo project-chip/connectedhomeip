@@ -352,7 +352,7 @@ void ClosureManager::HandleClosureMotionAction()
     DataModel::Nullable<GenericCurrentStateStruct> ep3CurrentState;
     DataModel::Nullable<GenericTargetStruct> ep2TargetState;
     DataModel::Nullable<GenericTargetStruct> ep3TargetState;
-    
+
     VerifyOrReturn(ep2.GetLogic().GetCurrentState(ep2CurrentState) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to get current state for Endpoint 2"));
     VerifyOrReturn(ep3.GetLogic().GetCurrentState(ep3CurrentState) == CHIP_NO_ERROR,
