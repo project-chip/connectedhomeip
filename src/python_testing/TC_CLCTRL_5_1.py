@@ -103,13 +103,15 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             TestStep("3h", "Latch the DUT manually to set OverallCurrentState.Latch to True."),
             TestStep("3i", "If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute."),
             TestStep("3j", "If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute."),
-            TestStep("4a", "If the PS feature is supported on the cluster or the LT feature is not supported on the cluster, skip steps 4b to 4g."),
-            TestStep("4b", "If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip steps 4c to 4d."),
+            TestStep("4a", "If the LT feature is not supported on the cluster, skip steps 4b to 4i."),
+            TestStep("4b", "If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip steps 4c to 4f."),
             TestStep("4c", "TH sends command MoveTo with Latch = False."),
             TestStep("4d", "TH sends command Stop to DUT."),
-            TestStep("4e", "If LatchControlModes Bit 1 = 1 (RemoteUnlatching = True), skip step 4f."),
-            TestStep("4f", "Unlatch the DUT manually to set OverallCurrentState.Latch to False."),
-            TestStep("4g", "If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState.Latch attribute."),
+            TestStep("4e", "If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState.Latch attribute."),
+            TestStep("4f", "TH sends command MoveTo with Latch = False."),
+            TestStep("4g", "If LatchControlModes Bit 1 = 1 (RemoteUnlatching = True), skip step 4h."),
+            TestStep("4h", "Unlatch the DUT manually to set OverallCurrentState.Latch to False."),
+            TestStep("4i", "Wait until TH receives a subscription report with OverallCurrentState.Latch = False"),
             TestStep("5a", "If the PS feature is not supported on the cluster, skip steps 5b to 5e."),
             TestStep("5b", "If the attribute is supported on the cluster. TH reads from the DUT the OverallCurrentState attribute."),
             TestStep("5c", "If CurrentPosition is FullyClosed, skip steps 5d and 5e."),
@@ -323,26 +325,28 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             self.skip_step("3h")
             self.skip_step("3i")
             self.skip_step("3j")
-        # STEP 4a: If the PS feature is supported on the cluster or the LT feature is not supported on the cluster, skip steps 4b to 4g.
+        # STEP 4a: If the LT feature is not supported on the cluster, skip steps 4b to 4i.
         self.step("4a")
 
-        if is_ps_feature_supported or not is_lt_feature_supported:
-            logging.info("Motion Latching feature not supported or Positioning feature supported, skipping steps 4b to 4g")
+        if not is_lt_feature_supported:
+            logging.info("Motion Latching feature not supported, skipping steps 4b to 4i")
 
-            # Skipping steps 4b to 4g
+            # Skipping steps 4b to 4i
             self.skip_step("4b")
             self.skip_step("4c")
             self.skip_step("4d")
             self.skip_step("4e")
             self.skip_step("4f")
             self.skip_step("4g")
+            self.skip_step("4h")
+            self.skip_step("4i")
         else:
 
-            # STEP 4b: If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip step 5b
+            # STEP 4b: If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip steps 4c to 4f
             self.step("4b")
 
             if (int(bin(LatchControlModes), 2) & (1 << 1)) == 2:
-                logging.info("RemoteUnlatching is True, proceeding steps 4c to 4d")
+                logging.info("RemoteUnlatching is True, proceeding steps 4c to 4f")
 
                 # STEP 4c: TH sends command MoveTo with Latch = False
                 self.step("4c")
@@ -365,27 +369,9 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command Stop: {e.status}")
                     pass
+
+                # STEP 4e: If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute
                 self.step("4e")
-                self.skip_step("4f")
-            elif (int(bin(LatchControlModes), 2) & (1 << 1)) == 0:
-                self.skip_step("4c")
-                self.skip_step("4d")
-
-                # STEP 4e: If LatchControlModes Bit 1 = 1 (RemoteUnlatching = True), skip step 4f
-                self.step("4e")
-
-                logging.info("RemoteUnlatching is False, proceeding to step 4f")
-
-                # STEP 4f: Unlatch the DUT manually to set OverallCurrentState.Latch to False
-                self.step("4f")
-
-                logging.info("Unlatch the DUT manually to set OverallCurrentState.Latch to False")
-                # Simulating manual unlatching by waiting for user input
-                input("Press Enter after unlatching the DUT...")
-                logging.info("Manual unlatching completed.")
-
-            # STEP 4g: If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute
-                self.step("4g")
 
                 if attributes.OverallCurrentState.attribute_id in attribute_list:
                     overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
@@ -393,10 +379,50 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                     if overall_current_state is None:
                         logging.error("OverallCurrentState is None")
 
-                    asserts.assert_false(overall_current_state.latch, "OverallCurrentState.latch is not False")
+                    asserts.assert_true(overall_current_state.latch, "OverallCurrentState.latch is not True")
                 else:
                     asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
                     return
+
+                # STEP 4f: TH sends command MoveTo with Latch = False
+                self.step("4f")
+
+                try:
+                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
+                        latch=False
+                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                except InteractionModelError as e:
+                    asserts.assert_equal(
+                        e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
+                    pass
+
+                self.step("4g")
+                self.skip_step("4h")
+            elif (int(bin(LatchControlModes), 2) & (1 << 1)) == 0:
+                self.skip_step("4c")
+                self.skip_step("4d")
+                self.skip_step("4e")
+                self.skip_step("4f")
+
+                # STEP 4g: If LatchControlModes Bit 1 = 1 (RemoteUnlatching = True), skip step 4h
+                self.step("4g")
+
+                logging.info("RemoteUnlatching is False, proceeding to step 4h")
+
+                # STEP 4h: Unlatch the DUT manually to set OverallCurrentState.Latch to False
+                self.step("4h")
+
+                logging.info("Unlatch the DUT manually to set OverallCurrentState.Latch to False")
+                # Simulating manual unlatching by waiting for user input
+                input("Press Enter after unlatching the DUT...")
+                logging.info("Manual unlatching completed.")
+
+            # STEP 4i: Wait until TH receives a subscription report with OverallCurrentState.Latch = False
+            self.step("4i")
+
+            logging.info("Waiting for OverallCurrentState.Latch to be False")
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)],
+                                                          timeout_sec=timeout)
 
         # STEP 5a: If the PS feature is not supported on the cluster, skip steps 5b to 5e.
         self.step("5a")
