@@ -5,7 +5,7 @@
 ### `AttributePersistenceProvider`
 
 `AttributePersistenceProvider` was moved to `src/app/persistence` and its
-interface has updated:
+interface was updated:
 
 -   Read/write operate over pure buffers, without type information
 
