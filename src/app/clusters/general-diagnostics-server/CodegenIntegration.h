@@ -16,7 +16,6 @@
  */
 
 #include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
-#include <optional>
 
 namespace chip {
 namespace app {
