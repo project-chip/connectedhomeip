@@ -79,7 +79,7 @@ class TC_G_2_3(MatterBaseTest):
                 TestStep("1c", "TH cleans up the groups by sending the RemoveAllGroups command to the DUT on PIXIT.G.ENDPOINT"),
                 TestStep("1d", "TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT as unicast with the following fields : 1. GroupID as 0x0002 2. GroupName as Gp2"),
                 TestStep("2a", "TH reads GroupTable attribute from the GroupKeyManagement cluster from DUT on EP0"),
-                TestStep("2b", "Verify that the GroupTable contains an entry with the GroupName as Gp2"),
+                TestStep("2b", "If the GN feature is supported, verify that the GroupTable contains an entry with the GroupName as Gp2"),
                 TestStep("3", "TH sends AddGroup command to DUT on PIXIT.G.ENDPOINT as unicast with the following fields : 1. GroupID as 0x0003 2. GroupName as Gp3"),
                 TestStep("4a", "TH reads GroupTable attribute from the GroupKeyManagement cluster from DUT on EP0"),
                 TestStep("4b", "Verify that the GroupTable contains an entry with the GroupName as Gp3"),
