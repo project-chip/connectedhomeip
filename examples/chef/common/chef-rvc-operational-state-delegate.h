@@ -57,7 +57,10 @@ enum class ChefRvcOperationalStateEnum : uint8_t
 class RvcOperationalStateDelegate : public RvcOperationalState::Delegate
 {
 public:
-    RvcOperationalStateDelegate() { mOperationalStateList = Span<const OperationalState::GenericOperationalState>(mRvcOpStateList, std::size(mRvcOpStateList)); }
+    RvcOperationalStateDelegate()
+    {
+        mOperationalStateList = Span<const OperationalState::GenericOperationalState>(mRvcOpStateList, std::size(mRvcOpStateList));
+    }
 
     /**
      * Get the countdown time. This attribute is not used in this application.
@@ -119,7 +122,10 @@ public:
      */
     void HandleGoHomeCommandCallback(OperationalState::GenericOperationalError & err) override;
 
-    void SetCurrentRunningState(RvcOperationalState::ChefRvcOperationalStateEnum RunningState) { mCurrentRunningState = RunningState; };
+    void SetCurrentRunningState(RvcOperationalState::ChefRvcOperationalStateEnum RunningState)
+    {
+        mCurrentRunningState = RunningState;
+    };
 
     uint32_t mRunningTime = 0;
     uint32_t mPausedTime  = 0;
@@ -135,14 +141,16 @@ private:
         OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kRunning)),
         OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kPaused)),
         OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kError)),
-        OperationalState::GenericOperationalState(
-            to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kSeekingCharger)),
+        OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kSeekingCharger)),
         OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kCharging)),
         OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kDocked)),
-        OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kRunningWhileBeeping), Optional<CharSpan>("RunningWhileBeeping"_span)),
+        OperationalState::GenericOperationalState(
+            to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kRunningWhileBeeping),
+            Optional<CharSpan>("RunningWhileBeeping"_span)),
     };
 
-    RvcOperationalState::ChefRvcOperationalStateEnum mCurrentRunningState = RvcOperationalState::ChefRvcOperationalStateEnum::kRunning;
+    RvcOperationalState::ChefRvcOperationalStateEnum mCurrentRunningState =
+        RvcOperationalState::ChefRvcOperationalStateEnum::kRunning;
 };
 
 void Shutdown();
