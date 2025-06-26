@@ -58,7 +58,6 @@ CHIP_ERROR PairingCommand::SetAnchorNodeId(NodeId value)
     return mCommissionerStorage.SyncSetKeyValue(kAnchorNodeIdKey, &nodeId, sizeof(nodeId));
 }
 
-
 CHIP_ERROR PairingCommand::RunCommand()
 {
     CurrentCommissioner().RegisterPairingDelegate(this);
@@ -593,7 +592,8 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
             err = WaitForResponse(call);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(JointFabric, "Joint Commissioning Method (nodeId=%ld) failed: RPC OwnershipTransfer Timeout Error", nodeId);
+                ChipLogError(JointFabric, "Joint Commissioning Method (nodeId=%ld) failed: RPC OwnershipTransfer Timeout Error",
+                             nodeId);
             }
             else
             {

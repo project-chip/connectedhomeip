@@ -41,13 +41,13 @@
 std::map<CHIPCommand::CommissionerIdentity, std::unique_ptr<chip::Controller::DeviceCommissioner>> CHIPCommand::mCommissioners;
 std::set<CHIPCommand *> CHIPCommand::sDeferredCleanups;
 
-using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
-using JCMAutoCommissioner = chip::Controller::JCM::JCMAutoCommissioner;
-using JCMDeviceCommissioner = chip::Controller::JCM::JCMDeviceCommissioner;
+using DeviceControllerFactory      = chip::Controller::DeviceControllerFactory;
+using JCMAutoCommissioner          = chip::Controller::JCM::JCMAutoCommissioner;
+using JCMDeviceCommissioner        = chip::Controller::JCM::JCMDeviceCommissioner;
 using JCMTrustVerificationDelegate = chip::Controller::JCM::JCMTrustVerificationDelegate;
-using JCMTrustVerificationStage = chip::Controller::JCM::JCMTrustVerificationStage;
-using JCMTrustVerificationError = chip::Controller::JCM::JCMTrustVerificationError;
-using JCMTrustVerificationInfo = chip::Controller::JCM::JCMTrustVerificationInfo;
+using JCMTrustVerificationStage    = chip::Controller::JCM::JCMTrustVerificationStage;
+using JCMTrustVerificationError    = chip::Controller::JCM::JCMTrustVerificationError;
+using JCMTrustVerificationInfo     = chip::Controller::JCM::JCMTrustVerificationInfo;
 
 constexpr chip::FabricId kIdentityNullFabricId  = chip::kUndefinedFabricId;
 constexpr chip::FabricId kIdentityAlphaFabricId = 1;
@@ -473,12 +473,10 @@ void CHIPCommand::ShutdownCommissioner(const CommissionerIdentity & key)
     mCommissioners[key].get()->Shutdown();
 }
 
-struct TrustVerificationDelegate : public JCMTrustVerificationDelegate {
-    void OnProgressUpdate(
-        JCMDeviceCommissioner & commissioner,
-        JCMTrustVerificationStage stage,
-        JCMTrustVerificationInfo & info,
-        JCMTrustVerificationError error) override
+struct TrustVerificationDelegate : public JCMTrustVerificationDelegate
+{
+    void OnProgressUpdate(JCMDeviceCommissioner & commissioner, JCMTrustVerificationStage stage, JCMTrustVerificationInfo & info,
+                          JCMTrustVerificationError error) override
     {
         ChipLogProgress(Controller, "JCM: Trust Verification progress: %d", static_cast<int>(stage));
     }
@@ -490,14 +488,13 @@ struct TrustVerificationDelegate : public JCMTrustVerificationDelegate {
         commissioner.ContinueAfterUserConsent(true);
     }
 
-     void OnVerifyVendorId(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info)
+    void OnVerifyVendorId(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info)
     {
         ChipLogProgress(Controller, "Performing vendor ID verification for vendor ID: %u", info.adminVendorId);
 
         commissioner.ContinueAfterVendorIDVerification(true);
     }
 };
-
 
 CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, chip::FabricId fabricId)
 {
@@ -566,7 +563,8 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(CommissionerIdentity & identity, 
     commissionerParams.controllerVendorId             = commissionerVendorId;
     commissionerParams.defaultCommissioner            = &sAutoCommissioner;
 
-    ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, *(deviceCommissioner.get())));
+    ReturnLogErrorOnFailure(
+        DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, *(deviceCommissioner.get())));
 
     if (identity.mName != kIdentityNull)
     {

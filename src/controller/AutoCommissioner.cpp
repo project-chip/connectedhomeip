@@ -381,7 +381,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
     case CommissioningStage::kAttestationVerification:
         return CommissioningStage::kAttestationRevocationCheck;
     case CommissioningStage::kAttestationRevocationCheck:
-        if (mParams.GetUseJCM().ValueOr(false)) {
+        if (mParams.GetUseJCM().ValueOr(false))
+        {
             return CommissioningStage::kJCMTrustVerification;
         }
         return CommissioningStage::kSendOpCertSigningRequest;
@@ -795,7 +796,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                 }
             }
 
-             break;
+            break;
         }
         case CommissioningStage::kConfigureTimeZone:
             mNeedsDST = report.Get<TimeZoneResponseInfo>().requiresDSTOffsets;

@@ -838,7 +838,10 @@ protected:
 #if CHIP_CONFIG_ENABLE_READ_CLIENT
     Platform::UniquePtr<app::ClusterStateCache> mAttributeCache;
     Platform::UniquePtr<app::ReadClient> mReadClient;
-    virtual CHIP_ERROR ParseExtraCommissioningInfo(ReadCommissioningInfo & info, const CommissioningParameters & params) {return CHIP_NO_ERROR;}
+    virtual CHIP_ERROR ParseExtraCommissioningInfo(ReadCommissioningInfo & info, const CommissioningParameters & params)
+    {
+        return CHIP_NO_ERROR;
+    }
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
     template <typename RequestObjectT>
@@ -847,11 +850,11 @@ protected:
                                         CommandResponseFailureCallback failureCb, EndpointId endpoint,
                                         Optional<System::Clock::Timeout> timeout = NullOptional, bool fireAndForget = false);
     void SendCommissioningReadRequest(DeviceProxy * proxy, Optional<System::Clock::Timeout> timeout,
-                                    app::AttributePathParams * readPaths, size_t readPathsSize);
+                                      app::AttributePathParams * readPaths, size_t readPathsSize);
     template <typename AttrType>
     CHIP_ERROR SendCommissioningWriteRequest(DeviceProxy * device, EndpointId endpoint, ClusterId cluster, AttributeId attribute,
-                                            const AttrType & requestData, WriteResponseSuccessCallback successCb,
-                                            WriteResponseFailureCallback failureCb);
+                                             const AttrType & requestData, WriteResponseSuccessCallback successCb,
+                                             WriteResponseFailureCallback failureCb);
     // Cleans up and resets failsafe as appropriate depending on the error and the failed stage.
     // For success, sends completion report with the CommissioningDelegate and sends callbacks to the PairingDelegate
     // For failures after AddNOC succeeds, sends completion report with the CommissioningDelegate and sends callbacks to the

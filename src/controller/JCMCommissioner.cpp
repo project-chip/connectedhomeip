@@ -17,15 +17,14 @@
 
 #include "JCMCommissioner.h"
 #include "JCMTrustVerification.h"
-#include <controller/CommissioningDelegate.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/InteractionModelEngine.h>
+#include <controller/CommissioningDelegate.h>
+#include <controller/JCMCommissioner.h>
 #include <credentials/CHIPCert.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>
-#include <controller/JCMCommissioner.h>
-#include <credentials/CHIPCert.h>
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -82,29 +81,30 @@ CHIP_ERROR JCMDeviceCommissioner::ParseAdminFabricIndexAndEndpointId(ReadCommiss
 {
     auto attributeCache = info.attributes;
 
-    CHIP_ERROR err = attributeCache->ForEachAttribute(Clusters::JointFabricAdministrator::Id, [this, &attributeCache](const ConcreteAttributePath & path) {
-        using namespace Clusters::JointFabricAdministrator::Attributes;
-        AdministratorFabricIndex::TypeInfo::DecodableType administratorFabricIndex;
+    CHIP_ERROR err = attributeCache->ForEachAttribute(
+        Clusters::JointFabricAdministrator::Id, [this, &attributeCache](const ConcreteAttributePath & path) {
+            using namespace Clusters::JointFabricAdministrator::Attributes;
+            AdministratorFabricIndex::TypeInfo::DecodableType administratorFabricIndex;
 
-        VerifyOrReturnError(path.mAttributeId == AdministratorFabricIndex::Id, CHIP_NO_ERROR);
-        ReturnErrorOnFailure(attributeCache->Get<AdministratorFabricIndex::TypeInfo>(path, administratorFabricIndex));
+            VerifyOrReturnError(path.mAttributeId == AdministratorFabricIndex::Id, CHIP_NO_ERROR);
+            ReturnErrorOnFailure(attributeCache->Get<AdministratorFabricIndex::TypeInfo>(path, administratorFabricIndex));
 
-        if (!administratorFabricIndex.IsNull() && administratorFabricIndex.Value() != kUndefinedFabricIndex)
-        {
-            ChipLogProgress(Controller, "JCM: AdministratorFabricIndex: %d", administratorFabricIndex.Value());
-            mInfo.adminFabricIndex = administratorFabricIndex.Value();
-            mInfo.adminEndpointId = path.mEndpointId;
-        }
-        else
-        {
-            ChipLogError(Controller, "JCM: JF Administrator Cluster not found!");
-            return CHIP_ERROR_NOT_FOUND;
-        }
+            if (!administratorFabricIndex.IsNull() && administratorFabricIndex.Value() != kUndefinedFabricIndex)
+            {
+                ChipLogProgress(Controller, "JCM: AdministratorFabricIndex: %d", administratorFabricIndex.Value());
+                mInfo.adminFabricIndex = administratorFabricIndex.Value();
+                mInfo.adminEndpointId  = path.mEndpointId;
+            }
+            else
+            {
+                ChipLogError(Controller, "JCM: JF Administrator Cluster not found!");
+                return CHIP_ERROR_NOT_FOUND;
+            }
 
-        return CHIP_NO_ERROR;
-    });
+            return CHIP_NO_ERROR;
+        });
 
-    if( err != CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "JCM: Failed to parse Administrator Fabric Index: %s", err.AsString());
         return err;
@@ -116,7 +116,7 @@ CHIP_ERROR JCMDeviceCommissioner::ParseAdminFabricIndexAndEndpointId(ReadCommiss
         return CHIP_ERROR_NOT_FOUND;
     }
 
-    if(mInfo.adminEndpointId == kInvalidEndpointId)
+    if (mInfo.adminEndpointId == kInvalidEndpointId)
     {
         ChipLogError(Controller, "JCM: Invalid Endpoint ID");
         return CHIP_ERROR_NOT_FOUND;
@@ -131,11 +131,12 @@ CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningI
 {
     auto attributeCache = info.attributes;
 
-    CHIP_ERROR err = attributeCache->ForEachAttribute(OperationalCredentials::Id, [this, &attributeCache](const ConcreteAttributePath & path) {
-        using namespace chip::app::Clusters::OperationalCredentials::Attributes;
+    CHIP_ERROR err =
+        attributeCache->ForEachAttribute(OperationalCredentials::Id, [this, &attributeCache](const ConcreteAttributePath & path) {
+            using namespace chip::app::Clusters::OperationalCredentials::Attributes;
 
-        switch (path.mAttributeId)
-        {
+            switch (path.mAttributeId)
+            {
             case Fabrics::Id: {
                 Fabrics::TypeInfo::DecodableType fabrics;
                 ReturnErrorOnFailure(attributeCache->Get<Fabrics::TypeInfo>(path, fabrics));
@@ -155,7 +156,8 @@ CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningI
                     {
                         if (fabricDescriptor.rootPublicKey.size() != Crypto::kP256_PublicKey_Length)
                         {
-                            ChipLogError(Controller, "JCM: DeviceCommissioner::ParseJFAdministratorInfo - fabric root key size mismatch");
+                            ChipLogError(Controller,
+                                         "JCM: DeviceCommissioner::ParseJFAdministratorInfo - fabric root key size mismatch");
                             return CHIP_ERROR_KEY_NOT_FOUND;
                         }
 
@@ -201,10 +203,10 @@ CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningI
             }
             default:
                 return CHIP_NO_ERROR;
-        }
+            }
 
-        return CHIP_NO_ERROR;
-    });
+            return CHIP_NO_ERROR;
+        });
 
     if (err != CHIP_NO_ERROR)
     {
@@ -239,11 +241,12 @@ CHIP_ERROR JCMDeviceCommissioner::ParseTrustedRoot(ReadCommissioningInfo & info)
 {
     auto attributeCache = info.attributes;
 
-    CHIP_ERROR err = attributeCache->ForEachAttribute(OperationalCredentials::Id, [this, &attributeCache](const ConcreteAttributePath & path) {
-        using namespace chip::app::Clusters::OperationalCredentials::Attributes;
+    CHIP_ERROR err =
+        attributeCache->ForEachAttribute(OperationalCredentials::Id, [this, &attributeCache](const ConcreteAttributePath & path) {
+            using namespace chip::app::Clusters::OperationalCredentials::Attributes;
 
-        switch (path.mAttributeId)
-        {
+            switch (path.mAttributeId)
+            {
             case TrustedRootCertificates::Id: {
                 bool foundMatchingRcac = false;
                 TrustedRootCertificates::TypeInfo::DecodableType trustedCAs;
@@ -260,7 +263,8 @@ CHIP_ERROR JCMDeviceCommissioner::ParseTrustedRoot(ReadCommissioningInfo & info)
 
                     if (mInfo.rootPublicKey.size() != Crypto::kP256_PublicKey_Length)
                     {
-                        ChipLogError(Controller, "JCM: DeviceCommissioner::ParseJFAdministratorInfo - fabric root key size mismatch");
+                        ChipLogError(Controller,
+                                     "JCM: DeviceCommissioner::ParseJFAdministratorInfo - fabric root key size mismatch");
                         return CHIP_ERROR_KEY_NOT_FOUND;
                     }
 
@@ -283,9 +287,9 @@ CHIP_ERROR JCMDeviceCommissioner::ParseTrustedRoot(ReadCommissioningInfo & info)
             }
             default:
                 return CHIP_NO_ERROR;
-           }
-           return CHIP_NO_ERROR;
-    });
+            }
+            return CHIP_NO_ERROR;
+        });
 
     if (err != CHIP_NO_ERROR)
     {
@@ -384,7 +388,6 @@ JCMTrustVerificationError JCMDeviceCommissioner::PerformVendorIDVerificationProc
     return JCMTrustVerificationError::kAsync; // Indicate that this is an async operation
 }
 
-
 JCMTrustVerificationError JCMDeviceCommissioner::AskUserForConsent()
 {
     ChipLogProgress(Controller, "JCM: Asking user for consent");
@@ -404,25 +407,25 @@ void JCMDeviceCommissioner::PerformTrustVerificationStage(JCMTrustVerificationSt
 
     switch (nextStage)
     {
-        case JCMTrustVerificationStage::kVerifyingAdministratorInformation:
-            error = VerifyAdministratorInformation();
-            break;
-        case JCMTrustVerificationStage::kPerformingVendorIDVerification:
-            error = PerformVendorIDVerificationProcedure();
-            break;
-        case JCMTrustVerificationStage::kAskingUserForConsent:
-            error = AskUserForConsent();
-            break;
-        case JCMTrustVerificationStage::kComplete:
-            error = JCMTrustVerificationError::kSuccess;
-            break;
-        case JCMTrustVerificationStage::kError:
-            error = JCMTrustVerificationError::kInternalError;
-            break;
-        default:
-            ChipLogError(Controller, "JCM: Invalid stage: %d", static_cast<int>(nextStage));
-            error = JCMTrustVerificationError::kInternalError;
-            break;
+    case JCMTrustVerificationStage::kVerifyingAdministratorInformation:
+        error = VerifyAdministratorInformation();
+        break;
+    case JCMTrustVerificationStage::kPerformingVendorIDVerification:
+        error = PerformVendorIDVerificationProcedure();
+        break;
+    case JCMTrustVerificationStage::kAskingUserForConsent:
+        error = AskUserForConsent();
+        break;
+    case JCMTrustVerificationStage::kComplete:
+        error = JCMTrustVerificationError::kSuccess;
+        break;
+    case JCMTrustVerificationStage::kError:
+        error = JCMTrustVerificationError::kInternalError;
+        break;
+    default:
+        ChipLogError(Controller, "JCM: Invalid stage: %d", static_cast<int>(nextStage));
+        error = JCMTrustVerificationError::kInternalError;
+        break;
     }
 
     if (error != JCMTrustVerificationError::kAsync)
@@ -431,7 +434,8 @@ void JCMDeviceCommissioner::PerformTrustVerificationStage(JCMTrustVerificationSt
     }
 }
 
-void JCMDeviceCommissioner::TrustVerificationStageFinished(JCMTrustVerificationStage completedStage, JCMTrustVerificationError error)
+void JCMDeviceCommissioner::TrustVerificationStageFinished(JCMTrustVerificationStage completedStage,
+                                                           JCMTrustVerificationError error)
 {
     ChipLogProgress(Controller, "JCM: Trust Verification Stage Finished: %s", enumToString(completedStage).c_str());
 
@@ -469,22 +473,22 @@ JCMTrustVerificationStage JCMDeviceCommissioner::GetNextTrustVerificationStage(J
 
     switch (currentStage)
     {
-        case JCMTrustVerificationStage::kIdle:
-            nextStage = JCMTrustVerificationStage::kVerifyingAdministratorInformation;
-            break;
-        case JCMTrustVerificationStage::kVerifyingAdministratorInformation:
-            nextStage = JCMTrustVerificationStage::kPerformingVendorIDVerification;
-            break;
-        case JCMTrustVerificationStage::kPerformingVendorIDVerification:
-            nextStage = JCMTrustVerificationStage::kAskingUserForConsent;
-            break;
-        case JCMTrustVerificationStage::kAskingUserForConsent:
-            nextStage = JCMTrustVerificationStage::kComplete;
-            break;
-        default:
-            ChipLogError(Controller, "JCM: Invalid stage: %d", static_cast<int>(currentStage));
-            nextStage = JCMTrustVerificationStage::kError;
-            break;
+    case JCMTrustVerificationStage::kIdle:
+        nextStage = JCMTrustVerificationStage::kVerifyingAdministratorInformation;
+        break;
+    case JCMTrustVerificationStage::kVerifyingAdministratorInformation:
+        nextStage = JCMTrustVerificationStage::kPerformingVendorIDVerification;
+        break;
+    case JCMTrustVerificationStage::kPerformingVendorIDVerification:
+        nextStage = JCMTrustVerificationStage::kAskingUserForConsent;
+        break;
+    case JCMTrustVerificationStage::kAskingUserForConsent:
+        nextStage = JCMTrustVerificationStage::kComplete;
+        break;
+    default:
+        ChipLogError(Controller, "JCM: Invalid stage: %d", static_cast<int>(currentStage));
+        nextStage = JCMTrustVerificationStage::kError;
+        break;
     }
 
     return nextStage;
@@ -518,12 +522,13 @@ void JCMDeviceCommissioner::CleanupCommissioning(DeviceProxy * proxy, NodeId nod
 
 /*
  * JCMAutoCommissioner override implementation
-*/
+ */
 CHIP_ERROR JCMAutoCommissioner::SetCommissioningParameters(const CommissioningParameters & params)
 {
     ReturnErrorOnFailure(AutoCommissioner::SetCommissioningParameters(params));
 
-    if (params.GetUseJCM().ValueOr(false)) {
+    if (params.GetUseJCM().ValueOr(false))
+    {
         auto extraReadPaths = params.GetExtraReadPaths();
 
         mTempReadPaths.clear();

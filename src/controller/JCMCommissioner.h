@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
- #pragma once
+#pragma once
 
 #include "JCMTrustVerification.h"
 
@@ -49,8 +49,8 @@ class JCMDeviceCommissioner : public DeviceCommissioner
 {
 public:
     // The constructor initializes the JCMCommissioner with a reference to this device commissioner
-    JCMDeviceCommissioner(){}
-    ~JCMDeviceCommissioner(){}
+    JCMDeviceCommissioner() {}
+    ~JCMDeviceCommissioner() {}
 
     void RegisterTrustVerificationDelegate(JCMTrustVerificationDelegate * trustVerificationDelegate)
     {
@@ -87,10 +87,7 @@ public:
     /*
      * GetJCMTrustVerificationInfo is a method that returns the JCM trust verification information.
      */
-     JCMTrustVerificationInfo & GetJCMTrustVerificationInfo()
-    {
-       return mInfo;
-    }
+    JCMTrustVerificationInfo & GetJCMTrustVerificationInfo() { return mInfo; }
 
 protected:
     // Override ParseExtraCommissioningInfo to parse JCM administrator info
@@ -150,14 +147,17 @@ public:
     void CleanupCommissioning() override;
 
 private:
-     // Joint Fabric Management: all attributes
-     const std::vector<app::AttributePathParams> mExtraReadPaths =
-     {
-         app::AttributePathParams(app::Clusters::JointFabricAdministrator::Id, app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::Id),
-         app::AttributePathParams(kRootEndpointId, app::Clusters::OperationalCredentials::Id, app::Clusters::OperationalCredentials::Attributes::Fabrics::Id),
-         app::AttributePathParams(kRootEndpointId, app::Clusters::OperationalCredentials::Id, app::Clusters::OperationalCredentials::Attributes::NOCs::Id),
-         app::AttributePathParams(kRootEndpointId, app::Clusters::OperationalCredentials::Id, app::Clusters::OperationalCredentials::Attributes::TrustedRootCertificates::Id)
-     };
+    // Joint Fabric Management: all attributes
+    const std::vector<app::AttributePathParams> mExtraReadPaths = {
+        app::AttributePathParams(app::Clusters::JointFabricAdministrator::Id,
+                                 app::Clusters::JointFabricAdministrator::Attributes::AdministratorFabricIndex::Id),
+        app::AttributePathParams(kRootEndpointId, app::Clusters::OperationalCredentials::Id,
+                                 app::Clusters::OperationalCredentials::Attributes::Fabrics::Id),
+        app::AttributePathParams(kRootEndpointId, app::Clusters::OperationalCredentials::Id,
+                                 app::Clusters::OperationalCredentials::Attributes::NOCs::Id),
+        app::AttributePathParams(kRootEndpointId, app::Clusters::OperationalCredentials::Id,
+                                 app::Clusters::OperationalCredentials::Attributes::TrustedRootCertificates::Id)
+    };
     std::vector<app::AttributePathParams> mTempReadPaths;
 };
 

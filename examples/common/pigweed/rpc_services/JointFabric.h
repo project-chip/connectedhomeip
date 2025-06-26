@@ -17,7 +17,7 @@ public:
 private:
     struct OwnershipTransferContext
     {
-        OwnershipTransferContext(uint64_t nodeId, bool jcm) : mNodeId(nodeId), mJCM(jcm){}
+        OwnershipTransferContext(uint64_t nodeId, bool jcm) : mNodeId(nodeId), mJCM(jcm) {}
 
         uint64_t mNodeId;
         bool mJCM;

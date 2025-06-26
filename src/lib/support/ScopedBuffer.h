@@ -281,10 +281,7 @@ public:
 
     // Allow creating a CharSpan, ByteSpan from ScopedMemoryBufferWithSize, so we
     // don't have to reinvent it in various places.
-    chip::Span<const T> GetSpan()
-    {
-        return chip::Span<const T>(ScopedMemoryBuffer<T>::Get(), AllocatedSize());
-    }
+    chip::Span<const T> GetSpan() { return chip::Span<const T>(ScopedMemoryBuffer<T>::Get(), AllocatedSize()); }
 
 private:
     size_t mCount = 0;
