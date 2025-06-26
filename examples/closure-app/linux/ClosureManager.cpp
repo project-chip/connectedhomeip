@@ -178,9 +178,6 @@ void ClosureManager::HandleClosureActionTimer(System::Layer * layer, void * aApp
     case ClosureAction::kCalibrateAction:
         instance.HandleCalibrateActionComplete();
         break;
-    case ClosureAction::kStopAction:
-        instance.HandleStopActionComplete();
-        break;
     case ClosureAction::kMoveToAction:
         // Add logic to handle MoveTo action completion
         break;
