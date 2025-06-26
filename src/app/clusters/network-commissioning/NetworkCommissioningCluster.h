@@ -26,7 +26,7 @@ namespace Clusters {
 /// Integration of Network Commissioning logic within the Matter data model
 ///
 /// Translates generic cluster calls (general TLV or untyped data)
-/// into type-safe calls to be processed by the `NetworkCommissionigLogic`
+/// into type-safe calls to be processed by the `NetworkCommissioningLogic`
 ///
 /// This is a `ServerClusterInterface` wrapper around the functionality implemented
 /// inside `NetworkCommissioningLogic`.
