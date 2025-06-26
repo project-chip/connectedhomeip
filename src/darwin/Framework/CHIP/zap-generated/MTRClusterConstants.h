@@ -7092,11 +7092,9 @@ typedef NS_ENUM(uint32_t, MTRCommandIDType) {
     MTRCommandIDTypeClusterZoneManagementCommandCreateTwoDCartesianZoneID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,
     MTRCommandIDTypeClusterZoneManagementCommandCreateTwoDCartesianZoneResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000001,
     MTRCommandIDTypeClusterZoneManagementCommandUpdateTwoDCartesianZoneID MTR_PROVISIONALLY_AVAILABLE = 0x00000002,
-    MTRCommandIDTypeClusterZoneManagementCommandGetTwoDCartesianZoneID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
-    MTRCommandIDTypeClusterZoneManagementCommandGetTwoDCartesianZoneResponseID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
-    MTRCommandIDTypeClusterZoneManagementCommandRemoveZoneID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
-    MTRCommandIDTypeClusterZoneManagementCommandCreateOrUpdateTriggerID MTR_PROVISIONALLY_AVAILABLE = 0x00000006,
-    MTRCommandIDTypeClusterZoneManagementCommandRemoveTriggerID MTR_PROVISIONALLY_AVAILABLE = 0x00000007,
+    MTRCommandIDTypeClusterZoneManagementCommandRemoveZoneID MTR_PROVISIONALLY_AVAILABLE = 0x00000003,
+    MTRCommandIDTypeClusterZoneManagementCommandCreateOrUpdateTriggerID MTR_PROVISIONALLY_AVAILABLE = 0x00000004,
+    MTRCommandIDTypeClusterZoneManagementCommandRemoveTriggerID MTR_PROVISIONALLY_AVAILABLE = 0x00000005,
 
     // Cluster CameraAVStreamManagement commands
     MTRCommandIDTypeClusterCameraAVStreamManagementCommandAudioStreamAllocateID MTR_PROVISIONALLY_AVAILABLE = 0x00000000,

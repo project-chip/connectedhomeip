@@ -17343,10 +17343,9 @@ public class ClusterIDMapping {
         public enum Command {
             CreateTwoDCartesianZone(0L),
             UpdateTwoDCartesianZone(2L),
-            GetTwoDCartesianZone(3L),
-            RemoveZone(5L),
-            CreateOrUpdateTrigger(6L),
-            RemoveTrigger(7L),;
+            RemoveZone(3L),
+            CreateOrUpdateTrigger(4L),
+            RemoveTrigger(5L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -17392,23 +17391,6 @@ public class ClusterIDMapping {
                     }
                     public static UpdateTwoDCartesianZoneCommandField value(int id) throws NoSuchFieldError {
                         for (UpdateTwoDCartesianZoneCommandField field : UpdateTwoDCartesianZoneCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum GetTwoDCartesianZoneCommandField {ZoneID(0),;
-                    private final int id;
-                    GetTwoDCartesianZoneCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static GetTwoDCartesianZoneCommandField value(int id) throws NoSuchFieldError {
-                        for (GetTwoDCartesianZoneCommandField field : GetTwoDCartesianZoneCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

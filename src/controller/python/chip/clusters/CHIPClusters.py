@@ -12574,27 +12574,20 @@ class ChipClusters:
             },
             0x00000003: {
                 "commandId": 0x00000003,
-                "commandName": "GetTwoDCartesianZone",
-                "args": {
-                    "zoneID": "int",
-                },
-            },
-            0x00000005: {
-                "commandId": 0x00000005,
                 "commandName": "RemoveZone",
                 "args": {
                     "zoneID": "int",
                 },
             },
-            0x00000006: {
-                "commandId": 0x00000006,
+            0x00000004: {
+                "commandId": 0x00000004,
                 "commandName": "CreateOrUpdateTrigger",
                 "args": {
                     "trigger": "ZoneTriggerControlStruct",
                 },
             },
-            0x00000007: {
-                "commandId": 0x00000007,
+            0x00000005: {
+                "commandId": 0x00000005,
                 "commandName": "RemoveTrigger",
                 "args": {
                     "zoneID": "int",

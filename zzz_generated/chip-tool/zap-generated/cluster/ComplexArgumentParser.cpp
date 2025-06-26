@@ -6282,6 +6282,13 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.zoneSource, value["zoneSource"]));
     valueCopy.removeMember("zoneSource");
 
+    if (value.isMember("twoDCartesianZone"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "twoDCartesianZone");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.twoDCartesianZone, value["twoDCartesianZone"]));
+    }
+    valueCopy.removeMember("twoDCartesianZone");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -6290,6 +6297,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ZoneManagement::Struct
     ComplexArgumentParser::Finalize(request.zoneID);
     ComplexArgumentParser::Finalize(request.zoneType);
     ComplexArgumentParser::Finalize(request.zoneSource);
+    ComplexArgumentParser::Finalize(request.twoDCartesianZone);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
