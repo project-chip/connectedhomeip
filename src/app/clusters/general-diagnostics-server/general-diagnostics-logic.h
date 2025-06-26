@@ -47,10 +47,7 @@ struct GeneralDiagnosticsEnabledAttributes
 
 class GeneralDiagnosticsLogic {
 public:
-    GeneralDiagnosticsLogic(const GeneralDiagnosticsEnabledAttributes enabledAttributes = GeneralDiagnosticsEnabledAttributes()) : mEnabledAttributes(enabledAttributes){}
-
-    // GeneralDiagnosticsLogic(const GeneralDiagnosticsEnabledAttributes enabledAttributes) : mEnabledAttributes(enabledAttributes){}
-    // GeneralDiagnosticsLogic() = default;
+    GeneralDiagnosticsLogic(const GeneralDiagnosticsEnabledAttributes enabledAttributes) : mEnabledAttributes(enabledAttributes){}
     ~GeneralDiagnosticsLogic() = default;
 
     CHIP_ERROR GetRebootCount(uint16_t & rebotCount) const { return GetDiagnosticDataProvider().GetRebootCount(rebotCount); }

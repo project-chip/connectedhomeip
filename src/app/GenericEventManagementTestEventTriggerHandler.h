@@ -20,7 +20,6 @@
 
 #include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 #include <app/TestEventTriggerDelegate.h>
-#include <optional>
 
 namespace chip {
 namespace app {
