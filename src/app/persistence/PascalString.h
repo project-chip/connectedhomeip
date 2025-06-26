@@ -37,7 +37,7 @@ struct PascalPrefixOperations;
 template <>
 struct PascalPrefixOperations<1>
 {
-    using LengthType = uint8_t;
+    using LengthType                           = uint8_t;
     static constexpr LengthType kInvalidLength = 0xFF;
 
     static LengthType GetLength(const uint8_t * buffer) { return *buffer; }
@@ -51,7 +51,7 @@ struct PascalPrefixOperations<1>
 template <>
 struct PascalPrefixOperations<2>
 {
-    using LengthType = uint16_t;
+    using LengthType                           = uint16_t;
     static constexpr LengthType kInvalidLength = 0xFFFF;
 
     static LengthType GetLength(const uint8_t * buffer) { return Encoding::LittleEndian::Get16(buffer); }
@@ -73,7 +73,7 @@ template <typename T, uint8_t PREFIX_LEN>
 class PascalBuffer
 {
 public:
-    using LengthType = typename PascalPrefixOperations<PREFIX_LEN>::LengthType;
+    using LengthType                           = typename PascalPrefixOperations<PREFIX_LEN>::LengthType;
     static constexpr LengthType kInvalidLength = PascalPrefixOperations<PREFIX_LEN>::kInvalidLength;
 
     static_assert(sizeof(T) == 1);
