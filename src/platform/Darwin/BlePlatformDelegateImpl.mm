@@ -88,6 +88,9 @@ namespace DeviceLayer {
             if (manager != nil)
                 [manager cancelPeripheralConnection:peripheral];
 
+            // TODO: This does not cause our BleConnectionDelegateImpl to let go of the CBPeripheral
+            // since MTRBleConnection does not implement centralManager:didDisconnectPeripheral:error:
+
             return CHIP_NO_ERROR;
         }
 

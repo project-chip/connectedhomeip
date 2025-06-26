@@ -17,7 +17,7 @@
 import unittest
 from unittest.mock import mock_open, patch
 
-from matter_yamltests.pics_checker import InvalidPICSConfigurationError, InvalidPICSConfigurationValueError, PICSChecker
+from matter.yamltests.pics_checker import InvalidPICSConfigurationError, InvalidPICSConfigurationValueError, PICSChecker
 
 empty_config = ''
 

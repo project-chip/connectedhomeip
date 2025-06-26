@@ -77,6 +77,11 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 @property (readonly) BOOL deviceCachePrimed MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
 /**
+ * Returns true if a diagnostic log transfer is ongoing.
+ */
+@property (readonly) BOOL diagnosticLogTransferInProgress MTR_PROVISIONALLY_AVAILABLE;
+
+/**
  * The estimated device system start time.
  *
  * A device can report its events with either calendar time or time since system start time. When events are reported with time

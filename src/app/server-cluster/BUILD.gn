@@ -18,6 +18,7 @@ source_set("server-cluster") {
     "DefaultServerCluster.cpp",
     "DefaultServerCluster.h",
     "ServerClusterContext.h",
+    "ServerClusterInterface.cpp",
     "ServerClusterInterface.h",
   ]
 

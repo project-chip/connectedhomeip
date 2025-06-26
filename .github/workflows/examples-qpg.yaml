@@ -40,7 +40,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:125
+            image: ghcr.io/project-chip/chip-build:140
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -50,6 +50,7 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: qpg
+                extra-submodule-parameters: --recursive
 
             - name: Set up environment for size reports
               uses: ./.github/actions/setup-size-reports
@@ -57,15 +58,15 @@ jobs:
               with:
                 gh-context: ${{ toJson(github) }}
 
-            - name: Build QPG6105 example apps
+            - name: Build QPG6200 example apps
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
                         --enable-flashbundle \
-                        --target qpg-qpg6105-lock \
-                        --target qpg-qpg6105-light \
-                        --target qpg-qpg6105-light-switch \
-                        --target qpg-qpg6105-thermostat \
+                        --target qpg-qpg6200-lock \
+                        --target qpg-qpg6200-light \
+                        --target qpg-qpg6200-light-switch \
+                        --target qpg-qpg6200-thermostat \
                         build \
                         --copy-artifacts-to out/artifacts \
                      "
@@ -76,12 +77,12 @@ jobs:
             - name: Prepare some bloat report from the previous builds
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    qpg qpg6105+debug lighting-app \
-                    out/qpg-qpg6105-light/chip-qpg6105-lighting-example.out \
+                    qpg qpg6200+debug lighting-app \
+                    out/qpg-qpg6200-light/chip-qpg6200-lighting-example.out \
                     /tmp/bloat_reports/
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    qpg qpg6105+debug lock-app \
-                    out/qpg-qpg6105-lock/chip-qpg6105-lock-example.out \
+                    qpg qpg6200+debug lock-app \
+                    out/qpg-qpg6200-lock/chip-qpg6200-lock-example.out \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports

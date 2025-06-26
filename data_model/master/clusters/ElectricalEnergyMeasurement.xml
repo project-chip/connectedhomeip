@@ -80,10 +80,16 @@ Davis, CA 95616, USA
       <optionalConform choice="b" more="true" min="1"/>
     </feature>
     <feature bit="4" code="APPE" name="ApparentEnergy" summary="Measurements report apparent energy">
-      <optionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </feature>
     <feature bit="5" code="REAE" name="ReactiveEnergy" summary="Measurements report reactive energy">
-      <optionalConform/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </feature>
   </features>
   <dataTypes>
@@ -123,22 +129,31 @@ Davis, CA 95616, USA
           </between>
         </constraint>
       </field>
-      <field id="1" name="StartTimestamp" type="epoch-s"/>
+      <field id="1" name="StartTimestamp" type="epoch-s">
+        <describedConform/>
+      </field>
       <field id="2" name="EndTimestamp" type="epoch-s">
+        <describedConform/>
         <constraint>
           <min value="StartTimestamp + 1"/>
         </constraint>
       </field>
-      <field id="3" name="StartSystime" type="systime-ms"/>
+      <field id="3" name="StartSystime" type="systime-ms">
+        <describedConform/>
+      </field>
       <field id="4" name="EndSystime" type="systime-ms">
+        <describedConform/>
         <constraint>
           <min value="StartSystime + 1"/>
         </constraint>
       </field>
       <field id="5" name="ApparentEnergy" type="energy-mVAh">
-        <mandatoryConform>
-          <feature name="APPE"/>
-        </mandatoryConform>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="APPE"/>
+          </mandatoryConform>
+        </otherwiseConform>
         <constraint>
           <between>
             <from value="0"/>
@@ -147,9 +162,12 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="6" name="ReactiveEnergy" type="energy-mVARh">
-        <mandatoryConform>
-          <feature name="REAE"/>
-        </mandatoryConform>
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform>
+            <feature name="REAE"/>
+          </mandatoryConform>
+        </otherwiseConform>
         <constraint>
           <between>
             <from value="0"/>

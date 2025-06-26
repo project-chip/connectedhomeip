@@ -135,7 +135,9 @@ TEST_CASES = [
     TestSpec(0, 0, 0, 10, False),
     # min specified, max out of range top
     TestSpec(0, 32768, 0, 10, False),
+]
 
+TEST_CASES_TOLERANCE = [
     # ==============================
     # Tolerance test cases
     # ==============================
@@ -147,7 +149,6 @@ TEST_CASES = [
     TestSpec(NullValue, NullValue, 0, -1, False),
     # Tolerance out of range top
     TestSpec(NullValue, NullValue, 0, 2049, False),
-
 ]
 
 
@@ -157,6 +158,19 @@ def test_spec_to_attribute_cache(test_spec: TestSpec) -> Attribute.AsyncReadTran
     resp = Attribute.AsyncReadTransaction.ReadResponse({}, [], {})
     resp.attributes = {1: {c: {attr.MaxMeasuredValue: test_spec.max,
                                attr.MinMeasuredValue: test_spec.min, attr.MeasuredValue: test_spec.measured, attr.Tolerance: test_spec.tolerance}}}
+    resp.attributes[1][c][attr.AttributeList] = [a.attribute_id for a in resp.attributes[1][c].keys()]
+
+    return resp
+
+
+def test_spec_to_attribute_cache_no_tolerance(test_spec: TestSpec) -> Attribute.AsyncReadTransaction.ReadResponse:
+    c = Clusters.TemperatureMeasurement
+    attr = Clusters.TemperatureMeasurement.Attributes
+    resp = Attribute.AsyncReadTransaction.ReadResponse({}, [], {})
+    resp.attributes = {1: {c: {attr.MaxMeasuredValue: test_spec.max,
+                               attr.MinMeasuredValue: test_spec.min, attr.MeasuredValue: test_spec.measured, attr.Tolerance: test_spec.tolerance}}}
+    resp.attributes[1][c][attr.AttributeList] = [a.attribute_id for a in resp.attributes[1][c].keys()]
+
     return resp
 
 
@@ -167,11 +181,20 @@ def main():
     for idx, t in enumerate(TEST_CASES):
         ok = test_runner.run_test_with_mock_read(test_spec_to_attribute_cache(t)) == t.expect_pass
         if not ok:
-            failures.append(f"Measured test case failure: {idx} {t}")
+            failures.append(f"Measured test case failure (tolerance included): {idx} {t}")
+        ok = test_runner.run_test_with_mock_read(test_spec_to_attribute_cache_no_tolerance(t)) == t.expect_pass
+        if not ok:
+            failures.append(f"Measured test case failure (tolerance not included): {idx} {t}")
+
+    for idx, t in enumerate(TEST_CASES_TOLERANCE):
+        ok = test_runner.run_test_with_mock_read(test_spec_to_attribute_cache(t)) == t.expect_pass
+        if not ok:
+            failures.append(f"Measured tolerance test case failure: {idx} {t}")
 
     test_runner.Shutdown()
+    num_tests = len(TEST_CASES)*2 + len(TEST_CASES_TOLERANCE)
     print(
-        f"Test of tests: run {len(TEST_CASES)}, test response correct: {len(TEST_CASES) - len(failures)} test response incorrect: {len(failures)}")
+        f"Test of tests: run {num_tests}, test response correct: {num_tests - len(failures)} test response incorrect: {len(failures)}")
     for f in failures:
         print(f)
 

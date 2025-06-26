@@ -22,9 +22,8 @@ from dataclasses import dataclass, field
 from enum import Enum, IntEnum
 from typing import Any, Optional, Tuple
 
-from matter_yamltests.pseudo_clusters.pseudo_clusters import get_default_pseudo_clusters
-
 from matter.idl.generators.filters import to_pascal_case, to_snake_case
+from matter.yamltests.pseudo_clusters.pseudo_clusters import get_default_pseudo_clusters
 
 from .. import interaction_model as MatterInteractionModel
 from ..ChipDeviceCtrl import ChipDeviceController, discovery

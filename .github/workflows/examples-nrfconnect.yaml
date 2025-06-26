@@ -40,7 +40,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:125
+            image: ghcr.io/project-chip/chip-build-nrf-platform:140
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -60,6 +60,9 @@ jobs:
                         - '**/nrfconnect/**'
                         - '**/Zephyr/**'
                         - '**/zephyr/**'
+                      pigweed:
+                        - 'src/pw_backends/**'
+                        - 'third_party/pigweed/**'
                       tests:
                         - '**/tests/**'
                       shell:
@@ -194,7 +197,11 @@ jobs:
                     examples/all-clusters-app/nrfconnect/build/nrfconnect/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Run unit tests for Zephyr native_posix_64 platform
-              if: github.event_name == 'push' || steps.changed_paths.outputs.tests == 'true' || steps.changed_paths.outputs.nrfconnect == 'true'
+              if: >
+                github.event_name == 'push' ||
+                steps.changed_paths.outputs.tests == 'true' ||
+                steps.changed_paths.outputs.nrfconnect == 'true' ||
+                steps.changed_paths.outputs.pigweed == 'true'
               run: |
                   # Temporarily fix link issue
                   sed -i '151s/<LINK_FLAGS> //' /opt/NordicSemiconductor/nrfconnect/zephyr/cmake/linker/ld/target.cmake

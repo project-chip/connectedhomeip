@@ -41,7 +41,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]' && github.repository_owner == 'espressif'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32-qemu:125
+            image: ghcr.io/project-chip/chip-build-esp32-qemu:140
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -79,7 +79,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-tizen-qemu:125
+            image: ghcr.io/project-chip/chip-build-tizen-qemu:140
             options: --user root
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
@@ -98,4 +98,5 @@ jobs:
                     "./scripts/build/build_examples.py \
                         --target tizen-arm-tests-no-ble-no-thread \
                         build
-                    "
+                    " \
+                || { ./scripts/helpers/tizen-crashlog.sh; exit 1; }

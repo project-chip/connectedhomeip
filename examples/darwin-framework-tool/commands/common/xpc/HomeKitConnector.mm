@@ -17,8 +17,7 @@
  */
 
 #import "HomeKitConnector.h"
-#import "../CHIPCommandBridge.h"
-#import <lib/support/logging/CHIPLogging.h>
+#import "../CommissionerInfos.h"
 
 #import <HomeKit/HomeKit.h>
 
@@ -47,7 +46,9 @@ NSString * kControllerIdPrefixStr = @(kControllerIdPrefix);
 
 - (void)start
 {
-    VerifyOrReturn(!_connectorStarted);
+    if (_connectorStarted) {
+        return;
+    }
     _connectorStarted = YES;
 
     _homeManagerReady = NO;
@@ -65,7 +66,9 @@ NSString * kControllerIdPrefixStr = @(kControllerIdPrefix);
 
 - (void)stop
 {
-    VerifyOrReturn(_connectorStarted);
+    if (!_connectorStarted) {
+        return;
+    }
 
     _homeManager.delegate = nil;
     _homeManager = nil;
@@ -73,7 +76,9 @@ NSString * kControllerIdPrefixStr = @(kControllerIdPrefix);
 
 - (void)homeManagerDidUpdateHomes:(HMHomeManager *)manager
 {
-    VerifyOrReturn(!_homeManagerReady);
+    if (_homeManagerReady) {
+        return;
+    }
     dispatch_group_leave(_homeManagerReadyGroup);
 }
 
@@ -82,14 +87,17 @@ NSString * kControllerIdPrefixStr = @(kControllerIdPrefix);
     [[HomeKitConnector sharedInstance] start];
 
     __auto_type * homes = _homeManager.homes;
-    VerifyOrReturnValue(0 != homes.count, nil, ChipLogError(chipTool, "HomeKit is not configured with any homes."));
+    if (homes.count == 0) {
+        NSLog(@"HomeKit is not configured with any homes.");
+        return nil;
+    }
 
     NSNumber * fabricId = nil;
     if ([controllerID hasPrefix:kControllerIdPrefixStr]) {
         __auto_type * fabricIdString = [controllerID substringFromIndex:kControllerIdPrefixStr.length];
         fabricId = @([fabricIdString integerValue]);
     } else {
-        fabricId = CHIPCommandBridge::GetCommissionerFabricId([controllerID UTF8String]);
+        fabricId = GetCommissionerFabricId([controllerID UTF8String]);
     }
 
     // When multiple homes exist, the first controller corresponds to the first home, the second controller to the second home, etc.
@@ -175,17 +183,17 @@ NSString * kControllerIdPrefixStr = @(kControllerIdPrefix);
     return home.matterControllerID;
 }
 
-- (NSXPCConnection * (^)(void) )connectBlockFor:(NSString *)controllerID;
+- (NSXPCConnection * (^)(void) )connectBlockFor:(NSString *)controllerID
 {
     __auto_type * home = [self homeFor:controllerID];
-    ChipLogProgress(chipTool, "Controller '%s' will be associated with home '%s'.", [controllerID UTF8String], [home.matterControllerID UTF8String]);
+    NSLog(@"Controller '%s' will be associated with home '%s'.", [controllerID UTF8String], [home.matterControllerID UTF8String]);
 
     if ([controllerID hasPrefix:kControllerIdPrefixStr]) {
         if ([home respondsToSelector:NSSelectorFromString(@"matterStartupParametersXPCConnectBlock")]) {
             return [home valueForKey:@"matterStartupParametersXPCConnectBlock"];
         }
 
-        ChipLogError(chipTool, "Error: 'matterStartupParametersXPCConnectBlock' not available for controller '%s'.", [controllerID UTF8String]);
+        NSLog(@"Error: 'matterStartupParametersXPCConnectBlock' not available for controller '%s'.", [controllerID UTF8String]);
         return nil;
     } else {
         return home.matterControllerXPCConnectBlock;

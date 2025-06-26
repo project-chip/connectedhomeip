@@ -42,6 +42,9 @@ inline constexpr char kSerialNumberDefaultStringValue[] = "123456789";
 const uint32_t kSerialNumberDefaultUInt32Value          = 123456789;
 
 inline constexpr char kDefaultPayloadQRCode[] = "MT:M5L90MP500K64J00000";
+// kDefaultPayloadQRCode followed by the same but with passcode and
+// discriminator incremented by 1, then 2, then 3.
+inline constexpr char kConcatenatedQRCode[] = "MT:M5L90MP500K64J00000*M5L90U.D010K4J00000*M5L900CM02IX4J00000*M5L908OU03-85J00000";
 
 inline SetupPayload GetDefaultPayload()
 {

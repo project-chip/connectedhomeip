@@ -83,40 +83,38 @@ class TC_CADMIN_1_15(MatterBaseTest):
 
     def steps_TC_CADMIN_1_15(self) -> list[TestStep]:
         return [
+            TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep(
-                1, "TH_CR1 gets the MaxCumulativeFailsafeSeconds value from BasicCommissioningInfo attribute in GeneralCommissioning Cluster",
+                2, "TH_CR1 gets the MaxCumulativeFailsafeSeconds value from BasicCommissioningInfo attribute in GeneralCommissioning Cluster",
                 "Should set the MaxCumulativeFailsafeSeconds value from BasicCommissioningInfo attribute to timeout"),
-            TestStep(
-                2, "TH_CR1 reads the Fabrics attribute from the Node Operational Credentials cluster using a non-fabric-filtered read. Save the number of fabrics in the list as initial_number_of_fabrics"),
-            TestStep(
-                3, "TH_CR1 opens commissioning window on DUT with duration set to value for MaxCumulativeFailsafeSeconds",
-                "Commissioning window should open with timeout set to MaxCumulativeFailsafeSeconds"),
-            TestStep(4, "TH_CR2 fully commissions DUT_CE", "DUT should fully commission"),
-            TestStep(
-                5, "TH_CR1 opens commissioning window on DUT with duration set to value from BasicCommissioningInfo", "New commissioning window should open and be set to timeout"),
-            TestStep(6, "TH_CR3 fully commissions DUT_CE", "DUT should fully commission to TH_CR3"),
-            TestStep(7, "TH_CR2 reads the Fabrics attribute from the Node Operational Credentials cluster using a non-fabric-filtered read",
+            TestStep(3, "TH_CR1 reads the Fabrics attribute from the Node Operational Credentials cluster using a non-fabric-filtered read. Save the number of fabrics in the list as initial_number_of_fabrics"),
+            TestStep(4, "TH_CR1 opens commissioning window on DUT with duration set to value for MaxCumulativeFailsafeSeconds",
+                     "Commissioning window should open with timeout set to MaxCumulativeFailsafeSeconds"),
+            TestStep(5, "TH_CR2 fully commissions DUT_CE", "DUT should fully commission"),
+            TestStep(6, "TH_CR1 opens commissioning window on DUT with duration set to value from BasicCommissioningInfo",
+                     "New commissioning window should open and be set to timeout"),
+            TestStep(7, "TH_CR3 fully commissions DUT_CE", "DUT should fully commission to TH_CR3"),
+            TestStep(8, "TH_CR2 reads the Fabrics attribute from the Node Operational Credentials cluster using a non-fabric-filtered read",
                      "Verify the list shows initial_number_of_fabrics + 2 fabrics"),
-            TestStep(8, "Verify DUT_CE is now discoverable over DNS-SD with 3 Operational service records (_matter._tcp SRV records)."),
-            TestStep(9, "TH_CR2 reads the CurrentFabricIndex from the Node Operational Credentials cluster and saves as fabric_idx_cr2"),
-            TestStep(10, "TH_CR2 sends RemoveFabric with FabricIndex = fabric_idx_cr2 command to DUT_CE",
+            TestStep(9, "Verify DUT_CE is now discoverable over DNS-SD with 3 Operational service records (_matter._tcp SRV records)."),
+            TestStep(10, "TH_CR2 reads the CurrentFabricIndex from the Node Operational Credentials cluster and saves as fabric_idx_cr2"),
+            TestStep(11, "TH_CR2 sends RemoveFabric with FabricIndex = fabric_idx_cr2 command to DUT_CE",
                      "Verify DUT_CE responses with NOCResponse with a StatusCode OK"),
-            TestStep(11, "TH_CR2 reads the Basic Information Cluster’s NodeLabel attribute of DUT_CE",
+            TestStep(12, "TH_CR2 reads the Basic Information Cluster’s NodeLabel attribute of DUT_CE",
                      "Verify read/write commands fail as expected since the DUT_CE is no longer on the network"),
-            TestStep(12, "TH_CR1 reads the list of Fabrics on DUT_CE",
+            TestStep(13, "TH_CR1 reads the list of Fabrics on DUT_CE",
                      "Verify the list shows initial_number_of_fabrics + 1 fabrics and fabric_idx_cr2 is not included."),
-            TestStep(13, "TH_CR1 sends a OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration"),
-            TestStep(14, "TH_CR2 commissions DUT_CE", "Commissioning is successful"),
-            TestStep(15, "TH_CR2 reads the Fabrics attribute from the Node Operational Credentials cluster using a non-fabric-filtered read",
+            TestStep(14, "TH_CR1 sends a OpenCommissioningWindow command to DUT_CE using a commissioning timeout of max_window_duration"),
+            TestStep(15, "TH_CR2 commissions DUT_CE", "Commissioning is successful"),
+            TestStep(16, "TH_CR2 reads the Fabrics attribute from the Node Operational Credentials cluster using a non-fabric-filtered read",
                      "Verify the list shows initial_number_of_fabrics + 2 fabrics and fabric_idx_cr2 is not included, since a new fabric index should have been allocated."),
-            TestStep(16, "TH_CR2 reads the CurrentFabricIndex from the Node Operational Credentials cluster and saves as fabric_idx_cr2_2"),
-            TestStep(17, "TH_CR3 reads the CurrentFabricIndex from the Node Operational Credentials cluster and saves as fabric_idx_cr3"),
-            TestStep(18, "TH_CR1 sends RemoveFabric with FabricIndex = fabric_idx_cr2_2 command to DUT_CE",
+            TestStep(17, "TH_CR2 reads the CurrentFabricIndex from the Node Operational Credentials cluster and saves as fabric_idx_cr2_2"),
+            TestStep(18, "TH_CR3 reads the CurrentFabricIndex from the Node Operational Credentials cluster and saves as fabric_idx_cr3"),
+            TestStep(19, "TH_CR1 sends RemoveFabric with FabricIndex = fabric_idx_cr2_2 command to DUT_CE",
                      "Verify DUT_CE responses with NOCResponse with a StatusCode OK"),
-            TestStep(19, "TH_CR1 sends RemoveFabric with FabricIndex = fabric_idx_cr3 command to DUT_CE",
+            TestStep(20, "TH_CR1 sends RemoveFabric with FabricIndex = fabric_idx_cr3 command to DUT_CE",
                      "Verify DUT_CE responses with NOCResponse with a StatusCode OK"),
-            TestStep(20, "TH_CR1 reads the list of Fabrics on DUT_CE",
-                     "Verify the list shows initial_number_of_fabrics fabrics."),
+            TestStep(21, "TH_CR1 reads the list of Fabrics on DUT_CE", "Verify the list shows initial_number_of_fabrics fabrics."),
         ]
 
     def pics_TC_CADMIN_1_15(self) -> list[str]:
@@ -124,6 +122,7 @@ class TC_CADMIN_1_15(MatterBaseTest):
 
     @async_test_body
     async def test_TC_CADMIN_1_15(self):
+        self.step(1)
         # Establishing TH1 controller
         self.th1 = self.default_controller
         self.discriminator = random.randint(0, 4095)
@@ -138,37 +137,37 @@ class TC_CADMIN_1_15(MatterBaseTest):
         th3_fabric_admin = th3_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th2.fabricId + 1)
         self.th3 = th3_fabric_admin.NewController(nodeId=3, useTestCommissioner=True)
 
-        self.step(1)
+        self.step(2)
         GC_cluster = Clusters.GeneralCommissioning
         attribute = GC_cluster.Attributes.BasicCommissioningInfo
         duration = await self.read_single_attribute_check_success(endpoint=0, cluster=GC_cluster, attribute=attribute)
         self.max_window_duration = duration.maxCumulativeFailsafeSeconds
 
-        self.step(2)
+        self.step(3)
         fabrics = await self.get_fabrics(th=self.th1)
         initial_number_of_fabrics = len(fabrics)
 
-        self.step(3)
+        self.step(4)
         params = await self.OpenCommissioningWindow(th=self.th1, expectedErrCode=0x00)
         setupPinCode = params.setupPinCode
 
-        self.step(4)
+        self.step(5)
         await self.CommissionAttempt(setupPinCode, thnum=2, th=self.th2)
 
-        self.step(5)
+        self.step(6)
         params2 = await self.OpenCommissioningWindow(th=self.th1, expectedErrCode=0x00)
         setupPinCode2 = params2.setupPinCode
 
-        self.step(6)
+        self.step(7)
         await self.CommissionAttempt(setupPinCode2, thnum=3, th=self.th3)
 
-        self.step(7)
+        self.step(8)
         fabrics = await self.get_fabrics(th=self.th2)
         if len(fabrics) != initial_number_of_fabrics + 2:
             # len of fabrics is expected to be 3, if 3 not found then we assert failure here
             asserts.fail("Expected number of fabrics not correct")
 
-        self.step(8)
+        self.step(9)
         # Gathering instance names associated with compressed fabrics for each TH in order to verify there are 3 operational service records for DUT.
         mdns = MdnsDiscovery()
         compressed_fabric_ids = {
@@ -193,29 +192,25 @@ class TC_CADMIN_1_15(MatterBaseTest):
             f"Expected 3 instances but got {len(op_services)}"
         )
 
-        self.step(9)
+        self.step(10)
         fabric_idx_cr2 = await self.read_currentfabricindex(th=self.th2)
 
-        self.step(10)
+        self.step(11)
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr2)
         await self.th2.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
-        self.step(11)
+        self.step(12)
         # Verifies TH_CR2 is unable to read the Basic Information Cluster’s NodeLabel attribute of DUT_CE as no longer on network
-        try:
+        with asserts.assert_raises(ChipStackError) as cm:
             await self.read_single_attribute_check_success(
                 dev_ctrl=self.th2,
                 endpoint=0,
                 cluster=Clusters.BasicInformation,
                 attribute=Clusters.BasicInformation.Attributes.NodeLabel
             )
-            asserts.fail("Expected exception not thrown")
-        except ChipStackError as e:
-            # Verify that the DUT returns an "Timeout" status response
-            asserts.assert_equal(e.err, 0x00000032,
-                                 "Expected to timeout as DUT_CE is no longer on network")
+        asserts.assert_equal(cm.exception.err, 0x00000032, "Expected to timeout as DUT_CE is no longer on network")
 
-        self.step(12)
+        self.step(13)
         fabrics2 = await self.get_fabrics(th=self.th1)
         fabric_indexes = [fabric.fabricIndex for fabric in fabrics2]
         if len(fabrics2) != initial_number_of_fabrics + 1:
@@ -225,14 +220,14 @@ class TC_CADMIN_1_15(MatterBaseTest):
         if fabric_idx_cr2 in fabric_indexes:
             asserts.fail("fabricIndexes should consist of indexes 1 and 3 at this point")
 
-        self.step(13)
+        self.step(14)
         params3 = await self.OpenCommissioningWindow(self.th1, expectedErrCode=0x00)
         setupPinCode3 = params3.setupPinCode
 
-        self.step(14)
+        self.step(15)
         await self.CommissionAttempt(setupPinCode3, thnum=2, th=self.th2)
 
-        self.step(15)
+        self.step(16)
         fabrics3 = await self.get_fabrics(th=self.th2)
         fabric_indexes2 = [fabric.fabricIndex for fabric in fabrics3]
         if len(fabrics3) != initial_number_of_fabrics + 2:
@@ -242,21 +237,21 @@ class TC_CADMIN_1_15(MatterBaseTest):
         if fabric_idx_cr2 in fabric_indexes2:
             asserts.fail("fabricIndexes should not consist of fabric_idx_cr2, but it appears it was")
 
-        self.step(16)
+        self.step(17)
         fabric_idx_cr2_2 = await self.read_currentfabricindex(th=self.th2)
 
-        self.step(17)
+        self.step(18)
         fabric_idx_cr3 = await self.read_currentfabricindex(th=self.th3)
 
-        self.step(18)
+        self.step(19)
         removeFabricCmd2 = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr2_2)
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd2)
 
-        self.step(19)
+        self.step(20)
         removeFabricCmd3 = Clusters.OperationalCredentials.Commands.RemoveFabric(fabric_idx_cr3)
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd3)
 
-        self.step(20)
+        self.step(21)
         fabrics4 = await self.get_fabrics(th=self.th1)
         if len(fabrics4) > initial_number_of_fabrics:
             asserts.fail(

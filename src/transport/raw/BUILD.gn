@@ -24,6 +24,7 @@ static_library("raw") {
     "Base.h",
     "MessageHeader.cpp",
     "MessageHeader.h",
+    "PeerAddress.cpp",
     "PeerAddress.h",
     "Tuple.h",
     "UDP.cpp",
@@ -49,6 +50,13 @@ static_library("raw") {
     sources += [
       "WiFiPAF.cpp",
       "WiFiPAF.h",
+    ]
+  }
+
+  if (chip_enable_nfc_based_commissioning) {
+    sources += [
+      "NFC.cpp",
+      "NFC.h",
     ]
   }
 

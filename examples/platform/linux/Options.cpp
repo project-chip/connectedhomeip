@@ -88,6 +88,7 @@ enum
     kDeviceOption_PICS,
     kDeviceOption_KVS,
     kDeviceOption_InterfaceId,
+    kDeviceOption_AppPipe,
     kDeviceOption_Spake2pVerifierBase64,
     kDeviceOption_Spake2pSaltBase64,
     kDeviceOption_Spake2pIterations,
@@ -136,14 +137,22 @@ enum
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     kDeviceOption_icdActiveModeDurationMs,
     kDeviceOption_icdIdleModeDuration,
-#endif // CHIP_ENABLE_ICD_SERVER
+#endif
+#if ENABLE_CAMERA_SERVER
+    kDeviceOption_Camera_DeferredOffer,
+#endif
+    kDeviceOption_VendorName,
+    kDeviceOption_ProductName,
+    kDeviceOption_HardwareVersionString,
+    kDeviceOption_SoftwareVersionString,
+    kDeviceOption_SerialNumber,
 };
 
 constexpr unsigned kAppUsageLength = 64;
 
 OptionDef sDeviceOptionDefs[] = {
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    { "ble-device", kArgumentRequired, kDeviceOption_BleDevice },
+    { "ble-controller", kArgumentRequired, kDeviceOption_BleDevice },
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     { "wifi", kNoArgument, kDeviceOption_WiFi },
@@ -158,6 +167,11 @@ OptionDef sDeviceOptionDefs[] = {
     { "version", kArgumentRequired, kDeviceOption_Version },
     { "vendor-id", kArgumentRequired, kDeviceOption_VendorID },
     { "product-id", kArgumentRequired, kDeviceOption_ProductID },
+    { "vendor-name", kArgumentRequired, kDeviceOption_VendorName },
+    { "product-name", kArgumentRequired, kDeviceOption_ProductName },
+    { "hardware-version-string", kArgumentRequired, kDeviceOption_HardwareVersionString },
+    { "software-version-string", kArgumentRequired, kDeviceOption_SoftwareVersionString },
+    { "serial-number", kArgumentRequired, kDeviceOption_SerialNumber },
     { "custom-flow", kArgumentRequired, kDeviceOption_CustomFlow },
     { "capabilities", kArgumentRequired, kDeviceOption_Capabilities },
     { "discriminator", kArgumentRequired, kDeviceOption_Discriminator },
@@ -177,6 +191,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "PICS", kArgumentRequired, kDeviceOption_PICS },
     { "KVS", kArgumentRequired, kDeviceOption_KVS },
     { "interface-id", kArgumentRequired, kDeviceOption_InterfaceId },
+    { "app-pipe", kArgumentRequired, kDeviceOption_AppPipe },
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     { "trace_file", kArgumentRequired, kDeviceOption_TraceFile },
     { "trace_log", kArgumentRequired, kDeviceOption_TraceLog },
@@ -220,14 +235,17 @@ OptionDef sDeviceOptionDefs[] = {
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     { "icdActiveModeDurationMs", kArgumentRequired, kDeviceOption_icdActiveModeDurationMs },
     { "icdIdleModeDuration", kArgumentRequired, kDeviceOption_icdIdleModeDuration },
-#endif // CHIP_ENABLE_ICD_SERVER
+#endif
+#if ENABLE_CAMERA_SERVER
+    { "camera-deferred-offer", kNoArgument, kDeviceOption_Camera_DeferredOffer },
+#endif
     {}
 };
 
 const char * sDeviceOptionHelp =
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-    "  --ble-device <number>\n"
-    "       The device number for CHIPoBLE, without 'hci' prefix, can be found by hciconfig.\n"
+    "  --ble-controller <selector>\n"
+    "       BLE controller selector, see example or platform docs for details\n"
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     "\n"
@@ -259,6 +277,21 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --product-id <id>\n"
     "       The Product ID is specified by vendor.\n"
+    "\n"
+    "  --vendor-name <name>\n"
+    "       The vendor name specified by the vendor.\n"
+    "\n"
+    "  --product-name <name>\n"
+    "       The product name specified by vendor.\n"
+    "\n"
+    "  --hardware-version-string <string>\n"
+    "       The HardwareVersionString used in the basic information cluster.\n"
+    "\n"
+    "  --software-version-string <string>\n"
+    "       The SoftwareVersionString used in the basic information cluster.\n"
+    "\n"
+    "  --serial-number <serial_number>\n"
+    "       The serial number specified by vendor.\n"
     "\n"
     "  --custom-flow <Standard = 0 | UserActionRequired = 1 | Custom = 2>\n"
     "       A 2-bit unsigned enumeration specifying manufacturer-specific custom flow options.\n"
@@ -315,6 +348,9 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --interface-id <interface>\n"
     "       A interface id to advertise on.\n"
+    "\n"
+    "  --app-pipe <filepath>\n"
+    "       Custom path for the current application to send out of band commands.\n"
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     "\n"
     "  --trace_file <file>\n"
@@ -402,6 +438,11 @@ const char * sDeviceOptionHelp =
     "  --icdIdleModeDuration <icdIdleModeDuration>\n"
     "       Sets the ICD idle mode durations (in seconds). (Default: 300)\n"
     "       This defines the how long the ICD server can stay in idle mode.\n"
+#endif
+#if ENABLE_CAMERA_SERVER
+    "\n"
+    "  --camera-deferred-offer\n"
+    "       Indicates the delayed processing hint of the WebRTC Provider.\n"
 #endif
     "\n";
 
@@ -491,6 +532,26 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
     case kDeviceOption_ProductID:
         LinuxDeviceOptions::GetInstance().payload.productID = static_cast<uint16_t>(strtoul(aValue, nullptr, 0));
+        break;
+
+    case kDeviceOption_VendorName:
+        LinuxDeviceOptions::GetInstance().vendorName.SetValue(std::string{ aValue });
+        break;
+
+    case kDeviceOption_ProductName:
+        LinuxDeviceOptions::GetInstance().productName.SetValue(std::string{ aValue });
+        break;
+
+    case kDeviceOption_HardwareVersionString:
+        LinuxDeviceOptions::GetInstance().hardwareVersionString.SetValue(std::string{ aValue });
+        break;
+
+    case kDeviceOption_SoftwareVersionString:
+        LinuxDeviceOptions::GetInstance().softwareVersionString.SetValue(std::string{ aValue });
+        break;
+
+    case kDeviceOption_SerialNumber:
+        LinuxDeviceOptions::GetInstance().serialNumber.SetValue(std::string{ aValue });
         break;
 
     case kDeviceOption_CustomFlow:
@@ -622,6 +683,10 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
     case kDeviceOption_KVS:
         LinuxDeviceOptions::GetInstance().KVS = aValue;
+        break;
+
+    case kDeviceOption_AppPipe:
+        LinuxDeviceOptions::GetInstance().app_pipe = aValue;
         break;
 
     case kDeviceOption_InterfaceId:
@@ -819,6 +884,12 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
             // Covert from seconds to mini seconds
             LinuxDeviceOptions::GetInstance().icdIdleModeDurationMs.SetValue(chip::System::Clock::Milliseconds32(value * 1000));
         }
+        break;
+    }
+#endif
+#if ENABLE_CAMERA_SERVER
+    case kDeviceOption_Camera_DeferredOffer: {
+        LinuxDeviceOptions::GetInstance().cameraDeferredOffer = true;
         break;
     }
 #endif

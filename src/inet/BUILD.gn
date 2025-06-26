@@ -22,12 +22,17 @@ import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/platform/device.gni")
 import("inet.gni")
 
-if (chip_system_config_use_openthread_inet_endpoints) {
+if (chip_system_config_use_openthread_inet_endpoints &&
+    current_os != "zephyr") {
   import("//build_overrides/openthread.gni")
 }
 
 if (chip_system_config_use_lwip) {
   import("//build_overrides/lwip.gni")
+}
+
+if (chip_device_platform == "darwin") {
+  import("${chip_root}/src/platform/Darwin/inet/darwin_sources.gni")
 }
 
 declare_args() {
@@ -94,7 +99,6 @@ static_library("inet") {
   #   - src/inet/EndPointStateSockets.h
   sources = [
     "EndPointBasis.h",
-    "EndPointState${chip_system_config_inet}.h",
     "IANAConstants.h",
     "IPAddress-StringFuncts.cpp",
     "IPAddress.cpp",
@@ -114,6 +118,10 @@ static_library("inet") {
     "arpa-inet-compatibility.h",
   ]
 
+  if (!chip_system_config_use_network_framework) {
+    sources += [ "EndPointState${chip_system_config_inet}.h" ]
+  }
+
   public_deps = [
     ":impl_header",
     ":inet_config_header",
@@ -128,7 +136,8 @@ static_library("inet") {
     public_deps += [ "${lwip_root}:lwip" ]
   }
 
-  if (chip_system_config_use_openthread_inet_endpoints) {
+  if (chip_system_config_use_openthread_inet_endpoints &&
+      current_os != "zephyr") {
     public_deps += [ "${chip_root}/third_party/openthread:openthread" ]
   }
 
@@ -168,9 +177,7 @@ static_library("inet") {
       "UDPEndPointImpl.h",
     ]
 
-    if (chip_system_config_use_network_framework) {
-      sources += [ "UDPEndPointImpl${chip_system_config_inet}.mm" ]
-    } else {
+    if (!chip_system_config_use_network_framework) {
       sources += [ "UDPEndPointImpl${chip_system_config_inet}.cpp" ]
     }
   }
@@ -197,6 +204,6 @@ static_library("inet") {
   if (current_os == "nuttx") {
     cflags -= [ "-Wconversion" ]
   } else if (chip_system_config_use_network_framework) {
-    cflags += [ "-fobjc-arc" ]
+    sources += darwin_sources
   }
 }

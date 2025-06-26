@@ -28,6 +28,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 // Use a default pairing code if one hasn't been provisioned in flash.
 #ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
@@ -100,3 +102,43 @@
  *
  */
 #define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (2000_ms32)
+
+namespace SilabsDoorLockConfig {
+namespace ResourceRanges {
+// Used to size arrays
+static constexpr uint16_t kMaxUsers                  = 10;
+static constexpr uint8_t kMaxCredentialsPerUser      = 10;
+static constexpr uint8_t kMaxWeekdaySchedulesPerUser = 10;
+static constexpr uint8_t kMaxYeardaySchedulesPerUser = 10;
+static constexpr uint8_t kMaxHolidaySchedules        = 10;
+static constexpr uint8_t kMaxCredentialSize          = 20;
+static constexpr uint8_t kNumCredentialTypes         = 6;
+
+} // namespace ResourceRanges
+} // namespace SilabsDoorLockConfig
+
+/**
+ * DOOR_LOCK_USE_LOCAL_BUFFER
+ *
+ * If enabled, door-lock-server will use a local buffer for stored data to be copied into.
+ */
+#define DOOR_LOCK_USE_LOCAL_BUFFER 1
+
+/**
+ * DOOR_LOCK_CREDENTIAL_BUFFER_LENGTH
+ *
+ * A size, in bytes, of an individual credential.
+ */
+
+#define DOOR_LOCK_CREDENTIAL_BUFFER_LENGTH SilabsDoorLockConfig::ResourceRanges::kMaxCredentialsPerUser
+/**
+ * DOOR_LOCK_CREDENTIAL_BUFFER_LENGTH
+ *
+ * Number of CredentialStructs attached to a user.
+ */
+#define DOOR_LOCK_USER_CREDENTIALS_BUFFER_LENGTH SilabsDoorLockConfig::ResourceRanges::kMaxCredentialSize
+
+// Enable `Extension` attribute of ACL Cluster as required by door locks
+#ifndef CHIP_CONFIG_ENABLE_ACL_EXTENSIONS
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
+#endif

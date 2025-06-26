@@ -120,7 +120,7 @@ MTR{{cluster}}Cluster{{command}}Params
                (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name))))}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name preserveAcronyms=true}}{{/inline}}
 - (void)read{{>attribute}}With
-{{~#if_is_fabric_scoped_struct type~}}
+{{~#if_is_fabric_scoped_struct type cluster=../name~}}
   Params:(MTRReadParams * _Nullable)params completion:
 {{~else~}}
   Completion:
@@ -131,7 +131,7 @@ MTR{{cluster}}Cluster{{command}}Params
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
-    {{#if_is_fabric_scoped_struct type}}
+    {{#if_is_fabric_scoped_struct type cluster=../name}}
                                             params:params
     {{else}}
                                             params:nil
@@ -273,14 +273,14 @@ reportHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value
            (isSupported (compatClusterNameRemapping parent.name) attribute=(compatAttributeNameRemapping parent.name name)))}}
 {{#*inline "attribute"}}Attribute{{compatAttributeNameRemapping parent.name name}}{{/inline}}
 - (void)read{{>attribute}}With
-{{~#if_is_fabric_scoped_struct type~}}
+{{~#if_is_fabric_scoped_struct type cluster=../name~}}
   Params:(MTRReadParams * _Nullable)params completionHandler:
 {{~else~}}
   CompletionHandler:
 {{~/if_is_fabric_scoped_struct~}}
 (void (^)({{asObjectiveCClass type parent.name compatRemapClusterName=true}} * _Nullable value, NSError * _Nullable error))completionHandler
 {
-  [self readAttribute{{asUpperCamelCase name preserveAcronyms=true}}With{{#if_is_fabric_scoped_struct type}}Params:params completion:{{else}}Completion:{{/if_is_fabric_scoped_struct}}
+  [self readAttribute{{asUpperCamelCase name preserveAcronyms=true}}With{{#if_is_fabric_scoped_struct type cluster=../name}}Params:params completion:{{else}}Completion:{{/if_is_fabric_scoped_struct}}
       ^({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error) {
         // Cast is safe because subclass does not add any selectors.
         completionHandler(static_cast<{{asObjectiveCClass type parent.name compatRemapClusterName=true}} *>(value), error);

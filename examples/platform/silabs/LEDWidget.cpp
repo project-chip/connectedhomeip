@@ -38,7 +38,6 @@ void LEDWidget::Init(const uint8_t led)
     mBlinkOffTimeMS   = 0;
     mLed              = led;
     mLedStatus        = false;
-
     Set(false);
 }
 
@@ -81,4 +80,24 @@ void LEDWidget::Animate()
             mLastChangeTimeMS = nowMS;
         }
     }
+}
+
+uint8_t LEDWidget::GetLED()
+{
+    return mLed;
+}
+
+bool LEDWidget::GetLEDStatus(uint8_t led)
+{
+    return mLedStatus;
+}
+
+void LEDWidget::SetLevel(uint8_t level)
+{
+    mLevel = level;
+}
+
+uint8_t LEDWidget::GetLevel()
+{
+    return mLevel;
 }

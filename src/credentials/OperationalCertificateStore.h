@@ -34,6 +34,12 @@ public:
         kNoc  = 2
     };
 
+    enum class VidVerificationElement : uint8_t
+    {
+        kVidVerificationStatement = 0,
+        kVvsc                     = 1,
+    };
+
     virtual ~OperationalCertificateStore() {}
 
     // ==== API designed for commisionables to support fail-safe (although can be used by controllers) ====
@@ -49,6 +55,15 @@ public:
      *        `AddNewOpCertsForFabric` or `UpdateOpCertsForFabric`.
      */
     virtual bool HasPendingNocChain() const = 0;
+
+    /**
+     * @brief Returns true if either a pending VVSC or VIDVerificationStatement exists and is active.
+     */
+    virtual bool HasPendingVidVerificationElements() const
+    {
+        // Default false to match the CHIP_ERROR_NOT_IMPLEMENTED for default versions in this base class.
+        return false;
+    }
 
     /**
      * @brief Returns whether a usable operational certificates chain exists for the given fabric.
@@ -132,9 +147,10 @@ public:
      * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if `fabricIndex` mismatches the one from a previous successful
      *                                         `AddNewTrustedRootCertForFabric`.
      * @retval CHIP_ERROR_INCORRECT_STATE if the certificate store is not properly initialized, if this method
-     *                                    is called after `UpdateOpCertsForFabric`, or if there was
-     *                                    already a pending or persisted operational cert chain for the given `fabricIndex`,
-     *                                    or if AddNewTrustedRootCertForFabric had not yet been called for the given `fabricIndex`.
+     *                                    is called after `UpdateOpCertsForFabric`, if there was
+     *                                    already a pending or persisted operational cert chain for the given `fabricIndex`, or
+     *                                    if AddNewTrustedRootCertForFabric had not yet been called for the given `fabricIndex`.
+     *
      * @retval other CHIP_ERROR value on internal errors
      */
     virtual CHIP_ERROR AddNewOpCertsForFabric(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac) = 0;
@@ -170,9 +186,9 @@ public:
      * @retval CHIP_ERROR_NO_MEMORY if there is insufficient memory to maintain the temporary `noc` and `icac` cert copies
      * @retval CHIP_ERROR_INVALID_ARGUMENT if either the noc or icac are invalid sizes
      * @retval CHIP_ERROR_INCORRECT_STATE if the certificate store is not properly initialized, if this method
-     *                                    is called after `AddNewOpCertsForFabric`, or if there was
-     *                                    already a pending cert chain for the given `fabricIndex`, or if there are
-     *                                    no associated persisted root and NOC chain for for the given `fabricIndex`.
+     *                                    is called after `AddNewOpCertsForFabric`, if there was
+     *                                    already a pending cert chain for the given `fabricIndex`, if there are
+     *                                    no associated persisted root and NOC chain for the given `fabricIndex`.
      * @retval other CHIP_ERROR value on internal errors
      */
     virtual CHIP_ERROR UpdateOpCertsForFabric(FabricIndex fabricIndex, const ByteSpan & noc, const ByteSpan & icac) = 0;
@@ -200,6 +216,9 @@ public:
      * This is to be used for RemoveFabric. Removes both the pending operational cert chain
      * elements for the fabricIndex (if any) and the committed ones (if any).
      *
+     * This must also remove any VID Verification statement elements, if they exist, since
+     * those are associated with the opcerts.
+     *
      * @param fabricIndex - FabricIndex for which to remove the operational cert chain
      *
      * @retval CHIP_NO_ERROR on success
@@ -221,6 +240,70 @@ public:
      * certificate chain usable.
      */
     virtual void RevertPendingOpCerts() = 0;
+
+    /**
+     * @brief Update the VidVerificationSigningCertificate (VVSC) for the given fabric, including
+     *        possibly removing it (if an empty vvsc buffer is provided).
+     *
+     * If a fabric was pending, the certificate is temporary until committed by `CommitOpCertsForFabric`
+     * or reverted by `RevertPendingOpCerts`. Otherwise it is immediately commited/erased.
+     *
+     * Only one pending VVSC certificate is supported at a time and it is illegal
+     * to call this method if there was is not already an operational certificate chain
+     * pending or committed for the given fabric.
+     *
+     * Cryptographic signature verification or path validation are not enforced by this method.
+     *
+     * If there is no existing persisted or pending trusted root certificate and NOC chain for the given
+     * fabricIndex, this method will return CHIP_ERROR_INCORRECT_STATE since it is
+     * illegal in this implementation to store a VVSC without a fabric already there.
+     *
+     * @param fabricIndex - FabricIndex for which to update the VidVerificationSigningCert
+     * @param vvsc - Buffer containing the VVSC payload
+     *
+     * @retval CHIP_NO_ERROR on success
+     * @retval CHIP_ERROR_NO_MEMORY if there is insufficient memory to maintain the temporary `vvsc` cert copy
+     * @retval CHIP_ERROR_INVALID_ARGUMENT if the VVSC is an invalid size
+     * @retval CHIP_ERROR_INCORRECT_STATE if the certificate store is not properly initialized, or if there are
+     *                                    no associated root and NOC chain for the given `fabricIndex`.
+     * @retval CHIP_ERROR_NOT_IMPLEMENTED if this method is not implemented (e.g. for simple controller-only cases).
+     * @retval other CHIP_ERROR value on internal errors
+     */
+    virtual CHIP_ERROR UpdateVidVerificationSignerCertForFabric(FabricIndex fabricIndex, ByteSpan vvsc)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    /**
+     * @brief Update the VidVerificationStatement for the given fabric, including
+     *        possibly removing it (if an empty `vidVerificationStatement` buffer is provided).
+     *
+     * If a fabric was pending, the statement is temporary until committed by `CommitOpCertsForFabric`
+     * or reverted by `RevertPendingOpCerts`. Otherwise it is immediately commited/erased.
+     *
+     * Only one pending statement is supported at a time and it is illegal
+     * to call this method if there was is not already an operational certificate chain
+     * pending or committed for the given fabric.
+     *
+     * If there is no existing persisted or pending trusted root certificate and NOC chain for the given
+     * fabricIndex, this method will return CHIP_ERROR_INCORRECT_STATE since it is
+     * illegal in this implementation to store a VVSC without a fabric already there.
+     *
+     * @param fabricIndex - FabricIndex for which to update the VidVerificationSigningCert
+     * @param vidVerificationStatement - Buffer containing the VidVerificationStatement payload
+     *
+     * @retval CHIP_NO_ERROR on success
+     * @retval CHIP_ERROR_NO_MEMORY if there is insufficient memory to maintain the temporary `vidVerificatioNStatement` copy
+     * @retval CHIP_ERROR_INVALID_ARGUMENT if the vidVerificationStatement is an invalid format
+     * @retval CHIP_ERROR_INCORRECT_STATE if the certificate store is not properly initialized, or if there are
+     *                                    no associated root and NOC chain for the given `fabricIndex`.
+     * @retval CHIP_ERROR_NOT_IMPLEMENTED if this method is not implemented (e.g. for simple controller-only cases).
+     * @retval other CHIP_ERROR value on internal errors
+     */
+    virtual CHIP_ERROR UpdateVidVerificationStatementForFabric(FabricIndex fabricIndex, ByteSpan vidVerificationStatement)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
     /**
      * @brief Same as RevertPendingOpCerts(), but leaves pending Trusted Root certs if they had
@@ -251,6 +334,32 @@ public:
      */
     virtual CHIP_ERROR GetCertificate(FabricIndex fabricIndex, CertChainElement element,
                                       MutableByteSpan & outCertificate) const = 0;
+
+    /**
+     * @brief Get the VidVerification element requested, giving the pending data or committed
+     *        data depending on prior `UpdateVidVerificationSignerCertForFabric`, or
+     *        `UpdateVidVerificationStatemmentForFabric` calls.
+     *
+     * If element is not found, outElement is resized to 0 bytes (empty).
+     *
+     * On success, the `outElement` span is resized to the size of the actual element read-back.
+     *
+     * @param fabricIndex - fabricIndex for which to get the certificate
+     * @param element - which element to get
+     * @param outElement- buffer to contain the element obtained from persistent or temporary storage
+     *
+     * @retval CHIP_NO_ERROR on success.
+     * @retval CHIP_ERROR_BUFFER_TOO_SMALL if `outElement` is too small to fit the certificate found.
+     * @retval CHIP_ERROR_INCORRECT_STATE if the certificate store is not properly initialized.
+     * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if the fabricIndex is invalid.
+     * @retval CHIP_ERROR_NOT_IMPLEMENTED if this method is not implemented (e.g. for simple controller-only cases).
+     * @retval other CHIP_ERROR value on internal storage errors.
+     */
+    virtual CHIP_ERROR GetVidVerificationElement(FabricIndex fabricIndex, VidVerificationElement element,
+                                                 MutableByteSpan & outElement) const
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 };
 
 /**

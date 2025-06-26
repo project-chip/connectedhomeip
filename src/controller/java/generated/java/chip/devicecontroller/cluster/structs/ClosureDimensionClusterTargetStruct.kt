@@ -25,7 +25,7 @@ import matter.tlv.TlvWriter
 
 class ClosureDimensionClusterTargetStruct(
   val position: Optional<UInt>,
-  val latch: Optional<UInt>,
+  val latch: Optional<Boolean>,
   val speed: Optional<UInt>,
 ) {
   override fun toString(): String = buildString {
@@ -70,7 +70,7 @@ class ClosureDimensionClusterTargetStruct(
         }
       val latch =
         if (tlvReader.isNextTag(ContextSpecificTag(TAG_LATCH))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_LATCH)))
+          Optional.of(tlvReader.getBoolean(ContextSpecificTag(TAG_LATCH)))
         } else {
           Optional.empty()
         }

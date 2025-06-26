@@ -34,7 +34,7 @@ namespace chip {
 
 #if __cplusplus >= 202300L
 
-using to_underlying = std::to_underlying;
+using std::to_underlying;
 
 #else
 /**

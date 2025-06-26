@@ -33,6 +33,7 @@ namespace Test {
 inline constexpr EndpointId kMockEndpoint1   = 0xFFFE;
 inline constexpr EndpointId kMockEndpoint2   = 0xFFFD;
 inline constexpr EndpointId kMockEndpoint3   = 0xFFFC;
+inline constexpr EndpointId kMockEndpoint4   = 0xFFFB;
 inline constexpr EndpointId kMockEndpointMin = 0xFFF1;
 
 constexpr AttributeId MockAttributeId(const uint16_t & id)

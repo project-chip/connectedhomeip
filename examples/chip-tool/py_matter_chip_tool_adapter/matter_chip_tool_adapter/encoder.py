@@ -209,6 +209,19 @@ _ALIASES = {
                 'has_endpoint': False,
             },
         }
+    },
+
+    'WebRTC': {
+        'alias': 'webrtc',
+        'commands': {
+            'Connect': {
+                'has_destination': False,
+                'alias': 'connect',
+                'arguments': {
+                    'nodeId': 'node-id',
+                }
+            },
+        }
     }
 }
 

@@ -193,6 +193,7 @@
     "files.trimFinalNewlines": true,
     "C_Cpp.default.cppStandard": "gnu++17",
     "C_Cpp.default.cStandard": "gnu11",
+    "shellformat.flag": "-i 4 -ci",
     "cmake.configureOnOpen": false,
     "search.followSymlinks": false,
     "[python]": {

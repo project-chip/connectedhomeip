@@ -33,7 +33,9 @@
 
 #include <CHIPVersion.h>
 #include <inet/IPPrefix.h>
+#include <inet/InetConfig.h>
 #include <inet/InetError.h>
+#include <inet/UDPEndPoint.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
@@ -386,12 +388,29 @@ TEST_F(TestInetEndPoint, TestInetEndPointLimit)
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    // we assume NO open endpoints
+    gUDP.ForEachEndPoint([](UDPEndPoint * ep) {
+        ChipLogError(Test, "NOTE: Unexpected UDP endpoint in use. Will free it");
+        ep->Free();
+        return Loop::Continue;
+    });
+
     int udpCount = 0;
     SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumUDPEps);
     for (int i = INET_CONFIG_NUM_UDP_ENDPOINTS; i >= 0; --i)
     {
         err = gUDP.NewEndPoint(&testUDPEP[i]);
-        EXPECT_EQ(err, (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
+
+        CHIP_ERROR expected_error = (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL);
+        if (err != expected_error)
+        {
+            // have a log to debug things
+            ChipLogError(Test, "UDP: Failure on index %d: (out of %d)", i, INET_CONFIG_NUM_UDP_ENDPOINTS);
+
+            // this will fail after the above log
+            EXPECT_EQ(err, expected_error);
+        }
+
         if (err == CHIP_NO_ERROR)
         {
             ++udpCount;
@@ -402,12 +421,27 @@ TEST_F(TestInetEndPoint, TestInetEndPointLimit)
     EXPECT_TRUE(SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, udpHighWaterMark));
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    // we assume NO open endpoints
+    gTCP.ForEachEndPoint([](TCPEndPoint * ep) {
+        ChipLogError(Test, "NOTE: Unexpected TCP endpoint in use. Will free it");
+        ep->Free();
+        return Loop::Continue;
+    });
+
     int tcpCount = 0;
     SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumTCPEps);
     for (int i = INET_CONFIG_NUM_TCP_ENDPOINTS; i >= 0; --i)
     {
-        err = gTCP.NewEndPoint(&testTCPEP[i]);
-        EXPECT_EQ(err, (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
+        err                       = gTCP.NewEndPoint(&testTCPEP[i]);
+        CHIP_ERROR expected_error = (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL);
+        if (err != expected_error)
+        {
+            // have a log to debug things
+            ChipLogError(Test, "TCP: Failure on index %d: (out of %d)", i, INET_CONFIG_NUM_TCP_ENDPOINTS);
+
+            // this will fail after the above log
+            EXPECT_EQ(err, expected_error);
+        }
         if (err == CHIP_NO_ERROR)
         {
             ++tcpCount;

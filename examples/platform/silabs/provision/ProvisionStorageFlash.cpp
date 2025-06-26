@@ -484,6 +484,28 @@ CHIP_ERROR Storage::GetPersistentUniqueId(uint8_t * value, size_t max, size_t & 
     return Flash::Get(Parameters::ID::kPersistentUniqueId, value, max, size);
 }
 
+CHIP_ERROR Storage::SetSoftwareVersionString(const char * value, size_t len)
+{
+    return Flash::Set(Parameters::ID::kSwVersionStr, value, len);
+}
+
+CHIP_ERROR Storage::GetSoftwareVersionString(char * value, size_t max)
+{
+    size_t size    = 0;
+    CHIP_ERROR err = Flash::Get(Parameters::ID::kSwVersionStr, value, max, size);
+
+#if defined(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING)
+    if (CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND == err)
+    {
+        VerifyOrReturnError(value != nullptr, CHIP_ERROR_NO_MEMORY);
+        VerifyOrReturnError(max > strlen(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
+        Platform::CopyString(value, max, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+        err = CHIP_NO_ERROR;
+    }
+#endif
+    return err;
+}
+
 //
 // CommissionableDataProvider
 //
@@ -664,7 +686,7 @@ CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, Mutab
     }
 #endif // SL_MATTER_ENABLE_EXAMPLE_CREDENTIALS
     ReturnErrorOnFailure(err);
-#if (defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE)
+#ifdef SL_MBEDTLS_USE_TINYCRYPT
     uint8_t key_buffer[kDeviceAttestationKeySizeMax] = { 0 };
     MutableByteSpan private_key(key_buffer);
     AttestationKey::Unwrap(temp, size, private_key);
@@ -673,7 +695,7 @@ CHIP_ERROR Storage::SignWithDeviceAttestationKey(const ByteSpan & message, Mutab
     AttestationKey key;
     ReturnErrorOnFailure(key.Import(temp, size));
     return key.SignMessage(message, signature);
-#endif // SLI_SI91X_MCU_INTERFACE
+#endif // SL_MBEDTLS_USE_TINYCRYPT
 }
 
 //
@@ -729,6 +751,12 @@ CHIP_ERROR Storage::SetOtaTlvEncryptionKey(const ByteSpan & value)
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 #endif // SL_MATTER_ENABLE_OTA_ENCRYPTION
+
+CHIP_ERROR Storage::SetTestEventTriggerKey(const ByteSpan & value)
+{
+    // TODO: Implement this function if needed.
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
 
 CHIP_ERROR Storage::GetTestEventTriggerKey(MutableByteSpan & keySpan)
 {

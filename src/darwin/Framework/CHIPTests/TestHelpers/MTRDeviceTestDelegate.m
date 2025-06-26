@@ -26,6 +26,13 @@
     }
 }
 
+- (void)_deviceInternalStateChanged:(MTRDevice *)device
+{
+    if (self.onInternalStateChanged != nil) {
+        self.onInternalStateChanged();
+    }
+}
+
 - (void)device:(MTRDevice *)device receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
     if (self.onAttributeDataReceived != nil) {
@@ -56,6 +63,10 @@
 
 - (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device
 {
+    if (self.subscriptionMaxIntervalOverride) {
+        return self.subscriptionMaxIntervalOverride;
+    }
+
     // Make sure our subscriptions time out in finite time.
     return @(2); // seconds
 }
@@ -131,6 +142,23 @@
     if (self.onSubscriptionReset != nil) {
         self.onSubscriptionReset();
     }
+}
+
+- (void)unitTestSetUTCTimeInvokedForDevice:(MTRDevice *)device error:(NSError * _Nullable)error
+{
+    if (self.onUTCTimeSet != nil) {
+        self.onUTCTimeSet(error);
+    }
+}
+
+- (BOOL)unitTestTimeUpdateShortDelayIsZero:(MTRDevice *)device
+{
+    return self.forceTimeUpdateShortDelayToZero;
+}
+
+- (BOOL)unitTestTimeSynchronizationLossDetectionCadenceIsZero:(MTRDevice *)device
+{
+    return self.forceTimeSynchronizationLossDetectionCadenceToZero;
 }
 
 @end

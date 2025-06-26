@@ -46,14 +46,7 @@ enable_eventlist_attribute = true
 declare_args() {
   # TODO : set no_mcuboot to false by default when enabling ota requestor by default
   no_mcuboot = true
-
-  chip_enable_secondary_nwk_if = false
 }
-
-# As a temporary workaround, we are disabling the session resumption because currently
-# the mbedtls port does not support this.
-# If not disabled, reconnecting to the OTA Provider node will fail.
-chip_enable_session_resumption = false
 
 mbedtls_target = "${nxp_sdk_build_root}:nxp_mbedtls"
 

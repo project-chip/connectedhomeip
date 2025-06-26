@@ -17,12 +17,14 @@
 # (Uses default behaviour of compiling all source files in directory, adding 'include' to include path.)
 
 get_filename_component(CHIP_ROOT ${CMAKE_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
-get_filename_component(ENERGY_GATEWAY_COMMON_DIR ${CHIP_ROOT}/examples/energy-gateway-app/energy-gateway-common/ REALPATH)
+get_filename_component(ENERGY_GATEWAY_DIR ${CHIP_ROOT}/examples/energy-gateway-app/ REALPATH)
 get_filename_component(APP_COMMON_GEN_DIR ${CHIP_ROOT}/zzz_generated/app-common/app-common/zap-generated REALPATH)
 
 set(PRIV_INCLUDE_DIRS_LIST
   "${CHIP_ROOT}/examples/providers"
-  "${ENERGY_GATEWAY_COMMON_DIR}/common/include"
+  "${ENERGY_GATEWAY_DIR}/commodity-price/include"
+  "${ENERGY_GATEWAY_DIR}/common/include"
+  "${ENERGY_GATEWAY_DIR}/electrical-grid-conditions/include"
   "${CMAKE_CURRENT_LIST_DIR}/include"
   "${CHIP_ROOT}/examples/platform/esp32"
 )
@@ -31,7 +33,9 @@ set(SRC_DIRS_LIST
   "${APP_COMMON_GEN_DIR}/attributes"
   "${APP_COMMON_GEN_DIR}"
   "${CHIP_ROOT}/examples/providers"
-  "${ENERGY_GATEWAY_COMMON_DIR}/common/src"
+  "${ENERGY_GATEWAY_DIR}/commodity-price/src"
+  "${ENERGY_GATEWAY_DIR}/common/src"
+  "${ENERGY_GATEWAY_DIR}/electrical-grid-conditions/src"
   "${CHIP_ROOT}/examples/platform/esp32/ota"
   "${CHIP_ROOT}/examples/platform/esp32/common"
   "${CHIP_ROOT}/examples/platform/esp32/time"
@@ -66,7 +70,7 @@ idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
 
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
 chip_configure_data_model(${COMPONENT_LIB}
-    ZAP_FILE ${ENERGY_GATEWAY_COMMON_DIR}/energy-gateway-app.zap
+    ZAP_FILE ${ENERGY_GATEWAY_DIR}/energy-gateway-common/energy-gateway-app.zap
 )
 
 if(CONFIG_ENABLE_ESP_INSIGHTS_TRACE)

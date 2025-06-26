@@ -20,8 +20,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
-#include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
-#include <app/clusters/switch-server/switch-server.h>
+#include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
@@ -217,7 +216,7 @@ void LightingAppCommandHandler::OnSoftwareFaultEventHandler(uint32_t eventId)
         softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(timeChar), strlen(timeChar)));
     }
 
-    Clusters::SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
+    Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault);
 }
 
 void LightingAppCommandDelegate::OnEventCommandReceived(const char * json)

@@ -132,7 +132,6 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/platform/service/sleeptimer/inc",
       "${efr32_sdk_root}/platform/service/sleeptimer/config",
       "${efr32_sdk_root}/platform/service/sleeptimer/src",
-      "${matter_support_root}/board-support/si91x/support/inc",
 
       "${efr32_sdk_root}/platform/service/iostream/inc",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/button/inc",
@@ -186,7 +185,7 @@ template("siwx917_sdk") {
     # To fix this, these files are also manually depended upon in the source set
     # declared in siwx917_mbedtls_config further down this file.
     defines += [
-      "__STARTUP_CLEAR_BSS",
+      "__STARTUP_CLEAR_BSS=1",
       "HARD_FAULT_LOG_ENABLE",
       "SL_HEAP_SIZE=32768",
       "SL_WIFI=1",
@@ -243,6 +242,8 @@ template("siwx917_sdk") {
       "NVM3_LOCK_OVERRIDE=1",
       "SL_MEMORY_POOL_LIGHT=1",
       "SL_CODE_COMPONENT_CORE=core",
+      "SL_CODE_COMPONENT_SLEEPTIMER=sleeptimer",
+      "SL_CODE_COMPONENT_PSEC_OSAL=psec_osal",
       "SLI_SI91X_MCU_EXTERNAL_LDO_FOR_PSRAM=1",
       "CLOCK_ROMDRIVER_PRESENT=1",
       "ULPSS_CLOCK_ROMDRIVER_PRESENT=1",
@@ -255,38 +256,18 @@ template("siwx917_sdk") {
       "SLI_CODE_CLASSIFICATION_DISABLE=1",
       "SL_MATTER_GN_BUILD=1",
       "SILABS_LOG_OUT_UART=${sl_uart_log_output}",
+      "SUPPORT_CPLUSPLUS=1",
+      "SLI_SI91X_LWIP_HOSTED_NETWORK_STACK=1",
+
+      # TODO: This is a workaround for the init issue with the SiWx917
+      "SL_WLAN_EVENT_THREAD_PRIORITY=osPriorityRealtime6",
+      "SL_WLAN_COMMAND_ENGINE_THREAD_PRIORITY=osPriorityRealtime5",
     ]
 
     if (silabs_log_enabled && chip_logging) {
       defines += [ "SILABS_LOG_ENABLED=1" ]
     } else {
       defines += [ "SILABS_LOG_ENABLED=0" ]
-    }
-
-    defines += [
-      "LWIP_NETIF_API=1",
-      "SLI_SI91X_LWIP_HOSTED_NETWORK_STACK=1",
-    ]
-    if (chip_enable_wifi_ipv4) {
-      defines += [
-        "LWIP_IPV4=1",
-
-        # adds following options to provide
-        # them to .cpp source files
-        # flags ported from lwipopts file
-        # TODO: move lwipopts to one location
-        "LWIP_ARP=1",
-        "LWIP_ICMP=1",
-        "LWIP_IGMP=1",
-        "LWIP_DHCP=1",
-      ]
-    } else {
-      defines += [ "LWIP_IPV4=0" ]
-    }
-    if (lwip_ipv6) {
-      defines += [ "LWIP_IPV6=1" ]
-    } else {
-      defines += [ "LWIP_IPV6=0" ]
     }
 
     if (chip_enable_wifi_ipv4) {
@@ -308,7 +289,7 @@ template("siwx917_sdk") {
         "SI917_MEMLCD=1",
         "SYSCALLS_WRITE",
         "SPI_MULTI_SLAVE",
-        "SL_ULP_TIMER",
+        "SL_ULP_TIMER=1",
       ]
     }
 
@@ -685,6 +666,7 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/rsi_system_config.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/system_si91x.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/common/src/rsi_debug.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/common/src/sl_si91x_stack_object_declare.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/config/src/rsi_nvic_priorities_config.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/cmsis_driver/UDMA.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/cmsis_driver/USART.c",
@@ -765,10 +747,12 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_retarget.c",
       "${efr32_sdk_root}/platform/service/memory_manager/src/sli_memory_manager_common.c",
 
-      # STARTUP FILES
+      # iostream
       "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream.c",
       "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream_rtt.c",
-      "${matter_support_root}/board-support/si91x/support/src/startup_common_RS1xxxx.c",
+
+      # STARTUP FILES.
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/startup_si91x.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/nvm3/src/sl_si91x_common_flash_intf.c",
 
       # OTA

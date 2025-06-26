@@ -26,7 +26,7 @@ jobs:
           ${{ github.event.pull_request.body }}
           EndMarkerForPrSummary
 
-          python -c 'import sys; pr_summary = open("/tmp/pr-summary.txt", "rt").read(); sys.exit(1 if "Make sure you delete these instructions" in pr_summary else 0)'
+          python -c 'import sys; pr_summary = open("/tmp/pr-summary.txt", "rt").read(); sys.exit(1 if "Please replace this HTML comment" in pr_summary else 0)'
 
       # NOTE: comments disabled for now as separate permissions are required
       #       failing CI step may be sufficient to start (although it contains less information about why it failed)
@@ -47,7 +47,7 @@ jobs:
       - name: Fail if PR instructions were not deleted
         if: (steps.check-instructions.outcome == 'failure') && (github.event.pull_request.user.login != 'dependabot[bot]')
         run: |
-          python -c 'import sys; print("PR instructions were not replaced"); sys.exit(1)'
+          python -c 'import sys; print("Please remove the HTML comment blocks that include \"Please replace this HTML comment\" text."); sys.exit(1)'
 
       # - name: Add comment (missing testing)
       #   if: steps.check-testing.outcome == 'failure'
@@ -67,4 +67,3 @@ jobs:
 
         run: |
           python -c 'import sys; print("Testing section missing (test failed)"); sys.exit(1)'
-

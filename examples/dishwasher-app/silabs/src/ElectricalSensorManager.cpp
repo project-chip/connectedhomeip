@@ -29,7 +29,6 @@
 #include "DishwasherManager.h"
 #include "ElectricalEnergyMeasurementInstance.h"
 #include "ElectricalSensorManager.h"
-#include "EnergyTimeUtils.h"
 #include "PowerTopologyDelegate.h"
 #include <ElectricalPowerMeasurementDelegate.h>
 

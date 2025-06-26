@@ -51,8 +51,8 @@ class PushAvStreamTransportClusterTransportZoneOptionsStruct(
   }
 
   companion object {
-    private const val TAG_ZONE = 1
-    private const val TAG_SENSITIVITY = 2
+    private const val TAG_ZONE = 0
+    private const val TAG_SENSITIVITY = 1
 
     fun fromTlv(
       tlvTag: Tag,

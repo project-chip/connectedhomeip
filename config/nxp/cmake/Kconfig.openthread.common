@@ -1,0 +1,96 @@
+#
+#   Copyright (c) 2024-2025 Project CHIP Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+if NET_L2_OPENTHREAD
+
+config OT_ROOT
+	string "OT root path"
+	default "third_party/openthread/ot-nxp/openthread"
+	help
+	  OT root path relative to Matter root
+
+config OT_EXTERNAL_MBEDTLS
+	string "Mbedtls gn target used by OT gn build system"
+	default "nxp_mbedtls"
+	help
+	  Use "${nxp_sdk_build_root}:nxp_mbedtls" by default.
+	  The full path is handled in common.cmake. If blank,
+	  OT will use internal mbedtls.
+
+config OT_EXTERNAL_PLATFORM
+	string "OT external platform target used by OT gn build system"
+	default "libopenthread-k32w1" if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71
+	default "libopenthread-mcxw72" if CHIP_NXP_PLATFORM_MCXW72
+	default "libopenthread-rw61x" if CHIP_NXP_PLATFORM_RW61X
+	default "libopenthread-rt1060" if CHIP_NXP_PLATFORM_RT1060
+	default "libopenthread-rt1170" if CHIP_NXP_PLATFORM_RT1170
+	help
+	  OT external platform target used by OT gn build system
+
+config OT_PROJECT_CORE_CONFIG_FILE
+	string "OT configuration file used by OT gn build system"
+	default "examples/platform/nxp/mcxw71_k32w1/app/project_include/openthread/OpenThreadConfig.h" if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71
+	default "$(CHIP_ROOT)/third_party/nxp/nxp_matter_support/examples/platform/mcxw72/app/project_include/openthread/OpenThreadConfig.h" if CHIP_NXP_PLATFORM_MCXW72
+	default "$(CHIP_ROOT)/third_party/nxp/nxp_matter_support/examples/platform/rt/rw61x/app/project_include/openthread/OpenThreadConfig.h" if CHIP_NXP_PLATFORM_RW61X
+	default "$(CHIP_ROOT)/third_party/nxp/nxp_matter_support/examples/platform/rt/rt1060/app/project_include/openthread/OpenThreadConfig.h" if CHIP_NXP_PLATFORM_RT1060
+	default "$(CHIP_ROOT)/third_party/nxp/nxp_matter_support/examples/platform/rt/rt1170/app/project_include/openthread/OpenThreadConfig.h" if CHIP_NXP_PLATFORM_RT1170
+	help
+	  OT configuration file used by OT gn build system.
+
+config OT_PROJECT_LIB_CONFIG_FILE
+	string "OT project lib config file"
+	default "$(CHIP_ROOT)/third_party/nxp/nxp_matter_support/examples/platform/rt/rw61x/app/project_include/openthread/OpenThreadProjectLibConfig.h" if CHIP_NXP_PLATFORM_RW61X
+	help
+	  OT lib config file.
+
+config OT_CORE_CONFIG_PLATFORM_CHECK_FILE
+	string "OT core configuration check file used by OT gn build system"
+	default "openthread-core-k32w1-config-check.h" if CHIP_NXP_PLATFORM_K32W1
+	default "openthread-core-mcxw71-config-check.h" if CHIP_NXP_PLATFORM_MCXW71
+	default "openthread-core-mcxw72-config-check.h" if CHIP_NXP_PLATFORM_MCXW72
+	default "openthread-core-rw612-config-check.h" if CHIP_NXP_PLATFORM_RW61X
+	default "openthread-core-rt1060-config-check.h" if CHIP_NXP_PLATFORM_RT1060
+	default "openthread-core-rt1170-config-check.h" if CHIP_NXP_PLATFORM_RT1170
+	help
+	  OT core configuration check file used by OT gn build system
+
+config OT_CORE_CONFIG_DEPS
+	string "OT core configuration gn deps file used by OT gn build system"
+	default "third_party/openthread/platforms/nxp/mcxw71_k32w1:openthread_core_config_k32w1" if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71
+    default "third_party/openthread/platforms/nxp/mcxw72:openthread_core_config_mcxw72" if CHIP_NXP_PLATFORM_MCXW72
+	default "third_party/openthread/platforms/nxp/rt/rw61x:openthread_core_config_rw61x" if CHIP_NXP_PLATFORM_RW61X
+	default "third_party/openthread/platforms/nxp/rt/rt1060:openthread_core_config_rt1060" if CHIP_NXP_PLATFORM_RT1060
+	default "third_party/openthread/platforms/nxp/rt/rt1170:openthread_core_config_rt1170" if CHIP_NXP_PLATFORM_RT1170
+	help
+	  OT core configuration gn deps file used by OT gn build system
+
+config OT_NXP_PLATFORM_FOLDER
+	string "ot-nxp platform specific folder"
+	default "src/k32w1" if CHIP_NXP_PLATFORM_K32W1
+	default "src/mcxw71" if CHIP_NXP_PLATFORM_MCXW71
+	default "src/mcxw72" if CHIP_NXP_PLATFORM_MCXW72
+	help
+	  ot-nxp platform specific folder (relative to ot-nxp root)
+
+config OT_NXP_SPINEL_INTERFACE_LINK
+	string "spinel interface link"
+	default "hdlc" if CHIP_NXP_PLATFORM_RW61X
+	default "spi"
+	help
+		Define the spinel interface used for host transceiver communication
+
+
+endif # NET_L2_OPENTHREAD

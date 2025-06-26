@@ -27,7 +27,7 @@ include:
   file_list:
   - {path: app.h}
   - {path: reset_util.h}
-sdk: {id: simplicity_sdk, version: 2024.6.0}
+sdk: {id: simplicity_sdk, version: 2024.12.2}
 toolchain_settings: []
 
 component:

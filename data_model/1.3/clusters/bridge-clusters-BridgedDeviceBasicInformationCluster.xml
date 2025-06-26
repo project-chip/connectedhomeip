@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -55,7 +55,7 @@ Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
 
-:sectnums:
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0039" name="Bridged Device Basic Information Cluster" revision="3">
   <revisionHistory>
@@ -67,96 +67,320 @@ Davis, CA 95616, USA
     <clusterId id="0x0039" name="Bridged Device Basic Information"/>
   </clusterIds>
   <classification hierarchy="derived" baseCluster="Basic Information" role="utility" picsCode="BRBINFO" scope="Endpoint"/>
+  <dataTypes>
+    <enum name="ColorEnum">
+      <item value="0" name="Black" summary="Approximately RGB #000000.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Navy" summary="Approximately RGB #000080.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Green" summary="Approximately RGB #008000.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Teal" summary="Approximately RGB #008080.">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="Maroon" summary="Approximately RGB #800080.">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="Purple" summary="Approximately RGB #800080.">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="Olive" summary="Approximately RGB #808000.">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="Gray" summary="Approximately RGB #808080.">
+        <mandatoryConform/>
+      </item>
+      <item value="8" name="Blue" summary="Approximately RGB #0000FF.">
+        <mandatoryConform/>
+      </item>
+      <item value="9" name="Lime" summary="Approximately RGB #00FF00.">
+        <mandatoryConform/>
+      </item>
+      <item value="10" name="Aqua" summary="Approximately RGB #00FFFF.">
+        <mandatoryConform/>
+      </item>
+      <item value="11" name="Red" summary="Approximately RGB #FF0000.">
+        <mandatoryConform/>
+      </item>
+      <item value="12" name="Fuchsia" summary="Approximately RGB #FF00FF.">
+        <mandatoryConform/>
+      </item>
+      <item value="13" name="Yellow" summary="Approximately RGB #FFFF00.">
+        <mandatoryConform/>
+      </item>
+      <item value="14" name="White" summary="Approximately RGB #FFFFFF.">
+        <mandatoryConform/>
+      </item>
+      <item value="15" name="Nickel" summary="Typical hardware &quot;Nickel&quot; color.">
+        <mandatoryConform/>
+      </item>
+      <item value="16" name="Chrome" summary="Typical hardware &quot;Chrome&quot; color.">
+        <mandatoryConform/>
+      </item>
+      <item value="17" name="Brass" summary="Typical hardware &quot;Brass&quot; color.">
+        <mandatoryConform/>
+      </item>
+      <item value="18" name="Copper" summary="Typical hardware &quot;Copper&quot; color.">
+        <mandatoryConform/>
+      </item>
+      <item value="19" name="Silver" summary="Typical hardware &quot;Silver&quot; color.">
+        <mandatoryConform/>
+      </item>
+      <item value="20" name="Gold" summary="Typical hardware &quot;Gold&quot; color.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="ProductFinishEnum">
+      <item value="0" name="Other" summary="Product has some other finish not listed below.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Matte" summary="Product has a matte finish.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Satin" summary="Product has a satin finish.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Polished" summary="Product has a polished or shiny finish.">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="Rugged" summary="Product has a rugged finish.">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="Fabric" summary="Product has a fabric finish.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <struct name="CapabilityMinimaStruct">
+      <field id="0" name="CaseSessionsPerFabric" type="uint16" default="3">
+        <mandatoryConform/>
+        <constraint>
+          <min value="3"/>
+        </constraint>
+      </field>
+      <field id="1" name="SubscriptionsPerFabric" type="uint16" default="3">
+        <mandatoryConform/>
+        <constraint>
+          <min value="3"/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="ProductAppearanceStruct">
+      <field id="0" name="Finish" type="ProductFinishEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="PrimaryColor" type="ColorEnum">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </struct>
+  </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="DataModelRevision">
+    <attribute id="0x0000" name="DataModelRevision" type="uint16" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <disallowConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="VendorName" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="VendorID" type="vendor-id" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0003" name="ProductName" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="ProductID" type="uint16" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <disallowConform/>
     </attribute>
-    <attribute id="0x0001" name="VendorName">
+    <attribute id="0x0005" name="NodeLabel" type="string" default="&quot;&quot;">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0006" name="Location" type="string" default="&quot;XX&quot;">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
+      <quality persistence="nonVolatile"/>
+      <disallowConform/>
+      <constraint>
+        <allowed value="2"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0007" name="HardwareVersion" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0002" name="VendorID">
+    <attribute id="0x0008" name="HardwareVersionString" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <optionalConform/>
+      <constraint>
+        <lengthBetween>
+          <from value="1"/>
+          <to value="64"/>
+        </lengthBetween>
+      </constraint>
     </attribute>
-    <attribute id="0x0003" name="ProductName">
+    <attribute id="0x0009" name="SoftwareVersion" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <optionalConform/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
-    <attribute id="0x0004" name="ProductID">
+    <attribute id="0x000A" name="SoftwareVersionString" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <lengthBetween>
+          <from value="1"/>
+          <to value="64"/>
+        </lengthBetween>
+      </constraint>
+    </attribute>
+    <attribute id="0x000B" name="ManufacturingDate" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <lengthBetween>
+          <from value="8"/>
+          <to value="16"/>
+        </lengthBetween>
+      </constraint>
+    </attribute>
+    <attribute id="0x000C" name="PartNumber" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000D" name="ProductURL" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="256"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000E" name="ProductLabel" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="64"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000F" name="SerialNumber" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0010" name="LocalConfigDisabled" type="bool" default="false">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
       <disallowConform/>
     </attribute>
-    <attribute id="0x0005" name="NodeLabel">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0006" name="Location">
-      <disallowConform/>
-    </attribute>
-    <attribute id="0x0007" name="HardwareVersion">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0008" name="HardwareVersionString">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0009" name="SoftwareVersion">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x000A" name="SoftwareVersionString">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x000B" name="ManufacturingDate">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x000C" name="PartNumber">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x000D" name="ProductURL">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x000E" name="ProductLabel">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x000F" name="SerialNumber">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0010" name="LocalConfigDisabled">
-      <disallowConform/>
-    </attribute>
-    <attribute id="0x0011" name="Reachable">
+    <attribute id="0x0011" name="Reachable" type="bool" default="true">
+      <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
     </attribute>
-    <attribute id="0x0012" name="UniqueID">
+    <attribute id="0x0012" name="UniqueID" type="string" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0013" name="CapabilityMinima" type="CapabilityMinimaStruct" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <disallowConform/>
+    </attribute>
+    <attribute id="0x0014" name="ProductAppearance" type="ProductAppearanceStruct" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <optionalConform/>
     </attribute>
-    <attribute id="0x0013" name="CapabilityMinima">
+    <attribute id="0x0015" name="SpecificationVersion" type="uint32" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <disallowConform/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
-    <attribute id="0x0014" name="ProductAppearance">
-      <optionalConform/>
-    </attribute>
-    <attribute id="0x0015" name="SpecificationVersion">
+    <attribute id="0x0016" name="MaxPathsPerInvoke" type="uint16" default="1">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <disallowConform/>
-    </attribute>
-    <attribute id="0x0016" name="MaxPathsPerInvoke">
-      <disallowConform/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
     </attribute>
   </attributes>
   <events>
-    <event id="0x00" name="StartUp">
+    <event id="0x00" name="StartUp" priority="critical">
       <access readPrivilege="view"/>
       <optionalConform/>
-    </event>
-    <event id="0x01" name="ShutDown">
-      <access readPrivilege="view"/>
-      <optionalConform/>
-    </event>
-    <event id="0x02" name="Leave">
-      <access readPrivilege="view"/>
-      <optionalConform/>
-      <field id="0" name="FabricIndex">
-        <disallowConform/>
+      <field id="0" name="SoftwareVersion" type="uint32">
+        <mandatoryConform/>
       </field>
     </event>
-    <event id="0x03" name="ReachableChanged">
+    <event id="0x01" name="ShutDown" priority="critical">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+    </event>
+    <event id="0x02" name="Leave" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+      <field id="0" name="FabricIndex" type="fabric-idx">
+        <disallowConform/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="254"/>
+          </between>
+        </constraint>
+      </field>
+    </event>
+    <event id="0x03" name="ReachableChanged" priority="info">
       <access readPrivilege="view"/>
       <mandatoryConform/>
+      <field id="0" name="ReachableNewValue" type="bool">
+        <mandatoryConform/>
+      </field>
     </event>
   </events>
 </cluster>

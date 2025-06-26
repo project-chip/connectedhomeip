@@ -1,0 +1,9 @@
+#include "Project.xcconfig"
+
+GCC_OPTIMIZATION_LEVEL = 0
+SWIFT_OPTIMIZATION_LEVEL = -Onone
+TAPI_ENABLE_PROJECT_HEADERS = YES
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) DEBUG=1
+
+// Include override file last, if it exists
+#include? "Project.Debug.override.xcconfig"

@@ -32,3 +32,6 @@
 
 // Allows app options (ports) to be configured on launch of app
 #define CHIP_DEVICE_ENABLE_PORT_PARAMS 1
+
+// Needed for CI tests
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1

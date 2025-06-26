@@ -318,6 +318,24 @@ public:
     CHIP_ERROR SetClock_RealTime(Microseconds64 aNewCurTime) override;
 };
 
+/**
+ * @brief  Helper function to get current timestamp in Matter EpochS format
+ *
+ * This function is expected to return the local platform's notion of
+ * current real time, expressed as a Matter EPOCH second timestamp (seconds
+ * since 1st Jan 2000).
+ *
+ * @param  aMatterEpoch (uint32_t) reference to hold return epoch-s value
+ *
+ * @retval #CHIP_NO_ERROR     If the method succeeded.
+ * @retval #CHIP_ERROR_REAL_TIME_NOT_SYNCED
+ *                            If the platform is capable of tracking real time,
+ *                            but is currently unsynchronized.
+ * @retval #CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
+ *                            If the platform is incapable of tracking real time.
+ */
+CHIP_ERROR GetClock_MatterEpochS(uint32_t & aMatterEpoch);
+
 namespace Internal {
 
 // This should only be used via SystemClock() below.

@@ -39,6 +39,7 @@ public:
 #ifdef QR_CODE_ENABLED
         QRCodeScreen,
 #endif
+        CycleScreen,
         InvalidScreen,
     } Screen_e;
 

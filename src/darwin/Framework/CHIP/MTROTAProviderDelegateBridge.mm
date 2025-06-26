@@ -24,7 +24,7 @@
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 
-#include <app/clusters/ota-provider/ota-provider.h>
+#include <app/clusters/ota-provider/CodegenIntegration.h>
 #include <controller/CHIPDeviceController.h>
 #include <lib/core/Global.h>
 #include <lib/support/TypeTraits.h>

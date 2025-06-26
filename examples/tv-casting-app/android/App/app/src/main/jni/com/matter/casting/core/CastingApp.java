@@ -167,6 +167,7 @@ public final class CastingApp {
       Log.e(TAG, "CastingApp.stop failed to stop Matter server");
       return MatterError.CHIP_ERROR_INCORRECT_STATE;
     }
+    finishStopping();
     mState =
         CastingAppState.NOT_RUNNING; // CastingApp stopped successfully, set state to NOT_RUNNING
 
@@ -192,6 +193,9 @@ public final class CastingApp {
 
   /** Performs post Matter server startup registrations */
   private native MatterError finishStartup();
+
+  /** Performs cleanup after stopping Matter server */
+  private native void finishStopping();
 
   static {
     System.loadLibrary("TvCastingApp");

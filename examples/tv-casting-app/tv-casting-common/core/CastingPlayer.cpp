@@ -102,20 +102,23 @@ void CastingPlayer::VerifyOrEstablishConnection(ConnectionCallbacks connectionCa
     // as per IdentificationDeclarationOptions.mTargetAppInfos, simply Find or Re-establish the CASE session and return early.
     if (cachedCastingPlayers.size() != 0)
     {
-        ChipLogProgress(AppServer, "CastingPlayer::VerifyOrEstablishConnection() Re-establishing CASE with cached CastingPlayer");
+        ChipLogProgress(AppServer,
+                        "CastingPlayer::VerifyOrEstablishConnection() Checking cached CastingPlayer(s) for *this* CastingPlayer");
         it = std::find_if(cachedCastingPlayers.begin(), cachedCastingPlayers.end(),
                           [this](const core::CastingPlayer & castingPlayerParam) { return castingPlayerParam == *this; });
 
         // found the CastingPlayer in cache
         if (it != cachedCastingPlayers.end())
         {
-            ChipLogProgress(AppServer, "CastingPlayer::VerifyOrEstablishConnection() found this CastingPlayer in app cache");
+            ChipLogProgress(
+                AppServer,
+                "CastingPlayer::VerifyOrEstablishConnection() *this* CastingPlayer found in cache; checking for TargetApp(s)");
             unsigned index = (unsigned int) std::distance(cachedCastingPlayers.begin(), it);
             if (ContainsDesiredTargetApp(&cachedCastingPlayers[index], idOptions.getTargetAppInfoList()))
             {
                 ChipLogProgress(
                     AppServer,
-                    "CastingPlayer::VerifyOrEstablishConnection() calling FindOrEstablishSession on cached CastingPlayer");
+                    "CastingPlayer::VerifyOrEstablishConnection() Attempting to Re-establish CASE with cached CastingPlayer");
                 *this                          = cachedCastingPlayers[index];
                 mConnectionState               = CASTING_PLAYER_CONNECTING;
                 mOnCompleted                   = connectionCallbacks.mOnConnectionComplete;
@@ -314,6 +317,8 @@ void CastingPlayer::Disconnect()
 
 void CastingPlayer::RegisterEndpoint(const memory::Strong<Endpoint> endpoint)
 {
+    ChipLogProgress(AppServer, "CastingPlayer::RegisterEndpoint() EndpointID: %d, VendorID: %d, ProductID: %d", endpoint->GetId(),
+                    endpoint->GetVendorId(), endpoint->GetProductId());
     auto it = std::find_if(mEndpoints.begin(), mEndpoints.end(), [endpoint](const memory::Strong<Endpoint> & _endpoint) {
         return _endpoint->GetId() == endpoint->GetId();
     });
@@ -403,12 +408,13 @@ bool CastingPlayer::ContainsDesiredTargetApp(
                 match && (desiredTargetApps[i].productId == 0 || cachedEndpoint->GetProductId() == desiredTargetApps[i].productId);
             if (match)
             {
-                ChipLogProgress(AppServer, "CastingPlayer::ContainsDesiredTargetApp() matching cached CastingPlayer found");
+                ChipLogProgress(AppServer,
+                                "CastingPlayer::ContainsDesiredTargetApp() CastingPlayer's Endpoint(s) match Target App(s)");
                 return true;
             }
         }
     }
-    ChipLogProgress(AppServer, "CastingPlayer::ContainsDesiredTargetApp() matching cached CastingPlayer not found");
+    ChipLogError(AppServer, "CastingPlayer::ContainsDesiredTargetApp() CastingPlayer's Endpoints DO NOT match Target App(s)");
     return false;
 }
 

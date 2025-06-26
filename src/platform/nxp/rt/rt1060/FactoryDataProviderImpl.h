@@ -17,7 +17,7 @@
  */
 #pragma once
 
-#include <platform/nxp/common/factory_data/FactoryDataProvider.h>
+#include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
 
 #define FACTORY_DATA_MAX_SIZE 4096
 
@@ -36,7 +36,7 @@ namespace DeviceLayer {
  * Example of calls for loading the dataset using a software key:
  *
  * FactoryDataPrvdImpl().SetEncryptionMode(FactoryDataProvider::encrypt_ecb);
- * FactoryDataPrvdImpl().SetAes128Key(&aes128TestKey[0]);
+ * FactoryDataPrvdImpl().SetAesKey(&aes128TestKey[0], 128U);
  * FactoryDataPrvdImpl().Init();
  *
  * Example of calls for loading the dataset using a OTP key:
@@ -49,7 +49,19 @@ namespace DeviceLayer {
 class FactoryDataProviderImpl : public FactoryDataProvider
 {
 public:
-    enum KeySelect
+    static FactoryDataProviderImpl sInstance;
+
+    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
+                           uint32_t * contentAddr = NULL);
+    ~FactoryDataProviderImpl(){};
+
+    CHIP_ERROR Init(void);
+    CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer);
+
+    CHIP_ERROR SetKeyType(KeyType type);
+
+private:
+    enum KeySelectDcp
     {
         kDCP_UseSoftKey   = 0U,
         kDCP_OTPMKKeyLow  = 1U, /* Use [127:0] from snvs key as dcp key */
@@ -57,32 +69,8 @@ public:
         kDCP_OCOTPKeyLow  = 3U, /* Use [127:0] from ocotp key as dcp key */
         kDCP_OCOTPKeyHigh = 4U  /* Use [255:128] from ocotp key as dcp key */
     };
-
-    static FactoryDataProviderImpl sInstance;
-
-    CHIP_ERROR Init(void);
-    CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
-                           uint32_t * contentAddr = NULL);
-    CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer);
-
-    CHIP_ERROR SetAes128Key(const uint8_t * keyAes128);
-    CHIP_ERROR SetKeySelected(KeySelect key);
-    CHIP_ERROR SetEncryptionMode(EncryptionMode mode);
-    CHIP_ERROR SetCbcInitialVector(const uint8_t * iv, uint16_t ivSize);
-
-private:
-    struct Header
-    {
-        uint32_t hashId;
-        uint32_t size;
-        uint8_t hash[4];
-    };
     uint8_t factoryDataRamBuffer[FACTORY_DATA_MAX_SIZE];
-    Header mHeader;
-    const uint8_t * pAesKey          = nullptr;
-    const uint8_t * cbcInitialVector = nullptr;
-    EncryptionMode encryptMode       = encrypt_none;
-    KeySelect selectedKey;
+    KeySelectDcp selectedKey;
     bool dcpDriverIsInitialized;
     void SetDCP_OTPKeySelect(void);
     CHIP_ERROR ReadEncryptedData(uint8_t * desBuff, uint8_t * sourceAddr, uint16_t sizeToRead);
@@ -90,15 +78,7 @@ private:
     CHIP_ERROR LoadKeypairFromRaw(ByteSpan privateKey, ByteSpan publicKey, Crypto::P256Keypair & keypair);
 };
 
-inline FactoryDataProvider & FactoryDataPrvd()
-{
-    return FactoryDataProviderImpl::sInstance;
-}
-
-inline FactoryDataProviderImpl & FactoryDataPrvdImpl()
-{
-    return FactoryDataProviderImpl::sInstance;
-}
+FactoryDataProvider & FactoryDataPrvdImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

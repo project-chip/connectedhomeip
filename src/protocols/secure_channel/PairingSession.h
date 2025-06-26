@@ -183,25 +183,11 @@ protected:
         }
 
         Optional<uintptr_t> protocolData;
-        if (report.GetGeneralCode() == Protocols::SecureChannel::GeneralStatusCode::kBusy &&
-            report.GetProtocolCode() == Protocols::SecureChannel::kProtocolCodeBusy)
+        if (report.IsBusy() && report.GetMinimumWaitTime().has_value())
         {
-            if (!report.GetProtocolData().IsNull())
-            {
-                Encoding::LittleEndian::Reader reader(report.GetProtocolData()->Start(), report.GetProtocolData()->DataLength());
-
-                uint16_t minimumWaitTime = 0;
-                CHIP_ERROR waitTimeErr   = reader.Read16(&minimumWaitTime).StatusCode();
-                if (waitTimeErr != CHIP_NO_ERROR)
-                {
-                    ChipLogError(SecureChannel, "Failed to read the minimum wait time: %" CHIP_ERROR_FORMAT, waitTimeErr.Format());
-                }
-                else
-                {
-                    ChipLogProgress(SecureChannel, "Received busy status report with minimum wait time: %u ms", minimumWaitTime);
-                    protocolData.Emplace(minimumWaitTime);
-                }
-            }
+            System::Clock::Milliseconds16 minimumWaitTime = report.GetMinimumWaitTime().value();
+            ChipLogProgress(SecureChannel, "Received busy status report with minimum wait time: %u ms", minimumWaitTime.count());
+            protocolData.Emplace(minimumWaitTime.count());
         }
 
         // It's very important that we propagate the return value from

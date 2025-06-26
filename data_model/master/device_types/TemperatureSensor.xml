@@ -57,10 +57,11 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0302" name="Temperature Sensor" revision="2">
+<deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0302" name="Temperature Sensor" revision="3">
   <revisionHistory>
     <revision revision="1" summary="Initial Zigbee 3.0 revision"/>
     <revision revision="2" summary="New data model format and notation"/>
+    <revision revision="3" summary="Added Thermostat User Interface Configuration cluster"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>
@@ -71,6 +72,9 @@ Davis, CA 95616, USA
       <optionalConform>
         <condition name="Zigbee"/>
       </optionalConform>
+    </cluster>
+    <cluster id="0x0204" name="Thermostat User Interface Configuration" side="server">
+      <optionalConform/>
     </cluster>
     <cluster id="0x0402" name="Temperature Measurement" side="server">
       <mandatoryConform/>

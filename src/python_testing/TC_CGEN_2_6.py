@@ -29,7 +29,7 @@
 #           --in-test-commissioning-method on-network
 #           --qr-code MT:-24J0AFN00KA0648G00
 #           --trace-to json:log
-#       factoryreset: True
+#       factory-reset: true
 #       quiet: True
 # === END CI TEST ARGUMENTS ===
 

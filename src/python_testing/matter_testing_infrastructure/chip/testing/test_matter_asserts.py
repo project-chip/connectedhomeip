@@ -164,6 +164,18 @@ class TestMatterAsserts(unittest.TestCase):
         with self.assertRaises(signals.TestFailure):
             matter_asserts.assert_list([1, 2, 3], "test_max_length", max_length=2)
 
+    def test_assert_all(self):
+        """Test assert_all with valid and invalid values."""
+        # Valid cases
+        matter_asserts.assert_all([], lambda x: isinstance(x, str), "empty list")
+        matter_asserts.assert_all([1, 2, 3], lambda x: isinstance(x, int), "list of ints")
+
+        # Invalid cases
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_all([1, 2, 'a'], lambda x: isinstance(x, int), "mixed types")
+        with self.assertRaises(signals.TestFailure):
+            matter_asserts.assert_all("not a list", lambda x: True, "not a list")
+
     def test_assert_list_element_type(self):
         """Test assert_list_element_type with valid and invalid values."""
         # Valid cases

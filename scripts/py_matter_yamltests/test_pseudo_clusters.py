@@ -16,7 +16,7 @@
 
 import unittest
 
-from matter_yamltests.pseudo_clusters.pseudo_clusters import PseudoCluster, PseudoClusters
+from matter.yamltests.pseudo_clusters.pseudo_clusters import PseudoCluster, PseudoClusters
 
 
 class MockStep:

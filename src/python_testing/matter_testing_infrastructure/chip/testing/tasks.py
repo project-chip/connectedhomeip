@@ -68,7 +68,7 @@ class Subprocess(threading.Thread):
         self.output_match: Optional[re.Pattern] = None
         self.returncode = None
 
-    def _set_output_match(self, pattern: Union[str, re.Pattern]):
+    def set_output_match(self, pattern: Union[str, re.Pattern]):
         if isinstance(pattern, str):
             self.output_match = re.compile(re.escape(pattern.encode()))
         else:
@@ -116,7 +116,7 @@ class Subprocess(threading.Thread):
         """Start a subprocess and optionally wait for a specific output."""
 
         if expected_output is not None:
-            self._set_output_match(expected_output)
+            self.set_output_match(expected_output)
             self.event.clear()
 
         super().start()
@@ -138,7 +138,7 @@ class Subprocess(threading.Thread):
         """Send a message to a process and optionally wait for a response."""
 
         if expected_output is not None:
-            self._set_output_match(expected_output)
+            self.set_output_match(expected_output)
             self.event.clear()
 
         self.p.stdin.write((message + end).encode())

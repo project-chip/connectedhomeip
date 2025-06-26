@@ -26,6 +26,7 @@ namespace chip {
 
 CHIP_ERROR OTATestEventTriggerHandler::HandleEventTrigger(uint64_t eventTrigger)
 {
+    eventTrigger = clearEndpointInEventTrigger(eventTrigger);
     if ((eventTrigger & ~kOtaQueryFabricIndexMask) == kOtaQueryTrigger)
     {
         OTARequestorInterface * requestor = GetRequestorInstance();

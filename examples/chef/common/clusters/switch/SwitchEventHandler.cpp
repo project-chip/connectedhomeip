@@ -17,13 +17,15 @@
  */
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#ifdef MATTER_DM_PLUGIN_SWITCH_SERVER
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
 #include <platform/PlatformManager.h>
 
 #include "SwitchEventHandler.h"
 
+#include <app/util/config.h>
+
+#if MATTER_DM_SWITCH_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -78,4 +80,4 @@ void SwitchEventHandler::OnMultiPressComplete(EndpointId endpointId, uint8_t pre
 
     Clusters::SwitchServer::Instance().OnMultiPressComplete(endpointId, previousPosition, count);
 }
-#endif // MATTER_DM_PLUGIN_SWITCH_SERVER
+#endif // MATTER_DM_SWITCH_CLUSTER_SERVER_ENDPOINT_COUNT > 0

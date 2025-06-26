@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Project CHIP Authors
+# Copyright (c) 2024-2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,7 +36,9 @@ executable("water-leak-detector-app") {
   deps = [
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/examples/water-leak-detector-app/water-leak-detector-common",
+    "${chip_root}/examples/water-leak-detector-app/water-leak-detector-common:sources",
     "${chip_root}/src/lib",
+    "${chip_root}/third_party/jsoncpp",
   ]
 
   if (chip_examples_enable_imgui_ui) {

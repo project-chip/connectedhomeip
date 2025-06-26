@@ -146,12 +146,11 @@ buildconfig_header("system_buildconfig") {
     defines += [ "CHIP_SYSTEM_LAYER_IMPL_CONFIG_FILE=<system/SystemLayerImpl${chip_system_config_event_loop}.h>" ]
   }
 
-  if (chip_system_config_use_sockets && current_os != "zephyr") {
-    defines += [
-      "CHIP_SYSTEM_CONFIG_MULTICAST_HOMING=${chip_system_config_use_sockets} ",
-    ]
+  if ((chip_system_config_use_sockets && current_os != "zephyr") ||
+      chip_system_config_use_network_framework) {
+    defines += [ "CHIP_SYSTEM_CONFIG_MULTICAST_HOMING=1" ]
   } else {
-    defines += [ "CHIP_SYSTEM_CONFIG_MULTICAST_HOMING=0 " ]
+    defines += [ "CHIP_SYSTEM_CONFIG_MULTICAST_HOMING=0" ]
   }
 }
 
@@ -203,6 +202,9 @@ source_set("system_config_header") {
         public_deps +=
             [ "${bouffalolab_iot_sdk_build_root}/bl616:bouffalo_sdk" ]
       }
+      if (chip_device_platform == "cc13x4_26x4") {
+        public_deps += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk" ]
+      }
 
       # Add platform here as needed.
     }
@@ -250,10 +252,21 @@ static_library("system") {
     # or
     #    - SystemLayerImplSelect.h
     #    - SystemLayerImplSelect.cpp
-    sources += [
-      "SystemLayerImpl${chip_system_config_event_loop}.cpp",
-      "SystemLayerImpl${chip_system_config_event_loop}.h",
-    ]
+    # or
+    #    - SystemLayerImplDispatch.mm
+    #    - SystemLayerImplDispatch.h
+    # or
+    #    - SystemLayerImplZephyr.h
+    #    - SystemLayerImplZephyr.cpp
+
+    if (chip_system_config_use_dispatch) {
+      sources += [ "${chip_root}/src/platform/Darwin/system/SystemLayerImpl${chip_system_config_event_loop}.h" ]
+    } else {
+      sources += [
+        "SystemLayerImpl${chip_system_config_event_loop}.cpp",
+        "SystemLayerImpl${chip_system_config_event_loop}.h",
+      ]
+    }
   }
 
   cflags = [ "-Wconversion" ]

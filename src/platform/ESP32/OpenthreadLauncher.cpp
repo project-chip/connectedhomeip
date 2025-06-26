@@ -262,7 +262,12 @@ esp_err_t openthread_init_stack(void)
     }
     assert(s_platform_config);
     // Initialize the OpenThread stack
-    ESP_ERROR_CHECK(esp_openthread_init(s_platform_config));
+    if ((err = esp_openthread_init(s_platform_config)) == ESP_ERR_INVALID_STATE)
+    {
+        ESP_LOGW(TAG, "OpenThread is already initialized");
+        return ESP_OK;
+    }
+    ESP_ERROR_CHECK(err);
 #if defined(CONFIG_OPENTHREAD_BORDER_ROUTER) && defined(CONFIG_AUTO_UPDATE_RCP)
     try_update_ot_rcp(s_platform_config);
 #endif // CONFIG_OPENTHREAD_BORDER_ROUTER && CONFIG_AUTO_UPDATE_RCP

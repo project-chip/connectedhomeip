@@ -37,8 +37,10 @@ template("cyw30739_example") {
     ]
 
     deps = [
-      "${chip_root}/examples/providers:device_info_provider",
+      "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
       "${chip_root}/examples/shell/shell_common:shell_common",
+      "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
+      "${chip_root}/src/app/clusters/software-diagnostics-server:software-fault-listener",
       "${chip_root}/src/setup_payload:onboarding-codes-utils",
       "${matter_wpan_sdk_build_root}:${board}",
       app_data_model,

@@ -60,4 +60,21 @@ private:
     chip::Optional<uint8_t> mWebRTCSessionId;
 };
 
+class SolicitOfferCommand : public CHIPCommand
+{
+public:
+    SolicitOfferCommand(CredentialIssuerCommands * credIssuerCommands) : CHIPCommand("solicit-offer", credIssuerCommands)
+    {
+        AddArgument("stream-usage", 0, UINT8_MAX, &mStreamUsage);
+    }
+
+    /////////// CHIPCommand Interface /////////
+    CHIP_ERROR RunCommand() override;
+
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(1); }
+
+private:
+    uint8_t mStreamUsage = 0;
+};
+
 } // namespace webrtc

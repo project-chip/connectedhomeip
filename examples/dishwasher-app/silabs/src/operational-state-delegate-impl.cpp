@@ -24,7 +24,6 @@
 #include <app/util/generic-callbacks.h>
 
 #include "DataModelHelper.h"
-#include "EnergyTimeUtils.h"
 #include "operational-state-delegate-impl.h"
 
 using namespace chip;

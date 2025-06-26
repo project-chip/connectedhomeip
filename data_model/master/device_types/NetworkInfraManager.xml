@@ -70,6 +70,9 @@ Davis, CA 95616, USA
     <cluster id="0x0035" name="Thread Network Diagnostics" side="server">
       <mandatoryConform/>
     </cluster>
+    <cluster id="0x0450" name="Network Identity Management" side="server">
+      <mandatoryConform/>
+    </cluster>
     <cluster id="0x0451" name="Wi-Fi Network Management" side="server">
       <mandatoryConform/>
     </cluster>

@@ -36,7 +36,7 @@ static const uint8_t aes128TestKey[]
 #endif
 
 #if CONFIG_CHIP_FACTORY_DATA
-#include <platform/nxp/common/factory_data/FactoryDataProvider.h>
+#include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
 #else
 #include <platform/nxp/zephyr/DeviceInstanceInfoProviderImpl.h>
 #endif
@@ -87,12 +87,12 @@ CHIP_ERROR NXP::App::AppFactoryData_PostMatterStackInit(void)
 #if CONFIG_CHIP_FACTORY_DATA
 #if CONFIG_CHIP_ENCRYPTED_FACTORY_DATA
     FactoryDataPrvdImpl().SetEncryptionMode(FactoryDataProvider::encrypt_ecb);
-    FactoryDataPrvdImpl().SetAes128Key(&aes128TestKey[0]);
+    FactoryDataPrvdImpl().SetAesKey(&aes128TestKey[0], FactoryDataProvider::aes_128);
 #endif /* CONFIG_CHIP_ENCRYPTED_FACTORY_DATA */
     ReturnErrorOnFailure(FactoryDataPrvdImpl().Init());
-    SetDeviceInstanceInfoProvider(&FactoryDataPrvd());
-    SetDeviceAttestationCredentialsProvider(&FactoryDataPrvd());
-    SetCommissionableDataProvider(&FactoryDataPrvd());
+    SetDeviceInstanceInfoProvider(&FactoryDataPrvdImpl());
+    SetDeviceAttestationCredentialsProvider(&FactoryDataPrvdImpl());
+    SetCommissionableDataProvider(&FactoryDataPrvdImpl());
 #else
     SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

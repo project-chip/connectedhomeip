@@ -27,6 +27,7 @@
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRUnfairLock.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
 
@@ -155,7 +156,10 @@ private:
     MTRDiagnosticLogsDownloader * __weak mDelegate;
 };
 
-@implementation MTRDownload
+@implementation MTRDownload {
+    // Guards access to _finalize to make sure we only finalize once.
+    os_unfair_lock _lock;
+}
 
 static void OnTransferTimeout(chip::System::Layer * layer, void * context)
 {
@@ -188,18 +192,30 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
         auto * fileDesignator = [self _toFileDesignatorString:type nodeID:nodeID];
         auto * fileURL = [self _toFileURL:type nodeID:nodeID];
 
-        __weak typeof(self) weakSelf = self;
+        mtr_weakify(self);
         auto bdxTransferDone = ^(NSError * bdxError) {
-            dispatch_async(queue, ^{
-                MTRDownload * strongSelf = weakSelf;
-                if (strongSelf) {
-                    // If a fileHandle exists, it means that the BDX session has been initiated and a file has
-                    // been created to host the data of the session. So even if there is an error there may be some
-                    // data in the logs that the caller may find useful. For this reason, fileURL is passed in even
-                    // when there is an error but fileHandle is not nil.
-                    completion(strongSelf->_fileHandle ? fileURL : nil, bdxError);
+            mtr_strongify(self);
+            // Hold strong ref to fileHandle here across the async dispatch, so we do the right thing with our
+            // completion even if "self" goes away in the meantime.
+            auto * fileHandle = self->_fileHandle;
 
-                    done(strongSelf);
+            dispatch_async(queue, ^{
+                // Make sure to invoke our completion even if this objects was destroyed between queueing this block
+                // and it running.  This is needed because when we cancel a transfer we remove the object from the
+                // list, dropping the last ref, immediately after calling _finalize, but we should still call our
+                // overall API consumer's completion.
+                //
+                // If a fileHandle exists, it means that the BDX session has been initiated and a file has
+                // been created to host the data of the session. So even if there is an error there may be some
+                // data in the logs that the caller may find useful. For this reason, fileURL is passed in even
+                // when there is an error but fileHandle is not nil.
+                completion(fileHandle ? fileURL : nil, bdxError);
+
+                // On the other hand, all "done" does is remove us from the list in MTRDownloads.  If we're gone, we're
+                // already not in that list.
+                mtr_strongify(self);
+                if (self) {
+                    done(self);
                 }
             });
         };
@@ -210,6 +226,7 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
         _fileURL = fileURL;
         _fileHandle = nil;
         _finalize = bdxTransferDone;
+        _lock = OS_UNFAIR_LOCK_INIT;
 
         if (timeout <= 0) {
             timeout = 0;
@@ -301,15 +318,31 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
     return [_fileDesignator isEqualToString:fileDesignator] && [_fabricIndex isEqualToNumber:fabricIndex] && [_nodeID isEqualToNumber:nodeID];
 }
 
+- (void)_callFinalize:(nullable NSError *)error
+{
+    // Ensure we only call our finalize hook once.
+    MTRStatusCompletion finalize;
+    {
+        std::lock_guard lock(_lock);
+        finalize = _finalize;
+        _finalize = nil;
+    }
+
+    if (finalize) {
+        finalize(error);
+    }
+}
+
 - (void)failure:(NSError *)error
 {
     MTR_LOG("%@ Diagnostic log transfer failure: %@", self, error);
-    _finalize(error);
+
+    [self _callFinalize:error];
 }
 
 - (void)success
 {
-    _finalize(nil);
+    [self _callFinalize:nil];
 }
 
 - (void)cancelTimeoutTimer

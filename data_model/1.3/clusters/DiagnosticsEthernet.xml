@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0037" name="Ethernet Network Diagnostics Cluster" revision="1">
   <revisionHistory>
@@ -110,57 +112,57 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="PHYRate" type="PHYRateEnum" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0001" name="FullDuplex" type="bool" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0002" name="PacketRxCount" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <mandatoryConform>
         <feature name="PKTCNT"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0003" name="PacketTxCount" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <mandatoryConform>
         <feature name="PKTCNT"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0004" name="TxErrCount" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <mandatoryConform>
         <feature name="ERRCNT"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0005" name="CollisionCount" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <mandatoryConform>
         <feature name="ERRCNT"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0006" name="OverrunCount" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <mandatoryConform>
         <feature name="ERRCNT"/>
       </mandatoryConform>
     </attribute>
     <attribute id="0x0007" name="CarrierDetect" type="bool" default="null">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true" nullable="true"/>
       <optionalConform/>
     </attribute>
     <attribute id="0x0008" name="TimeSinceReset" type="uint64" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="true" nullable="false" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality changeOmitted="true"/>
       <optionalConform/>
     </attribute>
   </attributes>

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0023" name="Casting Video Player" revision="2">
   <revisionHistory>
@@ -62,9 +64,7 @@ Davis, CA 95616, USA
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <conditions>
-    <condition name="ContentAppPlatform" summary="The device includes a Content App Platform. A Content App is usually an
-application built by a Content Provider. A Casting Video Player with a Content App Platform is able to
-launch Content Apps and represent these apps as separate endpoints."/>
+    <condition name="ContentAppPlatform" summary="The device includes a Content App Platform. A Content App is usually an application built by a Content Provider. A Casting Video Player with a Content App Platform is able to launch Content Apps and represent these apps as separate endpoints."/>
     <condition name="PhysicalInputs" summary="The device has physical inputs for media."/>
   </conditions>
   <clusters>
@@ -88,7 +88,7 @@ launch Content Apps and represent these apps as separate endpoints."/>
     </cluster>
     <cluster id="0x0507" name="Media Input" side="server">
       <mandatoryConform>
-        <attribute name="PhysicalInputs"/>
+        <condition name="PhysicalInputs"/>
       </mandatoryConform>
     </cluster>
     <cluster id="0x0508" name="Low Power" side="server">
@@ -105,7 +105,7 @@ launch Content Apps and represent these apps as separate endpoints."/>
     </cluster>
     <cluster id="0x050C" name="Application Launcher" side="server">
       <mandatoryConform>
-        <attribute name="ContentAppPlatform"/>
+        <condition name="ContentAppPlatform"/>
       </mandatoryConform>
       <features>
         <feature code="" name="ApplicationPlatform">

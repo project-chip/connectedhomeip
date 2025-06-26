@@ -23,7 +23,6 @@
 #include "DeviceEnergyManagementDelegateImpl.h"
 #include "DeviceEnergyManager.h"
 #include "DishwasherManager.h"
-#include "EnergyTimeUtils.h"
 
 using namespace chip;
 using namespace chip::app;

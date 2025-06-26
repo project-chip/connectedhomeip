@@ -42,9 +42,9 @@ config("ti_simplelink_mbedtls_config") {
   if (ti_simplelink_device_family == "cc13x4_26x4") {
     defines = [ "MBEDTLS_CONFIG_FILE=\"cc13x4_26x4-mbedtls-config.h\"" ]
     include_dirs = [
-      "${chip_root}/src/platform/cc13xx_26xx/",
-      "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4",
-      "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/crypto",
+      "${chip_root}/src/platform/ti/cc13xx_26xx/",
+      "${chip_root}/src/platform/ti/cc13xx_26xx/cc13x4_26x4",
+      "${chip_root}/src/platform/ti/cc13xx_26xx/cc13x4_26x4/crypto",
       "${ti_simplelink_sdk_root}/source",
     ]
   } else if (ti_simplelink_device_family == "cc32xx") {
@@ -58,11 +58,11 @@ mbedtls_target("mbedtls") {
   # Hardware acceleration
   if (ti_simplelink_device_family == "cc13x4_26x4") {
     sources = [
-      "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/crypto/aes_alt.c",
-      "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/crypto/ecdh_alt.c",
-      "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/crypto/ecdsa_alt.c",
-      "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/crypto/ecjpake_alt.c",
-      "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/crypto/sha256_alt.c",
+      "${chip_root}/src/platform/ti/cc13xx_26xx/cc13x4_26x4/crypto/aes_alt.c",
+      "${chip_root}/src/platform/ti/cc13xx_26xx/cc13x4_26x4/crypto/ecdh_alt.c",
+      "${chip_root}/src/platform/ti/cc13xx_26xx/cc13x4_26x4/crypto/ecdsa_alt.c",
+      "${chip_root}/src/platform/ti/cc13xx_26xx/cc13x4_26x4/crypto/ecjpake_alt.c",
+      "${chip_root}/src/platform/ti/cc13xx_26xx/cc13x4_26x4/crypto/sha256_alt.c",
     ]
   }
 
@@ -76,10 +76,10 @@ mbedtls_target("mbedtls") {
 config("ti_simplelink_freertos_config") {
   if (ti_simplelink_device_family == "cc13x4_26x4") {
     include_dirs = [
-      "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4",
+      "${chip_root}/src/platform/ti/cc13xx_26xx/cc13x4_26x4",
       "${freertos_root}/portable/GCC/ARM_CM33_NTZ",
       "${freertos_root}/portable/GCC/ARM_CM33_NTZ/non_secure",
-      "${chip_root}/src/platform/cc13xx_26xx",
+      "${chip_root}/src/platform/ti/cc13xx_26xx",
     ]
   } else if (ti_simplelink_device_family == "cc32xx") {
     include_dirs = [

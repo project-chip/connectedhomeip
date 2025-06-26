@@ -22,7 +22,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CHIP_RVC_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvcopstate_2_3_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -30,6 +30,7 @@
 #       --passcode 20202021
 #       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
 #       --endpoint 1
+#       --app-pipe /tmp/rvcopstate_2_3_fifo
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -61,6 +62,14 @@ def state_enum_to_text(state_enum):
         return "Charging(0x41)"
     elif state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kDocked:
         return "Docked(0x42)"
+    elif state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kEmptyingDustBin:
+        return "EmptyingDustBin(0x43)"
+    elif state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kCleaningMop:
+        return "CleaningMop(0x44)"
+    elif state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kFillingWaterTank:
+        return "FillingWaterTank(0x45)"
+    elif state_enum == Clusters.RvcOperationalState.Enums.OperationalStateEnum.kUpdatingMaps:
+        return "UpdatingMaps(0x46)"
     else:
         return "UnknownEnumValue"
 
@@ -91,6 +100,22 @@ def error_enum_to_text(error_enum):
         return "WaterTankLidOpen(0x46)"
     elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kMopCleaningPadMissing:
         return "MopCleaningPadMissing(0x47)"
+    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kLowBattery:
+        return "LowBattery(0x48)"
+    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kCannotReachTargetArea:
+        return "CannotReachTargetArea(0x49)"
+    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDirtyWaterTankFull:
+        return "DirtyWaterTankFull(0x4A)"
+    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kDirtyWaterTankMissing:
+        return "DirtyWaterTankMissing(0x4B)"
+    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kWheelsJammed:
+        return "WheelsJammed(0x4C)"
+    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kBrushJammed:
+        return "BrushJammed(0x4D)"
+    elif error_enum == Clusters.RvcOperationalState.Enums.ErrorStateEnum.kNavigationSensorObscured:
+        return "NavigationSensorObscured(0x4E)"
+    else:
+        return "UnknownEnumValue"
 
 
 class TC_RVCOPSTATE_2_3(MatterBaseTest):
@@ -99,7 +124,6 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         super().__init__(*args)
         self.endpoint = None
         self.is_ci = False
-        self.app_pipe = "/tmp/chip_rvc_fifo_"
 
     async def read_mod_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.RvcOperationalState
@@ -161,11 +185,6 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
         self.endpoint = self.get_endpoint()
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid == 0:
-                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set.c")
-            self.app_pipe = self.app_pipe + str(app_pid)
 
         asserts.assert_true(self.check_pics("RVCOPSTATE.S.A0003"), "RVCOPSTATE.S.A0003 must be supported")
         asserts.assert_true(self.check_pics("RVCOPSTATE.S.A0004"), "RVCOPSTATE.S.A0004 must be supported")
@@ -348,6 +367,90 @@ class TC_RVCOPSTATE_2_3(MatterBaseTest):
             await self.read_operational_state_with_check(44, rvc_op_states.kSeekingCharger)
 
             await self.send_resume_cmd_with_check(45, op_errors.kCommandInvalidInState)
+
+        if self.check_pics("RVCOPSTATE.S.M.ST_EMPTYINGDUSTBIN"):
+            test_step = "Manually put the device in the EmptyingDustBin(0x43) operational state"
+            self.print_step(46, test_step)
+            if self.is_ci:
+                self.write_to_app_pipe({"Name": "EmptyingDustBin"})
+            else:
+                self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
+
+            await self.read_operational_state_with_check(47, rvc_op_states.kEmptyingDustBin)
+
+            # EmptyingDustBin is not Pause compatible
+            await self.send_pause_cmd_with_check(48, op_errors.kCommandInvalidInState)
+
+            test_step = "Manually put the device in the EmptyingDustBin(0x43) operational state and RVC Run Mode cluster's CurrentMode attribute set to a mode with the Idle mode tag"
+            self.print_step(49, test_step)
+            if not self.is_ci:
+                self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
+
+            # EmptyingDustBin is not Resume compatible
+            await self.send_resume_cmd_with_check(49, op_errors.kCommandInvalidInState)
+
+        if self.check_pics("RVCOPSTATE.S.M.ST_CLEANINGMOP"):
+            test_step = "Manually put the device in the CleaningMop(0x44) operational state"
+            self.print_step(50, test_step)
+            if self.is_ci:
+                self.write_to_app_pipe({"Name": "CleaningMop"})
+            else:
+                self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
+
+            await self.read_operational_state_with_check(51, rvc_op_states.kCleaningMop)
+
+            # CleaningMop is not Pause compatible
+            await self.send_pause_cmd_with_check(52, op_errors.kCommandInvalidInState)
+
+            test_step = "Manually put the device in the CleaningMop(0x44) operational state and RVC Run Mode cluster's CurrentMode attribute set to a mode with the Idle mode tag"
+            self.print_step(53, test_step)
+            if not self.is_ci:
+                self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
+
+            # CleaningMop is not Resume compatible
+            await self.send_resume_cmd_with_check(53, op_errors.kCommandInvalidInState)
+
+        if self.check_pics("RVCOPSTATE.S.M.ST_FILLINGWATERTNK"):
+            test_step = "Manually put the device in the FillingWaterTank(0x45) operational state"
+            self.print_step(54, test_step)
+            if self.is_ci:
+                self.write_to_app_pipe({"Name": "FillingWaterTank"})
+            else:
+                self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
+
+            await self.read_operational_state_with_check(55, rvc_op_states.kFillingWaterTank)
+
+            # FillingWaterTank is not Pause compatible
+            await self.send_pause_cmd_with_check(56, op_errors.kCommandInvalidInState)
+
+            test_step = "Manually put the device in the FillingWaterTank(0x45) operational state and RVC Run Mode cluster's CurrentMode attribute set to a mode with the Idle mode tag"
+            self.print_step(57, test_step)
+            if not self.is_ci:
+                self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
+
+            # FillingWaterTank is not Resume compatible
+            await self.send_resume_cmd_with_check(57, op_errors.kCommandInvalidInState)
+
+        if self.check_pics("RVCOPSTATE.S.M.ST_UPDATINGMAPS"):
+            test_step = "Manually put the device in the UpdatingMaps(0x46) operational state"
+            self.print_step(58, test_step)
+            if self.is_ci:
+                self.write_to_app_pipe({"Name": "UpdatingMaps"})
+            else:
+                self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
+
+            await self.read_operational_state_with_check(59, rvc_op_states.kUpdatingMaps)
+
+            # UpdatingMaps is not Pause compatible
+            await self.send_pause_cmd_with_check(60, op_errors.kCommandInvalidInState)
+
+            test_step = "Manually put the device in the UpdatingMaps(0x46) operational state and RVC Run Mode cluster's CurrentMode attribute set to a mode with the Idle mode tag"
+            self.print_step(61, test_step)
+            if not self.is_ci:
+                self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when done.\n")
+
+            # UpdatingMaps is not Resume compatible
+            await self.send_resume_cmd_with_check(61, op_errors.kCommandInvalidInState)
 
 
 if __name__ == "__main__":

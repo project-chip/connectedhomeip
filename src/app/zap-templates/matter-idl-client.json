@@ -40,6 +40,10 @@
             "path": "partials/idl/cluster_definition.zapt"
         },
         {
+            "name": "idl_label_clarification",
+            "path": "partials/idl/label_clarification.zapt"
+        },
+        {
             "name": "idl_global_types",
             "path": "partials/idl/global_types.zapt"
         }

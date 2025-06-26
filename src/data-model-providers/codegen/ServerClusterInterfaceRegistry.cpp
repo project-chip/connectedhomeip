@@ -48,13 +48,21 @@ CHIP_ERROR ServerClusterInterfaceRegistry::Register(ServerClusterRegistration & 
     VerifyOrReturnError(entry.next == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(entry.serverClusterInterface != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    ConcreteClusterPath path = entry.serverClusterInterface->GetPath();
+    Span<const ConcreteClusterPath> paths = entry.serverClusterInterface->GetPaths();
+    VerifyOrReturnError(!paths.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrReturnError(path.HasValidIds(), CHIP_ERROR_INVALID_ARGUMENT);
+    for (const ConcreteClusterPath & path : paths)
+    {
+        VerifyOrReturnError(path.HasValidIds(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    // Double-checking for duplicates makes the checks O(n^2) on the total number of registered
-    // items. We preserve this however we may want to make this optional at some point in time.
-    VerifyOrReturnError(Get(path) == nullptr, CHIP_ERROR_DUPLICATE_KEY_ID);
+        // Double-checking for duplicates makes the checks O(n^2) on the total number of registered
+        // items. We preserve this however we may want to make this optional at some point in time.
+        VerifyOrReturnError(Get(path) == nullptr, CHIP_ERROR_DUPLICATE_KEY_ID);
+
+        // Codegen registry requirements (so that we can support endpoint unregistration): every
+        // path must belong to the same endpoint id.
+        VerifyOrReturnError(path.mEndpointId == paths[0].mEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
+    }
 
     if (mContext.has_value())
     {
@@ -67,14 +75,14 @@ CHIP_ERROR ServerClusterInterfaceRegistry::Register(ServerClusterRegistration & 
     return CHIP_NO_ERROR;
 }
 
-ServerClusterInterface * ServerClusterInterfaceRegistry::Unregister(const ConcreteClusterPath & path)
+CHIP_ERROR ServerClusterInterfaceRegistry::Unregister(ServerClusterInterface * what)
 {
     ServerClusterRegistration * prev    = nullptr;
     ServerClusterRegistration * current = mRegistrations;
 
     while (current != nullptr)
     {
-        if (current->serverClusterInterface->GetPath() == path)
+        if (current->serverClusterInterface == what)
         {
             // take the item out of the current list and return it.
             ServerClusterRegistration * next = current->next;
@@ -99,15 +107,14 @@ ServerClusterInterface * ServerClusterInterfaceRegistry::Unregister(const Concre
                 current->serverClusterInterface->Shutdown();
             }
 
-            return current->serverClusterInterface;
+            return CHIP_NO_ERROR;
         }
 
         prev    = current;
         current = current->next;
     }
 
-    // Not found.
-    return nullptr;
+    return CHIP_ERROR_NOT_FOUND;
 }
 
 ServerClusterInterfaceRegistry::ClustersList ServerClusterInterfaceRegistry::ClustersOnEndpoint(EndpointId endpointId)
@@ -121,7 +128,12 @@ void ServerClusterInterfaceRegistry::UnregisterAllFromEndpoint(EndpointId endpoi
     ServerClusterRegistration * current = mRegistrations;
     while (current != nullptr)
     {
-        if (current->serverClusterInterface->GetPath().mEndpointId == endpointId)
+        // Requirements for Paths:
+        //   - GetPaths() MUST be non-empty
+        //   - GetPaths() MUST belong to the same endpoint
+        // Loop below relies on that: if the endpoint matches, it can be removed
+        auto paths = current->serverClusterInterface->GetPaths();
+        if (paths.empty() || paths.front().mEndpointId == endpointId)
         {
             if (mCachedInterface == current->serverClusterInterface)
             {
@@ -153,10 +165,10 @@ void ServerClusterInterfaceRegistry::UnregisterAllFromEndpoint(EndpointId endpoi
     }
 }
 
-ServerClusterInterface * ServerClusterInterfaceRegistry::Get(const ConcreteClusterPath & path)
+ServerClusterInterface * ServerClusterInterfaceRegistry::Get(const ConcreteClusterPath & clusterPath)
 {
     // Check the cache to speed things up
-    if ((mCachedInterface != nullptr) && (mCachedInterface->GetPath() == path))
+    if ((mCachedInterface != nullptr) && mCachedInterface->PathsContains(clusterPath))
     {
         return mCachedInterface;
     }
@@ -166,7 +178,7 @@ ServerClusterInterface * ServerClusterInterfaceRegistry::Get(const ConcreteClust
 
     while (current != nullptr)
     {
-        if (current->serverClusterInterface->GetPath() == path)
+        if (current->serverClusterInterface->PathsContains(clusterPath))
         {
             mCachedInterface = current->serverClusterInterface;
             return mCachedInterface;
@@ -197,7 +209,8 @@ CHIP_ERROR ServerClusterInterfaceRegistry::SetContext(ServerClusterContext && co
         if (err != CHIP_NO_ERROR)
         {
 #if CHIP_ERROR_LOGGING
-            const ConcreteClusterPath path = registration->serverClusterInterface->GetPath();
+            // Paths MUST contain at least one element. Log the first one for identification (even though there may be more)
+            const ConcreteClusterPath path = registration->serverClusterInterface->GetPaths().front();
             ChipLogError(DataManagement, "Cluster %u/" ChipLogFormatMEI " startup failed: %" CHIP_ERROR_FORMAT, path.mEndpointId,
                          ChipLogValueMEI(path.mClusterId), err.Format());
 #endif

@@ -41,6 +41,8 @@ lwip_debug = false
 
 chip_build_tests = false
 
+chip_crypto = "mbedtls"
+chip_external_mbedtls = true
 openthread_external_mbedtls = mbedtls_target
 
 openthread_external_platform =

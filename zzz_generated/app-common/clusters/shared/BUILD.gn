@@ -1,0 +1,53 @@
+import("//build_overrides/chip.gni")
+
+source_set("enums") {
+  sources = [
+    "Enums.h",
+    "EnumsCheck.h",
+  ]
+}
+
+source_set("headers") {
+  sources = [
+    "Attributes.h",
+    "Structs.h",
+    # For consistency, we have a `.ipp` file here part of cluster-objects.
+    # Reasoning for creating a monolith for these files is compiler seems to be able to optimize
+    # things significantly more when sharing bits.
+    # "Structs.cpp",
+  ]
+  public_deps = [
+    ":enums",
+    "${chip_root}/src/app:events",
+    "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/common:global-ids",
+    "${chip_root}/src/app/data-model",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/protocols/interaction_model",
+  ]
+
+  visibility = [
+    ":elements",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/zzz_generated/app-common/clusters/*",
+    "${chip_root}/zzz_generated/app-common/clusters:all-headers",
+  ]
+}
+
+source_set("elements") {
+  public_deps = [
+    ":headers",
+  ]
+  deps = [
+    # NOTE: awkward dependency because cluster-objects contains ALL the cluster
+    #       .cpp files as one compile unit to optimize for flash size during
+    #       compilation.
+    # Dependency tree is as:
+    #      - <CLUSTER>:headers (mostly private as a target) contains *.h
+    #      - src/app/common:cluster-objects contains "*.ipp" for attr/commands/events/structs
+    #      - <CLUSTER>:elements makes the headers available and depends on the cluster-objects impl.
+    "${chip_root}/src/app/common:cluster-objects",
+  ]
+}
+
+

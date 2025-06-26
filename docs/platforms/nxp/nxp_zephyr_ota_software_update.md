@@ -208,7 +208,7 @@ user@ubuntu:~/connectedhomeip$ : ./out/chip-tool-app/chip-tool pairing ble-wifi 
 ```
 
 Once commissioned, the OTA process can be initiated with the
-"announce-ota-provider" command using chip-tool (the given numbers refer
+"announce-otaprovider" command using chip-tool (the given numbers refer
 respectively to [ProviderNodeId][vendorid] [AnnouncementReason][endpoint]
 [node-id][endpoint-id]) :
 

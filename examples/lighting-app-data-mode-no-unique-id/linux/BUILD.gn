@@ -45,6 +45,7 @@ executable("chip-lighting-app") {
     "${chip_root}/examples/lighting-app-data-mode-no-unique-id/lighting-common",
     "${chip_root}/examples/lighting-app-data-mode-no-unique-id/lighting-common:lighting-manager",
     "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/app/clusters/software-diagnostics-server:software-fault-listener",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/jsoncpp",
   ]

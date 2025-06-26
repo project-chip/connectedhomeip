@@ -1,0 +1,58 @@
+// DO NOT EDIT MANUALLY - Generated file
+//
+// Cluster metadata information for cluster {{cluster.name}} (cluster code: {{"%d/0x%X" | format(cluster.code, cluster.code)}})
+// based on {{input_name}}
+#pragma once
+
+#include <app/data-model-provider/MetadataTypes.h>
+#include <lib/core/DataModelTypes.h>
+
+#include <cstdint>
+
+#include <clusters/{{cluster.name | upfirst}}/Ids.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace {{cluster.name}} {
+
+inline constexpr uint32_t kRevision = {{cluster.revision}};
+
+namespace Attributes {
+{% for attribute in cluster.attributes | reject("global_attribute") -%}
+namespace {{attribute.definition.name | upfirst}} {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(
+    {{attribute.definition.name | upfirst}}::Id,
+    BitFlags<DataModel::AttributeQualityFlags>( {{ attribute | extract_attribute_quality_flags | join(", ") }} ),
+    {% if attribute.is_readable -%}
+        {{attribute.readacl | as_privilege}}
+      {%- else -%}
+        std::nullopt
+      {%- endif -%}
+    ,
+    {% if attribute.is_writable -%}
+        {{attribute.writeacl | as_privilege}}
+      {%- else -%}
+        std::nullopt
+      {%- endif -%}
+);
+} // namespace {{attribute.definition.name | upfirst}}
+{% endfor %}
+
+} // namespace Attributes
+
+namespace Commands {
+{% for command in cluster.commands -%}
+namespace {{command.name | upfirst}} {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(
+    {{command.name | upfirst}}::Id,
+    BitFlags<DataModel::CommandQualityFlags>( {{ command | extract_command_quality_flags | join(", ") }} ),
+    {{ command.invokeacl | as_privilege}}
+);
+} // namespace {{command.name | upfirst}}
+{% endfor %}
+} // namespace Commands
+} // namespace {{cluster.name}}
+} // namespace Clusters
+} // namespace app
+} // namespace chip

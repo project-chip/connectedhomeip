@@ -122,7 +122,6 @@ rt_executable("all_cluster_app") {
 
   sources = [
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/binding-handler.cpp",
-    "${chip_root}/examples/providers/DeviceInfoProviderImpl.cpp",
     "../../common/main/AppTask.cpp",
     "../../common/main/DeviceCallbacks.cpp",
     "../../common/main/ZclCallbacks.cpp",
@@ -166,6 +165,8 @@ rt_executable("all_cluster_app") {
 
   deps = [
     "${chip_root}/examples/${app_common_folder}",
+    "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload:onboarding-codes-utils",
   ]

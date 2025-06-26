@@ -78,12 +78,12 @@ public:
 
     Protocols::InteractionModel::Status SnapshotStreamDeallocate(const uint16_t streamID);
 
-    void OnRankedStreamPrioritiesChanged();
+    void OnStreamUsagePrioritiesChanged();
 
     void OnAttributeChanged(AttributeId attributeId);
 
-    Protocols::InteractionModel::Status CaptureSnapshot(const uint16_t streamID, const VideoResolutionStruct & resolution,
-                                                        ImageSnapshot & outImageSnapshot);
+    Protocols::InteractionModel::Status CaptureSnapshot(const DataModel::Nullable<uint16_t> streamID,
+                                                        const VideoResolutionStruct & resolution, ImageSnapshot & outImageSnapshot);
 
     CHIP_ERROR
     LoadAllocatedVideoStreams(std::vector<VideoStreamStruct> & allocatedVideoStreams);
@@ -95,6 +95,10 @@ public:
     LoadAllocatedSnapshotStreams(std::vector<SnapshotStreamStruct> & allocatedSnapshotStreams);
 
     CHIP_ERROR PersistentAttributesLoadedCallback();
+
+    CHIP_ERROR OnTransportAcquireAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID);
+
+    CHIP_ERROR OnTransportReleaseAudioVideoStreams(uint16_t audioStreamID, uint16_t videoStreamID);
 
     void Init();
 

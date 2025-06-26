@@ -74,6 +74,7 @@ target_include_directories(app PUBLIC
   ${PIGWEED_ROOT}/pw_string/public
   ${PIGWEED_ROOT}/pw_unit_test/public
   ${PIGWEED_ROOT}/pw_unit_test/light_public_overrides
+  ${PIGWEED_ROOT}/pw_containers/public
   ${PIGWEED_ROOT}/third_party/fuchsia/repo/sdk/lib/stdcompat/include
 )
 target_link_libraries(app PUBLIC chip $<TARGET_FILE:kernel>)

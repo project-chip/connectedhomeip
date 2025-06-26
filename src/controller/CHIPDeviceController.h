@@ -1086,6 +1086,11 @@ private:
     CHIP_ERROR ParsePowerSource(ReadCommissioningInfo & info);
 #endif // CHIP_CONFIG_ENABLE_READ_CLIENT
 
+#if (CHIP_CONFIG_ENABLE_READ_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC)
+    CHIP_ERROR ParseJFAdministratorInfo(ReadCommissioningInfo & info);
+    CHIP_ERROR ValidateJFAdminNOC(const ByteSpan & adminNOC);
+#endif // CHIP_CONFIG_ENABLE_READ_CLIENT && CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
     static CHIP_ERROR
     ConvertFromOperationalCertStatus(chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatusEnum err);
 
@@ -1133,6 +1138,10 @@ private:
     Credentials::AttestationVerificationResult mAttestationResult;
     Platform::UniquePtr<Credentials::DeviceAttestationVerifier::AttestationDeviceInfo> mAttestationDeviceInfo;
     Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier = nullptr;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    chip::Optional<chip::Crypto::P256PublicKey> mTrustedIcacPublicKeyB;
+#endif
 };
 
 } // namespace Controller

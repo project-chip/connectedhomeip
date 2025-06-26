@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2024 Project CHIP Authors
+#   Copyright (c) 2024-2025 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -25,10 +25,6 @@ config CHIP_WIFI
 	select WIFI
 	select WIFI_NXP
 	select WIFI_NM_WPA_SUPPLICANT
-	select WIFI_NM_WPA_SUPPLICANT_CRYPTO_ENTERPRISE
-	select WIFI_NM_WPA_SUPPLICANT_DPP
-	select WIFI_NM_WPA_SUPPLICANT_EAPOL
-	select WIFI_NM_WPA_SUPPLICANT_WPS
 	select NET_L2_ETHERNET
 	select NET_IPV4
 	select NET_DHCPV4

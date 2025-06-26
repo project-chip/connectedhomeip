@@ -21,53 +21,53 @@
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
 namespace chip {
-
-/// @brief Interface to Persistent Storage Delegate allowing storage of data of variable size such as TLV.
-/// @tparam kMaxSerializedSize size of the mBuffer necessary to retrieve an entry from the storage. Varies with the type of data
-/// stored. Will be allocated on the stack so the implementation needs to be aware of this when choosing this value.
-template <size_t kMaxSerializedSize>
-struct PersistentData
+/// @brief Data accessor allowing data to be persisted by PersistentStore to be accessed
+struct DataAccessor
 {
-    PersistentData(PersistentStorageDelegate * storage = nullptr) : mStorage(storage) {}
-    virtual ~PersistentData() = default;
-
-    virtual CHIP_ERROR UpdateKey(StorageKeyName & key)          = 0;
+    virtual ~DataAccessor()                                     = default;
+    virtual CHIP_ERROR UpdateKey(StorageKeyName & key) const    = 0;
     virtual CHIP_ERROR Serialize(TLV::TLVWriter & writer) const = 0;
     virtual CHIP_ERROR Deserialize(TLV::TLVReader & reader)     = 0;
     virtual void Clear()                                        = 0;
+};
 
-    virtual CHIP_ERROR Save() { return this->Save(this->mStorage); }
+/// @brief Interface to PersistentStorageDelegate allowing storage of data of variable size such as TLV, delegating data access
+/// to DataAccessor
+/// @tparam kMaxSerializedSize size of the mBuffer necessary to retrieve an entry from the storage. Varies with the type of data
+/// stored. Will be allocated on the stack so the implementation needs to be aware of this when choosing this value.
+template <size_t kMaxSerializedSize>
+struct PersistentStore
+{
+    virtual ~PersistentStore() = default;
 
-    virtual CHIP_ERROR Save(PersistentStorageDelegate * storage)
+    CHIP_ERROR Save(const DataAccessor & persistent, PersistentStorageDelegate * storage)
     {
         VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
 
         StorageKeyName key = StorageKeyName::Uninitialized();
-        ReturnErrorOnFailure(UpdateKey(key));
+        ReturnErrorOnFailure(persistent.UpdateKey(key));
 
         // Serialize the data
         TLV::TLVWriter writer;
         writer.Init(mBuffer, sizeof(mBuffer));
 
-        ReturnErrorOnFailure(Serialize(writer));
+        ReturnErrorOnFailure(persistent.Serialize(writer));
 
         // Save serialized data
         return storage->SyncSetKeyValue(key.KeyName(), mBuffer, static_cast<uint16_t>(writer.GetLengthWritten()));
     }
 
-    virtual CHIP_ERROR Load() { return this->Load(this->mStorage); }
-
-    virtual CHIP_ERROR Load(PersistentStorageDelegate * storage)
+    CHIP_ERROR Load(DataAccessor & persistent, PersistentStorageDelegate * storage)
     {
         VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
 
         StorageKeyName key = StorageKeyName::Uninitialized();
 
         // Update storage key
-        ReturnErrorOnFailure(UpdateKey(key));
+        ReturnErrorOnFailure(persistent.UpdateKey(key));
 
         // Set data to defaults
-        Clear();
+        persistent.Clear();
 
         // Load the serialized data
         uint16_t size  = static_cast<uint16_t>(sizeof(mBuffer));
@@ -78,21 +78,42 @@ struct PersistentData
         // Decode serialized data
         TLV::TLVReader reader;
         reader.Init(mBuffer, size);
-        return Deserialize(reader);
+        return persistent.Deserialize(reader);
     }
 
-    virtual CHIP_ERROR Delete(PersistentStorageDelegate * storage)
+    CHIP_ERROR Delete(DataAccessor & persistent, PersistentStorageDelegate * storage)
     {
         VerifyOrReturnError(nullptr != storage, CHIP_ERROR_INVALID_ARGUMENT);
 
         StorageKeyName key = StorageKeyName::Uninitialized();
-        ReturnErrorOnFailure(UpdateKey(key));
+        ReturnErrorOnFailure(persistent.UpdateKey(key));
 
         return storage->SyncDeleteKeyValue(key.KeyName());
     }
 
+    uint8_t mBuffer[kMaxSerializedSize] = { 0 };
+};
+
+/// @brief Combines PersistentStore and DataAccessor
+template <size_t kMaxSerializedSize>
+struct PersistentData : PersistentStore<kMaxSerializedSize>, DataAccessor
+{
+    using SizedStore = PersistentStore<kMaxSerializedSize>;
+
+    PersistentData(PersistentStorageDelegate * storage = nullptr) : mStorage(storage) {}
+    virtual ~PersistentData() = default;
+
+    virtual CHIP_ERROR Save() { return this->Save(this->mStorage); }
+
+    virtual CHIP_ERROR Save(PersistentStorageDelegate * storage) { return SizedStore::Save(*this, storage); }
+
+    virtual CHIP_ERROR Load() { return this->Load(this->mStorage); }
+
+    virtual CHIP_ERROR Load(PersistentStorageDelegate * storage) { return SizedStore::Load(*this, storage); }
+
+    virtual CHIP_ERROR Delete(PersistentStorageDelegate * storage) { return SizedStore::Delete(*this, storage); }
+
     PersistentStorageDelegate * mStorage = nullptr;
-    uint8_t mBuffer[kMaxSerializedSize]  = { 0 };
 };
 
 } // namespace chip
