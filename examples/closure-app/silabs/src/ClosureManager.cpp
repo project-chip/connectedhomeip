@@ -294,6 +294,9 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
     event.Handler             = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
 
+    SetCurrentAction(Action_t::CALIBRATE_ACTION);
+    mCurrentActionEndpointId = ep1.GetEndpoint();
+
     isCalibrationInProgress = true;
     return Status::Success;
 }
@@ -381,15 +384,26 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
 
   chip::app::Clusters::ClosureDimension::ClusterState epState = ep->GetLogic().GetState();
   DataModel::Nullable<GenericCurrentStateStruct> currentState = DataModel::NullNullable;
+
+  VerifyOrReturn(epState.target.HasValue(), ChipLogError(AppServer, "EndPoint %d target is not set", endpointId));
+  VerifyOrReturn(epState.currentState.HasValue(), ChipLogError(AppServer, "EndPoint %d current state is not set", endpointId));
   
   bool panelTargetReached = false;
 
   if(UpdatePanelCurrentStateToNextPosition(epState, currentState))
   {
     ep->GetLogic().SetCurrentState(currentState);
-    panelTargetReached = (currentState.Value().position.Value() == epState.target.Value().position.Value());
-    ChipLogError(AppServer, "EndPoint %d Current Position: %d, Target Position: %d", ep->GetDelegate().GetEndpoint(), currentState.Value().position.Value(),
+    if (epState.target.Value().position.HasValue() && currentState.Value().position.HasValue())
+    {
+        panelTargetReached = (currentState.Value().position.Value() == epState.target.Value().position.Value());
+        ChipLogError(AppServer, "EndPoint %d Current Position: %d, Target Position: %d", ep->GetDelegate().GetEndpoint(), currentState.Value().position.Value(),
                                                                                             epState.target.Value().position.Value());
+
+    }
+    else
+    {
+        ChipLogError(AppServer, "EndPoint %d Set Target Action failed due to Current Position or Target Position is not set", ep->GetDelegate().GetEndpoint());
+    }
   }
 
   if (!panelTargetReached)

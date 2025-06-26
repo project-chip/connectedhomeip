@@ -117,7 +117,7 @@ public:
      * @param[in] endpointId The endpoint identifier for the closure panel.
      *
      * @return chip::Protocols::InteractionModel::Status
-     *         Returns Status::Success if the Stop command is handled successfully,
+     *         Returns Status::Success if the SetTarget command is handled successfully,
      *         or an appropriate error status otherwise.
      */
     chip::Protocols::InteractionModel::Status OnSetTargetCommand(
