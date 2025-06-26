@@ -154,7 +154,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             return await self.default_controller.Read(
                 self.dut_node_id,
                 attribute_path)
-        except ChipStackError as e:
+        except ChipStackError as e: # chipstack-ok
             if "Timeout" in str(e):
                 logging.error(f"Read operation timed out after {timeout_ms}ms")
                 logging.error(f"Attribute path: {attribute_path}")
@@ -521,7 +521,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                 [attribute_path]
             )
             asserts.fail("Expected INVALID_ACTION error but operation succeeded")
-        except ChipStackError as e:
+        except ChipStackError as e: # chipstack-ok
             asserts.assert_equal(e.err, 0x580,
                                  "Incorrect error response for reading non-global attribute on all clusters at endpoint")
             return None
@@ -593,7 +593,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
             if handler is None:
                 raise ValueError(f"Invalid operation type: {operation_type}")
             return await handler(**kwargs)
-        except ChipStackError as e:
+        except ChipStackError as e: # chipstack-ok
             logging.error(f"Operation {operation_type} failed: {str(e)}")
             logging.error(f"Arguments: {kwargs}")
             raise
