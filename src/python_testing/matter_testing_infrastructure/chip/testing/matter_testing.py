@@ -1574,15 +1574,49 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         Returns nothing on success so the test can go on.
         """
+        self.mark_step_range_skipped(starting_step_number, None)
+
+    def mark_step_range_skipped(self, starting_step_number: typing.Union[int, str], ending_step_number: typing.Union[int, str, None]) -> None:
+        """Mark a range of remaining test steps starting with provided starting step
+            starting_step_number gives the first step to be skipped, as defined in the TestStep.test_plan_number
+            starting_step_number must be provided, and is not derived intentionally.
+
+            If ending_step_number is provided, it gives the last step to be skipped, as defined in the TestStep.test_plan_number.
+            If ending_step_number is None, all steps until the end of the test will be skipped
+            ending_step_number is optional, and if not provided, all steps until the end of the test will be skipped.
+
+            By providing argument test is more deliberately identifying where test skips are starting from, 
+            making it easier to validate against the test plan for correctness.
+        Args:
+            starting_step_number (int,str): Number of name of the step to start skipping the steps.
+            ending_step_number (int,str,None): Number of name of the step to stop skipping the steps (inclusive).
+
+        Returns nothing on success so the test can go on.
+        """
         steps = self.get_test_steps(self.current_test_info.name)
+        starting_step_idx = None
         for idx, step in enumerate(steps):
             if step.test_plan_number == starting_step_number:
                 starting_step_idx = idx
                 break
+        asserts.assert_is_not_none(starting_step_idx, "mark_step_ranges_skipped was provided with invalid starting_step_num")
+
+        ending_step_idx = None
+        # If ending_step_number is None, we skip all steps until the end of the test
+        if ending_step_number is not None:
+            for idx, step in enumerate(steps):
+                if step.test_plan_number == ending_step_number:
+                    ending_step_idx = idx
+                    break
+
+            asserts.assert_is_not_none(ending_step_idx, "mark_step_ranges_skipped was provided with invalid ending_step_num")
+            asserts.assert_greater(ending_step_idx, starting_step_idx,
+                                   "mark_step_ranges_skipped was provided with ending_step_num that is before starting_step_num")
+            skipping_steps = steps[starting_step_idx:ending_step_idx+1]
         else:
-            asserts.fail("mark_all_remaining_steps_skipped was provided with invalid starting_step_num")
-        remaining = steps[starting_step_idx:]
-        for step in remaining:
+            skipping_steps = steps[starting_step_idx:]
+
+        for step in skipping_steps:
             self.skip_step(step.test_plan_number)
 
     def step(self, step: typing.Union[int, str]):
