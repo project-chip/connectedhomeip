@@ -86,7 +86,7 @@ CHIP_ERROR PairingCommand::RunCommand()
             ChipLogError(JointFabric, "Please first commission the Anchor Administrator: add `--anchor true` parameter");
             return CHIP_ERROR_NOT_CONNECTED;
         }
-        
+
         chip::CASEAuthTag anchorCAT = GetAnchorCATWithVersion(CHIP_CONFIG_ANCHOR_CAT_INITIAL_VERSION);
 
         // JFA will be issued a NOC with Anchor CAT and Administrator CAT
@@ -100,11 +100,11 @@ CHIP_ERROR PairingCommand::RunCommand()
                      ChipLogValueX64(anchorNodeId));
         return CHIP_ERROR_BAD_REQUEST;
     }
-    else  
+    else
     {
         // Skip commissioning complete for JCM and other device commissioning methods but not Anchor Administrator commissioning.
-        mSkipCommissioningComplete = MakeOptional(true);  
-    }  
+        mSkipCommissioningComplete = MakeOptional(true);
+    }
 
     // Clear the CATs in OperationalCredentialsIssuer
     mCredIssuerCmds->SetCredentialIssuerCATValues(kUndefinedCATs);

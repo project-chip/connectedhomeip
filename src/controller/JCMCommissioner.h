@@ -62,16 +62,16 @@ public:
      * StartJCMTrustVerification is a method that initiates the JCM trust verification process for the device.
      * It is called by the commissioning client to start the trust verification process.
      * The method will return an error if the device proxy is null or if the trust verification process fails.
-     * 
+     *
      * @return CHIP_ERROR indicating success or failure of the operation.
      */
     CHIP_ERROR StartJCMTrustVerification() override;
-    
+
     /*
      * ContinueAfterUserConsent is a method that continues the JCM trust verification process after the user has
      * provided consent or denied it. If the user grants consent, the trust verification process will continue;
      * otherwise, it will terminate with an error.
-     * 
+     *
      * @param consent A boolean indicating whether the user granted consent (true) or denied it (false).
      */
     void ContinueAfterUserConsent(bool consent);
@@ -79,7 +79,7 @@ public:
     /*
      * ContinueAfterVendorIDVerification is a method that continues the JCM trust verification process after the
      * vendor ID verification step. It will call the trust verification delegate to continue the process.
-     * 
+     *
      * @param verified A boolean indicating whether the vendor ID verification was successful (true) or not (false).
      */
     void ContinueAfterVendorIDVerification(bool verified);
@@ -98,7 +98,7 @@ protected:
     // Override CleanupCommissioning to clean up JCM trust verification state
     void CleanupCommissioning(DeviceProxy * proxy, NodeId nodeId, const CompletionStatus & completionStatus) override;
 
-private:    
+private:
     // Parses the JCM extra commissioning information from the device
     CHIP_ERROR ParseAdminFabricIndexAndEndpointId(ReadCommissioningInfo & info);
     CHIP_ERROR ParseOperationalCredentials(ReadCommissioningInfo & info);
@@ -116,7 +116,7 @@ private:
     /*
      * OnTrustVerificationComplete is a callback method that is called when the JCM trust verification process is complete.
      * It will handle the result of the trust verification and report it to the commissioning delegate.
-     * 
+     *
      * @param result The result of the JCM trust verification process.
      */
     virtual void OnTrustVerificationComplete(JCMTrustVerificationError error);

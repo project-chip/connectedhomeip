@@ -75,7 +75,7 @@ const char * StageToString(CommissioningStage stage)
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     case kJCMTrustVerification:
         return "JCMTrustVerification";
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC  
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     case kSendOpCertSigningRequest:
         return "SendOpCertSigningRequest";
 

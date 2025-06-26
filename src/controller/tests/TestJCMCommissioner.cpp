@@ -52,7 +52,7 @@ namespace JCM {
 class MockJCMTrustVerificationDelegate : public JCMTrustVerificationDelegate
 {
 public:
-    void OnProgressUpdate(JCMDeviceCommissioner & commissioner, 
+    void OnProgressUpdate(JCMDeviceCommissioner & commissioner,
                           JCMTrustVerificationStage stage,
                           JCMTrustVerificationInfo & info,
                           JCMTrustVerificationError error) override
@@ -88,7 +88,7 @@ public:
 class MockClusterStateCache : public ClusterStateCache
 {
 public:
-    MockClusterStateCache() : ClusterStateCache(mClusterStateCacheCallback) 
+    MockClusterStateCache() : ClusterStateCache(mClusterStateCacheCallback)
     {
     }
 
@@ -103,7 +103,7 @@ public:
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         // Setup JF Administrator cluster attributes
-        ConcreteAttributePath adminFabricIndexPath(1, JointFabricAdministrator::Id, 
+        ConcreteAttributePath adminFabricIndexPath(1, JointFabricAdministrator::Id,
                                                  JointFabricAdministrator::Attributes::AdministratorFabricIndex::Id);
         err = SetAttribute(adminFabricIndexPath, static_cast<FabricIndex>(1));
         ReturnErrorOnFailure(err);
@@ -118,7 +118,7 @@ public:
         DataModel::List<chip::ByteSpan> rcacCerts;
         rcacCerts = rcacCertsData;
 
-        ConcreteAttributePath trustedRootsPath(0, OperationalCredentials::Id, 
+        ConcreteAttributePath trustedRootsPath(0, OperationalCredentials::Id,
                                              OperationalCredentials::Attributes::TrustedRootCertificates::Id);
         err = SetAttribute(trustedRootsPath, rcacCerts);
         ReturnErrorOnFailure(err);
@@ -130,7 +130,7 @@ public:
         fabricDescriptor.vendorID = static_cast<chip::VendorId>(chip::VendorId::TestVendor1); // Example vendor ID
         fabricDescriptor.fabricID = static_cast<chip::FabricId>(1234);
         fabricDescriptor.nodeID = static_cast<chip::NodeId>(1);
-        
+
         // Create a fake public key for testing
         Credentials::P256PublicKeySpan trustedCAPublicKeySpan;
         err = Credentials::ExtractPublicKeyFromChipCert(rcac, trustedCAPublicKeySpan);
@@ -149,12 +149,12 @@ public:
         // NOCs attribute
         OperationalCredentials::Structs::NOCStruct::Type nocStruct;
         nocStruct.fabricIndex = 1;
-        
+
         std::string nocString = "153001010124020137032413032C080E6A662D616E63686F722D6963616318260480228127260580254D3A370624150124110B26160100FFFF26160100FEFF1824070124080130094104A32EFB8E9D2BDFE01911600064D9B9CE7A4B3D24188EFF0942A3889261D4CEFCCC8109FBBF8C65F23B41C9220EBCF8CD5B162039524CA9263D90B6884A800A4F370A3501280118240201360304020401183004140E1347C63F35CCDA5382AE29D1E42B1C4BD3400B30051418B72CD295F75A805D5AC41B9A13F13C9DB74D0218300B40DAE0BC25977BC590359BAA15BDFB28C7DEE05C7F8221EBE174CF75BFFB7320F6CE5D1FE562287735C1879FEBC3598E48EBDD98A8F8DF58914C3EF5631B4DC03518";
         auto nocBytes = hexStringToBytes(nocString);
         chip::ByteSpan noc(nocBytes.data(), nocBytes.size());
         nocStruct.noc = noc;
-        
+
         std::string icacString = "1530010101240201370324140118260480228127260580254D3A37062413032C080E6A662D616E63686F722D6963616318240701240801300941044192347068FE0999BDE90BC853DEC5AA7E45DAB387567AD165F539B1F36B3B1E5A56E14AD849EDBDD5FD7E42C89B85EF458D2643E2BFE5D8286F49397FC73E21370A350129011824026030041418B72CD295F75A805D5AC41B9A13F13C9DB74D02300514E564D5D4948410F8B108C5EA8E12B43ACF8D4A4918300B40DF0A62FF24ED10C91B754A14D712C04C4041CDD5963A5954BD542748A05B2B7F5E53E2FADE8F3D1F1CE3FCE3D1B2723E38698AB400E1AABAEF6456790651631118";
         auto icacBytes = hexStringToBytes(icacString);
         chip::ByteSpan icac(icacBytes.data(), icacBytes.size());
@@ -167,7 +167,7 @@ public:
         ConcreteAttributePath nocsPath(0, OperationalCredentials::Id, OperationalCredentials::Attributes::NOCs::Id);
         err = SetAttributeForWrite(nocsPath, nocsList);
         ReturnErrorOnFailure(err);
-       
+
         return err;
     }
 
@@ -304,7 +304,7 @@ protected:
         delete mDeviceCommissioner;
         mDeviceCommissioner = nullptr;
 
-        chip::Test::AppContext::TearDown(); 
+        chip::Test::AppContext::TearDown();
     }
 
 private:
@@ -319,9 +319,9 @@ private:
 TEST_F_FROM_FIXTURE(TestJCMCommissioner, TestTrustVerificationStageFinishedProgressesThroughStages)
 {
     TestableJCMDeviceCommissioner commissioner;
-    
+
     // Simulate user consenting
-    mTrustVerificationDelegate.mShouldConsent = true; 
+    mTrustVerificationDelegate.mShouldConsent = true;
     // Register the mock trust verification delegate
     commissioner.RegisterTrustVerificationDelegate(&mTrustVerificationDelegate);
     // Set up the mock ReadCommissioningInfo
@@ -415,7 +415,7 @@ TEST_F_FROM_FIXTURE(TestJCMCommissioner, TestParseTrustedRoot) {
     // Set up the prerequisites for ParseTrustedRoot
     EXPECT_EQ(CHIP_NO_ERROR, mDeviceCommissioner->ParseAdminFabricIndexAndEndpointId(mInfo));
     EXPECT_EQ(CHIP_NO_ERROR, mDeviceCommissioner->ParseOperationalCredentials(mInfo));
-    
+
     // Call the method directly to test it
     EXPECT_EQ(CHIP_NO_ERROR, mDeviceCommissioner->ParseTrustedRoot(mInfo));
 
@@ -439,7 +439,7 @@ TEST_F_FROM_FIXTURE(TestJCMCommissioner, TestParseExtraCommissioningInfo)
 {
     // Call the method directly to test it
     EXPECT_EQ(CHIP_NO_ERROR, mDeviceCommissioner->ParseExtraCommissioningInfo(mInfo, mCommissioningParams));
-    
+
     // Verify the ParseExtraCommissioningInfo results
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricIndex, 1);
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminEndpointId, 1);

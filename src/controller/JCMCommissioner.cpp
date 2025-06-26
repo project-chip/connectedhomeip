@@ -36,22 +36,22 @@ namespace Controller {
 namespace JCM {
 
 /*
- * JCMDeviceCommissioner public interface and override implementation    
+ * JCMDeviceCommissioner public interface and override implementation
  */
 CHIP_ERROR JCMDeviceCommissioner::StartJCMTrustVerification()
 {
     JCMTrustVerificationError error = JCMTrustVerificationError::kSuccess;
 
     ChipLogProgress(Controller, "JCM: Starting Trust Verification");
-    
+
     TrustVerificationStageFinished(JCMTrustVerificationStage::kIdle, error);
     if (error != JCMTrustVerificationError::kSuccess)
     {
         ChipLogError(Controller, "JCM: Failed to start Trust Verification: %s", enumToString(error).c_str());
         return CHIP_ERROR_INTERNAL;
     }
-    
-    return CHIP_NO_ERROR;  
+
+    return CHIP_NO_ERROR;
 }
 
 void JCMDeviceCommissioner::ContinueAfterUserConsent(bool consent)
@@ -81,7 +81,7 @@ void JCMDeviceCommissioner::ContinueAfterVendorIDVerification(bool verified)
 CHIP_ERROR JCMDeviceCommissioner::ParseAdminFabricIndexAndEndpointId(ReadCommissioningInfo & info)
 {
     auto attributeCache = info.attributes;
-    
+
     CHIP_ERROR err = attributeCache->ForEachAttribute(Clusters::JointFabricAdministrator::Id, [this, &attributeCache](const ConcreteAttributePath & path) {
         using namespace Clusters::JointFabricAdministrator::Attributes;
         AdministratorFabricIndex::TypeInfo::DecodableType administratorFabricIndex;

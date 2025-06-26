@@ -273,7 +273,7 @@ public:
             Free();
             return *this;
         }
-        
+
         ScopedMemoryBufferWithSize<T>::Alloc(span.size());
         memcpy(ScopedMemoryBuffer<T>::Get(), span.data(), AllocatedSize());
         return *this;

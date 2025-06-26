@@ -475,7 +475,7 @@ void CHIPCommand::ShutdownCommissioner(const CommissionerIdentity & key)
 
 struct TrustVerificationDelegate : public JCMTrustVerificationDelegate {
     void OnProgressUpdate(
-        JCMDeviceCommissioner & commissioner, 
+        JCMDeviceCommissioner & commissioner,
         JCMTrustVerificationStage stage,
         JCMTrustVerificationInfo & info,
         JCMTrustVerificationError error) override
@@ -486,14 +486,14 @@ struct TrustVerificationDelegate : public JCMTrustVerificationDelegate {
     void OnAskUserForConsent(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info)
     {
         ChipLogProgress(Controller, "Asking user for consent for vendor ID: %u", info.adminVendorId);
-        
+
         commissioner.ContinueAfterUserConsent(true);
     }
 
      void OnVerifyVendorId(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info)
     {
         ChipLogProgress(Controller, "Performing vendor ID verification for vendor ID: %u", info.adminVendorId);
-        
+
         commissioner.ContinueAfterVendorIDVerification(true);
     }
 };
