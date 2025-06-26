@@ -143,14 +143,6 @@ private:
     ClusterLogic mLogic;
     Interface mInterface;
 
-    /**
-     * @brief Updates the target state to match the current state.
-     *
-     * This method synchronizes the target state variable with the current state,
-     * ensuring that any changes in the current state are reflected in the target state.
-     * Typically used to reset or align the target state after a stop action.
-     */
-    void UpdateTargetStateFromCurrentState();
 };
 
 } // namespace ClosureDimension

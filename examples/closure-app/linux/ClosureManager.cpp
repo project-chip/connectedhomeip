@@ -135,7 +135,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStopCommand()
     DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
     mCurrentAction     = ClosureAction::kStopAction;
     mCurrentEndpointId = kClosureEndpoint1;
-    HandleClosureActionComplete(mCurrentAction);
+    HandleStopActionComplete();
     return Status::Success;
 }
 
@@ -179,7 +179,7 @@ void ClosureManager::HandleClosureActionTimer(System::Layer * layer, void * aApp
         instance.HandleCalibrateActionComplete();
         break;
     case ClosureAction::kStopAction:
-        // This will never be called as Stop action is made synchronous
+        instance.HandleStopActionComplete();
         break;
     case ClosureAction::kMoveToAction:
         // Add logic to handle MoveTo action completion
@@ -216,7 +216,28 @@ void ClosureManager::HandleCalibrateActionComplete()
 
 void ClosureManager::HandleStopActionComplete()
 {
-    // Add logic to handle Stop action completion
+  // Add logic to handle Stop action completion
+  ChipLogProgress(AppServer, "HandleStopActionComplete called");
+  if (mIsCalibrationActionInProgress)
+  {
+    ChipLogDetail(AppServer, "Stopping calibration action");
+    mClosureEndpoint1.OnStopCalibrateActionComplete();
+    mClosurePanelEndpoint2.OnStopCalibrateActionComplete();
+    mClosurePanelEndpoint3.OnStopCalibrateActionComplete();
+    mIsCalibrationActionInProgress = false;
+  }
+  else if (mIsMoveToActionInProgress)
+  {
+    ChipLogDetail(AppServer, "Stopping move to action");
+    mClosureEndpoint1.OnStopMotionActionComplete();
+    mClosurePanelEndpoint2.OnStopMotionActionComplete();
+    mClosurePanelEndpoint3.OnStopMotionActionComplete();
+    mIsMoveToActionInProgress = false;
+  }
+  else
+  {
+      ChipLogDetail(AppServer, "No action in progress to stop");
+  }
 }
 
 void ClosureManager::HandleMoveToActionComplete()
