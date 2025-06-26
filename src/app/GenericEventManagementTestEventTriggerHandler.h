@@ -28,11 +28,11 @@ class GenericEventManagementTestEventTriggerHandler : public TestEventTriggerHan
 {
 public:
     GenericEventManagementTestEventTriggerHandler(chip::app::Clusters::GeneralDiagnosticsCluster * generalDiagnosticsClusterInstance) : mGeneralDiagnosticsCluster(generalDiagnosticsClusterInstance) {}
-    
+
     chip::app::Clusters::GeneralDiagnosticsCluster* GetGeneralDiagnosticsClusterInstance() {
         return mGeneralDiagnosticsCluster;
     }
-    
+
     void SetGeneralDiagnosticsClusterInstance(chip::app::Clusters::GeneralDiagnosticsCluster* generalDiagnosticsClusterInstance){
         mGeneralDiagnosticsCluster = generalDiagnosticsClusterInstance;
     }

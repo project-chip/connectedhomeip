@@ -102,21 +102,21 @@ namespace GeneralDiagnostics {
     void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason) {
         if (gServer.IsConstructed()) {
             gServer.Cluster().OnDeviceReboot(bootReason);
-        } 
+        }
     }
 
     void GlobalNotifyHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
                                 const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current) {
         if (gServer.IsConstructed()) {
             gServer.Cluster().OnHardwareFaultsDetect(previous, current);
-        } 
+        }
     }
 
     void GlobalNotifyRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
                              const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current) {
         if (gServer.IsConstructed()) {
             gServer.Cluster().OnRadioFaultsDetect(previous, current);
-        } 
+        }
     }
 
     void GlobalNotifyNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,

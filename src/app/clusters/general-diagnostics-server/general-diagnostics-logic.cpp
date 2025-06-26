@@ -115,7 +115,7 @@ std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsLogic::HandlePayl
 
     memset(payload.Get(), commandData.value, payload.AllocatedSize());
     response.payload = ByteSpan{ payload.Get(), payload.AllocatedSize() };
-    
+
     if (handler.AddResponseData(commandPath, response) != CHIP_NO_ERROR)
     {
         return chip::Protocols::InteractionModel::Status::ResourceExhausted;
