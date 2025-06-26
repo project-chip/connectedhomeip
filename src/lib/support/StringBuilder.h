@@ -51,8 +51,8 @@ public:
         return Add(buff);
     }
 
-    /// Append an unsigned char
-    StringBuilderBase & Add(unsigned char value)
+    /// Append an uint8_t value
+    StringBuilderBase & Add(uint8_t value)
     {
         char buff[32];
         snprintf(buff, sizeof(buff), "%c", value);
@@ -110,28 +110,28 @@ private:
     char mBuffer[kSize];
 };
 
-/// Build a c-style string of a char* and length that can be used inplace
+/// Build a c-style string of a char * and length that can be used inplace
 /// Default buffer size is 256
 template <size_t N = 256>
 StringBuilder<N> StringOf(const char * data, size_t length)
 {
-    chip::StringBuilder<N> builder;
+    StringBuilder<N> builder;
     builder.AddFormat("%.*s", static_cast<int>(length), data);
     return builder;
 }
 
-/// Build a c-style string of an unsigned char* and length that can be used inplace
+/// Build a c-style string of an uint8_t * and length that can be used inplace
 /// Only printable elements will be added
 /// Default buffer size is 256
 template <size_t N = 256>
-StringBuilder<N> StringOf(const unsigned char * data, size_t length)
+StringBuilder<N> StringOf(const uint8_t * data, size_t length)
 {
-    chip::StringBuilder<N> builder;
+    StringBuilder<N> builder;
     for (size_t i = 0; i < length; ++i)
     {
-        if (std::isprint(*(data + i)))
+        if (std::isprint(data[i]))
         {
-            builder.Add(*(data + i));
+            builder.Add(data[i]);
         }
     }
     return builder;
@@ -142,7 +142,7 @@ StringBuilder<N> StringOf(const unsigned char * data, size_t length)
 template <size_t N = 256>
 StringBuilder<N> StringOf(const CharSpan & span)
 {
-    chip::StringBuilder<N> builder;
+    StringBuilder<N> builder;
     builder.AddFormat("%.*s", static_cast<int>(span.size()), span.data());
     return builder;
 }
@@ -153,7 +153,7 @@ StringBuilder<N> StringOf(const CharSpan & span)
 template <size_t N = 256>
 StringBuilder<N> StringOf(const ByteSpan & span)
 {
-    chip::StringBuilder<N> builder;
+    StringBuilder<N> builder;
     for (size_t i = 0; i < span.size(); ++i)
     {
         if (std::isprint(span[i]))
