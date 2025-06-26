@@ -36,6 +36,7 @@ CHIP_ERROR GenericEventManagementTestEventTriggerHandler::HandleFillUpEventLoggi
     }
 
     /* Fill up the critical logging buffer by 10 hardware faults. */
+    VerifyOrReturn(mGeneralDiagnosticsCluster != nullptr);
     constexpr uint8_t kHardwareFaultCountForCriticalBuffer = 10;
     for (uint8_t i = 0; i < kHardwareFaultCountForCriticalBuffer; i++)
     {

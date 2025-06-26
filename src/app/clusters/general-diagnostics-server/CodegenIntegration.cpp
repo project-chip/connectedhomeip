@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 
-// #include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-logic.h>
 #include <app/static-cluster-config/GeneralDiagnostics.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>

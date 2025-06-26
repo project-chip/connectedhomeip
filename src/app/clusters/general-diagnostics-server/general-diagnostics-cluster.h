@@ -29,7 +29,8 @@ namespace Clusters {
 class GeneralDiagnosticsCluster : public DefaultServerCluster {
 public:
     GeneralDiagnosticsCluster(GeneralDiagnosticsEnabledAttributes attributes) : 
-        DefaultServerCluster({kRootEndpointId, GeneralDiagnostics::Id}) 
+        DefaultServerCluster({kRootEndpointId, GeneralDiagnostics::Id}),
+        mLogic(attributes)
     {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
