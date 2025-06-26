@@ -63,7 +63,7 @@ bool IsRunningState(ChefRvcOperationalStateEnum operationalState) {
 class RvcOperationalStateDelegate : public RvcOperationalState::Delegate
 {
 public:
-    RvcOperationalStateDelegate() { mOperationalStateList = Span<const OperationalState::GenericOperationalState>(mRvcOpStateList); }
+    RvcOperationalStateDelegate() { mOperationalStateList = Span<const OperationalState::GenericOperationalState>(mRvcOpStateList, std::size(mRvcOpStateList)); }
 
     /**
      * Get the countdown time. This attribute is not used in this application.
@@ -145,7 +145,7 @@ private:
             to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kSeekingCharger)),
         OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kCharging)),
         OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kDocked)),
-        OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kRunningWhileBeeping), "RunningWhileBeeping"_span),
+        OperationalState::GenericOperationalState(to_underlying(RvcOperationalState::ChefRvcOperationalStateEnum::kRunningWhileBeeping), Optional<CharSpan>("RunningWhileBeeping"_span)),
     };
 
     RvcOperationalState::ChefRvcOperationalStateEnum mCurrentRunningState = RvcOperationalState::ChefRvcOperationalStateEnum::kRunning;
