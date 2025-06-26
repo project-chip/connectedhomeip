@@ -420,10 +420,16 @@ Status Instance::ValidateTargets(
                 return Status::ConstraintError;
             }
 
-            // If SocReporting is supported, targetSoc can have a value in the range [0, 100] (if present)
+            // If SocReporting is supported, targetSoc must have a value in the range [0, 100]
             if (HasFeature(Feature::kSoCReporting))
             {
-                if (targetStruct.targetSoC.HasValue() && targetStruct.targetSoC.Value() > 100)
+                if (!targetStruct.targetSoC.HasValue())
+                {
+                    ChipLogError(AppServer, "kSoCReporting is supported but TargetSoC does not have a value");
+                    return Status::Failure;
+                }
+
+                if (targetStruct.targetSoC.Value() > 100)
                 {
                     ChipLogError(AppServer, "TargetSoC has invalid value (%d)", static_cast<int>(targetStruct.targetSoC.Value()));
                     return Status::ConstraintError;
