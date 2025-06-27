@@ -169,14 +169,14 @@ void ClosureControlEndpoint::OnStopMotionActionComplete()
 
 void ClosureControlEndpoint::OnCalibrateActionComplete()
 {
-    DataModel::Nullable<GenericOverallCurrentState> overallState(GenericOverallCurrentState(
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(GenericOverallCurrentState(
         MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed)), MakeOptional(DataModel::MakeNullable(true)),
         MakeOptional(Globals::ThreeLevelAutoEnum::kAuto), MakeOptional(DataModel::MakeNullable(true))));
-    DataModel::Nullable<GenericOverallTargetState> overallTarget = DataModel::NullNullable;
+    DataModel::Nullable<GenericOverallTargetState> overallTargetState = DataModel::NullNullable;
 
     mLogic.SetMainState(MainStateEnum::kStopped);
-    mLogic.SetOverallCurrentState(overallState);
-    mLogic.SetOverallTargetState(overallTarget);
+    mLogic.SetOverallCurrentState(overallCurrentState);
+    mLogic.SetOverallTargetState(overallTargetState);
     mLogic.SetCountdownTimeFromDelegate(0);
     mLogic.GenerateMovementCompletedEvent();
 }
