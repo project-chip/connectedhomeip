@@ -408,7 +408,7 @@ TEST_F_FROM_FIXTURE(TestJCMCommissioner, TestParseOperationalCredentials)
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminEndpointId, 1);
 
     // Verify the ParseOperationalCredentials results
-    EXPECT_EQ(mDeviceCommissioner->mInfo.rootPublicKey.size(), Crypto::kP256_PublicKey_Length);
+    EXPECT_EQ(mDeviceCommissioner->mInfo.rootPublicKey.AllocatedSize(), Crypto::kP256_PublicKey_Length);
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminVendorId, static_cast<VendorId>(chip::VendorId::TestVendor1));
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricId, static_cast<FabricId>(1234));
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminNOC.AllocatedSize(), static_cast<size_t>(270));
@@ -430,7 +430,7 @@ TEST_F_FROM_FIXTURE(TestJCMCommissioner, TestParseTrustedRoot)
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminEndpointId, 1);
 
     // Verify the ParseOperationalCredentials results
-    EXPECT_EQ(mDeviceCommissioner->mInfo.rootPublicKey.size(), Crypto::kP256_PublicKey_Length);
+    EXPECT_EQ(mDeviceCommissioner->mInfo.rootPublicKey.AllocatedSize(), Crypto::kP256_PublicKey_Length);
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminVendorId, static_cast<VendorId>(chip::VendorId::TestVendor1));
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricId, static_cast<FabricId>(1234));
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminNOC.AllocatedSize(), static_cast<size_t>(270));
@@ -449,7 +449,7 @@ TEST_F_FROM_FIXTURE(TestJCMCommissioner, TestParseExtraCommissioningInfo)
     // Verify the ParseExtraCommissioningInfo results
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricIndex, 1);
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminEndpointId, 1);
-    EXPECT_EQ(mDeviceCommissioner->mInfo.rootPublicKey.size(), Crypto::kP256_PublicKey_Length);
+    EXPECT_EQ(mDeviceCommissioner->mInfo.rootPublicKey.AllocatedSize(), Crypto::kP256_PublicKey_Length);
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminVendorId, static_cast<VendorId>(chip::VendorId::TestVendor1));
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminFabricId, static_cast<FabricId>(1234));
     EXPECT_EQ(mDeviceCommissioner->mInfo.adminNOC.AllocatedSize(), static_cast<size_t>(270));
