@@ -487,6 +487,8 @@ public:
     CHIP_ERROR SetUdcListenPort(uint16_t listenPort);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
+    using DeviceController::Init;
+    
     /**
      * Commissioner-specific initialization, includes parameters such as the pairing delegate.
      */

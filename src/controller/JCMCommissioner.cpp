@@ -161,7 +161,7 @@ CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningI
                             return CHIP_ERROR_KEY_NOT_FOUND;
                         }
 
-                        mInfo.rootPublicKey = fabricDescriptor.rootPublicKey;
+                        mInfo.rootPublicKey.CopyFromSpan(fabricDescriptor.rootPublicKey);
                         mInfo.adminVendorId = fabricDescriptor.vendorID;
                         mInfo.adminFabricId = fabricDescriptor.fabricID;
 
@@ -214,7 +214,11 @@ CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningI
         return err;
     }
 
-    if (mInfo.rootPublicKey.empty())
+    if (mInfo.rootPublicKey.AllocatedSize() == 0)
+    {
+        ChipLogError(Controller, "JCM: Root public key is empty!");
+        return CHIP_ERROR_KEY_NOT_FOUND;
+    }
     {
         ChipLogError(Controller, "JCM: Root key span is empty!");
         return CHIP_ERROR_KEY_NOT_FOUND;
@@ -261,14 +265,14 @@ CHIP_ERROR JCMDeviceCommissioner::ParseTrustedRoot(ReadCommissioningInfo & info)
                     ReturnErrorOnFailure(Credentials::ExtractPublicKeyFromChipCert(trustedCA, trustedCAPublicKeySpan));
                     Crypto::P256PublicKey trustedCAPublicKey{ trustedCAPublicKeySpan };
 
-                    if (mInfo.rootPublicKey.size() != Crypto::kP256_PublicKey_Length)
+                    if (mInfo.rootPublicKey.AllocatedSize() != Crypto::kP256_PublicKey_Length)
                     {
                         ChipLogError(Controller,
                                      "JCM: DeviceCommissioner::ParseJFAdministratorInfo - fabric root key size mismatch");
                         return CHIP_ERROR_KEY_NOT_FOUND;
                     }
 
-                    Credentials::P256PublicKeySpan rootPubKeySpan(mInfo.rootPublicKey.data());
+                    Credentials::P256PublicKeySpan rootPubKeySpan(mInfo.rootPublicKey.Get());
                     Crypto::P256PublicKey fabricTableRootPublicKey{ rootPubKeySpan };
 
                     if (trustedCAPublicKey.Matches(fabricTableRootPublicKey) && trustedCA.size())
@@ -369,7 +373,7 @@ JCMTrustVerificationError JCMDeviceCommissioner::VerifyAdministratorInformation(
     ChipLogProgress(Controller, "JCM: Administrator endpoint ID: %d", mInfo.adminEndpointId);
     ChipLogProgress(Controller, "JCM: Administrator fabric index: %d", mInfo.adminFabricIndex);
     ChipLogProgress(Controller, "JCM: Administrator vendor ID: %d", mInfo.adminVendorId);
-    ChipLogProgress(Controller, "JCM: Administrator fabric ID: %ld", mInfo.adminFabricId);
+    ChipLogProgress(Controller, "JCM: Administrator fabric ID: %llu", mInfo.adminFabricId);
 
     return JCMTrustVerificationError::kSuccess;
 }

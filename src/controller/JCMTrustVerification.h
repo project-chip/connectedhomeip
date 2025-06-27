@@ -17,8 +17,10 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <cstdint>
+#include <string>
+
+#include <app-common/zap-generated/cluster-objects.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/DLLUtil.h>
@@ -36,7 +38,7 @@ struct JCMTrustVerificationInfo
     VendorId adminVendorId;
     FabricId adminFabricId;
 
-    ByteSpan rootPublicKey;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> rootPublicKey;
     Platform::ScopedMemoryBufferWithSize<uint8_t> adminRCAC;
     Platform::ScopedMemoryBufferWithSize<uint8_t> adminICAC;
     Platform::ScopedMemoryBufferWithSize<uint8_t> adminNOC;
@@ -47,7 +49,7 @@ struct JCMTrustVerificationInfo
         adminFabricIndex = kUndefinedFabricIndex;
         adminVendorId    = VendorId::Common;
         adminFabricId    = kUndefinedFabricId;
-        rootPublicKey    = MutableByteSpan{};
+        rootPublicKey.Free();
         adminNOC.Free();
         adminICAC.Free();
         adminRCAC.Free();
