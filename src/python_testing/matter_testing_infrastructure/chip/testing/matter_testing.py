@@ -1661,24 +1661,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             return None
 
 
-def _find_test_class():
-    """Finds the test class in a test script.
-    Walk through module members and find the subclass of MatterBaseTest. Only
-    one subclass is allowed in a test script.
-    Returns:
-      The test class in the test module.
-    Raises:
-      SystemExit: Raised if the number of test classes is not exactly one.
-    """
-    subclasses = utils.find_subclasses_in_module([MatterBaseTest], sys.modules['__main__'])
-    subclasses = [c for c in subclasses if c.__name__ != "MatterBaseTest"]
-    if len(subclasses) != 1:
-        print(
-            'Exactly one subclass of `MatterBaseTest` should be in the main file. Found %s.' %
-            str([subclass.__name__ for subclass in subclasses]))
-        sys.exit(1)
 
-    return subclasses[0]
 
 
 

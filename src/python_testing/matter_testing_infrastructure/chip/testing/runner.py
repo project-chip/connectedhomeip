@@ -39,7 +39,7 @@ from typing import List
 
 import chip.testing.global_stash as global_stash
 from chip.clusters import Attribute
-from mobly import signals
+from mobly import signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
 
@@ -302,6 +302,29 @@ def generate_mobly_test_config(matter_test_config):
     return test_run_config
 
 
+def _find_test_class():
+    """Finds the test class in a test script.
+    Walk through module members and find the subclass of MatterBaseTest. Only
+    one subclass is allowed in a test script.
+    Returns:
+      The test class in the test module.
+    Raises:
+      SystemExit: Raised if the number of test classes is not exactly one.
+    """
+    # Import MatterBaseTest here to avoid circular dependency
+    from chip.testing.matter_testing import MatterBaseTest
+    
+    subclasses = utils.find_subclasses_in_module([MatterBaseTest], sys.modules['__main__'])
+    subclasses = [c for c in subclasses if c.__name__ != "MatterBaseTest"]
+    if len(subclasses) != 1:
+        print(
+            'Exactly one subclass of `MatterBaseTest` should be in the main file. Found %s.' %
+            str([subclass.__name__ for subclass in subclasses]))
+        sys.exit(1)
+
+    return subclasses[0]
+
+
 def default_matter_test_main():
     """Execute the test class in a test module.
     This is the default entry point for running a test script file directly.
@@ -313,8 +336,6 @@ def default_matter_test_main():
       if __name__ == '__main__':
         default_matter_test_main()
     """
-
-    from chip.testing.matter_testing import _find_test_class
 
     matter_test_config = parse_matter_test_args()
 
