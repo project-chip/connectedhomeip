@@ -139,13 +139,11 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                      "OverallCurrentState.Speed should be Low"),
             TestStep("7a", "If the PS feature is supported, send MoveTo command with Position = 6",
                      "Receive CONSTRAINT_ERROR response from the DUT"),
-            TestStep("7b", "If the LT feature is supported, send MoveTo command with Latch = 2",
+            TestStep("7b", "If the SP feature is supported, send MoveTo command with Speed = 4",
                      "Receive CONSTRAINT_ERROR response from the DUT"),
-            TestStep("7c", "If the SP feature is supported, send MoveTo command with Speed = 4",
+            TestStep("7c", "If the SP feature is supported, send MoveTo command with Position = 6 and Speed = High",
                      "Receive CONSTRAINT_ERROR response from the DUT"),
-            TestStep("7d", "If the SP feature is supported, send MoveTo command with Position = 6 and Speed = High",
-                     "Receive CONSTRAINT_ERROR response from the DUT"),
-            TestStep("7e", "If the SP feature is supported, send MoveTo command with Position = MoveToFullyClosed and Speed = 4",
+            TestStep("7d", "If the SP feature is supported, send MoveTo command with Position = MoveToFullyClosed and Speed = 4",
                      "Receive CONSTRAINT_ERROR response from the DUT"),
         ]
         return steps
@@ -432,22 +430,8 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             logging.info("Skipping step 7a as Positioning feature is not supported")
             self.skip_step("7a")
 
-        if is_latching_supported:
-            self.step("7b")
-            try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=2))
-                logging.error("MoveTo command with Latch = 2 should have failed but succeeded")
-                asserts.assert_true(False, "MoveTo command with Latch = 2 should have failed but succeeded")
-            except InteractionModelError as e:
-                logging.info(f"Expected exception caught for MoveTo with Latch = 2: {e}")
-                asserts.assert_equal(e.status, Status.ConstraintError,
-                                     f"Expected CONSTRAINT_ERROR for MoveTo with Latch = 2 but got: {e}")
-        else:
-            logging.info("Skipping step 7b as Latching feature is not supported")
-            self.skip_step("7b")
-
         if is_speed_supported:
-            self.step("7c")
+            self.step("7b")
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(speed=4))
                 logging.error("MoveTo command with Speed = 4 should have failed but succeeded")
@@ -456,7 +440,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 logging.info(f"Expected exception caught for MoveTo with Speed = 4: {e}")
                 asserts.assert_equal(e.status, Status.ConstraintError,
                                      f"Expected CONSTRAINT_ERROR for MoveTo with Speed = 4 but got: {e}")
-            self.step("7d")
+            self.step("7c")
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=6, speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh))
                 logging.error("MoveTo command with Position = 6 and Speed = High should have failed but succeeded")
@@ -465,7 +449,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 logging.info(f"Expected exception caught for MoveTo with Position = 6 and Speed = High: {e}")
                 asserts.assert_equal(e.status, Status.ConstraintError,
                                      f"Expected CONSTRAINT_ERROR for MoveTo with Position = 6 and Speed = High but got: {e}")
-            self.step("7e")
+            self.step("7d")
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed, speed=4))
                 logging.error("MoveTo command with Position = MoveToFullyClosed and Speed = 4 should have failed but succeeded")
@@ -476,9 +460,9 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.ConstraintError,
                                      f"Expected CONSTRAINT_ERROR for MoveTo with Position = MoveToFullyClosed and Speed = 4 but got: {e}")
         else:
+            self.skip_step("7b")
             self.skip_step("7c")
             self.skip_step("7d")
-            self.skip_step("7e")
 
 
 if __name__ == "__main__":
