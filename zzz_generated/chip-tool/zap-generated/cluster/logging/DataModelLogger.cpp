@@ -3859,15 +3859,16 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ClosureControl::Structs::OverallStateStruct::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::ClosureControl::Structs::OverallCurrentStateStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("Positioning", indent + 1, value.positioning);
+        CHIP_ERROR err = LogValue("Position", indent + 1, value.position);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Positioning'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Position'");
             return err;
         }
     }
@@ -3900,8 +3901,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ClosureControl::Structs::OverallTargetStruct::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::ClosureControl::Structs::OverallTargetStateStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -17297,15 +17299,22 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentErrorList", 1, value);
         }
-        case ClosureControl::Attributes::OverallState::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallStateStruct::DecodableType> value;
+        case ClosureControl::Attributes::OverallCurrentState::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallCurrentStateStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("OverallState", 1, value);
+            return DataModelLogger::LogValue("OverallCurrentState", 1, value);
         }
-        case ClosureControl::Attributes::OverallTarget::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallTargetStruct::DecodableType> value;
+        case ClosureControl::Attributes::OverallTargetState::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallTargetStateStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("OverallTarget", 1, value);
+            return DataModelLogger::LogValue("OverallTargetState", 1, value);
+        }
+        case ClosureControl::Attributes::LatchControlModes::Id: {
+            chip::BitMask<chip::app::Clusters::ClosureControl::LatchControlModesBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LatchControlModes", 1, value);
         }
         case ClosureControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
