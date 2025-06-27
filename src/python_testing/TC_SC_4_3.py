@@ -106,16 +106,20 @@ class TC_SC_4_3(MatterBaseTest):
             attribute=Clusters.IcdManagement.Attributes.FeatureMap
         )
 
-    def get_dut_instance_name(self) -> str:
+    def get_dut_instance_name(self, log_result: bool = False) -> str:
         node_id = self.dut_node_id
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
         instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
+        if log_result:
+            logging.info(f"DUT Instance Name: {instance_name}")
         return instance_name
 
-    def get_operational_subtype(self) -> str:
+    def get_operational_subtype(self, log_result: bool = False) -> str:
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
-        service_name = f'_I{compressed_fabric_id:016X}._sub.{MdnsServiceType.OPERATIONAL.value}'
-        return service_name
+        operational_subtype = f'_I{compressed_fabric_id:016X}._sub.{MdnsServiceType.OPERATIONAL.value}'
+        if log_result:
+            logging.info(f"Operational Subtype: {operational_subtype}")
+        return operational_subtype
 
     @staticmethod
     def verify_decimal_value(input_value, max_value: int):
@@ -241,7 +245,7 @@ class TC_SC_4_3(MatterBaseTest):
         # assigned 64-bit Node identifier, each expressed as a fixed-length sixteen-character hexadecimal
         # string, encoded as ASCII (UTF-8) text using capital letters, separated by a hyphen.
         self.step(5)
-        instance_name = self.get_dut_instance_name()
+        instance_name = self.get_dut_instance_name(log_result=True)
         instance_qname = f"{instance_name}.{MdnsServiceType.OPERATIONAL.value}"
 
         # *** STEP 6 ***
@@ -387,7 +391,7 @@ class TC_SC_4_3(MatterBaseTest):
         # text using capital letters. Verify DUT returns a PTR record with DNS-SD instance name set to instance_name
         self.step(10)
         service_types = await mdns.get_service_types(log_output=True)
-        op_sub_type = self.get_operational_subtype()
+        op_sub_type = self.get_operational_subtype(log_result=True)
         asserts.assert_in(op_sub_type, service_types, f"No PTR record with DNS-SD instance name '{op_sub_type}' was found.")
 
         # # *** STEP 11 ***
