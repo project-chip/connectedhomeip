@@ -121,9 +121,7 @@ struct ClusterState
     DataModel::Nullable<GenericOverallCurrentState> mOverallCurrentState = DataModel::NullNullable;
     DataModel::Nullable<GenericOverallTargetState> mOverallTargetState   = DataModel::NullNullable;
     BitFlags<LatchControlModesBitmap> mLatchControlModes;
-
-    // CurrentErrorList attribute is not stored here. When it is necessary it will be requested from the delegate to get the current
-    // active errors.
+    ClosureErrorEnum mCurrentErrorList[kCurrentErrorListMaxSize] = {};
 };
 
 /**
@@ -174,12 +172,21 @@ public:
     CHIP_ERROR GetMainState(MainStateEnum & mainState);
     CHIP_ERROR GetOverallCurrentState(DataModel::Nullable<GenericOverallCurrentState> & overallCurrentState);
     CHIP_ERROR GetOverallTargetState(DataModel::Nullable<GenericOverallTargetState> & overallTarget);
-    // The delegate is expected to return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to indicate end of list
-    CHIP_ERROR GetCurrentErrorList(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
+    CHIP_ERROR GetCurrentErrorList(DataModel::List<const ClosureErrorEnum> & currentErrorList);
     CHIP_ERROR GetLatchControlModes(BitFlags<LatchControlModesBitmap> & latchControlModes);
-    CHIP_ERROR SetCurrentErrorList(ClosureErrorEnum error);
     CHIP_ERROR GetFeatureMap(BitFlags<Feature> & featureMap);
     CHIP_ERROR GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision);
+
+    /**
+     * @brief Reads the CurrentErrorList attribute.
+     *        This method is used to read the CurrentErrorList attribute and encode it using the provided encoder.
+     *
+     * @param[in] encoder The encoder to use for encoding the CurrentErrorList attribute.
+     *
+     * @return CHIP_NO_ERROR if the read was successful.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     */
+    CHIP_ERROR ReadCurrentErrorListAttribute(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
     /**
      * @brief Set SetOverallCurrentState.
