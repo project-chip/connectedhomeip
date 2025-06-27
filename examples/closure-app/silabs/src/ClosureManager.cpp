@@ -130,9 +130,9 @@ void ClosureManager::InitiateAction(AppEvent * event)
 
     ClosureManager & instance = ClosureManager::GetInstance();
 
-    // ideally, we should not receive an event for a different action while another action is ongoing.
-    // But due to asynchronous processing of command and stop command, this can happen if stop is received
-    // after InitaiteAction event is posted.
+    // We should not receive an event for a different action while another action is ongoing.
+    // But due to asynchronous processing of commands and synchronous processing of the stop command,
+    // this can happen if stop is received after InitaiteAction event is posted.
     // This is a safety check to ensure that we do not initiate a new action while another action is in progress.
     // If this happens, we log an error and do not proceed with initiating the action.
     VerifyOrReturn(eventAction == instance.GetCurrentAction(),
@@ -179,9 +179,9 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
 
     ClosureManager & instance = ClosureManager::GetInstance();
 
-    // ideally, we should not receive an event for a different action while another action is ongoing.
-    // But due to asynchronous processing of command and stop command, this can happen if stop is received
-    // after InitaiteAction event is posted.
+    // We should not receive an event for a different action while another action is ongoing.
+    // But due to asynchronous processing of commands and synchronous processing of the stop command,
+    // this can happen if stop is received after InitaiteAction event is posted.
     // This is a safety check to ensure that we do not initiate a new action while another action is in progress.
     // If this happens, we log an error and do not proceed with initiating the action.
     VerifyOrReturn(currentAction == instance.GetCurrentAction(),
