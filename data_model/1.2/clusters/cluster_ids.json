@@ -10,6 +10,8 @@
     "31": "Access Control",
     "37": "Actions",
     "40": "Basic Information",
+    "41": "OTA Software Update Provider",
+    "42": "OTA Software Update Requestor",
     "43": "Localization Configuration",
     "44": "Time Format Localization",
     "45": "Unit Localization",
