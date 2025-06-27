@@ -19,6 +19,8 @@ not_automated:
       reason: Camera App does not support all features required for this TC
     - name: TC_CNET_4_2.py
       reason: It has no CI execution block, it not executed in CI
+    - name: TC_CNET_4_1.py
+      reason: Required commissioning not implemented on CI
     - name: TC_CNET_4_4.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_9.py
@@ -136,6 +138,8 @@ not_automated:
           are fully verified.
     - name: TC_WEBRTC_Utils.py
       reason: Helper methods for WebRTC TCs, not a standalone test.
+    - name: TC_CHIMETestBase.py
+      reason: Shared code for the Chime Cluster, not a standalone test.
     - name: TC_CLCTRL_2_1.py
       reason: Closure app on master branch does not support this test script yet.
     - name: TC_CLCTRL_4_2.py
