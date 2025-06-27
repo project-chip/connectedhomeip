@@ -38,7 +38,7 @@ struct TwoDCartZone
 /**
  * The application delegate to define the options & implement commands.
  */
-class ZoneManager : public ZoneMgmtDelegate
+class ZoneManager : public ZoneMgmtDelegate, public CameraDeviceInterface::CameraHALInterface::ZoneEventCallback
 {
 public:
     Protocols::InteractionModel::Status CreateTwoDCartesianZone(const TwoDCartesianZoneStorage & zone,
@@ -55,6 +55,11 @@ public:
     Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneID) override;
 
     void OnAttributeChanged(AttributeId attributeId) override;
+
+    void OnZoneTriggeredEvent(uint16_t zoneId,
+                              chip::app::Clusters::ZoneManagement::ZoneEventTriggeredReasonEnum triggerReason) override;
+
+    void OnZoneStoppedEvent(uint16_t zoneId, chip::app::Clusters::ZoneManagement::ZoneEventStoppedReasonEnum stopReason) override;
 
     ZoneManager()  = default;
     ~ZoneManager() = default;
