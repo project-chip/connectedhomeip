@@ -49,8 +49,6 @@ class ZoneManagementCluster(
 ) {
   class CreateTwoDCartesianZoneResponse(val zoneID: UShort)
 
-  class GetTwoDCartesianZoneResponse(val zones: List<ZoneManagementClusterTwoDCartesianZoneStruct>)
-
   class ZonesAttribute(val value: List<ZoneManagementClusterZoneInformationStruct>)
 
   sealed class ZonesAttributeSubscriptionState {
@@ -189,62 +187,8 @@ class ZoneManagementCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun getTwoDCartesianZone(
-    zoneID: UShort?,
-    timedInvokeTimeout: Duration? = null,
-  ): GetTwoDCartesianZoneResponse {
-    val commandId: UInt = 3u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.startStructure(AnonymousTag)
-
-    val TAG_ZONE_ID_REQ: Int = 0
-    zoneID?.let { tlvWriter.put(ContextSpecificTag(TAG_ZONE_ID_REQ), zoneID) }
-    tlvWriter.endStructure()
-
-    val request: InvokeRequest =
-      InvokeRequest(
-        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
-        tlvPayload = tlvWriter.getEncoded(),
-        timedRequest = timedInvokeTimeout,
-      )
-
-    val response: InvokeResponse = controller.invoke(request)
-    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
-
-    val tlvReader = TlvReader(response.payload)
-    tlvReader.enterStructure(AnonymousTag)
-    val TAG_ZONES: Int = 0
-    var zones_decoded: List<ZoneManagementClusterTwoDCartesianZoneStruct>? = null
-
-    while (!tlvReader.isEndOfContainer()) {
-      val tag = tlvReader.peekElement().tag
-
-      if (tag == ContextSpecificTag(TAG_ZONES)) {
-        zones_decoded =
-          buildList<ZoneManagementClusterTwoDCartesianZoneStruct> {
-            tlvReader.enterArray(tag)
-            while (!tlvReader.isEndOfContainer()) {
-              add(ZoneManagementClusterTwoDCartesianZoneStruct.fromTlv(AnonymousTag, tlvReader))
-            }
-            tlvReader.exitContainer()
-          }
-      } else {
-        tlvReader.skipElement()
-      }
-    }
-
-    if (zones_decoded == null) {
-      throw IllegalStateException("zones not found in TLV")
-    }
-
-    tlvReader.exitContainer()
-
-    return GetTwoDCartesianZoneResponse(zones_decoded)
-  }
-
   suspend fun removeZone(zoneID: UShort, timedInvokeTimeout: Duration? = null) {
-    val commandId: UInt = 5u
+    val commandId: UInt = 3u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -268,7 +212,7 @@ class ZoneManagementCluster(
     trigger: ZoneManagementClusterZoneTriggerControlStruct,
     timedInvokeTimeout: Duration? = null,
   ) {
-    val commandId: UInt = 6u
+    val commandId: UInt = 4u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
@@ -289,7 +233,7 @@ class ZoneManagementCluster(
   }
 
   suspend fun removeTrigger(zoneID: UShort, timedInvokeTimeout: Duration? = null) {
-    val commandId: UInt = 7u
+    val commandId: UInt = 5u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
