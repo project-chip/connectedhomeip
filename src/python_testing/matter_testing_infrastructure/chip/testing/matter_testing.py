@@ -1739,3 +1739,6 @@ _has_attribute = decorators._has_attribute
 get_test_info = runner.get_test_info
 run_tests = runner.run_tests
 run_tests_no_exit = runner.run_tests_no_exit
+
+# Backward compatibility aliases for relocated functions
+parse_matter_test_args = runner.parse_matter_test_args
