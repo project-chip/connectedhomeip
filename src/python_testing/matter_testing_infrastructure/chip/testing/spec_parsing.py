@@ -30,8 +30,9 @@ from typing import Callable, Optional, Union
 import chip.clusters as Clusters
 import chip.testing.conformance as conformance_support
 from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecisionWithChoice,
-                                      ConformanceException, ConformanceParseParameters, conformance_allowed, feature, is_disallowed, mandatory, optional,
-                                      or_operation, parse_callable_from_xml, parse_device_type_callable_from_xml)
+                                      ConformanceException, ConformanceParseParameters, conformance_allowed, feature, is_disallowed,
+                                      mandatory, optional, or_operation, parse_callable_from_xml,
+                                      parse_device_type_callable_from_xml)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                          EventPathLocation, FeaturePathLocation, ProblemLocation, ProblemNotice, ProblemSeverity)
