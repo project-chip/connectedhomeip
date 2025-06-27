@@ -304,15 +304,12 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendInsufficientHeadroom)
     EXPECT_EQ(packet1->DataLength(), packet1->MaxDataLength());
 }
 
-// Test that the initial value of the last received sequence number is zero.
-TEST_F(TestBtpEngine, LastReceivedSequenceNumberInitial)
+// Test that the initial sequence numbers are set correctly when the BtpEngine is initialized.
+TEST_F(TestBtpEngine, InitialSequenceNumbers)
 {
-    EXPECT_EQ(mBtpEngine.GetLastReceivedSequenceNumber(), 0);
-}
-
-// Test that the initial value of the newest unacknowledged sent sequence number is zero.
-TEST_F(TestBtpEngine, NewestUnackedSentSequenceNumberInitial)
-{
+    // inline function completely omitted from the LCOV report, no function symbols are generated.
+    EXPECT_EQ(mBtpEngine.GetLastReceivedSequenceNumber(), 0); 
+    // inline function appears in the LCOV report as uncovered (red), even though is actually covered/executed in the test cases, function symbols are generated.
     EXPECT_EQ(mBtpEngine.GetNewestUnackedSentSequenceNumber(), 0);
 }
 
