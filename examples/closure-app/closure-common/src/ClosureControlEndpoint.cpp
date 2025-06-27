@@ -179,7 +179,7 @@ void ClosureControlEndpoint::OnStopMotionActionComplete()
     VerifyOrReturn(mLogic.GetMainState(presentMainState) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to get main state in OnStopMotionActionComplete"));
 
-    // If the current main state is WaitingForMotion, it means the device hasn't started moving yet, 
+    // If the current main state is WaitingForMotion, it means the device hasn't started moving yet,
     // so we don't need to update the current state.
     if (presentMainState != MainStateEnum::kWaitingForMotion)
     {
