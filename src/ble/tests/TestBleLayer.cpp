@@ -161,6 +161,11 @@ public:
     void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override {}
     void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override {}
     CHIP_ERROR CancelConnection() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR NewConnection(BleLayer * bleLayer, void * appState, const Span<const SetupDiscriminator> & discriminators,
+                                     OnConnectionByDiscriminatorsCompleteFunct onConnectionComplete,
+                                     OnConnectionErrorFunct onConnectionError) override {
+            return CHIP_NO_ERROR;
+    }
 
 private:
     unsigned int mNumConnection = 0;
@@ -417,6 +422,19 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoBleTransportLayer) {
     auto OnError = [](void * appState, CHIP_ERROR err) {};
 
     EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_ERROR_INCORRECT_STATE);
+}
+
+TEST_F(TestBleLayer, NewConnectionByDiscriminatorsSuccess) {
+    chip::Test::BleLayerTestAccess access(this);
+    access.SetConnectionDelegate(this);
+    
+    SetupDiscriminator discriminators[] = {SetupDiscriminator(), SetupDiscriminator()};
+    Span<const SetupDiscriminator> discriminatorsSpan(discriminators, 2);
+    
+    auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {};
+    auto OnError = [](void * appState, CHIP_ERROR err) {};
+    
+    EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_NO_ERROR); 
 }
   
 }; // namespace Ble
