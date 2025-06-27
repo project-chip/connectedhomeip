@@ -35178,8 +35178,9 @@ public class ChipClusters {
     private static final long COUNTDOWN_TIME_ATTRIBUTE_ID = 0L;
     private static final long MAIN_STATE_ATTRIBUTE_ID = 1L;
     private static final long CURRENT_ERROR_LIST_ATTRIBUTE_ID = 2L;
-    private static final long OVERALL_STATE_ATTRIBUTE_ID = 3L;
-    private static final long OVERALL_TARGET_ATTRIBUTE_ID = 4L;
+    private static final long OVERALL_CURRENT_STATE_ATTRIBUTE_ID = 3L;
+    private static final long OVERALL_TARGET_STATE_ATTRIBUTE_ID = 4L;
+    private static final long LATCH_CONTROL_MODES_ATTRIBUTE_ID = 5L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -35264,12 +35265,12 @@ public class ChipClusters {
       void onSuccess(List<Integer> value);
     }
 
-    public interface OverallStateAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable ChipStructs.ClosureControlClusterOverallStateStruct value);
+    public interface OverallCurrentStateAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable ChipStructs.ClosureControlClusterOverallCurrentStateStruct value);
     }
 
-    public interface OverallTargetAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable ChipStructs.ClosureControlClusterOverallTargetStruct value);
+    public interface OverallTargetStateAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable ChipStructs.ClosureControlClusterOverallTargetStateStruct value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -35362,56 +35363,82 @@ public class ChipClusters {
         }, CURRENT_ERROR_LIST_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readOverallStateAttribute(
-        OverallStateAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OVERALL_STATE_ATTRIBUTE_ID);
+    public void readOverallCurrentStateAttribute(
+        OverallCurrentStateAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OVERALL_CURRENT_STATE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable ChipStructs.ClosureControlClusterOverallStateStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable ChipStructs.ClosureControlClusterOverallCurrentStateStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, OVERALL_STATE_ATTRIBUTE_ID, true);
+        }, OVERALL_CURRENT_STATE_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeOverallStateAttribute(
-        OverallStateAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OVERALL_STATE_ATTRIBUTE_ID);
+    public void subscribeOverallCurrentStateAttribute(
+        OverallCurrentStateAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OVERALL_CURRENT_STATE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable ChipStructs.ClosureControlClusterOverallStateStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable ChipStructs.ClosureControlClusterOverallCurrentStateStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, OVERALL_STATE_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, OVERALL_CURRENT_STATE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readOverallTargetAttribute(
-        OverallTargetAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OVERALL_TARGET_ATTRIBUTE_ID);
+    public void readOverallTargetStateAttribute(
+        OverallTargetStateAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OVERALL_TARGET_STATE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable ChipStructs.ClosureControlClusterOverallTargetStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable ChipStructs.ClosureControlClusterOverallTargetStateStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, OVERALL_TARGET_ATTRIBUTE_ID, true);
+        }, OVERALL_TARGET_STATE_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeOverallTargetAttribute(
-        OverallTargetAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OVERALL_TARGET_ATTRIBUTE_ID);
+    public void subscribeOverallTargetStateAttribute(
+        OverallTargetStateAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, OVERALL_TARGET_STATE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable ChipStructs.ClosureControlClusterOverallTargetStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable ChipStructs.ClosureControlClusterOverallTargetStateStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, OVERALL_TARGET_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, OVERALL_TARGET_STATE_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readLatchControlModesAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LATCH_CONTROL_MODES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, LATCH_CONTROL_MODES_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeLatchControlModesAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LATCH_CONTROL_MODES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, LATCH_CONTROL_MODES_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -56872,42 +56899,12 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void getTwoDCartesianZone(GetTwoDCartesianZoneResponseCallback callback, @Nullable Optional<Integer> zoneID) {
-      getTwoDCartesianZone(callback, zoneID, 0);
-    }
-
-    public void getTwoDCartesianZone(GetTwoDCartesianZoneResponseCallback callback, @Nullable Optional<Integer> zoneID, int timedInvokeTimeoutMs) {
-      final long commandId = 3L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long zoneIDFieldID = 0L;
-      BaseTLVType zoneIDtlvValue = zoneID != null ? zoneID.<BaseTLVType>map((nonOptionalzoneID) -> new UIntType(nonOptionalzoneID)).orElse(new EmptyType()) : new NullType();
-      elements.add(new StructElement(zoneIDFieldID, zoneIDtlvValue));
-
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          final long zonesFieldID = 0L;
-          ArrayList<ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct> zones = null;
-          for (StructElement element: invokeStructValue.value()) {
-            if (element.contextTagNum() == zonesFieldID) {
-              if (element.value(BaseTLVType.class).type() == TLVType.Array) {
-                ArrayType castingValue = element.value(ArrayType.class);
-                zones = castingValue.map((elementcastingValue) -> ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct.decodeTlv(elementcastingValue));
-              }
-            }
-          }
-          callback.onSuccess(zones);
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
     public void removeZone(DefaultClusterCallback callback, Integer zoneID) {
       removeZone(callback, zoneID, 0);
     }
 
     public void removeZone(DefaultClusterCallback callback, Integer zoneID, int timedInvokeTimeoutMs) {
-      final long commandId = 5L;
+      final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long zoneIDFieldID = 0L;
@@ -56927,7 +56924,7 @@ public class ChipClusters {
     }
 
     public void createOrUpdateTrigger(DefaultClusterCallback callback, ChipStructs.ZoneManagementClusterZoneTriggerControlStruct trigger, int timedInvokeTimeoutMs) {
-      final long commandId = 6L;
+      final long commandId = 4L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long triggerFieldID = 0L;
@@ -56947,7 +56944,7 @@ public class ChipClusters {
     }
 
     public void removeTrigger(DefaultClusterCallback callback, Integer zoneID, int timedInvokeTimeoutMs) {
-      final long commandId = 7L;
+      final long commandId = 5L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long zoneIDFieldID = 0L;
@@ -56964,10 +56961,6 @@ public class ChipClusters {
 
     public interface CreateTwoDCartesianZoneResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer zoneID);
-    }
-
-    public interface GetTwoDCartesianZoneResponseCallback extends BaseClusterCallback {
-      void onSuccess(ArrayList<ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct> zones);
     }
 
     public interface ZonesAttributeCallback extends BaseAttributeCallback {
