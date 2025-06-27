@@ -33,14 +33,18 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace CurrentErrorList
-namespace OverallState {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(OverallState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+namespace OverallCurrentState {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(OverallCurrentState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
-} // namespace OverallState
-namespace OverallTarget {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(OverallTarget::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+} // namespace OverallCurrentState
+namespace OverallTargetState {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(OverallTargetState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
-} // namespace OverallTarget
+} // namespace OverallTargetState
+namespace LatchControlModes {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(LatchControlModes::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace LatchControlModes
 
 } // namespace Attributes
 
