@@ -142,14 +142,9 @@ void Instance::ResetCurrentAttributes()
     mCurrentDayEntry.SetNull();
     mNextDayEntry.SetNull();
     mCurrentDayEntryDate.SetNull();
-    mNextDayEntryDate.SetNull();
-    mNextTariffComponents.SetNull();
 
-    if (mCurrentTariffComponents.data())
-    {
-        chip::Platform::MemoryFree(mCurrentTariffComponents.data());
-        mCurrentTariffComponents = DataModel::List<Structs::TariffComponentStruct::Type>();
-    }
+    mCurrentTariffComponents_MgmtObj.Cleanup();
+    mNextTariffComponents_MgmtObj.Cleanup();
 }
 
 static uint32_t GetCurrentTimestamp(void)
@@ -342,7 +337,7 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
 
 const Structs::TariffPeriodStruct::Type * FindTariffPeriodByDayEntryId(CurrentTariffAttrsCtx & aCtx, uint32_t dayEntryID)
 {
-    for (const auto & period : aCtx.TariffProvider->GetTariffPeriods())
+    for (const auto & period : aCtx.TariffProvider->GetTariffPeriods().Value())
     {
         for (const auto & entryID : period.dayEntryIDs)
         {
@@ -358,7 +353,7 @@ const Structs::TariffPeriodStruct::Type * FindTariffPeriodByDayEntryId(CurrentTa
 
 const Structs::TariffPeriodStruct::Type * FindTariffPeriodByTariffComponentId(CurrentTariffAttrsCtx & aCtx, uint32_t componentID)
 {
-    for (const auto & period : aCtx.TariffProvider->GetTariffPeriods())
+    for (const auto & period : aCtx.TariffProvider->GetTariffPeriods().Value())
     {
         for (const auto & entryID : period.tariffComponentIDs)
         {
@@ -393,7 +388,7 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(CurrentTariffAttrsCtx & aCtx, 
 
         if ((err = mgmtObj.CreateNewValue(tempList.size())) == CHIP_NO_ERROR)
         {
-            std::copy(tempList.begin(), tempList.end(), mgmtObj.GetNewValue());
+            std::copy(tempList.begin(), tempList.end(), mgmtObj.GetNewValueData());
             mgmtObj.MarkAsAssigned();
             mgmtObj.UpdateBegin(nullptr, nullptr);
             mgmtObj.UpdateCommit();
@@ -418,11 +413,11 @@ static void AttrsCtxInit(Delegate & aTariffProvider, CurrentTariffAttrsCtx & aCt
     aCtx.TariffProvider = &aTariffProvider;
 
     Utils::ListToMap<Structs::DayPatternStruct::Type, &Structs::DayPatternStruct::Type::dayPatternID>(
-        aTariffProvider.GetDayPatterns(), aCtx.DayPatternsMap);
-    Utils::ListToMap<Structs::DayEntryStruct::Type, &Structs::DayEntryStruct::Type::dayEntryID>(aTariffProvider.GetDayEntries(),
+        aTariffProvider.GetDayPatterns().Value(), aCtx.DayPatternsMap);
+    Utils::ListToMap<Structs::DayEntryStruct::Type, &Structs::DayEntryStruct::Type::dayEntryID>(aTariffProvider.GetDayEntries().Value(),
                                                                                                 aCtx.DayEntriesMap);
     Utils::ListToMap<Structs::TariffComponentStruct::Type, &Structs::TariffComponentStruct::Type::tariffComponentID>(
-        aTariffProvider.GetTariffComponents(), aCtx.TariffComponentsMap);
+        aTariffProvider.GetTariffComponents().Value(), aCtx.TariffComponentsMap);
 }
 
 static void AttrsCtxDeinit(CurrentTariffAttrsCtx & aCtx)
@@ -480,6 +475,7 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
         if (mCurrentDay.IsNull())
         {
             // Something went wrong! The attribute can't be Null if tariff is active
+            ChipLogError(NotSpecified, "The mCurrentDay can't be Null if tariff is active!");
             assert(false);
         }
 
@@ -504,7 +500,7 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
         if (current != nullptr)
         {
             if (CHIP_NO_ERROR ==
-                Utils::UpdateTariffComponentAttrsDayEntryById(mServerTariffAttrsCtx, current->dayEntryID, mCurrentTariffComponentsMgmtObj))
+                Utils::UpdateTariffComponentAttrsDayEntryById(mServerTariffAttrsCtx, current->dayEntryID, mCurrentTariffComponents_MgmtObj))
             {
                 mCurrentDayEntry.SetNonNull(*current);
                 mCurrentDayEntryDate.SetNonNull(mCurrentDay.Value().date);
@@ -517,33 +513,25 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
         {
             mCurrentDayEntry.SetNull();
             mCurrentDayEntryDate.SetNull();
+            mCurrentTariffComponents_MgmtObj.Cleanup();
         }
 
         if (next != nullptr)
         {
-            if (CHIP_NO_ERROR == Utils::UpdateTariffComponentAttrsDayEntryById(mServerTariffAttrsCtx, next->dayEntryID, mNextTariffComponentsMgmtObj))
+            if (CHIP_NO_ERROR == Utils::UpdateTariffComponentAttrsDayEntryById(mServerTariffAttrsCtx, next->dayEntryID, mNextTariffComponents_MgmtObj))
             {
                 mNextDayEntry.SetNonNull(*next);
                 mNextDayEntryDate.SetNonNull(mCurrentDay.Value().date);
                 MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, NextDayEntry::Id);
                 MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, NextDayEntryDate::Id);
+                MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, NextTariffComponents::Id);
             }
-
-            if (mCurrentTariffComponentsMgmtObj.GetValue().empty())
-            {
-                mNextTariffComponents.SetNull();
-            }
-            else
-            {
-                mNextTariffComponents.SetNonNull(mNextTariffComponentsMgmtObj.GetValue());
-            }
-            MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, NextTariffComponents::Id);
         }
         else
         {
             mNextDayEntry.SetNull();
             mNextDayEntryDate.SetNull();
-            mNextTariffComponents.SetNull();
+            mNextTariffComponents_MgmtObj.Cleanup();
         }
 
         if (nextUpdInterval > 0)

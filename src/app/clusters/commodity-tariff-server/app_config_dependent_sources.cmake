@@ -19,4 +19,6 @@ TARGET_SOURCES(
   "${CLUSTER_DIR}/CommodityTariffTestEventTriggerHandler.h"
   "${CLUSTER_DIR}/commodity-tariff-server.cpp"
   "${CLUSTER_DIR}/commodity-tariff-server.h"
+  "${CLUSTER_DIR}/CommodityTariffAttrsDataMgmt.cpp"
+  "${CLUSTER_DIR}/CommodityTariffAttrsDataMgmt.h"
 )

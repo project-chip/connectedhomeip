@@ -60,19 +60,19 @@ typedef uint32_t epoch_s; ///< Type alias for epoch timestamps in seconds
  * be changed by authorized tariff updates. These are typically set by utility providers.
  */
 #define COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS                                                                                      \
-    X(TariffUnit, DataModel::Nullable<Globals::TariffUnitEnum>)                                                                    \
-    X(StartDate, DataModel::Nullable<uint32_t>)                                                                                    \
-    X(DefaultRandomizationOffset, DataModel::Nullable<int16_t>)                                                                    \
-    X(DefaultRandomizationType, DataModel::Nullable<DayEntryRandomizationTypeEnum>)
+    X(TariffUnit,                   DataModel::Nullable<Globals::TariffUnitEnum>)                                                  \
+    X(StartDate,                    DataModel::Nullable<uint32_t>)                                                                 \
+    X(DefaultRandomizationOffset,   DataModel::Nullable<int16_t>)                                                                  \
+    X(DefaultRandomizationType,     DataModel::Nullable<DayEntryRandomizationTypeEnum>)
 
 #define COMMODITY_TARIFF_PRIMARY_COMPLEX_ATTRIBUTES                                                                                \
-    X(TariffInfo, DataModel::Nullable<Structs::TariffInformationStruct::Type>)                                                     \
-    X(DayEntries, DataModel::List<Structs::DayEntryStruct::Type>)                                                                  \
-    X(DayPatterns, DataModel::List<Structs::DayPatternStruct::Type>)                                                               \
-    X(TariffComponents, DataModel::List<Structs::TariffComponentStruct::Type>)                                                     \
-    X(TariffPeriods, DataModel::List<Structs::TariffPeriodStruct::Type>)                                                           \
-    X(IndividualDays, DataModel::Nullable<DataModel::List<Structs::DayStruct::Type>>)                                              \
-    X(CalendarPeriods, DataModel::Nullable<DataModel::List<Structs::CalendarPeriodStruct::Type>>)
+    X(TariffInfo,               DataModel::Nullable<Structs::TariffInformationStruct::Type>)                                       \
+    X(DayEntries,               DataModel::Nullable<DataModel::List<Structs::DayEntryStruct::Type>>)                               \
+    X(DayPatterns,              DataModel::Nullable<DataModel::List<Structs::DayPatternStruct::Type>>)                             \
+    X(TariffComponents,         DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>>)                        \
+    X(TariffPeriods,            DataModel::Nullable<DataModel::List<Structs::TariffPeriodStruct::Type>>)                           \
+    X(IndividualDays,           DataModel::Nullable<DataModel::List<Structs::DayStruct::Type>>)                                    \
+    X(CalendarPeriods,          DataModel::Nullable<DataModel::List<Structs::CalendarPeriodStruct::Type>>)
 
 #define COMMODITY_TARIFF_PRIMARY_ATTRIBUTES                                                                                        \
     COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS                                                                                          \
@@ -85,15 +85,21 @@ typedef uint32_t epoch_s; ///< Type alias for epoch timestamps in seconds
  * Current attributes represent the dynamically changing state of the tariff system,
  * automatically updated based on time context and primary attribute values.
  */
+#define COMMODITY_TARIFF_CURRENT_SINGLE_ATTRIBUTES                                                                                 \
+    X(CurrentDay,               DataModel::Nullable<Structs::DayStruct::Type>)                                                     \
+    X(NextDay,                  DataModel::Nullable<Structs::DayStruct::Type>)                                                     \
+    X(CurrentDayEntry,          DataModel::Nullable<Structs::DayEntryStruct::Type>)                                                \
+    X(NextDayEntry,             DataModel::Nullable<Structs::DayEntryStruct::Type>)                                                \
+    X(CurrentDayEntryDate,      DataModel::Nullable<uint32_t>)                                                                     \
+    X(NextDayEntryDate,         DataModel::Nullable<uint32_t>)
+
+#define COMMODITY_TARIFF_CURRENT_LIST_ATTRIBUTES                                                                                  \
+    X(CurrentTariffComponents,  DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>>)                        \
+    X(NextTariffComponents,     DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>>)
+
 #define COMMODITY_TARIFF_CURRENT_ATTRIBUTES                                                                                        \
-    X(CurrentDay, DataModel::Nullable<Structs::DayStruct::Type>)                                                                   \
-    X(NextDay, DataModel::Nullable<Structs::DayStruct::Type>)                                                                      \
-    X(CurrentDayEntry, DataModel::Nullable<Structs::DayEntryStruct::Type>)                                                         \
-    X(NextDayEntry, DataModel::Nullable<Structs::DayEntryStruct::Type>)                                                            \
-    X(CurrentDayEntryDate, DataModel::Nullable<uint32_t>)                                                                          \
-    X(NextDayEntryDate, DataModel::Nullable<uint32_t>)                                                                             \
-    X(CurrentTariffComponents, DataModel::List<Structs::TariffComponentStruct::Type>)                                              \
-    X(NextTariffComponents, DataModel::Nullable<DataModel::List<Structs::TariffComponentStruct::Type>>)
+    COMMODITY_TARIFF_CURRENT_SINGLE_ATTRIBUTES                                                                                     \
+    COMMODITY_TARIFF_CURRENT_LIST_ATTRIBUTES
 
 /** @} */ // end of tariff_attributes
 
@@ -133,7 +139,7 @@ using namespace chip::app::CommodityTariffAttrsDataMgmt;
     class attrName##DataClass : public CTC_BaseDataClass<attrType>                                                                 \
     {                                                                                                                              \
     public:                                                                                                                        \
-        attrName##DataClass(attrType & aValueStorage) : CTC_BaseDataClass<attrType>(aValueStorage, Attributes::attrName::Id) {}    \
+        attrName##DataClass() : CTC_BaseDataClass<attrType>(Attributes::attrName::Id) {}    \
         ~attrName##DataClass() override = default;                                                                                 \
                                                                                                                                    \
     protected:                                                                                                                     \
@@ -146,7 +152,7 @@ COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS
     class attrName##DataClass : public CTC_BaseDataClass<attrType>                                                                 \
     {                                                                                                                              \
     public:                                                                                                                        \
-        attrName##DataClass(attrType & aValueStorage) : CTC_BaseDataClass<attrType>(aValueStorage, Attributes::attrName::Id) {}    \
+        attrName##DataClass() : CTC_BaseDataClass<attrType>(Attributes::attrName::Id) {}    \
         ~attrName##DataClass() override = default;                                                                                 \
         void CleanupExtEntry(PayloadType & entry)                                                                                  \
         {                                                                                                                          \
@@ -267,8 +273,7 @@ public:
 private:
     // Primary attribute storage and management
 #define X(attrName, attrType)                                                                                                      \
-    attrType m##attrName;                                                                                                          \
-    attrName##DataClass m##attrName##_MgmtObj{ m##attrName };
+    attrName##DataClass m##attrName##_MgmtObj{};
     COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
 
@@ -393,13 +398,14 @@ private:
 #define X(attrName, attrType)                                                                                                      \
     attrType m##attrName;                                                                                                          \
     attrType & Get##attrName() { return m##attrName; }
-    COMMODITY_TARIFF_CURRENT_ATTRIBUTES
+    COMMODITY_TARIFF_CURRENT_SINGLE_ATTRIBUTES
 #undef X
 
-    DataModel::List<Structs ::TariffComponentStruct ::Type> mNextTariffComponentsValueStorage;
-
-    TariffComponentsDataClass mCurrentTariffComponentsMgmtObj{ mCurrentTariffComponents };
-    TariffComponentsDataClass mNextTariffComponentsMgmtObj{ mNextTariffComponentsValueStorage };
+#define X(attrName, attrType)                                                                                                      \
+    TariffComponentsDataClass m##attrName##_MgmtObj{};                                                                             \
+    attrType & Get##attrName() { return m##attrName##_MgmtObj.GetValue(); }
+    COMMODITY_TARIFF_CURRENT_LIST_ATTRIBUTES
+#undef X
 
     void TariffDataUpdatedCb();
     void ResetCurrentAttributes();
