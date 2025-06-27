@@ -29369,8 +29369,9 @@ class ClosureControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="countdownTime", Tag=0x00000000, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="mainState", Tag=0x00000001, Type=ClosureControl.Enums.MainStateEnum),
                 ClusterObjectFieldDescriptor(Label="currentErrorList", Tag=0x00000002, Type=typing.List[ClosureControl.Enums.ClosureErrorEnum]),
-                ClusterObjectFieldDescriptor(Label="overallState", Tag=0x00000003, Type=typing.Union[Nullable, ClosureControl.Structs.OverallStateStruct]),
-                ClusterObjectFieldDescriptor(Label="overallTarget", Tag=0x00000004, Type=typing.Union[Nullable, ClosureControl.Structs.OverallTargetStruct]),
+                ClusterObjectFieldDescriptor(Label="overallCurrentState", Tag=0x00000003, Type=typing.Union[Nullable, ClosureControl.Structs.OverallCurrentStateStruct]),
+                ClusterObjectFieldDescriptor(Label="overallTargetState", Tag=0x00000004, Type=typing.Union[Nullable, ClosureControl.Structs.OverallTargetStateStruct]),
+                ClusterObjectFieldDescriptor(Label="latchControlModes", Tag=0x00000005, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -29381,8 +29382,9 @@ class ClosureControl(Cluster):
     countdownTime: typing.Union[None, Nullable, uint] = None
     mainState: ClosureControl.Enums.MainStateEnum = 0
     currentErrorList: typing.List[ClosureControl.Enums.ClosureErrorEnum] = field(default_factory=lambda: [])
-    overallState: typing.Union[Nullable, ClosureControl.Structs.OverallStateStruct] = NullValue
-    overallTarget: typing.Union[Nullable, ClosureControl.Structs.OverallTargetStruct] = NullValue
+    overallCurrentState: typing.Union[Nullable, ClosureControl.Structs.OverallCurrentStateStruct] = NullValue
+    overallTargetState: typing.Union[Nullable, ClosureControl.Structs.OverallTargetStateStruct] = NullValue
+    latchControlModes: typing.Optional[uint] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -29402,6 +29404,19 @@ class ClosureControl(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5
 
+        class CurrentPositionEnum(MatterIntEnum):
+            kFullyClosed = 0x00
+            kFullyOpened = 0x01
+            kPartiallyOpened = 0x02
+            kOpenedForPedestrian = 0x03
+            kOpenedForVentilation = 0x04
+            kOpenedAtSignature = 0x05
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 6
+
         class MainStateEnum(MatterIntEnum):
             kStopped = 0x00
             kMoving = 0x01
@@ -29417,25 +29432,12 @@ class ClosureControl(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 8
 
-        class PositioningEnum(MatterIntEnum):
-            kFullyClosed = 0x00
-            kFullyOpened = 0x01
-            kPartiallyOpened = 0x02
-            kOpenedForPedestrian = 0x03
-            kOpenedForVentilation = 0x04
-            kOpenedAtSignature = 0x05
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 6
-
         class TargetPositionEnum(MatterIntEnum):
-            kCloseInFull = 0x00
-            kOpenInFull = 0x01
-            kPedestrian = 0x02
-            kVentilation = 0x03
-            kSignature = 0x04
+            kMoveToFullyClosed = 0x00
+            kMoveToFullyOpen = 0x01
+            kMoveToPedestrianPosition = 0x02
+            kMoveToVentilationPosition = 0x03
+            kMoveToSignaturePosition = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
@@ -29454,37 +29456,41 @@ class ClosureControl(Cluster):
             kProtection = 0x80
             kManuallyOperable = 0x100
 
+        class LatchControlModesBitmap(IntFlag):
+            kRemoteLatching = 0x1
+            kRemoteUnlatching = 0x2
+
     class Structs:
         @dataclass
-        class OverallStateStruct(ClusterObject):
+        class OverallCurrentStateStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="positioning", Tag=0, Type=typing.Union[None, Nullable, ClosureControl.Enums.PositioningEnum]),
+                        ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Union[None, Nullable, ClosureControl.Enums.CurrentPositionEnum]),
                         ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Union[None, Nullable, bool]),
-                        ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Union[None, Nullable, Globals.Enums.ThreeLevelAutoEnum]),
+                        ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
                         ClusterObjectFieldDescriptor(Label="secureState", Tag=3, Type=typing.Union[None, Nullable, bool]),
                     ])
 
-            positioning: 'typing.Union[None, Nullable, ClosureControl.Enums.PositioningEnum]' = None
+            position: 'typing.Union[None, Nullable, ClosureControl.Enums.CurrentPositionEnum]' = None
             latch: 'typing.Union[None, Nullable, bool]' = None
-            speed: 'typing.Union[None, Nullable, Globals.Enums.ThreeLevelAutoEnum]' = None
+            speed: 'typing.Optional[Globals.Enums.ThreeLevelAutoEnum]' = None
             secureState: 'typing.Union[None, Nullable, bool]' = None
 
         @dataclass
-        class OverallTargetStruct(ClusterObject):
+        class OverallTargetStateStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Optional[ClosureControl.Enums.TargetPositionEnum]),
-                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Union[None, Nullable, ClosureControl.Enums.TargetPositionEnum]),
+                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Union[None, Nullable, bool]),
                         ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
                     ])
 
-            position: 'typing.Optional[ClosureControl.Enums.TargetPositionEnum]' = None
-            latch: 'typing.Optional[bool]' = None
+            position: 'typing.Union[None, Nullable, ClosureControl.Enums.TargetPositionEnum]' = None
+            latch: 'typing.Union[None, Nullable, bool]' = None
             speed: 'typing.Optional[Globals.Enums.ThreeLevelAutoEnum]' = None
 
     class Commands:
@@ -29584,7 +29590,7 @@ class ClosureControl(Cluster):
             value: typing.List[ClosureControl.Enums.ClosureErrorEnum] = field(default_factory=lambda: [])
 
         @dataclass
-        class OverallState(ClusterAttributeDescriptor):
+        class OverallCurrentState(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000104
@@ -29595,12 +29601,12 @@ class ClosureControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ClosureControl.Structs.OverallStateStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ClosureControl.Structs.OverallCurrentStateStruct])
 
-            value: typing.Union[Nullable, ClosureControl.Structs.OverallStateStruct] = NullValue
+            value: typing.Union[Nullable, ClosureControl.Structs.OverallCurrentStateStruct] = NullValue
 
         @dataclass
-        class OverallTarget(ClusterAttributeDescriptor):
+        class OverallTargetState(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000104
@@ -29611,9 +29617,25 @@ class ClosureControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ClosureControl.Structs.OverallTargetStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ClosureControl.Structs.OverallTargetStateStruct])
 
-            value: typing.Union[Nullable, ClosureControl.Structs.OverallTargetStruct] = NullValue
+            value: typing.Union[Nullable, ClosureControl.Structs.OverallTargetStateStruct] = NullValue
+
+        @dataclass
+        class LatchControlModes(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000104
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -41031,6 +41053,10 @@ class ThreadBorderRouterManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=typing.Optional[uint]),
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
             activeDataset: bytes = b""
             breadcrumb: typing.Optional[uint] = None
 
@@ -41047,6 +41073,10 @@ class ThreadBorderRouterManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="pendingDataset", Tag=0, Type=bytes),
                     ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
 
             pendingDataset: bytes = b""
 
@@ -45707,11 +45737,13 @@ class ZoneManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="zoneID", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="zoneType", Tag=1, Type=ZoneManagement.Enums.ZoneTypeEnum),
                         ClusterObjectFieldDescriptor(Label="zoneSource", Tag=2, Type=ZoneManagement.Enums.ZoneSourceEnum),
+                        ClusterObjectFieldDescriptor(Label="twoDCartesianZone", Tag=3, Type=typing.Optional[ZoneManagement.Structs.TwoDCartesianZoneStruct]),
                     ])
 
             zoneID: 'uint' = 0
             zoneType: 'ZoneManagement.Enums.ZoneTypeEnum' = 0
             zoneSource: 'ZoneManagement.Enums.ZoneSourceEnum' = 0
+            twoDCartesianZone: 'typing.Optional[ZoneManagement.Structs.TwoDCartesianZoneStruct]' = None
 
         @dataclass
         class ZoneTriggerControlStruct(ClusterObject):
@@ -45786,41 +45818,9 @@ class ZoneManagement(Cluster):
             zone: ZoneManagement.Structs.TwoDCartesianZoneStruct = field(default_factory=lambda: ZoneManagement.Structs.TwoDCartesianZoneStruct())
 
         @dataclass
-        class GetTwoDCartesianZone(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000550
-            command_id: typing.ClassVar[int] = 0x00000003
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[str] = 'GetTwoDCartesianZoneResponse'
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="zoneID", Tag=0, Type=typing.Union[None, Nullable, uint]),
-                    ])
-
-            zoneID: typing.Union[None, Nullable, uint] = None
-
-        @dataclass
-        class GetTwoDCartesianZoneResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000550
-            command_id: typing.ClassVar[int] = 0x00000004
-            is_client: typing.ClassVar[bool] = False
-            response_type: typing.ClassVar[typing.Optional[str]] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="zones", Tag=0, Type=typing.List[ZoneManagement.Structs.TwoDCartesianZoneStruct]),
-                    ])
-
-            zones: typing.List[ZoneManagement.Structs.TwoDCartesianZoneStruct] = field(default_factory=lambda: [])
-
-        @dataclass
         class RemoveZone(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000550
-            command_id: typing.ClassVar[int] = 0x00000005
+            command_id: typing.ClassVar[int] = 0x00000003
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -45836,7 +45836,7 @@ class ZoneManagement(Cluster):
         @dataclass
         class CreateOrUpdateTrigger(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000550
-            command_id: typing.ClassVar[int] = 0x00000006
+            command_id: typing.ClassVar[int] = 0x00000004
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 
@@ -45852,7 +45852,7 @@ class ZoneManagement(Cluster):
         @dataclass
         class RemoveTrigger(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000550
-            command_id: typing.ClassVar[int] = 0x00000007
+            command_id: typing.ClassVar[int] = 0x00000005
             is_client: typing.ClassVar[bool] = True
             response_type: typing.ClassVar[typing.Optional[str]] = None
 

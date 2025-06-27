@@ -222,6 +222,7 @@ std::optional<uint16_t> BridgedDeviceManager::AddDeviceEndpoint(std::unique_ptr<
                 ChipLogProgress(NotSpecified, "Added device with Id=[%d:0x" ChipLogFormatX64 "] to dynamic endpoint %d (index=%d)",
                                 dev->GetScopedNodeId().GetFabricIndex(), ChipLogValueX64(dev->GetScopedNodeId().GetNodeId()),
                                 mCurrentEndpointId, index);
+                dev->RegisterClusters();
                 mDevices[index] = std::move(dev);
                 return index;
             }
