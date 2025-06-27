@@ -162,8 +162,6 @@ void ClosureManager::InitiateAction(AppEvent * event)
 
 void ClosureManager::TimerEventHandler(void * timerCbArg)
 {
-    ChipLogError(AppServer, "Timer expired");
-    osDelay(1000);
     ClosureManager * closureManager = static_cast<ClosureManager *>(timerCbArg);
 
     // The timer event handler will be called in the context of the timer task
@@ -179,8 +177,7 @@ void ClosureManager::TimerEventHandler(void * timerCbArg)
 void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
 {
     Action_t currentAction = static_cast<ClosureManager::Action_t>(event->ClosureEvent.Action);
-    ChipLogError(AppServer, "HandleClosureActionCompleteEvent called for action: %d", currentAction);
-    osDelay(1000); // Simulate some processing delay
+
     switch (currentAction)
     {
     case Action_t::CALIBRATE_ACTION:
@@ -308,12 +305,15 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
 
         ep2Target.position.SetValue(ep2Position);
         ep3Target.position.SetValue(ep3Position);
+        ChipLogError(AppServer, "Setting target position for Endpoint 2: %d, Endpoint 3: %d", ep2Target.position.Value(), ep3Target.position.Value());
     }
 
     if (latch.HasValue())
     {
         ep2Target.latch.SetValue(latch.Value());
         ep3Target.latch.SetValue(latch.Value());
+        ChipLogError(AppServer, "Setting latch for Endpoint 2: %s, Endpoint 3: %s",
+                     ep2Target.latch.Value() ? "true" : "false", ep3Target.latch.Value() ? "true" : "false");
     }
 
     if (speed.HasValue())
@@ -326,6 +326,7 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
                         ChipLogError(AppServer, "Failed to set target for Endpoint 2"));
     VerifyOrReturnError(ep3.GetLogic().SetTarget(DataModel::MakeNullable(ep3Target)) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set target for Endpoint 3"));
+    
     VerifyOrReturnError(ep1.GetLogic().SetCountdownTimeFromDelegate(10) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
 
@@ -517,8 +518,7 @@ bool ClosureManager::GetPanelNextPosition(const GenericCurrentStateStruct & curr
                                            const GenericTargetStruct & targetState,
                                            Optional<chip::Percent100ths> & nextPosition)
 {
-    ChipLogError(AppServer, "GetPanelNextPosition called");
-    osDelay(1000); // Simulate some processing delay
+    
     if (!targetState.position.HasValue())
     {
         ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to  Target position is not set");
@@ -537,18 +537,18 @@ bool ClosureManager::GetPanelNextPosition(const GenericCurrentStateStruct & curr
     if (currentPosition < targetPosition)
     {
         // Increment position by 1000 units, capped at target.
-        nextPosition.Value() = std::min(static_cast<chip::Percent100ths>(currentPosition + 1000), targetPosition);
+        nextPosition.SetValue(std::min(static_cast<chip::Percent100ths>(currentPosition + 1000), targetPosition));
     }
     else if (currentPosition > targetPosition)
     {
         // Moving down: Decreasing the current position by a step of 1000 units,
         // ensuring it does not go below the target position.
-        nextPosition.Value() = std::max(static_cast<chip::Percent100ths>(currentPosition - 1000), targetPosition);
+        nextPosition.SetValue(std::max(static_cast<chip::Percent100ths>(currentPosition - 1000), targetPosition));
     }
     else
     {
         // Already at target: No further action is needed as the current position matches the target position.
-        nextPosition.Value() = currentPosition;
+        nextPosition.SetValue(currentPosition);
         return false; // No update needed
     }
     return true;
