@@ -94,7 +94,7 @@ shared_library("ChipDeviceCtrl") {
       "chip/utils/DeviceProxyUtils.cpp",
     ]
     if (chip_support_webrtc_python_bindings && current_os == "linux" &&
-        (current_cpu == "x64" || current_cpu == "armv64")) {
+        (current_cpu == "x64" || current_cpu == "arm64")) {
       sources += [ "chip/webrtc/RTCClient.cpp" ]
     }
     defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
@@ -228,7 +228,7 @@ chip_python_wheel_action("chip-core") {
         "chip/yaml/runner.py",
       ]
       if (current_os == "linux" &&
-          (current_cpu == "x64" || current_cpu == "armv64")) {
+          (current_cpu == "x64" || current_cpu == "arm64")) {
         sources += [
           "chip/webrtc/__init__.py",
           "chip/webrtc/callbacks.py",
@@ -284,7 +284,7 @@ chip_python_wheel_action("chip-core") {
     "chip.fault_injection",
   ]
   if (chip_support_webrtc_python_bindings && current_os == "linux" &&
-      (current_cpu == "x64" || current_cpu == "armv64")) {
+      (current_cpu == "x64" || current_cpu == "arm64")) {
     py_packages += [ "chip.webrtc" ]
   }
 

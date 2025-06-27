@@ -22,10 +22,21 @@ namespace chip {
 namespace webrtc {
 
 WebRTCClient::WebRTCClient() {}
-WebRTCClient::~WebRTCClient() {}
-
-void WebRTCClient::createPeerConnection(const std::string & stunUrl)
+WebRTCClient::~WebRTCClient()
 {
+    if (mPeerConnection == nullptr)
+        return;
+
+    delete mPeerConnection;
+}
+
+void WebRTCClient::CreatePeerConnection(const std::string & stunUrl)
+{
+    if (mPeerConnection != nullptr)
+    {
+        ChipLogProgress(NotSpecified, "PeerConnection exists already!");
+        return;
+    }
     rtc::Configuration config;
     if (!stunUrl.empty())
     {
@@ -35,51 +46,80 @@ void WebRTCClient::createPeerConnection(const std::string & stunUrl)
     {
         ChipLogError(NotSpecified, "No STUN server URL provided");
     }
-    pc_ = std::make_shared<rtc::PeerConnection>(config);
+    mPeerConnection = new rtc::PeerConnection(config);
+    if (mPeerConnection == nullptr)
+    {
+        ChipLogError(NotSpecified, "Failed to create PeerConnection");
+        return;
+    }
 
-    pc_->onLocalDescription([this](rtc::Description desc) {
-        if (localDescriptionCallback_)
+    mPeerConnection->onLocalDescription([this](rtc::Description desc) {
+        if (mLocalDescriptionCallback)
         {
-            localDescriptionCallback_(rtc::Description::typeToString(desc.type()), desc.typeString());
+            mLocalDescriptionCallback(rtc::Description::typeToString(desc.type()), desc.typeString());
         }
     });
 
-    pc_->onLocalCandidate([this](rtc::Candidate cand) {
-        if (iceCandidateCallback_)
+    mPeerConnection->onLocalCandidate([this](rtc::Candidate cand) {
+        if (mIceCandidateCallback)
         {
-            iceCandidateCallback_(cand.candidate(), cand.mid());
+            mIceCandidateCallback(cand.candidate(), cand.mid());
         }
     });
 }
 
-void WebRTCClient::createOffer()
+void WebRTCClient::CreateOffer()
 {
-    pc_->setLocalDescription();
+    if (mPeerConnection == nullptr)
+    {
+        ChipLogError(NotSpecified, "Peerconnection is null");
+        return;
+    }
+
+    mPeerConnection->setLocalDescription();
 }
 
-void WebRTCClient::createAnswer()
+void WebRTCClient::CreateAnswer()
 {
-    pc_->setLocalDescription();
+    if (mPeerConnection == nullptr)
+    {
+        ChipLogError(NotSpecified, "Peerconnection is null");
+        return;
+    }
+
+    mPeerConnection->setLocalDescription();
 }
 
-void WebRTCClient::setRemoteDescription(const std::string & sdp, const std::string & type)
+void WebRTCClient::SetRemoteDescription(const std::string & sdp, const std::string & type)
 {
-    pc_->setRemoteDescription(rtc::Description(sdp, type));
+    if (mPeerConnection == nullptr)
+    {
+        ChipLogError(NotSpecified, "Peerconnection is null");
+        return;
+    }
+
+    mPeerConnection->setRemoteDescription(rtc::Description(sdp, type));
 }
 
-void WebRTCClient::addIceCandidate(const std::string & candidate, const std::string & mid)
+void WebRTCClient::AddIceCandidate(const std::string & candidate, const std::string & mid)
 {
-    pc_->addRemoteCandidate(rtc::Candidate(candidate, mid));
+    if (mPeerConnection == nullptr)
+    {
+        ChipLogError(NotSpecified, "Peerconnection is null");
+        return;
+    }
+
+    mPeerConnection->addRemoteCandidate(rtc::Candidate(candidate, mid));
 }
 
-void WebRTCClient::onLocalDescription(std::function<void(const std::string &, const std::string &)> callback)
+void WebRTCClient::OnLocalDescription(std::function<void(const std::string &, const std::string &)> callback)
 {
-    localDescriptionCallback_ = callback;
+    mLocalDescriptionCallback = callback;
 }
 
-void WebRTCClient::onIceCandidate(std::function<void(const std::string &, const std::string &)> callback)
+void WebRTCClient::OnIceCandidate(std::function<void(const std::string &, const std::string &)> callback)
 {
-    iceCandidateCallback_ = callback;
+    mIceCandidateCallback = callback;
 }
 
 } // namespace webrtc

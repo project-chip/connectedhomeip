@@ -56,7 +56,7 @@ void webrtc_client_create_peer_connection(WebRTCClientHandle handle, const char 
     auto it = g_clients.find(handle);
     if (it != g_clients.end())
     {
-        it->second->createPeerConnection(stun_url);
+        it->second->CreatePeerConnection(stun_url);
     }
 }
 
@@ -66,7 +66,7 @@ void webrtc_client_create_offer(WebRTCClientHandle handle)
     auto it = g_clients.find(handle);
     if (it != g_clients.end())
     {
-        it->second->createOffer();
+        it->second->CreateOffer();
     }
 }
 
@@ -76,7 +76,7 @@ void webrtc_client_create_answer(WebRTCClientHandle handle)
     auto it = g_clients.find(handle);
     if (it != g_clients.end())
     {
-        it->second->createAnswer();
+        it->second->CreateAnswer();
     }
 }
 
@@ -86,7 +86,7 @@ void webrtc_client_set_remote_description(WebRTCClientHandle handle, const char 
     auto it = g_clients.find(handle);
     if (it != g_clients.end())
     {
-        it->second->setRemoteDescription(sdp, type);
+        it->second->SetRemoteDescription(sdp, type);
     }
 }
 
@@ -96,7 +96,7 @@ void webrtc_client_add_ice_candidate(WebRTCClientHandle handle, const char * can
     auto it = g_clients.find(handle);
     if (it != g_clients.end())
     {
-        it->second->addIceCandidate(candidate, mid);
+        it->second->AddIceCandidate(candidate, mid);
     }
 }
 
@@ -106,7 +106,7 @@ void webrtc_client_set_local_description_callback(WebRTCClientHandle handle, Loc
     auto it = g_clients.find(handle);
     if (it != g_clients.end())
     {
-        it->second->onLocalDescription(
+        it->second->OnLocalDescription(
             [cb, user_data](const std::string & sdp, const std::string & type) { cb(sdp.c_str(), type.c_str(), user_data); });
     }
 }
@@ -117,7 +117,7 @@ void webrtc_client_set_ice_candidate_callback(WebRTCClientHandle handle, IceCand
     auto it = g_clients.find(handle);
     if (it != g_clients.end())
     {
-        it->second->onIceCandidate([cb, user_data](const std::string & candidate, const std::string & mid) {
+        it->second->OnIceCandidate([cb, user_data](const std::string & candidate, const std::string & mid) {
             cb(candidate.c_str(), mid.c_str(), user_data);
         });
     }
