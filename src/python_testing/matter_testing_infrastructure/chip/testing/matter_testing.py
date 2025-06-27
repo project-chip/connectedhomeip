@@ -31,7 +31,6 @@ import sys
 import textwrap
 import threading
 import time
-import traceback
 import typing
 import uuid
 from binascii import unhexlify
@@ -1354,21 +1353,6 @@ class MatterBaseTest(base_test.BaseTestClass):
     def record_note(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.NOTE, problem, spec_location))
 
-    def _format_exception_with_traceback(self, exc):
-        """
-        Returns a string with the exception message and its stacktrace.
-        If __traceback__ is not available, uses fallback_stacktrace if provided.
-        """
-        fallback_stacktrace = getattr(exc, 'stacktrace', '')
-
-        if hasattr(exc, '__traceback__') and exc.__traceback__:
-            stacktrace_str = ''.join(traceback.format_exception(type(exc), exc, exc.__traceback__))
-        elif fallback_stacktrace:
-            stacktrace_str = fallback_stacktrace
-        else:
-            stacktrace_str = ''
-        return f"{exc}\nStacktrace:\n{stacktrace_str}"
-
     def on_fail(self, record):
         ''' Called by Mobly on test failure
 
@@ -1389,13 +1373,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 test_duration = 0
             # TODO: I have no idea what logger, logs, request or received are. Hope None works because I have nothing to give
             self.runner_hook.step_failure(logger=None, logs=None, duration=step_duration, request=None, received=None)
-            # Convert a potentially complex exception (with custom types or non-serializable data)
-            # into a simple Exception containing only the message and stacktrace, making it safe
-            # to send across process boundaries or for reporting purposes.
-            exception_message = self._format_exception_with_traceback(exception)
-            basic_exception = Exception(exception_message)
-            logging.error("Exception with stacktrace captured during test failure:\n%s", exception_message)
-            self.runner_hook.test_stop(exception=basic_exception, duration=test_duration)
+            self.runner_hook.test_stop(exception=exception, duration=test_duration)
 
             def extract_error_text() -> tuple[str, str]:
                 no_stack_trace = ("Stack Trace Unavailable", "")
