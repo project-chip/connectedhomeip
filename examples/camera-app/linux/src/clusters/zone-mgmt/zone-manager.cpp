@@ -128,3 +128,16 @@ void ZoneManager::OnAttributeChanged(AttributeId attributeId)
         ChipLogProgress(Camera, "Unknown Attribute with AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
     }
 }
+
+void ZoneManager::OnZoneTriggeredEvent(uint16_t zoneId,
+                                       chip::app::Clusters::ZoneManagement::ZoneEventTriggeredReasonEnum triggerReason)
+{
+    ChipLogProgress(Camera, "Generating ZoneTriggered event for ZoneId = %u", zoneId);
+    GetZoneMgmtServer()->GenerateZoneTriggeredEvent(zoneId, triggerReason);
+}
+
+void ZoneManager::OnZoneStoppedEvent(uint16_t zoneId, chip::app::Clusters::ZoneManagement::ZoneEventStoppedReasonEnum stopReason)
+{
+    ChipLogProgress(Camera, "Generating ZoneStopped event for ZoneId = %u", zoneId);
+    GetZoneMgmtServer()->GenerateZoneStoppedEvent(zoneId, stopReason);
+}

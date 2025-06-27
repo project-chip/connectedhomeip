@@ -288,7 +288,7 @@ public:
     Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneId);
 
     // Send Zone events
-    Protocols::InteractionModel::Status GenerateZoneTriggerredEvent(uint16_t zoneID, ZoneEventTriggeredReasonEnum triggerReason);
+    Protocols::InteractionModel::Status GenerateZoneTriggeredEvent(uint16_t zoneID, ZoneEventTriggeredReasonEnum triggerReason);
     Protocols::InteractionModel::Status GenerateZoneStoppedEvent(uint16_t zoneID, ZoneEventStoppedReasonEnum stopReason);
 
 private:
