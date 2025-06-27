@@ -208,5 +208,5 @@ ALLOW: Dict[str, Set[str]] = {
 
     # For webrtc python bindings
     'src/controller/webrtc/WebRTC.h': {'string'},
-    'src/controller/webrtc/WebRTCClient.h': {'map, string'},
+    'src/controller/webrtc/WebRTCClient.h': {'map', 'string'},
 }
