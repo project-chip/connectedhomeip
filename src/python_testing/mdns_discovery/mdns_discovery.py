@@ -15,11 +15,11 @@
 #    limitations under the License.
 #
 
-import re
 import ast
 import ipaddress
 import json
 import logging
+import re
 from asyncio import Event, TimeoutError, ensure_future, wait_for
 from dataclasses import asdict, dataclass
 from enum import Enum
