@@ -126,7 +126,7 @@ void ClosureManager::CancelTimer()
 
 void ClosureManager::InitiateAction(AppEvent * event)
 {
-    Action_t eventAction = static_cast<uint8_t>(event->ClosureEvent.Action);
+    Action_t eventAction = static_cast<Action_t>(event->ClosureEvent.Action);
 
     ClosureManager & instance = ClosureManager::GetInstance();
 
@@ -178,7 +178,7 @@ void ClosureManager::TimerEventHandler(void * timerCbArg)
 
 void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
 {
-    Action_t currentAction = static_cast<uint8_t>(event->ClosureEvent.Action);
+    Action_t currentAction = static_cast<Action_t>(event->ClosureEvent.Action);
 
     ClosureManager & instance = ClosureManager::GetInstance();
 
