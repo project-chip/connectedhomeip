@@ -24,7 +24,7 @@
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
-#       --string-arg th_server_app_path:${CAMERA_APP}
+#       --string-arg th_server_app_path:out/linux-x64-camera/chip-camera-app
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true

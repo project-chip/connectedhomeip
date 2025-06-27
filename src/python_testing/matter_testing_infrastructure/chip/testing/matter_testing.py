@@ -32,6 +32,7 @@ import textwrap
 import threading
 import time
 import typing
+import uuid
 from binascii import unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
@@ -58,15 +59,16 @@ from time import sleep
 import chip.clusters as Clusters
 import chip.logging
 import chip.native
-import chip.testing.global_stash as global_stash
+from chip import discovery
 from chip.ChipStack import ChipStack
-from chip.clusters import Attribute, ClusterObjects
+from chip.clusters import Attribute
+from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
+from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
-from chip.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
-                                        get_setup_payload_info_config)
+from chip.testing.commissioning import CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.pics import read_pics_from_file
 from chip.testing.runner import TestRunnerHooks, TestStep
@@ -87,6 +89,21 @@ _DEFAULT_LOG_PATH = "/tmp/matter_testing/logs"
 _DEFAULT_CONTROLLER_NODE_ID = 112233
 _DEFAULT_DUT_NODE_ID = 0x12344321
 _DEFAULT_TRUST_ROOT_INDEX = 1
+
+# Mobly cannot deal with user config passing of ctypes objects,
+# so we use this dict of uuid -> object to recover items stashed
+# by reference.
+_GLOBAL_DATA = {}
+
+
+def stash_globally(o: object) -> str:
+    id = str(uuid.uuid1())
+    _GLOBAL_DATA[id] = o
+    return id
+
+
+def unstash_globally(id: str) -> Any:
+    return _GLOBAL_DATA.get(id)
 
 
 def default_paa_rootstore_from_root(root_path: pathlib.Path) -> Optional[pathlib.Path]:
@@ -619,7 +636,7 @@ class MatterTestConfig:
 
     wifi_ssid: Optional[str] = None
     wifi_passphrase: Optional[str] = None
-    thread_operational_dataset: Optional[bytes] = None
+    thread_operational_dataset: Optional[str] = None
 
     pics: dict[bool, str] = field(default_factory=dict)
 
@@ -959,13 +976,15 @@ class MatterBaseTest(base_test.BaseTestClass):
         except AttributeError:
             return test
 
-    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None):
+    def write_to_app_pipe(self, command_dict: dict, app_pipe_prefix: Optional[str] = None, app_pid: Optional[int] = None):
         """
         Send an out-of-band command to a Matter app.
         Args:
-            command_dict (dict): dictionary with the command and data.
-            app_pipe (Optional[str], optional): Name of the cluster pipe file  (i.e. /tmp/chip_all_clusters_fifo_55441 or /tmp/chip_rvc_fifo_11111). Raises
-            FileNotFoundError if pipe file is not found. If None takes the value from the CI argument --app-pipe,  arg --app-pipe has his own file exists check.
+            command_dict (dict): dictionary with the command and data
+            app_pipe_prefix (Optional[str], optional): Name of the cluster pipe file prefix (i.e. /tmp/chip_all_clusters_fifo_ or /tmp/chip_rvc_fifo_). If None
+            takes the value from the CI argument --app-pipe-prefix.
+            app_pid (Optional[uint], optional): pid of the process for app_pipe_name. If None takes the value from the CI
+            argument --app-pid.
 
         This method uses the following environment variables:
 
@@ -979,16 +998,15 @@ class MatterBaseTest(base_test.BaseTestClass):
                  + Step 1: If you do not have a key, create one using ssh-keygen
                  + Step 2: Authorize this key on the remote host: run ssh-copy-id user@ip once, using your password
                  + Step 3: From now on ssh user@ip will no longer ask for your password
+
         """
-        # If is not empty from the args, verify if the fifo file exists.
-        if app_pipe is not None and not os.path.exists(app_pipe):
-            logging.error("Named pipe %r does NOT exist" % app_pipe)
-            raise FileNotFoundError("CANNOT FIND %r" % app_pipe)
 
-        if app_pipe is None:
-            app_pipe = self.matter_test_config.app_pipe
+        if app_pipe_prefix is None:
+            app_pipe_prefix = self.matter_test_config.app_pipe_prefix
+        if app_pid is None:
+            app_pid = self.matter_test_config.app_pid
 
-        if not isinstance(app_pipe, str):
+        if not isinstance(app_pipe_prefix, str):
             raise TypeError("The named pipe must be provided as a string value")
 
         if not isinstance(command_dict, dict):
@@ -998,10 +1016,23 @@ class MatterBaseTest(base_test.BaseTestClass):
         dut_ip = os.getenv('LINUX_DUT_IP')
 
         # Checks for concatenate app_pipe and app_pid
+        if not isinstance(app_pid, int):
+            raise TypeError("The --app-pid flag is not instance of int")
+        # Verify we have a valid app-id
+        if app_pid == 0:
+            asserts.fail("app_pid is 0 , is the flag --app-pid set?. app-id flag must be set in order to write to pipe.")
+        app_pipe_name = app_pipe_prefix + str(app_pid)
+
         if dut_ip is None:
-            with open(app_pipe, "w") as app_pipe_fp:
-                logger.info(f"Sending out-of-band command: {command} to file: {app_pipe}")
-                app_pipe_fp.write(json.dumps(command_dict) + "\n")
+            if not os.path.exists(app_pipe_name):
+                # Named pipes are unique, so we MUST have consistent PID/paths
+                # Set up for them to work.
+                logging.error("Named pipe %r does NOT exist" % app_pipe_name)
+                raise FileNotFoundError("CANNOT FIND %r" % app_pipe_name)
+            with open(app_pipe_name, "w") as app_pipe:
+                logger.info(f"Sending out-of-band command: {command} to file: {app_pipe_name}")
+                app_pipe.write(json.dumps(command_dict) + "\n")
+
             # TODO(#31239): remove the need for sleep
             # This was tested with matter.js as being reliable enough
             sleep(0.05)
@@ -1012,7 +1043,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
             logging.info(f"Using DUT user name: {dut_uname}")
             command_fixed = shlex.quote(json.dumps(command_dict))
-            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe)
+            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe_name)
             os.system(cmd)
 
     # Override this if the test requires a different default timeout.
@@ -1023,23 +1054,23 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     @property
     def runner_hook(self) -> TestRunnerHooks:
-        return global_stash.unstash_globally(self.user_params.get("hooks"))
+        return unstash_globally(self.user_params.get("hooks"))
 
     @property
     def matter_test_config(self) -> MatterTestConfig:
-        return global_stash.unstash_globally(self.user_params.get("matter_test_config"))
+        return unstash_globally(self.user_params.get("matter_test_config"))
 
     @property
     def default_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
-        return global_stash.unstash_globally(self.user_params.get("default_controller"))
+        return unstash_globally(self.user_params.get("default_controller"))
 
     @property
     def matter_stack(self) -> MatterStackState:
-        return global_stash.unstash_globally(self.user_params.get("matter_stack"))
+        return unstash_globally(self.user_params.get("matter_stack"))
 
     @property
     def certificate_authority_manager(self) -> chip.CertificateAuthority.CertificateAuthorityManager:
-        return global_stash.unstash_globally(self.user_params.get("certificate_authority_manager"))
+        return unstash_globally(self.user_params.get("certificate_authority_manager"))
 
     @property
     def dut_node_id(self) -> int:
@@ -1047,22 +1078,6 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def get_endpoint(self, default: Optional[int] = 0) -> int:
         return self.matter_test_config.endpoint if self.matter_test_config.endpoint is not None else default
-
-    def get_wifi_ssid(self, default: Optional[str] = 0) -> str:
-        ''' Get WiFi SSID
-
-            Get the WiFi networks name provided with flags
-
-        '''
-        return self.matter_test_config.wifi_ssid if self.matter_test_config.wifi_ssid is not None else default
-
-    def get_credentials(self, default: Optional[str] = 0) -> str:
-        ''' Get WiFi passphrase
-
-            Get the WiFi credentials provided with flags
-
-        '''
-        return self.matter_test_config.wifi_passphrase if self.matter_test_config.wifi_passphrase is not None else default
 
     def setup_class(self):
         super().setup_class()
@@ -1546,24 +1561,21 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step(step)
         self.mark_current_step_skipped()
 
-    def mark_all_remaining_steps_skipped(self, starting_step_number: typing.Union[int, str]) -> None:
-        """Mark all remaining test steps starting with provided starting step
-            starting_step_number gives the first step to be skipped, as defined in the TestStep.test_plan_number
-            starting_step_number must be provided, and is not derived intentionally.
-            By providing argument test is more deliberately identifying where test skips are starting from, 
-            making it easier to validate against the test plan for correctness.
-        Args:
-            starting_step_number (int,str): Number of name of the step to start skipping the steps.
+    def skip_all_remaining_steps(self, starting_step_number):
+        ''' Skips all remaining test steps starting with provided starting step
 
-        Returns nothing on success so the test can go on.
-        """
+            starting_step_number gives the first step to be skipped, as defined in the TestStep.test_plan_number
+            starting_step_number must be provided, and is not derived intentionally. By providing argument
+                test is more deliberately identifying where test skips are starting from, making
+                it easier to validate against the test plan for correctness.
+        '''
         steps = self.get_test_steps(self.current_test_info.name)
         for idx, step in enumerate(steps):
             if step.test_plan_number == starting_step_number:
                 starting_step_idx = idx
                 break
         else:
-            asserts.fail("mark_all_remaining_steps_skipped was provided with invalid starting_step_num")
+            asserts.fail("skip_all_remaining_steps was provided with invalid starting_step_num")
         remaining = steps[starting_step_idx:]
         for step in remaining:
             self.skip_step(step.test_plan_number)
@@ -1595,12 +1607,44 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step_skipped = False
 
     def get_setup_payload_info(self) -> List[SetupPayloadInfo]:
-        """
-        Get and builds the payload info provided in the execution.
-        Returns:
-            List[SetupPayloadInfo]: List of Payload used by the test case
-        """
-        return get_setup_payload_info_config(self.matter_test_config)
+        setup_payloads = []
+        for qr_code in self.matter_test_config.qr_code_content:
+            try:
+                setup_payloads.append(SetupPayload().ParseQrCode(qr_code))
+            except ChipStackError:
+                asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
+
+        for manual_code in self.matter_test_config.manual_code:
+            try:
+                setup_payloads.append(SetupPayload().ParseManualPairingCode(manual_code))
+            except ChipStackError:
+                asserts.fail(
+                    f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
+
+        infos = []
+        for setup_payload in setup_payloads:
+            info = SetupPayloadInfo()
+            info.passcode = setup_payload.setup_passcode
+            if setup_payload.short_discriminator is not None:
+                info.filter_type = discovery.FilterType.SHORT_DISCRIMINATOR
+                info.filter_value = setup_payload.short_discriminator
+            else:
+                info.filter_type = discovery.FilterType.LONG_DISCRIMINATOR
+                info.filter_value = setup_payload.long_discriminator
+            infos.append(info)
+
+        num_passcodes = 0 if self.matter_test_config.setup_passcodes is None else len(self.matter_test_config.setup_passcodes)
+        num_discriminators = 0 if self.matter_test_config.discriminators is None else len(self.matter_test_config.discriminators)
+        asserts.assert_equal(num_passcodes, num_discriminators, "Must have same number of discriminators as passcodes")
+        if self.matter_test_config.discriminators:
+            for idx, discriminator in enumerate(self.matter_test_config.discriminators):
+                info = SetupPayloadInfo()
+                info.passcode = self.matter_test_config.setup_passcodes[idx]
+                info.filter_type = DiscoveryFilterType.LONG_DISCRIMINATOR
+                info.filter_value = discriminator
+                infos.append(info)
+
+        return infos
 
     def wait_for_user_input(self,
                             prompt_msg: str,
@@ -1944,13 +1988,9 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
+    config.app_pid = 0 if args.app_pid is None else args.app_pid
     config.app_pipe = args.app_pipe
-    if config.app_pipe is not None and not os.path.exists(config.app_pipe):
-        # Named pipes are unique, so we MUST have consistent paths
-        # Verify from start the named pipe exists.
-        logging.error("Named pipe %r does NOT exist" % config.app_pipe)
-        raise FileNotFoundError("CANNOT FIND %r" % config.app_pipe)
-
+    config.app_pipe_prefix = args.app_pipe_prefix
     config.fail_on_skipped_tests = args.fail_on_skipped
 
     config.legacy = args.use_legacy_test_event_triggers
@@ -2009,7 +2049,10 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                              help='Node ID for primary DUT communication, '
                              'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
     basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
-    basic_group.add_argument('--app-pipe', type=str, default=None, help="The full path of the app to send an out-of-band command")
+    basic_group.add_argument('--app-pid', type=int, default=0, help="The PID of the app against which the test is going to run")
+    basic_group.add_argument('--app-pipe', type=str, default=None, help="The path of the app to send an out-of-band command")
+    basic_group.add_argument('--app-pipe_prefix', type=str, default=None,
+                             help="The path prefix of the app to send an out-of-band command")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
 
@@ -2145,6 +2188,18 @@ async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: End
     matching = [e for e in wildcard.attributes.keys()
                 if accept_function(wildcard, e)]
     return matching
+
+
+class CommissionDeviceTest(MatterBaseTest):
+    """Test class auto-injected at the start of test list to commission a device when requested"""
+
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.is_commissioning = True
+
+    def test_run_commissioning(self):
+        if not self.event_loop.run_until_complete(self.commission_devices()):
+            raise signals.TestAbortAll("Failed to commission node(s)")
 
 
 # TODO(#37537): Remove these temporary aliases after transition period

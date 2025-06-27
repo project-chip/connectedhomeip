@@ -26,7 +26,7 @@
 #     script-args: >
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --storage-path admin_storage.json
-#       --string-arg th_server_app_path:${CAMERA_APP}
+#       --string-arg th_server_app_path:out/linux-x64-camera/chip-camera-app
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -176,14 +176,14 @@ class TC_WebRTCRequestor_2_4(MatterBaseTest):
         )
 
         if self.is_pics_sdk_ci_only:
-            self.th_server.set_output_match("PeerConnection State: Connected")
+            self.th_server.set_output_match("Got a DataChannel with label")
             self.th_server.event.clear()
 
             try:
                 await self.send_command("webrtc provide-offer 3")
                 # Wait up to 90s until the provider logs that the data‑channel opened
                 if not self.th_server.event.wait(90):
-                    raise TimeoutError("PeerConnection is not connected within 90s")
+                    raise TimeoutError("DataChannel did not open within 90s")
                 resp = 'Y'
             except TimeoutError:
                 resp = 'N'

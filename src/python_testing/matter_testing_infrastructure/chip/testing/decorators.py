@@ -25,7 +25,7 @@ import asyncio
 import logging
 from enum import IntFlag
 from functools import partial
-from typing import TYPE_CHECKING, Callable, Type
+from typing import TYPE_CHECKING, Callable
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
@@ -41,7 +41,7 @@ EndpointCheckFunction = Callable[[
     Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
 
 
-def _has_cluster(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse, endpoint: int, cluster: Type[ClusterObjects.Cluster]) -> bool:
+def _has_cluster(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse, endpoint: int, cluster: ClusterObjects.Cluster) -> bool:
     """Check if a cluster exists on a specific endpoint.
 
     Args:
@@ -95,7 +95,7 @@ def _has_attribute(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadRespons
         ValueError: If AttributeList value is not a list type
         KeyError: If attribute's cluster_id is not found in ALL_CLUSTERS
     """
-    cluster: Type[ClusterObjects.Cluster] = ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
+    cluster = ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
 
     if endpoint not in wildcard.attributes:
         return False
@@ -103,14 +103,10 @@ def _has_attribute(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadRespons
     if cluster not in wildcard.attributes[endpoint]:
         return False
 
-    # Mypy can't verify that cluster subclasses have Attributes, because the Attribute subclass does not
-    # appear in the base class. However, cluster classes are generated code and all derived cluster classes
-    # are guaranteed to have attributes because the global attributes are included.
-    if cluster.Attributes.AttributeList not in wildcard.attributes[endpoint][cluster]:  # type: ignore[attr-defined]
+    if cluster.Attributes.AttributeList not in wildcard.attributes[endpoint][cluster]:
         return False
 
-    # Mypy can't verify that cluster subclasses have Attributes, but they do at runtime
-    attr_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AttributeList]  # type: ignore[attr-defined]
+    attr_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AttributeList]
     if not isinstance(attr_list, list):
         raise ValueError(
             f"Failed to read mandatory AttributeList attribute value for cluster {cluster} on endpoint {endpoint}: {attr_list}.")
@@ -157,7 +153,7 @@ def _has_command(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse,
         ValueError: If AcceptedCommandList value is not a list type
         KeyError: If command's cluster_id is not found in ALL_CLUSTERS
     """
-    cluster: Type[ClusterObjects.Cluster] = ClusterObjects.ALL_CLUSTERS[command.cluster_id]
+    cluster = ClusterObjects.ALL_CLUSTERS[command.cluster_id]
 
     if endpoint not in wildcard.attributes:
         return False
@@ -165,12 +161,10 @@ def _has_command(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse,
     if cluster not in wildcard.attributes[endpoint]:
         return False
 
-    # Mypy can't verify that cluster subclasses have Attributes, but they do at runtime
-    if cluster.Attributes.AcceptedCommandList not in wildcard.attributes[endpoint][cluster]:  # type: ignore[attr-defined]
+    if cluster.Attributes.AcceptedCommandList not in wildcard.attributes[endpoint][cluster]:
         return False
 
-    # Mypy can't verify that cluster subclasses have Attributes, but they do at runtime
-    cmd_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AcceptedCommandList]  # type: ignore[attr-defined]
+    cmd_list = wildcard.attributes[endpoint][cluster][cluster.Attributes.AcceptedCommandList]
     if not isinstance(cmd_list, list):
         raise ValueError(
             f"Failed to read mandatory AcceptedCommandList command value for cluster {cluster} on endpoint {endpoint}: {cmd_list}.")
@@ -208,12 +202,10 @@ def _has_feature(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse,
     if cluster not in wildcard.attributes[endpoint]:
         return False
 
-    # Mypy can't verify that cluster subclasses have Attributes, but they do at runtime
-    if cluster.Attributes.FeatureMap not in wildcard.attributes[endpoint][cluster]:  # type: ignore[attr-defined]
+    if cluster.Attributes.FeatureMap not in wildcard.attributes[endpoint][cluster]:
         return False
 
-    # Mypy can't verify that cluster subclasses have Attributes, but they do at runtime
-    feature_map = wildcard.attributes[endpoint][cluster][cluster.Attributes.FeatureMap]  # type: ignore[attr-defined]
+    feature_map = wildcard.attributes[endpoint][cluster][cluster.Attributes.FeatureMap]
     if not isinstance(feature_map, int):
         raise ValueError(
             f"Failed to read mandatory FeatureMap attribute value for cluster {cluster} on endpoint {endpoint}: {feature_map}.")
