@@ -24,8 +24,8 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/attribute-storage.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/TimeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -34,8 +34,8 @@ using namespace chip::app::Clusters::ClosureControl;
 using namespace chip::app::Clusters::ClosureDimension;
 
 namespace {
-constexpr uint32_t kDefaultCountdownTimeSeconds = 10; // 10 seconds
-constexpr uint32_t kCalibrateTimerMs  = 10000; // 10 seconds
+constexpr uint32_t kDefaultCountdownTimeSeconds = 10;    // 10 seconds
+constexpr uint32_t kCalibrateTimerMs            = 10000; // 10 seconds
 
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
@@ -137,8 +137,8 @@ void ClosureManager::InitiateAction(AppEvent * event)
     // If this happens, we log an error and do not proceed with initiating the action.
     if (eventAction != instance.GetCurrentAction())
     {
-        ChipLogError(AppServer, "Got Event for %d in InitiateAction while current ongoing action is %d",
-                     to_underlying(eventAction), to_underlying(instance.GetCurrentAction()));
+        ChipLogError(AppServer, "Got Event for %d in InitiateAction while current ongoing action is %d", to_underlying(eventAction),
+                     to_underlying(instance.GetCurrentAction()));
         return;
     }
 
@@ -215,8 +215,8 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
 
 chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
 {
-    VerifyOrReturnValue(ep1.GetLogic().SetCountdownTimeFromDelegate(kDefaultCountdownTimeSeconds) == CHIP_NO_ERROR,
-            Status::Failure, ChipLogError(AppServer, "Failed to set countdown time for calibration"));
+    VerifyOrReturnValue(ep1.GetLogic().SetCountdownTimeFromDelegate(kDefaultCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
+                        ChipLogError(AppServer, "Failed to set countdown time for calibration"));
 
     SetCurrentAction(Action_t::CALIBRATE_ACTION);
     mCurrentActionEndpointId = ep1.GetEndpointId();

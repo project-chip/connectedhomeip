@@ -209,10 +209,8 @@ void ClosureControlEndpoint::OnStopMotionActionComplete()
     // Set the OverallTarget latch to False as motion was in progress and latch will be disengaged.
     if (overallTargetState.IsNull())
     {
-        overallTargetState.SetNonNull(GenericOverallTargetState(
-                                        NullOptional,
-                                        MakeOptional(DataModel::MakeNullable(false)),
-                                        NullOptional));
+        overallTargetState.SetNonNull(
+            GenericOverallTargetState(NullOptional, MakeOptional(DataModel::MakeNullable(false)), NullOptional));
     }
     else
     {
