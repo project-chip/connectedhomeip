@@ -80,6 +80,19 @@ class EEVSEBaseTestHelper:
             asserts.assert_equal(e.status, expected_status,
                                  "Unexpected error returned")
 
+    async def send_enable_discharge_command(self, endpoint: int = None, discharge_until: int = None, timedRequestTimeoutMs: int = 3000,
+                                            max_discharge: int = 32000, expected_status: Status = Status.Success):
+        try:
+            await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.EnableDischarging(
+                dischargingEnabledUntil=discharge_until,
+                maximumDischargeCurrent=max_discharge),
+                endpoint=endpoint,
+                timedRequestTimeoutMs=timedRequestTimeoutMs)
+
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, expected_status,
+                                 "Unexpected error returned")
+
     async def send_disable_command(self, endpoint: int = None, timedRequestTimeoutMs: int = 3000, expected_status: Status = Status.Success):
         try:
             await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.Disable(),
