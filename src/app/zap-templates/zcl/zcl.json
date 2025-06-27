@@ -231,7 +231,6 @@
             "CurrentDayEntry",
             "NextDayEntry"
         ],
-        "Commodity Metering": [],
         "Descriptor": ["ClusterRevision", "FeatureMap"],
         "Device Energy Management": [
             "ESAType",
