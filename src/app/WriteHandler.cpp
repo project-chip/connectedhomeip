@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include "data-model-provider/MetadataTypes.h"
+#include "lib/core/DataModelTypes.h"
 #include <app/AppConfig.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeValueDecoder.h>
@@ -821,29 +823,27 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
         }
     }
 
-    // validate that timed write is enforced
+    // SPEC:
+    //   Else if the path indicates specific attribute data that requires a Timed Write
+    //   transaction to write and this action is not part of a Timed Write transaction,
+    //   an AttributeStatusIB SHALL be generated with the NEEDS_TIMED_INTERACTION Status Code.
     VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kTimed),
                         Status::NeedsTimedInteraction);
 
-    // TODO: spec requires a "write to a fabric scoped list" check
-    //       here (in between timed write and version checks).
-    //
-    //       This should be added here.
-    //
-    //       ...
-    //       - Else if the path indicates specific attribute data that requires a Timed Write
-    //         transaction to write and this action is not part of a Timed Write transaction,
-    //         an AttributeStatusIB SHALL be generated with the NEEDS_TIMED_INTERACTION Status Code.
-    //
-    // THIS => Else if the attribute in the path indicates a fabric-scoped list and there is no accessing
-    //         fabric, an AttributeStatusIB SHALL be generated with the UNSUPPORTED_ACCESS Status Code,
-    //         with the Path field indicating only the path to the attribute.
-    //
-    //       - Else if the DataVersion field of the AttributeDataIB is present and does not match the
-    //         data version of the indicated cluster instance, an AttributeStatusIB SHALL be generated
-    //         with the DATA_VERSION_MISMATCH Status Code.
-    //       ...
+    // SPEC:
+    //   Else if the attribute in the path indicates a fabric-scoped list and there is no accessing
+    //   fabric, an AttributeStatusIB SHALL be generated with the UNSUPPORTED_ACCESS Status Code,
+    //   with the Path field indicating only the path to the attribute.
+    if (attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kListAttribute) &&
+        attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kFabricScoped))
+    {
+        VerifyOrReturnError(aSubject.fabricIndex != kUndefinedFabricIndex, Status::UnsupportedAccess);
+    }
 
+    // SPEC:
+    //   Else if the DataVersion field of the AttributeDataIB is present and does not match the
+    //   data version of the indicated cluster instance, an AttributeStatusIB SHALL be generated
+    //   with the DATA_VERSION_MISMATCH Status Code.
     if (aPath.mDataVersion.HasValue())
     {
         DataModel::ServerClusterFinder clusterFinder(mDataModelProvider);
