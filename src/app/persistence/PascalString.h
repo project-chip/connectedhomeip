@@ -84,7 +84,7 @@ public:
     template <size_t N>
     PascalBuffer(T (&data)[N]) : mData(data), mMaxSize(N - PREFIX_LEN)
     {
-        static_assert(N > 0);
+        static_assert(N >= PREFIX_LEN);
         static_assert(N <= kInvalidLength);
     }
 
