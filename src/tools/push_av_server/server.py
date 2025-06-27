@@ -550,7 +550,7 @@ class PushAvServer:
         if stream.get('strict_mode', False):
             raise HTTPException(404, "Wrong path. Fragments should follow Matter's specificied path.")
 
-        logging.debug("processing to store fiel via any_upload")
+        logging.debug("processing to store field via any_upload")
         dst = self.wd.mkdir("streams", str(stream_id), file_path, is_file=True)
 
         return await self._handle_upload(dst, req)
