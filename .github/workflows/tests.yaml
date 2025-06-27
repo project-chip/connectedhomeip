@@ -229,7 +229,8 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/sample-mei-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/electrical-energy-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/electrical-power-measurement-cluster.xml \
-                      src/app/zap-templates/zcl/data-model/chip/zone-management-cluster.xml \"
+                      src/app/zap-templates/zcl/data-model/chip/zone-management-cluster.xml \
+                  "
             - name: Build Apps
               run: |
                   ./scripts/run_in_build_env.sh \
