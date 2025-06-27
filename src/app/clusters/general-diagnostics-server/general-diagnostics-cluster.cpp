@@ -85,7 +85,7 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
         uint32_t features = 0;
 
 #if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
-        features |= to_underlying(Clusters::Feature::kDataModelTest);
+        features |= to_underlying(Clusters::GeneralDiagnostics::Feature::kDataModelTest);
 #endif // CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
 
         return encoder.Encode(features);

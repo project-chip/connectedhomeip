@@ -22,11 +22,6 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <lib/core/CHIPError.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/GeneralFaults.h>
-
-using namespace chip::app::Clusters::GeneralDiagnostics;
-using namespace chip::app::Clusters::GeneralDiagnostics::Attributes;
-using namespace chip::DeviceLayer;
 
 namespace chip {
 namespace app {
@@ -51,23 +46,23 @@ public:
     GeneralDiagnosticsLogic(const GeneralDiagnosticsEnabledAttributes enabledAttributes) : mEnabledAttributes(enabledAttributes) {}
     ~GeneralDiagnosticsLogic() = default;
 
-    CHIP_ERROR GetRebootCount(uint16_t & rebotCount) const { return GetDiagnosticDataProvider().GetRebootCount(rebotCount); }
+    CHIP_ERROR GetRebootCount(uint16_t & rebootCount) const { return chip::DeviceLayer::GetDiagnosticDataProvider().GetRebootCount(rebootCount); }
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) const
     {
-        return GetDiagnosticDataProvider().GetTotalOperationalHours(totalOperationalHours);
+        return chip::DeviceLayer::GetDiagnosticDataProvider().GetTotalOperationalHours(totalOperationalHours);
     }
-    CHIP_ERROR GetBootReason(BootReasonEnum & bootReason) const { return GetDiagnosticDataProvider().GetBootReason(bootReason); }
-    CHIP_ERROR GetActiveHardwareFaults(GeneralFaults<DeviceLayer::kMaxHardwareFaults> & hardwareFaults) const
+    CHIP_ERROR GetBootReason(chip::app::Clusters::GeneralDiagnostics::BootReasonEnum & bootReason) const { return chip::DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason); }
+    CHIP_ERROR GetActiveHardwareFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & hardwareFaults) const
     {
-        return GetDiagnosticDataProvider().GetActiveHardwareFaults(hardwareFaults);
+        return chip::DeviceLayer::GetDiagnosticDataProvider().GetActiveHardwareFaults(hardwareFaults);
     }
-    CHIP_ERROR GetActiveRadioFaults(GeneralFaults<DeviceLayer::kMaxRadioFaults> & radioFaults) const
+    CHIP_ERROR GetActiveRadioFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & radioFaults) const
     {
-        return GetDiagnosticDataProvider().GetActiveRadioFaults(radioFaults);
+        return chip::DeviceLayer::GetDiagnosticDataProvider().GetActiveRadioFaults(radioFaults);
     }
-    CHIP_ERROR GetActiveNetworkFaults(GeneralFaults<DeviceLayer::kMaxNetworkFaults> & networkFaults) const
+    CHIP_ERROR GetActiveNetworkFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & networkFaults) const
     {
-        return GetDiagnosticDataProvider().GetActiveNetworkFaults(networkFaults);
+        return chip::DeviceLayer::GetDiagnosticDataProvider().GetActiveNetworkFaults(networkFaults);
     }
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
 
