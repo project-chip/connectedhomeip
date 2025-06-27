@@ -383,7 +383,8 @@ class MdnsDiscovery:
 
         if is_discovered:
             if not service_info.decoded_properties:
-                logging.info(f"TXT Record found but no properties for service {service_name} of type {service_type}, attempting to recover from cache.")
+                logging.info(
+                    f"TXT Record found but no properties for service {service_name} of type {service_type}, attempting to recover from cache.")
                 for service, records in self._azc.zeroconf.cache.cache.items():
                     for _, dns_record in records.items():
                         if service_name.lower() == dns_record.name.lower():
