@@ -201,30 +201,19 @@ protected:
      */
     template <typename RequestT, typename FuncT,
               typename std::enable_if_t<!DataModel::IsFabricScoped<RequestT>::value, bool> = true>
-    void HandleCommand(HandlerContext & handlerContext, FuncT func)
+    __attribute__((always_inline)) inline void HandleCommand(HandlerContext & handlerContext, FuncT func)
     {
-        if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mClusterId == RequestT::GetClusterId()) &&
-            (handlerContext.mRequestPath.mCommandId == RequestT::GetCommandId()))
+        if (!PrehandleCommand(handlerContext, RequestT::GetClusterId(), RequestT::GetCommandId()))
         {
-            RequestT requestPayload;
-
-            //
-            // If the command matches what the caller is looking for, let's mark this as being handled
-            // even if errors happen after this. This ensures that we don't execute any fall-back strategies
-            // to handle this command since at this point, the caller is taking responsibility for handling
-            // the command in its entirety, warts and all.
-            //
-            handlerContext.SetCommandHandled();
-
-            if (DataModel::Decode(handlerContext.mPayload, requestPayload) != CHIP_NO_ERROR)
-            {
-                handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
-                                                         Protocols::InteractionModel::Status::InvalidCommand);
-                return;
-            }
-
-            func(handlerContext, requestPayload);
+            return;
         }
+        RequestT requestPayload;
+        if (!HandleDecode(handlerContext, DataModel::Decode(handlerContext.mPayload, requestPayload)))
+        {
+            return;
+        }
+
+        func(handlerContext, requestPayload);
     }
 
     /*
@@ -239,13 +228,27 @@ protected:
      *  void Func(HandlerContext &handlerContext, const RequestT &requestPayload);
      */
     template <typename RequestT, typename FuncT, typename std::enable_if_t<DataModel::IsFabricScoped<RequestT>::value, bool> = true>
-    void HandleCommand(HandlerContext & handlerContext, FuncT func)
+    __attribute__((always_inline)) inline void HandleCommand(HandlerContext & handlerContext, FuncT func)
     {
-        if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mClusterId == RequestT::GetClusterId()) &&
-            (handlerContext.mRequestPath.mCommandId == RequestT::GetCommandId()))
+        if (!PrehandleCommand(handlerContext, RequestT::GetClusterId(), RequestT::GetCommandId()))
         {
-            RequestT requestPayload;
+            return;
+        }
+        RequestT requestPayload;
+        if (!HandleDecode(handlerContext,
+                          requestPayload.Decode(handlerContext.mPayload, handlerContext.mCommandHandler.GetAccessingFabricIndex())))
+        {
+            return;
+        }
 
+        func(handlerContext, requestPayload);
+    }
+
+    inline bool PrehandleCommand(HandlerContext & handlerContext, ClusterId expectedClusterId, CommandId expectedCommandId)
+    {
+        if (!handlerContext.mCommandHandled && (handlerContext.mRequestPath.mClusterId == expectedClusterId) &&
+            (handlerContext.mRequestPath.mCommandId == expectedCommandId))
+        {
             //
             // If the command matches what the caller is looking for, let's mark this as being handled
             // even if errors happen after this. This ensures that we don't execute any fall-back strategies
@@ -254,16 +257,21 @@ protected:
             //
             handlerContext.SetCommandHandled();
 
-            if (requestPayload.Decode(handlerContext.mPayload, handlerContext.mCommandHandler.GetAccessingFabricIndex()) !=
-                CHIP_NO_ERROR)
-            {
-                handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath,
-                                                         Protocols::InteractionModel::Status::InvalidCommand);
-                return;
-            }
-
-            func(handlerContext, requestPayload);
+            return true;
         }
+
+        return false;
+    }
+
+    inline bool HandleDecode(HandlerContext & handlerContext, CHIP_ERROR decodeStatus)
+    {
+        if (decodeStatus == CHIP_NO_ERROR)
+        {
+            return true;
+        }
+
+        handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Protocols::InteractionModel::Status::InvalidCommand);
+        return false;
     }
 
     Optional<EndpointId> GetEndpointId() { return mEndpointId; }
