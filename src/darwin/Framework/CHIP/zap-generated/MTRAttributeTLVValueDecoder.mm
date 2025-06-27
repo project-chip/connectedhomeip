@@ -10879,26 +10879,26 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
         }
         return value;
     }
-    case Attributes::OverallState::Id: {
-        using TypeInfo = Attributes::OverallState::TypeInfo;
+    case Attributes::OverallCurrentState::Id: {
+        using TypeInfo = Attributes::OverallCurrentState::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        MTRClosureControlClusterOverallStateStruct * _Nullable value;
+        MTRClosureControlClusterOverallCurrentStateStruct * _Nullable value;
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [MTRClosureControlClusterOverallStateStruct new];
-            if (cppValue.Value().positioning.HasValue()) {
-                if (cppValue.Value().positioning.Value().IsNull()) {
-                    value.positioning = nil;
+            value = [MTRClosureControlClusterOverallCurrentStateStruct new];
+            if (cppValue.Value().position.HasValue()) {
+                if (cppValue.Value().position.Value().IsNull()) {
+                    value.position = nil;
                 } else {
-                    value.positioning = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().positioning.Value().Value())];
+                    value.position = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().position.Value().Value())];
                 }
             } else {
-                value.positioning = nil;
+                value.position = nil;
             }
             if (cppValue.Value().latch.HasValue()) {
                 if (cppValue.Value().latch.Value().IsNull()) {
@@ -10910,11 +10910,7 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
                 value.latch = nil;
             }
             if (cppValue.Value().speed.HasValue()) {
-                if (cppValue.Value().speed.Value().IsNull()) {
-                    value.speed = nil;
-                } else {
-                    value.speed = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().speed.Value().Value())];
-                }
+                value.speed = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().speed.Value())];
             } else {
                 value.speed = nil;
             }
@@ -10930,25 +10926,33 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
         }
         return value;
     }
-    case Attributes::OverallTarget::Id: {
-        using TypeInfo = Attributes::OverallTarget::TypeInfo;
+    case Attributes::OverallTargetState::Id: {
+        using TypeInfo = Attributes::OverallTargetState::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
-        MTRClosureControlClusterOverallTargetStruct * _Nullable value;
+        MTRClosureControlClusterOverallTargetStateStruct * _Nullable value;
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [MTRClosureControlClusterOverallTargetStruct new];
+            value = [MTRClosureControlClusterOverallTargetStateStruct new];
             if (cppValue.Value().position.HasValue()) {
-                value.position = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().position.Value())];
+                if (cppValue.Value().position.Value().IsNull()) {
+                    value.position = nil;
+                } else {
+                    value.position = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value().position.Value().Value())];
+                }
             } else {
                 value.position = nil;
             }
             if (cppValue.Value().latch.HasValue()) {
-                value.latch = [NSNumber numberWithBool:cppValue.Value().latch.Value()];
+                if (cppValue.Value().latch.Value().IsNull()) {
+                    value.latch = nil;
+                } else {
+                    value.latch = [NSNumber numberWithBool:cppValue.Value().latch.Value().Value()];
+                }
             } else {
                 value.latch = nil;
             }
@@ -10958,6 +10962,17 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
                 value.speed = nil;
             }
         }
+        return value;
+    }
+    case Attributes::LatchControlModes::Id: {
+        using TypeInfo = Attributes::LatchControlModes::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nonnull value;
+        value = [NSNumber numberWithUnsignedChar:cppValue.Raw()];
         return value;
     }
     default: {
