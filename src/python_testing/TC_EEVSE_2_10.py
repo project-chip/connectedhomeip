@@ -70,6 +70,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
     def steps_TC_EEVSE_2_10(self) -> list[TestStep]:
         steps = [
             TestStep("1", "Commissioning, already done", is_commissioning=True),
+            TestStep("1a", "Set up a subscription to all EnergyEVSE cluster events"),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
             TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for Basic Functionality Test Event",
@@ -84,37 +85,37 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
                      "Verify DUT responds w/ status SUCCESS(0x00) and event EVConnected sent"),
             TestStep("4a", "TH reads from the DUT the State",
                      "Value has to be 0x01 (PluggedInNoDemand)"),
-            TestStep("5", "TH sends command EnableCharging with ChargingEnabledUntil=10 seconds in the future, minimumChargeCurrent=6000, maximumChargeCurrent=60000",
+            TestStep("5", "TH sends command EnableCharging with ChargingEnabledUntil=10 seconds in the future, MinimumChargeCurrent=6000, MaximumChargeCurrent=60000. Store the ChargingEnabledUntil into Matter EPOCH in UTC as ChargingEnabledUntilEpochTime, MinimumChargeCurrent as MinimumChargeCurrent and MaximumChargeCurrent as MaximumChargeCurrent",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep("6a", "TH reads from the DUT the SupplyState",
                      "Value has to be 0x01 (ChargingEnabled)"),
-            TestStep("7", "TH sends command EnableDischarging with DischargingEnabledUntil=5 seconds in the future, maximumDischargeCurrent=32000",
+            TestStep("7", "TH sends command EnableDischarging with DischargingEnabledUntil=5 seconds in the future, MaximumDischargeCurrent=32000. Store the DischargingEnabledUntil into Matter EPOCH in UTC as DischargingEnabledUntilEpochTime, MaximumDischargeCurrent as MaximumDischargeCurrent",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep("7a", "TH reads from the DUT the SupplyState",
                      "Value has to be 0x05 (Enabled)"),
             TestStep("7b", "TH reads from the DUT the ChargingEnabledUntil",
-                     "Value has to be the ChargingEnabledUntil commanded value"),
+                     "Value has to be the ChargingEnabledUntilEpochTime"),
             TestStep("7c", "TH reads from the DUT the MinimumChargeCurrent",
-                     "Value has to be the minimumChargeCurrent commanded value"),
+                     "Value has to be the MinimumChargeCurrent"),
             TestStep("7d", "TH reads from the DUT the CircuitCapacity",
                      "Store the value as CircuitCapacity"),
             TestStep("7e", "TH reads from the DUT the MaximumChargeCurrent",
-                     "Value has to be the minimum value of (maximumChargeCurrent commanded value,CircuitCapacity)"),
+                     "Value has to be the minimum value of MaximumChargeCurrent and CircuitCapacity"),
             TestStep("7f", "TH reads from the DUT the DischargingEnabledUntil",
-                     "Value has to be the DischargingEnabledUntil commanded value"),
+                     "Value has to be the DischargingEnabledUntilEpochTime"),
             TestStep("7g", "TH reads from the DUT the MaximumDischargeCurrent",
-                     "Value has to be the minimum value of (maximumDischargeCurrent commanded value,CircuitCapacity)"),
+                     "Value has to be the minimum value of MaximumDischargeCurrent and CircuitCapacity"),
             TestStep("8", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Charge Demand Test Event",
-                     "Verify DUT responds w/ status SUCCESS(0x00) and event EnergyTransferStarted sent containing MaximumCurrent with maximumChargeCurrent value determined in step 8d, and MaximumDischargeCurrent having the maximumDischargeCurrent as determined in step 9d."),
+                     "Verify DUT responds w/ status SUCCESS(0x00) and event EnergyTransferStarted sent containing MaximumCurrent with MaximumChargeCurrent value determined in step 7e, and MaximumDischargeCurrent having the MaximumDischargeCurrent as determined in step 7g."),
             TestStep("9", "Wait 7 seconds"),
             TestStep("9a", "TH reads from the DUT the SupplyState",
                      "Value has to be 0x01 (ChargingEnabled)"),
             TestStep("9b", "TH reads from the DUT the ChargingEnabledUntil",
-                     "Value has to be the ChargingEnabledUntil commanded value"),
+                     "Value has to be the ChargingEnabledUntilEpochTime"),
             TestStep("9c", "TH reads from the DUT the MinimumChargeCurrent",
-                     "Value has to be the minimumChargeCurrent commanded value"),
+                     "Value has to be the MinimumChargeCurrent"),
             TestStep("9d", "TH reads from the DUT the MaximumChargeCurrent",
-                     "Value has to be the minimum value of (maximumChargeCurrent commanded value,CircuitCapacity)"),
+                     "Value has to be the minimum value of MaximumChargeCurrent and CircuitCapacity"),
             TestStep("9e", "TH reads from the DUT the DischargingEnabledUntil",
                      "Value has to be 0"),
             TestStep("9f", "TH reads from the DUT the MaximumDischargeCurrent",
@@ -128,7 +129,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
                      "Value has to be 0"),
             TestStep("10d", "TH reads from the DUT the MaximumChargeCurrent",
                      "Value has to be 0"),
-            TestStep("11", "TH sends command EnableDischarging with DischargingEnabledUntil=null, maximumDischargeCurrent=12000",
+            TestStep("11", "TH sends command EnableDischarging with DischargingEnabledUntil=null, maximumDischargeCurrent=12000. Store MaximumDischargeCurrent as MaximumDischargeCurrent",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep("11a", "TH reads from the DUT the SupplyState",
                      "Value has to be 0x02 (DischargingEnabled)"),
@@ -141,7 +142,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("11e", "TH reads from the DUT the DischargingEnabledUntil",
                      "Value has to be null"),
             TestStep("11f", "TH reads from the DUT the MaximumDischargeCurrent",
-                     "Value has to be minimum value of (maximumDischargeCurrent commanded value,CircuitCapacity)"),
+                     "Value has to be minimum value of MaximumDischargeCurrent and CircuitCapacity"),
             TestStep("12", "TH sends command Disable",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep("12a", "TH reads from the DUT the SupplyState",
@@ -170,7 +171,8 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
         self.step("1")
         # Commissioning, already done
 
-        # Subscribe to Events and when they are sent push them to a queue for checking later
+        self.step("1a")
+        # Set up a subscription to all EnergyEVSE cluster events
         events_callback = EventChangeCallback(cluster)
         await events_callback.start(self.default_controller,
                                     self.dut_node_id,
@@ -219,8 +221,11 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
         await self.check_evse_attribute("State", expected_state)
 
         self.step("5")
+
         # TH sends command EnableCharging with ChargingEnabledUntil=10 seconds in the future,
-        # minimumChargeCurrent=6000, maximumChargeCurrent=60000
+        # MinimumChargeCurrent=6000, MaximumChargeCurrent=60000.
+        # Store the ChargingEnabledUntil into Matter EPOCH in UTC as ChargingEnabledUntilEpochTime,
+        # MinimumChargeCurrent as MinimumChargeCurrent and MaximumChargeCurrent as MaximumChargeCurrent
         # Verify DUT responds w/ status SUCCESS(0x00)
         charging_duration = 10  # seconds
         min_charge_current = 6000
@@ -240,7 +245,9 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
         await self.check_evse_attribute("SupplyState", cluster.Enums.SupplyStateEnum.kChargingEnabled)
 
         self.step("7")
-        # TH sends command EnableDischarging with DischargingEnabledUntil=5 seconds in the future, maximumDischargeCurrent=32000
+        # TH sends command EnableDischarging with DischargingEnabledUntil=5 seconds in the future, MaximumDischargeCurrent=32000.
+        # Store the DischargingEnabledUntil into Matter EPOCH in UTC as DischargingEnabledUntilEpochTime,
+        # MaximumDischargeCurrent as MaximumDischargeCurrent
         # Verify DUT responds w/ status SUCCESS(0x00)
         discharging_duration = 5  # seconds
         utc_time_discharging_end = datetime.now(
@@ -258,12 +265,12 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("7b")
         # TH reads from the DUT the ChargingEnabledUntil
-        # Value has to be the ChargingEnabledUntil commanded value
+        # Value has to be the ChargingEnabledUntilEpochTime
         await self.check_evse_attribute("ChargingEnabledUntil", charging_end_epoch_time)
 
         self.step("7c")
         # TH reads from the DUT the MinimumChargeCurrent
-        # Value has to be the minimumChargeCurrent commanded value
+        # Value has to be the MinimumChargeCurrent
         await self.check_evse_attribute("MinimumChargeCurrent", min_charge_current)
 
         self.step("7d")
@@ -279,18 +286,18 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("7e")
         # TH reads from the DUT the MaximumChargeCurrent
-        # Value has to be the minimum value of (maximumChargeCurrent commanded value,CircuitCapacity)
+        # Value has to be the minimum value of MaximumChargeCurrent and CircuitCapacity
         expected_maximum_charge_current = min(max_charge_current, circuit_capacity)
         await self.check_evse_attribute("MaximumChargeCurrent", expected_maximum_charge_current)
 
         self.step("7f")
         # TH reads from the DUT the DischargingEnabledUntil
-        # Value has to be the DischargingEnabledUntil commanded value
+        # Value has to be the DischargingEnabledUntilEpochTime
         await self.check_evse_attribute("DischargingEnabledUntil", discharging_end_epoch_time)
 
         self.step("7g")
         # TH reads from the DUT the MaximumDischargeCurrent
-        # Value has to be the minimum value of (maximumDischargeCurrent commanded value,CircuitCapacity)
+        # Value has to be the minimum value of MaximumDischargeCurrent and CircuitCapacity
         expected_maximum_discharge_current = min(maximum_discharge_current, circuit_capacity)
         await self.check_evse_attribute("MaximumDischargeCurrent", expected_maximum_discharge_current)
 
@@ -299,8 +306,8 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
         # EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to
         # PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Charge Demand Test Event
         # Verify DUT responds w/ status SUCCESS(0x00) and event EnergyTransferStarted sent
-        # containing MaximumCurrent with maximumChargeCurrent value determined in step 8d,
-        # and MaximumDischargeCurrent having the maximumDischargeCurrent as determined in step 9d.
+        # containing MaximumChargeCurrent value determined in step 7e, and MaximumDischargeCurrent
+        # having the MaximumDischargeCurrent as determined in step 7g.
         await self.send_test_event_trigger_charge_demand()
         event_data = events_callback.wait_for_event_report(cluster.Events.EnergyTransferStarted)
         maximum_current = event_data.maximumCurrent
@@ -326,17 +333,17 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("9b")
         # TH reads from the DUT the ChargingEnabledUntil
-        # Value has to be the ChargingEnabledUntil commanded value
+        # Value has to be the ChargingEnabledUntilEpochTime
         await self.check_evse_attribute("ChargingEnabledUntil", charging_end_epoch_time)
 
         self.step("9c")
         # TH reads from the DUT the MinimumChargeCurrent
-        # Value has to be the minimumChargeCurrent commanded value
+        # Value has to be the MinimumChargeCurrent
         await self.check_evse_attribute("MinimumChargeCurrent", min_charge_current)
 
         self.step("9d")
         # TH reads from the DUT the MaximumChargeCurrent
-        # Value has to be the minimum value of (maximumChargeCurrent commanded value,CircuitCapacity)
+        # Value has to be the minimum value of MaximumChargeCurrent and CircuitCapacity
         expected_maximum_charge_current = min(max_charge_current, circuit_capacity)
         await self.check_evse_attribute("MaximumChargeCurrent", expected_maximum_charge_current)
 
@@ -382,7 +389,8 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
         # and the EV is still connected.
 
         self.step("11")
-        # TH sends command EnableDischarging with DischargingEnabledUntil=null, maximumDischargeCurrent=12000
+        # TH sends command EnableDischarging with DischargingEnabledUntil=null,
+        # maximumDischargeCurrent=12000. Store MaximumDischargeCurrent as MaximumDischargeCurrent
         # Verify DUT responds w/ status SUCCESS(0x00)
         maximum_discharge_current = 12000
         await self.send_enable_discharge_command(maximum_discharge_current=maximum_discharge_current)
@@ -414,7 +422,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("11f")
         # TH reads from the DUT the MaximumDischargeCurrent
-        # Value has to be minimum value of (maximumDischargeCurrent commanded value,CircuitCapacity)
+        # Value has to be minimum value of MaximumDischargeCurrent and CircuitCapacity
         expected_maximum_discharge_current = min(maximum_discharge_current, circuit_capacity)
         await self.check_evse_attribute("MaximumDischargeCurrent", expected_maximum_discharge_current)
 
