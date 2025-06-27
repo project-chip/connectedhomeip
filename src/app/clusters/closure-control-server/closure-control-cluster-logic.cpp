@@ -355,6 +355,7 @@ CHIP_ERROR ClusterLogic::SetLatchControlModes(const BitFlags<LatchControlModesBi
 
 CHIP_ERROR ClusterLogic::AddErrorToCurrentErrorList(ClosureErrorEnum error)
 {
+    assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(EnsureKnownEnumValue(error) != ClosureErrorEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
     // Check for duplicates
@@ -366,7 +367,9 @@ CHIP_ERROR ClusterLogic::AddErrorToCurrentErrorList(ClosureErrorEnum error)
     VerifyOrReturnError(mCurrentErrorCount < kCurrentErrorListMaxSize, CHIP_ERROR_PROVIDER_LIST_EXHAUSTED,
                         ChipLogError(AppServer, "Error list is full"));
     mState.mCurrentErrorList[mCurrentErrorCount++] = error;
+    DataModel::List<const ClosureErrorEnum> currentErrorList(mState.mCurrentErrorList, mCurrentErrorCount);
     mMatterContext.MarkDirty(Attributes::CurrentErrorList::Id);
+    ReturnLogErrorOnFailure(GenerateOperationalErrorEvent(currentErrorList));
     return CHIP_NO_ERROR;
 }
 
@@ -419,8 +422,20 @@ CHIP_ERROR ClusterLogic::GetOverallTargetState(DataModel::Nullable<GenericOveral
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::GetCurrentErrorList(const AttributeValueEncoder::ListEncodeHelper & encoder)
+CHIP_ERROR ClusterLogic::GetCurrentErrorList(DataModel::List<const ClosureErrorEnum> & currentErrorList)
 {
+    assertChipStackLockedByCurrentThread();
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+
+    currentErrorList = DataModel::List<const ClosureErrorEnum>(mState.mCurrentErrorList, mCurrentErrorCount);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClusterLogic::ReadCurrentErrorListAttribute(const AttributeValueEncoder::ListEncodeHelper & encoder)
+{
+    assertChipStackLockedByCurrentThread();
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     for (size_t i = 0; i < mCurrentErrorCount; i++)
     {
         ClosureErrorEnum error = mState.mCurrentErrorList[i];

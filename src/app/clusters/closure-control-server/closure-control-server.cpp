@@ -85,7 +85,7 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
 
     case Attributes::CurrentErrorList::Id: {
         return aEncoder.EncodeList(
-            [&logic = mClusterLogic](const auto & encoder) -> CHIP_ERROR { return logic.GetCurrentErrorList(encoder); });
+            [&logic = mClusterLogic](const auto & encoder) -> CHIP_ERROR { return logic.ReadCurrentErrorListAttribute(encoder); });
     }
 
     case Attributes::OverallCurrentState::Id: {
