@@ -19,7 +19,7 @@ import ast
 import ipaddress
 import json
 import logging
-from asyncio import Event, wait_for, TimeoutError, ensure_future
+from asyncio import Event, TimeoutError, ensure_future, wait_for
 from dataclasses import asdict, dataclass
 from enum import Enum
 from typing import Dict, List, Optional, cast
@@ -29,7 +29,7 @@ from zeroconf import IPVersion, ServiceListener, ServiceStateChange, Zeroconf
 from zeroconf._dns import DNSAddress, DNSRecord
 from zeroconf._engine import AsyncListener
 from zeroconf._protocol.incoming import DNSIncoming
-from zeroconf.asyncio import AsyncZeroconf, AsyncServiceInfo, AsyncZeroconfServiceTypes
+from zeroconf.asyncio import AsyncServiceInfo, AsyncZeroconf, AsyncZeroconfServiceTypes
 
 logger = logging.getLogger(__name__)
 
