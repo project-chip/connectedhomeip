@@ -94,15 +94,15 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("7a", "TH reads from the DUT the SupplyState",
                      "Value has to be 0x05 (Enabled)"),
             TestStep("7b", "TH reads from the DUT the ChargingEnabledUntil",
-                     "Value has to be the ChargingEnabledUntilEpochTime"),
+                     "Value has to be equal to the value of ChargingEnabledUntilEpochTime"),
             TestStep("7c", "TH reads from the DUT the MinimumChargeCurrent",
-                     "Value has to be the MinimumChargeCurrent"),
+                     "Value has to be equal to the value of MinimumChargeCurrent"),
             TestStep("7d", "TH reads from the DUT the CircuitCapacity",
                      "Store the value as CircuitCapacity"),
             TestStep("7e", "TH reads from the DUT the MaximumChargeCurrent",
                      "Value has to be the minimum value of MaximumChargeCurrent and CircuitCapacity"),
             TestStep("7f", "TH reads from the DUT the DischargingEnabledUntil",
-                     "Value has to be the DischargingEnabledUntilEpochTime"),
+                     "Value has to be equal to the value of DischargingEnabledUntilEpochTime"),
             TestStep("7g", "TH reads from the DUT the MaximumDischargeCurrent",
                      "Value has to be the minimum value of MaximumDischargeCurrent and CircuitCapacity"),
             TestStep("8", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EV Charge Demand Test Event",
@@ -111,9 +111,9 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("9a", "TH reads from the DUT the SupplyState",
                      "Value has to be 0x01 (ChargingEnabled)"),
             TestStep("9b", "TH reads from the DUT the ChargingEnabledUntil",
-                     "Value has to be the ChargingEnabledUntilEpochTime"),
+                     "Value has to be equal to the value of ChargingEnabledUntilEpochTime"),
             TestStep("9c", "TH reads from the DUT the MinimumChargeCurrent",
-                     "Value has to be the MinimumChargeCurrent"),
+                     "Value has to be equal to the value of MinimumChargeCurrent"),
             TestStep("9d", "TH reads from the DUT the MaximumChargeCurrent",
                      "Value has to be the minimum value of MaximumChargeCurrent and CircuitCapacity"),
             TestStep("9e", "TH reads from the DUT the DischargingEnabledUntil",
@@ -265,12 +265,12 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("7b")
         # TH reads from the DUT the ChargingEnabledUntil
-        # Value has to be the ChargingEnabledUntilEpochTime
+        # Value has to be equal to the value of ChargingEnabledUntilEpochTime
         await self.check_evse_attribute("ChargingEnabledUntil", charging_end_epoch_time)
 
         self.step("7c")
         # TH reads from the DUT the MinimumChargeCurrent
-        # Value has to be the MinimumChargeCurrent
+        # Value has to be equal to the value of MinimumChargeCurrent
         await self.check_evse_attribute("MinimumChargeCurrent", min_charge_current)
 
         self.step("7d")
@@ -292,7 +292,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("7f")
         # TH reads from the DUT the DischargingEnabledUntil
-        # Value has to be the DischargingEnabledUntilEpochTime
+        # Value has to be equal to the value of DischargingEnabledUntilEpochTime
         await self.check_evse_attribute("DischargingEnabledUntil", discharging_end_epoch_time)
 
         self.step("7g")
@@ -333,12 +333,12 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("9b")
         # TH reads from the DUT the ChargingEnabledUntil
-        # Value has to be the ChargingEnabledUntilEpochTime
+        # Value has to be equal to the value of ChargingEnabledUntilEpochTime
         await self.check_evse_attribute("ChargingEnabledUntil", charging_end_epoch_time)
 
         self.step("9c")
         # TH reads from the DUT the MinimumChargeCurrent
-        # Value has to be the MinimumChargeCurrent
+        # Value has to be equal to the value of MinimumChargeCurrent
         await self.check_evse_attribute("MinimumChargeCurrent", min_charge_current)
 
         self.step("9d")
