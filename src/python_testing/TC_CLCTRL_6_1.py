@@ -35,7 +35,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import time
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
@@ -101,7 +100,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             TestStep("4d", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_ENABLE_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState Test Event Clear."),
             TestStep("5a", "If PS feature is not supported on the cluster or IS feature is supported on the cluster, skip steps 5b to 5f."),
             TestStep("5b", "TH sends command MoveTo with Position = MoveToFullyOpen."),
-            TestStep("5c", "If the attribute is supported on the cluster, wait 2 seconds and TH reads from the DUT the OverallCurrentState.Position = FullyOpened."),
+            TestStep("5c", "Wait until TH receives a subscription report with OverallCurrentState.Position = FullyOpened."),
             TestStep("5d", "TH sends command MoveTo with Position = MoveToFullyClosed."),
             TestStep("5e", "Verify that the DUT has emitted the MovementCompleted event."),
             TestStep("5f", "TH reads from the DUT the Mainstate attribute."),
@@ -422,24 +421,12 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
                 pass
 
-            # STEP 5c: If the attribute is supported on the cluster, wait 2 seconds and TH reads from the DUT the OverallCurrentState.Position = FullyOpened.
+            # STEP 5c: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyOpened.
             self.step("5c")
 
-            time.sleep(2)
-
-            if attributes.OverallCurrentState.attribute_id in attribute_list:
-                overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-                logging.info(f"OverallCurrentState: {overall_current_state}")
-
-                if overall_current_state is None:
-                    logging.error("OverallCurrentState is None")
-
-                logging.info(f"OverallCurrentState: {overall_current_state}")
-                asserts.assert_equal(overall_current_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyOpened,
-                                     "OverallCurrentState.position is not FullyOpened")
-            else:
-                asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
-                return
+            logging.info("Waiting for OverallCurrentState.Position to be FullyOpened and OverallCurrentState.SecureState to be False")
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyOpened)],
+                                                          timeout_sec=timeout)
 
             # STEP 5d: TH sends command MoveTo with Position = MoveToFullyClosed
             self.step("5d")
