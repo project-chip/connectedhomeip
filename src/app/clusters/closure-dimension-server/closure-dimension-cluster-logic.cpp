@@ -670,7 +670,24 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     VerifyOrReturnError(currentState.Value().position.HasValue() && !currentState.Value().position.Value().IsNull(),
                         Status::InvalidInState);
 
-    // TargetState should only be set when delegate function returns status as Success. Return failure otherwise
+    // Check for invalid latch transition: current latch is true and target latch is true
+    if (mConformance.HasFeature(Feature::kMotionLatching))
+    {
+        bool currentLatch = currentState.Value().latch.HasValue() ? currentState.Value().latch.Value() : false;
+        // default target latch to true if not present
+        bool targetLatch = target.Value().latch.HasValue() ? target.Value().latch.Value() : true;
+
+        // Only exception: both position and speed are not present
+        bool noTargetPosition = !(target.Value().position.HasValue() && !target.Value().position.Value());
+        bool noTargetSpeed = !(target.Value().speed.HasValue());
+
+        if (currentLatch && targetLatch)
+        {
+            return (noTargetPosition && noTargetSpeed) ? Status::Success : Status::InvalidInState;
+        }
+    }
+
+    // Target should only be set when delegate function returns status as Success. Return failure otherwise
     VerifyOrReturnError(mDelegate.HandleSetTarget(position, latch, speed) == Status::Success, Status::Failure);
 
     VerifyOrReturnError(SetTargetState(targetState) == CHIP_NO_ERROR, Status::Failure);

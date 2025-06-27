@@ -554,6 +554,34 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
                             state == MainStateEnum::kStopped,
                         Status::InvalidInState);
 
+    // Check for invalid latch transition: current latch is true and target latch is true or null
+    if (mConformance.HasFeature(Feature::kMotionLatching))
+    {
+        DataModel::Nullable<GenericOverallCurrentState> currentState;
+        if (GetOverallCurrentState(currentState) == CHIP_NO_ERROR && !currentState.IsNull())
+        {
+            const auto & curr = currentState.Value();
+            bool currentLatch = curr.latch.HasValue() && !curr.latch.Value().IsNull() && curr.latch.Value().Value();
+ 
+            // default target latch to true if not present
+            bool targetLatchIsTrueOrNull = true;
+            if (overallTargetState.Value().latch.HasValue())
+            {
+                auto & targetLatch = overallTargetState.Value().latch.Value();
+                targetLatchIsTrueOrNull = targetLatch.IsNull() || targetLatch.Value();
+            }
+ 
+            // Only exception: both position and speed are not present
+            bool noTargetPosition = !(overallTargetState.Value().position.HasValue() && !overallTargetState.Value().position.Value().IsNull());
+            bool noTargetSpeed = !(overallTargetState.Value().speed.HasValue());
+ 
+            if (currentLatch && targetLatchIsTrueOrNull)
+            {
+                return (noTargetPosition && noTargetSpeed) ? Status::Success : Status::InvalidInState;
+            }
+        }
+    }
+
     // Set MainState and OverallTargetState only if the delegate call to HandleMoveToCommand is successful
     Status status = mDelegate.HandleMoveToCommand(position, latch, speed);
     VerifyOrReturnValue(status == Status::Success, status);
