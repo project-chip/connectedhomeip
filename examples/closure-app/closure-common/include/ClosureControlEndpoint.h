@@ -178,12 +178,12 @@ private:
     void UpdateCurrentStateFromTargetState();
 
     /**
-     * @brief Maps a TargetPositionEnum value to the corresponding PositioningEnum value.
+     * @brief Maps a TargetPositionEnum value to the corresponding CurrentPositionEnum value.
      *
      * @param value The TargetPositionEnum value to be mapped.
-     * @return PositioningEnum The corresponding PositioningEnum value.
+     * @return CurrentPositionEnum The corresponding CurrentPositionEnum value.
      */
-    PositioningEnum MapTargetPositionToCurrentPositioning(TargetPositionEnum value);
+    CurrentPositionEnum MapTargetPositionToCurrentPositioning(TargetPositionEnum value);
 };
 
 } // namespace ClosureControl

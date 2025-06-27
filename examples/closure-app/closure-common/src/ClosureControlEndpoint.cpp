@@ -170,16 +170,16 @@ void ClosureControlEndpoint::OnStopMotionActionComplete()
 
 void ClosureControlEndpoint::OnCalibrateActionComplete()
 {
-    DataModel::Nullable<GenericOverallState> overallState(GenericOverallState(
-        MakeOptional(DataModel::MakeNullable(PositioningEnum::kFullyClosed)), MakeOptional(DataModel::MakeNullable(true)),
-        MakeOptional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kAuto)), MakeOptional(DataModel::MakeNullable(true))));
-    DataModel::Nullable<GenericOverallTarget> overallTarget = DataModel::NullNullable;
+    // DataModel::Nullable<GenericOverallState> overallState(GenericOverallState(
+    //     MakeOptional(DataModel::MakeNullable(PositioningEnum::kFullyClosed)), MakeOptional(DataModel::MakeNullable(true)),
+    //     MakeOptional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kAuto)), MakeOptional(DataModel::MakeNullable(true))));
+    // DataModel::Nullable<GenericOverallTarget> overallTarget = DataModel::NullNullable;
 
-    mLogic.SetMainState(MainStateEnum::kStopped);
-    mLogic.SetOverallState(overallState);
-    mLogic.SetOverallTarget(overallTarget);
-    mLogic.SetCountdownTimeFromDelegate(0);
-    mLogic.GenerateMovementCompletedEvent();
+    // mLogic.SetMainState(MainStateEnum::kStopped);
+    // mLogic.SetOverallState(overallState);
+    // mLogic.SetOverallTarget(overallTarget);
+    // mLogic.SetCountdownTimeFromDelegate(0);
+    // mLogic.GenerateMovementCompletedEvent();
 }
 
 void ClosureControlEndpoint::OnMoveToActionComplete()
@@ -192,51 +192,52 @@ void ClosureControlEndpoint::OnMoveToActionComplete()
 
 void ClosureControlEndpoint::UpdateCurrentStateFromTargetState()
 {
-    DataModel::Nullable<GenericOverallState> overallState;
-    DataModel::Nullable<GenericOverallTarget> overallTarget;
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
+    DataModel::Nullable<GenericOverallTargetState> overallTargetState;
 
-    VerifyOrReturn(mLogic.GetOverallState(overallState) == CHIP_NO_ERROR,
+    VerifyOrReturn(mLogic.GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to get overall state from logic"));
-    VerifyOrReturn(mLogic.GetOverallTarget(overallTarget) == CHIP_NO_ERROR,
+    VerifyOrReturn(mLogic.GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to get overall target from logic"));
 
-    VerifyOrReturn(!overallTarget.IsNull(), ChipLogError(AppServer, "Current overall target is null, Move to action Failed"));
-    VerifyOrReturn(!overallState.IsNull(), ChipLogError(AppServer, "Current overall state is null, Move to action Failed"));
+    VerifyOrReturn(!overallTargetState.IsNull(), ChipLogError(AppServer, "Current overall target is null, Move to action Failed"));
+    VerifyOrReturn(!overallCurrentState.IsNull(), ChipLogError(AppServer, "Current overall state is null, Move to action Failed"));
 
-    if (overallTarget.Value().position.HasValue())
+    if (overallTargetState.Value().position.HasValue() && !overallTargetState.Value().position.Value().IsNull())
     {
-        PositioningEnum currentPositioning = MapTargetPositionToCurrentPositioning(overallTarget.Value().position.Value());
-        overallState.Value().positioning.SetValue(MakeNullable(currentPositioning));
+        // Map the target position to the current positioning enum.
+        CurrentPositionEnum currentPositioning = MapTargetPositionToCurrentPositioning(overallTargetState.Value().position.Value().Value());
+        overallCurrentState.Value().position.SetValue(MakeNullable(currentPositioning));
     }
 
-    if (overallTarget.Value().latch.HasValue())
+    if (overallTargetState.Value().latch.HasValue() && !overallTargetState.Value().latch.Value().IsNull())
     {
-        overallState.Value().latch.SetValue(MakeNullable(overallTarget.Value().latch.Value()));
+        overallCurrentState.Value().latch.SetValue(MakeNullable(false));
     }
 
-    if (overallTarget.Value().speed.HasValue())
+    if (overallTargetState.Value().speed.HasValue())
     {
-        overallState.Value().speed.SetValue(MakeNullable(overallTarget.Value().speed.Value()));
+        overallCurrentState.Value().speed.SetValue(overallTargetState.Value().speed.Value());
     }
 
-    mLogic.SetOverallState(overallState);
+    mLogic.SetOverallCurrentState(overallCurrentState);
 }
 
-PositioningEnum ClosureControlEndpoint::MapTargetPositionToCurrentPositioning(TargetPositionEnum value)
+CurrentPositionEnum ClosureControlEndpoint::MapTargetPositionToCurrentPositioning(TargetPositionEnum value)
 {
     switch (value)
     {
-    case TargetPositionEnum::kCloseInFull:
-        return PositioningEnum::kFullyClosed;
-    case TargetPositionEnum::kOpenInFull:
-        return PositioningEnum::kFullyOpened;
-    case TargetPositionEnum::kPedestrian:
-        return PositioningEnum::kOpenedForPedestrian;
-    case TargetPositionEnum::kVentilation:
-        return PositioningEnum::kOpenedForVentilation;
-    case TargetPositionEnum::kSignature:
-        return PositioningEnum::kOpenedAtSignature;
+    case TargetPositionEnum::kMoveToFullyClosed:
+        return CurrentPositionEnum::kFullyClosed;
+    case TargetPositionEnum::kMoveToFullyOpen:
+        return CurrentPositionEnum::kFullyOpened;
+    case TargetPositionEnum::kMoveToPedestrianPosition:
+        return CurrentPositionEnum::kOpenedForPedestrian;
+    case TargetPositionEnum::kMoveToVentilationPosition:
+        return CurrentPositionEnum::kOpenedForVentilation;
+    case TargetPositionEnum::kMoveToSignaturePosition:
+        return CurrentPositionEnum::kOpenedAtSignature;
     default:
-        return PositioningEnum::kUnknownEnumValue;
+        return CurrentPositionEnum::kUnknownEnumValue;
     }
 }

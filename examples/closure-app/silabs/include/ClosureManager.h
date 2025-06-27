@@ -40,7 +40,6 @@ public:
         MOVE_TO_ACTION,
         STOP_MOTION_ACTION,
         STOP_CALIBRATE_ACTION,
-        LATCH_ACTION,
 
         INVALID_ACTION
     };
@@ -197,42 +196,28 @@ private:
     static void TimerEventHandler(void * timerCbArg);
 
     /**
-     * @brief Handles the motion action for closure endpoints.
+     * @brief Handles the motion action for closure endpoint.
      *
-     * This method manages the state transitions and actions for closure endpoints (such as panels or doors)
-     * during a motion event. It updates the current positions of endpoints 2 and 3 to next position.
-     * It also triggers
-     *       - Timer for motion action completion if the target position is not reached
-     *       - Timer for Latch action if needed based on the current state of the closure.
-     *       - HandleMotionActionComplete to finalize the motion action when the target is reached.
+     * This method perform the latch action for closure endpoint. and then updates the current positions of endpoints 2 and 3
+     * to the next position towards their target positions and calls HandleClosureActionComplete if both endpoints
+     * have reached their target positions.
      */
     void HandleClosureMotionAction();
 
     /**
-     * @brief Updates the current state of a closure panel to the next position towards its target.
+     * @brief Moves the current state of a closure panel to the next position towards its target.
      *
-     * This function increments or decrements the current position of the panel by a fixed step (1000 units)
-     * towards the target position, ensuring it does not overshoot the target. It also preserves the latch and speed
-     * values if they are set in the current state.
+     * This function performs increments or decrements the current position of the panel by a fixed step
+     * (1000 units) towards the target position, ensuring it does not overshoot the target.
      *
      * @param currentState The current state of the closure panel.
      * @param targetState The target state of the closure panel.
-     * @param nextCurrentState A reference to a Nullable object that will be updated with the next current state.
+     * @param nextPosition A reference to a Nullable object that will be updated with the next current state.
      * @return true if the current state need to be updated to the next position,
      *         false if the target position is already reached or update to next position failed.
      */
-    bool UpdatePanelCurrentStateToNextPosition(
+    bool GetPanelNextPosition(
         const chip::app::Clusters::ClosureDimension::GenericCurrentStateStruct & currentState,
         const chip::app::Clusters::ClosureDimension::GenericTargetStruct & targetState,
-        chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::GenericCurrentStateStruct> & nextCurrentState);
-
-    /**
-     * @brief Determines if a latch action is needed based on the current and target closure states.
-     *
-     * This function checks the provided closure state to decide whether a latch action should be performed.
-     * The latch action is needed if target and state latch values differ.
-     *
-     * @return true if a latch action is needed, false otherwise.
-     */
-    bool IsClosureLatchActionNeeded();
+        chip::Optional<chip::Percent100ths> & nextPosition);
 };
