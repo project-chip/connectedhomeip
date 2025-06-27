@@ -15,20 +15,22 @@
 #    limitations under the License.
 #
 
+import ast
 import ipaddress
 import json
 import logging
-import ast
+from asyncio import Event, wait_for, TimeoutError, ensure_future
 from dataclasses import asdict, dataclass
 from enum import Enum
 from typing import Dict, List, Optional, cast
-from asyncio import Event, wait_for, TimeoutError, ensure_future
+
 from mdns_discovery.mdns_async_service_info import DNSRecordType, MdnsAsyncServiceInfo
 from zeroconf import IPVersion, ServiceListener, ServiceStateChange, Zeroconf
-from zeroconf._dns import DNSRecord, DNSAddress
+from zeroconf._dns import DNSAddress, DNSRecord
 from zeroconf._engine import AsyncListener
 from zeroconf._protocol.incoming import DNSIncoming
-from zeroconf.asyncio import AsyncZeroconf, AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconfServiceTypes
+from zeroconf.asyncio import AsyncZeroconf, AsyncServiceInfo, AsyncZeroconfServiceTypes
+
 logger = logging.getLogger(__name__)
 
 
@@ -378,7 +380,7 @@ class MdnsDiscovery:
             self._azc.zeroconf,
             discovery_timeout_sec * 1000,
             record_type=DNSRecordType.TXT)
-        
+
         if is_discovered:
             if not service_info.decoded_properties:
                 logging.info(f"TXT Record found but no properties for service {service_name} of type {service_type}")
@@ -405,9 +407,9 @@ class MdnsDiscovery:
             return mdns_service_info
 
     async def get_quada_record(self, hostname: str,
-                                discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
-                                log_output: bool = False
-                                ) -> Optional[MdnsAddressInfo]:
+                               discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
+                               log_output: bool = False
+                               ) -> Optional[MdnsAddressInfo]:
         """
         Asynchronously retrieves the AAAA (IPv6) record of a device on the local network via mDNS.
 
@@ -429,7 +431,7 @@ class MdnsDiscovery:
         service_type = MdnsServiceType.OPERATIONAL.value
         service_info = MdnsAsyncServiceInfo(name=hostname, type_=service_type)
         mdns_address_info = None
-        
+
         await service_info.async_request(
             self._azc.zeroconf,
             timeout=discovery_timeout_sec * 1000,
@@ -660,7 +662,7 @@ class MdnsDiscovery:
         self._discovered_services = {}
         self._service_types = [service_type.value]
         await self._discover(discovery_timeout_sec, log_output)
-        
+
         if self._verbose_logging:
             logger.info("Getting service from discovered services: %s", self._discovered_services)
 
