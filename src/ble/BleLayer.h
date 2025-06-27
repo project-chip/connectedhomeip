@@ -70,6 +70,11 @@
 #include "BleUUID.h"
 
 namespace chip {
+
+namespace Test {
+    // Forward declaration of BleLayerTestAccess class tests to allow it to be friends with BleLayer
+    class BleLayerTestAccess;
+} // namespace Test
 namespace Ble {
 
 /**
@@ -216,6 +221,8 @@ public:
 class DLL_EXPORT BleLayer
 {
     friend class BLEEndPoint;
+    friend class chip::Test::BleLayerTestAccess;
+ 
 
 public:
     // Public data members:
@@ -354,6 +361,7 @@ private:
 
     static void OnConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj);
     static void OnConnectionError(void * appState, CHIP_ERROR err);
+
 };
 
 } /* namespace Ble */
