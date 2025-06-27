@@ -25,6 +25,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/attribute-storage.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <cmsis_os2.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -161,6 +162,8 @@ void ClosureManager::InitiateAction(AppEvent * event)
 
 void ClosureManager::TimerEventHandler(void * timerCbArg)
 {
+    ChipLogError(AppServer, "Timer expired");
+    osDelay(1000);
     ClosureManager * closureManager = static_cast<ClosureManager *>(timerCbArg);
 
     // The timer event handler will be called in the context of the timer task
@@ -176,7 +179,8 @@ void ClosureManager::TimerEventHandler(void * timerCbArg)
 void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
 {
     Action_t currentAction = static_cast<ClosureManager::Action_t>(event->ClosureEvent.Action);
-
+    ChipLogError(AppServer, "HandleClosureActionCompleteEvent called for action: %d", currentAction);
+    osDelay(1000); // Simulate some processing delay
     switch (currentAction)
     {
     case Action_t::CALIBRATE_ACTION:
@@ -403,8 +407,8 @@ void ClosureManager::HandleClosureMotionAction()
     Optional<chip::Percent100ths> ep2NextPosition = NullOptional;
     Optional<chip::Percent100ths> ep3NextPosition = NullOptional;
 
-    bool isEndPoint2TargetReached = false;
-    bool isEndPoint3TargetReached = false;
+    bool isEndPoint2ProgressPossible = false;
+    bool isEndPoint3ProgressPossible = false;
 
     // Get the Next Current State to be set for the endpoint 2, if target postion is not reached.
     if (GetPanelNextPosition(ep2CurrentState.Value(), ep2TargetState.Value(), ep2NextPosition))
@@ -413,7 +417,7 @@ void ClosureManager::HandleClosureMotionAction()
                        ChipLogError(AppServer, "Failed to get next position for Endpoint 2"));
         ep2CurrentState.Value().position.SetValue(ep2NextPosition.Value());
         instance.ep2.GetLogic().SetCurrentState(ep2CurrentState);
-        isEndPoint2TargetReached = (ep2NextPosition.Value() == ep2TargetState.Value().position.Value());
+        isEndPoint2ProgressPossible = (ep2NextPosition.Value() != ep2TargetState.Value().position.Value());
         ChipLogProgress(AppServer, "EndPoint 2 Current Position: %d, Target Position: %d",
                         ep2NextPosition.Value(), ep2TargetState.Value().position.Value());
     }
@@ -425,7 +429,7 @@ void ClosureManager::HandleClosureMotionAction()
                        ChipLogError(AppServer, "Failed to get next position for Endpoint 3"));
         ep3CurrentState.Value().position.SetValue(ep3NextPosition.Value());
         instance.ep3.GetLogic().SetCurrentState(ep3CurrentState);
-        isEndPoint3TargetReached = (ep3NextPosition.Value() == ep3TargetState.Value().position.Value());
+        isEndPoint3ProgressPossible = (ep3NextPosition.Value() != ep3TargetState.Value().position.Value());
         ChipLogProgress(AppServer, "EndPoint 3 Current Position: %d, Target Position: %d",
                         ep3NextPosition.Value(), ep3TargetState.Value().position.Value());
     }
@@ -435,12 +439,12 @@ void ClosureManager::HandleClosureMotionAction()
     // If either endpoint has not reached its target position, we will continue the motion action
     // and set the closureTargetReached flag to false.
     // This will ensure that the closure motion action continues until both endpoints have reached their target positions.
-    bool closureTargetReached = isEndPoint2TargetReached && isEndPoint3TargetReached;
+    bool isProgressPossible = isEndPoint2ProgressPossible && isEndPoint3ProgressPossible;
 
-    ChipLogProgress(AppServer, "Motion progress possible: %s", closureTargetReached ? "false" : "true");
+    ChipLogProgress(AppServer, "Motion progress possible: %s", isProgressPossible ? "true" : "false");
 
     // If the closure target is not reached, we will reschedule the timer for motion action
-    if (!closureTargetReached)
+    if (isProgressPossible)
     {
         instance.CancelTimer(); // Cancel any existing timer before starting a new action
         instance.SetCurrentAction(MOVE_TO_ACTION);
@@ -457,14 +461,14 @@ void ClosureManager::HandleClosureMotionAction()
         if (!ep1CurrentState.Value().latch.Value().Value() && ep1TargetState.Value().latch.Value().Value())
         {
             // In Real application, this would be replaced with actual unlatch logic.
-            ChipLogProgress(AppServer, "Performing unlatch action");
+            ChipLogProgress(AppServer, "Performing latch action");
             ep1CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
             instance.ep1.GetLogic().SetOverallCurrentState(ep1CurrentState);
-            ep2CurrentState.Value().latch.SetValue(false);
+            ep2CurrentState.Value().latch.SetValue(true);
             instance.ep2.GetLogic().SetCurrentState(ep2CurrentState);
-            ep3CurrentState.Value().latch.SetValue(false);
+            ep3CurrentState.Value().latch.SetValue(true);
             instance.ep3.GetLogic().SetCurrentState(ep3CurrentState);
-            ChipLogProgress(AppServer, "Unlatched both endpoints before moving");
+            ChipLogProgress(AppServer, "latched action complete");
         }
     }
 
@@ -513,6 +517,8 @@ bool ClosureManager::GetPanelNextPosition(const GenericCurrentStateStruct & curr
                                            const GenericTargetStruct & targetState,
                                            Optional<chip::Percent100ths> & nextPosition)
 {
+    ChipLogError(AppServer, "GetPanelNextPosition called");
+    osDelay(1000); // Simulate some processing delay
     if (!targetState.position.HasValue())
     {
         ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to  Target position is not set");
@@ -545,6 +551,5 @@ bool ClosureManager::GetPanelNextPosition(const GenericCurrentStateStruct & curr
         nextPosition.Value() = currentPosition;
         return false; // No update needed
     }
-
     return true;
 }
