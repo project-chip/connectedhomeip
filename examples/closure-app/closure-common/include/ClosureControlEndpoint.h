@@ -156,16 +156,16 @@ public:
     void OnMoveToActionComplete();
 
     /**
-     * @brief Callback for when a panel motion action is completed.
+     * @brief Handles the completion of a panel motion action for closure endpoint.
      *
      * This function is called when a panel motion action has been completed.
-     * It should update the internal state of the closure control endpoint to reflect
+     * It should update the internal state of the closure endpoint to reflect
      * the completion of the panel motion action.
      */
     void OnPanelMotionActionComplete();
 
     /**
-     * @brief Retrieves the endpoint identifier associated with ClusterLogic instance.
+     * @brief Retrieves the endpoint for this instance.
      *
      * @return The endpoint ID (EndpointId) for this instance.
      */

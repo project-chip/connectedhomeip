@@ -57,19 +57,19 @@ public:
     bool IsManualLatchingNeeded() override { return false; }
 
     /**
-     * @brief Retrieves the endpoint identifier associated with ClusterLogic instance.
+     * @brief Retrieves the endpoint for this instance.
      *
-     * @return The endpoint ID (EndpointId) for this instance.
+     * @return The endpoint (EndpointId) for this instance.
      */
     EndpointId GetEndpoint() const { return mEndpoint; }
 
     /**
-     * @brief Function to get the target direction for the step command.
+     * @brief Function to get the present target direction for the step command.
      */
     StepDirectionEnum GetStepCommandTargetDirection() const { return mStepCommandTargetDirection; }
 
     /**
-     * @brief Function to save the target direction of the step command.
+     * @brief Function to save the present target direction of the step command.
      */
     void SetStepCommandTargetDirection(StepDirectionEnum direction) { mStepCommandTargetDirection = direction; }
 
@@ -158,16 +158,16 @@ public:
     void OnMoveToActionComplete();
 
     /**
-     * @brief Callback for when a panel motion action is completed.
+     * @brief Handles the completion of a panel motion action for closure Panel endpoint.
      *
      * This function is called when a panel motion action has been completed.
-     * It should update the internal state of the closure control endpoint to reflect
+     * It should update the internal state of the closure panel endpoint to reflect
      * the completion of the panel motion action.
      */
     void OnPanelMotionActionComplete();
 
     /**
-     * @brief Retrieves the endpoint identifier associated with this instance.
+     * @brief Retrieves the endpoint for this instance.
      *
      * @return The endpoint ID (EndpointId) for this instance.
      */
@@ -179,15 +179,6 @@ private:
     ClosureDimensionDelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
-
-    /**
-     * @brief Updates the current state from the target state.
-     *
-     * This function retrieves the current state and updates it based on the target state.
-     * It ensures that the current state reflects the latest target position, latch status,
-     * and speed settings.
-     */
-    void UpdateCurrentStateFromTargetState();
 };
 
 } // namespace ClosureDimension

@@ -266,6 +266,11 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
     VerifyOrReturnValue(ep1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set countdown time for calibration"));
 
+    SetCurrentAction(CALIBRATE_ACTION);
+    mCurrentActionEndpointId = ep1.GetEndpoint();
+
+    isCalibrationInProgress = true;
+
     // Post an event to initiate the calibration action asynchronously.
     AppEvent event;
     event.Type                    = AppEvent::kEventType_Closure;
@@ -273,10 +278,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
     event.ClosureEvent.EndpointId = ep1.GetEndpoint();
     event.Handler                 = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
-    SetCurrentAction(CALIBRATE_ACTION);
-    mCurrentActionEndpointId = ep1.GetEndpoint();
 
-    isCalibrationInProgress = true;
     return Status::Success;
 }
 
@@ -328,17 +330,17 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
     VerifyOrReturnValue(ep1.GetLogic().SetOverallTargetState(ep1Target) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set overall target for Step command"));
 
+    SetCurrentAction(PANEL_STEP_ACTION);
+    mCurrentActionEndpointId = endpointId;
+
+    isStepActionInProgress = true;
+
     AppEvent event;
     event.Type                    = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action     = PANEL_STEP_ACTION;
     event.ClosureEvent.EndpointId = endpointId;
     event.Handler                 = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
-
-    SetCurrentAction(PANEL_STEP_ACTION);
-    mCurrentActionEndpointId = endpointId;
-
-    isStepActionInProgress = true;
 
     return Status::Success;
 }
@@ -362,42 +364,50 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
         return;
     }
 
-    chip::app::Clusters::ClosureDimension::ClusterState epState = ep->GetLogic().GetState();
-    StepDirectionEnum stepDirection                             = ep->GetDelegate().GetStepCommandTargetDirection();
-    GenericCurrentStateStruct currentState;
+    StepDirectionEnum stepDirection = ep->GetDelegate().GetStepCommandTargetDirection();
 
-    VerifyOrReturn(!epState.currentState.IsNull() && epState.currentState.Value().position.HasValue(),
+    DataModel::Nullable<GenericCurrentStateStruct> epCurrentState;
+    DataModel::Nullable<GenericTargetStruct> epTarget;
+
+    VerifyOrReturn(ep->GetLogic().GetCurrentState(epCurrentState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get current state for Step action"));
+    VerifyOrReturn(ep->GetLogic().GetTarget(epTarget) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get target state for Step action"));
+
+    VerifyOrReturn(!epCurrentState.IsNull() && epCurrentState.Value().position.HasValue(),
                    ChipLogError(AppServer, "Current state or position is null, Step action Failed"));
-    VerifyOrReturn(!epState.target.IsNull() && epState.target.Value().position.HasValue(),
+    VerifyOrReturn(!epTarget.IsNull() && epTarget.Value().position.HasValue(),
                    ChipLogError(AppServer, "Target state or position is null, Step action Failed"));
 
-    chip::Percent100ths currentPosition = epState.currentState.Value().position.Value();
-    chip::Percent100ths targetPosition  = epState.target.Value().position.Value();
+    chip::Percent100ths currentPosition = epCurrentState.Value().position.Value();
+    chip::Percent100ths targetPosition  = epTarget.Value().position.Value();
+
     ChipLogProgress(AppServer, "Current Position: %d, Target Position: %d", currentPosition, targetPosition);
+
     bool panelTargetReached = (currentPosition == targetPosition);
     ChipLogProgress(AppServer, "Panel Target Reached: %s", panelTargetReached ? "true" : "false");
+
     if (!panelTargetReached)
     {
         chip::Percent100ths nextCurrentPosition;
+        chip::Percent100ths stepValue;
+        VerifyOrReturn(ep->GetLogic().GetStepValue(stepValue) == CHIP_NO_ERROR,
+                       ChipLogError(AppServer, "Failed to get step value for Step action"));
 
         // Compute the next position
         if (stepDirection == StepDirectionEnum::kIncrease)
         {
-            nextCurrentPosition = std::min(static_cast<chip::Percent100ths>(currentPosition + epState.stepValue), targetPosition);
+            nextCurrentPosition = std::min(static_cast<chip::Percent100ths>(currentPosition + stepValue), targetPosition);
         }
         else
         {
-            nextCurrentPosition = std::max(static_cast<chip::Percent100ths>(currentPosition - epState.stepValue), targetPosition);
+            nextCurrentPosition = std::max(static_cast<chip::Percent100ths>(currentPosition - stepValue), targetPosition);
         }
 
         // Set the new state once
-        currentState.Set(MakeOptional(nextCurrentPosition),
-                         epState.currentState.Value().latch.HasValue() ? MakeOptional(epState.currentState.Value().latch.Value())
-                                                                       : NullOptional,
-                         epState.currentState.Value().speed.HasValue() ? MakeOptional(epState.currentState.Value().speed.Value())
-                                                                       : NullOptional);
+        epCurrentState.Value().position.SetValue(nextCurrentPosition);
 
-        ep->GetLogic().SetCurrentState(DataModel::MakeNullable(currentState));
+        ep->GetLogic().SetCurrentState(epCurrentState);
 
         instance.CancelTimer(); // Cancel any existing timer before starting a new action
         instance.SetCurrentAction(PANEL_STEP_ACTION);

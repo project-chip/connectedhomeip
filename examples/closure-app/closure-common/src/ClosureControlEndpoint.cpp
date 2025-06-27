@@ -169,16 +169,16 @@ void ClosureControlEndpoint::OnStopMotionActionComplete()
 
 void ClosureControlEndpoint::OnCalibrateActionComplete()
 {
-    // DataModel::Nullable<GenericOverallState> overallState(GenericOverallState(
-    //     MakeOptional(DataModel::MakeNullable(PositioningEnum::kFullyClosed)), MakeOptional(DataModel::MakeNullable(true)),
-    //     MakeOptional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kAuto)), MakeOptional(DataModel::MakeNullable(true))));
-    // DataModel::Nullable<GenericOverallTarget> overallTarget = DataModel::NullNullable;
+    DataModel::Nullable<GenericOverallState> overallState(GenericOverallState(
+        MakeOptional(DataModel::MakeNullable(PositioningEnum::kFullyClosed)), MakeOptional(DataModel::MakeNullable(true)),
+        MakeOptional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kAuto)), MakeOptional(DataModel::MakeNullable(true))));
+    DataModel::Nullable<GenericOverallTarget> overallTarget = DataModel::NullNullable;
 
-    // mLogic.SetMainState(MainStateEnum::kStopped);
-    // mLogic.SetOverallState(overallState);
-    // mLogic.SetOverallTarget(overallTarget);
-    // mLogic.SetCountdownTimeFromDelegate(0);
-    // mLogic.GenerateMovementCompletedEvent();
+    mLogic.SetMainState(MainStateEnum::kStopped);
+    mLogic.SetOverallState(overallState);
+    mLogic.SetOverallTarget(overallTarget);
+    mLogic.SetCountdownTimeFromDelegate(0);
+    mLogic.GenerateMovementCompletedEvent();
 }
 
 void ClosureControlEndpoint::OnMoveToActionComplete()
@@ -196,8 +196,11 @@ void ClosureControlEndpoint::OnPanelMotionActionComplete()
 
     DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
     DataModel::Nullable<GenericOverallTargetState> overallTargetState;
-    mLogic.GetOverallCurrentState(overallCurrentState);
-    mLogic.GetOverallTargetState(overallTargetState);
+
+    VerifyOrReturn(mLogic.GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get OverallCurrentState"));
+    VerifyOrReturn(mLogic.GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get OverallTargetState"));
 
     if (overallCurrentState.IsNull())
     {
