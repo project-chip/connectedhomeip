@@ -27,7 +27,7 @@ chip_test_suite("tests") {
     "TestBtpEngine.cpp",
   ]
 
-  sources = [ "BleLayerAccess.h" ]
+  sources = [ "BleLayerTestAccess.h" ]
 
   cflags = [ "-Wconversion" ]
 
