@@ -102,16 +102,18 @@ void ClosureDimensionEndpoint::UpdateCurrentStateFromTargetState()
     VerifyOrReturn(!currentState.IsNull(),
                    ChipLogError(AppServer, "Current state is null, Updating CurrentState From TargetState Failed"));
 
-    auto updateFieldIfPresent = [](auto & targetField, auto & currentField) {
-        if (targetField.HasValue())
-        {
-            currentField.SetValue(targetField.Value());
-        }
-    };
-
-    updateFieldIfPresent(target.Value().position, currentState.Value().position);
-    updateFieldIfPresent(target.Value().latch, currentState.Value().latch);
-    updateFieldIfPresent(target.Value().speed, currentState.Value().speed);
+    if (target.Value().position.HasValue())
+    {
+        currentState.Value().position.SetValue(target.Value().position.Value());
+    }
+    if (target.Value().latch.HasValue())
+    {
+        currentState.Value().latch.SetValue(target.Value().latch.Value());
+    }
+    if (target.Value().speed.HasValue())
+    {
+        currentState.Value().speed.SetValue(target.Value().speed.Value());
+    }
 
     mLogic.SetCurrentState(currentState);
 }

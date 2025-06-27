@@ -35,8 +35,8 @@ using namespace chip::app::Clusters::ClosureDimension;
 
 namespace {
 constexpr uint32_t kCountdownTimeSeconds  = 10;
-constexpr uint32_t kMotionCountdownTimeMs = 1000; // 10% change of position per second
-constexpr uint32_t kLatchCountdownTimeMs  = 2000;
+constexpr uint32_t kMotionCountdownTimeMs = 1000; // 1 second for each motion.
+constexpr chip::Percent100ths kMotionPositionStep = 1000; // 10% of the total range per motion interval.
 
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
@@ -247,22 +247,23 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
     //  MoveTo command to Fullclose will set target position of both panels to 10000
     //  We simulate harware action by using timer for 1 sec and updating the current state of the panels after the timer expires.
     //  till we reach the target position.
+
     DataModel::Nullable<GenericCurrentStateStruct> ep2CurrentState;
-    VerifyOrReturnValue(ep2.GetLogic().GetCurrentState(ep2CurrentState) == CHIP_NO_ERROR, Status::Failure,
+    VerifyOrReturnError(ep2.GetLogic().GetCurrentState(ep2CurrentState) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to get current state for Endpoint 2"));
     DataModel::Nullable<GenericCurrentStateStruct> ep3CurrentState;
-    VerifyOrReturnValue(ep3.GetLogic().GetCurrentState(ep3CurrentState) == CHIP_NO_ERROR, Status::Failure,
+    VerifyOrReturnError(ep3.GetLogic().GetCurrentState(ep3CurrentState) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to get current state for Endpoint 3"));
     DataModel::Nullable<GenericTargetStruct> ep2TargetState;
-    VerifyOrReturnValue(ep2.GetLogic().GetTarget(ep2TargetState) == CHIP_NO_ERROR, Status::Failure,
+    VerifyOrReturnError(ep2.GetLogic().GetTarget(ep2TargetState) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to get target state for Endpoint 2"));
     DataModel::Nullable<GenericTargetStruct> ep3TargetState;
-    VerifyOrReturnValue(ep3.GetLogic().GetTarget(ep3TargetState) == CHIP_NO_ERROR, Status::Failure,
+    VerifyOrReturnError(ep3.GetLogic().GetTarget(ep3TargetState) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to get target state for Endpoint 3"));
 
-    VerifyOrReturnValue(!ep2CurrentState.IsNull(), Status::Failure,
+    VerifyOrReturnError(!ep2CurrentState.IsNull(), Status::Failure,
                         ChipLogError(AppServer, "MoveToCommand failed due to Null value Current state on Endpoint 2"));
-    VerifyOrReturnValue(!ep3CurrentState.IsNull(), Status::Failure,
+    VerifyOrReturnError(!ep3CurrentState.IsNull(), Status::Failure,
                         ChipLogError(AppServer, "MoveToCommand failed due to Null value Current state on Endpoint 3"));
 
     // Create target struct for the panels if the target state is not set.
@@ -305,15 +306,12 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
 
         ep2Target.position.SetValue(ep2Position);
         ep3Target.position.SetValue(ep3Position);
-        ChipLogError(AppServer, "Setting target position for Endpoint 2: %d, Endpoint 3: %d", ep2Target.position.Value(), ep3Target.position.Value());
     }
 
     if (latch.HasValue())
     {
         ep2Target.latch.SetValue(latch.Value());
         ep3Target.latch.SetValue(latch.Value());
-        ChipLogError(AppServer, "Setting latch for Endpoint 2: %s, Endpoint 3: %s",
-                     ep2Target.latch.Value() ? "true" : "false", ep3Target.latch.Value() ? "true" : "false");
     }
 
     if (speed.HasValue())
@@ -327,8 +325,11 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
     VerifyOrReturnError(ep3.GetLogic().SetTarget(DataModel::MakeNullable(ep3Target)) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set target for Endpoint 3"));
     
-    VerifyOrReturnError(ep1.GetLogic().SetCountdownTimeFromDelegate(10) == CHIP_NO_ERROR, Status::Failure,
+    VerifyOrReturnError(ep1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
+
+    SetCurrentAction(MOVE_TO_ACTION);
+    isMoveToInProgress = true;
 
     // Post an event to initiate the move to action asynchronously.
     // MoveTo Command can only be initiated from Closure Control Endpoint (Endpoint 1).
@@ -338,8 +339,7 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
     event.Handler             = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
 
-    SetCurrentAction(MOVE_TO_ACTION);
-    isMoveToInProgress = true;
+
     return Status::Success;
 }
 
@@ -440,7 +440,7 @@ void ClosureManager::HandleClosureMotionAction()
     // If either endpoint has not reached its target position, we will continue the motion action
     // and set the closureTargetReached flag to false.
     // This will ensure that the closure motion action continues until both endpoints have reached their target positions.
-    bool isProgressPossible = isEndPoint2ProgressPossible && isEndPoint3ProgressPossible;
+    bool isProgressPossible = isEndPoint2ProgressPossible || isEndPoint3ProgressPossible;
 
     ChipLogProgress(AppServer, "Motion progress possible: %s", isProgressPossible ? "true" : "false");
 
@@ -510,26 +510,15 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
     GetInstance().SetCurrentAction(Action_t::INVALID_ACTION);
 }
 
-/**
- * Advances the current state of the closure panel towards the target position by a fixed step.
- * Returns true if the state was updated (i.e., not yet at target), false if already at target.
- */
 bool ClosureManager::GetPanelNextPosition(const GenericCurrentStateStruct & currentState,
                                            const GenericTargetStruct & targetState,
                                            Optional<chip::Percent100ths> & nextPosition)
 {
-    
-    if (!targetState.position.HasValue())
-    {
-        ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to  Target position is not set");
-        return false;
-    }
+    VerifyOrReturnValue(targetState.position.HasValue(), false,
+                        ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to Target position is not set"));
 
-    if (!currentState.position.HasValue())
-    {
-        ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to Current position is not set");
-        return false;
-    }
+    VerifyOrReturnValue(currentState.position.HasValue(), false,
+                        ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to Current position is not set"));
 
     chip::Percent100ths currentPosition = currentState.position.Value();
     chip::Percent100ths targetPosition  = targetState.position.Value();
@@ -537,13 +526,13 @@ bool ClosureManager::GetPanelNextPosition(const GenericCurrentStateStruct & curr
     if (currentPosition < targetPosition)
     {
         // Increment position by 1000 units, capped at target.
-        nextPosition.SetValue(std::min(static_cast<chip::Percent100ths>(currentPosition + 1000), targetPosition));
+        nextPosition.SetValue(std::min(static_cast<chip::Percent100ths>(currentPosition + kMotionPositionStep), targetPosition));
     }
     else if (currentPosition > targetPosition)
     {
         // Moving down: Decreasing the current position by a step of 1000 units,
         // ensuring it does not go below the target position.
-        nextPosition.SetValue(std::max(static_cast<chip::Percent100ths>(currentPosition - 1000), targetPosition));
+        nextPosition.SetValue(std::max(static_cast<chip::Percent100ths>(currentPosition - kMotionPositionStep), targetPosition));
     }
     else
     {

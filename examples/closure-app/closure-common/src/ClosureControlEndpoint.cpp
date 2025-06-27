@@ -170,14 +170,13 @@ void ClosureControlEndpoint::OnStopMotionActionComplete()
 
 void ClosureControlEndpoint::OnCalibrateActionComplete()
 {
-    DataModel::Nullable<GenericOverallCurrentState> overallState(GenericOverallCurrentState(
-        MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed)), MakeOptional(DataModel::MakeNullable(true)),
-        MakeOptional(Globals::ThreeLevelAutoEnum::kAuto), MakeOptional(DataModel::MakeNullable(true))));
-    DataModel::Nullable<GenericOverallTargetState> overallTarget = DataModel::NullNullable;
-
+    DataModel::Nullable<GenericOverallState> overallState(GenericOverallState(
+        MakeOptional(DataModel::MakeNullable(PositioningEnum::kFullyClosed)), MakeOptional(DataModel::MakeNullable(true)),
+        MakeOptional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kAuto)), MakeOptional(DataModel::MakeNullable(true))));
+    DataModel::Nullable<GenericOverallTarget> overallTarget = DataModel::NullNullable;
     mLogic.SetMainState(MainStateEnum::kStopped);
-    mLogic.SetOverallCurrentState(overallState);
-    mLogic.SetOverallTargetState(overallTarget);
+    mLogic.SetOverallState(overallState);
+    mLogic.SetOverallTarget(overallTarget);
     mLogic.SetCountdownTimeFromDelegate(0);
     mLogic.GenerateMovementCompletedEvent();
 }
@@ -196,9 +195,9 @@ void ClosureControlEndpoint::UpdateCurrentStateFromTargetState()
     DataModel::Nullable<GenericOverallTargetState> overallTargetState;
 
     VerifyOrReturn(mLogic.GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to get overall state from logic"));
+                   ChipLogError(AppServer, "Failed to get overall state from closure Endpoint"));
     VerifyOrReturn(mLogic.GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to get overall target from logic"));
+                   ChipLogError(AppServer, "Failed to get overall target from closure Endpoint"));
 
     VerifyOrReturn(!overallTargetState.IsNull(), ChipLogError(AppServer, "Current overall target is null, Move to action Failed"));
     VerifyOrReturn(!overallCurrentState.IsNull(), ChipLogError(AppServer, "Current overall state is null, Move to action Failed"));
@@ -212,7 +211,7 @@ void ClosureControlEndpoint::UpdateCurrentStateFromTargetState()
 
     if (overallTargetState.Value().latch.HasValue() && !overallTargetState.Value().latch.Value().IsNull())
     {
-        overallCurrentState.Value().latch.SetValue(MakeNullable(false));
+        overallCurrentState.Value().latch.SetValue(MakeNullable(overallTargetState.Value().latch.Value().Value()));
     }
 
     if (overallTargetState.Value().speed.HasValue())
