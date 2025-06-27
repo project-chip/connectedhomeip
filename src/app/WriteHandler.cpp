@@ -780,10 +780,6 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     // if path is not valid, return a spec-compliant return code.
     if (!attributeEntry.has_value())
     {
-        // Global lists are not in metadata and not writable. Return the correct error code according to the spec
-        Status attributeErrorStatus =
-            IsSupportedGlobalAttributeNotInMetadata(aPath.mAttributeId) ? Status::UnsupportedWrite : Status::UnsupportedAttribute;
-
         return DataModel::ValidateClusterPath(mDataModelProvider, aPath, attributeErrorStatus);
     }
 
@@ -828,6 +824,25 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     // validate that timed write is enforced
     VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kTimed),
                         Status::NeedsTimedInteraction);
+
+    // TODO: spec requires a "write to a fabric scoped list" check
+    //       here (in between timed write and version checks).
+    //
+    //       This should be added here.
+    //
+    //       ...
+    //       - Else if the path indicates specific attribute data that requires a Timed Write
+    //         transaction to write and this action is not part of a Timed Write transaction,
+    //         an AttributeStatusIB SHALL be generated with the NEEDS_TIMED_INTERACTION Status Code.
+    //
+    // THIS => Else if the attribute in the path indicates a fabric-scoped list and there is no accessing
+    //         fabric, an AttributeStatusIB SHALL be generated with the UNSUPPORTED_ACCESS Status Code,
+    //         with the Path field indicating only the path to the attribute.
+    //
+    //       - Else if the DataVersion field of the AttributeDataIB is present and does not match the
+    //         data version of the indicated cluster instance, an AttributeStatusIB SHALL be generated
+    //         with the DATA_VERSION_MISMATCH Status Code.
+    //       ...
 
     if (aPath.mDataVersion.HasValue())
     {
