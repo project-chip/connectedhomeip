@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+import re
 import ast
 import ipaddress
 import json
@@ -691,30 +692,35 @@ class MdnsDiscovery:
         logger.info("Discovery data:\n%s", json_str)
 
 
-def get_txt_from_dns_record(dns_record: DNSRecord) -> dict[str, str | None]:
+def get_txt_from_dns_record(dns_record: DNSRecord) -> dict[str, str]:
     """
     Decodes a DNS TXT record into a dictionary of key-value pairs.
 
-    This function takes a DNSRecord object (typically of TXT type), extracts the
-    raw byte content using its string representation, and parses it according to
-    the DNS TXT format (length-prefixed key=value entries).
-
     Returns:
-        A dictionary where each key and value is a string. Entries without a value
-        (e.g., "flag") are skipped. If the record is not a TXT type or the format is
-        invalid, an empty dictionary is returned.
+        A dictionary where each key and value is a string.
 
     Raises:
         ValueError: If the TXT data cannot be parsed from the record.
     """
     dns_record_str = str(dns_record)
-    if "record[txt," not in dns_record_str:
-        logging.info(f"Unexpected DNSRecord format: {dns_record_str}")
+    logging.debug(f"[TXT Decode] Raw DNSRecord string: {dns_record_str}")
+
+    if "txt" not in dns_record_str.lower():
+        logging.warning(f"[TXT Decode] Record is not of TXT type: {dns_record_str}")
         return {}
 
     try:
-        _, byte_literal = dns_record_str.rsplit(",", 1)
-        raw_bytes = ast.literal_eval(byte_literal.strip())
+        # Attempt to extract the byte literal from the end of the string
+        match = re.search(r"(b'[^']*')\s*\}?\s*$", dns_record_str)
+        if not match:
+            logging.error(f"[TXT Decode] No byte literal found in record string: {dns_record_str}")
+            return {}
+
+        byte_literal = match.group(1)
+        logging.debug(f"[TXT Decode] Extracted byte literal: {byte_literal}")
+
+        raw_bytes = ast.literal_eval(byte_literal)
+        logging.debug(f"[TXT Decode] Parsed raw bytes: {raw_bytes}")
 
         decoded: dict[str, str] = {}
         i = 0
@@ -722,13 +728,17 @@ def get_txt_from_dns_record(dns_record: DNSRecord) -> dict[str, str | None]:
             length = raw_bytes[i]
             i += 1
             entry = raw_bytes[i:i+length].decode("utf-8", errors="replace").strip()
+            logging.debug(f"[TXT Decode] Parsed entry: '{entry}'")
             i += length
 
             if "=" in entry:
                 k, v = entry.split("=", 1)
                 decoded[k.strip()] = v.strip()
+            else:
+                logging.info(f"[TXT Decode] Skipped entry without '=': '{entry}'")
 
         return decoded
 
     except Exception as e:
+        logging.exception(f"[TXT Decode] Failed to decode TXT record: {e}")
         raise ValueError(f"Failed to decode TXT record: {e}")
