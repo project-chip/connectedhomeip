@@ -17,6 +17,7 @@
  */
 
 #include <ClosureControlEndpoint.h>
+#include <ClosureManager.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -54,24 +55,18 @@ enum class ClosureControlTestEventTrigger : uint64_t
 
 Status ClosureControlDelegate::HandleCalibrateCommand()
 {
-    ChipLogProgress(AppServer, "HandleCalibrateCommand");
-    // Add the calibration logic here
-    return Status::Success;
+    return ClosureManager::GetInstance().OnCalibrateCommand();
 }
 
 Status ClosureControlDelegate::HandleMoveToCommand(const Optional<TargetPositionEnum> & position, const Optional<bool> & latch,
                                                    const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
-    ChipLogProgress(AppServer, "HandleMoveToCommand");
-    // Add the move to logic here
-    return Status::Success;
+    return ClosureManager::GetInstance().OnMoveToCommand(position, latch, speed);
 }
 
 Status ClosureControlDelegate::HandleStopCommand()
 {
-    ChipLogProgress(AppServer, "HandleStopCommand");
-    // Add the stop logic here
-    return Status::Success;
+    return ClosureManager::GetInstance().OnStopCommand();
 }
 
 CHIP_ERROR ClosureControlDelegate::GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError)
@@ -160,4 +155,33 @@ CHIP_ERROR ClosureControlEndpoint::Init()
     ReturnErrorOnFailure(mInterface.Init());
 
     return CHIP_NO_ERROR;
+}
+
+void ClosureControlEndpoint::OnStopCalibrateActionComplete()
+{
+    // This function should handle closure control state updation after stopping of calibration Action.
+}
+
+void ClosureControlEndpoint::OnStopMotionActionComplete()
+{
+    // This function should handle closure control state updation after stopping of Motion Action.
+}
+
+void ClosureControlEndpoint::OnCalibrateActionComplete()
+{
+    DataModel::Nullable<GenericOverallState> overallState(GenericOverallState(
+        MakeOptional(DataModel::MakeNullable(PositioningEnum::kFullyClosed)), MakeOptional(DataModel::MakeNullable(true)),
+        MakeOptional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kAuto)), MakeOptional(DataModel::MakeNullable(true))));
+    DataModel::Nullable<GenericOverallTarget> overallTarget = DataModel::NullNullable;
+
+    mLogic.SetMainState(MainStateEnum::kStopped);
+    mLogic.SetOverallState(overallState);
+    mLogic.SetOverallTarget(overallTarget);
+    mLogic.SetCountdownTimeFromDelegate(0);
+    mLogic.GenerateMovementCompletedEvent();
+}
+
+void ClosureControlEndpoint::OnMoveToActionComplete()
+{
+    // This function should handle closure control state updation after completion of Motion Action.
 }

@@ -1186,12 +1186,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value, MarkAttributeDirty markDirty);
 } // namespace FeatureMap
 
-namespace ClusterRevision {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint16_t * value); // int16u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
-} // namespace ClusterRevision
-
 } // namespace Attributes
 } // namespace AdministratorCommissioning
 
@@ -2891,6 +2885,17 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::ClosureControl::MainStateEnum value,
                                         MarkAttributeDirty markDirty);
 } // namespace MainState
+
+namespace LatchControlModes {
+Protocols::InteractionModel::Status
+Get(EndpointId endpoint,
+    chip::BitMask<chip::app::Clusters::ClosureControl::LatchControlModesBitmap> * value); // LatchControlModesBitmap
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::ClosureControl::LatchControlModesBitmap> value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint,
+                                        chip::BitMask<chip::app::Clusters::ClosureControl::LatchControlModesBitmap> value,
+                                        MarkAttributeDirty markDirty);
+} // namespace LatchControlModes
 
 } // namespace Attributes
 } // namespace ClosureControl

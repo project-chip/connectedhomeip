@@ -173,6 +173,7 @@
             "FeatureMap"
         ],
         "Administrator Commissioning": [
+            "ClusterRevision",
             "WindowStatus",
             "AdminFabricIndex",
             "AdminVendorId"
@@ -203,8 +204,8 @@
         "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": [
             "CountdownTime",
-            "OverallState",
-            "OverallTarget",
+            "OverallCurrentState",
+            "OverallTargetState",
             "FeatureMap",
             "ClusterRevision"
         ],
