@@ -29,7 +29,7 @@ from zeroconf import IPVersion, ServiceListener, ServiceStateChange, Zeroconf
 from zeroconf._dns import DNSAddress, DNSRecord
 from zeroconf._engine import AsyncListener
 from zeroconf._protocol.incoming import DNSIncoming
-from zeroconf.asyncio import AsyncServiceInfo, AsyncZeroconf, AsyncZeroconfServiceTypes
+from zeroconf.asyncio import AsyncServiceInfo, AsyncZeroconf, AsyncZeroconfServiceTypes, AsyncServiceBrowser
 
 logger = logging.getLogger(__name__)
 
@@ -390,7 +390,7 @@ class MdnsDiscovery:
                             txt_found = get_txt_from_dns_record(dns_record)
                             if txt_found:
                                 txt_from_cache = txt_found
-                                logging.info(f"TXT data recovered from cache.")
+                                logging.info("TXT data recovered from cache.")
 
             # Adds service to discovered services
             mdns_service_info = self._to_mdns_service_info_class(service_info)
