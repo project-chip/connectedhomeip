@@ -15,7 +15,6 @@
 #  limitations under the License.
 #
 
-import ctypes
 from ctypes import CFUNCTYPE, c_char_p, c_void_p
 
 import chip.native
