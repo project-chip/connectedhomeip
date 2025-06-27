@@ -219,10 +219,6 @@ CHIP_ERROR JCMDeviceCommissioner::ParseOperationalCredentials(ReadCommissioningI
         ChipLogError(Controller, "JCM: Root public key is empty!");
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
-    {
-        ChipLogError(Controller, "JCM: Root key span is empty!");
-        return CHIP_ERROR_KEY_NOT_FOUND;
-    }
 
     if (mInfo.adminNOC.AllocatedSize() == 0)
     {
@@ -373,7 +369,7 @@ JCMTrustVerificationError JCMDeviceCommissioner::VerifyAdministratorInformation(
     ChipLogProgress(Controller, "JCM: Administrator endpoint ID: %d", mInfo.adminEndpointId);
     ChipLogProgress(Controller, "JCM: Administrator fabric index: %d", mInfo.adminFabricIndex);
     ChipLogProgress(Controller, "JCM: Administrator vendor ID: %d", mInfo.adminVendorId);
-    ChipLogProgress(Controller, "JCM: Administrator fabric ID: %llu", mInfo.adminFabricId);
+    ChipLogProgress(Controller, "JCM: Administrator fabric ID: %llu", (unsigned long long) mInfo.adminFabricId);
 
     return JCMTrustVerificationError::kSuccess;
 }
