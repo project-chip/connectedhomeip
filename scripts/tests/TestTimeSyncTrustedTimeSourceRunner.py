@@ -26,7 +26,7 @@ DEFAULT_CHIP_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'
 
 DEFAULT_ALL_CLUSTERS = os.path.join(
     DEFAULT_CHIP_ROOT,
-    'objdir-clone',
+    'out',
     'linux-x64-all-clusters-ipv6only-no-ble-no-wifi-tsan-clang-test',
     'chip-all-clusters-app')
 DEFAULT_TEST_RUNNER = os.path.join(DEFAULT_CHIP_ROOT, 'scripts', 'tests', 'run_python_test.py')
