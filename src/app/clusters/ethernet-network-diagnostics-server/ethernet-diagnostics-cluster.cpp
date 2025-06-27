@@ -88,7 +88,7 @@ GetFeatureMap(const EthernetDiagnosticsEnabledAttributes & enabledAttributes)
         .Set(EthernetNetworkDiagnostics::Feature::kErrorCounts, enabledAttributes.enableErrCount);
 }
 
-CHIP_ERROR EncodeValue(uint64_t value, CHIP_ERROR readError, AttributeValueEncoder & encoder)
+CHIP_ERROR EncodeU64Value(uint64_t value, CHIP_ERROR readError, AttributeValueEncoder & encoder)
 {
     if (readError == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
@@ -150,7 +150,7 @@ DataModel::ActionReturnStatus EthernetDiagnosticsServerCluster::ReadAttribute(co
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
 
-    return EncodeValue(value, err, encoder);
+    return EncodeU64Value(value, err, encoder);
 }
 
 std::optional<DataModel::ActionReturnStatus>
