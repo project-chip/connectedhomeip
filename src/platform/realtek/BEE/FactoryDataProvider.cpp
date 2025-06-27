@@ -639,12 +639,10 @@ exit:
 
 CHIP_ERROR FactoryDataProvider::GetSoftwareVersionString(char * buf, size_t bufSize)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     VerifyOrReturnError(bufSize >= sizeof(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
     strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR FactoryDataProvider::GetHardwareVersion(uint16_t & hardwareVersion)

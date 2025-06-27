@@ -52,7 +52,8 @@ void CHIPDeviceManager::CommonDeviceEventHandler(const ChipDeviceEvent * event, 
 CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 {
     CHIP_ERROR err;
-    mCB = cb;
+    mCB         = cb;
+    mIsInitDone = false;
 
     ChipLogProgress(DeviceLayer, "Start to init MemoryInit");
     err = Platform::MemoryInit();
