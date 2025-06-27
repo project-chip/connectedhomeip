@@ -181,8 +181,8 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
 
     // TODO: we explicitly DO NOT validate that path is a valid cluster path (even more, above serverClusterFinder
-    //       explicitly ignores that case). This means that global attribute reads as well as ReadAttribute
-    //       can be passed invalid paths when an invalid Read is detected and must handle them.
+    //       explicitly ignores that case).
+    //       Validation of attribute existence is done after ACL, in `ValidateAttributeIsReadable` below
     //
     //       See https://github.com/project-chip/connectedhomeip/issues/37410
 
@@ -196,9 +196,9 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
         // the are routed through metadata.
         status = ReadGlobalAttributeFromMetadata(dataModel, readRequest.path, attributeValueEncoder);
     }
-    else if (auto existence_status = ValidateAttributeIsReadable(dataModel, path); existence_status.has_value())
+    else if (auto readable_status = ValidateAttributeIsReadable(dataModel, path); readable_status.has_value())
     {
-        status = *existence_status;
+        status = *readable_status;
     }
     else
     {
