@@ -73,6 +73,8 @@ data_model_XMLS_1_2 = [
   "${chip_root}/data_model/1.2/clusters/Mode_RVCRun.xml",
   "${chip_root}/data_model/1.2/clusters/Mode_Refrigerator.xml",
   "${chip_root}/data_model/1.2/clusters/NetworkCommissioningCluster.xml",
+  "${chip_root}/data_model/1.2/clusters/OTAProvider.xml",
+  "${chip_root}/data_model/1.2/clusters/OTARequestor.xml",
   "${chip_root}/data_model/1.2/clusters/OccupancySensing.xml",
   "${chip_root}/data_model/1.2/clusters/OnOff.xml",
   "${chip_root}/data_model/1.2/clusters/OperationalCredentialCluster.xml",
