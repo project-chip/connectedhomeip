@@ -353,7 +353,7 @@ std::optional<DataModel::AttributeEntry> CodegenDataModelProvider::FindAttribute
 
     VerifyOrReturnValue(cluster->Attributes(path, builder) == CHIP_NO_ERROR, std::nullopt);
 
-    for (auto info : builder.TakeBuffer())
+    for (auto & info : builder.TakeBuffer())
     {
         if (info.attributeId == path.mAttributeId)
         {
