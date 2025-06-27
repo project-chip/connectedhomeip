@@ -160,6 +160,19 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL
+ *
+ * The SIT slow polling interval (in milliseconds) is a configuration that allows LIT capable devices
+ * operating in SIT mode to use a shorter slow polling interval than their typical
+ * Slow polling interval.
+ *
+ * The SIT slow polling interval cannot be set to a value greater than CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT
+ */
+#ifndef CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL
+#define CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT
+#endif // CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL
+
+/**
  * CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL
  *
  * The default amount of time in milliseconds that the sleepy end device will use as an active interval.
