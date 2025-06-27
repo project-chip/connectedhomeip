@@ -136,8 +136,8 @@ void ClosureManager::InitiateAction(AppEvent * event)
     // This is a safety check to ensure that we do not initiate a new action while another action is in progress.
     // If this happens, we log an error and do not proceed with initiating the action.
     VerifyOrReturn(eventAction == instance.GetCurrentAction(),
-        ChipLogError(AppServer, "Got Event for %d in InitiateAction while current ongoing action is %d", to_underlying(eventAction),
-                     to_underlying(instance.GetCurrentAction())));
+                   ChipLogError(AppServer, "Got Event for %d in InitiateAction while current ongoing action is %d",
+                                to_underlying(eventAction), to_underlying(instance.GetCurrentAction())));
 
     instance.CancelTimer(); // Cancel any existing timer before starting a new action
 

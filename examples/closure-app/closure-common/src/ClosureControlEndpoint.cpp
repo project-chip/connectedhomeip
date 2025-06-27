@@ -200,17 +200,15 @@ void ClosureControlEndpoint::OnStopMotionActionComplete()
         }
 
         VerifyOrReturn(mLogic.SetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to set overall state in OnStopMotionActionComplete"));
+                       ChipLogError(AppServer, "Failed to set overall state in OnStopMotionActionComplete"));
     }
 
     VerifyOrReturn(mLogic.SetMainState(MainStateEnum::kStopped) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to set main state in OnStopMotionActionComplete"));
 
     // Set the Position, latch in OverallTargetState to Null and speed to Auto as the motion has been stopped.
-    GenericOverallTargetState overallTargetState(
-        MakeOptional(DataModel::NullNullable),
-        MakeOptional(DataModel::NullNullable),
-        MakeOptional(Globals::ThreeLevelAutoEnum::kAuto));
+    GenericOverallTargetState overallTargetState(MakeOptional(DataModel::NullNullable), MakeOptional(DataModel::NullNullable),
+                                                 MakeOptional(Globals::ThreeLevelAutoEnum::kAuto));
     VerifyOrReturn(mLogic.SetOverallTargetState(DataModel::MakeNullable(overallTargetState)) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to set overall target in OnStopMotionActionComplete"));
 
