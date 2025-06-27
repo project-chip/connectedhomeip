@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <data-model-providers/endpoint/EndpointProviderRegistry.h>
+#include <data-model-providers/codedriven/endpoint/EndpointProviderRegistry.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {
