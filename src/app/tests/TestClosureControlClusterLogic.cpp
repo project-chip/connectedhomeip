@@ -1552,7 +1552,7 @@ TEST_F(TestClosureControlClusterLogic, ClearCurrentErrorList)
     conformance.FeatureMap().Set(Feature::kPositioning);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     logic->ClearCurrentErrorList();
-
+    
     EXPECT_EQ(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor), CHIP_ERROR_INCORRECT_STATE);
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
 
@@ -1568,7 +1568,7 @@ TEST_F(TestClosureControlClusterLogic, ClearCurrentErrorList)
 
     logic->ClearCurrentErrorList();
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
-
+    
     currentErrorList.reduce_size(0);
     EXPECT_EQ(logic->GetCurrentErrorList(currentErrorList), CHIP_NO_ERROR);
     EXPECT_TRUE(currentErrorList.empty());
