@@ -175,51 +175,43 @@ void ClosureControlEndpoint::OnStopCalibrateActionComplete()
 
 void ClosureControlEndpoint::OnStopMotionActionComplete()
 {
+    MainStateEnum presentMainState;
+    VerifyOrReturn(mLogic.GetMainState(presentMainState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get main state in OnStopMotionActionComplete"));
+
+    // If the current main state is WaitingForMotion, then we should not Update the OverallCurrentState.
+    if (presentMainState == MainStateEnum::kWaitingForMotion)
+    {
+        // Set the OverallState position to PartiallyOpened as motion has been stopped
+        // and the closure is not fully closed or fully opened.
+        auto position = MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened));
+
+        DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
+        VerifyOrReturn(mLogic.GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR,
+                       ChipLogError(AppServer, "Failed to get overall state in OnStopMotionActionComplete"));
+
+        if (overallCurrentState.IsNull())
+        {
+            overallCurrentState.SetNonNull(GenericOverallCurrentState(position, NullOptional, NullOptional, NullOptional));
+        }
+        else
+        {
+            overallCurrentState.Value().position = position;
+        }
+
+        VerifyOrReturn(mLogic.SetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set overall state in OnStopMotionActionComplete"));
+    }
+
     VerifyOrReturn(mLogic.SetMainState(MainStateEnum::kStopped) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to set main state in OnStopMotionActionComplete"));
 
-    // Set the OverallState position to PartiallyOpened as motion has been stopped
-    // and the closure is not fully closed or fully opened.
-    auto position = MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened));
-
-    // Set the OverallState latch to False as motion was in progress and latch will be disengaged.
-    auto latch = MakeOptional(DataModel::MakeNullable(false));
-
-    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
-    VerifyOrReturn(mLogic.GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to get overall state in OnStopMotionActionComplete"));
-
-    if (overallCurrentState.IsNull())
-    {
-        overallCurrentState.SetNonNull(GenericOverallCurrentState(position, latch, NullOptional, NullOptional));
-    }
-    else
-    {
-        overallCurrentState.Value().position = position;
-        overallCurrentState.Value().latch    = latch;
-    }
-
-    VerifyOrReturn(mLogic.SetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to set overall state in OnStopMotionActionComplete"));
-
-    DataModel::Nullable<GenericOverallTargetState> overallTargetState;
-    VerifyOrReturn(mLogic.GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to get overall target state in OnStopMotionActionComplete"));
-
-    // Set the OverallTarget latch to False as motion was in progress and latch will be disengaged.
-    if (overallTargetState.IsNull())
-    {
-        overallTargetState.SetNonNull(
-            GenericOverallTargetState(NullOptional, MakeOptional(DataModel::MakeNullable(false)), NullOptional));
-    }
-    else
-    {
-        // Clear the position in OverallTarget as motion is stopped and we don't have a target position anymore.
-        overallTargetState.Value().position.ClearValue();
-        overallTargetState.Value().latch.SetValue(DataModel::MakeNullable(false));
-    }
-
-    VerifyOrReturn(mLogic.SetOverallTargetState(overallTargetState) == CHIP_NO_ERROR,
+    // Set the Position, latch in OverallTargetState to Null and speed to Auto as the motion has been stopped.
+    GenericOverallTargetState overallTargetState(
+        MakeOptional(DataModel::NullNullable),
+        MakeOptional(DataModel::NullNullable),
+        MakeOptional(Globals::ThreeLevelAutoEnum::kAuto));
+    VerifyOrReturn(mLogic.SetOverallTargetState(DataModel::MakeNullable(overallTargetState)) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to set overall target in OnStopMotionActionComplete"));
 
     VerifyOrReturn(mLogic.SetCountdownTimeFromDelegate(0) == CHIP_NO_ERROR,

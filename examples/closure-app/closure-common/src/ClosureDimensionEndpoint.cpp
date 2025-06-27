@@ -67,22 +67,10 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
 
 void ClosureDimensionEndpoint::OnStopMotionActionComplete()
 {
-    DataModel::Nullable<GenericTargetStruct> target;
-    mLogic.GetTarget(target);
-
-    // Set the OverallTarget latch to False as motion was in progress and latch will be disengaged.
-    if (target.IsNull())
-    {
-        target.SetNonNull(GenericTargetStruct(NullOptional, MakeOptional(false), NullOptional));
-    }
-    else
-    {
-        // Target Position is not relevant when motion is stopped.
-        target.Value().position.ClearValue();
-        target.Value().latch.SetValue(false);
-    }
-
-    VerifyOrReturn(mLogic.SetTarget(target) == CHIP_NO_ERROR,
+    // Set the Position, latch in OverallTargetState to Null and speed to Auto as the motion has been stopped.
+    GenericTargetStruct target = GenericTargetStruct(
+        NullOptional, NullOptional, MakeOptional(Globals::ThreeLevelAutoEnum::kAuto));
+    VerifyOrReturn(mLogic.SetTarget(DataModel::MakeNullable(target)) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to set target in OnStopMotionActionComplete"));
 }
 
