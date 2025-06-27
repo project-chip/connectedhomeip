@@ -64,10 +64,6 @@ case "$OS_TYPE" in
         ;;
 esac
 
-if [ -n "$chip_support_webrtc_python_bindings" ]; then
-    extra_gn_args+=("--args=chip_support_webrtc_python_bindings=true")
-fi
-
 help() {
 
     echo "Usage: $file_name [ options ... ]"

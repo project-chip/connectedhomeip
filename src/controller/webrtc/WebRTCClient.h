@@ -17,9 +17,6 @@
 
 #pragma once
 #include <functional>
-#include <map>
-#include <memory>
-#include <mutex>
 #include <rtc/rtc.hpp>
 #include <string>
 
@@ -32,19 +29,19 @@ public:
     WebRTCClient();
     ~WebRTCClient();
 
-    void createPeerConnection(const std::string & stunUrl);
-    void createOffer();
-    void createAnswer();
-    void setRemoteDescription(const std::string & sdp, const std::string & type);
-    void addIceCandidate(const std::string & candidate, const std::string & mid);
+    void CreatePeerConnection(const std::string & stunUrl);
+    void CreateOffer();
+    void CreateAnswer();
+    void SetRemoteDescription(const std::string & sdp, const std::string & type);
+    void AddIceCandidate(const std::string & candidate, const std::string & mid);
 
-    void onLocalDescription(std::function<void(const std::string &, const std::string &)> callback);
-    void onIceCandidate(std::function<void(const std::string &, const std::string &)> callback);
+    void OnLocalDescription(std::function<void(const std::string &, const std::string &)> callback);
+    void OnIceCandidate(std::function<void(const std::string &, const std::string &)> callback);
 
 private:
-    std::shared_ptr<rtc::PeerConnection> pc_;
-    std::function<void(const std::string &, const std::string &)> localDescriptionCallback_;
-    std::function<void(const std::string &, const std::string &)> iceCandidateCallback_;
+    rtc::PeerConnection * mPeerConnection;
+    std::function<void(const std::string &, const std::string &)> mLocalDescriptionCallback;
+    std::function<void(const std::string &, const std::string &)> mIceCandidateCallback;
 };
 
 } // namespace webrtc
