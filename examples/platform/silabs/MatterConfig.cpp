@@ -262,7 +262,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
 
     // Provision Manager
-    Provision::Manager & provision = Manager::GetInstance();
+    Provision::Manager & provision = Provision::Manager::GetInstance();
     ReturnErrorOnFailure(provision.Init());
     SetDeviceInstanceInfoProvider(&provision.GetStorage());
     SetCommissionableDataProvider(&provision.GetStorage());
