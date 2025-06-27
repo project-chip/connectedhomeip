@@ -304,4 +304,63 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendInsufficientHeadroom)
     EXPECT_EQ(packet1->DataLength(), packet1->MaxDataLength());
 }
 
+TEST_F(TestBtpEngine, EncodeStandAloneAckOnePacket)
+{
+    constexpr uint8_t packetData0[] = {
+        to_underlying(BtpEngine::HeaderFlags::kStartMessage) | to_underlying(BtpEngine::HeaderFlags::kEndMessage),
+        0x01,
+        0x01,
+        0x00,
+        0xff,
+    };
+
+    auto packet0 = System::PacketBufferHandle::NewWithData(packetData0, sizeof(packetData0));
+    EXPECT_FALSE(packet0.IsNull());
+
+    SequenceNumber_t receivedAck;
+    bool didReceiveAck;
+    EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(packet0), receivedAck, didReceiveAck), CHIP_NO_ERROR);
+    EXPECT_EQ(mBtpEngine.RxState(), BtpEngine::kState_Complete);
+
+    EXPECT_TRUE(mBtpEngine.HasUnackedData());
+
+    auto ackPacket = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    EXPECT_FALSE(ackPacket.IsNull());
+
+    EXPECT_EQ(mBtpEngine.EncodeStandAloneAck(ackPacket), CHIP_NO_ERROR);
+    EXPECT_EQ(ackPacket->DataLength(), kTransferProtocolStandaloneAckHeaderSize);
+
+    EXPECT_EQ(ackPacket->Start()[0], to_underlying(BtpEngine::HeaderFlags::kFragmentAck));
+    EXPECT_EQ(ackPacket->Start()[1], 0x01);
+    EXPECT_EQ(ackPacket->Start()[2], 0x00);
+}
+
+TEST_F(TestBtpEngine, EncodeStandAloneAckNoUnackedData)
+{
+    auto ackPacket = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    EXPECT_FALSE(ackPacket.IsNull());
+
+    EXPECT_EQ(mBtpEngine.EncodeStandAloneAck(ackPacket), CHIP_NO_ERROR);
+    EXPECT_EQ(ackPacket->DataLength(), kTransferProtocolStandaloneAckHeaderSize);
+
+    EXPECT_EQ(ackPacket->Start()[0], to_underlying(BtpEngine::HeaderFlags::kFragmentAck));
+    EXPECT_EQ(ackPacket->Start()[1], 0x00);
+    EXPECT_EQ(ackPacket->Start()[2], 0x00);
+}
+
+TEST_F(TestBtpEngine, EncodeStandAloneAckInsufficientBuffer)
+{
+    auto ackPacket0 = System::PacketBufferHandle::New(kTransferProtocolStandaloneAckHeaderSize - 1);
+    EXPECT_FALSE(ackPacket0.IsNull());
+
+    EXPECT_EQ(mBtpEngine.EncodeStandAloneAck(ackPacket0), CHIP_ERROR_NO_MEMORY);
+    EXPECT_EQ(ackPacket0->DataLength(), static_cast<size_t>(0));
+
+    // Complite this test
+    // auto ackPacket1 = System::PacketBufferHandle::New(10, 0);
+    // ackPacket1->SetDataLength(10);
+    // EXPECT_EQ(mBtpEngine.EncodeStandAloneAck(ackPacket1), CHIP_ERROR_NO_MEMORY);
+    // EXPECT_EQ(ackPacket->DataLength(), static_cast<size_t>(0));
+}
+
 } // namespace
