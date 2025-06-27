@@ -20,9 +20,14 @@
 #include <lib/core/CHIPError.h>
 #include <optional>
 
+using namespace chip::DeviceLayer;
+
 namespace chip {
 namespace app {
 namespace Clusters {
+
+// Max decodable count allowed is 2048.
+constexpr u_int16_t kMaxPayloadTestRequestCount = 2048;
 
 CHIP_ERROR GeneralDiagnosticsLogic::ReadNetworkInterfaces(AttributeValueEncoder & aEncoder)
 {
@@ -100,8 +105,7 @@ std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsLogic::HandlePayl
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType & commandData)
 {
-    // Max allowed is 2048.
-    if (commandData.count > 2048)
+    if (commandData.count > kMaxPayloadTestRequestCount)
     {
         return chip::Protocols::InteractionModel::Status::ConstraintError;
     }
