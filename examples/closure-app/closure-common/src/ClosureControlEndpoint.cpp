@@ -180,7 +180,7 @@ void ClosureControlEndpoint::OnStopMotionActionComplete()
                    ChipLogError(AppServer, "Failed to get main state in OnStopMotionActionComplete"));
 
     // If the current main state is WaitingForMotion, then we should not Update the OverallCurrentState.
-    if (presentMainState == MainStateEnum::kWaitingForMotion)
+    if (presentMainState != MainStateEnum::kWaitingForMotion)
     {
         // Set the OverallState position to PartiallyOpened as motion has been stopped
         // and the closure is not fully closed or fully opened.
