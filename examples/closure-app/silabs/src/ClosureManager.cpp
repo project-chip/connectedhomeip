@@ -324,7 +324,7 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
                         ChipLogError(AppServer, "Failed to set target for Endpoint 2"));
     VerifyOrReturnError(ep3.GetLogic().SetTarget(DataModel::MakeNullable(ep3Target)) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set target for Endpoint 3"));
-    
+
     VerifyOrReturnError(ep1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
 
@@ -375,7 +375,7 @@ void ClosureManager::HandleClosureMotionAction()
                    ChipLogError(AppServer, "MoveToCommand failed due to Null value Current state on Endpoint 2"));
     VerifyOrReturn(!ep3CurrentState.IsNull(),
                    ChipLogError(AppServer, "MoveToCommand failed due to Null value Current state on Endpoint 3"));
-    
+
     VerifyOrReturn(!ep1TargetState.IsNull(),
                    ChipLogError(AppServer, "MoveToCommand failed due to Null value Target state on Endpoint 1"));
     VerifyOrReturn(!ep2TargetState.IsNull(),
