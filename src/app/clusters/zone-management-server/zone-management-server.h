@@ -111,6 +111,7 @@ struct ZoneInformationStorage : ZoneInformationStruct
         zoneType            = aZoneType;
         zoneSource          = aZoneSource;
         twoDCartZoneStorage = aTwoDCartZoneStorage;
+        twoDCartesianZone   = twoDCartZoneStorage;
     }
 
     Optional<TwoDCartesianZoneStorage> twoDCartZoneStorage;

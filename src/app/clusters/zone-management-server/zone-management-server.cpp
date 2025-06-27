@@ -373,7 +373,7 @@ Status ZoneMgmtServer::ValidateTwoDCartesianZone(const TwoDCartesianZoneDecodabl
 
     if (zone.color.HasValue())
     {
-        VerifyOrReturnError(zone.color.Value().size() == 7 && zone.color.Value().size() == 9, Status::ConstraintError);
+        VerifyOrReturnError(zone.color.Value().size() == 7 || zone.color.Value().size() == 9, Status::ConstraintError);
     }
 
     return Status::Success;
