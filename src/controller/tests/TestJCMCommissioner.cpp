@@ -63,7 +63,7 @@ public:
         commissioner.ContinueAfterUserConsent(mShouldConsent);
     }
 
-    void OnVerifyVendorId(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info)
+    void OnVerifyVendorId(JCMDeviceCommissioner & commissioner, JCMTrustVerificationInfo & info) override
     {
         mAskedForVendorIdVerification = true;
         commissioner.ContinueAfterVendorIDVerification(mShouldVerifyVendorId);

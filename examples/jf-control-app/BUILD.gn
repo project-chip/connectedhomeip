@@ -97,7 +97,10 @@ static_library("jfc-utils") {
     "commands/pairing/PairingCommand.h",
   ]
 
-  deps = [ "${chip_root}/src/app:events" ]
+  deps = [
+    "${chip_root}/src/app:events",
+    "${chip_root}/src/controller:jcm",
+  ]
 
   if (config_use_interactive_mode) {
     sources += [ "${chip_root}/examples/chip-tool/commands/interactive/InteractiveCommands.cpp" ]
