@@ -268,6 +268,9 @@ void RvcOperationalStateDelegate::HandleGoHomeCommandCallback(OperationalState::
         ChipLogDetail(DeviceLayer, "HandleGoHomeCommandCallback: RVC was started, current state = %d. Stopping RVC.",
                       to_underlying(current_state));
         gRvcOperationalStateDelegate->HandleStopStateCallback(err);
+#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
+        getRvcRunModeInstance()->UpdateCurrentMode(RvcRunMode::ModeIdle);
+#endif // MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
     }
 
     // Skip SeekingCharger and Docking states and directly go into charging.
