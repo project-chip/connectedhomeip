@@ -100,10 +100,8 @@ P256Keypair::~P256Keypair()
     {
         Clear();
     }
-    else
-    {
-        // Delete the key in SE
-    }
+#else
+    Clear();
 #endif
 }
 
