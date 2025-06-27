@@ -368,6 +368,34 @@ public:
 
         // Remove a zone trigger
         virtual CameraError RemoveZoneTrigger(uint16_t zoneID) = 0;
+
+        class ZoneEventCallback
+        {
+        public:
+            virtual ~ZoneEventCallback() = default;
+
+            /*
+             * Callback for ZoneTriggered event. This notification callback
+             * would be called by the camera-device to generate and Log a
+             * ZoneTriggered event.
+             */
+            virtual void OnZoneTriggeredEvent(uint16_t zoneId,
+                                              chip::app::Clusters::ZoneManagement::ZoneEventTriggeredReasonEnum triggerReason)
+            {
+                return;
+            }
+
+            /*
+             * Callback for ZoneStopped event. This notification callback
+             * would be called by the camera-device to generate and Log a
+             * ZoneStopped event.
+             */
+            virtual void OnZoneStoppedEvent(uint16_t zoneId,
+                                            chip::app::Clusters::ZoneManagement::ZoneEventStoppedReasonEnum stopReason)
+            {
+                return;
+            }
+        };
     };
 
     virtual CameraHALInterface & GetCameraHALInterface() = 0;

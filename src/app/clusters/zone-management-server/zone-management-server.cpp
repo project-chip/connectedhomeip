@@ -19,6 +19,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
+#include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/zone-management-server/zone-management-server.h>
 #include <app/reporting/reporting.h>
@@ -633,6 +634,44 @@ void ZoneMgmtServer::HandleRemoveTrigger(HandlerContext & ctx, const Commands::R
     }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
+}
+
+Status ZoneMgmtServer::GenerateZoneTriggeredEvent(uint16_t zoneID, ZoneEventTriggeredReasonEnum triggerReason)
+{
+    Events::ZoneTriggered::Type event;
+    EventNumber eventNumber;
+
+    event.zone   = zoneID;
+    event.reason = triggerReason;
+
+    CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
+
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(AppServer, "Endpoint %d - Unable to generate ZoneTriggered event: %" CHIP_ERROR_FORMAT, mEndpointId,
+                     err.Format());
+        return Status::Failure;
+    }
+    return Status::Success;
+}
+
+Status ZoneMgmtServer::GenerateZoneStoppedEvent(uint16_t zoneID, ZoneEventStoppedReasonEnum stopReason)
+{
+    Events::ZoneStopped::Type event;
+    EventNumber eventNumber;
+
+    event.zone   = zoneID;
+    event.reason = stopReason;
+
+    CHIP_ERROR err = LogEvent(event, mEndpointId, eventNumber);
+
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(AppServer, "Endpoint %d - Unable to generate ZoneTriggered event: %" CHIP_ERROR_FORMAT, mEndpointId,
+                     err.Format());
+        return Status::Failure;
+    }
+    return Status::Success;
 }
 
 } // namespace ZoneManagement
