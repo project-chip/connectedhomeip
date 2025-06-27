@@ -308,8 +308,9 @@ TEST_F(TestBtpEngine, HandleCharacteristicSendInsufficientHeadroom)
 TEST_F(TestBtpEngine, InitialSequenceNumbers)
 {
     // inline function completely omitted from the LCOV report, no function symbols are generated.
-    EXPECT_EQ(mBtpEngine.GetLastReceivedSequenceNumber(), 0); 
-    // inline function appears in the LCOV report as uncovered (red), even though is actually covered/executed in the test cases, function symbols are generated.
+    EXPECT_EQ(mBtpEngine.GetLastReceivedSequenceNumber(), 0);
+    // inline function appears in the LCOV report as uncovered (red), even though is actually covered/executed in the test cases,
+    // function symbols are generated.
     EXPECT_EQ(mBtpEngine.GetNewestUnackedSentSequenceNumber(), 0);
 }
 
