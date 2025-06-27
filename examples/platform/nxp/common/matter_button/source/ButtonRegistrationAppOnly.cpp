@@ -23,12 +23,10 @@
 
 #include <lib/support/CodeUtils.h>
 
-CHIP_ERROR chip::NXP::App::RegisterButtons(void)
+CHIP_ERROR chip::NXP::App::RegisterButtons()
 {
     ReturnErrorOnFailure(ButtonMgr().Init());
 
     static chip::NXP::App::ButtonApp sAppButton;
-    ReturnErrorOnFailure(ButtonMgr().RegisterButton(sAppButton));
-
-    return CHIP_NO_ERROR;
+    return ButtonMgr().RegisterButton(sAppButton);
 }

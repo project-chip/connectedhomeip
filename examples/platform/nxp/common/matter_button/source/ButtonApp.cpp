@@ -29,15 +29,19 @@ extern "C" {
  *
  * By default assuming button handles are predefined in the SDK
  * If not, flag CHIP_APP_BUTTON_HANDLE_SDK_NOT_PREDEFINED should be defined
+ * or set to 1
  */
+#ifndef CONFIG_CHIP_APP_BUTTON_HANDLE_SDK_NOT_PREDEFINED
+#define CONFIG_CHIP_APP_BUTTON_HANDLE_SDK_NOT_PREDEFINED 0
+#endif
 
-#ifdef CONFIG_CHIP_APP_BUTTON_HANDLE_SDK_NOT_PREDEFINED
+#if CONFIG_CHIP_APP_BUTTON_HANDLE_SDK_NOT_PREDEFINED
 BUTTON_HANDLE_ARRAY_DEFINE(g_buttonHandle, gAppButtonCnt_c);
 #endif
 
 CHIP_ERROR chip::NXP::App::ButtonApp::Init()
 {
-#ifndef CONFIG_CHIP_APP_BUTTON_HANDLE_SDK_NOT_PREDEFINED
+#if !CONFIG_CHIP_APP_BUTTON_HANDLE_SDK_NOT_PREDEFINED
     // Button is defined in the SDK and initialized in otSysInit, when APP_InitServices is called.
     handle = &g_buttonHandle[1];
 #else
