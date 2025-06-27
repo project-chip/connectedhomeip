@@ -20,6 +20,7 @@ from ctypes import c_char_p, c_void_p
 
 import chip.native
 
+
 def _GetWebRTCLibraryHandle() -> ctypes.CDLL:
     """ Get the native library handle with webrtc method initialization.
 
