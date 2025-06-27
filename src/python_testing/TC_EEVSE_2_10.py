@@ -393,7 +393,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
         # maximumDischargeCurrent=12000. Store MaximumDischargeCurrent as MaximumDischargeCurrent
         # Verify DUT responds w/ status SUCCESS(0x00)
         maximum_discharge_current = 12000
-        await self.send_enable_discharge_command(maximum_discharge_current=maximum_discharge_current)
+        await self.send_enable_discharge_command(max_discharge=maximum_discharge_current)
 
         self.step("11a")
         # TH reads from the DUT the SupplyState
