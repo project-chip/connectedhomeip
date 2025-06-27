@@ -239,7 +239,7 @@ void CYW30739MatterConfig::InitApp(void)
 
     // Init Matter Server
     const Clusters::GeneralDiagnosticsEnabledAttributes enabledAttributes = Clusters::GeneralDiagnosticsEnabledAttributes();
-    Clusters::GeneralDiagnosticsCluster cluster(enabledAttributes);
+    static Clusters::GeneralDiagnosticsCluster cluster(enabledAttributes);
     sEventManagementTestEventTriggerHandler.SetGeneralDiagnosticsClusterInstance(&cluster);
     chip::Server::GetInstance().Init(initParams);
 
