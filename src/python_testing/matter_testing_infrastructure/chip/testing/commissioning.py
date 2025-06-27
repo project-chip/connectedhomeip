@@ -63,7 +63,7 @@ class CommissioningInfo:
         commissioning_method (Optional[str]):
             The method by which the device is being commissioned.
 
-        thread_operational_dataset (Optional[str]):
+        thread_operational_dataset (Optional[bytes]):
             The Thread operational dataset if applicable during commissioning.
 
         wifi_passphrase (Optional[str]):
@@ -81,7 +81,7 @@ class CommissioningInfo:
     """
     commissionee_ip_address_just_for_testing: Optional[str] = None
     commissioning_method: Optional[str] = None
-    thread_operational_dataset: Optional[str] = None
+    thread_operational_dataset: Optional[bytes] = None
     wifi_passphrase: Optional[str] = None
     wifi_ssid: Optional[str] = None
     tc_version_to_simulate: Optional[int] = None
@@ -158,6 +158,12 @@ async def commission_device(
             return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "ble-wifi":
         try:
+            asserts.assert_is_not_none(commissioning_info.wifi_ssid, "WiFi SSID must be provided for ble-wifi commissioning")
+            asserts.assert_is_not_none(commissioning_info.wifi_passphrase,
+                                       "WiFi Passphrase must be provided for ble-wifi commissioning")
+            # Type assertions to help mypy understand these are not None after the asserts
+            assert commissioning_info.wifi_ssid is not None
+            assert commissioning_info.wifi_passphrase is not None
             await dev_ctrl.CommissionWiFi(
                 info.filter_value,
                 info.passcode,
@@ -172,6 +178,10 @@ async def commission_device(
             return PairingStatus(exception=e)
     elif commissioning_info.commissioning_method == "ble-thread":
         try:
+            asserts.assert_is_not_none(commissioning_info.thread_operational_dataset,
+                                       "Thread dataset must be provided for ble-thread commissioning")
+            # Type assertion to help mypy understand this is not None after the assert
+            assert commissioning_info.thread_operational_dataset is not None
             await dev_ctrl.CommissionThread(
                 info.filter_value,
                 info.passcode,
