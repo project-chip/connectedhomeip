@@ -215,6 +215,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/tls-client-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/user-label-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/unit-localization-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/valve-configuration-and-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/wake-on-lan-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/washer-controls-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/water-heater-management-cluster.xml \
@@ -640,7 +641,25 @@ jobs:
                   build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-python-bindings"
 
+            - name: Build linux-x64-python-bindings
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-jf-control-app
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-jf-control-app"
+
+            - name: Build linux-x64-python-bindings
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-jf-admin-app
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-jf-admin-app"
+
+
             - name: Generate an argument environment file
+              # GitHub VM remains out of memory after adding Joint Fabrics example apps to be built.
+              # Add as a temporary fix the removal of out/ folders for JF apps and use artifacts from objdir-clone (see step above) as .o files are no longer requred.
+              # Maybe do this for all apps. 
               run: |
                   echo -n "" >/tmp/test_env.yaml
                   echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
@@ -661,6 +680,10 @@ jobs:
                   echo "LIGHTING_APP_NO_UNIQUE_ID: objdir-clone/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang/chip-lighting-app" >> /tmp/test_env.yaml
                   echo "TERMS_AND_CONDITIONS_APP: objdir-clone/linux-x64-terms-and-conditions/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
+                  echo "JF_CONTROL_APP: objdir-clone/linux-x64-jf-control-app/jfc-app" >> /tmp/test_env.yaml
+                  echo "JF_ADMIN_APP: objdir-clone/linux-x64-jf-admin-app/jfa-app" >> /tmp/test_env.yaml
+
+                  # Generic trace setups after applications
                   echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
 
