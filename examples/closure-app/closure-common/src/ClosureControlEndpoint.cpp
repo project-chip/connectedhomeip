@@ -205,7 +205,8 @@ void ClosureControlEndpoint::UpdateCurrentStateFromTargetState()
     if (overallTargetState.Value().position.HasValue() && !overallTargetState.Value().position.Value().IsNull())
     {
         // Map the target position to the current positioning enum.
-        CurrentPositionEnum currentPositioning = MapTargetPositionToCurrentPositioning(overallTargetState.Value().position.Value().Value());
+        CurrentPositionEnum currentPositioning =
+            MapTargetPositionToCurrentPositioning(overallTargetState.Value().position.Value().Value());
         overallCurrentState.Value().position.SetValue(MakeNullable(currentPositioning));
     }
 

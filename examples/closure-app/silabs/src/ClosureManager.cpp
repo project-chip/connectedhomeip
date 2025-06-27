@@ -24,8 +24,8 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/attribute-storage.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <cmsis_os2.h>
+#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -34,8 +34,8 @@ using namespace chip::app::Clusters::ClosureControl;
 using namespace chip::app::Clusters::ClosureDimension;
 
 namespace {
-constexpr uint32_t kCountdownTimeSeconds  = 10;
-constexpr uint32_t kMotionCountdownTimeMs = 1000; // 1 second for each motion.
+constexpr uint32_t kCountdownTimeSeconds          = 10;
+constexpr uint32_t kMotionCountdownTimeMs         = 1000; // 1 second for each motion.
 constexpr chip::Percent100ths kMotionPositionStep = 1000; // 10% of the total range per motion interval.
 
 // Define the Namespace and Tag for the endpoint
@@ -339,7 +339,6 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
     event.Handler             = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
 
-
     return Status::Success;
 }
 
@@ -383,8 +382,6 @@ void ClosureManager::HandleClosureMotionAction()
     VerifyOrReturn(!ep3TargetState.IsNull(),
                    ChipLogError(AppServer, "MoveToCommand failed due to Null value Target state on Endpoint 3"));
 
-
-
     // check if closure (endpoint 1) need unlatch before starting the motion action.
     if (ep1CurrentState.Value().latch.HasValue() && !ep1CurrentState.Value().latch.Value().IsNull() &&
         ep1TargetState.Value().latch.HasValue() && !ep1TargetState.Value().latch.Value().IsNull())
@@ -414,25 +411,23 @@ void ClosureManager::HandleClosureMotionAction()
     // Get the Next Current State to be set for the endpoint 2, if target postion is not reached.
     if (GetPanelNextPosition(ep2CurrentState.Value(), ep2TargetState.Value(), ep2NextPosition))
     {
-        VerifyOrReturn(ep2NextPosition.HasValue(),
-                       ChipLogError(AppServer, "Failed to get next position for Endpoint 2"));
+        VerifyOrReturn(ep2NextPosition.HasValue(), ChipLogError(AppServer, "Failed to get next position for Endpoint 2"));
         ep2CurrentState.Value().position.SetValue(ep2NextPosition.Value());
         instance.ep2.GetLogic().SetCurrentState(ep2CurrentState);
         isEndPoint2ProgressPossible = (ep2NextPosition.Value() != ep2TargetState.Value().position.Value());
-        ChipLogProgress(AppServer, "EndPoint 2 Current Position: %d, Target Position: %d",
-                        ep2NextPosition.Value(), ep2TargetState.Value().position.Value());
+        ChipLogProgress(AppServer, "EndPoint 2 Current Position: %d, Target Position: %d", ep2NextPosition.Value(),
+                        ep2TargetState.Value().position.Value());
     }
 
     // Get the Next Current State to be set for the endpoint 3, if target postion is not reached.
     if (GetPanelNextPosition(ep3CurrentState.Value(), ep3TargetState.Value(), ep3NextPosition))
     {
-        VerifyOrReturn(ep3NextPosition.HasValue(),
-                       ChipLogError(AppServer, "Failed to get next position for Endpoint 3"));
+        VerifyOrReturn(ep3NextPosition.HasValue(), ChipLogError(AppServer, "Failed to get next position for Endpoint 3"));
         ep3CurrentState.Value().position.SetValue(ep3NextPosition.Value());
         instance.ep3.GetLogic().SetCurrentState(ep3CurrentState);
         isEndPoint3ProgressPossible = (ep3NextPosition.Value() != ep3TargetState.Value().position.Value());
-        ChipLogProgress(AppServer, "EndPoint 3 Current Position: %d, Target Position: %d",
-                        ep3NextPosition.Value(), ep3TargetState.Value().position.Value());
+        ChipLogProgress(AppServer, "EndPoint 3 Current Position: %d, Target Position: %d", ep3NextPosition.Value(),
+                        ep3TargetState.Value().position.Value());
     }
 
     // Check if both endpoints have reached their target positions
@@ -510,9 +505,8 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
     GetInstance().SetCurrentAction(Action_t::INVALID_ACTION);
 }
 
-bool ClosureManager::GetPanelNextPosition(const GenericCurrentStateStruct & currentState,
-                                           const GenericTargetStruct & targetState,
-                                           Optional<chip::Percent100ths> & nextPosition)
+bool ClosureManager::GetPanelNextPosition(const GenericCurrentStateStruct & currentState, const GenericTargetStruct & targetState,
+                                          Optional<chip::Percent100ths> & nextPosition)
 {
     VerifyOrReturnValue(targetState.position.HasValue(), false,
                         ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to Target position is not set"));
