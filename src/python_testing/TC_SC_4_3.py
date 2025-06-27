@@ -40,7 +40,7 @@ import re
 
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mdns_discovery.mdns_discovery import DNSRecordType, MdnsDiscovery, MdnsServiceType
+from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mobly import asserts
 from zeroconf.const import _TYPE_AAAA, _TYPES
 
@@ -71,7 +71,7 @@ class TC_SC_4_3(MatterBaseTest):
                 TestStep(8, "TH performs a query for the AAAA record against the target listed in the SRV record",
                          "Verify AAAA record is returned"),
                 TestStep(9, "TH verifies the following from the returned records:",
-                         "TH verifies the following from the returned records: The hostname must be a fixed-length twelve-character (or sixteen-character) hexadecimal string, encoded as ASCII (UTF-8) text using capital letters.. ICD TXT key: • If supports_lit is false, verify that the ICD key is NOT present in the TXT record • If supports_lit is true, verify the ICD key IS present in the TXT record, and it has the value of 0 or 1 (ASCII) SII TXT key: • If supports_icd is true and supports_lit is false, set sit_mode to true • If supports_icd is true and supports_lit is true, set sit_mode to true if ICD=0 otherwise set sit_mode to false • If supports_icd is false, set sit_mode to false • If sit_mode is true, verify that the SII key IS present in the TXT record • if the SII key is present, verify it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms) SAI TXT key: • if supports_icd is true, verify that the SAI key is present in the TXT record • If the SAI key is present, verify it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms)"),
+                         "The hostname must be a fixed-length twelve-character (or sixteen-character) hexadecimal string, encoded as ASCII (UTF-8) text using capital letters.. ICD TXT key: • If supports_lit is false, verify that the ICD key is NOT present in the TXT record • If supports_lit is true, verify the ICD key IS present in the TXT record, and it has the value of 0 or 1 (ASCII) SII TXT key: • If supports_icd is true and supports_lit is false, set sit_mode to true • If supports_icd is true and supports_lit is true, set sit_mode to true if ICD=0 otherwise set sit_mode to false • If supports_icd is false, set sit_mode to false • If sit_mode is true, verify that the SII key IS present in the TXT record • if the SII key is present, verify it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms) SAI TXT key: • if supports_icd is true, verify that the SAI key is present in the TXT record • If the SAI key is present, verify it is a decimal value with no leading zeros and is less than or equal to 3600000 (1h in ms)"),
                 TestStep(10, "TH performs a DNS-SD browse for _I<hhhh>._sub._matter._tcp.local, where <hhhh> is the 64-bit compressed Fabric identifier, expressed as a fixed-length, sixteencharacter hexadecimal string, encoded as ASCII (UTF-8) text using capital letters.",
                          "Verify DUT returns a PTR record with DNS-SD instance name set to instance_name"),
                 TestStep(11, "TH performs a DNS-SD browse for _matter._tcp.local",
@@ -169,19 +169,14 @@ class TC_SC_4_3(MatterBaseTest):
             return False, f"T value ({t_value}) is not a valid integer"
 
     @staticmethod
-    def is_ipv6_address(addresses):
-        if isinstance(addresses, str):
-            addresses = [addresses]
-
-        for address in addresses:
-            try:
-                # Attempt to create an IPv6 address object. If successful, this is an IPv6 address.
-                ipaddress.IPv6Address(address)
-                return True, "At least one IPv6 address is present."
-            except ipaddress.AddressValueError:
-                # If an AddressValueError is raised, the current address is not a valid IPv6 address.
-                return False, f"Invalid IPv6 address encountered: {address}, provided addresses: {addresses}"
-        return False, "No IPv6 addresses found."
+    def is_valid_ipv6_address(address) -> bool:
+        try:
+            # Attempt to create an IPv6 address object. If successful, this is an IPv6 address.
+            ipaddress.IPv6Address(address)
+            return True
+        except ipaddress.AddressValueError:
+            # If an AddressValueError is raised, the current address is not a valid IPv6 address.
+            return False
 
     @staticmethod
     def extract_ipv6_address(text):
@@ -254,10 +249,9 @@ class TC_SC_4_3(MatterBaseTest):
         # Verify SRV record is returned
         self.step(6)
         mdns = MdnsDiscovery()
-        operational_record = await mdns.get_service_by_record_type(
+        operational_record = await mdns.get_srv_record(
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
-            record_type=DNSRecordType.SRV,
             log_output=True
         )
 
@@ -273,10 +267,9 @@ class TC_SC_4_3(MatterBaseTest):
         # TH performs a query for the TXT record against the qname instance_qname.
         # Verify TXT record is returned
         self.step(7)
-        operational_record = await mdns.get_service_by_record_type(
+        operational_record = await mdns.get_txt_record(
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
-            record_type=DNSRecordType.TXT,
             log_output=True
         )
 
@@ -289,20 +282,23 @@ class TC_SC_4_3(MatterBaseTest):
         # Verify AAAA record is returned
         self.step(8)
 
-        quada_record = await mdns.get_service_by_record_type(
-            service_name=hostname,
-            service_type=MdnsServiceType.OPERATIONAL.value,
-            record_type=DNSRecordType.AAAA,
+        quada_record = await mdns.get_quada_record(
+            hostname=hostname,
             log_output=True
         )
 
-        answer_record_type = quada_record.get_type(quada_record.type)
+        # answer_record_type = quada_record.get_type(quada_record.type)
         quada_record_type = _TYPES[_TYPE_AAAA]
 
         # Verify AAAA record is returned
-        asserts.assert_equal(hostname, quada_record.name, f"Server name mismatch: {hostname} vs {quada_record.name}")
-        asserts.assert_equal(quada_record_type, answer_record_type,
-                             f"Record type should be {quada_record_type} but got {answer_record_type}")
+        asserts.assert_equal(hostname, quada_record.hostname, f"Server name mismatch: {hostname} vs {quada_record.hostname}")
+        asserts.assert_equal(quada_record_type, quada_record.record_type,
+                             f"Record type should be {quada_record_type} but got {quada_record.record_type}")
+
+        # Verify the AAAA record contains an IPv6 address
+        logging.info("Verify the AAAA record contains a valid IPv6 address")
+        is_valid_ipv6_addr = self.is_valid_ipv6_address(quada_record.address)
+        asserts.assert_true(is_valid_ipv6_addr, f"Address '{quada_record.address}' is not a valid IPv6 address.")
 
         # # *** STEP 9 ***
         # TH verifies the following from the returned records: The hostname must be a fixed-length twelve-character (or sixteen-character)
@@ -385,12 +381,6 @@ class TC_SC_4_3(MatterBaseTest):
             result, message = self.verify_t_value(t_value)
             asserts.assert_true(result, message)
 
-        # AAAA
-        logging.info("Verify the AAAA record contains at least one IPv6 address")
-        ipv6_address = self.extract_ipv6_address(str(quada_record))
-        result, message = self.is_ipv6_address(ipv6_address)
-        asserts.assert_true(result, message)
-
         # # *** STEP 10 ***
         # TH performs a DNS-SD browse for _I<hhhh>._sub._matter._tcp.local, where <hhhh> is the 64-bit compressed
         # Fabric identifier, expressed as a fixed-length, sixteencharacter hexadecimal string, encoded as ASCII (UTF-8)
@@ -405,6 +395,7 @@ class TC_SC_4_3(MatterBaseTest):
         # Verify DUT returns a PTR record with DNS-SD instance name set to instance_name
         self.step(11)
         op_service_info = await mdns._get_service(
+            service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL,
             log_output=True,
             discovery_timeout_sec=15
