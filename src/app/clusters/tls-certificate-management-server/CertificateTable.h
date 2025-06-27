@@ -37,7 +37,7 @@ public:
     using ClientCertStruct = TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::DecodableType;
 
     /// @brief a root cert along with an associated buffer for the cert payload. RootCertStruct has a ByteSpan,
-    /// and this wrapper ensures that the underlying buffer for the ByteSpan has an equivalent lifetime.
+    /// and this wrapper ensures that the underlying buffer for the ByteSpan has a long-enough lifetime.
     /// No other functionality from PersistentStore<> is required to be used by the implementation except the underlying buffer.
     struct BufferedRootCert
     {
@@ -50,8 +50,9 @@ public:
         PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> & mBuffer;
     };
 
-    /// @brief a client cert along with an associated buffer for the cert payload.  ClientCertStruct has a ByteSpan,
-    /// and this wrapper ensures that the underlying buffer for the ByteSpan has an equivalent lifetime.
+    /// @brief a client cert along with an associated buffer for the cert payload.  ClientCertStruct contains various
+    /// lists and bytespans, and this wrapper ensures that the underlying buffers for those data structures
+    /// have long-enough lifetimes.
     /// No other functionality from PersistentStore<> is required to be used by the implementation except the underlying buffer.
     struct BufferedClientCert
     {
