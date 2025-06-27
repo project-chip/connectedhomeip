@@ -46,12 +46,18 @@ public:
     GeneralDiagnosticsLogic(const GeneralDiagnosticsEnabledAttributes enabledAttributes) : mEnabledAttributes(enabledAttributes) {}
     ~GeneralDiagnosticsLogic() = default;
 
-    CHIP_ERROR GetRebootCount(uint16_t & rebootCount) const { return chip::DeviceLayer::GetDiagnosticDataProvider().GetRebootCount(rebootCount); }
+    CHIP_ERROR GetRebootCount(uint16_t & rebootCount) const
+    {
+        return chip::DeviceLayer::GetDiagnosticDataProvider().GetRebootCount(rebootCount);
+    }
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) const
     {
         return chip::DeviceLayer::GetDiagnosticDataProvider().GetTotalOperationalHours(totalOperationalHours);
     }
-    CHIP_ERROR GetBootReason(chip::app::Clusters::GeneralDiagnostics::BootReasonEnum & bootReason) const { return chip::DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason); }
+    CHIP_ERROR GetBootReason(chip::app::Clusters::GeneralDiagnostics::BootReasonEnum & bootReason) const
+    {
+        return chip::DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason);
+    }
     CHIP_ERROR GetActiveHardwareFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & hardwareFaults) const
     {
         return chip::DeviceLayer::GetDiagnosticDataProvider().GetActiveHardwareFaults(hardwareFaults);
