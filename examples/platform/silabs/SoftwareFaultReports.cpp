@@ -26,6 +26,7 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <uart.h>
 
 #if !defined(SLI_SI91X_MCU_INTERFACE) || !defined(SLI_SI91X_ENABLE_BLE)
 #include "rail_types.h"
@@ -85,6 +86,25 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
 } // namespace DeviceLayer
 } // namespace chip
 
+<<<<<<< HEAD
+=======
+// This method is already implemented in the Zigbee stack and is required by the Zigbee
+#ifndef SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
+extern "C" void halInternalAssertFailed(const char * filename, int linenumber)
+{
+#if SILABS_LOG_ENABLED
+    char faultMessage[kMaxFaultStringLen] = { 0 };
+    snprintf(faultMessage, sizeof faultMessage, "Assert failed: %s:%d", filename, linenumber);
+    ChipLogError(NotSpecified, "%s", faultMessage);
+#if SILABS_LOG_OUT_UART
+    uartFlushTxQueue();
+#endif // SILABS_LOG_OUT_UART
+#endif
+    configASSERT((volatile void *) NULL);
+}
+#endif
+
+>>>>>>> 87176944ed (Added a uart flush to force a uart output without relying on the yart task when we hit a fault, added handlers for faults other than hardfault to get logts)
 #if HARD_FAULT_LOG_ENABLE
 /**
  * Log register contents to UART when a hard fault occurs.
@@ -120,23 +140,62 @@ extern "C" __attribute__((used)) void debugHardfault(uint32_t * sp)
     ChipLogError(NotSpecified, "LR          0x%08lx", lr);
     ChipLogError(NotSpecified, "PC          0x%08lx", pc);
     ChipLogError(NotSpecified, "PSR         0x%08lx", psr);
+#if SILABS_LOG_OUT_UART
+    uartFlushTxQueue();
+#endif // SILABS_LOG_OUT_UART
 #endif // SILABS_LOG_ENABLED
 
     configASSERTNULL(NULL);
 }
 
 /**
- * Override default hard-fault handler
+ * Log a fault to the debugHardfault function.
+ * This function is called by the fault handlers to log the fault details.
  */
+<<<<<<< HEAD
+=======
+extern "C" void LogFault_Handler(void)
+{
+    uint32_t * sp;
+    __asm volatile("tst lr, #4 \n"
+                   "ite eq \n"
+                   "mrseq %0, msp \n"
+                   "mrsne %0, psp \n"
+                   : "=r"(sp));
+    debugHardfault(sp);
+}
+
+#ifndef SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
+extern "C" __attribute__((naked)) void NMI_Handler(void)
+{
+    __asm volatile("b LogFault_Handler");
+}
+>>>>>>> 87176944ed (Added a uart flush to force a uart output without relying on the yart task when we hit a fault, added handlers for faults other than hardfault to get logts)
 extern "C" __attribute__((naked)) void HardFault_Handler(void)
 {
-    __asm volatile("tst lr, #4                                    \n"
-                   "ite eq                                        \n"
-                   "mrseq r0, msp                                 \n"
-                   "mrsne r0, psp                                 \n"
-                   "ldr r1, debugHardfault_address                \n"
-                   "bx r1                                         \n"
-                   "debugHardfault_address: .word debugHardfault  \n");
+    __asm volatile("b LogFault_Handler");
+}
+extern "C" __attribute__((naked)) void mpu_fault_handler(void)
+{
+    __asm volatile("b LogFault_Handler");
+}
+extern "C" __attribute__((naked)) void BusFault_Handler(void)
+{
+    __asm volatile("b LogFault_Handler");
+}
+extern "C" __attribute__((naked)) void UsageFault_Handler(void)
+{
+    __asm volatile("b LogFault_Handler");
+}
+#if (__CORTEX_M >= 23U)
+extern "C" __attribute__((naked)) void SecureFault_Handler(void)
+{
+    __asm volatile("b LogFault_Handler");
+}
+#endif // (__CORTEX_M >= 23U)
+extern "C" __attribute__((naked)) void DebugMon_Handler(void)
+{
+    __asm volatile("b LogFault_Handler");
 }
 
 extern "C" void vApplicationMallocFailedHook(void)
@@ -168,7 +227,10 @@ extern "C" void vApplicationStackOverflowHook(TaskHandle_t pxTask, char * pcTask
     snprintf(faultMessage, sizeof faultMessage, "%s Task overflowed", pcTaskName);
 #if SILABS_LOG_ENABLED
     ChipLogError(NotSpecified, "%s", faultMessage);
-#endif
+#if SILABS_LOG_OUT_UART
+    uartFlushTxQueue();
+#endif // SILABS_LOG_OUT_UART
+#endif // SILABS_LOG_ENABLED
     Silabs::OnSoftwareFaultEventHandler(faultMessage);
 
     /* Force an assert. */
@@ -249,6 +311,9 @@ extern "C" void RAILCb_AssertFailed(RAIL_Handle_t railHandle, uint32_t errorCode
 #else
     ChipLogError(NotSpecified, "%s", faultMessage);
 #endif // RAIL_ASSERT_DEBUG_STRING
+#if SILABS_LOG_OUT_UART
+    uartFlushTxQueue();
+#endif // SILABS_LOG_OUT_UART
 #endif // SILABS_LOG_ENABLED
     Silabs::OnSoftwareFaultEventHandler(faultMessage);
 
