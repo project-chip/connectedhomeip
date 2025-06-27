@@ -543,6 +543,7 @@ static uint8_t * singletonAttributeLocation(const EmberAfAttributeMetadata * am)
 {
 
     uint16_t index = 0;
+    // NOLINTNEXTLINE(bugprone-sizeof-expression)
     if constexpr (sizeof(generatedAttributes) > 0)
     {
         const EmberAfAttributeMetadata * m = &(generatedAttributes[0]);
