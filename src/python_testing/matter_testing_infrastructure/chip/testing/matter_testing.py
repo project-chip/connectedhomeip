@@ -44,6 +44,11 @@ import chip.testing.conversions as conversions
 import chip.testing.decorators as decorators
 import chip.testing.matchers as matchers
 import chip.testing.runner as runner
+from chip.testing.runner import (
+    int_decimal_or_hex, byte_string_from_hex, str_from_manual_code,
+    int_named_arg, str_named_arg, float_named_arg, json_named_arg,
+    bool_named_arg, bytes_as_hex_named_arg, root_index
+)
 import chip.testing.timeoperations as timeoperations
 
 # isort: off
@@ -1710,123 +1715,6 @@ def _find_test_class():
         sys.exit(1)
 
     return subclasses[0]
-
-
-def int_decimal_or_hex(s: str) -> int:
-    val = int(s, 0)
-    if val < 0:
-        raise ValueError("Negative values not supported")
-    return val
-
-
-def byte_string_from_hex(s: str) -> bytes:
-    return unhexlify(s.replace(":", "").replace(" ", "").replace("0x", ""))
-
-
-def str_from_manual_code(s: str) -> str:
-    """Enforces legal format for manual codes and removes spaces/dashes."""
-    s = s.replace("-", "").replace(" ", "")
-    regex = r"^([0-9]{11}|[0-9]{21})$"
-    match = re.match(regex, s)
-    if not match:
-        raise ValueError("Invalid manual code format, does not match %s" % regex)
-
-    return s
-
-
-def int_named_arg(s: str) -> Tuple[str, int]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<hex_value>0x[0-9a-fA-F_]+)|(?P<decimal_value>-?\d+))$"
-    match = re.match(regex, s)
-    if not match:
-        raise ValueError("Invalid int argument format, does not match %s" % regex)
-
-    name = match.group("name")
-    if match.group("hex_value"):
-        value = int(match.group("hex_value"), 0)
-    else:
-        value = int(match.group("decimal_value"), 10)
-    return (name, value)
-
-
-def str_named_arg(s: str) -> Tuple[str, str]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
-    match = re.match(regex, s)
-    if not match:
-        raise ValueError("Invalid string argument format, does not match %s" % regex)
-
-    return (match.group("name"), match.group("value"))
-
-
-def float_named_arg(s: str) -> Tuple[str, float]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
-    match = re.match(regex, s)
-    if not match:
-        raise ValueError("Invalid float argument format, does not match %s" % regex)
-
-    name = match.group("name")
-    value = float(match.group("value"))
-
-    return (name, value)
-
-
-def json_named_arg(s: str) -> Tuple[str, object]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
-    match = re.match(regex, s)
-    if not match:
-        raise ValueError("Invalid JSON argument format, does not match %s" % regex)
-
-    name = match.group("name")
-    value = json.loads(match.group("value"))
-
-    return (name, value)
-
-
-def bool_named_arg(s: str) -> Tuple[str, bool]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
-    match = re.match(regex, s.lower())
-    if not match:
-        raise ValueError("Invalid bool argument format, does not match %s" % regex)
-
-    name = match.group("name")
-    if match.group("truth_value"):
-        value = True if match.group("truth_value") == "true" else False
-    else:
-        value = int(match.group("decimal_value")) != 0
-
-    return (name, value)
-
-
-def bytes_as_hex_named_arg(s: str) -> Tuple[str, bytes]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>[0-9a-fA-F:]+)$"
-    match = re.match(regex, s)
-    if not match:
-        raise ValueError("Invalid bytes as hex argument format, does not match %s" % regex)
-
-    name = match.group("name")
-    value_str = match.group("value")
-    value_str = value_str.replace(":", "")
-    if len(value_str) % 2 != 0:
-        raise ValueError("Byte string argument value needs to be event number of hex chars")
-    value = unhexlify(value_str)
-
-    return (name, value)
-
-
-def root_index(s: str) -> int:
-    CHIP_TOOL_COMPATIBILITY = {
-        "alpha": 1,
-        "beta": 2,
-        "gamma": 3
-    }
-
-    for name, id in CHIP_TOOL_COMPATIBILITY.items():
-        if s.lower() == name:
-            return id
-    else:
-        root_index = int(s)
-        if root_index == 0:
-            raise ValueError("Only support root index >= 1")
-        return root_index
 
 
 def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConfig) -> bool:
