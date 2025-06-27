@@ -111,8 +111,8 @@ public:
     /**
      * @brief Unregisters an endpoint provider with the given EndpointId.
      * @param endpointId The ID of the endpoint provider to unregister.
-     * @return CHIP_NO_ERROR on success.
-     *         CHIP_ERROR_NOT_FOUND if no provider with the given ID is found.
+     * @return CHIP_NO_ERROR on success. It is not considered an error to
+     *         unregister a provider that is not found.
      *         CHIP_ERROR_INVALID_ARGUMENT if endpointId is kInvalidEndpointId.
      */
     CHIP_ERROR Unregister(EndpointId endpointId);
