@@ -383,7 +383,7 @@ class MdnsDiscovery:
 
         if is_discovered:
             if not service_info.decoded_properties:
-                logging.info(f"TXT Record found but no properties for service {service_name} of type {service_type}")
+                logging.info(f"TXT Record found but no properties for service {service_name} of type {service_type}, attempting to recover from cache.")
                 for service, records in self._azc.zeroconf.cache.cache.items():
                     for _, dns_record in records.items():
                         if service_name.lower() == dns_record.name.lower():
@@ -391,6 +391,8 @@ class MdnsDiscovery:
                             if txt_found:
                                 txt_from_cache = txt_found
                                 logging.info("TXT data recovered from cache.")
+                            else:
+                                logging.info("Failed to recover valid TXT data from cache.")
 
             # Adds service to discovered services
             mdns_service_info = self._to_mdns_service_info_class(service_info)
@@ -616,7 +618,7 @@ class MdnsDiscovery:
 
         return mdns_service_info
 
-    def _to_mdns_address_info_class(self, dns_address: DNSAddress) -> MdnsServiceInfo:
+    def _to_mdns_address_info_class(self, dns_address: DNSAddress) -> MdnsAddressInfo:
         """
         Converts a DNSAddress object into an MdnsAddressInfo data class.
 
@@ -706,6 +708,7 @@ def get_txt_from_dns_record(dns_record: DNSRecord) -> dict[str, str | None]:
     """
     dns_record_str = str(dns_record)
     if "record[txt," not in dns_record_str:
+        logging.info(f"Unexpected DNSRecord format: {dns_record_str}")
         return {}
 
     try:
