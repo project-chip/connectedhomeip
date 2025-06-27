@@ -63,20 +63,13 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance, const Clus
     return CHIP_NO_ERROR;
 }
 
-//Adding Specification for reference:
-
+// Specification rules for CurrentState quiet reporting:
 // Changes to this attribute SHALL only be marked as reportable in the following cases:
-
 // When the Position changes from null to any other value and vice versa, or
-
 // At most once every 5 seconds when the Position changes from one non-null value to another non-null value, or
-
 // When Target.Position is reached, or
-
 // When CurrentState.Speed changes, or
-
 // When CurrentState.Latch changes.
-
 CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurrentStateStruct> & incomingCurrentState)
 {
     assertChipStackLockedByCurrentThread();
