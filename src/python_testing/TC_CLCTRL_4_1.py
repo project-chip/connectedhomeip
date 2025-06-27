@@ -35,6 +35,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import time
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
@@ -172,11 +173,11 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             TestStep("15a", "If IS feature is not supported on the cluster, skip steps 15b to 15i."),
             TestStep("15b", "TH sends command MoveTo with Position = MoveToFullyOpen."),
             TestStep("15c", "If attribute is supported on the cluster, TH reads from the DUT the OverallTargetState attribute."),
-            TestStep("15d", "Wait until TH receives a subscription report with OverallCurrentState.Position = FullyOpened."),
+            TestStep("15d", "If the attribute is supported on the cluster, wait 2 seconds and TH reads from the DUT the OverallCurrentState.Position = FullyOpened."),
             TestStep("15e", "Wait until TH receives a subscription report with MainState = Stopped."),
             TestStep("15f", "TH sends command MoveTo with Position = MoveToFullyClosed."),
             TestStep("15g", "If attribute is supported on the cluster, TH reads from the DUT the OverallTargetState attribute."),
-            TestStep("15h", "Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed."),
+            TestStep("15h", "If the attribute is supported on the cluster, wait 2 seconds and TH reads from the DUT the OverallCurrentState.Position = FullyClosed."),
             TestStep("15i", "Wait until TH receives a subscription report with MainState = Stopped."),
         ]
         return steps
@@ -997,12 +998,24 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 asserts.assert_true(False, "OverallTargetState attribute is not supported.")
                 return
 
-            # STEP 15d: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyOpened.
+            # STEP 15d: If the attribute is supported on the cluster, wait 2 seconds and TH reads from the DUT the OverallCurrentState.Position = FullyOpened.
             self.step("15d")
 
-            logging.info("Waiting for OverallCurrentState.Position to be FullyOpened")
-            sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyOpened)],
-                                                          timeout_sec=timeout)
+            time.sleep(2)
+
+            if attributes.OverallCurrentState.attribute_id in attribute_list:
+                overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
+                logging.info(f"OverallCurrentState: {overall_current_state}")
+
+                if overall_current_state is None:
+                    logging.error("OverallCurrentState is None")
+
+                logging.info(f"OverallCurrentState: {overall_current_state}")
+                asserts.assert_equal(overall_current_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyOpened,
+                                     "OverallCurrentState.position is not FullyOpened")
+            else:
+                asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
+                return
 
             # STEP 15e: Wait until TH receives a subscription report with MainState = Stopped.
             self.step("15e")
@@ -1036,12 +1049,23 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 asserts.assert_true(False, "OverallTargetState attribute is not supported.")
                 return
 
-            # STEP 15h: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed.
+            # STEP 15h: If the attribute is supported on the cluster, wait 2 secounds and TH reads from the DUT the OverallCurrentState.Position = FullyClosed.
             self.step("15h")
 
-            logging.info("Waiting for OverallCurrentState.Position to be FullyClosed")
-            sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed)],
-                                                          timeout_sec=timeout)
+            time.sleep(2)
+            if attributes.OverallCurrentState.attribute_id in attribute_list:
+                overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
+                logging.info(f"OverallCurrentState: {overall_current_state}")
+
+                if overall_current_state is None:
+                    logging.error("OverallCurrentState is None")
+
+                logging.info(f"OverallCurrentState: {overall_current_state}")
+                asserts.assert_equal(overall_current_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed,
+                                     "OverallCurrentState.position is not FullyClosed")
+            else:
+                asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
+                return
 
             # STEP 15i: Wait until TH receives a subscription report with MainState = Stopped.
             self.step("15i")
