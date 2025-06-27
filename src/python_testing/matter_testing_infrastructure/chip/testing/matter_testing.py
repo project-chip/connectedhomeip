@@ -15,7 +15,6 @@
 #    limitations under the License.
 #
 
-import argparse
 import asyncio
 import builtins
 import inspect
@@ -25,33 +24,22 @@ import os
 import pathlib
 import queue
 import random
-import re
 import shlex
-import sys
 import textwrap
 import threading
 import time
 import typing
-from binascii import unhexlify
-from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
-from itertools import chain
-from typing import Any, Callable, Iterable, List, Optional, Tuple
+from typing import Any, Callable, Iterable, List, Optional
 
 import chip.testing.conversions as conversions
 import chip.testing.decorators as decorators
 import chip.testing.matchers as matchers
 import chip.testing.runner as runner
-from chip.testing.runner import (
-    int_decimal_or_hex, byte_string_from_hex, str_from_manual_code,
-    int_named_arg, str_named_arg, float_named_arg, json_named_arg,
-    bool_named_arg, bytes_as_hex_named_arg, root_index,
-    populate_commissioning_args, convert_args_to_matter_config, parse_matter_test_args,
-    default_matter_test_main
-)
 import chip.testing.timeoperations as timeoperations
+from chip.testing.runner import _DEFAULT_ADMIN_VENDOR_ID, _DEFAULT_CONTROLLER_NODE_ID, _DEFAULT_TRUST_ROOT_INDEX
 
 # isort: off
 
@@ -75,10 +63,9 @@ from chip.storage import PersistentStorage
 from chip.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
                                         get_setup_payload_info_config)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.pics import read_pics_from_file
 from chip.testing.runner import TestRunnerHooks, TestStep
 from chip.tlv import uint
-from mobly import asserts, base_test, signals, utils
+from mobly import asserts, base_test, signals
 
 # TODO: Add utility to commission a device if needed
 # TODO: Add utilities to keep track of controllers/fabrics
@@ -87,14 +74,6 @@ logger = logging.getLogger("matter.python_testing")
 logger.setLevel(logging.INFO)
 
 DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
-
-from chip.testing.runner import (
-    _DEFAULT_ADMIN_VENDOR_ID, _DEFAULT_STORAGE_PATH, _DEFAULT_LOG_PATH,
-    _DEFAULT_CONTROLLER_NODE_ID, _DEFAULT_DUT_NODE_ID, _DEFAULT_TRUST_ROOT_INDEX
-)
-
-
-
 
 
 class SimpleEventCallback:
@@ -1659,12 +1638,6 @@ class MatterBaseTest(base_test.BaseTestClass):
         except EOFError:
             logging.info("========= EOF on STDIN =========")
             return None
-
-
-
-
-
-
 
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):

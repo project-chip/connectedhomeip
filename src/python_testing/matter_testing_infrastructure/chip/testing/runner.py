@@ -15,36 +15,33 @@
 #    limitations under the License.
 #
 
+# Add new imports for argument parsing functions
+import argparse
 import asyncio
 import importlib
 import json
 import logging
 import os
+import pathlib
 import re
 import sys
 import typing
 from binascii import unhexlify
+from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
-from typing import Optional, Tuple
-from unittest.mock import MagicMock
-
-# Add new imports for argument parsing functions
-import argparse
-import pathlib
-from dataclasses import asdict as dataclass_asdict
 from itertools import chain
-from typing import List
+from pathlib import Path
+from typing import List, Optional, Tuple
+from unittest.mock import MagicMock
 
 import chip.testing.global_stash as global_stash
 from chip.clusters import Attribute
+# Add imports for argument parsing dependencies
+from chip.testing.pics import read_pics_from_file
 from mobly import signals, utils
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner
-
-# Add imports for argument parsing dependencies
-from chip.testing.pics import read_pics_from_file
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks
