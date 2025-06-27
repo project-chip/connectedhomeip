@@ -215,7 +215,7 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
 
 chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
 {
-    VerifyOrReturnValue(ep1.GetLogic().SetCountdownTimeFromDelegate(kDefaultCountdownTimeSeconds) == CHIP_NO_ERROR, 
+    VerifyOrReturnValue(ep1.GetLogic().SetCountdownTimeFromDelegate(kDefaultCountdownTimeSeconds) == CHIP_NO_ERROR,
             Status::Failure, ChipLogError(AppServer, "Failed to set countdown time for calibration"));
 
     SetCurrentAction(Action_t::CALIBRATE_ACTION);
