@@ -782,7 +782,7 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     // if path is not valid, return a spec-compliant return code.
     if (!attributeEntry.has_value())
     {
-        return DataModel::ValidateClusterPath(mDataModelProvider, aPath, attributeErrorStatus);
+        return DataModel::ValidateClusterPath(mDataModelProvider, aPath, Status::UnsupportedAttribute);
     }
 
     // Allow writes on writable attributes only
