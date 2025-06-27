@@ -140,6 +140,7 @@ enum
 #endif
 #if ENABLE_CAMERA_SERVER
     kDeviceOption_Camera_DeferredOffer,
+    kDeviceOption_Camera_VideoDevice,
 #endif
     kDeviceOption_VendorName,
     kDeviceOption_ProductName,
@@ -238,6 +239,7 @@ OptionDef sDeviceOptionDefs[] = {
 #endif
 #if ENABLE_CAMERA_SERVER
     { "camera-deferred-offer", kNoArgument, kDeviceOption_Camera_DeferredOffer },
+    { "camera-video-device", kArgumentRequired, kDeviceOption_Camera_VideoDevice },
 #endif
     {}
 };
@@ -443,6 +445,9 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --camera-deferred-offer\n"
     "       Indicates the delayed processing hint of the WebRTC Provider.\n"
+    "\n"
+    "  --camera-video-device <path>\n"
+    "       Path to a V4L2 video capture device (default: /dev/video0).\n"
 #endif
     "\n";
 
@@ -890,6 +895,10 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 #if ENABLE_CAMERA_SERVER
     case kDeviceOption_Camera_DeferredOffer: {
         LinuxDeviceOptions::GetInstance().cameraDeferredOffer = true;
+        break;
+    }
+    case kDeviceOption_Camera_VideoDevice: {
+        LinuxDeviceOptions::GetInstance().cameraVideoDevice.SetValue(aValue);
         break;
     }
 #endif
