@@ -72,6 +72,7 @@ executable("chip-camera-app") {
     "${chip_root}/examples/camera-app/linux/src/clusters/chime/chime-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/clusters/webrtc-provider/webrtc-provider-manager.cpp",
     "${chip_root}/examples/camera-app/linux/src/media-controller/default-media-controller.cpp",
+    "${chip_root}/examples/camera-app/linux/src/webrtc-libdatachannel.cpp",
     "${chip_root}/examples/camera-app/linux/src/webrtc-transport.cpp",
     "include/CHIPProjectAppConfig.h",
     "main.cpp",
