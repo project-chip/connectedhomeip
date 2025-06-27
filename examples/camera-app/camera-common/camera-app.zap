@@ -5254,7 +5254,7 @@
               "isEnabled": 1
             },
             {
-              "name": "GetTwoDCartesianZone",
+              "name": "RemoveZone",
               "code": 3,
               "mfgCode": null,
               "source": "client",
@@ -5262,24 +5262,8 @@
               "isEnabled": 1
             },
             {
-              "name": "GetTwoDCartesianZoneResponse",
-              "code": 4,
-              "mfgCode": null,
-              "source": "server",
-              "isIncoming": 0,
-              "isEnabled": 1
-            },
-            {
-              "name": "RemovZone",
-              "code": 5,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
               "name": "CreateOrUpdateTrigger",
-              "code": 6,
+              "code": 4,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
@@ -5287,7 +5271,7 @@
             },
             {
               "name": "RemoveTrigger",
-              "code": 7,
+              "code": 5,
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
