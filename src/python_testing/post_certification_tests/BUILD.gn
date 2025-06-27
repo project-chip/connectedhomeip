@@ -30,9 +30,6 @@ pw_python_package("post-certification-tests-module") {
     metadata = {
       name = "post-certification-tests-module"
       version = "1.4.2"
-      author = "Project CHIP Authors"
-      license_expression = "Apache-2.0"  # Consistent license format
-      url = "https://github.com/project-chip/connectedhomeip"
     }
   }
 
