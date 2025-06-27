@@ -186,9 +186,9 @@ class TC_CLCTRL_2_1(MatterBaseTest):
                 logging.info(
                     f"OverallTargetState.position: {overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum(overall_target.position).name}")
                 asserts.assert_less_equal(
-                    overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kSignature, "OverallTargetState.position is out of range")
+                    overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToSignaturePosition, "OverallTargetState.position is out of range")
                 asserts.assert_greater_equal(
-                    overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kCloseInFull, "OverallTargetState.position is out of range")
+                    overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed, "OverallTargetState.position is out of range")
 
             # Check MotionLatching feature in OverallTargetState
             if is_latching_supported and overall_target.latch is not NullValue:  # LT feature (bit 1)
