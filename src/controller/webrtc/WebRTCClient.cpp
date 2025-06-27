@@ -30,12 +30,12 @@ WebRTCClient::~WebRTCClient()
     delete mPeerConnection;
 }
 
-void WebRTCClient::CreatePeerConnection(const std::string & stunUrl)
+CHIP_ERROR WebRTCClient::CreatePeerConnection(const std::string & stunUrl)
 {
     if (mPeerConnection != nullptr)
     {
-        ChipLogProgress(NotSpecified, "PeerConnection exists already!");
-        return;
+        ChipLogError(NotSpecified, "PeerConnection exists already!");
+        return CHIP_ERROR_ALREADY_INITIALIZED;
     }
     rtc::Configuration config;
     if (!stunUrl.empty())
@@ -50,7 +50,7 @@ void WebRTCClient::CreatePeerConnection(const std::string & stunUrl)
     if (mPeerConnection == nullptr)
     {
         ChipLogError(NotSpecified, "Failed to create PeerConnection");
-        return;
+        return CHIP_ERROR_NO_MEMORY;
     }
 
     mPeerConnection->onLocalDescription([this](rtc::Description desc) {
@@ -66,6 +66,8 @@ void WebRTCClient::CreatePeerConnection(const std::string & stunUrl)
             mIceCandidateCallback(cand.candidate(), cand.mid());
         }
     });
+
+    return CHIP_NO_ERROR;
 }
 
 void WebRTCClient::CreateOffer()
