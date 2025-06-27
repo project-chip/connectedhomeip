@@ -511,16 +511,24 @@ jobs:
             - name: Set up a IPV6 known envionment
               uses: ./.github/actions/add-ipv6
 
+            - name: Build python env
+              run: scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
+
+            - name: Build linux-x64-all-clusters
+              run: ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py \
+                      --target linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test \
+                      build --copy-artifacts-to objdir-clone \
+                      && rm -rf out/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test \
+                   "
+
             - name: Build Python REPL and example apps
               #  TODO: build variants seem to DIFFER and they should be updated to be consistent:
               #   - camera app needs clang support
               #   - T&C app needs variants (probably)
               #   - determine why some apps are tsan and some are not (and does that add runtime overhead? )
               run: |
-                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
                   ./scripts/run_in_build_env.sh \
                    "./scripts/build/build_examples.py \
-                      --target linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test \
                       --target linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test \
                       --target linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test \
                       --target linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test \
@@ -544,11 +552,11 @@ jobs:
             - name: Generate an argument environment file
               run: |
                   echo -n "" >/tmp/test_env.yaml
-                  echo "ALL_CLUSTERS_APP: out/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
+                  echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
                   echo "BRIDGE_APP: out/linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test/chip-bridge-app" >> /tmp/test_env.yaml
                   echo "CHIP_LOCK_APP: out/linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test/chip-lock-app" >> /tmp/test_env.yaml
                   echo "CAMERA_APP: out/linux-x64-camera/chip-camera-app" >> /tmp/test_env.yaml
-                  echo "CAMERA_CONTROLLER_APP: out/linux-x64-camera-controller/chip-camera-controller" >> /tmp/test_env.yaml                  
+                  echo "CAMERA_CONTROLLER_APP: out/linux-x64-camera-controller/chip-camera-controller" >> /tmp/test_env.yaml
                   echo "ENERGY_MANAGEMENT_APP: out/linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test/chip-energy-management-app" >> /tmp/test_env.yaml
                   echo "ENERGY_GATEWAY_APP: out/linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test/chip-energy-gateway-app" >> /tmp/test_env.yaml
                   echo "LIT_ICD_APP: out/linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test/lit-icd-app" >> /tmp/test_env.yaml
