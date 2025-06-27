@@ -13,6 +13,7 @@ import string
 import subprocess
 import sys
 import tempfile
+from enum import Enum
 from pathlib import Path
 from typing import Awaitable, Callable, Literal, Optional
 
@@ -385,6 +386,12 @@ class SignClientCertificate(BaseModel):
     csr: str
 
 
+class SupportedIngestInterface(str, Enum):
+    cmaf = "cmaf-ingest"
+    dash = "dash"
+    hls = "hls"
+
+
 class PushAvServer:
 
     templates = Jinja2Templates(directory="templates")
@@ -476,7 +483,7 @@ class PushAvServer:
 
     # APIs
 
-    def create_stream(self):
+    def create_stream(self, interface: Optional[SupportedIngestInterface] = None):
         # Find the last registered stream
         dirs = [d for d in pathlib.Path(self.wd.path("streams")).iterdir() if d.is_dir()]
         last_stream = int(dirs[-1].name) if len(dirs) > 0 else 0
@@ -484,7 +491,7 @@ class PushAvServer:
 
         # TODO Add option to specify Interface-1, Interface-2 DASH, or I2-HLS to improve the strict mode
         p = self.wd.mkdir("streams", str(stream_id))
-        stream = {"stream_id": stream_id, "strict_mode": self.strict_mode}
+        stream = {"stream_id": stream_id, "strict_mode": self.strict_mode, "interface": interface}
 
         with open(p / "details.json", 'w', encoding='utf-8') as f:
             json.dump(stream, f, ensure_ascii=False, indent=4)
@@ -525,7 +532,10 @@ class PushAvServer:
         stream = self._read_stream_details(stream_id)
 
         if stream.get('strict_mode', False):
-            if ext not in ['mpd', 'm3u8']:
+            iface = stream.get('interface', None)
+            if (iface == SupportedIngestInterface.dash and ext != "mpd" or
+                iface == SupportedIngestInterface.hls and ext != "m3u8" or
+                    iface == SupportedIngestInterface.cmaf):
                 raise HTTPException(404, "Unsupported manifest object extension")
 
         dst = self.wd.mkdir("streams", str(stream_id), f"{manifest}.{ext}", is_file=True)
