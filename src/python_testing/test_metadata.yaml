@@ -18,13 +18,17 @@ not_automated:
     - name: TC_AVSM_2_11.py
       reason: Camera App does not support all features required for this TC
     - name: TC_CLCTRL_3_1.py
-      reason: Closure app on the master branch does not support this test script yet
+      reason:
+          Closure app on the master branch does not support this test script yet
     - name: TC_CLCTRL_4_1.py
-      reason: Closure app on the master branch does not support this test script yet
+      reason:
+          Closure app on the master branch does not support this test script yet
     - name: TC_CLCTRL_5_1.py
-      reason: Closure app on the master branch does not support this test script yet
+      reason:
+          Closure app on the master branch does not support this test script yet
     - name: TC_CLCTRL_6_1.py
-      reason: Closure app on the master branch does not support this test script yet
+      reason:
+          Closure app on the master branch does not support this test script yet
     - name: TC_CNET_4_2.py
       reason: It has no CI execution block, it not executed in CI
     - name: TC_CNET_4_1.py
