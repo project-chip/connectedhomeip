@@ -56,13 +56,12 @@ def main_state_matcher(main_state: Clusters.ClosureControl.Enums.MainStateEnum) 
 
 def current_position_matcher(current_position: Clusters.ClosureControl.Enums.CurrentPositionEnum) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
-        if report.attribute != Clusters.ClosureControl.Attributes.OverallCurrentState or not isinstance(report.value, list):
+        if report.attribute != Clusters.ClosureControl.Attributes.OverallCurrentState:
             return False
-        for entry in report.value:
-            if entry.Position == current_position:
-                return True
-            else:
-                return False
+        if report.value.position == current_position:
+            return True
+        else:
+            return False
     return AttributeMatcher.from_callable(description=f"OverallCurrentState.Position is {current_position}", matcher=predicate)
 
 
@@ -471,7 +470,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         if attributes.OverallCurrentState.attribute_id in attribute_list:
             overall_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
             logging.info(f"OverallCurrentState: {overall_state}")
-            asserts.assert_equal(overall_state.position, Clusters.ClosureControl.Enums.PositioningEnum.kFullyOpened,
+            asserts.assert_equal(overall_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyOpened,
                                  "OverallCurrentState.position is not FullyOpened")
         else:
             asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
