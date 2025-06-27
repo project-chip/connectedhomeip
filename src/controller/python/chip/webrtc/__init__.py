@@ -16,6 +16,7 @@
 #
 
 from ctypes import CFUNCTYPE, c_char_p, c_void_p
+from .native import PyChipError
 
 import chip.native
 
@@ -29,6 +30,7 @@ IceCandidateCallbackType = CFUNCTYPE(None, c_char_p, c_char_p, c_void_p)
 lib.webrtc_client_create.restype = WebRTCClientHandle
 lib.webrtc_client_destroy.argtypes = [WebRTCClientHandle]
 
+lib.webrtc_client_create_peer_connection.restype = PyChipError
 lib.webrtc_client_create_peer_connection.argtypes = [WebRTCClientHandle, c_char_p]
 lib.webrtc_client_create_offer.argtypes = [WebRTCClientHandle]
 lib.webrtc_client_create_answer.argtypes = [WebRTCClientHandle]
@@ -51,7 +53,7 @@ class WebRTCClient:
             self._handle = None
 
     def create_peer_connection(self, stun_url):
-        lib.webrtc_client_create_peer_connection(self._handle, stun_url.encode('utf-8'))
+        return lib.webrtc_client_create_peer_connection(self._handle, stun_url.encode('utf-8'))
 
     def create_offer(self):
         lib.webrtc_client_create_offer(self._handle)

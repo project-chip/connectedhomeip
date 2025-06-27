@@ -17,6 +17,7 @@
 
 #pragma once
 #include <functional>
+#include <lib/core/CHIPError.h>
 #include <rtc/rtc.hpp>
 #include <string>
 
@@ -29,7 +30,7 @@ public:
     WebRTCClient();
     ~WebRTCClient();
 
-    void CreatePeerConnection(const std::string & stunUrl);
+    CHIP_ERROR CreatePeerConnection(const std::string & stunUrl);
     void CreateOffer();
     void CreateAnswer();
     void SetRemoteDescription(const std::string & sdp, const std::string & type);
