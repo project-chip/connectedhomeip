@@ -313,19 +313,19 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
                         ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
 
     // Update Overall Target to Null for the Closure Control on Endpoint 1
-    DataModel::Nullable<GenericOverallTarget> ep1Target;
+    DataModel::Nullable<GenericOverallTargetState> ep1Target;
 
-    VerifyOrReturnValue(ep1.GetLogic().GetOverallTarget(ep1Target) == CHIP_NO_ERROR, Status::Failure,
+    VerifyOrReturnValue(ep1.GetLogic().GetOverallTargetState(ep1Target) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to get overall target for Step command"));
 
     if (ep1Target.IsNull())
     {
-        ep1Target.SetNonNull(GenericOverallTarget{});
+        ep1Target.SetNonNull(GenericOverallTargetState{});
     }
 
     ep1Target.Value().position = NullOptional; // Reset position to Null
 
-    VerifyOrReturnValue(ep1.GetLogic().SetOverallTarget(ep1Target) == CHIP_NO_ERROR, Status::Failure,
+    VerifyOrReturnValue(ep1.GetLogic().SetOverallTargetState(ep1Target) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set overall target for Step command"));
 
     AppEvent event;

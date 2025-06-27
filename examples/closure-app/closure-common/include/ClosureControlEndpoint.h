@@ -177,25 +177,6 @@ private:
     ClosureControlDelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
-
-    /**
-     * @brief Updates the target state based on the current state of the closure control endpoint.
-     *
-     * This function retrieves the current state of the closure control endpoint and updates
-     * the target state accordingly. It ensures that the target state reflects the latest
-     * positioning and other relevant attributes.
-     */
-    void UpdateTargetStateFromCurrentState();
-
-    /**
-     * @brief Maps the current positioning to a target position.
-     *
-     * This function converts the current positioning state to a corresponding target position.
-     *
-     * @param currentPositioning The current positioning state to be mapped.
-     * @return TargetPositionEnum The mapped target position.
-     */
-    TargetPositionEnum MapCurrentPositioningToTargetPosition(PositioningEnum currentPositioning);
 };
 
 } // namespace ClosureControl

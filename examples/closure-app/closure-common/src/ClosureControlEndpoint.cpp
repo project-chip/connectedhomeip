@@ -169,16 +169,16 @@ void ClosureControlEndpoint::OnStopMotionActionComplete()
 
 void ClosureControlEndpoint::OnCalibrateActionComplete()
 {
-    DataModel::Nullable<GenericOverallState> overallState(GenericOverallState(
-        MakeOptional(DataModel::MakeNullable(PositioningEnum::kFullyClosed)), MakeOptional(DataModel::MakeNullable(true)),
-        MakeOptional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kAuto)), MakeOptional(DataModel::MakeNullable(true))));
-    DataModel::Nullable<GenericOverallTarget> overallTarget = DataModel::NullNullable;
+    // DataModel::Nullable<GenericOverallState> overallState(GenericOverallState(
+    //     MakeOptional(DataModel::MakeNullable(PositioningEnum::kFullyClosed)), MakeOptional(DataModel::MakeNullable(true)),
+    //     MakeOptional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kAuto)), MakeOptional(DataModel::MakeNullable(true))));
+    // DataModel::Nullable<GenericOverallTarget> overallTarget = DataModel::NullNullable;
 
-    mLogic.SetMainState(MainStateEnum::kStopped);
-    mLogic.SetOverallState(overallState);
-    mLogic.SetOverallTarget(overallTarget);
-    mLogic.SetCountdownTimeFromDelegate(0);
-    mLogic.GenerateMovementCompletedEvent();
+    // mLogic.SetMainState(MainStateEnum::kStopped);
+    // mLogic.SetOverallState(overallState);
+    // mLogic.SetOverallTarget(overallTarget);
+    // mLogic.SetCountdownTimeFromDelegate(0);
+    // mLogic.GenerateMovementCompletedEvent();
 }
 
 void ClosureControlEndpoint::OnMoveToActionComplete()
@@ -192,39 +192,37 @@ void ClosureControlEndpoint::OnPanelMotionActionComplete()
 
     // Set the OverallState position to PartiallyOpened as motion has been stopped
     // and the closure is not fully closed or fully opened.
-    auto position = MakeOptional(DataModel::MakeNullable(PositioningEnum::kPartiallyOpened));
+    auto position = MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened));
 
-    DataModel::Nullable<GenericOverallState> overallState;
-    DataModel::Nullable<GenericOverallTarget> overallTarget;
-    mLogic.GetOverallState(overallState);
-    mLogic.GetOverallTarget(overallTarget);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
+    DataModel::Nullable<GenericOverallTargetState> overallTargetState;
+    mLogic.GetOverallCurrentState(overallCurrentState);
+    mLogic.GetOverallTargetState(overallTargetState);
 
-    if (overallState.IsNull())
+    if (overallCurrentState.IsNull())
     {
-        overallState.SetNonNull(GenericOverallState(position, NullOptional, NullOptional, NullOptional));
+        overallCurrentState.SetNonNull(GenericOverallCurrentState(position, NullOptional, NullOptional, NullOptional));
     }
     else
     {
-        overallState.Value().positioning = position;
+        overallCurrentState.Value().position = position;
     }
 
     // Set latch and speed to their target values if they are set in the overall target.
-    if (!overallTarget.IsNull())
+    if (!overallTargetState.IsNull())
     {
-
-        if (overallTarget.Value().latch.HasValue())
+        if (overallTargetState.Value().latch.HasValue() && !overallTargetState.Value().latch.Value().IsNull())
         {
-            // If the target position was FullyClosed, we set it to PartiallyOpened.
-            overallState.Value().latch.SetValue(DataModel::MakeNullable(overallTarget.Value().latch.Value()));
+            overallCurrentState.Value().latch.SetValue(DataModel::MakeNullable(overallTargetState.Value().latch.Value().Value()));
         }
 
-        if (overallTarget.Value().speed.HasValue())
+        if (overallTargetState.Value().speed.HasValue())
         {
             // If the target speed was Auto, we set it to Auto.
-            overallState.Value().speed.SetValue(DataModel::MakeNullable(overallTarget.Value().speed.Value()));
+            overallCurrentState.Value().speed.SetValue(overallTargetState.Value().speed.Value());
         }
     }
-    mLogic.SetOverallState(overallState);
+    mLogic.SetOverallCurrentState(overallCurrentState);
 
     mLogic.SetCountdownTimeFromDelegate(0);
     mLogic.GenerateMovementCompletedEvent();
