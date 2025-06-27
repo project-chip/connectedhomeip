@@ -310,7 +310,7 @@ def _find_test_class():
     """
     # Import MatterBaseTest here to avoid circular dependency
     from chip.testing.matter_testing import MatterBaseTest
-    
+
     subclasses = utils.find_subclasses_in_module([MatterBaseTest], sys.modules['__main__'])
     subclasses = [c for c in subclasses if c.__name__ != "MatterBaseTest"]
     if len(subclasses) != 1:
