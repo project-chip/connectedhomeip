@@ -41,50 +41,53 @@ constexpr char kLocalNodeIdKey[]           = "LocalNodeId";
 constexpr char kCommissionerCATsKey[]      = "CommissionerCATs";
 constexpr LogCategory kDefaultLoggingLevel = kLogCategory_Automation;
 
-const char * GetUsedDirectory(const char * directory)
+std::string GetUsedDirectory(const std::string & directory)
 {
-    const char * dir = directory;
-
-    if (dir == nullptr)
+    // Explicit directory given: use as-is.
+    if (!directory.empty())
     {
-        dir = getenv("TMPDIR");
+        return directory;
     }
 
-    if (dir == nullptr)
+    // Fall-back to environment-provided directory.
+    if (const char * dir = getenv("TMPDIR"); dir != nullptr)
     {
-        dir = "/tmp";
+        return dir;
     }
 
-    return dir;
+    // Worst-case: just /tmp (legacy behavior from long ago).
+    return "/tmp";
 }
 
-std::string GetFilename(const char * directory, const char * name)
+std::string PersistentStorage::GenerateStoragePath(const std::string & name) const
 {
-    const char * dir = GetUsedDirectory(directory);
+    std::string storagePath = mUsedDirectory + "/chip_tool_config";
 
-    if (name == nullptr)
+    if (!name.empty())
     {
-        return std::string(dir) + "/chip_tool_config.ini";
+        storagePath.append(".");
+        storagePath.append(name);
     }
 
-    return std::string(dir) + "/chip_tool_config." + std::string(name) + ".ini";
+    return storagePath.append(".ini");
 }
 
 CHIP_ERROR PersistentStorage::Init(const char * name, const char * directory)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    mUsedDirectory   = GetUsedDirectory(directory != nullptr ? directory : "");
+    mStorageFilePath = GenerateStoragePath(name != nullptr ? name : "");
+
     std::ifstream ifs;
-    ifs.open(GetFilename(directory, name), std::ifstream::in);
+    ifs.open(mStorageFilePath, std::ifstream::in);
     if (!ifs.good())
     {
-        CommitConfig(directory, name);
-        ifs.open(GetFilename(directory, name), std::ifstream::in);
+        CommitConfig();
+        ifs.open(mStorageFilePath, std::ifstream::in);
     }
     VerifyOrExit(ifs.is_open(), err = CHIP_ERROR_OPEN_FAILED);
 
-    mName      = name;
-    mDirectory = directory;
     mConfig.clear();
     mConfig.parse(ifs);
     ifs.close();
@@ -141,7 +144,7 @@ CHIP_ERROR PersistentStorage::SyncSetKeyValue(const char * key, const void * val
     }
 
     mConfig.sections[kDefaultSectionName] = section;
-    return CommitConfig(mDirectory, mName);
+    return CommitConfig();
 }
 
 CHIP_ERROR PersistentStorage::SyncDeleteKeyValue(const char * key)
@@ -154,7 +157,7 @@ CHIP_ERROR PersistentStorage::SyncDeleteKeyValue(const char * key)
     section.erase(escapedKey);
 
     mConfig.sections[kDefaultSectionName] = section;
-    return CommitConfig(mDirectory, mName);
+    return CommitConfig();
 }
 
 bool PersistentStorage::SyncDoesKeyExist(const char * key)
@@ -189,20 +192,20 @@ CHIP_ERROR PersistentStorage::SyncClearAll()
     auto section = mConfig.sections[kDefaultSectionName];
     section.clear();
     mConfig.sections[kDefaultSectionName] = section;
-    return CommitConfig(mDirectory, mName);
+    return CommitConfig();
 }
 
 const char * PersistentStorage::GetDirectory() const
 {
-    return GetUsedDirectory(mDirectory);
+    return mUsedDirectory.c_str();
 }
 
-CHIP_ERROR PersistentStorage::CommitConfig(const char * directory, const char * name)
+CHIP_ERROR PersistentStorage::CommitConfig()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     std::ofstream ofs;
-    std::string tmpPath = GetFilename(directory, name) + ".tmp";
+    std::string tmpPath = mStorageFilePath + ".tmp";
     ofs.open(tmpPath, std::ofstream::out | std::ofstream::trunc);
     VerifyOrExit(ofs.good(), err = CHIP_ERROR_WRITE_FAILED);
 
@@ -210,7 +213,7 @@ CHIP_ERROR PersistentStorage::CommitConfig(const char * directory, const char * 
     ofs.close();
     VerifyOrExit(ofs.good(), err = CHIP_ERROR_WRITE_FAILED);
 
-    VerifyOrExit(rename(tmpPath.c_str(), GetFilename(directory, name).c_str()) == 0, err = CHIP_ERROR_WRITE_FAILED);
+    VerifyOrExit(rename(tmpPath.c_str(), mStorageFilePath.c_str()) == 0, err = CHIP_ERROR_WRITE_FAILED);
 
 exit:
     return err;

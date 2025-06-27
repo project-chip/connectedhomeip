@@ -2907,6 +2907,8 @@ public class ClusterIDMapping {
             TCAcknowledgements(7L),
             TCAcknowledgementsRequired(8L),
             TCUpdateDeadline(9L),
+            RecoveryIdentifier(10L),
+            NetworkRecoveryReason(11L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -11351,8 +11353,9 @@ public class ClusterIDMapping {
             CountdownTime(0L),
             MainState(1L),
             CurrentErrorList(2L),
-            OverallState(3L),
-            OverallTarget(4L),
+            OverallCurrentState(3L),
+            OverallTargetState(4L),
+            LatchControlModes(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -17285,10 +17288,13 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            SupportedZoneSources(0L),
-            Zones(1L),
-            Triggers(2L),
-            Sensitivity(3L),
+            MaxUserDefinedZones(0L),
+            MaxZones(1L),
+            Zones(2L),
+            Triggers(3L),
+            SensitivityMax(4L),
+            Sensitivity(5L),
+            TwoDCartesianMax(6L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -17338,8 +17344,9 @@ public class ClusterIDMapping {
         public enum Command {
             CreateTwoDCartesianZone(0L),
             UpdateTwoDCartesianZone(2L),
-            GetTwoDCartesianZone(3L),
-            RemoveZone(5L),;
+            RemoveZone(3L),
+            CreateOrUpdateTrigger(4L),
+            RemoveTrigger(5L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -17391,23 +17398,6 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum GetTwoDCartesianZoneCommandField {ZoneID(0),;
-                    private final int id;
-                    GetTwoDCartesianZoneCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static GetTwoDCartesianZoneCommandField value(int id) throws NoSuchFieldError {
-                        for (GetTwoDCartesianZoneCommandField field : GetTwoDCartesianZoneCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
                 }public enum RemoveZoneCommandField {ZoneID(0),;
                     private final int id;
                     RemoveZoneCommandField(int id) {
@@ -17419,6 +17409,40 @@ public class ClusterIDMapping {
                     }
                     public static RemoveZoneCommandField value(int id) throws NoSuchFieldError {
                         for (RemoveZoneCommandField field : RemoveZoneCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum CreateOrUpdateTriggerCommandField {Trigger(0),;
+                    private final int id;
+                    CreateOrUpdateTriggerCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static CreateOrUpdateTriggerCommandField value(int id) throws NoSuchFieldError {
+                        for (CreateOrUpdateTriggerCommandField field : CreateOrUpdateTriggerCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum RemoveTriggerCommandField {ZoneID(0),;
+                    private final int id;
+                    RemoveTriggerCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static RemoveTriggerCommandField value(int id) throws NoSuchFieldError {
+                        for (RemoveTriggerCommandField field : RemoveTriggerCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -17480,7 +17504,7 @@ public class ClusterIDMapping {
             AllocatedVideoStreams(15L),
             AllocatedAudioStreams(16L),
             AllocatedSnapshotStreams(17L),
-            RankedVideoStreamPrioritiesList(18L),
+            StreamUsagePriorities(18L),
             SoftRecordingPrivacyModeEnabled(19L),
             SoftLivestreamPrivacyModeEnabled(20L),
             HardPrivacyModeOn(21L),
@@ -17609,7 +17633,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum VideoStreamAllocateCommandField {StreamUsage(0),VideoCodec(1),MinFrameRate(2),MaxFrameRate(3),MinResolution(4),MaxResolution(5),MinBitRate(6),MaxBitRate(7),MinFragmentLen(8),MaxFragmentLen(9),WatermarkEnabled(10),OSDEnabled(11),;
+                }public enum VideoStreamAllocateCommandField {StreamUsage(0),VideoCodec(1),MinFrameRate(2),MaxFrameRate(3),MinResolution(4),MaxResolution(5),MinBitRate(6),MaxBitRate(7),MinKeyFrameInterval(8),MaxKeyFrameInterval(9),WatermarkEnabled(10),OSDEnabled(11),;
                     private final int id;
                     VideoStreamAllocateCommandField(int id) {
                         this.id = id;
@@ -17785,7 +17809,7 @@ public class ClusterIDMapping {
             MPTZPosition(0L),
             MaxPresets(1L),
             MPTZPresets(2L),
-            DPTZRelativeMove(3L),
+            DPTZStreams(3L),
             ZoomMax(4L),
             TiltMin(5L),
             TiltMax(6L),
@@ -18062,11 +18086,11 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            SolicitOffer(1L),
-            ProvideOffer(3L),
-            ProvideAnswer(5L),
-            ProvideICECandidates(6L),
-            EndSession(7L),;
+            SolicitOffer(0L),
+            ProvideOffer(2L),
+            ProvideAnswer(4L),
+            ProvideICECandidates(5L),
+            EndSession(6L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -18084,7 +18108,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum SolicitOfferCommandField {StreamUsage(0),OriginatingEndpointID(1),VideoStreamID(2),AudioStreamID(3),ICEServers(4),ICETransportPolicy(5),MetadataOptions(6),;
+        }public enum SolicitOfferCommandField {StreamUsage(0),OriginatingEndpointID(1),VideoStreamID(2),AudioStreamID(3),ICEServers(4),ICETransportPolicy(5),MetadataEnabled(6),;
                     private final int id;
                     SolicitOfferCommandField(int id) {
                         this.id = id;
@@ -18101,7 +18125,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum ProvideOfferCommandField {WebRTCSessionID(0),Sdp(1),StreamUsage(2),OriginatingEndpointID(3),VideoStreamID(4),AudioStreamID(5),ICEServers(6),ICETransportPolicy(7),MetadataOptions(8),;
+                }public enum ProvideOfferCommandField {WebRTCSessionID(0),Sdp(1),StreamUsage(2),OriginatingEndpointID(3),VideoStreamID(4),AudioStreamID(5),ICEServers(6),ICETransportPolicy(7),MetadataEnabled(8),;
                     private final int id;
                     ProvideOfferCommandField(int id) {
                         this.id = id;
@@ -18252,10 +18276,10 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            Offer(1L),
-            Answer(2L),
-            ICECandidates(3L),
-            End(4L),;
+            Offer(0L),
+            Answer(1L),
+            ICECandidates(2L),
+            End(3L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -20428,12 +20452,12 @@ public class ClusterIDMapping {
             WriteOnlyInt8u(16426L),
             NullableGlobalEnum(16435L),
             NullableGlobalStruct(16436L),
-            MeiInt8u(4294070017L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
             FeatureMap(65532L),
-            ClusterRevision(65533L),;
+            ClusterRevision(65533L),
+            MeiInt8u(4294070017L),;
             private final long id;
             Attribute(long id) {
                 this.id = id;
@@ -20503,6 +20527,7 @@ public class ClusterIDMapping {
             TestSecondBatchHelperRequest(23L),
             StringEchoRequest(24L),
             GlobalEchoRequest(25L),
+            TestCheckCommandFlags(26L),
             TestDifferentVendorMeiRequest(4294049962L),;
             private final long id;
             Command(long id) {

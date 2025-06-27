@@ -481,7 +481,7 @@ EndpointId ContentAppFactoryImpl::RemoveContentApp(EndpointId epId)
 {
     for (size_t i = 0; i < mContentApps.size(); ++i)
     {
-        auto & app = mContentApps.at(i);
+        auto app = mContentApps.at(i);
         if (app->GetEndpointId() == epId)
         {
             ChipLogProgress(DeviceLayer, "ContentAppFactoryImpl RemoveContentApp endpointId %d", epId);

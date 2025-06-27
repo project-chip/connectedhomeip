@@ -27,11 +27,14 @@
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/Base64.h>
 #include <lib/support/BufferReader.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/BytesToHex.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+#include <lib/support/StringBuilder.h>
 #include <lib/support/TypeTraits.h>
 #include <stdint.h>
 #include <string.h>
@@ -1251,6 +1254,61 @@ CHIP_ERROR VerifyCertificateSigningRequestFormat(const uint8_t * csr, size_t csr
     VerifyOrReturnError(csr_length == (seq_length + header_overhead), CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
     return CHIP_NO_ERROR;
+}
+
+const char * PemEncoder::NextLine()
+{
+    bool hasLine = false;
+
+    switch (mState)
+    {
+    case State::kPrintHeader: {
+        // The `.48s` is to make sure the header is not wider than out internal string buffer. We clamp the header.
+        mStringBuilder.Reset().AddFormat("-----BEGIN %.48s-----", mEncodedElement);
+        mState  = mDerBytes.empty() ? State::kPrintFooter : State::kPrintBody;
+        hasLine = true;
+        break;
+    }
+    case State::kPrintBody: {
+        size_t remaining      = mDerBytes.size() - mProcessedBytes;
+        size_t chunkSizeBytes = std::min(remaining, kNumBytesPerLine);
+
+        {
+            char base64EncodedBuf[kLineBufferSize];
+            size_t encodedLen = static_cast<size_t>(
+                Base64Encode(mDerBytes.data() + mProcessedBytes, static_cast<uint16_t>(chunkSizeBytes), base64EncodedBuf));
+            VerifyOrDie(encodedLen < sizeof(base64EncodedBuf));
+            base64EncodedBuf[encodedLen] = '\0';
+            mStringBuilder.Reset().Add(base64EncodedBuf);
+        }
+
+        mProcessedBytes += chunkSizeBytes;
+        mState  = (mProcessedBytes < mDerBytes.size()) ? State::kPrintBody : State::kPrintFooter;
+        hasLine = true;
+        break;
+    }
+    case State::kPrintFooter: {
+        // The `.50s` is to make sure the header is not wider than out internal string buffer. We clamp the footer.
+        mStringBuilder.Reset().AddFormat("-----END %.50s-----", mEncodedElement);
+        mState  = State::kDone;
+        hasLine = true;
+        break;
+    }
+    case State::kDone:
+        [[fallthrough]];
+    default: {
+        // Default initialized StringBuilder: empty output.
+        mState  = State::kDone;
+        hasLine = false;
+        break;
+    }
+    }
+
+    // All the string should have fit based on the logic. It would be a public
+    // API invariant failure if this ever fails.
+    VerifyOrDie(mStringBuilder.Fit());
+
+    return hasLine ? mStringBuilder.c_str() : nullptr;
 }
 
 } // namespace Crypto

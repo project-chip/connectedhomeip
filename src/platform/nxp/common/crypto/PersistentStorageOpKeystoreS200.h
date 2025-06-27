@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *          Platform-specific implementation of the persistent operational keystore for K32W1
+ *          Platform-specific implementation of the persistent operational keystore for MCXW7x
  */
 
 #pragma once

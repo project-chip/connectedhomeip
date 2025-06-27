@@ -60,7 +60,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
             TestStep(8, "Read and verify MPTZPosition attribute."),
             TestStep(9, "Read and verify MaxPresets attribute, if supported."),
             TestStep(10, "Read and verify MPTZPresets attribute, if supported."),
-            TestStep(11, "Read and verify DPTZRelativeMove attribute, if supported"),
+            TestStep(11, "Read and verify DPTZStreams attribute, if supported"),
         ]
         return steps
 
@@ -158,7 +158,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
                               "MaxPresets attribute is a mandatory attribute if MPRESETS.")
 
             # For now force a preset to be present so there is something to read
-            await self.send_save_presets_command(endpoint, name="newpreset")
+            await self.send_save_preset_command(endpoint, name="newpreset")
 
             max_presets_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MaxPresets)
 
@@ -184,16 +184,16 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
 
         if self.has_feature_dptz:
             self.step(11)
-            asserts.assert_in(attributes.DPTZRelativeMove.attribute_id, attribute_list,
-                              "DPTZRelativeMove attribute is a mandatory attribute if DPTZ.")
+            asserts.assert_in(attributes.DPTZStreams.attribute_id, attribute_list,
+                              "DPTZStreams attribute is a mandatory attribute if DPTZ.")
 
-            dptz_relative_move_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.DPTZRelativeMove)
-            if dptz_relative_move_dut is not None:
+            dptz_streams_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.DPTZStreams)
+            if dptz_streams_dut is not None:
                 # Verify that all elements in the list are unique
-                asserts.assert_equal(len(dptz_relative_move_dut), len(
-                    set(dptz_relative_move_dut)), "DPTZRelativeMove has non-unique values")
-                for videostreamid in dptz_relative_move_dut:
-                    asserts.assert_greater_equal(videostreamid, 0, "Provided video stream id is out of range")
+                asserts.assert_equal(len(dptz_streams_dut), len(
+                    set(dptz_streams_dut)), "DPTZStreams has non-unique values")
+                for streams in dptz_streams_dut:
+                    asserts.assert_greater_equal(streams.videostreamid, 0, "Provided video stream id is out of range")
         else:
             logging.info("DPTZ Feature not supported. Test step skipped")
             self.skip_step(11)

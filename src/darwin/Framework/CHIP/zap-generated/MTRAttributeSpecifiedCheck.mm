@@ -803,6 +803,12 @@ static BOOL AttributeIsSpecifiedInGeneralCommissioningCluster(AttributeId aAttri
     case Attributes::TCUpdateDeadline::Id: {
         return YES;
     }
+    case Attributes::RecoveryIdentifier::Id: {
+        return YES;
+    }
+    case Attributes::NetworkRecoveryReason::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -3576,10 +3582,13 @@ static BOOL AttributeIsSpecifiedInClosureControlCluster(AttributeId aAttributeId
     case Attributes::CurrentErrorList::Id: {
         return YES;
     }
-    case Attributes::OverallState::Id: {
+    case Attributes::OverallCurrentState::Id: {
         return YES;
     }
-    case Attributes::OverallTarget::Id: {
+    case Attributes::OverallTargetState::Id: {
+        return YES;
+    }
+    case Attributes::LatchControlModes::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5815,7 +5824,10 @@ static BOOL AttributeIsSpecifiedInZoneManagementCluster(AttributeId aAttributeId
 {
     using namespace Clusters::ZoneManagement;
     switch (aAttributeId) {
-    case Attributes::SupportedZoneSources::Id: {
+    case Attributes::MaxUserDefinedZones::Id: {
+        return YES;
+    }
+    case Attributes::MaxZones::Id: {
         return YES;
     }
     case Attributes::Zones::Id: {
@@ -5824,7 +5836,13 @@ static BOOL AttributeIsSpecifiedInZoneManagementCluster(AttributeId aAttributeId
     case Attributes::Triggers::Id: {
         return YES;
     }
+    case Attributes::SensitivityMax::Id: {
+        return YES;
+    }
     case Attributes::Sensitivity::Id: {
+        return YES;
+    }
+    case Attributes::TwoDCartesianMax::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5906,7 +5924,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::AllocatedSnapshotStreams::Id: {
         return YES;
     }
-    case Attributes::RankedVideoStreamPrioritiesList::Id: {
+    case Attributes::StreamUsagePriorities::Id: {
         return YES;
     }
     case Attributes::SoftRecordingPrivacyModeEnabled::Id: {
@@ -6009,7 +6027,7 @@ static BOOL AttributeIsSpecifiedInCameraAVSettingsUserLevelManagementCluster(Att
     case Attributes::MPTZPresets::Id: {
         return YES;
     }
-    case Attributes::DPTZRelativeMove::Id: {
+    case Attributes::DPTZStreams::Id: {
         return YES;
     }
     case Attributes::ZoomMax::Id: {

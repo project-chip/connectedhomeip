@@ -102,6 +102,11 @@ private:
     void OnAirQualityChange(uint32_t aEnum);
 
     /**
+     * Should be called when it is necessary to change the measured moisture value.
+     */
+    void OnSoilMoistureChange(chip::EndpointId endpointId, chip::app::DataModel::Nullable<chip::Percent> soilMoisture);
+
+    /**
      * Should be called when it is necessary to change the operational state as a manual operation.
      */
     void OnOperationalStateChange(std::string device, std::string operation, Json::Value param);

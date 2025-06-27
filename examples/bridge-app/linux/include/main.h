@@ -26,6 +26,8 @@ std::vector<EndpointListInfo> GetEndpointListInfo(chip::EndpointId parentId);
 
 std::vector<Action *> GetActionListInfo(chip::EndpointId parentId);
 
+std::vector<Room *> GetRoomListInfo(chip::EndpointId parentId);
+
 class BridgeAppCommandHandler
 {
 public:
@@ -44,3 +46,7 @@ class BridgeCommandDelegate : public NamedPipeCommandDelegate
 public:
     void OnEventCommandReceived(const char * json) override;
 };
+
+// Declare runOnOffRoomAction as an external function that can be called from bridged-actions-stub.cpp
+void runOnOffRoomAction(Room * room, bool actionOn, chip::EndpointId endpointId, uint16_t actionID, uint32_t invokeID,
+                        bool hasInvokeID);

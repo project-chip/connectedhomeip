@@ -198,6 +198,7 @@ struct GroupMembershipResponse
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::GetGroupMembershipResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Groups::Id; }
+    static constexpr bool kIsFabricScoped = false;
 
     GroupMembershipResponse(const Commands::GetGroupMembership::DecodableType & data, chip::EndpointId endpoint,
                             GroupDataProvider::EndpointIterator * iter) :

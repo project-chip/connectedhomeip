@@ -162,6 +162,11 @@ config CHIP_WIFI
 	help
 		Enable Matter-over-Wi-Fi.
 
+config CHIP_ETHERNET
+	bool "Enable NXP ethernet support"
+	help
+		Enable Matter-over-ethernet.
+
 config CHIP_WIFI_CONNECTION_RECOVERY_MINIMUM_INTERVAL
 	int "Define the minimum connection recovery time interval in milliseconds"
 	depends on CHIP_WIFI
@@ -203,6 +208,7 @@ endif # NET_L2_OPENTHREAD
 
 config CHIP_IPV4
 	bool "IPv4 support for Matter"
+	default n if CHIP_NET_L2_OPENTHREAD && !CHIP_WIFI
 	default y
 	help
 		If disabled, it allows to build NXP SDK application

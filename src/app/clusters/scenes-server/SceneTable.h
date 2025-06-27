@@ -20,7 +20,6 @@
 #include <app/clusters/scenes-server/ExtensionFieldSets.h>
 #include <app/storage/TableEntry.h>
 #include <lib/support/CHIPMemString.h>
-#include <lib/support/CommonIterator.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/PersistentData.h>
 #include <lib/support/Span.h>
@@ -233,7 +232,7 @@ public:
 
     SceneTable & operator=(const SceneTable &) = delete;
 
-    virtual CHIP_ERROR Init(PersistentStorageDelegate * storage) = 0;
+    virtual CHIP_ERROR Init(PersistentStorageDelegate & storage) = 0;
     virtual void Finish()                                        = 0;
 
     // Global scene count

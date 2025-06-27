@@ -17,8 +17,9 @@ RUN set -x \
     && zephyr-sdk-0.17.0/setup.sh -t riscv64-zephyr-elf \
     && : # last line
 
-# Setup Zephyr version: 3.7.0; branch: develop
-ARG ZEPHYR_REVISION=ed037d7de7c23eb14c908453d2d481cdf782796a
+# Setup Zephyr version: 4.1.0; branch: develop
+ARG ZEPHYR_REVISION=050e732c8ba66ece6058aac1591508e0e3510729
+ARG N22_BIN_REVISION=1f37e056bd06cac9d164a8d1d2c7dbfce940d119
 WORKDIR /opt/telink/zephyrproject
 RUN set -x \
     && python3 -m pip install --break-system-packages -U --no-cache-dir west \
@@ -30,6 +31,7 @@ RUN set -x \
     && west init -l \
     && west update -o=--depth=1 -n -f smart \
     && west blobs fetch hal_telink \
+    && scripts/utils/telink_w91_post_build $PWD ${N22_BIN_REVISION} 1 \
     && : # last line
 
 FROM ghcr.io/project-chip/chip-build:${VERSION}

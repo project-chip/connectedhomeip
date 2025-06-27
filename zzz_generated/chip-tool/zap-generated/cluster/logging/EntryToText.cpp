@@ -840,6 +840,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "TCAcknowledgementsRequired";
         case chip::app::Clusters::GeneralCommissioning::Attributes::TCUpdateDeadline::Id:
             return "TCUpdateDeadline";
+        case chip::app::Clusters::GeneralCommissioning::Attributes::RecoveryIdentifier::Id:
+            return "RecoveryIdentifier";
+        case chip::app::Clusters::GeneralCommissioning::Attributes::NetworkRecoveryReason::Id:
+            return "NetworkRecoveryReason";
         case chip::app::Clusters::GeneralCommissioning::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::GeneralCommissioning::Attributes::AcceptedCommandList::Id:
@@ -2759,10 +2763,12 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "MainState";
         case chip::app::Clusters::ClosureControl::Attributes::CurrentErrorList::Id:
             return "CurrentErrorList";
-        case chip::app::Clusters::ClosureControl::Attributes::OverallState::Id:
-            return "OverallState";
-        case chip::app::Clusters::ClosureControl::Attributes::OverallTarget::Id:
-            return "OverallTarget";
+        case chip::app::Clusters::ClosureControl::Attributes::OverallCurrentState::Id:
+            return "OverallCurrentState";
+        case chip::app::Clusters::ClosureControl::Attributes::OverallTargetState::Id:
+            return "OverallTargetState";
+        case chip::app::Clusters::ClosureControl::Attributes::LatchControlModes::Id:
+            return "LatchControlModes";
         case chip::app::Clusters::ClosureControl::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ClosureControl::Attributes::AcceptedCommandList::Id:
@@ -4266,14 +4272,20 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
     case chip::app::Clusters::ZoneManagement::Id: {
         switch (id)
         {
-        case chip::app::Clusters::ZoneManagement::Attributes::SupportedZoneSources::Id:
-            return "SupportedZoneSources";
+        case chip::app::Clusters::ZoneManagement::Attributes::MaxUserDefinedZones::Id:
+            return "MaxUserDefinedZones";
+        case chip::app::Clusters::ZoneManagement::Attributes::MaxZones::Id:
+            return "MaxZones";
         case chip::app::Clusters::ZoneManagement::Attributes::Zones::Id:
             return "Zones";
         case chip::app::Clusters::ZoneManagement::Attributes::Triggers::Id:
             return "Triggers";
+        case chip::app::Clusters::ZoneManagement::Attributes::SensitivityMax::Id:
+            return "SensitivityMax";
         case chip::app::Clusters::ZoneManagement::Attributes::Sensitivity::Id:
             return "Sensitivity";
+        case chip::app::Clusters::ZoneManagement::Attributes::TwoDCartesianMax::Id:
+            return "TwoDCartesianMax";
         case chip::app::Clusters::ZoneManagement::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ZoneManagement::Attributes::AcceptedCommandList::Id:
@@ -4327,8 +4339,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "AllocatedAudioStreams";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::AllocatedSnapshotStreams::Id:
             return "AllocatedSnapshotStreams";
-        case chip::app::Clusters::CameraAvStreamManagement::Attributes::RankedVideoStreamPrioritiesList::Id:
-            return "RankedVideoStreamPrioritiesList";
+        case chip::app::Clusters::CameraAvStreamManagement::Attributes::StreamUsagePriorities::Id:
+            return "StreamUsagePriorities";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::SoftRecordingPrivacyModeEnabled::Id:
             return "SoftRecordingPrivacyModeEnabled";
         case chip::app::Clusters::CameraAvStreamManagement::Attributes::SoftLivestreamPrivacyModeEnabled::Id:
@@ -4396,8 +4408,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "MaxPresets";
         case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::MPTZPresets::Id:
             return "MPTZPresets";
-        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::DPTZRelativeMove::Id:
-            return "DPTZRelativeMove";
+        case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::DPTZStreams::Id:
+            return "DPTZStreams";
         case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::ZoomMax::Id:
             return "ZoomMax";
         case chip::app::Clusters::CameraAvSettingsUserLevelManagement::Attributes::TiltMin::Id:
@@ -6060,10 +6072,12 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "CreateTwoDCartesianZone";
         case chip::app::Clusters::ZoneManagement::Commands::UpdateTwoDCartesianZone::Id:
             return "UpdateTwoDCartesianZone";
-        case chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZone::Id:
-            return "GetTwoDCartesianZone";
         case chip::app::Clusters::ZoneManagement::Commands::RemoveZone::Id:
             return "RemoveZone";
+        case chip::app::Clusters::ZoneManagement::Commands::CreateOrUpdateTrigger::Id:
+            return "CreateOrUpdateTrigger";
+        case chip::app::Clusters::ZoneManagement::Commands::RemoveTrigger::Id:
+            return "RemoveTrigger";
         default:
             return "Unknown";
         }
@@ -6357,6 +6371,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "StringEchoRequest";
         case chip::app::Clusters::UnitTesting::Commands::GlobalEchoRequest::Id:
             return "GlobalEchoRequest";
+        case chip::app::Clusters::UnitTesting::Commands::TestCheckCommandFlags::Id:
+            return "TestCheckCommandFlags";
         case chip::app::Clusters::UnitTesting::Commands::TestDifferentVendorMeiRequest::Id:
             return "TestDifferentVendorMeiRequest";
         default:
@@ -6832,8 +6848,6 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
         {
         case chip::app::Clusters::ZoneManagement::Commands::CreateTwoDCartesianZoneResponse::Id:
             return "CreateTwoDCartesianZoneResponse";
-        case chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZoneResponse::Id:
-            return "GetTwoDCartesianZoneResponse";
         default:
             return "Unknown";
         }
@@ -7051,6 +7065,8 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Water Leak Detector";
     case 0x00000044:
         return "Rain Sensor";
+    case 0x00000045:
+        return "Soil Sensor";
     case 0x00000070:
         return "Refrigerator";
     case 0x00000071:

@@ -11,5 +11,36 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-group("software-diagnostics-server") {
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+source_set("software-fault-listener") {
+  sources = [
+    "software-fault-listener.cpp",
+    "software-fault-listener.h",
+  ]
+
+  public_deps =
+      [ "${chip_root}/zzz_generated/app-common/clusters/SoftwareDiagnostics" ]
+
+  public_configs = [ "${chip_root}/src:includes" ]
+}
+
+source_set("software-diagnostics-server") {
+  sources = [
+    "software-diagnostics-cluster.h",
+    "software-diagnostics-logic.cpp",
+    "software-diagnostics-logic.h",
+  ]
+
+  public_deps = [
+    ":software-fault-listener",
+    "${chip_root}/src/app:attribute-access",
+    "${chip_root}/src/app/data-model-provider:metadata",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/lib/core:error",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/zzz_generated/app-common/clusters/SoftwareDiagnostics",
+  ]
+  public_configs = [ "${chip_root}/src:includes" ]
 }

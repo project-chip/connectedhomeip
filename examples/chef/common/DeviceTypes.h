@@ -30,6 +30,7 @@ namespace DeviceTypes {
 constexpr chip::DeviceTypeId kCookSurfaceDeviceId                  = 0x0077;
 constexpr chip::DeviceTypeId kCooktopDeviceId                      = 0x0078;
 constexpr chip::DeviceTypeId kOvenDeviceId                         = 0x007B;
+constexpr chip::DeviceTypeId kPumpDeviceId                         = 0x0303;
 constexpr chip::DeviceTypeId kRefrigeratorDeviceId                 = 0x0070;
 constexpr chip::DeviceTypeId kTemperatureControlledCabinetDeviceId = 0x0071;
 

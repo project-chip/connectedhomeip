@@ -19,21 +19,21 @@ namespace UpdateTwoDCartesianZone {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace UpdateTwoDCartesianZone
 
-namespace GetTwoDCartesianZone {
-inline constexpr CommandId Id = 0x00000003;
-} // namespace GetTwoDCartesianZone
-
 namespace RemoveZone {
-inline constexpr CommandId Id = 0x00000005;
+inline constexpr CommandId Id = 0x00000003;
 } // namespace RemoveZone
+
+namespace CreateOrUpdateTrigger {
+inline constexpr CommandId Id = 0x00000004;
+} // namespace CreateOrUpdateTrigger
+
+namespace RemoveTrigger {
+inline constexpr CommandId Id = 0x00000005;
+} // namespace RemoveTrigger
 
 namespace CreateTwoDCartesianZoneResponse {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace CreateTwoDCartesianZoneResponse
-
-namespace GetTwoDCartesianZoneResponse {
-inline constexpr CommandId Id = 0x00000004;
-} // namespace GetTwoDCartesianZoneResponse
 
 } // namespace Commands
 } // namespace ZoneManagement

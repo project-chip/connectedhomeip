@@ -34,6 +34,7 @@ namespace CameraAvSettingsUserLevelManagement {
 
 using MPTZStructType       = Structs::MPTZStruct::Type;
 using MPTZPresetStructType = Structs::MPTZPresetStruct::Type;
+using DPTZStruct           = Structs::DPTZStruct::Type;
 
 constexpr int16_t kMinPanValue  = -180;
 constexpr int16_t kMaxPanValue  = 180;
@@ -54,15 +55,15 @@ class Delegate;
 
 enum class OptionalAttributes : uint32_t
 {
-    kMptzPosition     = 0x0001,
-    kMaxPresets       = 0x0002,
-    kMptzPresets      = 0x0004,
-    kDptzRelativeMove = 0x0008,
-    kZoomMax          = 0x0010,
-    kTiltMin          = 0x0020,
-    kTiltMax          = 0x0040,
-    kPanMin           = 0x0080,
-    kPanMax           = 0x0100,
+    kMptzPosition = 0x0001,
+    kMaxPresets   = 0x0002,
+    kMptzPresets  = 0x0004,
+    kDptzStreams  = 0x0008,
+    kZoomMax      = 0x0010,
+    kTiltMin      = 0x0020,
+    kTiltMax      = 0x0040,
+    kPanMin       = 0x0080,
+    kPanMax       = 0x0100,
 };
 
 struct MPTZPresetHelper
@@ -133,7 +134,7 @@ public:
 
     uint8_t GetMaxPresets() const { return mMaxPresets; }
 
-    const std::vector<uint16_t> GetDptzRelativeMove() const { return mDptzRelativeMove; }
+    const std::vector<DPTZStruct> GetDptzRelativeMove() const { return mDptzStreams; }
 
     uint8_t GetZoomMax() const { return mZoomMax; }
 
@@ -164,18 +165,30 @@ public:
     void SetZoom(Optional<uint8_t> aZoom);
 
     /**
-     * Allows for a delegate or application to provide the ID of an allocated video stream that is capable of digital movement.
-     * It is expected that this would be done by a delegate on the conclusion of allocating a video stream via the AV Stream
+     * Allows for a delegate or application to provide the ID and default Viewport of an allocated video stream that is capable of
+     * digital movement. This should be invoked by a delegate on the conclusion of allocating a video stream via the AV Stream
      * Management cluster.
      */
-    void AddMoveCapableVideoStreamID(uint16_t aVideoStreamID);
+    void AddMoveCapableVideoStream(uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport);
+
+    /**
+     * Allows for a delegate or application to update the viewport of an already allocated video stream.
+     * This should be invoked whenever a viewport is updated by DPTZSetVewport or DPTZRelativeMove
+     */
+    void UpdateMoveCapableVideoStream(uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport);
+
+    /**
+     * Allows for a delegate or application to update all of the viewports for all of the allocated video streams.
+     * This should be invoked whenever the device default viewport is updated via a write to Viewport on the
+     * AV Stream Management Cluster
+     */
+    void UpdateMoveCapableVideoStreams(Globals::Structs::ViewportStruct::Type aViewport);
 
     /**
      * Allows for a delegate or application to remove a video stream from the set that is capable of digital movement.
-     * It is expected that this would be done by a delegate on the conclusion of deallocating a video stream via the AV Stream
-     * Management cluster.
+     * This should be invoked by a delegate on the conclusion of deallocating a video stream via the AV Stream Management cluster.
      */
-    void RemoveMoveCapableVideoStreamID(uint16_t aVideoStreamID);
+    void RemoveMoveCapableVideoStream(uint16_t aVideoStreamID);
 
     EndpointId GetEndpointId() { return AttributeAccessInterface::GetEndpointId().Value(); }
 
@@ -201,14 +214,14 @@ private:
     uint8_t mZoomMax = kMaxZoomValue;
 
     std::vector<MPTZPresetHelper> mMptzPresetHelpers;
-    std::vector<uint16_t> mDptzRelativeMove;
+    std::vector<DPTZStruct> mDptzStreams;
 
     // Attribute handler interface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
     // Helper Read functions for complex attribute types
     CHIP_ERROR ReadAndEncodeMPTZPresets(AttributeValueEncoder & encoder);
-    CHIP_ERROR ReadAndEncodeDPTZRelativeMove(AttributeValueEncoder & encoder);
+    CHIP_ERROR ReadAndEncodeDPTZStreams(AttributeValueEncoder & encoder);
 
     CHIP_ERROR StoreMPTZPosition(const MPTZStructType & mptzPosition);
     CHIP_ERROR LoadMPTZPosition(MPTZStructType & mptzPosition);
@@ -260,9 +273,13 @@ public:
     virtual bool CanChangeMPTZ() = 0;
 
     /**
-     * Allows the delegate to verify that a received video stream ID is valid
+     * DPTZ Stream handling. Invoked on the delegate by an app, providing to the delegate the id of an
+     * allocated or deallocated stream, or the viewport when the device level viewport is updated.
+     * The delegate shall invoke the appropriate MoveCapableVideoStream methods on its instance of the server
      */
-    virtual bool IsValidVideoStreamID(uint16_t aVideoStreamID) = 0;
+    virtual void VideoStreamAllocated(uint16_t aStreamID)                                 = 0;
+    virtual void VideoStreamDeallocated(uint16_t aStreamID)                               = 0;
+    virtual void DefaultViewportUpdated(Globals::Structs::ViewportStruct::Type aViewport) = 0;
 
     /**
      * Delegate command handlers
@@ -330,7 +347,7 @@ public:
      * @param aViewport      The new values of Viewport that are to be set
      */
     virtual Protocols::InteractionModel::Status DPTZSetViewport(uint16_t aVideoStreamID,
-                                                                Structs::ViewportStruct::Type aViewport) = 0;
+                                                                Globals::Structs::ViewportStruct::Type aViewport) = 0;
     /**
      * Informs the delegate that a request has been made to digitally alter the current rendered stream. The server has already
      * validated that the Zoom Delta (if provided) is in range, and that the video stream ID is valid. The app needs to work with
@@ -342,7 +359,8 @@ public:
      * @param aZoomDelta     Relative change of digital zoom
      */
     virtual Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
-                                                                 Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta) = 0;
+                                                                 Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta,
+                                                                 Globals::Structs::ViewportStruct::Type & aViewport) = 0;
 
     /**
      *  @brief Callback into the delegate once persistent attributes managed by
@@ -358,7 +376,7 @@ public:
      *  server list, at initialization.
      */
     virtual CHIP_ERROR LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers) = 0;
-    virtual CHIP_ERROR LoadDPTZRelativeMove(std::vector<uint16_t> dptzRelativeMove)       = 0;
+    virtual CHIP_ERROR LoadDPTZStreams(std::vector<DPTZStruct> & dptzStreams)             = 0;
 
     CameraAvSettingsUserLevelMgmtServer * mServer = nullptr;
 

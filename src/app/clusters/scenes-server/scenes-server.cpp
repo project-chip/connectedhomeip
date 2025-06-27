@@ -333,7 +333,7 @@ CHIP_ERROR ScenesServer::Init()
     mGroupProvider = Credentials::GetGroupDataProvider();
 
     SceneTable * sceneTable = scenes::GetSceneTableImpl();
-    ReturnErrorOnFailure(sceneTable->Init(&Server::GetInstance().GetPersistentStorage()));
+    ReturnErrorOnFailure(sceneTable->Init(Server::GetInstance().GetPersistentStorage()));
     ReturnErrorOnFailure(Server::GetInstance().GetFabricTable().AddFabricDelegate(&gFabricDelegate));
 
     mIsInitialized = true;

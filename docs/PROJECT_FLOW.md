@@ -28,13 +28,7 @@ base. They should be easy to review, as a "yes, that's better". Refrain from
 requesting review until all PR checks have completed successfully, lest you tire
 your reviewers.
 
-PR Don'ts:
-
--   Don't combine unrelated changes. E.g. if the PR addresses a bug in some C
-    code, an update to the top-level .gitignore doesn't belong.
--   Don't make stacks. E.g. if a change in a component requires a new feature or
-    even a small tweak in one or more of its dependencies, each dependency
-    change belongs in its own separate PR.
+See a guideline [here](./pull_request_guidelines.md)
 
 ### Milestones
 

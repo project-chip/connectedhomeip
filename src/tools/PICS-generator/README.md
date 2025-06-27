@@ -51,6 +51,9 @@ provided to the tool using these arguments:
 -   --pics-template is the absolute path to the folder containing the PICS
     templates
 -   --pics-output is the absolute path to the output folder to be used
+-   --dm-xml (Optional) is the absolute path to the spec scrape to use, located
+    in the data_model folder in the root of the connectedhomeip repo. An example
+    path is "connectedhomeip/data_model/master".
 
 If the device has not been commissioned this can be done by passing in the
 commissioning information:
@@ -86,14 +89,17 @@ If a device has already been commissioned, the tool can be executed like this:
 python3 PICSGenerator.py --pics-template <pathToPicsTemplateFolder> --pics-output <outputPath>
 ```
 
-The tool can be used to validate against the available spec versions, this can
-be done by providing the following tag in the command, if no path is provided it
-will use the current scrape of Master. An example path is
-"connectedhomeip/data_model/master".
+The tool can be used to generate PICS for a specific spec versions, this can be
+done by providing the following tag in the command, if no path is provided the
+tool will request the specification version from the device in the
+BasicInformation cluster and use that to select DM scrape to use for the PICS
+generation.
 
 ```
-python3 PICSGenerator.py --pics-template <pathToPicsTemplateFolder> --dm <pathToDmScrapeFolder>
+python3 XMLPICSValidator.py --pics-template <pathToPicsTemplateFolder> --dm-xml <pathToDmScrapeFolder>
 ```
+
+If the tag is not provided
 
 # Updates for future releases
 
@@ -109,14 +115,8 @@ PICS.
 To run the XMLPICSValidator, the following command can be used:
 
 ```
-python3 XMLPICSValidator.py --pics-template <pathToPicsTemplateFolder>
+python3 XMLPICSValidator.py --pics-template <pathToPicsTemplateFolder> --dm-xml <pathToDmScrapeFolder>
 ```
 
-The tool can be used to validate against the available spec versions, this can
-be done by providing the following tag in the command, if no path is provided it
-will use the current scrape of Master. An example path is
-"connectedhomeip/data_model/master".
-
-```
-python3 XMLPICSValidator.py --pics-template <pathToPicsTemplateFolder> --dm <pathToDmScrapeFolder>
-```
+NOTE: The --dm-xml is required for this script, since it does not run against a
+specific device.
