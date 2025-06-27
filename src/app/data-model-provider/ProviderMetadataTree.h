@@ -22,6 +22,7 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/ConcreteEventPath.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/NodeConfigurationListener.h>
 #include <app/data-model/List.h>
 #include <clusters/Descriptor/Structs.h>
 #include <lib/support/ReadOnlyBuffer.h>
@@ -31,6 +32,13 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
+struct NodeDataModelConfiguration
+{
+    uint32_t configurationVersion;
+    uint32_t dataModelVersion;
+    uint32_t specVersion;
+};
+
 /// Provides metadata information for a data model
 ///
 /// The data model can be viewed as a tree of endpoint/cluster/(attribute+commands+events)
@@ -38,6 +46,50 @@ namespace DataModel {
 class ProviderMetadataTree
 {
 public:
+    /// This updater class provides a scope where the configuration version get bumped.
+    /// It is used to provide RAII for the ConfigurationVersion where the value is bumped when deconstructed
+    /// and provides a stable interface for clients to perform the bump.
+    ///
+    /// This is provided as a stable interface for applications to bump the stored configuration version
+    /// in case the interface or implementation is moved in the future.
+    class ScopedConfigurationVersionUpdater
+    {
+    public:
+        explicit ScopedConfigurationVersionUpdater(ProviderMetadataTree * parentTree) : mParentTree(parentTree) {}
+
+        ~ScopedConfigurationVersionUpdater()
+        {
+            if (mParentTree)
+            {
+                mParentTree->Internal_BumpNodeDataModelConfigurationVersion();
+            }
+        };
+
+        // No copying for move-only.
+        ScopedConfigurationVersionUpdater(const ScopedConfigurationVersionUpdater &)             = delete;
+        ScopedConfigurationVersionUpdater & operator=(const ScopedConfigurationVersionUpdater &) = delete;
+
+        // Move constructor makes prior handle unusable.
+        ScopedConfigurationVersionUpdater(ScopedConfigurationVersionUpdater && other) noexcept : mParentTree(other.mParentTree)
+        {
+            other.mParentTree = nullptr;
+        }
+
+        // Move assignment.
+        ScopedConfigurationVersionUpdater & operator=(ScopedConfigurationVersionUpdater && other) noexcept
+        {
+            if (this != &other)
+            {
+                mParentTree       = other.mParentTree;
+                other.mParentTree = nullptr;
+            }
+            return *this;
+        }
+
+    private:
+        ProviderMetadataTree * mParentTree;
+    };
+
     virtual ~ProviderMetadataTree() = default;
 
     using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
@@ -99,6 +151,28 @@ public:
     /// the attribute changes.
     virtual void Temporary_ReportAttributeChanged(const AttributePathParams & path) = 0;
 
+    /// Functions used to manage changes to ConfigurationVersion, the Basic Information cluster server implementation
+    /// registers a listener and is notified if the stored configuration version value is changed.
+    ///
+    /// The interface also includes a getter function to obtain the stored DataModelConfiguration version
+    /// e.g. in case of a read of the associated values in BAsic Information or if needed in other areas of the implementation.
+    ///
+    /// In case of a factory reset, the device is able to reset the stored configuration version to the initial value
+    /// by invoking the reset function.
+    ///
+    /// These this interface is not intended to be used directly by the application and may change location in the future.
+    virtual void SetNodeConfigurationListener(NodeConfigurationListener * listener)                           = 0;
+    virtual void NotifyNodeConfigurationListener()                                                            = 0;
+    virtual CHIP_ERROR GetNodeDataModelConfiguration(NodeDataModelConfiguration & nodeDataModelConfiguration) = 0;
+    virtual CHIP_ERROR ResetNodeDataModelConfigurationVersion()                                               = 0;
+
+    /// Function used to get a ScopedConfigurationVersionUpdater object to bump
+    /// the stored configuration version.
+    ScopedConfigurationVersionUpdater GetNodeDataModelConfigurationVersionUpdater()
+    {
+        return ScopedConfigurationVersionUpdater(this);
+    }
+
     // "convenience" functions that just return the data and ignore the error
     // This returns the `ReadOnlyBufferBuilder<..>::TakeBuffer` from their equivalent fuctions as-is,
     // even after an error (e.g. not found would return empty data).
@@ -108,6 +182,12 @@ public:
     ReadOnlyBuffer<EndpointEntry> EndpointsIgnoreError();
     ReadOnlyBuffer<ServerClusterEntry> ServerClustersIgnoreError(EndpointId endpointId);
     ReadOnlyBuffer<AttributeEntry> AttributesIgnoreError(const ConcreteClusterPath & path);
+
+protected:
+    /// Internal function to bump the stored configuration version. This is intentionally marked as internal
+    /// to make it unavailable for the application, since this may be moved or changed in the future.
+    /// The stable interface for bumping the value if provided by ScopedConfigurationVersionUpdater.
+    virtual CHIP_ERROR Internal_BumpNodeDataModelConfigurationVersion() = 0;
 };
 
 } // namespace DataModel
