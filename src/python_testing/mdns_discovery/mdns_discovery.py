@@ -130,7 +130,7 @@ class MdnsDiscovery:
             - get_all_services
         """
         # An instance of Zeroconf to manage mDNS operations.
-        self._azc = AsyncZeroconf(ip_version=IPVersion.All)
+        self._azc = AsyncZeroconf(ip_version=IPVersion.V6Only)
 
         # A dictionary to store discovered services.
         self._discovered_services = {}
