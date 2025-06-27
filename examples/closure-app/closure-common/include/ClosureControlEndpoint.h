@@ -156,9 +156,9 @@ public:
     void OnMoveToActionComplete();
 
     /**
-     * @brief Retrieves the endpoint identifier associated with ClusterLogic instance.
+     * @brief Retrieves the endpoint for this instance.
      *
-     * @return The endpoint ID (EndpointId) for this instance.
+     * @return The endpoint (EndpointId) for this instance.
      */
     EndpointId GetEndpoint() const { return mEndpoint; }
 

@@ -57,9 +57,9 @@ public:
     bool IsManualLatchingNeeded() override { return false; }
 
     /**
-     * @brief Retrieves the endpoint identifier associated with ClusterLogic instance.
-     *
-     * @return The endpoint ID (EndpointId) for this instance.
+     * @brief Retrieves the endpoint for this instance.
+     * 
+     * @return The endpoint (EndpointId) for this instance.
      */
     EndpointId GetEndpoint() const { return mEndpoint; }
 
@@ -109,9 +109,9 @@ public:
     ClusterLogic & GetLogic() { return mLogic; }
 
     /**
-     * @brief Retrieves the endpoint identifier associated with ClusterLogic instance.
+     * @brief Retrieves the endpoint for this instance.
      *
-     * @return The endpoint ID (EndpointId) for this instance.
+     * @return The endpoint (EndpointId) for this instance.
      */
     EndpointId GetEndpoint() const { return mEndpoint; }
 

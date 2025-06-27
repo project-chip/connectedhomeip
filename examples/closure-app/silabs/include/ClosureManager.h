@@ -41,7 +41,6 @@ public:
         STOP_MOTION_ACTION,
         STOP_CALIBRATE_ACTION,
         SET_TARGET_ACTION,
-        PANEL_LATCH_ACTION,
 
         INVALID_ACTION
     };
@@ -107,8 +106,8 @@ public:
     /**
      * @brief Handles the SetTarget command for a closure panel.
      *
-     * This method processes the SetTarget command, allowing the caller to specify a target position,
-     * latch state, and speed for the closure panel at the given endpoint.
+     * This method processes the SetTarget command, based on target position,
+     * latch , and speed for the closure panel at the given endpoint.
      *
      * @param[in] position  Optional target position as a percentage in hundredths (0-10000).
      * @param[in] latch     Optional latch state (true to latch, false to unlatch).
@@ -219,14 +218,10 @@ private:
     static void TimerEventHandler(void * timerCbArg);
 
     /**
-     * @brief Handles the action to set the target position of the panel for a panel endpoint.
+     * @brief Handles the SetTarget motion action for a panel endpoint.
      *
-     * This method manages the state transitions and actions for closure endpoints (such as panels or doors)
-     * during a motion event. It updates the current positions of endpoints 2/3 to next position.
-     * It also triggers
-     *       - Timer for SetTarget action completion if the target position is not reached
-     *       - Timer for Panel Latch action if needed
-     *       - HandleMotionActionComplete to finalize the motion action when the target is reached.
+     * This method Performs the latch actions for closure and updates the current positions 
+     * of panel endpoint to next position.
      *
      * @param endpointId The identifier of the endpoint for which the panel target action should be handled.
      */
