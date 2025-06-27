@@ -55,10 +55,6 @@ public:
 
     bool HasFeature(Feature feature) const;
 
-    // Helpers to read list items via delegate APIs
-    CHIP_ERROR ReadAndEncodeCurrentConnections(const AttributeValueEncoder::ListEncodeHelper & encoder, FabricIndex fabricIndex);
-    CHIP_ERROR ReadAndEncodeSupportedFormats(const AttributeValueEncoder::ListEncodeHelper & encoder);
-
     Protocols::InteractionModel::Status
     ValidateIncomingTransportOptions(const Structs::TransportOptionsStruct::DecodableType & transportOptions);
 

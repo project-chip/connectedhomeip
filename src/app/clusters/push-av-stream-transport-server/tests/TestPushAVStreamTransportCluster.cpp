@@ -24,7 +24,7 @@
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/CommandDataIB.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h>
+#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 #include <app/tests/AppTestContext.h>
 #include <lib/core/Optional.h>
 #include <lib/core/StringBuilderAdapters.h>
@@ -575,7 +575,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestCurrentConnectionsAttributeAcce
     subjectDescriptor.fabricIndex = peerFabricIndex;
     AttributeValueEncoder encoder(builder, subjectDescriptor, path, dataVersion, true);
 
-    // Read the CurrentConnections attribute using the Actions cluster's Read function
+    // Read the CurrentConnections attribute using the cluster's Read function
     DataModel::ActionReturnStatus status = server.ReadAttribute(request, encoder);
     EXPECT_TRUE(status.IsSuccess());
 

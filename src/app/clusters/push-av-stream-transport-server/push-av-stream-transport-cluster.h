@@ -71,6 +71,10 @@ public:
 
 private:
     PushAvStreamTransportServerLogic mLogic;
+
+    // Helpers to read list items
+    CHIP_ERROR ReadAndEncodeCurrentConnections(const AttributeValueEncoder::ListEncodeHelper & encoder, FabricIndex fabricIndex);
+    CHIP_ERROR ReadAndEncodeSupportedFormats(const AttributeValueEncoder::ListEncodeHelper & encoder);
 };
 
 } // namespace PushAvStreamTransport

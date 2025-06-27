@@ -22,7 +22,7 @@
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/EventLogging.h>
 #include <app/InteractionModelEngine.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-server.h>
+#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 #include <app/reporting/reporting.h>
 #include <app/util/util.h>
 #include <clusters/PushAvStreamTransport/Commands.h>
@@ -68,6 +68,31 @@ CHIP_ERROR PushAvStreamTransportServer::Attributes(const ConcreteClusterPath & p
     return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
 }
 
+CHIP_ERROR PushAvStreamTransportServer::ReadAndEncodeSupportedFormats(const AttributeValueEncoder::ListEncodeHelper & encoder)
+{
+    for (const auto & supportsFormat : mLogic.mSupportedFormats)
+    {
+        ReturnErrorOnFailure(encoder.Encode(supportsFormat));
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+PushAvStreamTransportServer::ReadAndEncodeCurrentConnections(const AttributeValueEncoder::ListEncodeHelper & encoder,
+                                                             FabricIndex fabricIndex)
+{
+    for (const auto & currentConnections : mLogic.mCurrentConnections)
+    {
+        if (currentConnections.fabricIndex == fabricIndex)
+        {
+            ReturnErrorOnFailure(encoder.Encode(currentConnections));
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 DataModel::ActionReturnStatus PushAvStreamTransportServer::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                          AttributeValueEncoder & aEncoder)
 {
@@ -85,12 +110,11 @@ DataModel::ActionReturnStatus PushAvStreamTransportServer::ReadAttribute(const D
         return aEncoder.Encode(PushAvStreamTransport::kRevision);
 
     case PushAvStreamTransport::Attributes::SupportedFormats::Id:
-        return aEncoder.EncodeList(
-            [this](const auto & encoder) -> CHIP_ERROR { return mLogic.ReadAndEncodeSupportedFormats(encoder); });
+        return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR { return ReadAndEncodeSupportedFormats(encoder); });
 
     case PushAvStreamTransport::Attributes::CurrentConnections::Id:
         return aEncoder.EncodeList([this, &aEncoder](const auto & encoder) -> CHIP_ERROR {
-            CHIP_ERROR err = mLogic.ReadAndEncodeCurrentConnections(encoder, aEncoder.AccessingFabricIndex());
+            CHIP_ERROR err = ReadAndEncodeCurrentConnections(encoder, aEncoder.AccessingFabricIndex());
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Zcl, "Push AV Stream Transport: Error reading CurrentConnections");

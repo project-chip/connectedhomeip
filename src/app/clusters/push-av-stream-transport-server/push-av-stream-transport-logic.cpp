@@ -73,31 +73,6 @@ bool PushAvStreamTransportServerLogic::HasFeature(Feature feature) const
     return mFeatures.Has(feature);
 }
 
-CHIP_ERROR PushAvStreamTransportServerLogic::ReadAndEncodeSupportedFormats(const AttributeValueEncoder::ListEncodeHelper & encoder)
-{
-    for (const auto & supportsFormat : mSupportedFormats)
-    {
-        ReturnErrorOnFailure(encoder.Encode(supportsFormat));
-    }
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR
-PushAvStreamTransportServerLogic::ReadAndEncodeCurrentConnections(const AttributeValueEncoder::ListEncodeHelper & encoder,
-                                                                  FabricIndex fabricIndex)
-{
-    for (const auto & currentConnections : mCurrentConnections)
-    {
-        if (currentConnections.fabricIndex == fabricIndex)
-        {
-            ReturnErrorOnFailure(encoder.Encode(currentConnections));
-        }
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 bool PushAvStreamTransportServerLogic::IsNullDelegateWithLogging(EndpointId endpointIdForLogging)
 {
 
