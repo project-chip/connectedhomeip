@@ -106,7 +106,7 @@ public:
     /**
      * @brief Handles the Step command for the ClosureDimension cluster.
      *
-     * This method processes a step operation in a specified direction for a given number of steps,
+     * This method processes and initiates step motion in a specified direction for a given number of steps,
      * optionally at a specified speed, on the provided panel endpoint.
      *
      * @param direction The direction in which to perform the step operation.
@@ -217,9 +217,8 @@ private:
     /**
      * @brief Handles a single step action for the panel associated with the specified endpoint.
      *
-     * This method processes a panel step action, typically triggered by a user interaction or
-     * an automation event, for the panel given endpoint. The implementation should define the specific
-     * behavior of a "step" for the panel (e.g., moving to the next position, toggling state, etc.).
+     * This method processes a panel step action for the panel endpoint and updates the current position to 
+     * reflect the step position and triggers timer if target is not reached.
      *
      * @param endpointId The identifier of the endpoint for which the panel step action is to be handled.
      */

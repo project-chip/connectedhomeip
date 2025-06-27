@@ -191,7 +191,6 @@ void ClosureControlEndpoint::OnPanelMotionActionComplete()
     mLogic.SetMainState(MainStateEnum::kStopped);
 
     // Set the OverallState position to PartiallyOpened as motion has been stopped
-    // and the closure is not fully closed or fully opened.
     auto position = MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened));
 
     DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;

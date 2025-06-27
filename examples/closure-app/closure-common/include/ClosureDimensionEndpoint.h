@@ -161,7 +161,7 @@ public:
      * @brief Handles the completion of a panel motion action for closure Panel endpoint.
      *
      * This function is called when a panel motion action has been completed.
-     * It should update the internal state of the closure panel endpoint to reflect
+     * It updates the internal state of the closure panel endpoint to reflect
      * the completion of the panel motion action.
      */
     void OnPanelMotionActionComplete();
