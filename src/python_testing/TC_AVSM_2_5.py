@@ -70,12 +70,12 @@ class TC_AVSM_2_5(MatterBaseTest):
             ),
             TestStep(
                 4,
-                "TH reads StreamUsagePrioritie attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
-                "Store this value in aStreamUsagePriorities.",
+                "TH reads RankedVideoStreamPrioritiesList attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
+                "Store this value in aRankedStreamPriorities.",
             ),
             TestStep(
                 5,
-                "TH sends the AudioStreamAllocate command with valid values of AudioCodec, ChannelCount, SampleRate and BitDepth from aMicrophoneCapabilities and StreamUsage from aStreamUsagePriorities.",
+                "TH sends the AudioStreamAllocate command with valid values of AudioCodec, ChannelCount, SampleRate and BitDepth from aMicrophoneCapabilities and StreamUsage from aRankedStreamPriorities.",
                 "DUT responds with AudioStreamAllocateResponse command with a valid AudioStreamID.",
             ),
             TestStep(
@@ -137,16 +137,16 @@ class TC_AVSM_2_5(MatterBaseTest):
         logger.info(f"Rx'd MicrophoneCapabilities: {aMicrophoneCapabilities}")
 
         self.step(4)
-        aStreamUsagePriorities = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
+        aRankedStreamPriorities = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.RankedVideoStreamPrioritiesList
         )
-        logger.info(f"Rx'd StreamUsagePriorities : {aStreamUsagePriorities}")
+        logger.info(f"Rx'd RankedVideoStreamPrioritiesList : {aRankedStreamPriorities}")
 
         self.step(5)
-        asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
+        asserts.assert_greater(len(aRankedStreamPriorities), 0, "RankedVideoStreamPrioritiesList is empty")
         try:
             adoStreamAllocateCmd = commands.AudioStreamAllocate(
-                streamUsage=aStreamUsagePriorities[0],
+                streamUsage=aRankedStreamPriorities[0],
                 audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
                 channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
                 sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
@@ -172,7 +172,7 @@ class TC_AVSM_2_5(MatterBaseTest):
         self.step(7)
         try:
             adoStreamAllocateCmd = commands.AudioStreamAllocate(
-                streamUsage=aStreamUsagePriorities[0],
+                streamUsage=aRankedStreamPriorities[0],
                 audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
                 channelCount=16,
                 sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
@@ -194,7 +194,7 @@ class TC_AVSM_2_5(MatterBaseTest):
         self.step(8)
         try:
             adoStreamAllocateCmd = commands.AudioStreamAllocate(
-                streamUsage=aStreamUsagePriorities[0],
+                streamUsage=aRankedStreamPriorities[0],
                 audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
                 channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
                 sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
@@ -216,7 +216,7 @@ class TC_AVSM_2_5(MatterBaseTest):
         self.step(9)
         try:
             adoStreamAllocateCmd = commands.AudioStreamAllocate(
-                streamUsage=aStreamUsagePriorities[0],
+                streamUsage=aRankedStreamPriorities[0],
                 audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
                 channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
                 sampleRate=0,
@@ -238,7 +238,7 @@ class TC_AVSM_2_5(MatterBaseTest):
         self.step(10)
         try:
             adoStreamAllocateCmd = commands.AudioStreamAllocate(
-                streamUsage=aStreamUsagePriorities[0],
+                streamUsage=aRankedStreamPriorities[0],
                 audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
                 channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
                 sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],

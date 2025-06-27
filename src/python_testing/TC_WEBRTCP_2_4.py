@@ -139,8 +139,8 @@ class TC_WebRTCProvider_2_4(MatterBaseTest):
             ),
             streamUsage=3,
             originatingEndpointID=endpoint,
-            videoStreamID=None,
-            audioStreamID=None
+            videoStreamID=NullValue,
+            audioStreamID=NullValue
         )
         resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.ProvideOfferResponse,
