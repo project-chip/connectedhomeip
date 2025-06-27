@@ -2033,7 +2033,7 @@ cluster Thermostat = 513 {
 }
 
 endpoint 0 {
-  device type ma_rootdevice = 22, version 1;
+  device type ma_rootdevice = 22, version 3;
   device type ma_otarequestor = 18, version 1;
 
   binding cluster OtaSoftwareUpdateProvider;
@@ -2245,7 +2245,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_thermostat = 769, version 1;
+  device type ma_thermostat = 769, version 4;
 
 
   server cluster Identify {
@@ -2323,7 +2323,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0x3;
-    ram      attribute clusterRevision default = 8;
+    ram      attribute clusterRevision default = 9;
 
     handle command SetpointRaiseLower;
   }

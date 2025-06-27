@@ -2763,10 +2763,12 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "MainState";
         case chip::app::Clusters::ClosureControl::Attributes::CurrentErrorList::Id:
             return "CurrentErrorList";
-        case chip::app::Clusters::ClosureControl::Attributes::OverallState::Id:
-            return "OverallState";
-        case chip::app::Clusters::ClosureControl::Attributes::OverallTarget::Id:
-            return "OverallTarget";
+        case chip::app::Clusters::ClosureControl::Attributes::OverallCurrentState::Id:
+            return "OverallCurrentState";
+        case chip::app::Clusters::ClosureControl::Attributes::OverallTargetState::Id:
+            return "OverallTargetState";
+        case chip::app::Clusters::ClosureControl::Attributes::LatchControlModes::Id:
+            return "LatchControlModes";
         case chip::app::Clusters::ClosureControl::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ClosureControl::Attributes::AcceptedCommandList::Id:
@@ -6070,8 +6072,6 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "CreateTwoDCartesianZone";
         case chip::app::Clusters::ZoneManagement::Commands::UpdateTwoDCartesianZone::Id:
             return "UpdateTwoDCartesianZone";
-        case chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZone::Id:
-            return "GetTwoDCartesianZone";
         case chip::app::Clusters::ZoneManagement::Commands::RemoveZone::Id:
             return "RemoveZone";
         case chip::app::Clusters::ZoneManagement::Commands::CreateOrUpdateTrigger::Id:
@@ -6848,8 +6848,6 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
         {
         case chip::app::Clusters::ZoneManagement::Commands::CreateTwoDCartesianZoneResponse::Id:
             return "CreateTwoDCartesianZoneResponse";
-        case chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZoneResponse::Id:
-            return "GetTwoDCartesianZoneResponse";
         default:
             return "Unknown";
         }

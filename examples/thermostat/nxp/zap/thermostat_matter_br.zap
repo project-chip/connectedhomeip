@@ -1241,14 +1241,6 @@
               "isEnabled": 1
             },
             {
-              "name": "AddOrUpdateThreadNetwork",
-              "code": 3,
-              "mfgCode": null,
-              "source": "client",
-              "isIncoming": 1,
-              "isEnabled": 1
-            },
-            {
               "name": "RemoveNetwork",
               "code": 4,
               "mfgCode": null,
@@ -3030,7 +3022,7 @@
         }
       ],
       "deviceVersions": [
-        1
+        4
       ],
       "deviceIdentifiers": [
         769
@@ -3879,7 +3871,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "8",
+              "defaultValue": "9",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -3917,7 +3909,7 @@
       ],
       "deviceVersions": [
         1,
-        1
+        2
       ],
       "deviceIdentifiers": [
         25,

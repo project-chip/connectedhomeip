@@ -16,10 +16,10 @@
  *    limitations under the License.
  */
 
-#ifndef APP_CONFIG_H
-#define APP_CONFIG_H
+#pragma once
 
-// ---- Lock Example App Config ----
+#define BASE_APP_BUILD 0
+#define ACTIVATE_IDENTIFY_ON_EP2 0
 
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.
@@ -35,5 +35,3 @@
 #define CONFIG_LOCK_NUM_CREDENTIALS (10)
 // Maximum number of credentials per user supported by lock
 #define CONFIG_LOCK_NUM_CREDENTIALS_PER_USER (2)
-
-#endif // APP_CONFIG_H

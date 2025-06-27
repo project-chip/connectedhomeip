@@ -478,15 +478,15 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::DoorLock::Struc
 
 static void Finalize(chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ClosureControl::Structs::OverallStateStruct::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ClosureControl::Structs::OverallCurrentStateStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::ClosureControl::Structs::OverallStateStruct::Type & request);
+static void Finalize(chip::app::Clusters::ClosureControl::Structs::OverallCurrentStateStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ClosureControl::Structs::OverallTargetStruct::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ClosureControl::Structs::OverallTargetStateStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::ClosureControl::Structs::OverallTargetStruct::Type & request);
+static void Finalize(chip::app::Clusters::ClosureControl::Structs::OverallTargetStateStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::Type & request,
                         Json::Value & value);

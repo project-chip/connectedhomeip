@@ -5097,12 +5097,16 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentErrorList";
             break;
 
-        case MTRAttributeIDTypeClusterClosureControlAttributeOverallStateID:
-            result = @"OverallState";
+        case MTRAttributeIDTypeClusterClosureControlAttributeOverallCurrentStateID:
+            result = @"OverallCurrentState";
             break;
 
-        case MTRAttributeIDTypeClusterClosureControlAttributeOverallTargetID:
-            result = @"OverallTarget";
+        case MTRAttributeIDTypeClusterClosureControlAttributeOverallTargetStateID:
+            result = @"OverallTargetState";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureControlAttributeLatchControlModesID:
+            result = @"LatchControlModes";
             break;
 
         case MTRAttributeIDTypeClusterClosureControlAttributeGeneratedCommandListID:
@@ -11692,10 +11696,6 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"UpdateTwoDCartesianZone";
             break;
 
-        case MTRCommandIDTypeClusterZoneManagementCommandGetTwoDCartesianZoneID:
-            result = @"GetTwoDCartesianZone";
-            break;
-
         case MTRCommandIDTypeClusterZoneManagementCommandRemoveZoneID:
             result = @"RemoveZone";
             break;
@@ -13796,10 +13796,6 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
 
         case MTRCommandIDTypeClusterZoneManagementCommandCreateTwoDCartesianZoneResponseID:
             result = @"CreateTwoDCartesianZoneResponse";
-            break;
-
-        case MTRCommandIDTypeClusterZoneManagementCommandGetTwoDCartesianZoneResponseID:
-            result = @"GetTwoDCartesianZoneResponse";
             break;
 
         default:

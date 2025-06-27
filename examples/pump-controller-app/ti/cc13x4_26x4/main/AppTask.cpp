@@ -47,6 +47,9 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+
 #include <src/platform/ti/cc13xx_26xx/DefaultTestEventTriggerDelegate.h>
 
 #include <ti/drivers/apps/Button.h>
@@ -85,6 +88,8 @@ static LED_Handle sAppGreenHandle;
 #endif
 static Button_Handle sAppLeftHandle;
 static Button_Handle sAppRightHandle;
+
+Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(0 /*endpointId*/);
 
 AppTask AppTask::sAppTask;
 
@@ -278,6 +283,7 @@ int AppTask::Init()
             ;
     }
 
+    sThreadNetworkDriver.Init();
     ret = ThreadStackMgrImpl().StartThreadTask();
     if (ret != CHIP_NO_ERROR)
     {

@@ -18,6 +18,7 @@
 
 #include <diagnostic-logs-provider-delegate-impl.h>
 #include <lib/support/SafeInt.h>
+#include <tracing/esp32_diagnostic_trace/DiagnosticTracing.h>
 
 #if defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
 #include <esp_core_dump.h>
@@ -29,10 +30,7 @@ using namespace chip::app::Clusters::DiagnosticLogs;
 LogProvider LogProvider::sInstance;
 LogProvider::CrashLogContext LogProvider::sCrashLogContext;
 
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 static uint32_t sReadEntries = 0;
-static uint8_t retrievalBuffer[CONFIG_RETRIEVAL_BUFFER_SIZE];
-#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 namespace {
 bool IsValidIntent(IntentEnum intent)
@@ -40,12 +38,6 @@ bool IsValidIntent(IntentEnum intent)
     return intent != IntentEnum::kUnknownEnumValue;
 }
 
-// end_user_support.log and network_diag.log files are embedded in the firmware
-extern const uint8_t endUserSupportLogStart[] asm("_binary_end_user_support_log_start");
-extern const uint8_t endUserSupportLogEnd[] asm("_binary_end_user_support_log_end");
-
-extern const uint8_t networkDiagnosticLogStart[] asm("_binary_network_diag_log_start");
-extern const uint8_t networkDiagnosticLogEnd[] asm("_binary_network_diag_log_end");
 } // namespace
 
 LogProvider::~LogProvider()
@@ -55,6 +47,30 @@ LogProvider::~LogProvider()
         Platform::MemoryFree(sessionSpan.second);
     }
     mSessionContextMap.clear();
+    if (mStorageInstance != nullptr)
+    {
+        delete mStorageInstance;
+        mStorageInstance = nullptr;
+    }
+    if (mRetrievalBuffer != nullptr)
+    {
+        Platform::MemoryFree(mRetrievalBuffer);
+        mRetrievalBuffer = nullptr;
+    }
+}
+
+CHIP_ERROR LogProvider::Init(LogProviderInit & providerInit)
+{
+    mRetrievalBuffer = providerInit.retrievalBuffer;
+    mBufferSize      = providerInit.retrievalBufferSize;
+    mStorageInstance = new CircularDiagnosticBuffer(providerInit.endUserBuffer, providerInit.endUserBufferSize);
+    if (mStorageInstance == nullptr)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    static chip::Tracing::Diagnostics::ESP32Diagnostics diagnosticBackend(mStorageInstance);
+    chip::Tracing::Register(diagnosticBackend);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR LogProvider::GetLogForIntent(IntentEnum intent, MutableByteSpan & outBuffer, Optional<uint64_t> & outTimeStamp,
@@ -80,15 +96,11 @@ size_t LogProvider::GetSizeForIntent(IntentEnum intent)
     switch (intent)
     {
     case IntentEnum::kEndUserSupport:
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
         VerifyOrReturnError(mStorageInstance != nullptr, 0,
                             ChipLogError(DeviceLayer, "Diagnostic Storage instance cannot be null."));
         return mStorageInstance->GetDataSize();
-#else
-        return static_cast<size_t>(endUserSupportLogEnd - endUserSupportLogStart);
-#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     case IntentEnum::kNetworkDiag:
-        return static_cast<size_t>(networkDiagnosticLogEnd - networkDiagnosticLogStart);
+        return 0;
     case IntentEnum::kCrashLogs:
         return GetCrashSize();
     default:
@@ -118,10 +130,9 @@ CHIP_ERROR LogProvider::PrepareLogContextForIntent(LogContext * context, IntentE
     switch (intent)
     {
     case IntentEnum::kEndUserSupport: {
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
         VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INTERNAL,
                             ChipLogError(DeviceLayer, "Diagnostic Storage instance cannot be null."));
-        MutableByteSpan endUserSupportSpan(retrievalBuffer, CONFIG_RETRIEVAL_BUFFER_SIZE);
+        MutableByteSpan endUserSupportSpan(mRetrievalBuffer, mBufferSize);
         VerifyOrReturnError(!mStorageInstance->IsBufferEmpty(), CHIP_ERROR_NOT_FOUND,
                             ChipLogError(DeviceLayer, "Empty Diagnostic buffer"));
         // Retrieve data from the diagnostic storage
@@ -132,16 +143,11 @@ CHIP_ERROR LogProvider::PrepareLogContextForIntent(LogContext * context, IntentE
             return err;
         }
         context->EndUserSupport.span = endUserSupportSpan;
-#else
-        context->EndUserSupport.span =
-            ByteSpan(&endUserSupportLogStart[0], static_cast<size_t>(endUserSupportLogEnd - endUserSupportLogStart));
-#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     }
     break;
 
     case IntentEnum::kNetworkDiag: {
-        context->NetworkDiag.span =
-            ByteSpan(&networkDiagnosticLogStart[0], static_cast<size_t>(networkDiagnosticLogEnd - networkDiagnosticLogStart));
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
     break;
 
@@ -304,7 +310,6 @@ CHIP_ERROR LogProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &
 
 CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle, CHIP_ERROR error)
 {
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_INTERNAL,
                         ChipLogError(DeviceLayer, "Diagnostic Storage instance cannot be null."));
     if (error == CHIP_NO_ERROR)
@@ -319,7 +324,6 @@ CHIP_ERROR LogProvider::EndLogCollection(LogSessionHandle sessionHandle, CHIP_ER
             ChipLogDetail(DeviceLayer, "Cleared all read diagnostics successfully");
         }
     }
-#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
     VerifyOrReturnValue(sessionHandle != kInvalidLogSessionHandle, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnValue(mSessionContextMap.count(sessionHandle), CHIP_ERROR_INVALID_ARGUMENT);

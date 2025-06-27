@@ -54,7 +54,7 @@ CameraAVStreamMgmtServer::CameraAVStreamMgmtServer(
     const AudioCapabilitiesStruct & aSpeakerCapabilities, TwoWayTalkSupportTypeEnum aTwoWayTalkSupport,
     const std::vector<Structs::SnapshotCapabilitiesStruct::Type> & aSnapshotCapabilities, uint32_t aMaxNetworkBandwidth,
     const std::vector<Globals::StreamUsageEnum> & aSupportedStreamUsages,
-    const std::vector<Globals::StreamUsageEnum> & aRankedStreamPriorities) :
+    const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities) :
     CommandHandlerInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id),
     AttributeAccessInterface(MakeOptional(aEndpointId), CameraAvStreamManagement::Id), mDelegate(aDelegate),
     mEndpointId(aEndpointId), mFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs), mMaxConcurrentEncoders(aMaxConcurrentEncoders),
@@ -64,7 +64,7 @@ CameraAVStreamMgmtServer::CameraAVStreamMgmtServer(
     mMicrophoneCapabilities(aMicrophoneCapabilities), mSpeakerCapabilities(aSpeakerCapabilities),
     mTwoWayTalkSupport(aTwoWayTalkSupport), mSnapshotCapabilitiesList(aSnapshotCapabilities),
     mMaxNetworkBandwidth(aMaxNetworkBandwidth), mSupportedStreamUsages(aSupportedStreamUsages),
-    mStreamUsagePriorities(aRankedStreamPriorities)
+    mStreamUsagePriorities(aStreamUsagePriorities)
 {
     mDelegate.SetCameraAVStreamMgmtServer(this);
 }
@@ -1648,6 +1648,7 @@ void CameraAVStreamMgmtServer::InvokeCommand(HandlerContext & handlerContext)
         return;
     }
 }
+
 bool CameraAVStreamMgmtServer::StreamPrioritiesHasDuplicates(const std::vector<Globals::StreamUsageEnum> & aStreamUsagePriorities)
 {
     std::set<Globals::StreamUsageEnum> seenStreamUsages;
@@ -2023,7 +2024,7 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
 {
 
     auto & streamPriorities = commandData.streamPriorities;
-    std::vector<Globals::StreamUsageEnum> rankedStreamPriorities;
+    std::vector<Globals::StreamUsageEnum> streamUsagePriorities;
     auto iter = streamPriorities.begin();
 
     // If any video, audio or snapshot streams exist fail the command.
@@ -2043,7 +2044,8 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
         auto it = std::find(mSupportedStreamUsages.begin(), mSupportedStreamUsages.end(), streamUsage);
         VerifyOrReturn(it != mSupportedStreamUsages.end(),
                        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError));
-        rankedStreamPriorities.push_back(streamUsage);
+
+        streamUsagePriorities.push_back(streamUsage);
     }
 
     if (iter.GetStatus() != CHIP_NO_ERROR)
@@ -2054,10 +2056,10 @@ void CameraAVStreamMgmtServer::HandleSetStreamPriorities(HandlerContext & ctx,
 
     // If there are duplicate stream usages in StreamPriorities,
     // return AlreadyExists
-    VerifyOrReturn(!StreamPrioritiesHasDuplicates(rankedStreamPriorities),
+    VerifyOrReturn(!StreamPrioritiesHasDuplicates(streamUsagePriorities),
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::AlreadyExists));
 
-    CHIP_ERROR err = SetStreamUsagePriorities(rankedStreamPriorities);
+    CHIP_ERROR err = SetStreamUsagePriorities(streamUsagePriorities);
 
     if (err != CHIP_NO_ERROR)
     {

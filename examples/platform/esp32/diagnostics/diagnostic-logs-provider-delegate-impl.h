@@ -26,11 +26,8 @@
 #include <esp_core_dump.h>
 #endif // defined(CONFIG_ESP_COREDUMP_ENABLE_TO_FLASH) && defined(CONFIG_ESP_COREDUMP_DATA_FORMAT_ELF)
 
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 #include <tracing/esp32_diagnostic_trace/DiagnosticStorage.h>
 using namespace chip::Tracing::Diagnostics;
-#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -45,8 +42,16 @@ namespace DiagnosticLogs {
 class LogProvider : public DiagnosticLogsProviderDelegate
 {
 public:
-    static inline LogProvider & GetInstance() { return sInstance; }
+    struct LogProviderInit
+    {
+        uint8_t * endUserBuffer;
+        size_t endUserBufferSize;
+        uint8_t * retrievalBuffer;
+        size_t retrievalBufferSize;
+    };
 
+    static inline LogProvider & GetInstance() { return sInstance; }
+    CHIP_ERROR Init(LogProviderInit & init);
     /////////// DiagnosticLogsProviderDelegate Interface /////////
     CHIP_ERROR StartLogCollection(IntentEnum intent, LogSessionHandle & outHandle, Optional<uint64_t> & outTimeStamp,
                                   Optional<uint64_t> & outTimeSinceBoot) override;
@@ -55,9 +60,6 @@ public:
     size_t GetSizeForIntent(IntentEnum intent) override;
     CHIP_ERROR GetLogForIntent(IntentEnum intent, MutableByteSpan & outBuffer, Optional<uint64_t> & outTimeStamp,
                                Optional<uint64_t> & outTimeSinceBoot) override;
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-    void SetDiagnosticStorageInstance(CircularDiagnosticBuffer * bufferInstance) { mStorageInstance = bufferInstance; }
-#endif
 
 private:
     static LogProvider sInstance;
@@ -66,11 +68,10 @@ private:
 
     LogProvider(const LogProvider &)             = delete;
     LogProvider & operator=(const LogProvider &) = delete;
-
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
     // If mStorageInstance is nullptr then operations related to diagnostic storage will be skipped.
     CircularDiagnosticBuffer * mStorageInstance = nullptr;
-#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
+    uint8_t * mRetrievalBuffer                  = nullptr;
+    size_t mBufferSize                          = 0;
 
     struct CrashLogContext
     {

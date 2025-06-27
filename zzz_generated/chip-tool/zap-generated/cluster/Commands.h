@@ -9048,8 +9048,9 @@ private:
 | * CountdownTime                                                     | 0x0000 |
 | * MainState                                                         | 0x0001 |
 | * CurrentErrorList                                                  | 0x0002 |
-| * OverallState                                                      | 0x0003 |
-| * OverallTarget                                                     | 0x0004 |
+| * OverallCurrentState                                               | 0x0003 |
+| * OverallTargetState                                                | 0x0004 |
+| * LatchControlModes                                                 | 0x0005 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -13701,10 +13702,9 @@ private:
 | Commands:                                                           |        |
 | * CreateTwoDCartesianZone                                           |   0x00 |
 | * UpdateTwoDCartesianZone                                           |   0x02 |
-| * GetTwoDCartesianZone                                              |   0x03 |
-| * RemoveZone                                                        |   0x05 |
-| * CreateOrUpdateTrigger                                             |   0x06 |
-| * RemoveTrigger                                                     |   0x07 |
+| * RemoveZone                                                        |   0x03 |
+| * CreateOrUpdateTrigger                                             |   0x04 |
+| * RemoveTrigger                                                     |   0x05 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * MaxUserDefinedZones                                               | 0x0000 |
@@ -13802,44 +13802,6 @@ public:
 private:
     chip::app::Clusters::ZoneManagement::Commands::UpdateTwoDCartesianZone::Type mRequest;
     TypedComplexArgument<chip::app::Clusters::ZoneManagement::Structs::TwoDCartesianZoneStruct::Type> mComplex_Zone;
-};
-
-/*
- * Command GetTwoDCartesianZone
- */
-class ZoneManagementGetTwoDCartesianZone : public ClusterCommand
-{
-public:
-    ZoneManagementGetTwoDCartesianZone(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("get-two-dcartesian-zone", credsIssuerConfig)
-    {
-        AddArgument("ZoneID", 0, UINT16_MAX, &mRequest.zoneID);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::ZoneManagement::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZone::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::ZoneManagement::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZone::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZone::Type mRequest;
 };
 
 /*
@@ -25522,8 +25484,9 @@ void registerClusterClosureControl(Commands & commands, CredentialIssuerCommands
         make_unique<ReadAttribute>(Id, "countdown-time", Attributes::CountdownTime::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "main-state", Attributes::MainState::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "current-error-list", Attributes::CurrentErrorList::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "overall-state", Attributes::OverallState::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "overall-target", Attributes::OverallTarget::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "overall-current-state", Attributes::OverallCurrentState::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "overall-target-state", Attributes::OverallTargetState::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "latch-control-modes", Attributes::LatchControlModes::Id, credsIssuerConfig),       //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25539,11 +25502,14 @@ void registerClusterClosureControl(Commands & commands, CredentialIssuerCommands
             WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::ClosureControl::ClosureErrorEnum>>>(
             Id, "current-error-list", Attributes::CurrentErrorList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallStateStruct::Type>>>(
-            Id, "overall-state", Attributes::OverallState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallCurrentStateStruct::Type>>>(
+            Id, "overall-current-state", Attributes::OverallCurrentState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallTargetStruct::Type>>>(
-            Id, "overall-target", Attributes::OverallTarget::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallTargetStateStruct::Type>>>(
+            Id, "overall-target-state", Attributes::OverallTargetState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::ClosureControl::LatchControlModesBitmap>>>(
+            Id, "latch-control-modes", 0, UINT8_MAX, Attributes::LatchControlModes::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -25559,8 +25525,9 @@ void registerClusterClosureControl(Commands & commands, CredentialIssuerCommands
         make_unique<SubscribeAttribute>(Id, "countdown-time", Attributes::CountdownTime::Id, credsIssuerConfig),                //
         make_unique<SubscribeAttribute>(Id, "main-state", Attributes::MainState::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "current-error-list", Attributes::CurrentErrorList::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "overall-state", Attributes::OverallState::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "overall-target", Attributes::OverallTarget::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "overall-current-state", Attributes::OverallCurrentState::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "overall-target-state", Attributes::OverallTargetState::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "latch-control-modes", Attributes::LatchControlModes::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -29619,7 +29586,6 @@ void registerClusterZoneManagement(Commands & commands, CredentialIssuerCommands
         make_unique<ClusterCommand>(Id, credsIssuerConfig),                    //
         make_unique<ZoneManagementCreateTwoDCartesianZone>(credsIssuerConfig), //
         make_unique<ZoneManagementUpdateTwoDCartesianZone>(credsIssuerConfig), //
-        make_unique<ZoneManagementGetTwoDCartesianZone>(credsIssuerConfig),    //
         make_unique<ZoneManagementRemoveZone>(credsIssuerConfig),              //
         make_unique<ZoneManagementCreateOrUpdateTrigger>(credsIssuerConfig),   //
         make_unique<ZoneManagementRemoveTrigger>(credsIssuerConfig),           //

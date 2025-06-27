@@ -41,7 +41,7 @@
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/platform/Dnssd.h>
 #include <platform/GeneralFaults.h>
-#include <platform/NetworkCommissioning.h>
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -77,6 +77,8 @@ public:
         mpStatusChangeCallback = statusChangeCallback;
     }
 
+    void InjectNetworkCommissioningDriver(NetworkCommissioning::GenericThreadDriver * driver) { mpCommissioningDriver = driver; }
+
 protected:
     // ===== Methods that implement the ThreadStackManager abstract interface.
 
@@ -91,7 +93,7 @@ protected:
     CHIP_ERROR _GetThreadProvision(Thread::OperationalDataset & dataset);
     CHIP_ERROR _SetThreadProvision(ByteSpan netInfo);
     CHIP_ERROR _AttachToThreadNetwork(const Thread::OperationalDataset & dataset,
-                                      NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback);
+                                      NetworkCommissioning::ThreadDriver::ConnectCallback * callback);
     void _OnThreadAttachFinished();
     void _ErasePersistentInfo();
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType();
@@ -156,6 +158,7 @@ private:
     bool mIsAttached            = false;
     bool mTemporaryRxOnWhenIdle = false;
 
+    NetworkCommissioning::GenericThreadDriver * mpCommissioningDriver = nullptr;
     NetworkCommissioning::ThreadDriver::ScanCallback * mpScanCallback;
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
     NetworkCommissioning::Internal::BaseDriver::NetworkStatusChangeCallback * mpStatusChangeCallback = nullptr;
