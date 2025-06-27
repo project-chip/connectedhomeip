@@ -9078,23 +9078,23 @@ public static class DoorLockClusterCredentialStruct {
     return output.toString();
   }
 }
-public static class ClosureControlClusterOverallStateStruct {
-  public @Nullable Optional<Integer> positioning;
+public static class ClosureControlClusterOverallCurrentStateStruct {
+  public @Nullable Optional<Integer> position;
   public @Nullable Optional<Boolean> latch;
-  public @Nullable Optional<Integer> speed;
+  public Optional<Integer> speed;
   public @Nullable Optional<Boolean> secureState;
-  private static final long POSITIONING_ID = 0L;
+  private static final long POSITION_ID = 0L;
   private static final long LATCH_ID = 1L;
   private static final long SPEED_ID = 2L;
   private static final long SECURE_STATE_ID = 3L;
 
-  public ClosureControlClusterOverallStateStruct(
-    @Nullable Optional<Integer> positioning,
+  public ClosureControlClusterOverallCurrentStateStruct(
+    @Nullable Optional<Integer> position,
     @Nullable Optional<Boolean> latch,
-    @Nullable Optional<Integer> speed,
+    Optional<Integer> speed,
     @Nullable Optional<Boolean> secureState
   ) {
-    this.positioning = positioning;
+    this.position = position;
     this.latch = latch;
     this.speed = speed;
     this.secureState = secureState;
@@ -9102,27 +9102,27 @@ public static class ClosureControlClusterOverallStateStruct {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(POSITIONING_ID, positioning != null ? positioning.<BaseTLVType>map((nonOptionalpositioning) -> new UIntType(nonOptionalpositioning)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(POSITION_ID, position != null ? position.<BaseTLVType>map((nonOptionalposition) -> new UIntType(nonOptionalposition)).orElse(new EmptyType()) : new NullType()));
     values.add(new StructElement(LATCH_ID, latch != null ? latch.<BaseTLVType>map((nonOptionallatch) -> new BooleanType(nonOptionallatch)).orElse(new EmptyType()) : new NullType()));
-    values.add(new StructElement(SPEED_ID, speed != null ? speed.<BaseTLVType>map((nonOptionalspeed) -> new UIntType(nonOptionalspeed)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(SPEED_ID, speed.<BaseTLVType>map((nonOptionalspeed) -> new UIntType(nonOptionalspeed)).orElse(new EmptyType())));
     values.add(new StructElement(SECURE_STATE_ID, secureState != null ? secureState.<BaseTLVType>map((nonOptionalsecureState) -> new BooleanType(nonOptionalsecureState)).orElse(new EmptyType()) : new NullType()));
 
     return new StructType(values);
   }
 
-  public static ClosureControlClusterOverallStateStruct decodeTlv(BaseTLVType tlvValue) {
+  public static ClosureControlClusterOverallCurrentStateStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    @Nullable Optional<Integer> positioning = null;
+    @Nullable Optional<Integer> position = null;
     @Nullable Optional<Boolean> latch = null;
-    @Nullable Optional<Integer> speed = null;
+    Optional<Integer> speed = Optional.empty();
     @Nullable Optional<Boolean> secureState = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == POSITIONING_ID) {
+      if (element.contextTagNum() == POSITION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
           UIntType castingValue = element.value(UIntType.class);
-          positioning = Optional.of(castingValue.value(Integer.class));
+          position = Optional.of(castingValue.value(Integer.class));
         }
       } else if (element.contextTagNum() == LATCH_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
@@ -9141,8 +9141,8 @@ public static class ClosureControlClusterOverallStateStruct {
         }
       }
     }
-    return new ClosureControlClusterOverallStateStruct(
-      positioning,
+    return new ClosureControlClusterOverallCurrentStateStruct(
+      position,
       latch,
       speed,
       secureState
@@ -9152,9 +9152,9 @@ public static class ClosureControlClusterOverallStateStruct {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("ClosureControlClusterOverallStateStruct {\n");
-    output.append("\tpositioning: ");
-    output.append(positioning);
+    output.append("ClosureControlClusterOverallCurrentStateStruct {\n");
+    output.append("\tposition: ");
+    output.append(position);
     output.append("\n");
     output.append("\tlatch: ");
     output.append(latch);
@@ -9169,17 +9169,17 @@ public static class ClosureControlClusterOverallStateStruct {
     return output.toString();
   }
 }
-public static class ClosureControlClusterOverallTargetStruct {
-  public Optional<Integer> position;
-  public Optional<Boolean> latch;
+public static class ClosureControlClusterOverallTargetStateStruct {
+  public @Nullable Optional<Integer> position;
+  public @Nullable Optional<Boolean> latch;
   public Optional<Integer> speed;
   private static final long POSITION_ID = 0L;
   private static final long LATCH_ID = 1L;
   private static final long SPEED_ID = 2L;
 
-  public ClosureControlClusterOverallTargetStruct(
-    Optional<Integer> position,
-    Optional<Boolean> latch,
+  public ClosureControlClusterOverallTargetStateStruct(
+    @Nullable Optional<Integer> position,
+    @Nullable Optional<Boolean> latch,
     Optional<Integer> speed
   ) {
     this.position = position;
@@ -9189,19 +9189,19 @@ public static class ClosureControlClusterOverallTargetStruct {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(POSITION_ID, position.<BaseTLVType>map((nonOptionalposition) -> new UIntType(nonOptionalposition)).orElse(new EmptyType())));
-    values.add(new StructElement(LATCH_ID, latch.<BaseTLVType>map((nonOptionallatch) -> new BooleanType(nonOptionallatch)).orElse(new EmptyType())));
+    values.add(new StructElement(POSITION_ID, position != null ? position.<BaseTLVType>map((nonOptionalposition) -> new UIntType(nonOptionalposition)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(LATCH_ID, latch != null ? latch.<BaseTLVType>map((nonOptionallatch) -> new BooleanType(nonOptionallatch)).orElse(new EmptyType()) : new NullType()));
     values.add(new StructElement(SPEED_ID, speed.<BaseTLVType>map((nonOptionalspeed) -> new UIntType(nonOptionalspeed)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
 
-  public static ClosureControlClusterOverallTargetStruct decodeTlv(BaseTLVType tlvValue) {
+  public static ClosureControlClusterOverallTargetStateStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Optional<Integer> position = Optional.empty();
-    Optional<Boolean> latch = Optional.empty();
+    @Nullable Optional<Integer> position = null;
+    @Nullable Optional<Boolean> latch = null;
     Optional<Integer> speed = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == POSITION_ID) {
@@ -9221,7 +9221,7 @@ public static class ClosureControlClusterOverallTargetStruct {
         }
       }
     }
-    return new ClosureControlClusterOverallTargetStruct(
+    return new ClosureControlClusterOverallTargetStateStruct(
       position,
       latch,
       speed
@@ -9231,7 +9231,7 @@ public static class ClosureControlClusterOverallTargetStruct {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("ClosureControlClusterOverallTargetStruct {\n");
+    output.append("ClosureControlClusterOverallTargetStateStruct {\n");
     output.append("\tposition: ");
     output.append(position);
     output.append("\n");
