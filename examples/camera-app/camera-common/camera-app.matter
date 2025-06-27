@@ -3525,6 +3525,7 @@ endpoint 1 {
     handle command CreateTwoDCartesianZoneResponse;
     handle command UpdateTwoDCartesianZone;
     handle command RemoveZone;
+    handle command CreateOrUpdateTrigger;
     handle command RemoveTrigger;
   }
 
