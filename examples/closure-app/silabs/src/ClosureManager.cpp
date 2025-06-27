@@ -25,6 +25,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/attribute-storage.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <lib/support/TimeUtils.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -33,7 +34,8 @@ using namespace chip::app::Clusters::ClosureControl;
 using namespace chip::app::Clusters::ClosureDimension;
 
 namespace {
-constexpr uint32_t kCountdownTimeSeconds = 10;
+constexpr uint32_t kDefaultCountdownTimeSeconds = 10; // 10 seconds
+constexpr uint32_t kCalibrateTimerMs  = 10000; // 10 seconds
 
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
@@ -124,7 +126,7 @@ void ClosureManager::CancelTimer()
 
 void ClosureManager::InitiateAction(AppEvent * event)
 {
-    Action_t eventAction = static_cast<Action_t>(event->ClosureEvent.Action);
+    Action_t eventAction = static_cast<uint8_t>(event->ClosureEvent.Action);
 
     ClosureManager & instance = ClosureManager::GetInstance();
 
@@ -136,7 +138,8 @@ void ClosureManager::InitiateAction(AppEvent * event)
     if (eventAction != instance.GetCurrentAction())
     {
         ChipLogError(AppServer, "Got Event for %d in InitiateAction while current ongoing action is %d",
-                     static_cast<int>(eventAction), static_cast<int>(instance.GetCurrentAction()));
+                     to_underlying(eventAction), to_underlying(instance.GetCurrentAction()));
+        return;
     }
 
     instance.CancelTimer(); // Cancel any existing timer before starting a new action
@@ -147,14 +150,10 @@ void ClosureManager::InitiateAction(AppEvent * event)
         ChipLogDetail(AppServer, "Initiating calibration action");
         // Timer used in sample application to simulate the calibration process.
         // In a real application, this would be replaced with actual calibration logic.
-        instance.StartTimer(kCountdownTimeSeconds * 1000);
+        instance.StartTimer(kCalibrateTimerMs);
         break;
     case Action_t::MOVE_TO_ACTION:
         ChipLogDetail(AppServer, "Initiating move to action");
-        // Timer used in sample application to simulate the move to process.
-        // In a real application, this would be replaced with actual logic to move
-        // the closure to the desired position.
-        instance.StartTimer(kCountdownTimeSeconds * 1000);
         break;
     default:
         ChipLogDetail(AppServer, "Invalid action received in InitiateAction");
@@ -179,7 +178,7 @@ void ClosureManager::TimerEventHandler(void * timerCbArg)
 
 void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
 {
-    Action_t currentAction = static_cast<ClosureManager::Action_t>(event->ClosureEvent.Action);
+    Action_t currentAction = static_cast<uint8_t>(event->ClosureEvent.Action);
 
     ClosureManager & instance = ClosureManager::GetInstance();
 
@@ -191,7 +190,8 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
     if (currentAction != instance.GetCurrentAction())
     {
         ChipLogError(AppServer, "Got Event for %d in InitiateAction while current ongoing action is %d",
-                     static_cast<int>(currentAction), static_cast<int>(instance.GetCurrentAction()));
+                     to_underlying(currentAction), to_underlying(instance.GetCurrentAction()));
+        return;
     }
 
     switch (currentAction)
@@ -215,22 +215,23 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
 
 chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
 {
-    VerifyOrReturnValue(ep1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(AppServer, "Failed to set countdown time for calibration"));
-
-    // Post an event to initiate the calibration action asynchronously.
-    // Calibration can be only initiated from Closure Endpoint 1, so we set the endpoint ID to ep1.
-    AppEvent event;
-    event.Type                    = AppEvent::kEventType_Closure;
-    event.ClosureEvent.Action     = CALIBRATE_ACTION;
-    event.ClosureEvent.EndpointId = ep1.GetEndpointId();
-    event.Handler                 = InitiateAction;
-    AppTask::GetAppTask().PostEvent(&event);
+    VerifyOrReturnValue(ep1.GetLogic().SetCountdownTimeFromDelegate(kDefaultCountdownTimeSeconds) == CHIP_NO_ERROR, 
+            Status::Failure, ChipLogError(AppServer, "Failed to set countdown time for calibration"));
 
     SetCurrentAction(Action_t::CALIBRATE_ACTION);
     mCurrentActionEndpointId = ep1.GetEndpointId();
 
     isCalibrationInProgress = true;
+
+    // Post an event to initiate the calibration action asynchronously.
+    // Calibration can be only initiated from Closure Endpoint 1, so we set the endpoint ID to ep1.
+    AppEvent event;
+    event.Type                    = AppEvent::kEventType_Closure;
+    event.ClosureEvent.Action     = GetCurrentAction();
+    event.ClosureEvent.EndpointId = mCurrentActionEndpointId;
+    event.Handler                 = InitiateAction;
+    AppTask::GetAppTask().PostEvent(&event);
+
     return Status::Success;
 }
 
