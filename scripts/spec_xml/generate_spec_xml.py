@@ -341,6 +341,10 @@ def dump_ids_from_prebuilt_dirs():
             print(f"checking device type for {d.name} for {dir}")
             dt_mandatory = [id for id, requirement in d.server_clusters.items() if requirement.conformance(
                 [], 0, 0).decision == ConformanceDecision.MANDATORY]
+            print(dt_mandatory)
+            if any(c for c in dt_mandatory if c not in clusters.keys()):
+                print("found it")
+            return "C"
             provisional = [clusters[c].name for c in dt_mandatory if clusters[c].is_provisional]
             if provisional:
                 print(f"Found provisional mandatory clusters {provisional} in device type {d.name} for revision {dir.dirname}")

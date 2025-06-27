@@ -30,7 +30,7 @@ from typing import Callable, Optional, Union
 import chip.clusters as Clusters
 import chip.testing.conformance as conformance_support
 from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecisionWithChoice,
-                                      ConformanceException, ConformanceParseParameters, feature, is_disallowed, mandatory, optional,
+                                      ConformanceException, ConformanceParseParameters, conformance_allowed, feature, is_disallowed, mandatory, optional,
                                       or_operation, parse_callable_from_xml, parse_device_type_callable_from_xml)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
@@ -796,7 +796,7 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
             xml_clusters[id] = new
 
 
-def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
+def parse_single_device_type(root: ElementTree.Element, xml_clusters: dict[uint, XmlCluster]) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     problems: list[ProblemNotice] = []
     device_types: dict[int, XmlDeviceType] = {}
     device = root.iter('deviceType')
@@ -849,7 +849,7 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDe
                 except ValueError:
                     location = DeviceTypePathLocation(device_type_id=id)
                     problems.append(ProblemNotice("Parse Device Type XML", location=location,
-                                    severity=ProblemSeverity.WARNING, problem=f"Unknown cluster id {c.attrib['id']}"))
+                                    severity=ProblemSeverity.WARNING, problem=f"{name} Unknown cluster id {c.attrib['id']}"))
                     continue
                 conformance_xml, tmp_problem = get_conformance(c, cid)
                 if tmp_problem:
@@ -857,10 +857,10 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDe
                 conformance = parse_device_type_callable_from_xml(conformance_xml)
                 side_dict = {'server': ClusterSide.SERVER, 'client': ClusterSide.CLIENT}
                 side = side_dict[c.attrib['side']]
-                name = c.attrib['name']
+                cluster_name = c.attrib['name']
                 if cid in CLUSTER_NAME_FIXES:
-                    name = CLUSTER_NAME_FIXES[cid]
-                cluster = XmlDeviceTypeClusterRequirements(name=name, side=side, conformance=conformance)
+                    cluster_name = CLUSTER_NAME_FIXES[cid]
+                cluster = XmlDeviceTypeClusterRequirements(name=cluster_name, side=side, conformance=conformance)
                 if side == ClusterSide.SERVER:
                     device_types[id].server_clusters[cid] = cluster
                 else:
@@ -869,6 +869,11 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDe
                 location = DeviceTypePathLocation(device_type_id=id, cluster_id=cid)
                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                 severity=ProblemSeverity.WARNING, problem="Unable to parse conformance for cluster"))
+
+            if cid not in xml_clusters.keys() and conformance_allowed(conformance(0, [], []), allow_provisional=False):
+                location = DeviceTypePathLocation(device_type_id=id)
+                problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                                severity=ProblemSeverity.WARNING, problem=f"{name}: Given cluster ID 0x{cid:04X} does not appear in the cluster spec"))
             # TODO: Check for features, attributes and commands as element requirements
             # NOTE: Spec currently does a bad job of matching these exactly to the names and codes
             # so this will need a bit of fancy handling here to get this right.
@@ -877,6 +882,7 @@ def parse_single_device_type(root: ElementTree.Element) -> tuple[dict[int, XmlDe
 
 def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelDirectory, Traversable]) -> tuple[dict[int, XmlDeviceType], list[ProblemNotice]]:
     top = get_data_model_directory(data_model_directory, DataModelLevel.kDeviceType)
+    xml_clusters, _ = build_xml_clusters(data_model_directory)
     device_types: dict[int, XmlDeviceType] = {}
     problems: list[ProblemNotice] = []
 
@@ -889,7 +895,7 @@ def build_xml_device_types(data_model_directory: typing.Union[PrebuiltDataModelD
         found_xmls += 1
         with file.open('r', encoding="utf8") as xml:
             root = ElementTree.parse(xml).getroot()
-            tmp_device_types, tmp_problems = parse_single_device_type(root)
+            tmp_device_types, tmp_problems = parse_single_device_type(root, xml_clusters)
             problems = problems + tmp_problems
             device_types.update(tmp_device_types)
 
