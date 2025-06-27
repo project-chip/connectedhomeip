@@ -141,7 +141,7 @@ std::optional<Status> ValidateAttributeIsReadable(DataModel::Provider * dataMode
 
     if (!entry->GetReadPrivilege().has_value())
     {
-        return Status::UnsupportedAttribute;
+        return Status::UnsupportedRead;
     }
 
     return std::nullopt;
