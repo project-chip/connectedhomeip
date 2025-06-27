@@ -16,9 +16,10 @@
 #
 
 from ctypes import CFUNCTYPE, c_char_p, c_void_p
-from .native import PyChipError
 
 import chip.native
+
+from .native import PyChipError
 
 lib = chip.native.GetLibraryHandle(chip.native.HandleFlags(0))
 
