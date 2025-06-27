@@ -5097,12 +5097,16 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"CurrentErrorList";
             break;
 
-        case MTRAttributeIDTypeClusterClosureControlAttributeOverallStateID:
-            result = @"OverallState";
+        case MTRAttributeIDTypeClusterClosureControlAttributeOverallCurrentStateID:
+            result = @"OverallCurrentState";
             break;
 
-        case MTRAttributeIDTypeClusterClosureControlAttributeOverallTargetID:
-            result = @"OverallTarget";
+        case MTRAttributeIDTypeClusterClosureControlAttributeOverallTargetStateID:
+            result = @"OverallTargetState";
+            break;
+
+        case MTRAttributeIDTypeClusterClosureControlAttributeLatchControlModesID:
+            result = @"LatchControlModes";
             break;
 
         case MTRAttributeIDTypeClusterClosureControlAttributeGeneratedCommandListID:

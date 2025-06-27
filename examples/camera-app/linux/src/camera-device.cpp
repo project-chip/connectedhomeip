@@ -315,13 +315,6 @@ GstElement * CreateSnapshotPipelineLibcamerasrc(const SnapshotPipelineConfig & c
 
 CameraDevice::CameraDevice()
 {
-    InitializeCameraDevice();
-
-    InitializeStreams();
-
-    // Initialize WebRTC connnection
-    mWebRTCProviderManager.Init();
-
     // Set the CameraHALInterface in CameraAVStreamManager and CameraAVsettingsUserLevelManager.
     mCameraAVStreamManager.SetCameraDeviceHAL(this);
     mCameraAVSettingsUserLevelManager.SetCameraDeviceHAL(this);
@@ -341,6 +334,13 @@ CameraDevice::~CameraDevice()
     }
 }
 
+void CameraDevice::Init()
+{
+    InitializeCameraDevice();
+    InitializeStreams();
+    mWebRTCProviderManager.Init();
+}
+
 CameraError CameraDevice::InitializeCameraDevice()
 {
     static bool gstreamerInitialized = false;
@@ -351,12 +351,10 @@ CameraError CameraDevice::InitializeCameraDevice()
         gstreamerInitialized = true;
     }
 
-    // TODO: Replace hardcoded device file with device passed in from
-    // camera-app.
-    videoDeviceFd = open("/dev/video0", O_RDWR);
+    videoDeviceFd = open(mVideoDevicePath.c_str(), O_RDWR);
     if (videoDeviceFd == -1)
     {
-        ChipLogError(Camera, "Error opening video device: %s", strerror(errno));
+        ChipLogError(Camera, "Error opening video device: %s at %s", strerror(errno), mVideoDevicePath.c_str());
         return CameraError::ERROR_INIT_FAILED;
     }
 
@@ -629,7 +627,7 @@ CameraError CameraDevice::StartVideoStream(uint16_t streamID)
     // Create Gstreamer video pipeline
     CameraError error = CameraError::SUCCESS;
     GstElement * videoPipeline =
-        CreateVideoPipeline("/dev/video0", it->videoStreamParams.minResolution.width, it->videoStreamParams.minResolution.height,
+        CreateVideoPipeline(mVideoDevicePath, it->videoStreamParams.minResolution.width, it->videoStreamParams.minResolution.height,
                             it->videoStreamParams.minFrameRate, error);
     if (videoPipeline == nullptr)
     {
@@ -804,7 +802,7 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
     // Create the GStreamer pipeline
     CameraError error             = CameraError::SUCCESS;
     GstElement * snapshotPipeline = CreateSnapshotPipeline(
-        "/dev/video0", it->snapshotStreamParams.minResolution.width, it->snapshotStreamParams.minResolution.height,
+        mVideoDevicePath, it->snapshotStreamParams.minResolution.width, it->snapshotStreamParams.minResolution.height,
         it->snapshotStreamParams.quality, it->snapshotStreamParams.frameRate, "capture_snapshot.jpg", error);
     if (snapshotPipeline == nullptr)
     {

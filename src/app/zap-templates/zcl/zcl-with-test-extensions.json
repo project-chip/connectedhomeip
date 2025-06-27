@@ -205,8 +205,8 @@
         "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": [
             "CountdownTime",
-            "OverallState",
-            "OverallTarget",
+            "OverallCurrentState",
+            "OverallTargetState",
             "FeatureMap",
             "ClusterRevision"
         ],
