@@ -659,9 +659,6 @@ jobs:
 
 
             - name: Generate an argument environment file
-              # GitHub VM remains out of memory after adding Joint Fabrics example apps to be built.
-              # Add as a temporary fix the removal of out/ folders for JF apps and use artifacts from objdir-clone (see step above) as .o files are no longer requred.
-              # Maybe do this for all apps.
               run: |
                   echo -n "" >/tmp/test_env.yaml
                   echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
