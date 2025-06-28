@@ -20,10 +20,10 @@
 
 #pragma once
 
-#include <app/cluster-building-blocks/QuieterReporting.h>
 #include "closure-dimension-cluster-objects.h"
 #include "closure-dimension-delegate.h"
 #include "closure-dimension-matter-context.h"
+#include <app/cluster-building-blocks/QuieterReporting.h>
 
 namespace chip {
 namespace app {

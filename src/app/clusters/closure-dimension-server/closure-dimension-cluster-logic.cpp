@@ -32,7 +32,7 @@ using namespace chip::app::Clusters::ClosureDimension::Attributes;
 
 namespace {
 
-constexpr Percent100ths kPercents100thsMaxValue = 10000;
+constexpr Percent100ths kPercents100thsMaxValue    = 10000;
 constexpr uint64_t kPositionQuietReportingInterval = 5000;
 
 } // namespace
@@ -94,18 +94,17 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
             {
 
                 VerifyOrReturnError(incomingCurrentState.Value().position.Value().Value() <= kPercents100thsMaxValue,
-                                CHIP_ERROR_INVALID_ARGUMENT);
-
+                                    CHIP_ERROR_INVALID_ARGUMENT);
             }
 
             bool targetPositionReached = false;
-            auto now  = System::SystemClock().GetMonotonicTimestamp();
+            auto now                   = System::SystemClock().GetMonotonicTimestamp();
 
             // Logic to determine if target position is reached.
             // If the target position is reached, we need to report the current state.
             if (!mState.targetState.IsNull() && mState.targetState.Value().position.HasValue() &&
-                 !mState.targetState.Value().position.Value().IsNull() &&
-                 mState.targetState.Value().position == incomingCurrentState.Value().position)
+                !mState.targetState.Value().position.Value().IsNull() &&
+                mState.targetState.Value().position == incomingCurrentState.Value().position)
             {
                 targetPositionReached = true;
                 ChipLogError(AppServer, "Target position reached");
@@ -113,21 +112,22 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
 
             if (targetPositionReached)
             {
-                auto predicate = [](const decltype(quietReportableCurrentStatePosition)::SufficientChangePredicateCandidate &) -> bool {
+                auto predicate =
+                    [](const decltype(quietReportableCurrentStatePosition)::SufficientChangePredicateCandidate &) -> bool {
                     return true;
                 };
-                markDirty = (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.Value().position.Value(), now, predicate)
-                                == AttributeDirtyState::kMustReport);
+                markDirty = (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.Value().position.Value(), now,
+                                                                          predicate) == AttributeDirtyState::kMustReport);
                 ChipLogError(AppServer, "Target position reached Mark dirty = %d", markDirty);
             }
             else
             {
-                // Predicate to report at most once every 5 seconds when the Position changes from one non-null value to another non-null value,
-                // or when the Position changes from null to any other value and vice versa
+                // Predicate to report at most once every 5 seconds when the Position changes from one non-null value to another
+                // non-null value, or when the Position changes from null to any other value and vice versa
                 System::Clock::Milliseconds64 reportInterval = System::Clock::Milliseconds64(kPositionQuietReportingInterval);
                 auto predicate = quietReportableCurrentStatePosition.GetPredicateForSufficientTimeSinceLastDirty(reportInterval);
-                markDirty = (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.Value().position.Value(), now, predicate)
-                                == AttributeDirtyState::kMustReport);
+                markDirty      = (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.Value().position.Value(), now,
+                                                                               predicate) == AttributeDirtyState::kMustReport);
                 ChipLogError(AppServer, "Target position not reached Mark dirty = %d", markDirty);
             }
         }
@@ -138,7 +138,6 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
             //  If the latching member is present in the incoming CurrentState, we need to check if the MotionLatching
             //  feature is supported by the closure. If the MotionLatching feature is not supported, return an error.
             VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
         }
 
         // Changes to this attribute SHALL only be marked as reportable when latch changes.
@@ -169,8 +168,8 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
     }
 
     // If the current state is null and the incoming current state is null and vice versa, we need to mark dirty.
-    if ( (mState.currentState.IsNull() && !incomingCurrentState.IsNull()) ||
-        (!mState.currentState.IsNull() && incomingCurrentState.IsNull()) )
+    if ((mState.currentState.IsNull() && !incomingCurrentState.IsNull()) ||
+        (!mState.currentState.IsNull() && incomingCurrentState.IsNull()))
     {
         markDirty = true;
     }

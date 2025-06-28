@@ -21,9 +21,9 @@
 #include <app/clusters/closure-dimension-server/closure-dimension-delegate.h>
 #include <app/clusters/closure-dimension-server/closure-dimension-matter-context.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/UnitTestUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <pw_unit_test/framework.h>
-#include <lib/support/UnitTestUtils.h>
 #include <system/SystemClock.h>
 #include <system/SystemTimer.h>
 #include <vector>
@@ -1960,8 +1960,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingPositionN
 
     GenericDimensionStateStruct testCurrentStateStruct;
     testCurrentStateStruct.position = Optional<DataModel::Nullable<chip::Percent100ths>>(1000);
-    testCurrentStateStruct.latch = Optional<DataModel::Nullable<bool>>(false);
-    testCurrentStateStruct.speed = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
+    testCurrentStateStruct.latch    = Optional<DataModel::Nullable<bool>>(false);
+    testCurrentStateStruct.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
 
     DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
@@ -1998,8 +1998,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingPositionN
 
     GenericDimensionStateStruct testCurrentStateStruct;
     testCurrentStateStruct.position = Optional<DataModel::Nullable<chip::Percent100ths>>(DataModel::NullNullable);
-    testCurrentStateStruct.latch = Optional<DataModel::Nullable<bool>>(false);
-    testCurrentStateStruct.speed = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
+    testCurrentStateStruct.latch    = Optional<DataModel::Nullable<bool>>(false);
+    testCurrentStateStruct.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
 
     DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
@@ -2036,8 +2036,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingPositionC
 
     GenericDimensionStateStruct testCurrentStateStruct;
     testCurrentStateStruct.position = Optional<DataModel::Nullable<chip::Percent100ths>>(1000);
-    testCurrentStateStruct.latch = Optional<DataModel::Nullable<bool>>(false);
-    testCurrentStateStruct.speed = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
+    testCurrentStateStruct.latch    = Optional<DataModel::Nullable<bool>>(false);
+    testCurrentStateStruct.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
 
     DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
@@ -2074,8 +2074,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingPositionC
 
     GenericDimensionStateStruct testCurrentStateStruct;
     testCurrentStateStruct.position = Optional<DataModel::Nullable<chip::Percent100ths>>(1000);
-    testCurrentStateStruct.latch = Optional<DataModel::Nullable<bool>>(false);
-    testCurrentStateStruct.speed = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
+    testCurrentStateStruct.latch    = Optional<DataModel::Nullable<bool>>(false);
+    testCurrentStateStruct.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
 
     DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
@@ -2136,8 +2136,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingLatchNull
 
     GenericDimensionStateStruct testCurrentStateStruct;
     testCurrentStateStruct.position = Optional<DataModel::Nullable<chip::Percent100ths>>(1000);
-    testCurrentStateStruct.latch = Optional<DataModel::Nullable<bool>>(DataModel::NullNullable);
-    testCurrentStateStruct.speed = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
+    testCurrentStateStruct.latch    = Optional<DataModel::Nullable<bool>>(DataModel::NullNullable);
+    testCurrentStateStruct.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
 
     DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
@@ -2174,8 +2174,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingLatchValu
 
     GenericDimensionStateStruct testCurrentStateStruct;
     testCurrentStateStruct.position = Optional<DataModel::Nullable<chip::Percent100ths>>(1000);
-    testCurrentStateStruct.latch = Optional<DataModel::Nullable<bool>>(false);
-    testCurrentStateStruct.speed = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
+    testCurrentStateStruct.latch    = Optional<DataModel::Nullable<bool>>(false);
+    testCurrentStateStruct.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
 
     DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
@@ -2212,8 +2212,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingLatchValu
 
     GenericDimensionStateStruct testCurrentStateStruct;
     testCurrentStateStruct.position = Optional<DataModel::Nullable<chip::Percent100ths>>(1000);
-    testCurrentStateStruct.latch = Optional<DataModel::Nullable<bool>>(false);
-    testCurrentStateStruct.speed = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
+    testCurrentStateStruct.latch    = Optional<DataModel::Nullable<bool>>(false);
+    testCurrentStateStruct.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
 
     DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
@@ -2250,12 +2250,11 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingSpeedNull
 
     GenericDimensionStateStruct testCurrentStateStruct;
     testCurrentStateStruct.position = Optional<DataModel::Nullable<chip::Percent100ths>>(1000);
-    testCurrentStateStruct.latch = Optional<DataModel::Nullable<bool>>(false);
-    testCurrentStateStruct.speed = NullOptional;
+    testCurrentStateStruct.latch    = Optional<DataModel::Nullable<bool>>(false);
+    testCurrentStateStruct.speed    = NullOptional;
 
     DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
-
 
     EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
     EXPECT_EQ(currentState, DataModel::NullNullable);
@@ -2289,8 +2288,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingSpeedValu
 
     GenericDimensionStateStruct testCurrentStateStruct;
     testCurrentStateStruct.position = Optional<DataModel::Nullable<chip::Percent100ths>>(1000);
-    testCurrentStateStruct.latch = Optional<DataModel::Nullable<bool>>(false);
-    testCurrentStateStruct.speed = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
+    testCurrentStateStruct.latch    = Optional<DataModel::Nullable<bool>>(false);
+    testCurrentStateStruct.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
 
     DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
@@ -2327,8 +2326,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingSpeedValu
 
     GenericDimensionStateStruct testCurrentStateStruct;
     testCurrentStateStruct.position = Optional<DataModel::Nullable<chip::Percent100ths>>(1000);
-    testCurrentStateStruct.latch = Optional<DataModel::Nullable<bool>>(false);
-    testCurrentStateStruct.speed = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
+    testCurrentStateStruct.latch    = Optional<DataModel::Nullable<bool>>(false);
+    testCurrentStateStruct.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
 
     DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
