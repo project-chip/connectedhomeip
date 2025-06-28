@@ -155,28 +155,20 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
     {
         app::DataModel::DecodableList<CommandId> v;
         EXPECT_EQ(app::DataModel::Decode(*apData, v), CHIP_NO_ERROR);
-        auto it          = v.begin();
-        size_t arraySize = 0;
-        while (it.Next())
-        {
-            FAIL();
-        }
-        EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
-        EXPECT_EQ(v.ComputeSize(&arraySize), CHIP_NO_ERROR);
+        size_t arraySize   = 0;
+        auto iterateStatus = v.for_each([&](auto &, bool &) -> CHIP_ERROR { return CHIP_ERROR_INTERNAL; });
+        EXPECT_EQ(iterateStatus, CHIP_NO_ERROR);
+        EXPECT_EQ(v.ComputeSize(arraySize), CHIP_NO_ERROR);
         EXPECT_EQ(arraySize, 0u);
     }
     else if (aPath.mAttributeId == Globals::Attributes::AcceptedCommandList::Id)
     {
         app::DataModel::DecodableList<CommandId> v;
         EXPECT_EQ(app::DataModel::Decode(*apData, v), CHIP_NO_ERROR);
-        auto it          = v.begin();
-        size_t arraySize = 0;
-        while (it.Next())
-        {
-            FAIL();
-        }
-        EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
-        EXPECT_EQ(v.ComputeSize(&arraySize), CHIP_NO_ERROR);
+        size_t arraySize   = 0;
+        auto iterateStatus = v.for_each([&](auto &, bool &) -> CHIP_ERROR { return CHIP_ERROR_INTERNAL; });
+        EXPECT_EQ(iterateStatus, CHIP_NO_ERROR);
+        EXPECT_EQ(v.ComputeSize(arraySize), CHIP_NO_ERROR);
         EXPECT_EQ(arraySize, 0u);
     }
     else if (aPath.mAttributeId == Globals::Attributes::AttributeList::Id)
@@ -188,7 +180,7 @@ void TestReadCallback::OnAttributeData(const app::ConcreteDataAttributePath & aP
         app::DataModel::DecodableList<ByteSpan> v;
         EXPECT_EQ(app::DataModel::Decode(*apData, v), CHIP_NO_ERROR);
         size_t arraySize = 0;
-        EXPECT_EQ(v.ComputeSize(&arraySize), CHIP_NO_ERROR);
+        EXPECT_EQ(v.ComputeSize(arraySize), CHIP_NO_ERROR);
         EXPECT_EQ(arraySize, 4u);
     }
     else

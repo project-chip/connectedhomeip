@@ -252,19 +252,18 @@ DefaultSceneHandlerImpl::SerializeAdd(EndpointId endpoint, const ExtensionFieldS
 
     size_t pairTotal = 0;
     // Verify size of list
-    ReturnErrorOnFailure(extensionFieldSet.attributeValueList.ComputeSize(&pairTotal));
+    ReturnErrorOnFailure(extensionFieldSet.attributeValueList.ComputeSize(pairTotal));
     VerifyOrReturnError(pairTotal <= MATTER_ARRAY_SIZE(aVPairs), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     uint8_t pairCount  = 0;
-    auto pair_iterator = extensionFieldSet.attributeValueList.begin();
-    while (pair_iterator.Next())
-    {
-        AttributeValuePairType currentPair = pair_iterator.GetValue();
-        ReturnErrorOnFailure(ValidateAttributePath(endpoint, extensionFieldSet.clusterID, currentPair));
-        aVPairs[pairCount] = currentPair;
+    auto iterateStatus = extensionFieldSet.attributeValueList.for_each([&](auto & currentPair, bool &) -> CHIP_ERROR {
+        AttributeValuePairType & mutablePair = aVPairs[pairCount];
+        mutablePair                          = currentPair;
+        ReturnErrorOnFailure(ValidateAttributePath(endpoint, extensionFieldSet.clusterID, mutablePair));
         pairCount++;
-    }
-    ReturnErrorOnFailure(pair_iterator.GetStatus());
+        return CHIP_NO_ERROR;
+    });
+    ReturnErrorOnFailure(iterateStatus);
     List<AttributeValuePairType> attributeValueList(aVPairs, pairCount);
 
     return EncodeAttributeValueList(attributeValueList, serializedBytes);
@@ -279,17 +278,16 @@ CHIP_ERROR DefaultSceneHandlerImpl::Deserialize(EndpointId endpoint, ClusterId c
 
     // Verify size of list
     size_t pairTotal = 0;
-    ReturnErrorOnFailure(attributeValueList.ComputeSize(&pairTotal));
+    ReturnErrorOnFailure(attributeValueList.ComputeSize(pairTotal));
     VerifyOrReturnError(pairTotal <= MATTER_ARRAY_SIZE(mAVPairs), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     uint8_t pairCount  = 0;
-    auto pair_iterator = attributeValueList.begin();
-    while (pair_iterator.Next())
-    {
-        mAVPairs[pairCount] = pair_iterator.GetValue();
+    auto iterateStatus = attributeValueList.for_each([&](auto & currentPair, bool &) -> CHIP_ERROR {
+        mAVPairs[pairCount] = currentPair;
         pairCount++;
-    };
-    ReturnErrorOnFailure(pair_iterator.GetStatus());
+        return CHIP_NO_ERROR;
+    });
+    ReturnErrorOnFailure(iterateStatus);
 
     extensionFieldSet.clusterID          = cluster;
     extensionFieldSet.attributeValueList = mAVPairs;

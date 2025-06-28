@@ -111,10 +111,7 @@ bool CountAttributeRequests(const DataModel::DecodableList<chip::AttributeId> at
     attributeRequestCount = 0;
     requestedPresets      = false;
     requestedSchedules    = false;
-    auto attributeIdsIter = attributeRequests.begin();
-    while (attributeIdsIter.Next())
-    {
-        auto & attributeId = attributeIdsIter.GetValue();
+    auto iterateStatus    = attributeRequests.for_each([&](auto & attributeId, bool &) -> CHIP_ERROR {
         switch (attributeId)
         {
         case Presets::Id:
@@ -127,8 +124,9 @@ bool CountAttributeRequests(const DataModel::DecodableList<chip::AttributeId> at
             break;
         }
         attributeRequestCount++;
-    }
-    return attributeIdsIter.GetStatus() == CHIP_NO_ERROR;
+        return CHIP_NO_ERROR;
+    });
+    return iterateStatus == CHIP_NO_ERROR;
 }
 
 /// @brief Builds the list of attribute statuses to return from an AtomicRequest invocation
@@ -159,26 +157,23 @@ Status BuildAttributeStatuses(const EndpointId endpoint, const DataModel::Decoda
         attributeStatuses[i].attributeID = kInvalidAttributeId;
         attributeStatuses[i].statusCode  = 0;
     }
-    auto attributeIdsIter = attributeRequests.begin();
-    size_t index          = 0;
-    while (attributeIdsIter.Next())
-    {
-        auto & attributeId = attributeIdsIter.GetValue();
-
+    size_t index       = 0;
+    auto iterateStatus = attributeRequests.for_each([&](auto & attributeId, bool &) -> CHIP_ERROR {
         for (size_t i = 0; i < index; ++i)
         {
             auto & attributeStatus = attributeStatuses[i];
             if (attributeStatus.attributeID == attributeId)
             {
                 // Double-requesting an attribute is invalid
-                return Status::InvalidCommand;
+                return CHIP_ERROR_INTERNAL;
             }
         }
         attributeStatuses[index].attributeID = attributeId;
         attributeStatuses[index].statusCode  = to_underlying(Status::Success);
         index++;
-    }
-    if (attributeIdsIter.GetStatus() != CHIP_NO_ERROR)
+        return CHIP_NO_ERROR;
+    });
+    if (iterateStatus != CHIP_NO_ERROR)
     {
         return Status::InvalidCommand;
     }
@@ -412,11 +407,8 @@ void ThermostatAttrAccess::BeginAtomicWrite(CommandHandler * commandObj, const C
         return;
     }
 
-    auto maximumTimeout   = System::Clock::Milliseconds16(0);
-    auto attributeIdsIter = commandData.attributeRequests.begin();
-    while (attributeIdsIter.Next())
-    {
-        auto & attributeId = attributeIdsIter.GetValue();
+    auto maximumTimeout = System::Clock::Milliseconds16(0);
+    auto iterateStatus  = commandData.attributeRequests.for_each([&](auto & attributeId, bool &) -> CHIP_ERROR {
         switch (attributeId)
         {
         case Presets::Id:
@@ -430,6 +422,11 @@ void ThermostatAttrAccess::BeginAtomicWrite(CommandHandler * commandObj, const C
             }
             break;
         }
+        return CHIP_NO_ERROR;
+    });
+    if (iterateStatus != CHIP_NO_ERROR)
+    {
+        status = Status::InvalidCommand;
     }
 
     status = Status::Success;

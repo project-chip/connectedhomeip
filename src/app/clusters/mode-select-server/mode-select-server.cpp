@@ -225,25 +225,24 @@ public:
         ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
 
         size_t attributeCount = 0;
-        ReturnErrorOnFailure(attributeValueList.ComputeSize(&attributeCount));
+        ReturnErrorOnFailure(attributeValueList.ComputeSize(attributeCount));
         VerifyOrReturnError(attributeCount <= kScenableAttributeCount, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-        auto pair_iterator = attributeValueList.begin();
-        while (pair_iterator.Next())
-        {
-            auto & decodePair = pair_iterator.GetValue();
+        bool inserted      = false;
+        auto iterateStatus = attributeValueList.for_each([&](auto & decodePair, bool &) -> CHIP_ERROR {
             VerifyOrReturnError(decodePair.attributeID == Attributes::CurrentMode::Id, CHIP_ERROR_INVALID_ARGUMENT);
             VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
             ReturnErrorOnFailure(mSceneEndpointStatePairs.InsertPair(
                 ModeSelectEndPointPair(endpoint, static_cast<uint8_t>(decodePair.valueUnsigned8.HasValue()))));
-        }
+            inserted = true;
+            return CHIP_NO_ERROR;
+        });
         // Verify that the EFS was completely read
-        CHIP_ERROR err = pair_iterator.GetStatus();
-        if (CHIP_NO_ERROR != err)
+        if (inserted && CHIP_NO_ERROR != iterateStatus)
         {
             mSceneEndpointStatePairs.RemovePair(endpoint);
-            return err;
         }
+        ReturnErrorOnFailure(iterateStatus);
 
         VerifyOrReturnError(mTransitionTimeInterface.sceneEventControl(endpoint) != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(timeMs), timerCallback,

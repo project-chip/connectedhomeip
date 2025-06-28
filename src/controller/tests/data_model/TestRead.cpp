@@ -231,15 +231,13 @@ TEST_F(TestRead, TestReadAttributeResponse)
     auto onSuccessCb = [&onSuccessCbInvoked](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         uint8_t i = 0;
         EXPECT_TRUE(attributePath.mDataVersion.HasValue() && attributePath.mDataVersion.Value() == kDataVersion);
-        auto iter = dataResponse.begin();
-        while (iter.Next())
-        {
-            auto & item = iter.GetValue();
+        auto iterateStatus = dataResponse.for_each([&](auto & item, bool &) -> CHIP_ERROR {
             EXPECT_EQ(item.member1, i);
             i++;
-        }
+            return CHIP_NO_ERROR;
+        });
         EXPECT_EQ(i, 4u);
-        EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+        EXPECT_EQ(iterateStatus, CHIP_NO_ERROR);
         onSuccessCbInvoked = true;
     };
 
@@ -3251,7 +3249,7 @@ TEST_F(TestRead, TestReadFabricScopedWithoutFabricFilter)
     auto onSuccessCb = [&onSuccessCbInvoked](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         size_t len = 0;
 
-        EXPECT_EQ(dataResponse.ComputeSize(&len), CHIP_NO_ERROR);
+        EXPECT_EQ(dataResponse.ComputeSize(len), CHIP_NO_ERROR);
         EXPECT_GT(len, 1u);
 
         onSuccessCbInvoked = true;
@@ -3296,7 +3294,7 @@ TEST_F(TestRead, TestReadFabricScopedWithFabricFilter)
     auto onSuccessCb = [&onSuccessCbInvoked](const ConcreteDataAttributePath & attributePath, const auto & dataResponse) {
         size_t len = 0;
 
-        EXPECT_EQ(dataResponse.ComputeSize(&len), CHIP_NO_ERROR);
+        EXPECT_EQ(dataResponse.ComputeSize(len), CHIP_NO_ERROR);
         EXPECT_EQ(len, 1u);
 
         // TODO: Uncomment the following code after we have fabric support in unit tests.

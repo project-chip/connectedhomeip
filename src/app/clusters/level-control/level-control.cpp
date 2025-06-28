@@ -214,19 +214,14 @@ public:
         ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
 
         size_t attributeCount = 0;
-        ReturnErrorOnFailure(attributeValueList.ComputeSize(&attributeCount));
+        ReturnErrorOnFailure(attributeValueList.ComputeSize(attributeCount));
         VerifyOrReturnError(attributeCount <= kLevelMaxScenableAttributes, CHIP_ERROR_BUFFER_TOO_SMALL);
-
-        auto pair_iterator = attributeValueList.begin();
 
         // The level control cluster should have a maximum of 2 attributes
         uint8_t level = 0;
         // TODO : Uncomment when frequency is supported by the level control cluster
         // uint16_t frequency;
-        while (pair_iterator.Next())
-        {
-            auto & decodePair = pair_iterator.GetValue();
-
+        auto iterateStatus = attributeValueList.for_each([&](auto & decodePair, bool &) -> CHIP_ERROR {
             // If attribute ID was encoded, checks which attribute from LC cluster is there
             switch (decodePair.attributeID)
             {
@@ -242,8 +237,9 @@ public:
             default:
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
-        }
-        ReturnErrorOnFailure(pair_iterator.GetStatus());
+            return CHIP_NO_ERROR;
+        });
+        ReturnErrorOnFailure(iterateStatus);
 
         // TODO : Implement action on frequency when frequency not provisional anymore
         // if(LevelControlHasFeature(endpoint, LevelControl::Feature::kFrequency)){}

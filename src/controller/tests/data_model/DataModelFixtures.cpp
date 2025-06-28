@@ -361,16 +361,12 @@ ActionReturnStatus CustomDataModel::WriteAttribute(const WriteAttributeRequest &
 
                 ReturnErrorOnFailure(decoder.Decode(value));
 
-                auto iter                         = value.begin();
                 listStructOctetStringElementCount = 0;
-                while (iter.Next())
-                {
-                    auto & item = iter.GetValue();
-
+                return value.for_each([&](auto & item, bool &) -> CHIP_ERROR {
                     VerifyOrReturnError(item.member1 == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
                     listStructOctetStringElementCount++;
-                }
-                return CHIP_NO_ERROR;
+                    return CHIP_NO_ERROR;
+                });
             }
 
             if (request.path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
@@ -405,12 +401,7 @@ ActionReturnStatus CustomDataModel::WriteAttribute(const WriteAttributeRequest &
 
             ReturnErrorOnFailure(invalidSubjectDescriptorDecoder.Decode(value));
 
-            auto iter = value.begin();
-            while (iter.Next())
-            {
-                auto & item = iter.GetValue();
-                (void) item;
-            }
+            ReturnErrorOnFailure(value.for_each([&](auto &, bool &) -> CHIP_ERROR { return CHIP_NO_ERROR; }));
         }
         else if (request.path.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
         {

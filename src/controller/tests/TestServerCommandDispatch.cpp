@@ -287,20 +287,17 @@ void TestServerCommandDispatch::TestDataResponseHelper(const EmberAfEndpointType
     // not safe to do so.
     auto onSuccessCb = [&onSuccessWasCalled](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
                                              const auto & dataResponse) {
-        uint8_t i = 0;
-        auto iter = dataResponse.arg1.begin();
-        while (iter.Next())
-        {
-            auto & item = iter.GetValue();
-
+        uint8_t i          = 0;
+        auto iterateStatus = dataResponse.arg1.for_each([&](auto & item, bool &) -> CHIP_ERROR {
             EXPECT_EQ(item.a, i);
             EXPECT_FALSE(item.b);
             EXPECT_EQ(item.c.a, i);
             EXPECT_TRUE(item.c.b);
             i++;
-        }
+            return CHIP_NO_ERROR;
+        });
 
-        EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+        EXPECT_EQ(iterateStatus, CHIP_NO_ERROR);
         EXPECT_TRUE(dataResponse.arg6);
 
         onSuccessWasCalled = true;
@@ -325,16 +322,15 @@ void TestServerCommandDispatch::TestDataResponseHelper(const EmberAfEndpointType
 
     auto readSuccessCb = [&onSuccessWasCalled, aExpectSuccess](const ConcreteDataAttributePath &,
                                                                const DataModel::DecodableList<CommandId> & commandList) {
-        auto count = 0;
-        auto iter  = commandList.begin();
-        while (iter.Next())
-        {
+        auto count         = 0;
+        auto iterateStatus = commandList.for_each([&](auto & item, bool &) -> CHIP_ERROR {
             // We only expect 0 or 1 command ids here.
             EXPECT_EQ(count, 0);
-            EXPECT_EQ(iter.GetValue(), Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id);
+            EXPECT_EQ(item, Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id);
             ++count;
-        }
-        EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+            return CHIP_NO_ERROR;
+        });
+        EXPECT_EQ(iterateStatus, CHIP_NO_ERROR);
         if (aExpectSuccess)
         {
             EXPECT_EQ(count, 1);

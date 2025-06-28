@@ -178,10 +178,9 @@ public:
         ReturnErrorOnFailure(DecodeAttributeValueList(serializedBytes, attributeValueList));
 
         size_t attributeCount = 0;
-        auto pair_iterator    = attributeValueList.begin();
 
         // The color control cluster should have a maximum of 9 scenable attributes
-        ReturnErrorOnFailure(attributeValueList.ComputeSize(&attributeCount));
+        ReturnErrorOnFailure(attributeValueList.ComputeSize(attributeCount));
         VerifyOrReturnError(attributeCount <= kColorControlScenableAttributesCount, CHIP_ERROR_BUFFER_TOO_SMALL);
 
         uint16_t epIndex = ColorControlServer::Instance().getEndpointIndex(endpoint);
@@ -209,10 +208,7 @@ public:
         uint8_t loopDirectionValue = 0x00;
         uint16_t loopTimeValue     = 0x0019; // Default loop time value according to spec
 
-        while (pair_iterator.Next())
-        {
-            auto & decodePair = pair_iterator.GetValue();
-
+        auto iterateStatus = attributeValueList.for_each([&](auto & decodePair, bool &) -> CHIP_ERROR {
             switch (decodePair.attributeID)
             {
             case Attributes::CurrentX::Id:
@@ -277,8 +273,9 @@ public:
                 return CHIP_ERROR_INVALID_ARGUMENT;
                 break;
             }
-        }
-        ReturnErrorOnFailure(pair_iterator.GetStatus());
+            return CHIP_NO_ERROR;
+        });
+        ReturnErrorOnFailure(iterateStatus);
 
         // Switch to the mode saved in the scene
         if (SupportsColorMode(endpoint, targetColorMode))

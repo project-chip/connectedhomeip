@@ -121,6 +121,52 @@ public:
     constexpr pointer begin() const { return data(); }
     constexpr pointer end() const { return data() + size(); }
 
+    /**
+     * @brief Iterates through all elements, calling iterateFn on each element.
+     * The T element passed in to iterateFn has a guaranteed lifetime of the method call
+     * @tparam BinaryFunc a function of type std::function<CHIP_ERROR(T & entry, bool & breakLoop)>; template arg for GCC inlining
+     * efficiency for lambdas
+     * @param iterateFn the function to call on each element. if this function returns an error result or sets breakLoop=true,
+     * iteration stops and for_each returns that same error result.
+     */
+    template <typename BinaryFunc>
+    __attribute__((always_inline)) inline CHIP_ERROR for_each(BinaryFunc iterateFn) const
+    {
+        for (const auto & item : *this)
+        {
+            bool breakLoop = false;
+            ReturnErrorOnFailure(iterateFn(item, breakLoop));
+            if (breakLoop)
+            {
+                break;
+            }
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * @brief Iterates through all elements, calling iterateFn on each element.
+     * The T element passed in to iterateFn has a guaranteed lifetime of the method call
+     * @tparam BinaryFunc a function of type std::function<CHIP_ERROR(T & entry, bool & breakLoop)>; template arg for GCC inlining
+     * efficiency for lambdas
+     * @param iterateFn the function to call on each element. if this function returns an error result or sets breakLoop=true,
+     * iteration stops and for_each returns that same error result.
+     */
+    template <typename BinaryFunc>
+    __attribute__((always_inline)) inline CHIP_ERROR for_each(BinaryFunc iterateFn)
+    {
+        for (auto & item : *this)
+        {
+            bool breakLoop = false;
+            ReturnErrorOnFailure(iterateFn(item, breakLoop));
+            if (breakLoop)
+            {
+                break;
+            }
+        }
+        return CHIP_NO_ERROR;
+    }
+
     // Element accessors, matching the std::span API.
     reference operator[](size_t index) const
     {

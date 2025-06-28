@@ -21,6 +21,7 @@
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/FabricScoped.h>
+#include <functional>
 #include <lib/core/TLV.h>
 
 namespace chip {
@@ -65,6 +66,15 @@ struct List : public Span<T>
         return (*this);
     }
 
+    /*
+     * For API compatibility with DecodableList::ComputeSize
+     */
+    CHIP_ERROR ComputeSize(size_t & size) const
+    {
+        size = this->size();
+        return CHIP_NO_ERROR;
+    }
+
     //
     // A list is deemed fabric scoped if the type of its elements is as well.
     //
@@ -78,7 +88,7 @@ List(T * data, size_t size) -> List<T>;
 template <class T, size_t N>
 List(T (&databuf)[N]) -> List<T>;
 
-template <typename X>
+template <typename X, std::enable_if_t<!DataModel::IsFabricScoped<X>::value, bool> = true>
 inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, List<X> list)
 {
     TLV::TLVType type;

@@ -117,20 +117,17 @@ TEST_F(TestCommands, TestDataResponse)
     // not safe to do so.
     auto onSuccessCb = [&onSuccessWasCalled](const app::ConcreteCommandPath & commandPath, const app::StatusIB & aStatus,
                                              const auto & dataResponse) {
-        uint8_t i = 0;
-        auto iter = dataResponse.arg1.begin();
-        while (iter.Next())
-        {
-            auto & item = iter.GetValue();
-
+        uint8_t i          = 0;
+        auto iterateStatus = dataResponse.arg1.for_each([&](auto & item, bool &) -> CHIP_ERROR {
             EXPECT_EQ(item.a, i);
             EXPECT_FALSE(item.b);
             EXPECT_EQ(item.c.a, i);
             EXPECT_TRUE(item.c.b);
             i++;
-        }
+            return CHIP_NO_ERROR;
+        });
 
-        EXPECT_EQ(iter.GetStatus(), CHIP_NO_ERROR);
+        EXPECT_EQ(iterateStatus, CHIP_NO_ERROR);
         EXPECT_TRUE(dataResponse.arg6);
 
         onSuccessWasCalled = true;

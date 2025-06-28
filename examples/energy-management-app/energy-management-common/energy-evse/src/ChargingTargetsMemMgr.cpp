@@ -114,43 +114,20 @@ CHIP_ERROR ChargingTargetsMemMgr::AllocAndCopy()
 
     return CHIP_NO_ERROR;
 }
-
 CHIP_ERROR
 ChargingTargetsMemMgr::AllocAndCopy(const DataModel::List<const Structs::ChargingTargetStruct::Type> & chargingTargets)
 {
-    // NOTE: ChargingTargetsMemMgr::PrepareDaySchedule() must be called as specified in the class comments in
-    // ChargingTargetsMemMgr.h before this method can be called.
-
-    VerifyOrDie(mpListOfDays[mChargingTargetSchedulesIdx] == nullptr);
-
-    mNumDailyChargingTargets = static_cast<uint16_t>(chargingTargets.size());
-
-    if (mNumDailyChargingTargets > 0)
-    {
-        // Allocate the memory first and then use placement new to initialise the memory of each element in the array
-        mpListOfDays[mChargingTargetSchedulesIdx] = static_cast<EnergyEvse::Structs::ChargingTargetStruct::Type *>(
-            chip::Platform::MemoryAlloc(sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * chargingTargets.size()));
-
-        VerifyOrReturnError(mpListOfDays[mChargingTargetSchedulesIdx] != nullptr, CHIP_ERROR_NO_MEMORY);
-
-        uint16_t idx = 0;
-        for (auto & chargingTarget : chargingTargets)
-        {
-            // This will cause the ChargingTargetStruct constructor to be called and this element in the array
-            new (mpListOfDays[mChargingTargetSchedulesIdx] + idx) EnergyEvse::Structs::ChargingTargetStruct::Type();
-
-            // Now copy the chargingTarget
-            mpListOfDays[mChargingTargetSchedulesIdx][idx] = chargingTarget;
-
-            idx++;
-        }
-    }
-
-    return CHIP_NO_ERROR;
+    return AllocAndCopyInternal(chargingTargets);
 }
 
 CHIP_ERROR
 ChargingTargetsMemMgr::AllocAndCopy(const DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> & chargingTargets)
+{
+    return AllocAndCopyInternal(chargingTargets);
+}
+
+template <class ListType> // List<T> or DecodableList<T>
+CHIP_ERROR ChargingTargetsMemMgr::AllocAndCopyInternal(const ListType & chargingTargets)
 {
     // NOTE: ChargingTargetsMemMgr::PrepareDaySchedule() must be called as specified in the class comments in
     // ChargingTargetsMemMgr.h before this method can be called.
@@ -158,7 +135,7 @@ ChargingTargetsMemMgr::AllocAndCopy(const DataModel::DecodableList<Structs::Char
     VerifyOrDie(mpListOfDays[mChargingTargetSchedulesIdx] == nullptr);
 
     size_t numDailyChargingTargets = 0;
-    ReturnErrorOnFailure(chargingTargets.ComputeSize(&numDailyChargingTargets));
+    ReturnErrorOnFailure(chargingTargets.ComputeSize(numDailyChargingTargets));
 
     mNumDailyChargingTargets = static_cast<uint16_t>(numDailyChargingTargets);
 
@@ -171,13 +148,10 @@ ChargingTargetsMemMgr::AllocAndCopy(const DataModel::DecodableList<Structs::Char
         VerifyOrReturnError(mpListOfDays[mChargingTargetSchedulesIdx] != nullptr, CHIP_ERROR_NO_MEMORY);
 
         uint16_t idx = 0;
-        auto it      = chargingTargets.begin();
-        while (it.Next())
-        {
+
+        return chargingTargets.for_each([&](auto & chargingTarget, bool &) -> CHIP_ERROR {
             // Check that the idx is still valid
             VerifyOrReturnError(idx < mNumDailyChargingTargets, CHIP_ERROR_INCORRECT_STATE);
-
-            auto & chargingTarget = it.GetValue();
 
             // This will cause the ChargingTargetStruct constructor to be called and this element in the array
             new (mpListOfDays[mChargingTargetSchedulesIdx] + idx) EnergyEvse::Structs::ChargingTargetStruct::Type();
@@ -186,7 +160,9 @@ ChargingTargetsMemMgr::AllocAndCopy(const DataModel::DecodableList<Structs::Char
             mpListOfDays[mChargingTargetSchedulesIdx][idx] = chargingTarget;
 
             idx++;
-        }
+
+            return CHIP_NO_ERROR;
+        });
     }
 
     return CHIP_NO_ERROR;

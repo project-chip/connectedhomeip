@@ -158,11 +158,11 @@ TEST_F(TestWifiResponseEncoding, TestSuccessEncode)
         ASSERT_TRUE(response.wiFiScanResults.HasValue());
         std::vector<WiFiInterfaceScanResultStruct::DecodableType> items;
 
-        auto value = response.wiFiScanResults.Value().begin();
-        while (value.Next())
-        {
-            items.push_back(value.GetValue());
-        }
+        auto iterateStatus = response.wiFiScanResults.Value().for_each([&](auto & value, bool &) -> CHIP_ERROR {
+            items.push_back(value);
+            return CHIP_NO_ERROR;
+        });
+        ASSERT_EQ(iterateStatus, CHIP_NO_ERROR);
 
         // assert expectations:
         //   - values exist

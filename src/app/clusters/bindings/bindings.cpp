@@ -96,14 +96,13 @@ bool IsValidBinding(const EndpointId localEndpoint, const TargetStructType & ent
 CHIP_ERROR CheckValidBindingList(const EndpointId localEndpoint, const DecodableBindingListType & bindingList,
                                  FabricIndex accessingFabricIndex)
 {
-    size_t listSize = 0;
-    auto iter       = bindingList.begin();
-    while (iter.Next())
-    {
-        VerifyOrReturnError(IsValidBinding(localEndpoint, iter.GetValue()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    size_t listSize    = 0;
+    auto iterateStatus = bindingList.for_each([&](auto & item, bool &) -> CHIP_ERROR {
+        VerifyOrReturnError(IsValidBinding(localEndpoint, item), CHIP_IM_GLOBAL_STATUS(ConstraintError));
         listSize++;
-    }
-    ReturnErrorOnFailure(iter.GetStatus());
+        return CHIP_NO_ERROR;
+    });
+    ReturnErrorOnFailure(iterateStatus);
 
     // Check binding table size
     uint8_t oldListSize = 0;
@@ -228,12 +227,8 @@ CHIP_ERROR BindingTableAccess::WriteBindingTable(const ConcreteDataAttributePath
         }
 
         // Add new entries
-        auto iter      = newBindingList.begin();
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        while (iter.Next() && err == CHIP_NO_ERROR)
-        {
-            err = CreateBindingEntry(iter.GetValue(), path.mEndpointId);
-        }
+        auto err =
+            newBindingList.for_each([&](auto & item, bool &) -> CHIP_ERROR { return CreateBindingEntry(item, path.mEndpointId); });
 
         // If this was not caused by a list operation, OnListWriteEnd is not going to be triggered
         // so a notification is sent here.

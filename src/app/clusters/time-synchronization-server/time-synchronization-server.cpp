@@ -539,7 +539,7 @@ void TimeSynchronizationServer::InitTimeZone()
 CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList<Structs::TimeZoneStruct::Type> & tzL)
 {
     size_t items;
-    VerifyOrReturnError(CHIP_NO_ERROR == tzL.ComputeSize(&items), CHIP_IM_GLOBAL_STATUS(InvalidCommand));
+    VerifyOrReturnError(CHIP_NO_ERROR == tzL.ComputeSize(items), CHIP_IM_GLOBAL_STATUS(InvalidCommand));
 
     if (items > CHIP_CONFIG_TIME_ZONE_LIST_MAX_SIZE)
     {
@@ -565,29 +565,23 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
         }
     }
 
-    auto newTzL = tzL.begin();
-    uint8_t i   = 0;
+    uint8_t i = 0;
     InitTimeZone();
 
-    while (newTzL.Next())
-    {
-        auto & tzStore     = mTimeZoneObj.timeZoneList[i];
-        const auto & newTz = newTzL.GetValue();
+    auto iterateStatus = tzL.for_each([&](auto & newTz, bool &) -> CHIP_ERROR {
+        auto & tzStore = mTimeZoneObj.timeZoneList[i];
         if (newTz.offset < -43200 || newTz.offset > 50400)
         {
-            ReturnErrorOnFailure(LoadTimeZone());
             return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
         }
         // first element shall have validAt entry of 0
         if (i == 0 && newTz.validAt != 0)
         {
-            ReturnErrorOnFailure(LoadTimeZone());
             return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
         }
         // if second element, it shall have validAt entry of non-0
         if (i != 0 && newTz.validAt == 0)
         {
-            ReturnErrorOnFailure(LoadTimeZone());
             return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
         }
         tzStore.timeZone.offset  = newTz.offset;
@@ -597,14 +591,12 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
             size_t len = newTz.name.Value().size();
             if (len > sizeof(tzStore.name))
             {
-                ReturnErrorOnFailure(LoadTimeZone());
                 return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_IB;
             }
             memset(tzStore.name, 0, sizeof(tzStore.name));
             chip::MutableCharSpan tempSpan(tzStore.name, len);
             if (CHIP_NO_ERROR != CopyCharSpanToMutableCharSpan(newTz.name.Value(), tempSpan))
             {
-                ReturnErrorOnFailure(LoadTimeZone());
                 return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
             }
             tzStore.timeZone.name.SetValue(CharSpan(tzStore.name, len));
@@ -614,10 +606,16 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
             tzStore.timeZone.name.ClearValue();
         }
         i++;
-    }
-    if (CHIP_NO_ERROR != newTzL.GetStatus())
+        return CHIP_NO_ERROR;
+    });
+
+    if (iterateStatus != CHIP_NO_ERROR)
     {
         ReturnErrorOnFailure(LoadTimeZone());
+        if (iterateStatus.IsPart(ChipError::SdkPart::kIMGlobalStatus))
+        {
+            return iterateStatus;
+        }
         return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
     }
 
@@ -664,7 +662,7 @@ void TimeSynchronizationServer::InitDSTOffset()
 CHIP_ERROR TimeSynchronizationServer::SetDSTOffset(const DataModel::DecodableList<Structs::DSTOffsetStruct::Type> & dstL)
 {
     size_t items;
-    VerifyOrReturnError(CHIP_NO_ERROR == dstL.ComputeSize(&items), CHIP_IM_GLOBAL_STATUS(InvalidCommand));
+    VerifyOrReturnError(CHIP_NO_ERROR == dstL.ComputeSize(items), CHIP_IM_GLOBAL_STATUS(InvalidCommand));
 
     if (items > CHIP_CONFIG_DST_OFFSET_LIST_MAX_SIZE)
     {
@@ -676,18 +674,15 @@ CHIP_ERROR TimeSynchronizationServer::SetDSTOffset(const DataModel::DecodableLis
         return ClearDSTOffset();
     }
 
-    auto newDstL = dstL.begin();
-    size_t i     = 0;
+    size_t i = 0;
     InitDSTOffset();
 
-    while (newDstL.Next())
-    {
-        auto & dst = mDstOffsetObj.dstOffsetList[i];
-        dst        = newDstL.GetValue();
-        i++;
-    }
+    auto iterateStatus = dstL.for_each([&](auto & newDst, bool &) -> CHIP_ERROR {
+        mDstOffsetObj.dstOffsetList[i++] = newDst;
+        return CHIP_NO_ERROR;
+    });
 
-    if (CHIP_NO_ERROR != newDstL.GetStatus())
+    if (CHIP_NO_ERROR != iterateStatus)
     {
         ReturnErrorOnFailure(LoadDSTOffset());
         return CHIP_IM_GLOBAL_STATUS(InvalidCommand);
