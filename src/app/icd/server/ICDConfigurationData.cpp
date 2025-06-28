@@ -24,17 +24,37 @@ ICDConfigurationData ICDConfigurationData::instance;
 
 System::Clock::Milliseconds32 ICDConfigurationData::GetSlowPollingInterval()
 {
-#if CHIP_CONFIG_ENABLE_ICD_LIT
-    // When in SIT mode, the slow poll interval SHALL NOT be greater than the SIT mode polling threshold, per spec.
+    // When LIT capable device operates in SIT mode, it shall transition to use the mSITPollingInterval
+    // if this one is shorter than the configured mLITPollingInterval.
+    // Either way, the slow poll interval used SHALL NOT be greater than the SIT mode polling threshold, per spec.
     // This is important for ICD device configured for LIT operation but currently operating as a SIT
     // due to a lack of client registration
-    if (mICDMode == ICDMode::SIT && mSlowPollingInterval > kSITPollingThreshold)
+    if (mFeatureMap.Has(app::Clusters::IcdManagement::Feature::kLongIdleTimeSupport) && mICDMode == ICDMode::SIT)
     {
-        return kSITPollingThreshold;
+        // mSITPollingInterval cannot be configured to a value greater than kSITPollingThreshold.
+        // The SIT slow polling interval compliance is therefore always respected by using the smallest
+        // value from mLITPollingInterval or mSITPollingInterval;
+        return std::min(mLITPollingInterval, mSITPollingInterval);
     }
-#endif // CHIP_CONFIG_ENABLE_ICD_LIT
 
-    return mSlowPollingInterval;
+    return mLITPollingInterval;
+}
+
+CHIP_ERROR ICDConfigurationData::SetSlowPollingInterval(System::Clock::Milliseconds32 slowPollInterval)
+{
+    bool isLITSupported = mFeatureMap.Has(app::Clusters::IcdManagement::Feature::kLongIdleTimeSupport);
+    // If LIT is not supported, the slow polling interval cannot be set higher than kSITPollingThreshold.
+    VerifyOrReturnError((isLITSupported || slowPollInterval <= kSITPollingThreshold), CHIP_ERROR_INVALID_ARGUMENT);
+
+    mLITPollingInterval = slowPollInterval;
+    return CHIP_NO_ERROR;
+};
+
+CHIP_ERROR ICDConfigurationData::SetSITPollingInterval(System::Clock::Milliseconds32 pollingInterval)
+{
+    VerifyOrReturnError(pollingInterval <= kSITPollingThreshold, CHIP_ERROR_INVALID_ARGUMENT);
+    mSITPollingInterval = pollingInterval;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ICDConfigurationData::SetModeDurations(Optional<System::Clock::Milliseconds32> activeModeDuration,

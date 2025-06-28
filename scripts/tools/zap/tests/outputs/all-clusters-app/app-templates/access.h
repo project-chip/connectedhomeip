@@ -46,8 +46,6 @@
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: view */ \
@@ -81,8 +79,6 @@
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: view */ \
@@ -116,8 +112,6 @@
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
     /* Cluster: Window Covering, Attribute: Mode, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: KeypadLockout, Privilege: view */ \
-    /* Cluster: Thermostat User Interface Configuration, Attribute: ScheduleProgrammingVisibility, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointRX, Privilege: view */ \

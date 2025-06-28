@@ -25,7 +25,11 @@ namespace Clusters {
 
 /// Integration of Network Commissioning logic within the Matter data model
 ///
-/// Translates between matter calls and Network commissioning logic
+/// Translates generic cluster calls (general TLV or untyped data)
+/// into type-safe calls to be processed by the `NetworkCommissioningLogic`
+///
+/// This is a `ServerClusterInterface` wrapper around the functionality implemented
+/// inside `NetworkCommissioningLogic`.
 class NetworkCommissioningCluster : public DefaultServerCluster
 {
 public:
@@ -41,7 +45,10 @@ public:
 
     CHIP_ERROR Init() { return mLogic.Init(); }
 
-    // Undo of the init. Separate name as `Shutdown` has meaning for a server cluster
+    // Undo of the init.
+    //
+    // Note: This can't be named `Shutdown` because the server cluster API already has a method
+    // with that name, with different semantics.
     void Deinit() { mLogic.Shutdown(); }
 
     // Server cluster implementation

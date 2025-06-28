@@ -32,14 +32,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 
-using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
-using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
-using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
-using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
-using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
-
-using namespace Camera;
-
 namespace {
 
 // Constants
@@ -466,9 +458,9 @@ WebRTCProviderManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    auto & avsmDelegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
 
-    return avsmDelegate.ValidateStreamUsage(streamUsage, videoStreamId, audioStreamId);
+    return avsmController.ValidateStreamUsage(streamUsage, videoStreamId, audioStreamId);
 }
 
 CHIP_ERROR WebRTCProviderManager::ValidateVideoStreamID(uint16_t videoStreamId)
@@ -479,9 +471,9 @@ CHIP_ERROR WebRTCProviderManager::ValidateVideoStreamID(uint16_t videoStreamId)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    auto & avsmDelegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
 
-    return avsmDelegate.ValidateVideoStreamID(videoStreamId);
+    return avsmController.ValidateVideoStreamID(videoStreamId);
 }
 
 CHIP_ERROR WebRTCProviderManager::ValidateAudioStreamID(uint16_t audioStreamId)
@@ -492,9 +484,9 @@ CHIP_ERROR WebRTCProviderManager::ValidateAudioStreamID(uint16_t audioStreamId)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    auto & avsmDelegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
 
-    return avsmDelegate.ValidateAudioStreamID(audioStreamId);
+    return avsmController.ValidateAudioStreamID(audioStreamId);
 }
 
 CHIP_ERROR WebRTCProviderManager::IsPrivacyModeActive(bool & isActive)
@@ -505,9 +497,9 @@ CHIP_ERROR WebRTCProviderManager::IsPrivacyModeActive(bool & isActive)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    auto & avsmDelegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
 
-    return avsmDelegate.IsPrivacyModeActive(isActive);
+    return avsmController.IsPrivacyModeActive(isActive);
 }
 
 bool WebRTCProviderManager::HasAllocatedVideoStreams()
@@ -518,9 +510,9 @@ bool WebRTCProviderManager::HasAllocatedVideoStreams()
         return false;
     }
 
-    auto & avsmDelegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
 
-    return avsmDelegate.HasAllocatedVideoStreams();
+    return avsmController.HasAllocatedVideoStreams();
 }
 
 bool WebRTCProviderManager::HasAllocatedAudioStreams()
@@ -531,9 +523,9 @@ bool WebRTCProviderManager::HasAllocatedAudioStreams()
         return false;
     }
 
-    auto & avsmDelegate = mCameraDevice->GetCameraAVStreamMgmtDelegate();
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
 
-    return avsmDelegate.HasAllocatedAudioStreams();
+    return avsmController.HasAllocatedAudioStreams();
 }
 
 void WebRTCProviderManager::MoveToState(const State targetState)
