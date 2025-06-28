@@ -24,7 +24,7 @@ import random
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from time import sleep
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
@@ -220,7 +220,7 @@ class CADMINSupport:
         clock_skew_ms = self.calculate_clock_skew_factor(expected_duration_seconds)
         max_allowed_duration = expected_duration_seconds + (clock_skew_ms / 1000)
 
-        logging.info(f"=== COMMISSIONING WINDOW MONITORING STARTED ===")
+        logging.info("=== COMMISSIONING WINDOW MONITORING STARTED ===")
         logging.info(f"Monitoring commissioning window closure for node {node_id}")
         logging.info(f"Expected duration: {expected_duration_seconds}s")
         logging.info(f"Clock skew factor: {clock_skew_ms}ms")
