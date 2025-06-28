@@ -73,10 +73,10 @@ public:
  * FabricTableImpl is an implementation that allows to store arbitrary entities using PersistentStorageDelegate.
  * It handles the storage of entities by their StorageId and EnpointId over multiple fabrics.
  */
-template <class StorageId, class StorageData, size_t kIteratorsMax>
+template <class StorageId, class StorageData>
 class FabricTableImpl
 {
-    using TableEntry = Data::TableEntry<StorageId, StorageData>;
+    using TableEntry = Data::TableEntryRef<StorageId, StorageData>;
 
 public:
     using EntryIterator = CommonIterator<TableEntry>;
@@ -106,7 +106,18 @@ public:
 
     // Data
     CHIP_ERROR GetRemainingCapacity(FabricIndex fabric_index, uint8_t & capacity);
-    CHIP_ERROR SetTableEntry(FabricIndex fabric_index, const StorageId & entry_id, const StorageData & data);
+
+    /**
+     * @brief Writes the entry to persistent storage.
+     * @param fabric_index the fabric to write the entry to
+     * @param entry_id the unique entry identifier
+     * @param data the source data
+     * @param writeBuffer the buffer that will be used to write the data before being persisted; PersistentStorageDelegate does not
+     * offer a way to stream bytes to be written
+     */
+    template <size_t kEntryMaxBytes>
+    CHIP_ERROR SetTableEntry(FabricIndex fabric_index, const StorageId & entry_id, const StorageData & data,
+                             PersistentStore<kEntryMaxBytes> & writeBuffer);
 
     /**
      * @brief Loads the entry from persistent storage.
@@ -136,6 +147,19 @@ public:
     void SetTableSize(uint16_t endpointEntryTableSize, uint16_t maxPerFabric);
     bool IsInitialized() { return (mStorage != nullptr); }
 
+    /**
+     * @brief Iterates through all entries in fabric, calling iterateFn with the allocated iterator.
+     * @tparam kEntryMaxBytes size of the buffer for loading entries, should match DefaultSerializer::kEntryMaxBytes
+     * @tparam UnaryFunc a function of type std::function<CHIP_ERROR(EntryIterator & iterator)>; template arg for GCC inlining
+     * efficiency
+     * @param fabric the fabric to iterate entries for
+     * @param store the in-memory buffer that an entry will be read into
+     * @param iterateFn a function that will be called with the iterator; if this function returns an error result, iteration stops
+     * and IterateEntries returns that same error result.
+     */
+    template <size_t kEntryMaxBytes, class UnaryFunc>
+    CHIP_ERROR IterateEntries(FabricIndex fabric, PersistentStore<kEntryMaxBytes> & store, UnaryFunc iterateFn);
+
 protected:
     // This constructor is meant for test purposes, it allows to change the defined max for entries per fabric and global, which
     // allows to simulate OTA where this value was changed
@@ -149,20 +173,23 @@ protected:
     /**
      * @brief Implementation of an iterator over the elements in the FabricTableImpl.
      *
-     * If you would like to expose iterators in your subclass of FabricTableImpl, use this class
-     * in an ObjectPool<EntryIteratorImpl> field to allow callers to obtain an iterator.
+     * If you would like to expose iterators in your subclass of FabricTableImpl, you can:
+     * A) Use this class in an ObjectPool<EntryIteratorImpl> field to allow callers to obtain an iterator, with AutoRelease to free
+     * resources B) Use IterateEntries to allocate on stack
      */
+    template <size_t kEntryMaxBytes>
     class EntryIteratorImpl : public EntryIterator
     {
     public:
         EntryIteratorImpl(FabricTableImpl & provider, FabricIndex fabricIdx, EndpointId endpoint, uint16_t maxEntriesPerFabric,
-                          uint16_t maxEntriesPerEndpoint);
+                          uint16_t maxEntriesPerEndpoint, PersistentStore<kEntryMaxBytes> & store);
         size_t Count() override;
         bool Next(TableEntry & output) override;
         void Release() override;
 
     protected:
         FabricTableImpl & mProvider;
+        PersistentStore<kEntryMaxBytes> & mStore;
         FabricIndex mFabric  = kUndefinedFabricIndex;
         EndpointId mEndpoint = kInvalidEndpointId;
         EntryIndex mNextEntryIdx;

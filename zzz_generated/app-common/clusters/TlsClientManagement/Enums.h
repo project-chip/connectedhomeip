@@ -28,6 +28,20 @@ namespace app {
 namespace Clusters {
 namespace TlsClientManagement {
 
+// Enum for StatusCodeEnum
+enum class StatusCodeEnum : uint8_t
+{
+    kEndpointAlreadyInstalled  = 0x02,
+    kRootCertificateNotFound   = 0x03,
+    kClientCertificateNotFound = 0x04,
+    kEndpointInUse             = 0x05,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 0,
+};
+
 // Enum for TLSEndpointStatusEnum
 enum class TLSEndpointStatusEnum : uint8_t
 {

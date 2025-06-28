@@ -260,6 +260,20 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
             binary="chip-camera-app",
         )
     )
+    targets.append(
+        ApplicationTarget(
+            key="JF_CONTROL_APP",
+            target=f"{target_prefix}-jf-control-app",
+            binary="jfc-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
+            key="JF_ADMIN_APP",
+            target=f"{target_prefix}-jf-admin-app",
+            binary="jfa-app",
+        )
+    )
 
     return targets
 
@@ -896,7 +910,7 @@ def python_tests(
                 tend = time.time()
 
                 if result.returncode != 0:
-                    logging.error("Test failed: %s", script)
+                    logging.error("Test failed: %s (error code %d when running %r)", script, result.returncode, cmd)
                     if fail_log_dir:
                         out_name = os.path.join(fail_log_dir, f"{base_name}.out.log")
                         err_name = os.path.join(fail_log_dir, f"{base_name}.err.log")
@@ -1121,7 +1135,7 @@ def chip_tool_tests(
     # This likely should be run in docker to not allow breaking things
     # run as:
     #
-    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:134
+    # docker run --rm -it -v ~/devel/connectedhomeip:/workspace --privileged ghcr.io/project-chip/chip-build-vscode:140
     runner = __RUNNERS__[runner]
 
     # make sure we are fully aware if running with or without coverage
