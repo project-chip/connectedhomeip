@@ -420,7 +420,7 @@ class MdnsDiscovery:
                     {}
                 )
                 if txt_data:
-                    logging.info("TXT data returned from cache.")
+                    logging.info("TXT data recovered from cache.")
                     txt_from_cache = txt_data.txt_value
             else:
                 # Cache the TXT record data
