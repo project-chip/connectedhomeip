@@ -91,28 +91,32 @@ void ClosureDimensionEndpoint::OnMoveToActionComplete()
 
 void ClosureDimensionEndpoint::UpdateCurrentStateFromTargetState()
 {
-    DataModel::Nullable<GenericCurrentStateStruct> currentState;
-    DataModel::Nullable<GenericTargetStruct> target;
+    DataModel::Nullable<GenericDimensionStateStruct> currentState;
+    DataModel::Nullable<GenericDimensionStateStruct> targetState;
+
     VerifyOrReturn(mLogic.GetCurrentState(currentState) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to get current state, Updating CurrentState From TargetState Failed"));
-    VerifyOrReturn(mLogic.GetTarget(target) == CHIP_NO_ERROR,
+    VerifyOrReturn(mLogic.GetTargetState(targetState) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to get target state, Updating CurrentState From TargetState Failed"));
-    VerifyOrReturn(!target.IsNull(),
+
+    VerifyOrReturn(!targetState.IsNull(),
                    ChipLogError(AppServer, "Target state is null, Updating CurrentState From TargetState Failed"));
     VerifyOrReturn(!currentState.IsNull(),
                    ChipLogError(AppServer, "Current state is null, Updating CurrentState From TargetState Failed"));
 
-    if (target.Value().position.HasValue())
+    if (targetState.Value().position.HasValue() && !targetState.Value().position.Value().IsNull())
     {
-        currentState.Value().position.SetValue(target.Value().position.Value());
+        currentState.Value().position.SetValue(DataModel::MakeNullable(targetState.Value().position.Value().Value()));
     }
-    if (target.Value().latch.HasValue())
+
+    if (targetState.Value().latch.HasValue() && !targetState.Value().latch.Value().IsNull())
     {
-        currentState.Value().latch.SetValue(target.Value().latch.Value());
+        currentState.Value().latch.SetValue(DataModel::MakeNullable(targetState.Value().latch.Value().Value()));
     }
-    if (target.Value().speed.HasValue())
+
+    if (targetState.Value().speed.HasValue())
     {
-        currentState.Value().speed.SetValue(target.Value().speed.Value());
+        currentState.Value().speed.SetValue(targetState.Value().speed.Value());
     }
 
     mLogic.SetCurrentState(currentState);

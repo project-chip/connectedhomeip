@@ -217,7 +217,7 @@ private:
      * @return true if the next position was updated and movement is required; false if no update is needed
      *         or if either the current or target position is not set.
      */
-    bool GetPanelNextPosition(const chip::app::Clusters::ClosureDimension::GenericCurrentStateStruct & currentState,
-                              const chip::app::Clusters::ClosureDimension::GenericTargetStruct & targetState,
-                              chip::Optional<chip::Percent100ths> & nextPosition);
+    bool GetPanelNextPosition(const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & currentState,
+                              const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & targetState,
+                              chip::app::DataModel::Nullable<chip::Percent100ths> & nextPosition);
 };
