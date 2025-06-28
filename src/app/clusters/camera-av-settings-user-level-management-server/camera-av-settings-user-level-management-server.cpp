@@ -74,11 +74,13 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
     //
     if (SupportsOptAttr(OptionalAttributes::kMptzPosition))
     {
-        VerifyOrReturnError(HasFeature(Feature::kMechanicalPan) || HasFeature(Feature::kMechanicalTilt) ||
-                            HasFeature(Feature::kMechanicalZoom), CHIP_ERROR_INVALID_ARGUMENT,
-                            ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If MPTZPosition is enabled "
-                                "then one of Pan, Tilt, or Zoom is required",
-                            mEndpointId));
+        VerifyOrReturnError(
+            HasFeature(Feature::kMechanicalPan) || HasFeature(Feature::kMechanicalTilt) || HasFeature(Feature::kMechanicalZoom),
+            CHIP_ERROR_INVALID_ARGUMENT,
+            ChipLogError(Zcl,
+                         "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If MPTZPosition is enabled "
+                         "then one of Pan, Tilt, or Zoom is required",
+                         mEndpointId));
     }
 
     if (SupportsOptAttr(OptionalAttributes::kMaxPresets))
