@@ -15,16 +15,14 @@
 #    limitations under the License.
 #
 
-import ast
 import ipaddress
 import json
 import logging
-import re
 from asyncio import Event, TimeoutError, ensure_future, wait_for
 from dataclasses import asdict, dataclass, field
+from datetime import datetime
 from enum import Enum
 from typing import Dict, List, Optional, cast
-from datetime import datetime
 
 from mdns_discovery.mdns_async_service_info import DNSRecordType, MdnsAsyncServiceInfo
 from zeroconf import IPVersion, ServiceListener, ServiceStateChange, Zeroconf
@@ -97,7 +95,7 @@ class TxtData:
 
     # A dictionary of key-value pairs extracted from the TXT record
     txt_value: Optional[dict[str, str]]
-    
+
     # Timestamp when the TXT data was created or observed
     created_at: datetime = field(default_factory=datetime.utcnow)
 
