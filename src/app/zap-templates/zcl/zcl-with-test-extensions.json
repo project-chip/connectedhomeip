@@ -212,7 +212,7 @@
         ],
         "Closure Dimension": [
             "CurrentState",
-            "Target",
+            "TargetState",
             "UnitRange",
             "LimitRange",
             "FeatureMap",
