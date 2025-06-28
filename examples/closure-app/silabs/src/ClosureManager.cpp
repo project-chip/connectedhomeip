@@ -506,7 +506,8 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
     GetInstance().SetCurrentAction(Action_t::INVALID_ACTION);
 }
 
-bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & currentState, const GenericDimensionStateStruct & targetState,
+bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & currentState,
+                                          const GenericDimensionStateStruct & targetState,
                                           DataModel::Nullable<chip::Percent100ths> & nextPosition)
 {
     VerifyOrReturnValue(targetState.position.HasValue() && !targetState.position.Value().IsNull(), false,
