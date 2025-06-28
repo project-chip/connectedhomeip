@@ -78,8 +78,8 @@ void ClosureDimensionEndpoint::OnStopCalibrateActionComplete()
 void ClosureDimensionEndpoint::OnCalibrateActionComplete()
 {
     DataModel::Nullable<GenericDimensionStateStruct> currentState(GenericDimensionStateStruct(
-        MakeOptional(DataModel::MakeNullable(kFullClosedTargetPosition)), 
-        MakeOptional(DataModel::MakeNullable(true)), 
+        MakeOptional(DataModel::MakeNullable(kFullClosedTargetPosition)),
+        MakeOptional(DataModel::MakeNullable(true)),
         MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
     DataModel::Nullable<GenericDimensionStateStruct> targetState{ DataModel::NullNullable };
     mLogic.SetCurrentState(currentState);
