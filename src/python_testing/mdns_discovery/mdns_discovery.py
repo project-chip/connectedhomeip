@@ -336,8 +336,8 @@ class MdnsDiscovery:
 
         if is_discovered:
             if service_info.decoded_properties:
-                logging.info(f"SRV Record decoded_properties: {service_info.decoded_properties}")
                 # Cache the TXT record data
+                logging.info("Caching TXT data.")
                 self.txt_data_cache.append(TxtData(
                     service_name=service_info.name,
                     hostname=service_info.server,
@@ -412,21 +412,24 @@ class MdnsDiscovery:
         if is_discovered:
             if not service_info.decoded_properties:
                 logging.info(
-                    f"TXT Record found but no properties for service '{service_name}' of type '{service_type}', attempting to recover from cache.")
+                    f"TXT Record found but no properties for service '{service_name}' of type '{service_type}', attempting to recover from cache...")
+
+                # Look for TXT data in the cache
                 txt_data = next(
                     (d for d in reversed(self.txt_data_cache) if d.service_name == service_name and d.hostname == service_info.server),
                     {}
                 )
                 if txt_data:
+                    logging.info("TXT data returned from cache.")
                     txt_from_cache = txt_data.txt_value
             else:
                 # Cache the TXT record data
+                logging.info("Caching TXT data.")
                 self.txt_data_cache.append(TxtData(
                     service_name=service_info.name,
                     hostname=service_info.server,
                     txt_value=service_info.decoded_properties
                 ))
-                logging.info(f"txt_data_cache: {self.txt_data_cache}")
 
             # Adds service to discovered services
             mdns_service_info = self._to_mdns_service_info_class(service_info)
@@ -441,6 +444,9 @@ class MdnsDiscovery:
                 self._log_output()
 
             return mdns_service_info
+        else:
+            logger.error(f"TXT Record for service '{service_name}' of type '{service_type}' not found.")
+            return None
 
     async def get_quada_record(self, hostname: str,
                                discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
