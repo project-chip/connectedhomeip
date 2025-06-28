@@ -148,7 +148,7 @@ class CADMINSupport:
             window_status_accumulator.await_all_expected_report_matches([status_match], timeout_sec=timeout_sec)
             logging.info(f"✅ Window status changed to {status_name} (status={expected_status})")
             return True
-        except Exception as e:
+        except asyncio.TimeoutError as e:
             logging.error(f"❌ Timeout waiting for window status {expected_status} ({status_name}): {e}")
             logging.error(f"Timeout occurred after {timeout_sec}s")
             return False
