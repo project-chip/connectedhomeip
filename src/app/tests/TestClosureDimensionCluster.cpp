@@ -2003,7 +2003,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingPositionN
 
     DataModel::Nullable<GenericDimensionStateStruct> testCurrentState(testCurrentStateStruct);
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
- 
+
     EXPECT_EQ(logic->GetCurrentState(currentState), CHIP_NO_ERROR);
     EXPECT_EQ(currentState, DataModel::NullNullable);
 

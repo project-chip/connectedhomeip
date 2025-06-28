@@ -78,7 +78,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
     ChipLogError(AppServer, "SetCurrentState");
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState.currentState != incomingCurrentState, CHIP_NO_ERROR);
-    
+
     bool markDirty = false;
 
     if (!incomingCurrentState.IsNull())
@@ -90,7 +90,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
             //  feature is supported by the closure. If the Positioning feature is not supported, return an error.
             VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-            if (!incomingCurrentState.Value().position.Value().IsNull()) 
+            if (!incomingCurrentState.Value().position.Value().IsNull())
             {
 
                 VerifyOrReturnError(incomingCurrentState.Value().position.Value().Value() <= kPercents100thsMaxValue,
@@ -116,17 +116,17 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
                 auto predicate = [](const decltype(quietReportableCurrentStatePosition)::SufficientChangePredicateCandidate &) -> bool {
                     return true;
                 };
-                markDirty = (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.Value().position.Value(), now, predicate) 
+                markDirty = (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.Value().position.Value(), now, predicate)
                                 == AttributeDirtyState::kMustReport);
                 ChipLogError(AppServer, "Target position reached Mark dirty = %d", markDirty);
             }
             else
-            {   
+            {
                 // Predicate to report at most once every 5 seconds when the Position changes from one non-null value to another non-null value,
                 // or when the Position changes from null to any other value and vice versa
                 System::Clock::Milliseconds64 reportInterval = System::Clock::Milliseconds64(kPositionQuietReportingInterval);
-                auto predicate = quietReportableCurrentStatePosition.GetPredicateForSufficientTimeSinceLastDirty(reportInterval);   
-                markDirty = (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.Value().position.Value(), now, predicate) 
+                auto predicate = quietReportableCurrentStatePosition.GetPredicateForSufficientTimeSinceLastDirty(reportInterval);
+                markDirty = (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.Value().position.Value(), now, predicate)
                                 == AttributeDirtyState::kMustReport);
                 ChipLogError(AppServer, "Target position not reached Mark dirty = %d", markDirty);
             }
@@ -170,7 +170,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
 
     // If the current state is null and the incoming current state is null and vice versa, we need to mark dirty.
     if ( (mState.currentState.IsNull() && !incomingCurrentState.IsNull()) ||
-        (!mState.currentState.IsNull() && incomingCurrentState.IsNull()) )  
+        (!mState.currentState.IsNull() && incomingCurrentState.IsNull()) )
     {
         markDirty = true;
     }
