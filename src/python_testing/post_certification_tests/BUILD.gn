@@ -25,14 +25,20 @@ idt_files = [
 
 credentials_files = [ "${chip_root}/credentials/fetch_paa_certs_from_dcl.py" ]
 
+_version = "1.4.2"
+
 pw_python_package("post-certification-tests-module") {
   generate_setup = {
     metadata = {
       name = "post-certification-tests-module"
-      version = "1.4.2"
+      version = _version
     }
   }
 
+  # NOTE: production_device_checks.py is included here because `sources` is
+  # a mandatory parameter. It is also included in `extra_files` to place it
+  # in the correct directory in the final wheel. This duplication is a known
+  # issue due to build system limitations.
   sources = [ "production_device_checks.py" ]
 }
 
@@ -41,7 +47,7 @@ pw_python_distribution("matter-post-certification-tests") {
 
   generate_setup_cfg = {
     name = "matter-post-certification-tests"
-    version = "1.4.2"
+    version = _version
     include_default_pyproject_file = true
     include_extra_files_in_package_data = true
   }
