@@ -11,22 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
-source_set("testing") {
-  sources = [
-    "EmptyProvider.cpp",
-    "EmptyProvider.h",
-    "TestEventGenerator.h",
-    "TestProviderChangeListener.h",
-    "TestServerClusterContext.h",
-  ]
+chip_test_suite("tests") {
+  output_name = "appPersistenceTests"
+
+  test_sources = [ "TestPascalString.cpp" ]
 
   public_deps = [
-    "${chip_root}/src/app/persistence:default",
-    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/app/persistence",
+    "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support:testing",
   ]
 }
