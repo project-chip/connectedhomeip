@@ -26,7 +26,7 @@ from typing import Dict, List, Optional, cast
 
 from mdns_discovery.mdns_async_service_info import DNSRecordType, MdnsAsyncServiceInfo
 from zeroconf import IPVersion, ServiceListener, ServiceStateChange, Zeroconf
-from zeroconf._dns import DNSAddress, DNSRecord, DNSText
+from zeroconf._dns import DNSAddress
 from zeroconf._engine import AsyncListener
 from zeroconf._protocol.incoming import DNSIncoming
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconf, AsyncZeroconfServiceTypes
