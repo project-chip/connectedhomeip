@@ -186,33 +186,22 @@ class TC_CADMIN(MatterBaseTest):
             self.step(9)
             # TH_CR2 opens a commissioning window on DUT_CE for 180 seconds using ECM
             await self.th2.OpenCommissioningWindow(nodeid=self.dut_node_id, timeout=180, iteration=1000, discriminator=0, option=1)
+            results = await self.support.monitor_commissioning_window_closure_with_subscription(
+                th=self.th2,
+                node_id=self.dut_node_id,
+                expected_duration_seconds=180
+            )
+            asserts.assert_true(results['window_closed'], "Window should have closed")
+            asserts.assert_true(results['timing_valid'], "Window should have closed within timing constraints")
 
             self.step(10)
-            sleep(181)
-
-            self.step(11)
-            # TH_CR2 reads the window status to verify the DUT_CE window is closed
-            # TODO: Issue noticed when initially attempting to check window status, issue is detailed here: https://github.com/project-chip/connectedhomeip/issues/35983
-            # Workaround in place until above issue resolved
-            try:
-                window_status = await self.th2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.AdministratorCommissioning.Attributes.WindowStatus)])
-            except asyncio.CancelledError:
-                window_status = await self.th2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.AdministratorCommissioning.Attributes.WindowStatus)])
-
-            window_status = window_status[0]
-            outer_key = list(window_status.keys())[0]
-            inner_key = list(window_status[outer_key].keys())[1]
-            if window_status[outer_key][inner_key] != Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kWindowNotOpen:
-                asserts.fail("Commissioning window is expected to be closed, but was found to be open")
-
-            self.step(12)
             # TH_CR2 opens a commissioning window on DUT_CE using ECM
             self.discriminator = random.randint(0, 4095)
             # params2 = await self.openCommissioningWindow(dev_ctrl=self.th2, node_id=self.dut_node_id)
             params2 = await self.th2.OpenCommissioningWindow(nodeid=self.dut_node_id, timeout=self.max_window_duration, iteration=1000, discriminator=1234, option=1)
 
-            self.step(13)
-            # TH_CR1 starts a commissioning process with DUT_CE before the timeout from step 12
+            self.step(11)
+            # TH_CR1 starts a commissioning process with DUT_CE before the timeout from step 10
             try:
                 await self.th1.CommissionOnNetwork(
                     nodeId=self.dut_node_id, setupPinCode=params2.setupPinCode,
@@ -226,14 +215,14 @@ class TC_CADMIN(MatterBaseTest):
                 [2024-10-08 11:57:43.144365][TEST][STDOUT][MatterTest] 10-08 11:57:42.777 INFO Add NOC failed with error src/controller/CHIPDeviceController.cpp:1712: CHIP Error 0x0000007E: Trying to add a NOC for a fabric that already exists
             """
 
-            self.step(14)
+            self.step(12)
             revokeCmd = Clusters.AdministratorCommissioning.Commands.RevokeCommissioning()
             await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=revokeCmd, timedRequestTimeoutMs=6000)
             # The failsafe cleanup is scheduled after the command completes, so give it a bit of time to do that
             sleep(1)
 
         if commission_type == "ECM":
-            self.step(15)
+            self.step(13)
 
         elif commission_type == "BCM":
             self.step(7)
@@ -268,17 +257,15 @@ class TC_CADMIN(MatterBaseTest):
                      "Verify DUT_CE responds to both write/read with a success"),
             TestStep(8, "TH_CR2 reads, writes and then reads the Basic Information Cluster’s NodeLabel mandatory attribute of DUT_CE",
                      "Verify the initial read reflect the value written in the above step. Verify DUT_CE responds to both write/read with a success"),
-            TestStep(9, "TH_CR2 opens a commissioning window on DUT_CE for 180 seconds using ECM"),
-            TestStep(10, "Wait for the commissioning window in step 9 to timeout"),
-            TestStep(11, "TH_CR2 reads the window status to verify the DUT_CE window is closed",
-                     "DUT_CE windows status shows the window is closed"),
-            TestStep(12, "TH_CR2 opens a commissioning window on DUT_CE using ECM",
+            TestStep(9, "TH_CR2 opens a commissioning window on DUT_CE for 180 seconds using ECM and monitors until the window closes to verify window timing",
+                     "Verify that the window closed within the expected duration of 180 seconds + 1.8 seconds of clock skew"),
+            TestStep(10, "TH_CR2 opens a commissioning window on DUT_CE using ECM",
                      "DUT_CE opens its Commissioning window to allow a new commissioning"),
-            TestStep(13, "TH_CR1 starts a commissioning process with DUT_CE before the timeout from step 12",
+            TestStep(11, "TH_CR1 starts a commissioning process with DUT_CE before the timeout from step 10",
                      "Since DUT_CE was already commissioned by TH_CR1 in step 1, AddNOC fails with NOCResponse with StatusCode field set to FabricConflict (9)"),
-            TestStep(14, "TH_CR1 sends an RevokeCommissioning command to the DUT to cleanup step 13",
+            TestStep(12, "TH_CR1 sends an RevokeCommissioning command to the DUT to cleanup step 11",
                      "Successfully revoked commissioning"),
-            TestStep(15, "TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx",
+            TestStep(13, "TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx",
                      "TH_CR1 removes TH_CR2 fabric using th2_idx")
         ]
 

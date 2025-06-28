@@ -20,14 +20,17 @@ Support module for CADMIN test modules containing shared functionality.
 
 import logging
 import random
+import asyncio
 from dataclasses import dataclass
 from time import sleep
-from typing import Optional
+from typing import Optional, Callable, Any
+from datetime import datetime, timedelta
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.interaction_model import Status
+from chip.testing.matter_testing import ClusterAttributeChangeAccumulator, AttributeMatcher
 from mdns_discovery import mdns_discovery
 from mobly import asserts
 
@@ -67,6 +70,268 @@ class CADMINSupport:
             log_output=False,
         )
         return comm_service
+
+    def calculate_clock_skew_factor(self, duration_seconds: int) -> int:
+        """
+        Calculate the clock skew factor for commissioning window monitoring.
+        
+        Args:
+            duration_seconds: The duration of the commissioning window in seconds
+            
+        Returns:
+            Clock skew factor in milliseconds (1% of duration or 100ms, whichever is greater)
+        """
+        skew_percentage = 0.01  # 1%
+        skew_ms = max(int(duration_seconds * 1000 * skew_percentage), 100)
+        return skew_ms
+
+    async def create_window_status_subscription(
+        self,
+        th: ChipDeviceCtrl,
+        node_id: int,
+        min_interval_sec: int = 0,
+        max_interval_sec: int = 30
+    ) -> ClusterAttributeChangeAccumulator:
+        """
+        Create a subscription to WindowStatus attribute using ClusterAttributeChangeAccumulator.
+        
+        Args:
+            th: Controller to use
+            node_id: Target node ID
+            min_interval_sec: Minimum reporting interval in seconds
+            max_interval_sec: Maximum reporting interval in seconds
+            
+        Returns:
+            ClusterAttributeChangeAccumulator for WindowStatus
+        """
+        window_status_accumulator = ClusterAttributeChangeAccumulator(
+            Clusters.AdministratorCommissioning,
+            Clusters.AdministratorCommissioning.Attributes.WindowStatus
+        )
+        
+        await window_status_accumulator.start(
+            th, node_id, 0, fabric_filtered=False,
+            min_interval_sec=min_interval_sec,
+            max_interval_sec=max_interval_sec
+        )
+        
+        logging.info(f"Created WindowStatus subscription for node {node_id}")
+        return window_status_accumulator
+
+    async def wait_for_window_status_change(
+        self,
+        window_status_accumulator: ClusterAttributeChangeAccumulator,
+        expected_status: int,
+        timeout_sec: float = 10.0
+    ) -> bool:
+        """
+        Wait for window status to change to expected value.
+        
+        Args:
+            window_status_accumulator: The subscription accumulator
+            expected_status: Expected window status (0=closed, 1=open)
+            timeout_sec: Timeout in seconds
+            
+        Returns:
+            True if status changed to expected value, False if timeout
+        """
+        status_name = "CLOSED" if expected_status == 0 else "OPEN"
+        logging.info(f"Waiting for window status to change to {status_name} (status={expected_status})")
+        logging.info(f"Timeout set to: {timeout_sec}s")
+        
+        status_match = AttributeMatcher.from_callable(
+            f"WindowStatus is {expected_status}",
+            lambda report: report.value == expected_status
+        )
+        
+        try:
+            window_status_accumulator.await_all_expected_report_matches([status_match], timeout_sec=timeout_sec)
+            logging.info(f"✅ Window status changed to {status_name} (status={expected_status})")
+            return True
+        except Exception as e:
+            logging.error(f"❌ Timeout waiting for window status {expected_status} ({status_name}): {e}")
+            logging.error(f"Timeout occurred after {timeout_sec}s")
+            return False
+
+    def log_timing_results(self, results: dict[str, Any], test_step: str = ""):
+        """
+        Log timing results prominently for easy visibility in test output.
+        
+        Args:
+            results: Results dictionary from monitor_commissioning_window_closure_with_subscription
+            test_step: Optional test step identifier
+        """
+        step_prefix = f"[{test_step}] " if test_step else ""
+        
+        logging.info(f"{step_prefix}=== COMMISSIONING WINDOW TIMING RESULTS ===")
+        logging.info(f"{step_prefix}Window closed: {'✅ YES' if results['window_closed'] else '❌ NO'}")
+        logging.info(f"{step_prefix}Timing valid: {'✅ YES' if results['timing_valid'] else '❌ NO'}")
+        
+        if results['window_closed'] and results['actual_duration_seconds'] is not None:
+            actual = results['actual_duration_seconds']
+            expected = results['expected_duration_seconds']
+            max_allowed = results['max_allowed_duration_seconds']
+            skew_ms = results['clock_skew_ms']
+            
+            logging.info(f"{step_prefix}⏱️  TIMING BREAKDOWN:")
+            logging.info(f"{step_prefix}   Expected duration: {expected}s")
+            logging.info(f"{step_prefix}   Actual duration: {actual:.2f}s")
+            logging.info(f"{step_prefix}   Clock skew applied: {skew_ms}ms")
+            logging.info(f"{step_prefix}   Maximum allowed: {max_allowed:.2f}s")
+            
+            if actual <= expected:
+                early_by = expected - actual
+                logging.info(f"{step_prefix}   ✅ Window closed EARLY by {early_by:.2f}s")
+            elif actual <= max_allowed:
+                late_by = actual - expected
+                logging.info(f"{step_prefix}   ⚠️  Window closed LATE but within tolerance by {late_by:.2f}s")
+            else:
+                over_by = actual - max_allowed
+                logging.error(f"{step_prefix}   ❌ Window closed TOO LATE by {over_by:.2f}s")
+            
+            logging.info(f"{step_prefix}   Start time: {results['start_time']}")
+            logging.info(f"{step_prefix}   End time: {results['end_time']}")
+            logging.info(f"{step_prefix}   Total monitoring time: {actual:.2f}s")
+        
+        logging.info(f"{step_prefix}=== END TIMING RESULTS ===")
+
+    async def monitor_commissioning_window_closure_with_subscription(
+        self,
+        th: ChipDeviceCtrl,
+        node_id: int,
+        expected_duration_seconds: int,
+        min_interval_sec: int = 0,
+        max_interval_sec: int = 30
+    ) -> dict[str, Any]:
+        """
+        Monitor commissioning window closure using subscription (replaces hardcoded sleep).
+        
+        Args:
+            th: Controller to use
+            node_id: Target node ID
+            expected_duration_seconds: Expected duration of the window
+            min_interval_sec: Minimum reporting interval for subscription
+            max_interval_sec: Maximum reporting interval for subscription
+            
+        Returns:
+            Dictionary with monitoring results
+        """
+        start_time = datetime.now()
+        clock_skew_ms = self.calculate_clock_skew_factor(expected_duration_seconds)
+        max_allowed_duration = expected_duration_seconds + (clock_skew_ms / 1000)
+        
+        logging.info(f"=== COMMISSIONING WINDOW MONITORING STARTED ===")
+        logging.info(f"Monitoring commissioning window closure for node {node_id}")
+        logging.info(f"Expected duration: {expected_duration_seconds}s")
+        logging.info(f"Clock skew factor: {clock_skew_ms}ms")
+        logging.info(f"Maximum allowed duration: {max_allowed_duration:.2f}s")
+        logging.info(f"Monitoring started at: {start_time}")
+        logging.info(f"Expected closure by: {start_time + timedelta(seconds=expected_duration_seconds)}")
+        logging.info(f"Latest acceptable closure: {start_time + timedelta(seconds=max_allowed_duration)}")
+        
+        # Create subscription to window status
+        window_status_accumulator = await self.create_window_status_subscription(
+            th=th,
+            node_id=node_id,
+            min_interval_sec=min_interval_sec,
+            max_interval_sec=max_interval_sec
+        )
+        
+        try:
+            # Wait for window to close (status = 0)
+            window_closed = await self.wait_for_window_status_change(
+                window_status_accumulator=window_status_accumulator,
+                expected_status=0,
+                timeout_sec=max_allowed_duration + 10  # Add 10s buffer
+            )
+            
+            # Calculate actual duration
+            end_time = datetime.now()
+            actual_duration = None
+            if window_closed:
+                actual_duration = (end_time - start_time).total_seconds()
+            
+            # Verify timing
+            timing_valid = True
+            if not window_closed:
+                timing_valid = False
+                logging.error("❌ WINDOW DID NOT CLOSE WITHIN EXPECTED TIME")
+                logging.error(f"Monitoring timed out after {max_allowed_duration + 10}s")
+            elif actual_duration > max_allowed_duration:
+                timing_valid = False
+                logging.error("❌ WINDOW CLOSED TOO LATE")
+                logging.error(f"Expected: {expected_duration_seconds}s")
+                logging.error(f"Actual: {actual_duration:.2f}s")
+                logging.error(f"Max allowed: {max_allowed_duration:.2f}s")
+                logging.error(f"Over by: {actual_duration - max_allowed_duration:.2f}s")
+            
+            
+            results = {
+                'window_closed': window_closed,
+                'expected_duration_seconds': expected_duration_seconds,
+                'actual_duration_seconds': actual_duration,
+                'clock_skew_ms': clock_skew_ms,
+                'max_allowed_duration_seconds': max_allowed_duration,
+                'timing_valid': timing_valid,
+                'start_time': start_time,
+                'end_time': end_time
+            }
+            
+            # Log results prominently
+            self.log_timing_results(results)
+            
+            return results
+            
+        finally:
+            # Clean up subscription
+            await window_status_accumulator.cancel()
+
+    async def open_commissioning_window_with_subscription_monitoring(
+        self,
+        th: ChipDeviceCtrl,
+        timeout: int,
+        node_id: int,
+        discriminator: int = None,
+        option: int = 1,
+        iteration: int = 10000,
+        min_interval_sec: int = 0,
+        max_interval_sec: int = 30
+    ) -> tuple[CommissioningParameters, ClusterAttributeChangeAccumulator]:
+        """
+        Open a commissioning window and create subscription for monitoring.
+        
+        Args:
+            th: Controller to use
+            timeout: Window timeout in seconds
+            node_id: Target node ID
+            discriminator: Optional discriminator value
+            option: Commissioning option (default: 1)
+            iteration: Number of iterations (default: 10000)
+            min_interval_sec: Minimum reporting interval for subscription
+            max_interval_sec: Maximum reporting interval for subscription
+            
+        Returns:
+            Tuple of (CommissioningParameters, ClusterAttributeChangeAccumulator)
+        """
+        # Create subscription first
+        window_status_accumulator = await self.create_window_status_subscription(
+            th=th,
+            node_id=node_id,
+            min_interval_sec=min_interval_sec,
+            max_interval_sec=max_interval_sec
+        )
+        
+        # Open the commissioning window
+        params = await self.open_commissioning_window(
+            th=th,
+            timeout=timeout,
+            node_id=node_id,
+            discriminator=discriminator,
+            option=option,
+            iteration=iteration
+        )
+        
+        return params, window_status_accumulator
 
     async def open_commissioning_window(
         self,
