@@ -21,13 +21,14 @@ import json
 import logging
 import re
 from asyncio import Event, TimeoutError, ensure_future, wait_for
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from enum import Enum
 from typing import Dict, List, Optional, cast
+from datetime import datetime
 
 from mdns_discovery.mdns_async_service_info import DNSRecordType, MdnsAsyncServiceInfo
 from zeroconf import IPVersion, ServiceListener, ServiceStateChange, Zeroconf
-from zeroconf._dns import DNSAddress, DNSRecord
+from zeroconf._dns import DNSAddress, DNSRecord, DNSText
 from zeroconf._engine import AsyncListener
 from zeroconf._protocol.incoming import DNSIncoming
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconf, AsyncZeroconfServiceTypes
@@ -86,6 +87,21 @@ class MdnsAddressInfo:
     address: str
 
 
+@dataclass
+class TxtData:
+    # The full mDNS service instance name
+    service_name: str
+
+    # The hostname associated with the service
+    hostname: str
+
+    # A dictionary of key-value pairs extracted from the TXT record
+    txt_value: Optional[dict[str, str]]
+    
+    # Timestamp when the TXT data was created or observed
+    created_at: datetime = field(default_factory=datetime.utcnow)
+
+
 class MdnsServiceType(Enum):
     """
     Enum for Matter mDNS service types used in network service discovery.
@@ -117,6 +133,8 @@ class MdnsServiceListener(ServiceListener):
 class MdnsDiscovery:
 
     DISCOVERY_TIMEOUT_SEC = 15
+
+    txt_data_cache: list[TxtData] = []
 
     def __init__(self, verbose_logging: bool = False):
         """
@@ -318,6 +336,16 @@ class MdnsDiscovery:
             discovery_timeout_sec * 1000,
             record_type=DNSRecordType.SRV)
 
+        if is_discovered:
+            if service_info.decoded_properties:
+                logging.info(f"SRV Record decoded_properties: {service_info.decoded_properties}")
+                # Cache the TXT record data
+                self.txt_data_cache.append(TxtData(
+                    service_name=service_info.name,
+                    hostname=service_info.server,
+                    txt_value=service_info.decoded_properties
+                ))
+
         # Adds service to discovered services
         if is_discovered:
             mdns_service_info = self._to_mdns_service_info_class(service_info)
@@ -387,15 +415,20 @@ class MdnsDiscovery:
             if not service_info.decoded_properties:
                 logging.info(
                     f"TXT Record found but no properties for service '{service_name}' of type '{service_type}', attempting to recover from cache.")
-                for service, records in self._azc.zeroconf.cache.cache.items():
-                    for _, dns_record in records.items():
-                        if service_name.lower() == dns_record.name.lower():
-                            txt_found = get_txt_from_dns_record(dns_record)
-                            if txt_found:
-                                txt_from_cache = txt_found
-                                logging.info("TXT data recovered from cache.")
-                            else:
-                                logging.info("Failed to recover valid TXT data from cache.")
+                txt_data = next(
+                    (d for d in reversed(self.txt_data_cache) if d.service_name == service_name and d.hostname == service_info.server),
+                    {}
+                )
+                if txt_data:
+                    txt_from_cache = txt_data.txt_value
+            else:
+                # Cache the TXT record data
+                self.txt_data_cache.append(TxtData(
+                    service_name=service_info.name,
+                    hostname=service_info.server,
+                    txt_value=service_info.decoded_properties
+                ))
+                logging.info(f"txt_data_cache: {self.txt_data_cache}")
 
             # Adds service to discovered services
             mdns_service_info = self._to_mdns_service_info_class(service_info)
@@ -691,55 +724,3 @@ class MdnsDiscovery:
         converted_services = {key: [asdict(item) for item in value] for key, value in self._discovered_services.items()}
         json_str = json.dumps(converted_services, indent=4)
         logger.info("Discovery data:\n%s", json_str)
-
-
-def get_txt_from_dns_record(dns_record: DNSRecord) -> dict[str, str]:
-    """
-    Decodes a DNS TXT record into a dictionary of key-value pairs.
-
-    Returns:
-        A dictionary where each key and value is a string.
-
-    Raises:
-        ValueError: If the TXT data cannot be parsed from the record.
-    """
-    dns_record_str = str(dns_record)
-    logging.debug(f"[TXT Decode] Raw DNSRecord string: {dns_record_str}")
-
-    if "txt" not in dns_record_str.lower():
-        logging.warning(f"[TXT Decode] Record is not of TXT type: {dns_record_str}")
-        return {}
-
-    try:
-        # Attempt to extract the byte literal from the end of the string
-        match = re.search(r"(b'[^']*')\s*\}?\s*$", dns_record_str)
-        if not match:
-            logging.error(f"[TXT Decode] No byte literal found in record string: {dns_record_str}")
-            return {}
-
-        byte_literal = match.group(1)
-        logging.debug(f"[TXT Decode] Extracted byte literal: {byte_literal}")
-
-        raw_bytes = ast.literal_eval(byte_literal)
-        logging.debug(f"[TXT Decode] Parsed raw bytes: {raw_bytes}")
-
-        decoded: dict[str, str] = {}
-        i = 0
-        while i < len(raw_bytes):
-            length = raw_bytes[i]
-            i += 1
-            entry = raw_bytes[i:i+length].decode("utf-8", errors="replace").strip()
-            logging.debug(f"[TXT Decode] Parsed entry: '{entry}'")
-            i += length
-
-            if "=" in entry:
-                k, v = entry.split("=", 1)
-                decoded[k.strip()] = v.strip()
-            else:
-                logging.info(f"[TXT Decode] Skipped entry without '=': '{entry}'")
-
-        return decoded
-
-    except Exception as e:
-        logging.exception(f"[TXT Decode] Failed to decode TXT record: {e}")
-        raise ValueError(f"Failed to decode TXT record: {e}")
