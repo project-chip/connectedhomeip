@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/storage/TableEntry.h>
+#include <functional>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/PersistentData.h>
 #include <lib/support/TypeTraits.h>
@@ -76,7 +77,7 @@ public:
 template <class StorageId, class StorageData>
 class FabricTableImpl
 {
-    using TableEntry = Data::TableEntry<StorageId, StorageData>;
+    using TableEntry = Data::TableEntryRef<StorageId, StorageData>;
 
 public:
     using EntryIterator = CommonIterator<TableEntry>;

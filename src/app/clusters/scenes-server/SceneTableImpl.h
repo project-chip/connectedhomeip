@@ -29,11 +29,7 @@
 namespace chip {
 namespace scenes {
 
-#if defined(SCENES_MANAGEMENT_TABLE_SIZE) && SCENES_MANAGEMENT_TABLE_SIZE
-static constexpr uint16_t kMaxScenesPerEndpoint = SCENES_MANAGEMENT_TABLE_SIZE;
-#else
 static constexpr uint16_t kMaxScenesPerEndpoint = CHIP_CONFIG_MAX_SCENES_TABLE_SIZE;
-#endif
 
 static_assert(kMaxScenesPerEndpoint <= CHIP_CONFIG_MAX_SCENES_TABLE_SIZE,
               "CHIP_CONFIG_MAX_SCENES_TABLE_SIZE is smaller than the zap configuration, please increase "

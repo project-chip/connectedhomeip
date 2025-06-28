@@ -793,7 +793,15 @@
             "ClusterRevision"
         ],
         "Unit Localization": ["TemperatureUnit"],
-        "Zone Management": ["TwoDCartesianMax"]
+        "Zone Management": ["TwoDCartesianMax"],
+        "TLS Certificate Management": [
+            "ClusterRevision",
+            "MaxRootCertificates",
+            "ProvisionedRootCertificates",
+            "MaxClientCertificates",
+            "ProvisionedClientCertificates"
+        ],
+        "TLS Client Management": ["ClusterRevision", "MaxProvisioned"]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",
