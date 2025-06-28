@@ -68,8 +68,8 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
 void ClosureDimensionEndpoint::OnStopMotionActionComplete()
 {
     // Set the Position, latch in OverallTargetState to Null and speed to Auto as the motion has been stopped.
-    GenericTargetStruct target = GenericTargetStruct(NullOptional, NullOptional, MakeOptional(Globals::ThreeLevelAutoEnum::kAuto));
-    VerifyOrReturn(mLogic.SetTarget(DataModel::MakeNullable(target)) == CHIP_NO_ERROR,
+    GenericDimensionStateStruct targetState = GenericDimensionStateStruct(NullOptional, NullOptional, MakeOptional(Globals::ThreeLevelAutoEnum::kAuto));
+    VerifyOrReturn(mLogic.SetTargetState(DataModel::MakeNullable(targetState)) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to set target in OnStopMotionActionComplete"));
 }
 
@@ -78,7 +78,7 @@ void ClosureDimensionEndpoint::OnStopCalibrateActionComplete()
     // Current state and target are set to null after calibration is stopped to indicate an unknown state.
     VerifyOrReturn(mLogic.SetCurrentState(DataModel::NullNullable) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to set current state to null in OnStopCalibrateActionComplete"));
-    VerifyOrReturn(mLogic.SetTarget(DataModel::NullNullable) == CHIP_NO_ERROR,
+    VerifyOrReturn(mLogic.SetTargetState(DataModel::NullNullable) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to set target to null in OnStopCalibrateActionComplete"));
 }
 
