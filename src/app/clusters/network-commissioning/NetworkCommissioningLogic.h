@@ -59,6 +59,10 @@ class NetworkCommissioningLogic : private NetworkCommissioningLogicListNode,
                                   public DeviceLayer::NetworkCommissioning::ThreadDriver::ScanCallback
 {
 public:
+    using ThreadDriver   = DeviceLayer::NetworkCommissioning::ThreadDriver;
+    using WiFiDriver     = DeviceLayer::NetworkCommissioning::WiFiDriver;
+    using EthernetDriver = DeviceLayer::NetworkCommissioning::EthernetDriver;
+
     CHIP_ERROR Init();
     void Shutdown();
 
@@ -136,18 +140,18 @@ public:
 #if (CHIP_DEVICE_CONFIG_ENABLE_THREAD)
         if (mFeatureFlags.Has(NetworkCommissioning::Feature::kThreadNetworkInterface))
         {
-            return mpDriver.Get<DeviceLayer::NetworkCommissioning::ThreadDriver *>()->GetThreadVersion();
+            return mpDriver.Get<ThreadDriver *>()->GetThreadVersion();
         }
 #endif
         return 0;
     }
 
-    BitMask<chip::DeviceLayer::NetworkCommissioning::ThreadCapabilities> GetThreadCapabilities() const
+    BitMask<DeviceLayer::NetworkCommissioning::ThreadCapabilities> GetThreadCapabilities() const
     {
 #if (CHIP_DEVICE_CONFIG_ENABLE_THREAD)
         if (mFeatureFlags.Has(NetworkCommissioning::Feature::kThreadNetworkInterface))
         {
-            return mpDriver.Get<chip::DeviceLayer::NetworkCommissioning::ThreadDriver *>()->GetSupportedThreadFeatures();
+            return mpDriver.Get<ThreadDriver *>()->GetSupportedThreadFeatures();
         }
 #endif
         return {};
@@ -187,7 +191,7 @@ private:
     DeviceLayer::NetworkCommissioning::Internal::WirelessDriver * const mpWirelessDriver;
     DeviceLayer::NetworkCommissioning::Internal::BaseDriver * const mpBaseDriver;
 
-    Variant<DeviceLayer::NetworkCommissioning::WiFiDriver *, DeviceLayer::NetworkCommissioning::ThreadDriver *> mpDriver;
+    Variant<WiFiDriver *, ThreadDriver *> mpDriver;
 
     app::CommandHandler::Handle mAsyncCommandHandle;
     ConcreteCommandPath mAsyncCommandPath;
@@ -223,9 +227,9 @@ private:
     void UpdateBreadcrumb(const Optional<uint64_t> & breadcrumbValue);
 
 public:
-    NetworkCommissioningLogic(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::WiFiDriver * apDelegate);
-    NetworkCommissioningLogic(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::ThreadDriver * apDelegate);
-    NetworkCommissioningLogic(EndpointId aEndpointId, DeviceLayer::NetworkCommissioning::EthernetDriver * apDelegate);
+    NetworkCommissioningLogic(EndpointId aEndpointId, WiFiDriver * apDelegate);
+    NetworkCommissioningLogic(EndpointId aEndpointId, ThreadDriver * apDelegate);
+    NetworkCommissioningLogic(EndpointId aEndpointId, EthernetDriver * apDelegate);
     virtual ~NetworkCommissioningLogic()
     {
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
