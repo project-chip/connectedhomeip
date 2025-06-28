@@ -1605,7 +1605,6 @@ DataModel::Nullable<Percent> EnergyEvseDelegate::GetStateOfCharge()
 {
     return mStateOfCharge;
 }
-
 CHIP_ERROR EnergyEvseDelegate::SetStateOfCharge(DataModel::Nullable<Percent> newValue)
 {
     DataModel::Nullable<Percent> oldValue = mStateOfCharge;
