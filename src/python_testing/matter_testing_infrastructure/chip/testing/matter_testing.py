@@ -38,7 +38,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
 from itertools import chain
-from typing import Any, Callable, Iterable, List, Optional, Tuple
+from typing import Any, Callable, Iterable, List, Optional, Tuple, Union
 
 import chip.testing.conversions as conversions
 import chip.testing.decorators as decorators
@@ -220,7 +220,7 @@ class EventChangeCallback:
 
 class AttributeChangeCallback:
     def __init__(self, expected_attribute: ClusterObjects.ClusterAttributeDescriptor):
-        self._output = queue.Queue()
+        self._output: queue.Queue[tuple[TypedAttributePath, SubscriptionTransaction]] = queue.Queue()
         self._expected_attribute = expected_attribute
 
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
@@ -284,7 +284,7 @@ class AttributeMatcher:
 
         The condition matched should be clearly expressed by the `description` property.
         """
-        pass
+        raise NotImplementedError("Subclasses must implement the matches method")
 
     @property
     def description(self):
@@ -373,12 +373,12 @@ class ClusterAttributeChangeAccumulator:
             If provided, subscribes to a single attribute. Defaults to None.
     """
 
-    def __init__(self, expected_cluster: ClusterObjects.Cluster, expected_attribute: ClusterObjects.ClusterAttributeDescriptor = None):
+    def __init__(self, expected_cluster: ClusterObjects.Cluster, expected_attribute: Optional[ClusterObjects.ClusterAttributeDescriptor] = None):
         self._expected_cluster = expected_cluster
         self._expected_attribute = expected_attribute
         self._subscription = None
         self._lock = threading.Lock()
-        self._q = queue.Queue()
+        self._q: queue.Queue[AttributeValue] = queue.Queue()
         self._endpoint_id = 0
         self.reset()
 
@@ -387,7 +387,7 @@ class ClusterAttributeChangeAccumulator:
             self._attribute_report_counts = {}
             attrs = [cls for name, cls in inspect.getmembers(self._expected_cluster.Attributes) if inspect.isclass(
                 cls) and issubclass(cls, ClusterObjects.ClusterAttributeDescriptor)]
-            self._attribute_reports: dict[Any, AttributeValue] = {}
+            self._attribute_reports: dict[Any, list[AttributeValue]] = {}
             if self._expected_attribute is not None:
                 attrs = [self._expected_attribute]
             for a in attrs:
@@ -398,9 +398,13 @@ class ClusterAttributeChangeAccumulator:
 
     async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 5, keepSubscriptions: bool = True) -> Any:
         """This starts a subscription for attributes on the specified node_id and endpoint. The cluster is specified when the class instance is created."""
-        attributes = [(endpoint, self._expected_cluster)]
+
         if self._expected_attribute is not None:
-            attributes = [(endpoint, self._expected_attribute)]
+            attributes: list[tuple[int, Union[ClusterObjects.Cluster, ClusterObjects.ClusterAttributeDescriptor]]] = [
+                (endpoint, self._expected_attribute)]
+        else:
+            attributes = [(endpoint, self._expected_cluster)]
+
         self._subscription = await dev_ctrl.ReadAttribute(
             nodeid=node_id,
             attributes=attributes,
@@ -409,7 +413,8 @@ class ClusterAttributeChangeAccumulator:
             keepSubscriptions=keepSubscriptions
         )
         self._endpoint_id = endpoint
-        self._subscription.SetAttributeUpdateCallback(self.__call__)
+        if self._subscription is not None:
+            self._subscription.SetAttributeUpdateCallback(self.__call__)
         return self._subscription
 
     async def cancel(self):
@@ -433,13 +438,17 @@ class ClusterAttributeChangeAccumulator:
 
         if valid_report:
             data = transaction.GetAttribute(path)
-            value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
-                                   value=data, timestamp_utc=datetime.now(timezone.utc))
-            logging.info(f"Got subscription report for {path.AttributeType}: {data}")
-            self._q.put(value)
-            with self._lock:
-                self._attribute_report_counts[path.AttributeType] += 1
-                self._attribute_reports[path.AttributeType].append(value)
+            # Ensure path.Path and path.AttributeType are not None before accessing their properties
+            if path.Path is not None and path.AttributeType is not None:
+                # mypy assertion: EndpointId should not be None when Path is not None
+                assert path.Path.EndpointId is not None
+                value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
+                                       value=data, timestamp_utc=datetime.now(timezone.utc))
+                logging.info(f"Got subscription report for {path.AttributeType}: {data}")
+                self._q.put(value)
+                with self._lock:
+                    self._attribute_report_counts[path.AttributeType] += 1
+                    self._attribute_reports[path.AttributeType].append(value)
 
     def await_all_final_values_reported(self, expected_final_values: Iterable[AttributeValue], timeout_sec: float = 1.0):
         """Expect that every `expected_final_value` report is the last value reported for the given attribute, ignoring timestamps.
@@ -564,7 +573,7 @@ class ClusterAttributeChangeAccumulator:
             return self._attribute_report_counts
 
     @property
-    def attribute_reports(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, AttributeValue]:
+    def attribute_reports(self) -> dict[ClusterObjects.ClusterAttributeDescriptor, list[AttributeValue]]:
         with self._lock:
             return self._attribute_reports.copy()
 
@@ -599,6 +608,7 @@ class MatterTestConfig:
     timeout: typing.Union[int, None] = None
     endpoint: typing.Union[int, None] = 0
     app_pid: int = 0
+    app_pipe: Optional[str] = None
     pipe_name: typing.Union[str, None] = None
     fail_on_skipped_tests: bool = False
 
@@ -621,7 +631,7 @@ class MatterTestConfig:
     wifi_passphrase: Optional[str] = None
     thread_operational_dataset: Optional[bytes] = None
 
-    pics: dict[bool, str] = field(default_factory=dict)
+    pics: dict[str, bool] = field(default_factory=dict)
 
     # Node ID for basic DUT
     dut_node_ids: List[int] = field(default_factory=list)
@@ -645,8 +655,8 @@ class MatterTestConfig:
     trace_to: List[str] = field(default_factory=list)
 
     # Accepted Terms and Conditions if used
-    tc_version_to_simulate: int = None
-    tc_user_response_to_simulate: int = None
+    tc_version_to_simulate: Optional[int] = None
+    tc_user_response_to_simulate: Optional[int] = None
     # path to device attestation revocation set json file
     dac_revocation_set_path: Optional[pathlib.Path] = None
 
@@ -696,7 +706,6 @@ class ClusterPathLocation:
 
 @dataclass
 class AttributePathLocation(ClusterPathLocation):
-    cluster_id: Optional[int] = None
     attribute_id: Optional[int] = None
 
     def as_cluster_string(self, mapper: ClusterMapper):
@@ -828,7 +837,7 @@ class MatterStackState:
 
     def _init_stack(self, already_initialized: bool, **kwargs):
         if already_initialized:
-            self._chip_stack = builtins.chipStack
+            self._chip_stack = getattr(builtins, "chipStack")
             self._logger.warn(
                 "Re-using existing ChipStack object found in current interpreter: "
                 "storage path %s will be ignored!" % (self._config.storage_path)
@@ -836,7 +845,7 @@ class MatterStackState:
             # TODO: Warn that storage will not follow what we set in config
         else:
             self._chip_stack = ChipStack(**kwargs)
-            builtins.chipStack = self._chip_stack
+            setattr(builtins, "chipStack", self._chip_stack)
 
         chip.logging.RedirectToPythonLogging()
 
@@ -863,7 +872,7 @@ class MatterStackState:
             # managed elsewhere so we have to be careful not to touch unless
             # we initialized ourselves.
             self._certificate_authority_manager.Shutdown()
-            global_chip_stack = builtins.chipStack
+            global_chip_stack = getattr(builtins, "chipStack")
             global_chip_stack.Shutdown()
 
     @property
@@ -880,7 +889,7 @@ class MatterStackState:
 
     @property
     def stack(self) -> ChipStack:
-        return builtins.chipStack
+        return getattr(builtins, "chipStack")
 
 
 class MatterBaseTest(base_test.BaseTestClass):
@@ -1045,7 +1054,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     def dut_node_id(self) -> int:
         return self.matter_test_config.dut_node_ids[0]
 
-    def get_endpoint(self, default: Optional[int] = 0) -> int:
+    def get_endpoint(self, default: int = 0) -> int:
         return self.matter_test_config.endpoint if self.matter_test_config.endpoint is not None else default
 
     def get_wifi_ssid(self, default: Optional[str] = 0) -> str:
@@ -1161,21 +1170,24 @@ class MatterBaseTest(base_test.BaseTestClass):
             node_id = self.dut_node_id
         try:
             commissioning_params = await dev_ctrl.OpenCommissioningWindow(nodeid=node_id, timeout=timeout, iteration=1000,
-                                                                          discriminator=rnd_discriminator, option=1)
+                                                                          discriminator=rnd_discriminator, option=dev_ctrl.CommissioningWindowPasscode.kTokenWithRandomPin)
             params = CustomCommissioningParameters(commissioning_params, rnd_discriminator)
             return params
 
         except InteractionModelError as e:
             asserts.fail(e.status, 'Failed to open commissioning window')
+            raise  # Help mypy understand this never returns
 
     async def read_single_attribute(
-            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: object, fabricFiltered: bool = True) -> object:
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
+            self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor, fabricFiltered: bool = True) -> object:
+        # autopep8: off
+        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)  # type: ignore[list-item]
+        # autopep8: on
         data = result[endpoint]
         return list(data.values())[0][attribute]
 
     async def read_single_attribute_all_endpoints(
-            self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
+            self, cluster: ClusterObjects.Cluster, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
             dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None):
         """Reads a single attribute of a specified cluster across all endpoints.
 
@@ -1187,8 +1199,9 @@ class MatterBaseTest(base_test.BaseTestClass):
             dev_ctrl = self.default_controller
         if node_id is None:
             node_id = self.dut_node_id
-
-        read_response = await dev_ctrl.ReadAttribute(node_id, [(attribute)])
+        # autopep8: off
+        read_response = await dev_ctrl.ReadAttribute(node_id, [(attribute)])  # type: ignore[list-item]
+        # autopep8: on
         attrs = {}
         for endpoint in read_response:
             attr_ret = read_response[endpoint][cluster][attribute]
@@ -1196,7 +1209,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return attrs
 
     async def read_single_attribute_check_success(
-            self, cluster: Clusters.ClusterObjects.ClusterCommand, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
+            self, cluster: ClusterObjects.Cluster, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
             dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None, fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
@@ -1204,8 +1217,9 @@ class MatterBaseTest(base_test.BaseTestClass):
             node_id = self.dut_node_id
         if endpoint is None:
             endpoint = self.get_endpoint()
-
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
+        # autopep8: off
+        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)  # type: ignore[list-item]
+        # autopep8: on
         attr_ret = result[endpoint][cluster][attribute]
         read_err_msg = f"Error reading {str(cluster)}:{str(attribute)} = {attr_ret}"
         desired_type = attribute.attribute_type.Type
@@ -1227,7 +1241,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return attr_ret
 
     async def read_single_attribute_expect_error(
-            self, cluster: object, attribute: object,
+            self, cluster: ClusterObjects.Cluster, attribute: ClusterObjects.ClusterAttributeDescriptor,
             error: Status, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
             fabric_filtered: bool = True, assert_on_error: bool = True, test_name: str = "") -> object:
         if dev_ctrl is None:
@@ -1236,8 +1250,9 @@ class MatterBaseTest(base_test.BaseTestClass):
             node_id = self.dut_node_id
         if endpoint is None:
             endpoint = self.get_endpoint()
-
-        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)
+        # autopep8: off
+        result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabric_filtered)  # type: ignore[list-item]
+        # autopep8: on
         attr_ret = result[endpoint][cluster][attribute]
         err_msg = "Did not see expected error when reading {}:{}".format(str(cluster), str(attribute))
         error_type_ok = attr_ret is not None and isinstance(
@@ -1253,7 +1268,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         return attr_ret
 
-    async def write_single_attribute(self, attribute_value: object, endpoint_id: Optional[int] = None, expect_success: bool = True) -> Status:
+    async def write_single_attribute(self, attribute_value: ClusterObjects.ClusterAttributeDescriptor, endpoint_id: Optional[int] = None, expect_success: bool = True) -> Status:
         """Write a single `attribute_value` on a given `endpoint_id` and assert on failure.
 
         If `endpoint_id` is None, the default DUT endpoint for the test is selected.
@@ -1289,7 +1304,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                                             payloadCapability=payloadCapability)
         return result
 
-    async def send_test_event_triggers(self, eventTrigger: int, enableKey: bytes = None):
+    async def send_test_event_triggers(self, eventTrigger: int, enableKey: Optional[bytes] = None):
         """This helper function sends a test event trigger to the General Diagnostics cluster on endpoint 0
 
            The enableKey can be passed into the function, or omitted which will then
@@ -1309,7 +1324,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
         try:
             # GeneralDiagnostics cluster is meant to be on Endpoint 0 (Root)
-            await self.send_single_cmd(endpoint=0, cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey, eventTrigger))
+            await self.send_single_cmd(endpoint=0, cmd=Clusters.GeneralDiagnostics.Commands.TestEventTrigger(enableKey, uint(eventTrigger)))
 
         except InteractionModelError as e:
             asserts.fail(
@@ -2175,7 +2190,9 @@ def get_cluster_from_command(command: ClusterObjects.ClusterCommand) -> ClusterO
 
 async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
     """ Returns a list of endpoints matching the accept condition. """
-    wildcard = await self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
+    # autopep8: off
+    wildcard = await self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])  # type: ignore[list-item]
+    # autopep8: on
     matching = [e for e in wildcard.attributes.keys()
                 if accept_function(wildcard, e)]
     return matching
@@ -2201,7 +2218,9 @@ has_attribute = decorators.has_attribute
 has_command = decorators.has_command
 has_feature = decorators.has_feature
 should_run_test_on_endpoint = decorators.should_run_test_on_endpoint
-_get_all_matching_endpoints = decorators._get_all_matching_endpoints
+# autopep8: off
+_get_all_matching_endpoints = decorators._get_all_matching_endpoints  # type: ignore[assignment]
+# autopep8: on
 _has_feature = decorators._has_feature
 _has_command = decorators._has_command
 _has_attribute = decorators._has_attribute
