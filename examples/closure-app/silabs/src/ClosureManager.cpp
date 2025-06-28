@@ -349,14 +349,14 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * ep = nullptr;
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * panelEp = nullptr;
     if (endpointId == instance.ep2.GetEndpoint())
     {
-        ep = &instance.ep2;
+        panelEp = &instance.ep2;
     }
     else if (endpointId == instance.ep3.GetEndpoint())
     {
-        ep = &instance.ep3;
+        panelEp = &instance.ep3;
     }
     else
     {
@@ -364,23 +364,27 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
         return;
     }
 
-    StepDirectionEnum stepDirection = ep->GetDelegate().GetStepCommandTargetDirection();
+    StepDirectionEnum stepDirection = panelEp->GetDelegate().GetStepCommandTargetDirection();
 
-    DataModel::Nullable<GenericCurrentStateStruct> epCurrentState;
-    DataModel::Nullable<GenericTargetStruct> epTarget;
+    DataModel::Nullable<GenericDimensionStateStruct> panelCurrentState;
+    DataModel::Nullable<GenericDimensionStateStruct> panelTargetState;
 
-    VerifyOrReturn(ep->GetLogic().GetCurrentState(epCurrentState) == CHIP_NO_ERROR,
+    VerifyOrReturn(panelEp->GetLogic().GetCurrentState(panelCurrentState) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to get current state for Step action"));
-    VerifyOrReturn(ep->GetLogic().GetTarget(epTarget) == CHIP_NO_ERROR,
+    VerifyOrReturn(panelEp->GetLogic().GetTargetState(panelTargetState) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to get target state for Step action"));
 
-    VerifyOrReturn(!epCurrentState.IsNull() && epCurrentState.Value().position.HasValue(),
-                   ChipLogError(AppServer, "Current state or position is null, Step action Failed"));
-    VerifyOrReturn(!epTarget.IsNull() && epTarget.Value().position.HasValue(),
-                   ChipLogError(AppServer, "Target state or position is null, Step action Failed"));
+    VerifyOrReturn(!panelCurrentState.IsNull(),
+                   ChipLogError(AppServer, "Current state is null, Step action Failed"));
+    VerifyOrReturn(!panelTargetState.IsNull(),
+                   ChipLogError(AppServer, "Target state  is null, Step action Failed"));
+    VerifyOrReturn(panelCurrentState.Value().position.HasValue() && !panelCurrentState.Value().position.Value().IsNull(),
+                   ChipLogError(AppServer, "Current or target position is not set, Step action Failed"));
+    VerifyOrReturn(panelTargetState.Value().position.HasValue() && !panelTargetState.Value().position.Value().IsNull(),
+                   ChipLogError(AppServer, "Current or target position is not set, Step action Failed"));
 
-    chip::Percent100ths currentPosition = epCurrentState.Value().position.Value();
-    chip::Percent100ths targetPosition  = epTarget.Value().position.Value();
+    chip::Percent100ths currentPosition = panelCurrentState.Value().position.Value().Value();
+    chip::Percent100ths targetPosition  = panelTargetState.Value().position.Value().Value();
 
     ChipLogProgress(AppServer, "Current Position: %d, Target Position: %d", currentPosition, targetPosition);
 
@@ -391,7 +395,7 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
     {
         chip::Percent100ths nextCurrentPosition;
         chip::Percent100ths stepValue;
-        VerifyOrReturn(ep->GetLogic().GetStepValue(stepValue) == CHIP_NO_ERROR,
+        VerifyOrReturn(panelEp->GetLogic().GetStepValue(stepValue) == CHIP_NO_ERROR,
                        ChipLogError(AppServer, "Failed to get step value for Step action"));
 
         // Compute the next position
@@ -404,10 +408,8 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
             nextCurrentPosition = std::max(static_cast<chip::Percent100ths>(currentPosition - stepValue), targetPosition);
         }
 
-        // Set the new state once
-        epCurrentState.Value().position.SetValue(nextCurrentPosition);
-
-        ep->GetLogic().SetCurrentState(epCurrentState);
+        panelCurrentState.Value().position.SetValue(DataModel::MakeNullable(nextCurrentPosition));
+        panelEp->GetLogic().SetCurrentState(panelCurrentState);
 
         instance.CancelTimer(); // Cancel any existing timer before starting a new action
         instance.SetCurrentAction(PANEL_STEP_ACTION);
