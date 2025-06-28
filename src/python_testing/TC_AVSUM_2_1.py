@@ -147,7 +147,8 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
 
         if self.has_feature_mpan | self.has_feature_mtilt | self.has_feature_mzoom:
             self.step(8)
-            asserts.assert_in(attributes.MPTZPosition.attribute_id, attribute_list, "MPTZPosition attribute is mandatory if one of MPAN, MTILT, or MZOOM.")
+            asserts.assert_in(attributes.MPTZPosition.attribute_id, attribute_list,
+                              "MPTZPosition attribute is mandatory if one of MPAN, MTILT, or MZOOM.")
             mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
             self.ptz_range_validation(mptzposition_dut, tilt_min_dut, tilt_max_dut, pan_min_dut, pan_max_dut, zoom_max_dut)
         else:
