@@ -363,7 +363,7 @@ const MockNodeConfig gTestNodeConfig({
             MockEventId(1), MockEventId(2),
         }),
         MockClusterConfig(MockClusterId(2), {
-            ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
+            ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1)
         }),
         MockClusterConfig(MockClusterId(3), {}, {}, {}, {}, BitMask<MockClusterSide>().Set(MockClusterSide::kClient)),
         MockClusterConfig(MockClusterId(4), {}, {}, {}, {}, BitMask<MockClusterSide>().Set(MockClusterSide::kClient)),
@@ -772,6 +772,12 @@ public:
         { 102 },
     };
 
+    static constexpr AttributeEntry kExtraAttributes[] = {
+        AttributeEntry{ kAttributeIdReadOnly, BitFlags<AttributeQualityFlags>{}, Access::Privilege::kView, std::nullopt },
+        AttributeEntry{ kAttributeIdTimedWrite, BitFlags<AttributeQualityFlags>{}, Access::Privilege::kView,
+                        Access::Privilege::kOperate },
+    };
+
     FakeDefaultServerCluster(const ConcreteClusterPath & path) : DefaultServerCluster(path) {}
 
     [[nodiscard]] BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags(const ConcreteClusterPath &) const override
@@ -803,6 +809,12 @@ public:
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override
+    {
+        ReturnErrorOnFailure(builder.ReferenceExisting(kExtraAttributes));
+        return DefaultServerCluster::Attributes(path, builder);
+    }
+
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
     {
@@ -832,7 +844,7 @@ public:
     }
 
     Access::Privilege mEventInfoFakePrivilege = Access::Privilege::kView;
-};
+}; // namespace
 
 template <typename T, EmberAfAttributeType ZclType>
 void TestEmberScalarTypeRead(typename NumericAttributeTraits<T>::WorkingType value)
@@ -2654,8 +2666,12 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
         ReadOnlyBufferBuilder<AttributeEntry> builder;
         ASSERT_EQ(model.Attributes(kTestClusterPath, builder), CHIP_NO_ERROR);
 
+        ReadOnlyBufferBuilder<AttributeEntry> expectedEntriesBuilder;
+        ASSERT_EQ(expectedEntriesBuilder.AppendElements(FakeDefaultServerCluster::kExtraAttributes), CHIP_NO_ERROR);
+        ASSERT_EQ(expectedEntriesBuilder.AppendElements(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
+
         // Attributes will be just global attributes
-        ASSERT_TRUE(DefaultServerCluster::GlobalAttributes().data_equal(builder.TakeBuffer()));
+        ASSERT_TRUE(expectedEntriesBuilder.TakeBuffer().data_equal(builder.TakeBuffer()));
     }
 
     {
@@ -2684,7 +2700,7 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
 
     // Write attribute also has a specific error to know the right code is called
     {
-        WriteOperation test(kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kAttributeIdReadOnly);
+        WriteOperation test(kTestClusterPath.mEndpointId, kTestClusterPath.mClusterId, kAttributeIdTimedWrite);
         test.SetSubjectDescriptor(kAdminSubjectDescriptor);
 
         AttributeValueDecoder decoder = test.DecoderFor<uint32_t>(1234);

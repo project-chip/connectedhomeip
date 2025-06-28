@@ -300,6 +300,10 @@
 		7567A2102DA5ABCF00D91529 /* DefaultServerCluster.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7567A20B2DA5ABCE00D91529 /* DefaultServerCluster.cpp */; };
 		7567A2112DA5ABCF00D91529 /* ServerClusterInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 7567A20C2DA5ABCE00D91529 /* ServerClusterInterface.h */; };
 		7567A2122DA5ABCF00D91529 /* ServerClusterInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7567A20D2DA5ABCE00D91529 /* ServerClusterInterface.cpp */; };
+		7567A2152E05FCD200D91529 /* EmberAttributeStorageImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7567A2132E05FCD100D91529 /* EmberAttributeStorageImpl.cpp */; };
+		7567A2162E05FCD200D91529 /* EmberAttributeStorageImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7567A2132E05FCD100D91529 /* EmberAttributeStorageImpl.cpp */; };
+		7567A2172E05FCD200D91529 /* EmberAttributeStorageImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 7567A2142E05FCD100D91529 /* EmberAttributeStorageImpl.h */; };
+		7567A2182E05FCD200D91529 /* EmberAttributeStorageImpl.h in Headers */ = {isa = PBXBuildFile; fileRef = 7567A2142E05FCD100D91529 /* EmberAttributeStorageImpl.h */; };
 		757DA30A2DB035A900E4AD75 /* DefaultServerCluster.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7567A20B2DA5ABCE00D91529 /* DefaultServerCluster.cpp */; };
 		757DA30B2DB035A900E4AD75 /* ServerClusterInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7567A20D2DA5ABCE00D91529 /* ServerClusterInterface.cpp */; };
 		757DA3102DB0369100E4AD75 /* ota-provider-cluster.h in Headers */ = {isa = PBXBuildFile; fileRef = 757DA30D2DB0369100E4AD75 /* ota-provider-cluster.h */; };
@@ -912,6 +916,8 @@
 		7567A20B2DA5ABCE00D91529 /* DefaultServerCluster.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DefaultServerCluster.cpp; sourceTree = "<group>"; };
 		7567A20C2DA5ABCE00D91529 /* ServerClusterInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerClusterInterface.h; sourceTree = "<group>"; };
 		7567A20D2DA5ABCE00D91529 /* ServerClusterInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ServerClusterInterface.cpp; sourceTree = "<group>"; };
+		7567A2132E05FCD100D91529 /* EmberAttributeStorageImpl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EmberAttributeStorageImpl.cpp; sourceTree = "<group>"; };
+		7567A2142E05FCD100D91529 /* EmberAttributeStorageImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmberAttributeStorageImpl.h; sourceTree = "<group>"; };
 		757DA30D2DB0369100E4AD75 /* ota-provider-cluster.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ota-provider-cluster.h"; sourceTree = "<group>"; };
 		757DA30E2DB0369100E4AD75 /* ota-provider-cluster.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "ota-provider-cluster.cpp"; sourceTree = "<group>"; };
 		757DA30F2DB0369100E4AD75 /* ota-provider-delegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ota-provider-delegate.h"; sourceTree = "<group>"; };
@@ -1600,6 +1606,8 @@
 		7521D2932CBECE3F00218E16 /* codegen-data-model-provider */ = {
 			isa = PBXGroup;
 			children = (
+				7567A2132E05FCD100D91529 /* EmberAttributeStorageImpl.cpp */,
+				7567A2142E05FCD100D91529 /* EmberAttributeStorageImpl.h */,
 				7567A2022D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.cpp */,
 				7567A2012D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.h */,
 				7592BD092CC6BCC300EB74A0 /* EmberAttributeDataBuffer.h */,
@@ -2128,6 +2136,7 @@
 				037C3DCB2991BD5100B7EEE2 /* CHIPCommandStorageDelegate.h in Headers */,
 				037C3DD32991BD5200B7EEE2 /* logging.h in Headers */,
 				037C3DB72991BD5000B7EEE2 /* ModelCommandBridge.h in Headers */,
+				7567A2182E05FCD200D91529 /* EmberAttributeStorageImpl.h in Headers */,
 				B4D67A3B2D00DAB700C49965 /* XPCServerRegistry.h in Headers */,
 				7567A2042D7A1FFF00D91529 /* ServerClusterInterfaceRegistry.h in Headers */,
 				037C3DC52991BD5100B7EEE2 /* StorageManagementCommand.h in Headers */,
@@ -2250,6 +2259,7 @@
 				757DA3102DB0369100E4AD75 /* ota-provider-cluster.h in Headers */,
 				757DA3112DB0369100E4AD75 /* ota-provider-delegate.h in Headers */,
 				B4FCD56A2B5EDBD300832859 /* MTRDiagnosticLogsType.h in Headers */,
+				7567A2172E05FCD200D91529 /* EmberAttributeStorageImpl.h in Headers */,
 				5A6FEC9A27B5C89300F25F42 /* MTRDeviceControllerXPCConnection.h in Headers */,
 				5129BCFD26A9EE3300122DDF /* MTRError.h in Headers */,
 				93E610AA2B626E290077F02A /* MTRClusterNames.h in Headers */,
@@ -2508,6 +2518,7 @@
 				B4D67A932D527F4A00C49965 /* DisplayTermsAndConditions.cpp in Sources */,
 				B4D67A952D527F4A00C49965 /* JsonSchemaMacros.cpp in Sources */,
 				B45373C12A9FEA9100807602 /* close.c in Sources */,
+				7567A2162E05FCD200D91529 /* EmberAttributeStorageImpl.cpp in Sources */,
 				B45373D42A9FEB0C00807602 /* context.c in Sources */,
 				B45373E52A9FEBA400807602 /* date.c in Sources */,
 				B45373C42A9FEA9100807602 /* dummy-callback.c in Sources */,
@@ -2662,6 +2673,7 @@
 				9BFE5D512C6D3075007D4319 /* MTRDeviceController_XPC.mm in Sources */,
 				514A98B12CD98C5E000EF4FD /* MTRAttributeValueWaiter.mm in Sources */,
 				B2E0D7B3245B0B5C003C5B48 /* MTRError.mm in Sources */,
+				7567A2152E05FCD200D91529 /* EmberAttributeStorageImpl.cpp in Sources */,
 				51E51FC1282AD37A00FC978D /* MTRDeviceControllerStartupParams.mm in Sources */,
 				51565CAE2A79D42100469F18 /* MTRConversion.mm in Sources */,
 				517BF3F1282B62B800A8B7DB /* MTRCertificates.mm in Sources */,

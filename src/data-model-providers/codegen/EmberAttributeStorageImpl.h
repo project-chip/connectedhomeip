@@ -1,6 +1,5 @@
-/*
- *
- *    Copyright (c) 2020 Project CHIP Authors
+/**
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,22 +13,24 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-#include <app/util/basic-types.h>
+#include <app/storage/AttributeStorage.h>
 
 namespace chip {
 namespace app {
-namespace Clusters {
-namespace BasicInformation {
-/**
- * Check whether LocalConfigDisabled is set (on endpoint 0, which is the only
- * place the Basic Information cluster exists and can have the attribute be
- * set).
- */
-bool IsLocalConfigDisabled();
-} // namespace BasicInformation
-} // namespace Clusters
+namespace Storage {
+
+/// Provides an attribute storage implementation that is using
+/// AttributePersistenceProvider to implement read/write operations.
+class EmberAttributeStorageImpl : public AttributeStorage
+{
+public:
+    ~EmberAttributeStorageImpl() override = default;
+    CHIP_ERROR Write(const ConcreteAttributePath & path, const Value & value) override;
+    CHIP_ERROR Read(const ConcreteAttributePath & path, Buffer buffer) override;
+};
+
+} // namespace Storage
 } // namespace app
 } // namespace chip
