@@ -254,7 +254,7 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
     DataModel::Nullable<GenericDimensionStateStruct> ep3CurrentState;
     VerifyOrReturnError(ep3.GetLogic().GetCurrentState(ep3CurrentState) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to get current state for Endpoint 3"));
-                        
+
     DataModel::Nullable<GenericDimensionStateStruct> ep2TargetState;
     VerifyOrReturnError(ep2.GetLogic().GetTargetState(ep2TargetState) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to get target state for Endpoint 2"));
