@@ -78,15 +78,15 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::EnableCharging()");
 
-    if (maximumChargeCurrent < kMinimumChargeCurrent)
+    if (maximumChargeCurrent < kMinimumChargeCurrentLimit)
     {
         ChipLogError(AppServer, "Maximum Current outside limits");
         return Status::ConstraintError;
     }
 
-    if (minimumChargeCurrent < kMinimumChargeCurrent)
+    if (minimumChargeCurrent < kMinimumChargeCurrentLimit)
     {
-        ChipLogError(AppServer, "Maximum Current outside limits");
+        ChipLogError(AppServer, "Minimum Current outside limits");
         return Status::ConstraintError;
     }
 
@@ -341,7 +341,7 @@ Status EnergyEvseDelegate::HwRegisterEvseCallbackHandler(EVSECallbackFunc handle
  */
 Status EnergyEvseDelegate::HwSetMaxHardwareCurrentLimit(int64_t currentmA)
 {
-    if (currentmA < kMinimumChargeCurrent)
+    if (currentmA < kMinimumChargeCurrentLimit)
     {
         return Status::ConstraintError;
     }
@@ -350,6 +350,27 @@ Status EnergyEvseDelegate::HwSetMaxHardwareCurrentLimit(int64_t currentmA)
     mMaxHardwareCurrentLimit = currentmA;
 
     return ComputeMaxChargeCurrentLimit();
+}
+
+/**
+ * @brief    Called by EVSE Hardware to notify the delegate of the nominal
+ *           mains voltage (in mV)
+ *
+ *           This is normally called at start-up.
+ *
+ * @param   voltage_mV - nominal mains voltage
+ */
+Status EnergyEvseDelegate::HwSetNominalMainsVoltage(int64_t voltage_mV)
+{
+    if (voltage_mV < kMinimumMainsVoltage_mV)
+    {
+        ChipLogError(AppServer, "Mains voltage looks too low - check value is in mV");
+        return Status::ConstraintError;
+    }
+
+    mNominalMainsVoltage = voltage_mV;
+
+    return Status::Success;
 }
 
 /**
@@ -363,7 +384,7 @@ Status EnergyEvseDelegate::HwSetMaxHardwareCurrentLimit(int64_t currentmA)
  */
 Status EnergyEvseDelegate::HwSetCircuitCapacity(int64_t currentmA)
 {
-    if (currentmA < kMinimumChargeCurrent)
+    if (currentmA < kMinimumChargeCurrentLimit)
     {
         return Status::ConstraintError;
     }
@@ -388,7 +409,7 @@ Status EnergyEvseDelegate::HwSetCircuitCapacity(int64_t currentmA)
  */
 Status EnergyEvseDelegate::HwSetCableAssemblyLimit(int64_t currentmA)
 {
-    if (currentmA < kMinimumChargeCurrent)
+    if (currentmA < kMinimumChargeCurrentLimit)
     {
         return Status::ConstraintError;
     }
@@ -1584,9 +1605,10 @@ DataModel::Nullable<Percent> EnergyEvseDelegate::GetStateOfCharge()
 {
     return mStateOfCharge;
 }
-CHIP_ERROR EnergyEvseDelegate::SetStateOfCharge(DataModel::Nullable<uint8_t> newValue)
+
+CHIP_ERROR EnergyEvseDelegate::SetStateOfCharge(DataModel::Nullable<Percent> newValue)
 {
-    DataModel::Nullable<uint8_t> oldValue = mStateOfCharge;
+    DataModel::Nullable<Percent> oldValue = mStateOfCharge;
 
     mStateOfCharge = newValue;
     if (oldValue != newValue)
