@@ -158,7 +158,7 @@ class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):
                               "MaxPresets attribute is a mandatory attribute if MPRESETS.")
 
             # For now force a preset to be present so there is something to read
-            await self.send_save_presets_command(endpoint, name="newpreset")
+            await self.send_save_preset_command(endpoint, name="newpreset")
 
             max_presets_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MaxPresets)
 

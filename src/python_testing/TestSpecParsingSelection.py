@@ -38,16 +38,16 @@ class TestSpecParsingSelection(MatterBaseTest, DeviceConformanceTests):
                              "Incorrect directory selected for 1.4.1")
         asserts.assert_equal(dm_from_spec_version(0x01040100), PrebuiltDataModelDirectory.k1_4_1,
                              "Incorrect directory selected for 1.4.1")
-        asserts.assert_equal(dm_from_spec_version(0x01050000), PrebuiltDataModelDirectory.k1_5,
-                             "Incorrect directory selected for 1.5")
+        asserts.assert_equal(dm_from_spec_version(0x01040200), PrebuiltDataModelDirectory.k1_4_2,
+                             "Incorrect directory selected for 1.4.2")
 
         # We don't have data model files for 1.2, so these should error
         with asserts.assert_raises(ConformanceException, "Expected assertion was not raised for spec version 1.2"):
             dm_from_spec_version(0x01020000)
 
-        # Any dot release besides 0 and 1 for 1.4 should error
+        # Any dot release besides 0, 1 and 2 for 1.4 should error
         with asserts.assert_raises(ConformanceException, "Data model incorrectly identified for 1.4.2"):
-            dm_from_spec_version(0x01040200)
+            dm_from_spec_version(0x01040300)
 
         with asserts.assert_raises(ConformanceException, "Data model incorrectly identified for 1.4.FF"):
             dm_from_spec_version(0x0104FF00)

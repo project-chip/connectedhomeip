@@ -29,7 +29,7 @@ jobs:
     if: github.actor != 'restyled-io[bot]'
     
     container:
-      image: ghcr.io/project-chip/chip-build:119
+      image: ghcr.io/project-chip/chip-build:140
       options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
     
     steps:
@@ -57,7 +57,11 @@ jobs:
             src/python_testing/matter_testing_infrastructure/chip/testing/apps.py \
             src/python_testing/matter_testing_infrastructure/chip/testing/tasks.py \
             src/python_testing/matter_testing_infrastructure/chip/testing/taglist_and_topology_test.py \
-            src/python_testing/matter_testing_infrastructure/chip/testing/pics.py"
+            src/python_testing/matter_testing_infrastructure/chip/testing/pics.py \
+            src/python_testing/matter_testing_infrastructure/chip/testing/choice_conformance.py \
+            src/python_testing/matter_testing_infrastructure/chip/testing/commissioning.py \
+            src/python_testing/matter_testing_infrastructure/chip/testing/decorators.py \
+            src/python_testing/matter_testing_infrastructure/chip/testing/basic_composition.py"
           
           # Print a reminder about expanding coverage
           echo "⚠️ NOTE: Currently only checking a subset of files. Remember to expand coverage!" 

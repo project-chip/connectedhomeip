@@ -42,19 +42,18 @@ public:
         mLastError = DataModel::Encode(mWriter, TLV::ContextTag(contextTag), std::forward<Args>(args)...);
     }
 
-    template <typename... Args>
-    void EncodeForWrite(uint8_t contextTag, Args &&... args)
+    template <typename T>
+    void EncodeRequestCommandFabricScopedStructField(uint8_t contextTag, const T & field)
     {
         VerifyOrReturn(mLastError == CHIP_NO_ERROR);
-        mLastError = DataModel::EncodeForWrite(mWriter, TLV::ContextTag(contextTag), std::forward<Args>(args)...);
+        mLastError = DataModel::EncodeForWrite(mWriter, TLV::ContextTag(contextTag), field);
     }
 
-    template <typename... Args>
-    void EncodeForRead(uint8_t contextTag, FabricIndex accessingFabricIndex, Args &&... args)
+    template <typename T>
+    void EncodeResponseCommandFabricScopedStructField(uint8_t contextTag, const uint8_t accessingFabricIndex, const T & field)
     {
         VerifyOrReturn(mLastError == CHIP_NO_ERROR);
-        mLastError =
-            DataModel::EncodeForRead(mWriter, TLV::ContextTag(contextTag), accessingFabricIndex, std::forward<Args>(args)...);
+        mLastError = DataModel::EncodeForRead(mWriter, TLV::ContextTag(contextTag), accessingFabricIndex, field);
     }
 
     CHIP_ERROR Finalize();

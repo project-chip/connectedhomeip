@@ -724,7 +724,7 @@ tests:
       response:
           saveAs: SpecificationVersionValue
           constraints:
-              anyOf: [0x01040000, 0x01040100, 0x01050000]
+              anyOf: [0x01040000, 0x01040100, 0x01040200]
               hasMasksClear: [0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80]
 
     - label:

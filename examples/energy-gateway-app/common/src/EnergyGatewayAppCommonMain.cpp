@@ -20,6 +20,7 @@
 #include "CommodityPriceMain.h"
 #include "CommodityTariffMain.h"
 #include "ElectricalGridConditionsMain.h"
+#include "MeterIdentificationInstance.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>

@@ -17,6 +17,7 @@
 
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/BitFlags.h>
+#include <lib/support/Span.h>
 
 #include <cstdint>
 
@@ -39,6 +40,8 @@ struct ClusterConfiguration
 {
     EndpointId endpointNumber;
     BitFlags<FeatureEnumType> featureMap;
+    Span<const AttributeId> enabledAttributes;
+    Span<const CommandId> enabledCommands;
 };
 
 } // namespace StaticApplicationConfig

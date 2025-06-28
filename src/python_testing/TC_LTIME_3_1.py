@@ -27,6 +27,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 0
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -40,7 +41,7 @@ import logging
 import chip.clusters as Clusters
 from chip.interaction_model import Status
 from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 
 
@@ -68,22 +69,23 @@ class TC_LTIME_3_1(MatterBaseTest):
             TestStep(6, "TH writes 255 (UseActiveLocale) to HourFormat attribute"),
             TestStep(7, "If the prior write was successful, TH reads HourFormat attribute",
                      "Verify that the value is 255 (UseActiveLocale)."),
-            TestStep(8, "TH reads SupportedCalendarTypes attribute from DUT and saves as `cluster_supported_calendar_types`",
-                     "Verify that the SupportedCalendarTypes attribute is of Enum8 datatype and only accepts values 0-11 (specific calendar types) and 255 (UseActiveLocale), as defined in the CalendarTypeEnum in the specification."),
-            TestStep(9, "TH reads ActiveCalendarType attribute from DUT",
+            TestStep(8, "TH writes 5 to HourFormat attribute", "Verify that the write request shows 0x87 (Constraint Error)."),
+            TestStep(9, "TH reads the feature map attribute. If the CALFMT feature is not supported, skip all remaining steps"),
+            TestStep(10, "TH reads SupportedCalendarTypes attribute from DUT and saves as `cluster_supported_calendar_types`",
+                     "Verify that the SupportedCalendarTypes attribute is of Enum8 datatype and only contains values from 0-11 (specific calendar types) and 255 (UseActiveLocale), as defined in the CalendarTypeEnum in the specification."),
+            TestStep(11, "TH reads ActiveCalendarType attribute from DUT",
                      "Verify that the ActiveCalendarType is in `cluster_supported_calendar_types`"),
-            TestStep(10, "For each entry in `cluster_supported_calendar_types`, TH writes that value to ActiveCalendarType, verifies that the write was successful and confirms the value via a read",
+            TestStep(12, "For each entry in `cluster_supported_calendar_types`, TH writes that value to ActiveCalendarType, verifies that the write was successful and confirms the value via a read",
                      "Write is successful and read value matches for every entry"),
-            TestStep(11, "TH finds the set of CalendarTypesEnum value that do not appear in `cluster_supported_calendar_types` and saves as `cluster_not_supported_calendar_types`"),
-            TestStep(12, "For each value in `cluster_unsupported_calendar_types`, TH writes the value to the ActiveCalendarType attributes",
+            TestStep(13, "TH finds the set of CalendarTypesEnum value that do not appear in `cluster_supported_calendar_types` and saves as `cluster_not_supported_calendar_types`"),
+            TestStep(14, "For each value in `cluster_unsupported_calendar_types`, TH writes the value to the ActiveCalendarType attributes",
                      "DUT returns CONSTRAINT_ERROR"),
-            TestStep(13, "TH writes 50 to ActiveCalendarType attribute",
+            TestStep(15, "TH writes 50 to ActiveCalendarType attribute",
                      "Verify that the write request shows 0x87 (Constraint Error)."),
-            TestStep(14, "TH writes 5 to HourFormat attribute", "Verify that the write request shows 0x87 (Constraint Error).")
         ]
         return steps
 
-    @async_test_body
+    @run_if_endpoint_matches(has_cluster(Clusters.TimeFormatLocalization))
     async def test_TC_LTIME_3_1(self):
         self.endpoint = self.get_endpoint(default=0)
         self.cluster = Clusters.TimeFormatLocalization
@@ -132,11 +134,23 @@ class TC_LTIME_3_1(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(8)
+        hourformat_status = await self.write_single_attribute(self.cluster.Attributes.HourFormat(5), self.endpoint, expect_success=False)
+        asserts.assert_equal(hourformat_status, Status.ConstraintError)
+
+        self.step(9)
+        feature_map = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.FeatureMap)
+        if (feature_map & self.cluster.Bitmaps.Feature.kCalendarFormat) == 0:
+            self.skip_all_remaining_steps(10)
+            return
+
+        self.step(10)
         calendar_type_values = set([i for i in range(0, 12)])
         calendar_type_values.add(255)
         cluster_supported_calendar_types = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.SupportedCalendarTypes)
+        asserts.assert_true(set(cluster_supported_calendar_types).issubset(
+            set(calendar_type_values)), "SupportedCalendarTypes contains unknown values")
 
-        self.step(9)
+        self.step(11)
         active_calendar_type = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.ActiveCalendarType)
         logging.info(f"Value for {active_calendar_type}")
         matter_asserts.assert_valid_uint8(active_calendar_type, "ActiveCalendarType")
@@ -145,7 +159,7 @@ class TC_LTIME_3_1(MatterBaseTest):
         asserts.assert_in(active_calendar_type, cluster_supported_calendar_types,
                           "ActiveCalendarType is not listed in SupportedCalendarTypes")
 
-        self.step(10)
+        self.step(12)
         # Verify the supported calendar types are active (can read and write).
         for supported in cluster_supported_calendar_types:
             logging.info(f"Testing for SupportedCalendarType value {supported}")
@@ -153,10 +167,10 @@ class TC_LTIME_3_1(MatterBaseTest):
             active_calendar_type = await self.read_single_attribute_check_success(self.cluster, self.cluster.Attributes.ActiveCalendarType)
             asserts.assert_equal(active_calendar_type, supported)
 
-        self.step(11)
+        self.step(13)
         cluster_not_supported_calendar_types = calendar_type_values - set(cluster_supported_calendar_types)
 
-        self.step(12)
+        self.step(14)
         # If is the case for not supported check they return a ConstraintError
         for unsupported in cluster_not_supported_calendar_types:
             status = await self.write_single_attribute(self.cluster.Attributes.ActiveCalendarType(
@@ -164,13 +178,9 @@ class TC_LTIME_3_1(MatterBaseTest):
             asserts.assert_equal(status, Status.ConstraintError,
                                  f"ConstraintError, unable to write value {unsupported} into ActiveCalendarType")
 
-        self.step(13)
+        self.step(15)
         activecalendartype_status = await self.write_single_attribute(self.cluster.Attributes.ActiveCalendarType(50), self.endpoint, expect_success=False)
         asserts.assert_equal(activecalendartype_status, Status.ConstraintError)
-
-        self.step(14)
-        hourformat_status = await self.write_single_attribute(self.cluster.Attributes.HourFormat(5), self.endpoint, expect_success=False)
-        asserts.assert_equal(hourformat_status, Status.ConstraintError)
 
 
 if __name__ == "__main__":

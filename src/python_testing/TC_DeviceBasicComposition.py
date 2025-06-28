@@ -180,12 +180,13 @@ from chip import ChipUtility
 from chip.clusters.Attribute import ValueDecodeFailure
 from chip.clusters.ClusterObjects import ClusterAttributeDescriptor, ClusterObjectFieldDescriptor
 from chip.clusters.Types import Nullable
+from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, CommandIdType, GlobalAttributeIds, attribute_id_type,
                                                cluster_id_type, command_id_type)
 from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, MatterBaseTest, TestStep,
-                                         async_test_body, default_matter_test_main)
+                                         UnknownProblemLocation, async_test_body, default_matter_test_main)
 from chip.testing.taglist_and_topology_test import (create_device_type_list_for_root, create_device_type_lists,
                                                     find_tag_list_problems, find_tree_roots, flat_list_ok,
                                                     get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
@@ -456,11 +457,10 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
                             continue
 
                         attribute_value = cluster[attribute_id]
-                        if isinstance(attribute_value, ValueDecodeFailure):
-                            self.record_warning(self.get_test_name(), location=location,
-                                                problem=f"Found a failure to read/decode {attribute_string} on {location.as_cluster_string(self.cluster_mapper)} when it was claimed as supported in AttributeList ({attribute_list}): {str(attribute_value)}", spec_location="AttributeList Attribute")
-                            # Warn only for now
-                            # TODO: Fail in the future
+                        if isinstance(attribute_value, ValueDecodeFailure) and cluster_id != Clusters.Objects.UnitTesting.id:
+                            self.record_error(self.get_test_name(), location=location,
+                                              problem=f"Found a failure to read/decode {attribute_string} on {location.as_cluster_string(self.cluster_mapper)} when it was claimed as supported in AttributeList ({attribute_list}): {str(attribute_value)}", spec_location="AttributeList Attribute")
+                            success = False
                             continue
                     for attribute_id in cluster:
                         if attribute_id not in attribute_list:
@@ -673,6 +673,28 @@ class TC_DeviceBasicComposition(MatterBaseTest, BasicCompositionTests):
         if not success:
             self.fail_current_test(
                 "At least one cluster has failed the range and support checks for its listed attributes, commands or features")
+
+        # Wildcard reads of events: event list MUST NOT be empty since at least a boot event should be registered.
+        self.print_step(12, "Validate that event wildcard subscription works")
+
+        test_failure = None
+        try:
+            subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id,
+                                                                   events=[('*')],
+                                                                   fabricFiltered=False,
+                                                                   reportInterval=(100, 1000))
+            if len(subscription.GetEvents()) == 0:
+                test_failure = 'Wildcard event subscription returned no events'
+        except ChipStackError as e:  # chipstack-ok: assert_raises not suitable here since error must be inspected before determining test outcome
+            # Connection over PASE will fail subscriptions with "Unsupported access"
+            # TODO: ideally we should SKIP this test for PASE connections
+            _IM_UNSUPPORTED_ACCESS_CODE = 0x500 + Status.UnsupportedAccess
+            if e.code != _IM_UNSUPPORTED_ACCESS_CODE:
+                test_failure = f"Failed to wildcard subscribe events(*): {e}"
+
+        if test_failure:
+            self.record_error(self.get_test_name(), problem=test_failure, location=UnknownProblemLocation())
+            self.fail_current_test(test_failure)
 
     def test_TC_IDM_11_1(self):
         success = True

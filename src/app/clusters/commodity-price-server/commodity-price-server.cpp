@@ -246,6 +246,15 @@ Instance::GetDetailedForecastRequest(BitMask<CommodityPriceDetailBitmap> details
     size_t count      = 0;
     size_t bufferSize = mPriceForecast.size();
 
+    if (bufferSize == 0)
+    {
+        /* Special case when no forecast entries exist - calling calloc(0) returns NULL
+           and results in an error on some platforms */
+        forecastList = DataModel::List<const Structs::CommodityPriceStruct::Type>();
+
+        return CHIP_NO_ERROR;
+    }
+
     if (!forecastBuffer.Calloc(bufferSize))
     {
         ChipLogError(AppServer, "Memory allocation failed for forecast buffer");

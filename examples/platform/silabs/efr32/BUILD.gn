@@ -122,6 +122,7 @@ config("efr32-common-config") {
 
 source_set("efr32-common") {
   deps = [
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
     "${chip_root}/src/app/clusters/software-diagnostics-server:software-fault-listener",
     "${silabs_common_plat_dir}/provision:storage",
   ]
@@ -186,6 +187,11 @@ source_set("efr32-common") {
       "${chip_root}/third_party/openthread:openthread",
       "${chip_root}/third_party/openthread:openthread-platform",
     ]
+  }
+
+  if (sl_enable_rgb_led) {
+    sources += [ "${silabs_common_plat_dir}/led/RGBLEDWidget.cpp" ]
+    include_dirs = [ "${silabs_common_plat_dir}/rgb_led" ]
   }
 
   if (chip_build_libshell) {
