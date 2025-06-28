@@ -33,6 +33,7 @@ using namespace chip::app::Clusters::ClosureDimension::Attributes;
 namespace {
 
 constexpr Percent100ths kPercents100thsMaxValue = 10000;
+constexpr uint64_t kPositionQuietReportingInterval = 5000;
 
 } // namespace
 
@@ -70,7 +71,7 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance, const Clus
 // When Target.Position is reached, or
 // When CurrentState.Speed changes, or
 // When CurrentState.Latch changes.
-CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurrentStateStruct> & incomingCurrentState)
+CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimensionStateStruct> & incomingCurrentState)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -88,18 +89,28 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
             //  feature is supported by the closure. If the Positioning feature is not supported, return an error.
             VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-            VerifyOrReturnError(incomingCurrentState.Value().position.Value() <= kPercents100thsMaxValue,
+            if (!incomingCurrentState.Value().position.Value().IsNull()) 
+            {
+
+                VerifyOrReturnError(incomingCurrentState.Value().position.Value().Value() <= kPercents100thsMaxValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
 
+            }
+
+            bool targetPositionReached = false;
             auto now  = System::SystemClock().GetMonotonicTimestamp();
 
             // Logic to determine if target position is reached.
             // If the target position is reached, we need to report the current state.
-            bool targetPositionReached = (!mState.target.IsNull() && mState.target.Value().position == incomingCurrentState.Value().position);
+            if (!mState.targetState.IsNull() && mState.targetState.Value().position.HasValue() &&
+                 !mState.targetState.Value().position.Value().IsNull() &&
+                 mState.targetState.Value().position == incomingCurrentState.Value().position)
+            {
+                targetPositionReached = true;
+            }
 
             if (targetPositionReached)
             {
-                // if target position is reached, we need to report the current state.
                 auto predicate = [](const decltype(quietReportableCurrentStatePosition)::SufficientChangePredicateCandidate &) -> bool {
                     return true;
                 };
@@ -108,10 +119,11 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericCurren
             }
             else
             {   
-                // During transitions, reports should be once per 5 seconds
-                // Null to non-null or non-null to null changes are always reported as per default policy
-                System::Clock::Milliseconds64 reportInterval = System::Clock::Milliseconds64(5000);
+                // Predicate to report at most once every 5 seconds when the Position changes from one non-null value to another non-null value,
+                // or when the Position changes from null to any other value and vice versa
+                System::Clock::Milliseconds64 reportInterval = System::Clock::Milliseconds64(kPositionQuietReportingInterval);
                 auto predicate = quietReportableCurrentStatePosition.GetPredicateForSufficientTimeSinceLastDirty(reportInterval);
+
                 markDirty = (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.Value().position.Value(), now, predicate) 
                                 == AttributeDirtyState::kMustReport);
             }
