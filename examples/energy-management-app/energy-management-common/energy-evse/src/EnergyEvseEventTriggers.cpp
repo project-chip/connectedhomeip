@@ -142,7 +142,6 @@ void SetTestEventTrigger_EVSESetSoCLow()
     // Set SoC 20%, 70kWh BatterySize
     EnergyEvseDelegate * dg = GetEvseDelegate();
     dg->SetStateOfCharge(20);
-
     dg->SetBatteryCapacity(70000000);
 }
 void SetTestEventTrigger_EVSESetSoCHigh()
@@ -150,7 +149,6 @@ void SetTestEventTrigger_EVSESetSoCHigh()
     // Set SoC 95%, 70kWh BatterySize
     EnergyEvseDelegate * dg = GetEvseDelegate();
     dg->SetStateOfCharge(95);
-
     dg->SetBatteryCapacity(70000000);
 }
 void SetTestEventTrigger_EVSESetSoCClear()
