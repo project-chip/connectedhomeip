@@ -78,7 +78,8 @@ class TC_CADMIN(MatterBaseTest):
             setupPayloadInfo = self.get_setup_payload_info()
             if not setupPayloadInfo:
                 asserts.assert_true(
-                    False, 'passcode and discriminator must be provided values in order for this test to work due to using BCM, please rerun test with providing --passcode <value> and --discriminator <value>')
+                    False,
+                    'passcode and discriminator must be provided values in order for this test to work due to using BCM, please rerun test with providing --passcode <value> and --discriminator <value>')
 
         # Establishing TH1
         self.th1 = self.default_controller
@@ -207,7 +208,7 @@ class TC_CADMIN(MatterBaseTest):
                     nodeId=self.dut_node_id, setupPinCode=params2.setupPinCode,
                     filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
             except ChipStackError as e:  # chipstack-ok: This disables ChipStackError linter check. Error occurs if a NOC for the fabric already exists, which may depend on device state. Can not use assert_raises because it not always fails
-                asserts.assert_equal(e.err,  0x0000007E,
+                asserts.assert_equal(e.err, 0x0000007E,
                                      "Expected to return Trying to add NOC for fabric that already exists")
             """
             expected error:
@@ -227,7 +228,9 @@ class TC_CADMIN(MatterBaseTest):
         elif commission_type == "BCM":
             self.step(7)
 
-        # TH_CR2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx
+        # TH_CR2 reads the CurrentFabricIndex attribute from the Operational
+        # Credentials cluster and saves as th2_idx, TH_CR1 sends the RemoveFabric
+        # command to the DUT with the FabricIndex set to th2_idx
         th2_idx = await self.th2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)])
         outer_key = list(th2_idx.keys())[0]
         inner_key = list(th2_idx[outer_key].keys())[0]
@@ -295,7 +298,8 @@ class TC_CADMIN(MatterBaseTest):
     async def test_TC_CADMIN_1_3(self):
         await self.combined_commission_val_steps(commission_type="ECM")
 
-    @run_if_endpoint_matches(has_feature(cluster=Clusters.AdministratorCommissioning, feature=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic))
+    @run_if_endpoint_matches(has_feature(cluster=Clusters.AdministratorCommissioning,
+                             feature=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic))
     async def test_TC_CADMIN_1_4(self):
         await self.combined_commission_val_steps(commission_type="BCM")
 
