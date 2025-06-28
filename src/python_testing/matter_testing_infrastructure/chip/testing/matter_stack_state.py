@@ -31,6 +31,17 @@ if TYPE_CHECKING:
 
 
 class MatterStackState:
+    """
+    This class manages the state and initialization of the Matter stack.
+    Responsible for setting up the stack, persistent storage, and certificate authorities.
+
+    Args:
+        config (MatterTestConfig): Configuration for the stack.
+
+    Raises:
+        ValueError: If no storage path is provided.
+    """
+
     def __init__(self, config: 'MatterTestConfig'):
         self._logger = logger
         self._config = config
