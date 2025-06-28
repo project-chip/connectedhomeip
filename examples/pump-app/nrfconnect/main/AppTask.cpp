@@ -26,6 +26,7 @@
 #include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -37,6 +38,10 @@
 #include <lib/support/CodeUtils.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemClock.h>
+
+#ifdef CONFIG_NET_L2_OPENTHREAD
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#endif
 
 #if CONFIG_CHIP_OTA_REQUESTOR
 #include "OTAUtil.h"
@@ -88,6 +93,11 @@ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 #ifdef CONFIG_CHIP_CRYPTO_PSA
 chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
 #endif
+
+#ifdef CONFIG_NET_L2_OPENTHREAD
+app::Clusters::NetworkCommissioning::InstanceAndDriver<DeviceLayer::NetworkCommissioning::GenericThreadDriver>
+    sThreadNetworkDriver(0 /*endpointId*/);
+#endif
 } // namespace
 
 namespace LedConsts {
@@ -138,6 +148,8 @@ CHIP_ERROR AppTask::Init()
         LOG_ERR("ConnectivityMgr().SetThreadDeviceType() failed");
         return err;
     }
+
+    sThreadNetworkDriver.Init();
 #elif !defined(CONFIG_WIFI_NRF70)
     return CHIP_ERROR_INTERNAL;
 #endif

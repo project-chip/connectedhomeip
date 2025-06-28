@@ -32,22 +32,22 @@ using namespace chip::app::Clusters::ClosureControl;
 
 TEST(GenericOverallStateTest, DefaultConstructor)
 {
-    GenericOverallState state;
-    EXPECT_FALSE(state.positioning.HasValue());
+    GenericOverallCurrentState state;
+    EXPECT_FALSE(state.position.HasValue());
     EXPECT_FALSE(state.latch.HasValue());
     EXPECT_FALSE(state.speed.HasValue());
 }
 
 TEST(GenericOverallStateTest, ParameterizedConstructor)
 {
-    auto positioning = Optional<DataModel::Nullable<PositioningEnum>>(MakeNullable(PositioningEnum::kFullyClosed));
-    auto latch       = Optional<DataModel::Nullable<bool>>(MakeNullable(true));
-    auto speed       = Optional<DataModel::Nullable<Globals::ThreeLevelAutoEnum>>(MakeNullable(Globals::ThreeLevelAutoEnum::kAuto));
+    auto position = Optional<DataModel::Nullable<CurrentPositionEnum>>(MakeNullable(CurrentPositionEnum::kFullyClosed));
+    auto latch    = Optional<DataModel::Nullable<bool>>(MakeNullable(true));
+    auto speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto);
 
-    GenericOverallState state(positioning, latch, speed, NullOptional);
+    GenericOverallCurrentState state(position, latch, speed, NullOptional);
 
-    EXPECT_TRUE(state.positioning.HasValue());
-    EXPECT_EQ(state.positioning.Value(), PositioningEnum::kFullyClosed);
+    EXPECT_TRUE(state.position.HasValue());
+    EXPECT_EQ(state.position.Value(), CurrentPositionEnum::kFullyClosed);
     EXPECT_TRUE(state.latch.HasValue());
     EXPECT_EQ(state.latch.Value(), true);
     EXPECT_TRUE(state.speed.HasValue());
@@ -56,14 +56,14 @@ TEST(GenericOverallStateTest, ParameterizedConstructor)
 
 TEST(GenericOverallStateTest, EqualityOperator)
 {
-    auto positioning1 = Optional<DataModel::Nullable<PositioningEnum>>(MakeNullable(PositioningEnum::kFullyClosed));
+    auto positioning1 = Optional<DataModel::Nullable<CurrentPositionEnum>>(MakeNullable(CurrentPositionEnum::kFullyClosed));
     auto latching1    = Optional<DataModel::Nullable<bool>>(MakeNullable(true));
 
-    auto positioning2 = Optional<DataModel::Nullable<PositioningEnum>>(MakeNullable(PositioningEnum::kFullyClosed));
+    auto positioning2 = Optional<DataModel::Nullable<CurrentPositionEnum>>(MakeNullable(CurrentPositionEnum::kFullyClosed));
     auto latching2    = Optional<DataModel::Nullable<bool>>(MakeNullable(true));
 
-    GenericOverallState state1(positioning1, latching1);
-    GenericOverallState state2(positioning2, latching2);
+    GenericOverallCurrentState state1(positioning1, latching1);
+    GenericOverallCurrentState state2(positioning2, latching2);
 
     EXPECT_TRUE(state1 == state2);
 
@@ -74,22 +74,21 @@ TEST(GenericOverallStateTest, EqualityOperator)
 
 TEST(GenericOverallStateTest, CopyConstructor)
 {
-    auto positioning = Optional<DataModel::Nullable<PositioningEnum>>(MakeNullable(PositioningEnum::kFullyClosed));
-    auto latch       = Optional<DataModel::Nullable<bool>>(MakeNullable(true));
-    auto speed       = Optional<DataModel::Nullable<Globals::ThreeLevelAutoEnum>>(MakeNullable(Globals::ThreeLevelAutoEnum::kAuto));
+    auto position = Optional<DataModel::Nullable<CurrentPositionEnum>>(MakeNullable(CurrentPositionEnum::kFullyClosed));
+    auto latch    = Optional<DataModel::Nullable<bool>>(MakeNullable(true));
+    auto speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto);
 
-    GenericOverallState originalState(positioning, latch, speed, NullOptional);
-    GenericOverallState copiedState(originalState);
+    GenericOverallCurrentState originalState(position, latch, speed, NullOptional);
+    GenericOverallCurrentState copiedState(originalState);
 
     // Modify the original object
-    originalState.positioning = Optional<DataModel::Nullable<PositioningEnum>>(MakeNullable(PositioningEnum::kFullyOpened));
-    originalState.latch       = Optional<DataModel::Nullable<bool>>(MakeNullable(false));
-    originalState.speed =
-        Optional<DataModel::Nullable<Globals::ThreeLevelAutoEnum>>(MakeNullable(Globals::ThreeLevelAutoEnum::kLow));
+    originalState.position = Optional<DataModel::Nullable<CurrentPositionEnum>>(MakeNullable(CurrentPositionEnum::kFullyOpened));
+    originalState.latch    = Optional<DataModel::Nullable<bool>>(MakeNullable(false));
+    originalState.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
 
     // Validate that the copied object remains unchanged
-    EXPECT_TRUE(copiedState.positioning.HasValue());
-    EXPECT_EQ(copiedState.positioning.Value(), PositioningEnum::kFullyClosed);
+    EXPECT_TRUE(copiedState.position.HasValue());
+    EXPECT_EQ(copiedState.position.Value(), CurrentPositionEnum::kFullyClosed);
     EXPECT_TRUE(copiedState.latch.HasValue());
     EXPECT_EQ(copiedState.latch.Value(), true);
     EXPECT_TRUE(copiedState.speed.HasValue());
@@ -98,7 +97,7 @@ TEST(GenericOverallStateTest, CopyConstructor)
 
 TEST(GenericOverallTargetTest, DefaultConstructor)
 {
-    GenericOverallTarget target;
+    GenericOverallTargetState target;
     EXPECT_FALSE(target.position.HasValue());
     EXPECT_FALSE(target.latch.HasValue());
     EXPECT_FALSE(target.speed.HasValue());
@@ -106,14 +105,14 @@ TEST(GenericOverallTargetTest, DefaultConstructor)
 
 TEST(GenericOverallTargetTest, ParameterizedConstructor)
 {
-    auto position = Optional<TargetPositionEnum>(TargetPositionEnum::kCloseInFull);
+    auto position = Optional<TargetPositionEnum>(TargetPositionEnum::kMoveToFullyClosed);
     auto latch    = Optional<bool>(true);
     auto speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh);
 
-    GenericOverallTarget target(position, latch, speed);
+    GenericOverallTargetState target(position, latch, speed);
 
     EXPECT_TRUE(target.position.HasValue());
-    EXPECT_EQ(target.position.Value(), TargetPositionEnum::kCloseInFull);
+    EXPECT_EQ(target.position.Value(), TargetPositionEnum::kMoveToFullyClosed);
     EXPECT_TRUE(target.latch.HasValue());
     EXPECT_EQ(target.latch.Value(), true);
     EXPECT_TRUE(target.speed.HasValue());
@@ -122,14 +121,14 @@ TEST(GenericOverallTargetTest, ParameterizedConstructor)
 
 TEST(GenericOverallTargetTest, EqualityOperator)
 {
-    auto position1 = Optional<TargetPositionEnum>(TargetPositionEnum::kCloseInFull);
+    auto position1 = Optional<TargetPositionEnum>(TargetPositionEnum::kMoveToFullyClosed);
     auto latch1    = Optional<bool>(true);
 
-    auto position2 = Optional<TargetPositionEnum>(TargetPositionEnum::kCloseInFull);
+    auto position2 = Optional<TargetPositionEnum>(TargetPositionEnum::kMoveToFullyClosed);
     auto latch2    = Optional<bool>(true);
 
-    GenericOverallTarget target1(position1, latch1);
-    GenericOverallTarget target2(position2, latch2);
+    GenericOverallTargetState target1(position1, latch1);
+    GenericOverallTargetState target2(position2, latch2);
 
     EXPECT_TRUE(target1 == target2);
 
@@ -140,21 +139,21 @@ TEST(GenericOverallTargetTest, EqualityOperator)
 
 TEST(GenericOverallTargetTest, CopyConstructor)
 {
-    auto position = Optional<TargetPositionEnum>(TargetPositionEnum::kCloseInFull);
+    auto position = Optional<TargetPositionEnum>(TargetPositionEnum::kMoveToFullyClosed);
     auto latch    = Optional<bool>(true);
     auto speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh);
 
-    GenericOverallTarget originalTarget(position, latch, speed);
-    GenericOverallTarget copiedTarget(originalTarget);
+    GenericOverallTargetState originalTarget(position, latch, speed);
+    GenericOverallTargetState copiedTarget(originalTarget);
 
     // Modify the original object
-    originalTarget.position = Optional<TargetPositionEnum>(TargetPositionEnum::kOpenInFull);
+    originalTarget.position = Optional<TargetPositionEnum>(TargetPositionEnum::kMoveToFullyOpen);
     originalTarget.latch    = Optional<bool>(false);
     originalTarget.speed    = Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow);
 
     // Validate that the copied object remains unchanged
     EXPECT_TRUE(copiedTarget.position.HasValue());
-    EXPECT_EQ(copiedTarget.position.Value(), TargetPositionEnum::kCloseInFull);
+    EXPECT_EQ(copiedTarget.position.Value(), TargetPositionEnum::kMoveToFullyClosed);
     EXPECT_TRUE(copiedTarget.latch.HasValue());
     EXPECT_EQ(copiedTarget.latch.Value(), true);
     EXPECT_TRUE(copiedTarget.speed.HasValue());

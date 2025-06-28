@@ -4245,7 +4245,7 @@ cluster BooleanStateConfiguration = 128 {
 
 /** This cluster is used to configure a valve. */
 cluster ValveConfigurationAndControl = 129 {
-  revision 1;
+  revision 2;
 
   enum StatusCodeEnum : enum8 {
     kFailureDueToFault = 2;
@@ -7439,6 +7439,72 @@ provisional cluster Chime = 1366 {
   command PlayChimeSound(): DefaultSuccess = 0;
 }
 
+/** This Cluster is used to provision TLS Endpoints with enough information to facilitate subsequent connection. */
+provisional cluster TlsClientManagement = 2050 {
+  revision 1;
+
+  enum StatusCodeEnum : enum8 {
+    kEndpointAlreadyInstalled = 2;
+    kRootCertificateNotFound = 3;
+    kClientCertificateNotFound = 4;
+    kEndpointInUse = 5;
+  }
+
+  enum TLSEndpointStatusEnum : enum8 {
+    kProvisioned = 0;
+    kInUse = 1;
+  }
+
+  fabric_scoped struct TLSEndpointStruct {
+    int16u endpointID = 0;
+    octet_string<253> hostname = 1;
+    int16u port = 2;
+    int16u caid = 3;
+    nullable int16u ccdid = 4;
+    TLSEndpointStatusEnum status = 5;
+    fabric_idx fabricIndex = 254;
+  }
+
+  readonly attribute int8u maxProvisioned = 0;
+  readonly attribute TLSEndpointStruct provisionedEndpoints[] = 1;
+  readonly attribute command_id generatedCommandList[] = 65528;
+  readonly attribute command_id acceptedCommandList[] = 65529;
+  readonly attribute attrib_id attributeList[] = 65531;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
+
+  request struct ProvisionEndpointRequest {
+    octet_string<253> hostname = 0;
+    int16u port = 1;
+    int16u caid = 2;
+    nullable int16u ccdid = 3;
+    nullable int16u endpointID = 4;
+  }
+
+  response struct ProvisionEndpointResponse = 1 {
+    int16u endpointID = 0;
+  }
+
+  request struct FindEndpointRequest {
+    int16u endpointID = 0;
+  }
+
+  response struct FindEndpointResponse = 3 {
+    TLSEndpointStruct endpoint = 0;
+  }
+
+  request struct RemoveEndpointRequest {
+    int16u endpointID = 0;
+  }
+
+  /** This command is used to provision a TLS Endpoint for the provided HostName / Port combination. */
+  fabric command access(invoke: administer) ProvisionEndpoint(ProvisionEndpointRequest): ProvisionEndpointResponse = 0;
+  /** This command is used to find a TLS Endpoint by its ID. */
+  fabric command FindEndpoint(FindEndpointRequest): FindEndpointResponse = 2;
+  /** This command is used to remove a TLS Endpoint by its ID. */
+  fabric command access(invoke: administer) RemoveEndpoint(RemoveEndpointRequest): DefaultSuccess = 4;
+}
+
 /** The Test Cluster is meant to validate the generated code */
 internal cluster UnitTesting = 4294048773 {
   revision 1; // NOTE: Default/not specifically set
@@ -9815,6 +9881,22 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
 
     handle command PlayChimeSound;
+  }
+
+  server cluster TlsClientManagement {
+    callback attribute maxProvisioned;
+    callback attribute provisionedEndpoints;
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    callback attribute clusterRevision;
+
+    handle command ProvisionEndpoint;
+    handle command ProvisionEndpointResponse;
+    handle command FindEndpoint;
+    handle command FindEndpointResponse;
+    handle command RemoveEndpoint;
   }
 
   server cluster UnitTesting {
