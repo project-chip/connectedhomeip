@@ -68,6 +68,8 @@ from chip.storage import PersistentStorage
 from chip.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
                                         get_setup_payload_info_config)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
+from chip.testing.matter_global_defaults import (_DEFAULT_ADMIN_VENDOR_ID, _DEFAULT_CONTROLLER_NODE_ID, _DEFAULT_DUT_NODE_ID,
+                                                 _DEFAULT_LOG_PATH, _DEFAULT_STORAGE_PATH, _DEFAULT_TRUST_ROOT_INDEX)
 from chip.testing.pics import read_pics_from_file
 from chip.testing.runner import TestRunnerHooks, TestStep
 from chip.tlv import uint
@@ -80,13 +82,6 @@ logger = logging.getLogger("matter.python_testing")
 logger.setLevel(logging.INFO)
 
 DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
-
-_DEFAULT_ADMIN_VENDOR_ID = 0xFFF1
-_DEFAULT_STORAGE_PATH = "admin_storage.json"
-_DEFAULT_LOG_PATH = "/tmp/matter_testing/logs"
-_DEFAULT_CONTROLLER_NODE_ID = 112233
-_DEFAULT_DUT_NODE_ID = 0x12344321
-_DEFAULT_TRUST_ROOT_INDEX = 1
 
 
 def default_paa_rootstore_from_root(root_path: pathlib.Path) -> Optional[pathlib.Path]:
@@ -1970,7 +1965,8 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     if not populate_commissioning_args(args, config):
         sys.exit(1)
 
-    config.storage_path = pathlib.Path(_DEFAULT_STORAGE_PATH) if args.storage_path is None else args.storage_path
+    config.storage_path = pathlib.Path(
+        _DEFAULT_STORAGE_PATH) if args.storage_path is None else args.storage_path
     config.logs_path = pathlib.Path(_DEFAULT_LOG_PATH) if args.logs_path is None else args.logs_path
     config.paa_trust_store_path = args.paa_trust_store_path
     config.ble_controller = args.ble_controller
