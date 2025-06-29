@@ -800,9 +800,7 @@
             "MaxZones",
             "SensitivityMax",
             "Sensitivity",
-            "TwoDCartesianMax",
-            "FeatureMap",
-            "ClusterRevision"
+            "TwoDCartesianMax"
         ]
     },
     "mandatoryDeviceTypes": "0x0016",
