@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include "data-model-provider/MetadataTypes.h"
+#include "lib/core/DataModelTypes.h"
 #include <app/AppConfig.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeValueDecoder.h>
@@ -762,7 +764,7 @@ void WriteHandler::MoveToState(const State aTargetState)
 }
 
 DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::SubjectDescriptor & aSubject,
-                                                              const ConcreteAttributePath & aPath)
+                                                              const ConcreteDataAttributePath & aPath)
 {
     // TODO: ordering is to check writability/existence BEFORE ACL and this seems wrong, however
     //       existing unit tests (TC_AcessChecker.py) validate that we get UnsupportedWrite instead of UnsupportedAccess
@@ -780,11 +782,7 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     // if path is not valid, return a spec-compliant return code.
     if (!attributeEntry.has_value())
     {
-        // Global lists are not in metadata and not writable. Return the correct error code according to the spec
-        Status attributeErrorStatus =
-            IsSupportedGlobalAttributeNotInMetadata(aPath.mAttributeId) ? Status::UnsupportedWrite : Status::UnsupportedAttribute;
-
-        return DataModel::ValidateClusterPath(mDataModelProvider, aPath, attributeErrorStatus);
+        return DataModel::ValidateClusterPath(mDataModelProvider, aPath, Status::UnsupportedAttribute);
     }
 
     // Allow writes on writable attributes only
@@ -825,9 +823,36 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
         }
     }
 
-    // validate that timed write is enforced
+    // SPEC:
+    //   Else if the path indicates specific attribute data that requires a Timed Write
+    //   transaction to write and this action is not part of a Timed Write transaction,
+    //   an AttributeStatusIB SHALL be generated with the NEEDS_TIMED_INTERACTION Status Code.
     VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kTimed),
                         Status::NeedsTimedInteraction);
+
+    // SPEC:
+    //   Else if the attribute in the path indicates a fabric-scoped list and there is no accessing
+    //   fabric, an AttributeStatusIB SHALL be generated with the UNSUPPORTED_ACCESS Status Code,
+    //   with the Path field indicating only the path to the attribute.
+    if (attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kListAttribute) &&
+        attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kFabricScoped))
+    {
+        VerifyOrReturnError(aSubject.fabricIndex != kUndefinedFabricIndex, Status::UnsupportedAccess);
+    }
+
+    // SPEC:
+    //   Else if the DataVersion field of the AttributeDataIB is present and does not match the
+    //   data version of the indicated cluster instance, an AttributeStatusIB SHALL be generated
+    //   with the DATA_VERSION_MISMATCH Status Code.
+    if (aPath.mDataVersion.HasValue())
+    {
+        DataModel::ServerClusterFinder clusterFinder(mDataModelProvider);
+        std::optional<DataModel::ServerClusterEntry> cluster_entry = clusterFinder.Find(aPath);
+
+        // path is valid based on above checks (we have an attribute entry)
+        VerifyOrDie(cluster_entry.has_value());
+        VerifyOrReturnValue(cluster_entry->dataVersion == aPath.mDataVersion.Value(), Status::DataVersionMismatch);
+    }
 
     return Status::Success;
 }
