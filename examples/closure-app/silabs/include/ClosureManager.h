@@ -119,8 +119,11 @@ public:
 private:
     static ClosureManager sClosureMgr;
     osTimerId_t mClosureTimer;
+
     bool isCalibrationInProgress = false;
-    Action_t mCurrentAction      = Action_t::INVALID_ACTION;
+    bool isMoveToInProgress      = false;
+
+    Action_t mCurrentAction = Action_t::INVALID_ACTION;
 
     // Define the endpoint ID for the Closure
     static constexpr chip::EndpointId kClosureEndpoint       = 1;
@@ -191,4 +194,30 @@ private:
      * @param timerCbArg Pointer to the callback argument (unused).
      */
     static void TimerEventHandler(void * timerCbArg);
+
+    /**
+     * @brief Handles the motion action for closure endpoint.
+     *
+     * This method performs the latch action for closure endpoint and updates the current positions of endpoints 2 and 3
+     * to the next position towards their target positions and calls HandleClosureActionComplete if both endpoints
+     * have reached their target positions.
+     */
+    void HandleClosureMotionAction();
+
+    /**
+     * @brief Calculates the next position for a panel based on the closure panel state.
+     *
+     * This function determines the next position by incrementing or decrementing current position of the panel
+     * by a fixed step (1000 units) towards the target position, ensuring it does not overshoot the target.
+     *
+     * @param[in]  currentState   The current state of the panel, containing the current position.
+     * @param[in]  targetState    The target state of the panel, containing the desired position.
+     * @param[out] nextPosition   A reference to a Nullable object that will be updated with the next current position.
+     *
+     * @return true if the next position was updated and movement is required; false if no update is needed
+     *         or if either the current or target position is not set.
+     */
+    bool GetPanelNextPosition(const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & currentState,
+                              const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & targetState,
+                              chip::app::DataModel::Nullable<chip::Percent100ths> & nextPosition);
 };
