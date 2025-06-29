@@ -210,6 +210,18 @@ public:
      *          if access fails.
      */
     virtual CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    /**
+     * @brief Retrieves the current Joint Fabric mode.
+     *
+     * This method is intended to provide the current Joint Fabric Mode value.
+     * By default, it returns CHIP_ERROR_NOT_IMPLEMENTED and does not modify the output parameter.
+     *
+     * @param[out] jointFabricMode Reference to a uint8_t variable where the joint fabric mode will be stored.
+     * @returns CHIP_NO_ERROR on success, or another CHIP_ERROR from the underlying implementation
+     *          if access fails.
+     */
+    virtual CHIP_ERROR GetJointFabricMode(uint8_t & jointFabricMode) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 };
 
 /**
