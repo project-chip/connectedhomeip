@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
@@ -1836,7 +1837,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
     static constexpr bool kIsFabricScoped = true;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace TestCheckCommandFlags
 namespace TestDifferentVendorMeiRequest {

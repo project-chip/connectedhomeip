@@ -21,6 +21,7 @@
 #pragma once
 
 #include <app/data-model/DecodableList.h>
+#include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
 #include <app/data-model/NullObject.h>
@@ -121,7 +122,7 @@ public:
 
     Structs::TransportOptionsStruct::DecodableType transportOptions;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace AllocatePushTransport
 namespace AllocatePushTransportResponse {
@@ -188,7 +189,7 @@ public:
 
     uint16_t connectionID = static_cast<uint16_t>(0);
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace DeallocatePushTransport
 namespace ModifyPushTransport {
@@ -225,7 +226,7 @@ public:
     uint16_t connectionID = static_cast<uint16_t>(0);
     Structs::TransportOptionsStruct::DecodableType transportOptions;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace ModifyPushTransport
 namespace SetTransportStatus {
@@ -262,7 +263,7 @@ public:
     DataModel::Nullable<uint16_t> connectionID;
     TransportStatusEnum transportStatus = static_cast<TransportStatusEnum>(0);
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace SetTransportStatus
 namespace ManuallyTriggerTransport {
@@ -302,7 +303,7 @@ public:
     TriggerActivationReasonEnum activationReason = static_cast<TriggerActivationReasonEnum>(0);
     Optional<Structs::TransportMotionTriggerTimeControlStruct::DecodableType> timeControl;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace ManuallyTriggerTransport
 namespace FindTransport {
@@ -336,7 +337,7 @@ public:
 
     Optional<DataModel::Nullable<uint16_t>> connectionID;
 
-    CHIP_ERROR Decode(TLV::TLVReader & reader, FabricIndex aAccessingFabricIndex);
+    CHIP_ERROR Decode(DataModel::FabricAwareTLVReader & reader);
 };
 }; // namespace FindTransport
 namespace FindTransportResponse {
