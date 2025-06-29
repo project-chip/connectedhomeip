@@ -41,6 +41,7 @@ public:
         STOP_MOTION_ACTION,
         STOP_CALIBRATE_ACTION,
         SET_TARGET_ACTION,
+        PANEL_UNLATCH_ACTION,
 
         INVALID_ACTION
     };
@@ -220,10 +221,21 @@ private:
     /**
      * @brief Handles the SetTarget motion action for a panel endpoint.
      *
-     * This method Performs the latch actions for closure and updates the current positions
-     * of panel endpoint to next position.
+     * This method Performs the update the current positions of panel endpoint to next position
+     * and when target position is reached, it performs the latch action if required.
      *
      * @param endpointId The identifier of the endpoint for which the panel target action should be handled.
      */
     void HandlePanelSetTargetAction(chip::EndpointId endpointId);
+
+    /**
+     * @brief Handles the unlatch action for a closure panel.
+     *
+     * This method performs the unlatch action if required for the specified closure panel endpoint.
+     * It updates the current state of the panel and sets the target state accordingly and then calls
+     * HandlePanelSetTargetAction to move the panel to the target position.
+     *
+     * @param endpointId The identifier of the endpoint for which the unlatch action should be handled.
+     */
+    void HandlePanelUnlatchAction(chip::EndpointId endpointId);
 };

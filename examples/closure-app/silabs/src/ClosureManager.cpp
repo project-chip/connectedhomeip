@@ -157,6 +157,13 @@ void ClosureManager::InitiateAction(AppEvent * event)
         // the target position of the closure.
         instance.StartTimer(kMotionCountdownTimeMs);
         break;
+    case Action_t::PANEL_UNLATCH_ACTION:
+        ChipLogDetail(AppServer, "Initiating panel unlatch action");
+        // Timer used in sample application to simulate the panel unlatch process.
+        // In a real application, this would be replaced with actual logic to unlatch
+        // the closure panel
+        instance.StartTimer(kMotionCountdownTimeMs);
+        break;
     default:
         ChipLogDetail(AppServer, "Invalid action received in InitiateAction");
         return;
@@ -212,6 +219,12 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
         PlatformMgr().ScheduleWork([](intptr_t) {
             ClosureManager & instance = ClosureManager::GetInstance();
             instance.HandlePanelSetTargetAction(instance.mCurrentActionEndpointId);
+        });
+        break;
+    case Action_t::PANEL_UNLATCH_ACTION:
+        PlatformMgr().ScheduleWork([](intptr_t) {
+            ClosureManager & instance = ClosureManager::GetInstance();
+            instance.HandlePanelUnlatchAction(instance.mCurrentActionEndpointId);
         });
         break;
     default:
@@ -318,21 +331,6 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
         return Status::Failure;
     }
 
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * panelEp = nullptr;
-    if (endpointId == ep2.GetEndpoint())
-    {
-        panelEp = &ep2;
-    }
-    else if (endpointId == ep3.GetEndpoint())
-    {
-        panelEp = &ep3;
-    }
-    else
-    {
-        ChipLogError(AppServer, "HandlePanelSetTargetAction called with invalid endpointId: %u", endpointId);
-        return Status::Failure;
-    }
-
     // Update OverallTarget of Closure based on SetTarget command.
     DataModel::Nullable<GenericOverallTargetState> overallTargetState;
     VerifyOrReturnError(ep1.GetLogic().GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR, Status::Failure,
@@ -368,51 +366,17 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
     VerifyOrReturnError(ep1.GetLogic().SetMainState(MainStateEnum::kMoving) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set main state for move to command on Endpoint 1"));
 
-    DataModel::Nullable<GenericDimensionStateStruct> panelCurrentState = DataModel::NullNullable;
-    DataModel::Nullable<GenericDimensionStateStruct> panelTargetState  = DataModel::NullNullable;
-
-    VerifyOrReturnError(panelEp->GetLogic().GetCurrentState(panelCurrentState) == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(AppServer, "Failed to get current state for Endpoint %d", endpointId));
-    VerifyOrReturnError(!panelCurrentState.IsNull(), Status::Failure,
-                        ChipLogError(AppServer, "Current state is not set for Endpoint %d", endpointId));
-    VerifyOrReturnError(panelEp->GetLogic().GetTargetState(panelTargetState) == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(AppServer, "Failed to get target for Endpoint %d", endpointId));
-    VerifyOrReturnError(!panelTargetState.IsNull(), Status::Failure,
-                        ChipLogError(AppServer, "Target is not set for Endpoint %d", endpointId));
-
-    // If currently latched (true) and target is unlatched (false), unlatch first before starting motion
-    if (panelCurrentState.Value().latch.HasValue() && !panelCurrentState.Value().latch.Value().IsNull() &&
-        panelTargetState.Value().latch.HasValue() && !panelTargetState.Value().latch.Value().IsNull())
-    {
-        if (panelCurrentState.Value().latch.Value().Value() && !panelTargetState.Value().latch.Value().Value())
-        {
-
-            DataModel::Nullable<GenericOverallCurrentState> ep1OverallCurrentState = DataModel::NullNullable;
-            VerifyOrReturnError(ep1.GetLogic().GetOverallCurrentState(ep1OverallCurrentState) == CHIP_NO_ERROR, Status::Failure,
-                                ChipLogError(AppServer, "Failed to get current state for Endpoint 1"));
-            VerifyOrReturnError(!ep1OverallCurrentState.IsNull(), Status::Failure,
-                                ChipLogError(AppServer, "Current state is not set for Endpoint 1"));
-
-            // In Real application, this would be replaced with actual unlatch logic.
-            ChipLogProgress(AppServer, "Performing unlatch action");
-
-            ep1OverallCurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
-            ep1.GetLogic().SetOverallCurrentState(ep1OverallCurrentState);
-
-            panelCurrentState.Value().latch.SetValue(false);
-            panelEp->GetLogic().SetCurrentState(panelCurrentState);
-
-            ChipLogProgress(AppServer, "Unlatched action completed");
-        }
-    }
-
-    mCurrentAction           = Action_t::SET_TARGET_ACTION;
+    // Post an event to initiate the unlatch action asynchronously.
+    // Closure panel first performs the unlatch action if it is currently latched,
+    // and then continues with the SetTarget action.
+    // This is to ensure that the panel can move to the target position without being latched.
+    SetCurrentAction(Action_t::PANEL_UNLATCH_ACTION);
     mCurrentActionEndpointId = endpointId;
     isSetTargetInProgress    = true;
 
     AppEvent event;
     event.Type                    = AppEvent::kEventType_Closure;
-    event.ClosureEvent.Action     = Action_t::SET_TARGET_ACTION;
+    event.ClosureEvent.Action     = mCurrentAction;
     event.ClosureEvent.EndpointId = endpointId;
     event.Handler                 = InitiateAction;
 
@@ -503,4 +467,69 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
     }
 
     instance.HandleClosureActionComplete(Action_t::SET_TARGET_ACTION);
+}
+
+void ClosureManager::HandlePanelUnlatchAction(EndpointId endpointId)
+{
+    ClosureManager & instance = ClosureManager::GetInstance();
+
+    // Get the endpoint based on the endpointId
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * panelEp = nullptr;
+    if (endpointId == instance.ep2.GetEndpoint())
+    {
+        panelEp = &instance.ep2;
+    }
+    else if (endpointId == instance.ep3.GetEndpoint())
+    {
+        panelEp = &instance.ep3;
+    }
+    else
+    {
+        ChipLogError(AppServer, "HandlePanelSetTargetAction called with invalid endpointId: %u", endpointId);
+        return;
+    }
+
+    DataModel::Nullable<GenericDimensionStateStruct> panelCurrentState = DataModel::NullNullable;
+    DataModel::Nullable<GenericDimensionStateStruct> panelTargetState  = DataModel::NullNullable;
+
+    VerifyOrReturn(panelEp->GetLogic().GetCurrentState(panelCurrentState) == CHIP_NO_ERROR,
+                        ChipLogError(AppServer, "Failed to get current state for Endpoint %d", endpointId));
+    VerifyOrReturn(!panelCurrentState.IsNull(),
+                        ChipLogError(AppServer, "Current state is not set for Endpoint %d", endpointId));
+
+    VerifyOrReturn(panelEp->GetLogic().GetTargetState(panelTargetState) == CHIP_NO_ERROR,
+                        ChipLogError(AppServer, "Failed to get target for Endpoint %d", endpointId));
+    VerifyOrReturn(!panelTargetState.IsNull(),
+                        ChipLogError(AppServer, "Target is not set for Endpoint %d", endpointId));
+
+    // If currently latched (true) and target is unlatched (false), Perform unlatch action and call timer with SET_TARGET_ACTION
+    // to continue with the SetTarget action.
+    if (panelCurrentState.Value().latch.HasValue() && !panelCurrentState.Value().latch.Value().IsNull() &&
+        panelTargetState.Value().latch.HasValue() && !panelTargetState.Value().latch.Value().IsNull() &&
+        (panelCurrentState.Value().latch.Value().Value() && !panelTargetState.Value().latch.Value().Value()))
+    {
+        DataModel::Nullable<GenericOverallCurrentState> ep1OverallCurrentState = DataModel::NullNullable;
+
+        VerifyOrReturn(ep1.GetLogic().GetOverallCurrentState(ep1OverallCurrentState) == CHIP_NO_ERROR,
+                            ChipLogError(AppServer, "Failed to get current state for Endpoint 1"));
+        VerifyOrReturn(!ep1OverallCurrentState.IsNull(),
+                            ChipLogError(AppServer, "Current state is not set for Endpoint 1"));
+
+        // In Real application, this would be replaced with actual unlatch logic.
+        ChipLogProgress(AppServer, "Performing unlatch action");
+
+        ep1OverallCurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
+        ep1.GetLogic().SetOverallCurrentState(ep1OverallCurrentState);
+
+        panelCurrentState.Value().latch.SetValue(false);
+        panelEp->GetLogic().SetCurrentState(panelCurrentState);
+
+        ChipLogProgress(AppServer, "Unlatched action completed");
+    }
+
+    // Unlatch action completed, now proceed with the SetTarget action
+    instance.CancelTimer(); // Cancel any existing timer before starting a Set Target action
+
+    // Call HandlePanelSetTargetAction to continue with the SetTarget action
+    instance.HandlePanelSetTargetAction(endpointId);
 }
