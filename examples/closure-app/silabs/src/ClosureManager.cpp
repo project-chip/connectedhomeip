@@ -493,14 +493,12 @@ void ClosureManager::HandlePanelUnlatchAction(EndpointId endpointId)
     DataModel::Nullable<GenericDimensionStateStruct> panelTargetState  = DataModel::NullNullable;
 
     VerifyOrReturn(panelEp->GetLogic().GetCurrentState(panelCurrentState) == CHIP_NO_ERROR,
-                        ChipLogError(AppServer, "Failed to get current state for Endpoint %d", endpointId));
-    VerifyOrReturn(!panelCurrentState.IsNull(),
-                        ChipLogError(AppServer, "Current state is not set for Endpoint %d", endpointId));
+                   ChipLogError(AppServer, "Failed to get current state for Endpoint %d", endpointId));
+    VerifyOrReturn(!panelCurrentState.IsNull(), ChipLogError(AppServer, "Current state is not set for Endpoint %d", endpointId));
 
     VerifyOrReturn(panelEp->GetLogic().GetTargetState(panelTargetState) == CHIP_NO_ERROR,
-                        ChipLogError(AppServer, "Failed to get target for Endpoint %d", endpointId));
-    VerifyOrReturn(!panelTargetState.IsNull(),
-                        ChipLogError(AppServer, "Target is not set for Endpoint %d", endpointId));
+                   ChipLogError(AppServer, "Failed to get target for Endpoint %d", endpointId));
+    VerifyOrReturn(!panelTargetState.IsNull(), ChipLogError(AppServer, "Target is not set for Endpoint %d", endpointId));
 
     // If currently latched (true) and target is unlatched (false), Perform unlatch action and call timer with SET_TARGET_ACTION
     // to continue with the SetTarget action.
@@ -511,9 +509,8 @@ void ClosureManager::HandlePanelUnlatchAction(EndpointId endpointId)
         DataModel::Nullable<GenericOverallCurrentState> ep1OverallCurrentState = DataModel::NullNullable;
 
         VerifyOrReturn(ep1.GetLogic().GetOverallCurrentState(ep1OverallCurrentState) == CHIP_NO_ERROR,
-                            ChipLogError(AppServer, "Failed to get current state for Endpoint 1"));
-        VerifyOrReturn(!ep1OverallCurrentState.IsNull(),
-                            ChipLogError(AppServer, "Current state is not set for Endpoint 1"));
+                       ChipLogError(AppServer, "Failed to get current state for Endpoint 1"));
+        VerifyOrReturn(!ep1OverallCurrentState.IsNull(), ChipLogError(AppServer, "Current state is not set for Endpoint 1"));
 
         // In Real application, this would be replaced with actual unlatch logic.
         ChipLogProgress(AppServer, "Performing unlatch action");
