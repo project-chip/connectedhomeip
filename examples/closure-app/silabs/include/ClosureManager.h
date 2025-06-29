@@ -217,7 +217,7 @@ private:
     /**
      * @brief Handles a single step action for the panel associated with the specified endpoint.
      *
-     * This method processes a panel step action for the panel endpoint and updates the current position to 
+     * This method processes a panel step action for the panel endpoint and updates the current position to
      * reflect the next step position and triggers timer if target is not reached.
      *
      * @param endpointId The identifier of the endpoint for which the panel step action is to be handled.

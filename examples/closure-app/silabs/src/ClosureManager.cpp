@@ -306,7 +306,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
     VerifyOrReturnError(ep1.GetLogic().GetMainState(ep1MainState) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to get main state for Step command on Endpoint 1"));
 
-    //If this command is received while the MainState attribute is currently either in Disengaged, Protected, Calibrating, 
+    //If this command is received while the MainState attribute is currently either in Disengaged, Protected, Calibrating,
     // SetupRequired or Error, then a status code of INVALID_IN_STATE shall be returned.
     VerifyOrReturnError(ep1MainState != MainStateEnum::kDisengaged && ep1MainState != MainStateEnum::kProtected &&
                         ep1MainState != MainStateEnum::kSetupRequired && ep1MainState != MainStateEnum::kError &&
