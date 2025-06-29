@@ -18,7 +18,7 @@
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/ServerClusterInterface.h>
-#include <data-model-providers/endpoint/EndpointProviderInterface.h>
+#include <data-model-providers/codedriven/endpoint/EndpointProviderInterface.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Span.h>
 

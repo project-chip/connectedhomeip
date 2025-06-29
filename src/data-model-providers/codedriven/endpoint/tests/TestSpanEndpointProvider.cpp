@@ -2,7 +2,7 @@
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <data-model-providers/endpoint/SpanEndpointProvider.h>
+#include <data-model-providers/codedriven/endpoint/SpanEndpointProvider.h>
 
 #include <clusters/Descriptor/ClusterId.h>
 #include <clusters/OnOff/ClusterId.h>
