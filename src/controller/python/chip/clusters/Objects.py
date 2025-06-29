@@ -29470,13 +29470,13 @@ class ClosureControl(Cluster):
                         ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Union[None, Nullable, ClosureControl.Enums.CurrentPositionEnum]),
                         ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Union[None, Nullable, bool]),
                         ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
-                        ClusterObjectFieldDescriptor(Label="secureState", Tag=3, Type=typing.Union[None, Nullable, bool]),
+                        ClusterObjectFieldDescriptor(Label="secureState", Tag=3, Type=typing.Union[Nullable, bool]),
                     ])
 
             position: 'typing.Union[None, Nullable, ClosureControl.Enums.CurrentPositionEnum]' = None
             latch: 'typing.Union[None, Nullable, bool]' = None
             speed: 'typing.Optional[Globals.Enums.ThreeLevelAutoEnum]' = None
-            secureState: 'typing.Union[None, Nullable, bool]' = None
+            secureState: 'typing.Union[Nullable, bool]' = NullValue
 
         @dataclass
         class OverallTargetStateStruct(ClusterObject):

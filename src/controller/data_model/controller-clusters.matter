@@ -6503,7 +6503,7 @@ provisional cluster ClosureControl = 260 {
     optional nullable CurrentPositionEnum position = 0;
     optional nullable boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
-    optional nullable boolean secureState = 3;
+    nullable boolean secureState = 3;
   }
 
   struct OverallTargetStateStruct {
