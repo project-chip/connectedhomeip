@@ -166,7 +166,11 @@ void SetTestEventTrigger_EVSESetVehicleID()
 }
 void SetTestEventTrigger_EVSETriggerRFID()
 {
-    // TODO
+    EnergyEvseDelegate * dg = GetEvseDelegate();
+
+    uint8_t rfidData[10] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99 };
+    chip::ByteSpan rfidSpan(rfidData, sizeof(rfidData));
+    dg->HwSetRFID(rfidSpan);
 }
 
 bool HandleEnergyEvseTestEventTrigger(uint64_t eventTrigger)
