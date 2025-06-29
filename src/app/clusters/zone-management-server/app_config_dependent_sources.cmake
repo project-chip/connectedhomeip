@@ -18,4 +18,5 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/zone-management-server.cpp"
     "${CLUSTER_DIR}/zone-management-server.h"
+    "${CLUSTER_DIR}/zone-util.h"
 )
