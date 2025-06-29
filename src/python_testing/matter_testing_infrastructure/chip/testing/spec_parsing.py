@@ -547,6 +547,7 @@ def check_clusters_for_unknown_commands(clusters: dict[uint, XmlCluster], proble
 
 
 class PrebuiltDataModelDirectory(Enum):
+    k1_2 = auto()
     k1_3 = auto()
     k1_4 = auto()
     k1_4_1 = auto()
@@ -554,6 +555,8 @@ class PrebuiltDataModelDirectory(Enum):
 
     @property
     def dirname(self):
+        if self == PrebuiltDataModelDirectory.k1_2:
+            return "1.2"
         if self == PrebuiltDataModelDirectory.k1_3:
             return "1.3"
         if self == PrebuiltDataModelDirectory.k1_4:
