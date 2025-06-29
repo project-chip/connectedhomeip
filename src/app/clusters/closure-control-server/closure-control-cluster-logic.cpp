@@ -156,7 +156,8 @@ CHIP_ERROR ClusterLogic::SetCountdownTime(const DataModel::Nullable<ElapsedS> & 
     assertChipStackLockedByCurrentThread();
 
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous),
+                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     auto now       = System::SystemClock().GetMonotonicTimestamp();
     bool markDirty = false;
@@ -351,7 +352,8 @@ CHIP_ERROR ClusterLogic::GetCountdownTime(DataModel::Nullable<ElapsedS> & countd
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous),
+                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     countdownTime = mState.mCountdownTime.value();
 
