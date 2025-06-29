@@ -38,6 +38,10 @@
 #include <app/tests/suites/credentials/TestHarnessDACProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#if CHIP_ATTESTATION_TRUSTY_OS
+#include <platform/Linux/DeviceAttestationCredsTrusty.h>
+#endif
+
 #if ENABLE_TRACING
 #include <TracingCommandLineArgument.h> // nogncheck
 #endif
@@ -130,6 +134,9 @@ enum
     kDeviceOption_WiFi_PAF,
 #endif
     kDeviceOption_DacProvider,
+#if CHIP_ATTESTATION_TRUSTY_OS
+    kDeviceOption_TrustyDacProvider,
+#endif
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     kDeviceOption_TermsAndConditions_Version,
     kDeviceOption_TermsAndConditions_Required,
@@ -229,6 +236,9 @@ OptionDef sDeviceOptionDefs[] = {
     { "faults", kArgumentRequired, kDeviceOption_FaultInjection },
 #endif
     { "dac_provider", kArgumentRequired, kDeviceOption_DacProvider },
+#if CHIP_ATTESTATION_TRUSTY_OS
+    { "dac_provider_trusty", kNoArgument, kDeviceOption_TrustyDacProvider },
+#endif
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     { "tc-version", kArgumentRequired, kDeviceOption_TermsAndConditions_Version },
     { "tc-required", kArgumentRequired, kDeviceOption_TermsAndConditions_Required },
@@ -432,6 +442,10 @@ const char * sDeviceOptionHelp =
 #endif
     "  --dac_provider <filepath>\n"
     "       A json file with data used by the example dac provider to validate device attestation procedure.\n"
+#if CHIP_ATTESTATION_TRUSTY_OS
+    "  --dac_provider_trusty\n"
+    "       Invoke Trusty OS to get device attestation from secure storage.\n"
+#endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     "  --icdActiveModeDurationMs <icdActiveModeDurationMs>\n"
     "       Sets the ICD active mode duration (in milliseconds). (Default: 300) \n"
@@ -852,6 +866,12 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().dacProvider = &testDacProvider;
         break;
     }
+#if CHIP_ATTESTATION_TRUSTY_OS
+    case kDeviceOption_TrustyDacProvider: {
+        LinuxDeviceOptions::GetInstance().dacProvider = &chip::Credentials::Trusty::TrustyDACProvider::GetTrustyDACProvider();
+        break;
+    }
+#endif
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
     case kDeviceOption_TermsAndConditions_Version: {
         LinuxDeviceOptions::GetInstance().tcVersion.SetValue(static_cast<uint16_t>(atoi(aValue)));
