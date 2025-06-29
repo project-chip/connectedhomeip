@@ -40,6 +40,8 @@ public:
         MOVE_TO_ACTION,
         STOP_MOTION_ACTION,
         STOP_CALIBRATE_ACTION,
+        SET_TARGET_ACTION,
+        PANEL_UNLATCH_ACTION,
 
         INVALID_ACTION
     };
@@ -103,6 +105,26 @@ public:
     chip::Protocols::InteractionModel::Status OnStopCommand();
 
     /**
+     * @brief Handles the SetTarget command for a closure panel.
+     *
+     * This method processes the SetTarget command, based on target position,
+     * latch , and speed for the closure panel at the given endpoint.
+     *
+     * @param[in] position  Optional target position as a percentage in hundredths (0-10000).
+     * @param[in] latch     Optional latch state (true to latch, false to unlatch).
+     * @param[in] speed     Optional speed setting as a ThreeLevelAutoEnum value.
+     * @param[in] endpointId The endpoint identifier for the closure panel.
+     *
+     * @return chip::Protocols::InteractionModel::Status
+     *         Returns Status::Success if the SetTarget command is handled successfully,
+     *         or an appropriate error status otherwise.
+     */
+    chip::Protocols::InteractionModel::Status
+    OnSetTargetCommand(const chip::Optional<chip::Percent100ths> & position, const chip::Optional<bool> & latch,
+                       const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
+                       const chip::EndpointId endpointId);
+
+    /**
      * @brief Sets the current action being performed by the closure device.
      *
      * @param action The action to set, represented as chip::app::Clusters::ClosureControl::Action_t.
@@ -119,8 +141,12 @@ public:
 private:
     static ClosureManager sClosureMgr;
     osTimerId_t mClosureTimer;
+
     bool isCalibrationInProgress = false;
-    Action_t mCurrentAction      = Action_t::INVALID_ACTION;
+    bool isSetTargetInProgress   = false;
+
+    Action_t mCurrentAction                   = Action_t::INVALID_ACTION;
+    chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
 
     // Define the endpoint ID for the Closure
     static constexpr chip::EndpointId kClosureEndpoint       = 1;
@@ -191,4 +217,25 @@ private:
      * @param timerCbArg Pointer to the callback argument (unused).
      */
     static void TimerEventHandler(void * timerCbArg);
+
+    /**
+     * @brief Handles the SetTarget motion action for a panel endpoint.
+     *
+     * This method Performs the update the current positions of panel endpoint to next position
+     * and when target position is reached, it performs the latch action if required.
+     *
+     * @param endpointId The identifier of the endpoint for which the panel target action should be handled.
+     */
+    void HandlePanelSetTargetAction(chip::EndpointId endpointId);
+
+    /**
+     * @brief Handles the unlatch action for a closure panel.
+     *
+     * This method performs the unlatch action if required for the specified closure panel endpoint.
+     * It updates the current state of the panel and sets the target state accordingly and then calls
+     * HandlePanelSetTargetAction to move the panel to the target position.
+     *
+     * @param endpointId The identifier of the endpoint for which the unlatch action should be handled.
+     */
+    void HandlePanelUnlatchAction(chip::EndpointId endpointId);
 };
