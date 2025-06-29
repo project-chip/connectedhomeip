@@ -55,6 +55,9 @@ TEST(TestQRCode, TestRendezvousFlags)
     inPayload.rendezvousInformation.SetValue(RendezvousInformationFlag::kWiFiPAF);
     EXPECT_TRUE(CheckWriteRead(inPayload));
 
+    inPayload.rendezvousInformation.SetValue(RendezvousInformationFlag::kNFC);
+    EXPECT_TRUE(CheckWriteRead(inPayload));
+
     inPayload.rendezvousInformation.SetValue(
         RendezvousInformationFlags(RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork));
     EXPECT_TRUE(CheckWriteRead(inPayload));
@@ -65,6 +68,10 @@ TEST(TestQRCode, TestRendezvousFlags)
 
     inPayload.rendezvousInformation.SetValue(
         RendezvousInformationFlags(RendezvousInformationFlag::kWiFiPAF, RendezvousInformationFlag::kOnNetwork));
+    EXPECT_TRUE(CheckWriteRead(inPayload));
+
+    inPayload.rendezvousInformation.SetValue(
+        RendezvousInformationFlags(RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kNFC));
     EXPECT_TRUE(CheckWriteRead(inPayload));
 
     inPayload.rendezvousInformation.SetValue(RendezvousInformationFlags(
@@ -82,6 +89,11 @@ TEST(TestQRCode, TestRendezvousFlags)
     inPayload.rendezvousInformation.SetValue(
         RendezvousInformationFlags(RendezvousInformationFlag::kWiFiPAF, RendezvousInformationFlag::kBLE,
                                    RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork));
+    EXPECT_TRUE(CheckWriteRead(inPayload));
+
+    inPayload.rendezvousInformation.SetValue(RendezvousInformationFlags(
+        RendezvousInformationFlag::kWiFiPAF, RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kSoftAP,
+        RendezvousInformationFlag::kOnNetwork, RendezvousInformationFlag::kNFC));
     EXPECT_TRUE(CheckWriteRead(inPayload));
 }
 
@@ -107,9 +119,9 @@ TEST(TestQRCode, TestMaximumValues)
     inPayload.vendorID          = 0xFFFF;
     inPayload.productID         = 0xFFFF;
     inPayload.commissioningFlow = CommissioningFlow::kCustom;
-    inPayload.rendezvousInformation.SetValue(
-        RendezvousInformationFlags(RendezvousInformationFlag::kWiFiPAF, RendezvousInformationFlag::kBLE,
-                                   RendezvousInformationFlag::kSoftAP, RendezvousInformationFlag::kOnNetwork));
+    inPayload.rendezvousInformation.SetValue(RendezvousInformationFlags(
+        RendezvousInformationFlag::kWiFiPAF, RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kSoftAP,
+        RendezvousInformationFlag::kOnNetwork, RendezvousInformationFlag::kNFC));
     inPayload.discriminator.SetLongValue(static_cast<uint16_t>((1 << kPayloadDiscriminatorFieldLengthInBits) - 1));
     inPayload.setUpPINCode = static_cast<uint32_t>((1 << kSetupPINCodeFieldLengthInBits) - 1);
 

@@ -186,6 +186,10 @@ static NSString * MTRDiscoveryCapabilitiesAsString(MTRDiscoveryCapabilities valu
         [capabilities appendString:@"|OnNetwork"];
         value &= ~MTRDiscoveryCapabilitiesOnNetwork;
     }
+    if (value & MTRDiscoveryCapabilitiesNFC) {
+        [capabilities appendString:@"|NFC"];
+        value &= ~MTRDiscoveryCapabilitiesNFC;
+    }
     if (value != 0) {
         [capabilities appendFormat:@"|0x%llx", (unsigned long long) value];
     }
