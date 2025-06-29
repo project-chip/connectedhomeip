@@ -306,11 +306,11 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
     VerifyOrReturnError(ep1.GetLogic().GetMainState(ep1MainState) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to get main state for Step command on Endpoint 1"));
 
-    //If this command is received while the MainState attribute is currently either in Disengaged, Protected, Calibrating,
-    // SetupRequired or Error, then a status code of INVALID_IN_STATE shall be returned.
+    // If this command is received while the MainState attribute is currently either in Disengaged, Protected, Calibrating,
+    //  SetupRequired or Error, then a status code of INVALID_IN_STATE shall be returned.
     VerifyOrReturnError(ep1MainState != MainStateEnum::kDisengaged && ep1MainState != MainStateEnum::kProtected &&
-                        ep1MainState != MainStateEnum::kSetupRequired && ep1MainState != MainStateEnum::kError &&
-                        ep1MainState != MainStateEnum::kCalibrating,
+                            ep1MainState != MainStateEnum::kSetupRequired && ep1MainState != MainStateEnum::kError &&
+                            ep1MainState != MainStateEnum::kCalibrating,
                         Status::InvalidInState,
                         ChipLogError(AppServer, "Step command not allowed in current state: %d", static_cast<int>(ep1MainState)));
 
@@ -386,10 +386,8 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
     VerifyOrReturn(panelEp->GetLogic().GetTargetState(panelTargetState) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to get target state for Step action"));
 
-    VerifyOrReturn(!panelCurrentState.IsNull(),
-                   ChipLogError(AppServer, "Current state is null, Step action Failed"));
-    VerifyOrReturn(!panelTargetState.IsNull(),
-                   ChipLogError(AppServer, "Target state  is null, Step action Failed"));
+    VerifyOrReturn(!panelCurrentState.IsNull(), ChipLogError(AppServer, "Current state is null, Step action Failed"));
+    VerifyOrReturn(!panelTargetState.IsNull(), ChipLogError(AppServer, "Target state  is null, Step action Failed"));
     VerifyOrReturn(panelCurrentState.Value().position.HasValue() && !panelCurrentState.Value().position.Value().IsNull(),
                    ChipLogError(AppServer, "Current or target position is not set, Step action Failed"));
     VerifyOrReturn(panelTargetState.Value().position.HasValue() && !panelTargetState.Value().position.Value().IsNull(),
