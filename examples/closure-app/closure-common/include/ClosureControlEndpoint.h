@@ -55,7 +55,6 @@ public:
                                                             const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
     Protocols::InteractionModel::Status HandleCalibrateCommand() override;
 
-    CHIP_ERROR GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError) override;
     bool IsReadyToMove() override;
     bool IsManualLatchingNeeded() override;
     ElapsedS GetCalibrationCountdownTime() override;
