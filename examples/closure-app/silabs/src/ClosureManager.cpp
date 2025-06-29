@@ -300,6 +300,18 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
                                                                              const Optional<Globals::ThreeLevelAutoEnum> & speed,
                                                                              const chip::EndpointId endpointId)
 {
+    MainStateEnum ep1MainState;
+    VerifyOrReturnError(ep1.GetLogic().GetMainState(ep1MainState) == CHIP_NO_ERROR, Status::Failure,
+                        ChipLogError(AppServer, "Failed to get main state for Step command on Endpoint 1"));
+
+    // If this command is received while the MainState attribute is currently either in Disengaged, Protected, Calibrating,
+    //  SetupRequired or Error, then a status code of INVALID_IN_STATE shall be returned.
+    VerifyOrReturnError(ep1MainState != MainStateEnum::kDisengaged && ep1MainState != MainStateEnum::kProtected &&
+                            ep1MainState != MainStateEnum::kSetupRequired && ep1MainState != MainStateEnum::kError &&
+                            ep1MainState != MainStateEnum::kCalibrating,
+                        Status::InvalidInState,
+                        ChipLogError(AppServer, "Step command not allowed in current state: %d", static_cast<int>(ep1MainState)));
+    
     if (isSetTargetInProgress && mCurrentActionEndpointId != endpointId)
     {
         ChipLogError(AppServer, "SetTarget action is already in progress on Endpoint %d", endpointId);
