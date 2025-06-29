@@ -31,7 +31,25 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --string-arg th_icd_server_app_path:${LIT_ICD_APP} dut_fsa_stdin_pipe:dut-fsa-stdin
+#       --string-arg th_icd_server_app_path:${LIT_ICD_APP}
+#       --string-arg dut_fsa_stdin_pipe:dut-fsa-stdin
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${FABRIC_SYNC_APP}
+#     app-args: --discriminator=1234
+#     app-stdin-pipe: dut-fsa-stdin
+#     script-args: >
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --bool-arg unified_fabric_sync_app:true
+#       --string-arg th_icd_server_app_path:${LIT_ICD_APP}
+#       --string-arg dut_fsa_stdin_pipe:dut-fsa-stdin
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -199,8 +217,12 @@ class TC_BRBINFO_4_1(MatterBaseTest):
                 params.commissioningParameters.setupManualCode,
                 params.commissioningParameters.setupQRCode)
         else:
-            self.dut_fsa_stdin.write(
-                f"pairing onnetwork 2 {params.commissioningParameters.setupPinCode} --icd-registration true\n")
+            if self.user_params.get("unified_fabric_sync_app"):
+                setupQRCode = params.commissioningParameters.setupQRCode
+                self.dut_fsa_stdin.write(f"app pair-device 2 {setupQRCode} --enable-icd-registration\n")
+            else:
+                setupPinCode = params.commissioningParameters.setupPinCode
+                self.dut_fsa_stdin.write(f"pairing onnetwork 2 {setupPinCode} --icd-registration true\n")
             self.dut_fsa_stdin.flush()
             # Wait for the commissioning to complete.
             await asyncio.sleep(5)
