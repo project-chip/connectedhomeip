@@ -23,6 +23,7 @@
 #include "closure-dimension-cluster-objects.h"
 #include "closure-dimension-delegate.h"
 #include "closure-dimension-matter-context.h"
+#include <app/cluster-building-blocks/QuieterReporting.h>
 
 namespace chip {
 namespace app {
@@ -387,6 +388,8 @@ private:
     ClusterConformance mConformance;
     DelegateBase & mDelegate;
     MatterContext & mMatterContext;
+
+    QuieterReportingAttribute<Percent100ths> quietReportableCurrentStatePosition{ DataModel::NullNullable };
 };
 
 } // namespace ClosureDimension
