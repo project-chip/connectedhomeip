@@ -156,6 +156,7 @@ CHIP_ERROR ClusterLogic::SetCountdownTime(const DataModel::Nullable<ElapsedS> & 
     assertChipStackLockedByCurrentThread();
 
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     auto now       = System::SystemClock().GetMonotonicTimestamp();
     bool markDirty = false;
@@ -269,14 +270,7 @@ CHIP_ERROR ClusterLogic::SetOverallCurrentState(const DataModel::Nullable<Generi
                                 CHIP_ERROR_INVALID_ARGUMENT);
         }
 
-        // Validate the incoming SecureState FeatureMap conformance.
-        if (incomingOverallCurrentState.secureState.IsNull())
-        {
-            // If the secureState member is present in the OverallCurrentState, we need to check if the Speed feature is
-            // supported by the closure. If the Speed feature is not supported, return an error.
-            VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) || mConformance.HasFeature(Feature::kMotionLatching),
-                                CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-        }
+        // No Validation needed for SecureState as the feild is Mandatory and always present.
     }
 
     mState.mOverallCurrentState = overallCurrentState;
@@ -357,6 +351,7 @@ CHIP_ERROR ClusterLogic::GetCountdownTime(DataModel::Nullable<ElapsedS> & countd
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     countdownTime = mState.mCountdownTime.value();
 
@@ -557,7 +552,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleCalibrate()
 
     // If the Calibrate command is invoked in any state other than 'Stopped', the server shall respond with INVALID_IN_STATE.
     // This check excludes the 'Calibrating' MainState as it is already validated above
-    VerifyOrReturnError(state == MainStateEnum::kStopped, Status::InvalidInState);
+    VerifyOrReturnError(state == MainStateEnum::kStopped || state == MainStateEnum::kSetupRequired, Status::InvalidInState);
 
     // Set the MainState to 'Calibrating' only if the delegate call to HandleCalibrateCommand is successful
     Status status = mDelegate.HandleCalibrateCommand();
@@ -581,8 +576,7 @@ CHIP_ERROR ClusterLogic::GenerateOperationalErrorEvent(const DataModel::List<con
 
 CHIP_ERROR ClusterLogic::GenerateMovementCompletedEvent()
 {
-    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous),
-                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(!mConformance.HasFeature(Feature::kInstantaneous), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     Events::MovementCompleted::Type event{};
     ReturnErrorOnFailure(mMatterContext.GenerateEvent(event));
@@ -602,9 +596,6 @@ CHIP_ERROR ClusterLogic::GenerateEngageStateChangedEvent(const bool engageValue)
 
 CHIP_ERROR ClusterLogic::GenerateSecureStateChangedEvent(const bool secureValue)
 {
-    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous),
-                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
     Events::SecureStateChanged::Type event{ .secureValue = secureValue };
     ReturnErrorOnFailure(mMatterContext.GenerateEvent(event));
 
