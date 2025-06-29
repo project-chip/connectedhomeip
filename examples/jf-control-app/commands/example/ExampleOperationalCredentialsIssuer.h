@@ -31,7 +31,6 @@
 
 #include <controller/OperationalCredentialsDelegate.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <lib/core/CASEAuthTag.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/CodeUtils.h>
@@ -59,6 +58,12 @@ public:
                                 const ByteSpan & attestationChallenge, const ByteSpan & DAC, const ByteSpan & PAI,
                                 Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion) override;
 
+    CHIP_ERROR SignICAC(const ByteSpan & icaCsr, FabricId anchorFabricId, MutableByteSpan & icac) override;
+
+    CHIP_ERROR SignNOC(const ByteSpan & icac, const ByteSpan & nocCsr, MutableByteSpan & noc) override;
+
+    CHIP_ERROR ObtainICACSR(MutableByteSpan & icaCsr) override;
+
     void SetNodeIdForNextNOCRequest(NodeId nodeId) override
     {
         mNextRequestedNodeId = nodeId;
@@ -69,7 +74,7 @@ public:
 
     void SetFabricIdForNextNOCRequest(FabricId fabricId) override { mNextFabricId = fabricId; }
 
-    void SetCATValuesForNextNOCRequest(CATValues cats) { mNextCATs = cats; }
+    void SetCATValuesForNextNOCRequest(CATValues cats) override { mNextCATs = cats; }
 
     void SetCaseAdminSubjectForNextNOCRequest(NodeId caseAdminSubject) { mNextCaseAdminSubject = caseAdminSubject; }
 

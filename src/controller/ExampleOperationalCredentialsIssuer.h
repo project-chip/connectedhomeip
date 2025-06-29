@@ -72,7 +72,7 @@ public:
 
     void SetFabricIdForNextNOCRequest(FabricId fabricId) override { mNextFabricId = fabricId; }
 
-    void SetCATValuesForNextNOCRequest(CATValues cats) { mNextCATs = cats; }
+    void SetCATValuesForNextNOCRequest(CATValues cats) override { mNextCATs = cats; }
 
     /**
      * @brief Initialize the issuer with the keypair in the storage.
