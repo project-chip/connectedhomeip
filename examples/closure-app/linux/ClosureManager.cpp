@@ -131,7 +131,11 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
 
 chip::Protocols::InteractionModel::Status ClosureManager::OnStopCommand()
 {
-    // Add logic to handle the Stop command
+    // Cancel any existing timer for closure action
+    DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
+    mCurrentAction     = ClosureAction::kStopAction;
+    mCurrentEndpointId = kClosureEndpoint1;
+    HandleStopActionComplete();
     return Status::Success;
 }
 
@@ -174,9 +178,6 @@ void ClosureManager::HandleClosureActionTimer(System::Layer * layer, void * aApp
     case ClosureAction::kCalibrateAction:
         instance.HandleCalibrateActionComplete();
         break;
-    case ClosureAction::kStopAction:
-        // Add logic to handle Stop action completion
-        break;
     case ClosureAction::kMoveToAction:
         // Add logic to handle MoveTo action completion
         break;
@@ -213,6 +214,27 @@ void ClosureManager::HandleCalibrateActionComplete()
 void ClosureManager::HandleStopActionComplete()
 {
     // Add logic to handle Stop action completion
+    ChipLogProgress(AppServer, "HandleStopActionComplete called");
+    if (mIsCalibrationActionInProgress)
+    {
+        ChipLogDetail(AppServer, "Stopping calibration action");
+        mClosureEndpoint1.OnStopCalibrateActionComplete();
+        mClosurePanelEndpoint2.OnStopCalibrateActionComplete();
+        mClosurePanelEndpoint3.OnStopCalibrateActionComplete();
+        mIsCalibrationActionInProgress = false;
+    }
+    else if (mIsMoveToActionInProgress)
+    {
+        ChipLogDetail(AppServer, "Stopping move to action");
+        mClosureEndpoint1.OnStopMotionActionComplete();
+        mClosurePanelEndpoint2.OnStopMotionActionComplete();
+        mClosurePanelEndpoint3.OnStopMotionActionComplete();
+        mIsMoveToActionInProgress = false;
+    }
+    else
+    {
+        ChipLogDetail(AppServer, "No action in progress to stop");
+    }
 }
 
 void ClosureManager::HandleMoveToActionComplete()
