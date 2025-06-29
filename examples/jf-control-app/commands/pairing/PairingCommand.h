@@ -21,6 +21,7 @@
 #include "../common/CHIPCommand.h"
 #include <controller/CommissioningDelegate.h>
 #include <controller/CurrentFabricRemover.h>
+#include <controller/JCMCommissioner.h>
 
 #include <commands/common/CredentialIssuerCommands.h>
 #include <lib/support/Span.h>
@@ -53,10 +54,14 @@ enum class PairingNetworkType
     WiFiOrThread,
 };
 
+constexpr char kAnchorNodeIdKey[] = "AnchorNodeId";
+
 class PairingCommand : public CHIPCommand,
                        public chip::Controller::DevicePairingDelegate,
                        public chip::Controller::DeviceDiscoveryDelegate,
+                       public chip::Controller::JCM::JCMTrustVerificationDelegate,
                        public chip::Credentials::DeviceAttestationDelegate
+
 {
 public:
     PairingCommand(const char * commandName, PairingMode mode, PairingNetworkType networkType,
@@ -84,7 +89,7 @@ public:
         AddArgument("icd-stay-active-duration", 0, UINT32_MAX, &mICDStayActiveDurationMsec,
                     "If set, a LIT ICD that is commissioned will be requested to stay active for this many milliseconds");
         AddArgument("anchor", 0, 1, &mAnchor, "If set to true then a NOC with Anchor and Administrator CAT is issued");
-        AddArgument("execute-jcm", 0, 1, &mExecuteJCM, "Set it to true in order to commission a Joint Fabric Administrator");
+        AddArgument("jcm", 0, 1, &mJCM, "Set it to true in order to commission a Joint Fabric Administrator");
         switch (networkType)
         {
         case PairingNetworkType::None:
@@ -234,8 +239,7 @@ public:
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info) override;
-    void OnCommissioningComplete(NodeId nodeId, const chip::Optional<chip::Crypto::P256PublicKey> & trustedIcacPublicKeyB,
-                                 CHIP_ERROR err) override;
+    void OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err) override;
     void OnICDRegistrationComplete(chip::ScopedNodeId deviceId, uint32_t icdCounter) override;
     void OnICDStayActiveComplete(chip::ScopedNodeId deviceId, uint32_t promisedActiveDuration) override;
 
@@ -247,6 +251,16 @@ public:
     void OnDeviceAttestationCompleted(chip::Controller::DeviceCommissioner * deviceCommissioner, chip::DeviceProxy * device,
                                       const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
                                       chip::Credentials::AttestationVerificationResult attestationResult) override;
+
+    /////////// JCMTrustVerificationDelegate /////////
+    void OnProgressUpdate(chip::Controller::JCM::JCMDeviceCommissioner & commissioner,
+                          chip::Controller::JCM::JCMTrustVerificationStage stage,
+                          chip::Controller::JCM::JCMTrustVerificationInfo & info,
+                          chip::Controller::JCM::JCMTrustVerificationError error);
+    void OnAskUserForConsent(chip::Controller::JCM::JCMDeviceCommissioner & commissioner,
+                             chip::Controller::JCM::JCMTrustVerificationInfo & info);
+    void OnVerifyVendorId(chip::Controller::JCM::JCMDeviceCommissioner & commissioner,
+                          chip::Controller::JCM::JCMTrustVerificationInfo & info);
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);
@@ -264,14 +278,14 @@ private:
     const PairingNetworkType mNetworkType;
     const chip::Dnssd::DiscoveryFilterType mFilterType;
     Command::AddressWithInterface mRemoteAddr;
-    NodeId mNodeId       = chip::kUndefinedNodeId;
-    NodeId mAnchorNodeId = chip::kUndefinedNodeId;
+    NodeId mNodeId = chip::kUndefinedNodeId;
     chip::Optional<uint16_t> mTimeout;
     chip::Optional<bool> mDiscoverOnce;
     chip::Optional<bool> mUseOnlyOnNetworkDiscovery;
     chip::Optional<bool> mPaseOnly;
     chip::Optional<bool> mSkipCommissioningComplete;
     chip::Optional<bool> mAnchor;
+    chip::Optional<bool> mJCM;
     chip::Optional<bool> mBypassAttestationVerifier;
     chip::Optional<std::vector<uint32_t>> mCASEAuthTags;
     chip::Optional<char *> mCountryCode;
@@ -315,12 +329,12 @@ private:
     bool mDeviceIsICD = false;
     uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
 
-    chip::Optional<bool> mExecuteJCM;
-
     // For unpair
     chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;
     chip::Callback::Callback<chip::Controller::OnCurrentFabricRemove> mCurrentFabricRemoveCallback;
 
     static void OnCurrentFabricRemove(void * context, NodeId remoteNodeId, CHIP_ERROR status);
     void PersistIcdInfo();
+    CHIP_ERROR SetAnchorNodeId(NodeId value);
+    NodeId GetAnchorNodeId();
 };
