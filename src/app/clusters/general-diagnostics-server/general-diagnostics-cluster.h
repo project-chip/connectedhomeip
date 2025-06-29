@@ -1,7 +1,6 @@
-/*
+/**
  *
- *    Copyright (c) 2022 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,24 +14,30 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/CommandResponseHelper.h>
+#include <app/clusters/general-diagnostics-server/general-diagnostics-logic.h>
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/GeneralDiagnostics/ClusterId.h>
 #include <platform/GeneralFaults.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
-/**
- * @brief general-diagnostics-server class
- */
-class GeneralDiagnosticsServer
+class GeneralDiagnosticsCluster : public DefaultServerCluster
 {
 public:
-    static GeneralDiagnosticsServer & Instance();
+    GeneralDiagnosticsCluster(GeneralDiagnosticsEnabledAttributes attributes) :
+        DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }), mLogic(attributes)
+    {}
+
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override;
 
     /**
      * @brief
@@ -62,9 +67,17 @@ public:
                                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
 
 private:
-    static GeneralDiagnosticsServer instance;
-};
+    template <typename T>
+    CHIP_ERROR EncodeValue(T value, CHIP_ERROR readError, AttributeValueEncoder & encoder);
 
+    template <typename T>
+    CHIP_ERROR EncodeListOfValues(T valueList, CHIP_ERROR readError, AttributeValueEncoder & aEncoder);
+
+    bool IsTestEventTriggerEnabled();
+
+protected:
+    GeneralDiagnosticsLogic mLogic;
+};
 } // namespace Clusters
 } // namespace app
 } // namespace chip
