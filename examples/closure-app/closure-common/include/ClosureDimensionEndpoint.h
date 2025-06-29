@@ -58,7 +58,7 @@ public:
 
     /**
      * @brief Retrieves the endpoint for this instance.
-     * 
+     *
      * @return The endpoint (EndpointId) for this instance.
      */
     EndpointId GetEndpoint() const { return mEndpoint; }

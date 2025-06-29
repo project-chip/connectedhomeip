@@ -311,7 +311,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
                             ep1MainState != MainStateEnum::kCalibrating,
                         Status::InvalidInState,
                         ChipLogError(AppServer, "Step command not allowed in current state: %d", static_cast<int>(ep1MainState)));
-    
+
     if (isSetTargetInProgress && mCurrentActionEndpointId != endpointId)
     {
         ChipLogError(AppServer, "SetTarget action is already in progress on Endpoint %d", endpointId);
@@ -332,7 +332,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
         ChipLogError(AppServer, "HandlePanelSetTargetAction called with invalid endpointId: %u", endpointId);
         return Status::Failure;
     }
-    
+
     // Update OverallTarget of Closure based on SetTarget command.
     DataModel::Nullable<GenericOverallTargetState> overallTargetState;
     VerifyOrReturnError(ep1.GetLogic().GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR, Status::Failure,
@@ -367,8 +367,8 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
 
     VerifyOrReturnError(ep1.GetLogic().SetMainState(MainStateEnum::kMoving) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set main state for move to command on Endpoint 1"));
-    
-    
+
+
     DataModel::Nullable<GenericDimensionStateStruct> panelCurrentState = DataModel::NullNullable;
     DataModel::Nullable<GenericDimensionStateStruct> panelTargetState = DataModel::NullNullable;
 
@@ -382,7 +382,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
                         ChipLogError(AppServer, "Target is not set for Endpoint %d", endpointId));
 
     // If currently latched (true) and target is unlatched (false), unlatch first before starting motion
-    if (panelCurrentState.Value().latch.HasValue() && !panelCurrentState.Value().latch.Value().IsNull() 
+    if (panelCurrentState.Value().latch.HasValue() && !panelCurrentState.Value().latch.Value().IsNull()
         && panelTargetState.Value().latch.HasValue() && !panelTargetState.Value().latch.Value().IsNull())
     {
         if (panelCurrentState.Value().latch.Value().Value() && !panelTargetState.Value().latch.Value().Value())
@@ -402,7 +402,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
 
             panelCurrentState.Value().latch.SetValue(false);
             panelEp->GetLogic().SetCurrentState(panelCurrentState);
-            
+
             ChipLogProgress(AppServer, "Unlatched action completed");
         }
 
@@ -476,12 +476,12 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
         instance.CancelTimer(); // Cancel any existing timer before starting a new action
         instance.SetCurrentAction(Action_t::SET_TARGET_ACTION);
         instance.mCurrentActionEndpointId = endpointId;
-        instance.StartTimer(kMotionCountdownTimeMs);    
+        instance.StartTimer(kMotionCountdownTimeMs);
         return;
     }
 
     // If currently unlatched (false) and target is latched (true), latch after completing motion
-    if (panelCurrentState.Value().latch.HasValue() && !panelCurrentState.Value().latch.Value().IsNull() 
+    if (panelCurrentState.Value().latch.HasValue() && !panelCurrentState.Value().latch.Value().IsNull()
         && panelTargetState.Value().latch.HasValue() && !panelTargetState.Value().latch.Value().IsNull())
     {
         if (!panelCurrentState.Value().latch.Value().Value() && panelTargetState.Value().latch.Value().Value())

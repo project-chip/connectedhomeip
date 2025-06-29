@@ -220,7 +220,7 @@ private:
     /**
      * @brief Handles the SetTarget motion action for a panel endpoint.
      *
-     * This method Performs the latch actions for closure and updates the current positions 
+     * This method Performs the latch actions for closure and updates the current positions
      * of panel endpoint to next position.
      *
      * @param endpointId The identifier of the endpoint for which the panel target action should be handled.
