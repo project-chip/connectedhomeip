@@ -40,6 +40,7 @@ public:
         MOVE_TO_ACTION,
         STOP_MOTION_ACTION,
         STOP_CALIBRATE_ACTION,
+        PANEL_STEP_ACTION,
 
         INVALID_ACTION
     };
@@ -103,6 +104,23 @@ public:
     chip::Protocols::InteractionModel::Status OnStopCommand();
 
     /**
+     * @brief Handles the Step command for the ClosureDimension cluster.
+     *
+     * This method processes and initiates step motion in a specified direction for a given number of steps,
+     * optionally at a specified speed, on the provided panel endpoint.
+     *
+     * @param direction The direction in which to perform the step operation.
+     * @param numberOfSteps The number of steps to move in the specified direction.
+     * @param speed Optional speed setting for the step operation.
+     * @param endpointId The endpoint on which to perform the operation.
+     * @return chip::Protocols::InteractionModel::Status Status of the command execution.
+     */
+    chip::Protocols::InteractionModel::Status
+    OnStepCommand(const chip::app::Clusters::ClosureDimension::StepDirectionEnum & direction, const uint16_t & numberOfSteps,
+                  const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
+                  const chip::EndpointId & endpointId);
+
+    /**
      * @brief Sets the current action being performed by the closure device.
      *
      * @param action The action to set, represented as chip::app::Clusters::ClosureControl::Action_t.
@@ -119,8 +137,12 @@ public:
 private:
     static ClosureManager sClosureMgr;
     osTimerId_t mClosureTimer;
+
     bool isCalibrationInProgress = false;
-    Action_t mCurrentAction      = Action_t::INVALID_ACTION;
+    bool isStepActionInProgress  = false;
+
+    Action_t mCurrentAction                   = Action_t::INVALID_ACTION;
+    chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
 
     // Define the endpoint ID for the Closure
     static constexpr chip::EndpointId kClosureEndpoint       = 1;
@@ -191,4 +213,14 @@ private:
      * @param timerCbArg Pointer to the callback argument (unused).
      */
     static void TimerEventHandler(void * timerCbArg);
+
+    /**
+     * @brief Handles a single step action for the panel associated with the specified endpoint.
+     *
+     * This method processes a panel step action for the panel endpoint and updates the current position to
+     * reflect the next step position and triggers timer if target is not reached.
+     *
+     * @param endpointId The identifier of the endpoint for which the panel step action is to be handled.
+     */
+    void HandlePanelStepAction(chip::EndpointId endpointId);
 };
