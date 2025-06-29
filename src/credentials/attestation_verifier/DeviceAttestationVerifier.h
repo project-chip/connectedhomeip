@@ -313,7 +313,7 @@ public:
         {
             if (mCdBuffer.Get())
             {
-                return MakeOptional(ByteSpan(mDacDerBuffer.Get(), mDacDerBuffer.AllocatedSize()));
+                return MakeOptional(ByteSpan(mCdBuffer.Get(), mCdBuffer.AllocatedSize()));
             }
             else
             {
