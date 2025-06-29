@@ -18,6 +18,7 @@
 
 #include "EnergyGatewayAppCommonMain.h"
 #include "CommodityPriceMain.h"
+#include "CommodityTariffMain.h"
 #include "ElectricalGridConditionsMain.h"
 #include "MeterIdentificationInstance.h"
 
@@ -59,6 +60,13 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type electricalEnergyTar
     { .namespaceID = kNamespaceCommodityTariffFlow, .tag = kTagImport }
 };
 
+const char * tariff_file = nullptr;
+
+void ElectricalEnergyTariffSetTariffFile(const char * aFile)
+{
+    tariff_file = aFile;
+}
+
 /*
  *  @brief  Creates a Delegate and Instance for CommodityPrice clusters
  *
@@ -70,8 +78,15 @@ void ElectricalEnergyTariffInit()
 {
     EndpointId kElectricalEnergyTariffEndpointId = 1;
 
+    if (tariff_file)
+    {
+        CommodityTariffSetDefaultTariffFile(tariff_file);
+    }
+
     VerifyOrDie(CommodityPriceInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
+    VerifyOrDie(CommodityTariffInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
     VerifyOrDie(ElectricalGridConditionsInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
+
 
     // set the descriptor TagList to include "ElectricalEnergy" and "Current" (to indicate the ActiveTariff)
     SetTagList(kElectricalEnergyTariffEndpointId,
