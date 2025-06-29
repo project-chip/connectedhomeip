@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <cctype>
 #include <nlassert.h>
 
 #include "BufferWriter.h"
@@ -46,6 +47,15 @@ public:
     {
         char buff[32];
         snprintf(buff, sizeof(buff), "%d", value);
+        buff[sizeof(buff) - 1] = 0;
+        return Add(buff);
+    }
+
+    /// Append an uint8_t value
+    StringBuilderBase & Add(uint8_t value)
+    {
+        char buff[32];
+        snprintf(buff, sizeof(buff), "%c", value);
         buff[sizeof(buff) - 1] = 0;
         return Add(buff);
     }
@@ -89,12 +99,45 @@ private:
     }
 };
 
-/// a preallocated sized string builder
-template <size_t kSize>
+/// A preallocated sized string builder
+/// Default buffer size is 257
+template <size_t kSize = 257>
 class StringBuilder : public StringBuilderBase
 {
 public:
     StringBuilder() : StringBuilderBase(mBuffer, kSize) {}
+
+    /// Constructor for char * and length
+    StringBuilder(const char * data, size_t length) : StringBuilder() { AddFormat("%.*s", static_cast<int>(length), data); }
+
+    /// Constructor for uint8_t * and length
+    /// Only printable elements will be added
+    StringBuilder(const uint8_t * data, size_t length) : StringBuilder()
+    {
+        for (size_t i = 0; i < length; ++i)
+        {
+            if (std::isprint(data[i]))
+            {
+                Add(data[i]);
+            }
+        }
+    }
+
+    /// Constructor for CharSpan
+    StringBuilder(const CharSpan & span) : StringBuilder() { AddFormat("%.*s", static_cast<int>(span.size()), span.data()); }
+
+    /// Constructor for ByteSpan
+    /// Only printable elements will be added
+    StringBuilder(const ByteSpan & span) : StringBuilder()
+    {
+        for (size_t i = 0; i < span.size(); ++i)
+        {
+            if (std::isprint(span[i]))
+            {
+                Add(span[i]);
+            }
+        }
+    }
 
 private:
     char mBuffer[kSize];
