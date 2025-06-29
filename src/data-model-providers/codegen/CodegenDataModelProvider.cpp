@@ -29,6 +29,9 @@
 #include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterContext.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <app/util/DataModelHandler.h>
@@ -37,8 +40,6 @@
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
-#include <app/util/persistence/AttributePersistenceProvider.h>
-#include <app/util/persistence/DefaultAttributePersistenceProvider.h>
 #include <data-model-providers/codegen/EmberMetadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -164,6 +165,7 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
     return mRegistry.SetContext(ServerClusterContext{
         .provider           = this,
         .storage            = mPersistentStorageDelegate,
+        .attributeStorage   = GetAttributePersistenceProvider(),
         .interactionContext = &mContext,
     });
 }
@@ -248,6 +250,17 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindEndpointIndex(EndpointI
     }
 
     return std::make_optional<unsigned>(idx);
+}
+
+CHIP_ERROR CodegenDataModelProvider::EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo)
+{
+    if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
+    {
+        return cluster->EventInfo(path, eventInfo);
+    }
+
+    eventInfo.readPrivilege = RequiredPrivilege::ForReadEvent(path);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
@@ -366,21 +379,20 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
         ReturnErrorOnFailure(builder.Append(AttributeEntryFrom(path, attribute)));
     }
 
-    // This "GlobalListEntry" is specific for metadata that ember does not include
-    // in its attribute list metadata.
-    //
-    // By spec these Attribute/AcceptedCommands/GeneratedCommants lists are:
-    //   - lists of elements
-    //   - read-only, with read privilege view
-    //   - fixed value (no such flag exists, so this is not a quality flag we set/track)
-    DataModel::AttributeEntry globalListEntry(0, /* default initial value, attributeId is assigned later */
-                                              DataModel::AttributeQualityFlags::kListAttribute, Access::Privilege::kView,
-                                              std::nullopt);
-
-    for (auto & attribute : GlobalAttributesNotInMetadata)
+    for (auto & attributeId : GlobalAttributesNotInMetadata)
     {
-        globalListEntry.attributeId = attribute;
-        ReturnErrorOnFailure(builder.Append(globalListEntry));
+
+        // This "GlobalListEntry" is specific for metadata that ember does not include
+        // in its attribute list metadata.
+        //
+        // By spec these Attribute/AcceptedCommands/GeneratedCommants lists are:
+        //   - lists of elements
+        //   - read-only, with read privilege view
+        //   - fixed value (no such flag exists, so this is not a quality flag we set/track)
+        DataModel::AttributeEntry globalListEntry(attributeId, DataModel::AttributeQualityFlags::kListAttribute,
+                                                  Access::Privilege::kView, std::nullopt);
+
+        ReturnErrorOnFailure(builder.Append(std::move(globalListEntry)));
     }
 
     return CHIP_NO_ERROR;

@@ -1,5 +1,5 @@
 # Copyright (c) 2021 Project CHIP Authors
-# Copyright 2023-2024 NXP
+# Copyright 2023-2025 NXP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -73,12 +73,6 @@ config("nxp_platform_config") {
                  nxp_enable_secure_EL2GO_factory_data,
              "please select only one protection solution")
     }
-  }
-
-  # When OTBR is enabled Thread network commissioning cluster is enabled using chip_enable_secondary_nwk_if
-  if (chip_enable_wifi && chip_enable_openthread &&
-      !chip_enable_secondary_nwk_if) {
-    defines += [ "_NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_" ]
   }
 }
 
@@ -212,6 +206,11 @@ static_library("nxp_platform") {
       }
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
+  }
+
+  if (chip_enable_ethernet) {
+    include_dirs = [ "../../common/Ethernet/" ]
+    sources += [ "../../common/Ethernet/NxpEthDriver.cpp" ]
   }
 
   if (nxp_use_factory_data) {

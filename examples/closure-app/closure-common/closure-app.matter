@@ -211,6 +211,13 @@ enum RelativePositionTag : enum8 {
   kBehind = 6;
 }
 
+enum StreamUsageEnum : enum8 {
+  kInternal = 0;
+  kRecording = 1;
+  kAnalysis = 2;
+  kLiveView = 3;
+}
+
 enum TariffPriceTypeEnum : enum8 {
   kStandard = 0;
   kCritical = 1;
@@ -235,6 +242,21 @@ enum ThreeLevelAutoEnum : enum8 {
   kLow = 1;
   kMedium = 2;
   kHigh = 3;
+}
+
+enum WebRTCEndReasonEnum : enum8 {
+  kIceFailed = 0;
+  kIceTimeout = 1;
+  kUserHangup = 2;
+  kUserBusy = 3;
+  kReplaced = 4;
+  kNoUserMedia = 5;
+  kInviteTimeout = 6;
+  kAnsweredElsewhere = 7;
+  kOutOfResources = 8;
+  kMediaTimeout = 9;
+  kLowPower = 10;
+  kUnknownReason = 11;
 }
 
 bitmap TestGlobalBitmap : bitmap32 {
@@ -276,6 +298,19 @@ struct AtomicAttributeStatusStruct {
   status statusCode = 1;
 }
 
+struct ICECandidateStruct {
+  char_string candidate = 0;
+  nullable char_string SDPMid = 1;
+  nullable int16u SDPMLineIndex = 2;
+}
+
+struct ICEServerStruct {
+  char_string URLs[] = 0;
+  optional long_char_string<508> username = 1;
+  optional long_char_string<512> credential = 2;
+  optional int16u caid = 3;
+}
+
 struct LocationDescriptorStruct {
   char_string<128> locationName = 0;
   nullable int16s floorNumber = 1;
@@ -294,9 +329,27 @@ struct TestGlobalStruct {
   optional nullable TestGlobalEnum myEnum = 2;
 }
 
+struct ViewportStruct {
+  int16u x1 = 0;
+  int16u y1 = 1;
+  int16u x2 = 2;
+  int16u y2 = 3;
+}
+
+fabric_scoped struct WebRTCSessionStruct {
+  int16u id = 0;
+  node_id peerNodeID = 1;
+  endpoint_no peerEndpointID = 2;
+  StreamUsageEnum streamUsage = 3;
+  nullable int16u videoStreamID = 4;
+  nullable int16u audioStreamID = 5;
+  optional boolean metadataEnabled = 6;
+  fabric_idx fabricIndex = 254;
+}
+
 /** Attributes and commands for putting a device into Identification mode (e.g. flashing a light). */
 cluster Identify = 3 {
-  revision 4;
+  revision 5;
 
   enum EffectIdentifierEnum : enum8 {
     kBlink = 0;
@@ -337,9 +390,9 @@ cluster Identify = 3 {
     EffectVariantEnum effectVariant = 1;
   }
 
-  /** Command description for Identify */
+  /** This command starts or stops the receiving device identifying itself. */
   command access(invoke: manage) Identify(IdentifyRequest): DefaultSuccess = 0;
-  /** Command description for TriggerEffect */
+  /** This command allows the support of feedback to the user, such as a certain light effect. */
   command access(invoke: manage) TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
@@ -1022,6 +1075,12 @@ cluster GeneralCommissioning = 48 {
     kTCMinVersionNotMet = 7;
   }
 
+  enum NetworkRecoveryReasonEnum : enum8 {
+    kUnspecified = 0;
+    kAuth = 1;
+    kVisibility = 2;
+  }
+
   enum RegulatoryLocationTypeEnum : enum8 {
     kIndoor = 0;
     kOutdoor = 1;
@@ -1030,6 +1089,7 @@ cluster GeneralCommissioning = 48 {
 
   bitmap Feature : bitmap32 {
     kTermsAndConditions = 0x1;
+    kNetworkRecovery = 0x2;
   }
 
   struct BasicCommissioningInfo {
@@ -1047,6 +1107,8 @@ cluster GeneralCommissioning = 48 {
   provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
   provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
   provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
+  provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
+  provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1088,19 +1150,19 @@ cluster GeneralCommissioning = 48 {
     CommissioningErrorEnum errorCode = 0;
   }
 
-  /** Arm the persistent fail-safe timer with an expiry time of now + ExpiryLengthSeconds using device clock */
+  /** This command is used to arm or disarm the fail-safe timer. */
   command access(invoke: administer) ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
-  /** Set the regulatory configuration to be used during commissioning */
+  /** This command is used to set the regulatory configuration for the device. */
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
-  /** Signals the Server that the Client has successfully completed all steps of Commissioning/Recofiguration needed during fail-safe period. */
+  /** This command is used to indicate that the commissioning process is complete. */
   fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
-  /** This command sets the user acknowledgements received in the Enhanced Setup Flow Terms and Conditions into the node. */
+  /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms & Conditions into the node. */
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 cluster NetworkCommissioning = 49 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum NetworkCommissioningStatusEnum : enum8 {
     kSuccess = 0;
@@ -1409,7 +1471,7 @@ cluster GeneralDiagnostics = 51 {
 
 /** The Software Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster SoftwareDiagnostics = 52 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   bitmap Feature : bitmap32 {
     kWatermarks = 0x1;
@@ -1426,7 +1488,7 @@ cluster SoftwareDiagnostics = 52 {
   info event SoftwareFault = 0 {
     int64u id = 0;
     optional char_string name = 1;
-    optional octet_string faultRecording = 2;
+    optional long_octet_string faultRecording = 2;
   }
 
   readonly attribute optional ThreadMetricsStruct threadMetrics[] = 0;
@@ -1439,7 +1501,7 @@ cluster SoftwareDiagnostics = 52 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reception of this command SHALL reset the values: The StackFreeMinimum field of the ThreadMetrics attribute, CurrentHeapHighWaterMark attribute. */
+  /** This command is used to reset the high watermarks for heap and stack memory. */
   command access(invoke: manage) ResetWatermarks(): DefaultSuccess = 0;
 }
 
@@ -1612,7 +1674,7 @@ cluster ThreadNetworkDiagnostics = 53 {
 
 /** The Wi-Fi Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster WiFiNetworkDiagnostics = 54 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum AssociationFailureCauseEnum : enum8 {
     kUnknown = 0;
@@ -1682,13 +1744,13 @@ cluster WiFiNetworkDiagnostics = 54 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reception of this command SHALL reset the Breacon and Packet related count attributes to 0 */
+  /** This command is used to reset the count attributes. */
   command ResetCounts(): DefaultSuccess = 0;
 }
 
 /** The Ethernet Network Diagnostics Cluster provides a means to acquire standardized diagnostics metrics that MAY be used by a Node to assist a user or Administrative Node in diagnosing potential problems. */
 cluster EthernetNetworkDiagnostics = 55 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 1;
 
   enum PHYRateEnum : enum8 {
     kRate10M = 0;
@@ -1723,7 +1785,7 @@ cluster EthernetNetworkDiagnostics = 55 {
   readonly attribute bitmap32 featureMap = 65532;
   readonly attribute int16u clusterRevision = 65533;
 
-  /** Reception of this command SHALL reset the attributes: PacketRxCount, PacketTxCount, TxErrCount, CollisionCount, OverrunCount to 0 */
+  /** This command is used to reset the count attributes. */
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
@@ -2115,7 +2177,7 @@ cluster IcdManagement = 70 {
   command access(invoke: manage) StayActiveRequest(StayActiveRequestRequest): StayActiveResponse = 3;
 }
 
-/** This cluster provides an interface for controlling a Closure device. */
+/** This cluster provides an interface for controlling a Closure. */
 provisional cluster ClosureControl = 260 {
   revision 1;
 
@@ -2125,6 +2187,15 @@ provisional cluster ClosureControl = 260 {
     kTemperatureLimited = 2;
     kMaintenanceRequired = 3;
     kInternalInterference = 4;
+  }
+
+  enum CurrentPositionEnum : enum8 {
+    kFullyClosed = 0;
+    kFullyOpened = 1;
+    kPartiallyOpened = 2;
+    kOpenedForPedestrian = 3;
+    kOpenedForVentilation = 4;
+    kOpenedAtSignature = 5;
   }
 
   enum MainStateEnum : enum8 {
@@ -2138,21 +2209,12 @@ provisional cluster ClosureControl = 260 {
     kSetupRequired = 7;
   }
 
-  enum PositioningEnum : enum8 {
-    kFullyClosed = 0;
-    kFullyOpened = 1;
-    kPartiallyOpened = 2;
-    kOpenedForPedestrian = 3;
-    kOpenedForVentilation = 4;
-    kOpenedAtSignature = 5;
-  }
-
   enum TargetPositionEnum : enum8 {
-    kCloseInFull = 0;
-    kOpenInFull = 1;
-    kPedestrian = 2;
-    kVentilation = 3;
-    kSignature = 4;
+    kMoveToFullyClosed = 0;
+    kMoveToFullyOpen = 1;
+    kMoveToPedestrianPosition = 2;
+    kMoveToVentilationPosition = 3;
+    kMoveToSignaturePosition = 4;
   }
 
   bitmap Feature : bitmap32 {
@@ -2167,16 +2229,21 @@ provisional cluster ClosureControl = 260 {
     kManuallyOperable = 0x100;
   }
 
-  struct OverallStateStruct {
-    optional nullable PositioningEnum positioning = 0;
+  bitmap LatchControlModesBitmap : bitmap8 {
+    kRemoteLatching = 0x1;
+    kRemoteUnlatching = 0x2;
+  }
+
+  struct OverallCurrentStateStruct {
+    optional nullable CurrentPositionEnum position = 0;
     optional nullable boolean latch = 1;
-    optional nullable ThreeLevelAutoEnum speed = 2;
+    optional ThreeLevelAutoEnum speed = 2;
     optional nullable boolean secureState = 3;
   }
 
-  struct OverallTargetStruct {
-    optional TargetPositionEnum position = 0;
-    optional boolean latch = 1;
+  struct OverallTargetStateStruct {
+    optional nullable TargetPositionEnum position = 0;
+    optional nullable boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
   }
 
@@ -2198,8 +2265,9 @@ provisional cluster ClosureControl = 260 {
   readonly attribute optional nullable elapsed_s countdownTime = 0;
   readonly attribute MainStateEnum mainState = 1;
   readonly attribute ClosureErrorEnum currentErrorList[] = 2;
-  readonly attribute nullable OverallStateStruct overallState = 3;
-  readonly attribute nullable OverallTargetStruct overallTarget = 4;
+  readonly attribute nullable OverallCurrentStateStruct overallCurrentState = 3;
+  readonly attribute nullable OverallTargetStateStruct overallTargetState = 4;
+  readonly attribute optional LatchControlModesBitmap latchControlModes = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2214,13 +2282,13 @@ provisional cluster ClosureControl = 260 {
 
   /** On receipt of this command, the closure SHALL stop its movement as fast as the closure is able too. */
   command Stop(): DefaultSuccess = 0;
-  /** This command is used to move the device to a specific position, latch and/or perform the movement at specific speed. */
+  /** On receipt of this command, the closure SHALL operate to update its position, latch state and/or motion speed. */
   command MoveTo(MoveToRequest): DefaultSuccess = 1;
-  /** This command is used to trigger a calibration of the device. */
+  /** This command is used to trigger a calibration of the closure. */
   command access(invoke: manage) Calibrate(): DefaultSuccess = 2;
 }
 
-/** Ceiling values are dedicated for closures that close a ceiling, such as horizontal awnings, pergolas, etc. */
+/** This cluster provides an interface to reflect and control a closure's range of movement, usually involving a panel, by using 6-axis framework. */
 provisional cluster ClosureDimension = 261 {
   revision 1;
 
@@ -2283,10 +2351,6 @@ provisional cluster ClosureDimension = 261 {
     kBackward = 9;
     kDepthMask = 10;
     kDepthSymmetry = 11;
-    kCeilingSimple = 12;
-    kCeilingMask = 13;
-    kCeilingSidedSymmetry = 14;
-    kCeilingCenteredSymmetry = 15;
   }
 
   bitmap Feature : bitmap32 {
@@ -2300,9 +2364,14 @@ provisional cluster ClosureDimension = 261 {
     kModulation = 0x80;
   }
 
-  struct CurrentStateStruct {
-    optional percent100ths position = 0;
-    optional boolean latch = 1;
+  bitmap LatchControlModesBitmap : bitmap8 {
+    kRemoteLatching = 0x1;
+    kRemoteUnlatching = 0x2;
+  }
+
+  struct DimensionStateStruct {
+    optional nullable percent100ths position = 0;
+    optional nullable boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
   }
 
@@ -2311,19 +2380,13 @@ provisional cluster ClosureDimension = 261 {
     percent100ths max = 1;
   }
 
-  struct TargetStruct {
-    optional percent100ths position = 0;
-    optional boolean latch = 1;
-    optional ThreeLevelAutoEnum speed = 2;
-  }
-
   struct UnitRangeStruct {
     int16s min = 0;
     int16s max = 1;
   }
 
-  readonly attribute nullable CurrentStateStruct currentState = 0;
-  readonly attribute nullable TargetStruct target = 1;
+  readonly attribute nullable DimensionStateStruct currentState = 0;
+  readonly attribute nullable DimensionStateStruct targetState = 1;
   readonly attribute optional percent100ths resolution = 2;
   readonly attribute optional percent100ths stepValue = 3;
   readonly attribute optional ClosureUnitEnum unit = 4;
@@ -2333,6 +2396,7 @@ provisional cluster ClosureDimension = 261 {
   readonly attribute optional RotationAxisEnum rotationAxis = 8;
   readonly attribute optional OverflowEnum overflow = 9;
   readonly attribute optional ModulationTypeEnum modulationType = 10;
+  readonly attribute optional LatchControlModesBitmap latchControlModes = 11;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2351,9 +2415,9 @@ provisional cluster ClosureDimension = 261 {
     optional ThreeLevelAutoEnum speed = 2;
   }
 
-  /** This command is used to move a dimension of the device to a target position. */
+  /** This command is used to move a dimension of the closure to a target position. */
   command SetTarget(SetTargetRequest): DefaultSuccess = 0;
-  /** This command is used to move a dimension of the device to a target position by a number of steps. */
+  /** Upon receipt, this SHALL move a dimension of the closure to a target position by a number of steps. */
   command Step(StepRequest): DefaultSuccess = 1;
 }
 
@@ -2378,14 +2442,13 @@ endpoint 0 {
     emits event AccessControlEntryChanged;
     emits event AccessControlExtensionChanged;
     callback attribute acl;
-    callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
     callback attribute targetsPerAccessControlEntry;
     callback attribute accessControlEntriesPerFabric;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -2475,19 +2538,19 @@ endpoint 0 {
   }
 
   server cluster NetworkCommissioning {
-    ram      attribute maxNetworks;
+    callback attribute maxNetworks;
     callback attribute networks;
-    ram      attribute scanMaxTimeSeconds;
-    ram      attribute connectMaxTimeSeconds;
-    ram      attribute interfaceEnabled;
-    ram      attribute lastNetworkingStatus;
-    ram      attribute lastNetworkID;
-    ram      attribute lastConnectErrorValue;
+    callback attribute scanMaxTimeSeconds;
+    callback attribute connectMaxTimeSeconds;
+    callback attribute interfaceEnabled;
+    callback attribute lastNetworkingStatus;
+    callback attribute lastNetworkID;
+    callback attribute lastConnectErrorValue;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 2;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command ScanNetworks;
     handle command ScanNetworksResponse;
@@ -2507,9 +2570,6 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute activeHardwareFaults;
-    callback attribute activeRadioFaults;
-    callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -2528,7 +2588,7 @@ endpoint 0 {
     callback attribute currentHeapUsed;
     callback attribute currentHeapHighWatermark;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command ResetWatermarks;
   }
@@ -2648,7 +2708,7 @@ endpoint 0 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
     handle command RevokeCommissioning;
@@ -2757,13 +2817,14 @@ endpoint 1 {
     callback attribute countdownTime;
     ram      attribute mainState;
     callback attribute currentErrorList;
-    callback attribute overallState;
-    callback attribute overallTarget;
+    callback attribute overallCurrentState;
+    callback attribute overallTargetState;
+    ram      attribute latchControlModes;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command Stop;
     handle command MoveTo;
@@ -2789,7 +2850,7 @@ endpoint 2 {
 
   server cluster ClosureDimension {
     callback attribute currentState;
-    callback attribute target;
+    callback attribute targetState;
     ram      attribute resolution;
     ram      attribute stepValue;
     ram      attribute unit;
@@ -2799,11 +2860,12 @@ endpoint 2 {
     ram      attribute rotationAxis;
     ram      attribute overflow;
     ram      attribute modulationType;
+    ram      attribute latchControlModes;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command SetTarget;
     handle command Step;
@@ -2828,7 +2890,7 @@ endpoint 3 {
 
   server cluster ClosureDimension {
     callback attribute currentState;
-    callback attribute target;
+    callback attribute targetState;
     ram      attribute resolution;
     ram      attribute stepValue;
     ram      attribute unit;
@@ -2838,11 +2900,12 @@ endpoint 3 {
     ram      attribute rotationAxis;
     ram      attribute overflow;
     ram      attribute modulationType;
+    ram      attribute latchControlModes;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute featureMap;
+    callback attribute clusterRevision;
 
     handle command SetTarget;
     handle command Step;

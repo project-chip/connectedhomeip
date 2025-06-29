@@ -16,7 +16,22 @@
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
-    "${CLUSTER_DIR}/SoftwareDiagnosticsTestEventTriggerHandler.h"
-    "${CLUSTER_DIR}/software-diagnostics-server.cpp"
-    "${CLUSTER_DIR}/software-diagnostics-server.h"
+    "${CLUSTER_DIR}/CodegenIntegration.cpp"
+)
+
+# These are the things that BUILD.gn dependencies would pull
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/software-diagnostics-cluster.h"
+    "${CLUSTER_DIR}/software-diagnostics-logic.cpp"
+    "${CLUSTER_DIR}/software-diagnostics-logic.h"
+)
+
+# These are the things that BUILD.gn dependencies would pull
+TARGET_SOURCES(
+  ${APP_TARGET}
+  PRIVATE
+    "${CLUSTER_DIR}/software-fault-listener.cpp"
+    "${CLUSTER_DIR}/software-fault-listener.h"
 )

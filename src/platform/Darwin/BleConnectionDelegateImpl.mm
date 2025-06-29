@@ -35,6 +35,9 @@
 #include <setup_payload/SetupPayload.h>
 #include <tracing/metric_event.h>
 
+#include <algorithm>
+#include <vector>
+
 #import <CoreBluetooth/CoreBluetooth.h>
 
 #import "PlatformMetricKeys.h"
@@ -59,25 +62,28 @@ typedef NS_ENUM(uint8_t, BleConnectionMode) {
 
 @property (strong, nonatomic) dispatch_queue_t workQueue; // the CHIP work queue
 @property (strong, nonatomic) CBCentralManager * centralManager;
-@property (strong, nonatomic) CBPeripheral * peripheral;
+@property (strong, nonatomic, nullable) CBPeripheral * peripheral;
+// The discriminator that matches "peripheral"
+@property (strong, nonatomic, nullable) NSNumber * matchedLongDiscriminator;
 @property (strong, nonatomic, readonly, nullable) dispatch_source_t timer;
 @property (assign, nonatomic, readonly) BleConnectionMode currentMode;
 @property (strong, nonatomic) NSMutableDictionary<CBPeripheral *, NSDictionary *> * cachedPeripherals;
 @property (assign, nonatomic) bool found;
-@property (assign, nonatomic) chip::SetupDiscriminator deviceDiscriminator;
+@property (assign, nonatomic) std::vector<chip::SetupDiscriminator> desiredDiscriminators;
 @property (assign, nonatomic) void * appState;
 @property (assign, nonatomic) BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete;
+@property (assign, nonatomic) BleConnectionDelegate::OnConnectionByDiscriminatorsCompleteFunct onConnectionCompleteWithDiscriminator;
 @property (assign, nonatomic) BleConnectionDelegate::OnConnectionErrorFunct onConnectionError;
 @property (assign, nonatomic) chip::DeviceLayer::BleScannerDelegate * scannerDelegate;
 @property (assign, nonatomic) chip::Ble::BleLayer * bleLayer;
 
 - (instancetype)initWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate prewarm:(bool)prewarm;
-- (instancetype)initWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator;
+- (instancetype)initWithDiscriminators:(const chip::Span<const chip::SetupDiscriminator> &)desiredDiscriminators;
 
 - (void)start;
 - (void)stop;
 - (void)updateWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate prewarm:(bool)prewarm;
-- (void)updateWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator;
+- (void)updateWithDiscriminators:(const chip::Span<const chip::SetupDiscriminator> &)desiredDiscriminators;
 - (void)updateWithPeripheral:(CBPeripheral *)peripheral;
 - (BOOL)isConnecting;
 - (void)addPeripheralToCache:(CBPeripheral *)peripheral data:(NSData *)data;
@@ -94,31 +100,58 @@ namespace DeviceLayer {
         void BleConnectionDelegateImpl::NewConnection(
             Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & deviceDiscriminator)
         {
+            NewConnectionImpl(bleLayer, appState, chip::Span(&deviceDiscriminator, 1),
+                OnConnectionComplete, nullptr, OnConnectionError);
+        }
+
+        CHIP_ERROR BleConnectionDelegateImpl::NewConnection(BleLayer * bleLayer, void * appState, const Span<const SetupDiscriminator> & discriminators,
+            OnConnectionByDiscriminatorsCompleteFunct onConnectionComplete,
+            OnConnectionErrorFunct onConnectionError)
+        {
+            NewConnectionImpl(bleLayer, appState, discriminators, nullptr, onConnectionComplete, onConnectionError);
+            return CHIP_NO_ERROR;
+        }
+
+        void BleConnectionDelegateImpl::NewConnectionImpl(BleLayer * bleLayer, void * appState, const chip::Span<const SetupDiscriminator> & desiredDiscriminators,
+            BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
+            BleConnectionDelegate::OnConnectionByDiscriminatorsCompleteFunct onConnectionCompleteWithDiscriminator,
+            BleConnectionDelegate::OnConnectionErrorFunct onConnectionError)
+        {
             assertChipStackLockedByCurrentThread();
 
-            if (deviceDiscriminator.IsShortDiscriminator()) {
-                ChipLogProgress(Ble, "ConnectionDelegate NewConnection with short discriminator %d (0x%x)", deviceDiscriminator.GetShortValue(), deviceDiscriminator.GetShortValue());
-            } else {
-                ChipLogProgress(Ble, "ConnectionDelegate NewConnection with long discriminator %d (0x%x)", deviceDiscriminator.GetLongValue(), deviceDiscriminator.GetLongValue());
+            NSMutableArray * discriminatorStrings = [NSMutableArray arrayWithCapacity:desiredDiscriminators.size()];
+            for (auto & deviceDiscriminator : desiredDiscriminators) {
+                if (deviceDiscriminator.IsShortDiscriminator()) {
+                    [discriminatorStrings addObject:[NSString stringWithFormat:@"%d (short, 0x%x)", deviceDiscriminator.GetShortValue(), deviceDiscriminator.GetShortValue()]];
+                } else {
+                    [discriminatorStrings addObject:[NSString stringWithFormat:@"%d (long, 0x%03x)", deviceDiscriminator.GetLongValue(), deviceDiscriminator.GetLongValue()]];
+                }
             }
+
+            // Some consumers of this code (like chip-tool) don't seem to
+            // implement logging in a way that supports %@ so far.
+            ChipLogProgress(Ble, "ConnectionDelegate NewConnection with discriminator list: [ %s ]",
+                [discriminatorStrings componentsJoinedByString:@", "].UTF8String);
 
             // If the previous connection delegate was not a try to connect to something, just reuse it instead of
             // creating a brand new connection but update the discriminator and the ble layer members.
             if (ble and ![ble isConnecting]) {
                 ble.bleLayer = bleLayer;
                 ble.appState = appState;
-                ble.onConnectionComplete = OnConnectionComplete;
-                ble.onConnectionError = OnConnectionError;
-                [ble updateWithDiscriminator:deviceDiscriminator];
+                ble.onConnectionComplete = onConnectionComplete;
+                ble.onConnectionCompleteWithDiscriminator = onConnectionCompleteWithDiscriminator;
+                ble.onConnectionError = onConnectionError;
+                [ble updateWithDiscriminators:desiredDiscriminators];
                 return;
             }
 
             [ble stop];
-            ble = [[MTRBleConnection alloc] initWithDiscriminator:deviceDiscriminator];
+            ble = [[MTRBleConnection alloc] initWithDiscriminators:desiredDiscriminators];
             ble.bleLayer = bleLayer;
             ble.appState = appState;
-            ble.onConnectionComplete = OnConnectionComplete;
-            ble.onConnectionError = OnConnectionError;
+            ble.onConnectionComplete = onConnectionComplete;
+            ble.onConnectionCompleteWithDiscriminator = onConnectionCompleteWithDiscriminator;
+            ble.onConnectionError = onConnectionError;
             ble.centralManager = [ble.centralManager initWithDelegate:ble queue:ble.workQueue];
         }
 
@@ -248,11 +281,12 @@ namespace DeviceLayer {
     return self;
 }
 
-- (id)initWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator
+- (id)initWithDiscriminators:(const chip::Span<const chip::SetupDiscriminator> &)desiredDiscriminators
 {
     self = [self init];
     if (self) {
-        _deviceDiscriminator = deviceDiscriminator;
+        _desiredDiscriminators = std::vector<chip::SetupDiscriminator>(desiredDiscriminators.begin(),
+            desiredDiscriminators.end());
         _currentMode = kConnecting;
         [self setupTimer:kScanningWithDiscriminatorTimeoutInSeconds];
     }
@@ -303,9 +337,21 @@ namespace DeviceLayer {
 - (void)dispatchConnectionComplete:(CBPeripheral *)peripheral
 {
     auto * onConnectionComplete = _onConnectionComplete;
+    auto * onConnectionCompleteWithDiscriminator = _onConnectionCompleteWithDiscriminator;
+    auto * matchedLongDiscriminator = _matchedLongDiscriminator;
     auto * appState = _appState;
     [self clearConnectionCallbacks];
-    if (onConnectionComplete != nullptr) {
+    if (onConnectionCompleteWithDiscriminator != nullptr) {
+        // VerifyOrDie and VerifyOrDieWithMsg both seem to hit compiler errors:
+        // https://github.com/project-chip/connectedhomeip/issues/39135
+        if (matchedLongDiscriminator == nil) {
+            ChipLogError(Ble, "We should only have a peripheral without a discriminator if the "
+                              "NewConnection entrypoint took a BLE_CONNECTION_OBJECT, and in that case "
+                              "we would not be using onConnectionCompleteWithDiscriminator.");
+            VerifyOrDieWithoutLogging(matchedLongDiscriminator != nil);
+        }
+        onConnectionCompleteWithDiscriminator(appState, matchedLongDiscriminator.unsignedShortValue, BleConnObjectFromCBPeripheral(peripheral));
+    } else if (onConnectionComplete != nullptr) {
         onConnectionComplete(appState, BleConnObjectFromCBPeripheral(peripheral));
     }
 }
@@ -314,6 +360,7 @@ namespace DeviceLayer {
 {
     _onConnectionComplete = nullptr;
     _onConnectionError = nullptr;
+    _onConnectionCompleteWithDiscriminator = nullptr;
     _appState = nullptr;
 }
 
@@ -407,7 +454,10 @@ namespace DeviceLayer {
 
         MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredMatchingPeripheral);
         ChipLogProgress(Ble, "Connecting to device %p with discriminator: %d", peripheral, discriminator);
-        [self connect:peripheral];
+        [self connect:peripheral withLongDiscriminator:@(discriminator)];
+        // TODO: If we have multiple discriminators, consider continuing to
+        // scan for the other ones.  We would need to not store the peripheral
+        // and discriminator in singleton members for that.
         [self stopScanning];
     } else {
         [self addPeripheralToCache:peripheral data:serviceData];
@@ -416,7 +466,9 @@ namespace DeviceLayer {
 
 - (BOOL)checkDiscriminator:(uint16_t)discriminator
 {
-    return _deviceDiscriminator.MatchesLongDiscriminator(discriminator);
+    return std::find_if(_desiredDiscriminators.begin(), _desiredDiscriminators.end(), [discriminator](const chip::SetupDiscriminator & desiredDiscriminator) {
+        return desiredDiscriminator.MatchesLongDiscriminator(discriminator);
+    }) != _desiredDiscriminators.end();
 }
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral
@@ -466,7 +518,7 @@ namespace DeviceLayer {
     MATTER_LOG_METRIC_END(kMetricBLEDiscoveredCharacteristics, CHIP_ERROR(chip::ChipError::Range::kOS, static_cast<uint32_t>(error.code)));
 
     if (error != nil) {
-        ChipLogError(Ble, "Failed to discover characterstics: %@", error);
+        ChipLogError(Ble, "Failed to discover characteristics: %@", error);
     }
 
     // XXX error ?
@@ -561,7 +613,7 @@ namespace DeviceLayer {
     // otherwise start scanning to find the peripheral to connect to.
     if (_peripheral != nil) {
         MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredMatchingPeripheral);
-        [self connect:_peripheral];
+        [self connect:_peripheral withLongDiscriminator:_matchedLongDiscriminator];
     } else {
         [self startScanning];
     }
@@ -628,7 +680,7 @@ namespace DeviceLayer {
     [_centralManager stopScan];
 }
 
-- (void)connect:(CBPeripheral *)peripheral
+- (void)connect:(CBPeripheral *)peripheral withLongDiscriminator:(nullable NSNumber *)longDiscriminator
 {
     if (!_centralManager || !peripheral) {
         return;
@@ -637,6 +689,7 @@ namespace DeviceLayer {
     MATTER_LOG_METRIC_END(kMetricBLEDiscoveredMatchingPeripheral);
     MATTER_LOG_METRIC_BEGIN(kMetricBLEConnectPeripheral);
     _peripheral = peripheral;
+    _matchedLongDiscriminator = longDiscriminator;
     [_centralManager connectPeripheral:peripheral options:nil];
 }
 
@@ -672,13 +725,15 @@ namespace DeviceLayer {
     }
 }
 
-- (void)updateWithDiscriminator:(const chip::SetupDiscriminator &)deviceDiscriminator
+- (void)updateWithDiscriminators:(const chip::Span<const chip::SetupDiscriminator> &)desiredDiscriminators
 {
     [self detachScannerDelegate];
-    _deviceDiscriminator = deviceDiscriminator;
+    _desiredDiscriminators = std::vector<chip::SetupDiscriminator>(desiredDiscriminators.begin(),
+        desiredDiscriminators.end());
     _currentMode = kConnecting;
 
     CBPeripheral * peripheral = nil;
+    NSNumber * discriminator = nil;
     for (CBPeripheral * cachedPeripheral in _cachedPeripherals) {
         NSData * serviceData = _cachedPeripherals[cachedPeripheral][@"data"];
         ChipBLEDeviceIdentificationInfo info;
@@ -686,6 +741,7 @@ namespace DeviceLayer {
 
         if ([self checkDiscriminator:info.GetDeviceDiscriminator()]) {
             peripheral = cachedPeripheral;
+            discriminator = @(info.GetDeviceDiscriminator());
             break;
         }
     }
@@ -695,7 +751,7 @@ namespace DeviceLayer {
     if (peripheral) {
         MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredMatchingPeripheral);
         ChipLogProgress(Ble, "Connecting to cached device: %p", peripheral);
-        [self connect:peripheral];
+        [self connect:peripheral withLongDiscriminator:discriminator];
         // The cached peripheral might be obsolete, so continue scanning until didConnectPeripheral is triggered.
     } else {
         [self setupTimer:kScanningWithDiscriminatorTimeoutInSeconds];
@@ -709,7 +765,7 @@ namespace DeviceLayer {
 
     MATTER_LOG_METRIC_BEGIN(kMetricBLEDiscoveredMatchingPeripheral);
     ChipLogProgress(Ble, "Connecting to device: %p", peripheral);
-    [self connect:peripheral];
+    [self connect:peripheral withLongDiscriminator:nil];
     [self stopScanning];
 }
 

@@ -16,6 +16,9 @@
  *    limitations under the License.
  */
 
+#include "WaterLeakDetectorAppAttrUpdateDelegate.h"
+#include "WaterLeakDetectorManager.h"
+
 #include <AppMain.h>
 #include <platform/CHIPDeviceConfig.h>
 
@@ -26,17 +29,34 @@
 #include <imgui_ui/windows/qrcode.h>
 #endif
 
+static constexpr chip::EndpointId sWaterLeakDetectorEndpointId = 1;
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 
-void ApplicationInit() {}
+namespace {
+NamedPipeCommands sChipNamedPipeCommands;
+WaterLeakDetectorAppAttrUpdateDelegate sWaterLeakDetectorAppAttrUpdateDelegate;
+} // namespace
+
+void ApplicationInit()
+{
+    WaterLeakDetectorManager::InitInstance(sWaterLeakDetectorEndpointId);
+}
 
 void ApplicationShutdown() {}
 
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+    std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
+
+    if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sWaterLeakDetectorAppAttrUpdateDelegate) != CHIP_NO_ERROR))
+    {
+        ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
+        sChipNamedPipeCommands.Stop();
+    }
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
     example::Ui::ImguiUi ui;

@@ -29,9 +29,9 @@ from typing import Callable, Optional, Union
 
 import chip.clusters as Clusters
 import chip.testing.conformance as conformance_support
-from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision, ConformanceException,
-                                      ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
-                                      parse_callable_from_xml, parse_device_type_callable_from_xml)
+from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecisionWithChoice,
+                                      ConformanceException, ConformanceParseParameters, feature, is_disallowed, mandatory, optional,
+                                      or_operation, parse_callable_from_xml, parse_device_type_callable_from_xml)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                          EventPathLocation, FeaturePathLocation, ProblemLocation, ProblemNotice, ProblemSeverity)
@@ -55,7 +55,7 @@ class SpecParsingException(Exception):
 
 
 # passing in feature map, attribute list, command list
-ConformanceCallable = Callable[[uint, list[uint], list[uint]], ConformanceDecision]
+ConformanceCallable = Callable[[uint, list[uint], list[uint]], ConformanceDecisionWithChoice]
 
 
 @dataclass
@@ -92,7 +92,7 @@ class XmlAttribute:
 class XmlCommand:
     id: int
     name: str
-    conformance: Callable[[uint], ConformanceDecision]
+    conformance: ConformanceCallable
     privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
 
     def __str__(self):
@@ -550,7 +550,7 @@ class PrebuiltDataModelDirectory(Enum):
     k1_3 = auto()
     k1_4 = auto()
     k1_4_1 = auto()
-    k1_5 = auto()
+    k1_4_2 = auto()
 
     @property
     def dirname(self):
@@ -560,8 +560,8 @@ class PrebuiltDataModelDirectory(Enum):
             return "1.4"
         if self == PrebuiltDataModelDirectory.k1_4_1:
             return "1.4.1"
-        if self == PrebuiltDataModelDirectory.k1_5:
-            return "1.5_in_progress"
+        if self == PrebuiltDataModelDirectory.k1_4_2:
+            return "1.4.2"
         raise KeyError("Invalid enum: %r" % self)
 
 
@@ -936,9 +936,9 @@ def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirect
     version_to_dm = {0x01030000: PrebuiltDataModelDirectory.k1_3,
                      0x01040000: PrebuiltDataModelDirectory.k1_4,
                      0x01040100: PrebuiltDataModelDirectory.k1_4_1,
-                     0x01050000: PrebuiltDataModelDirectory.k1_5}
+                     0x01040200: PrebuiltDataModelDirectory.k1_4_2}
 
     if specification_version not in version_to_dm.keys():
-        raise ConformanceException(f"Unknown specification_version {specification_version:08X}")
+        raise ConformanceException(f"Unknown specification_version 0x{specification_version:08X}")
 
     return version_to_dm[specification_version]

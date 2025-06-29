@@ -2080,19 +2080,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface MTRZoneManagementClusterGetTwoDCartesianZoneParams (InternalMethods)
+@interface MTRZoneManagementClusterRemoveZoneParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRZoneManagementClusterGetTwoDCartesianZoneResponseParams (InternalMethods)
+@interface MTRZoneManagementClusterCreateOrUpdateTriggerParams (InternalMethods)
 
-- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZoneResponse::DecodableType &)decodableStruct;
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
 @end
 
-@interface MTRZoneManagementClusterRemoveZoneParams (InternalMethods)
+@interface MTRZoneManagementClusterRemoveTriggerParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 
@@ -2921,6 +2921,12 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRUnitTestingClusterGlobalEchoRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRUnitTestingClusterTestCheckCommandFlagsParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 

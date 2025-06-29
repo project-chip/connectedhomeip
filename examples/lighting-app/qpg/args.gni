@@ -20,7 +20,7 @@ import("${chip_root}/examples/platform/qpg/args.gni")
 qpg_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 chip_enable_ota_requestor = true
-chip_openthread_ftd = true
+chip_openthread_ftd = false
 enable_sleepy_device = false
 
 # Disable lock tracking, since our FreeRTOS configuration does not set

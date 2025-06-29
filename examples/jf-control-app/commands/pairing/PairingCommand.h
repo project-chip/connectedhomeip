@@ -42,6 +42,7 @@ enum class PairingMode
     AlreadyDiscoveredByIndex,
     AlreadyDiscoveredByIndexWithCode,
     OnNetwork,
+    Nfc,
 };
 
 enum class PairingNetworkType
@@ -82,6 +83,8 @@ public:
         AddArgument("icd-symmetric-key", &mICDSymmetricKey, "The 16 bytes ICD symmetric key, default: randomly generated.");
         AddArgument("icd-stay-active-duration", 0, UINT32_MAX, &mICDStayActiveDurationMsec,
                     "If set, a LIT ICD that is commissioned will be requested to stay active for this many milliseconds");
+        AddArgument("anchor", 0, 1, &mAnchor, "If set to true then a NOC with Anchor and Administrator CAT is issued");
+        AddArgument("execute-jcm", 0, 1, &mExecuteJCM, "Set it to true in order to commission a Joint Fabric Administrator");
         switch (networkType)
         {
         case PairingNetworkType::None:
@@ -105,7 +108,6 @@ public:
         case PairingMode::None:
             break;
         case PairingMode::Code:
-            AddArgument("anchor", 0, 1, &mAnchor);
             AddArgument("dcl-hostname", &mDCLHostName,
                         "Hostname of the DCL server to fetch information from. Defaults to 'on.dcl.csa-iot.org'.");
             AddArgument("dcl-port", 0, UINT16_MAX, &mDCLPort, "Port number for connecting to the DCL server. Defaults to '443'.");
@@ -117,17 +119,19 @@ public:
             AddArgument("use-only-onnetwork-discovery", 0, 1, &mUseOnlyOnNetworkDiscovery);
             break;
         case PairingMode::Ble:
-            AddArgument("anchor", 0, 1, &mAnchor);
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
+            AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
+            break;
+        case PairingMode::Nfc:
+            AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
             break;
         case PairingMode::OnNetwork:
-            AddArgument("anchor", 0, 1, &mAnchor);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
         case PairingMode::SoftAP:
-            AddArgument("anchor", 0, 1, &mAnchor);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
             AddArgument("device-remote-ip", &mRemoteAddr);
@@ -136,26 +140,22 @@ public:
             break;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
         case PairingMode::WiFiPAF:
-            AddArgument("anchor", 0, 1, &mAnchor);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
             break;
 #endif
         case PairingMode::AlreadyDiscovered:
-            AddArgument("anchor", 0, 1, &mAnchor);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("device-remote-ip", &mRemoteAddr);
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
         case PairingMode::AlreadyDiscoveredByIndex:
-            AddArgument("anchor", 0, 1, &mAnchor);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("index", 0, UINT16_MAX, &mIndex);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
             break;
         case PairingMode::AlreadyDiscoveredByIndexWithCode:
-            AddArgument("anchor", 0, 1, &mAnchor);
             AddArgument("payload", &mOnboardingPayload);
             AddArgument("index", 0, UINT16_MAX, &mIndex);
             AddArgument("pase-only", 0, 1, &mPaseOnly);
@@ -234,7 +234,8 @@ public:
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info) override;
-    void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
+    void OnCommissioningComplete(NodeId nodeId, const chip::Optional<chip::Crypto::P256PublicKey> & trustedIcacPublicKeyB,
+                                 CHIP_ERROR err) override;
     void OnICDRegistrationComplete(chip::ScopedNodeId deviceId, uint32_t icdCounter) override;
     void OnICDStayActiveComplete(chip::ScopedNodeId deviceId, uint32_t promisedActiveDuration) override;
 
@@ -313,6 +314,8 @@ private:
 
     bool mDeviceIsICD = false;
     uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
+
+    chip::Optional<bool> mExecuteJCM;
 
     // For unpair
     chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;

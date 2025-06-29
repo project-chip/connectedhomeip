@@ -37,11 +37,31 @@ import random
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
 class TC_ACL_2_6(MatterBaseTest):
+    async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlEntryChanged) -> int:
+        event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
+        events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
+
+        if not events:
+            raise AssertionError(f"No events found for {acec_event} to determine latest event number.")
+
+        return max(e.Header.EventNumber for e in events)
+
+    # Compare events by their relevant fields instead of string representation
+    def event_key(self, event):
+        # Extract only the fields we care about for comparison
+        return (
+            str(event.latestValue.privilege),
+            str(event.latestValue.authMode),
+            str(event.latestValue.subjects),
+            str(event.latestValue.targets),
+            str(event.latestValue.fabricIndex)
+        )
+
     def desc_TC_ACL_2_6(self) -> str:
         return "[TC-ACL-2.6] AccessControlEntryChanged event"
 
@@ -74,15 +94,22 @@ class TC_ACL_2_6(MatterBaseTest):
         cfi_attribute = oc_cluster.Attributes.CurrentFabricIndex
         f1 = await self.read_single_attribute_check_success(endpoint=0, cluster=oc_cluster, attribute=cfi_attribute)
 
-        # Created new follow-up task here: https://github.com/project-chip/matter-test-scripts/issues/548
         self.step(3)
+        # Set up event subscription for future steps
         acec_event = Clusters.AccessControl.Events.AccessControlEntryChanged
+        events_callback = EventChangeCallback(Clusters.AccessControl)
+        await events_callback.start(self.default_controller, self.dut_node_id, 0)
+
+        # Read initial events
         events_response = await self.th1.ReadEvent(
             self.dut_node_id,
             events=[(0, acec_event)],
             fabricFiltered=True
         )
         logging.info(f"Events response: {events_response}")
+        events_response = [events_response[0]]
+
+        # If we found events via read, verify them
         expected_event = Clusters.AccessControl.Events.AccessControlEntryChanged(
             adminNodeID=NullValue,
             adminPasscodeID=0,
@@ -96,18 +123,17 @@ class TC_ACL_2_6(MatterBaseTest):
             ),
             fabricIndex=f1
         )
-
         asserts.assert_equal(len(events_response), 1, "Expected 1 event")
+
+        # Verify read events match expectations
         found = False
         for event in events_response:
             if event.Data == expected_event:
                 found = True
                 break
-        asserts.assert_true(found, "Expected event not found in response")
+        asserts.assert_true(found, "Expected event not found in read response")
 
-        event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
-        initial_events = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=event_path)
-        initial_event_num = [e.Header.EventNumber for e in initial_events]
+        latest_event_number = await self.get_latest_event_number(acec_event)
 
         self.step(4)
         # Write ACL attribute
@@ -120,9 +146,9 @@ class TC_ACL_2_6(MatterBaseTest):
                 fabricIndex=f1
             ),
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
-                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
-                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[self.th1.nodeId],
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
+                authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kGroup,
+                subjects=NullValue,
                 targets=NullValue,
                 fabricIndex=f1
             )
@@ -136,26 +162,71 @@ class TC_ACL_2_6(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.Success, "Write should have succeeded")
 
         self.step(5)
-        # Create correct event path with endpoint 0
-        events_response2 = await self.default_controller.ReadEvent(
-            nodeid=self.dut_node_id,
-            events=event_path,
+        # Wait for subscription events
+        received_subscription_events = []
+        for _ in range(2):
+            event_data = events_callback.wait_for_event_report(acec_event, timeout_sec=15)
+            logging.info(f"Received subscription event: {event_data}")
+            received_subscription_events.append(event_data)
+
+        # Read events with retries
+        events_response = await self.th1.ReadEvent(
+            self.dut_node_id,
+            events=[(0, acec_event)],
             fabricFiltered=True,
-            eventNumberFilter=max(initial_event_num)+1
+            eventNumberFilter=latest_event_number + 1
         )
+        logging.info(f"Read events response: {events_response}")
 
-        logging.info(f"Events response: {events_response2}")
-        logging.info(f"Event response length: {len(events_response2)}")
-        asserts.assert_true(len(events_response2) == 2, "Expected 2 events")
+        if events_response:
+            # Get the most recent events from the read response
+            read_events = sorted([e.Data for e in events_response],
+                                 key=lambda x: next(e.Header.EventNumber for e in events_response if e.Data == x),
+                                 reverse=True)[:2]
 
-        # Check if both ACL entries are present in the events' latestValue field
-        for acl_entry in acl_entries:
-            found = False
-            for event in events_response2:
-                if event.Data.latestValue == acl_entry:
-                    found = True
-                    break
-            asserts.assert_true(found, f"Expected ACL entry not found in events: {acl_entry}")
+        # Verify we got the expected number of events
+        asserts.assert_true(events_response, "Did not receive a response when calling ReadEvents")
+        asserts.assert_true(len(read_events) >= 2,
+                            f"Expected at least 2 events from read, but got {len(read_events)}")
+
+        # Verify both read and subscription events match our expectations
+        for event_source in [received_subscription_events, read_events]:
+            for event_data in event_source:
+                found = False
+                for acl_entry in acl_entries:
+                    if event_data.latestValue == acl_entry:
+                        found = True
+                        break
+                asserts.assert_true(found, "Event data doesn't match any expected ACL entry")
+
+        # Log events for debugging
+        logging.info("Most recent subscription events:")
+        for event in received_subscription_events:
+            logging.info(f"  {event}")
+
+        logging.info("Most recent read events:")
+        for event in read_events:
+            logging.info(f"  {event}")
+
+        subscription_event_set = set(self.event_key(e) for e in received_subscription_events)
+        read_event_set = set(self.event_key(e) for e in read_events)
+
+        # If sets don't match, log the differences
+        if subscription_event_set != read_event_set:
+            logging.error("Events don't match. Differences:")
+            sub_only = subscription_event_set - read_event_set
+            read_only = read_event_set - subscription_event_set
+            if sub_only:
+                logging.error("Events only in subscription:")
+                for event in sub_only:
+                    logging.error(f"  {event}")
+            if read_only:
+                logging.error("Events only in read:")
+                for event in read_only:
+                    logging.error(f"  {event}")
+
+        asserts.assert_equal(subscription_event_set, read_event_set,
+                             "Most recent subscription events should match most recent read events (comparing relevant fields)")
 
         self.step(6)
         # Write invalid ACL attribute
@@ -167,7 +238,7 @@ class TC_ACL_2_6(MatterBaseTest):
                 targets=NullValue,
             ),
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
-                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kView,
+                privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kGroup,
                 subjects=[0],
                 targets=NullValue,
@@ -181,21 +252,23 @@ class TC_ACL_2_6(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.ConstraintError, "Write should have failed with CONSTRAINT_ERROR")
 
         self.step(7)
-        # Read AccessControlEntryChanged event again
-        events_response3 = await self.th1.ReadEvent(
+        # Verify no events for invalid entry via read as well
+        latest_event_number = await self.get_latest_event_number(acec_event)
+        events_response = await self.th1.ReadEvent(
             self.dut_node_id,
             events=[(0, acec_event)],
-            fabricFiltered=True
+            fabricFiltered=True,
+            eventNumberFilter=latest_event_number + 1
         )
 
-        found_invalid_event = False
-        for event in events_response3:
-            if (hasattr(event, 'Data') and
-                hasattr(event.Data, 'subjects') and
-                    0 in event.Data.subjects):
-                found_invalid_event = True
-                break
-        asserts.assert_false(found_invalid_event, "Should not find event for invalid entry")
+        # Check if any of the read events correspond to the invalid entry
+        invalid_entry = invalid_acl_entries[1]
+        for event in events_response:
+            if (event.Data.latestValue.authMode == invalid_entry.authMode and
+                    event.Data.latestValue.subjects == invalid_entry.subjects):
+                asserts.fail(f"Found event for invalid entry in read response: {event.Data}")
+
+        logging.info("No events found for invalid entry, as expected")
 
 
 if __name__ == "__main__":

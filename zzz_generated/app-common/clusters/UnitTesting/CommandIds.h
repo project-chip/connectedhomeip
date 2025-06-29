@@ -115,6 +115,10 @@ namespace GlobalEchoRequest {
 inline constexpr CommandId Id = 0x00000019;
 } // namespace GlobalEchoRequest
 
+namespace TestCheckCommandFlags {
+inline constexpr CommandId Id = 0x0000001A;
+} // namespace TestCheckCommandFlags
+
 namespace TestDifferentVendorMeiRequest {
 inline constexpr CommandId Id = 0xFFF200AA;
 } // namespace TestDifferentVendorMeiRequest

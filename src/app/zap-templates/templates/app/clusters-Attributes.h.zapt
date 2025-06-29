@@ -1,0 +1,59 @@
+{{> header}}
+// This file is generated from clusters-Attributes.h.zapt
+
+#pragma once
+
+#include <app/ConcreteAttributePath.h>
+#include <app/data-model/DecodableList.h>
+#include <app/data-model/List.h>
+#include <app/data-model/Nullable.h>
+#include <app/util/basic-types.h>
+#include <lib/core/TLV.h>
+#include <lib/support/BitMask.h>
+
+#include <clusters/shared/Attributes.h>
+#include <clusters/shared/Enums.h>
+#include <clusters/shared/Structs.h>
+
+#include <clusters/{{asUpperCamelCase name}}/AttributeIds.h>
+#include <clusters/{{asUpperCamelCase name}}/ClusterId.h>
+#include <clusters/{{asUpperCamelCase name}}/Enums.h>
+#include <clusters/{{asUpperCamelCase name}}/Structs.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace {{asUpperCamelCase name}} {
+namespace Attributes {
+
+{{#zcl_attributes_server}}
+namespace {{asUpperCamelCase label}} {
+    {{#if clusterRef}}
+      {{> cluster_objects_attribute_typeinfo ns=parent.name}}
+    {{else}}
+      struct TypeInfo : public Clusters::Globals::Attributes::{{asUpperCamelCase label}}::TypeInfo {
+          static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
+      };
+    {{/if}}
+} // namespace {{asUpperCamelCase label}}
+{{/zcl_attributes_server}}
+
+struct TypeInfo
+{
+    struct DecodableType {
+        static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase name}}::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader &reader, const ConcreteAttributePath &path);
+
+{{#zcl_attributes_server}}
+        {{! isOptional=false because optional attributes don't get represented
+            as Optional types here. }}
+        Attributes::{{asUpperCamelCase label}}::TypeInfo::DecodableType {{asLowerCamelCase label}}{{> cluster_objects_field_init ns=parent.name isOptional=false}};
+{{/zcl_attributes_server}}
+    };
+};
+} // namespace Attributes
+} // namespace {{asUpperCamelCase name}}
+} // namespace Clusters
+} // namespace app
+} // namespace chip

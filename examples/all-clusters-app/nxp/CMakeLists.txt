@@ -30,7 +30,7 @@ else()
 endif()
 
 # Export CHIP_ROOT as an environment variable to be recognized by Kconfig
-set(ENV{CHIP_ROOT} ${CHIP_ROOT})
+set(COMMON_KCONFIG_ENV_SETTINGS CHIP_ROOT=${CHIP_ROOT})
 
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(ALL_CLUSTERS_COMMON_DIR ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common REALPATH)
@@ -96,6 +96,8 @@ target_sources(app
 
 if (CONFIG_CHIP_WIFI AND CONFIG_NET_L2_OPENTHREAD)
     message(FATAL_ERROR "WiFi + Thread (Border Router) configuration is not supported in this application.")
+elseif(CONFIG_CHIP_ETHERNET)
+    message(FATAL_ERROR "Ethernet configuration is not supported in this application.")
 else()
     chip_configure_data_model(app
         INCLUDE_SERVER

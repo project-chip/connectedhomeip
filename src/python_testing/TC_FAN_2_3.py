@@ -42,8 +42,7 @@ from typing import Any
 import chip.clusters as Clusters
 from chip.interaction_model import Status
 from chip.testing.matter_asserts import assert_valid_map8
-from matter_testing_infrastructure.chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main,
-                                                                       has_feature, run_if_endpoint_matches)
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 
 logger = logging.getLogger(__name__)

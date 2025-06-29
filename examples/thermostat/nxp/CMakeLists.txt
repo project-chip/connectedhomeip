@@ -30,7 +30,7 @@ else()
 endif()
 
 # Export CHIP_ROOT as an environment variable to be recognized by Kconfig
-set(ENV{CHIP_ROOT} ${CHIP_ROOT})
+set(COMMON_KCONFIG_ENV_SETTINGS CHIP_ROOT=${CHIP_ROOT})
 
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(NXP_EXAMPLE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common REALPATH)
@@ -104,6 +104,11 @@ elseif(CONFIG_NET_L2_OPENTHREAD AND NOT CONFIG_CHIP_WIFI)
     chip_configure_data_model(app
         INCLUDE_SERVER
         ZAP_FILE ${NXP_EXAMPLE_ZAP_DIR}/thermostat_matter_thread.zap
+    )
+elseif(CONFIG_CHIP_ETHERNET)
+    chip_configure_data_model(app
+        INCLUDE_SERVER
+        ZAP_FILE ${NXP_EXAMPLE_ZAP_DIR}/thermostat_matter_eth.zap
     )
 endif()
 

@@ -382,6 +382,10 @@ def main() -> int:
                       help=("For use with --build_all. Build labels to include. "
                             "Accepts a regex pattern. Mutually exclusive with --build_exclude."),
                       dest="build_include")
+    parser.add_option("", "--build_bundle",
+                      help=(
+                          "Build platform bundle after build successed when building single device."),
+                      action="store_true", dest="build_bundle")
     parser.add_option("-k", "--keep_going",
                       help="For use in CD only. Continues building all sample apps in the event of an error.",
                       dest="keep_going", action="store_true")
@@ -773,6 +777,28 @@ def main() -> int:
             nrf_build_cmds.append(
                 f"-DCONFIG_CHEF_DEVICE_TYPE='\"{options.sample_device_type_name}\"'")
             nrf_build_cmds.append(
+                "-DCONFIG_OPENTHREAD_NORDIC_LIBRARY_MTD=y")
+            if options.enable_lit_icd or re.search(_ICD_DEVICE_PATTERN, options.sample_device_type_name):
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ENABLE_ICD_SUPPORT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ENABLE_READ_CLIENT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_LIT_SUPPORT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_CHECK_IN_SUPPORT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_UAT_SUPPORT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_DSLS_SUPPORT=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_REPORT_ON_ACTIVE_MODE=y")
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ICD_SIT_SLOW_POLL_LIMIT=5000")
+            else:
+                nrf_build_cmds.append(
+                    "-DCONFIG_CHIP_ENABLE_ICD_SUPPORT=n")
+            nrf_build_cmds.append(
                 f"-DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING='\"{sw_ver_string}\"'")
 
             shell.run_cmd(" ".join(nrf_build_cmds))
@@ -935,6 +961,13 @@ def main() -> int:
     #
     # Compilation DB TODO
     #
+
+    #
+    # Build bundle
+    #
+
+    if options.build_bundle:
+        bundle(options.build_target, options.sample_device_type_name)
 
     #
     # Flash

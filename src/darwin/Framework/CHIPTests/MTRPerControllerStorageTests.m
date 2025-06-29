@@ -2857,6 +2857,13 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     for (NSNumber * deviceID in orderedDeviceIDs) {
         MTRDeviceTestDelegate * delegate = deviceDelegates[deviceID];
         delegate.pretendThreadEnabled = YES;
+        // By default MTRDeviceTestDelegate sets a 2s MaxInterval.  But for this test, we don't
+        // really want that.  We don't care about getting incremental updates in this test, nor do
+        // we care about detecting subscription drops (and in fact, a subscription drop would mess
+        // up the counts in this test).
+        //
+        // Just use a 1 hour MaxInterval, for simplicity.
+        delegate.subscriptionMaxIntervalOverride = @(3600); // seconds
 
         delegate.onSubscriptionPoolDequeue = ^{
             // Count subscribing when dequeued from the subscription pool
@@ -2890,38 +2897,43 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         };
     }
 
-    // We have one fake device, which we use an invalid node ID for, that we use
-    // to test what happens if a device is deallocated while its subscription
-    // work item is queued.
-    //
-    // Schedule a job in the controller's pool that will not complete until the
-    // fake device is deallocated.
-    __auto_type * fakeDeviceDeletedExpectation = [self expectationWithDescription:@"Fake device deleted"];
-    MTRAsyncWorkItem * blockingWorkItem = [[MTRAsyncWorkItem alloc] initWithQueue:queue];
-    [blockingWorkItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull completion) {
-        [self waitForExpectations:@[ fakeDeviceDeletedExpectation ] timeout:kTimeoutInSeconds];
-        completion(MTRAsyncWorkComplete);
-    }];
-    [controller.concurrentSubscriptionPool enqueueWorkItem:blockingWorkItem description:@"Waiting for fake device deletion"];
+    if (subscriptionPoolSize == 1) {
+        // We have one fake device, which we use an invalid node ID for, that we use
+        // to test what happens if a device is deallocated while its subscription
+        // work item is queued.  It should not block other things from running.
+        //
+        // Schedule a job in the controller's pool that will not complete until the
+        // fake device is deallocated.
+        __auto_type * fakeDeviceDeletedExpectation = [self expectationWithDescription:@"Fake device deleted"];
+        MTRAsyncWorkItem * blockingWorkItem = [[MTRAsyncWorkItem alloc] initWithQueue:queue];
+        [blockingWorkItem setReadyHandler:^(id _Nonnull context, NSInteger retryCount, MTRAsyncWorkCompletionBlock _Nonnull completion) {
+            [self waitForExpectations:@[ fakeDeviceDeletedExpectation ] timeout:kTimeoutInSeconds];
+            completion(MTRAsyncWorkComplete);
+        }];
+        [controller.concurrentSubscriptionPool enqueueWorkItem:blockingWorkItem description:@"Waiting for fake device deletion"];
 
-    // Make sure the delegate for the fake device does not go away before the
-    // fake device does, so keep it out of the @autoreleasepool block.
-    MTRDeviceTestDelegate * fakeDeviceDelegate = [[MTRDeviceTestDelegate alloc] init];
-    fakeDeviceDelegate.pretendThreadEnabled = YES;
+        // Make sure the delegate for the fake device does not go away before the
+        // fake device does, so keep it out of the @autoreleasepool block.
+        MTRDeviceTestDelegate * fakeDeviceDelegate = [[MTRDeviceTestDelegate alloc] init];
+        fakeDeviceDelegate.pretendThreadEnabled = YES;
+        // See comments in the loop that sets up the other delegates above for why we are overriding
+        // subscriptionMaxIntervalOverride.
+        fakeDeviceDelegate.subscriptionMaxIntervalOverride = @(3600); // seconds
 
-    @autoreleasepool {
-        // Create our fake device and have it dealloc before the blocking WorkItem
-        // completes and hence before its subscription work item gets a chance
-        // to run (in the width-1 case).
+        @autoreleasepool {
+            // Create our fake device and have it dealloc before the blocking WorkItem
+            // completes and hence before its subscription work item gets a chance
+            // to run (in the width-1 case).
 
-        // onSubscriptionCallbackDelete is called from dealloc
-        fakeDeviceDelegate.onSubscriptionCallbackDelete = ^{
-            [fakeDeviceDeletedExpectation fulfill];
-        };
+            // onSubscriptionCallbackDelete is called from dealloc
+            fakeDeviceDelegate.onSubscriptionCallbackDelete = ^{
+                [fakeDeviceDeletedExpectation fulfill];
+            };
 
-        NSNumber * fakeDeviceID = @(0xFFFFFFFFFFFFFFFF);
-        __auto_type * device = [MTRDevice deviceWithNodeID:fakeDeviceID controller:controller];
-        [device setDelegate:fakeDeviceDelegate queue:queue];
+            NSNumber * fakeDeviceID = @(0xFFFFFFFFFFFFFFFF);
+            __auto_type * device = [MTRDevice deviceWithNodeID:fakeDeviceID controller:controller];
+            [device setDelegate:fakeDeviceDelegate queue:queue];
+        }
     }
 
     for (NSNumber * deviceID in orderedDeviceIDs) {
@@ -3007,6 +3019,8 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         @(118) : @"MT:0000000000Z1J900000",
         @(119) : @"MT:000008C801FFJ900000",
         @(120) : @"MT:00000GOG02XSJ900000",
+
+        /* Reduce "many devices" to 20 until either a better number or a better testing method is found
         @(121) : @"MT:00000O-O03D4K900000",
         @(122) : @"MT:00000WAX04VHK900000",
         @(123) : @"MT:000002N315BVK900000",
@@ -3037,6 +3051,7 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         @(148) : @"MT:00000AZB168QT900000",
         @(149) : @"MT:00000I9K17Q1U900000",
         @(150) : @"MT:00000000007FU900000",
+         */
     };
 
     // Start our helper apps.

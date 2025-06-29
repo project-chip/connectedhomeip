@@ -32,7 +32,6 @@ import textwrap
 import threading
 import time
 import typing
-import uuid
 from binascii import unhexlify
 from dataclasses import asdict as dataclass_asdict
 from dataclasses import dataclass, field
@@ -44,6 +43,7 @@ from typing import Any, Callable, Iterable, List, Optional, Tuple
 import chip.testing.conversions as conversions
 import chip.testing.decorators as decorators
 import chip.testing.matchers as matchers
+import chip.testing.runner as runner
 import chip.testing.timeoperations as timeoperations
 
 # isort: off
@@ -58,29 +58,20 @@ from time import sleep
 import chip.clusters as Clusters
 import chip.logging
 import chip.native
-from chip import discovery
+import chip.testing.global_stash as global_stash
 from chip.ChipStack import ChipStack
-from chip.clusters import Attribute
-from chip.clusters import ClusterObjects as ClusterObjects
+from chip.clusters import Attribute, ClusterObjects
 from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction, TypedAttributePath
-from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
-from chip.testing.commissioning import CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices
+from chip.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
+                                        get_setup_payload_info_config)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.pics import read_pics_from_file
-from chip.tracing import TracingContext
+from chip.testing.runner import TestRunnerHooks, TestStep
+from chip.tlv import uint
 from mobly import asserts, base_test, signals, utils
-from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
-from mobly.test_runner import TestRunner
-
-try:
-    from matter_yamltests.hooks import TestRunnerHooks
-except ImportError:
-    class TestRunnerHooks:
-        pass
-
 
 # TODO: Add utility to commission a device if needed
 # TODO: Add utilities to keep track of controllers/fabrics
@@ -96,21 +87,6 @@ _DEFAULT_LOG_PATH = "/tmp/matter_testing/logs"
 _DEFAULT_CONTROLLER_NODE_ID = 112233
 _DEFAULT_DUT_NODE_ID = 0x12344321
 _DEFAULT_TRUST_ROOT_INDEX = 1
-
-# Mobly cannot deal with user config passing of ctypes objects,
-# so we use this dict of uuid -> object to recover items stashed
-# by reference.
-_GLOBAL_DATA = {}
-
-
-def stash_globally(o: object) -> str:
-    id = str(uuid.uuid1())
-    _GLOBAL_DATA[id] = o
-    return id
-
-
-def unstash_globally(id: str) -> Any:
-    return _GLOBAL_DATA.get(id)
 
 
 def default_paa_rootstore_from_root(root_path: pathlib.Path) -> Optional[pathlib.Path]:
@@ -607,51 +583,6 @@ class ClusterAttributeChangeAccumulator:
         return
 
 
-class InternalTestRunnerHooks(TestRunnerHooks):
-
-    def start(self, count: int):
-        logging.info(f'Starting test set, running {count} tests')
-
-    def stop(self, duration: int):
-        logging.info(f'Finished test set, ran for {duration}ms')
-
-    def test_start(self, filename: str, name: str, count: int, steps: list[str] = []):
-        logging.info(f'Starting test from {filename}: {name} - {count} steps')
-
-    def test_stop(self, exception: Exception, duration: int):
-        logging.info(f'Finished test in {duration}ms')
-
-    def step_skipped(self, name: str, expression: str):
-        # TODO: Do we really need the expression as a string? We can evaluate this in code very easily
-        logging.info(f'\t\t**** Skipping: {name}')
-
-    def step_start(self, name: str):
-        # The way I'm calling this, the name is already includes the step number, but it seems like it might be good to separate these
-        logging.info(f'\t\t***** Test Step {name}')
-
-    def step_success(self, logger, logs, duration: int, request):
-        pass
-
-    def step_failure(self, logger, logs, duration: int, request, received):
-        # TODO: there's supposed to be some kind of error message here, but I have no idea where it's meant to come from in this API
-        logging.info('\t\t***** Test Failure : ')
-
-    def step_unknown(self):
-        """
-        This method is called when the result of running a step is unknown. For example during a dry-run.
-        """
-        pass
-
-    def show_prompt(self,
-                    msg: str,
-                    placeholder: Optional[str] = None,
-                    default_value: Optional[str] = None) -> None:
-        pass
-
-    def test_skipped(self, filename: str, name: str):
-        logging.info(f"Skipping test from {filename}: {name}")
-
-
 @dataclass
 class MatterTestConfig:
     storage_path: pathlib.Path = pathlib.Path(".")
@@ -688,7 +619,7 @@ class MatterTestConfig:
 
     wifi_ssid: Optional[str] = None
     wifi_passphrase: Optional[str] = None
-    thread_operational_dataset: Optional[str] = None
+    thread_operational_dataset: Optional[bytes] = None
 
     pics: dict[bool, str] = field(default_factory=dict)
 
@@ -952,25 +883,6 @@ class MatterStackState:
         return builtins.chipStack
 
 
-@dataclass
-class TestStep:
-    test_plan_number: typing.Union[int, str]
-    description: str
-    expectation: str = ""
-    is_commissioning: bool = False
-
-    def __str__(self):
-        return f'{self.test_plan_number}: {self.description}\tExpected outcome: {self.expectation}'
-
-
-@dataclass
-class TestInfo:
-    function: str
-    desc: str
-    steps: list[TestStep]
-    pics: list[str]
-
-
 class MatterBaseTest(base_test.BaseTestClass):
     def __init__(self, *args):
         super().__init__(*args)
@@ -1047,15 +959,13 @@ class MatterBaseTest(base_test.BaseTestClass):
         except AttributeError:
             return test
 
-    def write_to_app_pipe(self, command_dict: dict, app_pipe_prefix: Optional[str] = None, app_pid: Optional[int] = None):
+    def write_to_app_pipe(self, command_dict: dict, app_pipe: Optional[str] = None):
         """
         Send an out-of-band command to a Matter app.
         Args:
-            command_dict (dict): dictionary with the command and data
-            app_pipe_prefix (Optional[str], optional): Name of the cluster pipe file prefix (i.e. /tmp/chip_all_clusters_fifo_ or /tmp/chip_rvc_fifo_). If None
-            takes the value from the CI argument --app-pipe-prefix.
-            app_pid (Optional[uint], optional): pid of the process for app_pipe_name. If None takes the value from the CI
-            argument --app-pid.
+            command_dict (dict): dictionary with the command and data.
+            app_pipe (Optional[str], optional): Name of the cluster pipe file  (i.e. /tmp/chip_all_clusters_fifo_55441 or /tmp/chip_rvc_fifo_11111). Raises
+            FileNotFoundError if pipe file is not found. If None takes the value from the CI argument --app-pipe,  arg --app-pipe has his own file exists check.
 
         This method uses the following environment variables:
 
@@ -1069,15 +979,16 @@ class MatterBaseTest(base_test.BaseTestClass):
                  + Step 1: If you do not have a key, create one using ssh-keygen
                  + Step 2: Authorize this key on the remote host: run ssh-copy-id user@ip once, using your password
                  + Step 3: From now on ssh user@ip will no longer ask for your password
-
         """
+        # If is not empty from the args, verify if the fifo file exists.
+        if app_pipe is not None and not os.path.exists(app_pipe):
+            logging.error("Named pipe %r does NOT exist" % app_pipe)
+            raise FileNotFoundError("CANNOT FIND %r" % app_pipe)
 
-        if app_pipe_prefix is None:
-            app_pipe_prefix = self.matter_test_config.app_pipe_prefix
-        if app_pid is None:
-            app_pid = self.matter_test_config.app_pid
+        if app_pipe is None:
+            app_pipe = self.matter_test_config.app_pipe
 
-        if not isinstance(app_pipe_prefix, str):
+        if not isinstance(app_pipe, str):
             raise TypeError("The named pipe must be provided as a string value")
 
         if not isinstance(command_dict, dict):
@@ -1087,23 +998,10 @@ class MatterBaseTest(base_test.BaseTestClass):
         dut_ip = os.getenv('LINUX_DUT_IP')
 
         # Checks for concatenate app_pipe and app_pid
-        if not isinstance(app_pid, int):
-            raise TypeError("The --app-pid flag is not instance of int")
-        # Verify we have a valid app-id
-        if app_pid == 0:
-            asserts.fail("app_pid is 0 , is the flag --app-pid set?. app-id flag must be set in order to write to pipe.")
-        app_pipe_name = app_pipe_prefix + str(app_pid)
-
         if dut_ip is None:
-            if not os.path.exists(app_pipe_name):
-                # Named pipes are unique, so we MUST have consistent PID/paths
-                # Set up for them to work.
-                logging.error("Named pipe %r does NOT exist" % app_pipe_name)
-                raise FileNotFoundError("CANNOT FIND %r" % app_pipe_name)
-            with open(app_pipe_name, "w") as app_pipe:
-                logger.info(f"Sending out-of-band command: {command} to file: {app_pipe_name}")
-                app_pipe.write(json.dumps(command_dict) + "\n")
-
+            with open(app_pipe, "w") as app_pipe_fp:
+                logger.info(f"Sending out-of-band command: {command} to file: {app_pipe}")
+                app_pipe_fp.write(json.dumps(command_dict) + "\n")
             # TODO(#31239): remove the need for sleep
             # This was tested with matter.js as being reliable enough
             sleep(0.05)
@@ -1114,7 +1012,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             asserts.assert_true(dut_uname is not None, "The LINUX_DUT_USER environment variable must be set")
             logging.info(f"Using DUT user name: {dut_uname}")
             command_fixed = shlex.quote(json.dumps(command_dict))
-            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe_name)
+            cmd = "echo \"%s\" | ssh %s@%s \'cat > %s\'" % (command_fixed, dut_uname, dut_ip, app_pipe)
             os.system(cmd)
 
     # Override this if the test requires a different default timeout.
@@ -1125,23 +1023,23 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     @property
     def runner_hook(self) -> TestRunnerHooks:
-        return unstash_globally(self.user_params.get("hooks"))
+        return global_stash.unstash_globally(self.user_params.get("hooks"))
 
     @property
     def matter_test_config(self) -> MatterTestConfig:
-        return unstash_globally(self.user_params.get("matter_test_config"))
+        return global_stash.unstash_globally(self.user_params.get("matter_test_config"))
 
     @property
     def default_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
-        return unstash_globally(self.user_params.get("default_controller"))
+        return global_stash.unstash_globally(self.user_params.get("default_controller"))
 
     @property
     def matter_stack(self) -> MatterStackState:
-        return unstash_globally(self.user_params.get("matter_stack"))
+        return global_stash.unstash_globally(self.user_params.get("matter_stack"))
 
     @property
     def certificate_authority_manager(self) -> chip.CertificateAuthority.CertificateAuthorityManager:
-        return unstash_globally(self.user_params.get("certificate_authority_manager"))
+        return global_stash.unstash_globally(self.user_params.get("certificate_authority_manager"))
 
     @property
     def dut_node_id(self) -> int:
@@ -1149,6 +1047,22 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def get_endpoint(self, default: Optional[int] = 0) -> int:
         return self.matter_test_config.endpoint if self.matter_test_config.endpoint is not None else default
+
+    def get_wifi_ssid(self, default: Optional[str] = 0) -> str:
+        ''' Get WiFi SSID
+
+            Get the WiFi networks name provided with flags
+
+        '''
+        return self.matter_test_config.wifi_ssid if self.matter_test_config.wifi_ssid is not None else default
+
+    def get_credentials(self, default: Optional[str] = 0) -> str:
+        ''' Get WiFi passphrase
+
+            Get the WiFi credentials provided with flags
+
+        '''
+        return self.matter_test_config.wifi_passphrase if self.matter_test_config.wifi_passphrase is not None else default
 
     def setup_class(self):
         super().setup_class()
@@ -1632,23 +1546,60 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step(step)
         self.mark_current_step_skipped()
 
-    def skip_all_remaining_steps(self, starting_step_number):
-        ''' Skips all remaining test steps starting with provided starting step
-
+    def mark_all_remaining_steps_skipped(self, starting_step_number: typing.Union[int, str]) -> None:
+        """Mark all remaining test steps starting with provided starting step
             starting_step_number gives the first step to be skipped, as defined in the TestStep.test_plan_number
-            starting_step_number must be provided, and is not derived intentionally. By providing argument
-                test is more deliberately identifying where test skips are starting from, making
-                it easier to validate against the test plan for correctness.
-        '''
+            starting_step_number must be provided, and is not derived intentionally.
+            By providing argument test is more deliberately identifying where test skips are starting from, 
+            making it easier to validate against the test plan for correctness.
+        Args:
+            starting_step_number (int,str): Number of name of the step to start skipping the steps.
+
+        Returns nothing on success so the test can go on.
+        """
+        self.mark_step_range_skipped(starting_step_number, None)
+
+    def mark_step_range_skipped(self, starting_step_number: typing.Union[int, str], ending_step_number: typing.Union[int, str, None]) -> None:
+        """Mark a range of remaining test steps starting with provided starting step
+            starting_step_number gives the first step to be skipped, as defined in the TestStep.test_plan_number
+            starting_step_number must be provided, and is not derived intentionally.
+
+            If ending_step_number is provided, it gives the last step to be skipped, as defined in the TestStep.test_plan_number.
+            If ending_step_number is None, all steps until the end of the test will be skipped
+            ending_step_number is optional, and if not provided, all steps until the end of the test will be skipped.
+
+            By providing argument test is more deliberately identifying where test skips are starting from, 
+            making it easier to validate against the test plan for correctness.
+        Args:
+            starting_step_number (int,str): Number of name of the step to start skipping the steps.
+            ending_step_number (int,str,None): Number of name of the step to stop skipping the steps (inclusive).
+
+        Returns nothing on success so the test can go on.
+        """
         steps = self.get_test_steps(self.current_test_info.name)
+        starting_step_idx = None
         for idx, step in enumerate(steps):
             if step.test_plan_number == starting_step_number:
                 starting_step_idx = idx
                 break
+        asserts.assert_is_not_none(starting_step_idx, "mark_step_ranges_skipped was provided with invalid starting_step_num")
+
+        ending_step_idx = None
+        # If ending_step_number is None, we skip all steps until the end of the test
+        if ending_step_number is not None:
+            for idx, step in enumerate(steps):
+                if step.test_plan_number == ending_step_number:
+                    ending_step_idx = idx
+                    break
+
+            asserts.assert_is_not_none(ending_step_idx, "mark_step_ranges_skipped was provided with invalid ending_step_num")
+            asserts.assert_greater(ending_step_idx, starting_step_idx,
+                                   "mark_step_ranges_skipped was provided with ending_step_num that is before starting_step_num")
+            skipping_steps = steps[starting_step_idx:ending_step_idx+1]
         else:
-            asserts.fail("skip_all_remaining_steps was provided with invalid starting_step_num")
-        remaining = steps[starting_step_idx:]
-        for step in remaining:
+            skipping_steps = steps[starting_step_idx:]
+
+        for step in skipping_steps:
             self.skip_step(step.test_plan_number)
 
     def step(self, step: typing.Union[int, str]):
@@ -1678,44 +1629,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step_skipped = False
 
     def get_setup_payload_info(self) -> List[SetupPayloadInfo]:
-        setup_payloads = []
-        for qr_code in self.matter_test_config.qr_code_content:
-            try:
-                setup_payloads.append(SetupPayload().ParseQrCode(qr_code))
-            except ChipStackError:
-                asserts.fail(f"QR code '{qr_code} failed to parse properly as a Matter setup code.")
-
-        for manual_code in self.matter_test_config.manual_code:
-            try:
-                setup_payloads.append(SetupPayload().ParseManualPairingCode(manual_code))
-            except ChipStackError:
-                asserts.fail(
-                    f"Manual code code '{manual_code}' failed to parse properly as a Matter setup code. Check that all digits are correct and length is 11 or 21 characters.")
-
-        infos = []
-        for setup_payload in setup_payloads:
-            info = SetupPayloadInfo()
-            info.passcode = setup_payload.setup_passcode
-            if setup_payload.short_discriminator is not None:
-                info.filter_type = discovery.FilterType.SHORT_DISCRIMINATOR
-                info.filter_value = setup_payload.short_discriminator
-            else:
-                info.filter_type = discovery.FilterType.LONG_DISCRIMINATOR
-                info.filter_value = setup_payload.long_discriminator
-            infos.append(info)
-
-        num_passcodes = 0 if self.matter_test_config.setup_passcodes is None else len(self.matter_test_config.setup_passcodes)
-        num_discriminators = 0 if self.matter_test_config.discriminators is None else len(self.matter_test_config.discriminators)
-        asserts.assert_equal(num_passcodes, num_discriminators, "Must have same number of discriminators as passcodes")
-        if self.matter_test_config.discriminators:
-            for idx, discriminator in enumerate(self.matter_test_config.discriminators):
-                info = SetupPayloadInfo()
-                info.passcode = self.matter_test_config.setup_passcodes[idx]
-                info.filter_type = DiscoveryFilterType.LONG_DISCRIMINATOR
-                info.filter_value = discriminator
-                infos.append(info)
-
-        return infos
+        """
+        Get and builds the payload info provided in the execution.
+        Returns:
+            List[SetupPayloadInfo]: List of Payload used by the test case
+        """
+        return get_setup_payload_info_config(self.matter_test_config)
 
     def wait_for_user_input(self,
                             prompt_msg: str,
@@ -1753,25 +1672,58 @@ class MatterBaseTest(base_test.BaseTestClass):
             logging.info("========= EOF on STDIN =========")
             return None
 
+    def user_verify_snap_shot(self,
+                              prompt_msg: str,
+                              image: bytes) -> Optional[str]:
+        """Show Image Verification Prompt and wait for user validation.
 
-def generate_mobly_test_config(matter_test_config: MatterTestConfig):
-    test_run_config = TestRunConfig()
-    # We use a default name. We don't use Mobly YAML configs, so that we can be
-    # freestanding without relying
-    test_run_config.testbed_name = "MatterTest"
+        Args:
+            prompt_msg (str): Message for TH UI prompt and input function.
+            Indicates what is expected from the user.
+            image (bytes): Image data as bytes.
 
-    log_path = matter_test_config.logs_path
-    log_path = _DEFAULT_LOG_PATH if log_path is None else log_path
-    if ENV_MOBLY_LOGPATH in os.environ:
-        log_path = os.environ[ENV_MOBLY_LOGPATH]
+        Returns:
+            str: User input or none if input is closed.
+        """
 
-    test_run_config.log_path = log_path
-    # TODO: For later, configure controllers
-    test_run_config.controller_configs = {}
+        # Convert bytes to comma separated hex string
+        hex_string = ', '.join(f'{byte:02x}' for byte in image)
+        if self.runner_hook:
+            self.runner_hook.show_image_prompt(
+                msg=prompt_msg,
+                img_hex_str=hex_string
+            )
 
-    test_run_config.user_params = matter_test_config.global_test_params
+        logging.info("========= USER PROMPT for Image Verification =========")
+        logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
+        try:
+            return input()
+        except EOFError:
+            logging.info("========= EOF on STDIN =========")
+            return None
 
-    return test_run_config
+    def user_verify_video_stream(self,
+                                 prompt_msg: str) -> Optional[str]:
+        """Show Video Verification Prompt and wait for user validation.
+
+        Args:
+            prompt_msg (str): Message for TH UI prompt and input function.
+            Indicates what is expected from the user.
+
+        Returns:
+            str: User input or none if input is closed.
+        """
+
+        if self.runner_hook:
+            self.runner_hook.show_video_prompt(msg=prompt_msg)
+
+        logging.info("========= USER PROMPT for Video Stream Verification =========")
+        logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
+        try:
+            return input()
+        except EOFError:
+            logging.info("========= EOF on STDIN =========")
+            return None
 
 
 def _find_test_class():
@@ -2026,9 +1978,13 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
-    config.app_pid = 0 if args.app_pid is None else args.app_pid
     config.app_pipe = args.app_pipe
-    config.app_pipe_prefix = args.app_pipe_prefix
+    if config.app_pipe is not None and not os.path.exists(config.app_pipe):
+        # Named pipes are unique, so we MUST have consistent paths
+        # Verify from start the named pipe exists.
+        logging.error("Named pipe %r does NOT exist" % config.app_pipe)
+        raise FileNotFoundError("CANNOT FIND %r" % config.app_pipe)
+
     config.fail_on_skipped_tests = args.fail_on_skipped
 
     config.legacy = args.use_legacy_test_event_triggers
@@ -2087,10 +2043,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                              help='Node ID for primary DUT communication, '
                              'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
     basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
-    basic_group.add_argument('--app-pid', type=int, default=0, help="The PID of the app against which the test is going to run")
-    basic_group.add_argument('--app-pipe', type=str, default=None, help="The path of the app to send an out-of-band command")
-    basic_group.add_argument('--app-pipe_prefix', type=str, default=None,
-                             help="The path prefix of the app to send an out-of-band command")
+    basic_group.add_argument('--app-pipe', type=str, default=None, help="The full path of the app to send an out-of-band command")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
 
@@ -2185,166 +2138,47 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
     return convert_args_to_matter_config(parser.parse_known_args(argv)[0])
 
 
-class CommissionDeviceTest(MatterBaseTest):
-    """Test class auto-injected at the start of test list to commission a device when requested"""
+def _async_runner(body, self: MatterBaseTest, *args, **kwargs):
+    """Runs an async function within the test's event loop with a timeout.
 
-    def __init__(self, *args):
-        super().__init__(*args)
-        self.is_commissioning = True
+    This helper function takes an awaitable (async function) and executes it
+    using the test's event loop (`self.event_loop.run_until_complete`).
+    It applies a timeout based on the test configuration (`self.matter_test_config.timeout`)
+    or the default timeout (`self.default_timeout`) if not specified.
 
-    def test_run_commissioning(self):
-        if not self.event_loop.run_until_complete(self.commission_devices()):
-            raise signals.TestAbortAll("Failed to commission node(s)")
+    Args:
+        body: The async function (coroutine) to execute. It will be called
+              with `self` as the first argument, followed by `*args` and `**kwargs`.
+        self: The instance of the MatterBaseTest class.
+        *args: Positional arguments to pass to the `body` function.
+        **kwargs: Keyword arguments to pass to the `body` function.
 
-
-def default_matter_test_main():
-    """Execute the test class in a test module.
-    This is the default entry point for running a test script file directly.
-    In this case, only one test class in a test script is allowed.
-    To make your test script executable, add the following to your file:
-    .. code-block:: python
-      from chip.testing.matter_testing import default_matter_test_main
-      ...
-      if __name__ == '__main__':
-        default_matter_test_main()
+    Returns:
+        The result returned by the awaited `body` function.
     """
-
-    matter_test_config = parse_matter_test_args()
-
-    # Find the test class in the test script.
-    test_class = _find_test_class()
-
-    hooks = InternalTestRunnerHooks()
-
-    run_tests(test_class, matter_test_config, hooks)
+    timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
+    return self.event_loop.run_until_complete(asyncio.wait_for(body(self, *args, **kwargs), timeout=timeout))
 
 
-def get_test_info(test_class: MatterBaseTest, matter_test_config: MatterTestConfig) -> list[TestInfo]:
-    test_config = generate_mobly_test_config(matter_test_config)
-    base = test_class(test_config)
-
-    if len(matter_test_config.tests) > 0:
-        tests = matter_test_config.tests
-    else:
-        tests = base.get_existing_test_names()
-
-    info = []
-    for t in tests:
-        info.append(TestInfo(t, steps=base.get_test_steps(t), desc=base.get_test_desc(t), pics=base.get_test_pics(t)))
-
-    return info
+EndpointCheckFunction = typing.Callable[[Clusters.Attribute.AsyncReadTransaction.ReadResponse, int], bool]
 
 
-def run_tests_no_exit(test_class: MatterBaseTest, matter_test_config: MatterTestConfig,
-                      event_loop: asyncio.AbstractEventLoop, hooks: TestRunnerHooks,
-                      default_controller=None, external_stack=None) -> bool:
-
-    # NOTE: It's not possible to pass event loop via Mobly TestRunConfig user params, because the
-    #       Mobly deep copies the user params before passing them to the test class and the event
-    #       loop is not serializable. So, we are setting the event loop as a test class member.
-    CommissionDeviceTest.event_loop = event_loop
-    test_class.event_loop = event_loop
-
-    get_test_info(test_class, matter_test_config)
-
-    # Load test config file.
-    test_config = generate_mobly_test_config(matter_test_config)
-
-    # Parse test specifiers if exist.
-    tests = None
-    if len(matter_test_config.tests) > 0:
-        tests = matter_test_config.tests
-
-    if external_stack:
-        stack = external_stack
-    else:
-        stack = MatterStackState(matter_test_config)
-
-    with TracingContext() as tracing_ctx:
-        for destination in matter_test_config.trace_to:
-            tracing_ctx.StartFromString(destination)
-
-        test_config.user_params["matter_stack"] = stash_globally(stack)
-
-        # TODO: Steer to right FabricAdmin!
-        # TODO: If CASE Admin Subject is a CAT tag range, then make sure to issue NOC with that CAT tag
-        if not default_controller:
-            default_controller = stack.certificate_authorities[0].adminList[0].NewController(
-                nodeId=matter_test_config.controller_node_id,
-                paaTrustStorePath=str(matter_test_config.paa_trust_store_path),
-                catTags=matter_test_config.controller_cat_tags,
-                dacRevocationSetPath=str(matter_test_config.dac_revocation_set_path),
-            )
-        test_config.user_params["default_controller"] = stash_globally(default_controller)
-
-        test_config.user_params["matter_test_config"] = stash_globally(matter_test_config)
-        test_config.user_params["hooks"] = stash_globally(hooks)
-
-        # Execute the test class with the config
-        ok = True
-
-        test_config.user_params["certificate_authority_manager"] = stash_globally(stack.certificate_authority_manager)
-
-        # Execute the test class with the config
-        ok = True
-
-        runner = TestRunner(log_dir=test_config.log_path,
-                            testbed_name=test_config.testbed_name)
-
-        with runner.mobly_logger():
-            if matter_test_config.commissioning_method is not None:
-                runner.add_test_class(test_config, CommissionDeviceTest, None)
-
-            # Add the tests selected unless we have a commission-only request
-            if not matter_test_config.commission_only:
-                runner.add_test_class(test_config, test_class, tests)
-
-            if hooks:
-                # Right now, we only support running a single test class at once,
-                # but it's relatively easy to expand that to make the test process faster
-                # TODO: support a list of tests
-                hooks.start(count=1)
-                # Mobly gives the test run time in seconds, lets be a bit more precise
-                runner_start_time = datetime.now(timezone.utc)
-
-            try:
-                runner.run()
-                ok = runner.results.is_all_pass and ok
-                if matter_test_config.fail_on_skipped_tests and runner.results.skipped:
-                    ok = False
-            except TimeoutError:
-                ok = False
-            except signals.TestAbortAll:
-                ok = False
-            except Exception:
-                logging.exception('Exception when executing %s.', test_config.testbed_name)
-                ok = False
-
-    if hooks:
-        duration = (datetime.now(timezone.utc) - runner_start_time) / timedelta(microseconds=1)
-        hooks.stop(duration=duration)
-
-    if not external_stack:
-        async def shutdown():
-            stack.Shutdown()
-        # Shutdown the stack when all done. Use the async runner to ensure that
-        # during the shutdown callbacks can use tha same async context which was used
-        # during the initialization.
-        event_loop.run_until_complete(shutdown())
-
-    if ok:
-        logging.info("Final result: PASS !")
-    else:
-        logging.error("Final result: FAIL !")
-    return ok
+def get_cluster_from_attribute(attribute: ClusterObjects.ClusterAttributeDescriptor) -> ClusterObjects.Cluster:
+    """Returns the cluster object for a given attribute descriptor."""
+    return ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
 
 
-def run_tests(test_class: MatterBaseTest, matter_test_config: MatterTestConfig,
-              hooks: TestRunnerHooks, default_controller=None, external_stack=None) -> None:
-    with asyncio.Runner() as runner:
-        if not run_tests_no_exit(test_class, matter_test_config, runner.get_loop(),
-                                 hooks, default_controller, external_stack):
-            sys.exit(1)
+def get_cluster_from_command(command: ClusterObjects.ClusterCommand) -> ClusterObjects.Cluster:
+    """Returns the cluster object for a given command object."""
+    return ClusterObjects.ALL_CLUSTERS[command.cluster_id]
+
+
+async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: EndpointCheckFunction) -> list[uint]:
+    """ Returns a list of endpoints matching the accept condition. """
+    wildcard = await self.default_controller.Read(self.dut_node_id, [(Clusters.Descriptor), Attribute.AttributePath(None, None, GlobalAttributeIds.ATTRIBUTE_LIST_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.FEATURE_MAP_ID), Attribute.AttributePath(None, None, GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID)])
+    matching = [e for e in wildcard.attributes.keys()
+                if accept_function(wildcard, e)]
+    return matching
 
 
 # TODO(#37537): Remove these temporary aliases after transition period
@@ -2371,3 +2205,8 @@ _get_all_matching_endpoints = decorators._get_all_matching_endpoints
 _has_feature = decorators._has_feature
 _has_command = decorators._has_command
 _has_attribute = decorators._has_attribute
+
+default_matter_test_main = runner.default_matter_test_main
+get_test_info = runner.get_test_info
+run_tests = runner.run_tests
+run_tests_no_exit = runner.run_tests_no_exit

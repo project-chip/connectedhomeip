@@ -95,7 +95,11 @@ config("siwx917-common-config") {
 }
 
 source_set("siwx917-common") {
-  deps = [ "${silabs_common_plat_dir}/provision:storage" ]
+  deps = [
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
+    "${chip_root}/src/app/clusters/software-diagnostics-server:software-fault-listener",
+    "${silabs_common_plat_dir}/provision:storage",
+  ]
   defines = []
   public_deps = []
 
@@ -121,6 +125,11 @@ source_set("siwx917-common") {
     "${silabs_common_plat_dir}/silabs_utils.cpp",
     "${silabs_common_plat_dir}/syscalls_stubs.cpp",
   ]
+
+  if (sl_enable_rgb_led) {
+    sources += [ "${silabs_common_plat_dir}/rgb_led/RGBLEDWidget.cpp" ]
+    include_dirs += [ "${silabs_common_plat_dir}/rgb_led" ]
+  }
 
   if (chip_enable_pw_rpc || chip_build_libshell || sl_uart_log_output) {
     sources += [ "${silabs_common_plat_dir}/uart.cpp" ]

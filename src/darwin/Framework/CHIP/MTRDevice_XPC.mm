@@ -268,6 +268,12 @@
     // Not needed since this is a state update now
 }
 
+- (BOOL)diagnosticLogTransferInProgress
+{
+    NSNumber * diagnosticLogTransferInProgressNumber = MTR_SAFE_CAST(self._internalState[kMTRDeviceInternalPropertyDiagnosticLogTransferInProgress], NSNumber);
+    return diagnosticLogTransferInProgressNumber.boolValue;
+}
+
 - (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID
 {
     MTR_LOG("%@ %s", self, __PRETTY_FUNCTION__);
@@ -341,6 +347,7 @@
         kMTRDeviceInternalPropertyNetworkFeatures : NSNumber.class,
         kMTRDeviceInternalPropertyMostRecentReportTime : NSDate.class,
         kMTRDeviceInternalPropertyLastSubscriptionFailureTime : NSDate.class,
+        kMTRDeviceInternalPropertyDiagnosticLogTransferInProgress : NSNumber.class
     };
 
     VerifyOrReturn([self _ensureValidValuesForKeys:requiredInternalStateKeys inInternalState:newState valueRequired:YES]);

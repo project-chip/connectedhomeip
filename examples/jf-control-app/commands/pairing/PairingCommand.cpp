@@ -54,6 +54,12 @@ CHIP_ERROR PairingCommand::RunCommand()
         {
             chip::CASEAuthTag anchorCAT = GetAnchorCATWithVersion(CHIP_CONFIG_ANCHOR_CAT_INITIAL_VERSION);
 
+            if (mExecuteJCM.ValueOr(false))
+            {
+                ChipLogError(JointFabric, "--anchor and --execute-jcm options are not allowed simultaneously!");
+                return CHIP_ERROR_BAD_REQUEST;
+            }
+
             // JFA will be issued a NOC with Anchor CAT and Administrator CAT
             mCASEAuthTags = MakeOptional(std::vector<uint32_t>{ administratorCAT, anchorCAT });
         }
@@ -116,6 +122,17 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::Ble:
         err = Pair(remoteId, PeerAddress::BLE());
         break;
+    case PairingMode::Nfc:
+        if (mDiscriminator.has_value())
+        {
+            err = Pair(remoteId, PeerAddress::NFC(mDiscriminator.value()));
+        }
+        else
+        {
+            // Discriminator is mandatory
+            err = CHIP_ERROR_MESSAGE_INCOMPLETE;
+        }
+        break;
     case PairingMode::OnNetwork:
         err = PairWithMdns(remoteId);
         break;
@@ -147,6 +164,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 {
     auto params = CommissioningParameters();
     params.SetSkipCommissioningComplete(mSkipCommissioningComplete.ValueOr(false));
+    params.SetExecuteJCM(mExecuteJCM.ValueOr(false));
     if (mBypassAttestationVerifier.ValueOr(false))
     {
         params.SetDeviceAttestationDelegate(this);
@@ -517,7 +535,8 @@ void OnOwnershipTransferDone(const _pw_protobuf_Empty & response, ::pw::Status s
 
 } // namespace
 
-void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
+void PairingCommand::OnCommissioningComplete(NodeId nodeId, const Optional<Crypto::P256PublicKey> & trustedIcacPublicKeyB,
+                                             CHIP_ERROR err)
 {
     if (err == CHIP_NO_ERROR)
     {
@@ -532,6 +551,31 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 
             memset(&request, 0, sizeof(request));
             request.node_id = nodeId;
+            request.jcm     = false;
+
+            if (mExecuteJCM.ValueOr(false))
+            {
+                request.jcm = true;
+
+                if (trustedIcacPublicKeyB.HasValue())
+                {
+                    memcpy(request.trustedIcacPublicKeyB.bytes, trustedIcacPublicKeyB.Value().ConstBytes(),
+                           Crypto::kP256_PublicKey_Length);
+                    request.trustedIcacPublicKeyB.size = Crypto::kP256_PublicKey_Length;
+
+                    for (size_t i = 0; i < Crypto::kP256_PublicKey_Length; ++i)
+                    {
+                        ChipLogProgress(JointFabric, "trustedIcacPublicKeyB[%li] = %02X", i,
+                                        request.trustedIcacPublicKeyB.bytes[i]);
+                    }
+                }
+                else
+                {
+                    SetCommandExitStatus(CHIP_ERROR_INVALID_ARGUMENT);
+                    ChipLogError(chipTool, "JCM requested but peer Admin ICAC not found");
+                    return;
+                }
+            }
 
             auto call = rpcClient.TransferOwnership(request, OnOwnershipTransferDone);
             if (!call.active())

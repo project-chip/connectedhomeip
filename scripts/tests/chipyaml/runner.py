@@ -24,16 +24,17 @@ import traceback
 from dataclasses import dataclass
 
 import click
-from matter_yamltests.definitions import SpecDefinitionsFromPaths
-from matter_yamltests.parser import TestParserConfig
-from matter_yamltests.parser_builder import TestParserBuilderConfig
-from matter_yamltests.parser_config import TestConfigParser
-from matter_yamltests.pseudo_clusters.pseudo_clusters import PseudoClusters, get_default_pseudo_clusters
-from matter_yamltests.runner import TestRunner, TestRunnerConfig, TestRunnerOptions
-from matter_yamltests.websocket_runner import WebSocketRunner, WebSocketRunnerConfig
 from paths_finder import PathsFinder
 from tests_finder import TestsFinder
 from tests_logger import TestParserLogger, TestRunnerLogger, WebSocketRunnerLogger
+
+from matter.yamltests.definitions import SpecDefinitionsFromPaths
+from matter.yamltests.parser import TestParserConfig
+from matter.yamltests.parser_builder import TestParserBuilderConfig
+from matter.yamltests.parser_config import TestConfigParser
+from matter.yamltests.pseudo_clusters.pseudo_clusters import PseudoClusters, get_default_pseudo_clusters
+from matter.yamltests.runner import TestRunner, TestRunnerConfig, TestRunnerOptions
+from matter.yamltests.websocket_runner import WebSocketRunner, WebSocketRunnerConfig
 
 #
 # Options

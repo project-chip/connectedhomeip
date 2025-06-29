@@ -247,7 +247,6 @@ CHIP_ERROR WriteClient::PutSinglePreencodedAttributeWritePayload(const chip::app
     return err;
 }
 
-// TODO #38287 Add Unit Tests for PutPreencodedAttribute and for TryPutPreencodedAttributeWritePayloadIntoList.
 CHIP_ERROR WriteClient::PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data)
 {
     ReturnErrorOnFailure(EnsureMessage());

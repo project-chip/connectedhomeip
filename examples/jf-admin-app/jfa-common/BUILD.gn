@@ -23,3 +23,9 @@ chip_data_model("jfa-common") {
   zap_file = "jfa-app.zap"
   is_server = true
 }
+
+source_set("jfa-manager") {
+  deps = [ "${chip_root}/src/lib" ]
+  public_configs = [ ":config" ]
+  sources = []
+}
