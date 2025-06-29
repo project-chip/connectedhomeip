@@ -1526,7 +1526,7 @@ exit:
                 // Clamp to a number of seconds that will not overflow 32-bit
                 // int when converted to ms.
                 auto serverTimeoutInSeconds = System::Clock::Seconds16(serverSideProcessingTimeout.unsignedShortValue);
-                invokeTimeout.SetValue(session->ComputeRoundTripTimeout(serverTimeoutInSeconds));
+                invokeTimeout.SetValue(session->ComputeRoundTripTimeout(serverTimeoutInSeconds, true /*isFirstMessageOnExchange*/));
             }
             ReturnErrorOnFailure(commandSender->SendCommandRequest(session, invokeTimeout));
 
@@ -2772,7 +2772,7 @@ static NSString * const sClusterKey = @"clusterKey";
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRAttributePath endpoint %u cluster 0x%llx (%llu, %@) 0x%llx (%llu, %@)>",
+    return [NSString stringWithFormat:@"<MTRAttributePath endpoint %u cluster 0x%llx (%llu, %@) attribute 0x%llx (%llu, %@)>",
                      self.endpoint.unsignedShortValue,
                      self.cluster.unsignedLongLongValue, self.cluster.unsignedLongLongValue, MTRClusterNameForID(static_cast<MTRClusterIDType>(self.cluster.unsignedLongLongValue)),
                      _attribute.unsignedLongLongValue, _attribute.unsignedLongLongValue,

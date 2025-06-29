@@ -120,10 +120,9 @@ extern const int fhost_tcpip_priority;
 #define MEMP_NUM_UDP_PCB 16
 #define MEMP_NUM_REASSDATA LWIP_MIN((IP_REASS_MAX_PBUFS), 5)
 
-#define PBUF_POOL_SIZE 0
 #define MEM_ALIGNMENT 4
 #define MEM_SIZE 30720
-#define PBUF_POOL_BUFSIZE (PBUF_LINK_ENCAPSULATION_HLEN + PBUF_LINK_HLEN + 1280)
+#define PBUF_POOL_BUFSIZE (1280 + 462 + 26)
 #define MEMP_MEM_MALLOC 1
 
 // #define LWIP_HOOK_FILENAME        "lwiphooks.h"
@@ -176,5 +175,23 @@ extern const int fhost_tcpip_priority;
 #undef LWIP_DECLARE_MEMORY_ALIGNED
 #define LWIP_DECLARE_MEMORY_ALIGNED(variable_name, size)                                                                           \
     u8_t variable_name[size] __attribute__((aligned(4))) __attribute__((section("SHAREDRAM")))
+
+#if defined(CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM) && CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM
+#define PBUF_POOL_SIZE 0
+
+#include <lwip/arch.h>
+#include <lwip/mem.h>
+#define LWIP_PBUF_CUSTOM_DATA mem_size_t pool;
+
+#if defined(__cplusplus)
+extern "C" const mem_size_t * memp_sizes;
+extern "C" struct pbuf * pbuf_rightsize(struct pbuf * p, s16_t offset);
+#else
+extern const mem_size_t * memp_sizes;
+extern struct pbuf * pbuf_rightsize(struct pbuf * p, s16_t offset);
+#endif
+#else
+#define PBUF_POOL_SIZE 20
+#endif
 
 #endif /* LWIP_HDR_LWIPOPTS_H__ */

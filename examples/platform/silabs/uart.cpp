@@ -32,12 +32,18 @@ extern "C" {
 #include <string.h>
 
 #define UART_CONSOLE_ERR -1 // Negative value in case of UART Console action failed. Triggers a failure for PW_RPC
+#ifdef CHIP_SHELL_MAX_LINE_SIZE
+#define MAX_BUFFER_SIZE CHIP_SHELL_MAX_LINE_SIZE
+#else
 #define MAX_BUFFER_SIZE 256
+#endif
 #define MAX_DMA_BUFFER_SIZE (MAX_BUFFER_SIZE / 2)
 
 #if SLI_SI91X_MCU_INTERFACE
 #include "USART.h"
+#if defined(SL_SI91X_BOARD_INIT)
 #include "rsi_board.h"
+#endif // SL_SI91X_BOARD_INIT
 #include "rsi_debug.h"
 #include "rsi_rom_egpio.h"
 #else // For EFR32
@@ -92,7 +98,7 @@ extern "C" {
 #define EUSART_INT_ENABLE EUSART_IntEnable
 #define EUSART_INT_DISABLE EUSART_IntDisable
 #define EUSART_INT_CLEAR EUSART_IntClear
-#define EUSART_CLEAR_RX
+#define EUSART_CLEAR_RX(x) (void) x
 #define EUSART_GET_PENDING_INT EUSART_IntGet
 #define EUSART_ENABLE(eusart) EUSART_Enable(eusart, eusartEnable)
 #else
@@ -189,7 +195,7 @@ static Fifo_t sReceiveFifo;
 #if SLI_SI91X_MCU_INTERFACE == 0
 static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, uint8_t * data, UARTDRV_Count_t transferCount);
 #endif // SLI_SI91X_MCU_INTERFACE == 0
-static void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes);
+static void uartSendBytes(UartTxStruct_t & bufferStruct);
 
 static bool InitFifo(Fifo_t * fifo, uint8_t * pDataBuffer, uint16_t bufferSize)
 {
@@ -523,11 +529,10 @@ void uartMainLoop(void * args)
 
     while (1)
     {
-
         osStatus_t eventReceived = osMessageQueueGet(sUartTxQueue, &workBuffer, nullptr, osWaitForever);
         while (eventReceived == osOK)
         {
-            uartSendBytes(workBuffer.data, workBuffer.length);
+            uartSendBytes(workBuffer);
             eventReceived = osMessageQueueGet(sUartTxQueue, &workBuffer, nullptr, 0);
         }
     }
@@ -536,18 +541,21 @@ void uartMainLoop(void * args)
 /**
  * @brief Send Bytes to UART. This blocks the UART task.
  *
- * @param buffer pointer to the buffer containing the data
- * @param nbOfBytes number of bytes to send
+ * @param bufferStruct reference to the UartTxStruct_t containing the data
  */
-void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes)
+void uartSendBytes(UartTxStruct_t & bufferStruct)
 {
 #if SLI_SI91X_MCU_INTERFACE
     // ensuring null termination of buffer
-    if (nbOfBytes != CHIP_SHELL_MAX_LINE_SIZE && buffer[nbOfBytes - 1] != '\0')
+    if (bufferStruct.length < MATTER_ARRAY_SIZE(bufferStruct.data) && bufferStruct.data[bufferStruct.length - 1] != '\0')
     {
-        buffer[nbOfBytes] = '\0';
+        bufferStruct.data[bufferStruct.length] = '\0';
     }
-    Board_UARTPutSTR(reinterpret_cast<uint8_t *>(buffer));
+    else
+    {
+        bufferStruct.data[MATTER_ARRAY_SIZE(bufferStruct.data) - 1] = '\0';
+    }
+    Board_UARTPutSTR(bufferStruct.data);
 #else
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
@@ -560,10 +568,10 @@ void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes)
 #if (defined(EFR32MG24) && defined(WF200_WIFI))
     // Blocking transmit for the MG24 + WF200 since UART TX is multiplexed with
     // WF200 SPI IRQ
-    UARTDRV_ForceTransmit(vcom_handle, (uint8_t *) buffer, nbOfBytes);
+    UARTDRV_ForceTransmit(vcom_handle, bufferStruct.data, bufferStruct.length);
 #else
     // Non Blocking Transmit
-    UARTDRV_Transmit(vcom_handle, (uint8_t *) buffer, nbOfBytes, UART_tx_callback);
+    UARTDRV_Transmit(vcom_handle, bufferStruct.data, bufferStruct.length, UART_tx_callback);
     osThreadFlagsWait(kUartTxCompleteFlag, osFlagsWaitAny, osWaitForever);
 #endif /* EFR32MG24 && WF200_WIFI */
 
@@ -575,6 +583,32 @@ void uartSendBytes(uint8_t * buffer, uint16_t nbOfBytes)
     sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);
 #endif // SL_CATALOG_POWER_MANAGER_PRESENT
 #endif // SLI_SI91X_MCU_INTERFACE
+}
+
+/**
+ * @brief Flush the UART TX queue in a blocking manner.
+ */
+void uartFlushTxQueue(void)
+{
+    UartTxStruct_t workBuffer;
+
+    while (osMessageQueueGet(sUartTxQueue, &workBuffer, nullptr, 0) == osOK)
+    {
+#if SLI_SI91X_MCU_INTERFACE
+        // ensuring null termination of buffer
+        if (workBuffer.length < MATTER_ARRAY_SIZE(workBuffer.data) && workBuffer.data[workBuffer.length - 1] != '\0')
+        {
+            workBuffer.data[workBuffer.length] = '\0';
+        }
+        else
+        {
+            workBuffer.data[MATTER_ARRAY_SIZE(workBuffer.data) - 1] = '\0';
+        }
+        Board_UARTPutSTR(workBuffer.data);
+#else
+        UARTDRV_ForceTransmit(vcom_handle, workBuffer.data, workBuffer.length);
+#endif
+    }
 }
 
 #ifdef __cplusplus

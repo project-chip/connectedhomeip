@@ -53,7 +53,7 @@ bool IPAddress::operator!=(const IPAddress & other) const
     return Addr[0] != other.Addr[0] || Addr[1] != other.Addr[1] || Addr[2] != other.Addr[2] || Addr[3] != other.Addr[3];
 }
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
 IPAddress::IPAddress(const ip6_addr_t & ipv6Addr)
 {
@@ -252,7 +252,7 @@ CHIP_ERROR IPAddress::GetIPAddressFromSockAddr(const SockAddrWithoutStorage & so
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 IPAddress::IPAddress(const otIp6Address & ipv6Addr)
 {
     static_assert(sizeof(ipv6Addr.mFields.m32) == sizeof(Addr), "otIp6Address size mismatch");
@@ -273,7 +273,7 @@ IPAddress IPAddress::FromOtAddr(const otIp6Address & address)
     memcpy(addr.Addr, address.mFields.m32, sizeof(addr.Addr));
     return addr;
 }
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#endif // CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
 // Is address an IPv4 address encoded in IPv6 format?
 bool IPAddress::IsIPv4() const

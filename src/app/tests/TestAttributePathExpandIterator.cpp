@@ -126,11 +126,11 @@ TEST_F(TestAttributePathExpandIterator, TestAllWildcard)
 
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-        EXPECT_LT(index, ArraySize(paths));
+        EXPECT_LT(index, MATTER_ARRAY_SIZE(paths));
         EXPECT_EQ(paths[index], path);
         index++;
     }
-    EXPECT_EQ(index, ArraySize(paths));
+    EXPECT_EQ(index, MATTER_ARRAY_SIZE(paths));
 }
 
 TEST_F(TestAttributePathExpandIterator, TestWildcardEndpoint)
@@ -158,11 +158,11 @@ TEST_F(TestAttributePathExpandIterator, TestWildcardEndpoint)
         }
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-        EXPECT_LT(index, ArraySize(paths));
+        EXPECT_LT(index, MATTER_ARRAY_SIZE(paths));
         EXPECT_EQ(paths[index], path);
         index++;
     }
-    EXPECT_EQ(index, ArraySize(paths));
+    EXPECT_EQ(index, MATTER_ARRAY_SIZE(paths));
 }
 
 TEST_F(TestAttributePathExpandIterator, TestWildcardCluster)
@@ -193,11 +193,11 @@ TEST_F(TestAttributePathExpandIterator, TestWildcardCluster)
         }
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-        EXPECT_LT(index, ArraySize(paths));
+        EXPECT_LT(index, MATTER_ARRAY_SIZE(paths));
         EXPECT_EQ(paths[index], path);
         index++;
     }
-    EXPECT_EQ(index, ArraySize(paths));
+    EXPECT_EQ(index, MATTER_ARRAY_SIZE(paths));
 }
 
 TEST_F(TestAttributePathExpandIterator, TestWildcardClusterGlobalAttributeNotInMetadata)
@@ -229,11 +229,11 @@ TEST_F(TestAttributePathExpandIterator, TestWildcardClusterGlobalAttributeNotInM
         }
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-        EXPECT_LT(index, ArraySize(paths));
+        EXPECT_LT(index, MATTER_ARRAY_SIZE(paths));
         EXPECT_EQ(paths[index], path);
         index++;
     }
-    EXPECT_EQ(index, ArraySize(paths));
+    EXPECT_EQ(index, MATTER_ARRAY_SIZE(paths));
 }
 
 TEST_F(TestAttributePathExpandIterator, TestWildcardAttribute)
@@ -269,11 +269,11 @@ TEST_F(TestAttributePathExpandIterator, TestWildcardAttribute)
         }
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-        EXPECT_LT(index, ArraySize(paths));
+        EXPECT_LT(index, MATTER_ARRAY_SIZE(paths));
         EXPECT_EQ(paths[index], path);
         index++;
     }
-    EXPECT_EQ(index, ArraySize(paths));
+    EXPECT_EQ(index, MATTER_ARRAY_SIZE(paths));
 }
 
 TEST_F(TestAttributePathExpandIterator, TestNoWildcard)
@@ -302,11 +302,11 @@ TEST_F(TestAttributePathExpandIterator, TestNoWildcard)
         }
         ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                       ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-        EXPECT_LT(index, ArraySize(paths));
+        EXPECT_LT(index, MATTER_ARRAY_SIZE(paths));
         EXPECT_EQ(paths[index], path);
         index++;
     }
-    EXPECT_EQ(index, ArraySize(paths));
+    EXPECT_EQ(index, MATTER_ARRAY_SIZE(paths));
 }
 
 TEST_F(TestAttributePathExpandIterator, TestFixedPathExpansion)
@@ -484,11 +484,11 @@ TEST_F(TestAttributePathExpandIterator, TestMultipleClusInfo)
         {
             ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                           ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-            EXPECT_LT(index, ArraySize(paths));
+            EXPECT_LT(index, MATTER_ARRAY_SIZE(paths));
             EXPECT_EQ(paths[index], path);
             index++;
         }
-        EXPECT_EQ(index, ArraySize(paths));
+        EXPECT_EQ(index, MATTER_ARRAY_SIZE(paths));
     }
 
     // identical test, however this checks that position re-use works
@@ -508,11 +508,11 @@ TEST_F(TestAttributePathExpandIterator, TestMultipleClusInfo)
             }
             ChipLogDetail(AppServer, "Visited Attribute: 0x%04X / " ChipLogFormatMEI " / " ChipLogFormatMEI, path.mEndpointId,
                           ChipLogValueMEI(path.mClusterId), ChipLogValueMEI(path.mAttributeId));
-            EXPECT_LT(index, ArraySize(paths));
+            EXPECT_LT(index, MATTER_ARRAY_SIZE(paths));
             EXPECT_EQ(paths[index], path);
             index++;
         }
-        EXPECT_EQ(index, ArraySize(paths));
+        EXPECT_EQ(index, MATTER_ARRAY_SIZE(paths));
     }
 }
 

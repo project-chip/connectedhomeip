@@ -174,6 +174,13 @@ public:
      */
     bool SupportsFeature(Clusters::IcdManagement::Feature feature);
 
+    // See ICDConfigurationData::SetModeDurations
+    CHIP_ERROR SetModeDurations(Optional<System::Clock::Milliseconds32> activeModeDuration,
+                                Optional<System::Clock::Milliseconds32> idleModeDuration)
+    {
+        return ICDConfigurationData::GetInstance().SetModeDurations(activeModeDuration, idleModeDuration);
+    };
+
     ICDConfigurationData::ICDMode GetICDMode() { return ICDConfigurationData::GetInstance().GetICDMode(); };
 
     OperationalState GetOperaionalState() { return mOperationalState; };

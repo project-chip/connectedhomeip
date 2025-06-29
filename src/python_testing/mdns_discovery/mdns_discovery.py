@@ -191,7 +191,8 @@ class MdnsDiscovery:
             raise ValueError("Both node_id and compressed_fabric_id must be provided together or not at all.")
 
         self._name_filter = f'{compressed_fabric_id:016x}-{node_id:016x}.{MdnsServiceType.OPERATIONAL.value}'.upper()
-        return await self._get_service(MdnsServiceType.OPERATIONAL, log_output, discovery_timeout_sec)
+        logger.info(f"name filter {self._name_filter}")
+        return await self._get_service(MdnsServiceType.OPERATIONAL, log_output, discovery_timeout_sec, self._name_filter)
 
     async def get_border_router_service(self, log_output: bool = False,
                                         discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC
@@ -493,7 +494,8 @@ class MdnsDiscovery:
 
     async def _get_service(self, service_type: MdnsServiceType,
                            log_output: bool,
-                           discovery_timeout_sec: float
+                           discovery_timeout_sec: float,
+                           expected_value: str = None,
                            ) -> Optional[MdnsServiceInfo]:
         """
         Asynchronously discovers a specific type of mDNS service within the network and returns its details.
@@ -502,6 +504,7 @@ class MdnsDiscovery:
             service_type (MdnsServiceType): The enum representing the type of mDNS service to discover.
             log_output (bool): Logs the discovered services to the console. Defaults to False.
             discovery_timeout_sec (float): Defaults to 15 seconds.
+            expected_value (str): Defaults to none as currently only utilized to gather specific record in multiple discovery records if available
 
         Returns:
             Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo representing the discovered service, if
@@ -515,7 +518,12 @@ class MdnsDiscovery:
             logger.info("Getting service from discovered services: %s", self._discovered_services)
 
         if service_type.value in self._discovered_services:
-            return self._discovered_services[service_type.value][0]
+            if expected_value is not None:
+                for service in self._discovered_services[service_type.value]:
+                    if service.service_name == expected_value.replace("._MATTER._TCP.LOCAL.", "._matter._tcp.local."):
+                        return service
+            else:
+                return self._discovered_services[service_type.value][0]
         else:
             return None
 

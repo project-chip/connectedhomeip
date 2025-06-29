@@ -31,8 +31,6 @@ source_set("data-model-provider") {
     "ActionReturnStatus.h",
     "Context.h",
     "EventsGenerator.h",
-    "MetadataList.cpp",
-    "MetadataList.h",
     "MetadataLookup.cpp",
     "MetadataLookup.h",
     "OperationTypes.h",
@@ -45,7 +43,7 @@ source_set("data-model-provider") {
   public_deps = [
     ":metadata",
     "${chip_root}/src/app:attribute-access",
-    "${chip_root}/src/app:command-handler-interface",
+    "${chip_root}/src/app:command-handler",
     "${chip_root}/src/app:events",
     "${chip_root}/src/app:paths",
     "${chip_root}/src/app/MessageDef",

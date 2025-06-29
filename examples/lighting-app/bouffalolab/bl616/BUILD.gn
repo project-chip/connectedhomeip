@@ -121,6 +121,10 @@ bouffalolab_executable("lighting_app") {
     defines += [ "BOOT_PIN_RESET=2" ]
   }
 
+  if (enable_lwip_pbuf_ram) {
+    defines += [ "CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM=1" ]
+  }
+
   defines += [ "BL616DK" ]
 
   sources = [
@@ -138,7 +142,8 @@ bouffalolab_executable("lighting_app") {
   deps = [
     ":bouffalolab-lighting",
     ":sdk",
-    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
   ]

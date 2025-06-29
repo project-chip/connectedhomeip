@@ -110,9 +110,8 @@ public:
      * @param delegate A pointer to the delegate to be used by this server.
      * Note: the caller must ensure that the delegate lives throughout the instance's lifetime.
      * @param endpointId The endpoint on which this cluster exists. This must match the zap configuration.
-     * @param clusterId The ID of the Microwave Oven Control cluster to be instantiated.
      */
-    CommissionerControlServer(Delegate * delegate, EndpointId endpointId, ClusterId clusterId);
+    CommissionerControlServer(Delegate * delegate, EndpointId endpointId);
 
     ~CommissionerControlServer() override;
 

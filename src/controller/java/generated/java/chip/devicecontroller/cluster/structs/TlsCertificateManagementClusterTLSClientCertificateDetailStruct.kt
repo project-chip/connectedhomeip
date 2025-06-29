@@ -17,6 +17,7 @@
 package chip.devicecontroller.cluster.structs
 
 import chip.devicecontroller.cluster.*
+import java.util.Optional
 import matter.tlv.AnonymousTag
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
@@ -25,14 +26,16 @@ import matter.tlv.TlvWriter
 
 class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
   val ccdid: UInt,
-  val clientCertificate: ByteArray,
-  val intermediateCertificates: List<ByteArray>,
+  val clientCertificate: Optional<ByteArray>,
+  val intermediateCertificates: Optional<List<ByteArray>>,
+  val fabricIndex: UInt,
 ) {
   override fun toString(): String = buildString {
     append("TlsCertificateManagementClusterTLSClientCertificateDetailStruct {\n")
     append("\tccdid : $ccdid\n")
     append("\tclientCertificate : $clientCertificate\n")
     append("\tintermediateCertificates : $intermediateCertificates\n")
+    append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
 
@@ -40,12 +43,19 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
     tlvWriter.apply {
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CCDID), ccdid)
-      put(ContextSpecificTag(TAG_CLIENT_CERTIFICATE), clientCertificate)
-      startArray(ContextSpecificTag(TAG_INTERMEDIATE_CERTIFICATES))
-      for (item in intermediateCertificates.iterator()) {
-        put(AnonymousTag, item)
+      if (clientCertificate.isPresent) {
+        val optclientCertificate = clientCertificate.get()
+        put(ContextSpecificTag(TAG_CLIENT_CERTIFICATE), optclientCertificate)
       }
-      endArray()
+      if (intermediateCertificates.isPresent) {
+        val optintermediateCertificates = intermediateCertificates.get()
+        startArray(ContextSpecificTag(TAG_INTERMEDIATE_CERTIFICATES))
+        for (item in optintermediateCertificates.iterator()) {
+          put(AnonymousTag, item)
+        }
+        endArray()
+      }
+      put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
   }
@@ -54,6 +64,7 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
     private const val TAG_CCDID = 0
     private const val TAG_CLIENT_CERTIFICATE = 1
     private const val TAG_INTERMEDIATE_CERTIFICATES = 2
+    private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
       tlvTag: Tag,
@@ -61,15 +72,27 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
     ): TlsCertificateManagementClusterTLSClientCertificateDetailStruct {
       tlvReader.enterStructure(tlvTag)
       val ccdid = tlvReader.getUInt(ContextSpecificTag(TAG_CCDID))
-      val clientCertificate = tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_CERTIFICATE))
-      val intermediateCertificates =
-        buildList<ByteArray> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_INTERMEDIATE_CERTIFICATES))
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getByteArray(AnonymousTag))
-          }
-          tlvReader.exitContainer()
+      val clientCertificate =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_CLIENT_CERTIFICATE))) {
+          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_CERTIFICATE)))
+        } else {
+          Optional.empty()
         }
+      val intermediateCertificates =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_INTERMEDIATE_CERTIFICATES))) {
+          Optional.of(
+            buildList<ByteArray> {
+              tlvReader.enterArray(ContextSpecificTag(TAG_INTERMEDIATE_CERTIFICATES))
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getByteArray(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+          )
+        } else {
+          Optional.empty()
+        }
+      val fabricIndex = tlvReader.getUInt(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
 
@@ -77,6 +100,7 @@ class TlsCertificateManagementClusterTLSClientCertificateDetailStruct(
         ccdid,
         clientCertificate,
         intermediateCertificates,
+        fabricIndex,
       )
     }
   }

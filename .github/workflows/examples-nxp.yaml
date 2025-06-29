@@ -18,12 +18,15 @@ on:
     push:
         branches:
             - master
-            - 'v*-branch'
+            - "v*-branch"
     pull_request:
     merge_group:
 
 concurrency:
-    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    group:
+        ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
+        'pull_request' && github.event.number) || (github.event_name ==
+        'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
 env:
@@ -40,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp:112
+            image: ghcr.io/project-chip/chip-build-nxp:142
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -49,8 +52,8 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: nxp
-                extra-submodule-parameters: --recursive
+                  platform: nxp
+                  extra-submodule-parameters: --recursive
 
             - name: Detect changed paths
               uses: dorny/paths-filter@v3
@@ -64,50 +67,7 @@ jobs:
               uses: ./.github/actions/setup-size-reports
               if: ${{ !env.ACT }}
               with:
-                gh-context: ${{ toJson(github) }}
-
-            - name: Build K32W0 examples
-              run: |
-                  scripts/run_in_build_env.sh "\
-                      ./scripts/build/build_examples.py \
-                      --target nxp-k32w0-freertos-lighting-factory-log-progress \
-                      --target nxp-k32w0-freertos-contact-sensor-low-power-factory \
-                      build \
-                      --copy-artifacts-to out/artifacts \
-                  "
-            - name: Get K32W0 lighting app size stats
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    nxp k32w0+release light \
-                    out/artifacts/nxp-k32w0-freertos-lighting-factory-log-progress/chip-k32w0x-light-example.elf \
-                    /tmp/bloat_reports/
-            - name: Get K32W0 contact sensor size stats
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    nxp k32w0+release contact \
-                    out/artifacts/nxp-k32w0-freertos-contact-sensor-low-power-factory/chip-k32w0x-contact-example.elf \
-                    /tmp/bloat_reports/
-
-            - name: clean build
-              run: rm -rf ./out
-
-            - name: Build K32W1 examples
-              run: |
-                  scripts/run_in_build_env.sh "\
-                      ./scripts/build/build_examples.py \
-                      --target nxp-k32w1-freertos-lighting \
-                      build \
-                      --copy-artifacts-to out/artifacts \
-                  "
-            - name: Get K32W1 lighting app size stats
-              run: |
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    nxp k32w1+release light \
-                    out/artifacts/nxp-k32w1-freertos-lighting/chip-k32w1-light-example.elf \
-                    /tmp/bloat_reports/
-
-            - name: clean build
-              run: rm -rf ./out
+                  gh-context: ${{ toJson(github) }}
 
             - name: Build MCXW71 examples
               run: |
@@ -138,61 +98,42 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rt1060-freertos-all-clusters-wifi-iw416 \
-                      --target nxp-rt1060-freertos-all-clusters-wifi-w8801 \
-                      --target nxp-rt1060-freertos-all-clusters-wifi-ota-evkc-iwx12 \
+                      --target nxp-rt1060-freertos-all-clusters-wifi-iw416-cmake \
+                      --target nxp-rt1060-freertos-all-clusters-wifi-w8801-no-ble-cmake \
+                      --target nxp-rt1060-freertos-all-clusters-wifi-ota-evkc-iwx12-cmake \
                       build \
-                      --copy-artifacts-to out/artifacts \
                   "
             - name: Build RT1060 thermostat example app
-              if: github.event_name == 'push' || steps.changed_paths.outputs.nxp == 'true'
+              if:
+                  github.event_name == 'push' || steps.changed_paths.outputs.nxp
+                  == 'true' || steps.changed_paths.outputs.pigweed == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rt1060-freertos-thermostat-thread-wifi-evkc-iwx12 \
+                      --target nxp-rt1060-freertos-thermostat-thread-wifi-ota-evkc-iwx12-cmake \
                       build \
-                      --copy-artifacts-to out/artifacts \
-                  "
-            - name: Build RT1060 laundry-washer example app
-              if: github.event_name == 'push' || steps.changed_paths.outputs.nxp == 'true'
-              run: |
-                  scripts/run_in_build_env.sh "\
-                      ./scripts/build/build_examples.py \
-                      --target nxp-rt1060-freertos-laundry-washer-wifi-evkc-iwx12 \
-                      --target nxp-rt1060-freertos-laundry-washer-thread-evkc-iwx12 \
-                      build \
-                      --copy-artifacts-to out/artifacts \
                   "
 
             - name: clean build
               run: rm -rf ./out
 
             - name: Build RT1170 all clusters example app
-              if: github.event_name == 'push' || steps.changed_paths.outputs.nxp == 'true'
+              if:
+                  github.event_name == 'push' || steps.changed_paths.outputs.nxp
+                  == 'true' || steps.changed_paths.outputs.pigweed == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rt1170-freertos-all-clusters-wifi-iwx12 \
-                      --target nxp-rt1170-freertos-all-clusters-wifi-ota-iwx12 \
+                      --target nxp-rt1170-freertos-all-clusters-wifi-iwx12-cmake \
+                      --target nxp-rt1170-freertos-all-clusters-wifi-ota-iwx12-cmake \
                       build \
-                      --copy-artifacts-to out/artifacts \
                   "
             - name: Build RT1170 thermostat example app
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rt1170-freertos-thermostat-thread-wifi-iwx12 \
+                      --target nxp-rt1170-freertos-thermostat-thread-wifi-ota-iwx12-cmake \
                       build \
-                      --copy-artifacts-to out/artifacts \
-                  "
-            - name: Build RT1170 laundry-washer example app
-              if: github.event_name == 'push' || steps.changed_paths.outputs.nxp == 'true'
-              run: |
-                  scripts/run_in_build_env.sh "\
-                      ./scripts/build/build_examples.py \
-                      --target nxp-rt1170-freertos-laundry-washer-thread-iwx12 \
-                      build \
-                      --copy-artifacts-to out/artifacts \
                   "
 
             - name: clean build
@@ -202,26 +143,22 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-freertos-all-clusters-wifi \
+                      --target nxp-rw61x-freertos-all-clusters-wifi-ota-cmake \
                       build \
-                      --copy-artifacts-to out/artifacts \
                   "
-            - name: Build RW61X thermostat example app
+            - name: Build RW61X thermostat OTBR example app
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-freertos-thermostat-thread-wifi \
+                      --target nxp-rw61x-freertos-thermostat-thread-wifi-ota-factory-cmake \
                       build \
-                      --copy-artifacts-to out/artifacts \
                   "
-            - name: Build RW61X laundry-washer example app
-              if: github.event_name == 'push' || steps.changed_paths.outputs.nxp == 'true'
+            - name: Build RW61X thermostat ethernet example app
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target nxp-rw61x-freertos-laundry-washer-wifi \
+                      --target nxp-rw61x-freertos-thermostat-ethernet-cmake-frdm \
                       build \
-                      --copy-artifacts-to out/artifacts \
                   "
 
             - name: clean build
@@ -231,7 +168,7 @@ jobs:
               uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}
               with:
-                platform-name: NXP-FREERTOS
+                  platform-name: NXP-FREERTOS
     zephyr:
         name: ZEPHYR
 
@@ -239,7 +176,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nxp-zephyr:112
+            image: ghcr.io/project-chip/chip-build-nxp-zephyr:142
 
         steps:
             - name: Checkout
@@ -247,7 +184,7 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: nxp
+                  platform: nxp
             - name: Detect changed paths
               uses: dorny/paths-filter@v3
               id: changed_paths
@@ -255,14 +192,18 @@ jobs:
                   filters: |
                       nxp:
                         - '**/nxp/**'
+                      pigweed:
+                        - 'src/pw_backends/**'
+                        - 'third_party/pigweed/**'
             - name: Build NXP Zephyr examples
-              if: github.event_name == 'push' || steps.changed_paths.outputs.nxp == 'true'
+              if:
+                  github.event_name == 'push' || steps.changed_paths.outputs.nxp
+                  == 'true' || steps.changed_paths.outputs.pigweed == 'true'
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target nxp-rw61x-zephyr-all-clusters \
                       --target nxp-rw61x-zephyr-thermostat \
                       --target nxp-rw61x-zephyr-laundry-washer-factory \
-                      --target nxp-rw61x_eth-zephyr-thermostat-ethernet \
                       build \
                   "

@@ -133,7 +133,9 @@ def gen_test_certs(chip_cert: str,
                    pai_cert: str = None,
                    pai_key: str = None,
                    dac_cert: str = None,
-                   dac_key: str = None):
+                   dac_key: str = None,
+                   dac_product_id: int = None,
+                   discriminator: int = None):
 
     def parse_cert_file(cert):
 
@@ -189,7 +191,7 @@ def gen_test_certs(chip_cert: str,
                 log.info("Verify Certificate Chain: {}".format(shlex.join(cmd)))
                 subprocess.run(cmd)
 
-    def gen_dac_certificate(chip_cert, device_name, vendor_id, product_id, pai_cert, pai_key, dac_cert, dac_key, pai_issue_date, pai_expire_date):
+    def gen_dac_certificate(chip_cert, device_name, dac_vid, dac_pid, pai_cert, pai_key, dac_cert, dac_key, pai_issue_date, pai_expire_date, discriminator):
         def gen_valid_times(issue_date, expire_date):
             now = datetime.now() - timedelta(days=1)
 
@@ -206,8 +208,8 @@ def gen_test_certs(chip_cert: str,
             cmd = [chip_cert, "gen-att-cert",
                    "--type", "d",  # device attestation certificate
                    "--subject-cn", device_name + " Test DAC 0",
-                   "--subject-vid", hex(vendor_id),
-                   "--subject-pid", hex(product_id),
+                   "--subject-vid", hex(dac_vid),
+                   "--subject-pid", hex(dac_pid),
                    "--ca-cert", pai_cert,
                    "--ca-key", pai_key,
                    "--out", dac_cert,
@@ -230,7 +232,7 @@ def gen_test_certs(chip_cert: str,
 
         return der
 
-    def gen_cd(chip_cert, dac_vendor_id, dac_product_id, vendor_id, product_id, cd_cert, cd_key, cd):
+    def gen_cd(chip_cert, paa_cert, dac_vendor_id, dac_product_id, vendor_id, product_id, cd_cert, cd_key, cd):
 
         if os.path.isfile(cd):
             return
@@ -255,15 +257,29 @@ def gen_test_certs(chip_cert: str,
                     "--dac-origin-product-id", hex(dac_product_id),
                     ]
 
+        if paa_cert:
+            cmd += ["--authorized-paa-cert", paa_cert]
+
         log.info("Generate CD: {}".format(shlex.join(cmd)))
         subprocess.run(cmd)
 
     pai_vendor_id, pai_product_id, pai_issue_date, pai_expire_date = parse_cert_file(pai_cert)
 
-    dac_vendor_id = pai_vendor_id if pai_vendor_id else vendor_id
-    dac_product_id = pai_product_id if pai_product_id else product_id
+    dac_vendor_id = pai_vendor_id
+
+    if dac_product_id is not None and pai_product_id is not None and dac_product_id != pai_product_id:
+        raise Exception("Specified product id for DAC certificate is not same as product id in PAI certificate.")
+
+    if pai_product_id is not None:
+        dac_product_id = pai_product_id
+
+    if dac_cert is None:
+        dac_disc_vp = "{}_{}_{}".format(hex(dac_vendor_id).split("x")[-1], hex(dac_product_id).split("x")[-1], discriminator)
+        dac_cert = os.path.join(output, "out_{}_dac_cert.pem".format(dac_disc_vp))
+        dac_key = os.path.join(output, "out_{}_dac_key.pem".format(dac_disc_vp))
+
     gen_dac_certificate(chip_cert, device_name, dac_vendor_id, dac_product_id, pai_cert,
-                        pai_key, dac_cert, dac_key, pai_issue_date, pai_expire_date)
+                        pai_key, dac_cert, dac_key, pai_issue_date, pai_expire_date, discriminator)
 
     dac_cert_der = convert_pem_to_der(chip_cert, "convert-cert", dac_cert)
     dac_key_der = convert_pem_to_der(chip_cert, "convert-key", dac_key)
@@ -274,7 +290,7 @@ def gen_test_certs(chip_cert: str,
 
     verify_certificates(chip_cert, paa_cert, pai_cert, dac_cert)
 
-    gen_cd(chip_cert, dac_vendor_id, dac_product_id, vendor_id, product_id, cd_cert, cd_key, cd)
+    gen_cd(chip_cert, paa_cert, dac_vendor_id, dac_product_id, vendor_id, product_id, cd_cert, cd_key, cd)
 
     return cd, pai_cert_der, dac_cert_der, dac_key_der
 
@@ -447,10 +463,14 @@ def main():
         else:
             return None
 
+    def hex_to_int(hex_string):
+        return int(hex_string, 16)
+
     parser = argparse.ArgumentParser(description="Bouffalo Lab Factory Data generator tool")
 
     parser.add_argument("--dac_cert", type=str, help="DAC certificate file.")
     parser.add_argument("--dac_key", type=str, help="DAC certificate privat key.")
+    parser.add_argument("--dac_pid", type=hex_to_int, help="Product Identification, hex string, used in DAC certificate. ")
     parser.add_argument("--passcode", type=int, help="Setup pincode, optional.")
     parser.add_argument("--pai_cert", type=str, default=TEST_PAI_CERT, help="PAI certificate file.")
     parser.add_argument("--cd", type=str, help="Certificate Declaration file.")
@@ -460,9 +480,9 @@ def main():
     parser.add_argument("--spake2p_it", type=int, default=None, help="Spake2+ iteration count, optional.")
     parser.add_argument("--spake2p_salt", type=base64.b64decode, help="Spake2+ salt in hex string, optional.")
 
-    parser.add_argument("--vendor_id", type=int, default=0x130D, help="Vendor Identification, mandatory.")
+    parser.add_argument("--vendor_id", type=hex_to_int, default=0x130D, help="Vendor Identification, hex string, mandatory.")
     parser.add_argument("--vendor_name", type=str, default="Bouffalo Lab", help="Vendor Name string, optional.")
-    parser.add_argument("--product_id", type=int, default=0x1001, help="Product Identification, mandatory.")
+    parser.add_argument("--product_id", type=hex_to_int, default=0x1001, help="Product Identification, hex string, mandatory.")
     parser.add_argument("--product_name", type=str, default="Test Product", help="Product Name string, optional.")
 
     parser.add_argument("--product_part_no", type=str, help="Product Part number, optional.")
@@ -494,11 +514,8 @@ def main():
     unique_id = gen_test_unique_id(args.unique_id)
     spake2p_it, spake2p_salt, spake2p_verifier = gen_test_spake2(passcode, args.spake2p_it, args.spake2p_salt)
 
-    vp_info = "{}_{}".format(hex(args.vendor_id), hex(args.product_id))
-    vp_disc_info = "{}_{}_{}".format(hex(args.vendor_id), hex(args.product_id), discriminator)
-    if args.dac_cert is None:
-        args.dac_cert = os.path.join(args.output, "out_{}_dac_cert.pem".format(vp_disc_info))
-        args.dac_key = os.path.join(args.output, "out_{}_dac_key.pem".format(vp_disc_info))
+    vp_info = "{}_{}".format(hex(args.vendor_id).split('x')[-1], hex(args.product_id).split('x')[-1])
+    vp_disc_info = "{}_{}".format(vp_info, discriminator)
 
     if args.cd is None:
         args.cd = os.path.join(args.output, "out_{}_cd.der".format(vp_info))
@@ -516,7 +533,9 @@ def main():
                                                                  args.pai_cert,
                                                                  args.pai_key,
                                                                  args.dac_cert,
-                                                                 args.dac_key)
+                                                                 args.dac_key,
+                                                                 args.dac_pid,
+                                                                 discriminator)
 
     mfd_output = os.path.join(args.output, "out_{}_mfd.bin".format(vp_disc_info))
     args.dac_cert = dac_cert_der

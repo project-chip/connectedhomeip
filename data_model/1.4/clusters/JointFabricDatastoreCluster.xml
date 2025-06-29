@@ -97,14 +97,18 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="FriendlyName" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
       <field id="3" name="VendorID" type="vendor-id">
         <mandatoryConform/>
       </field>
       <field id="4" name="ICAC" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="400"/>
+        <constraint>
+          <maxLength value="400"/>
+        </constraint>
       </field>
       <access fabricScoped="true"/>
     </struct>
@@ -114,7 +118,9 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="Binding" type="TargetStruct">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="2" name="StatusEntry" type="DatastoreStatusEntry">
         <mandatoryConform/>
@@ -130,7 +136,9 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="FriendlyName" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
       <field id="3" name="StatusEntry" type="DatastoreStatusEntry">
         <mandatoryConform/>
@@ -160,19 +168,36 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="FriendlyName" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
       <field id="2" name="GroupKeySetID" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="65535"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="65535"/>
+          </between>
+        </constraint>
       </field>
       <field id="3" name="GroupCAT" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="65535"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="65535"/>
+          </between>
+        </constraint>
       </field>
       <field id="4" name="GroupCATVersion" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="65535"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="65535"/>
+          </between>
+        </constraint>
       </field>
       <field id="5" name="GroupPermission" type="AccessControlEntryPrivilegeEnum">
         <mandatoryConform/>
@@ -185,7 +210,9 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="FriendlyName" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
       <field id="3" name="CommissioningStatusEntry" type="DatastoreStatusEntry">
         <mandatoryConform/>
@@ -239,7 +266,9 @@ Davis, CA 95616, USA
     <attribute id="0x0003" name="FriendlyName" type="string">
       <access read="true" readPrivilege="admin" fabricSensitive="true"/>
       <mandatoryConform/>
-      <constraint type="maxLength" value="32"/>
+      <constraint>
+        <maxLength value="32"/>
+      </constraint>
     </attribute>
     <attribute id="0x0004" name="GroupKeySetList" type="list">
       <entry type="GroupKeySetStruct"/>
@@ -296,19 +325,36 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="FriendlyName" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
       <field id="2" name="GroupKeySetID" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="65535"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="65535"/>
+          </between>
+        </constraint>
       </field>
       <field id="3" name="GroupCAT" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="65535"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="65535"/>
+          </between>
+        </constraint>
       </field>
       <field id="4" name="GroupCATVersion" type="uint16">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="65535"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="65535"/>
+          </between>
+        </constraint>
       </field>
       <field id="5" name="GroupPermission" type="AccessControlEntryPrivilegeEnum">
         <mandatoryConform/>
@@ -323,22 +369,39 @@ Davis, CA 95616, USA
       <field id="1" name="FriendlyName" type="string">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
       <field id="2" name="GroupKeySetID" type="uint16">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="between" from="1" to="65535"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="65535"/>
+          </between>
+        </constraint>
       </field>
       <field id="3" name="GroupCAT" type="uint16">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="between" from="1" to="65535"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="65535"/>
+          </between>
+        </constraint>
       </field>
       <field id="4" name="GroupCATVersion" type="uint16">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="between" from="1" to="65535"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="65535"/>
+          </between>
+        </constraint>
       </field>
       <field id="5" name="GroupPermission" type="AccessControlEntryPrivilegeEnum">
         <mandatoryConform/>
@@ -368,12 +431,16 @@ Davis, CA 95616, USA
       <field id="1" name="FriendlyName" type="string">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
       <field id="2" name="ICAC" type="octstr">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="maxLength" value="400"/>
+        <constraint>
+          <maxLength value="400"/>
+        </constraint>
       </field>
     </command>
     <command id="0x08" name="RemoveAdmin" direction="commandToServer" response="Y">
@@ -391,7 +458,9 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="FriendlyName" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
     </command>
     <command id="0x0A" name="RefreshNode" direction="commandToServer" response="Y">
@@ -409,7 +478,9 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="FriendlyName" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
     </command>
     <command id="0x0C" name="RemoveNode" direction="commandToServer" response="Y">
@@ -430,7 +501,9 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="FriendlyName" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
     </command>
     <command id="0x0E" name="AddGroupIDToEndpointForNode" direction="commandToServer" response="Y">

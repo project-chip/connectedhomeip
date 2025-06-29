@@ -66,8 +66,6 @@ static_library("setup_payload") {
     "QRCodeSetupPayloadParser.h",
     "SetupPayload.cpp",
     "SetupPayload.h",
-    "SetupPayloadHelper.cpp",
-    "SetupPayloadHelper.h",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -78,6 +76,15 @@ static_library("setup_payload") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
   ]
+}
+
+source_set("setup_payload_helper") {
+  sources = [
+    "SetupPayloadHelper.cpp",
+    "SetupPayloadHelper.h",
+  ]
+
+  public_deps = [ "${chip_root}/src/setup_payload" ]
 }
 
 source_set("onboarding-codes-utils") {

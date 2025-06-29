@@ -63,6 +63,9 @@ Davis, CA 95616, USA
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>
+    <cluster id="0x0003" name="Identify" side="server">
+      <optionalConform/>
+    </cluster>
     <cluster id="0x0556" name="Chime" side="server">
       <mandatoryConform/>
     </cluster>

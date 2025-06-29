@@ -44,32 +44,18 @@ static uint32_t app_pds_wakeup_pin                  = -1;
 
 extern "C" void btble_pds_fastboot_done_callback(void);
 
-uint64_t wakeup_time        = 0;
-uint64_t sleep_calling_time = 0;
-uint64_t sleep_time         = 0;
-
 extern "C" void vApplicationSleep(TickType_t xExpectedIdleTime)
 {
     uint64_t sleep_before = bl_rtc_get_timestamp_ms();
-
-    sleep_calling_time = bl_rtc_get_timestamp_ms();
 
     btble_vApplicationSleepExt(xExpectedIdleTime);
 
     extern BaseType_t TrapNetCounter, *pTrapNetCounter;
     if (app_pds_wakeup_source == PDS_WAKEUP_BY_RTC)
     {
-        extern void * pxCurrentTCB;
-
-        ChipLogProgress(NotSpecified, "wakeup source: rtc. %lu vs %lu ms @ %lu\r\n", xExpectedIdleTime,
-                        (uint32_t) (bl_rtc_get_timestamp_ms() - sleep_before), (uint32_t) bl_rtc_get_timestamp_ms());
-
-        ChipLogProgress(NotSpecified, "application_sleep; %lu, %lu, %lu\r\n", (uint32_t) sleep_calling_time, (uint32_t) sleep_time,
-                        (uint32_t) wakeup_time);
     }
     else if (app_pds_wakeup_source == PDS_WAKEUP_BY_GPIO)
     {
-
         if (((1 << CHIP_RESET_PIN) & app_pds_wakeup_pin) && app_pds_irq_handler)
         {
             app_pds_irq_handler(&gpio_key);
@@ -79,10 +65,6 @@ extern "C" void vApplicationSleep(TickType_t xExpectedIdleTime)
         {
             app_pds_irq_handler(&gpio_contact);
         }
-
-        ChipLogProgress(NotSpecified, "wakeup source: gpio -> 0x%08lX. %lu vs %lu ms @ %lu\r\n", app_pds_wakeup_pin,
-                        xExpectedIdleTime, (uint32_t) (bl_rtc_get_timestamp_ms() - sleep_before),
-                        (uint32_t) bl_rtc_get_timestamp_ms());
     }
 
     app_pds_wakeup_source = -1;
@@ -103,8 +85,6 @@ void app_pds_config_pin(void)
 
 void app_pds_fastboot_done_callback(void)
 {
-    wakeup_time = bl_rtc_get_timestamp_ms();
-
 #if CHIP_PROGRESS_LOGGING || CHIP_ERROR_LOGGING
     extern hosal_uart_dev_t uart_stdio;
     bl_uart_init(uart_stdio.config.uart_id, uart_stdio.config.tx_pin, uart_stdio.config.rx_pin, uart_stdio.config.cts_pin,
@@ -125,11 +105,8 @@ int app_pds_before_sleep_callback(void)
 {
     if (otr_isStackIdle())
     {
-
         bl_pds_set_psram_retention(1);
         lmac154_sleepStoreRegs(low_power_pds_lmac154_backup);
-
-        sleep_time = bl_rtc_get_timestamp_ms();
 
         return 0;
     }
@@ -141,7 +118,6 @@ void app_pds_after_sleep_callback(void)
 {
     if (lmac154_isDisabled())
     {
-
         lmac154_sleepRestoreRegs(low_power_pds_lmac154_backup);
         lmac154_disableRx();
 

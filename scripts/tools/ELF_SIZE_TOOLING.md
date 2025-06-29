@@ -10,7 +10,7 @@ Use it to determine how much space specific parts of the code take. For example:
 ```
 ./scripts/tools/file_size_from_nm.py \
     --zoom '::chip::app'             \
-    ./out/qpg-qpg6105-light/chip-qpg6105-lighting-example.out
+    ./out/qpg-qpg6200-light/chip-qpg6200-lighting-example.out
 ```
 
 could result in a graph like:
@@ -26,8 +26,8 @@ you can build the master branch of a binary and save it somewhere like
 Example runs:
 
 ```
-> ~/devel/chip-scripts/bindiff.py \
-  ./out/qpg-qpg6105-light/chip-qpg6105-lighting-example.out \
+> ./scripts/tools/binary_elf_size_diff.py \
+  ./out/qpg-qpg6200-light/chip-qpg6200-lighting-example.out \
   ./out/qpg-master.out
 
 Type       Size  Function
@@ -46,9 +46,9 @@ TOTAL       -34
 ```
 
 ```
-> ~/devel/chip-scripts/bindiff.py \
+> ./scripts/tools/binary_elf_size_diff.py \
   --output csv --skip-total       \
-  ./out/qpg-qpg6105-light/chip-qpg6105-lighting-example.out ./out/qpg-master.out
+  ./out/qpg-qpg6200-light/chip-qpg6200-lighting-example.out ./out/qpg-master.out
 
 Type,Size,Function
 CHANGED,-128,"chip::app::CodegenDataModelProvider::WriteAttribute(chip::app::DataModel::WriteAttributeRequest const&, chip::app::AttributeValueDecoder&)"

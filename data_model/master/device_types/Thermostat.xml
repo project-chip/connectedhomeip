@@ -62,7 +62,7 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial Zigbee 3.0 revision"/>
     <revision revision="2" summary="New data model format and notation, added Clusters required for Matter support, restricted legacy elements to Zigbee only"/>
     <revision revision="3" summary="Addition of Energy Preference cluster and updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
-    <revision revision="4" summary="Remove Time Synchronization cluster and Zigbee only clusters, remove provisional marking from Energy Preference cluster"/>
+    <revision revision="4" summary="Remove Time Synchronization cluster, Scenes Management and Zigbee only clusters, remove provisional marking from Energy Preference cluster"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>

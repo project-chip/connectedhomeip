@@ -62,7 +62,9 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0552" name="Camera AV Settings User Level Management"/>
+    <clusterId id="0x0552" name="Camera AV Settings User Level Management">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="AVSUM" scope="Endpoint"/>
   <features>
@@ -92,6 +94,14 @@ Davis, CA 95616, USA
     <struct name="MPTZPresetStruct">
       <field id="0" name="PresetID" type="uint8">
         <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to>
+              <attribute name="MaxPresets"/>
+            </to>
+          </between>
+        </constraint>
       </field>
       <field id="1" name="Name" type="string">
         <mandatoryConform/>
@@ -109,10 +119,14 @@ Davis, CA 95616, USA
           <feature name="MPAN"/>
         </mandatoryConform>
         <constraint>
-          <min value="-180"/>
-        </constraint>
-        <constraint>
-          <max value="180"/>
+          <between>
+            <from>
+              <attribute name="PanMin"/>
+            </from>
+            <to>
+              <attribute name="PanMax"/>
+            </to>
+          </between>
         </constraint>
       </field>
       <field id="1" name="Tilt" type="int16" default="0">
@@ -120,10 +134,14 @@ Davis, CA 95616, USA
           <feature name="MTILT"/>
         </mandatoryConform>
         <constraint>
-          <min value="-180"/>
-        </constraint>
-        <constraint>
-          <max value="180"/>
+          <between>
+            <from>
+              <attribute name="TiltMin"/>
+            </from>
+            <to>
+              <attribute name="TiltMax"/>
+            </to>
+          </between>
         </constraint>
       </field>
       <field id="2" name="Zoom" type="uint8" default="1">
@@ -131,8 +149,11 @@ Davis, CA 95616, USA
           <feature name="MZOOM"/>
         </mandatoryConform>
         <constraint>
-          <between value="1">
-            <attribute name="ZoomMax"/>
+          <between>
+            <from value="1"/>
+            <to>
+              <attribute name="ZoomMax"/>
+            </to>
           </between>
         </constraint>
       </field>
@@ -151,6 +172,7 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0001" name="MaxPresets" type="uint8" default="5">
       <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="MPRESETS"/>
       </mandatoryConform>
@@ -192,10 +214,10 @@ Davis, CA 95616, USA
         <feature name="MTILT"/>
       </mandatoryConform>
       <constraint>
-        <min value="-180"/>
-      </constraint>
-      <constraint>
-        <max value="179"/>
+        <between>
+          <from value="-180"/>
+          <to value="179"/>
+        </between>
       </constraint>
     </attribute>
     <attribute id="0x0006" name="TiltMax" type="int16" default="90">
@@ -204,10 +226,10 @@ Davis, CA 95616, USA
         <feature name="MTILT"/>
       </mandatoryConform>
       <constraint>
-        <min value="-179"/>
-      </constraint>
-      <constraint>
-        <max value="180"/>
+        <between>
+          <from value="-179"/>
+          <to value="180"/>
+        </between>
       </constraint>
     </attribute>
     <attribute id="0x0007" name="PanMin" type="int16" default="-180">
@@ -216,10 +238,10 @@ Davis, CA 95616, USA
         <feature name="MPAN"/>
       </mandatoryConform>
       <constraint>
-        <min value="-180"/>
-      </constraint>
-      <constraint>
-        <max value="179"/>
+        <between>
+          <from value="-180"/>
+          <to value="179"/>
+        </between>
       </constraint>
     </attribute>
     <attribute id="0x0008" name="PanMax" type="int16" default="180">
@@ -228,10 +250,10 @@ Davis, CA 95616, USA
         <feature name="MPAN"/>
       </mandatoryConform>
       <constraint>
-        <min value="-179"/>
-      </constraint>
-      <constraint>
-        <max value="180"/>
+        <between>
+          <from value="-179"/>
+          <to value="180"/>
+        </between>
       </constraint>
     </attribute>
   </attributes>
@@ -250,14 +272,14 @@ Davis, CA 95616, USA
           <feature name="MPAN"/>
         </optionalConform>
         <constraint>
-          <min>
-            <attribute name="PanMin"/>
-          </min>
-        </constraint>
-        <constraint>
-          <max>
-            <attribute name="PanMax"/>
-          </max>
+          <between>
+            <from>
+              <attribute name="PanMin"/>
+            </from>
+            <to>
+              <attribute name="PanMax"/>
+            </to>
+          </between>
         </constraint>
       </field>
       <field id="1" name="Tilt" type="int16">
@@ -265,14 +287,14 @@ Davis, CA 95616, USA
           <feature name="MTILT"/>
         </optionalConform>
         <constraint>
-          <min>
-            <attribute name="TiltMin"/>
-          </min>
-        </constraint>
-        <constraint>
-          <max>
-            <attribute name="TiltMax"/>
-          </max>
+          <between>
+            <from>
+              <attribute name="TiltMin"/>
+            </from>
+            <to>
+              <attribute name="TiltMax"/>
+            </to>
+          </between>
         </constraint>
       </field>
       <field id="2" name="Zoom" type="uint8">
@@ -280,12 +302,12 @@ Davis, CA 95616, USA
           <feature name="MZOOM"/>
         </optionalConform>
         <constraint>
-          <min value="1"/>
-        </constraint>
-        <constraint>
-          <max>
-            <attribute name="ZoomMax"/>
-          </max>
+          <between>
+            <from value="1"/>
+            <to>
+              <attribute name="ZoomMax"/>
+            </to>
+          </between>
         </constraint>
       </field>
     </command>
@@ -302,16 +324,34 @@ Davis, CA 95616, USA
         <optionalConform choice="c" more="true" min="1">
           <feature name="MPAN"/>
         </optionalConform>
+        <constraint>
+          <between>
+            <from value="-1 * (PanMax - PanMin)"/>
+            <to value="PanMax - PanMin"/>
+          </between>
+        </constraint>
       </field>
       <field id="1" name="TiltDelta" type="int16" default="0">
         <optionalConform choice="c" more="true" min="1">
           <feature name="MTILT"/>
         </optionalConform>
+        <constraint>
+          <between>
+            <from value="-1 * (TiltMax - TiltMin)"/>
+            <to value="TiltMax - TiltMin"/>
+          </between>
+        </constraint>
       </field>
       <field id="2" name="ZoomDelta" type="int8" default="0">
         <optionalConform choice="c" more="true" min="1">
           <feature name="MZOOM"/>
         </optionalConform>
+        <constraint>
+          <between>
+            <from value="-1 * (ZoomMax - 1)"/>
+            <to value="ZoomMax - 1"/>
+          </between>
+        </constraint>
       </field>
     </command>
     <command id="0x02" name="MPTZMoveToPreset" direction="commandToServer" response="Y">
@@ -322,7 +362,12 @@ Davis, CA 95616, USA
       <field id="0" name="PresetID" type="uint8">
         <mandatoryConform/>
         <constraint>
-          <max value="MaxPresets - 1"/>
+          <between>
+            <from value="1"/>
+            <to>
+              <attribute name="MaxPresets"/>
+            </to>
+          </between>
         </constraint>
       </field>
     </command>
@@ -334,7 +379,12 @@ Davis, CA 95616, USA
       <field id="0" name="PresetID" type="uint8">
         <optionalConform/>
         <constraint>
-          <max value="MaxPresets - 1"/>
+          <between>
+            <from value="1"/>
+            <to>
+              <attribute name="MaxPresets"/>
+            </to>
+          </between>
         </constraint>
       </field>
       <field id="1" name="Name" type="string">
@@ -352,7 +402,12 @@ Davis, CA 95616, USA
       <field id="0" name="PresetID" type="uint8">
         <mandatoryConform/>
         <constraint>
-          <max value="MaxPresets - 1"/>
+          <between>
+            <from value="1"/>
+            <to>
+              <attribute name="MaxPresets"/>
+            </to>
+          </between>
         </constraint>
       </field>
     </command>
@@ -385,10 +440,10 @@ Davis, CA 95616, USA
       <field id="3" name="ZoomDelta" type="int8" default="0">
         <optionalConform choice="d" more="true" min="1"/>
         <constraint>
-          <min value="-100"/>
-        </constraint>
-        <constraint>
-          <max value="100"/>
+          <between>
+            <from value="-100"/>
+            <to value="100"/>
+          </between>
         </constraint>
       </field>
     </command>

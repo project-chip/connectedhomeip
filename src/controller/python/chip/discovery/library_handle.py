@@ -16,9 +16,8 @@
 
 import ctypes
 
-import chip.native
-from chip.discovery.types import DiscoverFailureCallback_t, DiscoverSuccessCallback_t
-from chip.native import PyChipError
+from ..native import GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChipError
+from .types import DiscoverFailureCallback_t, DiscoverSuccessCallback_t
 
 
 def _GetDiscoveryLibraryHandle() -> ctypes.CDLL:
@@ -28,12 +27,12 @@ def _GetDiscoveryLibraryHandle() -> ctypes.CDLL:
       native methods.
       """
 
-    handle = chip.native.GetLibraryHandle()
+    handle = GetLibraryHandle()
 
     # Uses one of the type decorators as an indicator for everything being
     # initialized.
     if not handle.pychip_discovery_resolve.argtypes:
-        setter = chip.native.NativeLibraryHandleMethodArguments(handle)
+        setter = NativeLibraryHandleMethodArguments(handle)
 
         setter.Set('pychip_discovery_resolve', PyChipError,
                    [ctypes.c_uint64, ctypes.c_uint64])

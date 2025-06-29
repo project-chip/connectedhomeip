@@ -268,7 +268,7 @@ void BLWiFiDriver::OnScanWiFiNetworkDone()
     }
 
     wifi_mgmr_ap_item_t * ScanResult = (wifi_mgmr_ap_item_t *) pvPortMalloc(ap_num * sizeof(wifi_mgmr_ap_item_t));
-    wifi_mgmr_get_scan_result(ScanResult, &ap_num, 0, mScanSSID);
+    wifi_mgmr_get_scan_result(ScanResult, &ap_num, mScanType, mScanSSID);
 
     if (ScanResult)
     {

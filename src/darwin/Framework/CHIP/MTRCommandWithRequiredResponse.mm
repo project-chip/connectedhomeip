@@ -14,9 +14,11 @@
  *    limitations under the License.
  */
 
+#import <Matter/Matter.h>
+
 #import "MTRDeviceDataValidation.h"
 #import "MTRLogging_Internal.h"
-#import <Matter/Matter.h>
+#import "MTRUtilities.h"
 
 @implementation MTRCommandWithRequiredResponse
 - (instancetype)initWithPath:(MTRCommandPath *)path
@@ -66,7 +68,14 @@ static NSString * const sExpectedResultKey = @"requiredResponseKey";
         return nil;
     }
 
-    _commandFields = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[ [NSDictionary class], [NSString class], [NSNumber class], [NSArray class], [NSData class] ]] forKey:sFieldsKey];
+    // The classes of things that can appear in a data-value dictionary.
+    static NSSet * const sDataValueClasses = [NSSet setWithArray:@[ NSDictionary.class, NSArray.class, NSData.class, NSString.class, NSNumber.class ]];
+
+    // Unfortunately, decodeDictionaryWithKeysOfClasses:objectsOfClasses:forKey:
+    // does not work when the objects stored in the dictionary can include
+    // collections, so we have to use decodeObjectOfClasses: and then manually
+    // validate we got a dictionary.
+    _commandFields = [decoder decodeObjectOfClasses:sDataValueClasses forKey:sFieldsKey];
     if (_commandFields) {
         if (![_commandFields isKindOfClass:NSDictionary.class]) {
             MTR_LOG_ERROR("MTRCommandWithRequiredResponse decoded %@ for commandFields, not NSDictionary.", _commandFields);
@@ -79,7 +88,7 @@ static NSString * const sExpectedResultKey = @"requiredResponseKey";
         }
     }
 
-    _requiredResponse = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[ [NSDictionary class], [NSString class], [NSNumber class], [NSArray class], [NSData class] ]] forKey:sExpectedResultKey];
+    _requiredResponse = [decoder decodeObjectOfClasses:sDataValueClasses forKey:sExpectedResultKey];
     if (_requiredResponse) {
         if (![_requiredResponse isKindOfClass:NSDictionary.class]) {
             MTR_LOG_ERROR("MTRCommandWithRequiredResponse decoded %@ for requiredResponse, not NSDictionary.", _requiredResponse);
@@ -114,6 +123,21 @@ static NSString * const sExpectedResultKey = @"requiredResponseKey";
     if (self.requiredResponse) {
         [coder encodeObject:self.requiredResponse forKey:sExpectedResultKey];
     }
+}
+
+- (BOOL)_isEqualToOther:(MTRCommandWithRequiredResponse *)other
+{
+    return MTREqualObjects(_path, other.path)
+        && MTREqualObjects(_commandFields, other.commandFields)
+        && MTREqualObjects(_requiredResponse, other.requiredResponse);
+}
+
+- (BOOL)isEqual:(id)object
+{
+    if ([object class] != [self class]) {
+        return NO;
+    }
+    return [self _isEqualToOther:object];
 }
 
 @end

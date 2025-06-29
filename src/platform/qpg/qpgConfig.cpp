@@ -211,6 +211,7 @@ CHIP_ERROR QPGConfig::FactoryResetConfig(void)
     {
         ClearConfigValue(key);
     }
+    qvCHIP_OtaResetProgressInfo();
 
     return CHIP_NO_ERROR;
 }

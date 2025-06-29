@@ -18,6 +18,7 @@ import("${silabs_sdk_build_root}/efr32_sdk.gni")
 
 rs911x_src_plat = [
   "${chip_root}/src/platform/silabs/wifi/SiWx/WifiInterfaceImpl.cpp",
+  "${chip_root}/src/platform/silabs/wifi/SiWx/WifiInterfaceImpl.h",
   "${chip_root}/src/platform/silabs/wifi/SiWx/ncp/sl_si91x_ncp_utility.c",
   "${chip_root}/src/platform/silabs/wifi/SiWx/ncp/sl_board_configuration.h",
   "${chip_root}/src/platform/silabs/wifi/wiseconnect-interface/WiseconnectWifiInterface.cpp",
@@ -42,9 +43,6 @@ rs9117_src_sapi = [
   "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ncp_interface/spi/sl_si91x_spi.c",
   "${wifi_sdk_root}/components/device/silabs/si91x/wireless/ncp_interface/sl_si91x_ncp_driver.c",
 
-  # Wi-Fi Config - Using the file sdk support until the wiseconnect file is fixed
-  "${matter_support_root}/sdk-copies/components/service/network_manager/src/sl_net_for_lwip.c",
-
   # wifi component
   "${wifi_sdk_root}/components/protocol/wifi/src/sl_wifi_basic_credentials.c",
   "${wifi_sdk_root}/components/protocol/wifi/src/sl_wifi_callback_framework.c",
@@ -53,6 +51,7 @@ rs9117_src_sapi = [
   # basic_network_manager component
   "${wifi_sdk_root}/components/service/network_manager/src/sl_net_credentials.c",
   "${wifi_sdk_root}/components/service/network_manager/src/sl_net_basic_profiles.c",
+  "${wifi_sdk_root}/components/service/network_manager/src/sl_net_for_lwip.c",
 
   # si91x_basic_buffers component
   "${wifi_sdk_root}/components/device/silabs/si91x/wireless/memory/malloc_buffers.c",

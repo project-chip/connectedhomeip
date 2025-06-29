@@ -18,13 +18,14 @@
 import base64
 import logging
 
-import chip.credentials.cert
-import chip.crypto.fabric
-from chip import ChipDeviceCtrl
-from chip import clusters as Clusters
-from chip import commissioning
 from cryptography import x509
 from cryptography.hazmat.primitives import serialization
+
+from .. import ChipDeviceCtrl
+from .. import clusters as Clusters
+from .. import commissioning
+from ..credentials.cert import convert_chip_cert_to_x509_cert
+from ..crypto.fabric import generate_compressed_fabric_id
 
 
 class CommissioningFlowBlocks:
@@ -109,14 +110,14 @@ class CommissioningFlowBlocks:
         try:
             x509_rcac = x509.load_pem_x509_certificate(
                 b'''-----BEGIN CERTIFICATE-----\n''' +
-                base64.b64encode(chip.credentials.cert.convert_chip_cert_to_x509_cert(commissionee_credentials.rcac)) +
+                base64.b64encode(convert_chip_cert_to_x509_cert(commissionee_credentials.rcac)) +
                 b'''\n-----END CERTIFICATE-----''')
             root_public_key = x509_rcac.public_key().public_bytes(serialization.Encoding.X962,
                                                                   serialization.PublicFormat.UncompressedPoint)
 
             x509_noc = x509.load_pem_x509_certificate(
                 b'''-----BEGIN CERTIFICATE-----\n''' +
-                base64.b64encode(chip.credentials.cert.convert_chip_cert_to_x509_cert(commissionee_credentials.noc)) +
+                base64.b64encode(convert_chip_cert_to_x509_cert(commissionee_credentials.noc)) +
                 b'''\n-----END CERTIFICATE-----''')
 
             for subject in x509_noc.subject:
@@ -130,7 +131,7 @@ class CommissioningFlowBlocks:
             if cert_node_id != commissionee_credentials.node_id:
                 self._logger.warning("Node ID in certificate does not match the node id in commissionee credentials struct.")
 
-            compressed_fabric_id = chip.crypto.fabric.generate_compressed_fabric_id(root_public_key, cert_fabric_id)
+            compressed_fabric_id = generate_compressed_fabric_id(root_public_key, cert_fabric_id)
 
         except Exception:
             self._logger.exception("The certificate should be a valid CHIP Certificate, but failed to parse it")

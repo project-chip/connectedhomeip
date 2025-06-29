@@ -97,13 +97,22 @@ Davis, CA 95616, USA
       </features>
       <attributes>
         <attribute code="0x0000" name="CurrentLevel">
-          <constraint type="between" from="1" to="254"/>
+          <constraint>
+            <between>
+              <from value="1"/>
+              <to value="254"/>
+            </between>
+          </constraint>
         </attribute>
         <attribute code="0x0002" name="MinLevel">
-          <constraint type="allowed" value="1"/>
+          <constraint>
+            <allowed value="1"/>
+          </constraint>
         </attribute>
         <attribute code="0x0003" name="MaxLevel">
-          <constraint type="allowed" value="254"/>
+          <constraint>
+            <allowed value="254"/>
+          </constraint>
         </attribute>
       </attributes>
     </cluster>

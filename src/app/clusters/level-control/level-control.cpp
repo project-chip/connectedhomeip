@@ -1593,3 +1593,4 @@ bool LevelControlHasFeature(EndpointId endpoint, Feature feature)
 }
 
 void MatterLevelControlPluginServerInitCallback() {}
+void MatterLevelControlPluginServerShutdownCallback() {}

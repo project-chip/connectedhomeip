@@ -189,7 +189,7 @@ public:
         AppContext::SetUp();
 
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
-        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), ArraySize(logStorageResources),
+        chip::app::EventManagement::CreateEventManagement(&GetExchangeManager(), MATTER_ARRAY_SIZE(logStorageResources),
                                                           gCircularEventBuffer, logStorageResources, &mEventCounter);
 
         Access::GetAccessControl().Finish();
@@ -245,7 +245,7 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
         DrainAndServiceIO();
 
         EXPECT_TRUE(delegate.mGotEventResponse);
-        EXPECT_TRUE(delegate.mNumReadEventFailureStatusReceived);
+        EXPECT_EQ(delegate.mNumReadEventFailureStatusReceived, 1); // need exactly one UnsupportedAccess, nothing else
         EXPECT_EQ(delegate.mLastStatusReceived.mStatus, Protocols::InteractionModel::Status::UnsupportedAccess);
         EXPECT_FALSE(delegate.mReadError);
     }

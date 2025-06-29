@@ -20,8 +20,8 @@ from queue import Queue
 from threading import Thread
 from typing import Generator
 
-from chip.ble.library_handle import _GetBleLibraryHandle
-from chip.ble.types import DeviceScannedCallback, ScanDoneCallback, ScanErrorCallback
+from .library_handle import _GetBleLibraryHandle
+from .types import DeviceScannedCallback, ScanDoneCallback, ScanErrorCallback
 
 
 @DeviceScannedCallback

@@ -85,7 +85,7 @@ constexpr AclEntryData aclEntryData[] = {
         .subject     = kOperationalNodeId2,
     },
 };
-constexpr size_t aclEntryDataCount = ArraySize(aclEntryData);
+constexpr size_t aclEntryDataCount = MATTER_ARRAY_SIZE(aclEntryData);
 
 struct CheckData
 {
@@ -348,14 +348,14 @@ TEST_F(TestAccessRestriction, AccessAttributeRestrictionTest)
     // test wildcarded entity id
     entries.push_back(entry);
     EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
-    RunChecks(accessAttributeRestrictionTestData, ArraySize(accessAttributeRestrictionTestData));
+    RunChecks(accessAttributeRestrictionTestData, MATTER_ARRAY_SIZE(accessAttributeRestrictionTestData));
 
     // test specific entity id
     entries.clear();
     entry.restrictions[0].id.SetValue(1);
     entries.push_back(entry);
     EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
-    RunChecks(accessAttributeRestrictionTestData, ArraySize(accessAttributeRestrictionTestData));
+    RunChecks(accessAttributeRestrictionTestData, MATTER_ARRAY_SIZE(accessAttributeRestrictionTestData));
 }
 
 constexpr CheckData writeAttributeRestrictionTestData[] = {
@@ -401,14 +401,14 @@ TEST_F(TestAccessRestriction, WriteAttributeRestrictionTest)
     // test wildcarded entity id
     entries.push_back(entry);
     EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
-    RunChecks(writeAttributeRestrictionTestData, ArraySize(writeAttributeRestrictionTestData));
+    RunChecks(writeAttributeRestrictionTestData, MATTER_ARRAY_SIZE(writeAttributeRestrictionTestData));
 
     // test specific entity id
     entries.clear();
     entry.restrictions[0].id.SetValue(1);
     entries.push_back(entry);
     EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
-    RunChecks(writeAttributeRestrictionTestData, ArraySize(writeAttributeRestrictionTestData));
+    RunChecks(writeAttributeRestrictionTestData, MATTER_ARRAY_SIZE(writeAttributeRestrictionTestData));
 }
 
 constexpr CheckData commandAttributeRestrictionTestData[] = {
@@ -454,14 +454,14 @@ TEST_F(TestAccessRestriction, CommandRestrictionTest)
     // test wildcarded entity id
     entries.push_back(entry);
     EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
-    RunChecks(commandAttributeRestrictionTestData, ArraySize(commandAttributeRestrictionTestData));
+    RunChecks(commandAttributeRestrictionTestData, MATTER_ARRAY_SIZE(commandAttributeRestrictionTestData));
 
     // test specific entity id
     entries.clear();
     entry.restrictions[0].id.SetValue(1);
     entries.push_back(entry);
     EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
-    RunChecks(commandAttributeRestrictionTestData, ArraySize(commandAttributeRestrictionTestData));
+    RunChecks(commandAttributeRestrictionTestData, MATTER_ARRAY_SIZE(commandAttributeRestrictionTestData));
 }
 
 constexpr CheckData eventAttributeRestrictionTestData[] = {
@@ -507,14 +507,14 @@ TEST_F(TestAccessRestriction, EventRestrictionTest)
     // test wildcarded entity id
     entries.push_back(entry);
     EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
-    RunChecks(eventAttributeRestrictionTestData, ArraySize(eventAttributeRestrictionTestData));
+    RunChecks(eventAttributeRestrictionTestData, MATTER_ARRAY_SIZE(eventAttributeRestrictionTestData));
 
     // test specific entity id
     entries.clear();
     entry.restrictions[0].id.SetValue(1);
     entries.push_back(entry);
     EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
-    RunChecks(eventAttributeRestrictionTestData, ArraySize(eventAttributeRestrictionTestData));
+    RunChecks(eventAttributeRestrictionTestData, MATTER_ARRAY_SIZE(eventAttributeRestrictionTestData));
 }
 
 constexpr CheckData combinedRestrictionTestData[] = {
@@ -612,7 +612,7 @@ TEST_F(TestAccessRestriction, CombinedRestrictionTest)
     entries2.push_back(entry2);
     EXPECT_EQ(accessRestrictionProvider.SetEntries(2, entries2), CHIP_NO_ERROR);
 
-    RunChecks(combinedRestrictionTestData, ArraySize(combinedRestrictionTestData));
+    RunChecks(combinedRestrictionTestData, MATTER_ARRAY_SIZE(combinedRestrictionTestData));
 }
 
 TEST_F(TestAccessRestriction, AttributeStorageSeperationTest)
@@ -715,7 +715,7 @@ TEST_F(TestAccessRestriction, ListSelectiondDuringCommissioningTest)
     entries.push_back(entry2);
     EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
 
-    RunChecks(listSelectionDuringCommissioningData, ArraySize(listSelectionDuringCommissioningData));
+    RunChecks(listSelectionDuringCommissioningData, MATTER_ARRAY_SIZE(listSelectionDuringCommissioningData));
 }
 
 } // namespace Access

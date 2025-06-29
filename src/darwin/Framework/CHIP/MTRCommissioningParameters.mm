@@ -47,14 +47,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    // SSID is not required to be UTF-8, but almost always is.
-    NSString * ssidString;
-    if (self.wifiSSID) {
-        ssidString = [[NSString alloc] initWithData:self.wifiSSID encoding:NSUTF8StringEncoding];
-    } else {
-        ssidString = nil;
-    }
-    return [NSString stringWithFormat:@"<MTRCommissioningParameters: %p ssid: %@>", self, ssidString];
+    return [NSString stringWithFormat:@"<MTRCommissioningParameters: %p, has ssid: %d, has thread dataset: %d>, accepted terms: %@, accepted terms version: %@", self,
+                     self.wifiSSID != nil, self.threadOperationalDataset != nil,
+                     self.acceptedTermsAndConditions, self.acceptedTermsAndConditionsVersion];
 }
 
 @end

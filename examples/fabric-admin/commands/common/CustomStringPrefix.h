@@ -23,16 +23,16 @@
 #include <lib/support/CodeUtils.h>
 
 static constexpr char kJsonStringPrefix[]    = "json:";
-inline constexpr size_t kJsonStringPrefixLen = ArraySize(kJsonStringPrefix) - 1; // Don't count the null
+inline constexpr size_t kJsonStringPrefixLen = MATTER_ARRAY_SIZE(kJsonStringPrefix) - 1; // Don't count the null
 
 static constexpr char kBase64StringPrefix[]    = "base64:";
-inline constexpr size_t kBase64StringPrefixLen = ArraySize(kBase64StringPrefix) - 1; // Don't count the null
+inline constexpr size_t kBase64StringPrefixLen = MATTER_ARRAY_SIZE(kBase64StringPrefix) - 1; // Don't count the null
 
 static constexpr char kHexStringPrefix[]    = "hex:";
-inline constexpr size_t kHexStringPrefixLen = ArraySize(kHexStringPrefix) - 1; // Don't count the null
+inline constexpr size_t kHexStringPrefixLen = MATTER_ARRAY_SIZE(kHexStringPrefix) - 1; // Don't count the null
 
 static constexpr char kStrStringPrefix[]    = "str:";
-inline constexpr size_t kStrStringPrefixLen = ArraySize(kStrStringPrefix) - 1; // Don't count the null
+inline constexpr size_t kStrStringPrefixLen = MATTER_ARRAY_SIZE(kStrStringPrefix) - 1; // Don't count the null
 
 inline bool IsJsonString(const char * str)
 {

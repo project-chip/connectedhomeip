@@ -41,6 +41,11 @@ include(generate_factory_data.cmake)
 if (NOT CHIP_ROOT)
     get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 endif()
+
+if (NOT CHIP_APP_ZAP_DIR)
+    get_filename_component(CHIP_APP_ZAP_DIR ${CHIP_ROOT}/zzz_generated/app-common REALPATH)
+endif()
+
 get_filename_component(GN_ROOT_TARGET ${CHIP_ROOT}/config/nrfconnect/chip-gn REALPATH)
 get_filename_component(COMMON_CMAKE_SOURCE_DIR ${CHIP_ROOT}/config/common/cmake REALPATH)
 
@@ -132,6 +137,7 @@ matter_common_gn_args(
 matter_add_gn_arg_string("zephyr_ar"                              ${CMAKE_AR})
 matter_add_gn_arg_string("zephyr_cc"                              ${CMAKE_C_COMPILER})
 matter_add_gn_arg_string("zephyr_cxx"                             ${CMAKE_CXX_COMPILER})
+matter_add_gn_arg_string("chip_app_zap_dir"                       ${CHIP_APP_ZAP_DIR})
 matter_add_gn_arg_bool  ("chip_logging"                           CONFIG_LOG)
 matter_add_gn_arg_bool  ("chip_enable_openthread"                 CONFIG_NET_L2_OPENTHREAD)
 matter_add_gn_arg_bool  ("chip_openthread_ftd"                    CONFIG_OPENTHREAD_FTD)
@@ -154,6 +160,9 @@ matter_add_gn_arg_bool  ("chip_enable_factory_data"               CONFIG_CHIP_FA
 matter_add_gn_arg_bool  ("chip_enable_read_client"                CONFIG_CHIP_ENABLE_READ_CLIENT)
 matter_add_gn_arg_bool  ("chip_mdns_minimal"                      CONFIG_WIFI_NRF70)
 matter_add_gn_arg_bool  ("chip_mdns_platform"                     CONFIG_NET_L2_OPENTHREAD)
+
+matter_add_gn_arg_bool  ("chip_system_config_use_sockets"                   NOT CONFIG_CHIP_USE_OPENTHREAD_ENDPOINT)
+matter_add_gn_arg_bool  ("chip_system_config_use_openthread_inet_endpoints" CONFIG_CHIP_USE_OPENTHREAD_ENDPOINT)
 
 if (CONFIG_CHIP_ENABLE_ICD_SUPPORT)
     matter_add_gn_arg_bool  ("chip_enable_icd_lit"                       CONFIG_CHIP_ICD_LIT_SUPPORT)
@@ -186,9 +195,9 @@ if (CONFIG_CHIP_CRYPTO_PSA)
     matter_add_gn_arg_bool  ("chip_crypto_psa_spake2p" CONFIG_PSA_WANT_ALG_SPAKE2P_MATTER)
 endif()
 
-if (BOARD STREQUAL "native_posix")
+if (BOARD STREQUAL "native_sim")
     matter_add_gn_arg_string("target_cpu" "x86")
-elseif (BOARD STREQUAL "native_posix_64")
+elseif (BOARD STREQUAL "native_sim/native/64")
     matter_add_gn_arg_string("target_cpu" "x64")
 endif()
 

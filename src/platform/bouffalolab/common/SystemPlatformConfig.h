@@ -38,9 +38,13 @@ struct ChipDeviceEvent;
 // #define CHIP_CONFIG_SHA256_CONTEXT_SIZE sizeof(mbedtls_sha256_context) in hw_acc/sha256_alt.h
 #define CHIP_CONFIG_SHA256_CONTEXT_SIZE (32 + 64 + 64 + 19 * 32)
 #define CHIP_CONFIG_SHA256_CONTEXT_ALIGN 32
-#define CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE (388)
 #else
 
 // #define CHIP_CONFIG_SHA256_CONTEXT_SIZE sizeof(bl_sha_ctx_t)
 #define CHIP_CONFIG_SHA256_CONTEXT_SIZE ((7 + 1 + 5 + 18 + 16 + 16 + 7) * sizeof(unsigned int))
+#endif
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#define CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE                                                                                     \
+    (PBUF_LINK_ENCAPSULATION_HLEN + PBUF_LINK_HLEN + PBUF_IP_HLEN + PBUF_TRANSPORT_HLEN + CHIP_SYSTEM_HEADER_RESERVE_SIZE)
 #endif

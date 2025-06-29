@@ -2,7 +2,7 @@
  *
  *    Copyright (c) 2020-2024 Project CHIP Authors
  *    Copyright (c) 2020 Nest Labs, Inc.
- *    Copyright 2023-2024 NXP
+ *    Copyright 2023-2025 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,6 +50,10 @@
 #define OT_NXP_SPINEL_PROP_VENDOR_BLE_STATE SPINEL_PROP_VENDOR__BEGIN
 #endif /* CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED */
 #endif
+
+extern "C" {
+#include "osa.h"
+}
 
 #if !CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_ENABLE_WPA
 
@@ -173,13 +177,6 @@ static CHIP_ERROR EnableWiFiCoexistence(void)
 #endif
 
     return ret;
-}
-#endif
-
-#if !CHIP_DEVICE_CONFIG_ENABLE_WPA
-extern "C" void vApplicationIdleHook(void)
-{
-    chip::DeviceLayer::PlatformManagerImpl::IdleHook();
 }
 #endif
 
@@ -317,8 +314,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     otPlatRandomInit();
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-
     osError = OSA_SetupIdleFunction(chip::DeviceLayer::PlatformManagerImpl::IdleHook);
     if (osError != WM_SUCCESS)
     {
@@ -328,7 +323,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     }
 
     ChipLogProgress(DeviceLayer, "Wi-Fi module initialization done.");
-#elif !CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_ENABLE_WPA
     err = EthernetInterfaceInit();
 
     if (err != CHIP_NO_ERROR)

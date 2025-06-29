@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # !!!!!!!!!! TEST INFORMATION !!!!!!!!!!!!!!!!!!
-# This test covers multi fabric support for scenes cluster attributes such as LastConfiguredBy and FabricSceneInfo
+# This test covers multi fabric support for scenes cluster attributes such as FabricSceneInfo
 
 name: Scenes Multi-fabric testing
 
@@ -314,19 +314,6 @@ tests:
               - name: "GroupID"
                 value: G1
 
-    - label: "TH1 Reads LastConfiguredBy attribute"
-      command: "readAttribute"
-      attribute: "LastConfiguredBy"
-      response:
-          value: null
-
-    - label: "TH2 reads LastConfiguredBy attribute"
-      identity: "beta"
-      command: "readAttribute"
-      attribute: "LastConfiguredBy"
-      response:
-          value: null
-
     - label: "TH1 sends an AddScene command to DUT for Scene 1 G1"
       command: "AddScene"
       arguments:
@@ -339,7 +326,7 @@ tests:
                 value: 1000
               - name: "SceneName"
                 value: "Scene1"
-              - name: "ExtensionFieldSets"
+              - name: "ExtensionFieldSetStructs"
                 value:
                     [
                         {
@@ -419,19 +406,6 @@ tests:
           value: []
           # TODO : Have FabricSceneInfo initialized on adding a new fabric
 
-    - label: "TH1 reads LastConfiguredBy attribute, should be TH1's nodeId"
-      command: "readAttribute"
-      attribute: "LastConfiguredBy"
-      response:
-          value: commissionerNodeIdAlpha
-
-    - label: "TH2 reads LastConfiguredBy attribute, should be TH1's nodeId"
-      identity: "beta"
-      command: "readAttribute"
-      attribute: "LastConfiguredBy"
-      response:
-          value: commissionerNodeIdAlpha
-
     - label: "TH2 sends an AddScene command to DUT for Scene 1 G1"
       identity: "beta"
       command: "AddScene"
@@ -445,7 +419,7 @@ tests:
                 value: 1000
               - name: "SceneName"
                 value: "Scene1"
-              - name: "ExtensionFieldSets"
+              - name: "ExtensionFieldSetStructs"
                 value:
                     [
                         {
@@ -467,19 +441,6 @@ tests:
                 value: G1
               - name: "SceneID"
                 value: 0x01
-
-    - label: "TH1 reads LastConfiguredBy attribute, should be TH2's nodeId"
-      command: "readAttribute"
-      attribute: "LastConfiguredBy"
-      response:
-          value: commissionerNodeIdBeta
-
-    - label: "TH2 reads LastConfiguredBy attribute, should be TH2's nodeId"
-      identity: "beta"
-      command: "readAttribute"
-      attribute: "LastConfiguredBy"
-      response:
-          value: commissionerNodeIdBeta
 
     - label: "TH2 sends a RecallScene command for Scene 1 Group 1"
       identity: "beta"
@@ -548,19 +509,6 @@ tests:
               - name: "SceneIdentifierFrom"
                 value: 0x01
 
-    - label: "TH1 reads LastConfiguredBy attribute, should be TH1's nodeId"
-      command: "readAttribute"
-      attribute: "LastConfiguredBy"
-      response:
-          value: commissionerNodeIdAlpha
-
-    - label: "TH2 reads LastConfiguredBy attribute, should be TH1's nodeId"
-      identity: "beta"
-      command: "readAttribute"
-      attribute: "LastConfiguredBy"
-      response:
-          value: commissionerNodeIdAlpha
-
     - label: "TH2 confirms the FabricSceneInfo didn't change"
       identity: "beta"
       command: "readAttribute"
@@ -613,19 +561,6 @@ tests:
                 value: G1
               - name: "SceneID"
                 value: 0x01
-
-    - label: "TH1 reads LastConfiguredBy attribute, should be TH2's nodeId"
-      command: "readAttribute"
-      attribute: "LastConfiguredBy"
-      response:
-          value: commissionerNodeIdBeta
-
-    - label: "TH2 reads LastConfiguredBy attribute, should be TH2's nodeId"
-      identity: "beta"
-      command: "readAttribute"
-      attribute: "LastConfiguredBy"
-      response:
-          value: commissionerNodeIdBeta
 
     - label: "TH2 confirms the FabricSceneInfo's update"
       identity: "beta"
@@ -682,19 +617,6 @@ tests:
                 value: G1
               - name: "SceneIdentifierFrom"
                 value: 0x00
-
-    - label: "TH1 reads LastConfiguredBy attribute, should be TH1's nodeId"
-      command: "readAttribute"
-      attribute: "LastConfiguredBy"
-      response:
-          value: commissionerNodeIdAlpha
-
-    - label: "TH2 reads LastConfiguredBy attribute, should be TH1's nodeId"
-      identity: "beta"
-      command: "readAttribute"
-      attribute: "LastConfiguredBy"
-      response:
-          value: commissionerNodeIdAlpha
 
     - label: "TH2 confirms its FabricSceneInfo remained unchanged"
       identity: "beta"
@@ -789,19 +711,6 @@ tests:
               - name: "SceneID"
                 value: 0x02
 
-    - label: "TH1 reads LastConfiguredBy attribute, should be TH2's nodeId"
-      command: "readAttribute"
-      attribute: "LastConfiguredBy"
-      response:
-          value: commissionerNodeIdBeta
-
-    - label: "TH2 reads LastConfiguredBy attribute, should be TH2's nodeId"
-      identity: "beta"
-      command: "readAttribute"
-      attribute: "LastConfiguredBy"
-      response:
-          value: commissionerNodeIdBeta
-
     - label: "TH2 confirms its FabricSceneInfo was updated"
       identity: "beta"
       command: "readAttribute"
@@ -848,19 +757,6 @@ tests:
                 value: 0
               - name: "GroupID"
                 value: G1
-
-    - label: "TH1 reads LastConfiguredBy attribute, should be TH1's nodeId"
-      command: "readAttribute"
-      attribute: "LastConfiguredBy"
-      response:
-          value: commissionerNodeIdAlpha
-
-    - label: "TH2 reads LastConfiguredBy attribute, should be TH1's nodeId"
-      identity: "beta"
-      command: "readAttribute"
-      attribute: "LastConfiguredBy"
-      response:
-          value: commissionerNodeIdAlpha
 
     - label: "TH2 confirms its FabricSceneInfo remained unchanged"
       identity: "beta"
@@ -915,19 +811,6 @@ tests:
               - name: "SceneID"
                 value: 0x02
 
-    - label: "TH1 reads LastConfiguredBy attribute, should be TH2's nodeId"
-      command: "readAttribute"
-      attribute: "LastConfiguredBy"
-      response:
-          value: commissionerNodeIdBeta
-
-    - label: "TH2 reads LastConfiguredBy attribute, should be TH2's nodeId"
-      identity: "beta"
-      command: "readAttribute"
-      attribute: "LastConfiguredBy"
-      response:
-          value: commissionerNodeIdBeta
-
     - label: "TH2 confirms its FabricSceneInfo was updated"
       identity: "beta"
       command: "readAttribute"
@@ -973,19 +856,6 @@ tests:
                 value: 0
               - name: "GroupID"
                 value: G2
-
-    - label: "TH1 reads LastConfiguredBy attribute, should be TH2's nodeId"
-      command: "readAttribute"
-      attribute: "LastConfiguredBy"
-      response:
-          value: commissionerNodeIdAlpha
-
-    - label: "TH2 reads LastConfiguredBy attribute, should be TH2's nodeId"
-      identity: "beta"
-      command: "readAttribute"
-      attribute: "LastConfiguredBy"
-      response:
-          value: commissionerNodeIdAlpha
 
     - label: "TH2 confirms its FabricSceneInfo remained unchanged"
       identity: "beta"

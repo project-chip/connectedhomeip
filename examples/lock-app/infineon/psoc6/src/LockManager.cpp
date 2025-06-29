@@ -142,7 +142,7 @@ bool LockManager::ReadConfigValues()
 {
     size_t outLen;
     PSOC6Config::ReadConfigValueBin(PSOC6Config::kConfigKey_LockUser, reinterpret_cast<uint8_t *>(&mLockUsers),
-                                    sizeof(EmberAfPluginDoorLockUserInfo) * ArraySize(mLockUsers), outLen);
+                                    sizeof(EmberAfPluginDoorLockUserInfo) * MATTER_ARRAY_SIZE(mLockUsers), outLen);
 
     PSOC6Config::ReadConfigValueBin(PSOC6Config::kConfigKey_Credential, reinterpret_cast<uint8_t *>(&mLockCredentials),
                                     sizeof(EmberAfPluginDoorLockCredentialInfo) * kMaxCredentials * kNumCredentialTypes, outLen);

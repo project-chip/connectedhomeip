@@ -40,9 +40,9 @@
 
 #include <transport/raw/PeerAddress.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 #error "When using OpenThread Endpoints, one should also use GenericThreadStackManagerImpl_OpenThread"
-#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_ENDPOINT
+#endif // CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 
 namespace chip {
 namespace DeviceLayer {

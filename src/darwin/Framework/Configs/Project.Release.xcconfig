@@ -1,0 +1,7 @@
+#include "Project.xcconfig"
+
+ENABLE_NS_ASSERTIONS = NO
+VALIDATE_PRODUCT = YES
+
+// Include override file last, if it exists
+#include? "Project.Release.override.xcconfig"

@@ -18,9 +18,11 @@ import("${silabs_sdk_build_root}/efr32_sdk.gni")
 
 wf200_plat_src = [
   "${chip_root}/src/platform/silabs/wifi/wf200/WifiInterfaceImpl.cpp",
+  "${chip_root}/src/platform/silabs/wifi/wf200/WifiInterfaceImpl.h",
   "${chip_root}/src/platform/silabs/wifi/wf200/ncp/sl_wfx_task.c",
   "${chip_root}/src/platform/silabs/wifi/wf200/ncp/wf200_init.c",
   "${chip_root}/src/platform/silabs/wifi/wf200/ncp/efr_spi.c",
+  "${chip_root}/src/platform/silabs/wifi/wf200/ncp/efr_spi.h",
   "${chip_root}/src/platform/silabs/wifi/wf200/ncp/sl_wfx_board.h",
   "${chip_root}/src/platform/silabs/wifi/wf200/ncp/sl_wfx_host.h",
   "${chip_root}/src/platform/silabs/wifi/wf200/ncp/sl_wfx_task.h",

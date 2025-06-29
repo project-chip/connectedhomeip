@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002D" name="Unit Localization Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002D" name="Unit Localization Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Added SupportedTemperatureUnits attribute"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x002D" name="Unit Localization"/>
@@ -73,13 +74,13 @@ Davis, CA 95616, USA
   <dataTypes>
     <enum name="TempUnitEnum">
       <item value="0" name="Fahrenheit" summary="Temperature conveyed in Fahrenheit">
-        <mandatoryConform/>
+        <optionalConform choice="a" more="true" min="2"/>
       </item>
       <item value="1" name="Celsius" summary="Temperature conveyed in Celsius">
-        <mandatoryConform/>
+        <optionalConform choice="a" more="true" min="2"/>
       </item>
       <item value="2" name="Kelvin" summary="Temperature conveyed in Kelvin">
-        <mandatoryConform/>
+        <optionalConform choice="a" more="true" min="2"/>
       </item>
     </enum>
   </dataTypes>
@@ -90,6 +91,20 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="TEMP"/>
       </mandatoryConform>
+    </attribute>
+    <attribute id="0x0001" name="SupportedTemperatureUnits" type="list">
+      <entry type="TempUnitEnum"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="TEMP"/>
+      </mandatoryConform>
+      <constraint>
+        <countBetween>
+          <from value="2"/>
+          <to value="3"/>
+        </countBetween>
+      </constraint>
     </attribute>
   </attributes>
 </cluster>

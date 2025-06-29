@@ -99,7 +99,7 @@ public:
     void SetLength(uint32_t length) { mLength = length; }
     void SetWasSelected(bool selected) { mWasSelected = selected; }
     bool WasSelected() { return mWasSelected; }
-#if OTA_ENCRYPTION_ENABLE
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
     CHIP_ERROR vOtaProcessInternalEncryption(MutableByteSpan & block);
 #endif
 
@@ -133,7 +133,7 @@ protected:
 
     bool IsError(CHIP_ERROR & status);
 
-#if OTA_ENCRYPTION_ENABLE
+#ifdef SL_MATTER_ENABLE_OTA_ENCRYPTION
     /*ota decryption*/
     uint32_t mIVOffset = 0;
     /* Expected byte size of the OTAEncryptionKeyLength */

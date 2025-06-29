@@ -27,7 +27,7 @@
 #include <platform/Linux/bluez/AdapterIterator.h>
 #include <platform/Linux/bluez/BluezObjectManager.h>
 #include <platform/Linux/bluez/ChipDeviceScanner.h>
-#include <platform/Linux/dbus/bluez/DbusBluez.h>
+#include <platform/Linux/dbus/bluez/DBusBluez.h>
 #include <platform/PlatformManager.h>
 #include <system/SystemClock.h>
 #include <system/SystemLayer.h>

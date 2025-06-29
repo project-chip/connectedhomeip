@@ -30,6 +30,7 @@ TestDriver = namedtuple('TestDriver', ['name', 'source'])
 class TizenBoard(Enum):
 
     ARM = Board('arm')
+    ARM64 = Board('arm64')
 
 
 class TizenApp(Enum):
@@ -186,16 +187,37 @@ class TizenBuilder(GnBuilder):
 
     def GnBuildArgs(self):
         # Make sure that required ENV variables are defined
-        for env in ('TIZEN_SDK_ROOT', 'TIZEN_SDK_SYSROOT'):
+        env = 'TIZEN_SDK_ROOT'
+        if env not in os.environ:
+            raise Exception(
+                "Environment %s missing, cannot build Tizen target" % env)
+
+        sysroot = None
+
+        if self.board.value.target_cpu == "arm64":
+            env = 'TIZEN_SDK_SYSROOT_ARM64'
             if env not in os.environ:
                 raise Exception(
                     "Environment %s missing, cannot build Tizen target" % env)
+
+            sysroot = os.environ[env]
+
+        elif self.board.value.target_cpu == "arm":
+            env = 'TIZEN_SDK_SYSROOT'
+            if env not in os.environ:
+                raise Exception(
+                    "Environment %s missing, cannot build Tizen target" % env)
+
+            sysroot = os.environ[env]
+
+        else:
+            raise Exception("CPU architecture is not supported")
 
         return self.extra_gn_options + [
             'target_os="tizen"',
             'target_cpu="%s"' % self.board.value.target_cpu,
             'tizen_sdk_root="%s"' % os.environ['TIZEN_SDK_ROOT'],
-            'tizen_sdk_sysroot="%s"' % os.environ['TIZEN_SDK_SYSROOT'],
+            'tizen_sdk_sysroot="%s"' % sysroot,
         ]
 
     def _bundle(self):

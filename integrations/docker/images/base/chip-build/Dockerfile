@@ -40,12 +40,15 @@ RUN set -x \
     clang-tidy \
     cmake \
     curl \
+    dbus-daemon \
     flex \
     g++ \
     generate-ninja \
     git \
     git-lfs \
     gperf \
+    gstreamer1.0-plugins-base \
+    gstreamer1.0-tools \
     iproute2 \
     iwyu \
     jq \
@@ -60,6 +63,9 @@ RUN set -x \
     libgif-dev \
     libgirepository-1.0-1 \
     libglib2.0-dev \
+    libgstreamer1.0-0 \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
     libical-dev \
     libjpeg-dev \
     libmbedtls-dev \
@@ -123,6 +129,7 @@ RUN set -x \
     pygit \
     PyGithub \
     ruff \
+    gcovr==8.3 \
     && : # last line
 
 # Install bloat comparison tools

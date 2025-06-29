@@ -17,16 +17,16 @@
 
 import ctypes
 
-import chip.native
+from ..native import GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChipError
 
 
 def _handle():
-    handle = chip.native.GetLibraryHandle()
+    handle = GetLibraryHandle()
     if handle.pychip_ConvertX509CertToChipCert.argtypes is None:
-        setter = chip.native.NativeLibraryHandleMethodArguments(handle)
-        setter.Set("pychip_ConvertX509CertToChipCert", chip.native.PyChipError, [ctypes.POINTER(
+        setter = NativeLibraryHandleMethodArguments(handle)
+        setter.Set("pychip_ConvertX509CertToChipCert", PyChipError, [ctypes.POINTER(
             ctypes.c_uint8), ctypes.c_size_t, ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_size_t)])
-        setter.Set("pychip_ConvertChipCertToX509Cert", chip.native.PyChipError, [ctypes.POINTER(
+        setter.Set("pychip_ConvertChipCertToX509Cert", PyChipError, [ctypes.POINTER(
             ctypes.c_uint8), ctypes.c_size_t, ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_size_t)])
     return handle
 

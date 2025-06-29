@@ -14,8 +14,9 @@
 
 import os
 
-from matter_idl.generators import CodeGenerator, GeneratorStorage
-from matter_idl.matter_idl_types import Cluster, Command, Field, Idl
+from matter.idl.generators import CodeGenerator
+from matter.idl.generators.storage import GeneratorStorage
+from matter.idl.matter_idl_types import Cluster, Command, Field, Idl
 
 
 def toUpperSnakeCase(s):
@@ -195,7 +196,7 @@ class CustomGenerator(CodeGenerator):
 
     def __init__(self, storage: GeneratorStorage, idl: Idl, **kargs):
         """
-        Inintialization is specific for java generation and will add
+        Initialization is specific for java generation and will add
         filters as required by the java .jinja templates to function.
         """
         super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))

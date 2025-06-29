@@ -55,6 +55,7 @@ static_library("Zephyr") {
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
   deps = [
     "${chip_root}/src/app:app_config",
+    "${chip_root}/src/app/common:ids",
     "${chip_root}/src/platform/logging:headers",
   ]
 
@@ -74,13 +75,6 @@ static_library("Zephyr") {
       ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
-  }
-
-  if (chip_enable_nfc_onboarding_payload) {
-    sources += [
-      "NFCOnboardingPayloadManagerImpl.cpp",
-      "NFCOnboardingPayloadManagerImpl.h",
-    ]
   }
 
   if (chip_malloc_sys_heap) {

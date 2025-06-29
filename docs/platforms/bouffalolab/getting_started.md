@@ -17,24 +17,34 @@ git clone --recurse-submodules https://github.com/project-chip/connectedhomeip.g
     git clone --depth=1 https://github.com/project-chip/connectedhomeip.git
     ```
 
--   check out `Bouffalo Lab` platform support repos as follows:
+-   Check out necessary submodules
+
+    Checkout `BL_IOT_SDK` for `BL602`, `BL702` and `BL702L` platform:
 
     ```
-    scripts/checkout_submodules.py --shallow --recursive --platform bouffalolab
+    ./scripts/checkout_submodules.py --shallow --recursive --platform bouffalolab
     ```
+
+    Checkout `bouffalo_sdk` for `BL616` platform:
+
+    ```
+    ./scripts/checkout_submodules.py --shallow --recursive --platform bouffalo_sdk
+    ```
+
+    > Please contact `Bouffalo Lab` for `BL616` SDK access.
 
     If you want to checkout Matter Linux example and development tools, please
     try as follows:
 
     ```
-    scripts/checkout_submodules.py --shallow --recursive --platform linux bouffalolab
+    ./scripts/checkout_submodules.py --shallow --recursive --platform linux bouffalolab
     ```
 
     Or if you want to checkout Matter Darwin example and development tools,
     please try as follows:
 
     ```
-    scripts/checkout_submodules.py --shallow --recursive --platform darwin bouffalolab
+    ./scripts/checkout_submodules.py --shallow --recursive --platform darwin bouffalolab
     ```
 
 # Setup build environment
@@ -192,6 +202,27 @@ Taking lighting app with `littlefs` supported as example :
 
     > This BL706 + BL602 Wi-Fi solution: BL602 runs WLAN part and BL706 runs
     > TCP/IP stack which uses SPI for communication between these two parts.
+
+# Partition table
+
+`Bouffalo Lab` provides reference partition table files for each platform under
+`examples/platform/bouffalolab/<platforms>/flash_config`.
+
+Final products may have different flash layout requirements, such as:
+
+-   Firmware size requirements;
+-   Over-the-air upgrade support with or without compressed image;
+-   Supports more Matter fabrics;
+-   Custom application partitions;
+-   And other specific needs.
+
+Developers should design the flash layout accordingly for their final products.
+For guidance, refer to the ‌ flash tool documentation or contact `Bouffalo Lab`
+for support.
+
+> ‌**Note:**‌ The partition table is typically ‌not editable over-the-air.
+> Ensure sufficient margin in the initial design to accommodate future
+> requirements.
 
 # Download image
 

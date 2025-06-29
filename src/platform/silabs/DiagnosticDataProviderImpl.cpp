@@ -340,7 +340,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
 
     VerifyOrReturnError(BssId.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    if (GetAccessPointInfo(ap) == CHIP_NO_ERROR)
+    if (Silabs::WifiInterface::GetInstance().GetAccessPointInfo(ap) == CHIP_NO_ERROR)
     {
         memcpy(BssId.data(), ap.bssid, bssIdSize);
         BssId.reduce_size(bssIdSize);
@@ -355,7 +355,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiSecurityType(app::Clusters::WiFiNe
     using app::Clusters::WiFiNetworkDiagnostics::SecurityTypeEnum;
 
     wfx_wifi_scan_result_t ap = { 0 };
-    CHIP_ERROR error          = GetAccessPointInfo(ap);
+    CHIP_ERROR error          = Silabs::WifiInterface::GetInstance().GetAccessPointInfo(ap);
     if (error == CHIP_NO_ERROR)
     {
         // TODO: Is this actually right?  Do the wfx_wifi_scan_result_t values
@@ -375,7 +375,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiVersion(app::Clusters::WiFiNetwork
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
 {
     wfx_wifi_scan_result_t ap = { 0 };
-    CHIP_ERROR error          = GetAccessPointInfo(ap);
+    CHIP_ERROR error          = Silabs::WifiInterface::GetInstance().GetAccessPointInfo(ap);
     if (error == CHIP_NO_ERROR)
     {
         channelNumber = ap.chan;
@@ -387,7 +387,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNu
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 {
     wfx_wifi_scan_result_t ap = { 0 };
-    CHIP_ERROR error          = GetAccessPointInfo(ap);
+    CHIP_ERROR error          = Silabs::WifiInterface::GetInstance().GetAccessPointInfo(ap);
     if (error == CHIP_NO_ERROR)
     {
         rssi = ap.rssi;
@@ -399,7 +399,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
 {
     wfx_wifi_scan_ext_t extra_info = { 0 };
-    CHIP_ERROR error               = GetAccessPointExtendedInfo(extra_info);
+    CHIP_ERROR error               = Silabs::WifiInterface::GetInstance().GetAccessPointExtendedInfo(extra_info);
     if (error == CHIP_NO_ERROR)
     {
         beaconLostCount = extra_info.beacon_lost_count;
@@ -416,7 +416,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiCurrentMaxRate(uint64_t & currentM
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
 {
     wfx_wifi_scan_ext_t extra_info = { 0 };
-    CHIP_ERROR error               = GetAccessPointExtendedInfo(extra_info);
+    CHIP_ERROR error               = Silabs::WifiInterface::GetInstance().GetAccessPointExtendedInfo(extra_info);
     if (error == CHIP_NO_ERROR)
     {
         packetMulticastRxCount = extra_info.mcast_rx_count;
@@ -428,7 +428,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastRxCount(uint32_t & 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
 {
     wfx_wifi_scan_ext_t extra_info = { 0 };
-    CHIP_ERROR error               = GetAccessPointExtendedInfo(extra_info);
+    CHIP_ERROR error               = Silabs::WifiInterface::GetInstance().GetAccessPointExtendedInfo(extra_info);
     if (error == CHIP_NO_ERROR)
     {
         packetMulticastTxCount = extra_info.mcast_tx_count;
@@ -440,7 +440,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketMulticastTxCount(uint32_t & 
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
 {
     wfx_wifi_scan_ext_t extra_info = { 0 };
-    CHIP_ERROR error               = GetAccessPointExtendedInfo(extra_info);
+    CHIP_ERROR error               = Silabs::WifiInterface::GetInstance().GetAccessPointExtendedInfo(extra_info);
     if (error == CHIP_NO_ERROR)
     {
         packetUnicastRxCount = extra_info.ucast_rx_count;
@@ -452,7 +452,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastRxCount(uint32_t & pa
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
 {
     wfx_wifi_scan_ext_t extra_info = { 0 };
-    CHIP_ERROR error               = GetAccessPointExtendedInfo(extra_info);
+    CHIP_ERROR error               = Silabs::WifiInterface::GetInstance().GetAccessPointExtendedInfo(extra_info);
     if (error == CHIP_NO_ERROR)
     {
         packetUnicastTxCount = extra_info.ucast_tx_count;
@@ -464,7 +464,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiPacketUnicastTxCount(uint32_t & pa
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCount)
 {
     wfx_wifi_scan_ext_t extra_info = { 0 };
-    CHIP_ERROR error               = GetAccessPointExtendedInfo(extra_info);
+    CHIP_ERROR error               = Silabs::WifiInterface::GetInstance().GetAccessPointExtendedInfo(extra_info);
     if (error == CHIP_NO_ERROR)
     {
         overrunCount = extra_info.overrun_count;
@@ -476,7 +476,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiOverrunCount(uint64_t & overrunCou
 CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
 {
     wfx_wifi_scan_ext_t extra_info = { 0 };
-    CHIP_ERROR error               = GetAccessPointExtendedInfo(extra_info);
+    CHIP_ERROR error               = Silabs::WifiInterface::GetInstance().GetAccessPointExtendedInfo(extra_info);
     if (error == CHIP_NO_ERROR)
     {
         beaconRxCount = extra_info.beacon_rx_count;
@@ -487,7 +487,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBeaconRxCount(uint32_t & beaconRxC
 
 CHIP_ERROR DiagnosticDataProviderImpl::ResetWiFiNetworkDiagnosticsCounts()
 {
-    return ResetCounters();
+    return Silabs::WifiInterface::GetInstance().ResetCounters();
 }
 #endif // SL_WIFI
 

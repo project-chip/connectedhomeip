@@ -146,10 +146,15 @@ MTR_DIRECT_MEMBERS
 // Returns YES if any non-null delegates were found
 - (BOOL)_iterateDelegatesWithBlock:(void(NS_NOESCAPE ^ _Nullable)(MTRDeviceDelegateInfo * delegateInfo))block;
 
+// For subclasses to call while holding lock
 - (BOOL)_delegateExists;
 
+// For device controller or other objects to call
+- (BOOL)delegateExists;
+
 // Must be called by subclasses or MTRDevice implementation only.
-- (void)_delegateAdded;
+- (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate;
+- (void)_delegateRemoved:(id<MTRDeviceDelegate>)delegate;
 
 #ifdef DEBUG
 // Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously
@@ -180,6 +185,10 @@ MTR_DIRECT_MEMBERS
 
 @end
 
+@interface MTRDevice (MatterPrivateForInternalDragonsDoNotFeed)
+- (void)_deviceMayBeReachable;
+@end
+
 #pragma mark - MTRDevice internal state monitoring
 @protocol MTRDeviceInternalStateDelegate
 - (void)devicePrivateInternalStateChanged:(MTRDevice *)device internalState:(NSDictionary *)state;
@@ -189,9 +198,6 @@ MTR_DIRECT_MEMBERS
 
 static NSString * const kDefaultSubscriptionPoolSizeOverrideKey = @"subscriptionPoolSizeOverride";
 static NSString * const kTestStorageUserDefaultEnabledKey = @"enableTestStorage";
-
-// Declared inside platform, but noting here for reference
-// static NSString * const kSRPTimeoutInMsecsUserDefaultKey = @"SRPTimeoutInMSecsOverride";
 
 // Concrete to XPC internal state property dictionary keys
 static NSString * const kMTRDeviceInternalPropertyKeyVendorID = @"MTRDeviceInternalStateKeyVendorID";
@@ -203,6 +209,7 @@ static NSString * const kMTRDeviceInternalPropertyMostRecentReportTime = @"MTRDe
 static NSString * const kMTRDeviceInternalPropertyLastSubscriptionFailureTime = @"MTRDeviceInternalPropertyLastSubscriptionFailureTime";
 static NSString * const kMTRDeviceInternalPropertyDeviceState = @"MTRDeviceInternalPropertyDeviceState";
 static NSString * const kMTRDeviceInternalPropertyDeviceCachePrimed = @"MTRDeviceInternalPropertyDeviceCachePrimed";
+static NSString * const kMTRDeviceInternalPropertyDiagnosticLogTransferInProgress = @"MTRDeviceInternalPropertyDiagnosticLogTransferInProgress";
 static NSString * const kMTRDeviceInternalPropertyEstimatedStartTime = @"MTRDeviceInternalPropertyEstimatedStartTime";
 static NSString * const kMTRDeviceInternalPropertyEstimatedSubscriptionLatency = @"MTRDeviceInternalPropertyEstimatedSubscriptionLatency";
 

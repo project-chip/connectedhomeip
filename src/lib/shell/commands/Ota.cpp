@@ -102,7 +102,7 @@ void RegisterOtaCommands()
                                                { &StateHandler, "state", "Get current image update state" },
                                                { &ProgressHandler, "progress", "Get current image update progress" } };
 
-    static constexpr Command otaCommand = { &SubShellCommand<ArraySize(subCommands), subCommands>, "ota", "OTA commands" };
+    static constexpr Command otaCommand = { &SubShellCommand<MATTER_ARRAY_SIZE(subCommands), subCommands>, "ota", "OTA commands" };
 
     Engine::Root().RegisterCommands(&otaCommand, 1);
 }

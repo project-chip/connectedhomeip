@@ -21,6 +21,10 @@
 #import "MTRDeviceClusterData.h"
 #import "MTRDeviceController_Concrete.h"
 
+#include <inet/IPAddress.h>
+
+#include <optional>
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDevice_Concrete : MTRDevice
@@ -44,6 +48,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 // For use from MTRDeviceController_Concrete when setting up a device instance.
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
+
+// The last IP address we tried to establish a subscription with.  std::nullopt if there
+// isn't one.
+@property (nonatomic, readonly) std::optional<chip::Inet::IPAddress> lastSubscriptionIPAddress;
 
 #ifdef DEBUG
 - (NSUInteger)unitTestAttributeCount;

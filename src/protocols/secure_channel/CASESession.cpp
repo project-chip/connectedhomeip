@@ -32,6 +32,7 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPSafeCasts.h>
+#include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
@@ -794,6 +795,7 @@ CHIP_ERROR CASESession::SendSigma1()
         MutableByteSpan destinationIdSpan(destinationIdentifier);
         ReturnErrorOnFailure(GenerateCaseDestinationId(ByteSpan(mIPK), encodeSigma1Inputs.initiatorRandom, rootPubKeySpan, fabricId,
                                                        mPeerNodeId, destinationIdSpan));
+        CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptDestinationID, destinationIdentifier[0] ^= 0xFF);
         encodeSigma1Inputs.destinationId = destinationIdSpan;
     }
 
@@ -889,8 +891,21 @@ CHIP_ERROR CASESession::EncodeSigma1(System::PacketBufferHandle & msg, EncodeSig
 
     if (input.sessionResumptionRequested)
     {
-        ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Sigma1Tags::kResumptionID), input.resumptionId));
-        ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Sigma1Tags::kResume1MIC), input.initiatorResumeMIC));
+        bool testOnlySkipResumptionID       = false;
+        bool testOnlySkipInitiatorResumeMIC = false;
+        CHIP_FAULT_INJECT(FaultInjection::kFault_CASESkipResumptionID, testOnlySkipResumptionID = true);
+        CHIP_FAULT_INJECT(FaultInjection::kFault_CASESkipInitiatorResumeMIC, testOnlySkipInitiatorResumeMIC = true);
+        CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptInitiatorResumeMIC, input.initiatorResume1MICBuffer[0] ^= 0xFF);
+
+        if (!testOnlySkipResumptionID)
+        {
+            ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Sigma1Tags::kResumptionID), input.resumptionId));
+        }
+
+        if (!testOnlySkipInitiatorResumeMIC)
+        {
+            ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(Sigma1Tags::kResume1MIC), input.initiatorResumeMIC));
+        }
     }
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
@@ -1173,7 +1188,7 @@ CHIP_ERROR CASESession::SendSigma2Resume(System::PacketBufferHandle && msgR2Resu
 
     mState = State::kSentSigma2Resume;
 
-    ChipLogDetail(SecureChannel, "Sent Sigma2Resume msg");
+    ChipLogProgress(SecureChannel, "Sent Sigma2Resume msg");
 
     return CHIP_NO_ERROR;
 }
@@ -1256,6 +1271,10 @@ CHIP_ERROR CASESession::PrepareSigma2(EncodeSigma2Inputs & outSigma2Data)
     TLVType outerContainerType = kTLVType_NotSpecified;
 
     ReturnErrorOnFailure(tlvWriter.StartContainer(AnonymousTag(), kTLVType_Structure, outerContainerType));
+
+    CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma2NOC, *nocCert.data() ^= 0xFF);
+    CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma2ICAC, *icaCert.data() ^= 0xFF);
+
     ReturnErrorOnFailure(tlvWriter.Put(AsTlvContextTag(TBEDataTags::kSenderNOC), nocCert));
     if (!icaCert.empty())
     {
@@ -1270,6 +1289,8 @@ CHIP_ERROR CASESession::PrepareSigma2(EncodeSigma2Inputs & outSigma2Data)
         nocBuf.Free();
         nocCert = MutableByteSpan{};
     }
+
+    CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma2Signature, *tbsData2Signature.Bytes() ^= 0xFF);
 
     ReturnErrorOnFailure(tlvWriter.PutBytes(AsTlvContextTag(TBEDataTags::kSignature), tbsData2Signature.ConstBytes(),
                                             static_cast<uint32_t>(tbsData2Signature.Length())));
@@ -1324,6 +1345,8 @@ CHIP_ERROR CASESession::EncodeSigma2(System::PacketBufferHandle & msgR2, EncodeS
 
     ReturnErrorOnFailure(tlvWriterMsg2.PutBytes(AsTlvContextTag(Sigma2Tags::kResponderEphPubKey), *input.responderEphPubKey,
                                                 static_cast<uint32_t>(input.responderEphPubKey->Length())));
+
+    CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptTBEData2Encrypted, *input.msgR2Encrypted.Get() ^= 0xFF);
 
     ReturnErrorOnFailure(tlvWriterMsg2.PutBytes(AsTlvContextTag(Sigma2Tags::kEncrypted2), input.msgR2Encrypted.Get(),
                                                 static_cast<uint32_t>(input.encrypted2Length)));
@@ -1733,6 +1756,14 @@ CHIP_ERROR CASESession::SendSigma3a()
         ReturnErrorOnFailure(mFabricsTable->FetchICACert(mFabricIndex, data.icaCert));
         ReturnErrorOnFailure(mFabricsTable->FetchNOCCert(mFabricIndex, data.nocCert));
 
+        CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma3NOC, *data.nocCert.data() ^= 0xFF);
+        CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma3ICAC, *data.icaCert.data() ^= 0xFF);
+
+        CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma3InitiatorEphPubKey,
+                          *(mEphemeralKey->TestOnlyMutablePubkey().Bytes()) ^= 0xFF);
+
+        CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma3ResponderEphPubKey, *mRemotePubKey ^= 0xFF);
+
         // Prepare Sigma3 TBS Data Blob
         size_t msgR3SignedLen = EstimateStructOverhead(data.nocCert.size(),    // initiatorNOC
                                                        data.icaCert.size(),    // initiatorICAC
@@ -1776,6 +1807,8 @@ CHIP_ERROR CASESession::SendSigma3b(SendSigma3Data & data, bool & cancel)
         // Legacy case: delegate to fabric table fabric info
         ReturnErrorOnFailure(data.fabricTable->SignWithOpKeypair(data.fabricIndex, data.msgR3SignedSpan, data.tbsData3Signature));
     }
+
+    CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma3Signature, *data.tbsData3Signature.Bytes() ^= 0xFF);
 
     // Prepare Sigma3 TBE Data Blob
     data.msg_r3_encrypted_len =
@@ -1856,6 +1889,7 @@ CHIP_ERROR CASESession::SendSigma3c(SendSigma3Data & data, CHIP_ERROR status)
         tlvWriter.Init(std::move(msg_R3));
         err = tlvWriter.StartContainer(AnonymousTag(), kTLVType_Structure, outerContainerType);
         SuccessOrExit(err);
+        CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptTBEData3Encrypted, *data.msg_R3_Encrypted.Get() ^= 0xFF);
         err = tlvWriter.PutBytes(AsTlvContextTag(Sigma3Tags::kEncrypted3), data.msg_R3_Encrypted.Get(),
                                  static_cast<uint32_t>(data.msg_r3_encrypted_len + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
         SuccessOrExit(err);
@@ -2611,7 +2645,7 @@ exit:
 
 namespace {
 System::Clock::Timeout ComputeRoundTripTimeout(ExchangeContext::Timeout serverProcessingTime,
-                                               const ReliableMessageProtocolConfig & remoteMrpConfig)
+                                               const ReliableMessageProtocolConfig & remoteMrpConfig, bool isFirstMessageOnExchange)
 {
     // TODO: This is duplicating logic from Session::ComputeRoundTripTimeout.  Unfortunately, it's called by
     // consumers who do not have a session.
@@ -2619,26 +2653,29 @@ System::Clock::Timeout ComputeRoundTripTimeout(ExchangeContext::Timeout serverPr
     const auto & defaultMRRPConfig   = GetDefaultMRPConfig();
     const auto & localMRPConfig      = maybeLocalMRPConfig.ValueOr(defaultMRRPConfig);
     return GetRetransmissionTimeout(remoteMrpConfig.mActiveRetransTimeout, remoteMrpConfig.mIdleRetransTimeout,
-                                    // Assume peer is idle, as a worst-case assumption (probably true for
-                                    // Sigma1, since that will be our initial message on the session, but less
-                                    // so for Sigma2).
-                                    System::Clock::kZero, remoteMrpConfig.mActiveThresholdTime) +
+                                    // The activity time only matters when isFirstMessageOnExchange is false,
+                                    // which only happens for Sigma1.  In that case, assume peer is idle,
+                                    // as a worst-case assumption, and pass System::Clock::kZero.
+                                    System::Clock::kZero, remoteMrpConfig.mActiveThresholdTime, isFirstMessageOnExchange) +
         serverProcessingTime +
         GetRetransmissionTimeout(localMRPConfig.mActiveRetransTimeout, localMRPConfig.mIdleRetransTimeout,
-                                 // Peer will assume we are active, since it's
-                                 // responding to our message.
-                                 System::SystemClock().GetMonotonicTimestamp(), localMRPConfig.mActiveThresholdTime);
+                                 // Peer will be responding to our message, so isFirstMessageOnExchange should be false
+                                 // and the timestamp does not matter.
+                                 System::SystemClock().GetMonotonicTimestamp(), localMRPConfig.mActiveThresholdTime,
+                                 false /*isFirstMessageOnExchange*/);
 }
 } // anonymous namespace
 
 System::Clock::Timeout CASESession::ComputeSigma1ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig)
 {
-    return ComputeRoundTripTimeout(kExpectedSigma1ProcessingTime, remoteMrpConfig);
+    // Sigma1 is the first message on the exchange.
+    return ComputeRoundTripTimeout(kExpectedSigma1ProcessingTime, remoteMrpConfig, true /*isFirstMessageOnExchange*/);
 }
 
 System::Clock::Timeout CASESession::ComputeSigma2ResponseTimeout(const ReliableMessageProtocolConfig & remoteMrpConfig)
 {
-    return ComputeRoundTripTimeout(kExpectedHighProcessingTime, remoteMrpConfig);
+    // Sigma2 is never the first message on the exchange.
+    return ComputeRoundTripTimeout(kExpectedHighProcessingTime, remoteMrpConfig, false /*isFirstMessageOnExchange*/);
 }
 
 bool CASESession::InvokeBackgroundWorkWatchdog()

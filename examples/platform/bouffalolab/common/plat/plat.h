@@ -23,6 +23,10 @@
 
 #define EXT_DISCOVERY_TIMEOUT_SECS 20
 
+#ifndef CONFIG_APP_ADVERTISE_COMMISSIONABLE_ON_LAST_FABRIC_REMOVAL
+#define CONFIG_APP_ADVERTISE_COMMISSIONABLE_ON_LAST_FABRIC_REMOVAL 0
+#endif
+
 typedef void (*app_pds_gpio_irq_handler_t)(void * arg);
 
 #ifdef __cplusplus

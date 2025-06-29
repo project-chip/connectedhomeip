@@ -19,5 +19,5 @@ RUN set -x \
     && rm -f kotlinc/bin/*.bat \
     && : # last line
 
-ENV PATH $PATH:/usr/lib/kotlinc/bin
+ENV PATH=$PATH:/usr/lib/kotlinc/bin
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64

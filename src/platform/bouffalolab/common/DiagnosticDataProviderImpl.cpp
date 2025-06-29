@@ -78,7 +78,10 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapUsed(uint64_t & currentHeap
 CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
 {
 #if CHIP_DEVICE_LAYER_TARGET_BL616
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    struct meminfo info;
+    bflb_mem_usage(KMEM_HEAP, &info);
+    currentHeapHighWatermark = info.total_size - info.max_free_size;
+
 #else
 #ifdef CFG_USE_PSRAM
     currentHeapHighWatermark =
@@ -86,8 +89,9 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
 #else
     currentHeapHighWatermark = get_heap_size() - xPortGetMinimumEverFreeHeapSize();
 #endif
-    return CHIP_NO_ERROR;
 #endif
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetThreadMetrics(ThreadMetrics ** threadMetricsOut)

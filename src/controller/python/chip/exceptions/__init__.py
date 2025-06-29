@@ -31,11 +31,24 @@ __all__ = [
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from chip.native import PyChipError
+    from ..native import PyChipError
 
 
 class ChipStackException(Exception):
-    pass
+    def __reduce__(self):
+        """
+        Allows this exception to be pickled by returning a simplified Exception
+        with the same message, ensuring it can be safely transferred across
+        processes in multiprocessing environments.
+
+        Note:
+        This replaces the custom exception with a plain Exception during
+        pickling, preserving the message but not the exception type, to avoid
+        import errors in environments where this exception class is unavailable.
+        """
+
+        e = Exception(f"{str(self)}")
+        return e.__reduce__()
 
 
 class ChipStackError(ChipStackException):

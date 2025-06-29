@@ -27,7 +27,7 @@ namespace chip {
 
 CHIP_ERROR GenericFaultTestEventTriggerHandler::HandleEventTrigger(uint64_t eventTrigger)
 {
-
+    eventTrigger = clearEndpointInEventTrigger(eventTrigger);
     if (eventTrigger == kGenericFaultQueryTrigger)
     {
         // Fault injection

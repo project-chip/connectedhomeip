@@ -165,7 +165,7 @@ TEST(TestQRCode, TestBase38)
     memset(encodedSpan.data(), '?', encodedSpan.size());
     subSpan = encodedSpan.SubSpan(0, 3);
     base38Encode(inputSpan.SubSpan(0, 1), subSpan);
-    size_t encodedLen = strnlen(encodedSpan.data(), ArraySize(encodedBuf));
+    size_t encodedLen = strnlen(encodedSpan.data(), MATTER_ARRAY_SIZE(encodedBuf));
     EXPECT_EQ(encodedLen, strlen("A0"));
     EXPECT_STREQ(encodedBuf, "A0");
 
@@ -370,6 +370,16 @@ TEST(TestQRCode, TestInvalidQRCodePayload_WrongLength)
     EXPECT_EQ(payload.isValidQRCodePayload(), false);
 }
 
+TEST(TestQRCode, TestConcatenatedQRCodePayload_WrongAPI)
+{
+    QRCodeSetupPayloadParser parser = QRCodeSetupPayloadParser(kConcatenatedQRCode);
+    SetupPayload payload;
+    CHIP_ERROR err = parser.populatePayload(payload);
+    bool didFail   = err != CHIP_NO_ERROR;
+    EXPECT_EQ(didFail, true);
+    EXPECT_EQ(payload.isValidQRCodePayload(), false);
+}
+
 TEST(TestQRCode, TestPayloadEquality)
 {
     SetupPayload payload      = GetDefaultPayload();
@@ -460,6 +470,8 @@ TEST(TestQRCode, TestExtractPayload)
     EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("%Z%MT:ABC")), std::string("ABC"));
     EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("%Z%MT:ABC%")), std::string("ABC"));
     EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("%Z%MT:ABC%DDD")), std::string("ABC"));
+    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("%Z%MT:ABC*DEF*GHI%DDD")), std::string("ABC*DEF*GHI"));
+    EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("%Z*WX%MT:ABC*DEF*GHI%DDD*EEE")), std::string("ABC*DEF*GHI"));
     EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("MT:ABC%DDD")), std::string("ABC"));
     EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("MT:ABC%")), std::string("ABC"));
     EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("%MT:")), std::string(""));
@@ -468,6 +480,81 @@ TEST(TestQRCode, TestExtractPayload)
     EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("MT:%")), std::string(""));
     EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("%MT:ABC")), std::string("ABC"));
     EXPECT_EQ(QRCodeSetupPayloadParser::ExtractPayload(std::string("ABC")), std::string(""));
+}
+
+TEST(TestQRCode, TestPopulatePayloadsInvalidValues)
+{
+    {
+        QRCodeSetupPayloadParser parser("");
+        std::vector<SetupPayload> payloads;
+        EXPECT_NE(parser.populatePayloads(payloads), CHIP_NO_ERROR);
+    }
+
+    {
+        // Payload not starting with MT:
+        QRCodeSetupPayloadParser parser("AT:M5L90MP500K64J00000");
+        std::vector<SetupPayload> payloads;
+        EXPECT_NE(parser.populatePayloads(payloads), CHIP_NO_ERROR);
+    }
+}
+
+TEST(TestQRCode, TestPopulatePayloadsMarginalValues)
+{
+    // Tests values that are well-formed but do not lead to valid payloads; for
+    // the _parser_ this is OK.
+    {
+        // Has invalid setup passcode 111111111
+        QRCodeSetupPayloadParser parser("MT:M5L90MP500W-GT68D20");
+        std::vector<SetupPayload> payloads;
+        EXPECT_EQ(parser.populatePayloads(payloads), CHIP_NO_ERROR);
+    }
+
+    {
+        // Has valid payload followed by one with invalid setup passcode 111111111
+        QRCodeSetupPayloadParser parser("MT:M5L90MP500K64J00000*M5L90MP500W-GT68D20");
+        std::vector<SetupPayload> payloads;
+        EXPECT_EQ(parser.populatePayloads(payloads), CHIP_NO_ERROR);
+    }
+
+    {
+        // Has payload with invalid setup passcode 111111111 followed by valid payload
+        QRCodeSetupPayloadParser parser("MT:M5L90MP500W-GT68D20*M5L90MP500K64J00000");
+        std::vector<SetupPayload> payloads;
+        EXPECT_EQ(parser.populatePayloads(payloads), CHIP_NO_ERROR);
+    }
+}
+
+TEST(TestQRCode, TestPopulatePayloadsSinglePayload)
+{
+    QRCodeSetupPayloadParser parser(kDefaultPayloadQRCode);
+
+    std::vector<SetupPayload> payloads;
+    auto err = parser.populatePayloads(payloads);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    ASSERT_EQ(payloads.size(), 1u);
+
+    EXPECT_EQ(payloads[0], GetDefaultPayload());
+}
+
+TEST(TestQRCode, TestParseMultiplePayloads)
+{
+    QRCodeSetupPayloadParser parser(kConcatenatedQRCode);
+
+    std::vector<SetupPayload> payloads;
+    auto err = parser.populatePayloads(payloads);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    ASSERT_EQ(payloads.size(), 4u);
+
+    for (size_t idx = 0; idx < payloads.size(); ++idx)
+    {
+        auto comparisonPayload = GetDefaultPayload();
+        comparisonPayload.discriminator.SetLongValue(comparisonPayload.discriminator.GetLongValue() + static_cast<uint16_t>(idx));
+        comparisonPayload.setUpPINCode += static_cast<uint32_t>(idx);
+
+        EXPECT_EQ(payloads[idx], comparisonPayload);
+    }
 }
 
 } // namespace

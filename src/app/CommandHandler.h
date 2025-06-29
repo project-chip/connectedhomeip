@@ -17,24 +17,27 @@
  */
 #pragma once
 
-#include <app/CommandHandlerExchangeInterface.h>
+#include <access/SubjectDescriptor.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/EncodableToTLV.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/FabricScoped.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <messaging/ExchangeContext.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
 
 /**
- *  A handler for incoming Invoke interactions.
+ *  A handler for incoming Invoke interactions.  This handles incoming Invoke
+ *  Request messages and generates Invoke Response messages.
  *
- *  Allows adding responses to be sent in an InvokeResponse: see the various
- *  "Add*" methods.
+ *  Allows adding responses (status, or server to client command) to be sent in
+ *  the Invoke Response message: see the various "Add*" methods.
  *
  *  Allows adding the responses asynchronously when using `CommandHandler::Handle`
  *  (see documentation for `CommandHandler::Handle` for details)
@@ -104,6 +107,8 @@ public:
          * valid.
          */
         CommandHandler * Get();
+
+        bool IsValid() const { return mpHandler != nullptr; }
 
         void Release();
 
@@ -261,7 +266,7 @@ public:
     template <typename CommandData>
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        DataModel::EncodableType<CommandData> encoder(aData);
+        EncodableResponseCommandPayload<CommandData> encoder(aData);
         return AddResponseData(aRequestCommandPath, CommandData::GetCommandId(), encoder);
     }
 
@@ -285,11 +290,35 @@ public:
     template <typename CommandData>
     void AddResponse(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        DataModel::EncodableType<CommandData> encodable(aData);
+        EncodableResponseCommandPayload<CommandData> encodable(aData);
         AddResponse(aRequestCommandPath, CommandData::GetCommandId(), encodable);
     }
 
 protected:
+    // Encoding a response command payload requires a fabric index, in general,
+    // because any fabric-scoped fields in the payload need it to deal with
+    // their fabric-sensitive fields.
+    template <typename CommandData>
+    class EncodableResponseCommandPayload : public DataModel::EncodableToTLV
+    {
+    public:
+        EncodableResponseCommandPayload(const CommandData & value) : mValue(value) {}
+
+        CHIP_ERROR EncodeTo(DataModel::FabricAwareTLVWriter & writer, TLV::Tag tag) const final
+        {
+            return DataModel::EncodeResponseCommandPayload(writer, tag, mValue);
+        }
+
+        CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const final
+        {
+            // Not used, keep it as small as we can.
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
+    private:
+        const CommandData & mValue;
+    };
+
     /**
      * IncrementHoldOff will increase the inner refcount of the CommandHandler.
      *

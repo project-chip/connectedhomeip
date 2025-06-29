@@ -1,0 +1,314 @@
+#
+#    Copyright (c) 2025 Project CHIP Authors
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+# Common NXP Application Kconfig
+
+menu "Matter application configuration"
+
+config APP_FREERTOS_OS
+	bool "FreeRTOS OS Application"
+	default y
+	help
+		When enabled this will differentiate between FreeRTOS and Zephyr in common NXP app code.
+
+config CHIP_APP_COMMON
+    bool "App Common Files"
+    default y
+    help
+        Enable the common NXP Application implementation.
+
+config CHIP_APP_CLUSTERS
+    bool "App Clusters"
+    help
+        Enable application common clusters implementation for the Identify and the ZCLCallbacks.
+
+config CHIP_APP_ASSERT
+    bool "Application Assert"
+    help
+        Enable application assert implementation to be used instead of assert component from the SDK.
+
+config CHIP_APP_BLE_MANAGER
+    bool "App BLE Manager"
+    default y if BT
+    help
+        Enable application BLE manager implementation.
+
+if CHIP_APP_BLE_MANAGER
+    choice CHIP_APP_BLE_MANAGER_SELECTION
+        prompt "Select Application BLE Manager"
+        
+        config CHIP_APP_BLE_MANAGER_CUSTOM
+            bool "App Custom BLE Manager"
+            depends on CHIP_CUSTOM_BLE_ADV_DATA && CHIP_DEVICE_USE_ZEPHYR_BLE
+            help
+                Enable application custom BLE manager.
+        
+        config CHIP_APP_BLE_MANAGER_EMPTY
+            bool "App BLE Manager Empty"
+            help
+                Enable application BLE manager empty implementation.
+
+    endchoice # CHIP_APP_BLE_MANAGER
+endif # CHIP_APP_BLE_MANAGER
+
+config DIAG_LOGS_DEMO
+	bool "Diagnostic log demo"
+	default y
+	help
+	  Enable the diagnostic log application demo.
+
+config CHIP_APP_FACTORY_DATA
+    bool "App Factory Data"
+    default y
+    help
+        Enable the application Factory Data implementation.
+
+if CHIP_APP_FACTORY_DATA
+    choice CHIP_APP_FACTORY_DATA_IMPL_SELECTION
+        prompt "Select AppFactoryData Implementation"
+        default CHIP_APP_FACTORY_DATA_IMPL_PLATFORM if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71
+        default CHIP_APP_FACTORY_DATA_IMPL_PLATFORM if CHIP_ENABLE_SECURE_WHOLE_FACTORY_DATA || CHIP_ENABLE_EL2GO_FACTORY_DATA
+        default CHIP_APP_FACTORY_DATA_IMPL_COMMON
+
+        config CHIP_APP_FACTORY_DATA_IMPL_PLATFORM
+            bool "App Factory Data Platform Implementation"
+            help
+                Enable the platform implementation of the application factory data.
+
+        config CHIP_APP_FACTORY_DATA_IMPL_COMMON
+            bool "App Factory Data Common Implementation"
+            help
+                Enable the platform implementation of the application factory data.
+
+    endchoice # CHIP_APP_FACTORY_DATA_IMPL_SELECTION
+
+endif # CHIP_APP_FACTORY_DATA
+
+config CHIP_APP_LED_WIDGET
+    bool "App LED Widget"
+    help
+        Enable the application implementation of LED widget.
+
+config CHIP_APP_LOW_POWER
+    bool "App Low Power"
+    default y if NXP_USE_LOW_POWER
+    help
+        Enable the application low power implementation.
+
+config CHIP_APP_BUTTON
+    bool "App Button"
+    default y
+    help
+        Enable the application Button implementation.
+
+if  CHIP_APP_BUTTON
+    choice CHIP_APP_BUTTON_REGISTRATION_SELECTION
+        prompt "App Button Registration Implementation Selection"
+        default CHIP_APP_BUTTON_REGISTRATION_APP_BLE if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+        default CHIP_APP_BUTTON_REGISTRATION_EMPTY
+
+        config CHIP_APP_BUTTON_REGISTRATION_EMPTY
+            bool "App Button Registration Empty Implementation"
+            help
+                Enable Button registration empty implementation.
+
+        config CHIP_APP_BUTTON_REGISTRATION_DEFAULT
+            bool "App Button Registration Default Implementation"
+            help
+                Enable button registration default implementation.
+
+        config CHIP_APP_BUTTON_REGISTRATION_APP_BLE
+            bool "App Button Registration App and BLE Implementation"
+            help
+                Enable button registration app and ble implementation.
+
+    endchoice # CHIP_APP_BUTTON_REGISTRATION_SELECTION
+
+    config CHIP_APP_BUTTON_WITH_TIMER
+        bool "App Button with Timer"
+        help
+            Enable application custom button behavior with timer.
+
+    config CHIP_APP_BUTTON_APP
+        bool "App Button Custom"
+        default y if CHIP_APP_BUTTON_REGISTRATION_APP_BLE
+        help
+            Enable application custom button behavior.
+
+    config CHIP_APP_BUTTON_BLE
+        bool "App Button BLE" 
+        default y if CHIP_APP_BUTTON_REGISTRATION_APP_BLE
+        select CHIP_APP_BUTTON_WITH_TIMER
+        help
+            Enable application custom button behavior for BLE.
+
+endif # CHIP_APP_BUTTON
+
+config CHIP_APP_CLI
+    bool "App Matter CLI"
+    default y if CHIP_LIB_SHELL
+    help
+        Enable application implementation of the Matter CLI.
+
+config CHIP_APP_OPERATIONAL_KEYSTORE
+    bool "App Operational Keystore"
+    default y if OPERATIONAL_KEYSTORE
+    help
+        Enable application operational keystore.
+
+if CHIP_APP_OPERATIONAL_KEYSTORE
+    choice CHIP_APP_OPERATIONAL_KEYSTORE_SELECTION
+        prompt "Select Operation Keystore Implementation"
+        default CHIP_APP_OPERATIONAL_KEYSTORE_S200
+
+        config CHIP_APP_OPERATIONAL_KEYSTORE_S200
+            bool "Operation Keystore S200"
+            help
+                Enable application Operational keystore S200 implementation.
+
+        config CHIP_APP_OPERATIONAL_KEYSTORE_EMPTY
+            bool "Operation Keystore Empty"
+            help
+                Enable application Operational keystore empty implementation.
+
+    endchoice # CHIP_APP_OPERATIONAL_KEYSTORE_SELECTION
+endif # CHIP_APP_OPERATIONAL_KEYSTORE
+
+config CHIP_APP_OTA_REQUESTOR
+    bool "App OTA Requestor"
+    default y if CHIP_OTA_REQUESTOR
+    help
+        Enable application OTA Requestor implementation.
+
+if CHIP_APP_OTA_REQUESTOR
+    choice CHIP_APP_OTA_REQUESTOR_INITIATOR_SELECTION
+        prompt "Select OTA Requestor Initiator"
+
+        config CHIP_APP_OTA_REQUESTOR_INITIATOR_MULTI_IMAGE
+            bool "OTA Requestor Initiator Multi-Image"
+            depends on CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+            help
+                Enable OTA Requestor Initiator for multiple image OTA SW update.
+
+        config CHIP_APP_OTA_REQUESTOR_INITIATOR_FREERTOS
+            bool "OTA Requestor Initiator FreeRTOS"
+            depends on APP_FREERTOS_OS
+            help
+                Enable OTA Requestor Initiator for FreeRTOS OS application.
+
+        config CHIP_APP_OTA_REQUESTOR_INITIATOR_ZEPHYR
+            bool "OTA Requestor Initiator Zephyr"
+            depends on !APP_FREERTOS_OS
+            help
+                Enable OTA Requestor Initiator for Zephyr OS application.
+    
+    endchoice # CHIP_APP_OTA_REQUESTOR_INITIATOR_SELECTION
+
+    config CHIP_APP_PLATFORM_OTA_UTILS
+        bool "Platform OTA Utils"
+        default y if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+        help
+            Use platform OtaUtils.cpp file.
+
+endif # CHIP_APP_OTA_REQUESTOR
+
+config CHIP_APP_RPC
+    bool "App RPC"
+    help
+        Enable app RPC include.
+
+config ENABLE_FEEDBACK
+	bool "Enable the app feedback component"
+    default y if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    depends on !NXP_USE_LOW_POWER
+	help
+		"Enable the app feedback component"
+
+config CHIP_APP_UI_FEEDBACK
+    bool "App UI Feedback"
+    default y if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    help
+        Enable application user interface feedback.
+
+config CHIP_APP_WIFI_CONNECT_AT_BOOT
+    bool "App wifi connection at boot"
+    help
+        Enable application connection to wifi network at boot.
+
+config CHIP_APP_WIFI_CONNECT
+    bool "App Wi-Fi Connect"
+    default y
+    depends on CHIP_APP_WIFI_CONNECT_AT_BOOT
+    help
+        Enable application wifi connect solution.
+
+if CHIP_APP_WIFI_CONNECT_AT_BOOT
+
+config CHIP_APP_WIFI_SSID
+    string "Wi-Fi SSID"
+    default "not specified"
+    help
+        Provide WiFi SSID to connect to the WiFi network during applicaton boot.
+        (Macro value is in quotes.)
+
+config CHIP_APP_WIFI_PASSWORD
+    string "Wi-Fi password"
+    default "not specified"
+    help
+        Provide WiFi password to connect to the WiFi network during applicaton boot.
+        (Macro value is in quotes.)
+
+endif # CHIP_APP_WIFI_CONNECT_AT_BOOT
+
+config CHIP_APP_PLATFORM_LED_ON_OFF
+    bool "App platform Led On Off Implementation"
+    default y if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    depends on CHIP_APP_UI_FEEDBACK
+    help
+        Enable platform LedOnOff Implementation.
+
+config CHIP_APP_DEVICE_TYPE_ENDPOINT
+	int "Application device-type endpoint ID"
+	default 1
+	help
+		Specify the endpoint ID of the application device-type.
+
+config CHIP_APP_LED_MANAGER_STATUS_LED_INDEX
+	int "Status LED index"
+	default 0
+	help
+		Set the status LED index for the LED Manager.
+
+config CHIP_APP_LED_MANAGER_LIGHT_LED_INDEX
+	int "Light LED index"
+	default 1
+	help
+		Set the light LED index for the LED Manager.
+
+config CHIP_APP_LED_MANAGER_STATUS_LED
+    int "App Led Status"
+    default 0 if (CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71) && CHIP_OTA_REQUESTOR
+    default 1
+    help
+        Enable status LED by setting value to 1, or disable with value 0.
+
+config CHIP_APP_QUEUE_TICKS_TO_WAIT
+    string "App queue ticks to wait"
+    default "pdMS_TO_TICKS(10)" if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    default "portMAX_DELAY"
+    help
+        Define app queue ticks to wait.
+
+endmenu

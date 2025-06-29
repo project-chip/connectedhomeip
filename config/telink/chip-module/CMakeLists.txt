@@ -56,6 +56,7 @@ endif()
 matter_add_flags(-DNL_ASSERT_USE_FLAGS_DEFAULT=1)
 
 zephyr_include_directories(${CHIP_ROOT}/src/platform/telink/)
+zephyr_include_directories(${CHIP_ROOT}/src/platform/telink/wifi/${ZEPHYR_VERSION_STRING})
 
 zephyr_get_compile_flags(ZEPHYR_CFLAGS_C C)
 matter_add_cflags("${ZEPHYR_CFLAGS_C}")
@@ -64,9 +65,14 @@ matter_add_cxxflags("${ZEPHYR_CFLAGS_CC}")
 zephyr_get_gnu_cpp_standard(ZEPHYR_GNU_CPP_STD)
 matter_add_cxxflags(${ZEPHYR_GNU_CPP_STD})
 
-matter_add_flags(-DMBEDTLS_USER_CONFIG_FILE=<telink-mbedtls-config.h>)
+matter_add_flags(-DMBEDTLS_USER_CONFIG_FILE=<${CONFIG_MBEDTLS_CFG_FILE}>)
 
 # Set up custom OpenThread configuration
+
+if (CONFIG_OPENTHREAD_TELINK_LIBRARY)
+    set(ZEPHYR_OPENTHREAD_MODULE_DIR ${ZEPHYR_BASE}/../modules/lib/openthread_telink_lib CACHE STRING INTERNAL)
+	message(STATUS "OpenThread used as precompiled Telink library, path: ${ZEPHYR_OPENTHREAD_MODULE_DIR}")
+endif()
 
 if (CONFIG_CHIP_OPENTHREAD_CONFIG)
     get_filename_component(CHIP_OPENTHREAD_CONFIG

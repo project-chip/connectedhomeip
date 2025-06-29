@@ -42,7 +42,6 @@
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server/Dnssd.h>
-#include <app/util/att-storage.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 #include "Display.h"

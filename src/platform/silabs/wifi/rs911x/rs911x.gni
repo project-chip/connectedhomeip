@@ -18,6 +18,7 @@ import("${silabs_sdk_build_root}/efr32_sdk.gni")
 
 rs911x_src_plat = [
   "${chip_root}/src/platform/silabs/wifi/rs911x/WifiInterfaceImpl.cpp",
+  "${chip_root}/src/platform/silabs/wifi/rs911x/WifiInterfaceImpl.h",
   "${chip_root}/src/platform/silabs/wifi/rs911x/ncp/rsi_hal_mcu_interrupt.c",
   "${chip_root}/src/platform/silabs/wifi/rs911x/ncp/rsi_hal_mcu_ioports.c",
   "${chip_root}/src/platform/silabs/wifi/rs911x/ncp/rsi_hal_mcu_timer.c",

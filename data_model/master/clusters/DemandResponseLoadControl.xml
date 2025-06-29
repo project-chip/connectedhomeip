@@ -65,7 +65,9 @@ Davis, CA 95616, USA
     <revision revision="4" summary="Matter Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0096" name="Demand Response Load Control"/>
+    <clusterId id="0x0096" name="Demand Response Load Control">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="application" picsCode="DRLC" scope="Endpoint"/>
   <features>

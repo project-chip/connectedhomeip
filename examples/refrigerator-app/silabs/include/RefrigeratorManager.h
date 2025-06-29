@@ -53,7 +53,6 @@ private:
     friend RefrigeratorManager & RefrigeratorMgr();
 
     int16_t mCurrentMode;
-    int16_t mStartUpMode;
     int16_t mOnMode;
 
     int16_t mTemperatureSetpoint;

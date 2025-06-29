@@ -24,7 +24,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
 #include <app/MessageDef/StatusIB.h>
-#include <app/RequiredPrivilege.h>
 #include <app/StatusResponse.h>
 #include <app/WriteHandler.h>
 #include <app/data-model-provider/ActionReturnStatus.h>
@@ -125,7 +124,7 @@ std::optional<bool> WriteHandler::IsListAttributePath(const ConcreteAttributePat
         return std::nullopt;
     }
 
-    return info->flags.Has(DataModel::AttributeQualityFlags::kListAttribute);
+    return info->HasFlags(DataModel::AttributeQualityFlags::kListAttribute);
 }
 
 Status WriteHandler::HandleWriteRequestMessage(Messaging::ExchangeContext * apExchangeContext,
@@ -258,17 +257,19 @@ exit:
 
 void WriteHandler::DeliverListWriteBegin(const ConcreteAttributePath & aPath)
 {
-    if (auto * attrOverride = AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId))
+    if (mDataModelProvider != nullptr)
     {
-        attrOverride->OnListWriteBegin(aPath);
+        mDataModelProvider->ListAttributeWriteNotification(aPath, DataModel::ListWriteOperation::kListWriteBegin);
     }
 }
 
 void WriteHandler::DeliverListWriteEnd(const ConcreteAttributePath & aPath, bool writeWasSuccessful)
 {
-    if (auto * attrOverride = AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId))
+    if (mDataModelProvider != nullptr)
     {
-        attrOverride->OnListWriteEnd(aPath, writeWasSuccessful);
+        mDataModelProvider->ListAttributeWriteNotification(aPath,
+                                                           writeWasSuccessful ? DataModel::ListWriteOperation::kListWriteSuccess
+                                                                              : DataModel::ListWriteOperation::kListWriteFailure);
     }
 }
 
@@ -772,10 +773,9 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     //
     //       Open issue that needs fixing: https://github.com/project-chip/connectedhomeip/issues/33735
 
-    std::optional<DataModel::AttributeEntry> attributeEntry;
     DataModel::AttributeFinder finder(mDataModelProvider);
 
-    attributeEntry = finder.Find(aPath);
+    std::optional<DataModel::AttributeEntry> attributeEntry = finder.Find(aPath);
 
     // if path is not valid, return a spec-compliant return code.
     if (!attributeEntry.has_value())
@@ -788,7 +788,7 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     }
 
     // Allow writes on writable attributes only
-    VerifyOrReturnValue(attributeEntry->writePrivilege.has_value(), Status::UnsupportedWrite);
+    VerifyOrReturnValue(attributeEntry->GetWritePrivilege().has_value(), Status::UnsupportedWrite);
 
     bool checkAcl = true;
     if (mLastSuccessfullyWrittenPath.has_value())
@@ -811,7 +811,10 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
                                          .endpoint    = aPath.mEndpointId,
                                          .requestType = Access::RequestType::kAttributeWriteRequest,
                                          .entityId    = aPath.mAttributeId };
-        CHIP_ERROR err = Access::GetAccessControl().Check(aSubject, requestPath, RequiredPrivilege::ForWriteAttribute(aPath));
+
+        // NOTE: we know that attributeEntry has a GetWriteProvilege based on the check above.
+        //       so we just directly reference it.
+        CHIP_ERROR err = Access::GetAccessControl().Check(aSubject, requestPath, *attributeEntry->GetWritePrivilege());
 
         if (err != CHIP_NO_ERROR)
         {
@@ -823,7 +826,7 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     }
 
     // validate that timed write is enforced
-    VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->flags.Has(DataModel::AttributeQualityFlags::kTimed),
+    VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kTimed),
                         Status::NeedsTimedInteraction);
 
     return Status::Success;

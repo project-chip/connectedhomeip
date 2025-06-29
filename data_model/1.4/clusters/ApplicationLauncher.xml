@@ -122,7 +122,9 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality nullable="true"/>
       <optionalConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
@@ -133,7 +135,9 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="AP"/>
         </mandatoryConform>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="Data" type="octstr" default="MS">
         <optionalConform/>
@@ -146,7 +150,9 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="AP"/>
         </mandatoryConform>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x02" name="HideApp" direction="commandToServer" response="LauncherResponse">
@@ -156,7 +162,9 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <feature name="AP"/>
         </mandatoryConform>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x03" name="LauncherResponse" direction="responseFromServer">

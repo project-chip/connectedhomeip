@@ -109,7 +109,7 @@ typedef void (^MTRDeviceControllerDataStoreClusterDataHandler)(NSDictionary<NSNu
  * Returns the list of node IDs for which this data store has stored data of
  * some sort.
  */
-- (NSArray<NSNumber *> *)nodesWithStoredData;
+@property (readonly, nonatomic) NSArray<NSNumber *> * nodesWithStoredData;
 
 @end
 

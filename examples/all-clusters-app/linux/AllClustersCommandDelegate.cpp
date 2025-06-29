@@ -22,11 +22,11 @@
 #include <app/EventLogging.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
+#include <app/clusters/refrigerator-alarm-server/refrigerator-alarm-server.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
-#include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
+#include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 #include <app/clusters/switch-server/switch-server.h>
 #include <app/server/Server.h>
-#include <app/util/att-storage.h>
 #include <app/util/attribute-storage.h>
 #include <platform/PlatformManager.h>
 
@@ -38,6 +38,7 @@
 #include <oven-modes.h>
 #include <oven-operational-state-delegate.h>
 #include <rvc-modes.h>
+#include <soil-measurement-stub.h>
 
 #include <memory>
 #include <string>
@@ -286,6 +287,47 @@ void HandleSimulateLatchPosition(Json::Value & jsonValue)
 }
 
 /**
+ * Named pipe handler for simulating a Door Opening.
+ *
+ * Usage example:
+ *   echo '{"Name":"SetRefrigeratorDoorStatus", "EndpointId": 1, "DoorOpen": 1}' > /tmp/chip_all_clusters_fifo_1146610
+ *
+ * JSON Arguments:
+ *   - "Name": Must be "SetRefrigeratorDoorStatus"
+ *   - "EndpointId": ID of endpoint
+ *   - "DoorOpen": Status of the Door, open or closed.
+ *
+ * @param jsonValue - JSON payload from named pipe
+ */
+void SetRefrigeratorDoorStatusHandler(Json::Value & jsonValue)
+{
+    bool hasEndpointId = HasNumericField(jsonValue, "EndpointId");
+    bool hasDoorStatus = HasNumericField(jsonValue, "DoorOpen");
+
+    if (!hasEndpointId || !hasDoorStatus)
+    {
+        std::string inputJson = jsonValue.toStyledString();
+        ChipLogError(NotSpecified, "Missing or invalid value for one of EndpointId, DoorOpen in %s", inputJson.c_str());
+        return;
+    }
+    // values to update the door status
+    EndpointId endpointId = static_cast<EndpointId>(jsonValue["EndpointId"].asUInt());
+    bool doorStatus       = static_cast<bool>(jsonValue["DoorOpen"].asBool());
+    ChipLogDetail(NotSpecified, "SetRefrigeratorDoorStatusHandler State -> %d.", doorStatus);
+    if (!doorStatus)
+    {
+        RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId, doorStatus);
+        ChipLogDetail(NotSpecified, "Refrigeratoralarm status updated to :%d", doorStatus);
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Refrigeratoralarm status updated to :%d", doorStatus);
+        RefrigeratorAlarmServer::Instance().SetMaskValue(endpointId, doorStatus);
+        RefrigeratorAlarmServer::Instance().SetStateValue(endpointId, doorStatus);
+    }
+}
+
+/**
  * Named pipe handler for simulating switch is idle
  *
  * Usage example:
@@ -510,9 +552,47 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
             ChipLogError(NotSpecified, "Invalid Occupancy state to set.");
         }
     }
+    else if (name == "SetRefrigeratorDoorStatus")
+    {
+        SetRefrigeratorDoorStatusHandler(self->mJsonValue);
+    }
+    else if (name == "SimulateConfigurationVersionChange")
+    {
+        uint32_t configurationVersion = 0;
+        ConfigurationMgr().GetConfigurationVersion(configurationVersion);
+        configurationVersion++;
+
+        if (ConfigurationMgr().StoreConfigurationVersion(configurationVersion + 1) != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "Failed to store configuration version:%d", configurationVersion);
+        }
+    }
+    else if (name == "SetSimulatedSoilMoisture")
+    {
+        EndpointId endpoint          = static_cast<EndpointId>(self->mJsonValue["EndpointId"].asUInt());
+        Json::Value jsonSoilMoisture = self->mJsonValue["SoilMoistureValue"];
+        DataModel::Nullable<Percent> soilMoistureMeasuredValue;
+
+        if (endpoint != 1)
+        {
+            ChipLogError(NotSpecified, "Invalid EndpointId to set Soil Moisture value.");
+            return;
+        }
+
+        if (jsonSoilMoisture.isNull())
+        {
+            soilMoistureMeasuredValue.SetNull();
+        }
+        else
+        {
+            soilMoistureMeasuredValue.SetNonNull(static_cast<uint8_t>(self->mJsonValue["SoilMoistureValue"].asUInt()));
+        }
+
+        self->OnSoilMoistureChange(endpoint, soilMoistureMeasuredValue);
+    }
     else
     {
-        ChipLogError(NotSpecified, "Unhandled command '%s': this hould never happen", name.c_str());
+        ChipLogError(NotSpecified, "Unhandled command '%s': this should never happen", name.c_str());
         VerifyOrDie(false && "Named pipe command not supported, see log above.");
     }
 
@@ -621,7 +701,7 @@ void AllClustersAppCommandHandler::OnSoftwareFaultEventHandler(uint32_t eventId)
         softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(timeChar), strlen(timeChar)));
     }
 
-    Clusters::SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
+    Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault);
 }
 
 void AllClustersAppCommandHandler::OnSwitchLatchedHandler(uint8_t newPosition)
@@ -870,6 +950,27 @@ void AllClustersAppCommandHandler::OnAirQualityChange(uint32_t aNewValue)
     {
         ChipLogDetail(NotSpecified, "Invalid value: %u", aNewValue);
     }
+}
+
+void AllClustersAppCommandHandler::OnSoilMoistureChange(EndpointId endpointId, DataModel::Nullable<Percent> soilMoisture)
+{
+    SoilMeasurement::Instance * soilMeasurementInstance = SoilMeasurement::GetInstance();
+
+    if (soilMoisture.IsNull())
+    {
+        ChipLogDetail(NotSpecified, "Set SoilMoisture value to null");
+    }
+    else if (soilMoisture.Value() > 100)
+    {
+        ChipLogDetail(NotSpecified, "Invalid SoilMoisture value");
+        return;
+    }
+    else
+    {
+        ChipLogDetail(NotSpecified, "Set SoilMoisture value to %u", soilMoisture.Value());
+    }
+
+    soilMeasurementInstance->SetSoilMeasuredValue(soilMoisture);
 }
 
 void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointId, uint8_t newOccupancyValue)
