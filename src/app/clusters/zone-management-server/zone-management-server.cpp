@@ -16,6 +16,7 @@
  *
  */
 
+#include "zone-util.h"
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
@@ -429,7 +430,17 @@ void ZoneMgmtServer::HandleCreateTwoDCartesianZone(HandlerContext & ctx,
         return;
     }
 
-    // TODO:1) Add the Duplicate check 2) Add Self-Intersecting check
+    if (DoesZoneAlreadyExist(zoneToCreate.use, twoDCartVertices))
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::AlreadyExists);
+        return;
+    }
+
+    if (ZoneUtil::IsZoneSelfIntersecting(twoDCartVertices))
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+        return;
+    }
 
     // Form the TwoDCartesianZoneStorage object
     TwoDCartesianZoneStorage twoDCartZoneStorage;
@@ -514,7 +525,17 @@ void ZoneMgmtServer::HandleUpdateTwoDCartesianZone(HandlerContext & ctx,
         return;
     }
 
-    // TODO:1) Add the Duplicate check 2) Add Self-Intersecting check
+    if (DoesZoneAlreadyExist(zoneToUpdate.use, twoDCartVertices))
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::AlreadyExists);
+        return;
+    }
+
+    if (ZoneUtil::IsZoneSelfIntersecting(twoDCartVertices))
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
+        return;
+    }
 
     TwoDCartesianZoneStorage twoDCartZoneStorage;
     twoDCartZoneStorage.Set(zoneToUpdate.name, zoneToUpdate.use, twoDCartVertices, zoneToUpdate.color);
@@ -634,6 +655,41 @@ void ZoneMgmtServer::HandleRemoveTrigger(HandlerContext & ctx, const Commands::R
     }
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
+}
+
+bool ZoneMgmtServer::DoZoneUseAndVerticesMatch(ZoneUseEnum use, const std::vector<TwoDCartesianVertexStruct> & vertices,
+                                               const TwoDCartesianZoneStorage & zone)
+{
+    if (use != zone.use)
+    {
+        return false;
+    }
+
+    size_t inputVerticesCount = vertices.size();
+    size_t zoneVerticesCount  = zone.vertices.size();
+
+    if (inputVerticesCount != zoneVerticesCount)
+    {
+        return false;
+    }
+
+    // Exact match check for vertices
+    return std::equal(vertices.begin(), vertices.end(), zone.verticesVector.begin(),
+                      [](const TwoDCartesianVertexStruct & v1, const TwoDCartesianVertexStruct & v2) {
+                          return ZoneUtil::AreTwoDCartVerticesEqual(v1, v2);
+                      });
+}
+
+bool ZoneMgmtServer::DoesZoneAlreadyExist(ZoneUseEnum zoneUse, const std::vector<TwoDCartesianVertexStruct> & vertices)
+{
+    for (auto & zone : mZones)
+    {
+        if (zone.twoDCartZoneStorage.HasValue() && DoZoneUseAndVerticesMatch(zoneUse, vertices, zone.twoDCartZoneStorage.Value()))
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 Status ZoneMgmtServer::GenerateZoneTriggeredEvent(uint16_t zoneID, ZoneEventTriggeredReasonEnum triggerReason)

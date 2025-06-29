@@ -220,7 +220,6 @@ protected:
 
 enum class OptionalAttribute : uint32_t
 {
-
 };
 
 class ZoneMgmtServer : public CommandHandlerInterface, public AttributeAccessInterface
@@ -325,6 +324,15 @@ private:
     CHIP_ERROR ReadAndEncodeTriggers(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
     Protocols::InteractionModel::Status ValidateTwoDCartesianZone(const TwoDCartesianZoneDecodableStruct & zone);
+
+    // Utility that matches a given zone's ZoneUse and verices with the given
+    // parameters to check if they match. Used by DoesZoneAlreadyExist().
+    bool DoZoneUseAndVerticesMatch(ZoneUseEnum use, const std::vector<TwoDCartesianVertexStruct> & vertices,
+                                   const TwoDCartesianZoneStorage & zone);
+
+    // Utility function to check if a given ZoneUse and a TwoDVertex already
+    // exists in mZones.
+    bool DoesZoneAlreadyExist(ZoneUseEnum zoneUse, const std::vector<TwoDCartesianVertexStruct> & vertices);
 
     /**
      * @brief Inherited from CommandHandlerInterface
