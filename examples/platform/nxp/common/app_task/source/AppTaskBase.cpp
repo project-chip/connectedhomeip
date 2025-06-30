@@ -56,6 +56,7 @@
 #if CONFIG_NET_L2_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
 #include <lib/support/ThreadOperationalDataset.h>
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #endif
 
 #if CONFIG_CHIP_APP_WIFI_CONNECT_AT_BOOT
@@ -118,6 +119,11 @@ using namespace ::chip::app::Clusters;
 
 #if CONFIG_DEVICE_INFO_PROVIDER_IMPL
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+#endif
+
+#if CONFIG_NET_L2_OPENTHREAD
+app::Clusters::NetworkCommissioning::InstanceAndDriver<DeviceLayer::NetworkCommissioning::GenericThreadDriver>
+    sThreadNetworkDriver(0 /*endpointId*/);
 #endif
 
 #if CONFIG_CHIP_WIFI || CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -284,6 +290,7 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
         ChipLogError(DeviceLayer, "Error during ThreadStackMgr().InitThreadStack()");
         return err;
     }
+    sThreadNetworkDriver.Init();
 
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::CONFIG_THREAD_DEVICE_TYPE);
     if (err != CHIP_NO_ERROR)

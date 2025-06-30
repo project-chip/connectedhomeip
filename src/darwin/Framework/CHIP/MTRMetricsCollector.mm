@@ -240,8 +240,8 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
         }
     }
 
-    // Add to the collection only if it does not exist as yet.
-    if (![_metricsDataCollection valueForKey:metricsKey]) {
+    // Add to the collection only if it does not exist as yet or pick latest value for instant event
+    if (![_metricsDataCollection valueForKey:metricsKey] || event.type() == MetricEvent::Type::kInstantEvent) {
         [_metricsDataCollection setValue:data forKey:metricsKey];
     }
 }
