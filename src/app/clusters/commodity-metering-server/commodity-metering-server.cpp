@@ -120,7 +120,7 @@ void Instance::Shutdown()
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
-CHIP_ERROR CopyMeteredQuantityEntry(Structs::MeteredQuantityStruct::Type & dest,
+CHIP_ERROR Instance::CopyMeteredQuantityEntry(Structs::MeteredQuantityStruct::Type & dest,
                                     Platform::ScopedMemoryBuffer<uint32_t> * destTariffComponentIDsBuffer,
                                     const Structs::MeteredQuantityStruct::Type & src)
 {
