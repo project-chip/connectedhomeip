@@ -37,31 +37,51 @@ from mobly import asserts
 
 class EventCallback:
     def __init__(self, *, name: Optional[str] = None, expected_cluster: Optional[ClusterObjects.Cluster] = None, expected_cluster_id: Optional[int] = None, expected_event_id: Optional[int] = None):
-        if expected_cluster is not None:
-            self._expected_cluster = expected_cluster
-            self._expected_cluster_id = expected_cluster.id
-            self._name = None
-            self._expected_event_id = None
-        elif expected_cluster_id is not None and expected_event_id is not None and name is not None:
-            self._expected_cluster = None
-            self._name = name
-            self._expected_cluster_id = expected_cluster_id
-            self._expected_event_id = expected_event_id
-        else:
+        # if expected_cluster is not None:
+        #     self._expected_cluster = expected_cluster
+        #     self._expected_cluster_id = expected_cluster.id
+        #     self._name = None
+        #     self._expected_event_id = None
+        # elif expected_cluster_id is not None and expected_event_id is not None and name is not None:
+        #     self._expected_cluster = None
+        #     self._name = name
+        #     self._expected_cluster_id = expected_cluster_id
+        #     self._expected_event_id = expected_event_id
+        # else:
+        #     raise ValueError("Failed argument inputs in EventCallback. You should use Cluster or ClusterId, EventId and name")
+        # self._q: queue.Queue = queue.Queue()
+
+        if expected_cluster is None or (expected_cluster_id is None and expected_event_id is None and name is None):
             raise ValueError("Failed argument inputs in EventCallback. You should use Cluster or ClusterId, EventId and name")
 
+        self._expected_cluster = expected_cluster
+        self._expected_cluster_id = expected_cluster_id if expected_cluster_id is not None else expected_cluster.id
+        self._expected_event_id = expected_event_id
+        self._name = name
+        self._subscription = None
         self._q: queue.Queue = queue.Queue()
 
     def __call__(self, event_result: EventReadResult, transaction: SubscriptionTransaction):
         # """This is the subscription callback when an event is received.
         #    It checks the event is from the expected_cluster and then posts it into the queue for later processing."""
-        if event_result.Status == Status.Success and event_result.Header.ClusterId == self._expected_cluster_id:
-            logging.info(
-                f'Got subscription report for event on cluster {self._expected_cluster}: {event_result.Data}')
-            self._q.put(event_result)
+        # if event_result.Status == Status.Success and event_result.Header.ClusterId == self._expected_cluster_id:
+        #     logging.info(
+        #         f'Got subscription report for event on cluster {self._expected_cluster}: {event_result.Data}')
+        #     self._q.put(event_result)
+        #     return
+        # if self._expected_cluster_id == event_result.Header.ClusterId and self._expected_event_id == event_result.Header.EventId:
+        #     self._q.put(event_result)
+        if event_result.Status != Status.Success:
             return
-        if self._expected_cluster_id == event_result.Header.ClusterId and self._expected_event_id == event_result.Header.EventId:
-            self._q.put(event_result)
+
+        header = event_result.Header
+        if header.ClusterId != self._expected_cluster_id:
+            return
+        if self._expected_event_id is not None and header.EventId != self._expected_event_id:
+            return
+
+        logging.info("f[EventCallback] Received event: {header}")
+        self._q.put(event_result)
 
     @property
     def name(self) -> Optional[str]:
