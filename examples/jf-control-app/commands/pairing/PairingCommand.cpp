@@ -66,7 +66,6 @@ CHIP_ERROR PairingCommand::RunCommand()
     commissioner.RegisterPairingDelegate(this);
     commissioner.RegisterTrustVerificationDelegate(this);
    
-
     // This check is to ensure that the --anchor and --jcm options are not used together.  If they are return an immediate error.
     if (mJCM.ValueOr(false) && mAnchor.ValueOr(false))
     {
@@ -89,7 +88,8 @@ CHIP_ERROR PairingCommand::RunCommand()
     // JFA will be issued a NOC with Anchor CAT and Administrator CAT
     mCASEAuthTags = MakeOptional(std::vector<uint32_t>{ administratorCAT, anchorCAT });
   
-    if (mAnchorNodeId == chip::kUndefinedNodeId)
+    NodeId anchorNodeId = GetAnchorNodeId();
+    if (anchorNodeId == chip::kUndefinedNodeId)
     {
         // The Anchor Administrator is not already commissioned, check if the mAnchor option is set.
         // If the --anchor option is not set, we cannot proceed unless we commission the Anchor Administrator first.
