@@ -108,7 +108,7 @@ private:
                     if (components == nullptr)
                     {
                         // Clean up previously allocated memory
-                        Platform::MemoryFree(newList); // Use MemoryFree instead of Delete
+                        Platform::MemoryFree(newList);
                         ChipLogError(Zcl, "Failed to allocate memory for tariffComponentIDs");
                         return;
                     }
@@ -162,7 +162,6 @@ private:
     {
         ClearMeteredQuantity();
         mMeteredQuantityTimestamp.SetNull();
-        mInstance = nullptr;
     }
 
     void RestoreAttributes() const
@@ -185,7 +184,7 @@ private:
             ChipLogError(Support, "UpdAttrs() could not get time");
         }
 
-        mMeteredQuantityTimestamp = DataModel::MakeNullable(matterEpoch);
+        mMeteredQuantityTimestamp.SetNonNull(matterEpoch);
 
         if (mTariffUnit == Globals::TariffUnitEnum::kKWh)
         {
@@ -219,8 +218,8 @@ public:
 
     void Clear()
     {
-        RestoreAttributes();
         ClearAttributes();
+        RestoreAttributes();
     }
 };
 

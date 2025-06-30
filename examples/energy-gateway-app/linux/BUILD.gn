@@ -71,7 +71,7 @@ executable("chip-energy-gateway-app") {
     "${chip_root}/examples/energy-gateway-app/commodity-price/include",
     "${chip_root}/examples/energy-gateway-app/electrical-grid-conditions/include",
     "${chip_root}/examples/energy-gateway-app/meter-identification/include",
-    "${chip_root}/examples/energy-gateway-app/commodity-metering/include/",
+    "${chip_root}/examples/energy-gateway-app/commodity-metering/include",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/include",
   ]
 
