@@ -21,7 +21,7 @@
 #include "mode-base-cluster-objects.h"
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
-#include <app/util/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 #include <lib/support/IntrusiveList.h>
 
 namespace chip {

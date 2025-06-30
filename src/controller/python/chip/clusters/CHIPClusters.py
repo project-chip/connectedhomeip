@@ -7897,7 +7897,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "Target",
+                "attributeName": "TargetState",
                 "attributeId": 0x00000001,
                 "type": "",
                 "reportable": True,
@@ -7953,6 +7953,12 @@ class ChipClusters:
             0x0000000A: {
                 "attributeName": "ModulationType",
                 "attributeId": 0x0000000A,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000000B: {
+                "attributeName": "LatchControlModes",
+                "attributeId": 0x0000000B,
                 "type": "int",
                 "reportable": True,
             },
@@ -14504,7 +14510,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000002: {
-                "attributeName": "MeasurementType",
+                "attributeName": "TariffUnit",
                 "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
