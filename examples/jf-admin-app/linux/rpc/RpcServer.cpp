@@ -13,7 +13,6 @@ namespace joint_fabric_service {
     ChipLogProgress(JointFabric, "Ownership Transfer for NodeId: 0x" ChipLogFormatX64 ", jcm=%d", ChipLogValueX64(request.node_id),
                     request.jcm);
 
-    OwnershipTransferContext * data = Platform::New<OwnershipTransferContext>(request.node_id, request.jcm);
     if (request.jcm && (Crypto::kP256_PublicKey_Length != request.trustedIcacPublicKeyB.size))
     {
         return pw::Status::OutOfRange();

@@ -17,16 +17,22 @@ public:
 private:
     struct OwnershipTransferContext
     {
-        OwnershipTransferContext(uint64_t nodeId, bool jcm) : mNodeId(nodeId), mJCM(jcm) {}
+        OwnershipTransferContext(uint64_t nodeId, bool jcm, ByteSpan trustedIcacPublicKeyB) : mNodeId(nodeId), mJCM(jcm)
+        {
+            memcpy(keyRawBytes, trustedIcacPublicKeyB.data(), kP256_PublicKey_Length);
+            mTrustedIcacPublicKeyBSerialized = keyRawBytes;
+        }
 
         uint64_t mNodeId;
         bool mJCM;
+        uint8_t keyRawBytes[kP256_PublicKey_Length] = { 0 };
+        P256PublicKey mTrustedIcacPublicKeyBSerialized;
     };
 
     static void FinalizeCommissioningWork(intptr_t arg)
     {
         OwnershipTransferContext * data = reinterpret_cast<OwnershipTransferContext *>(arg);
-        JFAMgr().FinalizeCommissioning(data->mNodeId, data->mJCM);
+        JFAMgr().FinalizeCommissioning(data->mNodeId, data->mJCM, data->mTrustedIcacPublicKeyBSerialized);
         Platform::Delete(data);
     }
 };
