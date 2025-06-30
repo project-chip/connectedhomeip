@@ -116,7 +116,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
                     [](const decltype(quietReportableCurrentStatePosition)::SufficientChangePredicateCandidate &) -> bool {
                     return true;
                 };
-                markDirty = (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.Value().position.Value(), now,
+markDirty |= (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.Value().position.Value(), now,
                                                                           predicate) == AttributeDirtyState::kMustReport);
                 ChipLogError(AppServer, "Target position reached Mark dirty = %d", markDirty);
             }
@@ -126,7 +126,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
                 // non-null value, or when the Position changes from null to any other value and vice versa
                 System::Clock::Milliseconds64 reportInterval = System::Clock::Milliseconds64(kPositionQuietReportingInterval);
                 auto predicate = quietReportableCurrentStatePosition.GetPredicateForSufficientTimeSinceLastDirty(reportInterval);
-                markDirty      = (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.Value().position.Value(), now,
+markDirty |= (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.Value().position.Value(), now,
                                                                                predicate) == AttributeDirtyState::kMustReport);
                 ChipLogError(AppServer, "Target position not reached Mark dirty = %d", markDirty);
             }
@@ -168,8 +168,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
     }
 
     // If the current state is null and the incoming current state is null and vice versa, we need to mark dirty.
-    if ((mState.currentState.IsNull() && !incomingCurrentState.IsNull()) ||
-        (!mState.currentState.IsNull() && incomingCurrentState.IsNull()))
+if (mState.currentState.IsNull() != incomingCurrentState.IsNull())
     {
         markDirty = true;
     }
