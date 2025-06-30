@@ -520,7 +520,7 @@ class TC_IDM_4_2(MatterBaseTest):
         subscription_timeout_sec = sub_cr1_update_value.GetSubscriptionTimeoutMs() / 1000
 
         # Set Attribute Update Callback
-        node_label_update_cb = AttributeCallback(expected_attribute=node_label_attr)
+        node_label_update_cb = AttributeCallback(expected_cluster=Clusters.BasicInformation, expected_attribute=node_label_attr)
         sub_cr1_update_value.SetAttributeUpdateCallback(node_label_update_cb)
 
         # Update attribute value

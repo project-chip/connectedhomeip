@@ -162,6 +162,7 @@ class AttributeCallback:
         self._subscription = None
         self._q = queue.Queue()
         self._endpoint_id = 0
+        self._lock = None
         if expected_cluster is not None:
             self._lock = threading.Lock()
             self.reset()
@@ -208,6 +209,30 @@ class AttributeCallback:
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
         # """This is the subscription callback when an attribute report is received.
         #    It checks the report is from the expected_cluster and then posts it into the queue for later processing."""
+        # valid_report = False
+        # if path.ClusterType == self._expected_cluster:
+        #     if self._expected_attribute is not None:
+        #         valid_report = path.ClusterId == self._expected_attribute.cluster_id
+        #     else:
+        #         valid_report = True
+        # elif path.AttributeType == self._expected_attribute:
+        #     logging.info(f"[AttributeCallback] Attribute update callback for {path.AttributeType}")
+        #     q = (path, transaction)
+        #     self._q.put(q)
+        #
+        # if valid_report:
+        #     data = transaction.GetAttribute(path)
+        #     value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
+        #                            value=data, timestamp_utc=datetime.now(timezone.utc))
+        #     logging.info(f"Got subscription report for {path.AttributeType}: {data}")
+        #     self._q.put(value)
+        #     with self._lock:
+        #         self._attribute_report_counts[path.AttributeType] += 1
+        #         self._attribute_reports[path.AttributeType].append(value)
+
+        # if (path.ClusterType == self._expected_cluster or path.AttributeType == self._expected_attribute):
+        #     return
+
         valid_report = False
         if path.ClusterType == self._expected_cluster:
             if self._expected_attribute is not None:
@@ -215,35 +240,31 @@ class AttributeCallback:
             else:
                 valid_report = True
         elif path.AttributeType == self._expected_attribute:
-            logging.info(f"[AttributeCallback] Attribute update callback for {path.AttributeType}")
-            q = (path, transaction)
-            self._q.put(q)
+            valid_report = True
 
         if valid_report:
             data = transaction.GetAttribute(path)
             value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
                                    value=data, timestamp_utc=datetime.now(timezone.utc))
-            logging.info(f"Got subscription report for {path.AttributeType}: {data}")
-            self._q.put(value)
-            with self._lock:
-                self._attribute_report_counts[path.AttributeType] += 1
-                self._attribute_reports[path.AttributeType].append(value)
+            logging.info(f"[AttributeCallback] Received attribute report: {path.AttributeType} = {data}")
+            self._q._put(value)
+            if self._lock:
+                with self._lock:
+                    self._attribute_report_counts[path.AttributeType] += 1
+                    self._attribute_reports[path.AttributeType].append(value)
 
     def wait_for_attribute_report(self):
         try:
-            path, transaction = self._q.get(block=True, timeout=10)
+            item = self._q.get(block=True, timeout=10)
+            attribute_value = item.value
+            logging.info(
+                f"[AttributeCallback] Got attribute subscription report. Attribute {item.attribute}. Updated value: {attribute_value}. SubscriptionId: {item.value}")
         except queue.Empty:
             asserts.fail(
                 f"[AttributeCallback] Failed to receive a report for the {self._expected_attribute} attribute change")
 
-        asserts.assert_equal(path.AttributeType, self._expected_attribute,
-                             f"[AttributeCallback] Received incorrect report. Expected: {self._expected_attribute}, received: {path.AttributeType}")
-        try:
-            attribute_value = transaction.GetAttribute(path)
-            logging.info(
-                f"[AttributeCallback] Got attribute subscription report. Attribute {path.AttributeType}. Updated value: {attribute_value}. SubscriptionId: {transaction.subscriptionId}")
-        except KeyError:
-            asserts.fail(f"[AttributeCallback] Attribute {self._expected_attribute} not found in returned report")
+        asserts.assert_equal(item.attribute, self._expected_attribute,
+                             f"[AttributeCallback] Received incorrect report. Expected: {self._expected_attribute}, received: {item.attribute}")
 
     def await_all_final_values_reported(self, expected_final_values: Iterable[AttributeValue], timeout_sec: float = 1.0):
         """Expect that every `expected_final_value` report is the last value reported for the given attribute, ignoring timestamps.
