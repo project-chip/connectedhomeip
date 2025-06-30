@@ -32,6 +32,11 @@ class BleLayerTestAccess {
         BleLayerTestAccess(Ble::BleLayer* layer) : mLayer(layer) {}
 
         void SetConnectionDelegate(Ble::BleConnectionDelegate* delegate) { mLayer->mConnectionDelegate = delegate; }
+
+        // Wrapper for OnConnectionComplete private method
+        void CallOnConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj) {
+            mLayer->OnConnectionComplete(appState, connObj);
+        }
     private:
         Ble::BleLayer* mLayer = nullptr;
 };
