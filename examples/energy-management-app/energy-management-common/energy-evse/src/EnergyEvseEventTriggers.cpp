@@ -27,7 +27,8 @@ using namespace chip::app::Clusters::EnergyEvse;
 
 struct EVSETestEventSaveData
 {
-    int64_t mOldMaxHardwareCurrentLimit;
+    int64_t mOldMaxHardwareChargeCurrentLimit;
+    int64_t mOldMaxHardwareDischargeCurrentLimit;
     int64_t mOldCircuitCapacity;
     int64_t mOldUserMaximumChargeCurrent;
     int64_t mOldCableAssemblyLimit;
@@ -52,12 +53,14 @@ void SetTestEventTrigger_BasicFunctionality()
 {
     EnergyEvseDelegate * dg = GetEvseDelegate();
 
-    sEVSETestEventSaveData.mOldMaxHardwareCurrentLimit  = dg->HwGetMaxHardwareCurrentLimit();
+    sEVSETestEventSaveData.mOldMaxHardwareChargeCurrentLimit  = dg->HwGetMaxHardwareChargeCurrentLimit();
+    sEVSETestEventSaveData.mOldMaxHardwareDischargeCurrentLimit  = dg->HwGetMaxHardwareDischargeCurrentLimit();
     sEVSETestEventSaveData.mOldCircuitCapacity          = dg->GetCircuitCapacity();
     sEVSETestEventSaveData.mOldUserMaximumChargeCurrent = dg->GetUserMaximumChargeCurrent();
     sEVSETestEventSaveData.mOldHwStateBasic             = dg->HwGetState();
 
-    dg->HwSetMaxHardwareCurrentLimit(32000);
+    dg->HwSetMaxHardwareChargeCurrentLimit(32000);
+    dg->HwSetMaxHardwareDischargeCurrentLimit(32000);
     dg->HwSetCircuitCapacity(32000);
     dg->SetUserMaximumChargeCurrent(32000);
     dg->HwSetState(StateEnum::kNotPluggedIn);
@@ -66,7 +69,8 @@ void SetTestEventTrigger_BasicFunctionalityClear()
 {
     EnergyEvseDelegate * dg = GetEvseDelegate();
 
-    dg->HwSetMaxHardwareCurrentLimit(sEVSETestEventSaveData.mOldMaxHardwareCurrentLimit);
+    dg->HwSetMaxHardwareChargeCurrentLimit(sEVSETestEventSaveData.mOldMaxHardwareChargeCurrentLimit);
+    dg->HwSetMaxHardwareDischargeCurrentLimit(sEVSETestEventSaveData.mOldMaxHardwareDischargeCurrentLimit);
     dg->HwSetCircuitCapacity(sEVSETestEventSaveData.mOldCircuitCapacity);
     dg->SetUserMaximumChargeCurrent(sEVSETestEventSaveData.mOldUserMaximumChargeCurrent);
     dg->HwSetState(sEVSETestEventSaveData.mOldHwStateBasic);
