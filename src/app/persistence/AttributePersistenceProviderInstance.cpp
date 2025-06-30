@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/util/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 
 namespace chip {
 namespace app {
