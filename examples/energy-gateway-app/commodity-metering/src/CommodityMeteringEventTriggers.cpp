@@ -61,20 +61,16 @@ private:
     DataModel::Nullable<uint32_t> mMeteredQuantityTimestamp;
     Globals::TariffUnitEnum mTariffUnit;
 
-    DataModel::List<Structs::MeteredQuantityStruct::Type> GetMeteredQuantityDataSample(uint8_t presetIdx)
+    std::array<const Structs::MeteredQuantityStruct::Type, 2> GetMeteredQuantityDataSample(uint8_t presetIdx)
     {
         switch (presetIdx)
         {
         case 0:
-            return DataModel::List<Structs::MeteredQuantityStruct::Type>(
-                const_cast<Structs::MeteredQuantityStruct::Type *>(MeteredQuantitySamples::Sample1::Data),
-                sizeof(MeteredQuantitySamples::Sample1::Data) / sizeof(MeteredQuantitySamples::Sample1::Data[0]));
+            return { MeteredQuantitySamples::Sample1::Data[0], MeteredQuantitySamples::Sample1::Data[1] };
         case 1:
-            return DataModel::List<Structs::MeteredQuantityStruct::Type>(
-                const_cast<Structs::MeteredQuantityStruct::Type *>(MeteredQuantitySamples::Sample2::Data),
-                sizeof(MeteredQuantitySamples::Sample2::Data) / sizeof(MeteredQuantitySamples::Sample2::Data[0]));
+            return { MeteredQuantitySamples::Sample2::Data[0], MeteredQuantitySamples::Sample2::Data[1] };
         default:
-            return DataModel::List<Structs::MeteredQuantityStruct::Type>();
+            return {}; // Return empty array
         }
     }
 
@@ -104,7 +100,8 @@ private:
                 {
                     const auto & src = sourceList[i];
 
-                    // Allocate memory for tariffComponentIDs
+                    auto * components =
+                        static_cast<uint32_t *>(Platform::MemoryCalloc(src.tariffComponentIDs.size(), sizeof(uint32_t)));
                     if (components == nullptr)
                     {
                         // Clean up previously allocated memory
@@ -195,11 +192,19 @@ private:
             mTariffUnit = Globals::TariffUnitEnum::kKWh;
         }
 
-        auto MQListSample = GetMeteredQuantityDataSample(static_cast<uint8_t>(mTariffUnit == Globals::TariffUnitEnum::kKWh));
+        auto MQSampleArray = GetMeteredQuantityDataSample(static_cast<uint8_t>(mTariffUnit == Globals::TariffUnitEnum::kKWh));
 
-        mInstance->SetMeteredQuantity(MakeNullable(MQListSample));
+        std::vector<Structs::MeteredQuantityStruct::Type> tempCopy(MQSampleArray.begin(), MQSampleArray.end());
+
+        DataModel::List<Structs::MeteredQuantityStruct::Type> tmpList(tempCopy.data(), tempCopy.size());
+        DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> nullableList;
+
+        nullableList.SetNonNull(std::move(tmpList));
+        mInstance->SetMeteredQuantity(nullableList);
         mInstance->SetMeteredQuantityTimestamp(mMeteredQuantityTimestamp);
         mInstance->SetTariffUnit(mTariffUnit);
+
+        tempCopy.clear();
     }
 
 public:
