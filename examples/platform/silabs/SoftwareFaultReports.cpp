@@ -192,6 +192,7 @@ extern "C" __attribute__((naked)) void DebugMon_Handler(void)
 {
     __asm volatile("b LogFault_Handler");
 }
+#endif // !SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
 
 extern "C" void vApplicationMallocFailedHook(void)
 {
@@ -203,7 +204,7 @@ extern "C" void vApplicationMallocFailedHook(void)
     const char * faultMessage = "Failed to allocate memory on HEAP.";
 #if SILABS_LOG_ENABLED
     ChipLogError(NotSpecified, "%s", faultMessage);
-#endif
+#endif // SILABS_LOG_ENABLED
     Silabs::OnSoftwareFaultEventHandler(faultMessage);
 
     /* Force an assert. */
