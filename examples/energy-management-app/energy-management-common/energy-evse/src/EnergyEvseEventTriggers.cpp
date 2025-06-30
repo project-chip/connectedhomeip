@@ -53,11 +53,11 @@ void SetTestEventTrigger_BasicFunctionality()
 {
     EnergyEvseDelegate * dg = GetEvseDelegate();
 
-    sEVSETestEventSaveData.mOldMaxHardwareChargeCurrentLimit  = dg->HwGetMaxHardwareChargeCurrentLimit();
-    sEVSETestEventSaveData.mOldMaxHardwareDischargeCurrentLimit  = dg->HwGetMaxHardwareDischargeCurrentLimit();
-    sEVSETestEventSaveData.mOldCircuitCapacity          = dg->GetCircuitCapacity();
-    sEVSETestEventSaveData.mOldUserMaximumChargeCurrent = dg->GetUserMaximumChargeCurrent();
-    sEVSETestEventSaveData.mOldHwStateBasic             = dg->HwGetState();
+    sEVSETestEventSaveData.mOldMaxHardwareChargeCurrentLimit    = dg->HwGetMaxHardwareChargeCurrentLimit();
+    sEVSETestEventSaveData.mOldMaxHardwareDischargeCurrentLimit = dg->HwGetMaxHardwareDischargeCurrentLimit();
+    sEVSETestEventSaveData.mOldCircuitCapacity                  = dg->GetCircuitCapacity();
+    sEVSETestEventSaveData.mOldUserMaximumChargeCurrent         = dg->GetUserMaximumChargeCurrent();
+    sEVSETestEventSaveData.mOldHwStateBasic                     = dg->HwGetState();
 
     dg->HwSetMaxHardwareChargeCurrentLimit(32000);
     dg->HwSetMaxHardwareDischargeCurrentLimit(32000);

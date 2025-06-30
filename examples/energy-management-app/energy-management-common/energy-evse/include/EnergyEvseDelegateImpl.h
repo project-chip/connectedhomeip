@@ -311,14 +311,14 @@ private:
     static constexpr int kPeriodicCheckIntervalRealTimeClockNotSynced_sec = 30;
 
     /* private variables for controlling the hardware - these are not attributes */
-    int64_t mMaxHardwareChargeCurrentLimit          = 0; /* Hardware current limit in mA for charging */
-    int64_t mMaxHardwareDischargeCurrentLimit       = 0; /* Hardware current limit in mA for discharging */
-    int64_t mCableAssemblyCurrentLimit              = 0; /* Cable limit detected when cable is plugged in, in mA */
-    int64_t mMaximumChargingCurrentLimitFromCommand = 0; /* Value of current maximum limit when charging enabled */
-    int64_t mActualChargingCurrentLimit             = 0;
+    int64_t mMaxHardwareChargeCurrentLimit             = 0; /* Hardware current limit in mA for charging */
+    int64_t mMaxHardwareDischargeCurrentLimit          = 0; /* Hardware current limit in mA for discharging */
+    int64_t mCableAssemblyCurrentLimit                 = 0; /* Cable limit detected when cable is plugged in, in mA */
+    int64_t mMaximumChargingCurrentLimitFromCommand    = 0; /* Value of current maximum limit when charging enabled */
+    int64_t mActualChargingCurrentLimit                = 0;
     int64_t mMaximumDischargingCurrentLimitFromCommand = 0; /* Value of current maximum limit when discharging enabled */
     int64_t mActualDischargingCurrentLimit             = 0;
-    int64_t mNominalMainsVoltage                    = 230000; /* Assume a sensible default mains voltage */
+    int64_t mNominalMainsVoltage                       = 230000; /* Assume a sensible default mains voltage */
 
     StateEnum mHwState = StateEnum::kNotPluggedIn; /* Hardware state */
 
@@ -391,8 +391,8 @@ private:
     EvseSession mSession = EvseSession();
 
     /* Helper variables to hold meter val since last EnergyTransferStarted event */
-    int64_t mImportedMeterValueAtEnergyTransferStart;   // Charging
-    int64_t mExportedMeterValueAtEnergyTransferStart;   // Discharging
+    int64_t mImportedMeterValueAtEnergyTransferStart; // Charging
+    int64_t mExportedMeterValueAtEnergyTransferStart; // Discharging
 
     /* Targets Delegate */
     EvseTargetsDelegate * mEvseTargetsDelegate = nullptr;
