@@ -114,6 +114,18 @@ CHIP_ERROR NxpEthDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
     return CHIP_NO_ERROR;
 }
 
+NetworkIterator * NxpEthDriver::GetNetworks()
+{
+    EthernetNetworkIterator *iterator = new EthernetNetworkIterator();
+
+    uint8_t interface_index = netif_get_index(&netif_app);
+    /* +1 for end char, example of interface name: eth_1*/
+    iterator->interfaceNameLen = std::min(strlen("eth_") + sizeof(interface_index) + 1, sizeof(iterator->interfaceName));
+    snprintf((char*)iterator->interfaceName, iterator->interfaceNameLen, "eth_%d", interface_index);
+
+    return iterator;
+}
+
 } // namespace NetworkCommissioning
 } // namespace DeviceLayer
 } // namespace chip
