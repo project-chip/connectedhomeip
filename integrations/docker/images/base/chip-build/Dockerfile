@@ -40,6 +40,7 @@ RUN set -x \
     clang-tidy \
     cmake \
     curl \
+    dbus-daemon \
     flex \
     g++ \
     generate-ninja \
@@ -64,6 +65,7 @@ RUN set -x \
     libglib2.0-dev \
     libgstreamer1.0-0 \
     libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
     libical-dev \
     libjpeg-dev \
     libmbedtls-dev \

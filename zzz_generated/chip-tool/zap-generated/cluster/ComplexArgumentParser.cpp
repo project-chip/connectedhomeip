@@ -449,6 +449,47 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Globals::Structs::Test
     ComplexArgumentParser::Finalize(request.myEnum);
 }
 
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::Globals::Structs::ViewportStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ViewportStruct.x1", "x1", value.isMember("x1")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ViewportStruct.y1", "y1", value.isMember("y1")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ViewportStruct.x2", "x2", value.isMember("x2")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ViewportStruct.y2", "y2", value.isMember("y2")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "x1");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.x1, value["x1"]));
+    valueCopy.removeMember("x1");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "y1");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.y1, value["y1"]));
+    valueCopy.removeMember("y1");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "x2");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.x2, value["x2"]));
+    valueCopy.removeMember("x2");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "y2");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.y2, value["y2"]));
+    valueCopy.removeMember("y2");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Globals::Structs::ViewportStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.x1);
+    ComplexArgumentParser::Finalize(request.y1);
+    ComplexArgumentParser::Finalize(request.x2);
+    ComplexArgumentParser::Finalize(request.y2);
+}
+
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type & request,
                                         Json::Value & value)
@@ -722,47 +763,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::Measu
     ComplexArgumentParser::Finalize(request.minMeasuredValue);
     ComplexArgumentParser::Finalize(request.maxMeasuredValue);
     ComplexArgumentParser::Finalize(request.accuracyRanges);
-}
-
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::detail::Structs::ViewportStruct::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ViewportStruct.x1", "x1", value.isMember("x1")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ViewportStruct.y1", "y1", value.isMember("y1")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ViewportStruct.x2", "x2", value.isMember("x2")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ViewportStruct.y2", "y2", value.isMember("y2")));
-
-    char labelWithMember[kMaxLabelLength];
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "x1");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.x1, value["x1"]));
-    valueCopy.removeMember("x1");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "y1");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.y1, value["y1"]));
-    valueCopy.removeMember("y1");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "x2");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.x2, value["x2"]));
-    valueCopy.removeMember("x2");
-
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "y2");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.y2, value["y2"]));
-    valueCopy.removeMember("y2");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::detail::Structs::ViewportStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.x1);
-    ComplexArgumentParser::Finalize(request.y1);
-    ComplexArgumentParser::Finalize(request.x2);
-    ComplexArgumentParser::Finalize(request.y2);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label, chip::app::Clusters::detail::Structs::ApplicationStruct::Type & request,
@@ -4317,7 +4317,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::DoorLock::Structs::Cre
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::ClosureControl::Structs::OverallStateStruct::Type & request,
+                                        chip::app::Clusters::ClosureControl::Structs::OverallCurrentStateStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -4326,12 +4326,12 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     Json::Value valueCopy(value);
 
     char labelWithMember[kMaxLabelLength];
-    if (value.isMember("positioning"))
+    if (value.isMember("position"))
     {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "positioning");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.positioning, value["positioning"]));
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "position");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.position, value["position"]));
     }
-    valueCopy.removeMember("positioning");
+    valueCopy.removeMember("position");
 
     if (value.isMember("latch"))
     {
@@ -4357,16 +4357,16 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::ClosureControl::Structs::OverallStateStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ClosureControl::Structs::OverallCurrentStateStruct::Type & request)
 {
-    ComplexArgumentParser::Finalize(request.positioning);
+    ComplexArgumentParser::Finalize(request.position);
     ComplexArgumentParser::Finalize(request.latch);
     ComplexArgumentParser::Finalize(request.speed);
     ComplexArgumentParser::Finalize(request.secureState);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::ClosureControl::Structs::OverallTargetStruct::Type & request,
+                                        chip::app::Clusters::ClosureControl::Structs::OverallTargetStateStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -4399,7 +4399,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::ClosureControl::Structs::OverallTargetStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ClosureControl::Structs::OverallTargetStateStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.position);
     ComplexArgumentParser::Finalize(request.latch);
@@ -4407,7 +4407,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ClosureControl::Struct
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::Type & request,
+                                        chip::app::Clusters::ClosureDimension::Structs::DimensionStateStruct::Type & request,
                                         Json::Value & value)
 {
     VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -4440,7 +4440,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
-void ComplexArgumentParser::Finalize(chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::Type & request)
+void ComplexArgumentParser::Finalize(chip::app::Clusters::ClosureDimension::Structs::DimensionStateStruct::Type & request)
 {
     ComplexArgumentParser::Finalize(request.position);
     ComplexArgumentParser::Finalize(request.latch);
@@ -4475,47 +4475,6 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ClosureDimension::Stru
 {
     ComplexArgumentParser::Finalize(request.min);
     ComplexArgumentParser::Finalize(request.max);
-}
-
-CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
-                                        chip::app::Clusters::ClosureDimension::Structs::TargetStruct::Type & request,
-                                        Json::Value & value)
-{
-    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
-
-    // Copy to track which members we already processed.
-    Json::Value valueCopy(value);
-
-    char labelWithMember[kMaxLabelLength];
-    if (value.isMember("position"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "position");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.position, value["position"]));
-    }
-    valueCopy.removeMember("position");
-
-    if (value.isMember("latch"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "latch");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.latch, value["latch"]));
-    }
-    valueCopy.removeMember("latch");
-
-    if (value.isMember("speed"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "speed");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.speed, value["speed"]));
-    }
-    valueCopy.removeMember("speed");
-
-    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
-}
-
-void ComplexArgumentParser::Finalize(chip::app::Clusters::ClosureDimension::Structs::TargetStruct::Type & request)
-{
-    ComplexArgumentParser::Finalize(request.position);
-    ComplexArgumentParser::Finalize(request.latch);
-    ComplexArgumentParser::Finalize(request.speed);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
@@ -6282,6 +6241,13 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.zoneSource, value["zoneSource"]));
     valueCopy.removeMember("zoneSource");
 
+    if (value.isMember("twoDCartesianZone"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "twoDCartesianZone");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.twoDCartesianZone, value["twoDCartesianZone"]));
+    }
+    valueCopy.removeMember("twoDCartesianZone");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -6290,6 +6256,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::ZoneManagement::Struct
     ComplexArgumentParser::Finalize(request.zoneID);
     ComplexArgumentParser::Finalize(request.zoneType);
     ComplexArgumentParser::Finalize(request.zoneSource);
+    ComplexArgumentParser::Finalize(request.twoDCartesianZone);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
@@ -6301,6 +6268,8 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ZoneTriggerControlStruct.zoneID", "zoneID", value.isMember("zoneID")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ZoneTriggerControlStruct.initialDuration", "initialDuration",
                                                                   value.isMember("initialDuration")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ZoneTriggerControlStruct.augmentationDuration",
@@ -6311,6 +6280,10 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                                                   value.isMember("blindDuration")));
 
     char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "zoneID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.zoneID, value["zoneID"]));
+    valueCopy.removeMember("zoneID");
+
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "initialDuration");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.initialDuration, value["initialDuration"]));
     valueCopy.removeMember("initialDuration");
@@ -6340,6 +6313,7 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
 
 void ComplexArgumentParser::Finalize(chip::app::Clusters::ZoneManagement::Structs::ZoneTriggerControlStruct::Type & request)
 {
+    ComplexArgumentParser::Finalize(request.zoneID);
     ComplexArgumentParser::Finalize(request.initialDuration);
     ComplexArgumentParser::Finalize(request.augmentationDuration);
     ComplexArgumentParser::Finalize(request.maxDuration);
@@ -6406,10 +6380,10 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
         ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.minBitRate", "minBitRate", value.isMember("minBitRate")));
     ReturnErrorOnFailure(
         ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.maxBitRate", "maxBitRate", value.isMember("maxBitRate")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.minFragmentLen", "minFragmentLen",
-                                                                  value.isMember("minFragmentLen")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.maxFragmentLen", "maxFragmentLen",
-                                                                  value.isMember("maxFragmentLen")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.minKeyFrameInterval", "minKeyFrameInterval",
+                                                                  value.isMember("minKeyFrameInterval")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.maxKeyFrameInterval", "maxKeyFrameInterval",
+                                                                  value.isMember("maxKeyFrameInterval")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("VideoStreamStruct.referenceCount", "referenceCount",
                                                                   value.isMember("referenceCount")));
 
@@ -6450,13 +6424,13 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.maxBitRate, value["maxBitRate"]));
     valueCopy.removeMember("maxBitRate");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "minFragmentLen");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.minFragmentLen, value["minFragmentLen"]));
-    valueCopy.removeMember("minFragmentLen");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "minKeyFrameInterval");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.minKeyFrameInterval, value["minKeyFrameInterval"]));
+    valueCopy.removeMember("minKeyFrameInterval");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxFragmentLen");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.maxFragmentLen, value["maxFragmentLen"]));
-    valueCopy.removeMember("maxFragmentLen");
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "maxKeyFrameInterval");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.maxKeyFrameInterval, value["maxKeyFrameInterval"]));
+    valueCopy.removeMember("maxKeyFrameInterval");
 
     if (value.isMember("watermarkEnabled"))
     {
@@ -6490,8 +6464,8 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::CameraAvStreamManageme
     ComplexArgumentParser::Finalize(request.maxResolution);
     ComplexArgumentParser::Finalize(request.minBitRate);
     ComplexArgumentParser::Finalize(request.maxBitRate);
-    ComplexArgumentParser::Finalize(request.minFragmentLen);
-    ComplexArgumentParser::Finalize(request.maxFragmentLen);
+    ComplexArgumentParser::Finalize(request.minKeyFrameInterval);
+    ComplexArgumentParser::Finalize(request.maxKeyFrameInterval);
     ComplexArgumentParser::Finalize(request.watermarkEnabled);
     ComplexArgumentParser::Finalize(request.OSDEnabled);
     ComplexArgumentParser::Finalize(request.referenceCount);
@@ -8794,6 +8768,13 @@ CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.status, value["status"]));
     valueCopy.removeMember("status");
 
+    if (value.isMember("fabricIndex"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fabricIndex");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fabricIndex, value["fabricIndex"]));
+    }
+    valueCopy.removeMember("fabricIndex");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -8805,6 +8786,7 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::TlsClientManagement::S
     ComplexArgumentParser::Finalize(request.caid);
     ComplexArgumentParser::Finalize(request.ccdid);
     ComplexArgumentParser::Finalize(request.status);
+    ComplexArgumentParser::Finalize(request.fabricIndex);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,

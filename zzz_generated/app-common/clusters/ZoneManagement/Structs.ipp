@@ -114,6 +114,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kZoneID), zoneID);
     encoder.Encode(to_underlying(Fields::kZoneType), zoneType);
     encoder.Encode(to_underlying(Fields::kZoneSource), zoneSource);
+    encoder.Encode(to_underlying(Fields::kTwoDCartesianZone), twoDCartesianZone);
     return encoder.Finalize();
 }
 
@@ -139,6 +140,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         {
             err = DataModel::Decode(reader, zoneSource);
         }
+        else if (__context_tag == to_underlying(Fields::kTwoDCartesianZone))
+        {
+            err = DataModel::Decode(reader, twoDCartesianZone);
+        }
 
         ReturnErrorOnFailure(err);
     }
@@ -150,6 +155,7 @@ namespace ZoneTriggerControlStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kZoneID), zoneID);
     encoder.Encode(to_underlying(Fields::kInitialDuration), initialDuration);
     encoder.Encode(to_underlying(Fields::kAugmentationDuration), augmentationDuration);
     encoder.Encode(to_underlying(Fields::kMaxDuration), maxDuration);
@@ -168,7 +174,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
         ReturnErrorOnFailure(err);
 
-        if (__context_tag == to_underlying(Fields::kInitialDuration))
+        if (__context_tag == to_underlying(Fields::kZoneID))
+        {
+            err = DataModel::Decode(reader, zoneID);
+        }
+        else if (__context_tag == to_underlying(Fields::kInitialDuration))
         {
             err = DataModel::Decode(reader, initialDuration);
         }

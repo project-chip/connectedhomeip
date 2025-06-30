@@ -37,7 +37,9 @@ qpg_executable("persistent_storage_app") {
   include_dirs = [ "${qpg_project_dir}/.." ]
   output_name = "chip-${qpg_target_ic}-persistent_storage-example.out"
 
-  deps = []
+  deps = [
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
+  ]
   defines = []
 
   public_deps = [
@@ -59,7 +61,7 @@ qpg_executable("persistent_storage_app") {
 
   output_dir = root_out_dir
 
-  ldscript = "${qpg_sdk_root}/Libraries/Qorvo/QorvoStack/gen/QorvoStack_${qpg_target_ic}${qpg_flavour}/QorvoStack_${qpg_target_ic}${qpg_flavour}.ld"
+  ldscript = "${qpg_sdk_root}/Applications/Matter/base/gen/base_${qpg_target_ic}_development/base_${qpg_target_ic}_development.ld"
 
   inputs = [ ldscript ]
 

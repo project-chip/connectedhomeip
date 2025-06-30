@@ -1777,6 +1777,18 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x0000000A: {
+                "attributeName": "RecoveryIdentifier",
+                "attributeId": 0x0000000A,
+                "type": "bytes",
+                "reportable": True,
+            },
+            0x0000000B: {
+                "attributeName": "NetworkRecoveryReason",
+                "attributeId": 0x0000000B,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -7805,15 +7817,21 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000003: {
-                "attributeName": "OverallState",
+                "attributeName": "OverallCurrentState",
                 "attributeId": 0x00000003,
                 "type": "",
                 "reportable": True,
             },
             0x00000004: {
-                "attributeName": "OverallTarget",
+                "attributeName": "OverallTargetState",
                 "attributeId": 0x00000004,
                 "type": "",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "LatchControlModes",
+                "attributeId": 0x00000005,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -7879,7 +7897,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "Target",
+                "attributeName": "TargetState",
                 "attributeId": 0x00000001,
                 "type": "",
                 "reportable": True,
@@ -7935,6 +7953,12 @@ class ChipClusters:
             0x0000000A: {
                 "attributeName": "ModulationType",
                 "attributeId": 0x0000000A,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000000B: {
+                "attributeName": "LatchControlModes",
+                "attributeId": 0x0000000B,
                 "type": "int",
                 "reportable": True,
             },
@@ -12562,14 +12586,21 @@ class ChipClusters:
             },
             0x00000003: {
                 "commandId": 0x00000003,
-                "commandName": "GetTwoDCartesianZone",
+                "commandName": "RemoveZone",
                 "args": {
                     "zoneID": "int",
                 },
             },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "CreateOrUpdateTrigger",
+                "args": {
+                    "trigger": "ZoneTriggerControlStruct",
+                },
+            },
             0x00000005: {
                 "commandId": 0x00000005,
-                "commandName": "RemoveZone",
+                "commandName": "RemoveTrigger",
                 "args": {
                     "zoneID": "int",
                 },
@@ -12577,30 +12608,47 @@ class ChipClusters:
         },
         "attributes": {
             0x00000000: {
-                "attributeName": "SupportedZoneSources",
+                "attributeName": "MaxUserDefinedZones",
                 "attributeId": 0x00000000,
                 "type": "int",
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "Zones",
+                "attributeName": "MaxZones",
                 "attributeId": 0x00000001,
-                "type": "",
+                "type": "int",
                 "reportable": True,
             },
             0x00000002: {
-                "attributeName": "Triggers",
+                "attributeName": "Zones",
                 "attributeId": 0x00000002,
                 "type": "",
                 "reportable": True,
-                "writable": True,
             },
             0x00000003: {
-                "attributeName": "Sensitivity",
+                "attributeName": "Triggers",
                 "attributeId": 0x00000003,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000004: {
+                "attributeName": "SensitivityMax",
+                "attributeId": 0x00000004,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "Sensitivity",
+                "attributeId": 0x00000005,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
+            },
+            0x00000006: {
+                "attributeName": "TwoDCartesianMax",
+                "attributeId": 0x00000006,
+                "type": "",
+                "reportable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
@@ -12669,8 +12717,8 @@ class ChipClusters:
                     "maxResolution": "VideoResolutionStruct",
                     "minBitRate": "int",
                     "maxBitRate": "int",
-                    "minFragmentLen": "int",
-                    "maxFragmentLen": "int",
+                    "minKeyFrameInterval": "int",
+                    "maxKeyFrameInterval": "int",
                     "watermarkEnabled": "bool",
                     "OSDEnabled": "bool",
                 },
@@ -12847,7 +12895,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000012: {
-                "attributeName": "RankedVideoStreamPrioritiesList",
+                "attributeName": "StreamUsagePriorities",
                 "attributeId": 0x00000012,
                 "type": "int",
                 "reportable": True,

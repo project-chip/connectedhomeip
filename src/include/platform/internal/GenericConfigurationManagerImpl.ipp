@@ -532,9 +532,11 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetUniqueId(char * buf,
     err                = ReadConfigValueStr(ConfigClass::kConfigKey_UniqueId, buf, bufSize, uniqueIdLen);
 
     ReturnErrorOnFailure(err);
-
     VerifyOrReturnError(uniqueIdLen < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrReturnError(buf[uniqueIdLen] == 0, CHIP_ERROR_INVALID_STRING_LENGTH);
+
+    // ensure null termination if the string read is not null terminting (e.g. posix config on darwin
+    // returns data without null terminators as it reads data as binary.)
+    buf[uniqueIdLen] = 0;
 
     return err;
 }

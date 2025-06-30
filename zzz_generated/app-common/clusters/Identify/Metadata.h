@@ -16,7 +16,7 @@ namespace app {
 namespace Clusters {
 namespace Identify {
 
-inline constexpr uint32_t kRevision = 4;
+inline constexpr uint32_t kRevision = 5;
 
 namespace Attributes {
 namespace IdentifyTime {

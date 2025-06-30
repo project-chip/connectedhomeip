@@ -192,7 +192,6 @@ private:
         System::PacketBufferTLVReader reader;
         reader.Init(std::move(payload));
         ReturnErrorOnFailure(response.Init(reader));
-        StatusIB status;
         ReturnErrorOnFailure(response.GetStatus(mLastStatus));
         return CHIP_NO_ERROR;
     }
