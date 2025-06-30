@@ -525,7 +525,7 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
 
     if (pkt->pts < 0)
     {
-        ChipLogError(Camera, "Warning Negative PTS detected: %" PRId64 "\n", pkt->pts);
+        ChipLogError(Camera, "Warning Negative PTS detected: %ld", pkt->pts);
         pkt->pts = (pkt->dts != AV_NOPTS_VALUE) ? pkt->dts : 0;
     }
     if (av_interleaved_write_frame(mFormatContext, pkt) < 0)
