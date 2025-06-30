@@ -184,14 +184,13 @@ class TC_G_2_3(MatterBaseTest):
         self.step("3")
         kGroupId3 = 3
         kGroupNameGp3 = "Gp3"
-        groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
-            dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
         result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(kGroupId3, kGroupNameGp3))
         asserts.assert_equal(result.status, Status.Success, "Adding Group 0x0003 failed")
 
         self.step("4a")
         groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
             dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
+        asserts.assert_greater_equal(len(groupTableList), 2, "Expected at least two entries in GroupTable")
         found = any(entry.groupId == kGroupId3 for entry in groupTableList)
         asserts.assert_true(found, f"groupId {kGroupId3} not found in GroupTable")
 
