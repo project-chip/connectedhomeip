@@ -42,5 +42,7 @@ codegen_data_model_PUBLIC_DEPS = [
   "${chip_root}/src/app/server-cluster",
   "${chip_root}/src/data-model-providers/codegen:instance-header",
   "${chip_root}/src/data-model-providers/codegen:registry",
-  "${chip_root}/src/app/util/persistence",
+  "${chip_root}/src/app/persistence",
+  "${chip_root}/src/app/persistence:default",
+  "${chip_root}/src/app/persistence:singleton",
 ]

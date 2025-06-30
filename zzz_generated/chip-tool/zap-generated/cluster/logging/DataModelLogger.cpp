@@ -3859,15 +3859,16 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ClosureControl::Structs::OverallStateStruct::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::ClosureControl::Structs::OverallCurrentStateStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
-        CHIP_ERROR err = LogValue("Positioning", indent + 1, value.positioning);
+        CHIP_ERROR err = LogValue("Position", indent + 1, value.position);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Positioning'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Position'");
             return err;
         }
     }
@@ -3900,8 +3901,9 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ClosureControl::Structs::OverallTargetStruct::DecodableType & value)
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::ClosureControl::Structs::OverallTargetStateStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3935,7 +3937,7 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
 
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::DecodableType & value)
+                          const chip::app::Clusters::ClosureDimension::Structs::DimensionStateStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3985,39 +3987,6 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Max'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ClosureDimension::Structs::TargetStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("Position", indent + 1, value.position);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Position'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Latch", indent + 1, value.latch);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Latch'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Speed", indent + 1, value.speed);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Speed'");
             return err;
         }
     }
@@ -5564,6 +5533,14 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ZoneSource'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TwoDCartesianZone", indent + 1, value.twoDCartesianZone);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TwoDCartesianZone'");
             return err;
         }
     }
@@ -11605,14 +11582,6 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const ZoneManagement::Commands::GetTwoDCartesianZoneResponse::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    ReturnErrorOnFailure(DataModelLogger::LogValue("zones", indent + 1, value.zones));
-    DataModelLogger::LogString(indent, "}");
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const CameraAvStreamManagement::Commands::AudioStreamAllocateResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -17297,15 +17266,22 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentErrorList", 1, value);
         }
-        case ClosureControl::Attributes::OverallState::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallStateStruct::DecodableType> value;
+        case ClosureControl::Attributes::OverallCurrentState::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallCurrentStateStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("OverallState", 1, value);
+            return DataModelLogger::LogValue("OverallCurrentState", 1, value);
         }
-        case ClosureControl::Attributes::OverallTarget::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallTargetStruct::DecodableType> value;
+        case ClosureControl::Attributes::OverallTargetState::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallTargetStateStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("OverallTarget", 1, value);
+            return DataModelLogger::LogValue("OverallTargetState", 1, value);
+        }
+        case ClosureControl::Attributes::LatchControlModes::Id: {
+            chip::BitMask<chip::app::Clusters::ClosureControl::LatchControlModesBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LatchControlModes", 1, value);
         }
         case ClosureControl::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -17339,14 +17315,16 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case ClosureDimension::Attributes::CurrentState::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::DecodableType> value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::DimensionStateStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentState", 1, value);
         }
-        case ClosureDimension::Attributes::Target::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::TargetStruct::DecodableType> value;
+        case ClosureDimension::Attributes::TargetState::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::DimensionStateStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Target", 1, value);
+            return DataModelLogger::LogValue("TargetState", 1, value);
         }
         case ClosureDimension::Attributes::Resolution::Id: {
             chip::Percent100ths value;
@@ -17392,6 +17370,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             chip::app::Clusters::ClosureDimension::ModulationTypeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ModulationType", 1, value);
+        }
+        case ClosureDimension::Attributes::LatchControlModes::Id: {
+            chip::BitMask<chip::app::Clusters::ClosureDimension::LatchControlModesBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LatchControlModes", 1, value);
         }
         case ClosureDimension::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -21695,10 +21678,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeteredQuantityTimestamp", 1, value);
         }
-        case CommodityMetering::Attributes::MeasurementType::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> value;
+        case CommodityMetering::Attributes::TariffUnit::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TariffUnitEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementType", 1, value);
+            return DataModelLogger::LogValue("TariffUnit", 1, value);
         }
         case CommodityMetering::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -22906,11 +22889,6 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             ZoneManagement::Commands::CreateTwoDCartesianZoneResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CreateTwoDCartesianZoneResponse", 1, value);
-        }
-        case ZoneManagement::Commands::GetTwoDCartesianZoneResponse::Id: {
-            ZoneManagement::Commands::GetTwoDCartesianZoneResponse::DecodableType value;
-            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("GetTwoDCartesianZoneResponse", 1, value);
         }
         }
         break;
