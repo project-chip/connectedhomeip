@@ -242,7 +242,6 @@ CHIP_ERROR DefaultRandomizationTypeDataClass::Validate(const ValueType & aValue)
 
 CHIP_ERROR TariffInfoDataClass::Validate(const ValueType & aValue) const
 {
-
     if (!aValue.IsNull())
     {
         const PayloadType & newValue = aValue.Value();
@@ -346,27 +345,37 @@ static CHIP_ERROR ValidateListEntry(const DayEntryStruct::Type & entryNewValue, 
 CHIP_ERROR DayEntriesDataClass::Validate(const ValueType & aValue) const
 {
     CHIP_ERROR err                                = CHIP_NO_ERROR;
-    auto & newList                                = aValue;
-    std::unordered_set<uint32_t> & DayEntryKeyIDs = ((TariffUpdateCtx *) mAuxData)->DayEntryKeyIDs;
 
-    VerifyOrReturnError_LogSend(newList.size() > 0 && newList.size() <= kDayEntriesAttrMaxLength, CHIP_ERROR_INVALID_LIST_LENGTH,
-                                "Incorrect DayEntries length");
-
-    for (const auto & item : newList)
+    if (!aValue.IsNull())
     {
-        if (!DayEntryKeyIDs.insert(item.dayEntryID).second)
-        {
-            err = CHIP_ERROR_DUPLICATE_KEY_ID;
-            break; // Duplicate found
-        }
+        auto & newList                                = aValue.Value();
+        std::unordered_set<uint32_t> & DayEntryKeyIDs = ((TariffUpdateCtx *) mAuxData)->DayEntryKeyIDs;
 
-        err = DayEntriesDataClass_Utils::ValidateListEntry(item, (TariffUpdateCtx *) mAuxData);
+        VerifyOrReturnError_LogSend(newList.size() > 0 && newList.size() <= kDayEntriesAttrMaxLength, CHIP_ERROR_INVALID_LIST_LENGTH,
+                                    "Incorrect DayEntries length");
 
-        if (err != CHIP_NO_ERROR)
+        for (const auto & item : newList)
         {
-            break;
+            if (!DayEntryKeyIDs.insert(item.dayEntryID).second)
+            {
+                err = CHIP_ERROR_DUPLICATE_KEY_ID;
+                break; // Duplicate found
+            }
+
+            err = DayEntriesDataClass_Utils::ValidateListEntry(item, (TariffUpdateCtx *) mAuxData);
+
+            if (err != CHIP_NO_ERROR)
+            {
+                break;
+            }
         }
     }
+    else
+    {
+        // The DayEntries is required, but not present.
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     return err;
 }
 
@@ -423,30 +432,35 @@ static CHIP_ERROR ValidateListEntry(const DayPatternStruct::Type & entryNewValue
 CHIP_ERROR DayPatternsDataClass::Validate(const ValueType & aValue) const
 {
     CHIP_ERROR err                                        = CHIP_NO_ERROR;
-    auto & newList                                        = aValue;
-    std::unordered_set<uint32_t> & DayPatternKeyIDs       = ((TariffUpdateCtx *) mAuxData)->DayPatternKeyIDs;
-    std::unordered_set<uint32_t> & DayPatternsDayEntryIDs = ((TariffUpdateCtx *) mAuxData)->DayPatternsDayEntryIDs;
-    // uint8_t tmpDoW = 0;
 
-    VerifyOrReturnError_LogSend((newList.size() > 0 && newList.size() <= kDayPatternsAttrMaxLength), CHIP_ERROR_INVALID_LIST_LENGTH,
-                                "Incorrect dayPatterns length");
-
-    for (const auto & item : newList)
+    if (!aValue.IsNull())
     {
-        if (!DayPatternKeyIDs.insert(item.dayPatternID).second)
-        {
-            err = CHIP_ERROR_DUPLICATE_KEY_ID;
-            break; // Duplicate found
-        }
+        auto & newList                                        = aValue.Value();
+        std::unordered_set<uint32_t> & DayPatternKeyIDs       = ((TariffUpdateCtx *) mAuxData)->DayPatternKeyIDs;
+        std::unordered_set<uint32_t> & DayPatternsDayEntryIDs = ((TariffUpdateCtx *) mAuxData)->DayPatternsDayEntryIDs;
+        // uint8_t tmpDoW = 0;
 
-        // tmpDoW |= item.daysOfWeek.Raw();
+        VerifyOrReturnError_LogSend((newList.size() > 0 && newList.size() <= kDayPatternsAttrMaxLength), CHIP_ERROR_INVALID_LIST_LENGTH,
+                                    "Incorrect dayPatterns length");
 
-        err = DayPatternsDataClass_Utils::ValidateListEntry(item, DayPatternsDayEntryIDs);
-        if (err != CHIP_NO_ERROR)
+        for (const auto & item : newList)
         {
-            break;
+            if (!DayPatternKeyIDs.insert(item.dayPatternID).second)
+            {
+                err = CHIP_ERROR_DUPLICATE_KEY_ID;
+                break; // Duplicate found
+            }
+
+            // tmpDoW |= item.daysOfWeek.Raw();
+
+            err = DayPatternsDataClass_Utils::ValidateListEntry(item, DayPatternsDayEntryIDs);
+            if (err != CHIP_NO_ERROR)
+            {
+                break;
+            }
         }
     }
+
     return err;
 }
 
@@ -522,28 +536,38 @@ static CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewVal
 CHIP_ERROR TariffPeriodsDataClass::Validate(const ValueType & aValue) const
 {
     CHIP_ERROR err                                          = CHIP_NO_ERROR;
-    auto & newList                                          = aValue;
-    std::unordered_set<uint32_t> & TariffPeriodsDayEntryIDs = ((TariffUpdateCtx *) mAuxData)->TariffPeriodsDayEntryIDs;
-    std::unordered_set<uint32_t> & TariffPeriodsTariffComponentIDs =
-        ((TariffUpdateCtx *) mAuxData)->TariffPeriodsTariffComponentIDs;
 
-    std::map<uint32_t, std::unordered_set<uint32_t>> tariffComponentsMap;
-
-    VerifyOrReturnError_LogSend((newList.size() > 0 && newList.size() <= kTariffPeriodsAttrMaxLength),
-                                CHIP_ERROR_INVALID_LIST_LENGTH, "Incorrect TariffPeriods length");
-
-    for (const auto & item : newList)
+    if (!aValue.IsNull())
     {
-        err = TariffPeriodsDataClass_Utils::ValidateListEntry(item,
-                                                              TariffPeriodsDayEntryIDs, 
-                                                              TariffPeriodsTariffComponentIDs,
-                                                              tariffComponentsMap
-        );
-        if (err != CHIP_NO_ERROR)
+        auto & newList                                          = aValue.Value();
+        std::unordered_set<uint32_t> & TariffPeriodsDayEntryIDs = ((TariffUpdateCtx *) mAuxData)->TariffPeriodsDayEntryIDs;
+        std::unordered_set<uint32_t> & TariffPeriodsTariffComponentIDs =
+            ((TariffUpdateCtx *) mAuxData)->TariffPeriodsTariffComponentIDs;
+
+        std::map<uint32_t, std::unordered_set<uint32_t>> tariffComponentsMap;
+
+        VerifyOrReturnError_LogSend((newList.size() > 0 && newList.size() <= kTariffPeriodsAttrMaxLength),
+                                    CHIP_ERROR_INVALID_LIST_LENGTH, "Incorrect TariffPeriods length");
+
+        for (const auto & item : newList)
         {
-            break;
+            err = TariffPeriodsDataClass_Utils::ValidateListEntry(item,
+                                                                  TariffPeriodsDayEntryIDs, 
+                                                                  TariffPeriodsTariffComponentIDs,
+                                                                  tariffComponentsMap
+            );
+            if (err != CHIP_NO_ERROR)
+            {
+                break;
+            }
         }
     }
+    else
+    {
+        // The TariffPeriods is required, but not present.
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     return err;
 }
 
@@ -686,24 +710,33 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
 CHIP_ERROR TariffComponentsDataClass::Validate(const ValueType & aValue) const
 {
     CHIP_ERROR err                                       = CHIP_NO_ERROR;
-    auto & newList                                       = aValue;
-    std::unordered_set<uint32_t> & TariffComponentKeyIDs = ((TariffUpdateCtx *) mAuxData)->TariffComponentKeyIDs;
 
-    VerifyOrReturnError((newList.size() > 0 && newList.size() <= kTariffComponentsAttrMaxLength), CHIP_ERROR_INVALID_LIST_LENGTH);
-
-    for (const auto & item : newList)
+    if (!aValue.IsNull())
     {
-        if (!TariffComponentKeyIDs.insert(item.tariffComponentID).second)
-        {
-            err = CHIP_ERROR_DUPLICATE_KEY_ID;
-            break; // Duplicate found
-        }
+        auto & newList                                       = aValue.Value();
+        std::unordered_set<uint32_t> & TariffComponentKeyIDs = ((TariffUpdateCtx *) mAuxData)->TariffComponentKeyIDs;
 
-        err = TariffComponentsDataClass_Utils::ValidateListEntry(item, (TariffUpdateCtx *) mAuxData);
-        if (err != CHIP_NO_ERROR)
+        VerifyOrReturnError((newList.size() > 0 && newList.size() <= kTariffComponentsAttrMaxLength), CHIP_ERROR_INVALID_LIST_LENGTH);
+
+        for (const auto & item : newList)
         {
-            break;
+            if (!TariffComponentKeyIDs.insert(item.tariffComponentID).second)
+            {
+                err = CHIP_ERROR_DUPLICATE_KEY_ID;
+                break; // Duplicate found
+            }
+
+            err = TariffComponentsDataClass_Utils::ValidateListEntry(item, (TariffUpdateCtx *) mAuxData);
+            if (err != CHIP_NO_ERROR)
+            {
+                break;
+            }
         }
+    }
+    else
+    {
+        // The TariffComponents is required, but not present.
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     return err;

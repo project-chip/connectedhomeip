@@ -537,7 +537,7 @@ public:
      * @param aUpdCb Callback to invoke on successful commit
      * @return CHIP_NO_ERROR if validation succeeds
      * @retval CHIP_ERROR_INCORRECT_STATE if not in kAssigned state
-     * @retval Other validation errors from ValidateValue()
+     * @retval Other validation errors from ValidateNewValue()
      *
      * @pre Must be in kAssigned state (after MarkAsAssigned())
      * @post On success, transitions to kValidated state
@@ -562,7 +562,7 @@ public:
         {
             mAuxData = aUpdCtx;
 
-            err = ValidateValue();
+            err = ValidateNewValue();
         }
 
         if ( aUpdCb != nullptr )
@@ -698,8 +698,13 @@ private:
      * @brief Validate a new value
      * @return CHIP_NO_ERROR if valid, an err code otherwise
      */
-    CHIP_ERROR ValidateValue()
+    CHIP_ERROR ValidateNewValue()
     {
+        if constexpr (IsValueNullable())
+        {
+            return Validate(mNewValue.Value());
+        }
+
         return Validate(mNewValue);
     }
 
