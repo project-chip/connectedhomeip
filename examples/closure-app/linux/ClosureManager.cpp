@@ -145,7 +145,7 @@ chip::Protocols::InteractionModel::Status
 ClosureManager::OnMoveToCommand(const Optional<TargetPositionEnum> & position, const Optional<bool> & latch,
                                 const Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed)
 {
-        // Cancel any existing timer for closure action
+    // Cancel any existing timer for closure action
     DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
 
     // Update the target state for the closure panels based on the MoveTo command.
@@ -238,7 +238,7 @@ ClosureManager::OnMoveToCommand(const Optional<TargetPositionEnum> & position, c
 
     VerifyOrReturnError(ep1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
-    VerifyOrReturnError(ep2.GetLogic().SetTargetState(MakeNullable(ep2Target)) == CHIP_NO_ERROR,  Status::Failure,
+    VerifyOrReturnError(ep2.GetLogic().SetTargetState(MakeNullable(ep2Target)) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set target for Panel 2"));
     VerifyOrReturnError(ep3.GetLogic().SetTargetState(MakeNullable(ep3Target)) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set target for Panel 3"));
@@ -246,7 +246,7 @@ ClosureManager::OnMoveToCommand(const Optional<TargetPositionEnum> & position, c
                         ChipLogError(AppServer, "Failed to set countdown time for move to command on Panel 1"));
 
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(1), HandleClosureActionTimer, this);
-    mCurrentAction                 = ClosureAction::kMoveToAction;
+    mCurrentAction            = ClosureAction::kMoveToAction;
     mIsMoveToActionInProgress = true;
     return Status::Success;
 }
