@@ -338,7 +338,8 @@ TEST(TestQRCode, TestSetupPayloadVerify)
     test_payload = payload;
     RendezvousInformationFlags invalid =
         RendezvousInformationFlags(RendezvousInformationFlag::kBLE, RendezvousInformationFlag::kSoftAP,
-                                   RendezvousInformationFlag::kOnNetwork, RendezvousInformationFlag::kWiFiPAF);
+                                   RendezvousInformationFlag::kOnNetwork, RendezvousInformationFlag::kWiFiPAF,
+                                   RendezvousInformationFlag::kNFC));
     invalid.SetRaw(static_cast<uint8_t>(invalid.Raw() + 1));
     test_payload.rendezvousInformation.SetValue(invalid);
     EXPECT_EQ(test_payload.isValidQRCodePayload(), false);
