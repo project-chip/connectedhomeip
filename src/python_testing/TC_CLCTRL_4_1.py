@@ -407,6 +407,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
                 ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                asserts.fail("Expected InvalidInState error, but command succeeded.")
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.InvalidInState, f"The MoveTo command sends an incorrect state: {e.status}")
@@ -861,6 +862,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
                 ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                asserts.fail("Expected InvalidInState error, but command succeeded.")
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.InvalidInState, f"The MoveTo command sends an incorrect state: {e.status}")
@@ -930,6 +932,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
                 ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                asserts.fail("Expected InvalidInState error, but command succeeded.")
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.InvalidInState, f"The MoveTo command sends an incorrect state: {e.status}")
