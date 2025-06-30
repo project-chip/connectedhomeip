@@ -37,11 +37,8 @@
 
 import copy
 import logging
-import time
-from typing import cast
 
 import chip.clusters as Clusters
-from chip.clusters.Attribute import EventReadResult
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
@@ -54,7 +51,7 @@ UNIT_TESTING_ENDPOINT_ID = 1
 INVALID_ACTION_ERROR_CODE = 0x580
 
 
-class TestReadSubscribeAceExitenceErrors(MatterBaseTest):
+class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
 
     async def get_dut_acl(self, ctrl, ep=ROOT_NODE_ENDPOINT_ID):
         sub = await ctrl.ReadAttribute(
@@ -141,7 +138,7 @@ class TestReadSubscribeAceExitenceErrors(MatterBaseTest):
         UnsupportedClusterAclAttrPath = (ROOT_NODE_ENDPOINT_ID + 1, aclAttr)
         UnsupportedReadAttrPath = (UNIT_TESTING_ENDPOINT_ID, UnsupportedReadAttr)
 
-        #######################################    Step 1: Subscribe to Single Attribute on Valid Path with UnsupportedAccess    ################################################
+        #######################################    Step 1: Subscribe to Single Attribute on Valid Path with No Access    ################################################
         #
         #
         # Attribute Paths:
@@ -211,7 +208,7 @@ class TestReadSubscribeAceExitenceErrors(MatterBaseTest):
         asserts.assert_equal(cm.exception.err, INVALID_ACTION_ERROR_CODE,
                              "Expected Invalid_Action since all paths are discarded")
 
-        #######################################    Step 4: Subscribe to Attributes on Mixed Paths (WITH ACCESS)    ################################################
+        #######################################    Step 4: Subscribe to Attributes on Mixed Valid and Invalid Paths (WITH ACCESS)    ################################################
         #
         #
         # Attribute Paths:
@@ -261,7 +258,7 @@ class TestReadSubscribeAceExitenceErrors(MatterBaseTest):
         asserts.assert_equal(Status.UnsupportedRead, sub_attrs_step4[UNIT_TESTING_ENDPOINT_ID]
                              [Clusters.UnitTesting][UnsupportedReadAttr].Reason.status, "Expected Attribute StatusIB with UnsupportedRead")
 
-        #######################################    Step 5: Subscribe Attributes without Access    ################################################
+        #######################################    Step 5: Subscribe Attributes Mixed Valid and Invalid Paths (Controller has NO ACCESS to None of the paths)    ################################################
         #
         #
         # Attribute Paths:
@@ -287,7 +284,7 @@ class TestReadSubscribeAceExitenceErrors(MatterBaseTest):
         asserts.assert_equal(cm.exception.err, INVALID_ACTION_ERROR_CODE,
                              "Expected Invalid_Action since all paths are discarded")
 
-        #######################################    Step 6: Subscribe to Attributes on Mixed Paths (with Mixed ACCESS)   ################################################
+        #######################################    Step 6: Subscribe to Attributes Mixed Valid and Invalid Paths (Controller ONLY has Access to Valid Attribute Path)  ################################################
         #
         #
         # Two Attribute Paths:
@@ -467,6 +464,8 @@ class TestReadSubscribeAceExitenceErrors(MatterBaseTest):
         )
 
         sub_step9_events = sub_th2_step9.GetEvents()
+
+        unsupportedAccessList = 0
 
         # Verify Two Unsupported Access statuses are received rather than Unsupported Cluster and Unsupported Endpoint
         unsupportedAccessList = [e for e in sub_step9_events if e.Status == Status.UnsupportedAccess]
@@ -687,10 +686,8 @@ class TestReadSubscribeAceExitenceErrors(MatterBaseTest):
         asserts.assert_equal(
             len(unsupportedAccessList),
             3,
-            f"Expected 2 UnsupportedAccess EventStatusIB, but found {len(unsupportedAccessList)}"
+            f"Expected 3 UnsupportedAccess EventStatusIB, but found {len(unsupportedAccessList)}"
         )
-        unsupportedAccessList = 0
-
         #####################################    Step 6: Read Events with MIXED Access    ################################################
         #
         #
@@ -732,6 +729,8 @@ class TestReadSubscribeAceExitenceErrors(MatterBaseTest):
             cluster=Clusters.BasicInformation,
             event=basicInfoStartUpEvent
         )
+
+        unsupportedAccessList = 0
 
         unsupportedAccessList = [e for e in read_th2_step6 if e.Status == Status.UnsupportedAccess]
         asserts.assert_equal(
