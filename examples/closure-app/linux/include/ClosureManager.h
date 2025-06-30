@@ -137,9 +137,9 @@ private:
     // Endpoint ID for the second closure panel
     static constexpr chip::EndpointId kClosurePanelEndpoint3 = 3;
 
-    chip::app::Clusters::ClosureControl::ClosureControlEndpoint mClosureEndpoint1{ kClosureEndpoint1 };
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint2{ kClosurePanelEndpoint2 };
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint3{ kClosurePanelEndpoint3 };
+    chip::app::Clusters::ClosureControl::ClosureControlEndpoint ep1{ kClosureEndpoint1 };
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep2{ kClosurePanelEndpoint2 };
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep3{ kClosurePanelEndpoint3 };
 
     /**
      * @brief Stores the current endpoint ID being managed or operated on.
@@ -215,6 +215,31 @@ private:
      * @param action The action that has been completed.
      */
     void HandleStepActionComplete();
+
+    /**
+     * @brief Handles the motion action for the closure system.
+     *
+     * This method is called when a move-to action has been initiated, 
+     * allowing for any necessary updates or state changes.
+     */
+    void HandleClosureMotionAction();
+
+    /**
+     * @brief Calculates the next position for a panel based on the closure panel state.
+     *
+     * This function determines the next position by incrementing or decrementing current position of the panel
+     * by a fixed step (1000 units) towards the target position, ensuring it does not overshoot the target.
+     *
+     * @param[in]  currentState   The current state of the panel, containing the current position.
+     * @param[in]  targetState    The target state of the panel, containing the desired position.
+     * @param[out] nextPosition   A reference to a Nullable object that will be updated with the next current position.
+     *
+     * @return true if the next position was updated and movement is required; false if no update is needed
+     *         or if either the current or target position is not set.
+     */
+    bool GetPanelNextPosition(const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & currentState,
+                              const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & targetState,
+                              chip::app::DataModel::Nullable<chip::Percent100ths> & nextPosition);
 
     bool mIsCalibrationActionInProgress = false;
     bool mIsMoveToActionInProgress      = false;
