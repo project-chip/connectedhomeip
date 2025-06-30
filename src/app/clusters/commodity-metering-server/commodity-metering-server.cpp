@@ -121,8 +121,8 @@ void Instance::Shutdown()
 }
 
 CHIP_ERROR Instance::CopyMeteredQuantityEntry(Structs::MeteredQuantityStruct::Type & dest,
-                                    Platform::ScopedMemoryBuffer<uint32_t> * destTariffComponentIDsBuffer,
-                                    const Structs::MeteredQuantityStruct::Type & src)
+                                              Platform::ScopedMemoryBuffer<uint32_t> * destTariffComponentIDsBuffer,
+                                              const Structs::MeteredQuantityStruct::Type & src)
 {
     dest.quantity = src.quantity;
 
