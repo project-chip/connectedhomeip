@@ -107,7 +107,6 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
                 mState.targetState.Value().position == incomingCurrentState.Value().position)
             {
                 targetPositionReached = true;
-                ChipLogError(AppServer, "Target position reached");
             }
 
             if (targetPositionReached)
@@ -116,9 +115,8 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
                     [](const decltype(quietReportableCurrentStatePosition)::SufficientChangePredicateCandidate &) -> bool {
                     return true;
                 };
-markDirty |= (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.Value().position.Value(), now,
+                markDirty |= (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.Value().position.Value(), now,
                                                                           predicate) == AttributeDirtyState::kMustReport);
-                ChipLogError(AppServer, "Target position reached Mark dirty = %d", markDirty);
             }
             else
             {
@@ -126,9 +124,8 @@ markDirty |= (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.
                 // non-null value, or when the Position changes from null to any other value and vice versa
                 System::Clock::Milliseconds64 reportInterval = System::Clock::Milliseconds64(kPositionQuietReportingInterval);
                 auto predicate = quietReportableCurrentStatePosition.GetPredicateForSufficientTimeSinceLastDirty(reportInterval);
-markDirty |= (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.Value().position.Value(), now,
+                markDirty |= (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.Value().position.Value(), now,
                                                                                predicate) == AttributeDirtyState::kMustReport);
-                ChipLogError(AppServer, "Target position not reached Mark dirty = %d", markDirty);
             }
         }
 
@@ -144,7 +141,6 @@ markDirty |= (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.
         if (!mState.currentState.IsNull() && mState.currentState.Value().latch != incomingCurrentState.Value().latch)
         {
             markDirty = true;
-            ChipLogError(AppServer, "Latch state changed Mark dirty ");
         }
 
         // Validate the incoming Speed value has valid input parameters and FeatureMap conformance.
@@ -163,12 +159,11 @@ markDirty |= (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.
         if (!mState.currentState.IsNull() && mState.currentState.Value().speed != incomingCurrentState.Value().speed)
         {
             markDirty = true;
-            ChipLogError(AppServer, "Speed state changed Mark dirty");
         }
     }
 
-    // If the current state is null and the incoming current state is null and vice versa, we need to mark dirty.
-if (mState.currentState.IsNull() != incomingCurrentState.IsNull())
+    // If the current state is null and the incoming current state is not null and vice versa, we need to mark dirty.
+    if (mState.currentState.IsNull() != incomingCurrentState.IsNull())
     {
         markDirty = true;
     }
