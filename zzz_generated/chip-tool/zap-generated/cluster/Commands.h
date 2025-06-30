@@ -17328,7 +17328,7 @@ private:
 | Attributes:                                                         |        |
 | * MeteredQuantity                                                   | 0x0000 |
 | * MeteredQuantityTimestamp                                          | 0x0001 |
-| * MeasurementType                                                   | 0x0002 |
+| * TariffUnit                                                        | 0x0002 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -30935,7 +30935,7 @@ void registerClusterCommodityMetering(Commands & commands, CredentialIssuerComma
         make_unique<ReadAttribute>(Id, "metered-quantity", Attributes::MeteredQuantity::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "metered-quantity-timestamp", Attributes::MeteredQuantityTimestamp::Id,
                                    credsIssuerConfig),                                                                     //
-        make_unique<ReadAttribute>(Id, "measurement-type", Attributes::MeasurementType::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "tariff-unit", Attributes::TariffUnit::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -30948,9 +30948,8 @@ void registerClusterCommodityMetering(Commands & commands, CredentialIssuerComma
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "metered-quantity-timestamp", 0, UINT32_MAX,
                                                                               Attributes::MeteredQuantityTimestamp::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>>>(
-            Id, "measurement-type", 0, UINT16_MAX, Attributes::MeasurementType::Id, WriteCommandType::kForceWrite,
-            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TariffUnitEnum>>>(
+            Id, "tariff-unit", 0, UINT8_MAX, Attributes::TariffUnit::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -30966,7 +30965,7 @@ void registerClusterCommodityMetering(Commands & commands, CredentialIssuerComma
         make_unique<SubscribeAttribute>(Id, "metered-quantity", Attributes::MeteredQuantity::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "metered-quantity-timestamp", Attributes::MeteredQuantityTimestamp::Id,
                                         credsIssuerConfig),                                                                     //
-        make_unique<SubscribeAttribute>(Id, "measurement-type", Attributes::MeasurementType::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "tariff-unit", Attributes::TariffUnit::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
