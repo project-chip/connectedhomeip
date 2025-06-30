@@ -38,6 +38,7 @@ public:
     {
         CALIBRATE_ACTION = 0,
         MOVE_TO_ACTION,
+        UNLATCH_ACTION,
         STOP_MOTION_ACTION,
         STOP_CALIBRATE_ACTION,
 
@@ -203,6 +204,14 @@ private:
      * have reached their target positions.
      */
     void HandleClosureMotionAction();
+
+    /**
+     * @brief Handles the unlatch action for closure endpoint.
+     *
+     * This method performs the unlatch action for closure endpoint if needed and updates the latch of endpoints 2 and 3
+     * and calls HandleClosureMotionAction to continue the motion action.
+     */
+    void HandleClosureUnlatchAction();
 
     /**
      * @brief Calculates the next position for a panel based on the closure panel state.

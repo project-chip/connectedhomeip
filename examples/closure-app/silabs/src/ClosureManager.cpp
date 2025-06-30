@@ -154,6 +154,12 @@ void ClosureManager::InitiateAction(AppEvent * event)
         // In a real application, this would be replaced with actual move to logic.
         instance.StartTimer(kMotionCountdownTimeMs);
         break;
+    case Action_t::UNLATCH_ACTION:
+        ChipLogDetail(AppServer, "Initiating unlatch action");
+        // Unlatch action check is a prerequisite for the move to action.
+        // In a real application, this would be replaced with actual unlatch logic.
+        instance.StartTimer(kMotionCountdownTimeMs);
+        break;
     default:
         ChipLogDetail(AppServer, "Invalid action received in InitiateAction");
         return;
@@ -202,6 +208,12 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
         PlatformMgr().ScheduleWork([](intptr_t) {
             ClosureManager & instance = ClosureManager::GetInstance();
             instance.HandleClosureMotionAction();
+        });
+        break;
+    case Action_t::UNLATCH_ACTION:
+        PlatformMgr().ScheduleWork([](intptr_t) {
+            ClosureManager & instance = ClosureManager::GetInstance();
+            instance.HandleClosureUnlatchAction();
         });
         break;
     default:
@@ -329,14 +341,17 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
     VerifyOrReturnError(ep1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
 
-    SetCurrentAction(MOVE_TO_ACTION);
+    // Set the current action to UNLATCH_ACTION.
+    // This is to ensure that the closure is unlatched before starting the motion action.
+    // The Closure Control Cluster will handle the unlatch action before proceeding with the motion action.
+    SetCurrentAction(UNLATCH_ACTION);
     isMoveToInProgress = true;
 
     // Post an event to initiate the move to action asynchronously.
     // MoveTo Command can only be initiated from Closure Control Endpoint (Endpoint 1).
     AppEvent event;
     event.Type                = AppEvent::kEventType_Closure;
-    event.ClosureEvent.Action = MOVE_TO_ACTION;
+    event.ClosureEvent.Action = mCurrentAction;
     event.Handler             = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
 
@@ -347,18 +362,12 @@ void ClosureManager::HandleClosureMotionAction()
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
-    DataModel::Nullable<GenericOverallCurrentState> ep1CurrentState;
+    
     DataModel::Nullable<GenericDimensionStateStruct> ep2CurrentState;
     DataModel::Nullable<GenericDimensionStateStruct> ep3CurrentState;
 
-    DataModel::Nullable<GenericOverallTargetState> ep1TargetState;
     DataModel::Nullable<GenericDimensionStateStruct> ep2TargetState;
     DataModel::Nullable<GenericDimensionStateStruct> ep3TargetState;
-
-    VerifyOrReturn(ep1.GetLogic().GetOverallCurrentState(ep1CurrentState) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to get current state for Endpoint 1"));
-    VerifyOrReturn(ep1.GetLogic().GetOverallTargetState(ep1TargetState) == CHIP_NO_ERROR,
-                   ChipLogError(AppServer, "Failed to get target state for Endpoint 1"));
 
     VerifyOrReturn(ep2.GetLogic().GetCurrentState(ep2CurrentState) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to get current state for Endpoint 2"));
@@ -369,38 +378,16 @@ void ClosureManager::HandleClosureMotionAction()
     VerifyOrReturn(ep3.GetLogic().GetTargetState(ep3TargetState) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to get target state for Endpoint 3"));
 
-    VerifyOrReturn(!ep1CurrentState.IsNull(),
-                   ChipLogError(AppServer, "MoveToCommand failed due to Null value Current state on Endpoint 1"));
+
     VerifyOrReturn(!ep2CurrentState.IsNull(),
                    ChipLogError(AppServer, "MoveToCommand failed due to Null value Current state on Endpoint 2"));
     VerifyOrReturn(!ep3CurrentState.IsNull(),
                    ChipLogError(AppServer, "MoveToCommand failed due to Null value Current state on Endpoint 3"));
 
-    VerifyOrReturn(!ep1TargetState.IsNull(),
-                   ChipLogError(AppServer, "MoveToCommand failed due to Null value Target state on Endpoint 1"));
     VerifyOrReturn(!ep2TargetState.IsNull(),
                    ChipLogError(AppServer, "MoveToCommand failed due to Null value Target state on Endpoint 2"));
     VerifyOrReturn(!ep3TargetState.IsNull(),
                    ChipLogError(AppServer, "MoveToCommand failed due to Null value Target state on Endpoint 3"));
-
-    // check if closure (endpoint 1) need unlatch before starting the motion action.
-    if (ep1CurrentState.Value().latch.HasValue() && !ep1CurrentState.Value().latch.Value().IsNull() &&
-        ep1TargetState.Value().latch.HasValue() && !ep1TargetState.Value().latch.Value().IsNull())
-    {
-        // If currently latched (true) and target is unlatched (false), unlatch first before moving
-        if (ep1CurrentState.Value().latch.Value().Value() && !ep1TargetState.Value().latch.Value().Value())
-        {
-            // In Real application, this would be replaced with actual unlatch logic.
-            ChipLogProgress(AppServer, "Performing unlatch action");
-            ep1CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
-            instance.ep1.GetLogic().SetOverallCurrentState(ep1CurrentState);
-            ep2CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
-            instance.ep2.GetLogic().SetCurrentState(ep2CurrentState);
-            ep3CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
-            instance.ep3.GetLogic().SetCurrentState(ep3CurrentState);
-            ChipLogProgress(AppServer, "Unlatched action completed");
-        }
-    }
 
     // Once Closure is unlatched, we can proceed with the motion action for endpoints 2 and 3.
     DataModel::Nullable<chip::Percent100ths> ep2NextPosition = DataModel::NullNullable;
@@ -449,6 +436,22 @@ void ClosureManager::HandleClosureMotionAction()
         return;
     }
 
+    DataModel::Nullable<GenericOverallCurrentState> ep1CurrentState;
+    DataModel::Nullable<GenericOverallTargetState> ep1TargetState;
+
+
+    VerifyOrReturn(ep1.GetLogic().GetOverallCurrentState(ep1CurrentState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get current state for Endpoint 1"));
+    VerifyOrReturn(ep1.GetLogic().GetOverallTargetState(ep1TargetState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get target state for Endpoint 1"));
+
+    
+    VerifyOrReturn(!ep1CurrentState.IsNull(),
+                   ChipLogError(AppServer, "MoveToCommand failed due to Null value Current state on Endpoint 1"));
+    VerifyOrReturn(!ep1TargetState.IsNull(),
+                   ChipLogError(AppServer, "MoveToCommand failed due to Null value Target state on Endpoint 1"));
+    
+
     // If both endpoints have reached their target positions, we can consider the closure motion action as complete.
     // Before calling HandleClosureActionComplete, we need to check if a latch action is needed.
     if (ep1CurrentState.Value().latch.HasValue() && !ep1CurrentState.Value().latch.Value().IsNull() &&
@@ -471,6 +474,60 @@ void ClosureManager::HandleClosureMotionAction()
 
     // Target reached and no latch action needed, call HandleClosureAction
     instance.HandleClosureActionComplete(ClosureManager::Action_t::MOVE_TO_ACTION);
+}
+
+void ClosureManager::HandleClosureUnlatchAction()
+{
+    ClosureManager & instance = ClosureManager::GetInstance();
+
+    DataModel::Nullable<GenericOverallCurrentState> ep1CurrentState;
+    DataModel::Nullable<GenericOverallTargetState> ep1TargetState;
+    DataModel::Nullable<GenericDimensionStateStruct> ep2CurrentState;
+    DataModel::Nullable<GenericDimensionStateStruct> ep3CurrentState;
+
+    VerifyOrReturn(ep1.GetLogic().GetOverallCurrentState(ep1CurrentState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get current state for Endpoint 1"));
+    VerifyOrReturn(ep1.GetLogic().GetOverallTargetState(ep1TargetState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get target state for Endpoint 1"));
+
+    VerifyOrReturn(ep2.GetLogic().GetCurrentState(ep2CurrentState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get current state for Endpoint 2"));
+    VerifyOrReturn(ep3.GetLogic().GetCurrentState(ep3CurrentState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get current state for Endpoint 3"));
+
+    VerifyOrReturn(!ep1CurrentState.IsNull(),
+                   ChipLogError(AppServer, "UnlatchAction failed due to Null value Current state on Endpoint 1"));
+    VerifyOrReturn(!ep1TargetState.IsNull(),
+                   ChipLogError(AppServer, "UnlatchAction failed due to Null value Target state on Endpoint 1"));
+
+    VerifyOrReturn(!ep2CurrentState.IsNull(),
+                   ChipLogError(AppServer, "UnlatchAction failed due to Null value Current state on Endpoint 2"));
+    VerifyOrReturn(!ep3CurrentState.IsNull(),
+                   ChipLogError(AppServer, "UnlatchAction failed due to Null value Current state on Endpoint 3"));
+
+    // check if closure (endpoint 1) need unlatch before starting the motion action.
+    if (ep1CurrentState.Value().latch.HasValue() && !ep1CurrentState.Value().latch.Value().IsNull() &&
+        ep1TargetState.Value().latch.HasValue() && !ep1TargetState.Value().latch.Value().IsNull())
+    {
+        // If currently latched (true) and target is unlatched (false), unlatch first before moving
+        if (ep1CurrentState.Value().latch.Value().Value() && !ep1TargetState.Value().latch.Value().Value())
+        {
+            // In Real application, this would be replaced with actual unlatch logic.
+            ChipLogProgress(AppServer, "Performing unlatch action");
+            ep1CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
+            instance.ep1.GetLogic().SetOverallCurrentState(ep1CurrentState);
+            ep2CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
+            instance.ep2.GetLogic().SetCurrentState(ep2CurrentState);
+            ep3CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
+            instance.ep3.GetLogic().SetCurrentState(ep3CurrentState);
+            ChipLogProgress(AppServer, "Unlatched action completed");
+        }
+    }
+
+    CancelTimer(); // Cancel any existing timer before proceeding with the motion action
+
+    // After unlatching, we can proceed with the motion action
+    instance.HandleClosureMotionAction();
 }
 
 void ClosureManager::HandleClosureActionComplete(Action_t action)
@@ -497,6 +554,11 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         instance.ep2.OnMoveToActionComplete();
         instance.ep3.OnMoveToActionComplete();
         instance.isMoveToInProgress = false;
+        break;
+    case Action_t::UNLATCH_ACTION:
+        // HandleClosureActionComplete should not be called for UNLATCH_ACTION,
+        // as unlatch action is prerequisite for MOVE_TO_ACTION.
+        ChipLogError(AppServer, "HandleClosureActionComplete should not be called for UNLATCH_ACTION");
         break;
     default:
         ChipLogError(AppServer, "Invalid action received in HandleClosureAction");
