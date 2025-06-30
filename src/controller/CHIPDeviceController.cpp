@@ -2069,12 +2069,12 @@ void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const
     }
 }
 
-void DeviceCommissioner::DeviceReadyForSecondCommissioningPhase(void)
+void DeviceCommissioner::ContinueCommissioningOverOperationalNetwork(void)
 {
-    ChipLogProgress(Controller, "DeviceCommissioner::DeviceReadyForSecondCommissioningPhase");
+    ChipLogProgress(Controller, "DeviceCommissioner::ContinueCommissioningOverOperationalNetwork");
 
-    // This method is meaningful only for the state kWaitDeviceInstallation
-    VerifyOrReturn(mCommissioningStage == kWaitDeviceInstallation);
+    // This method is meaningful only for the state kWaitForDeviceInstallation
+    VerifyOrReturn(mCommissioningStage == kWaitForDeviceInstallation);
 
     // Device is ready for 2nd phase on the operational network.
     // We can advance to next step
@@ -2311,6 +2311,8 @@ void DeviceCommissioner::ContinueReadingCommissioningInfo(const CommissioningPar
                                                 Clusters::GeneralCommissioning::Attributes::RegulatoryConfig::Id));
         VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::GeneralCommissioning::Id,
                                                 Clusters::GeneralCommissioning::Attributes::LocationCapability::Id));
+        VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::GeneralCommissioning::Id,
+                                                Clusters::GeneralCommissioning::Attributes::IsCommissioningWithoutPower::Id));
 
         // Basic Information: VID and PID for device attestation purposes
         VerifyOrReturn(builder.AddAttributePath(kRootEndpointId, Clusters::BasicInformation::Id,
@@ -2417,7 +2419,6 @@ void DeviceCommissioner::FinishReadingCommissioningInfo()
     AccumulateErrors(err, ParseTimeSyncInfo(info));
     AccumulateErrors(err, ParseFabrics(info));
     AccumulateErrors(err, ParseICDInfo(info));
-    AccumulateErrors(err, ParsePowerSource(info));
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     AccumulateErrors(err, ParseJFAdministratorInfo(info));
 #endif
@@ -2479,6 +2480,13 @@ CHIP_ERROR DeviceCommissioner::ParseGeneralCommissioningInfo(ReadCommissioningIn
     {
         ChipLogError(Controller, "Ignoring failure to read SupportsConcurrentConnection: %" CHIP_ERROR_FORMAT, err.Format());
         info.supportsConcurrentConnection = true; // default to true (concurrent), not a fatal error
+    }
+
+    err = mAttributeCache->Get<SupportsConcurrentConnection::TypeInfo>(kRootEndpointId, info.general.isCommissioningWithoutPower);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Ignoring failure to read IsCommissioningWithoutPower: %" CHIP_ERROR_FORMAT, err.Format());
+        info.general.isCommissioningWithoutPower = false; // default to false, not a fatal error
     }
 
     return return_err;
@@ -2700,50 +2708,6 @@ CHIP_ERROR DeviceCommissioner::ParseFabrics(ReadCommissioningInfo & info)
 
     return return_err;
 }
-
-CHIP_ERROR DeviceCommissioner::ParsePowerSource(ReadCommissioningInfo & info)
-{
-    using namespace chip::app::Clusters::PowerSource;
-    using namespace chip::app::Clusters::PowerSource::Attributes;
-
-    CHIP_ERROR err;
-
-    // Read Status of power source Cluster
-    err = mAttributeCache->Get<Status::TypeInfo>(kRootEndpointId, info.power.status);
-    if (err == CHIP_NO_ERROR)
-    {
-        mNFCCommissioningWithoutPower = (mNFCCommissioning && (info.power.status == app::Clusters::PowerSource::PowerSourceStatusEnum::kUnavailable)) ? true : false;
-
-        switch(info.power.status)
-        {
-            case app::Clusters::PowerSource::PowerSourceStatusEnum::kUnspecified:
-                ChipLogProgress(Controller, "PowerSourceStatus: Unspecified");
-                break;
-            case app::Clusters::PowerSource::PowerSourceStatusEnum::kActive:
-                ChipLogProgress(Controller, "PowerSourceStatus: Active");
-                break;
-            case app::Clusters::PowerSource::PowerSourceStatusEnum::kStandby:
-                ChipLogProgress(Controller, "PowerSourceStatus: Standby");
-                break;
-            case app::Clusters::PowerSource::PowerSourceStatusEnum::kUnavailable:
-                ChipLogProgress(Controller, "PowerSourceStatus: Power not available");
-                break;
-            default:
-                ChipLogError(Controller, "Invalid PowerSourceStatusEnum value: %d", (int) info.power.status);
-                break;
-        }
-    }
-    else
-    {
-        ChipLogProgress(Controller, "Power source status not found");
-        // This key is optional so not an error
-        err = CHIP_NO_ERROR;
-        mNFCCommissioningWithoutPower = false;
-    }
-
-    return err;
-}
-
 
 CHIP_ERROR DeviceCommissioner::ParseICDInfo(ReadCommissioningInfo & info)
 {
@@ -3943,8 +3907,10 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         return;
     }
 
-    case CommissioningStage::kWaitDeviceInstallation: {
+    case CommissioningStage::kWaitForDeviceInstallation: {
         // Nothing to do. Wait until the user confirms that he has installed the device and powered it up
+        // Failsafe timer is not an issue because it is suspended between the 1st commissioning phase over NFC
+        //  and the start of the second phase, on the operational network.
         return;
     }
 

@@ -481,17 +481,16 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         return CommissioningStage::kEvictPreviousCaseSessions;
     case CommissioningStage::kEvictPreviousCaseSessions:
         {
-            bool isNFCCommissioningWithoutPower = mCommissioner->isNFCCommissioningWithoutPower();
-            if (isNFCCommissioningWithoutPower)
+            if (mDeviceCommissioningInfo.general.isCommissioningWithoutPower)
             {
-               return CommissioningStage::kWaitDeviceInstallation;
+               return CommissioningStage::kWaitForDeviceInstallation;
             }
             else
             {
                return CommissioningStage::kFindOperationalForStayActive;
             }
         }
-    case CommissioningStage::kWaitDeviceInstallation:
+    case CommissioningStage::kWaitForDeviceInstallation:
         return CommissioningStage::kFindOperationalForStayActive;
     case CommissioningStage::kPrimaryOperationalNetworkFailed:
         if (mDeviceCommissioningInfo.network.wifi.endpoint == kRootEndpointId)

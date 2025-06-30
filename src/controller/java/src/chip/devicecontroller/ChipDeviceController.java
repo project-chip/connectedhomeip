@@ -603,8 +603,8 @@ public class ChipDeviceController {
     unpairDeviceCallback(deviceControllerPtr, deviceId, callback);
   }
 
-  public void deviceReadyForSecondCommissioningPhase() {
-    deviceReadyForSecondCommissioningPhase(deviceControllerPtr);
+  public void continueCommissioningOverOperationalNetwork() {
+    continueCommissioningOverOperationalNetwork(deviceControllerPtr);
   }
 
   /**
@@ -1677,7 +1677,7 @@ public class ChipDeviceController {
 
   private native void stopDevicePairing(long deviceControllerPtr, long deviceId);
 
-  private native void deviceReadyForSecondCommissioningPhase(long deviceControllerPtr);
+  private native void continueCommissioningOverOperationalNetwork(long deviceControllerPtr);
 
   private native long getDeviceBeingCommissionedPointer(long deviceControllerPtr, long nodeId);
 
