@@ -274,7 +274,7 @@ CHIP_ERROR BluezObjectManager::SetupObjectManager()
 
     GAutoPtr<GError> err;
     mObjectManager.reset(g_dbus_object_manager_client_new_sync(
-        mConnection.get(), G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, "org.bluez", "/", bluez_object_manager_client_get_proxy_type,
+        mConnection.get(), G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, BLUEZ_SERVICE, "/", bluez_object_manager_client_get_proxy_type,
         nullptr /* unused user data in the proxy type func */, nullptr /* destroy notify */, nullptr /* cancellable */,
         &err.GetReceiver()));
     VerifyOrReturnError(mObjectManager, CHIP_ERROR_INTERNAL,
