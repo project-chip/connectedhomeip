@@ -14,22 +14,25 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+#include "lib/support/Span.h"
 #include <app/util/attribute-storage.h>
-
-#include <app/util/attribute-storage-detail.h>
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
+#include <app/persistence/PascalString.h>
 #include <app/reporting/reporting.h>
+#include <app/util/attribute-metadata.h>
+#include <app/util/attribute-storage-detail.h>
 #include <app/util/config.h>
 #include <app/util/ember-io-storage.h>
 #include <app/util/ember-strings.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/generic-callbacks.h>
-#include <app/util/persistence/AttributePersistenceProvider.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/LockTracker.h>
@@ -171,6 +174,24 @@ uint16_t findIndexFromEndpoint(EndpointId endpoint, bool ignoreDisabledEndpoints
 uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(EndpointId endpoint)
 {
     return findIndexFromEndpoint(endpoint, false /* ignoreDisabledEndpoints */);
+}
+
+CHIP_ERROR ValidateDataContent(ByteSpan span, const EmberAfAttributeMetadata * am)
+{
+    if (emberAfIsStringAttributeType(am->attributeType))
+    {
+        VerifyOrReturnValue(Storage::ShortPascalBytes::IsValid(span), CHIP_ERROR_INCORRECT_STATE);
+        return CHIP_NO_ERROR;
+    }
+
+    if (emberAfIsLongStringAttributeType(am->attributeType))
+    {
+        VerifyOrReturnValue(Storage::LongPascalBytes::IsValid(span), CHIP_ERROR_INCORRECT_STATE);
+        return CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnValue(span.size() == am->size, CHIP_ERROR_INCORRECT_STATE);
+    return CHIP_NO_ERROR;
 }
 
 } // anonymous namespace
@@ -520,15 +541,20 @@ const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpo
 
 static uint8_t * singletonAttributeLocation(const EmberAfAttributeMetadata * am)
 {
-    const EmberAfAttributeMetadata * m = &(generatedAttributes[0]);
-    uint16_t index                     = 0;
-    while (m < am)
+
+    uint16_t index = 0;
+    // NOLINTNEXTLINE(bugprone-sizeof-expression)
+    if constexpr (sizeof(generatedAttributes) > 0)
     {
-        if (m->IsSingleton() && !m->IsExternal())
+        const EmberAfAttributeMetadata * m = &(generatedAttributes[0]);
+        while (m < am)
         {
-            index = static_cast<uint16_t>(index + m->size);
+            if (m->IsSingleton() && !m->IsExternal())
+            {
+                index = static_cast<uint16_t>(index + m->size);
+            }
+            m++;
         }
-        m++;
     }
     return (uint8_t *) (singletonAttributeData + index);
 }
@@ -1279,7 +1305,12 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, Optional<ClusterId> clusterI
                     VerifyOrDieWithMsg(attrStorage != nullptr, Zcl, "Attribute persistence needs a persistence provider");
                     MutableByteSpan bytes(attrData);
                     CHIP_ERROR err =
-                        attrStorage->ReadValue(ConcreteAttributePath(de->endpoint, cluster->clusterId, am->attributeId), am, bytes);
+                        attrStorage->ReadValue(ConcreteAttributePath(de->endpoint, cluster->clusterId, am->attributeId), bytes);
+                    if (err == CHIP_NO_ERROR)
+                    {
+                        err = ValidateDataContent(bytes, am);
+                    }
+
                     if (err == CHIP_NO_ERROR)
                     {
                         ptr = attrData;
