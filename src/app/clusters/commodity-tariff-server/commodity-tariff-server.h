@@ -188,6 +188,7 @@ struct TariffUpdateCtx
 
     BitMask<Feature> mFeature;
     EndpointId aEndpoint;
+    bool AnyHasChanged = false;
 };
 
 /**
@@ -214,7 +215,7 @@ public:
 
     bool HasFeature(Feature aFeature) { return mFeature.Has(aFeature); }
 
-    void SetTariffUpdCb(std::function<void()> cb) { mTariffDataUpdatedCb = cb; }
+    void SetTariffUpdCb(std::function<void(bool)> cb) { mTariffDataUpdatedCb = cb; }
 
     /**
      * @brief Process incoming tariff data updates
@@ -241,9 +242,9 @@ public:
             TariffDataUpd_Commit();
             ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
 
-            if (mTariffDataUpdatedCb != nullptr)
+            if ( (mTariffDataUpdatedCb != nullptr) && (UpdCtx.AnyHasChanged) )
             {
-                mTariffDataUpdatedCb();
+                mTariffDataUpdatedCb(false);
             }
 
             return;
@@ -268,6 +269,7 @@ public:
 #define X(attrName, attrType) m##attrName##_MgmtObj.Cleanup();
         COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
+        mTariffDataUpdatedCb(true);
     }
 
 private:
@@ -282,6 +284,7 @@ private:
         TariffUpdateCtx * UpdCtx = (TariffUpdateCtx *) CbCtx;
         ChipLogProgress(NotSpecified, "EGW-CTC: The value for attribute (Id %d) updated", aAttrId);
         MatterReportingAttributeChangeCallback(UpdCtx->aEndpoint, CommodityTariff::Id, aAttrId);
+        UpdCtx->AnyHasChanged = false;
     }
 
     // Primary attrs update pipeline methods
@@ -317,7 +320,7 @@ private:
 protected:
     EndpointId mEndpointId = 0; ///< Associated Matter endpoint ID
     BitMask<Feature> mFeature;
-    std::function<void()> mTariffDataUpdatedCb;
+    std::function<void(bool)> mTariffDataUpdatedCb;
 };
 
 
@@ -358,7 +361,7 @@ public:
         /* set the base class delegates endpointId */
         mDelegate.SetEndpointId(aEndpointId);
         mEndpointId = aEndpointId;
-        mDelegate.SetTariffUpdCb([this]() { this->TariffDataUpdatedCb(); });
+        mDelegate.SetTariffUpdCb([this](bool is_erased) { this->TariffDataUpdatedCb(is_erased); });
         mDelegate.SetFeatures(aFeature);
     }
 
@@ -372,7 +375,8 @@ public:
 private:
     enum class UpdateEventCode
     {
-        TariffUpdating,
+        TariffErased,
+        TariffUpdated,
         DaysUpdating,
         DayEntryUpdating
     };
@@ -407,7 +411,7 @@ private:
     COMMODITY_TARIFF_CURRENT_LIST_ATTRIBUTES
 #undef X
 
-    void TariffDataUpdatedCb();
+    void TariffDataUpdatedCb(bool is_erased);
     void ResetCurrentAttributes();
 
     // Current attrs (time depended) update methods

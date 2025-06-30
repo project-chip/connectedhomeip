@@ -157,11 +157,17 @@ static uint32_t GetCurrentTimestamp(void)
     return static_cast<uint32_t>(chipEpochTime / chip::kMicrosecondsPerSecond);
 }
 
-void Instance::TariffDataUpdatedCb()
+void Instance::TariffDataUpdatedCb(bool is_erased)
 {
+    if (is_erased)
+    {
+        UpdateCurrentAttrs(UpdateEventCode::TariffErased);
+        return;
+    }
+
     mServerTariffAttrsCtx.AlarmTriggerTime = GetCurrentTimestamp();
 
-    UpdateCurrentAttrs(UpdateEventCode::TariffUpdating);
+    UpdateCurrentAttrs(UpdateEventCode::TariffUpdated);
 }
 
 void Instance::ScheduleTariffActivation(uint32_t delay)
@@ -169,7 +175,7 @@ void Instance::ScheduleTariffActivation(uint32_t delay)
     DeviceLayer::SystemLayer().StartTimer(
         System::Clock::Milliseconds32(delay * 1000),
         [](System::Layer *, void * context) {
-            static_cast<Instance *>(context)->UpdateCurrentAttrs(UpdateEventCode::TariffUpdating);
+            static_cast<Instance *>(context)->UpdateCurrentAttrs(UpdateEventCode::TariffUpdated);
         },
         this);
 }
@@ -430,26 +436,36 @@ static void AttrsCtxDeinit(CurrentTariffAttrsCtx & aCtx)
 
 void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
 {
-    uint32_t timestampNow = mServerTariffAttrsCtx.AlarmTriggerTime;
-
-    assert(timestampNow);
+    uint32_t timestampNow = 0; ;
 
     ChipLogProgress(NotSpecified, "EGW-CTC: UpdateEventCode: %x", static_cast<std::underlying_type_t<UpdateEventCode>>(aEvt));
 
     switch (aEvt)
     {
-    case UpdateEventCode::TariffUpdating: {
+    case UpdateEventCode::TariffErased: {
+        [[fallthrough]];
+    }
+    case UpdateEventCode::TariffUpdated: {
         // Handle tariff structure updates
         // This would be triggered when primary attributes change
         // Reset all current attributes to null
+        AttrsCtxDeinit(mServerTariffAttrsCtx);
+        ResetCurrentAttributes();
+
+        if (aEvt == UpdateEventCode::TariffErased)
+        {
+            return;
+        }
+
+        assert(mServerTariffAttrsCtx.AlarmTriggerTime);
+
+        timestampNow = mServerTariffAttrsCtx.AlarmTriggerTime;
+
         if (mDelegate.GetStartDate().Value() > timestampNow)
         {
             ScheduleTariffActivation(mDelegate.GetStartDate().Value() - timestampNow);
             return;
         }
-
-        AttrsCtxDeinit(mServerTariffAttrsCtx);
-        ResetCurrentAttributes();
         AttrsCtxInit(mDelegate, mServerTariffAttrsCtx);
         // Fall through to days updating
         [[fallthrough]];

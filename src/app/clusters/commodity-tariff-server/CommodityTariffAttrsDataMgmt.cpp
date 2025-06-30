@@ -203,7 +203,7 @@ static bool AreOptionalNullableEqual(const Optional<DataModel::Nullable<T>>& lhs
     }
     
     // Both present and not null -> return false if equal
-    return (lhs.Value().Value() != rhs.Value().Value());
+    return (lhs.Value().Value() == rhs.Value().Value());
 }
 
 template <typename T>
@@ -284,8 +284,7 @@ CHIP_ERROR TariffInfoDataClass::Validate(const ValueType & aValue) const
 
 bool TariffInfoDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
-    if (CommonUtilities::HasFeatureInCtx((TariffUpdateCtx *) mAuxData, CommodityTariff::Feature::kPricing) &&
-        !CommonUtilities::AreOptionalNullableEqual(source.currency, destination.currency))
+    if (!CommonUtilities::AreOptionalNullableEqual(source.currency, destination.currency))
     {
         return true;
     }
@@ -309,10 +308,7 @@ void TariffInfoDataClass::CleanupStructValue(PayloadType & aValue)
         tmp_label.SetNull();
     }
 
-    if (CommonUtilities::HasFeatureInCtx((TariffUpdateCtx *) mAuxData, CommodityTariff::Feature::kPricing))
-    {
-        aValue.currency.ClearValue();
-    }
+    aValue.currency.ClearValue();
 }
 
 // DayEntriesDataClass
@@ -386,9 +382,8 @@ bool DayEntriesDataClass::CompareStructValue(const PayloadType & source, const P
         return true;
     }
 
-    if (CommonUtilities::HasFeatureInCtx((TariffUpdateCtx *) mAuxData, CommodityTariff::Feature::kRandomization) &&
-        (!CommonUtilities::AreOptionalEqual(source.randomizationOffset, destination.randomizationOffset) ||
-         !CommonUtilities::AreOptionalEqual(source.randomizationType, destination.randomizationType)))
+    if (!CommonUtilities::AreOptionalEqual(source.randomizationOffset, destination.randomizationOffset) ||
+         !CommonUtilities::AreOptionalEqual(source.randomizationType, destination.randomizationType))
     {
         return true;
     }
@@ -397,15 +392,10 @@ bool DayEntriesDataClass::CompareStructValue(const PayloadType & source, const P
 
 void DayEntriesDataClass::CleanupStructValue(PayloadType & aValue)
 {
-    // If RNDM feature are supported
-
     aValue.duration.ClearValue();
 
-    if (CommonUtilities::HasFeatureInCtx((TariffUpdateCtx *) mAuxData, CommodityTariff::Feature::kRandomization))
-    {
-        aValue.randomizationOffset.ClearValue();
-        aValue.randomizationType.ClearValue();
-    }
+    aValue.randomizationOffset.ClearValue();
+    aValue.randomizationType.ClearValue();
 }
 
 // DayPatternsDataClass
@@ -749,36 +739,31 @@ bool TariffComponentsDataClass::CompareStructValue(const PayloadType & source, c
         return true;
 
     // If PRICE feature are supported
-    if (CommonUtilities::HasFeatureInCtx((TariffUpdateCtx *) mAuxData, CommodityTariff::Feature::kPricing) &&
-        !CommonUtilities::AreOptionalNullableEqual(source.price, destination.price))
+    if (!CommonUtilities::AreOptionalNullableEqual(source.price, destination.price))
     {
         return true;
     }
 
     // If FCRED feature are supported
-    if (CommonUtilities::HasFeatureInCtx((TariffUpdateCtx *) mAuxData, CommodityTariff::Feature::kFriendlyCredit) &&
-        !CommonUtilities::AreOptionalEqual(source.friendlyCredit, destination.friendlyCredit))
+    if (!CommonUtilities::AreOptionalEqual(source.friendlyCredit, destination.friendlyCredit))
     {
         return true;
     }
 
     // If AUXLD feature are supported
-    if (CommonUtilities::HasFeatureInCtx((TariffUpdateCtx *) mAuxData, CommodityTariff::Feature::kAuxiliaryLoad) &&
-        !CommonUtilities::AreOptionalEqual(source.auxiliaryLoad, destination.auxiliaryLoad))
+    if (!CommonUtilities::AreOptionalEqual(source.auxiliaryLoad, destination.auxiliaryLoad))
     {
         return true;
     }
 
     // If PEAKP feature are supported
-    if (CommonUtilities::HasFeatureInCtx((TariffUpdateCtx *) mAuxData, CommodityTariff::Feature::kPeakPeriod) &&
-        !CommonUtilities::AreOptionalEqual(source.peakPeriod, destination.peakPeriod))
+    if (!CommonUtilities::AreOptionalEqual(source.peakPeriod, destination.peakPeriod))
     {
         return true;
     }
 
     // If PWRTHLD feature are supported
-    if (CommonUtilities::HasFeatureInCtx((TariffUpdateCtx *) mAuxData, CommodityTariff::Feature::kPowerThreshold) &&
-        !CommonUtilities::AreOptionalEqual(source.powerThreshold, destination.powerThreshold))
+    if (!CommonUtilities::AreOptionalEqual(source.powerThreshold, destination.powerThreshold))
     {
         return true;
     }
@@ -802,35 +787,11 @@ void TariffComponentsDataClass::CleanupStructValue(PayloadType & aValue)
         aValue.label.ClearValue();
     }
 
-    // If PRICE feature are supported
-    if (CommonUtilities::HasFeatureInCtx((TariffUpdateCtx *) mAuxData, CommodityTariff::Feature::kPricing))
-    {
-        aValue.price.ClearValue();
-    }
-
-    // If FCRED feature are supported
-    if (CommonUtilities::HasFeatureInCtx((TariffUpdateCtx *) mAuxData, CommodityTariff::Feature::kFriendlyCredit))
-    {
-        aValue.friendlyCredit.ClearValue();
-    }
-
-    // If AUXLD feature are supported
-    if (CommonUtilities::HasFeatureInCtx((TariffUpdateCtx *) mAuxData, CommodityTariff::Feature::kAuxiliaryLoad))
-    {
-        aValue.auxiliaryLoad.ClearValue();
-    }
-
-    // If PEAKP feature are supported
-    if (CommonUtilities::HasFeatureInCtx((TariffUpdateCtx *) mAuxData, CommodityTariff::Feature::kPeakPeriod))
-    {
-        aValue.peakPeriod.ClearValue();
-    }
-
-    // If PWRTHLD feature are supported
-    if (CommonUtilities::HasFeatureInCtx((TariffUpdateCtx *) mAuxData, CommodityTariff::Feature::kPowerThreshold))
-    {
-        aValue.powerThreshold.ClearValue();
-    }
+    aValue.price.ClearValue();
+    aValue.friendlyCredit.ClearValue();
+    aValue.auxiliaryLoad.ClearValue();
+    aValue.peakPeriod.ClearValue();
+    aValue.powerThreshold.ClearValue();
 }
 
 // IndividualDaysDataClass
