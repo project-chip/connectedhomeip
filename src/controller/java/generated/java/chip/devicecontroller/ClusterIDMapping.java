@@ -11480,7 +11480,7 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             CurrentState(0L),
-            Target(1L),
+            TargetState(1L),
             Resolution(2L),
             StepValue(3L),
             Unit(4L),
@@ -11490,6 +11490,7 @@ public class ClusterIDMapping {
             RotationAxis(8L),
             Overflow(9L),
             ModulationType(10L),
+            LatchControlModes(11L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
