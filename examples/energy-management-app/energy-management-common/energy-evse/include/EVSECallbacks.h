@@ -46,7 +46,7 @@ enum class EVSECallbackType : uint8_t
        update to EVSE application logic about a new discharging current )
      */
     DischargeCurrentChanged,
-    
+
     /*
      * Charging Preferences have changed
      * The daily charging target time, SoC / Added Energy schedules have changed
