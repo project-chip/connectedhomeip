@@ -86,8 +86,6 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
 } // namespace DeviceLayer
 } // namespace chip
 
-<<<<<<< HEAD
-=======
 // This method is already implemented in the Zigbee stack and is required by the Zigbee
 #ifndef SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
 extern "C" void halInternalAssertFailed(const char * filename, int linenumber)
@@ -104,7 +102,6 @@ extern "C" void halInternalAssertFailed(const char * filename, int linenumber)
 }
 #endif
 
->>>>>>> 87176944ed (Added a uart flush to force a uart output without relying on the yart task when we hit a fault, added handlers for faults other than hardfault to get logts)
 #if HARD_FAULT_LOG_ENABLE
 /**
  * Log register contents to UART when a hard fault occurs.
@@ -152,9 +149,8 @@ extern "C" __attribute__((used)) void debugHardfault(uint32_t * sp)
  * Log a fault to the debugHardfault function.
  * This function is called by the fault handlers to log the fault details.
  */
-<<<<<<< HEAD
-=======
-extern "C" void LogFault_Handler(void)
+
+extern "C" __attribute__((naked)) void LogFault_Handler(void)
 {
     uint32_t * sp;
     __asm volatile("tst lr, #4 \n"
@@ -170,7 +166,6 @@ extern "C" __attribute__((naked)) void NMI_Handler(void)
 {
     __asm volatile("b LogFault_Handler");
 }
->>>>>>> 87176944ed (Added a uart flush to force a uart output without relying on the yart task when we hit a fault, added handlers for faults other than hardfault to get logts)
 extern "C" __attribute__((naked)) void HardFault_Handler(void)
 {
     __asm volatile("b LogFault_Handler");
