@@ -101,7 +101,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             TestStep("3f", "TH sends command MoveTo with Latch = True."),
             TestStep("3g", "If LatchControlModes Bit 0 = 1 (RemoteLatching = True), skip step 3h."),
             TestStep("3h", "Latch the DUT manually to set OverallCurrentState.Latch to True."),
-            TestStep("3i", "If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute."),
+            TestStep("3i", "Wait until TH receives a subscription report with OverallCurrentState.Latch = True."),
             TestStep("3j", "If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute."),
             TestStep("4a", "If the LT feature is not supported on the cluster, skip steps 4b to 4i."),
             TestStep("4b", "If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip steps 4c to 4f."),
@@ -286,19 +286,12 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                     input("Press Enter after latching the DUT...")
                     logging.info("Manual latching completed.")
 
-                # STEP 3i: If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute
+                # STEP 3i: Wait until TH receives a subscription report with OverallCurrentState.Latch = True
                 self.step("3i")
 
-                if attributes.OverallCurrentState.attribute_id in attribute_list:
-                    overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
-                    logging.info(f"OverallCurrentState: {overall_current_state}")
-                    if overall_current_state is None:
-                        logging.error("OverallCurrentState is None")
-
-                    asserts.assert_true(overall_current_state.latch, "OverallCurrentState.latch is not True")
-                else:
-                    asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
-                    return
+                logging.info("Waiting for OverallCurrentState.Latch to be False")
+                sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(True)],
+                                                              timeout_sec=timeout)
 
             # STEP 3j: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
             self.step("3j")
