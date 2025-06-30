@@ -65,14 +65,14 @@ CHIP_ERROR PairingCommand::RunCommand()
         static_cast<chip::Controller::JCM::JCMDeviceCommissioner &>(CurrentCommissioner());
     commissioner.RegisterPairingDelegate(this);
     commissioner.RegisterTrustVerificationDelegate(this);
-   
+
     // This check is to ensure that the --anchor and --jcm options are not used together.  If they are return an immediate error.
     if (mJCM.ValueOr(false) && mAnchor.ValueOr(false))
     {
         ChipLogError(JointFabric, "--anchor and --jcm options are not allowed simultaneously!");
         return CHIP_ERROR_BAD_REQUEST;
     }
-  
+
     /* TODO: if JFA is onboarded get the Anchor CAT initial version from JF_DS@GroupList (through RPC)
      * https://github.com/project-chip/connectedhomeip/issues/39443
      */
@@ -84,10 +84,10 @@ CHIP_ERROR PairingCommand::RunCommand()
      */
     chip::CASEAuthTag administratorCAT   = GetAdminCATWithVersion(CHIP_CONFIG_ADMINISTRATOR_CAT_INITIAL_VERSION);
     NodeId administratorCaseAdminSubject = NodeIdFromCASEAuthTag(administratorCAT);
-  
+
     // JFA will be issued a NOC with Anchor CAT and Administrator CAT
     mCASEAuthTags = MakeOptional(std::vector<uint32_t>{ administratorCAT, anchorCAT });
-  
+
     NodeId anchorNodeId = GetAnchorNodeId();
     if (anchorNodeId == chip::kUndefinedNodeId)
     {
