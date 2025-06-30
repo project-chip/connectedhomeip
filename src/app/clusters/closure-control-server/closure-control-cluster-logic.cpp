@@ -479,20 +479,19 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
         overallTargetState.SetNonNull(GenericOverallTargetState{});
     }
 
-    if (position.HasValue())
+    if (position.HasValue() && mConformance.HasFeature(Feature::kPositioning))
     {
         VerifyOrReturnError(position.Value() != TargetPositionEnum::kUnknownEnumValue, Status::ConstraintError);
 
-        if (mConformance.HasFeature(Feature::kPositioning))
-        {
-            overallTargetState.Value().position.SetValue(DataModel::MakeNullable(position.Value()));
-        }
+        overallTargetState.Value().position.SetValue(DataModel::MakeNullable(position.Value()));
     }
 
     if (latch.HasValue() && mConformance.HasFeature(Feature::kMotionLatching))
     {
-        // If manual intervention is required to latch, respond with INVALID_IN_STATE
-        if (mDelegate.IsManualLatchingNeeded())
+        // If latch value is true and the Remote Latching feature is not supported, or
+        // if latch value is false and the Remote Unlatching feature is not supported, return InvalidInState.
+        if ((latch.Value() &&  !mState.mLatchControlModes.Has(LatchControlModesBitmap::kRemoteLatching)) ||
+            (!latch.Value() && !mState.mLatchControlModes.Has(LatchControlModesBitmap::kRemoteUnlatching)))
         {
             return Status::InvalidInState;
         }
@@ -500,14 +499,11 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
         overallTargetState.Value().latch.SetValue(DataModel::MakeNullable(latch.Value()));
     }
 
-    if (speed.HasValue())
+    if (speed.HasValue() & mConformance.HasFeature(Feature::kSpeed))
     {
         VerifyOrReturnError(speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, Status::ConstraintError);
 
-        if (mConformance.HasFeature(Feature::kSpeed))
-        {
-            overallTargetState.Value().speed.SetValue(speed.Value());
-        }
+        overallTargetState.Value().speed.SetValue(speed.Value());
     }
 
     MainStateEnum state;

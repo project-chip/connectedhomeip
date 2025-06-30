@@ -570,7 +570,13 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     // If latch field is present and MotionLatching feature is not supported, we should not set targetState.latch value.
     if (latch.HasValue() && mConformance.HasFeature(Feature::kMotionLatching))
     {
-        VerifyOrReturnError(!mDelegate.IsManualLatchingNeeded(), Status::InvalidAction);
+        // If latch value is true and the Remote Latching feature is not supported, or
+        // if latch value is false and the Remote Unlatching feature is not supported, return InvalidInState.
+        if ((latch.Value() &&  !mState.latchControlModes.Has(LatchControlModesBitmap::kRemoteLatching)) ||
+            (!latch.Value() && !mState.latchControlModes.Has(LatchControlModesBitmap::kRemoteUnlatching)))
+        {
+            return Status::InvalidInState;
+        }
 
         targetState.Value().latch.SetValue(DataModel::MakeNullable(latch.Value()));
     }
