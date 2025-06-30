@@ -219,7 +219,7 @@ private:
     /**
      * @brief Handles the motion action for the closure system.
      *
-     * This method is called when a move-to action has been initiated, 
+     * This method is called when a move-to action has been initiated,
      * allowing for any necessary updates or state changes.
      */
     void HandleClosureMotionAction();
