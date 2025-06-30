@@ -16,7 +16,7 @@
 #pragma once
 
 #include <app/StorageDelegateWrapper.h>
-#include <app/util/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 
@@ -34,18 +34,13 @@ namespace app {
 class DefaultAttributePersistenceProvider : protected StorageDelegateWrapper, public AttributePersistenceProvider
 {
 public:
-    constexpr DefaultAttributePersistenceProvider() {}
+    constexpr DefaultAttributePersistenceProvider() = default;
 
     CHIP_ERROR Init(PersistentStorageDelegate * storage) { return StorageDelegateWrapper::Init(storage); }
 
     // AttributePersistenceProvider implementation.
     CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override;
-    CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, const EmberAfAttributeMetadata * aMetadata,
-                         MutableByteSpan & aValue) override;
-
-private:
-    CHIP_ERROR InternalReadValue(const StorageKeyName & aKey, EmberAfAttributeType aType, size_t aExpectedSize,
-                                 MutableByteSpan & aValue);
+    CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue) override;
 };
 
 } // namespace app
