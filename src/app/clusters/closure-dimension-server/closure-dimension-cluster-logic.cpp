@@ -116,7 +116,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
                     return true;
                 };
                 markDirty |= (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.Value().position.Value(), now,
-                                                                          predicate) == AttributeDirtyState::kMustReport);
+                                                                           predicate) == AttributeDirtyState::kMustReport);
             }
             else
             {
@@ -125,7 +125,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
                 System::Clock::Milliseconds64 reportInterval = System::Clock::Milliseconds64(kPositionQuietReportingInterval);
                 auto predicate = quietReportableCurrentStatePosition.GetPredicateForSufficientTimeSinceLastDirty(reportInterval);
                 markDirty |= (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.Value().position.Value(), now,
-                                                                               predicate) == AttributeDirtyState::kMustReport);
+                                                                           predicate) == AttributeDirtyState::kMustReport);
             }
         }
 
