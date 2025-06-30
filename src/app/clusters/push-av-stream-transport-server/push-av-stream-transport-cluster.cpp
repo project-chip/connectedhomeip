@@ -117,7 +117,7 @@ DataModel::ActionReturnStatus PushAvStreamTransportServer::ReadAttribute(const D
             CHIP_ERROR err = ReadAndEncodeCurrentConnections(encoder, aEncoder.AccessingFabricIndex());
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(Zcl, "Push AV Stream Transport: Error reading CurrentConnections");
+                ChipLogError(Zcl, "Push AV Stream Transport: Error reading CurrentConnections %s", err.AsString());
             }
             return err;
         });

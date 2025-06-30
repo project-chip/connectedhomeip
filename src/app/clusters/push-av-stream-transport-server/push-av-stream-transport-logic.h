@@ -24,6 +24,11 @@ public:
     void SetDelegate(EndpointId aEndpoint, PushAvStreamTransportDelegate * delegate)
     {
         mDelegate = delegate;
+        if (mDelegate == nullptr)
+        {
+            ChipLogError(Zcl, "Push AV Stream Transport: Delegate is null");
+            return;
+        }
         mDelegate->SetEndpointId(aEndpoint);
     }
 
@@ -126,7 +131,7 @@ private:
      * @param endpointId    endpoint where DoorLockServer is running
      * @param timeoutSec    timeout in seconds
      */
-    void ScheduleTransportDeallocate(uint16_t connectionID, uint32_t timeoutSec);
+    CHIP_ERROR ScheduleTransportDeallocate(uint16_t connectionID, uint32_t timeoutSec);
 };
 } // namespace PushAvStreamTransport
 } // namespace Clusters

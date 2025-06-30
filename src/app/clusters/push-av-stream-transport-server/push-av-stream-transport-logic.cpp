@@ -243,7 +243,7 @@ void PushAvStreamTransportServerLogic::PushAVStreamTransportDeallocateCallback(S
     }
 }
 
-void PushAvStreamTransportServerLogic::ScheduleTransportDeallocate(uint16_t connectionID, uint32_t timeoutSec)
+CHIP_ERROR PushAvStreamTransportServerLogic::ScheduleTransportDeallocate(uint16_t connectionID, uint32_t timeoutSec)
 {
     uint32_t timeoutMs = timeoutSec * MILLISECOND_TICKS_PER_SECOND;
 
@@ -253,7 +253,7 @@ void PushAvStreamTransportServerLogic::ScheduleTransportDeallocate(uint16_t conn
     if (transportDeallocateContext == nullptr)
     {
         ChipLogError(Zcl, "Failed to allocate memory for deallocate context");
-        return;
+        return CHIP_ERROR_NO_MEMORY;
     }
 
     CHIP_ERROR err = DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(timeoutMs),
@@ -269,6 +269,8 @@ void PushAvStreamTransportServerLogic::ScheduleTransportDeallocate(uint16_t conn
     {
         UpsertTimerAppState(transportDeallocateContext);
     }
+
+    return err;
 }
 
 Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
@@ -511,7 +513,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     VerifyOrDo(transportOptionsValidityStatus == Status::Success, {
         ChipLogError(Zcl, "HandleAllocatePushTransport[ep=%d]: TransportOptions of command data is not Valid", mEndpointId);
         handler.AddStatus(commandPath, transportOptionsValidityStatus);
-        return std::nullopt;
+        return transportOptionsValidityStatus;
     });
 
     // Todo: TLSEndpointID Validation
