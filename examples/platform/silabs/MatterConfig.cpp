@@ -25,6 +25,7 @@
 #include <mbedtls/platform.h>
 
 #ifdef SL_WIFI
+#include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 #include <platform/silabs/wifi/WifiInterface.h>
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -85,15 +86,22 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
+#include <app/clusters/network-commissioning/network-commissioning.h>
+
 /**********************************************************
  * Defines
  *********************************************************/
 
 using namespace ::chip;
+using namespace ::chip::app;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Credentials;
 using namespace chip::DeviceLayer::Silabs;
+
+#ifdef SL_WIFI
+Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::SlWiFiDriver> sWifiNetworkDriver(kRootEndpointId);
+#endif /* SL_WIFI */
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <inet/EndPointStateOpenThread.h>
@@ -108,6 +116,9 @@ using namespace chip::DeviceLayer::Silabs;
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
 
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+
+Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(kRootEndpointId);
 // ================================================================================
 // Matter Networking Callbacks
 // ================================================================================
@@ -124,7 +135,6 @@ void UnlockOpenThreadTask(void)
 // ================================================================================
 // SilabsMatterConfig Methods
 // ================================================================================
-
 CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 {
     ChipLogProgress(DeviceLayer, "Initializing OpenThread stack");
@@ -144,6 +154,8 @@ CHIP_ERROR SilabsMatterConfig::InitOpenThread(void)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // CHIP_DEVICE_CONFIG_THREAD_FTD
 
+    sThreadNetworkDriver.Init();
+
     ChipLogProgress(DeviceLayer, "Starting OpenThread task");
     return ThreadStackMgrImpl().StartThreadTask();
 }
@@ -159,7 +171,12 @@ constexpr osThreadAttr_t kMainTaskAttr = { .name       = "main",
                                            .cb_size    = 0U,
                                            .stack_mem  = NULL,
                                            .stack_size = kMainTaskStackSize,
-                                           .priority   = osPriorityRealtime7 };
+#ifdef SLI_SI91X_MCU_INTERFACE
+                                           .priority = osPriorityRealtime4
+#else
+                                           .priority = osPriorityRealtime7
+#endif // SLI_SI91X_MCU_INTERFACE
+};
 osThreadId_t sMainTaskHandle;
 static chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
@@ -245,7 +262,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(appName);
 
     // Provision Manager
-    Silabs::Provision::Manager & provision = Silabs::Provision::Manager::GetInstance();
+    Provision::Manager & provision = Provision::Manager::GetInstance();
     ReturnErrorOnFailure(provision.Init());
     SetDeviceInstanceInfoProvider(&provision.GetStorage());
     SetCommissionableDataProvider(&provision.GetStorage());
@@ -263,11 +280,11 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     static chip::CommonCaseDeviceServerInitParams initParams;
 
     // Report scheduler and timer delegate instance
-    static chip::app::DefaultTimerDelegate sTimerDelegate;
+    static DefaultTimerDelegate sTimerDelegate;
 #if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
-    static chip::app::reporting::SynchronizedReportSchedulerImpl sReportScheduler(&sTimerDelegate);
+    static reporting::SynchronizedReportSchedulerImpl sReportScheduler(&sTimerDelegate);
 #else
-    static chip::app::reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
+    static reporting::ReportSchedulerImpl sReportScheduler(&sTimerDelegate);
 #endif
 
     initParams.reportScheduler = &sReportScheduler;
@@ -288,7 +305,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
     // Initialize the remaining (not overridden) providers to the SDK example defaults
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
-    initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
 #if CHIP_ENABLE_OPENTHREAD
     // Set up OpenThread configuration when OpenThread is included
@@ -320,6 +337,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #ifdef SL_WIFI
 CHIP_ERROR SilabsMatterConfig::InitWiFi(void)
 {
+    sWifiNetworkDriver.Init();
     return WifiInterface::GetInstance().InitWiFiStack();
 }
 #endif // SL_WIFI
