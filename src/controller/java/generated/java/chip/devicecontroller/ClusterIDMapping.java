@@ -11353,8 +11353,9 @@ public class ClusterIDMapping {
             CountdownTime(0L),
             MainState(1L),
             CurrentErrorList(2L),
-            OverallState(3L),
-            OverallTarget(4L),
+            OverallCurrentState(3L),
+            OverallTargetState(4L),
+            LatchControlModes(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -11479,7 +11480,7 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             CurrentState(0L),
-            Target(1L),
+            TargetState(1L),
             Resolution(2L),
             StepValue(3L),
             Unit(4L),
@@ -11489,6 +11490,7 @@ public class ClusterIDMapping {
             RotationAxis(8L),
             Overflow(9L),
             ModulationType(10L),
+            LatchControlModes(11L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -20263,7 +20265,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             MeteredQuantity(0L),
             MeteredQuantityTimestamp(1L),
-            MeasurementType(2L),
+            TariffUnit(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),

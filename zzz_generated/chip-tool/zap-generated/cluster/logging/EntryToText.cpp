@@ -2763,10 +2763,12 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "MainState";
         case chip::app::Clusters::ClosureControl::Attributes::CurrentErrorList::Id:
             return "CurrentErrorList";
-        case chip::app::Clusters::ClosureControl::Attributes::OverallState::Id:
-            return "OverallState";
-        case chip::app::Clusters::ClosureControl::Attributes::OverallTarget::Id:
-            return "OverallTarget";
+        case chip::app::Clusters::ClosureControl::Attributes::OverallCurrentState::Id:
+            return "OverallCurrentState";
+        case chip::app::Clusters::ClosureControl::Attributes::OverallTargetState::Id:
+            return "OverallTargetState";
+        case chip::app::Clusters::ClosureControl::Attributes::LatchControlModes::Id:
+            return "LatchControlModes";
         case chip::app::Clusters::ClosureControl::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ClosureControl::Attributes::AcceptedCommandList::Id:
@@ -2786,8 +2788,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         {
         case chip::app::Clusters::ClosureDimension::Attributes::CurrentState::Id:
             return "CurrentState";
-        case chip::app::Clusters::ClosureDimension::Attributes::Target::Id:
-            return "Target";
+        case chip::app::Clusters::ClosureDimension::Attributes::TargetState::Id:
+            return "TargetState";
         case chip::app::Clusters::ClosureDimension::Attributes::Resolution::Id:
             return "Resolution";
         case chip::app::Clusters::ClosureDimension::Attributes::StepValue::Id:
@@ -2806,6 +2808,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Overflow";
         case chip::app::Clusters::ClosureDimension::Attributes::ModulationType::Id:
             return "ModulationType";
+        case chip::app::Clusters::ClosureDimension::Attributes::LatchControlModes::Id:
+            return "LatchControlModes";
         case chip::app::Clusters::ClosureDimension::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::ClosureDimension::Attributes::AcceptedCommandList::Id:
@@ -4753,8 +4757,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "MeteredQuantity";
         case chip::app::Clusters::CommodityMetering::Attributes::MeteredQuantityTimestamp::Id:
             return "MeteredQuantityTimestamp";
-        case chip::app::Clusters::CommodityMetering::Attributes::MeasurementType::Id:
-            return "MeasurementType";
+        case chip::app::Clusters::CommodityMetering::Attributes::TariffUnit::Id:
+            return "TariffUnit";
         case chip::app::Clusters::CommodityMetering::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::CommodityMetering::Attributes::AcceptedCommandList::Id:
