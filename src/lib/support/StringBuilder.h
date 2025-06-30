@@ -112,13 +112,13 @@ public:
     StringBuilder(const char * data, size_t length) : StringBuilder() { AddFormat("%.*s", static_cast<int>(length), data); }
 
     /// Constructor for uint8_t * and length
-    StringBuilder(const uint8_t * data, size_t length) : StringBuilder((const char *)data, length) { }
+    StringBuilder(const uint8_t * data, size_t length) : StringBuilder((const char *) data, length) {}
 
     /// Constructor for CharSpan
-    StringBuilder(const CharSpan & span) : StringBuilder(span.data(), span.size()) { }
+    StringBuilder(const CharSpan & span) : StringBuilder(span.data(), span.size()) {}
 
     /// Constructor for ByteSpan
-    StringBuilder(const ByteSpan & span) : StringBuilder((const char *)span.data(), span.size()) { }
+    StringBuilder(const ByteSpan & span) : StringBuilder((const char *) span.data(), span.size()) {}
 
 private:
     char mBuffer[kSize];
