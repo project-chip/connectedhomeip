@@ -9245,17 +9245,17 @@ public static class ClosureControlClusterOverallTargetStateStruct {
     return output.toString();
   }
 }
-public static class ClosureDimensionClusterCurrentStateStruct {
-  public Optional<Integer> position;
-  public Optional<Boolean> latch;
+public static class ClosureDimensionClusterDimensionStateStruct {
+  public @Nullable Optional<Integer> position;
+  public @Nullable Optional<Boolean> latch;
   public Optional<Integer> speed;
   private static final long POSITION_ID = 0L;
   private static final long LATCH_ID = 1L;
   private static final long SPEED_ID = 2L;
 
-  public ClosureDimensionClusterCurrentStateStruct(
-    Optional<Integer> position,
-    Optional<Boolean> latch,
+  public ClosureDimensionClusterDimensionStateStruct(
+    @Nullable Optional<Integer> position,
+    @Nullable Optional<Boolean> latch,
     Optional<Integer> speed
   ) {
     this.position = position;
@@ -9265,19 +9265,19 @@ public static class ClosureDimensionClusterCurrentStateStruct {
 
   public StructType encodeTlv() {
     ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(POSITION_ID, position.<BaseTLVType>map((nonOptionalposition) -> new UIntType(nonOptionalposition)).orElse(new EmptyType())));
-    values.add(new StructElement(LATCH_ID, latch.<BaseTLVType>map((nonOptionallatch) -> new BooleanType(nonOptionallatch)).orElse(new EmptyType())));
+    values.add(new StructElement(POSITION_ID, position != null ? position.<BaseTLVType>map((nonOptionalposition) -> new UIntType(nonOptionalposition)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(LATCH_ID, latch != null ? latch.<BaseTLVType>map((nonOptionallatch) -> new BooleanType(nonOptionallatch)).orElse(new EmptyType()) : new NullType()));
     values.add(new StructElement(SPEED_ID, speed.<BaseTLVType>map((nonOptionalspeed) -> new UIntType(nonOptionalspeed)).orElse(new EmptyType())));
 
     return new StructType(values);
   }
 
-  public static ClosureDimensionClusterCurrentStateStruct decodeTlv(BaseTLVType tlvValue) {
+  public static ClosureDimensionClusterDimensionStateStruct decodeTlv(BaseTLVType tlvValue) {
     if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
       return null;
     }
-    Optional<Integer> position = Optional.empty();
-    Optional<Boolean> latch = Optional.empty();
+    @Nullable Optional<Integer> position = null;
+    @Nullable Optional<Boolean> latch = null;
     Optional<Integer> speed = Optional.empty();
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == POSITION_ID) {
@@ -9297,7 +9297,7 @@ public static class ClosureDimensionClusterCurrentStateStruct {
         }
       }
     }
-    return new ClosureDimensionClusterCurrentStateStruct(
+    return new ClosureDimensionClusterDimensionStateStruct(
       position,
       latch,
       speed
@@ -9307,7 +9307,7 @@ public static class ClosureDimensionClusterCurrentStateStruct {
   @Override
   public String toString() {
     StringBuilder output = new StringBuilder();
-    output.append("ClosureDimensionClusterCurrentStateStruct {\n");
+    output.append("ClosureDimensionClusterDimensionStateStruct {\n");
     output.append("\tposition: ");
     output.append(position);
     output.append("\n");
@@ -9377,82 +9377,6 @@ public static class ClosureDimensionClusterRangePercent100thsStruct {
     output.append("\n");
     output.append("\tmax: ");
     output.append(max);
-    output.append("\n");
-    output.append("}\n");
-    return output.toString();
-  }
-}
-public static class ClosureDimensionClusterTargetStruct {
-  public Optional<Integer> position;
-  public Optional<Boolean> latch;
-  public Optional<Integer> speed;
-  private static final long POSITION_ID = 0L;
-  private static final long LATCH_ID = 1L;
-  private static final long SPEED_ID = 2L;
-
-  public ClosureDimensionClusterTargetStruct(
-    Optional<Integer> position,
-    Optional<Boolean> latch,
-    Optional<Integer> speed
-  ) {
-    this.position = position;
-    this.latch = latch;
-    this.speed = speed;
-  }
-
-  public StructType encodeTlv() {
-    ArrayList<StructElement> values = new ArrayList<>();
-    values.add(new StructElement(POSITION_ID, position.<BaseTLVType>map((nonOptionalposition) -> new UIntType(nonOptionalposition)).orElse(new EmptyType())));
-    values.add(new StructElement(LATCH_ID, latch.<BaseTLVType>map((nonOptionallatch) -> new BooleanType(nonOptionallatch)).orElse(new EmptyType())));
-    values.add(new StructElement(SPEED_ID, speed.<BaseTLVType>map((nonOptionalspeed) -> new UIntType(nonOptionalspeed)).orElse(new EmptyType())));
-
-    return new StructType(values);
-  }
-
-  public static ClosureDimensionClusterTargetStruct decodeTlv(BaseTLVType tlvValue) {
-    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
-      return null;
-    }
-    Optional<Integer> position = Optional.empty();
-    Optional<Boolean> latch = Optional.empty();
-    Optional<Integer> speed = Optional.empty();
-    for (StructElement element: ((StructType)tlvValue).value()) {
-      if (element.contextTagNum() == POSITION_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          position = Optional.of(castingValue.value(Integer.class));
-        }
-      } else if (element.contextTagNum() == LATCH_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
-          BooleanType castingValue = element.value(BooleanType.class);
-          latch = Optional.of(castingValue.value(Boolean.class));
-        }
-      } else if (element.contextTagNum() == SPEED_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
-          UIntType castingValue = element.value(UIntType.class);
-          speed = Optional.of(castingValue.value(Integer.class));
-        }
-      }
-    }
-    return new ClosureDimensionClusterTargetStruct(
-      position,
-      latch,
-      speed
-    );
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder output = new StringBuilder();
-    output.append("ClosureDimensionClusterTargetStruct {\n");
-    output.append("\tposition: ");
-    output.append(position);
-    output.append("\n");
-    output.append("\tlatch: ");
-    output.append(latch);
-    output.append("\n");
-    output.append("\tspeed: ");
-    output.append(speed);
     output.append("\n");
     output.append("}\n");
     return output.toString();

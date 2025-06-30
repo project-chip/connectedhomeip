@@ -14,7 +14,8 @@
  *    limitations under the License.
  */
 
-#include <app/util/persistence/DeferredAttributePersistenceProvider.h>
+#include "app/persistence/AttributePersistenceProvider.h"
+#include <app/persistence/DeferredAttributePersistenceProvider.h>
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -57,10 +58,9 @@ CHIP_ERROR DeferredAttributePersistenceProvider::WriteValue(const ConcreteAttrib
     return mPersister.WriteValue(aPath, aValue);
 }
 
-CHIP_ERROR DeferredAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & aPath,
-                                                           const EmberAfAttributeMetadata * aMetadata, MutableByteSpan & aValue)
+CHIP_ERROR DeferredAttributePersistenceProvider::ReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue)
 {
-    return mPersister.ReadValue(aPath, aMetadata, aValue);
+    return mPersister.ReadValue(aPath, aValue);
 }
 
 void DeferredAttributePersistenceProvider::FlushAndScheduleNext()
