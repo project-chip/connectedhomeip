@@ -2305,6 +2305,17 @@ public class ClusterReadMapping {
           readGeneralCommissioningNetworkRecoveryReasonCommandParams
         );
         result.put("readNetworkRecoveryReasonAttribute", readGeneralCommissioningNetworkRecoveryReasonAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readGeneralCommissioningIsCommissioningWithoutPowerCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readGeneralCommissioningIsCommissioningWithoutPowerAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.GeneralCommissioningCluster) cluster).readIsCommissioningWithoutPowerAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readGeneralCommissioningIsCommissioningWithoutPowerCommandParams
+        );
+        result.put("readIsCommissioningWithoutPowerAttribute", readGeneralCommissioningIsCommissioningWithoutPowerAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readGeneralCommissioningGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readGeneralCommissioningGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
