@@ -1708,7 +1708,7 @@ _has_feature = decorators._has_feature
 _has_command = decorators._has_command
 _has_attribute = decorators._has_attribute
 
-
+default_matter_test_main = runner.default_matter_test_main
 get_test_info = runner.get_test_info
 run_tests = runner.run_tests
 run_tests_no_exit = runner.run_tests_no_exit
