@@ -116,7 +116,7 @@ public:
         if ( (err == CHIP_NO_ERROR) && 
              ((err = mgmtObj.CreateNewValue(tempList.size())) == CHIP_NO_ERROR) )
         {
-            std::copy(tempList.begin(), tempList.end(), mgmtObj.GetNewValue());
+            std::copy(tempList.begin(), tempList.end(), mgmtObj.GetNewValueData());
             mgmtObj.MarkAsAssigned();
         }
 
@@ -143,7 +143,7 @@ public:
 
         if ((err = mgmtObj.CreateNewValue(0)) == CHIP_NO_ERROR)
         {
-            *(mgmtObj.GetNewValue()) = output;
+            *(mgmtObj.GetNewValueData()) = output;
             mgmtObj.MarkAsAssigned();
         }
 

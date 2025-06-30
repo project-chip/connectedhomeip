@@ -61,7 +61,7 @@ CHIP_ERROR TariffUnit_LoadFromJson(const Json::Value & json, TariffUnitDataClass
         CHIP_ERROR err = MgmtObj.CreateNewValue(0);
         if (CHIP_NO_ERROR == err)
         {
-            *(MgmtObj.GetNewValue()) = static_cast<Globals::TariffUnitEnum>(json.asUInt());
+            *(MgmtObj.GetNewValueData()) = static_cast<Globals::TariffUnitEnum>(json.asUInt());
             MgmtObj.MarkAsAssigned();
         }
 
@@ -78,7 +78,7 @@ CHIP_ERROR StartDate_LoadFromJson(const Json::Value & json, StartDateDataClass &
         CHIP_ERROR err = MgmtObj.CreateNewValue(0);
         if (CHIP_NO_ERROR == err)
         {
-            *(MgmtObj.GetNewValue()) = static_cast<uint32_t>(json.asUInt());
+            *(MgmtObj.GetNewValueData()) = static_cast<uint32_t>(json.asUInt());
             MgmtObj.MarkAsAssigned();
         }
 
@@ -95,7 +95,7 @@ CHIP_ERROR DefaultRandomizationOffset_LoadFromJson(const Json::Value & json, Def
         CHIP_ERROR err = MgmtObj.CreateNewValue(0);
         if (CHIP_NO_ERROR == err)
         {
-            *(MgmtObj.GetNewValue()) = static_cast<int16_t>(json.asInt());
+            *(MgmtObj.GetNewValueData()) = static_cast<int16_t>(json.asInt());
             MgmtObj.MarkAsAssigned();
         }
 
@@ -112,7 +112,7 @@ CHIP_ERROR DefaultRandomizationType_LoadFromJson(const Json::Value & json, Defau
         CHIP_ERROR err = MgmtObj.CreateNewValue(0);
         if (CHIP_NO_ERROR == err)
         {
-            *(MgmtObj.GetNewValue()) = (static_cast<DayEntryRandomizationTypeEnum>(json.asUInt()));
+            *(MgmtObj.GetNewValueData()) = (static_cast<DayEntryRandomizationTypeEnum>(json.asUInt()));
             MgmtObj.MarkAsAssigned();
         }
 
@@ -728,7 +728,7 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
         }
     }
 
-    if ( GetIndividualDays_MgmtObj().IsValid() && (GetIndividualDays_MgmtObj().GetNewValue() != nullptr) )
+    if ( GetIndividualDays_MgmtObj().IsValid() && (GetIndividualDays_MgmtObj().GetNewValueData() != nullptr) )
     {
         
         assert(!UpdCtx.IndividualDaysDayEntryIDs.empty()); // Something went wrong if IndividualDays has no DE IDs
@@ -750,7 +750,7 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
         DayEntriesData_is_available = true;
     }
 
-    if ( GetCalendarPeriods_MgmtObj().IsValid() && ( GetCalendarPeriods_MgmtObj().GetNewValue() != nullptr) )
+    if ( GetCalendarPeriods_MgmtObj().IsValid() && ( GetCalendarPeriods_MgmtObj().GetNewValueData() != nullptr) )
     {
         assert(!UpdCtx.CalendarPeriodsDayPatternIDs.empty()); // Something went wrong if CP has no DP IDs
 

@@ -31,12 +31,12 @@ using namespace chip::app::Clusters::CommodityTariff::Structs;
 uint8_t presetIndex = 0;
 
 namespace TariffPresets {
-static constexpr const char * kTariff1 = "./DefaultTariff.json";
+//static constexpr const char * kTariff1 = "./DefaultTariff.json";
 static constexpr const char * kTariff2 = "./full_complex_tariff_1.json";
-static constexpr const char * kTariff3 = "./full_complex_tariff_2.json";
+//static constexpr const char * kTariff3 = "./full_complex_tariff_2.json";
 
 // Array of all presets
-static constexpr std::array<const char *, 3> kAllPresets = { kTariff1, kTariff2, kTariff3 };
+static constexpr std::array<const char *, 1> kAllPresets = { kTariff2 };
 
 // Number of presets (compile-time constant)
 static constexpr size_t kCount = kAllPresets.size();
@@ -44,7 +44,14 @@ static constexpr size_t kCount = kAllPresets.size();
 // Safe accessor function
 static constexpr const char * GetPreset(size_t index)
 {
-    return (index < kCount) ? kAllPresets[index] : nullptr;
+    if (index < kCount)
+    {
+        presetIndex++;
+    }
+    else{
+        index = kCount-1;
+    }
+    return kAllPresets[index];
 }
 } // namespace TariffPresets
 
@@ -56,7 +63,6 @@ void SetTestEventTrigger_TariffDataUpdated()
     if (const char * preset = TariffPresets::GetPreset(presetIndex))
     {
         LoadTariffFromJSONFile(preset, dg);
-        presetIndex++;            
     }
     else
     {
