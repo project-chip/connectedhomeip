@@ -124,6 +124,7 @@ def get_default_paa_trust_store(root_path: pathlib.Path) -> pathlib.Path:
         # On not having found a PAA dir, just return current dir to avoid blow-ups
         return pathlib.Path.cwd()
 
+
 def clear_queue(report_queue: queue.Queue):
     """Flush all contents of a report queue. Useful to get back to empty point."""
     while not report_queue.empty():

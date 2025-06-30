@@ -142,6 +142,15 @@ class AttributeChangeCallback:
         self._output.put(q)
 
     def wait_for_report(self):
+        """Blocks until a report to the subscribed attribute is received. If not, an exception is raised.
+        Returns:
+            Reported attribute value.
+        Raises:
+            Assertion errors if either of the following happened:
+              * No report was received.
+              * Attribute of unexpected type was reported.
+              * Unable to read the reported attribute's value.
+        """
         try:
             path, transaction = self._output.get(block=True, timeout=10)
         except queue.Empty:
@@ -154,6 +163,7 @@ class AttributeChangeCallback:
             attribute_value = transaction.GetAttribute(path)
             logging.info(
                 f"[AttributeChangeCallback] Got attribute subscription report. Attribute {path.AttributeType}. Updated value: {attribute_value}. SubscriptionId: {transaction.subscriptionId}")
+            return attribute_value
         except KeyError:
             asserts.fail(f"[AttributeChangeCallback] Attribute {self._expected_attribute} not found in returned report")
 

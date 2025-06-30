@@ -18,7 +18,8 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import AttributeChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.event_attribute_reporting import AttributeChangeCallback
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -28,7 +29,7 @@ class TC_PUMP(MatterBaseTest):
     """Tests for chef pump device."""
 
     # Ignore report if it is < 1s since the last report.
-    _SUBSCRIPTION_MIN_INTERVAL_SEC = 1
+    _SUBSCRIPTION_MIN_INTERVAL_SEC = 0
 
     # Set this to a large value so any liveliness updates aren't received during test.
     _SUBSCRIPTION_MAX_INTERVAL_SEC = 3600
