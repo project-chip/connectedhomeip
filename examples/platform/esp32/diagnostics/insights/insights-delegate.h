@@ -49,7 +49,7 @@ public:
      *
      * @return CHIP_ERROR CHIP_NO_ERROR on success, error code otherwise
      */
-    void StopPeriodicInsights();
+    CHIP_ERROR StopPeriodicInsights();
 
     /**
      * @brief Set sampling interval for sending diagnostic data to insights

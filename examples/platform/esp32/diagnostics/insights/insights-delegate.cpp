@@ -1,4 +1,5 @@
 #include "insights-delegate.h"
+
 #include <esp_diagnostics_metrics.h>
 #include <esp_heap_caps.h>
 #include <esp_insights.h>
@@ -8,6 +9,7 @@
 #include <map>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
+#include <tracing/esp32_diagnostic_trace/DiagnosticTracing.h>
 #include <tracing/esp32_diagnostic_trace/DiagnosticStorage.h>
 
 #define kMaxStringValueSize 128
@@ -33,6 +35,9 @@ CHIP_ERROR InsightsDelegate::Init(InsightsInitParams & initParams)
 
     mStorageInstance = new CircularDiagnosticBuffer(initParams.diagnosticBuffer, initParams.diagnosticBufferSize);
     VerifyOrReturnError(mStorageInstance != nullptr, CHIP_ERROR_NO_MEMORY, ESP_LOGE(TAG, "Failed to create diagnostic buffer"));
+    static ESP32Diagnostics diagnosticBackend(mStorageInstance);
+    Register(diagnosticBackend);
+
     return CHIP_NO_ERROR;
 }
 
@@ -43,9 +48,10 @@ CHIP_ERROR InsightsDelegate::StartPeriodicInsights(chip::System::Clock::Timeout 
     return DeviceLayer::SystemLayer().StartTimer(mTimeout, InsightsHandler, this);
 }
 
-void InsightsDelegate::StopPeriodicInsights()
+CHIP_ERROR InsightsDelegate::StopPeriodicInsights()
 {
-    return DeviceLayer::SystemLayer().CancelTimer(InsightsHandler, this);
+    DeviceLayer::SystemLayer().CancelTimer(InsightsHandler, this);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR InsightsDelegate::SetSamplingInterval(chip::System::Clock::Timeout aTimeout)
@@ -211,7 +217,6 @@ void InsightsDelegate::InsightsHandler(System::Layer * systemLayer, void * conte
     auto * instance = static_cast<InsightsDelegate *>(context);
     VerifyOrReturn(instance != nullptr);
     VerifyOrReturn(instance->mStorageInstance != nullptr);
-
     while (!instance->mStorageInstance->IsBufferEmpty())
     {
         instance->SendInsightsData();

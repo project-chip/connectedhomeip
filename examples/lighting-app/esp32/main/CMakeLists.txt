@@ -26,6 +26,7 @@ set(PRIV_INCLUDE_DIRS_LIST
                       "${LIGHT_COMMON_DIR}/include"
                       "${CMAKE_CURRENT_LIST_DIR}/include"
 )
+
 set(SRC_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}"
                       "${APP_COMMON_GEN_DIR}/attributes"
@@ -37,6 +38,11 @@ set(SRC_DIRS_LIST
                       "${CHIP_ROOT}/examples/platform/esp32/shell_extension"
 )
 
+if (CONFIG_ESP_INSIGHTS_ENABLED AND CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${CHIP_ROOT}/examples/platform/esp32/diagnostics/insights/")
+    list(APPEND SRC_DIRS_LIST "${CHIP_ROOT}/examples/platform/esp32/diagnostics/insights/")
+endif()
+
 if (CONFIG_ENABLE_PW_RPC)
 # Append additional directories for RPC build
 set(PRIV_INCLUDE_DIRS_LIST  "${PRIV_INCLUDE_DIRS_LIST}"
@@ -46,6 +52,7 @@ set(PRIV_INCLUDE_DIRS_LIST  "${PRIV_INCLUDE_DIRS_LIST}"
                      "${CHIP_ROOT}/examples/common/pigweed/esp32"
                      "${CHIP_ROOT}/src/lib/support"
 )
+
 
 if (${IDF_VERSION_MAJOR} LESS 5)
     list(APPEND PRIV_INCLUDE_DIRS_LIST "${IDF_PATH}/components/freertos/include/freertos")
