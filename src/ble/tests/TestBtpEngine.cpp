@@ -357,6 +357,43 @@ TEST_F(TestBtpEngine, EncodeStandAloneAckInsufficientBuffer)
     EXPECT_EQ(ackPacket0->DataLength(), static_cast<size_t>(0));
 }
 
+TEST_F(TestBtpEngine, EncodeStandAloneAckMultiFragmentMessage)
+{
+    constexpr uint8_t packetData0[] = { to_underlying(BtpEngine::HeaderFlags::kStartMessage), 0x01, 0x03, 0x00, 0xfd };
+    constexpr uint8_t packetData1[] = { to_underlying(BtpEngine::HeaderFlags::kContinueMessage), 0x02, 0xfe };
+    constexpr uint8_t packetData2[] = { to_underlying(BtpEngine::HeaderFlags::kEndMessage), 0x03, 0xff };
+
+    auto packet0 = System::PacketBufferHandle::NewWithData(packetData0, sizeof(packetData0));
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(5));
+
+    SequenceNumber_t receivedAck;
+    bool didReceiveAck;
+    EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(packet0), receivedAck, didReceiveAck), CHIP_NO_ERROR);
+    EXPECT_EQ(mBtpEngine.RxState(), BtpEngine::kState_InProgress);
+
+    auto packet1 = System::PacketBufferHandle::NewWithData(packetData1, sizeof(packetData1));
+    EXPECT_EQ(packet1->DataLength(), static_cast<size_t>(3));
+
+    EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(packet1), receivedAck, didReceiveAck), CHIP_NO_ERROR);
+    EXPECT_EQ(mBtpEngine.RxState(), BtpEngine::kState_InProgress);
+
+    auto packet2 = System::PacketBufferHandle::NewWithData(packetData2, sizeof(packetData2));
+    EXPECT_EQ(packet2->DataLength(), static_cast<size_t>(3));
+
+    EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(packet2), receivedAck, didReceiveAck), CHIP_NO_ERROR);
+    EXPECT_EQ(mBtpEngine.RxState(), BtpEngine::kState_Complete);
+
+    auto ackPacket = System::PacketBufferHandle::New(kTransferProtocolStandaloneAckHeaderSize);
+    EXPECT_FALSE(ackPacket.IsNull());
+
+    EXPECT_EQ(mBtpEngine.EncodeStandAloneAck(ackPacket), CHIP_NO_ERROR);
+    EXPECT_EQ(ackPacket->DataLength(), kTransferProtocolStandaloneAckHeaderSize);
+
+    EXPECT_EQ(ackPacket->Start()[0], to_underlying(BtpEngine::HeaderFlags::kFragmentAck));
+    EXPECT_EQ(ackPacket->Start()[1], 0x03); // sequence number
+    EXPECT_EQ(ackPacket->Start()[2], 0x00); // fragment count
+}
+
 TEST_F(TestBtpEngine, HandleCharacteristicReceivedIncorrectSequence)
 {
     uint8_t packetData0[] = {
