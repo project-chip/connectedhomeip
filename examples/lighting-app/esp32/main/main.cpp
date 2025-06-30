@@ -122,11 +122,11 @@ chip::Credentials::DeviceAttestationCredentialsProvider * get_dac_provider(void)
 static void InitInsights()
 {
 #if CONFIG_ESP_INSIGHTS_ENABLED && CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-    chip::Insights::InsightsInitParams initParams       = { .diagnosticBuffer     = endUserBuffer,
-                                                            .diagnosticBufferSize = CONFIG_END_USER_BUFFER_SIZE,
-                                                            .authKey              = insights_auth_key_start };
-    InsightsDelegate & insightsDelegate = InsightsDelegate::GetInstance();
-    CHIP_ERROR error                                    = insightsDelegate.Init(initParams);
+    chip::Insights::InsightsInitParams initParams = { .diagnosticBuffer     = endUserBuffer,
+                                                      .diagnosticBufferSize = CONFIG_END_USER_BUFFER_SIZE,
+                                                      .authKey              = insights_auth_key_start };
+    InsightsDelegate & insightsDelegate           = InsightsDelegate::GetInstance();
+    CHIP_ERROR error                              = insightsDelegate.Init(initParams);
     VerifyOrReturn(error == CHIP_NO_ERROR, ESP_LOGE(TAG, "Failed to initialize ESP Insights"));
     error = insightsDelegate.StartPeriodicInsights(chip::System::Clock::Timeout(START_TIMEOUT_MS));
     VerifyOrReturn(error == CHIP_NO_ERROR, ESP_LOGE(TAG, "Failed to start periodic insights"));

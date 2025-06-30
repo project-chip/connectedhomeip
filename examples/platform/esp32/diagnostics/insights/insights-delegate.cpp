@@ -9,8 +9,8 @@
 #include <map>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
-#include <tracing/esp32_diagnostic_trace/DiagnosticTracing.h>
 #include <tracing/esp32_diagnostic_trace/DiagnosticStorage.h>
+#include <tracing/esp32_diagnostic_trace/DiagnosticTracing.h>
 
 #define kMaxStringValueSize 128
 

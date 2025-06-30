@@ -56,9 +56,10 @@ The buffer sizes can be configured through Kconfig options:
 -   `CONFIG_END_USER_BUFFER_SIZE`: Size of the buffer used to store diagnostic
     data in esp32_diagnostic_trace backend.
 
-### Kconfig.projbuild Configuration
+### Kconfig Configuration
 
-Add the following configuration menu to your application's `main/Kconfig.projbuild` file:
+Add the following configuration menu to your application's
+`main/Kconfig.projbuild` file:
 
 ```kconfig
 menu "Platform Diagnostics"
@@ -80,7 +81,9 @@ menu "Platform Diagnostics"
 endmenu
 ```
 
-**Note**: The `examples/temperature-measurement-app/esp32/main/Kconfig.projbuild` demonstrates this complete configuration.
+**Note**: The
+`examples/temperature-measurement-app/esp32/main/Kconfig.projbuild` demonstrates
+this complete configuration.
 
 ### 3. Initialize the Log Provider
 
@@ -140,8 +143,9 @@ CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE=y
 ```
 
 Both options are required:
-- `CONFIG_ESP_INSIGHTS_ENABLED`: Enables ESP Insights cloud integration
-- `CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE`: Enables diagnostic data collection
+
+-   `CONFIG_ESP_INSIGHTS_ENABLED`: Enables ESP Insights cloud integration
+-   `CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE`: Enables diagnostic data collection
 
 ## Implementation Reference
 
@@ -182,7 +186,8 @@ extern const char insights_auth_key_end[] asm("_binary_insights_auth_key_txt_end
 
 ### 3. Create Auth Key File
 
-Create an `insights_auth_key.txt` file in your application's main directory containing your ESP Insights authentication key.
+Create an `insights_auth_key.txt` file in your application's main directory
+containing your ESP Insights authentication key.
 
 ### 4. Initialize Insights
 
@@ -223,9 +228,10 @@ if (CONFIG_ESP_INSIGHTS_ENABLED AND CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE)
 endif()
 ```
 
-### Kconfig.projbuild Configuration for Insights
+### Kconfig Configuration for Insights
 
-Add the following configuration menu to your application's `main/Kconfig.projbuild` file:
+Add the following configuration menu to your application's
+`main/Kconfig.projbuild` file:
 
 ```kconfig
 menu "Platform Diagnostics"
@@ -240,37 +246,39 @@ menu "Platform Diagnostics"
 endmenu
 ```
 
-**Note**: For ESP Insights, only the `END_USER_BUFFER_SIZE` configuration is required. Reference implementations can be found in:
-- `examples/lighting-app/esp32/main/Kconfig.projbuild`
-- `examples/energy-management-app/esp32/main/Kconfig.projbuild`
+**Note**: For ESP Insights, only the `END_USER_BUFFER_SIZE` configuration is
+required. Reference implementations can be found in:
+
+-   `examples/lighting-app/esp32/main/Kconfig.projbuild`
+-   `examples/energy-management-app/esp32/main/Kconfig.projbuild`
 
 ## Features
 
 The ESP Insights integration provides:
 
-- **Automatic Data Collection**: Collects diagnostic traces and metrics
-- **Cloud Integration**: Automatically sends data to ESP Insights dashboard
-- **Periodic Reporting**: Configurable sampling intervals for data transmission
-- **Trace Data**: Logs string-based diagnostic events
-- **Metric Data**: Reports signed and unsigned integer metrics
-- **Memory Monitoring**: Tracks heap usage and other system metrics
+-   **Automatic Data Collection**: Collects diagnostic traces and metrics
+-   **Cloud Integration**: Automatically sends data to ESP Insights dashboard
+-   **Periodic Reporting**: Configurable sampling intervals for data
+    transmission
+-   **Trace Data**: Logs string-based diagnostic events
+-   **Metric Data**: Reports signed and unsigned integer metrics
+-   **Memory Monitoring**: Tracks heap usage and other system metrics
 
 ## API Reference
 
 ### InsightsDelegate Methods
 
-- `Init(InsightsInitParams & initParams)`: Initialize insights with buffer and auth key
-- `StartPeriodicInsights(timeout)`: Start periodic data transmission
-- `StopPeriodicInsights()`: Stop periodic data transmission
-- `SetSamplingInterval(timeout)`: Configure data sampling interval
+-   `Init(InsightsInitParams & initParams)`: Initialize insights with buffer and
+    auth key
+-   `StartPeriodicInsights(timeout)`: Start periodic data transmission
+-   `StopPeriodicInsights()`: Stop periodic data transmission
+-   `SetSamplingInterval(timeout)`: Configure data sampling interval
 
 ### Configuration Parameters
 
-- `diagnosticBuffer`: Buffer for storing diagnostic data
-- `diagnosticBufferSize`: Size of the diagnostic buffer
-- `authKey`: ESP Insights authentication key
-
-
+-   `diagnosticBuffer`: Buffer for storing diagnostic data
+-   `diagnosticBufferSize`: Size of the diagnostic buffer
+-   `authKey`: ESP Insights authentication key
 
 ## Insights Example Integration
 
@@ -278,21 +286,26 @@ The following examples demonstrate proper ESP Insights integration:
 
 ### Working Examples
 
-- **`examples/lighting-app/esp32/`** - Complete implementation showing:
-  - Conditional compilation guards
-  - Buffer initialization and auth key setup
-  - Periodic insights reporting with configurable intervals
-  - Integration with diagnostic trace collection
+-   **`examples/lighting-app/esp32/`** - Complete implementation showing:
 
-- **`examples/energy-management-app/esp32/`** - Alternative implementation demonstrating:
+    -   Conditional compilation guards
+    -   Buffer initialization and auth key setup
+    -   Periodic insights reporting with configurable intervals
+    -   Integration with diagnostic trace collection
 
-For more detailed information about insights integration refer to the README.md file in each application folder.
+-   **`examples/energy-management-app/esp32/`** - Alternative implementation
+    demonstrating:
+
+For more detailed information about insights integration refer to the README.md
+file in each application folder.
 
 ## Important Notes
 
 -   The diagnostic logs provider **must** be explicitly enabled through the
     `CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE` option
--   ESP Insights requires both `CONFIG_ESP_INSIGHTS_ENABLED` and `CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE`
+-   ESP Insights requires both `CONFIG_ESP_INSIGHTS_ENABLED` and
+    `CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE`
 -   Buffer sizes should be adjusted based on your application's needs
 -   The provider supports end-user support logs and crash logs (when configured)
--   Authentication key must be obtained from ESP Insights dashboard and stored in `insights_auth_key.txt`
+-   Authentication key must be obtained from ESP Insights dashboard and stored
+    in `insights_auth_key.txt`
