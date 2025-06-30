@@ -51,7 +51,10 @@ class EventCallback:
         #     raise ValueError("Failed argument inputs in EventCallback. You should use Cluster or ClusterId, EventId and name")
         # self._q: queue.Queue = queue.Queue()
 
-        if expected_cluster is None or (expected_cluster_id is None and expected_event_id is None and name is None):
+        is_cluster_mode = expected_cluster is not None
+        is_id_mode = all(x is not None for x in (expected_cluster_id, expected_event_id, name))
+
+        if not (is_cluster_mode ^ is_id_mode):
             raise ValueError("Failed argument inputs in EventCallback. You should use Cluster or ClusterId, EventId and name")
 
         self._expected_cluster = expected_cluster
@@ -71,12 +74,14 @@ class EventCallback:
         #     return
         # if self._expected_cluster_id == event_result.Header.ClusterId and self._expected_event_id == event_result.Header.EventId:
         #     self._q.put(event_result)
+
         if event_result.Status != Status.Success:
             return
 
         header = event_result.Header
         if header.ClusterId != self._expected_cluster_id:
             return
+
         if self._expected_event_id is not None and header.EventId != self._expected_event_id:
             return
 
