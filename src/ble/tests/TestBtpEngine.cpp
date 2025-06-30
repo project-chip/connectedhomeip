@@ -355,12 +355,37 @@ TEST_F(TestBtpEngine, EncodeStandAloneAckInsufficientBuffer)
 
     EXPECT_EQ(mBtpEngine.EncodeStandAloneAck(ackPacket0), CHIP_ERROR_NO_MEMORY);
     EXPECT_EQ(ackPacket0->DataLength(), static_cast<size_t>(0));
+}
 
-    // Complite this test
-    // auto ackPacket1 = System::PacketBufferHandle::New(10, 0);
-    // ackPacket1->SetDataLength(10);
-    // EXPECT_EQ(mBtpEngine.EncodeStandAloneAck(ackPacket1), CHIP_ERROR_NO_MEMORY);
-    // EXPECT_EQ(ackPacket->DataLength(), static_cast<size_t>(0));
+TEST_F(TestBtpEngine, HandleCharacteristicReceivedIncorrectSequence)
+{
+    uint8_t packetData0[] = {
+        to_underlying(BtpEngine::HeaderFlags::kStartMessage) | to_underlying(BtpEngine::HeaderFlags::kEndMessage),
+        0x01, // sequence number increments
+        0x01,
+        0x00,
+        0xff,
+    };
+    auto packet0 = System::PacketBufferHandle::NewWithData(packetData0, sizeof(packetData0));
+    EXPECT_FALSE(packet0.IsNull());
+
+    SequenceNumber_t receivedAck;
+    bool didReceiveAck;
+    EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(packet0), receivedAck, didReceiveAck), CHIP_NO_ERROR);
+    EXPECT_EQ(mBtpEngine.RxState(), BtpEngine::kState_Complete);
+
+    uint8_t packetData1[] = {
+        to_underlying(BtpEngine::HeaderFlags::kStartMessage) | to_underlying(BtpEngine::HeaderFlags::kEndMessage),
+        0x02, // sequence number increments
+        0x01,
+        0x00,
+        0xff,
+    };
+    auto packet1 = System::PacketBufferHandle::NewWithData(packetData1, sizeof(packetData1));
+    EXPECT_FALSE(packet1.IsNull());
+
+    EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(packet1), receivedAck, didReceiveAck), BLE_ERROR_REASSEMBLER_INCORRECT_STATE);
+    EXPECT_EQ(mBtpEngine.RxState(), BtpEngine::kState_Error);
 }
 
 } // namespace
