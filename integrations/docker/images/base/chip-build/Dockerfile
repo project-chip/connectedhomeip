@@ -25,7 +25,8 @@ RUN case ${TARGETPLATFORM} in \
     ;; \
     esac
 
-
+ENV PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig:$PKG_CONFIG_PATH
+ENV PKG_CONFIG_PATH=/usr/lib/aarch64-linux-gnu/pkgconfig:$PKG_CONFIG_PATH
 # base build and check tools and libraries layer
 RUN set -x \
     && apt-get update \
