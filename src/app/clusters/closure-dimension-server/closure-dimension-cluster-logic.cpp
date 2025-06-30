@@ -75,7 +75,6 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
 {
     assertChipStackLockedByCurrentThread();
 
-    ChipLogError(AppServer, "SetCurrentState");
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState.currentState != incomingCurrentState, CHIP_NO_ERROR);
 
