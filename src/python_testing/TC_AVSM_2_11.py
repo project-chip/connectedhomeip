@@ -166,13 +166,13 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
             )
             asserts.assert_true(
                 False,
-                "Unexpected success when expecting INVALID_IN_STATE due to StreamPriorities containing a StreamUsage not in aSupportedStreamUsages",
+                "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to StreamPriorities containing a StreamUsage not in aSupportedStreamUsages",
             )
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
-                Status.InvalidInState,
-                "Unexpected error returned expecting INVALID_IN_STATE due to StreamPriorities containing a StreamUsage not in aSupportedStreamUsages",
+                Status.DynamicConstraintError,
+                "Unexpected error returned expecting DYNAMIC_CONSTRAINT_ERROR due to StreamPriorities containing a StreamUsage not in aSupportedStreamUsages",
             )
             pass
 

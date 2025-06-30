@@ -90,32 +90,32 @@ class TC_AVSM_2_2(MatterBaseTest):
             TestStep(
                 8,
                 "TH sends the SnapshotStreamAllocate command with values from step 6 except with MaxFrameRate set to 0 (outside of valid range).",
-                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
+                "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
             TestStep(
                 9,
                 "TH sends the SnapshotStreamAllocate command with values from step 6 except with Quality set to 0 (below valid range).",
-                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
+                "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
             TestStep(
                 10,
                 "TH sends the SnapshotStreamAllocate command with values from step 6 except with Quality set to 101 (above valid range).",
-                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
+                "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
             TestStep(
                 11,
                 "TH sends the SnapshotStreamAllocate command with values from step 6 except with ImageCodec set to 10(outside of valid range).",
-                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
+                "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
             TestStep(
                 12,
                 "TH sends the SnapshotStreamAllocate command with values from step 6 except with MinResolution set to {0,0} (outside of valid range).",
-                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code."
+                "DUT responds with a CONSTRAINT_ERROR status code."
             ),
             TestStep(
                 13,
                 "TH sends the SnapshotStreamAllocate command with values from step 6 except with MaxResolution set to {0,0} (outside of valid range).",
-                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
+                "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
         ]
 
@@ -198,13 +198,13 @@ class TC_AVSM_2_2(MatterBaseTest):
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
             asserts.assert_true(
-                False, "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to MaxFrameRate set to 0(outside of valid range)"
+                False, "Unexpected success when expecting CONSTRAINT_ERROR due to MaxFrameRate set to 0(outside of valid range)"
             )
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
-                Status.DynamicConstraintError,
-                "Unexpected status returned when expecting DYNAMIC_CONSTRAINT_ERROR due to MaxFrameRate set to 0(outside of valid range)",
+                Status.ConstraintError,
+                "Unexpected status returned when expecting CONSTRAINT_ERROR due to MaxFrameRate set to 0(outside of valid range)",
             )
             pass
 
@@ -221,13 +221,13 @@ class TC_AVSM_2_2(MatterBaseTest):
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
             asserts.assert_true(
-                False, "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to Quality set to 0 (below valid range)"
+                False, "Unexpected success when expecting CONSTRAINT_ERROR due to Quality set to 0 (below valid range)"
             )
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
-                Status.DynamicConstraintError,
-                "Unexpected status returned when expecting DYNAMIC_CONSTRAINT_ERROR due to Quality set to 0 (below valid range)",
+                Status.ConstraintError,
+                "Unexpected status returned when expecting CONSTRAINT_ERROR due to Quality set to 0 (below valid range)",
             )
             pass
 
@@ -244,13 +244,13 @@ class TC_AVSM_2_2(MatterBaseTest):
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
             asserts.assert_true(
-                False, "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to Quality set to 101 (above valid range)"
+                False, "Unexpected success when expecting CONSTRAINT_ERROR due to Quality set to 101 (above valid range)"
             )
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
-                Status.DynamicConstraintError,
-                "Unexpected status returned when expecting DYNAMIC_CONSTRAINT_ERROR due to Quality set to 101(outside of valid range)",
+                Status.ConstraintError,
+                "Unexpected status returned when expecting CONSTRAINT_ERROR due to Quality set to 101(outside of valid range)",
             )
             pass
 
@@ -267,13 +267,13 @@ class TC_AVSM_2_2(MatterBaseTest):
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
             asserts.assert_true(
-                False, "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to ImageCodec set to 10(outside of valid range)"
+                False, "Unexpected success when expecting CONSTRAINT_ERROR due to ImageCodec set to 10(outside of valid range)"
             )
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
-                Status.DynamicConstraintError,
-                "Unexpected status returned when expecting DYNAMIC_CONSTRAINT_ERROR due to ImageCodec set to 10(outside of valid range)",
+                Status.ConstraintError,
+                "Unexpected status returned when expecting CONSTRAINT_ERROR due to ImageCodec set to 10(outside of valid range)",
             )
             pass
 
@@ -290,13 +290,13 @@ class TC_AVSM_2_2(MatterBaseTest):
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
             asserts.assert_true(
-                False, "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to MinResolution set to {0,0} (outside of valid range)"
+                False, "Unexpected success when expecting CONSTRAINT_ERROR due to MinResolution set to {0,0} (outside of valid range)"
             )
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
-                Status.DynamicConstraintError,
-                "Unexpected status returned when expecting DYNAMIC_CONSTRAINT_ERROR due to MinResolution set to {0,0} (outside of valid range)",
+                Status.ConstraintError,
+                "Unexpected status returned when expecting CONSTRAINT_ERROR due to MinResolution set to {0,0} (outside of valid range)",
             )
             pass
 
@@ -313,34 +313,13 @@ class TC_AVSM_2_2(MatterBaseTest):
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
             asserts.assert_true(
-                False, "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to MaxResolution set to {0,0} (outside of valid range)"
-            )
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status,
-                Status.DynamicConstraintError,
-                "Unexpected status returned when expecting DYNAMIC_CONSTRAINT_ERROR due to MaxResolution set to {0,0} (outside of valid range)",
-            )
-            pass
-
-        self.step(8)
-        try:
-            snpStreamAllocateCmd = commands.SnapshotStreamAllocate(
-                imageCodec=cluster.Enums.ImageCodecEnum.extend_enum_if_value_doesnt_exist(10),
-                maxFrameRate=aSnapshotCapabilities[0].maxFrameRate,
-                minResolution=aSnapshotCapabilities[0].resolution,
-                maxResolution=aSnapshotCapabilities[0].resolution,
-                quality=90,
-            )
-            await self.send_single_cmd(endpoint=endpoint, cmd=snpStreamAllocateCmd)
-            asserts.assert_true(
-                False, "Unexpected success when expecting CONSTRAINT_ERROR due to ImageCodec set to 10(outside of valid range)"
+                False, "Unexpected success when expecting CONSTRAINT_ERROR due to MaxResolution set to {0,0} (outside of valid range)"
             )
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
                 Status.ConstraintError,
-                "Unexpected status returned when expecting CONSTRAINT_ERROR due to ImageCodec set to 10(outside of valid range)",
+                "Unexpected status returned when expecting CONSTRAINT_ERROR due to MaxResolution set to {0,0} (outside of valid range)",
             )
             pass
 

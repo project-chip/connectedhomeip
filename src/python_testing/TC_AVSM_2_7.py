@@ -141,32 +141,32 @@ class TC_AVSM_2_7(MatterBaseTest):
             TestStep(
                 18,
                 "TH sends the VideoStreamAllocate command with the same arguments from step 10 except MinFrameRate set to 0(outside of valid range).",
-                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
+                "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
             TestStep(
                 19,
                 "TH sends the VideoStreamAllocate command with the same arguments from step 10 except MinFrameRate > MaxFrameRate.",
-                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
+                "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
             TestStep(
                 20,
                 "TH sends the VideoStreamAllocate command with the same arguments from step 10 except MinBitRate set to 0(outside of valid range).",
-                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
+                "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
             TestStep(
                 21,
                 "TH sends the VideoStreamAllocate command with the same arguments from step 10 except MinBitRate > MaxBitRate.",
-                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
+                "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
             TestStep(
                 22,
                 "TH sends the VideoStreamAllocate command with the same arguments from step 10 except MinKeyFrameInterval > MaxKeyFrameInterval.",
-                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
+                "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
             TestStep(
                 23,
                 "TH sends the VideoStreamAllocate command with the same arguments from step 10 except VideoCodec is set to 10 (out of range).",
-                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
+                "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
         ]
 
