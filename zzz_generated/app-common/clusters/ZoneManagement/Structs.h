@@ -99,9 +99,10 @@ public:
 namespace ZoneInformationStruct {
 enum class Fields : uint8_t
 {
-    kZoneID     = 0,
-    kZoneType   = 1,
-    kZoneSource = 2,
+    kZoneID            = 0,
+    kZoneType          = 1,
+    kZoneSource        = 2,
+    kTwoDCartesianZone = 3,
 };
 
 struct Type
@@ -110,15 +111,25 @@ public:
     uint16_t zoneID           = static_cast<uint16_t>(0);
     ZoneTypeEnum zoneType     = static_cast<ZoneTypeEnum>(0);
     ZoneSourceEnum zoneSource = static_cast<ZoneSourceEnum>(0);
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
+    Optional<Structs::TwoDCartesianZoneStruct::Type> twoDCartesianZone;
 
     static constexpr bool kIsFabricScoped = false;
 
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
 };
 
-using DecodableType = Type;
+struct DecodableType
+{
+public:
+    uint16_t zoneID           = static_cast<uint16_t>(0);
+    ZoneTypeEnum zoneType     = static_cast<ZoneTypeEnum>(0);
+    ZoneSourceEnum zoneSource = static_cast<ZoneSourceEnum>(0);
+    Optional<Structs::TwoDCartesianZoneStruct::DecodableType> twoDCartesianZone;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+};
 
 } // namespace ZoneInformationStruct
 namespace ZoneTriggerControlStruct {
