@@ -95,14 +95,10 @@ CHIP_ERROR NXPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     mpConnectCallback      = nullptr;
     mpStatusChangeCallback = networkStatusChangeCallback;
 
-    // Try to connect to saved network
+    // Connect to saved network
     err = ConnectWiFiNetwork(mSavedNetwork.ssid, ssidLen, mSavedNetwork.credentials, credentialsLen);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Failed to connect to WiFi network: %" CHIP_ERROR_FORMAT, err.Format());
-    }
 
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 void NXPWiFiDriver::Shutdown()
