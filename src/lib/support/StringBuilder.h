@@ -105,39 +105,20 @@ template <size_t kSize = 257>
 class StringBuilder : public StringBuilderBase
 {
 public:
+    /// Default constructor
     StringBuilder() : StringBuilderBase(mBuffer, kSize) {}
 
     /// Constructor for char * and length
     StringBuilder(const char * data, size_t length) : StringBuilder() { AddFormat("%.*s", static_cast<int>(length), data); }
 
     /// Constructor for uint8_t * and length
-    /// Only printable elements will be added
-    StringBuilder(const uint8_t * data, size_t length) : StringBuilder()
-    {
-        for (size_t i = 0; i < length; ++i)
-        {
-            if (std::isprint(data[i]))
-            {
-                Add(data[i]);
-            }
-        }
-    }
+    StringBuilder(const uint8_t * data, size_t length) : StringBuilder((const char *)data, length) { }
 
     /// Constructor for CharSpan
-    StringBuilder(const CharSpan & span) : StringBuilder() { AddFormat("%.*s", static_cast<int>(span.size()), span.data()); }
+    StringBuilder(const CharSpan & span) : StringBuilder(span.data(), span.size()) { }
 
     /// Constructor for ByteSpan
-    /// Only printable elements will be added
-    StringBuilder(const ByteSpan & span) : StringBuilder()
-    {
-        for (size_t i = 0; i < span.size(); ++i)
-        {
-            if (std::isprint(span[i]))
-            {
-                Add(span[i]);
-            }
-        }
-    }
+    StringBuilder(const ByteSpan & span) : StringBuilder((const char *)span.data(), span.size()) { }
 
 private:
     char mBuffer[kSize];
