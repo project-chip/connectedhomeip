@@ -244,7 +244,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             if CurrentLatch:
                 logging.info("CurrentLatch is True, skipping steps 3e to 3i")
 
-                # Skipping steps 3e to 3j
+                # Skipping steps 3e to 3i
                 self.skip_step("3e")
                 self.skip_step("3f")
                 self.skip_step("3g")

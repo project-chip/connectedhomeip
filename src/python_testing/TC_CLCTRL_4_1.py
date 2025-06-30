@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2023 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -463,10 +463,6 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             self.skip_step("3l")
             self.skip_step("3m")
             self.skip_step("3n")
-            self.skip_step("3o")
-            self.skip_step("3p")
-            self.skip_step("3q")
-            self.skip_step("3r")
             self.skip_step("5a")
             self.skip_step("5b")
             self.skip_step("5c")
@@ -754,18 +750,19 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(Clusters.ClosureControl.Enums.MainStateEnum.kStopped)],
                                                       timeout_sec=timeout)
 
-        # STEP 12a: If SP feature is not supported on the cluster, skip steps 12b to 12f
+        # STEP 12a: If SP feature is not supported on the cluster, skip steps 12b to 12g
         self.step("12a")
 
         if not is_sp_feature_supported:
-            logging.info("Speed feature not supported, skipping steps 12b to 12f")
+            logging.info("Speed feature not supported, skipping steps 12b to 12g")
 
-            # Skipping steps 12b to 12f
+            # Skipping steps 12b to 12g
             self.skip_step("12b")
             self.skip_step("12c")
             self.skip_step("12d")
             self.skip_step("12e")
             self.skip_step("12f")
+            self.skip_step("12g")
         else:
             # STEP 12b: TH sends command MoveTo with Speed = High
             self.step("12b")
@@ -824,7 +821,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 asserts.assert_true(False, "OverallTargetState attribute is not supported.")
                 return
 
-            # STEP 12g: Wait until TH receives a subscription report with OverallCurrentState.Speed = High
+            # STEP 12g: Wait until TH receives a subscription report with OverallCurrentState.Speed = Low
             self.step("12g")
 
             logging.info("Waiting for OverallCurrentState.Speed to be Low")
