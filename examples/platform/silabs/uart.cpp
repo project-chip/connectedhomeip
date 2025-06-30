@@ -587,7 +587,7 @@ void uartSendBytes(UartTxStruct_t & bufferStruct)
 
 /**
  * @brief Flush the UART TX queue in a blocking manner.
- *   UART logs are non blocking, so we need to flush the queue here other wise the logs will not get logged in case of a hard
+ *   UART logs are non blocking, so we need to flush the queue here otherwise the logs will not get logged in case of a hard
  *   fault as they rely on the UART task to send the logs.
  */
 void uartFlushTxQueue(void)
