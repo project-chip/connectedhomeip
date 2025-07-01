@@ -374,7 +374,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                     asserts.assert_true(
                         False, "MoveTo command with Position = MoveToFullyOpen and Latch = True should have failed but succeeded")
                 except InteractionModelError as e:
-                    logging.info(f"Expected exception caught for MoveTo with Position = MoveToFullyOpen and Latch = True: {e}")
+                    logging.info(f"Exception caught for MoveTo with Position = MoveToFullyOpen and Latch = True: {e}")
                     asserts.assert_equal(e.status, Status.InvalidInState,
                                          f"Expected INVALID_IN_STATE for MoveTo with Position = MoveToFullyOpen and Latch = True but got: {e}")
 
@@ -440,7 +440,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 logging.error("MoveTo command with Position = 6 should have failed but succeeded")
                 asserts.assert_true(False, "MoveTo command with Position = 6 should have failed but succeeded")
             except InteractionModelError as e:
-                logging.info(f"Expected exception caught for MoveTo with Position = 6: {e}")
+                logging.info(f"Exception caught for MoveTo with Position = 6: {e}")
                 asserts.assert_equal(e.status, Status.ConstraintError,
                                      f"Expected CONSTRAINT_ERROR for MoveTo with Position = 6 but got: {e}")
         else:
@@ -454,7 +454,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 logging.error("MoveTo command with Speed = 4 should have failed but succeeded")
                 asserts.assert_true(False, "MoveTo command with Speed = 4 should have failed but succeeded")
             except InteractionModelError as e:
-                logging.info(f"Expected exception caught for MoveTo with Speed = 4: {e}")
+                logging.info(f"Exception caught for MoveTo with Speed = 4: {e}")
                 asserts.assert_equal(e.status, Status.ConstraintError,
                                      f"Expected CONSTRAINT_ERROR for MoveTo with Speed = 4 but got: {e}")
             self.step("7c")
@@ -463,7 +463,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 logging.error("MoveTo command with Position = 6 and Speed = High should have failed but succeeded")
                 asserts.assert_true(False, "MoveTo command with Position = 6 and Speed = High should have failed but succeeded")
             except InteractionModelError as e:
-                logging.info(f"Expected exception caught for MoveTo with Position = 6 and Speed = High: {e}")
+                logging.info(f"Exception caught for MoveTo with Position = 6 and Speed = High: {e}")
                 asserts.assert_equal(e.status, Status.ConstraintError,
                                      f"Expected CONSTRAINT_ERROR for MoveTo with Position = 6 and Speed = High but got: {e}")
             self.step("7d")
@@ -473,7 +473,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 asserts.assert_true(
                     False, "MoveTo command with Position = MoveToFullyClosed and Speed = 4 should have failed but succeeded")
             except InteractionModelError as e:
-                logging.info(f"Expected exception caught for MoveTo with Position = MoveToFullyClosed and Speed = 4: {e}")
+                logging.info(f"Exception caught for MoveTo with Position = MoveToFullyClosed and Speed = 4: {e}")
                 asserts.assert_equal(e.status, Status.ConstraintError,
                                      f"Expected CONSTRAINT_ERROR for MoveTo with Position = MoveToFullyClosed and Speed = 4 but got: {e}")
         else:
