@@ -224,6 +224,7 @@ class TC_ACL_2_9(MatterBaseTest):
         if access_control_extension_changed_list[0].Status != Status.UnsupportedAccess:
             asserts.fail(f"Expected UnsupportedAccess but got {access_control_extension_changed_list[0].Status}")
         
-
+        #TODO: Add factory reset to reset ACL back to admin privileges after test runs
+        
 if __name__ == "__main__":
     default_matter_test_main()
