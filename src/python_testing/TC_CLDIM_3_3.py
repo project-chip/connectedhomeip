@@ -357,7 +357,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             self.step("5g")
             if max_position < 10000:
                 sub_handler.await_all_expected_report_matches(
-                    expected_matchers=[current_position_matcher(10000)], timeout_sec=timeout)
+                    expected_matchers=[current_position_matcher(max_postion)], timeout_sec=timeout)
             else:
                 logging.info("MaxPosition not < 10000. Skipping step 5g.")
                 self.mark_current_step_skipped()
