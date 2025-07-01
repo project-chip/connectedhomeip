@@ -29,6 +29,7 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters::ClosureControl;
 using namespace chip::app::Clusters::ClosureDimension;
@@ -245,9 +246,9 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStopCommand()
 }
 
 chip::Protocols::InteractionModel::Status
-ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::ClosureControl::TargetPositionEnum> position,
-                                const chip::Optional<bool> latch,
-                                const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> speed)
+ClosureManager::OnMoveToCommand(const Optional<TargetPositionEnum> position,
+                                const Optional<bool> latch,
+                                const Optional<Globals::ThreeLevelAutoEnum> speed)
 {
 
     // Update the target state for the closure panels based on the MoveTo command.
@@ -287,30 +288,30 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
     {
         // Set the Closure panel target position for the panels based on the MoveTo Command position.
         // For Sample App,TargetPositionEnum is mapped to specific positions for the panels.
-        chip::Percent100ths ep2Position;
-        chip::Percent100ths ep3Position;
+        Percent100ths ep2Position;
+        Percent100ths ep3Position;
 
         switch (position.Value())
         {
         case TargetPositionEnum::kMoveToFullyClosed:
-            ep2Position = static_cast<chip::Percent100ths>(10000);
-            ep3Position = static_cast<chip::Percent100ths>(10000);
+            ep2Position = static_cast<Percent100ths>(10000);
+            ep3Position = static_cast<Percent100ths>(10000);
             break;
         case TargetPositionEnum::kMoveToFullyOpen:
-            ep2Position = static_cast<chip::Percent100ths>(0);
-            ep3Position = static_cast<chip::Percent100ths>(0);
+            ep2Position = static_cast<Percent100ths>(0);
+            ep3Position = static_cast<Percent100ths>(0);
             break;
         case TargetPositionEnum::kMoveToPedestrianPosition:
-            ep2Position = static_cast<chip::Percent100ths>(3000);
-            ep3Position = static_cast<chip::Percent100ths>(3000);
+            ep2Position = static_cast<Percent100ths>(3000);
+            ep3Position = static_cast<Percent100ths>(3000);
             break;
         case TargetPositionEnum::kMoveToSignaturePosition:
-            ep2Position = static_cast<chip::Percent100ths>(2000);
-            ep3Position = static_cast<chip::Percent100ths>(2000);
+            ep2Position = static_cast<Percent100ths>(2000);
+            ep3Position = static_cast<Percent100ths>(2000);
             break;
         case TargetPositionEnum::kMoveToVentilationPosition:
-            ep2Position = static_cast<chip::Percent100ths>(1000);
-            ep3Position = static_cast<chip::Percent100ths>(1000);
+            ep2Position = static_cast<Percent100ths>(1000);
+            ep3Position = static_cast<Percent100ths>(1000);
             break;
         default:
             ChipLogError(AppServer, "Invalid target position received in OnMoveToCommand");
@@ -390,8 +391,8 @@ void ClosureManager::HandleClosureMotionAction()
                    ChipLogError(AppServer, "MoveToCommand failed due to Null value Target state on Endpoint 3"));
 
     // Once Closure is unlatched, we can proceed with the motion action for endpoints 2 and 3.
-    DataModel::Nullable<chip::Percent100ths> ep2NextPosition = DataModel::NullNullable;
-    DataModel::Nullable<chip::Percent100ths> ep3NextPosition = DataModel::NullNullable;
+    DataModel::Nullable<Percent100ths> ep2NextPosition = DataModel::NullNullable;
+    DataModel::Nullable<Percent100ths> ep3NextPosition = DataModel::NullNullable;
 
     bool isEndPoint2ProgressPossible = false;
     bool isEndPoint3ProgressPossible = false;
@@ -570,7 +571,7 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
 
 bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & currentState,
                                           const GenericDimensionStateStruct & targetState,
-                                          DataModel::Nullable<chip::Percent100ths> & nextPosition)
+                                          DataModel::Nullable<Percent100ths> & nextPosition)
 {
     VerifyOrReturnValue(targetState.position.HasValue() && !targetState.position.Value().IsNull(), false,
                         ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to Target position is not set"));
