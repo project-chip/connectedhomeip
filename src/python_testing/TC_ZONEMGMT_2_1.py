@@ -38,8 +38,7 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_cluster,
-                                         run_if_endpoint_matches)
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -165,7 +164,7 @@ class TC_ZONEMGMT_2_1(MatterBaseTest):
             )
             logger.info(f"Rx'd VideoSensorParams: {videoSensorParams}")
             asserts.assert_true(twoDCartesianMax.x < videoSensorParams.sensorWidth and twoDCartesianMax.y <
-                                videoSensorParams.sensorHeight, f"TwoDCartesianMax should be within the VideoSensorParams dimensions")
+                                videoSensorParams.sensorHeight, "TwoDCartesianMax should be within the VideoSensorParams dimensions")
         else:
             logging.info("TWoDCart Feature not supported. Test steps skipped")
             self.skip_step(8)
