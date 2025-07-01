@@ -31,8 +31,8 @@
 #       --endpoint 1
 # === END CI TEST ARGUMENTS ===
 
-import random
 import logging
+import random
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
@@ -143,21 +143,21 @@ class TC_ACL_2_9(MatterBaseTest):
 
         # Open commissioning window on TH1
         params = await self.th1.OpenCommissioningWindow(
-                nodeid=self.dut_node_id,
-                timeout=self.max_window_duration,
-                iteration=1000,
-                discriminator=self.discriminator,
-                option=1
-            )
+            nodeid=self.dut_node_id,
+            timeout=self.max_window_duration,
+            iteration=1000,
+            discriminator=self.discriminator,
+            option=1
+        )
 
         # Commission TH2
         await self.th2.CommissionOnNetwork(
-                nodeId=self.dut_node_id,
-                setupPinCode=params.setupPinCode,
-                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
-                filter=self.discriminator
-            )
-        
+            nodeId=self.dut_node_id,
+            setupPinCode=params.setupPinCode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=self.discriminator
+        )
+
         self.step(3)
         # TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is
         # list of AccessControlEntryStruct containing 1 element
@@ -196,7 +196,7 @@ class TC_ACL_2_9(MatterBaseTest):
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[self.th1.nodeId],
+                subjects=[self.th2.nodeId],
                 targets=NullValue,
             ),
         ]
@@ -265,6 +265,7 @@ class TC_ACL_2_9(MatterBaseTest):
         # TH1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx
         removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx)
         await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
+
 
 if __name__ == "__main__":
     default_matter_test_main()
