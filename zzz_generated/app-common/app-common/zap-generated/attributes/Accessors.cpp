@@ -23229,7 +23229,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
 
 } // namespace ACCoilTemperature
 
-namespace ACCapacityformat {
+namespace ACCapacityFormat {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint, chip::app::Clusters::Thermostat::ACCapacityFormatEnum * value)
 {
@@ -23275,7 +23275,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
     return emberAfWriteAttribute(endpoint, Clusters::Thermostat::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
 }
 
-} // namespace ACCapacityformat
+} // namespace ACCapacityFormat
 
 namespace NumberOfPresets {
 

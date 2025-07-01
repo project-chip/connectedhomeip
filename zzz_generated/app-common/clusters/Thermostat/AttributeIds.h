@@ -204,9 +204,9 @@ namespace ACCoilTemperature {
 inline constexpr AttributeId Id = 0x00000046;
 } // namespace ACCoilTemperature
 
-namespace ACCapacityformat {
+namespace ACCapacityFormat {
 inline constexpr AttributeId Id = 0x00000047;
-} // namespace ACCapacityformat
+} // namespace ACCapacityFormat
 
 namespace PresetTypes {
 inline constexpr AttributeId Id = 0x00000048;

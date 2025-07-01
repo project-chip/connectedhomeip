@@ -128,8 +128,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, ACLouverPosition);
     case Attributes::ACCoilTemperature::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, ACCoilTemperature);
-    case Attributes::ACCapacityformat::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, ACCapacityformat);
+    case Attributes::ACCapacityFormat::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, ACCapacityFormat);
     case Attributes::PresetTypes::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, presetTypes);
     case Attributes::ScheduleTypes::TypeInfo::GetAttributeId():

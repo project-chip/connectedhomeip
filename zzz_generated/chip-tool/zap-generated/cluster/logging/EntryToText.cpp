@@ -3015,8 +3015,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "ACLouverPosition";
         case chip::app::Clusters::Thermostat::Attributes::ACCoilTemperature::Id:
             return "ACCoilTemperature";
-        case chip::app::Clusters::Thermostat::Attributes::ACCapacityformat::Id:
-            return "ACCapacityformat";
+        case chip::app::Clusters::Thermostat::Attributes::ACCapacityFormat::Id:
+            return "ACCapacityFormat";
         case chip::app::Clusters::Thermostat::Attributes::PresetTypes::Id:
             return "PresetTypes";
         case chip::app::Clusters::Thermostat::Attributes::ScheduleTypes::Id:

@@ -16,7 +16,7 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-inline constexpr uint32_t kRevision = 7;
+inline constexpr uint32_t kRevision = 9;
 
 namespace Attributes {
 namespace LocalTemperature {
@@ -221,10 +221,10 @@ namespace ACCoilTemperature {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ACCoilTemperature::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ACCoilTemperature
-namespace ACCapacityformat {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ACCapacityformat::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+namespace ACCapacityFormat {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(ACCapacityFormat::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kManage);
-} // namespace ACCapacityformat
+} // namespace ACCapacityFormat
 namespace PresetTypes {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(PresetTypes::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),

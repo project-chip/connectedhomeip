@@ -17854,10 +17854,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ACCoilTemperature", 1, value);
         }
-        case Thermostat::Attributes::ACCapacityformat::Id: {
+        case Thermostat::Attributes::ACCapacityFormat::Id: {
             chip::app::Clusters::Thermostat::ACCapacityFormatEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("ACCapacityformat", 1, value);
+            return DataModelLogger::LogValue("ACCapacityFormat", 1, value);
         }
         case Thermostat::Attributes::PresetTypes::Id: {
             chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::PresetTypeStruct::DecodableType> value;

@@ -591,13 +591,13 @@
         { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x7 }, /* ControlMode */                                                      \
                                                                                                                                    \
         /* Endpoint: 1, Cluster: Thermostat (server) */                                                                            \
-        { (uint16_t) 0xA28, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* OccupiedCoolingSetpoint */                                 \
-        { (uint16_t) 0x7D0, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* OccupiedHeatingSetpoint */                                 \
-        { (uint16_t) 0x2BC, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* MinHeatSetpointLimit */                                    \
-        { (uint16_t) 0xBB8, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* MaxHeatSetpointLimit */                                    \
-        { (uint16_t) 0x640, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* MinCoolSetpointLimit */                                    \
-        { (uint16_t) 0xC80, (uint16_t) -0x6AB3, (uint16_t) 0x7FFF }, /* MaxCoolSetpointLimit */                                    \
-        { (uint16_t) 0x19, (uint16_t) 0x0, (uint16_t) 0x7F },        /* MinSetpointDeadBand */                                     \
+        { (uint16_t) 0xA28, (uint16_t) -0x6AB3, (uint16_t) 0xFFFF }, /* OccupiedCoolingSetpoint */                                 \
+        { (uint16_t) 0x7D0, (uint16_t) -0x6AB3, (uint16_t) 0xFFFF }, /* OccupiedHeatingSetpoint */                                 \
+        { (uint16_t) 0x2BC, (uint16_t) -0x6AB3, (uint16_t) 0xFFFF }, /* MinHeatSetpointLimit */                                    \
+        { (uint16_t) 0xBB8, (uint16_t) -0x6AB3, (uint16_t) 0xFFFF }, /* MaxHeatSetpointLimit */                                    \
+        { (uint16_t) 0x640, (uint16_t) -0x6AB3, (uint16_t) 0xFFFF }, /* MinCoolSetpointLimit */                                    \
+        { (uint16_t) 0xC80, (uint16_t) -0x6AB3, (uint16_t) 0xFFFF }, /* MaxCoolSetpointLimit */                                    \
+        { (uint16_t) 0x19, (uint16_t) 0x0, (uint16_t) 0xFFFF },      /* MinSetpointDeadBand */                                     \
         { (uint16_t) 0x4, (uint16_t) 0x0, (uint16_t) 0x5 },          /* ControlSequenceOfOperation */                              \
         { (uint16_t) 0x1, (uint16_t) 0x0, (uint16_t) 0x9 },          /* SystemMode */                                              \
                                                                                                                                    \
