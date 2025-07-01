@@ -23,7 +23,7 @@
 
 namespace chip {
 namespace webrtc {
-	
+
 class WebRTCClient
 {
 public:
