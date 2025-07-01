@@ -69,7 +69,13 @@ CHIP_ERROR NXPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "WiFi network SSID not retrieved from persisted storage: %" CHIP_ERROR_FORMAT, err.Format());
-        return err;
+        if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            return err;
+        }
+        /* AP ssid has not been set. It's possible after factory-reset.
+        Do not return an error as it will cancel the cluster registration */
+        return CHIP_NO_ERROR;
     }
 
     err = PersistedStorage::KeyValueStoreMgr().Get(kWiFiCredentialsKeyName, mSavedNetwork.credentials,

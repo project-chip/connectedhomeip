@@ -34,8 +34,8 @@
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
-                                         async_test_body, default_matter_test_main)
+from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.matter_testing import AttributeValue, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 

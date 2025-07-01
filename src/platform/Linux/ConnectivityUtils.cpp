@@ -276,6 +276,10 @@ InterfaceTypeEnum ConnectivityUtils::GetInterfaceConnectionType(const char * ifn
     {
         ret = InterfaceTypeEnum::kEthernet;
     }
+    else if (strncmp(ifname, "wl", 2) == 0)
+    {
+        ret = InterfaceTypeEnum::kWiFi;
+    }
 
     close(sock);
 

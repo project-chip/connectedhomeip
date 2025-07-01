@@ -6894,12 +6894,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRClosureControlClusterOverallStateStruct
+@implementation MTRClosureControlClusterOverallCurrentStateStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _positioning = nil;
+        _position = nil;
 
         _latch = nil;
 
@@ -6912,9 +6912,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRClosureControlClusterOverallStateStruct alloc] init];
+    auto other = [[MTRClosureControlClusterOverallCurrentStateStruct alloc] init];
 
-    other.positioning = self.positioning;
+    other.position = self.position;
     other.latch = self.latch;
     other.speed = self.speed;
     other.secureState = self.secureState;
@@ -6924,13 +6924,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: positioning:%@; latch:%@; speed:%@; secureState:%@; >", NSStringFromClass([self class]), _positioning, _latch, _speed, _secureState];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: position:%@; latch:%@; speed:%@; secureState:%@; >", NSStringFromClass([self class]), _position, _latch, _speed, _secureState];
     return descriptionString;
 }
 
 @end
 
-@implementation MTRClosureControlClusterOverallTargetStruct
+@implementation MTRClosureControlClusterOverallTargetStateStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -6946,7 +6946,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRClosureControlClusterOverallTargetStruct alloc] init];
+    auto other = [[MTRClosureControlClusterOverallTargetStateStruct alloc] init];
 
     other.position = self.position;
     other.latch = self.latch;
@@ -7067,7 +7067,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@implementation MTRClosureDimensionClusterCurrentStateStruct
+@implementation MTRClosureDimensionClusterDimensionStateStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -7083,7 +7083,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)copyWithZone:(NSZone * _Nullable)zone
 {
-    auto other = [[MTRClosureDimensionClusterCurrentStateStruct alloc] init];
+    auto other = [[MTRClosureDimensionClusterDimensionStateStruct alloc] init];
 
     other.position = self.position;
     other.latch = self.latch;
@@ -7125,39 +7125,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: min:%@; max:%@; >", NSStringFromClass([self class]), _min, _max];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRClosureDimensionClusterTargetStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _position = nil;
-
-        _latch = nil;
-
-        _speed = nil;
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRClosureDimensionClusterTargetStruct alloc] init];
-
-    other.position = self.position;
-    other.latch = self.latch;
-    other.speed = self.speed;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: position:%@; latch:%@; speed:%@; >", NSStringFromClass([self class]), _position, _latch, _speed];
     return descriptionString;
 }
 
@@ -9335,6 +9302,8 @@ NS_ASSUME_NONNULL_BEGIN
         _zoneType = @(0);
 
         _zoneSource = @(0);
+
+        _twoDCartesianZone = nil;
     }
     return self;
 }
@@ -9346,13 +9315,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.zoneID = self.zoneID;
     other.zoneType = self.zoneType;
     other.zoneSource = self.zoneSource;
+    other.twoDCartesianZone = self.twoDCartesianZone;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; zoneType:%@; zoneSource:%@; >", NSStringFromClass([self class]), _zoneID, _zoneType, _zoneSource];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; zoneType:%@; zoneSource:%@; twoDCartesianZone:%@; >", NSStringFromClass([self class]), _zoneID, _zoneType, _zoneSource, _twoDCartesianZone];
     return descriptionString;
 }
 

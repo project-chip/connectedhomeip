@@ -13,8 +13,8 @@
 # limitations under the License.
 
 name:
-    "[TC-TBRM-2.4] Verify that getting Active or Pending Dataset in the PASE
-    session results in unsupported access"
+    "[TC-TBRM-2.4] Verify that getting or setting Active or Pending Dataset in a
+    PASE session results in unsupported access"
 
 PICS:
     - TBRM.S
@@ -31,6 +31,7 @@ config:
         defaultValue: "hex:d0e8a02db8629e9d172dfd40719c89204ff395651a6a2612839a71469880ec2404687d05cf0642b91242c712b5405b6905070c2a4bd80bdc8437ae5a2aded0cf3de91318d16f0ce9450d1c802cc01f39b8761de87cc7eeeb7f52b51308353da49a"
 
 tests:
+    # Step 1
     - label: "Wait for the commissioned device to be retrieved"
       cluster: DelayCommands
       command: WaitForCommissionee
@@ -39,6 +40,7 @@ tests:
               - name: nodeId
                 value: nodeId
 
+    # Step 2
     - label: "Open Commissioning Window"
       endpoint: 0
       cluster: Administrator Commissioning
@@ -57,6 +59,7 @@ tests:
               - name: Salt
                 value: "SPAKE2P Key Salt"
 
+    # Step 3
     - label: "TH2  establishes a PASE session with the DUT"
       identity: beta
       cluster: CommissionerCommands
@@ -69,6 +72,7 @@ tests:
               - name: payload
                 value: EcmPayload
 
+    # Step 4
     - label:
           "TH2 send GetActiveDatasetRequest command to the DUT in PASE session"
       identity: beta
@@ -76,6 +80,20 @@ tests:
       response:
           error: UNSUPPORTED_ACCESS
 
+    # Step 5
+    - label:
+          "TH2 send SetActiveDatasetRequest command to the DUT in PASE session"
+      identity: beta
+      command: SetActiveDatasetRequest
+      timedInteractionTimeoutMs: 2000
+      arguments:
+          values:
+              - name: ActiveDataset
+                value: "hex:0e080000000000010000"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    # Step 6
     - label:
           "TH2 send GetPendingDatasetRequest command to the DUT in PASE session"
       identity: beta
@@ -83,6 +101,22 @@ tests:
       response:
           error: UNSUPPORTED_ACCESS
 
+    # Step 7
+    - label:
+          "TH sends a SetPendingDatasetRequest command to the DUT in PASE
+          session"
+      PICS: TBRM.S.F00
+      identity: beta
+      command: SetPendingDatasetRequest
+      timedInteractionTimeoutMs: 2000
+      arguments:
+          values:
+              - name: PendingDataset
+                value: "hex:0e080000000000010000"
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    # Step 8
     - label: "Cleanup: Close the commissioning window"
       endpoint: 0
       cluster: Administrator Commissioning

@@ -144,7 +144,7 @@ CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadMPTZPresets(std::vector<MP
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadDPTZStreams(std::vector<DPTZStruct> dptzStreams)
+CHIP_ERROR AVSettingsUserLevelManagementDelegate::LoadDPTZStreams(std::vector<DPTZStruct> & dptzStreams)
 {
     dptzStreams.clear();
     return CHIP_NO_ERROR;

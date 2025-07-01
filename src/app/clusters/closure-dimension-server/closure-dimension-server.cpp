@@ -44,12 +44,12 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
     switch (aPath.mAttributeId)
     {
     case Attributes::CurrentState::Id: {
-        typedef DataModel::Nullable<GenericCurrentStateStruct> T;
+        typedef DataModel::Nullable<GenericDimensionStateStruct> T;
         return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetCurrentState(ret); });
     }
-    case Attributes::Target::Id: {
-        typedef DataModel::Nullable<GenericTargetStruct> T;
-        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetTarget(ret); });
+    case Attributes::TargetState::Id: {
+        typedef DataModel::Nullable<GenericDimensionStateStruct> T;
+        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetTargetState(ret); });
     }
     case Attributes::Resolution::Id: {
         typedef Attributes::Resolution::TypeInfo::Type T;
@@ -87,6 +87,10 @@ CHIP_ERROR Interface::Read(const ConcreteReadAttributePath & aPath, AttributeVal
     case Attributes::ModulationType::Id: {
         typedef Attributes::ModulationType::TypeInfo::Type T;
         return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetModulationType(ret); });
+    }
+    case Attributes::LatchControlModes::Id: {
+        typedef BitFlags<LatchControlModesBitmap> T;
+        return EncodeRead<T>(aEncoder, [&logic = mClusterLogic](T & ret) -> CHIP_ERROR { return logic.GetLatchControlModes(ret); });
     }
     case Attributes::FeatureMap::Id: {
         typedef BitFlags<Feature> T;

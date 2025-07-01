@@ -207,7 +207,7 @@ Status ChimeServer::SetSelectedChime(uint8_t chimeID)
 {
     if (!IsSupportedChimeID(chimeID))
     {
-        return Protocols::InteractionModel::Status::ConstraintError;
+        return Protocols::InteractionModel::Status::NotFound;
     }
 
     bool activeIDChanged = !(mSelectedChime == chimeID);
@@ -261,9 +261,15 @@ void ChimeServer::HandlePlayChimeSound(HandlerContext & ctx, const Commands::Pla
 {
 
     ChipLogDetail(Zcl, "Chime: PlayChimeSound");
+    Status status = Status::Success;
 
-    // call the delegate to play the chime
-    Status status = mDelegate.PlayChimeSound();
+    // Only invoke the delegate if enabled, otherwise don't play a sound, and "silently" return
+    if (mEnabled)
+    {
+        // call the delegate to play the chime
+        status = mDelegate.PlayChimeSound();
+    }
+
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
 }
 

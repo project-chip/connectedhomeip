@@ -49,10 +49,10 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <NetworkCommissioningDriver.h>
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platform/bouffalolab/common/ThreadStackManagerImpl.h>
@@ -73,6 +73,8 @@
 #endif
 #endif
 
+#include <app/clusters/network-commissioning/network-commissioning.h>
+
 #include <AppTask.h>
 #include <plat.h>
 
@@ -87,6 +89,10 @@ chip::app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::BLWiFiDriver::GetInstance()));
 }
 #endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver> sThreadNetworkDriver(0 /*endpointId*/);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE
 namespace {
@@ -249,7 +255,7 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
     ReturnErrorOnFailure(ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice));
 #endif
 #endif
-
+    sThreadNetworkDriver.Init();
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI

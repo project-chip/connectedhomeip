@@ -49,6 +49,8 @@ CommandHandlerInterfaceOnlyClusters:
     - Wi-Fi Network Management
     - Thread Border Router Management
     - Thread Network Directory
+    - TLS Client Management
+    - TLS Certificate Management
     - Water Heater Management
     - Water Heater Mode
     - WebRTC Transport Provider

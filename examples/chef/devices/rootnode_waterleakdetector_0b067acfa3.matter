@@ -1896,9 +1896,6 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute activeHardwareFaults;
-    callback attribute activeRadioFaults;
-    callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
     callback attribute featureMap;
     callback attribute clusterRevision;

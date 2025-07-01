@@ -36,6 +36,13 @@ using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvStreamManagement::Attributes;
 using chip::Protocols::InteractionModel::Status;
 
+namespace {
+
+// Constants
+constexpr uint16_t kInvalidStreamID = 65500;
+
+} // namespace
+
 void CameraAVStreamManager::SetCameraDeviceHAL(CameraDeviceInterface * aCameraDeviceHAL)
 {
     mCameraDeviceHAL = aCameraDeviceHAL;

@@ -45,6 +45,7 @@ config("config") {
     "include/transport",
     "${chip_root}/examples/camera-app/camera-common/include",
     "${chip_root}/examples/camera-app/camera-common/include/media-controller",
+    "${chip_root}/examples/camera-app/camera-common/include/camera-avstream-controller",
     "${chip_root}/examples/camera-app/camera-common/include/transport",
     "${chip_root}/third_party/libdatachannel/repo/include",
   ]

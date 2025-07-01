@@ -330,7 +330,7 @@ void Instance::InvokeCommand(HandlerContext & handlerContext)
 
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    ChipLogError(Zcl, "OperationalState: Reading");
+    ChipLogDetail(Zcl, "OperationalState: Reading");
     switch (aPath.mAttributeId)
     {
     case OperationalState::Attributes::OperationalStateList::Id: {

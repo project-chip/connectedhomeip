@@ -277,9 +277,9 @@
 		5AE6D4E427A99041001F2493 /* MTRDeviceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE6D4E327A99041001F2493 /* MTRDeviceTests.m */; };
 		75139A6F2B7FE5E900E3A919 /* MTRDeviceControllerLocalTestStorage.mm in Sources */ = {isa = PBXBuildFile; fileRef = 75139A6E2B7FE5E900E3A919 /* MTRDeviceControllerLocalTestStorage.mm */; };
 		75139A702B7FE68C00E3A919 /* MTRDeviceControllerLocalTestStorage.h in Headers */ = {isa = PBXBuildFile; fileRef = 75139A6D2B7FE5D600E3A919 /* MTRDeviceControllerLocalTestStorage.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		7534D1782CF8CDDF00F64654 /* AttributePersistenceProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7534D1772CF8CDDF00F64654 /* AttributePersistenceProvider.cpp */; };
+		7534D1782CF8CDDF00F64654 /* AttributePersistenceProviderInstance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7534D1772CF8CDDF00F64654 /* AttributePersistenceProviderInstance.cpp */; };
 		7534D1792CF8CDDF00F64654 /* AttributePersistenceProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 7534D1762CF8CDDF00F64654 /* AttributePersistenceProvider.h */; };
-		7534D17A2CF8CDDF00F64654 /* AttributePersistenceProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7534D1772CF8CDDF00F64654 /* AttributePersistenceProvider.cpp */; };
+		7534D17A2CF8CDDF00F64654 /* AttributePersistenceProviderInstance.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7534D1772CF8CDDF00F64654 /* AttributePersistenceProviderInstance.cpp */; };
 		7534D17B2CF8CDDF00F64654 /* AttributePersistenceProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 7534D1762CF8CDDF00F64654 /* AttributePersistenceProvider.h */; };
 		7534D17E2CF8CE2000F64654 /* DefaultAttributePersistenceProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 7534D17C2CF8CE2000F64654 /* DefaultAttributePersistenceProvider.h */; };
 		7534D17F2CF8CE2000F64654 /* DefaultAttributePersistenceProvider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7534D17D2CF8CE2000F64654 /* DefaultAttributePersistenceProvider.cpp */; };
@@ -895,7 +895,7 @@
 		75139A6D2B7FE5D600E3A919 /* MTRDeviceControllerLocalTestStorage.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRDeviceControllerLocalTestStorage.h; sourceTree = "<group>"; };
 		75139A6E2B7FE5E900E3A919 /* MTRDeviceControllerLocalTestStorage.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceControllerLocalTestStorage.mm; sourceTree = "<group>"; };
 		7534D1762CF8CDDF00F64654 /* AttributePersistenceProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AttributePersistenceProvider.h; sourceTree = "<group>"; };
-		7534D1772CF8CDDF00F64654 /* AttributePersistenceProvider.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AttributePersistenceProvider.cpp; sourceTree = "<group>"; };
+		7534D1772CF8CDDF00F64654 /* AttributePersistenceProviderInstance.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AttributePersistenceProviderInstance.cpp; sourceTree = "<group>"; };
 		7534D17C2CF8CE2000F64654 /* DefaultAttributePersistenceProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DefaultAttributePersistenceProvider.h; sourceTree = "<group>"; };
 		7534D17D2CF8CE2000F64654 /* DefaultAttributePersistenceProvider.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DefaultAttributePersistenceProvider.cpp; sourceTree = "<group>"; };
 		7534F12628BFF20300390851 /* MTRDeviceAttestationDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRDeviceAttestationDelegate.mm; sourceTree = "<group>"; };
@@ -1623,10 +1623,10 @@
 				7534D17C2CF8CE2000F64654 /* DefaultAttributePersistenceProvider.h */,
 				7534D17D2CF8CE2000F64654 /* DefaultAttributePersistenceProvider.cpp */,
 				7534D1762CF8CDDF00F64654 /* AttributePersistenceProvider.h */,
-				7534D1772CF8CDDF00F64654 /* AttributePersistenceProvider.cpp */,
+				7534D1772CF8CDDF00F64654 /* AttributePersistenceProviderInstance.cpp */,
 			);
 			name = persistence;
-			path = util/persistence;
+			path = persistence;
 			sourceTree = "<group>";
 		};
 		7567A2082DA5ABA500D91529 /* server-cluster */ = {
@@ -2588,7 +2588,7 @@
 				512431292BA0C8BF000BC136 /* ResetMRPParametersCommand.mm in Sources */,
 				037C3DB32991BD5000B7EEE2 /* OpenCommissioningWindowCommand.mm in Sources */,
 				037C3DAE2991BD4F00B7EEE2 /* PairingCommandBridge.mm in Sources */,
-				7534D17A2CF8CDDF00F64654 /* AttributePersistenceProvider.cpp in Sources */,
+				7534D17A2CF8CDDF00F64654 /* AttributePersistenceProviderInstance.cpp in Sources */,
 				037C3DCA2991BD5100B7EEE2 /* CHIPCommandStorageDelegate.mm in Sources */,
 				037C3DCF2991BD5200B7EEE2 /* MTRError.mm in Sources */,
 				514C79F72B62F0B900DD6D7B /* util.cpp in Sources */,
@@ -2692,7 +2692,7 @@
 				3CF134AD289D8E570017A19E /* MTRDeviceAttestationInfo.mm in Sources */,
 				2C1B027A2641DB4E00780EF1 /* MTROperationalCredentialsDelegate.mm in Sources */,
 				754784652BFE65CB0089C372 /* MTRDeviceStorageBehaviorConfiguration.mm in Sources */,
-				7534D1782CF8CDDF00F64654 /* AttributePersistenceProvider.cpp in Sources */,
+				7534D1782CF8CDDF00F64654 /* AttributePersistenceProviderInstance.cpp in Sources */,
 				7560FD1C27FBBD3F005E85B3 /* MTREventTLVValueDecoder.mm in Sources */,
 				5178E67E2AE098210069DF72 /* MTRCommandTimedCheck.mm in Sources */,
 				7596A84928762783004DAE0E /* MTRAsyncCallbackWorkQueue.mm in Sources */,

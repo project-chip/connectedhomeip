@@ -122,6 +122,7 @@ config("efr32-common-config") {
 
 source_set("efr32-common") {
   deps = [
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
     "${chip_root}/src/app/clusters/software-diagnostics-server:software-fault-listener",
     "${silabs_common_plat_dir}/provision:storage",
   ]

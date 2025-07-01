@@ -36,7 +36,7 @@ public:
 
     CHIP_ERROR Init(Server & server);
     void HandleCommissioningCompleteEvent();
-    CHIP_ERROR FinalizeCommissioning(NodeId nodeId);
+    CHIP_ERROR FinalizeCommissioning(NodeId nodeId, bool isJCM, chip::Crypto::P256PublicKey & trustedIcacPublicKeyB);
 
 private:
     // Various actions to take when OnConnected callback is called

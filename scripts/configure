@@ -145,7 +145,7 @@ function main() { # ...
 
     # Create the build environment if necessary
     if ! check_build_env; then
-        check_python
+        check_python 3.11
         configure_python_env
         if [[ -z "$CHIP_PREGEN_DIR" ]] && ! check_binary zap-cli; then
             download_zap
@@ -322,19 +322,19 @@ function call_impl() { # func ...
     "$PYTHON" "${CHIP_ROOT}/scripts/configure.impl.py" "$@"
 }
 
-function check_python() {
-    progress "Checking for Python 3"
-    if have_binary python3; then
-        PYTHON="$(hash -t python3)"
+function check_python() { # version
+    local required="$1" major="${1%%.*}"
+    progress "Checking for Python $required or later"
+    if have_binary "python$major"; then
+        PYTHON="$(hash -t "python$major")"
     elif have_binary python; then
         PYTHON="$(hash -t python)"
-        local ver="$("$PYTHON" --version)"
-        if [[ "$ver" != "Python 3."* ]]; then
-            info "need Python 3 but found $ver"
-            return 1
-        fi
     else
         info "not found"
+        return 1
+    fi
+    if ! "$PYTHON" -c 'import sys; sys.exit(1 if sys.version_info < tuple(map(int,sys.argv[1].split("."))) else 0)' "$required"; then
+        info "not found ($PYTHON is $("$PYTHON" --version))"
         return 1
     fi
     info "$PYTHON"

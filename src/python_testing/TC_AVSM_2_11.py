@@ -166,13 +166,13 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
             )
             asserts.assert_true(
                 False,
-                "Unexpected success when expecting INVALID_DATA_TYPE due to StreamPriorities containing a StreamUsage not in aSupportedStreamUsages",
+                "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to StreamPriorities containing a StreamUsage not in aSupportedStreamUsages",
             )
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
                 Status.DynamicConstraintError,
-                "Unexpected error returned expecting INVALID_DATA_TYPE due to StreamPriorities containing a StreamUsage not in aSupportedStreamUsages",
+                "Unexpected error returned expecting DYNAMIC_CONSTRAINT_ERROR due to StreamPriorities containing a StreamUsage not in aSupportedStreamUsages",
             )
             pass
 
@@ -184,13 +184,13 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
             )
             asserts.assert_true(
                 False,
-                "Unexpected success when expecting CONSTRAINT_ERROR due to StreamPriorities containing duplicate StreamUsage values from aSupportedStreamUsages",
+                "Unexpected success when expecting ALREADY_EXISTS due to StreamPriorities containing duplicate StreamUsage values from aSupportedStreamUsages",
             )
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
                 Status.AlreadyExists,
-                "Unexpected error returned when expecting CONSTRAINT_ERROR due to StreamPriorities containing duplicate StreamUsage values from aSupportedStreamUsages",
+                "Unexpected error returned when expecting ALREADY_EXISTS due to StreamPriorities containing duplicate StreamUsage values from aSupportedStreamUsages",
             )
             pass
 
