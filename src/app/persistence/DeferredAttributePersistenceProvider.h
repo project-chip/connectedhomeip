@@ -15,7 +15,7 @@
  */
 #pragma once
 
-#include <app/util/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProvider.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 #include <system/SystemClock.h>
@@ -68,8 +68,7 @@ public:
      * For other attributes, immediately pass the write operation to the decorated persister.
      */
     CHIP_ERROR WriteValue(const ConcreteAttributePath & aPath, const ByteSpan & aValue) override;
-    CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, const EmberAfAttributeMetadata * aMetadata,
-                         MutableByteSpan & aValue) override;
+    CHIP_ERROR ReadValue(const ConcreteAttributePath & aPath, MutableByteSpan & aValue) override;
 
 private:
     void FlushAndScheduleNext();
