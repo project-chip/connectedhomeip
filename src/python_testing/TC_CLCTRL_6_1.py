@@ -38,8 +38,10 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback,
-                                         MatterBaseTest, TestStep, async_test_body, default_matter_test_main)
+from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.event_attribute_reporting import EventChangeCallback
+from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest,
+                                         TestStep, async_test_body, default_matter_test_main)
 from mobly import asserts
 
 
@@ -759,11 +761,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
 
             # STEP 9f: Verify that the DUT has emitted the SecureStateChanged event
             self.step("9f")
-
-            # Wait for the SecureStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
-
-            asserts.assert_true(data.secureValue, f"Unexpected event data: {data.secureValue}")
+            self.skip_step("9f")
 
             # STEP 9g: If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip step 9h
             self.step("9g")

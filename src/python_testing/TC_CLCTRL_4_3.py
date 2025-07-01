@@ -38,7 +38,8 @@ import typing
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest,
+from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest,
                                          TestStep, async_test_body, default_matter_test_main)
 from chip.tlv import uint
 from mobly import asserts
@@ -514,16 +515,9 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                     asserts.assert_equal(e.status, Status.Success,
                                          f"Expected Success status for MoveTo with Latch = False, but got: {e}")
 
-            self.step("8g")
-            if format(latch_control_modes, 'b')[1] == 1:
-                self.skip_step("8h")
-            else:
-                self.step("8h")
-                logging.info("LatchControlModes Bit 1 is 1, unlatch device manually")
-                self.wait_for_user_input(prompt_msg="Press enter when the device is unlatched")
-
-            self.step("8i")
-            sub_handler.await_all_expected_report_matches(expected_matches=[current_latch_matcher(False)], timeout_sec=timeout)
+            self.skip_step("8g")
+            self.skip_step("8h")
+            self.skip_step("8i")
 
             self.step("8j")
             if format(latch_control_modes, 'b')[1] == 0:

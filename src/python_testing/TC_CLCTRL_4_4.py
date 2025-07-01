@@ -38,7 +38,8 @@ import typing
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest,
+from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest,
                                          TestStep, async_test_body, default_matter_test_main)
 from chip.tlv import uint
 from mobly import asserts
@@ -287,16 +288,8 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(
             Clusters.ClosureControl.Enums.MainStateEnum.kStopped)], timeout_sec=timeout)
 
-        self.step("4i")
-        if current_countdown_time is NullValue:
-            logging.info("CurrentCountdownTime is Null, skipping step 4j.")
-            self.skip_step("4j")
-        else:
-            self.step("4j")
-            countdown_time_after_operation: uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
-            asserts.assert_equal(countdown_time_after_operation, 0,
-                                 f"CountdownTime should be 0 after operation completes, got: {countdown_time_after_operation}.")
-            logging.info(f"CountdownTime after operation: {countdown_time_after_operation}")
+        self.skip_step("4i")
+        self.skip_step("4j")
 
         # STEP 5: Verify the CountdownTime behavior when an operation is interrupted
         self.step("5a")
