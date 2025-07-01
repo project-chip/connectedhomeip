@@ -121,7 +121,7 @@ class TC_ACL_2_9(MatterBaseTest):
             self.dut_node_id,
             [(0, acl_attribute(value=new_acl))]
         )
-        # Add explicit check for UnsupportedAccess error
+        # Add explicit check for Success
         if result[0].Status != Status.Success:
             asserts.fail(f"Expected Success but got {result[0].Status}")
 
@@ -175,54 +175,38 @@ class TC_ACL_2_9(MatterBaseTest):
             asserts.fail(f"Expected UnsupportedAccess but got {result3[0].Status}")
 
 
+        async def read_and_check_min_value(attribute: Clusters.ClusterAttribute, min_value: int):
+            result = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, attribute)])
+            value = result[0][Clusters.Objects.AccessControl][attribute]
+            asserts.assert_greater_equal(
+                value,
+                min_value,
+                f"{attribute.attribute_name} attribute should be {min_value} or greater, but got {value}"
+            )
+
         self.step(7)
         # TH1 reads DUT Endpoint 0 AccessControl cluster SubjectsPerAccessControlEntry attribute
-        subjects_per_access_control_entry_attribute = Clusters.AccessControl.Attributes.SubjectsPerAccessControlEntry
-        subjects_per_access_control_entry_list = await self.default_controller.ReadAttribute(
-            self.dut_node_id,
-            [(0, subjects_per_access_control_entry_attribute)]
-        )
-        self.check_value(subjects_per_access_control_entry_list, "subjects-per-access-control-entry")
+        await read_and_check_min_value(Clusters.AccessControl.Attributes.SubjectsPerAccessControlEntry, 4)
 
         self.step(8)
         # TH1 reads DUT Endpoint 0 AccessControl cluster TargetsPerAccessControlEntry attribute
-        targets_per_access_control_entry_attribute = Clusters.AccessControl.Attributes.TargetsPerAccessControlEntry
-        targets_per_access_control_entry_list = await self.default_controller.ReadAttribute(
-            self.dut_node_id,
-            [(0, targets_per_access_control_entry_attribute)]
-        )
-        self.check_value(targets_per_access_control_entry_list, "targets-per-access-control-entry")
+        await read_and_check_min_value(Clusters.AccessControl.Attributes.TargetsPerAccessControlEntry, 3)
 
         self.step(9)
         # TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntriesPerFabric attribute
-        access_control_entries_per_fabric_attribute = Clusters.AccessControl.Attributes.AccessControlEntriesPerFabric
-        access_control_entries_per_fabric_list = await self.default_controller.ReadAttribute(
-            self.dut_node_id,
-            [(0, access_control_entries_per_fabric_attribute)]
-        )
-        self.check_value(access_control_entries_per_fabric_list, "access-control-entries-per-fabric")
+        await read_and_check_min_value(Clusters.AccessControl.Attributes.AccessControlEntriesPerFabric, 4)
+
+        async def read_event_expect_unsupported_access(event: Clusters.ClusterEvent):
+            result = await self.default_controller.ReadEvent(self.dut_node_id, [(0, event)])
+            asserts.assert_equal(result[0].Status, Status.UnsupportedAccess, f"Expected UnsupportedAccess but got {result[0].Status}")
 
         self.step(10)
         # TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event
-        access_control_entry_changed_event = Clusters.AccessControl.Events.AccessControlEntryChanged
-        access_control_entry_changed_list = await self.default_controller.ReadEvent(
-            self.dut_node_id,
-            [(0, access_control_entry_changed_event)]
-        )
-         # Add explicit check for UnsupportedAccess error
-        if access_control_entry_changed_list[0].Status != Status.UnsupportedAccess:
-            asserts.fail(f"Expected UnsupportedAccess but got {access_control_entry_changed_list[0].Status}")
+        await read_event_expect_unsupported_access(Clusters.AccessControl.Events.AccessControlEntryChanged)
 
         self.step(11)
         # TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event
-        access_control_extension_changed_event = Clusters.AccessControl.Events.AccessControlExtensionChanged
-        access_control_extension_changed_list = await self.default_controller.ReadEvent(
-            self.dut_node_id,
-            [(0, access_control_extension_changed_event)]
-        )
-        # Add explicit check for UnsupportedAccess error
-        if access_control_extension_changed_list[0].Status != Status.UnsupportedAccess:
-            asserts.fail(f"Expected UnsupportedAccess but got {access_control_extension_changed_list[0].Status}")
+        await read_event_expect_unsupported_access(Clusters.AccessControl.Events.AccessControlExtensionChanged)
         
         #TODO: Add factory reset to reset ACL back to admin privileges after test runs
         
