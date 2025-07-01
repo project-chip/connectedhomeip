@@ -1,0 +1,52 @@
+steps:
+    - name: "ghcr.io/project-chip/chip-build-vscode:140"
+      entrypoint: "bash"
+      args:
+          - "-c"
+          - |
+              git config --global --add safe.directory "*"
+              python scripts/checkout_submodules.py --shallow --recursive --platform linux 
+      id: Submodules
+    - name: "ghcr.io/project-chip/chip-build-vscode:140"
+      # NOTE: silabs boostrap is NOT done with the rest as it requests a conflicting
+      #       jinja2 version (asks for 3.1.3 when constraints.txt asks for 3.0.3)
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - "-c"
+          - source ./scripts/bootstrap.sh -p linux
+      id: Bootstrap
+      waitFor:
+          - Submodules
+      entrypoint: /usr/bin/bash
+      volumes:
+          - name: pwenv
+            path: /pwenv
+      timeout: 900s
+    - name: "ghcr.io/project-chip/chip-build-vscode:140"
+      env:
+          - PW_ENVIRONMENT_ROOT=/pwenv
+      args:
+          - >-
+              ./examples/chef/chef.py -br -d rootnode_pump_5f904818cc -t linux &&
+              ./scripts/build_python.sh -i out/python_env &&
+              scripts/run_in_python_env.sh out/python_env './scripts/tests/run_python_test.py --app examples/chef/linux/out/rootnode_pump_5f904818cc --factory-reset --script ./examples/chef/tests/pump_tests.py --script-args "--dut-node-id 0x20 --discriminator 3840 --passcode 20202021 --commissioning-method on-network"'
+      id: PumpTest
+      waitFor:
+          - Bootstrap
+      entrypoint: ./scripts/run_in_build_env.sh
+      volumes:
+          - name: pwenv
+            path: /pwenv
+
+logsBucket: matter-build-automation-build-logs
+
+# Global timeout for all steps
+timeout: 43200s
+queueTtl: 21600s
+
+# Using higher CPU machines generally speeds up builds, except bootstrap is always
+# slow.
+options:
+    machineType: "E2_HIGHCPU_32"
+    diskSizeGb: 500
