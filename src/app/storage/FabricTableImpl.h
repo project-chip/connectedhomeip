@@ -76,7 +76,7 @@ public:
 template <class StorageId, class StorageData>
 class FabricTableImpl
 {
-    using TableEntry = Data::TableEntry<StorageId, StorageData>;
+    using TableEntry = Data::TableEntryRef<StorageId, StorageData>;
 
 public:
     using EntryIterator = CommonIterator<TableEntry>;
