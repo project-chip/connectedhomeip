@@ -37,6 +37,7 @@ public:
         kSetTargetAction,
         kStepAction,
         kPanelLatchAction,
+        kPanelUnLatchAction, // New action for unlatching the panel before SetTarget
 
         kInvalidAction
     };
@@ -159,6 +160,38 @@ public:
     static void HandleClosureActionTimer(chip::System::Layer * layer, void * aAppState);
 
     /**
+     * @brief Handles the step action for a panel endpoint.
+     * 
+     * This method updates the current position of the panel endpoint based on the step action
+     * and checks if the target position is reached. If so, it performs the latch action
+     * if required.
+     * 
+     * @param endpointId The identifier of the endpoint for which the panel step action should be handled.
+     */
+    void HandlePanelStepAction(chip::EndpointId endpointId);
+
+    /**
+     * @brief Handles the SetTarget motion action for a panel endpoint.
+     *
+     * This method Performs the update the current positions of panel endpoint to next position
+     * and when target position is reached, it performs the latch action if required.
+     *
+     * @param endpointId The identifier of the endpoint for which the panel target action should be handled.
+     */
+    void HandlePanelSetTargetAction(chip::EndpointId endpointId);
+
+    /**
+     * @brief Handles the unlatch action for a closure panel.
+     *
+     * This method performs the unlatch action if required for the specified closure panel endpoint.
+     * It updates the current state of the panel and sets the target state accordingly and then calls
+     * HandlePanelSetTargetAction to move the panel to the target position.
+     *
+     * @param endpointId The identifier of the endpoint for which the unlatch action should be handled.
+     */
+    void HandlePanelUnlatchAction(chip::EndpointId endpointId);
+
+    /**
      * @brief Handles the completion of a Calibrate action.
      *
      * This method is called when a calibrate action has finished executing.
@@ -196,7 +229,7 @@ public:
      *
      * @param action The action that has been completed.
      */
-    void HandleSetTargetActionComplete();
+    void HandlePanelSetTargetActionComplete();
 
     /**
      * @brief Handles the completion of a Step action.
@@ -206,17 +239,11 @@ public:
      *
      * @param action The action that has been completed.
      */
-    void HandleStepActionComplete();
-
-    /**
-     * @brief Handles the completion of a SetTarget action.
-     * 
-     * This method is called when the SetTarget action timer is expired.
-     */
-    void HandleSetTargetAction();
+    void HandlePanelStepActionComplete();
 
     bool mIsCalibrationActionInProgress = false;
     bool mIsMoveToActionInProgress      = false;
     bool mIsSetTargetActionInProgress   = false;
     bool mIsStepActionInProgress        = false;
+    chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
 };
