@@ -60,7 +60,6 @@ jobs:
             src/python_testing/matter_testing_infrastructure/chip/testing/pics.py \
             src/python_testing/matter_testing_infrastructure/chip/testing/choice_conformance.py \
             src/python_testing/matter_testing_infrastructure/chip/testing/commissioning.py \
-            src/python_testing/matter_testing_infrastructure/chip/testing/decorators.py \
             src/python_testing/matter_testing_infrastructure/chip/testing/basic_composition.py \
             src/python_testing/matter_testing_infrastructure/chip/testing/conformance.py \
             src/python_testing/matter_testing_infrastructure/chip/testing/spec_parsing.py \

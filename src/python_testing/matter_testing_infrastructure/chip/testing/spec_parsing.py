@@ -70,7 +70,7 @@ class SpecParsingException(Exception):
 
 
 # passing in feature map, attribute list, command list
-ConformanceCallable = Callable[[uint, list[uint], list[uint]], ConformanceDecisionWithChoice]
+ConformanceCallable = conformance_support.Conformance
 
 
 @dataclass
