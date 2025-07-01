@@ -75,10 +75,26 @@ CHIP_ERROR ZoneMgmtServer::Init()
     {
         VerifyOrReturnError(mMaxUserDefinedZones >= 5, CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxUserDefinedZones configuration error", mEndpointId));
+        VerifyOrReturnError(mMaxZones >= mMaxUserDefinedZones, CHIP_ERROR_INVALID_ARGUMENT,
+                            ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxZones configuration error", mEndpointId));
+        int mfgCount = 0;
+        for (const auto & zone : mZones)
+        {
+            if (zone.zoneSource == ZoneSourceEnum::kMfg)
+            {
+                mfgCount++;
+            }
+        }
+        VerifyOrReturnError(mfgCount == (mMaxZones - mMaxUserDefinedZones), CHIP_ERROR_INVALID_ARGUMENT,
+                            ChipLogError(Zcl,
+                                         "ZoneManagement[ep=%d]: MfgZones + MaxUserDefinedZones must be equal to MaxZones count",
+                                         mEndpointId));
     }
-
-    VerifyOrReturnError(mMaxZones >= 1, CHIP_ERROR_INVALID_ARGUMENT,
-                        ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxZones configuration error", mEndpointId));
+    else
+    {
+        VerifyOrReturnError(mMaxZones >= 1, CHIP_ERROR_INVALID_ARGUMENT,
+                            ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxZones configuration error", mEndpointId));
+    }
 
     VerifyOrReturnError(mSensitivityMax >= 2 && mSensitivityMax <= 10, CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(Zcl, "ZoneManagement[ep=%d]: SensitivityMax configuration error", mEndpointId));
