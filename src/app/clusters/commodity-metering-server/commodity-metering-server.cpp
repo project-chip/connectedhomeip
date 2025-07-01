@@ -46,7 +46,7 @@ namespace {
 
 inline bool operator==(const Span<const uint32_t> & a, const Span<const uint32_t> & b)
 {
-    return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
+    return std::equal(a.begin(), a.end(), b.begin());
 }
 
 inline bool operator==(const Structs::MeteredQuantityStruct::Type & lhs, const Structs::MeteredQuantityStruct::Type & rhs)
@@ -55,7 +55,7 @@ inline bool operator==(const Structs::MeteredQuantityStruct::Type & lhs, const S
 }
 
 template <typename T>
-bool NullableListsEqual(const DataModel::Nullable<DataModel::List<T>> & a, const DataModel::Nullable<DataModel::List<T>> & b)
+bool NullableListEqual(const DataModel::Nullable<DataModel::List<T>> & a, const DataModel::Nullable<DataModel::List<T>> & b)
 {
     if (a.IsNull() || b.IsNull())
     {
