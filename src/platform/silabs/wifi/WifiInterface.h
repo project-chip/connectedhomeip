@@ -364,6 +364,12 @@ protected:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_IPV4
     /**
+     * @brief Updates the IPv4 address in the Wi-Fi interface and notifies the application layer about the new IP address.
+     *
+     * @param[in] ip New IPv4 address
+     */
+    void GotIPv4Address(uint32_t ip);
+    /**
      * @brief Function notifies the PlatformManager that an IPv4 event occured on the WiFi interface.
      *
      * @param gotIPv4Addr true, got an IPv4 address

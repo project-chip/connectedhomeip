@@ -190,7 +190,8 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
 
         do_test_over_pase = self.user_params.get("use_pase_only", False)
         if do_test_over_pase:
-            self.connect_over_pase(self.default_controller)
+            setupCode = self.matter_test_config.qr_code_content or self.matter_test_config.manual_code
+            await self.default_controller.FindOrEstablishPASESession(setupCode[0], self.dut_node_id)
 
         # Commissioning - done
         self.step(0)

@@ -3582,10 +3582,13 @@ static BOOL AttributeIsSpecifiedInClosureControlCluster(AttributeId aAttributeId
     case Attributes::CurrentErrorList::Id: {
         return YES;
     }
-    case Attributes::OverallState::Id: {
+    case Attributes::OverallCurrentState::Id: {
         return YES;
     }
-    case Attributes::OverallTarget::Id: {
+    case Attributes::OverallTargetState::Id: {
+        return YES;
+    }
+    case Attributes::LatchControlModes::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -3616,7 +3619,7 @@ static BOOL AttributeIsSpecifiedInClosureDimensionCluster(AttributeId aAttribute
     case Attributes::CurrentState::Id: {
         return YES;
     }
-    case Attributes::Target::Id: {
+    case Attributes::TargetState::Id: {
         return YES;
     }
     case Attributes::Resolution::Id: {
@@ -3644,6 +3647,9 @@ static BOOL AttributeIsSpecifiedInClosureDimensionCluster(AttributeId aAttribute
         return YES;
     }
     case Attributes::ModulationType::Id: {
+        return YES;
+    }
+    case Attributes::LatchControlModes::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -5921,7 +5927,7 @@ static BOOL AttributeIsSpecifiedInCameraAVStreamManagementCluster(AttributeId aA
     case Attributes::AllocatedSnapshotStreams::Id: {
         return YES;
     }
-    case Attributes::RankedVideoStreamPrioritiesList::Id: {
+    case Attributes::StreamUsagePriorities::Id: {
         return YES;
     }
     case Attributes::SoftRecordingPrivacyModeEnabled::Id: {
@@ -6538,7 +6544,7 @@ static BOOL AttributeIsSpecifiedInCommodityMeteringCluster(AttributeId aAttribut
     case Attributes::MeteredQuantityTimestamp::Id: {
         return YES;
     }
-    case Attributes::MeasurementType::Id: {
+    case Attributes::TariffUnit::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

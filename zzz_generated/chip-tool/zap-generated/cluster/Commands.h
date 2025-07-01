@@ -9048,8 +9048,9 @@ private:
 | * CountdownTime                                                     | 0x0000 |
 | * MainState                                                         | 0x0001 |
 | * CurrentErrorList                                                  | 0x0002 |
-| * OverallState                                                      | 0x0003 |
-| * OverallTarget                                                     | 0x0004 |
+| * OverallCurrentState                                               | 0x0003 |
+| * OverallTargetState                                                | 0x0004 |
+| * LatchControlModes                                                 | 0x0005 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -9183,7 +9184,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * CurrentState                                                      | 0x0000 |
-| * Target                                                            | 0x0001 |
+| * TargetState                                                       | 0x0001 |
 | * Resolution                                                        | 0x0002 |
 | * StepValue                                                         | 0x0003 |
 | * Unit                                                              | 0x0004 |
@@ -9193,6 +9194,7 @@ private:
 | * RotationAxis                                                      | 0x0008 |
 | * Overflow                                                          | 0x0009 |
 | * ModulationType                                                    | 0x000A |
+| * LatchControlModes                                                 | 0x000B |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -13701,10 +13703,9 @@ private:
 | Commands:                                                           |        |
 | * CreateTwoDCartesianZone                                           |   0x00 |
 | * UpdateTwoDCartesianZone                                           |   0x02 |
-| * GetTwoDCartesianZone                                              |   0x03 |
-| * RemoveZone                                                        |   0x05 |
-| * CreateOrUpdateTrigger                                             |   0x06 |
-| * RemoveTrigger                                                     |   0x07 |
+| * RemoveZone                                                        |   0x03 |
+| * CreateOrUpdateTrigger                                             |   0x04 |
+| * RemoveTrigger                                                     |   0x05 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * MaxUserDefinedZones                                               | 0x0000 |
@@ -13802,44 +13803,6 @@ public:
 private:
     chip::app::Clusters::ZoneManagement::Commands::UpdateTwoDCartesianZone::Type mRequest;
     TypedComplexArgument<chip::app::Clusters::ZoneManagement::Structs::TwoDCartesianZoneStruct::Type> mComplex_Zone;
-};
-
-/*
- * Command GetTwoDCartesianZone
- */
-class ZoneManagementGetTwoDCartesianZone : public ClusterCommand
-{
-public:
-    ZoneManagementGetTwoDCartesianZone(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("get-two-dcartesian-zone", credsIssuerConfig)
-    {
-        AddArgument("ZoneID", 0, UINT16_MAX, &mRequest.zoneID);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(chip::DeviceProxy * device, std::vector<chip::EndpointId> endpointIds) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::ZoneManagement::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZone::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on endpoint %u", clusterId,
-                        commandId, endpointIds.at(0));
-        return ClusterCommand::SendCommand(device, endpointIds.at(0), clusterId, commandId, mRequest);
-    }
-
-    CHIP_ERROR SendGroupCommand(chip::GroupId groupId, chip::FabricIndex fabricIndex) override
-    {
-        constexpr chip::ClusterId clusterId = chip::app::Clusters::ZoneManagement::Id;
-        constexpr chip::CommandId commandId = chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZone::Id;
-
-        ChipLogProgress(chipTool, "Sending cluster (0x%08" PRIX32 ") command (0x%08" PRIX32 ") on Group %u", clusterId, commandId,
-                        groupId);
-
-        return ClusterCommand::SendGroupCommand(groupId, fabricIndex, clusterId, commandId, mRequest);
-    }
-
-private:
-    chip::app::Clusters::ZoneManagement::Commands::GetTwoDCartesianZone::Type mRequest;
 };
 
 /*
@@ -13989,7 +13952,7 @@ private:
 | * AllocatedVideoStreams                                             | 0x000F |
 | * AllocatedAudioStreams                                             | 0x0010 |
 | * AllocatedSnapshotStreams                                          | 0x0011 |
-| * RankedVideoStreamPrioritiesList                                   | 0x0012 |
+| * StreamUsagePriorities                                             | 0x0012 |
 | * SoftRecordingPrivacyModeEnabled                                   | 0x0013 |
 | * SoftLivestreamPrivacyModeEnabled                                  | 0x0014 |
 | * HardPrivacyModeOn                                                 | 0x0015 |
@@ -14120,8 +14083,8 @@ public:
         AddArgument("MaxResolution", &mComplex_MaxResolution);
         AddArgument("MinBitRate", 0, UINT32_MAX, &mRequest.minBitRate);
         AddArgument("MaxBitRate", 0, UINT32_MAX, &mRequest.maxBitRate);
-        AddArgument("MinFragmentLen", 0, UINT16_MAX, &mRequest.minFragmentLen);
-        AddArgument("MaxFragmentLen", 0, UINT16_MAX, &mRequest.maxFragmentLen);
+        AddArgument("MinKeyFrameInterval", 0, UINT16_MAX, &mRequest.minKeyFrameInterval);
+        AddArgument("MaxKeyFrameInterval", 0, UINT16_MAX, &mRequest.maxKeyFrameInterval);
         AddArgument("WatermarkEnabled", 0, 1, &mRequest.watermarkEnabled);
         AddArgument("OSDEnabled", 0, 1, &mRequest.OSDEnabled);
         ClusterCommand::AddArguments();
@@ -14716,7 +14679,7 @@ public:
 
 private:
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::Commands::DPTZSetViewport::Type mRequest;
-    TypedComplexArgument<chip::app::Clusters::CameraAvSettingsUserLevelManagement::Structs::ViewportStruct::Type> mComplex_Viewport;
+    TypedComplexArgument<chip::app::Clusters::Globals::Structs::ViewportStruct::Type> mComplex_Viewport;
 };
 
 /*
@@ -17365,7 +17328,7 @@ private:
 | Attributes:                                                         |        |
 | * MeteredQuantity                                                   | 0x0000 |
 | * MeteredQuantityTimestamp                                          | 0x0001 |
-| * MeasurementType                                                   | 0x0002 |
+| * TariffUnit                                                        | 0x0002 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -25522,8 +25485,9 @@ void registerClusterClosureControl(Commands & commands, CredentialIssuerCommands
         make_unique<ReadAttribute>(Id, "countdown-time", Attributes::CountdownTime::Id, credsIssuerConfig),                //
         make_unique<ReadAttribute>(Id, "main-state", Attributes::MainState::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "current-error-list", Attributes::CurrentErrorList::Id, credsIssuerConfig),         //
-        make_unique<ReadAttribute>(Id, "overall-state", Attributes::OverallState::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "overall-target", Attributes::OverallTarget::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "overall-current-state", Attributes::OverallCurrentState::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "overall-target-state", Attributes::OverallTargetState::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "latch-control-modes", Attributes::LatchControlModes::Id, credsIssuerConfig),       //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25539,11 +25503,14 @@ void registerClusterClosureControl(Commands & commands, CredentialIssuerCommands
             WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::ClosureControl::ClosureErrorEnum>>>(
             Id, "current-error-list", Attributes::CurrentErrorList::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallStateStruct::Type>>>(
-            Id, "overall-state", Attributes::OverallState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallCurrentStateStruct::Type>>>(
+            Id, "overall-current-state", Attributes::OverallCurrentState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallTargetStruct::Type>>>(
-            Id, "overall-target", Attributes::OverallTarget::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureControl::Structs::OverallTargetStateStruct::Type>>>(
+            Id, "overall-target-state", Attributes::OverallTargetState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::ClosureControl::LatchControlModesBitmap>>>(
+            Id, "latch-control-modes", 0, UINT8_MAX, Attributes::LatchControlModes::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -25559,8 +25526,9 @@ void registerClusterClosureControl(Commands & commands, CredentialIssuerCommands
         make_unique<SubscribeAttribute>(Id, "countdown-time", Attributes::CountdownTime::Id, credsIssuerConfig),                //
         make_unique<SubscribeAttribute>(Id, "main-state", Attributes::MainState::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "current-error-list", Attributes::CurrentErrorList::Id, credsIssuerConfig),         //
-        make_unique<SubscribeAttribute>(Id, "overall-state", Attributes::OverallState::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "overall-target", Attributes::OverallTarget::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "overall-current-state", Attributes::OverallCurrentState::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "overall-target-state", Attributes::OverallTargetState::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "latch-control-modes", Attributes::LatchControlModes::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25601,7 +25569,7 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
         //
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<ReadAttribute>(Id, "current-state", Attributes::CurrentState::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "target", Attributes::Target::Id, credsIssuerConfig),                               //
+        make_unique<ReadAttribute>(Id, "target-state", Attributes::TargetState::Id, credsIssuerConfig),                    //
         make_unique<ReadAttribute>(Id, "resolution", Attributes::Resolution::Id, credsIssuerConfig),                       //
         make_unique<ReadAttribute>(Id, "step-value", Attributes::StepValue::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "unit", Attributes::Unit::Id, credsIssuerConfig),                                   //
@@ -25611,6 +25579,7 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "rotation-axis", Attributes::RotationAxis::Id, credsIssuerConfig),                  //
         make_unique<ReadAttribute>(Id, "overflow", Attributes::Overflow::Id, credsIssuerConfig),                           //
         make_unique<ReadAttribute>(Id, "modulation-type", Attributes::ModulationType::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "latch-control-modes", Attributes::LatchControlModes::Id, credsIssuerConfig),       //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -25618,11 +25587,11 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
         make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::Type>>>(
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::DimensionStateStruct::Type>>>(
             Id, "current-state", Attributes::CurrentState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::TargetStruct::Type>>>(
-            Id, "target", Attributes::Target::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::DimensionStateStruct::Type>>>(
+            Id, "target-state", Attributes::TargetState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::Percent100ths>>(Id, "resolution", 0, UINT16_MAX, Attributes::Resolution::Id,
                                                          WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::Percent100ths>>(Id, "step-value", 0, UINT16_MAX, Attributes::StepValue::Id,
@@ -25644,6 +25613,9 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
         make_unique<WriteAttribute<chip::app::Clusters::ClosureDimension::ModulationTypeEnum>>(
             Id, "modulation-type", 0, UINT8_MAX, Attributes::ModulationType::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::BitMask<chip::app::Clusters::ClosureDimension::LatchControlModesBitmap>>>(
+            Id, "latch-control-modes", 0, UINT8_MAX, Attributes::LatchControlModes::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -25657,7 +25629,7 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
                                               WriteCommandType::kForceWrite, credsIssuerConfig),                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
         make_unique<SubscribeAttribute>(Id, "current-state", Attributes::CurrentState::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "target", Attributes::Target::Id, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, "target-state", Attributes::TargetState::Id, credsIssuerConfig),                    //
         make_unique<SubscribeAttribute>(Id, "resolution", Attributes::Resolution::Id, credsIssuerConfig),                       //
         make_unique<SubscribeAttribute>(Id, "step-value", Attributes::StepValue::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "unit", Attributes::Unit::Id, credsIssuerConfig),                                   //
@@ -25667,6 +25639,7 @@ void registerClusterClosureDimension(Commands & commands, CredentialIssuerComman
         make_unique<SubscribeAttribute>(Id, "rotation-axis", Attributes::RotationAxis::Id, credsIssuerConfig),                  //
         make_unique<SubscribeAttribute>(Id, "overflow", Attributes::Overflow::Id, credsIssuerConfig),                           //
         make_unique<SubscribeAttribute>(Id, "modulation-type", Attributes::ModulationType::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "latch-control-modes", Attributes::LatchControlModes::Id, credsIssuerConfig),       //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -29619,7 +29592,6 @@ void registerClusterZoneManagement(Commands & commands, CredentialIssuerCommands
         make_unique<ClusterCommand>(Id, credsIssuerConfig),                    //
         make_unique<ZoneManagementCreateTwoDCartesianZone>(credsIssuerConfig), //
         make_unique<ZoneManagementUpdateTwoDCartesianZone>(credsIssuerConfig), //
-        make_unique<ZoneManagementGetTwoDCartesianZone>(credsIssuerConfig),    //
         make_unique<ZoneManagementRemoveZone>(credsIssuerConfig),              //
         make_unique<ZoneManagementCreateOrUpdateTrigger>(credsIssuerConfig),   //
         make_unique<ZoneManagementRemoveTrigger>(credsIssuerConfig),           //
@@ -29737,9 +29709,8 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<ReadAttribute>(Id, "allocated-video-streams", Attributes::AllocatedVideoStreams::Id, credsIssuerConfig),  //
         make_unique<ReadAttribute>(Id, "allocated-audio-streams", Attributes::AllocatedAudioStreams::Id, credsIssuerConfig),  //
         make_unique<ReadAttribute>(Id, "allocated-snapshot-streams", Attributes::AllocatedSnapshotStreams::Id,
-                                   credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "ranked-video-stream-priorities-list", Attributes::RankedVideoStreamPrioritiesList::Id,
-                                   credsIssuerConfig), //
+                                   credsIssuerConfig),                                                                       //
+        make_unique<ReadAttribute>(Id, "stream-usage-priorities", Attributes::StreamUsagePriorities::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "soft-recording-privacy-mode-enabled", Attributes::SoftRecordingPrivacyModeEnabled::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "soft-livestream-privacy-mode-enabled", Attributes::SoftLivestreamPrivacyModeEnabled::Id,
@@ -29821,8 +29792,8 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
             Id, "allocated-snapshot-streams", Attributes::AllocatedSnapshotStreams::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::Globals::StreamUsageEnum>>>(
-            Id, "ranked-video-stream-priorities-list", Attributes::RankedVideoStreamPrioritiesList::Id,
-            WriteCommandType::kForceWrite, credsIssuerConfig), //
+            Id, "stream-usage-priorities", Attributes::StreamUsagePriorities::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "soft-recording-privacy-mode-enabled", 0, 1,
                                           Attributes::SoftRecordingPrivacyModeEnabled::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig), //
@@ -29836,7 +29807,7 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<WriteAttribute<chip::app::Clusters::CameraAvStreamManagement::TriStateAutoEnum>>(
             Id, "night-vision-illum", 0, UINT8_MAX, Attributes::NightVisionIllum::Id, WriteCommandType::kWrite,
             credsIssuerConfig), //
-        make_unique<WriteAttributeAsComplex<chip::app::Clusters::CameraAvStreamManagement::Structs::ViewportStruct::Type>>(
+        make_unique<WriteAttributeAsComplex<chip::app::Clusters::Globals::Structs::ViewportStruct::Type>>(
             Id, "viewport", Attributes::Viewport::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "speaker-muted", 0, 1, Attributes::SpeakerMuted::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig), //
@@ -29905,9 +29876,8 @@ void registerClusterCameraAvStreamManagement(Commands & commands, CredentialIssu
         make_unique<SubscribeAttribute>(Id, "allocated-video-streams", Attributes::AllocatedVideoStreams::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "allocated-audio-streams", Attributes::AllocatedAudioStreams::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "allocated-snapshot-streams", Attributes::AllocatedSnapshotStreams::Id,
-                                        credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "ranked-video-stream-priorities-list", Attributes::RankedVideoStreamPrioritiesList::Id,
-                                        credsIssuerConfig), //
+                                        credsIssuerConfig),                                                                       //
+        make_unique<SubscribeAttribute>(Id, "stream-usage-priorities", Attributes::StreamUsagePriorities::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "soft-recording-privacy-mode-enabled", Attributes::SoftRecordingPrivacyModeEnabled::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "soft-livestream-privacy-mode-enabled",
@@ -30965,7 +30935,7 @@ void registerClusterCommodityMetering(Commands & commands, CredentialIssuerComma
         make_unique<ReadAttribute>(Id, "metered-quantity", Attributes::MeteredQuantity::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "metered-quantity-timestamp", Attributes::MeteredQuantityTimestamp::Id,
                                    credsIssuerConfig),                                                                     //
-        make_unique<ReadAttribute>(Id, "measurement-type", Attributes::MeasurementType::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "tariff-unit", Attributes::TariffUnit::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -30978,9 +30948,8 @@ void registerClusterCommodityMetering(Commands & commands, CredentialIssuerComma
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "metered-quantity-timestamp", 0, UINT32_MAX,
                                                                               Attributes::MeteredQuantityTimestamp::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>>>(
-            Id, "measurement-type", 0, UINT16_MAX, Attributes::MeasurementType::Id, WriteCommandType::kForceWrite,
-            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TariffUnitEnum>>>(
+            Id, "tariff-unit", 0, UINT8_MAX, Attributes::TariffUnit::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -30996,7 +30965,7 @@ void registerClusterCommodityMetering(Commands & commands, CredentialIssuerComma
         make_unique<SubscribeAttribute>(Id, "metered-quantity", Attributes::MeteredQuantity::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "metered-quantity-timestamp", Attributes::MeteredQuantityTimestamp::Id,
                                         credsIssuerConfig),                                                                     //
-        make_unique<SubscribeAttribute>(Id, "measurement-type", Attributes::MeasurementType::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "tariff-unit", Attributes::TariffUnit::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //

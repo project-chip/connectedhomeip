@@ -40,6 +40,7 @@ RUN set -x \
     clang-tidy \
     cmake \
     curl \
+    dbus-daemon \
     flex \
     g++ \
     generate-ninja \

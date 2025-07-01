@@ -17,9 +17,9 @@ RUN set -x \
     && zephyr-sdk-0.17.0/setup.sh -t riscv64-zephyr-elf \
     && : # last line
 
-# Setup Zephyr version: 3.7.0; branch: develop
-ARG ZEPHYR_REVISION=9a6804cde48f744fa33ce782d2f50453abc9a767
-ARG N22_BIN_REVISION=05f9bcecde9df997a7d735ea119bb9a8212b8a8f
+# Setup Zephyr version: 4.1.0; branch: develop
+ARG ZEPHYR_REVISION=68194e5ec7d9852e59b696224e49186152104b3a
+ARG N22_BIN_REVISION=c8835e37647f0de6caf5f3c9264ca42d7231354b
 WORKDIR /opt/telink/zephyrproject
 RUN set -x \
     && python3 -m pip install --break-system-packages -U --no-cache-dir west \

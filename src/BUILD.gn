@@ -51,6 +51,7 @@ if (chip_build_tests) {
     deps = []
     tests = [
       "${chip_root}/src/access/tests",
+      "${chip_root}/src/app/clusters/administrator-commissioning-server/tests",
       "${chip_root}/src/app/clusters/network-commissioning/tests",
       "${chip_root}/src/app/clusters/ota-provider/tests",
       "${chip_root}/src/app/clusters/software-diagnostics-server/tests",
@@ -58,7 +59,9 @@ if (chip_build_tests) {
       "${chip_root}/src/app/data-model-provider/tests",
       "${chip_root}/src/app/data-model/tests",
       "${chip_root}/src/app/icd/server/tests",
+      "${chip_root}/src/app/persistence/tests",
       "${chip_root}/src/crypto/tests",
+      "${chip_root}/src/data-model-providers/endpoint/tests",
       "${chip_root}/src/inet/tests",
       "${chip_root}/src/lib/address_resolve/tests",
       "${chip_root}/src/app/server-cluster/tests",
