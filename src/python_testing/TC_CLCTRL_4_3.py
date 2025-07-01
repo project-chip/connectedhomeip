@@ -391,7 +391,11 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         else:
             self.step("6b")
             overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
-            current_speed: Clusters.Globals.Enums.ThreeLevelAutoEnum = overall_current_state.speed
+            current_speed: Clusters.Globals.Enums.ThreeLevelAutoEnum = None
+            if overall_current_state is NullValue:
+                current_speed = NullValue
+            else:
+                current_speed = overall_current_state.speed
             logging.info(f"CurrentSpeed: {current_speed}")
 
             self.step("6c")
