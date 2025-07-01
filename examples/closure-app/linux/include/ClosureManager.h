@@ -241,9 +241,9 @@ public:
      */
     void HandlePanelStepActionComplete();
 
-    bool mIsCalibrationActionInProgress = false;
-    bool mIsMoveToActionInProgress      = false;
-    bool mIsSetTargetActionInProgress   = false;
-    bool mIsStepActionInProgress        = false;
+    bool mIsCalibrationActionInProgress       = false;
+    bool mIsMoveToActionInProgress            = false;
+    bool mIsSetTargetActionInProgress         = false;
+    bool mIsStepActionInProgress              = false;
     chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
 };

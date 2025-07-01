@@ -33,7 +33,7 @@ using namespace chip::app::Clusters::ClosureDimension;
 
 namespace {
 // Define a constant for the countdown time
-constexpr uint32_t kCountdownTimeSeconds = 10;
+constexpr uint32_t kCountdownTimeSeconds  = 10;
 constexpr uint32_t kCountdownTimeSeconds  = 10;
 constexpr uint32_t kMotionCountdownTimeMs = 1000;
 
@@ -164,7 +164,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
 
     if (mIsSetTargetActionInProgress && mCurrentActionEndpointId != endpointId)
     {
-        ChipLogError(AppServer, "SetTarget action is already in progress on Endpoint %d", mCurrentActionEndpointId );
+        ChipLogError(AppServer, "SetTarget action is already in progress on Endpoint %d", mCurrentActionEndpointId);
         return Status::Failure;
     }
 
@@ -197,7 +197,8 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
     VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetOverallTargetState(overallTargetState) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set overall target for SetTarget command for Endpoint %d", endpointId));
 
-    VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
+    VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR,
+                        Status::Failure,
                         ChipLogError(AppServer, "Failed to set countdown time for SetTarget command on Endpoint %d", endpointId));
 
     VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetMainState(MainStateEnum::kMoving) == CHIP_NO_ERROR, Status::Failure,
@@ -209,8 +210,8 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
     // Closure panel first performs the unlatch action if it is currently latched,
     // and then continues with the SetTarget action.
     // This is to ensure that the panel can move to the target position without being latched.
-    mCurrentAction = ClosureManager::ClosureAction::kPanelUnLatchAction;
-    mCurrentActionEndpointId = endpointId;
+    mCurrentAction               = ClosureManager::ClosureAction::kPanelUnLatchAction;
+    mCurrentActionEndpointId     = endpointId;
     mIsSetTargetActionInProgress = true;
     (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(1), HandleClosureActionTimer, this);
 
@@ -267,7 +268,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
                         ChipLogError(AppServer, "Failed to set overall target for Step command"));
 
     (void) DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
-    mCurrentAction = ClosureManager::ClosureAction::kStepAction;
+    mCurrentAction           = ClosureManager::ClosureAction::kStepAction;
     mCurrentActionEndpointId = endpointId;
 
     mIsStepActionInProgress = true;
@@ -421,7 +422,7 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
     if (panelProgressPossible)
     {
         (void) DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
-        mCurrentAction = ClosureManager::ClosureAction::kSetTargetAction;
+        mCurrentAction     = ClosureManager::ClosureAction::kSetTargetAction;
         mCurrentEndpointId = endpointId;
         // Start the timer to continue with the SetTarget action
         (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(1), HandleClosureActionTimer, this);
@@ -522,7 +523,7 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
 
         // Cancel any existing timer before starting a new action
         (void) DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
-        instance.mCurrentAction = ClosureManager::ClosureAction::kStepAction;
+        instance.mCurrentAction           = ClosureManager::ClosureAction::kStepAction;
         instance.mCurrentActionEndpointId = endpointId;
         (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(1), HandleClosureActionTimer, this);
         return;
