@@ -324,6 +324,19 @@ class CommissionDeviceTest(base_test.BaseTestClass):
 
 @dataclass
 class SetupParameters:
+    """
+    Specifies configuration parameters for commissioning.
+
+    Args:
+        passcode (int): The setup passcode of the device.
+        vendor_id (Optional[int]): Identification number specific tothe vendor.
+        product_id (Optional[int]): Identification number specific to the product.
+        discriminator (Optional[int]): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
+        custom_flow (Optional[int]): The custom flow type.
+        capabilities (Optional[int]): Device capabilities.
+        version (Optional[int]): Version number.
+
+    """
     passcode: int
     vendor_id: int = 0xFFF1
     product_id: int = 0x8001
