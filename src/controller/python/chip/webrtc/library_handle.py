@@ -23,6 +23,7 @@ from ..native import GetLibraryHandle, HandleFlags, NativeLibraryHandleMethodArg
 LocalDescriptionCallbackType = CFUNCTYPE(None, c_char_p, c_char_p, c_void_p)
 IceCandidateCallbackType = CFUNCTYPE(None, c_char_p, c_char_p, c_void_p)
 
+
 def _GetWebRTCLibraryHandle() -> ctypes.CDLL:
     """ Get the native library handle with webrtc method initialization.
 
