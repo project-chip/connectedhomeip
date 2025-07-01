@@ -653,6 +653,13 @@ jobs:
                   build --copy-artifacts-to objdir-clone
                   && rm -rf out/linux-x64-python-bindings"
 
+            - name: Build linux-x64-python-bindings-webrtc
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-python-bindings-webrtc
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-python-bindings-webrtc"
+
             # TODO: JS admin app app needs variants (probably)
             - name: Build linux-x64-jf-control-app
               run: >-

@@ -127,6 +127,7 @@ def BuildHostTarget():
         TargetPart('simulated-app2', app=HostApp.SIMULATED_APP2,
                    enable_ble=False, enable_wifipaf=False),
         TargetPart('python-bindings', app=HostApp.PYTHON_BINDINGS),
+        TargetPart('python-bindings-webrtc', app=HostApp.PYTHON_BINDINGS_WEBRTC),
         TargetPart('tv-app', app=HostApp.TV_APP),
         TargetPart('tv-casting-app', app=HostApp.TV_CASTING),
         TargetPart('bridge', app=HostApp.BRIDGE),

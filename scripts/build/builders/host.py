@@ -68,6 +68,7 @@ class HostApp(Enum):
     SIMULATED_APP1 = auto()
     SIMULATED_APP2 = auto()
     PYTHON_BINDINGS = auto()
+    PYTHON_BINDINGS_WEBRTC = auto()
     EFR32_TEST_RUNNER = auto()
     TV_CASTING = auto()
     BRIDGE = auto()
@@ -127,7 +128,7 @@ class HostApp(Enum):
             return 'placeholder/linux/'
         elif self == HostApp.OTA_REQUESTOR:
             return 'ota-requestor-app/linux'
-        elif self in [HostApp.ADDRESS_RESOLVE, HostApp.TESTS, HostApp.PYTHON_BINDINGS, HostApp.CERT_TOOL]:
+        elif self in [HostApp.ADDRESS_RESOLVE, HostApp.TESTS, HostApp.PYTHON_BINDINGS, HostApp.PYTHON_BINDINGS_WEBRTC, HostApp.CERT_TOOL]:
             return '../'
         elif self == HostApp.EFR32_TEST_RUNNER:
             return '../src/test_driver/efr32'
@@ -242,7 +243,7 @@ class HostApp(Enum):
         elif self == HostApp.OTA_REQUESTOR:
             yield 'chip-ota-requestor-app'
             yield 'chip-ota-requestor-app.map'
-        elif self == HostApp.PYTHON_BINDINGS:
+        elif self == HostApp.PYTHON_BINDINGS or self == HostApp.PYTHON_BINDINGS_WEBRTC:
             yield 'controller/python'  # Directory containing WHL files
         elif self == HostApp.EFR32_TEST_RUNNER:
             yield 'chip_pw_test_runner_wheels'
@@ -525,6 +526,11 @@ class HostBuilder(GnBuilder):
             self.build_command = 'src/lib/address_resolve:address-resolve-tool'
         elif app == HostApp.PYTHON_BINDINGS:
             self.extra_gn_options.append('enable_rtti=false')
+            self.extra_gn_options.append('chip_project_config_include_dirs=["//config/python"]')
+            self.build_command = 'chip-repl'
+        elif app == HostApp.PYTHON_BINDINGS_WEBRTC:
+            self.extra_gn_options.append('enable_rtti=false')
+            self.extra_gn_options.append('chip_support_webrtc_python_bindings=true')
             self.extra_gn_options.append('chip_project_config_include_dirs=["//config/python"]')
             self.build_command = 'chip-repl'
 
