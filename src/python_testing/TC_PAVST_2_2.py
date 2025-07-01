@@ -123,7 +123,7 @@ class TC_PAVST_2_2(MatterBaseTest):
 
         self.step(4)
         if self.pics_guard(self.check_pics("AVSM.S")):
-            response = await self.send_single_cmd(cmd=Clusters.CameraAvStreamManagement.Commands.AudioStreamAllocate(
+            await self.send_single_cmd(cmd=Clusters.CameraAvStreamManagement.Commands.AudioStreamAllocate(
                 streamUsage=0,
                 audioCodec=0,
                 channelCount=2,
@@ -140,7 +140,7 @@ class TC_PAVST_2_2(MatterBaseTest):
 
         self.step(5)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            response = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
+            await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
                  "videoStreamID": 1,
                  "audioStreamID": 1,
