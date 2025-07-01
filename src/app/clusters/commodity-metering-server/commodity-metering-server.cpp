@@ -96,7 +96,7 @@ struct SpanCopier
         }
 
         std::copy(source.begin(), source.begin() + elementsToCopy, bufferOut->Get());
-        destination = DataModel::List<const T>(chip::Span<const T>(bufferOut->Get(), elementsToCopy));
+        destination = DataModel::List<const T>(bufferOut->Get(), elementsToCopy);
         return true;
     }
 };
