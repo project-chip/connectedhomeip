@@ -50,20 +50,6 @@ declare install_jupyterlab=no
 declare -a extra_packages
 declare -a extra_gn_args
 
-# Detect OS and set override some defaults accordingly.
-OS_TYPE="$(uname -s)"
-case "$OS_TYPE" in
-    "Darwin")
-        enable_wifi_paf=false
-        ;;
-    "Linux")
-        enable_wifi_paf=true
-        ;;
-    *)
-        enable_wifi_paf=false
-        ;;
-esac
-
 help() {
 
     echo "Usage: $file_name [ options ... ]"
