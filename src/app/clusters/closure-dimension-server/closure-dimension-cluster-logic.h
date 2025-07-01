@@ -389,6 +389,7 @@ private:
     DelegateBase & mDelegate;
     MatterContext & mMatterContext;
 
+    // Variable will be used for Quietreporting of current state position.
     QuieterReportingAttribute<Percent100ths> quietReportableCurrentStatePosition{ DataModel::NullNullable };
 };
 
