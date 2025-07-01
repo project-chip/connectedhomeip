@@ -28,11 +28,6 @@ namespace ClosureControl {
 
 using namespace Protocols::InteractionModel;
 
-namespace {
-// Variable to track the current error count for the cluster logic.
-size_t mCurrentErrorCount = 0;
-} // namespace
-
 /*
     ClusterLogic Implementation
 */
@@ -358,16 +353,16 @@ CHIP_ERROR ClusterLogic::AddErrorToCurrentErrorList(ClosureErrorEnum error)
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(EnsureKnownEnumValue(error) != ClosureErrorEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mState.mCurrentErrorCount < kCurrentErrorListMaxSize, CHIP_ERROR_PROVIDER_LIST_EXHAUSTED,
+                        ChipLogError(AppServer, "Error list is full"));
     // Check for duplicates
-    for (size_t i = 0; i < mCurrentErrorCount; ++i)
+    for (size_t i = 0; i < mState.mCurrentErrorCount; ++i)
     {
         VerifyOrReturnError(mState.mCurrentErrorList[i] != error, CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED,
                             ChipLogError(AppServer, "Error already exists in the list"));
     }
-    VerifyOrReturnError(mCurrentErrorCount < kCurrentErrorListMaxSize, CHIP_ERROR_PROVIDER_LIST_EXHAUSTED,
-                        ChipLogError(AppServer, "Error list is full"));
-    mState.mCurrentErrorList[mCurrentErrorCount++] = error;
-    DataModel::List<const ClosureErrorEnum> currentErrorList(mState.mCurrentErrorList, mCurrentErrorCount);
+    mState.mCurrentErrorList[mState.mCurrentErrorCount++] = error;
+    DataModel::List<const ClosureErrorEnum> currentErrorList(mState.mCurrentErrorList, mState.mCurrentErrorCount);
     mMatterContext.MarkDirty(Attributes::CurrentErrorList::Id);
     ReturnLogErrorOnFailure(GenerateOperationalErrorEvent(currentErrorList));
     return CHIP_NO_ERROR;
@@ -377,8 +372,13 @@ void ClusterLogic::ClearCurrentErrorList()
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrDieWithMsg(mIsInitialized, AppServer, "ClearCurrentErrorList called before Initialization of closure");
-
-    mCurrentErrorCount = 0;
+    // Clearing the error list array by setting all elements to kUnknownEnumValue
+    for(size_t i = 0; i < mState.mCurrentErrorCount; ++i)
+    {
+        mState.mCurrentErrorList[i] = ClosureErrorEnum::kUnknownEnumValue;
+    }
+    // Reset the current error count to 0
+    mState.mCurrentErrorCount = 0;
     mMatterContext.MarkDirty(Attributes::CurrentErrorList::Id);
 }
 
@@ -427,7 +427,7 @@ CHIP_ERROR ClusterLogic::GetCurrentErrorList(DataModel::List<const ClosureErrorE
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
 
-    currentErrorList = DataModel::List<const ClosureErrorEnum>(mState.mCurrentErrorList, mCurrentErrorCount);
+    currentErrorList = DataModel::List<const ClosureErrorEnum>(mState.mCurrentErrorList, mState.mCurrentErrorCount);
 
     return CHIP_NO_ERROR;
 }
@@ -436,7 +436,7 @@ CHIP_ERROR ClusterLogic::ReadCurrentErrorListAttribute(const AttributeValueEncod
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
-    for (size_t i = 0; i < mCurrentErrorCount; i++)
+    for (size_t i = 0; i < mState.mCurrentErrorCount; i++)
     {
         ClosureErrorEnum error = mState.mCurrentErrorList[i];
         // Encode the error

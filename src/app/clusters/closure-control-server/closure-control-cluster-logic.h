@@ -122,6 +122,9 @@ struct ClusterState
     DataModel::Nullable<GenericOverallTargetState> mOverallTargetState   = DataModel::NullNullable;
     BitFlags<LatchControlModesBitmap> mLatchControlModes;
     ClosureErrorEnum mCurrentErrorList[kCurrentErrorListMaxSize] = {};
+
+    // The current error count is used to track the number of errors in the CurrentErrorList.
+    size_t mCurrentErrorCount = 0;
 };
 
 /**
