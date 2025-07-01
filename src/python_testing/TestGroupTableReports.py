@@ -94,7 +94,8 @@ class TestGroupTableReports(MatterBaseTest):
 
         self.print_step(4, "TH subscribes to the GroupTable attribute from the Group Key Management Cluster")
         subscription_gcm = await self.TH1.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.GroupKeyManagement.Attributes.GroupTable)], reportInterval=(1, 5), fabricFiltered=False, keepSubscriptions=True, autoResubscribe=False)
-        gcm_cb = AttributeCallback(expected_attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
+        gcm_cb = AttributeCallback(expected_cluster=Clusters.GroupKeyManagement,
+                                   expected_attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
         subscription_gcm.SetAttributeUpdateCallback(gcm_cb)
 
         self.print_step(5, "TH Adds Group1 to the Group Cluster")

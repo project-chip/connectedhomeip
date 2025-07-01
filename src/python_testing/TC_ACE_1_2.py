@@ -60,7 +60,8 @@ class TC_ACE_1_2(MatterBaseTest):
         subscription_breadcrumb = await self.TH2.ReadAttribute(
             nodeid=self.dut_node_id, attributes=[(0, Clusters.GeneralCommissioning.Attributes.Breadcrumb)],
             reportInterval=(1, 5), keepSubscriptions=False, autoResubscribe=False)
-        breadcrumb_cb = AttributeCallback(expected_attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb)
+        breadcrumb_cb = AttributeCallback(expected_cluster=Clusters.GeneralCommissioning,
+                                          expected_attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb)
         subscription_breadcrumb.SetAttributeUpdateCallback(breadcrumb_cb)
         return breadcrumb_cb
 
@@ -124,7 +125,8 @@ class TC_ACE_1_2(MatterBaseTest):
 
         self.print_step(4, "TH2 subscribes to ACL attribute")
         subscription_acl = await self.TH2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.AccessControl.Attributes.Acl)], reportInterval=(1, 5), fabricFiltered=False, keepSubscriptions=True, autoResubscribe=False)
-        acl_cb = AttributeCallback(expected_attribute=Clusters.AccessControl.Attributes.Acl)
+        acl_cb = AttributeCallback(expected_cluster=Clusters.AccessControl,
+                                   expected_attribute=Clusters.AccessControl.Attributes.Acl)
         subscription_acl.SetAttributeUpdateCallback(acl_cb)
 
         self.print_step(5, "TH2 subscribes to the AccessControlEntryChanged event")

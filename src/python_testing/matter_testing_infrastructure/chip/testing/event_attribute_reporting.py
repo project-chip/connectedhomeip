@@ -180,18 +180,19 @@ class AttributeCallback:
     """
 
     def __init__(self, expected_cluster: ClusterObjects.Cluster = None, expected_attribute: ClusterObjects.ClusterAttributeDescriptor = None):
+
+        if expected_cluster is None:
+            raise ValueError("Missing argument. Expected Cluster attribute is missing in AttributeCallback constructor")
+
         self._expected_cluster = expected_cluster
         self._expected_attribute = expected_attribute
         self._subscription = None
         self._q = queue.Queue()
         self._endpoint_id = 0
-        self._lock = None
         self._attribute_report_counts = None
         self._attribute_reports = None
-
-        if expected_cluster is not None:
-            self._lock = threading.Lock()
-            self.reset()
+        self._lock = threading.Lock()
+        self.reset()
 
     def reset(self):
         with self._lock:
