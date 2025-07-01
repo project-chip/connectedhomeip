@@ -55,7 +55,7 @@ inline bool operator==(const Structs::MeteredQuantityStruct::Type & lhs, const S
 }
 
 template <typename T>
-bool NullableListEqual(const DataModel::Nullable<DataModel::List<T>> & a, const DataModel::Nullable<DataModel::List<T>> & b)
+bool NullableListsEqual(const DataModel::Nullable<DataModel::List<T>> & a, const DataModel::Nullable<DataModel::List<T>> & b)
 {
     if (a.IsNull() || b.IsNull())
     {
