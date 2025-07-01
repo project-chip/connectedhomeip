@@ -38,6 +38,7 @@
 import logging
 
 import chip.clusters as Clusters
+from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -101,7 +102,7 @@ class TC_PAVST_2_2(MatterBaseTest):
 
         self.step(3)
         if self.pics_guard(self.check_pics("AVSM.S")):
-            response = await self.send_single_cmd(cmd=Clusters.CameraAvStreamManagement.Commands.VideoStreamAllocate(
+            await self.send_single_cmd(cmd=Clusters.CameraAvStreamManagement.Commands.VideoStreamAllocate(
                 streamUsage=0,
                 videoCodec=0,
                 minFrameRate=30,
