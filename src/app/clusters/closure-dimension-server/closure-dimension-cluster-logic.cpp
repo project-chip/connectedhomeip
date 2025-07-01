@@ -681,7 +681,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
             // Return InvalidInState if incoming latch has no value
             VerifyOrReturnError(latch.HasValue(), Status::InvalidInState);
             if (latch.Value() && position.HasValue() && currentState.Value().position.HasValue() &&
-            !currentState.Value().position.Value().IsNull())
+                !currentState.Value().position.Value().IsNull())
             {
                 Percent100ths currentPosition = currentState.Value().position.Value().Value();
                 VerifyOrReturnError(position.Value() == currentPosition, Status::InvalidInState);
@@ -739,7 +739,8 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     {
         // Return InvalidInState if current latch is true, as the motion is not possible if closure panel is latched.
         VerifyOrReturnError(!(currentState.Value().latch.HasValue() && !currentState.Value().latch.Value().IsNull() &&
-        currentState.Value().latch.Value().Value()), Status::InvalidInState);
+                              currentState.Value().latch.Value().Value()),
+                            Status::InvalidInState);
     }
     // Derive TargetState Position from StepValue and NumberOfSteps.
     Percent100ths stepValue;

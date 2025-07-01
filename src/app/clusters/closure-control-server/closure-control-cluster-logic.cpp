@@ -528,7 +528,8 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
     DataModel::Nullable<GenericOverallTargetState> overallTargetState;
     VerifyOrReturnError(GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR, Status::Failure);
     VerifyOrReturnError(GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR, Status::Failure);
-    VerifyOrReturnError(!overallCurrentState.IsNull(), Status::InvalidInState, ChipLogError(AppServer, "OverallCurrentState is null"));
+    VerifyOrReturnError(!overallCurrentState.IsNull(), Status::InvalidInState,
+                        ChipLogError(AppServer, "OverallCurrentState is null"));
 
     if (overallTargetState.IsNull())
     {
@@ -547,7 +548,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
             // Return InvalidInState if incoming latch has no value
             VerifyOrReturnError(latch.HasValue(), Status::InvalidInState);
             if (latch.Value() && position.HasValue() && overallCurrentState.Value().position.HasValue() &&
-            !overallCurrentState.Value().position.Value().IsNull())
+                !overallCurrentState.Value().position.Value().IsNull())
             {
                 CurrentPositionEnum currentPosition = overallCurrentState.Value().position.Value().Value();
                 VerifyOrReturnError(position.Value() == MapCurrentPositionEnumToTargetPosition(currentPosition),
