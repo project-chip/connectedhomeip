@@ -31,12 +31,11 @@ using namespace chip::app::Clusters::CommodityTariff::Structs;
 uint8_t presetIndex = 0;
 
 namespace TariffPresets {
-//static constexpr const char * kTariff1 = "./DefaultTariff.json";
-static constexpr const char * kTariff2 = "./full_complex_tariff_1.json";
-//static constexpr const char * kTariff3 = "./full_complex_tariff_2.json";
+static constexpr const char * kTariff1 = "./full_complex_tariff_1.json";
+static constexpr const char * kTariff2 = "./full_complex_tariff_2.json";
 
 // Array of all presets
-static constexpr std::array<const char *, 1> kAllPresets = { kTariff2 };
+static constexpr std::array<const char *, 2> kAllPresets =  {kTariff1, kTariff2 };
 
 // Number of presets (compile-time constant)
 static constexpr size_t kCount = kAllPresets.size();
@@ -44,12 +43,12 @@ static constexpr size_t kCount = kAllPresets.size();
 // Safe accessor function
 static constexpr const char * GetPreset(size_t index)
 {
-    if (index < kCount)
+    if (index == kCount)
     {
-        presetIndex++;
+        index = presetIndex = 0;
     }
     else{
-        index = kCount-1;
+        presetIndex++;
     }
     return kAllPresets[index];
 }
@@ -81,12 +80,22 @@ void SetTestEventTrigger_TariffDataClear()
 
 void SetTestEventTrigger_ForcedOneDayForward()
 {
-    // TODO
+   CommodityTariffInstance * instance = GetCommodityTariffInstance();
+
+   if (instance)
+   {
+        instance->ForceDaysAttrsUpdate();
+   }
 }
 
 void SetTestEventTrigger_ForcedDayEntryForward()
 {
-    // TODO
+   CommodityTariffInstance * instance = GetCommodityTariffInstance();
+
+   if (instance)
+   {
+        instance->ForceDayEntriesAttrsUpdate();
+   }
 }
 
 bool HandleCommodityTariffTestEventTrigger(uint64_t eventTrigger)
