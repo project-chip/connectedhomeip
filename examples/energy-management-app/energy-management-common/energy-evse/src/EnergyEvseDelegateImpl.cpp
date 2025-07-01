@@ -162,6 +162,81 @@ Status EnergyEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t>
 }
 
 /**
+ * @brief    Helper function to get the earliest time from two Nullable<uint32_t> values
+ *
+ * If either time is null, it returns the other time. If both are non-null, it returns the earlier one.
+ */
+static DataModel::Nullable<uint32_t> getEarliestTime(const DataModel::Nullable<uint32_t> & time1,
+                                                     const DataModel::Nullable<uint32_t> & time2)
+{
+    if (time1.IsNull())
+        return time2;
+    if (time2.IsNull())
+        return time1;
+    return (time1.Value() < time2.Value()) ? time1 : time2;
+}
+
+/**
+ * @brief    Helper function to check if a time value has expired
+ *
+ * @param timeValue The Nullable<uint32_t> time value to check
+ * @param currentTime The current time in seconds since epoch
+ * @return true if the time has expired, false otherwise
+ */
+static bool IsTimeExpired(const DataModel::Nullable<uint32_t> & timeValue, uint32_t currentTime)
+{
+    return !timeValue.IsNull() && (static_cast<int32_t>(timeValue.Value() - currentTime) <= 0);
+}
+/**
+ * @brief    Helper function to handle timer expiration when in enabled state
+ *
+ * @param matterEpoch Current time in Matter epoch seconds
+ * This function is called when the EVSE is in an enabled state
+ * (either charging or discharging) and the timer expires.
+ * It checks if the charging or discharging enabled times have expired
+ * and updates the EVSE state accordingly.
+ * If both charging and discharging have expired or are null,
+ * it disables the EVSE.
+ * If only one has expired, it updates the state to the other enabled state.
+ * If both are still valid, it does nothing.
+ */
+void EnergyEvseDelegate::HandleEnabledStateExpiration(uint32_t matterEpoch)
+{
+
+    DataModel::Nullable<uint32_t> chargingEnabledUntil    = GetChargingEnabledUntil();
+    DataModel::Nullable<uint32_t> dischargingEnabledUntil = GetDischargingEnabledUntil();
+
+    bool chargingExpired    = IsTimeExpired(chargingEnabledUntil, matterEpoch);
+    bool dischargingExpired = IsTimeExpired(dischargingEnabledUntil, matterEpoch);
+
+    if (chargingExpired)
+    {
+        SetChargingEnabledUntil(DataModel::Nullable<uint32_t>()); // set to null
+        // Change to discharging-only if discharging is still enabled
+        if (!dischargingEnabledUntil.IsNull() && !dischargingExpired)
+        {
+            SetSupplyState(SupplyStateEnum::kDischargingEnabled);
+        }
+    }
+
+    if (dischargingExpired)
+    {
+        SetDischargingEnabledUntil(DataModel::Nullable<uint32_t>()); // set to null
+        // Change to charging-only if charging is still enabled
+        if (!chargingEnabledUntil.IsNull() && !chargingExpired)
+        {
+            SetSupplyState(SupplyStateEnum::kChargingEnabled);
+        }
+    }
+
+    // If both expired or are now null, disable the EVSE
+    if (GetChargingEnabledUntil().IsNull() && GetDischargingEnabledUntil().IsNull())
+    {
+        Disable();
+    }
+}
+
+/**
  * @brief    Routine to help schedule a timer callback to check if the EVSE should go disabled
  *
  * If the clock is sync'd we can work out when to call back to check when to disable the EVSE
@@ -173,130 +248,67 @@ Status EnergyEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t>
  */
 Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
 {
-
-    uint32_t matterEpoch = 0;
+    // Determine the relevant timeout based on current supply state
     DataModel::Nullable<uint32_t> enabledUntilTime;
-
-    if (mSupplyState == SupplyStateEnum::kChargingEnabled)
+    switch (mSupplyState)
     {
+    case SupplyStateEnum::kChargingEnabled:
         enabledUntilTime = GetChargingEnabledUntil();
-    }
-    else if (mSupplyState == SupplyStateEnum::kDischargingEnabled)
-    {
+        break;
+    case SupplyStateEnum::kDischargingEnabled:
         enabledUntilTime = GetDischargingEnabledUntil();
-    }
-    else if (mSupplyState == SupplyStateEnum::kEnabled)
-    {
-        // If the EVSE is enabled, we need to check the ChargingEnabledUntil time
-        // and DischargingEnabledUntil time - either of which could cause the EVSE to be disabled
-        // so we check the ChargingEnabledUntil first, and if that is null, then we
-        // check the DischargingEnabledUntil time.
-        // If both are null, then we assume the EVSE is enabled indefinitely.
-        // If either is not null, then we schedule a callback to check when the EVSE
-        // should be disabled.
-        // If both are not null, then we use the earliest time to schedule the callback.
-        DataModel::Nullable<uint32_t> chargingEnabledUntil    = GetChargingEnabledUntil();
-        DataModel::Nullable<uint32_t> dischargingEnabledUntil = GetDischargingEnabledUntil();
-        if (!chargingEnabledUntil.IsNull() && !dischargingEnabledUntil.IsNull())
-        {
-            // Use the earliest time to schedule the callback
-            enabledUntilTime =
-                (chargingEnabledUntil.Value() < dischargingEnabledUntil.Value()) ? chargingEnabledUntil : dischargingEnabledUntil;
-        }
-        else if (!chargingEnabledUntil.IsNull())
-        {
-            enabledUntilTime = chargingEnabledUntil;
-        }
-        else if (!dischargingEnabledUntil.IsNull())
-        {
-            enabledUntilTime = dischargingEnabledUntil;
-        }
-        else
-        {
-            // Both are null, so we assume the EVSE is enabled indefinitely
-            ChipLogDetail(AppServer, "EVSE is enabled indefinitely, no timer needed");
-            return Status::Success;
-        }
-    }
-    else
-    {
-        // In all other states the EVSE is disabled
+        break;
+    case SupplyStateEnum::kEnabled:
+        // For enabled state, use the earliest of charging or discharging timeout
+        enabledUntilTime = getEarliestTime(GetChargingEnabledUntil(), GetDischargingEnabledUntil());
+        break;
+    default:
+        // In all other states the EVSE is disabled, no timer needed
         return Status::Success;
     }
 
     if (enabledUntilTime.IsNull())
     {
-        /* This is enabled indefinitely so don't schedule a callback */
+        ChipLogDetail(AppServer, "EVSE is enabled indefinitely, no timer needed");
         return Status::Success;
     }
 
-    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(matterEpoch);
-    if (err == CHIP_NO_ERROR)
+    uint32_t matterEpoch = 0;
+    CHIP_ERROR err       = System::Clock::GetClock_MatterEpochS(matterEpoch);
+    if (err == CHIP_ERROR_REAL_TIME_NOT_SYNCED)
     {
-        /* time is sync'd */
-        int32_t delta = static_cast<int32_t>(enabledUntilTime.Value() - matterEpoch);
-        if (delta > 0)
-        {
-            /* The timer hasn't expired yet - set a timer to check in the future */
-            ChipLogDetail(AppServer, "Setting EVSE Enable check timer for %ld seconds", static_cast<long int>(delta));
-            DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(delta), EvseCheckTimerExpiry, this);
-        }
-        else
-        {
-            /* we have gone past the enabledUntilTime - so we need to disable */
-            ChipLogDetail(AppServer, "EVSE enable time expired, disabling charging");
-            // If we are SupplyStateEnum::kChargingEnabled or SupplyStateEnum::kDischargingEnabled, this will disable the EVSE
-            if (mSupplyState == SupplyStateEnum::kChargingEnabled || mSupplyState == SupplyStateEnum::kDischargingEnabled)
-            {
-                Disable();
-            }
-            // If we are SupplyStateEnum::kEnabled, we should only disable the charging or discharging if the respective
-            // enabledUntil time has expired
-            else if (mSupplyState == SupplyStateEnum::kEnabled)
-            {
-                DataModel::Nullable<uint32_t> chargingEnabledUntil    = GetChargingEnabledUntil();
-                DataModel::Nullable<uint32_t> dischargingEnabledUntil = GetDischargingEnabledUntil();
-
-                bool chargingExpired =
-                    !chargingEnabledUntil.IsNull() && (static_cast<int32_t>(chargingEnabledUntil.Value() - matterEpoch) <= 0);
-                bool dischargingExpired =
-                    !dischargingEnabledUntil.IsNull() && (static_cast<int32_t>(dischargingEnabledUntil.Value() - matterEpoch) <= 0);
-
-                if (chargingExpired)
-                {
-                    SetChargingEnabledUntil(DataModel::Nullable<uint32_t>()); // set to null
-                    // We need to change the state to SupplyStateEnum::kDischargingEnabled if we are Enabled and discharging is
-                    // still enabled
-                    if (!dischargingEnabledUntil.IsNull())
-                    {
-                        SetSupplyState(SupplyStateEnum::kDischargingEnabled);
-                    }
-                }
-                if (dischargingExpired)
-                {
-                    SetDischargingEnabledUntil(DataModel::Nullable<uint32_t>()); // set to null
-                    // We need to change the state to SupplyStateEnum::kChargingEnabled if we are Enabled and charging is still
-                    // enabled
-                    if (!chargingEnabledUntil.IsNull())
-                    {
-                        SetSupplyState(SupplyStateEnum::kChargingEnabled);
-                    }
-                }
-                // If both are now null, disable the EVSE
-                if (GetChargingEnabledUntil().IsNull() && GetDischargingEnabledUntil().IsNull())
-                {
-                    Disable();
-                }
-            }
-            // If we are SupplyStateEnum::kDisabled or SupplyStateEnum::kDisabledDiagnostics, do nothing
-        }
-    }
-    else if (err == CHIP_ERROR_REAL_TIME_NOT_SYNCED)
-    {
-        /* Real time isn't sync'd -lets check again in 30 seconds - otherwise keep the charger enabled */
+        // Real time isn't sync'd - check again in 30 seconds
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kPeriodicCheckIntervalRealTimeClockNotSynced_sec),
                                               EvseCheckTimerExpiry, this);
+        return Status::Success;
     }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        return Status::Failure; // Can't get time, skip scheduling
+    }
+
+    int32_t delta = static_cast<int32_t>(enabledUntilTime.Value() - matterEpoch);
+    if (delta > 0)
+    {
+        // Timer hasn't expired yet - schedule future check
+        ChipLogDetail(AppServer, "Setting EVSE Enable check timer for %ld seconds", static_cast<long int>(delta));
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(delta), EvseCheckTimerExpiry, this);
+        return Status::Success;
+    }
+
+    // Time has expired - handle expiration based on current state
+    ChipLogDetail(AppServer, "EVSE enable time expired, processing expiration");
+
+    if (mSupplyState == SupplyStateEnum::kChargingEnabled || mSupplyState == SupplyStateEnum::kDischargingEnabled)
+    {
+        Disable();
+    }
+    else if (mSupplyState == SupplyStateEnum::kEnabled)
+    {
+        HandleEnabledStateExpiration(matterEpoch);
+    }
+
     return Status::Success;
 }
 
