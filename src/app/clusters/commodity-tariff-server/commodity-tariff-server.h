@@ -240,11 +240,19 @@ public:
         else
         {
             TariffDataUpd_Commit();
-            ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
 
-            if ( (mTariffDataUpdatedCb != nullptr) && (UpdCtx.AnyHasChanged) )
+            if (UpdCtx.AnyHasChanged)
             {
-                mTariffDataUpdatedCb(false);
+                ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
+
+                if (mTariffDataUpdatedCb != nullptr)
+                {
+                    mTariffDataUpdatedCb(false);
+                }
+            }
+            else
+            {
+                ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data does not changed");
             }
 
             return;
@@ -269,7 +277,10 @@ public:
 #define X(attrName, attrType) m##attrName##_MgmtObj.Cleanup();
         COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
-        mTariffDataUpdatedCb(true);
+        if (mTariffDataUpdatedCb != nullptr)
+        {
+            mTariffDataUpdatedCb(true);
+        }
     }
 
 private:
@@ -284,7 +295,7 @@ private:
         TariffUpdateCtx * UpdCtx = (TariffUpdateCtx *) CbCtx;
         ChipLogProgress(NotSpecified, "EGW-CTC: The value for attribute (Id %d) updated", aAttrId);
         MatterReportingAttributeChangeCallback(UpdCtx->aEndpoint, CommodityTariff::Id, aAttrId);
-        UpdCtx->AnyHasChanged = false;
+        UpdCtx->AnyHasChanged = true;
     }
 
     // Primary attrs update pipeline methods
@@ -333,7 +344,7 @@ struct CurrentTariffAttrsCtx
     std::map<uint32_t, const Structs::DayEntryStruct::Type *> DayEntriesMap;
     std::map<uint32_t, const Structs::TariffComponentStruct::Type *> TariffComponentsMap;
 
-    uint32_t AlarmTriggerTime;
+    uint32_t forwardAlarmTriggerTime;
 };
 
 /**
@@ -372,6 +383,8 @@ public:
 
     bool HasFeature(Feature aFeature) const;
 
+    void ForceDaysAttrsUpdate();
+    void ForceDayEntriesAttrsUpdate();
 private:
     enum class UpdateEventCode
     {
@@ -410,6 +423,13 @@ private:
     attrType & Get##attrName() { return m##attrName##_MgmtObj.GetValue(); }
     COMMODITY_TARIFF_CURRENT_LIST_ATTRIBUTES
 #undef X
+
+    static constexpr size_t kMaxTariffComponents = 20;
+
+    Platform::ScopedMemoryBuffer<char>mOwnedCurrentTariffComponentsLabelsBuffer[kMaxTariffComponents][kTariffComponentMaxLabelLength];
+    Platform::ScopedMemoryBuffer<char>mOwnedNextTariffComponentsLabelsBuffer[kMaxTariffComponents][kTariffComponentMaxLabelLength];
+    Platform::ScopedMemoryBuffer<Structs::MeteredQuantityStruct::Type> mOwnedCurrentTariffComponentsStructBuffer;
+    Platform::ScopedMemoryBuffer<Structs::MeteredQuantityStruct::Type> mOwnedNextTariffComponentsStructBuffer;
 
     void TariffDataUpdatedCb(bool is_erased);
     void ResetCurrentAttributes();

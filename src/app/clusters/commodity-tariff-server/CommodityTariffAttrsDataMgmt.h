@@ -605,7 +605,7 @@ public:
         {
             if (mHoldState == StorageState::kHold)
             {
-                Cleanup();
+                Cleanup(); //Cleanup current value
             }
             mHoldState = StorageState::kHold;
             mUpdateState = UpdateState::kUpdated;

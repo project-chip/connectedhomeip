@@ -165,8 +165,6 @@ void Instance::TariffDataUpdatedCb(bool is_erased)
         return;
     }
 
-    mServerTariffAttrsCtx.AlarmTriggerTime = GetCurrentTimestamp();
-
     UpdateCurrentAttrs(UpdateEventCode::TariffUpdated);
 }
 
@@ -186,9 +184,6 @@ void Instance::ScheduleMidnightUpdate()
     uint32_t secondsSinceMidnight = static_cast<uint32_t>(now % kSecondsPerDay);
     uint32_t delay  = (secondsSinceMidnight == 0) ? static_cast<uint32_t>(kSecondsPerDay) : static_cast<uint32_t>(kSecondsPerDay - secondsSinceMidnight);
 
-    // Store the exact trigger time
-    mServerTariffAttrsCtx.AlarmTriggerTime = now + delay;
-
     DeviceLayer::SystemLayer().StartTimer(
         System::Clock::Milliseconds32(delay * 1000),
         [](System::Layer *, void * context) {
@@ -207,9 +202,6 @@ void Instance::ScheduleDayEntryUpdate(uint16_t minutesSinceMidnight)
     uint32_t delay = (triggerOffset > secondsSinceMidnight) 
                    ? triggerOffset - secondsSinceMidnight
                    : kSecondsPerDay - secondsSinceMidnight + triggerOffset;
-
-    // Store the exact trigger time
-    mServerTariffAttrsCtx.AlarmTriggerTime = now + delay;
 
     DeviceLayer::SystemLayer().StartTimer(
         System::Clock::Milliseconds32(delay * 1000),
@@ -388,8 +380,10 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(CurrentTariffAttrsCtx & aCtx, 
 
         for (const auto & entryID : componentIDs)
         {
+            Structs::TariffComponentStruct::Type entry;
             auto current = GetCurrNextItemsById<Structs::TariffComponentStruct::Type>(aCtx.TariffComponentsMap, entryID).first;
-            tempList.push_back(*current);
+            entry = *current;
+            tempList.push_back(entry);
         }
 
         if ((err = mgmtObj.CreateNewValue(tempList.size())) == CHIP_NO_ERROR)
@@ -436,9 +430,21 @@ static void AttrsCtxDeinit(CurrentTariffAttrsCtx & aCtx)
 
 void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
 {
-    uint32_t timestampNow = 0; ;
+    uint32_t timestampNow = GetCurrentTimestamp();
 
     ChipLogProgress(NotSpecified, "EGW-CTC: UpdateEventCode: %x", static_cast<std::underlying_type_t<UpdateEventCode>>(aEvt));
+
+    //Only for test purposes
+    if (mServerTariffAttrsCtx.forwardAlarmTriggerTime)
+    {
+        timestampNow = mServerTariffAttrsCtx.forwardAlarmTriggerTime;
+        mServerTariffAttrsCtx.forwardAlarmTriggerTime = 0;
+    }
+
+    if (mServerTariffAttrsCtx.TariffProvider == nullptr && aEvt != UpdateEventCode::TariffUpdated)
+    {
+        return;
+    }
 
     switch (aEvt)
     {
@@ -456,10 +462,6 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
         {
             return;
         }
-
-        assert(mServerTariffAttrsCtx.AlarmTriggerTime);
-
-        timestampNow = mServerTariffAttrsCtx.AlarmTriggerTime;
 
         if (mDelegate.GetStartDate().Value() > timestampNow)
         {
@@ -515,13 +517,13 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
 
         if (current != nullptr)
         {
+            mCurrentDayEntry.SetNonNull(*current);
+            mCurrentDayEntryDate.SetNonNull(mCurrentDay.Value().date);
+            MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, CurrentDayEntry::Id);
+            MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, CurrentDayEntryDate::Id);            
             if (CHIP_NO_ERROR ==
                 Utils::UpdateTariffComponentAttrsDayEntryById(mServerTariffAttrsCtx, current->dayEntryID, mCurrentTariffComponents_MgmtObj))
             {
-                mCurrentDayEntry.SetNonNull(*current);
-                mCurrentDayEntryDate.SetNonNull(mCurrentDay.Value().date);
-                MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, CurrentDayEntry::Id);
-                MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, CurrentDayEntryDate::Id);
                 MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, CurrentTariffComponents::Id);
             }
         }
@@ -534,12 +536,12 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
 
         if (next != nullptr)
         {
+            mNextDayEntry.SetNonNull(*next);
+            mNextDayEntryDate.SetNonNull(mCurrentDay.Value().date);
+            MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, NextDayEntry::Id);
+            MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, NextDayEntryDate::Id);            
             if (CHIP_NO_ERROR == Utils::UpdateTariffComponentAttrsDayEntryById(mServerTariffAttrsCtx, next->dayEntryID, mNextTariffComponents_MgmtObj))
             {
-                mNextDayEntry.SetNonNull(*next);
-                mNextDayEntryDate.SetNonNull(mCurrentDay.Value().date);
-                MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, NextDayEntry::Id);
-                MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, NextDayEntryDate::Id);
                 MatterReportingAttributeChangeCallback(mEndpointId, CommodityTariff::Id, NextTariffComponents::Id);
             }
         }
@@ -561,7 +563,7 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
 void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::GetTariffComponent::DecodableType & commandData)
 {
     Commands::GetTariffComponentResponse::Type response;
-    Status status = Status::Failure;
+    Status status = Status::NotFound;
 
     auto component = Utils::GetCurrNextItemsById<Structs::TariffComponentStruct::Type>(mServerTariffAttrsCtx.TariffComponentsMap,
                                                                                        commandData.tariffComponentID)
@@ -586,7 +588,7 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
 void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEntry::DecodableType & commandData)
 {
     Commands::GetDayEntryResponse::Type response;
-    Status status = Status::Failure;
+    Status status = Status::NotFound;
 
     auto entry =
         Utils::GetCurrNextItemsById<Structs::DayEntryStruct::Type>(mServerTariffAttrsCtx.DayEntriesMap, commandData.dayEntryID)
@@ -605,6 +607,23 @@ void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEnt
     }
 
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+}
+
+void Instance::ForceDaysAttrsUpdate()
+{
+    uint32_t now      = GetCurrentTimestamp();
+    uint32_t secondsSinceMidnight = static_cast<uint32_t>(now % kSecondsPerDay);
+    uint32_t delay  = (secondsSinceMidnight == 0) ? static_cast<uint32_t>(kSecondsPerDay) : static_cast<uint32_t>(kSecondsPerDay - secondsSinceMidnight);
+
+    mServerTariffAttrsCtx.forwardAlarmTriggerTime = now + delay;
+
+    UpdateCurrentAttrs(UpdateEventCode::DaysUpdating);
+}
+
+void Instance::ForceDayEntriesAttrsUpdate()
+{
+    // TODO - ...
+    ///mServerTariffAttrsCtx.forwardAlarmTriggerTime
 }
 
 } // namespace CommodityTariff
