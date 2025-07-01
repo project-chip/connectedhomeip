@@ -73,19 +73,19 @@ class TC_PAVST_2_1(MatterBaseTest):
             supported_formats = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SupportedFormats
             )
-            asserts.assert_not_equal(len(supported_formats), 0, "SupportedFormats must not be empty!")
+            assert len(supported_formats) != 0, "SupportedFormats must not be empty!"
             for format in supported_formats:
-                asserts.assert_not_equal(format.ContainerFormat, 0, "ContainerFormat must be a defined value!")
-                asserts.assert_not_equal(format.IngestMethod, 0, "IngestMethod must be a defined value!")
+                assert format.ContainerFormat != 0, "ContainerFormat must be a defined value!"
+                assert format.IngestMethod != 0, "IngestMethod must be a defined value!"
 
         self.step(3)
         if self.pics_guard(self.check_pics("PAVST.S.A0001")):
             transport_configs = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.CurrentConnections
             )
-            asserts.assert_not_equal(len(transport_configs), 0, "TransportConfigurations must not be empty!")
+            assert len(transport_configs) != 0, "TransportConfigurations must not be empty!"
             for config in transport_configs:
-                asserts.assert_not_equal(config.TransportStatus, 0, "TransportStatus must be a defined value!")
+                assert config.TransportStatus != 0, "TransportStatus must be a defined value!"
 
 
 if __name__ == "__main__":
