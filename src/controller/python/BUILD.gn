@@ -227,7 +227,7 @@ chip_python_wheel_action("chip-core") {
         "chip/yaml/format_converter.py",
         "chip/yaml/runner.py",
       ]
-      if (current_os == "linux" &&
+      if (chip_support_webrtc_python_bindings && current_os == "linux" &&
           (current_cpu == "x64" || current_cpu == "arm64")) {
         sources += [
           "chip/webrtc/__init__.py",

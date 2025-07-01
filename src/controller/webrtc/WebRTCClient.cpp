@@ -21,7 +21,11 @@
 namespace chip {
 namespace webrtc {
 
-WebRTCClient::WebRTCClient() {}
+WebRTCClient::WebRTCClient()
+{
+     mPeerConnection = nullptr;
+}
+
 WebRTCClient::~WebRTCClient()
 {
     if (mPeerConnection == nullptr)
