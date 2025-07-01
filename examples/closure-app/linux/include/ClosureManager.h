@@ -253,7 +253,8 @@ private:
      * @param action The action that has been completed.
      */
     void HandleStopActionComplete();
-
+    
+    CHIP_ERROR SetInitialState();
     /**
      * @brief Handles the completion of a SetTarget action.
      *

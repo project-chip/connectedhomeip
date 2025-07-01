@@ -77,6 +77,92 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kClosurePanelEndpoi
 // Definition of the static instance of ClosureManager
 ClosureManager ClosureManager::sInstance;
 
+CHIP_ERROR ClosureManager::SetInitialState()
+{
+    ClosureManager & instance = ClosureManager::GetInstance();
+
+    ChipLogProgress(AppServer, "ClosureControlEndpoint SetInitialState");
+    instance.mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(NullNullable);
+    instance.mClosureEndpoint1.GetLogic().SetMainState(MainStateEnum::kStopped);
+
+    DataModel::Nullable<GenericOverallCurrentState> overallState(
+        GenericOverallCurrentState(MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed)),
+                                   MakeOptional(DataModel::MakeNullable(true)),
+                                   MakeOptional(Globals::ThreeLevelAutoEnum::kAuto),
+                                   MakeOptional(DataModel::MakeNullable(true))));
+    instance.mClosureEndpoint1.GetLogic().SetOverallCurrentState(overallState);
+    DataModel::Nullable<GenericOverallTargetState> overallTarget(
+        GenericOverallTargetState(MakeOptional(DataModel::NullNullable),
+                                  MakeOptional(DataModel::NullNullable),
+                                  MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
+    instance.mClosureEndpoint1.GetLogic().SetOverallTargetState(overallTarget);
+    BitFlags<ClosureControl::LatchControlModesBitmap> latchControlModes;
+    latchControlModes.Set(ClosureControl::LatchControlModesBitmap::kRemoteLatching).Set(ClosureControl::LatchControlModesBitmap::kRemoteUnlatching);
+    instance.mClosureEndpoint1.GetLogic().SetLatchControlModes(latchControlModes);
+
+    ChipLogProgress(AppServer, "ClosureDimensionEndpoint SetInitialState");
+ 
+    DataModel::Nullable<GenericDimensionStateStruct> currentState(
+        GenericDimensionStateStruct(MakeOptional(10000), 
+                                    MakeOptional(true), 
+                                    MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
+    instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(currentState);
+ 
+    DataModel::Nullable<GenericDimensionStateStruct> targetState(
+        GenericDimensionStateStruct(MakeOptional(DataModel::NullNullable), 
+                                    MakeOptional(DataModel::NullNullable), 
+                                    MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
+    instance.mClosurePanelEndpoint2.GetLogic().SetTargetState(targetState);
+ 
+    instance.mClosurePanelEndpoint2.GetLogic().SetResolution(Percent100ths(100));
+    instance.mClosurePanelEndpoint2.GetLogic().SetStepValue(1000);
+    instance.mClosurePanelEndpoint2.GetLogic().SetUnit(ClosureUnitEnum::kUnknownEnumValue);
+    instance.mClosurePanelEndpoint2.GetLogic().SetUnitRange(DataModel::NullNullable);
+    instance.mClosurePanelEndpoint2.GetLogic().SetOverflow(OverflowEnum::kTopInside);
+ 
+    ClosureDimension::Structs::RangePercent100thsStruct::Type limitRange{
+        .min = static_cast<Percent100ths>(0),
+        .max = static_cast<Percent100ths>(10000)
+    };
+    instance.mClosurePanelEndpoint2.GetLogic().SetLimitRange(limitRange);
+    BitFlags<ClosureDimension::LatchControlModesBitmap> latchControlModes2;
+    latchControlModes2.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching).Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
+    instance.mClosurePanelEndpoint2.GetLogic().SetLatchControlModes(latchControlModes2);
+
+
+    ChipLogProgress(AppServer, "ClosureDimensionEndpoint SetInitialState");
+ 
+    DataModel::Nullable<GenericDimensionStateStruct> currentState(
+        GenericDimensionStateStruct(MakeOptional(10000), 
+                                    MakeOptional(true), 
+                                    MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
+    instance.mClosurePanelEndpoint3.GetLogic().SetCurrentState(currentState);
+ 
+    DataModel::Nullable<GenericDimensionStateStruct> targetState(
+        GenericDimensionStateStruct(MakeOptional(DataModel::NullNullable), 
+                                    MakeOptional(DataModel::NullNullable), 
+                                    MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
+    instance.mClosurePanelEndpoint3.GetLogic().SetTargetState(targetState);
+ 
+    instance.mClosurePanelEndpoint3.GetLogic().SetResolution(Percent100ths(100));
+    instance.mClosurePanelEndpoint3.GetLogic().SetStepValue(1000);
+    instance.mClosurePanelEndpoint3.GetLogic().SetUnit(ClosureUnitEnum::kUnknownEnumValue);
+    instance.mClosurePanelEndpoint3.GetLogic().SetUnitRange(DataModel::NullNullable);
+    instance.mClosurePanelEndpoint3.GetLogic().SetOverflow(OverflowEnum::kTopInside);
+
+    ClosureDimension::Structs::RangePercent100thsStruct::Type limitRange{
+        .min = static_cast<Percent100ths>(0),
+        .max = static_cast<Percent100ths>(10000)
+    };
+    instance.mClosurePanelEndpoint3.GetLogic().SetLimitRange(limitRange);
+    BitFlags<ClosureDimension::LatchControlModesBitmap> latchControlModes3;
+    latchControlModes3.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching).Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
+    instance.mClosurePanelEndpoint3.GetLogic().SetLatchControlModes(latchControlModes3);
+
+    return CHIP_NO_ERROR;
+    
+}
+
 void ClosureManager::Init()
 {
     VerifyOrDie(mClosureEndpoint1.Init() == CHIP_NO_ERROR);
@@ -96,6 +182,8 @@ void ClosureManager::Init()
     SetTagList(/* endpoint= */ kClosurePanelEndpoint3,
                Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kClosurePanelEndpoint3TagList));
 
+    VerifyOrDie(SetInitialState() == CHIP_NO_ERROR, 
+                ChipLogError(AppServer, "Failed to set initial state for ClosureManager"));
     TestEventTriggerDelegate * pTestEventDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
 
     if (pTestEventDelegate != nullptr)
