@@ -5749,6 +5749,8 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "MoveTo";
         case chip::app::Clusters::ClosureControl::Commands::Calibrate::Id:
             return "Calibrate";
+        case chip::app::Clusters::ClosureControl::Commands::GroupedMoveTo::Id:
+            return "GroupedMoveTo";
         default:
             return "Unknown";
         }
@@ -5760,6 +5762,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "SetTarget";
         case chip::app::Clusters::ClosureDimension::Commands::Step::Id:
             return "Step";
+        case chip::app::Clusters::ClosureDimension::Commands::GroupedSetTarget::Id:
+            return "GroupedSetTarget";
+        case chip::app::Clusters::ClosureDimension::Commands::GroupedStep::Id:
+            return "GroupedStep";
         default:
             return "Unknown";
         }

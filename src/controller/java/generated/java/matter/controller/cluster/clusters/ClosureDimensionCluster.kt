@@ -122,7 +122,7 @@ class ClosureDimensionCluster(
     position: UShort?,
     latch: Boolean?,
     speed: UByte?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration,
   ) {
     val commandId: UInt = 0u
 
@@ -154,9 +154,73 @@ class ClosureDimensionCluster(
     direction: UByte,
     numberOfSteps: UShort,
     speed: UByte?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration,
   ) {
     val commandId: UInt = 1u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_DIRECTION_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_DIRECTION_REQ), direction)
+
+    val TAG_NUMBER_OF_STEPS_REQ: Int = 1
+    tlvWriter.put(ContextSpecificTag(TAG_NUMBER_OF_STEPS_REQ), numberOfSteps)
+
+    val TAG_SPEED_REQ: Int = 2
+    speed?.let { tlvWriter.put(ContextSpecificTag(TAG_SPEED_REQ), speed) }
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun groupedSetTarget(
+    position: UShort?,
+    latch: Boolean?,
+    speed: UByte?,
+    timedInvokeTimeout: Duration? = null,
+  ) {
+    val commandId: UInt = 2u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_POSITION_REQ: Int = 0
+    position?.let { tlvWriter.put(ContextSpecificTag(TAG_POSITION_REQ), position) }
+
+    val TAG_LATCH_REQ: Int = 1
+    latch?.let { tlvWriter.put(ContextSpecificTag(TAG_LATCH_REQ), latch) }
+
+    val TAG_SPEED_REQ: Int = 2
+    speed?.let { tlvWriter.put(ContextSpecificTag(TAG_SPEED_REQ), speed) }
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun groupedStep(
+    direction: UByte,
+    numberOfSteps: UShort,
+    speed: UByte?,
+    timedInvokeTimeout: Duration? = null,
+  ) {
+    val commandId: UInt = 3u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)

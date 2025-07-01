@@ -23,6 +23,10 @@ namespace Calibrate {
 inline constexpr CommandId Id = 0x00000002;
 } // namespace Calibrate
 
+namespace GroupedMoveTo {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace GroupedMoveTo
+
 } // namespace Commands
 } // namespace ClosureControl
 } // namespace Clusters
