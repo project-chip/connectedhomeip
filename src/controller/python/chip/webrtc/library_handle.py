@@ -16,10 +16,13 @@
 #
 
 import ctypes
-from ctypes import c_char_p, c_void_p
+
+from ctypes import CFUNCTYPE, c_char_p, c_void_p
 
 from ..native import GetLibraryHandle, HandleFlags, NativeLibraryHandleMethodArguments, PyChipError
 
+LocalDescriptionCallbackType = CFUNCTYPE(None, c_char_p, c_char_p, c_void_p)
+IceCandidateCallbackType = CFUNCTYPE(None, c_char_p, c_char_p, c_void_p)
 
 def _GetWebRTCLibraryHandle() -> ctypes.CDLL:
     """ Get the native library handle with webrtc method initialization.
@@ -50,5 +53,9 @@ def _GetWebRTCLibraryHandle() -> ctypes.CDLL:
                    ctypes.c_void_p, [c_void_p, c_char_p, c_char_p])
         setter.Set('pychip_webrtc_client_add_ice_candidate',
                    ctypes.c_void_p, [c_void_p, c_char_p, c_char_p])
+        setter.Set('pychip_webrtc_client_set_local_description_callback',
+                   ctypes.c_void_p, [c_void_p, LocalDescriptionCallbackType, c_void_p])
+        setter.Set('pychip_webrtc_client_set_ice_candidate_callback',
+                   ctypes.c_void_p, [c_void_p, IceCandidateCallbackType, c_void_p])
 
     return handle

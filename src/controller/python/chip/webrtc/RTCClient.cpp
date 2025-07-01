@@ -57,4 +57,14 @@ void pychip_webrtc_client_add_ice_candidate(void * client, char * candidate, cha
 {
     chip::webrtc::webrtc_client_add_ice_candidate(client, candidate, mid);
 }
+
+void pychip_webrtc_client_set_local_description_callback(void * client, LocalDescriptionCallback cb, void * user_data)
+{
+    chip::webrtc::webrtc_client_set_local_description_callback(client, cb, user_data);
+}
+
+void pychip_webrtc_client_set_local_ice_candidate_callback(void * client, IceCandidateCallback cb, void * user_data)
+{
+    chip::webrtc:: webrtc_client_set_ice_candidate_callback(client, cb, user_data);
+}
 }
