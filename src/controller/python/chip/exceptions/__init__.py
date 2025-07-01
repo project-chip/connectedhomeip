@@ -47,8 +47,7 @@ class ChipStackException(Exception):
         import errors in environments where this exception class is unavailable.
         """
 
-        e = Exception(f"{str(self)}")
-        return e.__reduce__()
+        return (Exception, (str(self),))
 
 
 class ChipStackError(ChipStackException):
