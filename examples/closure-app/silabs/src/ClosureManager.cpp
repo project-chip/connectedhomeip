@@ -363,7 +363,7 @@ void ClosureManager::HandleClosureMotionAction()
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
-    
+
     DataModel::Nullable<GenericDimensionStateStruct> ep2CurrentState;
     DataModel::Nullable<GenericDimensionStateStruct> ep3CurrentState;
 
@@ -446,12 +446,12 @@ void ClosureManager::HandleClosureMotionAction()
     VerifyOrReturn(ep1.GetLogic().GetOverallTargetState(ep1TargetState) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to get target state for Endpoint 1"));
 
-    
+
     VerifyOrReturn(!ep1CurrentState.IsNull(),
                    ChipLogError(AppServer, "MoveToCommand failed due to Null value Current state on Endpoint 1"));
     VerifyOrReturn(!ep1TargetState.IsNull(),
                    ChipLogError(AppServer, "MoveToCommand failed due to Null value Target state on Endpoint 1"));
-    
+
 
     // If both endpoints have reached their target positions, we can consider the closure motion action as complete.
     // Before calling HandleClosureActionComplete, we need to check if a latch action is needed.
