@@ -21,6 +21,7 @@
 #include <nlassert.h>
 
 #include "BufferWriter.h"
+#include <lib/core/CHIPSafeCasts.h>
 
 namespace chip {
 
@@ -47,15 +48,6 @@ public:
     {
         char buff[32];
         snprintf(buff, sizeof(buff), "%d", value);
-        buff[sizeof(buff) - 1] = 0;
-        return Add(buff);
-    }
-
-    /// Append an uint8_t value
-    StringBuilderBase & Add(uint8_t value)
-    {
-        char buff[32];
-        snprintf(buff, sizeof(buff), "%c", value);
         buff[sizeof(buff) - 1] = 0;
         return Add(buff);
     }
@@ -112,13 +104,13 @@ public:
     StringBuilder(const char * data, size_t length) : StringBuilder() { AddFormat("%.*s", static_cast<int>(length), data); }
 
     /// Constructor for uint8_t * and length
-    StringBuilder(const uint8_t * data, size_t length) : StringBuilder((const char *) data, length) {}
+    StringBuilder(const uint8_t * data, size_t length) : StringBuilder(Uint8::to_const_char(data), length) {}
 
     /// Constructor for CharSpan
     StringBuilder(const CharSpan & span) : StringBuilder(span.data(), span.size()) {}
 
     /// Constructor for ByteSpan
-    StringBuilder(const ByteSpan & span) : StringBuilder((const char *) span.data(), span.size()) {}
+    StringBuilder(const ByteSpan & span) : StringBuilder(Uint8::to_const_char(span.data()), span.size()) {}
 
 private:
     char mBuffer[kSize];
