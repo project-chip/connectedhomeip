@@ -47,7 +47,7 @@ using Protocols::InteractionModel::Status;
 class ClosureDimensionDelegate : public DelegateBase
 {
 public:
-    ClosureDimensionDelegate() {}
+    mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
 
     // Override for the DelegateBase Virtual functions
     Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
@@ -55,6 +55,26 @@ public:
     Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                       const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
     bool IsManualLatchingNeeded() override { return false; }
+    /**
+     * @brief Retrieves the endpoint for this instance.
+     *
+     * @return The endpoint (EndpointId) for this instance.
+     */
+    EndpointId GetEndpoint() const { return mEndpoint; }
+
+    /**
+     * @brief Function to get the present target direction for the step command.
+     */
+    StepDirectionEnum GetStepCommandTargetDirection() const { return mStepCommandTargetDirection; }
+
+    /**
+     * @brief Function to save the present target direction of the step command.
+     */
+    void SetStepCommandTargetDirection(StepDirectionEnum direction) { mStepCommandTargetDirection = direction; }
+
+private:
+    EndpointId mEndpoint                          = kInvalidEndpointId;
+    StepDirectionEnum mStepCommandTargetDirection = StepDirectionEnum::kUnknownEnumValue;
 };
 
 /**
@@ -74,7 +94,7 @@ class ClosureDimensionEndpoint
 {
 public:
     ClosureDimensionEndpoint(EndpointId endpoint) :
-        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
+        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
     {}
 
     /**
@@ -135,6 +155,15 @@ public:
      * a motion completed event.
      */
     void OnMoveToActionComplete();
+
+        /**
+     * @brief Handles the completion of a panel motion action for closure Panel endpoint.
+     *
+     * This function is called when a panel motion action has been completed.
+     * It updates the internal state of the closure panel endpoint to reflect
+     * the completion of the panel motion action.
+     */
+    void OnPanelMotionActionComplete();
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
