@@ -155,15 +155,6 @@ public:
      */
     void OnMoveToActionComplete();
 
-    /**
-     * @brief Handles the completion of a SetTarget action.
-     * 
-     * This function is called when the SetTarget action is completed.
-     * It should update the internal state of the closure control endpoint to reflect the
-     * completion of the SetTarget action.
-     */
-    void OnSetTargetActionComplete();
-
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
     MatterContext mContext;
