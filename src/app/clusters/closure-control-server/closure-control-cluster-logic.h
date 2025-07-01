@@ -42,6 +42,9 @@ enum class OptionalAttributeEnum : uint32_t
     kCountdownTime = 0x1
 };
 
+// As per the spec, the maximum allowed CurrentErrorList size is 10.
+constexpr int kCurrentErrorListMaxSize = 10;
+
 /**
  * @brief Structure is used to configure and validate the Cluster configuration.
  *        Validates if the feature map, attributes and commands configuration is valid.
@@ -119,6 +122,8 @@ struct ClusterState
     DataModel::Nullable<GenericOverallCurrentState> mOverallCurrentState = DataModel::NullNullable;
     DataModel::Nullable<GenericOverallTargetState> mOverallTargetState   = DataModel::NullNullable;
     BitFlags<LatchControlModesBitmap> mLatchControlModes;
+    ClosureErrorEnum mCurrentErrorList[kCurrentErrorListMaxSize] = {};
+    size_t mCurrentErrorCount                                      = 0; // Number of errors in the CurrentErrorList
 
     // CurrentErrorList attribute is not stored here. When it is necessary it will be requested from the delegate to get the current
     // active errors.
@@ -172,11 +177,21 @@ public:
     CHIP_ERROR GetMainState(MainStateEnum & mainState);
     CHIP_ERROR GetOverallCurrentState(DataModel::Nullable<GenericOverallCurrentState> & overallCurrentState);
     CHIP_ERROR GetOverallTargetState(DataModel::Nullable<GenericOverallTargetState> & overallTarget);
-    // The delegate is expected to return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to indicate end of list
-    CHIP_ERROR GetCurrentErrorList(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
+    CHIP_ERROR GetCurrentErrorList(DataModel::List<const ClosureErrorEnum> & currentErrorList);
     CHIP_ERROR GetLatchControlModes(BitFlags<LatchControlModesBitmap> & latchControlModes);
     CHIP_ERROR GetFeatureMap(BitFlags<Feature> & featureMap);
     CHIP_ERROR GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision);
+
+    /**
+     * @brief Reads the CurrentErrorList attribute.
+     *        This method is used to read the CurrentErrorList attribute and encode it using the provided encoder.
+     *
+     * @param[in] encoder The encoder to use for encoding the CurrentErrorList attribute.
+     *
+     * @return CHIP_NO_ERROR if the read was successful.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     */
+    CHIP_ERROR ReadCurrentErrorListAttribute(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
     /**
      * @brief Set SetOverallCurrentState.
@@ -240,6 +255,23 @@ public:
     {
         return SetCountdownTime(countdownTime, true);
     }
+
+    /**
+     * @brief Adds error to current error list.
+     *
+     * @param[in] error The error to be added to the current error list.
+     *
+     * @return CHIP_NO_ERROR if the error was added successfully.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     */
+    CHIP_ERROR AddErrorToCurrentErrorList(ClosureErrorEnum error);
+
+    /**
+     * @brief Clears the current error list.
+     *        This method should be called whenever the current error list needs to be reset.
+     */
+    void ClearCurrentErrorList();
 
     /**
      *  @brief Calls delegate HandleStopCommand function after validating MainState, parameters and conformance.

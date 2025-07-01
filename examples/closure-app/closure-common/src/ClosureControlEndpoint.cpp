@@ -70,13 +70,6 @@ Status ClosureControlDelegate::HandleStopCommand()
     return ClosureManager::GetInstance().OnStopCommand();
 }
 
-CHIP_ERROR ClosureControlDelegate::GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError)
-{
-    // This function should return the current error at the specified index.
-    // For now, we dont have a ErrorList implemented, so will return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED.
-    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-}
-
 bool ClosureControlDelegate::IsReadyToMove()
 {
     // This function should return true if the closure is ready to move.
@@ -121,19 +114,26 @@ CHIP_ERROR ClosureControlDelegate::HandleEventTrigger(uint64_t eventTrigger)
     switch (trigger)
     {
     case ClosureControlTestEventTrigger::kMainStateIsSetupRequired:
-        return logic->SetMainState(MainStateEnum::kSetupRequired);
+        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kSetupRequired));
+        break;
     case ClosureControlTestEventTrigger::kMainStateIsProtected:
-        return logic->SetMainState(MainStateEnum::kProtected);
+        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kProtected));
+        break;
     case ClosureControlTestEventTrigger::kMainStateIsError:
-        return logic->SetMainState(MainStateEnum::kError);
+        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kError));
+        ReturnErrorOnFailure(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor));
+        break;
     case ClosureControlTestEventTrigger::kMainStateIsDisengaged:
-        return logic->SetMainState(MainStateEnum::kDisengaged);
+        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kDisengaged));
+        break;
     case ClosureControlTestEventTrigger::kClearEvent:
-        // TODO : Implement logic to clear test event after Test plan Spec issue #5429 is resolved.
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kStopped));
+        logic->ClearCurrentErrorList();
+        break;
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ClosureControlEndpoint::Init()
