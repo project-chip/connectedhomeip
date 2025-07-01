@@ -139,7 +139,7 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
 {
     assertChipStackLockedByCurrentThread();
 
-    if (NullableListEqual<Structs::MeteredQuantityStruct::Type>(newValue, mMeteredQuantity))
+    if (NullableListEqual(newValue, mMeteredQuantity))
     {
         return CHIP_NO_ERROR;
     }
