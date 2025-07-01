@@ -119,6 +119,13 @@ public:
     ClusterLogic & GetLogic() { return mLogic; }
 
     /**
+     * @brief Retrieves the endpoint for this instance.
+     *
+     * @return The endpoint (EndpointId) for this instance.
+     */
+    EndpointId GetEndpoint() const { return mEndpoint; }
+
+    /**
      * @brief Handles the completion of a stop motion action.
      *
      * This function is called when a motion action has been stopped.

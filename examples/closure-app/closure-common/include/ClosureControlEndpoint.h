@@ -163,13 +163,13 @@ public:
     void OnMoveToActionComplete();
 
     /**
-     * @brief Handles the completion of a SetTarget action.
-     * 
-     * This function is called when the SetTarget action is completed.
+     * @brief Handles the completion of a panel-motion action.
+     *
+     * This function is called when step, set-target or move-to action is completed.
      * It should update the internal state of the closure control endpoint to reflect the
-     * completion of the SetTarget action.
+     * completion of the panel-motion action.
      */
-    void OnSetTargetActionComplete();
+    void OnPanelMotionActionComplete();
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;

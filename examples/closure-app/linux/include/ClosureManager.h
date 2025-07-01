@@ -37,6 +37,7 @@ public:
         kSetTargetAction,
         kStepAction,
         kPanelLatchAction,
+        kPanelUnLatchAction,
 
         kInvalidAction
     };
@@ -167,6 +168,63 @@ private:
     static void HandleClosureActionTimer(chip::System::Layer * layer, void * aAppState);
 
     /**
+     * @brief Handles the motion action for the closure system.
+     *
+     * This method is called when a move-to action has been initiated,
+     * allowing for any necessary updates or state changes.
+     */
+    void HandleClosureMotionAction();
+
+    /**
+     * @brief Calculates the next position for a panel based on the closure panel state.
+     *
+     * This function determines the next position by incrementing or decrementing current position of the panel
+     * by a fixed step (1000 units) towards the target position, ensuring it does not overshoot the target.
+     *
+     * @param[in]  currentState   The current state of the panel, containing the current position.
+     * @param[in]  targetState    The target state of the panel, containing the desired position.
+     * @param[out] nextPosition   A reference to a Nullable object that will be updated with the next current position.
+     *
+     * @return true if the next position was updated and movement is required; false if no update is needed
+     *         or if either the current or target position is not set.
+     */
+    bool GetPanelNextPosition(const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & currentState,
+                              const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & targetState,
+                              chip::app::DataModel::Nullable<chip::Percent100ths> & nextPosition);
+
+    /**
+     * @brief Handles the step action for a panel endpoint.
+     *
+     * This method updates the current position of the panel endpoint based on the step action
+     * and checks if the target position is reached. If so, it performs the latch action
+     * if required.
+     *
+     * @param endpointId The identifier of the endpoint for which the panel step action should be handled.
+     */
+    void HandlePanelStepAction(chip::EndpointId endpointId);
+
+    /**
+     * @brief Handles the SetTarget motion action for a panel endpoint.
+     *
+     * This method Performs the update the current positions of panel endpoint to next position
+     * and when target position is reached, it performs the latch action if required.
+     *
+     * @param endpointId The identifier of the endpoint for which the panel target action should be handled.
+     */
+    void HandlePanelSetTargetAction(chip::EndpointId endpointId);
+
+    /**
+     * @brief Handles the unlatch action for a closure panel.
+     *
+     * This method performs the unlatch action if required for the specified closure panel endpoint.
+     * It updates the current state of the panel and sets the target state accordingly and then calls
+     * HandlePanelSetTargetAction to move the panel to the target position.
+     *
+     * @param endpointId The identifier of the endpoint for which the unlatch action should be handled.
+     */
+    void HandlePanelUnlatchAction(chip::EndpointId endpointId);
+
+    /**
      * @brief Handles the completion of a Calibrate action.
      *
      * This method is called when a calibrate action has finished executing.
@@ -204,7 +262,7 @@ private:
      *
      * @param action The action that has been completed.
      */
-    void HandleSetTargetActionComplete();
+    void HandlePanelSetTargetActionComplete();
 
     /**
      * @brief Handles the completion of a Step action.
@@ -214,10 +272,10 @@ private:
      *
      * @param action The action that has been completed.
      */
-    void HandleStepActionComplete();
+    void HandlePanelStepActionComplete();
 
-    bool mIsCalibrationActionInProgress = false;
-    bool mIsMoveToActionInProgress      = false;
-    bool mIsSetTargetActionInProgress   = false;
-    bool mIsStepActionInProgress        = false;
-};
+    bool mIsCalibrationActionInProgress       = false;
+    bool mIsMoveToActionInProgress            = false;
+    bool mIsSetTargetActionInProgress         = false;
+    bool mIsStepActionInProgress              = false;
+    chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
