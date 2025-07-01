@@ -330,7 +330,7 @@ subscription.SetEventUpdateCallback(callback=cb)
 try:
     cb.get_block(block=True, timeout=timeout)
 except queue.Empty:
-    asserts.assert_fail(“Timeout on event”)
+    asserts.assert_fail("Timeout on event")
 ```
 
 ### [WriteAttribute](./ChipDeviceCtrlAPI.md#writeattribute)

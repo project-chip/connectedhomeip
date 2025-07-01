@@ -73,6 +73,12 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         """Returns a description of this test"""
         return "[TC_BRBINFO_4_1] Verification of KeepActive Command [DUT-Server]"
 
+    def _wait_for_active_changed_event(self, cb: EventCallback, event, timeout_s: int) -> int:
+        """Waits for an ActiveChanged event and returns the promised active duration."""
+        promised_active_duration_event_data = cb.wait_for_event_report(event, timeout_s)
+        logging.info(f"PromisedActiveDurationEvent.Data: {promised_active_duration_event_data}")
+        return promised_active_duration_event_data.promisedActiveDuration
+
     def steps_TC_BRBINFO_4_1(self) -> list[TestStep]:
         return [
             TestStep("0",  "DUT commissioned and preconditions", is_commissioning=True),
@@ -295,9 +301,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         wait_for_dut_event_subscription_s = 5
         # This will throw exception if timeout is exceeded.
         await self.default_controller.WaitForActive(self.icd_nodeid, timeoutSeconds=wait_for_icd_checkin_timeout_s, stayActiveDurationMs=5000)
-        promised_active_duration_event_data = cb.wait_for_event_report(event, wait_for_dut_event_subscription_s)
-        logging.info(f"PromisedActiveDurationEvent.Data: {promised_active_duration_event_data}")
-        promised_active_duration_ms = promised_active_duration_event_data.promisedActiveDuration
+        promised_active_duration_ms = self._wait_for_active_changed_event(cb, event, wait_for_dut_event_subscription_s)
 
         asserts.assert_greater_equal(promised_active_duration_ms, stay_active_duration_ms,
                                      "PromisedActiveDuration < StayActiveDuration")
@@ -310,9 +314,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self.step("8")
         # This will throw exception if timeout is exceeded.
         await self.default_controller.WaitForActive(self.icd_nodeid, timeoutSeconds=wait_for_icd_checkin_timeout_s, stayActiveDurationMs=5000)
-        promised_active_duration_event_data = cb.wait_for_event_report(event, wait_for_dut_event_subscription_s)
-        logging.info(f"PromisedActiveDurationEvent.Data: {promised_active_duration_event_data}")
-        promised_active_duration_ms = promised_active_duration_event_data.promisedActiveDuration
+        promised_active_duration_ms = self._wait_for_active_changed_event(cb, event, wait_for_dut_event_subscription_s)
         asserts.assert_greater_equal(promised_active_duration_ms, stay_active_duration_ms,
                                      "PromisedActiveDuration < StayActiveDuration")
         asserts.assert_equal(cb.get_size(), 0, "Unexpected event received from DUT")
@@ -332,9 +334,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self.step("10")
         self.th_icd_server.resume()
         await self.default_controller.WaitForActive(self.icd_nodeid, timeoutSeconds=wait_for_icd_checkin_timeout_s, stayActiveDurationMs=5000)
-        promised_active_duration_event_data = cb.wait_for_event_report(event, wait_for_dut_event_subscription_s)
-        logging.info(f"PromisedActiveDurationEvent.Data: {promised_active_duration_event_data}")
-        promised_active_duration_ms = promised_active_duration_event_data.promisedActiveDuration
+        promised_active_duration_ms = self._wait_for_active_changed_event(cb, event, wait_for_dut_event_subscription_s)
         asserts.assert_equal(cb.get_size(), 0, "More than one event received from DUT")
 
         self.step("11")
@@ -374,9 +374,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
 
         self.step("18")
         await self.default_controller.WaitForActive(self.icd_nodeid, timeoutSeconds=wait_for_icd_checkin_timeout_s, stayActiveDurationMs=5000)
-        promised_active_duration_event_data = cb.wait_for_event_report(event, wait_for_dut_event_subscription_s)
-        logging.info(f"PromisedActiveDurationEvent.Data: {promised_active_duration_event_data}")
-        promised_active_duration_ms = promised_active_duration_event_data.promisedActiveDuration
+        promised_active_duration_ms = self._wait_for_active_changed_event(cb, event, wait_for_dut_event_subscription_s)
         asserts.assert_equal(cb.get_size(), 0, "More than one event received from DUT")
 
 

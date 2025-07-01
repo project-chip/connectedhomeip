@@ -20,7 +20,7 @@ This module provides classes to manage and validate subscription-based event and
 
 Classes:
     EventCallback: Handles subscription to events.
-    AtributeCallback: Manages subscriptions to specific attributes.
+    AttributeCallback: Manages subscriptions to specific attributes.
 
 Both classes allow tests to start and manage subscriptions, queue received updates asynchronously and 
 block until epected reports are received or fail on timeouts
@@ -95,7 +95,7 @@ class EventCallback:
         if self._expected_event_id is not None and header.EventId != self._expected_event_id:
             return
 
-        logging.info("f[EventCallback] Received event: {header}")
+        logging.info(f"[EventCallback] Received event: {header}")
         self._q.put(event_result)
 
     @property
@@ -186,6 +186,9 @@ class AttributeCallback:
         self._q = queue.Queue()
         self._endpoint_id = 0
         self._lock = None
+        self._attribute_report_counts = None
+        self._attribute_reports = None
+
         if expected_cluster is not None:
             self._lock = threading.Lock()
             self.reset()
@@ -242,20 +245,19 @@ class AttributeCallback:
         """
 
         valid_report = False
-        if path.ClusterType == self._expected_cluster:
-            if self._expected_attribute is not None:
-                valid_report = path.ClusterId == self._expected_attribute.cluster_id
-            else:
+        if self._expected_attribute:
+            if path.AttributeType == self._expected_attribute:
                 valid_report = True
-        elif path.AttributeType == self._expected_attribute:
-            valid_report = True
+        elif self._expected_cluster:
+            if path.ClusterType == self._expected_cluster:
+                valid_report = True
 
         if valid_report:
             data = transaction.GetAttribute(path)
             value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
                                    value=data, timestamp_utc=datetime.now(timezone.utc))
             logging.info(f"[AttributeCallback] Received attribute report: {path.AttributeType} = {data}")
-            self._q._put(value)
+            self._q.put(value)
             if self._lock:
                 with self._lock:
                     self._attribute_report_counts[path.AttributeType] += 1
