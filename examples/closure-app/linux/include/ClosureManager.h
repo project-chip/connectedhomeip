@@ -164,7 +164,8 @@ private:
      *
      * @return Pointer to the current panel instance, or nullptr if not found.
      */
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * ClosureManager::GetCurrentPanelInstance(chip::EndpointId endpointId);
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint *
+    ClosureManager::GetCurrentPanelInstance(chip::EndpointId endpointId);
     /**
      * @brief Timer callback handler for closure actions.
      *
