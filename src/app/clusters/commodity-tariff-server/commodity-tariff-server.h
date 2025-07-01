@@ -424,13 +424,6 @@ private:
     COMMODITY_TARIFF_CURRENT_LIST_ATTRIBUTES
 #undef X
 
-    static constexpr size_t kMaxTariffComponents = 20;
-
-    Platform::ScopedMemoryBuffer<char>mOwnedCurrentTariffComponentsLabelsBuffer[kMaxTariffComponents][kTariffComponentMaxLabelLength];
-    Platform::ScopedMemoryBuffer<char>mOwnedNextTariffComponentsLabelsBuffer[kMaxTariffComponents][kTariffComponentMaxLabelLength];
-    Platform::ScopedMemoryBuffer<Structs::MeteredQuantityStruct::Type> mOwnedCurrentTariffComponentsStructBuffer;
-    Platform::ScopedMemoryBuffer<Structs::MeteredQuantityStruct::Type> mOwnedNextTariffComponentsStructBuffer;
-
     void TariffDataUpdatedCb(bool is_erased);
     void ResetCurrentAttributes();
 

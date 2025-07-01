@@ -307,7 +307,7 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
         auto [current, next] = GetCurrNextItemsById<Structs::DayEntryStruct::Type>(aCtx.DayEntriesMap, entryID);
         duration             = (1500 - current->startTime);
 
-        if ((next != nullptr) && (next->dayEntryID == entryID + 1)) // Next DayEntry is belong to this day range
+        if (next != nullptr) //( && (next->dayEntryID == entryID + 1)) // Next DayEntry is belong to this day range
         {
             nextPtr = next;
 
@@ -383,6 +383,21 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(CurrentTariffAttrsCtx & aCtx, 
             Structs::TariffComponentStruct::Type entry;
             auto current = GetCurrNextItemsById<Structs::TariffComponentStruct::Type>(aCtx.TariffComponentsMap, entryID).first;
             entry = *current;
+            if (current->label.HasValue())
+            {
+                DataModel::Nullable<chip::CharSpan> tmpNullLabel;
+                tmpNullLabel.SetNull();
+
+                if (!current->label.Value().IsNull())
+                {
+                    chip::CharSpan srcLabelSpan = current->label.Value().Value();
+                    const char* srcLabel = srcLabelSpan.data();
+                    tmpNullLabel.SetNonNull(chip::CharSpan(strdup(srcLabel), srcLabelSpan.size()));
+                }
+
+                entry.label= MakeOptional(DataModel::Nullable<chip::CharSpan>(tmpNullLabel));
+            }
+
             tempList.push_back(entry);
         }
 
@@ -622,8 +637,42 @@ void Instance::ForceDaysAttrsUpdate()
 
 void Instance::ForceDayEntriesAttrsUpdate()
 {
-    // TODO - ...
-    ///mServerTariffAttrsCtx.forwardAlarmTriggerTime
+    // Early return if we don't have valid current day data
+    if (mCurrentDayEntryDate.IsNull() || mCurrentDayEntry.IsNull()) {
+        ChipLogDetail(NotSpecified, "ForceDayEntriesAttrsUpdate: No current day entry set");
+        return;
+    }
+
+    const uint32_t now = GetCurrentTimestamp();
+    const uint16_t minutesSinceMidnight = static_cast<uint16_t>((now % kSecondsPerDay) / 60);
+    const auto& currentEntry = mCurrentDayEntry.Value();
+    
+    // Calculate end time of current entry
+    uint16_t entryEndTime = 0;
+    if (currentEntry.duration.HasValue()) {
+        // Case 1: Entry has explicit duration
+        entryEndTime = currentEntry.startTime + currentEntry.duration.Value();
+    } else if (!mNextDayEntry.IsNull()) {
+        // Case 2: Use next entry's start time as our end time
+        entryEndTime = mNextDayEntry.Value().startTime;
+    } else {
+        // Case 3: Default to end of day if no duration or next entry
+        entryEndTime = 1500;
+    }
+
+    // Calculate seconds remaining in current entry
+    const uint16_t minutesRemaining = entryEndTime - minutesSinceMidnight;
+    mServerTariffAttrsCtx.forwardAlarmTriggerTime = now + (minutesRemaining * 60);
+
+    // Determine update type based on whether we're crossing day boundary
+    const bool isNewDayTransition = (mServerTariffAttrsCtx.forwardAlarmTriggerTime - mCurrentDayEntryDate.Value()) >= kSecondsPerDay;
+    const UpdateEventCode updateType = isNewDayTransition ? UpdateEventCode::DaysUpdating 
+                                                        : UpdateEventCode::DayEntryUpdating;
+
+    ChipLogDetail(NotSpecified, "ForceDayEntriesAttrsUpdate: Triggering %s update in %u minutes",
+                 isNewDayTransition ? "day" : "entry", minutesRemaining);
+
+    UpdateCurrentAttrs(updateType);
 }
 
 } // namespace CommodityTariff
