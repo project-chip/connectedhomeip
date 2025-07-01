@@ -366,7 +366,7 @@ void ClosureManager::HandlePanelUnlatchAction(EndpointId endpointId)
 
         ChipLogProgress(AppServer, "Unlatched action completed");
     }
-    
+
     (void) DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
 
     instance.HandlePanelSetTargetAction(endpointId);

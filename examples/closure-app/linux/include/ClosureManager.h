@@ -161,11 +161,11 @@ public:
 
     /**
      * @brief Handles the step action for a panel endpoint.
-     * 
+     *
      * This method updates the current position of the panel endpoint based on the step action
      * and checks if the target position is reached. If so, it performs the latch action
      * if required.
-     * 
+     *
      * @param endpointId The identifier of the endpoint for which the panel step action should be handled.
      */
     void HandlePanelStepAction(chip::EndpointId endpointId);
