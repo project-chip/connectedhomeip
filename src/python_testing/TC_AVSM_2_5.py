@@ -38,6 +38,7 @@
 import logging
 
 import chip.clusters as Clusters
+from chip.clusters import Globals
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
@@ -70,37 +71,53 @@ class TC_AVSM_2_5(MatterBaseTest):
             ),
             TestStep(
                 4,
-                "TH reads StreamUsagePrioritie attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
-                "Store this value in aStreamUsagePriorities.",
+                "TH selects a value for BitRate based on the codec in aMicrophoneCapabilities.supportedCodes.",
+                "Store this value as aBitrate",
             ),
             TestStep(
                 5,
-                "TH sends the AudioStreamAllocate command with valid values of AudioCodec, ChannelCount, SampleRate and BitDepth from aMicrophoneCapabilities and StreamUsage from aStreamUsagePriorities.",
-                "DUT responds with AudioStreamAllocateResponse command with a valid AudioStreamID.",
+                "TH reads StreamUsagePriorities attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
+                "Store this value in aStreamUsagePriorities.",
             ),
             TestStep(
                 6,
+                "TH sends the AudioStreamAllocate command with valid values of AudioCodec, ChannelCount, SampleRate and BitDepth from aMicrophoneCapabilities",
+                "a StreamUsage from aStreamUsagePriorities and aBitRate as set above.",
+                "DUT responds with AudioStreamAllocateResponse command with a valid AudioStreamID.",
+            ),
+            TestStep(
+                7,
                 "TH reads AllocatedAudioStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
                 "Verify the number of allocated audio streams in the list is 1.",
             ),
             TestStep(
-                7,
-                "TH sends the AudioStreamAllocate command with values from step 4 except with ChannelCount set to 16(outside of valid range)",
-                "DUT responds with a CONSTRAINT_ERROR status code.",
-            ),
-            TestStep(
                 8,
-                "TH sends the AudioStreamAllocate command with values from step 4 except with BitDepth set to 48(outside of valid range)",
-                "DUT responds with a CONSTRAINT_ERROR status code.",
+                "TH sends the AudioStreamAllocate command with values from step 6 except with StreamUsage set to a value not in aStreamUsagePriorities",
+                "DUT responds with a INVALID_IN_STATE status code.",
             ),
             TestStep(
                 9,
-                "TH sends the AudioStreamAllocate command with values from step 4 except with Samplerate set to 0(outside of valid range)",
+                "TH sends the AudioStreamAllocate command with values from step 6 except with ChannelCount set to 16(outside of valid range)",
                 "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
             TestStep(
                 10,
-                "TH sends the AudioStreamAllocate command with values from step 4 except with BitRate set to 0(outside of valid range)",
+                "TH sends the AudioStreamAllocate command with values from step 6 except with BitDepth set to 48(outside of valid range)",
+                "DUT responds with a CONSTRAINT_ERROR status code.",
+            ),
+            TestStep(
+                11,
+                "TH sends the AudioStreamAllocate command with values from step 6 except with Samplerate set to 0(outside of valid range)",
+                "DUT responds with a CONSTRAINT_ERROR status code.",
+            ),
+            TestStep(
+                12,
+                "TH sends the AudioStreamAllocate command with values from step 6 except with BitRate set to 0(outside of valid range)",
+                "DUT responds with a CONSTRAINT_ERROR status code.",
+            ),
+            TestStep(
+                13,
+                "TH sends the AudioStreamAllocate command with values from step 6 except with AudioCodec set to 10(outside of valid range)",
                 "DUT responds with a CONSTRAINT_ERROR status code.",
             ),
         ]
@@ -137,20 +154,30 @@ class TC_AVSM_2_5(MatterBaseTest):
         logger.info(f"Rx'd MicrophoneCapabilities: {aMicrophoneCapabilities}")
 
         self.step(4)
+        aBitRate = 0
+        match aMicrophoneCapabilities.supportedCodecs[0]:
+
+            case Clusters.CameraAvStreamManagement.Enums.AudioCodecEnum.kOpus:
+                aBitRate = 30000
+
+            case Clusters.CameraAvStreamManagement.Enums.AudioCodecEnum.kAacLc:
+                aBitRate = 40000
+
+        self.step(5)
         aStreamUsagePriorities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
-        logger.info(f"Rx'd StreamUsagePriorities : {aStreamUsagePriorities}")
-
-        self.step(5)
+        logger.info(f"Rx'StreamUsagePriorities : {aStreamUsagePriorities}")
         asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
+
+        self.step(6)
         try:
             adoStreamAllocateCmd = commands.AudioStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
                 channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
                 sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
-                bitRate=1024,
+                bitRate=aBitRate,
                 bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
             )
             audioStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
@@ -162,21 +189,46 @@ class TC_AVSM_2_5(MatterBaseTest):
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
 
-        self.step(6)
+        self.step(7)
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
         )
         logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
         asserts.assert_equal(len(aAllocatedAudioStreams), 1, "The number of allocated audio streams in the list is not 1.")
 
-        self.step(7)
+        notSupportedStreamUsage = next((e for e in Globals.Enums.StreamUsageEnum if e not in aStreamUsagePriorities),
+                                       Globals.Enums.StreamUsageEnum.kUnknownEnumValue,)
+
+        self.step(8)
+        try:
+            adoStreamAllocateCmd = commands.AudioStreamAllocate(
+                streamUsage=notSupportedStreamUsage,
+                audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
+                channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
+                sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
+                bitRate=aBitRate,
+                bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
+            )
+            await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
+            asserts.assert_true(
+                False, "Unexpected success when expecting INVALID_IN_STATE due to unsupported StreamUsage"
+            )
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status,
+                Status.InvalidInState,
+                "Unexpected status returned when expecting INVALID_IN_STATE due to unsupported StreamUsage",
+            )
+            pass
+
+        self.step(9)
         try:
             adoStreamAllocateCmd = commands.AudioStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
                 channelCount=16,
                 sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
-                bitRate=1024,
+                bitRate=aBitRate,
                 bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
@@ -191,14 +243,14 @@ class TC_AVSM_2_5(MatterBaseTest):
             )
             pass
 
-        self.step(8)
+        self.step(10)
         try:
             adoStreamAllocateCmd = commands.AudioStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
                 channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
                 sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
-                bitRate=1024,
+                bitRate=aBitRate,
                 bitDepth=48,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
@@ -213,14 +265,14 @@ class TC_AVSM_2_5(MatterBaseTest):
             )
             pass
 
-        self.step(9)
+        self.step(11)
         try:
             adoStreamAllocateCmd = commands.AudioStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
                 channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
                 sampleRate=0,
-                bitRate=1024,
+                bitRate=aBitRate,
                 bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
@@ -235,7 +287,7 @@ class TC_AVSM_2_5(MatterBaseTest):
             )
             pass
 
-        self.step(10)
+        self.step(12)
         try:
             adoStreamAllocateCmd = commands.AudioStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
@@ -254,6 +306,28 @@ class TC_AVSM_2_5(MatterBaseTest):
                 e.status,
                 Status.ConstraintError,
                 "Unexpected status returned when expecting CONSTRAINT_ERROR due to BitRate set to 0(outside of valid range)",
+            )
+            pass
+
+        self.step(13)
+        try:
+            adoStreamAllocateCmd = commands.AudioStreamAllocate(
+                streamUsage=aStreamUsagePriorities[0],
+                audioCodec=10,
+                channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
+                sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
+                bitRate=aBitRate,
+                bitDepth=aMicrophoneCapabilities.supportedBitDepths[0],
+            )
+            await self.send_single_cmd(endpoint=endpoint, cmd=adoStreamAllocateCmd)
+            asserts.assert_true(
+                False, "Unexpected success when expecting CONSTRAINT_ERROR due to AudioCodec set to 10(outside of valid range)"
+            )
+        except InteractionModelError as e:
+            asserts.assert_equal(
+                e.status,
+                Status.ConstraintError,
+                "Unexpected status returned when expecting CONSTRAINT_ERROR due to AudioCodec set to 10(outside of valid range)",
             )
             pass
 
