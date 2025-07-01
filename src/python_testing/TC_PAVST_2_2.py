@@ -85,7 +85,7 @@ class TC_PAVST_2_2(MatterBaseTest):
                 if config.ConnectionID != 0:
                     try:
                         await self.send_single_cmd(cmd=pvcluster.Commands.DeallocatePushTransport(ConnectionID=config.ConnectionID),
-                                                endpoint=endpoint)
+                                                   endpoint=endpoint)
                     except InteractionModelError as e:
                         assert e.status == Status.Success, "Unexpected error returned"
 
@@ -119,7 +119,7 @@ class TC_PAVST_2_2(MatterBaseTest):
                 endpoint=endpoint, cluster=avcluster, attribute=avattr.AllocatedVideoStreams
             )
             assert len(aAllocatedVideoStreams) != 0, "AllocatedVideoStreams must not be empty"
-                
+
         self.step(4)
         if self.pics_guard(self.check_pics("AVSM.S")):
             response = await self.send_single_cmd(cmd=Clusters.CameraAvStreamManagement.Commands.AudioStreamAllocate(
@@ -141,15 +141,15 @@ class TC_PAVST_2_2(MatterBaseTest):
         if self.pics_guard(self.check_pics("PAVST.S")):
             response = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
-                "videoStreamID": 1,
-                "audioStreamID": 1,
-                "endpointID": 1,
-                "url": "https://localhost:1234/streams/1",
-                "triggerOptions": {"triggerType": 2},
-                "ingestMethod": 0,
-                "containerFormat": 0,
-                "containerOptions": {"containerType": 0},
-                }), endpoint=endpoint)
+                 "videoStreamID": 1,
+                 "audioStreamID": 1,
+                 "endpointID": 1,
+                 "url": "https://localhost:1234/streams/1",
+                 "triggerOptions": {"triggerType": 2},
+                 "ingestMethod": 0,
+                 "containerFormat": 0,
+                 "containerOptions": {"containerType": 0},
+                 }), endpoint=endpoint)
 
         self.step(6)
         if self.pics_guard(self.check_pics("PAVST.S")):
@@ -163,6 +163,7 @@ class TC_PAVST_2_2(MatterBaseTest):
                 endpoint=endpoint, cluster=pvcluster, attribute=pvcluster.Attributes.CurrentConnections
             )
             assert len(current_connections) == 1, "TransportConfigurations must be 1"
+
 
 if __name__ == "__main__":
     default_matter_test_main()
