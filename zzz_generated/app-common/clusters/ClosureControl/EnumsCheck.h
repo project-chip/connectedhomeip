@@ -40,6 +40,22 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::Closure
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::CurrentPositionEnum val)
+{
+    using EnumType = ClosureControl::CurrentPositionEnum;
+    switch (val)
+    {
+    case EnumType::kFullyClosed:
+    case EnumType::kFullyOpened:
+    case EnumType::kPartiallyOpened:
+    case EnumType::kOpenedForPedestrian:
+    case EnumType::kOpenedForVentilation:
+    case EnumType::kOpenedAtSignature:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::MainStateEnum val)
 {
     using EnumType = ClosureControl::MainStateEnum;
@@ -58,32 +74,16 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::MainSta
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::PositioningEnum val)
-{
-    using EnumType = ClosureControl::PositioningEnum;
-    switch (val)
-    {
-    case EnumType::kFullyClosed:
-    case EnumType::kFullyOpened:
-    case EnumType::kPartiallyOpened:
-    case EnumType::kOpenedForPedestrian:
-    case EnumType::kOpenedForVentilation:
-    case EnumType::kOpenedAtSignature:
-        return val;
-    default:
-        return EnumType::kUnknownEnumValue;
-    }
-}
 static auto __attribute__((unused)) EnsureKnownEnumValue(ClosureControl::TargetPositionEnum val)
 {
     using EnumType = ClosureControl::TargetPositionEnum;
     switch (val)
     {
-    case EnumType::kCloseInFull:
-    case EnumType::kOpenInFull:
-    case EnumType::kPedestrian:
-    case EnumType::kVentilation:
-    case EnumType::kSignature:
+    case EnumType::kMoveToFullyClosed:
+    case EnumType::kMoveToFullyOpen:
+    case EnumType::kMoveToPedestrianPosition:
+    case EnumType::kMoveToVentilationPosition:
+    case EnumType::kMoveToSignaturePosition:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

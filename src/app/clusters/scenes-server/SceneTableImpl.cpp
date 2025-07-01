@@ -96,7 +96,7 @@ enum class TagScene : uint8_t
 using FabricSceneData =
     FabricEntryData<SceneStorageId, SceneData, Serializer::kEntryMaxBytes(), Serializer::kFabricMaxBytes(), kMaxScenesPerFabric>;
 
-template class chip::app::Storage::FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData, kIteratorsMax>;
+template class chip::app::Storage::FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData>;
 
 CHIP_ERROR DefaultSceneTableImpl::Init(PersistentStorageDelegate & storage)
 {
@@ -131,7 +131,9 @@ CHIP_ERROR DefaultSceneTableImpl::GetRemainingCapacity(FabricIndex fabric_index,
 
 CHIP_ERROR DefaultSceneTableImpl::SetSceneTableEntry(FabricIndex fabric_index, const SceneTableEntry & entry)
 {
-    return this->SetTableEntry(fabric_index, entry.mStorageId, entry.mStorageData);
+    // Scene data is small, buffer can be allocated on stack
+    PersistentStore<Serializer::kEntryMaxBytes()> writeBuffer;
+    return this->SetTableEntry(fabric_index, entry.mStorageId, entry.mStorageData, writeBuffer);
 }
 
 CHIP_ERROR DefaultSceneTableImpl::GetSceneTableEntry(FabricIndex fabric_index, SceneStorageId scene_id, SceneTableEntry & entry)

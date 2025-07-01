@@ -119,4 +119,9 @@ void BridgedDevice::SetAdminCommissioningAttributes(const AdminCommissioningAttr
     });
 }
 
+void BridgedDevice::RegisterClusters()
+{
+    mAdministratorCommissioningCluster = std::make_unique<BridgedAdministratorCommissioning>(*this);
+}
+
 } // namespace bridge
