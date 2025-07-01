@@ -45,13 +45,12 @@ import logging
 import time
 
 import chip.clusters as Clusters
+import test_plan_support
 from chip.clusters import Globals
-from chip.clusters.Types import NullValue, Nullable
+from chip.clusters.Types import Nullable, NullValue
 from chip.testing import matter_asserts
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-import test_plan_support
-
 from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
 
 logger = logging.getLogger(__name__)

@@ -42,14 +42,14 @@
 """Define Matter test case TC_SETRF_3_1."""
 
 import logging
-import time
 import queue
+import time
 
-from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
 import chip.clusters as Clusters
-from chip.clusters import ClusterObjects
-from chip.ChipDeviceCtrl import ChipDeviceController
 import test_plan_support
+from chip.ChipDeviceCtrl import ChipDeviceController
+from chip.clusters import ClusterObjects
+from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
 from chip.testing.matter_testing import (
     MatterBaseTest,
     TestStep,
