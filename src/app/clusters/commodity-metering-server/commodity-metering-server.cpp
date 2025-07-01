@@ -159,7 +159,7 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
 
     const size_t len = newValue.IsNull() ? 0 : newValue.Value().size();
 
-    if (!newValue.IsNull() && len)
+    if (len)
     {
         if (!mOwnedMeteredQuantityStructBuffer.Calloc(len))
         {
