@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#include <string>
 #include <lib/core/CHIPError.h>
+#include <string>
 
 extern "C" {
 

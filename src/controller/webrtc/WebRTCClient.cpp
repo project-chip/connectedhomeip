@@ -23,7 +23,7 @@ namespace webrtc {
 
 WebRTCClient::WebRTCClient()
 {
-     mPeerConnection = nullptr;
+    mPeerConnection = nullptr;
 }
 
 WebRTCClient::~WebRTCClient()
