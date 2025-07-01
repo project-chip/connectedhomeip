@@ -18,7 +18,8 @@
 import ctypes
 from ctypes import c_char_p, c_void_p
 
-import chip.native
+from chip import native
+from native import native.PyChipError
 
 
 def _GetWebRTCLibraryHandle() -> ctypes.CDLL:
@@ -41,7 +42,7 @@ def _GetWebRTCLibraryHandle() -> ctypes.CDLL:
         setter.Set('pychip_webrtc_client_destroy',
                    ctypes.c_void_p, [c_void_p])
         setter.Set('pychip_webrtc_client_create_peer_connection',
-                   ctypes.c_void_p, [c_void_p, c_char_p])
+                   native.PyChipError, [c_void_p, c_char_p])
         setter.Set('pychip_webrtc_client_create_offer',
                    ctypes.c_void_p, [c_void_p])
         setter.Set('pychip_webrtc_client_create_answer',

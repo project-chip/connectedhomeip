@@ -15,7 +15,8 @@
  *    limitations under the License.
  */
 
-#include <controller/webrtc/WebRTC.h>
+#include <controller/python/chip/webrtc/WebRTC.h>
+#include <lib/core/CHIPError.h>
 
 using namespace chip;
 using namespace chip::webrtc;
@@ -29,10 +30,10 @@ void * pychip_webrtc_client_create()
 
 void pychip_webrtc_client_destroy(void * client)
 {
-    return chip::webrtc::webrtc_client_destroy(client);
+    chip::webrtc::webrtc_client_destroy(client);
 }
 
-void pychip_webrtc_client_create_peer_connection(void * client, char * stun_url)
+CHIP_ERROR pychip_webrtc_client_create_peer_connection(void * client, char * stun_url)
 {
     return chip::webrtc::webrtc_client_create_peer_connection(client, stun_url);
 }

@@ -93,9 +93,12 @@ shared_library("ChipDeviceCtrl") {
       "chip/tracing/TracingSetup.cpp",
       "chip/utils/DeviceProxyUtils.cpp",
     ]
-    if (chip_support_webrtc_python_bindings && current_os == "linux" &&
-        (current_cpu == "x64" || current_cpu == "arm64")) {
-      sources += [ "chip/webrtc/RTCClient.cpp" ]
+    if (chip_support_webrtc_python_bindings) {
+      sources += [
+        "chip/webrtc/RTCClient.cpp",
+        "chip/webrtc/WebRTC.cpp",
+        "chip/webrtc/WebRTC.h",
+      ]
     }
     defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
     defines += [ "CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC=50" ]
@@ -142,6 +145,17 @@ shared_library("ChipDeviceCtrl") {
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]
+
+  if (chip_support_webrtc_python_bindings) {
+      public_deps += [
+        "${chip_root}/src/controller/webrtc:chip_webrtc",
+        "${chip_root}/third_party/libdatachannel:libdatachannel",
+      ]
+      include_dirs += [
+        "${chip_root}/src/controller/webrtc/",
+        "${chip_root}/third_party/libdatachannel/repo/include",
+      ]
+  }
 
   if (chip_support_commissioning_in_controller) {
     public_deps += [
@@ -227,8 +241,7 @@ chip_python_wheel_action("chip-core") {
         "chip/yaml/format_converter.py",
         "chip/yaml/runner.py",
       ]
-      if (chip_support_webrtc_python_bindings && current_os == "linux" &&
-          (current_cpu == "x64" || current_cpu == "arm64")) {
+      if (chip_support_webrtc_python_bindings) {
         sources += [
           "chip/webrtc/__init__.py",
           "chip/webrtc/callbacks.py",
@@ -283,8 +296,7 @@ chip_python_wheel_action("chip-core") {
     "chip.tracing",
     "chip.fault_injection",
   ]
-  if (chip_support_webrtc_python_bindings && current_os == "linux" &&
-      (current_cpu == "x64" || current_cpu == "arm64")) {
+  if (chip_support_webrtc_python_bindings) {
     py_packages += [ "chip.webrtc" ]
   }
 

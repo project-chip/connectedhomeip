@@ -16,7 +16,7 @@
  */
 
 #include "WebRTC.h"
-#include "WebRTCClient.h"
+#include <WebRTCClient.h>
 
 #include <memory>
 #include <thread>
@@ -49,14 +49,16 @@ void webrtc_client_destroy(WebRTCClientHandle handle)
     g_clients.erase(handle);
 }
 
-void webrtc_client_create_peer_connection(WebRTCClientHandle handle, const char * stun_url)
+CHIP_ERROR webrtc_client_create_peer_connection(WebRTCClientHandle handle, const char * stun_url)
 {
     std::lock_guard<std::mutex> lock(g_mutex);
     auto it = g_clients.find(handle);
     if (it != g_clients.end())
     {
-        it->second->CreatePeerConnection(stun_url);
+        return it->second->CreatePeerConnection(stun_url);
     }
+
+    return CHIP_NO_ERROR;
 }
 
 void webrtc_client_create_offer(WebRTCClientHandle handle)

@@ -16,6 +16,7 @@
  */
 
 #include <string>
+#include <lib/core/CHIPError.h>
 
 extern "C" {
 
@@ -51,8 +52,10 @@ void webrtc_client_destroy(WebRTCClientHandle handle);
  *
  * @param handle The client handle.
  * @param stun_url URL of the STUN server (e.g., "stun:stun.l.google.com:19302").
+ *
+ * @return CHIP_ERROR on error, CHIP_NO_ERROR.
  */
-void webrtc_client_create_peer_connection(WebRTCClientHandle handle, const char * stun_url);
+CHIP_ERROR webrtc_client_create_peer_connection(WebRTCClientHandle handle, const char * stun_url);
 
 /**
  * @brief Generates a local SDP offer for the peer connection.
