@@ -488,21 +488,16 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ClosureControl:
 
 static void Finalize(chip::app::Clusters::ClosureControl::Structs::OverallTargetStateStruct::Type & request);
 
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::Type & request,
+static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ClosureDimension::Structs::DimensionStateStruct::Type & request,
                         Json::Value & value);
 
-static void Finalize(chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::Type & request);
+static void Finalize(chip::app::Clusters::ClosureDimension::Structs::DimensionStateStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::ClosureDimension::Structs::RangePercent100thsStruct::Type & request,
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::ClosureDimension::Structs::RangePercent100thsStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ClosureDimension::Structs::TargetStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::ClosureDimension::Structs::TargetStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label, chip::app::Clusters::ClosureDimension::Structs::UnitRangeStruct::Type & request,
                         Json::Value & value);

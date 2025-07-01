@@ -16,19 +16,36 @@ import("//build_overrides/chip.gni")
 
 source_set("persistence") {
   sources = [
-    "AttributePersistenceProvider.cpp",
     "AttributePersistenceProvider.h",
+    "PascalString.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app:paths",
+    "${chip_root}/src/lib/support:span",
+  ]
+}
+
+source_set("singleton") {
+  sources = [
+    "AttributePersistenceProviderInstance.cpp",
+    "AttributePersistenceProviderInstance.h",
+  ]
+
+  public_deps = [ ":persistence" ]
+}
+
+source_set("default") {
+  sources = [
     "DefaultAttributePersistenceProvider.cpp",
     "DefaultAttributePersistenceProvider.h",
   ]
 
   public_deps = [
-    "${chip_root}/src/app:paths",
+    ":persistence",
     "${chip_root}/src/app:storage-wrapper",
-    "${chip_root}/src/app/util:types",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/lib/support:span",
   ]
 }
 
