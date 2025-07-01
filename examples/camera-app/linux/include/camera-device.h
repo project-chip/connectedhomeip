@@ -63,7 +63,7 @@ static constexpr uint16_t kVideoSensorHeightPixels   = 1080;    // 1080p resolut
 static constexpr uint16_t kMinImageRotation          = 0;
 static constexpr uint16_t kMaxImageRotation          = 359; // Spec constraint
 static constexpr uint8_t kMaxZones                   = 10;  // Spec has min 1
-static constexpr uint8_t kMaxUserDefinedZones        = 6;   // Spec has min 5
+static constexpr uint8_t kMaxUserDefinedZones        = 10;  // Spec has min 5
 static constexpr uint8_t kSensitivityMax             = 10;  // Spec has 2 to 10
 
 #define INVALID_SPKR_LEVEL (0)
