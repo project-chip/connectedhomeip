@@ -31,7 +31,11 @@
 #       --endpoint 1
 # === END CI TEST ARGUMENTS ===
 
+import random
+import logging
+
 import chip.clusters as Clusters
+from chip import ChipDeviceCtrl
 from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -40,7 +44,8 @@ from mobly import asserts
 
 class TC_ACL_2_9(MatterBaseTest):
     async def read_and_check_min_value(self, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor, min_value: int):
-        result = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, attribute)])
+        result = await self.th2.ReadAttribute(self.dut_node_id, [(0, attribute)])
+        logging.info(f"Result: {result}")
         value = result[0][Clusters.Objects.AccessControl][attribute]
         asserts.assert_greater_equal(
             value,
@@ -49,7 +54,7 @@ class TC_ACL_2_9(MatterBaseTest):
         )
 
     async def read_event_expect_unsupported_access(self, event: Clusters.ClusterObjects.ClusterEvent):
-        result = await self.default_controller.ReadEvent(self.dut_node_id, [(0, event)])
+        result = await self.th2.ReadEvent(self.dut_node_id, [(0, event)])
         asserts.assert_equal(result[0].Status, Status.UnsupportedAccess, f"Expected UnsupportedAccess but got {result[0].Status}")
 
     def desc_TC_ACL_2_9(self) -> str:
@@ -64,65 +69,108 @@ class TC_ACL_2_9(MatterBaseTest):
                 is_commissioning=True),
             TestStep(
                 2,
-                "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 1 element",
-                "Result is SUCCESS"),
+                "TH1 opens commissioning window on DUT, TH2 commissions DUT using admin node ID N2",
+                "DUT is commissioned on TH2 fabric"),
             TestStep(
                 3,
-                "TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
-                "Result is UNSUPPORTED_ACCESS (0x7e)"),
+                "TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 1 element",
+                "Result is SUCCESS"),
             TestStep(
                 4,
-                "TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 1 element",
+                "TH2 reads DUT Endpoint 0 AccessControl cluster ACL attribute",
                 "Result is UNSUPPORTED_ACCESS (0x7e)"),
             TestStep(
                 5,
-                "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
+                "TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is list of AccessControlEntryStruct containing 1 element",
                 "Result is UNSUPPORTED_ACCESS (0x7e)"),
             TestStep(
                 6,
-                "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is an empty list",
+                "TH2 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
                 "Result is UNSUPPORTED_ACCESS (0x7e)"),
             TestStep(
                 7,
-                "TH1 reads DUT Endpoint 0 AccessControl cluster SubjectsPerAccessControlEntry attribute",
-                "Result is SUCCESS,value is an integer with value 4 or greater."),
+                "TH2 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is an empty list",
+                "Result is UNSUPPORTED_ACCESS (0x7e)"),
             TestStep(
                 8,
-                "TH1 reads DUT Endpoint 0 AccessControl cluster TargetsPerAccessControlEntry attribute",
-                "Result is SUCCESS,value is an integer with value 3 or greater."),
+                "TH2 reads DUT Endpoint 0 AccessControl cluster SubjectsPerAccessControlEntry attribute",
+                "Result is SUCCESS,value is an integer with value 4 or greater."),
             TestStep(
                 9,
-                "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntriesPerFabric attribute",
-                "Result is SUCCESS, value is an integer with value 4 or greater."),
+                "TH2 reads DUT Endpoint 0 AccessControl cluster TargetsPerAccessControlEntry attribute",
+                "Result is SUCCESS,value is an integer with value 3 or greater."),
             TestStep(
                 10,
-                "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
-                "Result is UNSUPPORTED_ACCESS (0x7e)"),
+                "TH2 reads DUT Endpoint 0 AccessControl cluster AccessControlEntriesPerFabric attribute",
+                "Result is SUCCESS, value is an integer with value 4 or greater."),
             TestStep(
                 11,
-                "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event",
+                "TH2 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event",
                 "Result is UNSUPPORTED_ACCESS (0x7e)"),
+            TestStep(
+                12,
+                "TH2 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event",
+                "Result is UNSUPPORTED_ACCESS (0x7e)"),
+            TestStep(
+                13,
+                "TH2 reads the CurrentFabricIndex attribute from the Operational Credentials cluster and saves as th2_idx",
+                "th2_idx set to value for CurrentFabricIndex attribute from TH2"),
+            TestStep(
+                14,
+                "TH1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx",
+                "TH1 removes TH2 fabric using th2_idx"),
         ]
         return steps
 
     @async_test_body
     async def test_TC_ACL_2_9(self):
         self.step(1)
+        # Create TH1 controller
         self.th1 = self.default_controller
+        self.discriminator = random.randint(0, 4095)
 
         self.step(2)
-        # TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is
+        # Create TH2 controller
+        th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
+        th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
+        self.th2 = th2_fabric_admin.NewController(nodeId=2)
+
+        # Get the max window duration
+        GC_cluster = Clusters.GeneralCommissioning
+        attribute = GC_cluster.Attributes.BasicCommissioningInfo
+        duration = await self.read_single_attribute_check_success(endpoint=0, cluster=GC_cluster, attribute=attribute)
+        self.max_window_duration = duration.maxCumulativeFailsafeSeconds
+
+        # Open commissioning window on TH1
+        params = await self.th1.OpenCommissioningWindow(
+                nodeid=self.dut_node_id,
+                timeout=self.max_window_duration,
+                iteration=1000,
+                discriminator=self.discriminator,
+                option=1
+            )
+
+        # Commission TH2
+        await self.th2.CommissionOnNetwork(
+                nodeId=self.dut_node_id,
+                setupPinCode=params.setupPinCode,
+                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+                filter=self.discriminator
+            )
+        
+        self.step(3)
+        # TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is
         # list of AccessControlEntryStruct containing 1 element
         acl_attribute = Clusters.AccessControl.Attributes.Acl
         new_acl = [
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
                 privilege=Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kManage,
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
-                subjects=[self.th1.nodeId],
+                subjects=[self.th2.nodeId],
                 targets=NullValue,
             ),
         ]
-        result = await self.default_controller.WriteAttribute(
+        result = await self.th2.WriteAttribute(
             self.dut_node_id,
             [(0, acl_attribute(value=new_acl))]
         )
@@ -130,18 +178,19 @@ class TC_ACL_2_9(MatterBaseTest):
         if result[0].Status != Status.Success:
             asserts.fail(f"Expected Success but got {result[0].Status}")
 
-        self.step(3)
-        # TH1 reads DUT Endpoint 0 AccessControl cluster ACL attribute
+        self.step(4)
+        # TH2 reads DUT Endpoint 0 AccessControl cluster ACL attribute
         acl_attribute = Clusters.AccessControl.Attributes.Acl
         await self.read_single_attribute_expect_error(
+            dev_ctrl=self.th2,
             cluster=Clusters.Objects.AccessControl,
             attribute=acl_attribute,
             error=Status.UnsupportedAccess,
             endpoint=0
         )
 
-        self.step(4)
-        # TH1 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is
+        self.step(5)
+        # TH2 writes DUT Endpoint 0 AccessControl cluster ACL attribute, value is
         # list of AccessControlEntryStruct containing 1 element
         new_acl = [
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -151,7 +200,7 @@ class TC_ACL_2_9(MatterBaseTest):
                 targets=NullValue,
             ),
         ]
-        result2 = await self.default_controller.WriteAttribute(
+        result2 = await self.th2.WriteAttribute(
             self.dut_node_id,
             [(0, acl_attribute(value=new_acl))]
         )
@@ -159,20 +208,21 @@ class TC_ACL_2_9(MatterBaseTest):
         if result2[0].Status != Status.UnsupportedAccess:
             asserts.fail(f"Expected UnsupportedAccess but got {result2[0].Status}")
 
-        self.step(5)
-        # TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute
+        self.step(6)
+        # TH2 reads DUT Endpoint 0 AccessControl cluster Extension attribute
         extension_attribute = Clusters.AccessControl.Attributes.Extension
         await self.read_single_attribute_expect_error(
+            dev_ctrl=self.th2,
             cluster=Clusters.Objects.AccessControl,
             attribute=extension_attribute,
             error=Status.UnsupportedAccess,
             endpoint=0
         )
 
-        self.step(6)
-        # TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is an empty list
+        self.step(7)
+        # TH2 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is an empty list
         new_extension = []
-        result3 = await self.default_controller.WriteAttribute(
+        result3 = await self.th2.WriteAttribute(
             self.dut_node_id,
             [(0, extension_attribute(value=new_extension))]
         )
@@ -180,28 +230,41 @@ class TC_ACL_2_9(MatterBaseTest):
         if result3[0].Status != Status.UnsupportedAccess:
             asserts.fail(f"Expected UnsupportedAccess but got {result3[0].Status}")
 
-        self.step(7)
-        # TH1 reads DUT Endpoint 0 AccessControl cluster SubjectsPerAccessControlEntry attribute
+        self.step(8)
+        # TH2 reads DUT Endpoint 0 AccessControl cluster SubjectsPerAccessControlEntry attribute
         await self.read_and_check_min_value(Clusters.AccessControl.Attributes.SubjectsPerAccessControlEntry, 4)
 
-        self.step(8)
-        # TH1 reads DUT Endpoint 0 AccessControl cluster TargetsPerAccessControlEntry attribute
+        self.step(9)
+        # TH2 reads DUT Endpoint 0 AccessControl cluster TargetsPerAccessControlEntry attribute
         await self.read_and_check_min_value(Clusters.AccessControl.Attributes.TargetsPerAccessControlEntry, 3)
 
-        self.step(9)
-        # TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntriesPerFabric attribute
+        self.step(10)
+        # TH2 reads DUT Endpoint 0 AccessControl cluster AccessControlEntriesPerFabric attribute
         await self.read_and_check_min_value(Clusters.AccessControl.Attributes.AccessControlEntriesPerFabric, 4)
 
-        self.step(10)
-        # TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event
+        self.step(11)
+        # TH2 reads DUT Endpoint 0 AccessControl cluster AccessControlEntryChanged event
         await self.read_event_expect_unsupported_access(Clusters.AccessControl.Events.AccessControlEntryChanged)
 
-        self.step(11)
-        # TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event
+        self.step(12)
+        # TH2 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event
         await self.read_event_expect_unsupported_access(Clusters.AccessControl.Events.AccessControlExtensionChanged)
 
-        # TODO: Add factory reset to reset ACL back to admin privileges after test runs
+        self.step(13)
+        # Read the CurrentFabricIndex attribute from the Operational Credentials cluster
+        cluster = Clusters.OperationalCredentials
+        attribute = Clusters.OperationalCredentials.Attributes.CurrentFabricIndex
+        th2_idx = await self.read_single_attribute_check_success(
+            dev_ctrl=self.th2,
+            endpoint=0,
+            cluster=cluster,
+            attribute=attribute
+        )
 
+        self.step(14)
+        # TH1 sends the RemoveFabric command to the DUT with the FabricIndex set to th2_idx
+        removeFabricCmd = Clusters.OperationalCredentials.Commands.RemoveFabric(th2_idx)
+        await self.th1.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=removeFabricCmd)
 
 if __name__ == "__main__":
     default_matter_test_main()
