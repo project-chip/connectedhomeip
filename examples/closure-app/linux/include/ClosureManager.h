@@ -123,6 +123,14 @@ public:
                   const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
                   const chip::EndpointId endpointId);
 
+private:
+    /**
+     * @brief Singleton instance of the ClosureManager.
+     *
+     * Used to provide global access to the ClosureManager throughout the application.
+     */
+    static ClosureManager sInstance;
+
     // Endpoint ID for the main closure device
     static constexpr chip::EndpointId kClosureEndpoint1 = 1;
     // Endpoint ID for the first closure panel
@@ -148,6 +156,15 @@ public:
      */
     ClosureAction mCurrentAction = ClosureAction::kInvalidAction;
 
+    /**
+     * @brief Gets the current panel instance being operated on.
+     *
+     * This method returns a pointer to the ClosureDimensionEndpoint instance
+     * corresponding to the current endpoint ID.
+     *
+     * @return Pointer to the current panel instance, or nullptr if not found.
+     */
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * ClosureManager::GetCurrentPanelInstance(chip::EndpointId endpointId);
     /**
      * @brief Timer callback handler for closure actions.
      *

@@ -33,9 +33,9 @@ using namespace chip::app::Clusters::ClosureDimension;
 
 namespace {
 // Define a constant for the countdown time
-constexpr uint32_t kCountdownTimeSeconds  = 10;
-constexpr uint32_t kCountdownTimeSeconds  = 10;
-constexpr uint32_t kMotionCountdownTimeMs = 1000;
+constexpr uint32_t kCountdownTimeSeconds          = 10;
+constexpr uint32_t kMotionCountdownTimeMs         = 1000;
+constexpr chip::Percent100ths kMotionPositionStep = 1000; // 10% of the total range per motion interval.
 
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
@@ -213,12 +213,8 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
     mCurrentAction               = ClosureManager::ClosureAction::kPanelUnLatchAction;
     mCurrentActionEndpointId     = endpointId;
     mIsSetTargetActionInProgress = true;
-    (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(1), HandleClosureActionTimer, this);
+    (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kMotionCountdownTimeMs), HandleClosureActionTimer, this);
 
-    mCurrentAction     = ClosureManager::ClosureAction::kSetTargetAction;
-    mCurrentEndpointId = endpointId;
-    (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(1), HandleClosureActionTimer, this);
-    mIsSetTargetActionInProgress = true;
     return Status::Success;
 }
 
@@ -270,9 +266,8 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
     (void) DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
     mCurrentAction           = ClosureManager::ClosureAction::kStepAction;
     mCurrentActionEndpointId = endpointId;
-
-    mIsStepActionInProgress = true;
-    (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(1), HandleClosureActionTimer, this);
+    mIsStepActionInProgress  = true;
+    (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kMotionCountdownTimeMs), HandleClosureActionTimer, this);
     return Status::Success;
 }
 
@@ -317,21 +312,9 @@ void ClosureManager::HandlePanelUnlatchAction(EndpointId endpointId)
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
-    // Get the endpoint based on the endpointId
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * panelEp = nullptr;
-    if (endpointId == instance.mClosurePanelEndpoint2.GetEndpoint())
-    {
-        panelEp = &instance.mClosurePanelEndpoint2;
-    }
-    else if (endpointId == instance.mClosurePanelEndpoint3.GetEndpoint())
-    {
-        panelEp = &instance.mClosurePanelEndpoint3;
-    }
-    else
-    {
-        ChipLogError(AppServer, "HandlePanelSetTargetAction called with invalid endpointId: %u", endpointId);
-        return;
-    }
+    // Get the endpoint instance based on the endpointId
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * panelEp = GetCurrentPanelInstance(endpointId);
+    VerifyOrReturn(panelEp != nullptr, ChipLogError(AppServer, "HandlePanelSetTargetAction called with invalid endpointId: %u", endpointId));
 
     DataModel::Nullable<GenericDimensionStateStruct> panelCurrentState = DataModel::NullNullable;
     DataModel::Nullable<GenericDimensionStateStruct> panelTargetState  = DataModel::NullNullable;
@@ -368,30 +351,33 @@ void ClosureManager::HandlePanelUnlatchAction(EndpointId endpointId)
         ChipLogProgress(AppServer, "Unlatched action completed");
     }
 
+    // Cancel any active timers before starting the panel movement
     (void) DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
 
     instance.HandlePanelSetTargetAction(endpointId);
+}
+
+ClosureDimensionEndpoint * ClosureManager::GetCurrentPanelInstance(EndpointId endpointId)
+{
+    ClosureManager & instance = ClosureManager::GetInstance();
+    if (endpointId == instance.mClosurePanelEndpoint2.GetEndpoint())
+    {
+        return &instance.mClosurePanelEndpoint2;
+    }
+    else if (endpointId == instance.mClosurePanelEndpoint3.GetEndpoint())
+    {
+        return &instance.mClosurePanelEndpoint3;
+    }
+    return nullptr;
 }
 
 void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
-    // Get the endpoint based on the endpointId
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * ep = nullptr;
-    if (endpointId == instance.mClosurePanelEndpoint2.GetEndpoint())
-    {
-        ep = &instance.mClosurePanelEndpoint2;
-    }
-    else if (endpointId == instance.mClosurePanelEndpoint3.GetEndpoint())
-    {
-        ep = &instance.mClosurePanelEndpoint3;
-    }
-    else
-    {
-        ChipLogError(AppServer, "HandlePanelSetTargetAction called with invalid endpointId: %u", endpointId);
-        return;
-    }
+    // Get the endpoint instance based on the endpointId
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * ep = GetCurrentPanelInstance(endpointId);
+    VerifyOrReturn(ep != nullptr, ChipLogError(AppServer, "HandlePanelSetTargetAction called with invalid endpointId: %u", endpointId));
 
     DataModel::Nullable<GenericDimensionStateStruct> panelCurrentState = DataModel::NullNullable;
     DataModel::Nullable<GenericDimensionStateStruct> panelTargetState  = DataModel::NullNullable;
@@ -461,29 +447,17 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
-    // Get the endpoint based on the endpointId
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * panelEp = nullptr;
-    if (endpointId == instance.mClosurePanelEndpoint2.GetEndpoint())
-    {
-        panelEp = &instance.mClosurePanelEndpoint2;
-    }
-    else if (endpointId == instance.mClosurePanelEndpoint3.GetEndpoint())
-    {
-        panelEp = &instance.mClosurePanelEndpoint3;
-    }
-    else
-    {
-        ChipLogError(AppServer, "HandlePanelStepAction called with invalid endpointId: %u", endpointId);
-        return;
-    }
-    StepDirectionEnum stepDirection = panelEp->GetDelegate().GetStepCommandTargetDirection();
+    // Get the endpoint instance based on the endpointId
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * ep = GetCurrentPanelInstance(endpointId);
+    VerifyOrReturn(ep != nullptr, ChipLogError(AppServer, "HandlePanelSetTargetAction called with invalid endpointId: %u", endpointId));
+    StepDirectionEnum stepDirection = ep->GetDelegate().GetStepCommandTargetDirection();
 
     DataModel::Nullable<GenericDimensionStateStruct> panelCurrentState;
     DataModel::Nullable<GenericDimensionStateStruct> panelTargetState;
 
-    VerifyOrReturn(panelEp->GetLogic().GetCurrentState(panelCurrentState) == CHIP_NO_ERROR,
+    VerifyOrReturn(ep->GetLogic().GetCurrentState(panelCurrentState) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to get current state for Step action"));
-    VerifyOrReturn(panelEp->GetLogic().GetTargetState(panelTargetState) == CHIP_NO_ERROR,
+    VerifyOrReturn(ep->GetLogic().GetTargetState(panelTargetState) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to get target state for Step action"));
 
     VerifyOrReturn(!panelCurrentState.IsNull(), ChipLogError(AppServer, "Current state is null, Step action Failed"));
@@ -505,7 +479,7 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
     {
         chip::Percent100ths nextCurrentPosition;
         chip::Percent100ths stepValue;
-        VerifyOrReturn(panelEp->GetLogic().GetStepValue(stepValue) == CHIP_NO_ERROR,
+        VerifyOrReturn(ep->GetLogic().GetStepValue(stepValue) == CHIP_NO_ERROR,
                        ChipLogError(AppServer, "Failed to get step value for Step action"));
 
         // Compute the next position
@@ -519,7 +493,7 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
         }
 
         panelCurrentState.Value().position.SetValue(DataModel::MakeNullable(nextCurrentPosition));
-        panelEp->GetLogic().SetCurrentState(panelCurrentState);
+        ep->GetLogic().SetCurrentState(panelCurrentState);
 
         // Cancel any existing timer before starting a new action
         (void) DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
