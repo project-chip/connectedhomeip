@@ -40,8 +40,17 @@ using namespace ::chip::Controller;
 CHIP_ERROR PairingCommand::RunCommand()
 {
     CurrentCommissioner().RegisterPairingDelegate(this);
+    /* TODO: if JFA is onboarded get the administrator CAT initial version from JF_DS@GroupList (through RPC)
+     * https://github.com/project-chip/connectedhomeip/issues/39443
+     */
     chip::CASEAuthTag administratorCAT   = GetAdminCATWithVersion(CHIP_CONFIG_ADMINISTRATOR_CAT_INITIAL_VERSION);
     NodeId administratorCaseAdminSubject = NodeIdFromCASEAuthTag(administratorCAT);
+
+    /* TODO: if JFA is onboarded get the Anchor CAT initial version from JF_DS@GroupList (through RPC)
+     * https://github.com/project-chip/connectedhomeip/issues/39443
+     */
+    chip::CASEAuthTag anchorCAT   = GetAnchorCATWithVersion(CHIP_CONFIG_ANCHOR_CAT_INITIAL_VERSION);
+    NodeId anchorCaseAdminSubject = NodeIdFromCASEAuthTag(anchorCAT);
 
     if (mAnchorNodeId == chip::kUndefinedNodeId)
     {
@@ -52,8 +61,6 @@ CHIP_ERROR PairingCommand::RunCommand()
         }
         else
         {
-            chip::CASEAuthTag anchorCAT = GetAnchorCATWithVersion(CHIP_CONFIG_ANCHOR_CAT_INITIAL_VERSION);
-
             if (mExecuteJCM.ValueOr(false))
             {
                 ChipLogError(JointFabric, "--anchor and --execute-jcm options are not allowed simultaneously!");
@@ -75,15 +82,26 @@ CHIP_ERROR PairingCommand::RunCommand()
         mSkipCommissioningComplete = MakeOptional(true);
     }
 
+    mDeviceIsICD = false;
+
     // Clear the CATs in OperationalCredentialsIssuer
     mCredIssuerCmds->SetCredentialIssuerCATValues(kUndefinedCATs);
 
     // All the AddNOC commands invoked by JFC will have
     // the value below for the CaseAdminSubject field
-    (static_cast<ExampleCredentialIssuerCommands *>(mCredIssuerCmds))
-        ->SetCredentialIssuerCaseAdminSubject(administratorCaseAdminSubject);
+    if (mExecuteJCM.ValueOr(false))
+    {
+        // JFA-B will be issued a NOC with Administrator CAT
+        mCASEAuthTags = MakeOptional(std::vector<uint32_t>{ administratorCAT });
 
-    mDeviceIsICD = false;
+        (static_cast<ExampleCredentialIssuerCommands *>(mCredIssuerCmds))
+            ->SetCredentialIssuerCaseAdminSubject(anchorCaseAdminSubject);
+    }
+    else
+    {
+        (static_cast<ExampleCredentialIssuerCommands *>(mCredIssuerCmds))
+            ->SetCredentialIssuerCaseAdminSubject(administratorCaseAdminSubject);
+    }
 
     if (mCASEAuthTags.HasValue() && mCASEAuthTags.Value().size() <= kMaxSubjectCATAttributeCount)
     {
