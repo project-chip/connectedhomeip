@@ -231,12 +231,12 @@ ClosureManager::OnMoveToCommand(const Optional<TargetPositionEnum> & position, c
         ep3Target.speed.SetValue(speed.Value());
     }
 
-    VerifyOrReturnError(mClosurePanelEndpoint2.GetLogic().SetTargetState(DataModel::MakeNullable(ep2Target)) == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(AppServer, "Failed to set target for Endpoint 2"));
-    VerifyOrReturnError(mClosurePanelEndpoint3.GetLogic().SetTargetState(DataModel::MakeNullable(ep3Target)) == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(AppServer, "Failed to set target for Endpoint 3"));
-    VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
+    VerifyOrReturnError(mClosurePanelEndpoint2.GetLogic().SetTargetState(DataModel::MakeNullable(ep2Target)) == CHIP_NO_ERROR,
+                        Status::Failure, ChipLogError(AppServer, "Failed to set target for Endpoint 2"));
+    VerifyOrReturnError(mClosurePanelEndpoint3.GetLogic().SetTargetState(DataModel::MakeNullable(ep3Target)) == CHIP_NO_ERROR,
+                        Status::Failure, ChipLogError(AppServer, "Failed to set target for Endpoint 3"));
+    VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR,
+                        Status::Failure, ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
 
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kMotionCountdownTimeMs), HandleClosureActionTimer, this);
     mCurrentAction            = ClosureAction::kMoveToAction;
