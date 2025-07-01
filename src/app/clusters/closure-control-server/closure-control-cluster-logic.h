@@ -363,6 +363,14 @@ public:
      */
     CHIP_ERROR GenerateSecureStateChangedEvent(const bool secureValue);
 
+    /**
+     * @brief Maps CurrentPositionEnum to TargetPositionEnum.
+     *
+     * @param currentPosition The current position to map.
+     * @return The corresponding target position.
+     */
+    TargetPositionEnum MapCurrentPositionEnumToTargetPosition(CurrentPositionEnum currentPosition);
+
 private:
     bool mIsInitialized = false;
     DelegateBase & mDelegate;

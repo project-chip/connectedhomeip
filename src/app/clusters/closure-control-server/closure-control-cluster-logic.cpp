@@ -497,6 +497,26 @@ Protocols::InteractionModel::Status ClusterLogic::HandleStop()
     return Status::Success;
 }
 
+TargetPositionEnum ClusterLogic::MapCurrentPositionEnumToTargetPosition(CurrentPositionEnum currentPosition)
+{
+    switch (currentPosition)
+    {
+    case CurrentPositionEnum::kFullyClosed:
+        return TargetPositionEnum::kMoveToFullyClosed;
+    case CurrentPositionEnum::kFullyOpened:
+        return TargetPositionEnum::kMoveToFullyOpen;
+    case CurrentPositionEnum::kOpenedForPedestrian:
+        return TargetPositionEnum::kMoveToPedestrianPosition;
+    case CurrentPositionEnum::kOpenedForVentilation:
+        return TargetPositionEnum::kMoveToVentilationPosition;
+    case CurrentPositionEnum::kOpenedAtSignature:
+        return TargetPositionEnum::kMoveToSignaturePosition;
+    default:
+        // Handle unmapped or invalid cases
+        return TargetPositionEnum::kUnknownEnumValue;
+    }
+}
+
 Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPositionEnum> position, Optional<bool> latch,
                                                                Optional<Globals::ThreeLevelAutoEnum> speed)
 {
@@ -504,14 +524,36 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
 
     VerifyOrReturnError(position.HasValue() || latch.HasValue() || speed.HasValue(), Status::InvalidCommand);
 
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
     DataModel::Nullable<GenericOverallTargetState> overallTargetState;
     VerifyOrReturnError(GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR, Status::Failure);
+    VerifyOrReturnError(GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR, Status::Failure);
+    VerifyOrReturnError(!overallCurrentState.IsNull(), Status::InvalidInState, ChipLogError(AppServer, "OverallCurrentState is null"));
 
     if (overallTargetState.IsNull())
     {
         // If overallTargetState is null, we need to initialize to default value.
         // This is to ensure that we can set the position, latch, and speed values in the overallTargetState.
         overallTargetState.SetNonNull(GenericOverallTargetState{});
+    }
+    if (mConformance.HasFeature(Feature::kMotionLatching))
+    {
+        // Return InvalidInState if current latch has no value or is null
+        VerifyOrReturnError(overallCurrentState.Value().latch.HasValue(), Status::InvalidInState);
+        VerifyOrReturnError(!overallCurrentState.Value().latch.Value().IsNull(), Status::InvalidInState);
+        // If current state is latched, we need to validate the incoming latch value
+        if (overallCurrentState.Value().latch.Value().Value())
+        {
+            // Return InvalidInState if incoming latch has no value
+            VerifyOrReturnError(latch.HasValue(), Status::InvalidInState);
+            if (latch.Value() && position.HasValue() && overallCurrentState.Value().position.HasValue() && 
+            !overallCurrentState.Value().position.Value().IsNull())
+            {
+                CurrentPositionEnum currentPosition = overallCurrentState.Value().position.Value().Value();
+                VerifyOrReturnError(position.Value() == MapCurrentPositionEnumToTargetPosition(currentPosition),
+                                    Status::InvalidInState);
+            }
+        }
     }
 
     if (position.HasValue())
@@ -553,34 +595,6 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
     VerifyOrReturnError(state == MainStateEnum::kMoving || state == MainStateEnum::kWaitingForMotion ||
                             state == MainStateEnum::kStopped,
                         Status::InvalidInState);
-
-    // Check for invalid latch transition: current latch is true and target latch is true or null
-    if (mConformance.HasFeature(Feature::kMotionLatching))
-    {
-        DataModel::Nullable<GenericOverallCurrentState> currentState;
-        if (GetOverallCurrentState(currentState) == CHIP_NO_ERROR && !currentState.IsNull())
-        {
-            const auto & curr = currentState.Value();
-            bool currentLatch = curr.latch.HasValue() && !curr.latch.Value().IsNull() && curr.latch.Value().Value();
- 
-            // default target latch to true if not present
-            bool targetLatchIsTrueOrNull = true;
-            if (overallTargetState.Value().latch.HasValue())
-            {
-                auto & targetLatch = overallTargetState.Value().latch.Value();
-                targetLatchIsTrueOrNull = targetLatch.IsNull() || targetLatch.Value();
-            }
- 
-            // Only exception: both position and speed are not present
-            bool noTargetPosition = !(overallTargetState.Value().position.HasValue() && !overallTargetState.Value().position.Value().IsNull());
-            bool noTargetSpeed = !(overallTargetState.Value().speed.HasValue());
- 
-            if (currentLatch && targetLatchIsTrueOrNull)
-            {
-                return (noTargetPosition && noTargetSpeed) ? Status::Success : Status::InvalidInState;
-            }
-        }
-    }
 
     // Set MainState and OverallTargetState only if the delegate call to HandleMoveToCommand is successful
     Status status = mDelegate.HandleMoveToCommand(position, latch, speed);

@@ -673,17 +673,19 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     // Check for invalid latch transition: current latch is true and target latch is true
     if (mConformance.HasFeature(Feature::kMotionLatching))
     {
-        bool currentLatch = currentState.Value().latch.HasValue() ? currentState.Value().latch.Value() : false;
-        // default target latch to true if not present
-        bool targetLatch = target.Value().latch.HasValue() ? target.Value().latch.Value() : true;
-
-        // Only exception: both position and speed are not present
-        bool noTargetPosition = !(target.Value().position.HasValue() && !target.Value().position.Value());
-        bool noTargetSpeed = !(target.Value().speed.HasValue());
-
-        if (currentLatch && targetLatch)
+        // Return InvalidInState if current latch has no value or is null
+        VerifyOrReturnError(currentState.Value().latch.HasValue(), Status::InvalidInState);
+        VerifyOrReturnError(!currentState.Value().latch.Value().IsNull(), Status::InvalidInState);
+        if (currentState.Value().latch.Value().Value())
         {
-            return (noTargetPosition && noTargetSpeed) ? Status::Success : Status::InvalidInState;
+            // Return InvalidInState if incoming latch has no value
+            VerifyOrReturnError(latch.HasValue(), Status::InvalidInState);
+            if (latch.Value() && position.HasValue() && currentState.Value().position.HasValue() && 
+            !currentState.Value().position.Value().IsNull())
+            {
+                Percent100ths currentPosition = currentState.Value().position.Value().Value();
+                VerifyOrReturnError(position.Value() == currentPosition, Status::InvalidInState);
+            }
         }
     }
 
@@ -733,7 +735,12 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     VerifyOrReturnError(!currentState.IsNull(), Status::InvalidInState);
     VerifyOrReturnError(currentState.Value().position.HasValue() && !currentState.Value().position.Value().IsNull(),
                         Status::InvalidInState);
-
+    if (mConformance.HasFeature(Feature::kMotionLatching))
+    {
+        // Return InvalidInState if current latch is true, as the motion is not possible if closure panel is latched.
+        VerifyOrReturnError(!(currentState.Value().latch.HasValue() && !currentState.Value().latch.Value().IsNull() && 
+        currentState.Value().latch.Value().Value()), Status::InvalidInState);
+    }
     // Derive TargetState Position from StepValue and NumberOfSteps.
     Percent100ths stepValue;
     VerifyOrReturnError(GetStepValue(stepValue) == CHIP_NO_ERROR, Status::Failure);
