@@ -19,7 +19,7 @@ import ctypes
 from ctypes import c_char_p, c_void_p
 
 from chip import native
-from native import native.PyChipError
+from ..native import PyChipError
 
 
 def _GetWebRTCLibraryHandle() -> ctypes.CDLL:
