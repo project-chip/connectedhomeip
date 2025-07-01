@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:140
+            image: ghcr.io/project-chip/chip-build:146
             options: --user root
 
         steps:
@@ -58,7 +58,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:140
+            image: ghcr.io/project-chip/chip-build:146
             options: --user root
 
         steps:
@@ -79,7 +79,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:140
+            image: ghcr.io/project-chip/chip-build-esp32:146
             options: --user root
 
         steps:
@@ -100,7 +100,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:140
+            image: ghcr.io/project-chip/chip-build-nrf-platform:146
             options: --user root
 
         steps:
@@ -121,7 +121,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:140
+            image: ghcr.io/project-chip/chip-build-telink:146
             options: --user root
 
         steps:
