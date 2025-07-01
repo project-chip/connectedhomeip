@@ -16,7 +16,6 @@
 #
 
 import ctypes
-
 from ctypes import c_char_p, c_void_p
 
 from ..native import GetLibraryHandle, HandleFlags, NativeLibraryHandleMethodArguments, PyChipError
