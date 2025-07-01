@@ -566,7 +566,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
 
         Percent100ths resolution;
         VerifyOrReturnError(GetResolution(resolution) == CHIP_NO_ERROR, Status::Failure,
-                            ChipLogError(AppServer, "Unable to get Resolution value in SetTargetCommand"));
+                            ChipLogError(AppServer, "Unable to get Resolution value while handling SetTarget command"));
         // Check if position.Value() is an integer multiple of resolution, else round to nearest valid value
         if (position.Value() % resolution != 0)
         {
