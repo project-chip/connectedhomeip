@@ -95,7 +95,7 @@ limitations under the License.
     <field name="SupportsNames" mask="0x02"/>
   </bitmap>
 
-  <bitmap name="ThermostatSuggestionNotFollowingReasonBitmap" type="bitmap16">
+  <bitmap name="ThermostatSuggestionNotFollowingReasonBitmap" type="bitmap16" apiMaturity="provisional">
     <cluster code="0x0201"/>
     <field name="DemandResponseEvent" mask="0x0001"/>
     <field name="OngoingHold" mask="0x0002"/>
