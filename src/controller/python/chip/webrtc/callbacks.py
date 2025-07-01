@@ -8,6 +8,7 @@ candidates = []
 
 logger = logging.getLogger(__name__)
 
+
 def on_ice(candidates, peer):
     logger.info(f"on_ice received ICE candidates: {candidates}")
     if future_ice is not None:
