@@ -546,7 +546,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
         {
             // Return InvalidInState if incoming latch has no value
             VerifyOrReturnError(latch.HasValue(), Status::InvalidInState);
-            if (latch.Value() && position.HasValue() && overallCurrentState.Value().position.HasValue() && 
+            if (latch.Value() && position.HasValue() && overallCurrentState.Value().position.HasValue() &&
             !overallCurrentState.Value().position.Value().IsNull())
             {
                 CurrentPositionEnum currentPosition = overallCurrentState.Value().position.Value().Value();
