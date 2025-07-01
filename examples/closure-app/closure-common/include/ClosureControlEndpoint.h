@@ -57,7 +57,6 @@ public:
 
     CHIP_ERROR GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError) override;
     bool IsReadyToMove() override;
-    bool IsManualLatchingNeeded() override;
     ElapsedS GetCalibrationCountdownTime() override;
     ElapsedS GetMovingCountdownTime() override;
     ElapsedS GetWaitingForMotionCountdownTime() override;

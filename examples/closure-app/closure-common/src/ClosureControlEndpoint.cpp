@@ -83,13 +83,6 @@ bool ClosureControlDelegate::IsReadyToMove()
     return true;
 }
 
-bool ClosureControlDelegate::IsManualLatchingNeeded()
-{
-    // This function should return true if manual latching is needed.
-    // For now, we will return false.
-    return false;
-}
-
 ElapsedS ClosureControlDelegate::GetCalibrationCountdownTime()
 {
     // This function should return the calibration countdown time.

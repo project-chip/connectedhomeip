@@ -127,7 +127,6 @@ public:
     Status HandleCalibrateCommand() override { return Status::Success; }
     CHIP_ERROR GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError) override { return CHIP_NO_ERROR; }
 
-    bool IsManualLatchingNeeded() override { return false; }
     bool IsReadyToMove() override { return true; }
     ElapsedS GetCalibrationCountdownTime() override { return 30; }
     ElapsedS GetMovingCountdownTime() override { return 20; }
