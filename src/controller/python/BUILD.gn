@@ -147,14 +147,14 @@ shared_library("ChipDeviceCtrl") {
   ]
 
   if (chip_support_webrtc_python_bindings) {
-      public_deps += [
-        "${chip_root}/src/controller/webrtc:chip_webrtc",
-        "${chip_root}/third_party/libdatachannel:libdatachannel",
-      ]
-      include_dirs += [
-        "${chip_root}/src/controller/webrtc/",
-        "${chip_root}/third_party/libdatachannel/repo/include",
-      ]
+    public_deps += [
+      "${chip_root}/src/controller/webrtc:chip_webrtc",
+      "${chip_root}/third_party/libdatachannel:libdatachannel",
+    ]
+    include_dirs += [
+      "${chip_root}/src/controller/webrtc/",
+      "${chip_root}/third_party/libdatachannel/repo/include",
+    ]
   }
 
   if (chip_support_commissioning_in_controller) {
