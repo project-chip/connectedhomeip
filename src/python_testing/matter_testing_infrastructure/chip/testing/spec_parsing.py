@@ -356,7 +356,7 @@ class ClusterParser:
 
     def parse_access(self, element_xml: ElementTree.Element, access_xml: Optional[ElementTree.Element], conformance: Optional[ConformanceCallable]) -> tuple[Optional[ACCESS_CONTROL_PRIVILEGE_ENUM], Optional[ACCESS_CONTROL_PRIVILEGE_ENUM], Optional[ACCESS_CONTROL_PRIVILEGE_ENUM]]:
         ''' Returns a tuple of access types for read / write / invoke'''
-        def str_to_access_type(privilege_str: str) -> Optional[ACCESS_CONTROL_PRIVILEGE_ENUM]:
+        def str_to_access_type(privilege_str: str) -> ACCESS_CONTROL_PRIVILEGE_ENUM:
             if privilege_str == 'view':
                 return typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kView)
             if privilege_str == 'operate':
@@ -577,7 +577,6 @@ class PrebuiltDataModelDirectory(Enum):
     k1_4 = auto()
     k1_4_1 = auto()
     k1_4_2 = auto()
-    k1_5 = auto()
 
     @property
     def dirname(self):
@@ -589,8 +588,6 @@ class PrebuiltDataModelDirectory(Enum):
             return "1.4.1"
         if self == PrebuiltDataModelDirectory.k1_4_2:
             return "1.4.2"
-        if self == PrebuiltDataModelDirectory.k1_5:
-            return "1.5_in_progress"
         raise KeyError("Invalid enum: %r" % self)
 
 
