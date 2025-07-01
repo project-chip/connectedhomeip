@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2023 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -218,6 +218,8 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 logging.info(f"OverallCurrentState: {overall_current_state}")
                 if overall_current_state is None:
                     logging.error("OverallCurrentState is None")
+                    asserts.assert_true(False, "OverallCurrentState is None.")
+                    return
 
                 CurrentLatch = overall_current_state.latch
                 asserts.assert_in(CurrentLatch, [True, False], "OverallCurrentState.latch is not in the expected range")
@@ -254,14 +256,14 @@ class TC_CLCTRL_6_1(MatterBaseTest):
 
                 # STEP 3e: If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip step 3f
                 self.step("3e")
-
+                sub_handler.reset()
+                
                 if (int(bin(LatchControlModes), 2) & (1 << 1)) == 2:
                     logging.info("RemoteUnlatching is True, proceeding to step 3f")
 
                     # STEP 3f: TH sends command MoveTo with Latch = False
                     self.step("3f")
 
-                    sub_handler.reset()
                     try:
                         await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                             latch=False
@@ -317,6 +319,8 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 logging.info(f"OverallCurrentState: {overall_current_state}")
                 if overall_current_state is None:
                     logging.error("OverallCurrentState is None")
+                    asserts.assert_true(False, "OverallCurrentState is None.")
+                    return
 
                 CurrentPosition = overall_current_state.position
                 asserts.assert_in(CurrentPosition, Clusters.ClosureControl.Enums.CurrentPositionEnum,
@@ -393,7 +397,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
             pass
 
-        # STEP 5a: If PS feature is not supported on the cluster or IS feature is supported on the cluster, skip steps 4b to 4g
+        # STEP 5a: If PS feature is not supported on the cluster or IS feature is supported on the cluster, skip steps 5b to 5f
         self.step("5a")
 
         if not is_ps_feature_supported or is_is_feature_supported:
@@ -534,6 +538,8 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 logging.info(f"OverallCurrentState: {overall_current_state}")
                 if overall_current_state is None:
                     logging.error("OverallCurrentState is None")
+                    asserts.assert_true(False, "OverallCurrentState is None.")
+                    return
 
                 asserts.assert_in(overall_current_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum,
                                   "OverallCurrentState.position is not in the expected range")

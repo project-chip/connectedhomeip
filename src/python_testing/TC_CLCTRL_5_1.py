@@ -219,6 +219,8 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                 logging.info(f"OverallCurrentState: {overall_current_state}")
                 if overall_current_state is None:
                     logging.error("OverallCurrentState is None")
+                    asserts.assert_true(False, "OverallCurrentState is None.")
+                    return
 
                 CurrentLatch = overall_current_state.latch
                 asserts.assert_in(CurrentLatch, [True, False], "OverallCurrentState.latch is not in the expected range")
@@ -371,6 +373,8 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                     logging.info(f"OverallCurrentState: {overall_current_state}")
                     if overall_current_state is None:
                         logging.error("OverallCurrentState is None")
+                        asserts.assert_true(False, "OverallCurrentState is None.")
+                        return
 
                     asserts.assert_true(overall_current_state.latch, "OverallCurrentState.latch is not True")
                 else:
@@ -437,6 +441,8 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                 logging.info(f"OverallCurrentState: {overall_current_state}")
                 if overall_current_state is None:
                     logging.error("OverallCurrentState is None")
+                    asserts.assert_true(False, "OverallCurrentState is None.")
+                    return
 
                 CurrentPosition = overall_current_state.position
                 asserts.assert_in(CurrentPosition, Clusters.ClosureControl.Enums.CurrentPositionEnum,
