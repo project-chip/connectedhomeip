@@ -123,7 +123,8 @@ class InjectedDiagnosticsSoftwareDiagnosticsLogic : public SoftwareDiagnosticsLo
 public:
     InjectedDiagnosticsSoftwareDiagnosticsLogic(DeviceLayer::DiagnosticDataProvider & provider,
                                                 const SoftwareDiagnosticsEnabledAttributes enabledAttributes) :
-        SoftwareDiagnosticsLogic(enabledAttributes), mProvider(provider)
+        SoftwareDiagnosticsLogic(enabledAttributes),
+        mProvider(provider)
     {}
 
 protected:
