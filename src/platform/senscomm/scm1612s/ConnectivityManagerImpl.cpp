@@ -78,8 +78,14 @@ exit:
     return err;
 }
 
+//KJW - test
+extern "C" int (*printk)(const char *const fmt, ...);
+
 void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
+//KJW - test    
+    printk("[%s, %d]\n", __func__, __LINE__);
+
     ChipLogProgress(DeviceLayer, "%s", __func__);
 
     // Forward the event to the generic base classes as needed.
@@ -87,6 +93,9 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_OnPlatformEvent(event);
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+//KJW - test    
+    printk("[%s, %d]\n", __func__, __LINE__);
+
     _OnWiFiPlatformEvent(event);
 #endif
     OnInternetConnectivityChangeEvent(event);

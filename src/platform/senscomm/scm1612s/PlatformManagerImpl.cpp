@@ -28,14 +28,9 @@
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.ipp>
 #include <platform/senscomm/scm1612s/DiagnosticDataProviderImpl.h>
 
-#ifdef __no_stub__
-#include <lwip/tcpip.h>
-#include <tcpip_wrapper.h>
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include "wifi_api_ex.h"
-#endif
-#endif /* __no_stub__ */
+#include "wise_wifi.h"
+#include "wise_event_loop.h"
+#include "scm_wifi.h"
 
 extern "C" void PlatformLogPrint(int module, int level, const char * msg, va_list args)
 {
@@ -70,17 +65,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
     SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
-#ifdef __no_stub__
-    mFilogicCtx = filogic_start_sync();
-    assert(mFilogicCtx != NULL);
-
-    assert(filogic_set_logv_callback_sync(mFilogicCtx, PlatformLogPrint));
-
-    filogic_set_event_callback_sync(mFilogicCtx, FilogicEventHandler);
-
-    // Initialize LwIP.
-    mtk_tcpip_init(NULL, NULL);
-#endif /* __no_stub__ */
+    (void)scm_wifi_register_event_callback(WiseEventHandler, NULL);
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
@@ -116,26 +101,27 @@ void PlatformManagerImpl::_Shutdown()
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
 
-#ifdef __no_stub__
-void PlatformManagerImpl::FilogicEventHandler(void * c, filogic_async_event_id_t event, filogic_async_event_data * data)
+wise_err_t PlatformManagerImpl::WiseEventHandler(void * ctx, system_event_t * event)
 {
     ChipDeviceEvent e = { 0 };
 
-    ChipLogProgress(DeviceLayer, "%s %s", __func__, filogic_event_to_name(event));
+    ChipLogProgress(DeviceLayer, "%s %d", __func__, event->event_id);
 
-    if (event < FILOGIC_EVENT_ID_MAX)
+    if (event->event_id < SYSTEM_EVENT_MAX)
     {
-        e.Type = DeviceEventType::kMtkWiFiEvent;
-        memcpy(&e.Platform.MtkWiFiEvent.event_data, data, sizeof(*data));
-        ChipLogError(DeviceLayer, "event %s", filogic_event_to_name(event));
+        e.Type = DeviceEventType::kSCMSystemEvent;
+        memcpy(&e.Platform.SCMSystemEvent.event, event, sizeof(*event));
+        ChipLogError(DeviceLayer, "event %d", event->event_id);
         (void) sInstance.PostEvent(&e);
+
+        return WISE_OK;
     }
     else
     {
-        ChipLogError(DeviceLayer, "Unhandled event %d", event);
+        ChipLogError(DeviceLayer, "Unhandled event %d", event->event_id);
+        return WISE_FAIL;
     }
 }
-#endif /* __no_stub__ */
 
 } // namespace DeviceLayer
 } // namespace chip
