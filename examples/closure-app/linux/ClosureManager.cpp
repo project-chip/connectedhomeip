@@ -102,17 +102,17 @@ CHIP_ERROR ClosureManager::SetInitialState()
 
     ChipLogProgress(AppServer, "ClosureDimensionEndpoint SetInitialState");
  
-    DataModel::Nullable<GenericDimensionStateStruct> currentState(
+    DataModel::Nullable<GenericDimensionStateStruct> currentState2(
         GenericDimensionStateStruct(MakeOptional(10000), 
                                     MakeOptional(true), 
                                     MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
-    instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(currentState);
+    instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(currentState2);
  
-    DataModel::Nullable<GenericDimensionStateStruct> targetState(
+    DataModel::Nullable<GenericDimensionStateStruct> targetState2(
         GenericDimensionStateStruct(MakeOptional(DataModel::NullNullable), 
                                     MakeOptional(DataModel::NullNullable), 
                                     MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
-    instance.mClosurePanelEndpoint2.GetLogic().SetTargetState(targetState);
+    instance.mClosurePanelEndpoint2.GetLogic().SetTargetState(targetState2);
  
     instance.mClosurePanelEndpoint2.GetLogic().SetResolution(Percent100ths(100));
     instance.mClosurePanelEndpoint2.GetLogic().SetStepValue(1000);
@@ -120,11 +120,11 @@ CHIP_ERROR ClosureManager::SetInitialState()
     instance.mClosurePanelEndpoint2.GetLogic().SetUnitRange(DataModel::NullNullable);
     instance.mClosurePanelEndpoint2.GetLogic().SetOverflow(OverflowEnum::kTopInside);
  
-    ClosureDimension::Structs::RangePercent100thsStruct::Type limitRange{
+    ClosureDimension::Structs::RangePercent100thsStruct::Type limitRange2{
         .min = static_cast<Percent100ths>(0),
         .max = static_cast<Percent100ths>(10000)
     };
-    instance.mClosurePanelEndpoint2.GetLogic().SetLimitRange(limitRange);
+    instance.mClosurePanelEndpoint2.GetLogic().SetLimitRange(limitRange2);
     BitFlags<ClosureDimension::LatchControlModesBitmap> latchControlModes2;
     latchControlModes2.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching).Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
     instance.mClosurePanelEndpoint2.GetLogic().SetLatchControlModes(latchControlModes2);
@@ -132,17 +132,17 @@ CHIP_ERROR ClosureManager::SetInitialState()
 
     ChipLogProgress(AppServer, "ClosureDimensionEndpoint SetInitialState");
  
-    DataModel::Nullable<GenericDimensionStateStruct> currentState(
+    DataModel::Nullable<GenericDimensionStateStruct> currentState3(
         GenericDimensionStateStruct(MakeOptional(10000), 
                                     MakeOptional(true), 
                                     MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
-    instance.mClosurePanelEndpoint3.GetLogic().SetCurrentState(currentState);
- 
-    DataModel::Nullable<GenericDimensionStateStruct> targetState(
+    instance.mClosurePanelEndpoint3.GetLogic().SetCurrentState(currentState3);
+
+    DataModel::Nullable<GenericDimensionStateStruct> targetState3(
         GenericDimensionStateStruct(MakeOptional(DataModel::NullNullable), 
                                     MakeOptional(DataModel::NullNullable), 
                                     MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
-    instance.mClosurePanelEndpoint3.GetLogic().SetTargetState(targetState);
+    instance.mClosurePanelEndpoint3.GetLogic().SetTargetState(targetState3);
  
     instance.mClosurePanelEndpoint3.GetLogic().SetResolution(Percent100ths(100));
     instance.mClosurePanelEndpoint3.GetLogic().SetStepValue(1000);
@@ -150,11 +150,11 @@ CHIP_ERROR ClosureManager::SetInitialState()
     instance.mClosurePanelEndpoint3.GetLogic().SetUnitRange(DataModel::NullNullable);
     instance.mClosurePanelEndpoint3.GetLogic().SetOverflow(OverflowEnum::kTopInside);
 
-    ClosureDimension::Structs::RangePercent100thsStruct::Type limitRange{
+    ClosureDimension::Structs::RangePercent100thsStruct::Type limitRange3{
         .min = static_cast<Percent100ths>(0),
         .max = static_cast<Percent100ths>(10000)
     };
-    instance.mClosurePanelEndpoint3.GetLogic().SetLimitRange(limitRange);
+    instance.mClosurePanelEndpoint3.GetLogic().SetLimitRange(limitRange3);
     BitFlags<ClosureDimension::LatchControlModesBitmap> latchControlModes3;
     latchControlModes3.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching).Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
     instance.mClosurePanelEndpoint3.GetLogic().SetLatchControlModes(latchControlModes3);
@@ -182,8 +182,7 @@ void ClosureManager::Init()
     SetTagList(/* endpoint= */ kClosurePanelEndpoint3,
                Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kClosurePanelEndpoint3TagList));
 
-    VerifyOrDie(SetInitialState() == CHIP_NO_ERROR, 
-                ChipLogError(AppServer, "Failed to set initial state for ClosureManager"));
+    VerifyOrDie(SetInitialState() == CHIP_NO_ERROR);
     TestEventTriggerDelegate * pTestEventDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
 
     if (pTestEventDelegate != nullptr)

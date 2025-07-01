@@ -280,3 +280,4 @@ private:
     bool mIsSetTargetActionInProgress         = false;
     bool mIsStepActionInProgress              = false;
     chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
+};

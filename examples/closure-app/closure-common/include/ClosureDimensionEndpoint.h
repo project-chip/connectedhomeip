@@ -47,7 +47,10 @@ using Protocols::InteractionModel::Status;
 class ClosureDimensionDelegate : public DelegateBase
 {
 public:
-    mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
+    ClosureDimensionDelegate(EndpointId endpoint) : mEndpoint(endpoint)
+    {
+        
+    }
 
     // Override for the DelegateBase Virtual functions
     Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
@@ -171,6 +174,8 @@ public:
      * the completion of the panel motion action.
      */
     void OnPanelMotionActionComplete();
+
+    void UpdateCurrentStateFromTargetState();
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
