@@ -16,7 +16,14 @@
 #
 
 """
-This module contains classes and functions related to device event and attribute repporting
+This module provides classes to manage and validate subscription-based event and attribute reporting.
+
+Classes:
+    EventCallback: Handles subscription to events.
+    AtributeCallback: Manages subscriptions to specific attributes.
+
+Both classes allow tests to start and manage subscriptions, queue received updates asynchronously and 
+block until epected reports are received or fail on timeouts
 """
 
 import asyncio
@@ -36,21 +43,23 @@ from mobly import asserts
 
 
 class EventCallback:
-    def __init__(self, *, name: Optional[str] = None, expected_cluster: Optional[ClusterObjects.Cluster] = None, expected_cluster_id: Optional[int] = None, expected_event_id: Optional[int] = None):
-        # if expected_cluster is not None:
-        #     self._expected_cluster = expected_cluster
-        #     self._expected_cluster_id = expected_cluster.id
-        #     self._name = None
-        #     self._expected_event_id = None
-        # elif expected_cluster_id is not None and expected_event_id is not None and name is not None:
-        #     self._expected_cluster = None
-        #     self._name = name
-        #     self._expected_cluster_id = expected_cluster_id
-        #     self._expected_event_id = expected_event_id
-        # else:
-        #     raise ValueError("Failed argument inputs in EventCallback. You should use Cluster or ClusterId, EventId and name")
-        # self._q: queue.Queue = queue.Queue()
+    """
+    Handles subscription-based event reporting. It sets up and manages event subscriptions for a specific cluster or event ID,
+    captures incoming event reports through a callback and stores them for validation and processing.
 
+    It supports two usage modes:
+        1. Cluster mode: Pass a 'ClusterObjects.Cluster' to subscribe to all events in a cluster.
+        2. Event ID mode: Pass 'expected_cluster_id', 'expected_event_id' and 'name' to subscribe to a specific event.
+
+    Attributes:
+        _expected_cluster: The cluster object to match.
+        _expected_cluster_id: The cluster ID to match against incoming event headers.
+        _expected_event_id: The specific event ID to match.
+        _name: Name for identification in logs.
+        _q: Internal queue that stores matching EventReadResult objects.
+    """
+
+    def __init__(self, *, name: Optional[str] = None, expected_cluster: Optional[ClusterObjects.Cluster] = None, expected_cluster_id: Optional[int] = None, expected_event_id: Optional[int] = None):
         is_cluster_mode = expected_cluster is not None
         is_id_mode = all(x is not None for x in (expected_cluster_id, expected_event_id, name))
 
@@ -65,15 +74,16 @@ class EventCallback:
         self._q: queue.Queue = queue.Queue()
 
     def __call__(self, event_result: EventReadResult, transaction: SubscriptionTransaction):
-        # """This is the subscription callback when an event is received.
-        #    It checks the event is from the expected_cluster and then posts it into the queue for later processing."""
-        # if event_result.Status == Status.Success and event_result.Header.ClusterId == self._expected_cluster_id:
-        #     logging.info(
-        #         f'Got subscription report for event on cluster {self._expected_cluster}: {event_result.Data}')
-        #     self._q.put(event_result)
-        #     return
-        # if self._expected_cluster_id == event_result.Header.ClusterId and self._expected_event_id == event_result.Header.EventId:
-        #     self._q.put(event_result)
+        """
+        Callback invoked when an event report is received via subscription. This enqueued the event for later processing.
+
+        Parameters:
+            event_result (EventReadResult): The result of the received event (includinng header and payload).
+            transaction (SubscriptionTransaction): Associated subscription transaction.
+
+        Notes:
+            If an expected_event_id is set, only events with that ID will be accepted.
+        """
 
         if event_result.Status != Status.Success:
             return
@@ -156,6 +166,19 @@ class EventCallback:
 
 
 class AttributeCallback:
+    """
+    Callback class to handle attribute subscription reports. This class manages the reception. filtering and queuing of attribute update reports.
+
+    It provides methods to wait for specific updates, validate expected final values and track changes for verification.
+
+    Attributes;
+        _expected_cluster: The cluster type to subscribe to.
+        _expected_attribute: The attribute within the cluster expected to receive updates.
+        _q: Queue storing AttributeValue instances for received updates.
+        _attribute_reports: Dictionary holding history of all received reports by attribute.
+        _attribute_report_counts: Dictionary counting the number of reports received per attribute.
+    """
+
     def __init__(self, expected_cluster: ClusterObjects.Cluster = None, expected_attribute: ClusterObjects.ClusterAttributeDescriptor = None):
         self._expected_cluster = expected_cluster
         self._expected_attribute = expected_attribute
@@ -207,31 +230,16 @@ class AttributeCallback:
             pass
 
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
-        # """This is the subscription callback when an attribute report is received.
-        #    It checks the report is from the expected_cluster and then posts it into the queue for later processing."""
-        # valid_report = False
-        # if path.ClusterType == self._expected_cluster:
-        #     if self._expected_attribute is not None:
-        #         valid_report = path.ClusterId == self._expected_attribute.cluster_id
-        #     else:
-        #         valid_report = True
-        # elif path.AttributeType == self._expected_attribute:
-        #     logging.info(f"[AttributeCallback] Attribute update callback for {path.AttributeType}")
-        #     q = (path, transaction)
-        #     self._q.put(q)
-        #
-        # if valid_report:
-        #     data = transaction.GetAttribute(path)
-        #     value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
-        #                            value=data, timestamp_utc=datetime.now(timezone.utc))
-        #     logging.info(f"Got subscription report for {path.AttributeType}: {data}")
-        #     self._q.put(value)
-        #     with self._lock:
-        #         self._attribute_report_counts[path.AttributeType] += 1
-        #         self._attribute_reports[path.AttributeType].append(value)
+        """
+        Callback invoked when an attribute  repoort is received via subscription.
 
-        # if (path.ClusterType == self._expected_cluster or path.AttributeType == self._expected_attribute):
-        #     return
+        It extracts tha value using the transaction object, wraps into an AttributeValue, enqueues it for later processing,
+        and stores it in internal history for verification.
+
+        Parameters:
+            path (TypedAttributePath): Contains cluster and attribute metadata for the report.
+            transaction (SubscriptionTransaction): Provides access to the actual reported value.
+        """
 
         valid_report = False
         if path.ClusterType == self._expected_cluster:
@@ -254,6 +262,12 @@ class AttributeCallback:
                     self._attribute_reports[path.AttributeType].append(value)
 
     def wait_for_attribute_report(self):
+        """
+        Blocks and waits for a single attribute report to arrive in the queue.
+
+        This method dequeues one report, validates it and return its value.
+        """
+
         try:
             item = self._q.get(block=True, timeout=10)
             attribute_value = item.value
@@ -362,22 +376,21 @@ class AttributeCallback:
         asserts.fail("Did not find all expected reports before time-out")
 
     def await_sequence_of_reports(self, attribute: TypedAttributePath, sequence: list[Any], timeout_sec: float) -> None:
-        # """Await a given expected sequence of attribute reports in the accumulator for the endpoint associated.
-        #
-        # Args:
-        #   - attribute: attribute to match for reports to check.
-        #   - sequence: list of attribute values in order that are expected.
-        #   - timeout_sec: number of seconds to wait for.
-        #
-        # *** WARNING: The queue contains every report since the sub was established. Use
-        #     self.reset() to make it empty. ***
-        #
-        # This will fail current Mobly test with assertion failure if the data is not as expected in order.
-        #
-        # Returns nothing on success so the test can go on.
-        # """
-        # await_sequence_of_reports(report_queue=self.attribute_queue, endpoint_id=self._endpoint_id,
-        #                           attribute=attribute, sequence=sequence, timeout_sec=timeout_sec)
+        """Await a given expected sequence of attribute reports in the accumulator for the endpoint associated.
+
+        Args:
+          - attribute: attribute to match for reports to check.
+          - sequence: list of attribute values in order that are expected.
+          - timeout_sec: number of seconds to wait for.
+
+        *** WARNING: The queue contains every report since the sub was established. Use
+            self.reset() to make it empty. ***
+
+        This will fail current Mobly test with assertion failure if the data is not as expected in order.
+
+        Returns nothing on success so the test can go on.
+        """
+
         start_time = time.time()
         elapsed = 0.0
         time_remaining = timeout_sec
