@@ -31,18 +31,11 @@
 #       --endpoint 1
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
-import logging
-import random
-
-import chip
 import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
 from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
+from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-
 
 class TC_ACL_2_9(MatterBaseTest):
     async def read_and_check_min_value(self, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor, min_value: int):
