@@ -209,6 +209,12 @@ public:
     Status ScheduleCheckOnEnabledTimeout();
 
     /**
+     * @brief   Helper function to handle timer expiration when in enabled state
+     * @param matterEpoch Current time in Matter epoch seconds
+     */
+    void HandleEnabledStateExpiration(uint32_t matterEpoch);
+
+    /**
      * @brief   Helper function to get know if the EV is plugged in based on state
      *          (regardless of if it is actually transferring energy)
      */
