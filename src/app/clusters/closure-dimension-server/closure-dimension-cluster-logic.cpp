@@ -72,7 +72,7 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance, const Clus
 // When CurrentState.Speed changes, or
 // When CurrentState.Latch changes.
 
-//At present, QuieterReportingAttribute class doesnot support Stucts. 
+//At present, QuieterReportingAttribute class doesnot support Stucts.
 // so each field of current state struct are quiet handled independently.
 // At present , we are using QuieterReportingAttribute class for Position only.
 // Latch and Speed changes are directly handled by the cluster logic seperately.
