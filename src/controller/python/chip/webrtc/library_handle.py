@@ -16,11 +16,10 @@
 #
 
 import ctypes
+
 from ctypes import c_char_p, c_void_p
 
-from chip import native
-
-from ..native import PyChipError
+from ..native import GetLibraryHandle, HandleFlags, NativeLibraryHandleMethodArguments, PyChipError
 
 
 def _GetWebRTCLibraryHandle() -> ctypes.CDLL:
@@ -32,12 +31,12 @@ def _GetWebRTCLibraryHandle() -> ctypes.CDLL:
 
     # Getting a handle without requiring init, as webrtc methods
     # do not require chip stack startup
-    handle = chip.native.GetLibraryHandle(chip.native.HandleFlags(0))
+    handle = GetLibraryHandle(HandleFlags(0))
 
     # Uses one of the type decorators as an indicator for everything being
     # initialized.
     if not handle.pychip_webrtc_CreateWebrtcClient.argtypes:
-        setter = chip.native.NativeLibraryHandleMethodArguments(handle)
+        setter = NativeLibraryHandleMethodArguments(handle)
         setter.Set('pychip_webrtc_client_create',
                    ctypes.c_void_p, [None])
         setter.Set('pychip_webrtc_client_destroy',
