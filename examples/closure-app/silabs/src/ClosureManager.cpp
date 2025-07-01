@@ -245,10 +245,9 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStopCommand()
     return Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status
-ClosureManager::OnMoveToCommand(const Optional<TargetPositionEnum> position,
-                                const Optional<bool> latch,
-                                const Optional<Globals::ThreeLevelAutoEnum> speed)
+chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(const Optional<TargetPositionEnum> position,
+                                                                          const Optional<bool> latch,
+                                                                          const Optional<Globals::ThreeLevelAutoEnum> speed)
 {
 
     // Update the target state for the closure panels based on the MoveTo command.
@@ -363,7 +362,6 @@ void ClosureManager::HandleClosureMotionAction()
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
-
     DataModel::Nullable<GenericDimensionStateStruct> ep2CurrentState;
     DataModel::Nullable<GenericDimensionStateStruct> ep3CurrentState;
 
@@ -378,7 +376,6 @@ void ClosureManager::HandleClosureMotionAction()
                    ChipLogError(AppServer, "Failed to get target state for Endpoint 2"));
     VerifyOrReturn(ep3.GetLogic().GetTargetState(ep3TargetState) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to get target state for Endpoint 3"));
-
 
     VerifyOrReturn(!ep2CurrentState.IsNull(),
                    ChipLogError(AppServer, "MoveToCommand failed due to Null value Current state on Endpoint 2"));
@@ -440,18 +437,15 @@ void ClosureManager::HandleClosureMotionAction()
     DataModel::Nullable<GenericOverallCurrentState> ep1CurrentState;
     DataModel::Nullable<GenericOverallTargetState> ep1TargetState;
 
-
     VerifyOrReturn(ep1.GetLogic().GetOverallCurrentState(ep1CurrentState) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to get current state for Endpoint 1"));
     VerifyOrReturn(ep1.GetLogic().GetOverallTargetState(ep1TargetState) == CHIP_NO_ERROR,
                    ChipLogError(AppServer, "Failed to get target state for Endpoint 1"));
 
-
     VerifyOrReturn(!ep1CurrentState.IsNull(),
                    ChipLogError(AppServer, "MoveToCommand failed due to Null value Current state on Endpoint 1"));
     VerifyOrReturn(!ep1TargetState.IsNull(),
                    ChipLogError(AppServer, "MoveToCommand failed due to Null value Target state on Endpoint 1"));
-
 
     // If both endpoints have reached their target positions, we can consider the closure motion action as complete.
     // Before calling HandleClosureActionComplete, we need to check if a latch action is needed.
