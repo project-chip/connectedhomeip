@@ -20,20 +20,14 @@ inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
 namespace SupportedDrynessLevels {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SupportedDrynessLevels::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SupportedDrynessLevels::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace SupportedDrynessLevels
 namespace SelectedDrynessLevel {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SelectedDrynessLevel::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(SelectedDrynessLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace SelectedDrynessLevel
 
 } // namespace Attributes

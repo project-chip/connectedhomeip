@@ -42,6 +42,7 @@ source_set("mock_model") {
   # this ties in the codegen model to an actual ember implementation
   public_deps += [
     ":ember_extra_files",
+    "${chip_root}/src/app:required-privileges",
     "${chip_root}/src/app/util/mock:mock_ember",
     "${chip_root}/src/lib/core:string-builder-adapters",
   ]

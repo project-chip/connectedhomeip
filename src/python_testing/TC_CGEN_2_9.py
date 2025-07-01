@@ -61,7 +61,9 @@ class TC_CGEN_2_9(MatterBaseTest):
             dev_ctrl=commissioner,
             node_id=self.dut_node_id,
             endpoint=ROOT_ENDPOINT_ID,
-            attribute=Clusters.OperationalCredentials.Attributes.Fabrics)
+            attribute=Clusters.OperationalCredentials.Attributes.Fabrics,
+            fabricFiltered=False)
+
         logging.info(f"Fabrics table on DUT: {fabrics}")
 
         # Re-order the list of fabrics so that the test harness admin fabric is removed last
@@ -174,7 +176,7 @@ class TC_CGEN_2_9(MatterBaseTest):
         # Step 6: Put device in commissioning mode (requiring user input, so skip in CI)
         self.step(6)
         if not self.check_pics('PICS_USER_PROMPT'):
-            self.skip_all_remaining_steps(7)
+            self.mark_all_remaining_steps_skipped(7)
             return
 
         self.wait_for_user_input(prompt_msg="Set the DUT into commissioning mode")

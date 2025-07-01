@@ -121,7 +121,9 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(WiFiStationMode val)
 
     if (val != kWiFiStationMode_ApplicationControlled)
     {
+        chip::DeviceLayer::PlatformMgr().LockChipStack();
         DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
 
     if (mWiFiStationMode != val)

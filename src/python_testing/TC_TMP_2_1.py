@@ -13,6 +13,23 @@
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
+#
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   run1:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
@@ -39,7 +56,7 @@ class TC_TMP_2_1(MatterBaseTest):
                      "Verify that -27315 ≤ `min_measured_value` < `max_bound`"),
             TestStep(6, "TH reads the MeasuredValue attribute from the DUT",
                      "Verify that the DUT response contains either null or a int16 where `min_bound` ≤ MeasuredValue ≤ `max_bound`."),
-            TestStep(7, "TH reads the Tolerance attribute from the DUT",
+            TestStep(7, "If the tolerance attribute is supported, TH reads the Tolerance attribute from the DUT",
                      "Verify that Tolerance is in the range of 0 to 2048"),
         ]
 
@@ -87,10 +104,11 @@ class TC_TMP_2_1(MatterBaseTest):
                 measured_value, max_bound, "Measured value is greater than max bound")
 
         self.step(7)
-        tolerance = await self.read_single_attribute_check_success(cluster=cluster, attribute=attr.Tolerance)
-        asserts.assert_greater_equal(tolerance, 0, "Tolerance is less than 0")
-        asserts.assert_less_equal(
-            tolerance, 2048, "Tolerance is greater than 2048")
+        if await self.attribute_guard(self.get_endpoint(), attr.Tolerance):
+            tolerance = await self.read_single_attribute_check_success(cluster=cluster, attribute=attr.Tolerance)
+            asserts.assert_greater_equal(tolerance, 0, "Tolerance is less than 0")
+            asserts.assert_less_equal(
+                tolerance, 2048, "Tolerance is greater than 2048")
 
 
 if __name__ == "__main__":

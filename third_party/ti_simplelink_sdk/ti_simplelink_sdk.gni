@@ -14,6 +14,7 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/openthread.gni")
 
 import("//build_overrides/freertos.gni")
 import("//build_overrides/mbedtls.gni")
@@ -61,9 +62,11 @@ template("ti_sysconfig") {
       "-fno-unwind-tables",
     ]
     cflags = [ "-Wno-sign-compare" ]
-    if (ti_simplelink_device == "") {
+    if (ti_simplelink_board == "LP_EM_CC1354P10_6" ||
+        ti_simplelink_board == "LP_EM_CC1354P10_1") {
       defines = [ "DeviceFamily_CC13X4" ]
-    } else {
+    } else if (ti_simplelink_board == "LP_EM_CC2674P10" ||
+               ti_simplelink_board == "CC2674R10") {
       defines = [ "DeviceFamily_CC26X4" ]
     }
   }
@@ -187,14 +190,15 @@ template("ti_simplelink_sdk") {
   config("cc13x4_26x4_sdk_config") {
     libs = [ "${ti_simplelink_sdk_root}/source/ti/drivers/rf/lib/gcc/${ti_simplelink_isa}/rf_multiMode_${ti_simplelink_soc_family}.a" ]
     defines = [ "FLASH_ONLY_BUILD" ]
-    if (ti_simplelink_device == "") {
+    if (ti_simplelink_board == "LP_EM_CC1354P10_1" ||
+        ti_simplelink_board == "LP_EM_CC1354P10_6") {
       defines += [ "DeviceFamily_CC13X4" ]
-    } else {
+    } else if (ti_simplelink_board == "LP_EM_CC2674P10" ||
+               ti_simplelink_board == "CC2674R10") {
       defines += [ "DeviceFamily_CC26X4" ]
     }
     if (ti_simplelink_board == "LP_EM_CC1354P10_1" ||
-        (ti_simplelink_board == "CC2674" &&
-         ti_simplelink_device == "CC2674R10RGZ")) {
+        ti_simplelink_board == "CC2674R10") {
       defines += [ "EM_CC1354P10_1_LP" ]
     }
   }
@@ -305,7 +309,7 @@ template("ti_simplelink_sdk") {
     configs -= [ "${build_root}/config/compiler:std_default" ]
     configs += [ ":${sdk_target_name}_posix_config" ]
     sources = [
-      "${chip_root}/src/platform/cc13xx_26xx/memory.c",
+      "${chip_root}/src/platform/ti/cc13xx_26xx/memory.c",
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/clock.c",
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/mqueue.c",
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread.c",
@@ -347,7 +351,7 @@ template("ti_simplelink_sdk") {
       configs -= [ "${build_root}/config/compiler:std_default" ]
       configs += [ ":${sdk_target_name}_posix_config" ]
       sources = [
-        "${chip_root}/src/platform/cc13xx_26xx/nvocmp.c",
+        "${chip_root}/src/platform/ti/cc13xx_26xx/nvocmp.c",
         "${ti_simplelink_sdk_root}/source/ti/common/nv/crc.c",
       ]
 
@@ -383,15 +387,13 @@ template("ti_simplelink_sdk") {
     ]
     libs += [ "${ti_simplelink_sdk_root}/source/ti/dmm/lib/gcc/m4f/libdmmlib_freertos.a" ]
     if (ti_simplelink_board == "LP_EM_CC1354P10_1" ||
-        (ti_simplelink_board == "CC2674" &&
-         ti_simplelink_device == "CC2674R10RGZ")) {
+        ti_simplelink_board == "CC2674R10") {
       libs += [
         "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_1/OneLib.a",
         "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_1/StackWrapper.a",
       ]
     } else if (ti_simplelink_board == "LP_EM_CC1354P10_6" ||
-               (ti_simplelink_board == "CC2674" &&
-                ti_simplelink_device == "CC2674P10RGZ")) {
+               ti_simplelink_board == "LP_EM_CC2674P10") {
       libs += [
         "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_6/OneLib.a",
         "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/libraries/cc1354p10_6/StackWrapper.a",
@@ -414,8 +416,8 @@ template("ti_simplelink_sdk") {
       "${ti_simplelink_sdk_root}/source",
 
       # Eclipse the SDK config header from DMM
-      "${chip_root}/src/platform/cc13x4_26x4",
-      "${chip_root}/src/platform/cc13xx_26xx",
+      "${chip_root}/src/platform/ti/cc13x4_26x4",
+      "${chip_root}/src/platform/ti/cc13xx_26xx",
 
       # CHIPoBLE Added include dirs
       "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/",
@@ -523,9 +525,9 @@ template("ti_simplelink_sdk") {
       ]
 
       sources = [
-        "${chip_root}/src/platform/cc13xx_26xx/TI_heap_wrapper.c",
-        "${chip_root}/src/platform/cc13xx_26xx/chipOBleProfile.c",
-        "${chip_root}/src/platform/cc13xx_26xx/icall_FreeRTOS.c",
+        "${chip_root}/src/platform/ti/cc13xx_26xx/TI_heap_wrapper.c",
+        "${chip_root}/src/platform/ti/cc13xx_26xx/chipOBleProfile.c",
+        "${chip_root}/src/platform/ti/cc13xx_26xx/icall_FreeRTOS.c",
         "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/freertos/bget.c",
         "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/rcosc/rcosc_calibration.c",
         "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/ble_remote_display/stack/osal_icall_ble.c",
@@ -536,7 +538,7 @@ template("ti_simplelink_sdk") {
 
       if (ti_simplelink_device_family == "cc13x4_26x4") {
         sources += [
-          "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/ble_user_config.c",
+          "${chip_root}/src/platform/ti/cc13xx_26xx/cc13x4_26x4/ble_user_config.c",
           "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/host/gatt_uuid.c",
           "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/host/gattservapp_util.c",
           "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/icall/app/icall_api_lite.c",
@@ -547,7 +549,8 @@ template("ti_simplelink_sdk") {
           "${ti_simplelink_sdk_root}/source/ti/ble5stack_flash/rom/agama_r1/rom_init.c",
         ]
 
-        include_dirs += [ "${chip_root}/src/platform/cc13xx_26xx/cc13x4_26x4/" ]
+        include_dirs +=
+            [ "${chip_root}/src/platform/ti/cc13xx_26xx/cc13x4_26x4/" ]
       }
 
       configs -= [ "${build_root}/config/compiler:std_default" ]
@@ -570,6 +573,7 @@ template("ti_simplelink_sdk") {
     public_deps = [
       ":${sdk_target_name}_dpl",
       ":${sdk_target_name}_freertos",
+      "${openthread_root}/src/core:libopenthread_core_headers",
     ]
     if (ti_simplelink_device_family == "cc13x4_26x4") {
       public_deps += [

@@ -419,7 +419,21 @@ class DeviceMappingTest(MatterBaseTest):
         if args.dm_xml:
             xml_clusters, problems = build_xml_clusters(Path(f"{args.dm_xml}/clusters"))
         else:
-            xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.kMaster)
+            specVersionResponse = await self.default_controller.ReadAttribute(self.dut_node_id, [(rootNodeEndpointID, Clusters.BasicInformation.Attributes.SpecificationVersion)])
+            specVersion = specVersionResponse[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.SpecificationVersion]
+            console.print(f"Specification version received from device: {specVersion:x}")
+
+            if specVersion == 0x1030000:
+                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
+            elif specVersion == 0x1040000:
+                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
+            elif specVersion == 0x1040100:
+                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_1)
+            elif specVersion == 0x1050000:
+                xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
+            else:
+                console.print("FAILURE: Specification version reported by device not supported")
+                return
 
         # Run device mapping function
         await DeviceMapping(self.default_controller, self.dut_node_id, outputPathStr)

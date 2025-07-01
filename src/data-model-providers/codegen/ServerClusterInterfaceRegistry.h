@@ -21,7 +21,8 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 
-#include <iterator>
+#include <cstdint>
+#include <new>
 
 namespace chip {
 namespace app {
@@ -44,6 +45,87 @@ struct ServerClusterRegistration
     // we generally do not want to allow copies as those may have different "next" entries.
     ServerClusterRegistration(const ServerClusterRegistration & other)             = delete;
     ServerClusterRegistration & operator=(const ServerClusterRegistration & other) = delete;
+};
+
+/// It is very typical to join together a registration and a Server
+/// This templates makes this registration somewhat easier/standardized.
+template <typename SERVER_CLUSTER>
+struct RegisteredServerCluster
+{
+    template <typename... Args>
+    RegisteredServerCluster(Args &&... args) : cluster(std::forward<Args>(args)...), registration(cluster)
+    {}
+
+    [[nodiscard]] constexpr ServerClusterRegistration & Registration() { return registration; }
+    [[nodiscard]] constexpr SERVER_CLUSTER & Cluster() { return cluster; }
+
+private:
+    SERVER_CLUSTER cluster;
+    ServerClusterRegistration registration;
+};
+
+/// Lazy-construction of a RegisteredServerCluster to allow at-runtime lifetime management
+///
+/// If using this class, manamement of Create/Destroy MUST be done correctly.
+template <typename SERVER_CLUSTER>
+struct LazyRegisteredServerCluster
+{
+public:
+    constexpr LazyRegisteredServerCluster() = default;
+    ~LazyRegisteredServerCluster()
+    {
+        if (IsConstructed())
+        {
+            Destroy();
+        }
+    }
+
+    void Destroy()
+    {
+        VerifyOrDie(IsConstructed());
+        Registration().~ServerClusterRegistration();
+        memset(mRegistration, 0, sizeof(mRegistration));
+
+        Cluster().~SERVER_CLUSTER();
+        memset(mCluster, 0, sizeof(mCluster));
+    }
+
+    template <typename... Args>
+    void Create(Args &&... args)
+    {
+        VerifyOrDie(!IsConstructed());
+
+        new (mCluster) SERVER_CLUSTER(std::forward<Args>(args)...);
+        new (mRegistration) ServerClusterRegistration(Cluster());
+    }
+
+    [[nodiscard]] constexpr bool IsConstructed() const
+    {
+        // mRegistration is supposed to containt a serverClusterInterface that is NOT null
+        // so we check for non-zero content. This relies that nullptr is 0
+        return Registration().serverClusterInterface != nullptr;
+    }
+
+    [[nodiscard]] constexpr ServerClusterRegistration & Registration()
+    {
+        return *std::launder(reinterpret_cast<ServerClusterRegistration *>(mRegistration));
+    }
+
+    [[nodiscard]] constexpr const ServerClusterRegistration & Registration() const
+    {
+        return *std::launder(reinterpret_cast<const ServerClusterRegistration *>(mRegistration));
+    }
+
+    [[nodiscard]] constexpr SERVER_CLUSTER & Cluster() { return *std::launder(reinterpret_cast<SERVER_CLUSTER *>(mCluster)); }
+
+    [[nodiscard]] constexpr const SERVER_CLUSTER & Cluster() const
+    {
+        return *std::launder(reinterpret_cast<const SERVER_CLUSTER *>(mCluster));
+    }
+
+private:
+    alignas(SERVER_CLUSTER) uint8_t mCluster[sizeof(SERVER_CLUSTER)]                            = { 0 };
+    alignas(ServerClusterRegistration) uint8_t mRegistration[sizeof(ServerClusterRegistration)] = { 0 };
 };
 
 /// Allows registering and retrieving ServerClusterInterface instances for specific cluster paths.
@@ -125,6 +207,7 @@ public:
     /// Requirements:
     ///   - entry MUST NOT be part of any other registration
     ///   - paths MUST be part of the same endpoint (requirement for codegen server cluster interface implementations)
+    ///
     ///   - LIFETIME of entry must outlive the Registry (or entry must be unregistered)
     ///
     /// There can be only a single registration for a given `endpointId/clusterId` path.

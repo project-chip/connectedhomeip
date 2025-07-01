@@ -20,6 +20,7 @@
 #include <data-model-providers/codegen/tests/EmberReadWriteOverride.h>
 
 #include <access/AccessControl.h>
+#include <access/Privilege.h>
 #include <access/SubjectDescriptor.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -85,6 +86,8 @@ void InitDataModelHandler() {}
 
 namespace {
 
+constexpr EventId kTestEventId = 0x321;
+
 constexpr AttributeId kAttributeIdReadOnly   = 0x3001;
 constexpr AttributeId kAttributeIdTimedWrite = 0x3002;
 
@@ -104,6 +107,9 @@ constexpr uint8_t kDeviceTypeId2Version = 11;
 constexpr DeviceTypeId kDeviceTypeId3   = 3;
 constexpr uint8_t kDeviceTypeId3Version = 33;
 
+constexpr DeviceTypeId kDeviceTypeId4   = 1123;
+constexpr uint8_t kDeviceTypeId4Version = 33;
+
 constexpr uint8_t kNamespaceID1 = 123;
 constexpr uint8_t kTag1         = 10;
 constexpr char kLabel1[]        = "Label1";
@@ -119,6 +125,7 @@ static_assert(kEndpointIdThatIsMissing != kInvalidEndpointId);
 static_assert(kEndpointIdThatIsMissing != kMockEndpoint1);
 static_assert(kEndpointIdThatIsMissing != kMockEndpoint2);
 static_assert(kEndpointIdThatIsMissing != kMockEndpoint3);
+static_assert(kEndpointIdThatIsMissing != kMockEndpoint4);
 
 bool operator==(const Access::SubjectDescriptor & a, const Access::SubjectDescriptor & b)
 {
@@ -563,6 +570,18 @@ const MockNodeConfig gTestNodeConfig({
             MockAttributeConfig(kAttributeIdTimedWrite, ZCL_INT32S_ATTRIBUTE_TYPE, MATTER_ATTRIBUTE_FLAG_WRITABLE | MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE),
         }),
     }),
+    MockEndpointConfig(kMockEndpoint4, {
+        MockClusterConfig(MockClusterId(4), {
+            ClusterRevision::Id, FeatureMap::Id, MockAttributeId(4),
+            MockAttributeConfig(Clusters::Descriptor::Attributes::EndpointUniqueID::Id, ZCL_CHAR_STRING_ATTRIBUTE_TYPE),
+        }),
+    }, {
+        { kDeviceTypeId4, kDeviceTypeId4Version },
+    },
+    {}, // Empty semantic tags
+    EndpointComposition::kTree,
+    chip::CharSpan("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01", strlen("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01")) // Add endpointUniqueID
+    ),
 });
 // clang-format on
 
@@ -805,6 +824,14 @@ public:
 
     void TestIncreaseDataVersion() { IncreaseDataVersion(); }
     void TestNotifyAttributeChanged(AttributeId attributeId) { NotifyAttributeChanged(attributeId); }
+
+    CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) override
+    {
+        eventInfo.readPrivilege = mEventInfoFakePrivilege;
+        return CHIP_NO_ERROR;
+    }
+
+    Access::Privilege mEventInfoFakePrivilege = Access::Privilege::kView;
 };
 
 template <typename T, EmberAfAttributeType ZclType>
@@ -1000,6 +1027,8 @@ void TestEmberScalarTypeWriteNullValueToNullable()
     ASSERT_EQ(model.WriteAttribute(test.GetRequest(), decoder), CHIP_ERROR_WRONG_TLV_TYPE);
 }
 
+} // namespace
+
 uint16_t ReadLe16(const void * buffer)
 {
     const uint8_t * p = reinterpret_cast<const uint8_t *>(buffer);
@@ -1011,8 +1040,6 @@ void WriteLe16(void * buffer, uint16_t value)
     uint8_t * p = reinterpret_cast<uint8_t *>(buffer);
     chip::Encoding::LittleEndian::Write16(p, value);
 }
-
-} // namespace
 
 TEST_F(TestCodegenModelViaMocks, IterateOverEndpoints)
 {
@@ -1026,7 +1053,7 @@ TEST_F(TestCodegenModelViaMocks, IterateOverEndpoints)
 
     auto endpoints = endpointsBuilder.TakeBuffer();
 
-    ASSERT_EQ(endpoints.size(), 3u);
+    ASSERT_EQ(endpoints.size(), 4u);
 
     EXPECT_EQ(endpoints[0].id, kMockEndpoint1);
     EXPECT_EQ(endpoints[0].parentId, kInvalidEndpointId);
@@ -1138,26 +1165,26 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAttributes)
     ASSERT_EQ(attributes.size(), 7u);
 
     ASSERT_EQ(attributes[0].attributeId, ClusterRevision::Id);
-    ASSERT_FALSE(attributes[0].flags.Has(AttributeQualityFlags::kListAttribute));
+    ASSERT_FALSE(attributes[0].HasFlags(AttributeQualityFlags::kListAttribute));
 
     ASSERT_EQ(attributes[1].attributeId, FeatureMap::Id);
-    ASSERT_FALSE(attributes[1].flags.Has(AttributeQualityFlags::kListAttribute));
+    ASSERT_FALSE(attributes[1].HasFlags(AttributeQualityFlags::kListAttribute));
 
     ASSERT_EQ(attributes[2].attributeId, MockAttributeId(1));
-    ASSERT_FALSE(attributes[2].flags.Has(AttributeQualityFlags::kListAttribute));
+    ASSERT_FALSE(attributes[2].HasFlags(AttributeQualityFlags::kListAttribute));
 
     ASSERT_EQ(attributes[3].attributeId, MockAttributeId(2));
-    ASSERT_TRUE(attributes[3].flags.Has(AttributeQualityFlags::kListAttribute));
+    ASSERT_TRUE(attributes[3].HasFlags(AttributeQualityFlags::kListAttribute));
 
     // Ends with global list attributes
     ASSERT_EQ(attributes[4].attributeId, GeneratedCommandList::Id);
-    ASSERT_TRUE(attributes[4].flags.Has(AttributeQualityFlags::kListAttribute));
+    ASSERT_TRUE(attributes[4].HasFlags(AttributeQualityFlags::kListAttribute));
 
     ASSERT_EQ(attributes[5].attributeId, AcceptedCommandList::Id);
-    ASSERT_TRUE(attributes[5].flags.Has(AttributeQualityFlags::kListAttribute));
+    ASSERT_TRUE(attributes[5].HasFlags(AttributeQualityFlags::kListAttribute));
 
     ASSERT_EQ(attributes[6].attributeId, AttributeList::Id);
-    ASSERT_TRUE(attributes[6].flags.Has(AttributeQualityFlags::kListAttribute));
+    ASSERT_TRUE(attributes[6].HasFlags(AttributeQualityFlags::kListAttribute));
 }
 
 TEST_F(TestCodegenModelViaMocks, FindAttribute)
@@ -1177,26 +1204,27 @@ TEST_F(TestCodegenModelViaMocks, FindAttribute)
     ASSERT_FALSE(finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), MockAttributeId(10))).has_value());
 
     // valid info
-    std::optional<AttributeEntry> info = finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), FeatureMap::Id));
-    ASSERT_TRUE(info.has_value());
-    EXPECT_FALSE(info->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
+    std::optional<AttributeEntry> info1 = finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), FeatureMap::Id));
+    ASSERT_TRUE(info1.has_value());
+    EXPECT_FALSE(info1->HasFlags(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
 
     // Mocks always set everything as R/W with administrative privileges
-    EXPECT_EQ(info->readPrivilege, chip::Access::Privilege::kAdminister);  // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_EQ(info->writePrivilege, chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info1->GetReadPrivilege(), chip::Access::Privilege::kAdminister);  // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info1->GetWritePrivilege(), chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
 
-    info = finder.Find(ConcreteAttributePath(kMockEndpoint2, MockClusterId(2), MockAttributeId(2)));
-    ASSERT_TRUE(info.has_value());
-    EXPECT_TRUE(info->flags.Has(AttributeQualityFlags::kListAttribute));   // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_EQ(info->readPrivilege, chip::Access::Privilege::kAdminister);  // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_EQ(info->writePrivilege, chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
+    std::optional<AttributeEntry> info2 = finder.Find(ConcreteAttributePath(kMockEndpoint2, MockClusterId(2), MockAttributeId(2)));
+    ASSERT_TRUE(info2.has_value());
+    EXPECT_TRUE(info2->HasFlags(AttributeQualityFlags::kListAttribute));         // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info2->GetReadPrivilege(), chip::Access::Privilege::kAdminister);  // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info2->GetWritePrivilege(), chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
 
     // test a read-only attribute, which will not have a write privilege
-    info = finder.Find(ConcreteAttributePath(kMockEndpoint3, MockClusterId(3), kReadOnlyAttributeId));
-    ASSERT_TRUE(info.has_value());
-    EXPECT_FALSE(info->flags.Has(AttributeQualityFlags::kListAttribute)); // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_EQ(info->readPrivilege, chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
-    EXPECT_FALSE(info->writePrivilege.has_value());                       // NOLINT(bugprone-unchecked-optional-access)
+    std::optional<AttributeEntry> info3 =
+        finder.Find(ConcreteAttributePath(kMockEndpoint3, MockClusterId(3), kReadOnlyAttributeId));
+    ASSERT_TRUE(info3.has_value());
+    EXPECT_FALSE(info3->HasFlags(AttributeQualityFlags::kListAttribute));       // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_EQ(info3->GetReadPrivilege(), chip::Access::Privilege::kAdminister); // NOLINT(bugprone-unchecked-optional-access)
+    EXPECT_FALSE(info3->GetWritePrivilege().has_value());                       // NOLINT(bugprone-unchecked-optional-access)
 }
 
 // global attributes are EXPLICITLY supported
@@ -1207,17 +1235,18 @@ TEST_F(TestCodegenModelViaMocks, GlobalAttributeInfo)
 
     AttributeFinder finder(&model);
 
-    std::optional<AttributeEntry> info = finder.Find(
+    std::optional<AttributeEntry> info1 = finder.Find(
         ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::GeneratedCommandList::Id));
 
-    ASSERT_TRUE(info.has_value());
+    ASSERT_TRUE(info1.has_value());
 
-    info = finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id));
-    ASSERT_TRUE(info.has_value());
+    std::optional<AttributeEntry> info2 =
+        finder.Find(ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AttributeList::Id));
+    ASSERT_TRUE(info2.has_value());
 
-    info = finder.Find(
+    std::optional<AttributeEntry> info3 = finder.Find(
         ConcreteAttributePath(kMockEndpoint1, MockClusterId(1), Clusters::Globals::Attributes::AcceptedCommandList::Id));
-    ASSERT_TRUE(info.has_value());
+    ASSERT_TRUE(info3.has_value());
 }
 
 TEST_F(TestCodegenModelViaMocks, IterateOverAcceptedCommands)
@@ -2668,6 +2697,46 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesRegistration)
     model.Shutdown();
 }
 
+TEST_F(TestCodegenModelViaMocks, EventInfo)
+{
+    // Test that we format the event info correctly
+    TestServerClusterContext testContext;
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    // Mock models always set event privilege to admin.
+    EventEntry entry;
+    ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(1), kTestEventId }, entry), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.readPrivilege, Access::Privilege::kAdminister);
+    ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(2), kTestEventId }, entry), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.readPrivilege, Access::Privilege::kAdminister);
+
+    const ConcreteClusterPath kTestClusterPath(kMockEndpoint1, MockClusterId(2));
+    FakeDefaultServerCluster fakeClusterServer(kTestClusterPath);
+    ServerClusterRegistration registration(fakeClusterServer);
+    ASSERT_EQ(model.Registry().Register(registration), CHIP_NO_ERROR);
+
+    fakeClusterServer.mEventInfoFakePrivilege = Access::Privilege::kOperate;
+    ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(2), kTestEventId }, entry), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.readPrivilege, Access::Privilege::kOperate);
+
+    fakeClusterServer.mEventInfoFakePrivilege = Access::Privilege::kView;
+    ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(2), kTestEventId }, entry), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.readPrivilege, Access::Privilege::kView);
+
+    // the other cluster is unchanged
+    ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(1), kTestEventId }, entry), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.readPrivilege, Access::Privilege::kAdminister);
+
+    model.Registry().Unregister(&fakeClusterServer);
+
+    // once unregistered, go back to the default
+    ASSERT_EQ(model.EventInfo({ kMockEndpoint1, MockClusterId(2), kTestEventId }, entry), CHIP_NO_ERROR);
+    ASSERT_EQ(entry.readPrivilege, Access::Privilege::kAdminister);
+
+    model.Shutdown();
+}
+
 TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesListClusters)
 {
     TestServerClusterContext testContext;
@@ -2748,3 +2817,18 @@ TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesListClusters)
     model.Registry().Unregister(&fakeClusterServer);
     model.Shutdown();
 }
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+TEST_F(TestCodegenModelViaMocks, EndpointUniqueID)
+{
+    UseMockNodeConfig config(gTestNodeConfig);
+    CodegenDataModelProviderWithContext model;
+
+    // Mock endpoint 1 has a unique ID
+    char buffer[chip::app::Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
+    MutableCharSpan span(buffer);
+    // Mock endpoint 4 has a unique ID
+    // ASSERT_TRUE(builder.IsEmpty()); // ownership taken above, we start fresh
+    ASSERT_EQ(model.EndpointUniqueID(kMockEndpoint4, span), CHIP_NO_ERROR);
+    EXPECT_TRUE(span.data_equal("AABBCCDDEEFFGGHHIIJJKKLLMMNNOO01"_span));
+}
+#endif

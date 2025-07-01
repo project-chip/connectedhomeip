@@ -25,14 +25,14 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class WebRTCTransportProviderClusterICEServerStruct(
-  val urls: List<String>,
+  val URLs: List<String>,
   val username: Optional<String>,
   val credential: Optional<String>,
   val caid: Optional<UShort>,
 ) {
   override fun toString(): String = buildString {
     append("WebRTCTransportProviderClusterICEServerStruct {\n")
-    append("\turls : $urls\n")
+    append("\tURLs : $URLs\n")
     append("\tusername : $username\n")
     append("\tcredential : $credential\n")
     append("\tcaid : $caid\n")
@@ -42,8 +42,8 @@ class WebRTCTransportProviderClusterICEServerStruct(
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      startArray(ContextSpecificTag(TAG_URLS))
-      for (item in urls.iterator()) {
+      startArray(ContextSpecificTag(TAG_UR_LS))
+      for (item in URLs.iterator()) {
         put(AnonymousTag, item)
       }
       endArray()
@@ -64,16 +64,16 @@ class WebRTCTransportProviderClusterICEServerStruct(
   }
 
   companion object {
-    private const val TAG_URLS = 1
-    private const val TAG_USERNAME = 2
-    private const val TAG_CREDENTIAL = 3
-    private const val TAG_CAID = 4
+    private const val TAG_UR_LS = 0
+    private const val TAG_USERNAME = 1
+    private const val TAG_CREDENTIAL = 2
+    private const val TAG_CAID = 3
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): WebRTCTransportProviderClusterICEServerStruct {
       tlvReader.enterStructure(tlvTag)
-      val urls =
+      val URLs =
         buildList<String> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_URLS))
+          tlvReader.enterArray(ContextSpecificTag(TAG_UR_LS))
           while (!tlvReader.isEndOfContainer()) {
             add(tlvReader.getString(AnonymousTag))
           }
@@ -100,7 +100,7 @@ class WebRTCTransportProviderClusterICEServerStruct(
 
       tlvReader.exitContainer()
 
-      return WebRTCTransportProviderClusterICEServerStruct(urls, username, credential, caid)
+      return WebRTCTransportProviderClusterICEServerStruct(URLs, username, credential, caid)
     }
   }
 }

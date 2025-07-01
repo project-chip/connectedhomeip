@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -51,11 +51,11 @@ are the sole property of their respective owners.
 
 This notice and disclaimer must be included on all copies of this document.
 
-Connectivity Standards Alliance +
-508 Second Street, Suite 206 +
+Connectivity Standards Alliance
+508 Second Street, Suite 206
 Davis, CA 95616, USA
 
-:xrefstyle: short
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x005D" name="Dishwasher Alarm Cluster" revision="1">
   <revisionHistory>
@@ -70,34 +70,34 @@ Davis, CA 95616, USA
       <bitfield name="InflowError" bit="0" summary="Water inflow is abnormal">
         <otherwiseConform>
           <provisionalConform/>
-          <optionalConform choice="a" more="true"/>
+          <optionalConform choice="a" more="true" min="1"/>
         </otherwiseConform>
       </bitfield>
       <bitfield name="DrainError" bit="1" summary="Water draining is abnormal">
         <otherwiseConform>
           <provisionalConform/>
-          <optionalConform choice="a" more="true"/>
+          <optionalConform choice="a" more="true" min="1"/>
         </otherwiseConform>
       </bitfield>
       <bitfield name="DoorError" bit="2" summary="Door or door lock is abnormal">
-        <optionalConform choice="a" more="true"/>
+        <optionalConform choice="a" more="true" min="1"/>
       </bitfield>
       <bitfield name="TempTooLow" bit="3" summary="Unable to reach normal temperature">
         <otherwiseConform>
           <provisionalConform/>
-          <optionalConform choice="a" more="true"/>
+          <optionalConform choice="a" more="true" min="1"/>
         </otherwiseConform>
       </bitfield>
       <bitfield name="TempTooHigh" bit="4" summary="Temperature is too high">
         <otherwiseConform>
           <provisionalConform/>
-          <optionalConform choice="a" more="true"/>
+          <optionalConform choice="a" more="true" min="1"/>
         </otherwiseConform>
       </bitfield>
       <bitfield name="WaterLevelError" bit="5" summary="Water level is abnormal">
         <otherwiseConform>
           <provisionalConform/>
-          <optionalConform choice="a" more="true"/>
+          <optionalConform choice="a" more="true" min="1"/>
         </otherwiseConform>
       </bitfield>
     </bitmap>

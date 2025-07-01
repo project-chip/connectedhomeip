@@ -70,29 +70,33 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "${chip_root}/src/lib/core/tests:fuzz-tlv-reader-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
         "${chip_root}/src/lib/dnssd/minimal_mdns/tests:fuzz-minmdns-packet-parsing-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
         "${chip_root}/src/lib/format/tests:fuzz-payload-decoder-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
+        "${chip_root}/src/protocols/secure_channel/tests:fuzz-CASE-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
         "${chip_root}/src/protocols/secure_channel/tests:fuzz-PASE-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
         "${chip_root}/src/setup_payload/tests:fuzz-setup-payload-base38-pw(//build/toolchain/pw_fuzzer:chip_pw_fuzztest)",
       ]
     }
   }
 
-  # Matter's in-tree pw_python_package or pw_python_distribution targets.
-  _matter_python_packages = [
-    "//examples/chef",
-    "//examples/common/pigweed/rpc_console/py:chip_rpc",
-    "//integrations/mobly:chip_mobly",
-    "//scripts/py_matter_yamltests:matter_yamltests",
-    "//src/python_testing/matter_testing_infrastructure:chip-testing",
-  ]
-
   pw_python_venv("matter_build_venv") {
     path = "$root_build_dir/python-venv"
     constraints = pw_build_PIP_CONSTRAINTS
     requirements = pw_build_PIP_REQUIREMENTS
 
+    # Extra packages required for running tests.
+    requirements += [ "//scripts/tests/requirements.txt" ]
+
     # Packages available to import within GN's build venv.
-    source_packages = _matter_python_packages +
-                      [ "$dir_pw_env_setup:core_pigweed_python_packages" ]
+    # Matter's in-tree pw_python_package or pw_python_distribution targets.
+    #
+    # NOTE: Don't add "$dir_pw_env_setup:core_pigweed_python_packages"  here since it
+    # pulls in a large number of dependencies that we are not using;  instead add dependencies
+    # on the relevant pigweed modules via python_deps where they are needed.
+    source_packages = [
+      "//examples/chef",
+      "//examples/common/pigweed/rpc_console/py:chip_rpc",
+      "//integrations/mobly:chip_mobly",
+      "//src/python_testing/matter_testing_infrastructure:chip-testing",
+    ]
   }
 
   pw_python_pip_install("pip_install_matter_packages") {
@@ -122,8 +126,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     if (chip_enable_python_modules) {
       deps = [
         "${chip_root}/scripts:matter_yamltests_distribution.wheel",
+        "${chip_root}/scripts/py_matter_yamltests:matter-yamltests.wheel",
         "${chip_root}/src/controller/python:chip-repl",
         "${chip_root}/src/python_testing/matter_testing_infrastructure:chip-testing.wheel",
+        "${chip_root}/src/python_testing/post_certification_tests:matter-post-certification-tests.wheel",
       ]
     }
   }
@@ -252,8 +258,8 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "//:fake_platform_tests",
         "//examples/chef:chef.tests",
         "//scripts/build:build_examples.tests",
-        "//scripts/py_matter_idl:matter_idl.tests",
-        "//scripts/py_matter_yamltests:matter_yamltests.tests",
+        "//scripts/py_matter_idl:matter-idl.tests",
+        "//scripts/py_matter_yamltests:matter-yamltests.tests",
         "//src:tests_run",
         "//src/python_testing/matter_testing_infrastructure:chip-testing.tests",
 
@@ -299,9 +305,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
     # Set this to true to enable bl702 builds by default.
     enable_bl702_builds = false
-
-    # Set this to true to enable mw320 builds by default.
-    enable_mw320_builds = false
 
     # Set this to true to enable genio builds by default.
     enable_genio_builds = false
@@ -419,23 +422,11 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     # Build the efr32 window app example.
     enable_efr32_window_app_build = enable_efr32_builds
 
-    # Build the k32w lighting app example.
-    enable_k32w_lighting_app_build = enable_k32w_builds
-
-    # Build the k32w lock app example.
-    enable_k32w_lock_app_build = enable_k32w_builds
-
-    # Build the k32w shell app example.
-    enable_k32w_shell_app_build = enable_k32w_builds
-
     # Build the bl602 lighting app example.
     enable_bl602_lighting_app_build = enable_bl602_builds
 
     # Build the bl702 lighting app example.
     enable_bl702_lighting_app_build = enable_bl702_builds
-
-    # Build the mw320 shell app example.
-    enable_mw320_shell_build = enable_mw320_builds
 
     # Build the genio shell app example.
     enable_genio_shell_app_build = enable_genio_builds
@@ -710,30 +701,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     extra_build_deps += [ ":efr32_window_app" ]
   }
 
-  if (enable_k32w_lighting_app_build) {
-    group("k32w_lighting_app") {
-      deps = [ "${chip_root}/examples/lighting-app/nxp/k32w0/(${chip_root}/config/k32w/toolchain:k32w_lighting_app)" ]
-    }
-
-    extra_build_deps += [ ":k32w_lighting_app" ]
-  }
-
-  if (enable_k32w_lock_app_build) {
-    group("k32w_lock_app") {
-      deps = [ "${chip_root}/examples/lock-app/nxp/k32w0/(${chip_root}/config/k32w/toolchain:k32w_lock_app)" ]
-    }
-
-    extra_build_deps += [ ":k32w_lock_app" ]
-  }
-
-  if (enable_k32w_shell_app_build) {
-    group("k32w_shell_app") {
-      deps = [ "${chip_root}/examples/shell/nxp/k32w0/(${chip_root}/config/k32w/toolchain:k32w_shell_app)" ]
-    }
-
-    extra_build_deps += [ ":k32w_shell_app" ]
-  }
-
   if (enable_tizen_lighting_app) {
     group("tizen_lighting_app") {
       deps = [ "${chip_root}/examples/lighting-app/tizen(${chip_root}/build/toolchain/tizen:tizen_arm)" ]
@@ -753,14 +720,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     if (!chip_config_network_layer_ble) {
       extra_check_deps += [ ":check:tizen" ]
     }
-  }
-
-  if (enable_mw320_shell_build) {
-    group("mw320_shell") {
-      deps = [ "${chip_root}/examples/shell/mw320(${chip_root}/config/mw320/toolchain:mw320_shell)" ]
-    }
-
-    extra_build_deps += [ ":mw320_shell" ]
   }
 
   if (enable_bl702_lighting_app_build) {

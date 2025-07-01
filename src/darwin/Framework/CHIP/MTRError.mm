@@ -282,6 +282,11 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
                                          "InvokeResponses of an Invoke Response action.",
             nil);
         break;
+    case Status::DynamicConstraintError:
+        description = NSLocalizedString(@"The value for the data type was not accepted due to runtime "
+                                         "validation issues. Command or action not carried out.",
+            nil);
+        break;
     case Status::InvalidTransportType:
         description = NSLocalizedString(@"Attempt to process on a transport type not valid for this "
                                          "element. Command or action not carried out.",
@@ -291,8 +296,8 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
 
     NSMutableDictionary * userInfo = [[NSMutableDictionary alloc] init];
     userInfo[NSLocalizedDescriptionKey] = description;
-    if (status.mClusterStatus.HasValue()) {
-        userInfo[@"clusterStatus"] = @(status.mClusterStatus.Value());
+    if (status.mClusterStatus.has_value()) {
+        userInfo[@"clusterStatus"] = @(*status.mClusterStatus);
     }
 
     return [NSError errorWithDomain:MTRInteractionErrorDomain code:chip::to_underlying(status.mStatus) userInfo:userInfo];
@@ -312,7 +317,7 @@ NSString * const MTRInteractionErrorDomain = @"MTRInteractionErrorDomain";
     if (error.domain == MTRInteractionErrorDomain) {
         chip::app::StatusIB status(static_cast<chip::Protocols::InteractionModel::Status>(error.code));
         if (error.userInfo != nil && error.userInfo[@"clusterStatus"] != nil) {
-            status.mClusterStatus.Emplace([error.userInfo[@"clusterStatus"] unsignedCharValue]);
+            status.mClusterStatus.emplace([error.userInfo[@"clusterStatus"] unsignedCharValue]);
         }
         return status.ToChipError();
     }

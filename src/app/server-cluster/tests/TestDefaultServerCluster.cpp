@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "app/server-cluster/ServerClusterContext.h"
 #include <pw_unit_test/framework.h>
 
 #include <access/Privilege.h>
@@ -25,6 +24,7 @@
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/WriteTesting.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server-cluster/ServerClusterContext.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -115,9 +115,9 @@ TEST(TestDefaultServerCluster, AttributesDefault)
     // first 2 are normal, the rest are list
     for (size_t i = 0; i < 5; i++)
     {
-        ASSERT_EQ(data[i].flags.Has(AttributeQualityFlags::kListAttribute), (i >= 2));
-        ASSERT_EQ(data[i].readPrivilege, Access::Privilege::kView);
-        ASSERT_FALSE(data[i].writePrivilege.has_value());
+        ASSERT_EQ(data[i].HasFlags(AttributeQualityFlags::kListAttribute), (i >= 2));
+        ASSERT_EQ(data[i].GetReadPrivilege(), Access::Privilege::kView);
+        ASSERT_FALSE(data[i].GetWritePrivilege().has_value());
     }
 }
 

@@ -21,6 +21,7 @@ RUN set -x \
     patch \
     qemu-system-arm \
     xz-utils \
+    gdb-multiarch \
     # Cleanup
     && apt-get clean \
     && rm -rf /var/lib/apt/lists \
@@ -165,6 +166,10 @@ RUN set -x \
     | guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload - $SYSTEMD_UNIT_9P_MOUNT : \
     ln-sf $SYSTEMD_UNIT_9P_MOUNT $SYSTEMD_REQUIRES_LOCAL_FS : \
     mkdir /mnt/chip \
+    # Setup crash manager
+    && guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda download /etc/crash-manager.conf crash-manager.conf \
+    && sed -i 's|# CrashRootPath=/usr/opt/share/crash/|CrashRootPath=/mnt/chip/|g' crash-manager.conf \
+    && guestfish --rw -a $TIZEN_IOT_IMAGE_ROOT -m /dev/sda upload crash-manager.conf /etc/crash-manager.conf \
     # Setup auto-login for root user
     && SYSTEMD_UNIT_SERIAL_GETTY=$SYSTEMD_SYSTEM/serial-getty@.service \
     && virt-edit $TIZEN_IOT_IMAGE_ROOT -e \

@@ -40,7 +40,7 @@ common_example_dir = "${chip_root}/examples/platform/nxp/common"
 support_common_platform_dir =
     "${nxp_sdk_matter_support_root}/examples/platform/common"
 
-mcxw71_k32w1_sdk("sdk") {
+mcxw71_sdk("sdk") {
   defines = []
   include_dirs = []
   sources = []
@@ -99,7 +99,7 @@ mcxw71_k32w1_sdk("sdk") {
   }
 }
 
-mcxw71_k32w1_executable("lock_app") {
+mcxw71_executable("lock_app") {
   output_name = "chip-mcxw71-lock-example"
 
   defines = []
@@ -251,7 +251,8 @@ mcxw71_k32w1_executable("lock_app") {
   }
 
   deps += [
-    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload:onboarding-codes-utils",
   ]

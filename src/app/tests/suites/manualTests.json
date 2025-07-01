@@ -91,17 +91,13 @@
         "Test_TC_CNET_4_3",
         "Test_TC_CNET_4_5",
         "Test_TC_CNET_4_6",
-        "Test_TC_CNET_4_9",
         "Test_TC_CNET_4_10",
         "Test_TC_CNET_4_11",
-        "Test_TC_CNET_4_12",
         "Test_TC_CNET_4_13",
         "Test_TC_CNET_4_14",
-        "Test_TC_CNET_4_15",
         "Test_TC_CNET_4_16",
         "Test_TC_CNET_4_20",
-        "Test_TC_CNET_4_21",
-        "Test_TC_CNET_4_22"
+        "Test_TC_CNET_4_21"
     ],
     "DiagnosticsLogs": [
         "Test_TC_DLOG_2_1",

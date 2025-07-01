@@ -1793,6 +1793,30 @@ CHIP_ERROR FabricTable::UpdatePendingFabricCommon(FabricIndex fabricIndex, const
     const auto * fabricInfo = FindFabricWithIndex(fabricIndex);
     VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_INVALID_FABRIC_INDEX);
 
+    // Cannot have a VVSC already if ICAC is provided.
+    if (!icac.empty())
+    {
+        uint8_t vvscBuffer[kMaxCHIPCertLength];
+        MutableByteSpan vvscSpan{ vvscBuffer };
+
+        CHIP_ERROR err = mOpCertStore->GetVidVerificationElement(
+            fabricIndex, OperationalCertificateStore::VidVerificationElement::kVvsc, vvscSpan);
+        if (err == CHIP_NO_ERROR)
+        {
+            if (!vvscSpan.empty())
+            {
+                ChipLogError(
+                    FabricProvisioning,
+                    "Received an UpdateNOC storage request with ICAC when VVSC already present. VVSC must be removed first.");
+                return CHIP_ERROR_INCORRECT_STATE;
+            }
+        }
+        else if (err != CHIP_ERROR_NOT_IMPLEMENTED)
+        {
+            return err;
+        }
+    }
+
     // Check for an existing fabric matching RCAC and FabricID. We must find a correct
     // existing fabric that chains to same root. We assume the stored root is correct.
     if (!mStateFlags.Has(StateFlags::kAreCollidingFabricsIgnored))
@@ -2262,6 +2286,14 @@ CHIP_ERROR FabricTable::SetVIDVerificationStatementElements(FabricIndex fabricIn
     // Start with VVSC first as it's the most likely to fail.
     if (VVSC.HasValue())
     {
+        if (mOpCertStore->HasCertificateForFabric(fabricIndex, OperationalCertificateStore::CertChainElement::kIcac))
+        {
+            ChipLogError(FabricProvisioning,
+                         "Received SetVIDVerificationStatement storage request with VVSC when ICAC already present. ICAC must be "
+                         "removed first.");
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
         ReturnErrorOnFailure(mOpCertStore->UpdateVidVerificationSignerCertForFabric(fabricIndex, VVSC.Value()));
     }
 

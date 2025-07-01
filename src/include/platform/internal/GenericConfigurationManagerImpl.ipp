@@ -49,6 +49,8 @@
 #include <platform/ThreadStackManager.h>
 #endif
 
+#include <optional>
+
 // TODO : may be we can make it configurable
 #define BLE_ADVERTISEMENT_VERSION 0
 
@@ -56,7 +58,9 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-static Optional<System::Clock::Seconds32> sFirmwareBuildChipEpochTime;
+namespace {
+std::optional<System::Clock::Seconds32> gFirmwareBuildChipEpochTime;
+}
 
 #if CHIP_USE_TRANSITIONAL_COMMISSIONABLE_DATA_PROVIDER
 
@@ -301,9 +305,9 @@ template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & chipEpochTime)
 {
     // If the setter was called and we have a value in memory, return this.
-    if (sFirmwareBuildChipEpochTime.HasValue())
+    if (gFirmwareBuildChipEpochTime.has_value())
     {
-        chipEpochTime = sFirmwareBuildChipEpochTime.Value();
+        chipEpochTime = gFirmwareBuildChipEpochTime.value();
         return CHIP_NO_ERROR;
     }
 #ifdef CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME_MATTER_EPOCH_S
@@ -336,7 +340,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::SetFirmwareBuildChipEpo
     //
     // Implementations that can't use the hard-coded time for whatever reason
     // should set this at each init.
-    sFirmwareBuildChipEpochTime.SetValue(chipEpochTime);
+    gFirmwareBuildChipEpochTime = chipEpochTime;
     return CHIP_NO_ERROR;
 }
 
@@ -528,9 +532,11 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetUniqueId(char * buf,
     err                = ReadConfigValueStr(ConfigClass::kConfigKey_UniqueId, buf, bufSize, uniqueIdLen);
 
     ReturnErrorOnFailure(err);
-
     VerifyOrReturnError(uniqueIdLen < bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
-    VerifyOrReturnError(buf[uniqueIdLen] == 0, CHIP_ERROR_INVALID_STRING_LENGTH);
+
+    // ensure null termination if the string read is not null terminting (e.g. posix config on darwin
+    // returns data without null terminators as it reads data as binary.)
+    buf[uniqueIdLen] = 0;
 
     return err;
 }

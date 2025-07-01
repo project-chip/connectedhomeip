@@ -18,7 +18,7 @@ on:
     push:
         branches:
             - master
-            - 'v*-branch'
+            - "v*-branch"
     pull_request:
     merge_group:
     workflow_dispatch:
@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:125
+            image: ghcr.io/project-chip/chip-build:140
 
         steps:
             - name: Checkout
@@ -73,7 +73,7 @@ jobs:
                      --skip-dir platform/ASR \
                      --skip-dir platform/Beken \
                      --skip-dir platform/bouffalolab \
-                     --skip-dir platform/cc13xx_26xx \
+                     --skip-dir platform/ti/cc13xx_26xx \
                      --skip-dir platform/cc32xx \
                      --skip-dir platform/Darwin \
                      --skip-dir platform/ESP32 \
@@ -265,6 +265,26 @@ jobs:
               run: |
                   git grep -n 'NSLog(' -- src/darwin/Framework/CHIP && exit 1 || exit 0
 
+            # This check ensures that there are no `ember` nor `emAf` symbols being used
+            # We want to start removing exclusions as soon as they aren't required anymore
+            - name: Check for use of 'emberAf' or 'emAf' symbols
+              if: always()
+              run: |
+                  scripts/find_ember_symbols_prefixes.sh \
+                  --skip-subtree .github/ \
+                  --skip-subtree src/app/util \
+                  --skip-subtree zzz_generated/app-common/app-common/zap-generated \
+                  --skip-subtree src/app/zap-templates/templates \
+                  --skip-subtree src/app/codegen-data-node-provider \
+                  --skip-subtree src/data-model-providers \
+                  --skip-subtree scripts/ \
+                  --skip-subtree src/app/clusters \
+                  --skip-subtree examples \
+                  --skip-subtree docs \
+                  --skip-subtree src/app/tests \
+                  --skip-subtree src/controller/tests \
+                  --skip-from-file scripts/ember_exclusions.txt
+
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
             # to avoid our grep regexp matching itself, as well as excluding the files
@@ -274,7 +294,7 @@ jobs:
                   type-safe getters
               if: always()
               run: |
-                  git grep -I -n 'emberAfReadAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)src/app/util/attribute-table.h' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt' ':(exclude)src/app/util/attribute-table.cpp'  && exit 1 || exit 0
+                  git grep -I -n 'emberAfReadAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)src/app/util/attribute-table.h' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors.cpp.zapt' ':(exclude)src/app/util/attribute-table.cpp'  && exit 1 || exit 0
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
@@ -295,7 +315,7 @@ jobs:
                       ':(exclude)src/app/util/attribute-table.cpp'                                           \
                       ':(exclude)src/app/util/attribute-table.h'                                             \
                       ':(exclude)src/app/util/mock/CodegenEmberMocks.cpp'                                    \
-                      ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors-src.zapt'          \
+                      ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors.cpp.zapt'          \
                       ':(exclude)src/darwin/Framework/CHIP/ServerEndpoint/MTRIMDispatch.mm'                  \
                       ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' \
                       && exit 1 || exit 0
@@ -305,6 +325,12 @@ jobs:
               if: always()
               run: |
                   ruff check
+                
+            # Run ChipStackError linter
+            - name: Check for errors using ruff Python linter
+              if: always()
+              run: |
+                  python3 scripts/check_chipstack.py
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,

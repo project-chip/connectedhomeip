@@ -19,70 +19,60 @@ namespace ZoneManagement {
 inline constexpr uint32_t kRevision = 1;
 
 namespace Attributes {
-namespace SupportedZoneSources {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = SupportedZoneSources::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
-} // namespace SupportedZoneSources
+namespace MaxUserDefinedZones {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxUserDefinedZones::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace MaxUserDefinedZones
+namespace MaxZones {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxZones::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace MaxZones
 namespace Zones {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Zones::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = std::nullopt,
-};
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Zones::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Zones
 namespace Triggers {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Triggers::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{ DataModel::AttributeQualityFlags::kListAttribute },
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Triggers::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Triggers
+namespace SensitivityMax {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(SensitivityMax::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace SensitivityMax
 namespace Sensitivity {
-inline constexpr DataModel::AttributeEntry kMetadataEntry = {
-    .attributeId    = Sensitivity::Id,
-    .flags          = BitFlags<DataModel::AttributeQualityFlags>{},
-    .readPrivilege  = Access::Privilege::kView,
-    .writePrivilege = Access::Privilege::kOperate,
-};
+inline constexpr DataModel::AttributeEntry kMetadataEntry(Sensitivity::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace Sensitivity
+namespace TwoDCartesianMax {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(TwoDCartesianMax::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kView, std::nullopt);
+} // namespace TwoDCartesianMax
 
 } // namespace Attributes
 
 namespace Commands {
 namespace CreateTwoDCartesianZone {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ZoneManagement::Commands::CreateTwoDCartesianZone::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(CreateTwoDCartesianZone::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
 } // namespace CreateTwoDCartesianZone
 namespace UpdateTwoDCartesianZone {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ZoneManagement::Commands::UpdateTwoDCartesianZone::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(UpdateTwoDCartesianZone::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
 } // namespace UpdateTwoDCartesianZone
-namespace GetTwoDCartesianZone {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ZoneManagement::Commands::GetTwoDCartesianZone::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
-} // namespace GetTwoDCartesianZone
 namespace RemoveZone {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry = {
-    .commandId       = ZoneManagement::Commands::RemoveZone::Id,
-    .flags           = BitFlags<DataModel::CommandQualityFlags>{},
-    .invokePrivilege = Access::Privilege::kManage,
-};
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RemoveZone::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kManage);
 } // namespace RemoveZone
+namespace CreateOrUpdateTrigger {
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(CreateOrUpdateTrigger::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
+} // namespace CreateOrUpdateTrigger
+namespace RemoveTrigger {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RemoveTrigger::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kManage);
+} // namespace RemoveTrigger
 
 } // namespace Commands
 } // namespace ZoneManagement

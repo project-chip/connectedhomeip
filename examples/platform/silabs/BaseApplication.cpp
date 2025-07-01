@@ -64,7 +64,6 @@
 #include <platform/silabs/platformAbstraction/SilabsPlatform.h>
 
 #ifdef SL_WIFI
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <platform/silabs/NetworkCommissioningWiFiDriver.h>
 #include <platform/silabs/wifi/WifiInterface.h>
 
@@ -121,11 +120,6 @@ osMessageQueueId_t sAppEventQueue;
 #if (defined(ENABLE_WSTK_LEDS) && (defined(SL_CATALOG_SIMPLE_LED_LED1_PRESENT)))
 LEDWidget sStatusLED;
 #endif // ENABLE_WSTK_LEDS
-
-#ifdef SL_WIFI
-app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::SlWiFiDriver::GetInstance()));
-#endif /* SL_WIFI */
 
 bool sIsEnabled  = false;
 bool sIsAttached = false;
@@ -216,7 +210,7 @@ void BaseApplicationDelegate::OnCommissioningWindowClosed()
         SilabsLCD::Screen_e screen;
         slLCD.GetScreen(screen);
         VerifyOrReturn(screen == SilabsLCD::Screen_e::QRCodeScreen);
-        slLCD.SetScreen(SilabsLCD::Screen_e::DemoScreen);
+        BaseApplication::PostUpdateDisplayEvent(SilabsLCD::Screen_e::DemoScreen);
 #endif // QR_CODE_ENABLED
 #endif // DISPLAY_ENABLED
     }
@@ -303,12 +297,6 @@ CHIP_ERROR BaseApplication::BaseInit()
         osDelay(pdMS_TO_TICKS(10));
     }
     ChipLogProgress(AppServer, "APP: Done WiFi Init");
-    /* We will init server when we get IP */
-
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    sWiFiNetworkCommissioningInstance.Init();
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
 #endif
 
     // Create cmsis os sw timer for Function Selection.
@@ -366,6 +354,11 @@ CHIP_ERROR BaseApplication::BaseInit()
 
     err = chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAppDelegate);
     return err;
+}
+
+void BaseApplication::InitCompleteCallback(CHIP_ERROR err)
+{
+    // A stub for backward compatibility
 }
 
 void BaseApplication::FunctionTimerEventHandler(void * timerCbArg)
@@ -578,8 +571,6 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
             // - Cycle LCD screen
             CancelFunctionTimer();
 
-            AppTask::GetAppTask().UpdateDisplay();
-
 #ifdef SL_WIFI
             if (!ConnectivityMgr().IsWiFiStationProvisioned())
 #else
@@ -603,17 +594,13 @@ void BaseApplication::ButtonHandler(AppEvent * aEvent)
                 PlatformMgr().ScheduleWork([](intptr_t) { ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); });
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
             }
+            // Print the QR Code
+            OutputQrCode(false);
+#ifdef DISPLAY_ENABLED
+            PostUpdateDisplayEvent(SilabsLCD::Screen_e::CycleScreen);
+#endif // DISPLAY_ENABLED
         }
     }
-}
-
-void BaseApplication::UpdateDisplay()
-{
-    OutputQrCode(false);
-#ifdef DISPLAY_ENABLED
-    UpdateLCDStatusScreen();
-    slLCD.CycleScreens();
-#endif
 }
 
 void BaseApplication::CancelFunctionTimer()
@@ -774,14 +761,37 @@ SilabsLCD & BaseApplication::GetLCD(void)
     return slLCD;
 }
 
-void BaseApplication::UpdateLCDStatusScreen(bool withChipStackLock)
+void BaseApplication::PostUpdateDisplayEvent(SilabsLCD::Screen_e screen)
+{
+    AppEvent event;
+    event.Type            = AppEvent::kEventType_LCD;
+    event.LCDEvent.screen = screen;
+    event.Handler         = AppTask::GetAppTask().UpdateDisplayHandler;
+    BaseApplication::PostEvent(&event);
+}
+
+void BaseApplication::UpdateDisplayHandler(AppEvent * aEvent)
+{
+    VerifyOrReturn(aEvent->Type == AppEvent::kEventType_LCD);
+    SilabsLCD::Screen_e screen = aEvent->LCDEvent.screen;
+    if (screen == SilabsLCD::Screen_e::StatusScreen)
+    {
+        UpdateLCDStatusScreen();
+    }
+    (screen == SilabsLCD::Screen_e::CycleScreen) ? AppTask::GetAppTask().UpdateDisplay() : AppTask::GetLCD().SetScreen(screen);
+}
+
+void BaseApplication::UpdateDisplay()
+{
+    UpdateLCDStatusScreen();
+    slLCD.CycleScreens();
+}
+
+void BaseApplication::UpdateLCDStatusScreen()
 {
     SilabsLCD::DisplayStatus_t status;
     bool enabled, attached;
-    if (withChipStackLock)
-    {
-        chip::DeviceLayer::PlatformMgr().LockChipStack();
-    }
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
 #ifdef SL_WIFI
     enabled  = ConnectivityMgr().IsWiFiStationEnabled();
     attached = ConnectivityMgr().IsWiFiStationConnected();
@@ -806,10 +816,7 @@ void BaseApplication::UpdateLCDStatusScreen(bool withChipStackLock)
         ? SilabsLCD::ICDMode_e::SIT
         : SilabsLCD::ICDMode_e::LIT;
 #endif
-    if (withChipStackLock)
-    {
-        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    }
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     slLCD.SetStatus(status);
 }
 #endif
@@ -863,10 +870,16 @@ void BaseApplication::ScheduleFactoryReset()
 void BaseApplication::DoProvisioningReset()
 {
     PlatformMgr().ScheduleWork([](intptr_t) {
+        // Force the KeyMap update to make sure nvm3 is updated before anything happens.
+        // If the device reboots before the timer update happens, "shadow" keys are left in nvm3 causing a reduction of the
+        // overall available nvm3 - similar to a memory leak.
+        // FactoryResetThreadStack forces a reboot which was causing a memory loss.
+        chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().ForceKeyMapSave();
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         ConfigurationManagerImpl::GetDefaultInstance().ClearThreadStack();
         ThreadStackMgrImpl().FactoryResetThreadStack();
-        ThreadStackMgr().InitThreadStack();
+        // Triggers a reboot - nothing gets executed after this
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
@@ -916,8 +929,7 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
         // Update the LCD screen with SSID and connected state
         if (screen == SilabsLCD::Screen_e::StatusScreen)
         {
-            BaseApplication::UpdateLCDStatusScreen(false);
-            AppTask::GetLCD().SetScreen(screen);
+            PostUpdateDisplayEvent(SilabsLCD::Screen_e::StatusScreen);
         }
 #endif // DISPLAY_ENABLED
         if ((event->ThreadConnectivityChange.Result == kConnectivity_Established) ||

@@ -132,9 +132,6 @@ protected:
     // Returns true if any pending or persisted state exists for the fabricIndex, false if nothing at all is found.
     bool HasAnyCertificateForFabric(FabricIndex fabricIndex) const;
 
-    // Returns true if any pending or persisted state exists for the VVSC.
-    bool HasVvscForFabric(FabricIndex fabricIndex) const;
-
     // Returns true if there is stored or pending NOC chain .
     bool HasNocChainForFabric(FabricIndex fabricIndex) const;
 

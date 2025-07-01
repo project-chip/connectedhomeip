@@ -29,6 +29,9 @@
 #include <app/RequiredPrivilege.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterContext.h>
 #include <app/server-cluster/ServerClusterInterface.h>
 #include <app/util/DataModelHandler.h>
@@ -37,8 +40,6 @@
 #include <app/util/attribute-metadata.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
-#include <app/util/persistence/AttributePersistenceProvider.h>
-#include <app/util/persistence/DefaultAttributePersistenceProvider.h>
 #include <data-model-providers/codegen/EmberMetadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -58,13 +59,13 @@ DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(const ConcreteCommandPat
 {
     const CommandId commandId = path.mCommandId;
 
-    DataModel::AcceptedCommandEntry entry;
-
-    entry.commandId       = path.mCommandId;
-    entry.invokePrivilege = RequiredPrivilege::ForInvokeCommand(path);
-    entry.flags.Set(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(path.mClusterId, commandId));
-    entry.flags.Set(DataModel::CommandQualityFlags::kFabricScoped, CommandIsFabricScoped(path.mClusterId, commandId));
-    entry.flags.Set(DataModel::CommandQualityFlags::kLargeMessage, CommandHasLargePayload(path.mClusterId, commandId));
+    DataModel::AcceptedCommandEntry entry(
+        path.mCommandId,
+        BitFlags<DataModel::CommandQualityFlags>{}
+            .Set(DataModel::CommandQualityFlags::kTimed, CommandNeedsTimedInvoke(path.mClusterId, commandId))
+            .Set(DataModel::CommandQualityFlags::kFabricScoped, CommandIsFabricScoped(path.mClusterId, commandId))
+            .Set(DataModel::CommandQualityFlags::kLargeMessage, CommandHasLargePayload(path.mClusterId, commandId)),
+        RequiredPrivilege::ForInvokeCommand(path));
 
     return entry;
 }
@@ -97,19 +98,17 @@ DataModel::ServerClusterEntry ServerClusterEntryFrom(EndpointId endpointId, cons
 
 DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & clusterPath, const EmberAfAttributeMetadata & attribute)
 {
-    DataModel::AttributeEntry entry;
-
     const ConcreteAttributePath attributePath(clusterPath.mEndpointId, clusterPath.mClusterId, attribute.attributeId);
 
-    entry.attributeId   = attribute.attributeId;
-    entry.readPrivilege = RequiredPrivilege::ForReadAttribute(attributePath);
-    if (!attribute.IsReadOnly())
-    {
-        entry.writePrivilege = RequiredPrivilege::ForWriteAttribute(attributePath);
-    }
+    using DataModel::AttributeQualityFlags;
 
-    entry.flags.Set(DataModel::AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE));
-    entry.flags.Set(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite());
+    DataModel::AttributeEntry entry(
+        attribute.attributeId,
+        BitFlags<DataModel::AttributeQualityFlags>{}
+            .Set(AttributeQualityFlags::kListAttribute, (attribute.attributeType == ZCL_ARRAY_ATTRIBUTE_TYPE))
+            .Set(DataModel::AttributeQualityFlags::kTimed, attribute.MustUseTimedWrite()),
+        RequiredPrivilege::ForReadAttribute(attributePath),
+        attribute.IsReadOnly() ? std::nullopt : std::make_optional(RequiredPrivilege::ForWriteAttribute(attributePath)));
 
     // NOTE: we do NOT provide additional info for:
     //    - IsExternal/IsSingleton/IsAutomaticallyPersisted is not used by IM handling
@@ -123,8 +122,6 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
     // entry.flags.Set(DataModel::AttributeQualityFlags::kChangesOmitted)
     return entry;
 }
-
-const ConcreteCommandPath kInvalidCommandPath(kInvalidEndpointId, kInvalidClusterId, kInvalidCommandId);
 
 DefaultAttributePersistenceProvider gDefaultAttributePersistence;
 
@@ -168,6 +165,7 @@ CHIP_ERROR CodegenDataModelProvider::Startup(DataModel::InteractionModelContext 
     return mRegistry.SetContext(ServerClusterContext{
         .provider           = this,
         .storage            = mPersistentStorageDelegate,
+        .attributeStorage   = GetAttributePersistenceProvider(),
         .interactionContext = &mContext,
     });
 }
@@ -252,6 +250,17 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindEndpointIndex(EndpointI
     }
 
     return std::make_optional<unsigned>(idx);
+}
+
+CHIP_ERROR CodegenDataModelProvider::EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo)
+{
+    if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
+    {
+        return cluster->EventInfo(path, eventInfo);
+    }
+
+    eventInfo.readPrivilege = RequiredPrivilege::ForReadEvent(path);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
@@ -370,22 +379,20 @@ CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path
         ReturnErrorOnFailure(builder.Append(AttributeEntryFrom(path, attribute)));
     }
 
-    // This "GlobalListEntry" is specific for metadata that ember does not include
-    // in its attribute list metadata.
-    //
-    // By spec these Attribute/AcceptedCommands/GeneratedCommants lists are:
-    //   - lists of elements
-    //   - read-only, with read privilege view
-    //   - fixed value (no such flag exists, so this is not a quality flag we set/track)
-    DataModel::AttributeEntry globalListEntry;
-
-    globalListEntry.readPrivilege = Access::Privilege::kView;
-    globalListEntry.flags.Set(DataModel::AttributeQualityFlags::kListAttribute);
-
-    for (auto & attribute : GlobalAttributesNotInMetadata)
+    for (auto & attributeId : GlobalAttributesNotInMetadata)
     {
-        globalListEntry.attributeId = attribute;
-        ReturnErrorOnFailure(builder.Append(globalListEntry));
+
+        // This "GlobalListEntry" is specific for metadata that ember does not include
+        // in its attribute list metadata.
+        //
+        // By spec these Attribute/AcceptedCommands/GeneratedCommants lists are:
+        //   - lists of elements
+        //   - read-only, with read privilege view
+        //   - fixed value (no such flag exists, so this is not a quality flag we set/track)
+        DataModel::AttributeEntry globalListEntry(attributeId, DataModel::AttributeQualityFlags::kListAttribute,
+                                                  Access::Privilege::kView, std::nullopt);
+
+        ReturnErrorOnFailure(builder.Append(std::move(globalListEntry)));
     }
 
     return CHIP_NO_ERROR;
@@ -635,6 +642,17 @@ CHIP_ERROR CodegenDataModelProvider::SemanticTags(EndpointId endpointId, ReadOnl
 
     return CHIP_NO_ERROR;
 }
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+CHIP_ERROR CodegenDataModelProvider::EndpointUniqueID(EndpointId endpointId, MutableCharSpan & epUniqueId)
+{
+    char buffer[Clusters::Descriptor::Attributes::EndpointUniqueID::TypeInfo::MaxLength()] = { 0 };
+    MutableCharSpan epUniqueIdSpan(buffer);
+    emberAfGetEndpointUniqueIdForEndPoint(endpointId, epUniqueIdSpan);
+
+    memcpy(epUniqueId.data(), epUniqueIdSpan.data(), epUniqueIdSpan.size());
+    return CHIP_NO_ERROR;
+}
+#endif
 
 } // namespace app
 } // namespace chip

@@ -1,5 +1,5 @@
 #
-#   Copyright (c) 2024 Project CHIP Authors
+#   Copyright (c) 2024-2025 Project CHIP Authors
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -136,7 +136,7 @@ config NET_TC_TX_THREAD_BASE_PRIO
 config NET_TC_RX_THREAD_BASE_PRIO
 	default 3
 
-config NET_TC_SKIP_FOR_HIGH_PRIO
+config NET_TC_TX_SKIP_FOR_HIGH_PRIO
 	default y
 
 config NET_CONTEXT_PRIORITY
@@ -214,7 +214,7 @@ config BT_RX_STACK_SIZE
 	default 1700
 
 config BT_LONG_WQ_STACK_SIZE
-	default 1024
+	default 2560
 
 config BT_DEVICE_NAME_GATT_WRITABLE
 	bool
@@ -244,6 +244,31 @@ if CHIP_WIFI
 choice NXP_WIFI_PART
 	default NXP_RW610 if SOC_SERIES_RW6XX
 endchoice
+
+# Disable unnecessary features to save code size
+# Saves 365kB of flash
+config NXP_WIFI_SOFTAP_SUPPORT
+	default n
+
+# Saves 61kB of flash
+config NXP_WIFI_CSI
+	default n
+
+# Saves 45kB of flash
+config WIFI_NM_WPA_SUPPLICANT_ADVANCED_FEATURES
+	default n
+
+config NXP_WIFI_MON_TASK_STACK_SIZE
+	default 1024
+
+config NXP_WIFI_WLCMGR_TASK_STACK_SIZE
+	default 2048
+
+config NXP_WIFI_TX_TASK_STACK_SIZE
+	default 1024
+
+config NXP_WIFI_SCAN_TASK_STACK_SIZE
+	default 1024
 
 config ZVFS_OPEN_MAX
 	default 30
@@ -321,7 +346,7 @@ config NET_MAX_CONN
 	default 10
 
 config SHELL_STACK_SIZE
-	default 2616
+	default 1536
 
 config HEAP_MEM_POOL_SIZE
 	default 122880
@@ -344,10 +369,6 @@ endif
 
 if CHIP_ETHERNET
 
-choice NXP_ENET_DRIVER
-	default ETH_NXP_ENET
-endchoice
-
 config NET_SOCKETS_POLL_MAX
 	default 7
 
@@ -359,6 +380,9 @@ config MBEDTLS
 
 config MBEDTLS_CFG_FILE
 	default "config-tls-generic.h"
+
+config MBEDTLS_PSA_KEY_SLOT_COUNT
+    default 64
 
 config MBEDTLS_USER_CONFIG_ENABLE
     default y
@@ -431,16 +455,22 @@ endif # MCUX_ELS_PKC
 
 if SHELL
 
-config KERNEL_SHELL
+config SHELL_MINIMAL
 	default y
 
-config DEVICE_SHELL
+config SHELL_HELP
+	default y
+
+config KERNEL_SHELL
 	default y
 
 config REBOOT
 	default y
 
 # Disable not used shell modules
+config DEVICE_SHELL
+	default n
+
 config SHELL_WILDCARD
 	default n
 

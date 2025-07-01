@@ -922,6 +922,7 @@ public:
      * @retval CHIP_NO_ERROR on success
      * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if the `fabricIndex` is not an existing fabric
      * @retval CHIP_ERROR_INCORRECT_STATE if this is called in an inconsistent order
+     *                                    or if ICAC cannot be set due to VVSC presence (maps to INVALID_COMMAND).
      * @retval CHIP_ERROR_NO_MEMORY if there is insufficient memory to store the pending updates
      * @retval CHIP_ERROR_INVALID_ARGUMENT if any of the arguments are invalid such as too large or out of bounds.
      * @retval other CHIP_ERROR_* on internal errors or certificate validation errors.
@@ -955,6 +956,7 @@ public:
      * @retval CHIP_NO_ERROR on success
      * @retval CHIP_ERROR_INVALID_FABRIC_INDEX if the `fabricIndex` is not an existing fabric
      * @retval CHIP_ERROR_INCORRECT_STATE if this is called in an inconsistent order
+     *                                    or if ICAC cannot be set due to VVSC presence (maps to INVALID_COMMAND).
      * @retval CHIP_ERROR_NO_MEMORY if there is insufficient memory to store the pending updates
      * @retval CHIP_ERROR_INVALID_ARGUMENT if any of the arguments are invalid such as too large or out of bounds.
      * @retval other CHIP_ERROR_* on internal errors or certificate validation errors.

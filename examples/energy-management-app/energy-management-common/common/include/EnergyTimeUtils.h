@@ -29,14 +29,7 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace DeviceEnergyManagement {
-
-/**
- * @brief   Helper function to get current timestamp in Epoch format
- *
- * @param   chipEpoch reference to hold return timestamp
- */
-CHIP_ERROR GetEpochTS(uint32_t & chipEpoch);
+namespace EnergyEvse {
 
 /**
  * @brief   Helper function to get current timestamp and work out the day of week
@@ -68,7 +61,7 @@ CHIP_ERROR GetLocalDayOfWeekNow(BitMask<EnergyEvse::TargetDayOfWeekBitmap> & day
  */
 CHIP_ERROR GetMinutesPastMidnight(uint16_t & minutesPastMidnight);
 
-} // namespace DeviceEnergyManagement
+} // namespace EnergyEvse
 } // namespace Clusters
 } // namespace app
 } // namespace chip
