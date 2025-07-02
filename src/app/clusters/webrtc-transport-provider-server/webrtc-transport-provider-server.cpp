@@ -314,7 +314,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     {
         if (req.audioStreamID.Value().IsNull())
         {
-            // Is there an allocated stream, delegate handles matching against an allocated stream in the HandleSolicitOffer methoc
+            // Is there an allocated stream, delegate handles matching against an allocated stream in the HandleSolicitOffer method
             if (!mDelegate.HasAllocatedAudioStreams())
             {
                 ChipLogError(Zcl, "HandleSolicitOffer: audio requested when there are no AllocatedAudioStreams");
