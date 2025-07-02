@@ -26,7 +26,6 @@ steps:
       id: PumpTest
       waitFor:
           - Bootstrap
-      entrypoint: /usr/bin/bash
 
 logsBucket: matter-build-automation-build-logs
 
