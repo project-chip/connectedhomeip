@@ -52,6 +52,7 @@ static constexpr size_t kDayStructItemMaxDayEntryIDs        = 96;
 static constexpr size_t kDayPatternItemMaxDayEntryIDs       = kDayStructItemMaxDayEntryIDs;
 static constexpr size_t kTariffPeriodItemMaxIDs             = 20;
 static constexpr uint16_t kDayEntryDurationLimit = 1500;
+static constexpr uint8_t kFullWeekMask = 0x7f;
 
 template <typename T>
 struct SpanCopier
@@ -763,7 +764,8 @@ protected:
 
     virtual bool CompareStructValue(const PayloadType & source, const PayloadType & destination) const
     {
-        return memcmp(&destination, &source, sizeof(PayloadType));
+        ChipLogError(NotSpecified, "CompareStructValue must be overridden for struct types!");
+        return false;
     }
 
     bool ListsNotEqual(const DataModel::List<PayloadType> & source, const DataModel::List<PayloadType> & destination)

@@ -21,9 +21,6 @@
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
 
 using namespace chip;
 using namespace chip::app;
@@ -509,7 +506,6 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
         {
             // Something went wrong! The attribute can't be Null if tariff is active
             ChipLogError(NotSpecified, "The mCurrentDay can't be Null if tariff is active!");
-            assert(false);
         }
 
         Day = Utils::FindDay(mServerTariffAttrsCtx, timestampNow + kSecondsPerDay);

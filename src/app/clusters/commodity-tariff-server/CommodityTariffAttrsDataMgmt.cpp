@@ -428,7 +428,7 @@ CHIP_ERROR DayPatternsDataClass::Validate(const ValueType & aValue) const
         auto & newList                                        = aValue.Value();
         std::unordered_set<uint32_t> & DayPatternKeyIDs       = ((TariffUpdateCtx *) mAuxData)->DayPatternKeyIDs;
         std::unordered_set<uint32_t> & DayPatternsDayEntryIDs = ((TariffUpdateCtx *) mAuxData)->DayPatternsDayEntryIDs;
-        // uint8_t tmpDoW = 0;
+        uint8_t tmpDoW = 0;
 
         VerifyOrReturnError_LogSend((newList.size() > 0 && newList.size() <= kDayPatternsAttrMaxLength), CHIP_ERROR_INVALID_LIST_LENGTH,
                                     "Incorrect dayPatterns length");
@@ -441,13 +441,21 @@ CHIP_ERROR DayPatternsDataClass::Validate(const ValueType & aValue) const
                 break; // Duplicate found
             }
 
-            // tmpDoW |= item.daysOfWeek.Raw();
+            tmpDoW |= item.daysOfWeek.Raw();
 
             err = DayPatternsDataClass_Utils::ValidateListEntry(item, DayPatternsDayEntryIDs);
             if (err != CHIP_NO_ERROR)
             {
                 break;
             }
+        }
+
+        const bool isValidSingleRotatingDay = (!tmpDoW && newList.size() == 1); // Single rotating day pattern
+        const bool isValidFullWeekCoverage = (tmpDoW == kFullWeekMask);         // Complete week coverage
+
+        if ( !( isValidSingleRotatingDay || isValidFullWeekCoverage) )
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
 
@@ -506,13 +514,6 @@ static CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewVal
                 ChipLogError(NotSpecified, "Current dayEntryID  already attached to the tariffComponentID");
                 return CHIP_ERROR_DUPLICATE_KEY_ID;
             }
-
-            //One dayEntryID can't be attached to two different tariffComponentIDs
-            //if(!seenDeIDs.insert(deId).second)
-            //{
-            //    ChipLogError(NotSpecified, "One dayEntryID can't be attached to two different tariffComponentIDs");
-            //    return CHIP_ERROR_DUPLICATE_KEY_ID;
-            //}
         }
 
         //Here we save the tariff component IDs in the context for the next cross-checks

@@ -301,14 +301,12 @@ private:
     // Primary attrs update pipeline methods
     bool TariffDataUpd_Init(TariffUpdateCtx & UpdCtx)
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-#define X(attrName, attrType) err = m##attrName##_MgmtObj.UpdateBegin(&UpdCtx, TariffDataUpd_AttrChangeCb);
+#define X(attrName, attrType) \
+    if (m##attrName##_MgmtObj.UpdateBegin(&UpdCtx, TariffDataUpd_AttrChangeCb) != CHIP_NO_ERROR) { \
+        return false; \
+    }
         COMMODITY_TARIFF_PRIMARY_ATTRIBUTES
 #undef X
-        if (err != CHIP_NO_ERROR)
-        {
-            return false;
-        }
         return true;
     }
 
