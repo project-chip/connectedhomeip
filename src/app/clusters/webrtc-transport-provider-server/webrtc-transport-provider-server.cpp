@@ -473,7 +473,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
             return;
         }
 
-        // One of Video Stream ID or Audio Stream ID has to be present
+        // At least one of Video Stream ID and Audio Stream ID has to be present
         if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
         {
             ChipLogError(Zcl, "HandleProvideOffer: one of VideoStreamID or AudioStreamID must be present");
