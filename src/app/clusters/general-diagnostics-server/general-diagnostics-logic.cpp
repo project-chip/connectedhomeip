@@ -27,7 +27,7 @@ namespace app {
 namespace Clusters {
 
 // Max decodable count allowed is 2048.
-constexpr u_int16_t kMaxPayloadTestRequestCount = 2048;
+constexpr uint16_t kMaxPayloadTestRequestCount = 2048;
 
 CHIP_ERROR GeneralDiagnosticsLogic::ReadNetworkInterfaces(AttributeValueEncoder & aEncoder)
 {
