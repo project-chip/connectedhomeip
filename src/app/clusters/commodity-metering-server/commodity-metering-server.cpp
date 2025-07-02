@@ -238,9 +238,17 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 
     switch (aPath.mAttributeId)
     {
-    case MeteredQuantity::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(GetMeteredQuantity()));
+    case MeteredQuantity::Id: {
+        auto list = GetMeteredQuantity();
+        ReturnErrorOnFailure(aEncoder.EncodeList([&list](const auto & encoder) {
+            for (const auto & item : list.Value())
+            {
+                ReturnErrorOnFailure(encoder.Encode(item));
+            }
+            return CHIP_NO_ERROR;
+        }));
         break;
+    }
 
     case MeteredQuantityTimestamp::Id:
         ReturnErrorOnFailure(aEncoder.Encode(GetMeteredQuantityTimestamp()));
