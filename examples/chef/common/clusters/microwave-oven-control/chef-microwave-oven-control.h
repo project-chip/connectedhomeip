@@ -22,6 +22,7 @@
 #include <app/clusters/microwave-oven-control-server/microwave-oven-control-server.h>
 #include <app/util/config.h>
 #include <cstring>
+#include <memory>
 #include <protocols/interaction_model/StatusCode.h>
 #include <utility>
 
@@ -73,14 +74,16 @@ public:
 
     uint8_t GetPowerStepNum() const override { return kPowerStepNum; }
 
-    uint32_t GetMaxCookTimeSec() const override { return 100; }
-
     uint8_t GetCurrentWattIndex() const override { return mSelectedWattIndex; };
+
+    uint32_t GetMaxCookTimeSec() const override { return 100; }
 
     uint16_t GetWattRating() const override { return mWattRating; };
 
 private:
-    chip::app::Clusters::OperationalState::Instance * mOperationalStateInstancePtr;
+    std::unique_ptr<chip::app::Clusters::OperationalState::OperationalStateDelegate> mOperationalStateDelegatePtr;
+    std::unique_ptr<chip::app::Clusters::OperationalState::Instance> mOperationalStateInstancePtr;
+
     chip::app::Clusters::ModeBase::Instance * mMicrowaveOvenModeInstancePtr;
 
     MicrowaveOvenControl::Instance mMicrowaveOvenControlInstance;
@@ -91,17 +94,11 @@ private:
     static constexpr uint32_t kMaxCookTimeSec        = 86400u;
     static constexpr uint8_t kDefaultPowerSettingNum = kMaxPowerNum;
 
-    static constexpr uint16_t kExampleWatt1 = 100u;
-    static constexpr uint16_t kExampleWatt2 = 300u;
-    static constexpr uint16_t kExampleWatt3 = 500u;
-    static constexpr uint16_t kExampleWatt4 = 800u;
-    static constexpr uint16_t kExampleWatt5 = 1000u;
-
     uint8_t mPowerSettingNum   = kDefaultPowerSettingNum;
     uint8_t mSelectedWattIndex = 0;
     uint16_t mWattRating       = 0;
 
-    const uint16_t mWattSettingList[5] = { kExampleWatt1, kExampleWatt2, kExampleWatt3, kExampleWatt4, kExampleWatt5 };
+    const uint16_t mWattSettingList[5] = { 100u, 300u, 500u, 800u, 1000u };
 };
 
 } // namespace Clusters
