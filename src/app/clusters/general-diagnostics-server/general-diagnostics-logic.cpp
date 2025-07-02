@@ -17,9 +17,9 @@
 
 #include <app/clusters/general-diagnostics-server/general-diagnostics-logic.h>
 #include <app/server/Server.h>
+#include <clusters/GeneralDiagnostics/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <optional>
-#include <clusters/GeneralDiagnostics/Metadata.h>
 
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters::GeneralDiagnostics;
@@ -38,7 +38,6 @@ constexpr DataModel::AttributeEntry kAttributes[] = {
 };
 
 } // namespace
-
 
 // Max decodable count allowed is 2048.
 constexpr uint16_t kMaxPayloadTestRequestCount = 2048;
@@ -115,9 +114,9 @@ GeneralDiagnosticsLogic::HandleTimeSnapshot(CommandHandler & handler, const Conc
     return std::nullopt;
 }
 
-std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsLogic::HandlePayloadTestRequest(
-    CommandHandler & handler, const ConcreteCommandPath & commandPath,
-    const Commands::PayloadTestRequest::DecodableType & commandData)
+std::optional<DataModel::ActionReturnStatus>
+GeneralDiagnosticsLogic::HandlePayloadTestRequest(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                                                  const Commands::PayloadTestRequest::DecodableType & commandData)
 {
     if (commandData.count > kMaxPayloadTestRequestCount)
     {
@@ -148,7 +147,8 @@ std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsLogic::HandlePayl
     return std::nullopt;
 }
 
-CHIP_ERROR GeneralDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) {
+CHIP_ERROR GeneralDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+{
     // Mandatory attributes
     ReturnErrorOnFailure(builder.ReferenceExisting(kAttributes));
 

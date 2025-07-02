@@ -45,18 +45,18 @@ struct TestGeneralDiagnosticsCluster : public ::testing::Test
 TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
 {
     const GeneralDiagnosticsEnabledAttributes enabledAttributes{
-        .enableNetworkInterfaces = false,
-        .enableRebootCount = false,
-        .enableUpTime = false,
-        .enableTotalOperationalHours = false,
-        .enableBootReason = false,
-        .enableActiveHardwareFaults = false,
-        .enableActiveRadioFaults = false,
-        .enableActiveNetworkFaults = false,
+        .enableNetworkInterfaces        = false,
+        .enableRebootCount              = false,
+        .enableUpTime                   = false,
+        .enableTotalOperationalHours    = false,
+        .enableBootReason               = false,
+        .enableActiveHardwareFaults     = false,
+        .enableActiveRadioFaults        = false,
+        .enableActiveNetworkFaults      = false,
         .enableTestEventTriggersEnabled = false,
     };
 
     GeneralDiagnosticsCluster cluster(enabledAttributes);
 }
 
-}
+} // namespace
