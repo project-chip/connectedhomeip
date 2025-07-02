@@ -384,7 +384,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
     DeviceLayer::PlatformMgr().LockChipStack();
     SetCurrentAction(PANEL_STEP_ACTION);
     mCurrentActionEndpointId = endpointId;
-    isStepActionInProgress = true;
+    isStepActionInProgress   = true;
     DeviceLayer::PlatformMgr().UnlockChipStack();
 
     AppEvent event;
