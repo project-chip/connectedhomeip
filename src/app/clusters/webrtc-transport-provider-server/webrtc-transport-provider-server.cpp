@@ -272,14 +272,14 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     }
 
     // One of Video Stream ID or Audio Stream ID has to be present
-    if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue()) 
+    if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
     {
             ChipLogError(Zcl, "HandleSolicitOffer: one of VideoStreamID or AudioStreamID must be present");
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
             return;
     }
 
-    // Validate VideoStreamID against AllocatedVideoStreams. 
+    // Validate VideoStreamID against AllocatedVideoStreams.
     // If present and null then a stream has to have been allocated.
     // If present and not null, then the stream ID has to exist
     if (req.videoStreamID.HasValue())
@@ -310,7 +310,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     // Validate AudioStreamID against AllocatedAudioStreams if present
     // If present and null then a stream has to have been allocated.
     // If present and not null, then the stream ID has to exist
-    if (req.audioStreamID.HasValue()) 
+    if (req.audioStreamID.HasValue())
     {
         if (req.audioStreamID.Value().IsNull())
         {
@@ -320,7 +320,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
                 ChipLogError(Zcl, "HandleSolicitOffer: audio requested when there are no AllocatedVideoStreams");
                 ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
                 return;
-            }            
+            }
         }
         else
         {
@@ -474,14 +474,14 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         }
 
         // One of Video Stream ID or Audio Stream ID has to be present
-        if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue()) 
+        if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
         {
             ChipLogError(Zcl, "HandleSolicitOffer: one of VideoStreamID or AudioStreamID must be present");
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
             return;
         }
 
-        // Validate VideoStreamID against AllocatedVideoStreams. 
+        // Validate VideoStreamID against AllocatedVideoStreams.
         // If present and null then a stream has to have been allocated.
         // If present and not null, then the stream ID has to exist
         if (videoStreamID.HasValue() && !videoStreamID.Value().IsNull())
