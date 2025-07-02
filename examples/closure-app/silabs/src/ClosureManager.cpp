@@ -244,7 +244,10 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         instance.ep1.OnCalibrateActionComplete();
         instance.ep2.OnCalibrateActionComplete();
         instance.ep3.OnCalibrateActionComplete();
+
+        DeviceLayer::PlatformMgr().LockChipStack();
         isCalibrationInProgress = false;
+        DeviceLayer::PlatformMgr().UnlockChipStack();
         break;
     }
     case Action_t::MOVE_TO_ACTION:
@@ -257,7 +260,10 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
             instance.ep1.OnStopCalibrateActionComplete();
             instance.ep2.OnStopCalibrateActionComplete();
             instance.ep3.OnStopCalibrateActionComplete();
+            
+            DeviceLayer::PlatformMgr().LockChipStack();
             isCalibrationInProgress = false;
+            DeviceLayer::PlatformMgr().UnlockChipStack();
         }
         else if (isMoveToInProgress)
         {
@@ -265,7 +271,10 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
             instance.ep1.OnStopMotionActionComplete();
             instance.ep2.OnStopMotionActionComplete();
             instance.ep3.OnStopMotionActionComplete();
+
+            DeviceLayer::PlatformMgr().LockChipStack();
             isMoveToInProgress = false;
+            DeviceLayer::PlatformMgr().UnlockChipStack();
         }
         else
         {
@@ -283,7 +292,11 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         {
             instance.mClosurePanelEndpoint3.OnPanelMotionActionComplete();
         }
+
+        DeviceLayer::PlatformMgr().LockChipStack();
         instance.isSetTargetInProgress = false;
+        DeviceLayer::PlatformMgr().UnlockChipStack();
+
         break;
     default:
         ChipLogError(AppServer, "Invalid action received in HandleClosureAction");
@@ -302,10 +315,11 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
     VerifyOrReturnValue(ep1.GetLogic().SetCountdownTimeFromDelegate(kDefaultCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set countdown time for calibration"));
 
+    DeviceLayer::PlatformMgr().LockChipStack();
     SetCurrentAction(Action_t::CALIBRATE_ACTION);
     mCurrentActionEndpointId = ep1.GetEndpointId();
-
     isCalibrationInProgress = true;
+    DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // Post an event to initiate the calibration action asynchronously.
     // Calibration can be only initiated from Closure Endpoint 1, so we set the endpoint ID to ep1.
@@ -328,8 +342,11 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStopCommand()
 
     CancelTimer();
 
+    DeviceLayer::PlatformMgr().LockChipStack();
     SetCurrentAction(Action_t::STOP_ACTION);
     mCurrentActionEndpointId = ep1.GetEndpointId();
+    DeviceLayer::PlatformMgr().UnlockChipStack();
+
 
     HandleClosureActionComplete(Action_t::STOP_ACTION);
 
@@ -394,14 +411,15 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
         overallTargetState.Value().speed.SetValue(speed.Value());
     }
 
+    VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetMainState(MainStateEnum::kMoving) == CHIP_NO_ERROR, Status::Failure,
+                        ChipLogError(AppServer, "Failed to set main state while handling the SetTarget command on Endpoint 1"));
+
     VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetOverallTargetState(overallTargetState) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set overall target while handling the SetTarget command for Endpoint %d", endpointId));
 
-    VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
+    VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(kDefaultCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set countdown time while handling the SetTarget command for Endpoint %d", endpointId));
 
-    VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetMainState(MainStateEnum::kMoving) == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(AppServer, "Failed to set main state while handling the SetTarget command on Endpoint 1"));
 
     // Post an event to initiate the unlatch action asynchronously.
     // Closure panel first performs the unlatch action if it is currently latched,
@@ -468,7 +486,7 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
         instance.SetCurrentAction(Action_t::SET_TARGET_ACTION);
         instance.mCurrentActionEndpointId = endpointId;
         DeviceLayer::PlatformMgr().UnlockChipStack();
-        
+
         instance.StartTimer(kMotionCountdownTimeMs);
         return;
     }

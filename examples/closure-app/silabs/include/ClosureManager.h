@@ -142,11 +142,15 @@ private:
 
     osTimerId_t mClosureTimer;
 
+    // Below Progress variables and mCurrentAction, mCurrentActionEndpointId should be set only in
+    // chip task context. Incase if these variables are to be set in other task context, then we should
+    // make them thread-safe using mutex or other synchronization mechanisms. Presently, we use
+    // DeviceLayer::PlatformMgr().LockChipStack() and DeviceLayer::PlatformMgr().UnlockChipStack()
+    // to ensure that these variables are set in thread safe manner in chip task context.
     bool isCalibrationInProgress = false;
     bool isMoveToInProgress      = false;
     bool isSetTargetInProgress   = false;
     
-
     Action_t mCurrentAction                   = Action_t::INVALID_ACTION;
     chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
 
