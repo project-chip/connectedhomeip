@@ -260,8 +260,8 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
 
 chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
 {
-    VerifyOrReturnValue(mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(AppServer, "Failed to set countdown time for calibration"));
+    VerifyOrReturnValue(mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR,
+                        Status::Failure, ChipLogError(AppServer, "Failed to set countdown time for calibration"));
 
     // Post an event to initiate the calibration action asynchronously.
     AppEvent event;
@@ -300,11 +300,12 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
 
     // If this command is received while the MainState attribute is currently either in Disengaged, Protected, Calibrating,
     //  SetupRequired or Error, then a status code of INVALID_IN_STATE shall be returned.
-    VerifyOrReturnError(mClosureEndpoint1MainState != MainStateEnum::kDisengaged && mClosureEndpoint1MainState != MainStateEnum::kProtected &&
-                            mClosureEndpoint1MainState != MainStateEnum::kSetupRequired && mClosureEndpoint1MainState != MainStateEnum::kError &&
-                            mClosureEndpoint1MainState != MainStateEnum::kCalibrating,
-                        Status::InvalidInState,
-                        ChipLogError(AppServer, "Step command not allowed in current state: %d", static_cast<int>(mClosureEndpoint1MainState)));
+    VerifyOrReturnError(
+        mClosureEndpoint1MainState != MainStateEnum::kDisengaged && mClosureEndpoint1MainState != MainStateEnum::kProtected &&
+            mClosureEndpoint1MainState != MainStateEnum::kSetupRequired && mClosureEndpoint1MainState != MainStateEnum::kError &&
+            mClosureEndpoint1MainState != MainStateEnum::kCalibrating,
+        Status::InvalidInState,
+        ChipLogError(AppServer, "Step command not allowed in current state: %d", static_cast<int>(mClosureEndpoint1MainState)));
 
     if (isStepActionInProgress && mCurrentActionEndpointId != endpointId)
     {
@@ -321,8 +322,8 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
     // Update Overall Target to Null for the Closure Control on Endpoint 1
     DataModel::Nullable<GenericOverallTargetState> mClosureEndpoint1Target;
 
-    VerifyOrReturnValue(mClosureEndpoint1.GetLogic().GetOverallTargetState(mClosureEndpoint1Target) == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(AppServer, "Failed to get overall target for Step command"));
+    VerifyOrReturnValue(mClosureEndpoint1.GetLogic().GetOverallTargetState(mClosureEndpoint1Target) == CHIP_NO_ERROR,
+                        Status::Failure, ChipLogError(AppServer, "Failed to get overall target for Step command"));
 
     if (mClosureEndpoint1Target.IsNull())
     {
@@ -331,8 +332,8 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
 
     mClosureEndpoint1Target.Value().position = NullOptional; // Reset position to Null
 
-    VerifyOrReturnValue(mClosureEndpoint1.GetLogic().SetOverallTargetState(mClosureEndpoint1Target) == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(AppServer, "Failed to set overall target for Step command"));
+    VerifyOrReturnValue(mClosureEndpoint1.GetLogic().SetOverallTargetState(mClosureEndpoint1Target) == CHIP_NO_ERROR,
+                        Status::Failure, ChipLogError(AppServer, "Failed to set overall target for Step command"));
 
     SetCurrentAction(PANEL_STEP_ACTION);
     mCurrentActionEndpointId = endpointId;
