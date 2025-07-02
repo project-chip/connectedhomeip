@@ -129,8 +129,8 @@ private:
 class TlsCertificateManagementDelegate
 {
 public:
-    using RootCertStructType             = TlsCertificateManagement::Structs::TLSCertStruct::DecodableType;
-    using ClientCertStructType           = TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::DecodableType;
+    using RootCertStructType             = TlsCertificateManagement::Structs::TLSCertStruct::Type;
+    using ClientCertStructType           = TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::Type;
     using ProvisionRootCertificateType   = TlsCertificateManagement::Commands::ProvisionRootCertificate::DecodableType;
     using ProvisionClientCertificateType = TlsCertificateManagement::Commands::ProvisionClientCertificate::DecodableType;
     using ClientCsrType                  = TlsCertificateManagement::Commands::TLSClientCSR::DecodableType;
@@ -140,8 +140,10 @@ public:
 
     virtual ~TlsCertificateManagementDelegate() = default;
 
-    using LoadedRootCertificateCallback   = std::function<CHIP_ERROR(Tls::CertificateTable::RootCertStruct & cert)>;
-    using LoadedClientCertificateCallback = std::function<CHIP_ERROR(Tls::CertificateTable::ClientCertStruct & cert)>;
+    using RootCertificateListCallback     = std::function<CHIP_ERROR(DataModel::List<const RootCertStructType> & certs)>;
+    using ClientCertificateListCallback   = std::function<CHIP_ERROR(DataModel::List<const ClientCertStructType> & certs)>;
+    using LoadedRootCertificateCallback   = std::function<CHIP_ERROR(RootCertStructType & cert)>;
+    using LoadedClientCertificateCallback = std::function<CHIP_ERROR(ClientCertStructType & certs)>;
     using GeneratedCsrCallback            = std::function<Protocols::InteractionModel::Status(ClientCsrResponseType & cert)>;
 
     /**
@@ -173,16 +175,49 @@ public:
                                        LoadedRootCertificateCallback loadedCallback) const = 0;
 
     /**
+     * @brief Executes loadedCallback on all matching certificates. The certificates passed to loadedCallback has a guaranteed
+     * lifetime of the method call.
+     *
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric the certificate is associated with
+     * @param[in] loadedCallback lambda to execute on list of all matching certificates.  If this function returns an error result,
+     * iteration stops and returns that same error result.
+     */
+    virtual CHIP_ERROR RootCertsForFabric(EndpointId matterEndpoint, FabricIndex fabric,
+                                          RootCertificateListCallback loadedCallback) const = 0;
+
+    /**
+     * @brief Finds the TLSCertStruct with the given id
+     *
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric the certificate is associated with
+     * @param[in] id The id of the root certificate to find.
+     * @param[out] loadedCallback The lambda to execute with the loaded root cert.
+     * @return CHIP_ERROR_NOT_FOUND if no mapping is found.
+     */
+    virtual CHIP_ERROR FindRootCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id,
+                                    LoadedRootCertificateCallback loadedCallback) const = 0;
+
+    /**
      * @brief Finds the TLSCertStruct with the given fingerprint
      *
      * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric the certificate is associated with
      * @param[in] fingerprint The fingerprint of the root certificate to find.
      * @param[out] loadedCallback The lambda to execute with the loaded root cert.
-     * @return NotFound if no mapping is found.
+     * @return CHIP_ERROR_NOT_FOUND if no mapping is found.
      */
-    virtual Protocols::InteractionModel::Status LookupRootCert(EndpointId matterEndpoint, FabricIndex fabric,
-                                                               const ByteSpan & fingerprint,
-                                                               LoadedRootCertificateCallback loadedCallback) const = 0;
+    virtual CHIP_ERROR LookupRootCert(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & fingerprint,
+                                      LoadedRootCertificateCallback loadedCallback) const = 0;
+    /**
+     * @brief Removes the root certificate with the given ID
+     *
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric the certificate is associated with
+     * @param[in] id The id of the root certificate to remove.
+     * @return CHIP_ERROR_NOT_FOUND if no mapping is found.
+     */
+    virtual CHIP_ERROR RemoveRootCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) = 0;
 
     /**
      * @brief Generates a client certificate signing request (CSR)
@@ -211,13 +246,11 @@ public:
     ProvisionClientCert(EndpointId matterEndpoint, FabricIndex fabric, const ProvisionClientCertificateType & provisionReq) = 0;
 
     /**
-     * @brief Executes loadedCallback for each root certificate.  The certificate passed to loadedCallback has a guaranteed lifetime
-     of the method call.
+     * @brief Executes loadedCallback for each client certificate.  The certificate passed to loadedCallback has a guaranteed
+     lifetime of the method call.
      *
      * @param[in] loadedCallback lambda to execute with allocated memory for client certificate loading.  If this function returns
-     an error result,
-                                                                                                            * iteration stops and
-     returns that same error result.
+     an error result,  returns that same error result.
 
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fabric The fabric the certificate is associated with
@@ -226,16 +259,50 @@ public:
                                          LoadedClientCertificateCallback loadedCallback) const = 0;
 
     /**
+     * @brief Executes loadedCallback for all matching client certificates.  The certificates passed to loadedCallback has a
+     guaranteed lifetime of the method call.
+     *
+     * @param[in] loadedCallback lambda to execute with allocated memory for client certificate loading.  If this function returns
+     an error result,  returns that same error result.
+
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric the certificate is associated with
+     */
+    virtual CHIP_ERROR ClientCertsForFabric(EndpointId matterEndpoint, FabricIndex fabric,
+                                            ClientCertificateListCallback loadedCallback) const = 0;
+
+    /**
+     * @brief Finds the TLSClientCertificateDetailStruct with the given id
+     *
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric the certificate is associated with
+     * @param[in] id The id of the client certificate to find.
+     * @param[out] loadedCallback The lambda to execute with the loaded client cert.
+     * @return CHIP_ERROR_NOT_FOUND if no mapping is found.
+     */
+    virtual CHIP_ERROR FindClientCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id,
+                                      LoadedClientCertificateCallback loadedCallback) const = 0;
+
+    /**
      * @brief Finds the TLSClientCertificateDetailStruct with the given fingerprint
      *
      * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric the certificate is associated with
      * @param[in] fingerprint The fingerprint of the client certificate to find.
      * @param[out] loadedCallback The lambda to execute with the loaded client cert.
      * @return NotFound if no mapping is found.
      */
-    virtual Protocols::InteractionModel::Status LookupClientCert(EndpointId matterEndpoint, FabricIndex fabric,
-                                                                 const ByteSpan & fingerprint,
-                                                                 LoadedClientCertificateCallback loadedCallback) const = 0;
+    virtual CHIP_ERROR LookupClientCert(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & fingerprint,
+                                        LoadedClientCertificateCallback loadedCallback) const = 0;
+    /**
+     * @brief Removes the client certificate with the given ID
+     *
+     * @param[in] matterEndpoint The matter endpoint to query against
+     * @param[in] fabric The fabric the certificate is associated with
+     * @param[in] id The id of the client certificate to remove.
+     * @return CHIP_ERROR_NOT_FOUND if no mapping is found.
+     */
+    virtual CHIP_ERROR RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) = 0;
 
 protected:
     friend class TlsCertificateManagementServer;

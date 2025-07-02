@@ -69,6 +69,7 @@ public:
     /** Check if a buffer is valid */
     explicit operator bool() const { return mBuffer != nullptr; }
     bool operator!() const { return mBuffer == nullptr; }
+    inline bool IsNull() const { return mBuffer == nullptr; }
 
     /** Release memory used */
     void Free()
@@ -148,6 +149,11 @@ public:
     const T * Get() const { return static_cast<const T *>(Base::Ptr()); }
     const T & operator[](size_t index) const { return Get()[index]; }
 
+    inline T * operator->() { return Get(); }
+    inline const T * operator->() const { return Get(); }
+    inline const T & operator*() const { return *Get(); }
+    inline T & operator*() { return *Get(); }
+
     /**
      * Releases the underlying buffer.
      *
@@ -195,6 +201,49 @@ private:
     }
 };
 
+/// RAII class for allocation that guarantees that Free() will be called.
+/// This is effectively a simple unique_ptr, except calling Platform::Delete instead of delete
+template <typename T, class MemoryManagement = Impl::PlatformMemoryManagement>
+class AutoDelete : private Impl::ScopedMemoryBufferBase<MemoryManagement>
+{
+public:
+    using Base = Impl::ScopedMemoryBufferBase<MemoryManagement>;
+    using Base::operator bool;
+    using Base::operator!;
+    using Base::IsNull;
+
+    template <typename... Args>
+    AutoDelete(Args &&... args)
+    {
+        Base::Alloc(sizeof(T));
+        T * p = Get();
+        if (p != nullptr)
+        {
+            new (p) T(std::forward<Args>(args)...);
+        }
+    }
+    ~AutoDelete() { Free(); }
+
+    // Not copyable or movable
+    AutoDelete(const AutoDelete &)             = delete;
+    AutoDelete(const AutoDelete &&)            = delete;
+    AutoDelete & operator=(const AutoDelete &) = delete;
+
+    inline T * Get() { return static_cast<T *>(Base::Ptr()); }
+    inline T * operator->() { return Get(); }
+    inline const T * operator->() const { return Get(); }
+    inline const T & operator*() const { return *Get(); }
+    inline T & operator*() { return *Get(); }
+
+    void Free()
+    {
+        T * p = Get();
+        VerifyOrReturn(p != nullptr);
+        p->~T();
+        Base::Free();
+    }
+};
+
 /**
  * Represents a memory buffer with buffer size allocated using chip::Platform::Memory*Alloc
  * methods.
@@ -222,8 +271,8 @@ public:
     // return the size as count of elements
     inline size_t AllocatedSize() const { return mCount; }
 
-    chip::Span<T> Span() { return chip::Span<T>(this->Get(), AllocatedSize()); }
-    chip::Span<const T> Span() const { return chip::Span<T>(this->Get(), AllocatedSize()); }
+    inline chip::Span<T> Span() { return chip::Span<T>(this->Get(), AllocatedSize()); }
+    inline chip::Span<const T> Span() const { return chip::Span<T>(this->Get(), AllocatedSize()); }
 
     void Free()
     {
