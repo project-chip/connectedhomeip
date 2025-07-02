@@ -51,8 +51,8 @@ static constexpr size_t kCalendarPeriodItemMaxDayPatternIDs = 7;
 static constexpr size_t kDayStructItemMaxDayEntryIDs        = 96;
 static constexpr size_t kDayPatternItemMaxDayEntryIDs       = kDayStructItemMaxDayEntryIDs;
 static constexpr size_t kTariffPeriodItemMaxIDs             = 20;
-static constexpr uint16_t kDayEntryDurationLimit = 1500;
-static constexpr uint8_t kFullWeekMask = 0x7f;
+static constexpr uint16_t kDayEntryDurationLimit            = 1500;
+static constexpr uint8_t kFullWeekMask                      = 0x7f;
 
 template <typename T>
 struct SpanCopier
@@ -216,7 +216,8 @@ struct IsEnum : std::is_enum<U>
 {
 };
 template <typename U>
-struct IsStruct : std::integral_constant<bool, !IsList<U>::value && !IsNumeric<U>::value && !IsEnum<U>::value && !std::is_pointer<U>::value>
+struct IsStruct
+    : std::integral_constant<bool, !IsList<U>::value && !IsNumeric<U>::value && !IsEnum<U>::value && !std::is_pointer<U>::value>
 {
 };
 
@@ -398,24 +399,32 @@ public:
      */
     auto GetValueData() -> ExtractPayloadType_t<ValueType> *
     {
-        if (mUpdateState < UpdateState::kInitialized) {
+        if (mUpdateState < UpdateState::kInitialized)
+        {
             return nullptr;
-        }   
+        }
 
-        if constexpr (IsValueNullable()) {
-            if (GetValueRef().IsNull()) {
+        if constexpr (IsValueNullable())
+        {
+            if (GetValueRef().IsNull())
+            {
                 return nullptr;
             }
-            if constexpr (IsList<WrappedType>::value) {
+            if constexpr (IsList<WrappedType>::value)
+            {
                 return GetValueRef().Value().data();
-            } else {
+            }
+            else
+            {
                 return &GetValueRef().Value();
             }
-        } 
-        else if constexpr (IsValueList()) {
+        }
+        else if constexpr (IsValueList())
+        {
             return GetValueRef().data();
-        } 
-        else {
+        }
+        else
+        {
             return &GetValueRef();
         }
     }
@@ -507,26 +516,34 @@ public:
      *
      * @warning Pointer becomes invalid after UpdateCommit()/UpdateEnd()
      */
-    auto GetNewValueData() -> ExtractPayloadType_t<ValueType>*
+    auto GetNewValueData() -> ExtractPayloadType_t<ValueType> *
     {
-        if (mUpdateState < UpdateState::kInitialized) {
+        if (mUpdateState < UpdateState::kInitialized)
+        {
             return nullptr;
-        }   
+        }
 
-        if constexpr (IsValueNullable()) {
-            if (GetNewValueRef().IsNull()) {
+        if constexpr (IsValueNullable())
+        {
+            if (GetNewValueRef().IsNull())
+            {
                 return nullptr;
             }
-            if constexpr (IsList<WrappedType>::value) {
+            if constexpr (IsList<WrappedType>::value)
+            {
                 return GetNewValueRef().Value().data();
-            } else {
+            }
+            else
+            {
                 return &GetNewValueRef().Value();
             }
-        } 
-        else if constexpr (IsValueList()) {
+        }
+        else if constexpr (IsValueList())
+        {
             return GetNewValueRef().data();
-        } 
-        else {
+        }
+        else
+        {
             return &GetNewValueRef();
         }
     }
@@ -567,12 +584,12 @@ public:
         }
 
         CHIP_ERROR err = CHIP_NO_ERROR;
-    
+
         // Bypass validation if ctx not set
         if (aUpdCtx != nullptr)
         {
             mAuxData = aUpdCtx;
-            err = ValidateNewValue();
+            err      = ValidateNewValue();
         }
 
         if (aUpdCb != nullptr)
@@ -584,7 +601,7 @@ public:
         {
             mUpdateState = UpdateState::kValidated;
         }
-    
+
         return err;
     }
 
@@ -606,9 +623,9 @@ public:
         {
             if (mHoldState == StorageState::kHold)
             {
-                Cleanup(); //Cleanup current value
+                Cleanup(); // Cleanup current value
             }
-            mHoldState = StorageState::kHold;
+            mHoldState   = StorageState::kHold;
             mUpdateState = UpdateState::kUpdated;
         }
 
@@ -640,7 +657,7 @@ public:
         {
             CleanupValue(GetNewValueRef());
         }
-    
+
         mUpdateState = UpdateState::kIdle;
     }
 
@@ -660,15 +677,9 @@ private:
 
     ValueType & GetNewValueRef() { return mValueStorage[!mActiveValueIdx]; }
 
-    void SwapActiveValueStorage()
-    {
-        mActiveValueIdx = !mActiveValueIdx;
-    }
+    void SwapActiveValueStorage() { mActiveValueIdx = !mActiveValueIdx; }
 
-    static constexpr bool IsValueNullable()
-    {
-        return IsNullable<T>::value;
-    }
+    static constexpr bool IsValueNullable() { return IsNullable<T>::value; }
 
     static constexpr bool IsValueList() { return IsList<T>::value; }
 
@@ -706,10 +717,10 @@ private:
         {
             return ListsNotEqual(GetNewValueRef(), GetValueRef());
         }
-        else  
-        {  
+        else
+        {
             return GetNewValueRef() != GetValueRef();
-        }  
+        }
     }
 
     void CleanupValue(ValueType & aValue)
@@ -752,12 +763,12 @@ private:
 
 protected:
     T mValueStorage[2]; // Double-buffered storage
-    
-    void * mAuxData = nullptr; // Validation context
-    const uint32_t mAttrId; // Attribute identifier
+
+    void * mAuxData = nullptr;                  // Validation context
+    const uint32_t mAttrId;                     // Attribute identifier
     void (*mAuxCb)(uint32_t, void *) = nullptr; // Update callback
 
-    StorageState mHoldState = StorageState::kEmpty;
+    StorageState mHoldState  = StorageState::kEmpty;
     UpdateState mUpdateState = UpdateState::kIdle;
 
     virtual CHIP_ERROR Validate(const ValueType & aValue) const { return CHIP_NO_ERROR; }
