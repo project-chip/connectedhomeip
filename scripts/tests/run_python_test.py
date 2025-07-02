@@ -196,6 +196,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     if quiet:
         stream_output = io.BytesIO()
 
+    logging.info('[DEBUG] !!!! app', app)
     if app:
         if not os.path.exists(app):
             if app is None:
@@ -207,7 +208,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                                  f_stdout=stream_output,
                                  f_stderr=stream_output)
         app_process.start(expected_output=app_ready_pattern, timeout=30)
-        print('[DEBUF] !!!! Process started. app ready pattern - ', app_ready_pattern)
+        logging.info('[DEBUG] !!!! Process started. app ready pattern - ', app_ready_pattern)
         if app_stdin_pipe:
             logging.info("Forwarding stdin from '%s' to app", app_stdin_pipe)
             app_stdin_forwarding_thread = threading.Thread(
