@@ -97,8 +97,6 @@ namespace DeviceLayer {
         ConfigurationManagerImpl::GetDefaultInstance().ClearWiFiNetworkInformations();
     }
 
-    bool ConnectivityManagerImpl::_CanStartWiFiScan() { return _IsWiFiStationConnected(); }
-
     CHIP_ERROR ConnectivityManagerImpl::GetWiFiInterfaceName(char * outName, size_t maxLen)
     {
         auto interface = GetDefaultWiFiInterface();

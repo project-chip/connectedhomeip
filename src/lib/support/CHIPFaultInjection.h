@@ -39,50 +39,85 @@
 namespace chip {
 namespace FaultInjection {
 
+// X-Macro style enumeration of Fault Names and their ID.
+// This list is used to generate the "Id" enum and the array of strings sFaultNames[]
+// WARNING: When adding/modifying Faults to the below macro, make sure the changes are duplicated to the CHIPFaultId enum in the
+// Python Module src/controller/python/chip/fault_injection/__init__.py
+
+// BEGIN-IF-CHANGE-ALSO-CHANGE(src/controller/python/chip/fault_injection/__init__.py)
+#define CHIP_FAULTS_ENUMERATE(X)                                                                                                   \
+    X(AllocExchangeContext, 0) /**< Fail the allocation of an ExchangeContext */                                                   \
+    X(DropIncomingUDPMsg, 1)   /**< Drop an incoming UDP message without any processing */                                         \
+    X(DropOutgoingUDPMsg, 2)   /**< Drop an outgoing UDP message at the chip Message layer */                                      \
+    X(AllocBinding, 3)         /**< Fail the allocation of a Binding */                                                            \
+    X(SendAlarm, 4)            /**< Fail to send an alarm message */                                                               \
+    X(HandleAlarm, 5)          /**< Fail to handle an alarm message */                                                             \
+    X(FuzzExchangeHeaderTx, 6) /**< Fuzz an Exchange Header in the packet buffer; expects an int argument selecting a fuzzing      \
+                                  method. @see FuzzExchangeHeader */                                                               \
+    X(RMPDoubleTx, 7)          /**< Force RMP to transmit the outgoing message twice */                                            \
+    X(RMPSendError, 8)         /**< Simulate a send error in RMP as if retransmission count exceeded */                            \
+    X(BDXBadBlockCounter, 9)   /**< Corrupt the BDX Block Counter in a BlockSend or BlockEOF message */                            \
+    X(BDXAllocTransfer, 10)    /**< Fail the allocation of a BDXTransfer object */                                                 \
+    X(SecMgrBusy, 11)          /**< Simulate WEAVE_ERROR_SECURITY_MANAGER_BUSY on session start */                                 \
+    X(IMInvoke_SeparateResponses, 12) /**< Respond to 2 InvokeRequestMessage commands with 2 separate responses */                 \
+    X(IMInvoke_SeparateResponsesInvertResponseOrder, 13) /**< Respond with 2 InvokeResponses in reverse order of request */        \
+    X(IMInvoke_SkipSecondResponse, 14)                   /**< Respond to 2 commands but drop the second response */                \
+    X(ModifyWebRTCAnswerSessionId, 15)                   /**< Modify session ID in outgoing WebRTC Answer command */               \
+    X(ModifyWebRTCOfferSessionId, 16)                    /**< Modify session ID in outgoing WebRTC Offer command */                \
+    X(CASEServerBusy, 17)                                /**< Respond to CASE_Sigma1 with BUSY status */                           \
+    X(CASESkipInitiatorResumeMIC, 18)                    /**< Send Sigma1 with resumptionID but omit initiatorResumeMIC */         \
+    X(CASESkipResumptionID, 19)                          /**< Send Sigma1 with initiatorResumeMIC but omit resumptionID */         \
+    X(CASECorruptInitiatorResumeMIC, 20)                 /**< Send invalid initiatorResumeMIC in Sigma1 */                         \
+    X(CASECorruptDestinationID, 21)                      /**< Send Sigma1 with invalid DestinationID */                            \
+    X(CASECorruptTBEData3Encrypted, 22)                  /**< Send CASE_Sigma3 with improperly generated TBEData3Encrypted */      \
+    X(CASECorruptSigma3NOC, 23)                          /**< Send Sigma3 with invalid initiatorNOC */                             \
+    X(CASECorruptSigma3ICAC, 24)                         /**< Send Sigma3 with invalid initiatorICAC */                            \
+    X(CASECorruptSigma3Signature, 25)                    /**< Send Sigma3 with invalid signature */                                \
+    X(CASECorruptSigma3InitiatorEphPubKey, 26)           /**< Send Sigma3 with invalid initiator ephemeral public key */           \
+    X(CASECorruptSigma3ResponderEphPubKey, 27)           /**< Send Sigma3 with invalid responder ephemeral public key */           \
+    X(CASECorruptTBEData2Encrypted, 28)                  /**< Send Sigma2 with improperly generated TBEData2Encrypted */           \
+    X(CASECorruptSigma2NOC, 29)                          /**< Send Sigma2 with invalid responderNOC */                             \
+    X(CASECorruptSigma2ICAC, 30)                         /**< Send Sigma2 with invalid responderICAC */                            \
+    X(CASECorruptSigma2Signature, 31)                    /**< Send Sigma2 with invalid signature */
+
+// END-IF-CHANGE-ALSO-CHANGE(src/controller/python/chip/fault_injection/__init__.py)
+// WARNING: When adding/modifying Faults to the below macro, make sure the changes are duplicated to the CHIPFaultId enum in the
+// Python Module src/controller/python/chip/fault_injection/__init__.py
+
 /**
  * @brief   Fault injection points
  *
  * @details
  * Each point in the code at which a fault can be injected
  * is identified by a member of this enum.
+ *
+ * @note IMPORTANT: This enum must be kept in sync with the CHIPFaultId enum in
+ * src/controller/python/chip/fault_injection/__init__.py
+ * If you change values here, update them there as well.
  */
-typedef enum
+
+enum Id
 {
-    kFault_AllocExchangeContext, /**< Fail the allocation of an ExchangeContext */
-    kFault_DropIncomingUDPMsg,   /**< Drop an incoming UDP message without any processing */
-    kFault_DropOutgoingUDPMsg,   /**< Drop an outgoing UDP message at the chip Message layer */
-    kFault_AllocBinding,         /**< Fail the allocation of a Binding */
-    kFault_SendAlarm,            /**< Fail to send an alarm message */
-    kFault_HandleAlarm,          /**< Fail to handle an alarm message */
-    kFault_FuzzExchangeHeaderTx, /**< Fuzz a chip Exchange Header after it has been encoded into the packet buffer;
-                                      when the fault is enabled, it expects an integer argument, which is an index into
-                                      a table of modifications that can be applied to the header. @see FuzzExchangeHeader */
-    kFault_RMPDoubleTx,          /**< Force RMP to transmit the outgoing message twice */
-    kFault_RMPSendError,         /**< Fail a transmission in RMP as if the max number of retransmission has been exceeded */
-    kFault_BDXBadBlockCounter,   /**< Corrupt the BDX Block Counter in the BDX BlockSend or BlockEOF message about to be sent */
-    kFault_BDXAllocTransfer,     /**< Fail the allocation of a BDXTransfer object */
-    kFault_SecMgrBusy,           /**< Trigger a WEAVE_ERROR_SECURITY_MANAGER_BUSY when starting an authentication session */
-    kFault_IMInvoke_SeparateResponses, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid commands and respond
-                                        with 2 InvokeResponseMessages */
-    kFault_IMInvoke_SeparateResponsesInvertResponseOrder, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid
-                                        commands and respond with 2 InvokeResponseMessages where the response order is inverted
-                                        compared to the request order */
-    kFault_IMInvoke_SkipSecondResponse, /**< Validate incoming InvokeRequestMessage contains exactly 2 valid commands and respond
-                                        with 1 InvokeResponseMessage, dropping the response to the second request */
-#if CONFIG_NETWORK_LAYER_BLE
-    kFault_CHIPOBLESend, /**< Inject a GATT error when sending the first fragment of a chip message over BLE */
-#endif
-    kFault_CASEServerBusy, /**< Respond to CASE_Sigma1 with a BUSY status */
-    kFault_NumItems,
-} Id;
+#define _CHIP_FAULTS_ENUMERATE_DECL(FAULT, ...) kFault_##FAULT,
+    CHIP_FAULTS_ENUMERATE(_CHIP_FAULTS_ENUMERATE_DECL) //
+    kFault_NumItems                                    // marker value
+};
+
+// Exporting kNumChipFaultsFromEnum for usage in Python bindings
+const size_t kNumChipFaultsFromEnum = kFault_NumItems;
 
 static_assert(kFault_IMInvoke_SeparateResponses == 12, "Test plan specification and automation code relies on this value being 12");
 static_assert(kFault_IMInvoke_SeparateResponsesInvertResponseOrder == 13,
               "Test plan specification and automation code relies on this value being 13");
 static_assert(kFault_IMInvoke_SkipSecondResponse == 14,
               "Test plan specification and automation code relies on this value being 14");
+static_assert(kFault_ModifyWebRTCAnswerSessionId == 15,
+              "Test plan specification and automation code relies on this value being 15");
+static_assert(kFault_ModifyWebRTCOfferSessionId == 16, "Test plan specification and automation code relies on this value being 16");
 
 DLL_EXPORT nl::FaultInjection::Manager & GetManager();
+
+DLL_EXPORT uint32_t GetFaultCounter(uint32_t faultID);
 
 /**
  * The number of ways in which chip Fault Injection fuzzers can

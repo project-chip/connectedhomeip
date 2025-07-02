@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <lib/core/DataModelTypes.h>
+#include <vector>
 #include <zephyr/kernel.h>
 
 namespace chip {

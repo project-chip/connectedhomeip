@@ -45,6 +45,7 @@ namespace NetworkCommissioning {
 
 CHIP_ERROR GenericThreadDriver::Init(Internal::BaseDriver::NetworkStatusChangeCallback * statusChangeCallback)
 {
+    ThreadStackMgrImpl().InjectNetworkCommissioningDriver(this);
     ThreadStackMgrImpl().SetNetworkStatusChangeCallback(statusChangeCallback);
     ThreadStackMgrImpl().GetThreadProvision(mStagingNetwork);
     ReturnErrorOnFailure(PlatformMgr().AddEventHandler(OnThreadStateChangeHandler, reinterpret_cast<intptr_t>(this)));
@@ -119,7 +120,9 @@ CHIP_ERROR GenericThreadDriver::RevertConfiguration()
     // since the fail-safe was armed, so return with no error.
     VerifyOrReturnError(error != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND, CHIP_NO_ERROR);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
     ThreadStackMgrImpl().ClearAllSrpHostAndServices();
+#endif
 
     if (!GetEnabled())
     {

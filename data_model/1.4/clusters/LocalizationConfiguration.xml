@@ -70,16 +70,22 @@ Davis, CA 95616, USA
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="maxLength" value="35"/>
+      <constraint>
+        <maxLength value="35"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="SupportedLocales" type="list" default="MS">
       <entry type="string">
-        <constraint type="maxLength" value="35"/>
+        <constraint>
+          <maxLength value="35"/>
+        </constraint>
       </entry>
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="maxCount" value="32"/>
+      <constraint>
+        <maxCount value="32"/>
+      </constraint>
     </attribute>
   </attributes>
 </cluster>

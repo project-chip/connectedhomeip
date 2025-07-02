@@ -37,7 +37,7 @@ namespace RvcOperationalState {
 class RvcOperationalStateDelegate : public RvcOperationalState::Delegate
 {
 private:
-    const Clusters::OperationalState::GenericOperationalState mOperationalStateList[7] = {
+    const Clusters::OperationalState::GenericOperationalState mOperationalStateList[11] = {
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped)),
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)),
         OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused)),
@@ -46,6 +46,13 @@ private:
             to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kSeekingCharger)),
         OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kCharging)),
         OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kDocked)),
+        OperationalState::GenericOperationalState(
+            to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kEmptyingDustBin)),
+        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kCleaningMop)),
+        OperationalState::GenericOperationalState(
+            to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kFillingWaterTank)),
+        OperationalState::GenericOperationalState(
+            to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kUpdatingMaps)),
     };
     const Span<const CharSpan> mOperationalPhaseList;
 

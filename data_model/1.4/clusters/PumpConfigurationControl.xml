@@ -297,7 +297,9 @@ Davis, CA 95616, USA
           <feature name="AUTO"/>
         </optionalConform>
       </otherwiseConform>
-      <constraint type="min" value="-27315"/>
+      <constraint>
+        <min value="-27315"/>
+      </constraint>
     </attribute>
     <attribute id="0x000C" name="MaxConstTemp" type="int16" default="null">
       <access read="true" readPrivilege="view"/>
@@ -310,25 +312,33 @@ Davis, CA 95616, USA
           <feature name="AUTO"/>
         </optionalConform>
       </otherwiseConform>
-      <constraint type="min" value="-27315"/>
+      <constraint>
+        <min value="-27315"/>
+      </constraint>
     </attribute>
     <attribute id="0x0010" name="PumpStatus" type="PumpStatusBitmap" default="0">
       <access read="true" readPrivilege="view"/>
       <quality reportable="true"/>
       <optionalConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0011" name="EffectiveOperationMode" type="OperationModeEnum" default="desc">
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0012" name="EffectiveControlMode" type="ControlModeEnum" default="desc">
       <access read="true" readPrivilege="view"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0013" name="Capacity" type="int16" default="null">
       <access read="true" readPrivilege="view"/>
@@ -359,13 +369,17 @@ Davis, CA 95616, USA
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0021" name="ControlMode" type="ControlModeEnum" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
       <quality persistence="nonVolatile"/>
       <optionalConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0022" name="AlarmMask">
       <deprecateConform/>

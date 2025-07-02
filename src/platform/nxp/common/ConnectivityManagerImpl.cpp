@@ -20,12 +20,10 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include "NetworkCommissioningDriver.h"
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ConnectivityManager.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/internal/BLEManager.h>
 
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
 
@@ -41,11 +39,16 @@
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include <platform/internal/BLEManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if CONFIG_CHIP_ETHERNET
+#include "NxpEthDriver.h"
+#endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+#include "NetworkCommissioningDriver.h"
 extern "C" {
 #include "wlan.h"
 #include "wm_net.h"
@@ -87,9 +90,11 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
     mWiFiStationMode                = kWiFiStationMode_Disabled;
     mWiFiStationState               = kWiFiStationState_NotConnected;
     mWiFiStationReconnectIntervalMS = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
+#endif
 
     // Initialize the generic base classes that require it.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -108,14 +113,16 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_OnPlatformEvent(event);
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    if (event->Type == kPlatformNxpWlanEvent)
-    {
-        ProcessWlanEvent(event->Platform.WlanEventReason);
-    }
-    else if (event->Type == kPlatformNxpIpChangeEvent)
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA || CONFIG_CHIP_ETHERNET
+    if (event->Type == kPlatformNxpIpChangeEvent)
     {
         UpdateInternetConnectivityState();
+    }
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    else if (event->Type == kPlatformNxpWlanEvent)
+    {
+        ProcessWlanEvent(event->Platform.WlanEventReason);
     }
     else if (event->Type == kPlatformNxpStartWlanConnectEvent)
     {
@@ -166,6 +173,111 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     }
 #endif
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA || CONFIG_CHIP_ETHERNET
+void ConnectivityManagerImpl::UpdateInternetConnectivityState()
+{
+    bool haveIPv4Conn      = false;
+    bool haveIPv6Conn      = false;
+    const bool hadIPv4Conn = mFlags.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
+    const bool hadIPv6Conn = mFlags.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
+    const ip_addr_t * addr4;
+    const ip6_addr_t * addr6;
+    CHIP_ERROR err;
+    ChipDeviceEvent event;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    // If the WiFi station is currently in the connected state...
+    if (_IsWiFiStationConnected())
+    {
+        // Get the LwIP netif for the WiFi station interface.
+        struct netif * netif = static_cast<struct netif *>(net_get_mlan_handle());
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+
+#if CONFIG_CHIP_ETHERNET
+        // Get the LwIP netif for the Ethernet station interface.
+        struct netif * netif = DeviceLayer::NetworkCommissioning::NxpEthDriver::Instance().GetEthInetIf();
+#endif
+
+        // If interface is up...
+        if ((netif != nullptr) && netif_is_up(netif) && netif_is_link_up(netif))
+        {
+#if INET_CONFIG_ENABLE_IPV4
+            // Check if a DNS server is currently configured.  If so...
+            ip_addr_t dnsServerAddr = *dns_getserver(0);
+            if (!ip_addr_isany_val(dnsServerAddr))
+            {
+                // If the station interface has been assigned an IPv4 address, and has
+                // an IPv4 gateway, then presume that the device has IPv4 Internet
+                // connectivity.
+                if (!ip4_addr_isany_val(*netif_ip4_addr(netif)) && !ip4_addr_isany_val(*netif_ip4_gw(netif)))
+                {
+                    haveIPv4Conn = true;
+                    addr4        = &netif->ip_addr;
+                }
+            }
+#endif
+
+            // Search among the IPv6 addresses assigned to the interface for an
+            // address that is in the valid state. Search goes backwards because
+            // the link-local address is in the first slot and we prefer to report
+            // other than the link-local address value if there are multiple addresses.
+            for (int i = (LWIP_IPV6_NUM_ADDRESSES - 1); i >= 0; i--)
+            {
+                if (ip6_addr_isvalid(netif_ip6_addr_state(netif, i)))
+                {
+                    haveIPv6Conn = true;
+                    addr6        = netif_ip6_addr(netif, i);
+                    break;
+                }
+            }
+        }
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    }
+#endif
+
+    // Update the current state.
+    mFlags.Set(ConnectivityFlags::kHaveIPv4InternetConnectivity, haveIPv4Conn)
+        .Set(ConnectivityFlags::kHaveIPv6InternetConnectivity, haveIPv6Conn);
+
+    if (haveIPv4Conn != hadIPv4Conn)
+    {
+        /* Check if the */
+        event.Type                            = DeviceEventType::kInternetConnectivityChange;
+        event.InternetConnectivityChange.IPv4 = GetConnectivityChange(hadIPv4Conn, haveIPv4Conn);
+        event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
+        if (haveIPv4Conn)
+        {
+            event.InternetConnectivityChange.ipAddress = IPAddress(*addr4);
+        }
+        err = PlatformMgr().PostEvent(&event);
+        VerifyOrDie(err == CHIP_NO_ERROR);
+
+        ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv4", (haveIPv4Conn) ? "ESTABLISHED" : "LOST");
+    }
+
+    if (haveIPv6Conn != hadIPv6Conn)
+    {
+        event.Type                            = DeviceEventType::kInternetConnectivityChange;
+        event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
+        event.InternetConnectivityChange.IPv6 = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
+
+        if (haveIPv6Conn)
+        {
+            event.InternetConnectivityChange.ipAddress = IPAddress(*addr6);
+#if CHIP_ENABLE_OPENTHREAD
+            // In case of boot, start the Border Router services including MDNS Server
+            // The posted event will signal the application to restart the Matter mDNS server instance
+            BrHandleStateChange();
+#endif
+        }
+        err = PlatformMgr().PostEvent(&event);
+        VerifyOrDie(err == CHIP_NO_ERROR);
+
+        ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv6", (haveIPv6Conn) ? "ESTABLISHED" : "LOST");
+    }
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA || CONFIG_CHIP_ETHERNET
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 
@@ -226,6 +338,11 @@ bool ConnectivityManagerImpl::_IsWiFiStationEnabled()
 bool ConnectivityManagerImpl::_IsWiFiStationConnected()
 {
     return (mWiFiStationState == kWiFiStationState_Connected);
+}
+
+bool ConnectivityManagerImpl::_IsWiFiStationProvisioned()
+{
+    return mWifiIsProvisioned;
 }
 
 bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled()
@@ -391,100 +508,6 @@ void ConnectivityManagerImpl::OnStationDisconnected()
     UpdateInternetConnectivityState();
 }
 
-void ConnectivityManagerImpl::UpdateInternetConnectivityState()
-{
-    bool haveIPv4Conn      = false;
-    bool haveIPv6Conn      = false;
-    const bool hadIPv4Conn = mFlags.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
-    const bool hadIPv6Conn = mFlags.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
-    const ip_addr_t * addr4;
-    const ip6_addr_t * addr6;
-    CHIP_ERROR err;
-    ChipDeviceEvent event;
-
-    // If the WiFi station is currently in the connected state...
-    if (_IsWiFiStationConnected())
-    {
-        // Get the LwIP netif for the WiFi station interface.
-        struct netif * netif = static_cast<struct netif *>(net_get_mlan_handle());
-
-        // If the WiFi station interface is up...
-        if ((netif != nullptr) && netif_is_up(netif) && netif_is_link_up(netif))
-        {
-#if INET_CONFIG_ENABLE_IPV4
-            // Check if a DNS server is currently configured.  If so...
-            ip_addr_t dnsServerAddr = *dns_getserver(0);
-            if (!ip_addr_isany_val(dnsServerAddr))
-            {
-                // If the station interface has been assigned an IPv4 address, and has
-                // an IPv4 gateway, then presume that the device has IPv4 Internet
-                // connectivity.
-                if (!ip4_addr_isany_val(*netif_ip4_addr(netif)) && !ip4_addr_isany_val(*netif_ip4_gw(netif)))
-                {
-                    haveIPv4Conn = true;
-                    addr4        = &netif->ip_addr;
-                }
-            }
-#endif
-
-            // Search among the IPv6 addresses assigned to the interface for an
-            // address that is in the valid state. Search goes backwards because
-            // the link-local address is in the first slot and we prefer to report
-            // other than the link-local address value if there are multiple addresses.
-            for (int i = (LWIP_IPV6_NUM_ADDRESSES - 1); i >= 0; i--)
-            {
-                if (ip6_addr_isvalid(netif_ip6_addr_state(netif, i)))
-                {
-                    haveIPv6Conn = true;
-                    addr6        = netif_ip6_addr(netif, i);
-                    break;
-                }
-            }
-        }
-    }
-
-    // Update the current state.
-    mFlags.Set(ConnectivityFlags::kHaveIPv4InternetConnectivity, haveIPv4Conn)
-        .Set(ConnectivityFlags::kHaveIPv6InternetConnectivity, haveIPv6Conn);
-
-    if (haveIPv4Conn != hadIPv4Conn)
-    {
-        /* Check if the */
-        event.Type                            = DeviceEventType::kInternetConnectivityChange;
-        event.InternetConnectivityChange.IPv4 = GetConnectivityChange(hadIPv4Conn, haveIPv4Conn);
-        event.InternetConnectivityChange.IPv6 = kConnectivity_NoChange;
-        if (haveIPv4Conn)
-        {
-            event.InternetConnectivityChange.ipAddress = IPAddress(*addr4);
-        }
-        err = PlatformMgr().PostEvent(&event);
-        VerifyOrDie(err == CHIP_NO_ERROR);
-
-        ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv4", (haveIPv4Conn) ? "ESTABLISHED" : "LOST");
-    }
-
-    if (haveIPv6Conn != hadIPv6Conn)
-    {
-        event.Type                            = DeviceEventType::kInternetConnectivityChange;
-        event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
-        event.InternetConnectivityChange.IPv6 = GetConnectivityChange(hadIPv6Conn, haveIPv6Conn);
-
-        if (haveIPv6Conn)
-        {
-            event.InternetConnectivityChange.ipAddress = IPAddress(*addr6);
-#if CHIP_ENABLE_OPENTHREAD
-            // In case of boot, start the Border Router services including MDNS Server
-            // The posted event will signal the application to restart the Matter mDNS server instance
-            BrHandleStateChange();
-#endif
-        }
-        err = PlatformMgr().PostEvent(&event);
-        VerifyOrDie(err == CHIP_NO_ERROR);
-
-        ChipLogProgress(DeviceLayer, "%s Internet connectivity %s", "IPv6", (haveIPv6Conn) ? "ESTABLISHED" : "LOST");
-    }
-}
-
 void ConnectivityManagerImpl::_NetifExtCallback(struct netif * netif, netif_nsc_reason_t reason,
                                                 const netif_ext_callback_args_t * args)
 {
@@ -623,10 +646,24 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, uint
     if (keyLen > 0)
     {
         pNetworkData->security.type = WLAN_SECURITY_WILDCARD;
-        memcpy(pNetworkData->security.psk, key, keyLen);
-        pNetworkData->security.psk_len = keyLen;
+        if (keyLen <= sizeof(pNetworkData->security.psk))
+        {
+            /* Needed for WEP, WPA and WPA2 support */
+            memcpy(pNetworkData->security.psk, key, keyLen);
+            pNetworkData->security.psk_len = keyLen;
+        }
+        else
+        {
+            /* set psk len to 0 to avoid connection issues if the key is too long */
+            pNetworkData->security.psk_len = 0;
+        }
+        /* Needed for WPA3 SAE support as the max length of SAE password is larger than max length of WPA-PSK */
+        size_t password_actual_copy_len = std::min(static_cast<size_t>(keyLen), sizeof(pNetworkData->security.password));
+        memcpy(pNetworkData->security.password, key, password_actual_copy_len);
+        pNetworkData->security.password_len = static_cast<uint8_t>(password_actual_copy_len);
     }
 
+    mWifiIsProvisioned = true;
     ConnectNetworkTimerHandler(NULL, (void *) pNetworkData);
 
 exit:

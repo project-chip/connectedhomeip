@@ -55,17 +55,6 @@ public:
     CHIP_ERROR Init() override;
     CHIP_ERROR SignWithDacKey(const ByteSpan & messageToSign, MutableByteSpan & outSignBuffer) override;
 
-#if CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR
-
-    CHIP_ERROR PreResetCheck() override;
-    CHIP_ERROR PostResetCheck() override;
-
-    static StorageKeyName GetTargetVersionKey() { return StorageKeyName::FromConst("nxp/tgt-sw-ver"); }
-
-    static CHIP_ERROR GetTargetVersion(uint32_t & version);
-    static CHIP_ERROR SaveTargetVersion(uint32_t & version);
-#endif
-
 private:
 #if !CHIP_USE_PLAIN_DAC_KEY
 
@@ -119,6 +108,8 @@ private:
     sss_sscp_object_t mContext;
 #endif
 };
+
+FactoryDataProvider & FactoryDataPrvdImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

@@ -255,7 +255,7 @@ it. If anything seems wrong, the `.zap` file should be fixed (`.matter`
 represents the content of `.zap`). To lint use:
 
 ```bash
-scripts/idl_lint.py ${MATTER_FILE_PATH}
+matter-idl-lint ${MATTER_FILE_PATH}
 ```
 
 #### Running pre-generation

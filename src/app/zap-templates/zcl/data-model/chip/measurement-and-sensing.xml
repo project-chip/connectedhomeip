@@ -19,6 +19,7 @@ limitations under the License.
   <enum name="MeasurementTypeEnum" type="enum16">
     <cluster code="0x0090"/>
     <cluster code="0x0091"/>
+    <cluster code="0x0B07"/>
     <item name="Unspecified" value="0x0000"/>
     <item name="Voltage" value="0x0001"/>
     <item name="ActiveCurrent" value="0x0002"/>
@@ -34,6 +35,8 @@ limitations under the License.
     <item name="PowerFactor" value="0x000C"/>
     <item name="NeutralCurrent" value="0x000D"/>
     <item name="ElectricalEnergy" value="0x000E"/>
+    <item name="ReactiveEnergy" value="0x000F"/>
+    <item name="ApparentEnergy" value="0x0010"/>
   </enum>
   <struct name="MeasurementAccuracyRangeStruct" apiMaturity="provisional">
     <cluster code="0x0090"/>

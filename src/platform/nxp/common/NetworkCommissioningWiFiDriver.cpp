@@ -69,7 +69,13 @@ CHIP_ERROR NXPWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "WiFi network SSID not retrieved from persisted storage: %" CHIP_ERROR_FORMAT, err.Format());
-        return err;
+        if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+        {
+            return err;
+        }
+        /* AP ssid has not been set. It's possible after factory-reset.
+        Do not return an error as it will cancel the cluster registration */
+        return CHIP_NO_ERROR;
     }
 
     err = PersistedStorage::KeyValueStoreMgr().Get(kWiFiCredentialsKeyName, mSavedNetwork.credentials,
@@ -112,6 +118,17 @@ CHIP_ERROR NXPWiFiDriver::CommitConfiguration()
 
 CHIP_ERROR NXPWiFiDriver::RevertConfiguration()
 {
+    struct wlan_network searchedNetwork = { 0 };
+
+    /* If network was added we have to remove it (as the connection failed) from wifi driver to be able
+    to connect to another network next commissioning */
+    if (wlan_get_network_byname(mStagingNetwork.ssid, &searchedNetwork) == WM_SUCCESS)
+    {
+        if (wlan_remove_network(mStagingNetwork.ssid) != WM_SUCCESS)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+    }
     mStagingNetwork = mSavedNetwork;
 
     return CHIP_NO_ERROR;
@@ -192,7 +209,11 @@ CHIP_ERROR NXPWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen,
 
 void NXPWiFiDriver::OnConnectWiFiNetwork(Status commissioningError, CharSpan debugText, int32_t connectStatus)
 {
-    CommitConfiguration();
+    /* Commit wifi network credentials in flash only if the connection succeeded */
+    if (commissioningError == NetworkCommissioning::Status::kSuccess)
+    {
+        CommitConfiguration();
+    }
 
     if (mpConnectCallback != nullptr)
     {

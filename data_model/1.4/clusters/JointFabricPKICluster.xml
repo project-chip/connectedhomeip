@@ -112,7 +112,9 @@ Davis, CA 95616, USA
       <mandatoryConform/>
       <field id="0" name="ICACSR" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="400"/>
+        <constraint>
+          <maxLength value="400"/>
+        </constraint>
       </field>
     </command>
     <command id="0x01" name="ICACSRResponse" direction="responseFromServer">
@@ -122,7 +124,9 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="ICAC" type="octstr">
         <optionalConform/>
-        <constraint type="maxLength" value="400"/>
+        <constraint>
+          <maxLength value="400"/>
+        </constraint>
       </field>
     </command>
     <command id="0x02" name="TransferAnchorRequest" direction="commandToServer" response="TransferAnchorResponse">

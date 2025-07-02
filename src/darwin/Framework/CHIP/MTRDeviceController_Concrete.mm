@@ -173,10 +173,9 @@ using namespace chip::Tracing::DarwinFramework;
             storageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration
                           startSuspended:(BOOL)startSuspended
 {
-    if (self = [super initForSubclasses:startSuspended]) {
+    if (self = [super initForSubclasses:startSuspended uniqueIdentifier:uniqueIdentifier]) {
         // Make sure our storage is all set up to work as early as possible,
         // before we start doing anything else with the controller.
-        self.uniqueIdentifier = uniqueIdentifier;
 
         // Setup assertion variables
         _keepRunningAssertionCounter = 0;
@@ -268,6 +267,7 @@ using namespace chip::Tracing::DarwinFramework;
         if ([self checkForInitError:(_partialDACVerifier != nullptr) logMsg:kDeviceControllerErrorPartialDacVerifierInit]) {
             return nil;
         }
+        _partialDACVerifier->EnableVerboseLogs(true);
 
         _operationalCredentialsDelegate = new MTROperationalCredentialsDelegate(self);
         if ([self checkForInitError:(_operationalCredentialsDelegate != nullptr) logMsg:kDeviceControllerErrorOperationalCredentialsInit]) {
@@ -692,7 +692,9 @@ using namespace chip::Tracing::DarwinFramework;
             trustStore = chip::Credentials::GetTestAttestationTrustStore();
         }
 
+        // TODO: Pass a revocation delegate to DefaultDACVerifier!
         _defaultDACVerifier = new chip::Credentials::DefaultDACVerifier(trustStore);
+        _defaultDACVerifier->EnableVerboseLogs(true);
 
         if (startupParams.certificationDeclarationCertificates) {
             auto cdTrustStore = _defaultDACVerifier->GetCertificationDeclarationTrustStore();

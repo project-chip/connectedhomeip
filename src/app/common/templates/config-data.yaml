@@ -39,6 +39,7 @@ CommandHandlerInterfaceOnlyClusters:
     - Chime
     - Camera AV Stream Management
     - Commissioner Control
+    - Commodity Price
     - Energy EVSE
     - Energy EVSE Mode
     - Device Energy Management
@@ -48,16 +49,22 @@ CommandHandlerInterfaceOnlyClusters:
     - Wi-Fi Network Management
     - Thread Border Router Management
     - Thread Network Directory
+    - TLS Client Management
+    - TLS Certificate Management
     - Water Heater Management
     - Water Heater Mode
     - WebRTC Transport Provider
+    - WebRTC Transport Requestor
     - General Commissioning
     - General Diagnostics
     - Software Diagnostics
     - Wi-Fi Network Diagnostics
+    - Camera AV Settings User Level Management
     - Administrator Commissioning
     - Actions
     - Closure Control
+    - Closure Dimension
+    - OTA Software Update Provider
 
 # We need a more configurable way of deciding which clusters have which init functions....
 # See https://github.com/project-chip/connectedhomeip/issues/4369
@@ -77,7 +84,7 @@ ClustersWithInitFunctions:
     - Scenes Management
 
 ClustersWithAttributeChangedFunctions:
-    - Bridged Device Basic
+    - Bridged Device Basic Information
     - Door Lock
     - Identify
     - Pump Configuration and Control

@@ -37,6 +37,8 @@
 using namespace chip;
 using namespace chip::DeviceLayer;
 
+#define OTA_PERIODIC_TIMEOUT_SEC 7200 // 2 * 60 * 60
+
 /*****************************************************************************
  *                    Static Data Definitions
  *****************************************************************************/
@@ -59,16 +61,17 @@ bool OtaHeaderValidationCb(qvCHIP_Ota_ImageHeader_t imageHeader)
 
     if (GetDeviceInstanceInfoProvider()->GetVendorId(vendorId) != CHIP_NO_ERROR)
     {
+        ChipLogError(DeviceLayer, "Reject OTA image, wrong vendor ID");
         return false;
     }
     if (GetDeviceInstanceInfoProvider()->GetProductId(productId) != CHIP_NO_ERROR)
     {
+        ChipLogError(DeviceLayer, "Reject OTA image, wrong product ID");
         return false;
     }
 
-    // Check that the image matches vendor and product ID and that the version is higher than what we currently have
-    if (imageHeader.vendorId != vendorId || imageHeader.productId != productId ||
-        imageHeader.softwareVersion <= CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION)
+    // Check that the image matches vendor and product ID
+    if (imageHeader.vendorId != vendorId || imageHeader.productId != productId)
     {
         return false;
     }
@@ -78,15 +81,38 @@ bool OtaHeaderValidationCb(qvCHIP_Ota_ImageHeader_t imageHeader)
 
 void InitializeOTARequestor(void)
 {
-    ChipLogDetail(DeviceLayer, "Initialising OTA Requestor");
     // Initialize and interconnect the Requestor and Image Processor objects
     SetRequestorInstance(&gRequestorCore);
+
+    // Periodic query timeout must be set prior to the driver being initialized
+    gRequestorUser.SetPeriodicQueryTimeout(OTA_PERIODIC_TIMEOUT_SEC);
 
     gRequestorStorage.Init(chip::Server::GetInstance().GetPersistentStorage());
     gRequestorCore.Init(chip::Server::GetInstance(), gRequestorStorage, gRequestorUser, gDownloader);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+
+    ChipLogProgress(DeviceLayer, "Initialising OTA Requestor");
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
+
+    // If we are in the middle of an upgrade, execute ResumeDownload first
+    if (true == qvCHIP_OtaImageDownloadInProgress())
+    {
+        ChipLogProgress(DeviceLayer, "Resuming OTA download");
+        using ProviderLocation = chip::OTARequestorInterface::ProviderLocationType;
+        ProviderLocation lastUsedProvider;
+        qvCHIP_OtaGetLastProvider(&lastUsedProvider.providerNodeID, &lastUsedProvider.endpoint, &lastUsedProvider.fabricIndex);
+        gRequestorCore.SetCurrentProviderLocation(lastUsedProvider);
+
+        CHIP_ERROR error;
+        error = gRequestorCore.TriggerImmediateQuery(lastUsedProvider.fabricIndex);
+        // If there is any error in triggering an immediate query, we need to abort the download
+        if (error != CHIP_NO_ERROR)
+        {
+            qvCHIP_OtaResetProgressInfo();
+            ChipLogError(DeviceLayer, "Aborting OTA download");
+        }
+    }
 
     // Initialize OTA image validation callback
     qvCHIP_OtaSetHeaderValidationCb(OtaHeaderValidationCb);

@@ -43,12 +43,22 @@ public:
     void SetInitiateAction(Fixture_Action aAction, int32_t aActor, uint8_t * value);
     void UpdateClusterState(void);
 
+#ifdef CONFIG_TFLM_FEATURE
+    static void MicroSpeechProcessStop();
+#endif
+
 private:
     friend AppTask & GetAppTask(void);
     friend class AppTaskCommon;
 
     CHIP_ERROR Init(void);
     void LinkLeds(LedManager & ledManager);
+
+#ifdef CONFIG_TFLM_FEATURE
+    static void AudioProcessUpdateTimerTimeoutCallback(k_timer * timer);
+    static void AudioProcessUpdateTimerEventHandler(AppEvent * aEvent);
+    static void MicroSpeechProcessStart();
+#endif
 
     static void LightingActionEventHandler(AppEvent * aEvent);
 #ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET

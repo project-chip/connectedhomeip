@@ -103,12 +103,19 @@ Davis, CA 95616, USA
     <struct name="HarmonicMeasurementStruct">
       <field id="0" name="Order" type="uint8" default="1">
         <mandatoryConform/>
-        <constraint type="min" value="1"/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
       </field>
       <field id="1" name="Measurement" type="int64" default="null">
         <quality nullable="true"/>
         <mandatoryConform/>
-        <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
+        <constraint>
+          <between>
+            <from value="-4611686018427387904"/>
+            <to value="4611686018427387904"/>
+          </between>
+        </constraint>
       </field>
     </struct>
     <struct name="MeasurementRangeStruct">
@@ -117,11 +124,21 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="Min" type="int64">
         <mandatoryConform/>
-        <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
+        <constraint>
+          <between>
+            <from value="-4611686018427387904"/>
+            <to value="4611686018427387904"/>
+          </between>
+        </constraint>
       </field>
       <field id="2" name="Max" type="int64">
         <mandatoryConform/>
-        <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
+        <constraint>
+          <between>
+            <from value="-4611686018427387904"/>
+            <to value="4611686018427387904"/>
+          </between>
+        </constraint>
       </field>
       <field id="3" name="StartTimestamp" type="epoch-s">
         <mandatoryConform>
@@ -129,7 +146,9 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </field>
       <field id="4" name="EndTimestamp" type="epoch-s">
-        <constraint type="min" value="StartTimestamp + 1"/>
+        <constraint>
+          <min value="StartTimestamp + 1"/>
+        </constraint>
       </field>
       <field id="5" name="MinTimestamp" type="epoch-s">
         <mandatoryConform>
@@ -140,7 +159,9 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <field name="EndTimestamp"/>
         </mandatoryConform>
-        <constraint type="min" value="MinTimestamp + 1"/>
+        <constraint>
+          <min value="MinTimestamp + 1"/>
+        </constraint>
       </field>
       <field id="7" name="StartSystime" type="systime-ms">
         <mandatoryConform>
@@ -148,7 +169,9 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </field>
       <field id="8" name="EndSystime" type="systime-ms">
-        <constraint type="min" value="StartSystime + 1"/>
+        <constraint>
+          <min value="StartSystime + 1"/>
+        </constraint>
       </field>
       <field id="9" name="MinSystime" type="systime-ms">
         <mandatoryConform>
@@ -159,7 +182,9 @@ Davis, CA 95616, USA
         <mandatoryConform>
           <field name="EndSystime"/>
         </mandatoryConform>
-        <constraint type="min" value="MinSystime + 1"/>
+        <constraint>
+          <min value="MinSystime + 1"/>
+        </constraint>
       </field>
     </struct>
   </dataTypes>
@@ -172,16 +197,19 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="min" value="1"/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="Accuracy" type="list">
       <entry type="MeasurementAccuracyStruct"/>
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
-      <constraint type="countBetween">
-        <from value="1"/>
-        <to attribute="NumberOfMeasurementTypes"/>
+      <constraint>
+        <countBetween value="1">
+          <attribute name="NumberOfMeasurementTypes"/>
+        </countBetween>
       </constraint>
     </attribute>
     <attribute id="0x0003" name="Ranges" type="list" default="empty">
@@ -189,22 +217,33 @@ Davis, CA 95616, USA
       <access read="true" readPrivilege="view"/>
       <quality quieterReporting="true"/>
       <optionalConform/>
-      <constraint type="countBetween">
-        <from value="0"/>
-        <to attribute="NumberOfMeasurementTypes"/>
+      <constraint>
+        <countBetween value="0">
+          <attribute name="NumberOfMeasurementTypes"/>
+        </countBetween>
       </constraint>
     </attribute>
     <attribute id="0x0004" name="Voltage" type="voltage-mV" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" quieterReporting="true"/>
       <optionalConform/>
-      <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
+      <constraint>
+        <between>
+          <from value="-4611686018427387904"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0005" name="ActiveCurrent" type="amperage-mA" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" quieterReporting="true"/>
       <optionalConform/>
-      <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
+      <constraint>
+        <between>
+          <from value="-4611686018427387904"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0006" name="ReactiveCurrent" type="amperage-mA" default="null">
       <access read="true" readPrivilege="view"/>
@@ -212,7 +251,12 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
-      <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
+      <constraint>
+        <between>
+          <from value="-4611686018427387904"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0007" name="ApparentCurrent" type="amperage-mA" default="null">
       <access read="true" readPrivilege="view"/>
@@ -220,13 +264,23 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
-      <constraint type="between" from="0" to="4611686018427387904"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0008" name="ActivePower" type="power-mW" default="null">
       <access read="true" readPrivilege="view"/>
       <quality nullable="true" quieterReporting="true"/>
       <mandatoryConform/>
-      <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
+      <constraint>
+        <between>
+          <from value="-4611686018427387904"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0009" name="ReactivePower" type="power-mW" default="null">
       <access read="true" readPrivilege="view"/>
@@ -234,7 +288,12 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
-      <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
+      <constraint>
+        <between>
+          <from value="-4611686018427387904"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x000A" name="ApparentPower" type="power-mW" default="null">
       <access read="true" readPrivilege="view"/>
@@ -242,7 +301,12 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
-      <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
+      <constraint>
+        <between>
+          <from value="-4611686018427387904"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x000B" name="RMSVoltage" type="voltage-mV" default="null">
       <access read="true" readPrivilege="view"/>
@@ -250,7 +314,12 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
-      <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
+      <constraint>
+        <between>
+          <from value="-4611686018427387904"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x000C" name="RMSCurrent" type="amperage-mA" default="null">
       <access read="true" readPrivilege="view"/>
@@ -258,7 +327,12 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
-      <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
+      <constraint>
+        <between>
+          <from value="-4611686018427387904"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x000D" name="RMSPower" type="power-mW" default="null">
       <access read="true" readPrivilege="view"/>
@@ -266,7 +340,12 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
-      <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
+      <constraint>
+        <between>
+          <from value="-4611686018427387904"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x000E" name="Frequency" type="int64" default="null">
       <access read="true" readPrivilege="view"/>
@@ -274,7 +353,12 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
-      <constraint type="between" from="0" to="1000000"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="1000000"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x000F" name="HarmonicCurrents" type="list" default="null">
       <entry type="HarmonicMeasurementStruct"/>
@@ -283,7 +367,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="HARM"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0010" name="HarmonicPhases" type="list" default="null">
       <entry type="HarmonicMeasurementStruct"/>
@@ -292,7 +378,9 @@ Davis, CA 95616, USA
       <mandatoryConform>
         <feature name="PWRQ"/>
       </mandatoryConform>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0011" name="PowerFactor" type="int64" default="null">
       <access read="true" readPrivilege="view"/>
@@ -300,7 +388,12 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="ALTC"/>
       </optionalConform>
-      <constraint type="between" from="-10000" to="10000"/>
+      <constraint>
+        <between>
+          <from value="-10000"/>
+          <to value="10000"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0012" name="NeutralCurrent" type="amperage-mA" default="null">
       <access read="true" readPrivilege="view"/>
@@ -308,7 +401,12 @@ Davis, CA 95616, USA
       <optionalConform>
         <feature name="POLY"/>
       </optionalConform>
-      <constraint type="between" from="-4611686018427387904" to="4611686018427387904"/>
+      <constraint>
+        <between>
+          <from value="-4611686018427387904"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
     </attribute>
   </attributes>
   <events>

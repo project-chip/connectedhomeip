@@ -17,6 +17,7 @@
 
 #include "camera-app.h"
 #include "camera-device.h"
+
 #include <AppMain.h>
 #include <platform/CHIPDeviceConfig.h>
 
@@ -25,12 +26,23 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace Camera;
 
-CameraDevice cameraDevice;
+CameraDevice gCameraDevice;
 
 void ApplicationInit()
 {
-    ChipLogProgress(NotSpecified, "Matter Camera Linux App: ApplicationInit()");
-    CameraAppInit(&cameraDevice);
+    ChipLogProgress(Camera, "Matter Camera Linux App: ApplicationInit()");
+    if (LinuxDeviceOptions::GetInstance().cameraVideoDevice.HasValue())
+    {
+        std::string videoDevicePath = LinuxDeviceOptions::GetInstance().cameraVideoDevice.Value();
+        ChipLogDetail(Camera, "Using video device path from options: %s", videoDevicePath.c_str());
+        gCameraDevice.SetVideoDevicePath(videoDevicePath);
+    }
+    else
+    {
+        ChipLogDetail(Camera, "Using default video device path: %s", Camera::kDefaultVideoDevicePath);
+    }
+    gCameraDevice.Init();
+    CameraAppInit(&gCameraDevice);
 }
 
 void ApplicationShutdown()

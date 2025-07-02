@@ -12,7 +12,7 @@ image from hub.docker.com or build it locally using the provided Dockerfile in
 
 ```sh
 # Pull the image from hub.docker.com
-docker pull ghcr.io/project-chip/chip-build-tizen-qemu:125
+docker pull ghcr.io/project-chip/chip-build-tizen-qemu:140
 ```
 
 ## Building and Running Tests on QEMU
@@ -21,7 +21,7 @@ All steps described below should be done inside the docker container.
 
 ```sh
 docker run -it --rm --name chip-tizen-qemu \
-    ghcr.io/project-chip/chip-build-tizen-qemu:125 /bin/bash
+    ghcr.io/project-chip/chip-build-tizen-qemu:140 /bin/bash
 ```
 
 ### Clone the connectedhomeip repository
@@ -72,3 +72,26 @@ Then, use the run command and add the `rootshell` keyword to kernel arguments
 passed to QEMU (the string after the `-append` option). This will run QEMU, but
 instead of running the test, it will drop you to the shell. From there, you can
 run the test manually by typing `/mnt/chip/runner.sh`.
+
+## Analyzing core dumps
+
+In order for GDB to work correctly, same sysroot as is present on QEMU must be
+provided.
+
+-   Create sysroot directory
+-   Mount `/opt/tizen-sdk/iot-rootfs.img`
+-   Copy `/usr` from the mounted image to your sysroot directory
+-   Fix potentially broken symlinks in the libraries as needed
+
+Core dumps are generated in the `dump` directory as a zip archive file. After
+extracting it the core dump should be extracted from tar archive file.
+
+Set GDB config
+
+```
+set auto-load safe-path /
+set sysroot /path/to/sysroot/
+```
+
+And then run `gdb-multiarch` specifying `.coredump` file extracted before, your
+GDB config file if present and lastly the executable.

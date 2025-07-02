@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <platform/nxp/common/factory_data/FactoryDataProvider.h>
+#include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
 
 #define FACTORY_DATA_MAX_SIZE 4096
 
@@ -43,11 +43,13 @@ class FactoryDataProviderImpl : public FactoryDataProvider
 public:
     static FactoryDataProviderImpl sInstance;
 
-    CHIP_ERROR Init(void);
+    ~FactoryDataProviderImpl(){};
+
+    CHIP_ERROR Init(void) override;
+    CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer) override;
     CHIP_ERROR SearchForId(uint8_t searchedType, uint8_t * pBuf, size_t bufLength, uint16_t & length,
                            uint32_t * contentAddr = NULL);
-    CHIP_ERROR SignWithDacKey(const ByteSpan & digestToSign, MutableByteSpan & outSignBuffer);
-    ;
+
     CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan & outBuffer) override;
 
 private:
@@ -63,15 +65,7 @@ private:
     CHIP_ERROR ReadAndCheckFactoryDataInFlash(void);
 };
 
-inline FactoryDataProvider & FactoryDataPrvd()
-{
-    return FactoryDataProviderImpl::sInstance;
-}
-
-inline FactoryDataProviderImpl & FactoryDataPrvdImpl()
-{
-    return FactoryDataProviderImpl::sInstance;
-}
+FactoryDataProvider & FactoryDataPrvdImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

@@ -15,14 +15,11 @@ void MatterIdentifyPluginServerInitCallback();
 void MatterLevelControlPluginServerInitCallback();
 void MatterLocalizationConfigurationPluginServerInitCallback();
 void MatterNetworkCommissioningPluginServerInitCallback();
-void MatterOccupancySensingPluginServerInitCallback();
 void MatterOnOffPluginServerInitCallback();
 void MatterOperationalCredentialsPluginServerInitCallback();
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();
 void MatterSoftwareDiagnosticsPluginServerInitCallback();
-void MatterSwitchPluginServerInitCallback();
 void MatterThreadNetworkDiagnosticsPluginServerInitCallback();
-void MatterTimeFormatLocalizationPluginServerInitCallback();
 void MatterUserLabelPluginServerInitCallback();
 void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
 void MatterAccessControlPluginServerShutdownCallback();
@@ -41,14 +38,11 @@ void MatterIdentifyPluginServerShutdownCallback();
 void MatterLevelControlPluginServerShutdownCallback();
 void MatterLocalizationConfigurationPluginServerShutdownCallback();
 void MatterNetworkCommissioningPluginServerShutdownCallback();
-void MatterOccupancySensingPluginServerShutdownCallback();
 void MatterOnOffPluginServerShutdownCallback();
 void MatterOperationalCredentialsPluginServerShutdownCallback();
 void MatterOtaSoftwareUpdateRequestorPluginServerShutdownCallback();
 void MatterSoftwareDiagnosticsPluginServerShutdownCallback();
-void MatterSwitchPluginServerShutdownCallback();
 void MatterThreadNetworkDiagnosticsPluginServerShutdownCallback();
-void MatterTimeFormatLocalizationPluginServerShutdownCallback();
 void MatterUserLabelPluginServerShutdownCallback();
 void MatterWiFiNetworkDiagnosticsPluginServerShutdownCallback();
 
@@ -69,14 +63,11 @@ void MatterWiFiNetworkDiagnosticsPluginServerShutdownCallback();
     MatterLevelControlPluginServerInitCallback(); \
     MatterLocalizationConfigurationPluginServerInitCallback(); \
     MatterNetworkCommissioningPluginServerInitCallback(); \
-    MatterOccupancySensingPluginServerInitCallback(); \
     MatterOnOffPluginServerInitCallback(); \
     MatterOperationalCredentialsPluginServerInitCallback(); \
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback(); \
     MatterSoftwareDiagnosticsPluginServerInitCallback(); \
-    MatterSwitchPluginServerInitCallback(); \
     MatterThreadNetworkDiagnosticsPluginServerInitCallback(); \
-    MatterTimeFormatLocalizationPluginServerInitCallback(); \
     MatterUserLabelPluginServerInitCallback(); \
     MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
 
@@ -97,14 +88,11 @@ void MatterWiFiNetworkDiagnosticsPluginServerShutdownCallback();
     MatterLevelControlPluginServerShutdownCallback(); \
     MatterLocalizationConfigurationPluginServerShutdownCallback(); \
     MatterNetworkCommissioningPluginServerShutdownCallback(); \
-    MatterOccupancySensingPluginServerShutdownCallback(); \
     MatterOnOffPluginServerShutdownCallback(); \
     MatterOperationalCredentialsPluginServerShutdownCallback(); \
     MatterOtaSoftwareUpdateRequestorPluginServerShutdownCallback(); \
     MatterSoftwareDiagnosticsPluginServerShutdownCallback(); \
-    MatterSwitchPluginServerShutdownCallback(); \
     MatterThreadNetworkDiagnosticsPluginServerShutdownCallback(); \
-    MatterTimeFormatLocalizationPluginServerShutdownCallback(); \
     MatterUserLabelPluginServerShutdownCallback(); \
     MatterWiFiNetworkDiagnosticsPluginServerShutdownCallback();
 

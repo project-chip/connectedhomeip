@@ -62,16 +62,18 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0802" name="TLS Client Management"/>
+    <clusterId id="0x0802" name="TLS Client Management">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="base" role="utility" picsCode="TLSCLIENT" scope="Node"/>
   <dataTypes>
     <number name="TLSEndpointID" type="uint16"/>
     <enum name="TLSEndpointStatusEnum">
-      <item value="0" name="Provisioned" summary="The endpoint is provisioned but is not currently in use">
+      <item value="0" name="Provisioned" summary="The endpoint is provisioned but is not currently referenced by anything else">
         <mandatoryConform/>
       </item>
-      <item value="1" name="InUse" summary="The endpoint is provisioned and currently in use">
+      <item value="1" name="InUse" summary="The endpoint is provisioned and is referenced by something else">
         <mandatoryConform/>
       </item>
     </enum>
@@ -81,6 +83,12 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="Hostname" type="octstr">
         <mandatoryConform/>
+        <constraint>
+          <lengthBetween>
+            <from value="4"/>
+            <to value="253"/>
+          </lengthBetween>
+        </constraint>
       </field>
       <field id="2" name="Port" type="uint16">
         <mandatoryConform/>
@@ -95,32 +103,46 @@ Davis, CA 95616, USA
       <field id="5" name="Status" type="TLSEndpointStatusEnum">
         <mandatoryConform/>
       </field>
+      <access fabricScoped="true"/>
     </struct>
   </dataTypes>
   <attributes>
-    <attribute id="0x0000" name="MaxProvisioned" type="uint8">
-      <access read="true" readPrivilege="view" fabricSensitive="true"/>
+    <attribute id="0x0000" name="MaxProvisioned" type="uint8" default="5">
+      <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform/>
+      <constraint>
+        <between>
+          <from value="5"/>
+          <to value="254"/>
+        </between>
+      </constraint>
     </attribute>
-    <attribute id="0x0001" name="CurrentProvisioned" type="uint8">
+    <attribute id="0x0001" name="ProvisionedEndpoints" type="list">
+      <entry type="TLSEndpointStruct"/>
       <access read="true" readPrivilege="view" fabricSensitive="true"/>
       <quality persistence="nonVolatile"/>
       <mandatoryConform/>
-    </attribute>
-    <attribute id="0x0002" name="CurrentInUse" type="uint8">
-      <access read="true" readPrivilege="view" fabricSensitive="true"/>
-      <quality persistence="nonVolatile"/>
-      <mandatoryConform/>
+      <constraint>
+        <maxCount>
+          <attribute name="MaxProvisioned"/>
+        </maxCount>
+      </constraint>
     </attribute>
   </attributes>
   <commands>
     <command id="0x00" name="ProvisionEndpoint" direction="commandToServer" response="ProvisionEndpointResponse">
       <quality largeMessage="true"/>
-      <access invokePrivilege="admin"/>
+      <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="Hostname" type="octstr">
         <mandatoryConform/>
+        <constraint>
+          <lengthBetween>
+            <from value="4"/>
+            <to value="253"/>
+          </lengthBetween>
+        </constraint>
       </field>
       <field id="1" name="Port" type="uint16">
         <mandatoryConform/>
@@ -146,44 +168,26 @@ Davis, CA 95616, USA
     </command>
     <command id="0x02" name="FindEndpoint" direction="commandToServer" response="FindEndpointResponse">
       <quality largeMessage="true"/>
-      <access invokePrivilege="operate"/>
+      <access invokePrivilege="operate" fabricScoped="true"/>
       <mandatoryConform/>
-      <field id="0" name="EndpointID" type="TLSEndpointID" default="null">
-        <quality nullable="true"/>
+      <field id="0" name="EndpointID" type="TLSEndpointID">
         <mandatoryConform/>
       </field>
     </command>
     <command id="0x03" name="FindEndpointResponse" direction="responseFromServer">
       <quality largeMessage="true"/>
       <mandatoryConform/>
-      <field id="0" name="Endpoints" type="list">
-        <entry type="TLSEndpointStruct"/>
+      <field id="0" name="Endpoint" type="TLSEndpointStruct">
         <mandatoryConform/>
       </field>
     </command>
     <command id="0x04" name="RemoveEndpoint" direction="commandToServer" response="N">
       <quality largeMessage="true"/>
-      <access invokePrivilege="admin"/>
+      <access invokePrivilege="admin" fabricScoped="true"/>
       <mandatoryConform/>
       <field id="0" name="EndpointID" type="TLSEndpointID">
         <mandatoryConform/>
       </field>
     </command>
   </commands>
-  <events>
-    <event id="0x00" name="EndpointProvisioned" priority="info">
-      <access readPrivilege="view"/>
-      <mandatoryConform/>
-      <field id="0" name="EndpointID" type="TLSEndpointID">
-        <mandatoryConform/>
-      </field>
-    </event>
-    <event id="0x01" name="EndpointRemoved" priority="info">
-      <access readPrivilege="view"/>
-      <mandatoryConform/>
-      <field id="0" name="EndpointID" type="TLSEndpointID">
-        <mandatoryConform/>
-      </field>
-    </event>
-  </events>
 </cluster>

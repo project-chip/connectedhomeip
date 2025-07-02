@@ -18,7 +18,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/occ_3_1_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -27,6 +27,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
+#       --app-pipe /tmp/occ_3_1_fifo
 #       --bool-arg simulate_occupancy:true
 #     factory-reset: true
 #     quiet: true
@@ -43,8 +44,8 @@ from typing import Any, Optional
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest, TestStep,
-                                         async_test_body, await_sequence_of_reports, default_matter_test_main)
+from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator, EventChangeCallback, await_sequence_of_reports
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -91,25 +92,9 @@ class TC_OCC_3_1(MatterBaseTest):
         ]
         return pics
 
-    # Sends and out-of-band command to the all-clusters-app
-    def write_to_app_pipe(self, command):
-        # CI app pipe id creation
-        self.app_pipe = "/tmp/chip_all_clusters_fifo_"
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid == 0:
-                asserts.fail("The --app-pid flag must be set when using named pipe")
-            self.app_pipe = self.app_pipe + str(app_pid)
-
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests are flaky)
-        time.sleep(0.001)
-
     @async_test_body
     async def test_TC_OCC_3_1(self):
         hold_time = 10 if not self.is_ci else 1.0  # 10 seconds for occupancy state hold time
-
         self.step(1)  # Commissioning already done
 
         self.step(2)
@@ -133,7 +118,7 @@ class TC_OCC_3_1(MatterBaseTest):
 
         if self.is_ci:
             # CI call to trigger unoccupied.
-            self.write_to_app_pipe('{"Name":"SetOccupancy", "EndpointId": 1, "Occupancy": 0}')
+            self.write_to_app_pipe({"Name": "SetOccupancy", "EndpointId": 1, "Occupancy": 0})
         else:
             self.wait_for_user_input(
                 prompt_msg="Type any letter and press ENTER after the sensor occupancy is unoccupied state (occupancy attribute = 0)")
@@ -157,7 +142,7 @@ class TC_OCC_3_1(MatterBaseTest):
         self.step("5a")
         # CI call to trigger on
         if self.is_ci:
-            self.write_to_app_pipe('{"Name":"SetOccupancy", "EndpointId": 1, "Occupancy": 1}')
+            self.write_to_app_pipe({"Name": "SetOccupancy", "EndpointId": 1, "Occupancy": 1})
         else:
             # Trigger occupancy sensor to change Occupancy attribute value to 1 => TESTER ACTION on DUT
             self.wait_for_user_input(prompt_msg="Type any letter and press ENTER after a sensor occupancy is triggered.")
@@ -183,7 +168,7 @@ class TC_OCC_3_1(MatterBaseTest):
         self.step(6)
         if self.is_ci:
             # CI call to trigger unoccupied.
-            self.write_to_app_pipe('{"Name":"SetOccupancy", "EndpointId": 1, "Occupancy": 0}')
+            self.write_to_app_pipe({"Name": "SetOccupancy", "EndpointId": 1, "Occupancy": 0})
 
         if has_hold_time:
             time.sleep(hold_time + 2.0)  # add some extra 2 seconds to ensure hold time has passed.

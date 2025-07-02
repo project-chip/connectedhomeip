@@ -50,7 +50,7 @@ class TC_OPCREDS_3_5(MatterBaseTest):
         return ["OPCREDS.S"]
 
     def steps_TC_OPCREDS_3_5(self):
-        return [TestStep(1, "TH0 adds TH1 over CASE", "Commissioning is successful"),
+        return [TestStep(1, "TH0 adds TH1 over CASE", "Commissioning is successful", is_commissioning=True),
                 TestStep(2, "TH1 reads the NOCs attribute from the Node Operational Credentials cluster using a fabric-filtered read",
                          "Verify that the returned list has a single entry. Save the NOC field as noc_original and the ICAC field as icac_original"),
                 TestStep(3, "TH1 reads the TrustedRootCertificates attribute from the Node Operational Credentials cluster",

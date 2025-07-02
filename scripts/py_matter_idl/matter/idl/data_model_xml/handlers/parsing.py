@@ -104,8 +104,14 @@ _REF_NAME_MAPPING = {
 
 # Handle odd casing and naming
 _CASE_RENAMES_MAPPING = {
+    "amperage_mA": "amperage_ma",
     "power_mW": "power_mw",
-    "energy_mWh": "energy_mwh"
+    "power_mVA": "power_mva",
+    "power_mVAR": "power_mvar",
+    "energy_mWh": "energy_mwh",
+    "energy_mVAh": "energy_mvah",
+    "energy_mVARh": "energy_mvarh",
+    "voltage_mV": "voltage_mv",
 }
 
 
