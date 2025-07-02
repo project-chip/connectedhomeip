@@ -19,12 +19,26 @@
 #include <app/server/Server.h>
 #include <lib/core/CHIPError.h>
 #include <optional>
+#include <clusters/GeneralDiagnostics/Metadata.h>
 
 using namespace chip::DeviceLayer;
+using namespace chip::app::Clusters::GeneralDiagnostics;
 
 namespace chip {
 namespace app {
 namespace Clusters {
+
+namespace {
+
+constexpr DataModel::AttributeEntry kAttributes[] = {
+    Attributes::NetworkInterfaces::kMetadataEntry,
+    Attributes::RebootCount::kMetadataEntry,
+    Attributes::UpTime::kMetadataEntry,
+    Attributes::TestEventTriggersEnabled::kMetadataEntry,
+};
+
+} // namespace
+
 
 // Max decodable count allowed is 2048.
 constexpr uint16_t kMaxPayloadTestRequestCount = 2048;
@@ -56,7 +70,7 @@ CHIP_ERROR GeneralDiagnosticsLogic::ReadNetworkInterfaces(AttributeValueEncoder 
 }
 
 DataModel::ActionReturnStatus
-GeneralDiagnosticsLogic::HandleTestEventTrigger(const GeneralDiagnostics::Commands::TestEventTrigger::DecodableType & commandData)
+GeneralDiagnosticsLogic::HandleTestEventTrigger(const Commands::TestEventTrigger::DecodableType & commandData)
 {
     auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
     if (triggerDelegate == nullptr)
@@ -69,11 +83,11 @@ GeneralDiagnosticsLogic::HandleTestEventTrigger(const GeneralDiagnostics::Comman
 
 std::optional<DataModel::ActionReturnStatus>
 GeneralDiagnosticsLogic::HandleTimeSnapshot(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                            const GeneralDiagnostics::Commands::TimeSnapshot::DecodableType & commandData)
+                                            const Commands::TimeSnapshot::DecodableType & commandData)
 {
     ChipLogError(Zcl, "Received TimeSnapshot command!");
 
-    GeneralDiagnostics::Commands::TimeSnapshotResponse::Type response;
+    Commands::TimeSnapshotResponse::Type response;
 
     System::Clock::Microseconds64 posix_time_us{ 0 };
 
@@ -103,7 +117,7 @@ GeneralDiagnosticsLogic::HandleTimeSnapshot(CommandHandler & handler, const Conc
 
 std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsLogic::HandlePayloadTestRequest(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
-    const GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType & commandData)
+    const Commands::PayloadTestRequest::DecodableType & commandData)
 {
     if (commandData.count > kMaxPayloadTestRequestCount)
     {
@@ -117,7 +131,7 @@ std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsLogic::HandlePayl
         return chip::Protocols::InteractionModel::Status::ConstraintError;
     }
 
-    GeneralDiagnostics::Commands::PayloadTestResponse::Type response;
+    Commands::PayloadTestResponse::Type response;
     Platform::ScopedMemoryBufferWithSize<uint8_t> payload;
     if (!payload.Calloc(commandData.count))
     {
@@ -132,6 +146,41 @@ std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsLogic::HandlePayl
         return chip::Protocols::InteractionModel::Status::ResourceExhausted;
     }
     return std::nullopt;
+}
+
+CHIP_ERROR GeneralDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) {
+    // Mandatory attributes
+    ReturnErrorOnFailure(builder.ReferenceExisting(kAttributes));
+
+    // Ensure we have space for all optional attributes (there will be 5 at most)
+    ReturnErrorOnFailure(builder.EnsureAppendCapacity(5 + DefaultServerCluster::GlobalAttributes().size()));
+
+    if (mEnabledAttributes.enableTotalOperationalHours)
+    {
+        ReturnErrorOnFailure(builder.Append(Attributes::TotalOperationalHours::kMetadataEntry));
+    }
+
+    if (mEnabledAttributes.enableBootReason)
+    {
+        ReturnErrorOnFailure(builder.Append(Attributes::BootReason::kMetadataEntry));
+    }
+
+    if (mEnabledAttributes.enableActiveHardwareFaults)
+    {
+        ReturnErrorOnFailure(builder.Append(Attributes::ActiveHardwareFaults::kMetadataEntry));
+    }
+
+    if (mEnabledAttributes.enableActiveRadioFaults)
+    {
+        ReturnErrorOnFailure(builder.Append(Attributes::ActiveRadioFaults::kMetadataEntry));
+    }
+
+    if (mEnabledAttributes.enableActiveNetworkFaults)
+    {
+        ReturnErrorOnFailure(builder.Append(Attributes::ActiveNetworkFaults::kMetadataEntry));
+    }
+
+    return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
 }
 
 TestEventTriggerDelegate * GeneralDiagnosticsLogic::GetTriggerDelegateOnMatchingKey(ByteSpan enableKey)
