@@ -479,12 +479,18 @@ static CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewVal
                                     std::unordered_set<uint32_t> & seenTcIDs,
                                     std::map<uint32_t, std::unordered_set<uint32_t>> & componentMap)
 {
-    if (!entryNewValue.label.IsNull() && entryNewValue.label.Value().size() > kDefaultStringValuesMaxBufLength)
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    else if (entryNewValue.label.Value().empty())
+    if (!entryNewValue.label.IsNull())
     {
-        ChipLogError(NotSpecified, "TariffPeriod label must not be empty if present");
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        const auto & labelSpan = entryNewValue.label.Value();
+        if (labelSpan.size() > kDefaultStringValuesMaxBufLength)
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        if (labelSpan.empty())
+        {
+            ChipLogError(NotSpecified, "TariffPeriod label must not be empty if present");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
     }
 
     if (entryNewValue.dayEntryIDs.empty() || entryNewValue.dayEntryIDs.size() > kTariffPeriodItemMaxIDs)
