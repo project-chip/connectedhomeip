@@ -89,10 +89,10 @@ class TC_SEMT_2_1(MatterBaseTest):
 
     MaximumMeteredQuantities = None
 
-    async def test_checkMeteredQuantityStruct(self,
-                                              endpoint: int = None,
-                                              cluster: Clusters.CommodityMetering = None,
-                                              struct: Clusters.CommodityMetering.Structs.MeteredQuantityStruct = None):
+    async def checkMeteredQuantityStruct(self,
+                                         endpoint: int = None,
+                                         cluster: Clusters.CommodityMetering = None,
+                                         struct: Clusters.CommodityMetering.Structs.MeteredQuantityStruct = None):
         matter_asserts.assert_list(struct.tariffComponentIDs, "TariffComponentIDs attribute must return a list", max_length=128)
         matter_asserts.assert_list_element_type(
             struct.tariffComponentIDs, int, "TariffComponentIDs attribute must contain int elements")
@@ -144,7 +144,7 @@ class TC_SEMT_2_1(MatterBaseTest):
             matter_asserts.assert_list_element_type(
                 val, cluster.Structs.MeteredQuantityStruct, "MeteredQuantity attribute must contain MeteredQuantityStruct elements")
             for item in val:
-                await self.test_checkMeteredQuantityStruct(endpoint=endpoint, cluster=cluster, struct=item)
+                await self.checkMeteredQuantityStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
         self.step("8")
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MeteredQuantityTimestamp)
