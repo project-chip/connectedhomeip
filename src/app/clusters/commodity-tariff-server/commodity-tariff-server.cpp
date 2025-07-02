@@ -663,7 +663,7 @@ void Instance::ForceDayEntriesAttrsUpdate()
     else
     {
         // Case 3: Default to end of day if no duration or next entry
-        entryEndTime = 1500;
+        entryEndTime = kDayEntryDurationLimit;
     }
 
     // Calculate seconds remaining in current entry
