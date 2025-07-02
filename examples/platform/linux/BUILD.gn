@@ -132,7 +132,7 @@ source_set("app-main") {
     ":wifi-diagnostics-test-event-trigger",
     "${chip_root}/src/data-model-providers/codegen:instance-header",
     "${chip_root}/src/lib",
-    "${chip_root}/src/platform/logging:stdio",
+    "${chip_root}/src/platform/logging:default",
   ]
   deps = [
     ":ota-test-event-trigger",
