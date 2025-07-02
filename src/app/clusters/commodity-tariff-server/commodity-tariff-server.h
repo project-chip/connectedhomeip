@@ -103,8 +103,6 @@ typedef uint32_t epoch_s; ///< Type alias for epoch timestamps in seconds
 
 /** @} */ // end of tariff_attributes
 
-using namespace chip::app::CommodityTariffAttrsDataMgmt;
-
 /**
  * @defgroup attribute_management Attribute Management Classes
  * @brief Macro-generated classes for type-safe attribute management
@@ -136,7 +134,7 @@ using namespace chip::app::CommodityTariffAttrsDataMgmt;
  * @endcode
  */
 #define X(attrName, attrType)                                                                                                      \
-    class attrName##DataClass : public CTC_BaseDataClass<attrType>                                                                 \
+    class attrName##DataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<attrType>                                                                 \
     {                                                                                                                              \
     public:                                                                                                                        \
         attrName##DataClass() : CTC_BaseDataClass<attrType>(Attributes::attrName::Id) {}                                           \
@@ -149,7 +147,7 @@ COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS
 #undef X
 
 #define X(attrName, attrType)                                                                                                      \
-    class attrName##DataClass : public CTC_BaseDataClass<attrType>                                                                 \
+    class attrName##DataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<attrType>                                                                 \
     {                                                                                                                              \
     public:                                                                                                                        \
         attrName##DataClass() : CTC_BaseDataClass<attrType>(Attributes::attrName::Id) {}                                           \
