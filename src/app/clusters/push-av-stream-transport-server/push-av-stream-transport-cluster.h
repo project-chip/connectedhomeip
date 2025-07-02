@@ -26,7 +26,6 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace PushAvStreamTransport {
 
 /// Integration of Push AV Stream Transport logic within the matter data model
 ///
@@ -45,7 +44,7 @@ public:
      *
      * @note The caller must ensure the delegate lives throughout the instance's lifetime
      */
-    PushAvStreamTransportServer(EndpointId aEndpointId, BitFlags<Feature> aFeatures) :
+    PushAvStreamTransportServer(EndpointId aEndpointId, BitFlags<PushAvStreamTransport::Feature> aFeatures) :
         DefaultServerCluster({ aEndpointId, PushAvStreamTransport::Id }), mLogic(aEndpointId, aFeatures)
     {}
 
@@ -77,7 +76,6 @@ private:
     CHIP_ERROR ReadAndEncodeSupportedFormats(const AttributeValueEncoder::ListEncodeHelper & encoder);
 };
 
-} // namespace PushAvStreamTransport
 } // namespace Clusters
 } // namespace app
 } // namespace chip

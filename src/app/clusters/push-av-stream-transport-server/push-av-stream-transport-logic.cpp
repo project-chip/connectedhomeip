@@ -44,11 +44,11 @@ using chip::Protocols::InteractionModel::Status;
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace PushAvStreamTransport {
 
 PushAvStreamTransportServerLogic::PushAvStreamTransportServerLogic(EndpointId aEndpoint, BitFlags<Feature> aFeatures) :
     mEndpointId(aEndpoint), mFeatures(aFeatures),
-    mSupportedFormats{ SupportedFormatStruct{ ContainerFormatEnum::kCmaf, IngestMethodsEnum::kCMAFIngest } }
+    mSupportedFormats{ PushAvStreamTransport::SupportedFormatStruct{ PushAvStreamTransport::ContainerFormatEnum::kCmaf,
+                                                                     PushAvStreamTransport::IngestMethodsEnum::kCMAFIngest } }
 {}
 
 PushAvStreamTransportServerLogic::~PushAvStreamTransportServerLogic()
@@ -423,7 +423,7 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         ingestMethod != IngestMethodsEnum::kUnknownEnumValue, Status::ConstraintError,
         ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid Ingest Method ", mEndpointId));
 
-    const ContainerOptionsStruct & containerOptions = transportOptions.containerOptions;
+    const Structs::ContainerOptionsStruct::Type & containerOptions = transportOptions.containerOptions;
 
     VerifyOrReturnValue(
         containerOptions.containerType != ContainerFormatEnum::kUnknownEnumValue, Status::ConstraintError,
@@ -520,7 +520,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
 
     IngestMethodsEnum ingestMethod = commandData.transportOptions.ingestMethod;
 
-    ContainerOptionsStruct containerOptions = commandData.transportOptions.containerOptions;
+    Structs::ContainerOptionsStruct::Type containerOptions = commandData.transportOptions.containerOptions;
 
     bool isFormatSupported = false;
 
@@ -953,7 +953,7 @@ PushAvStreamTransportServerLogic::HandleFindTransport(CommandHandler & handler, 
 
     Optional<DataModel::Nullable<uint16_t>> connectionID = commandData.connectionID;
 
-    std::vector<TransportConfigurationStruct> transportConfigurations;
+    std::vector<Structs::TransportConfigurationStruct::Type> transportConfigurations;
 
     if (!connectionID.HasValue() || connectionID.Value().IsNull())
     {
@@ -992,8 +992,8 @@ PushAvStreamTransportServerLogic::HandleFindTransport(CommandHandler & handler, 
         handler.AddStatus(commandPath, Status::NotFound);
     }
 
-    response.transportConfigurations =
-        DataModel::List<const TransportConfigurationStruct>(transportConfigurations.data(), transportConfigurations.size());
+    response.transportConfigurations = DataModel::List<const Structs::TransportConfigurationStruct::Type>(
+        transportConfigurations.data(), transportConfigurations.size());
 
     handler.AddResponse(commandPath, response);
 
@@ -1043,7 +1043,6 @@ Status PushAvStreamTransportServerLogic::GeneratePushTransportEndEvent(const uin
     return Status::Success;
 }
 
-} // namespace PushAvStreamTransport
 } // namespace Clusters
 } // namespace app
 } // namespace chip

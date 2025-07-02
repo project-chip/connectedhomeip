@@ -35,7 +35,7 @@ static constexpr size_t kPushAvStreamTransportFixedClusterCount =
 static constexpr size_t kPushAvStreamTransportMaxClusterCount =
     kPushAvStreamTransportFixedClusterCount + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT;
 
-LazyRegisteredServerCluster<PushAvStreamTransport::PushAvStreamTransportServer> gServers[kPushAvStreamTransportMaxClusterCount];
+LazyRegisteredServerCluster<PushAvStreamTransportServer> gServers[kPushAvStreamTransportMaxClusterCount];
 
 // Find the 0-based array index corresponding to the given endpoint id.
 // Log an error if not found.

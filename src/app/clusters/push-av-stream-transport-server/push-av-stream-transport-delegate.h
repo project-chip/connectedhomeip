@@ -27,7 +27,6 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace PushAvStreamTransport {
 
 /**
  * @brief Defines interfaces for implementing application-specific logic for the PushAvStreamTransport Delegate.
@@ -58,8 +57,9 @@ public:
      * Allocates the transport and maps it to the connectionID.
      * On Success, TransportConfigurationStruct is sent as response by the server.
      */
-    virtual Protocols::InteractionModel::Status AllocatePushTransport(const TransportOptionsStruct & transportOptions,
-                                                                      const uint16_t connectionID) = 0;
+    virtual Protocols::InteractionModel::Status
+    AllocatePushTransport(const PushAvStreamTransport::Structs::TransportOptionsStruct::Type & transportOptions,
+                          const uint16_t connectionID) = 0;
 
     /**
      * @brief Handles stream transport deallocation for the provided connectionID.
@@ -82,8 +82,8 @@ public:
      * the PushAVStreamTransport Server. The allocated buffers are cleared and reassigned to modified
      * transportOptions on success of ModifyPushTransport and deallocated on success of DeallocatePushTransport.
      */
-    virtual Protocols::InteractionModel::Status ModifyPushTransport(const uint16_t connectionID,
-                                                                    const TransportOptionsStorage transportOptions) = 0;
+    virtual Protocols::InteractionModel::Status
+    ModifyPushTransport(const uint16_t connectionID, const PushAvStreamTransport::TransportOptionsStorage transportOptions) = 0;
 
     /**
      * @brief Handles stream transport status modification.
@@ -106,7 +106,7 @@ public:
      *   - Emits GeneratePushTransportBeginEvent
      */
     virtual Protocols::InteractionModel::Status SetTransportStatus(const std::vector<uint16_t> connectionIDList,
-                                                                   TransportStatusEnum transportStatus) = 0;
+                                                                   PushAvStreamTransport::TransportStatusEnum transportStatus) = 0;
 
     /**
      * @brief Requests manual start of the specified push transport.
@@ -121,9 +121,9 @@ public:
      * The delegate should emit PushTransportEnd Event using GeneratePushTransportEndEvent()
      * when timeControl values indicate end of transmission.
      */
-    virtual Protocols::InteractionModel::Status
-    ManuallyTriggerTransport(const uint16_t connectionID, TriggerActivationReasonEnum activationReason,
-                             const Optional<Structs::TransportMotionTriggerTimeControlStruct::Type> & timeControl) = 0;
+    virtual Protocols::InteractionModel::Status ManuallyTriggerTransport(
+        const uint16_t connectionID, PushAvStreamTransport::TriggerActivationReasonEnum activationReason,
+        const Optional<PushAvStreamTransport::Structs::TransportMotionTriggerTimeControlStruct::Type> & timeControl) = 0;
 
     /**
      * @brief Validates the provided URL.
@@ -146,7 +146,8 @@ public:
      * camera resources (CPU, memory, network bandwidth).
      */
     virtual Protocols::InteractionModel::Status
-    ValidateBandwidthLimit(StreamUsageEnum streamUsage, const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+    ValidateBandwidthLimit(PushAvStreamTransport::StreamUsageEnum streamUsage,
+                           const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                            const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) = 0;
 
     /**
@@ -157,7 +158,8 @@ public:
      * @return Status::Success and selected videoStreamID if successful;
      *         Status::InvalidStream if no allocated VideoStream exists
      */
-    virtual Protocols::InteractionModel::Status SelectVideoStream(StreamUsageEnum streamUsage, uint16_t & videoStreamId) = 0;
+    virtual Protocols::InteractionModel::Status SelectVideoStream(PushAvStreamTransport::StreamUsageEnum streamUsage,
+                                                                  uint16_t & videoStreamId) = 0;
 
     /**
      * @brief Assigns existing Audio Stream based on camera's resource management and stream priority policies.
@@ -167,7 +169,8 @@ public:
      * @return Status::Success and selected audioStreamID if successful;
      *         Status::InvalidStream if no allocated AudioStream exists
      */
-    virtual Protocols::InteractionModel::Status SelectAudioStream(StreamUsageEnum streamUsage, uint16_t & audioStreamId) = 0;
+    virtual Protocols::InteractionModel::Status SelectAudioStream(PushAvStreamTransport::StreamUsageEnum streamUsage,
+                                                                  uint16_t & audioStreamId) = 0;
 
     /**
      * @brief Validates that the video stream corresponding to videoStreamID is allocated.
@@ -193,7 +196,7 @@ public:
      * @param connectionID The connectionID of the stream transport to check status
      * @return busy if transport is uploading, idle otherwise
      */
-    virtual PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID) = 0;
+    virtual PushAvStreamTransport::PushAvStreamTransportStatusEnum GetTransportBusyStatus(const uint16_t connectionID) = 0;
 
     /**
      * @brief Delegate callback for notifying change in an attribute.
@@ -216,7 +219,8 @@ public:
      * @note Required buffers are managed by TransportConfigurationStorage;
      * the delegate function must populate the vector correctly.
      */
-    virtual CHIP_ERROR LoadCurrentConnections(std::vector<TransportConfigurationStorage> & currentConnections) = 0;
+    virtual CHIP_ERROR
+    LoadCurrentConnections(std::vector<PushAvStreamTransport::TransportConfigurationStorage> & currentConnections) = 0;
 
     /**
      * @brief Callback after persistent attributes managed by the Cluster are loaded from Storage.
@@ -228,7 +232,6 @@ public:
 protected:
     EndpointId mEndpointId = kInvalidEndpointId;
 };
-} // namespace PushAvStreamTransport
 } // namespace Clusters
 } // namespace app
 } // namespace chip

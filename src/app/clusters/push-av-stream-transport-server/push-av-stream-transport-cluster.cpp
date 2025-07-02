@@ -36,7 +36,6 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace PushAvStreamTransport {
 namespace {
 
 using namespace chip::app::Clusters::PushAvStreamTransport::Commands;
@@ -183,7 +182,6 @@ std::optional<DataModel::ActionReturnStatus> PushAvStreamTransportServer::Invoke
     return Status::UnsupportedCommand;
 }
 
-} // namespace PushAvStreamTransport
 } // namespace Clusters
 } // namespace app
 } // namespace chip

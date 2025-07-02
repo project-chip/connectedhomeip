@@ -13,12 +13,11 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace PushAvStreamTransport {
 
 class PushAvStreamTransportServerLogic
 {
 public:
-    PushAvStreamTransportServerLogic(EndpointId aEndpoint, BitFlags<Feature> aFeatures);
+    PushAvStreamTransportServerLogic(EndpointId aEndpoint, BitFlags<PushAvStreamTransport::Feature> aFeatures);
     ~PushAvStreamTransportServerLogic();
 
     void SetDelegate(EndpointId aEndpoint, PushAvStreamTransportDelegate * delegate)
@@ -48,52 +47,52 @@ public:
 
     std::vector<std::shared_ptr<PushAVStreamTransportDeallocateCallbackContext>> mTimerContexts;
 
-    BitFlags<Feature> mFeatures;
+    BitFlags<PushAvStreamTransport::Feature> mFeatures;
 
-    std::vector<SupportedFormatStruct> mSupportedFormats;
+    std::vector<PushAvStreamTransport::SupportedFormatStruct> mSupportedFormats;
 
-    std::vector<TransportConfigurationStorage> mCurrentConnections;
+    std::vector<PushAvStreamTransport::TransportConfigurationStorage> mCurrentConnections;
 
     CHIP_ERROR Init();
 
     void Shutdown();
 
-    bool HasFeature(Feature feature) const;
+    bool HasFeature(PushAvStreamTransport::Feature feature) const;
 
-    Protocols::InteractionModel::Status
-    ValidateIncomingTransportOptions(const Structs::TransportOptionsStruct::DecodableType & transportOptions);
+    Protocols::InteractionModel::Status ValidateIncomingTransportOptions(
+        const PushAvStreamTransport::Structs::TransportOptionsStruct::DecodableType & transportOptions);
 
     std::optional<DataModel::ActionReturnStatus>
     HandleAllocatePushTransport(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                const Commands::AllocatePushTransport::DecodableType & commandData);
+                                const PushAvStreamTransport::Commands::AllocatePushTransport::DecodableType & commandData);
 
     std::optional<DataModel::ActionReturnStatus>
     HandleDeallocatePushTransport(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                  const Commands::DeallocatePushTransport::DecodableType & commandData);
+                                  const PushAvStreamTransport::Commands::DeallocatePushTransport::DecodableType & commandData);
 
     std::optional<DataModel::ActionReturnStatus>
     HandleModifyPushTransport(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                              const Commands::ModifyPushTransport::DecodableType & commandData);
+                              const PushAvStreamTransport::Commands::ModifyPushTransport::DecodableType & commandData);
 
     std::optional<DataModel::ActionReturnStatus>
     HandleSetTransportStatus(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                             const Commands::SetTransportStatus::DecodableType & commandData);
+                             const PushAvStreamTransport::Commands::SetTransportStatus::DecodableType & commandData);
 
     std::optional<DataModel::ActionReturnStatus>
     HandleManuallyTriggerTransport(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                   const Commands::ManuallyTriggerTransport::DecodableType & commandData);
+                                   const PushAvStreamTransport::Commands::ManuallyTriggerTransport::DecodableType & commandData);
 
-    std::optional<DataModel::ActionReturnStatus> HandleFindTransport(CommandHandler & handler,
-                                                                     const ConcreteCommandPath & commandPath,
-                                                                     const Commands::FindTransport::DecodableType & commandData);
+    std::optional<DataModel::ActionReturnStatus>
+    HandleFindTransport(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                        const PushAvStreamTransport::Commands::FindTransport::DecodableType & commandData);
 
     // Send Push AV Stream Transport events
     Protocols::InteractionModel::Status
-    GeneratePushTransportBeginEvent(const uint16_t connectionID, const TransportTriggerTypeEnum triggerType,
-                                    const Optional<TriggerActivationReasonEnum> activationReason);
-    Protocols::InteractionModel::Status GeneratePushTransportEndEvent(const uint16_t connectionID,
-                                                                      const TransportTriggerTypeEnum triggerType,
-                                                                      const Optional<TriggerActivationReasonEnum> activationReason);
+    GeneratePushTransportBeginEvent(const uint16_t connectionID, const PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
+                                    const Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason);
+    Protocols::InteractionModel::Status
+    GeneratePushTransportEndEvent(const uint16_t connectionID, const PushAvStreamTransport::TransportTriggerTypeEnum triggerType,
+                                  const Optional<PushAvStreamTransport::TriggerActivationReasonEnum> activationReason);
 
 private:
     PushAvStreamTransportDelegate * mDelegate = nullptr;
@@ -110,12 +109,14 @@ private:
     // Helper functions
     uint16_t GenerateConnectionID();
 
-    TransportConfigurationStorage * FindStreamTransportConnection(const uint16_t connectionID);
+    PushAvStreamTransport::TransportConfigurationStorage * FindStreamTransportConnection(const uint16_t connectionID);
 
-    TransportConfigurationStorage * FindStreamTransportConnectionWithinFabric(const uint16_t connectionID, FabricIndex fabricIndex);
+    PushAvStreamTransport::TransportConfigurationStorage * FindStreamTransportConnectionWithinFabric(const uint16_t connectionID,
+                                                                                                     FabricIndex fabricIndex);
 
     // Add/Remove Management functions for transport
-    UpsertResultEnum UpsertStreamTransportConnection(const TransportConfigurationStorage & transportConfiguration);
+    UpsertResultEnum
+    UpsertStreamTransportConnection(const PushAvStreamTransport::TransportConfigurationStorage & transportConfiguration);
 
     void RemoveStreamTransportConnection(const uint16_t connectionID);
 
@@ -133,7 +134,7 @@ private:
      */
     CHIP_ERROR ScheduleTransportDeallocate(uint16_t connectionID, uint32_t timeoutSec);
 };
-} // namespace PushAvStreamTransport
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip
