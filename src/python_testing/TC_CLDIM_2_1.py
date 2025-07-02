@@ -89,14 +89,14 @@ class TC_CLDIM_2_1(MatterBaseTest):
         self.step("2a")
         feature_map = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
 
-        is_positioning_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
-        is_latching_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
-        is_unit_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kUnit
-        is_limitation_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kLimitation
-        is_speed_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
-        is_translation_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kTranslation
-        is_rotation_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kRotation
-        is_modulation_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kModulation
+        is_positioning_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
+        is_latching_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
+        is_unit_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kUnit
+        is_limitation_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kLimitation
+        is_speed_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
+        is_translation_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kTranslation
+        is_rotation_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kRotation
+        is_modulation_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kModulation
 
         # STEP 3: Read CurrentState attribute
         self.step(3)
@@ -111,7 +111,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
                 asserts.assert_true(isinstance(current_state.latch, bool) or current_state.latch is NullValue,
                                     "Latch is not a boolean or NullValue")
             if is_speed_supported:
-                asserts.assert_true(0 <= current_state.speed <= 3, "Speed is not in the expected range [0:3]")
+ asserts.assert_less(current_state.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kUnknownValue, f"Speed is not in the expected range [0:{Clusters.Globals.Enums.ThreeLevelAutoEnum.kUnknownValue.value - 1}]")
 
         # STEP 4: Read TargetState attribute
         self.step(4)
@@ -126,7 +126,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
                 asserts.assert_true(isinstance(target_state.latch, bool) or target_state.latch is NullValue,
                                     "Latch is not a boolean or NullValue")
             if is_speed_supported:
-                asserts.assert_true(0 <= target_state.speed <= 3, "Speed is not in the expected range [0:3]")
+                asserts.assert_less(target_state.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kUnknownValue, f"Speed is not in the expected range [0:{Clusters.Globals.Enums.ThreeLevelAutoEnum.kUnknownValue.value - 1}]")
 
         # STEP 5: Read Resolution attribute
         self.step(5)
