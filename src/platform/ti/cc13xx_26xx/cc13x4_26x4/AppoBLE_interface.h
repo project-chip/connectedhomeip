@@ -93,11 +93,11 @@ public:
 #define ADV_INDEX_INVALID (0xFF)
     typedef struct
     {
-        uint8_t len;                 // Data length
-        uint8_t * pData;             // Pointer to message
-        BLE_CONNECTION_OBJECT conId; // Connection ID
-        chip::Ble::ChipBleUUID svcId;           // Service ID
-        chip::Ble::ChipBleUUID charId;          // Characteristic ID
+        uint8_t len;                   // Data length
+        uint8_t * pData;               // Pointer to message
+        BLE_CONNECTION_OBJECT conId;   // Connection ID
+        chip::Ble::ChipBleUUID svcId;  // Service ID
+        chip::Ble::ChipBleUUID charId; // Characteristic ID
     } BLECharApi_msg;
 
     /*
