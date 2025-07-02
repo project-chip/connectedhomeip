@@ -200,7 +200,8 @@ CHIP_ERROR WiFiManager::Scan(const ByteSpan & ssid, ScanResultCallback resultCal
                 mWantedNetwork.Erase();
                 memcpy(mWantedNetwork.ssid, ssid.data(), ssid.size());
                 mWantedNetwork.ssidLen = ssid.size();
-                ChipLogProgress(DeviceLayer, "Directed Scanning, looking for: %s", StringBuilder(ssid).c_str());
+                ChipLogProgress(DeviceLayer, "Directed Scanning, looking for: %s",
+                                StringBuilder(Uint8::to_const_char(ssid.data()), ssid.size()).c_str());
             }
             else
             {

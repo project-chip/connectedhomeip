@@ -242,7 +242,8 @@ CHIP_ERROR WiFiManager::ClearStationProvisioningData()
 
 CHIP_ERROR WiFiManager::Connect(const ByteSpan & ssid, const ByteSpan & credentials, const ConnectionHandling & handling)
 {
-    ChipLogDetail(DeviceLayer, "Connecting to WiFi network: %s", StringBuilder(ssid).c_str());
+    ChipLogDetail(DeviceLayer, "Connecting to WiFi network: %s",
+                  StringBuilder(Uint8::to_const_char(ssid.data()), ssid.size()).c_str());
 
     mHandling = handling;
 
