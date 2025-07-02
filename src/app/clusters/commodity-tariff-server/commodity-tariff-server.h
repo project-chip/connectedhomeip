@@ -33,10 +33,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/reporting/reporting.h>
-#include <cstdint>
-#include <functional>
-#include <unordered_map>
-#include <unordered_set>
 
 #include "CommodityTariffAttrsDataMgmt.h"
 
