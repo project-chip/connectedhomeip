@@ -24,7 +24,6 @@
 
 using namespace chip;
 using namespace chip::app::Clusters::ClosureControl;
-using namespace chip::app::DataModel;
 
 using Protocols::InteractionModel::Status;
 

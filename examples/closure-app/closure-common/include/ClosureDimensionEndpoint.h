@@ -47,7 +47,7 @@ using Protocols::InteractionModel::Status;
 class ClosureDimensionDelegate : public DelegateBase
 {
 public:
-    ClosureDimensionDelegate(EndpointId endpoint) : mEndpoint(endpoint) {}
+    ClosureDimensionDelegate() {}
 
     // Override for the DelegateBase Virtual functions
     Status HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
@@ -55,16 +55,6 @@ public:
     Status HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                       const Optional<Globals::ThreeLevelAutoEnum> & speed) override;
     bool IsManualLatchingNeeded() override { return false; }
-
-    /**
-     * @brief Retrieves the endpoint for this instance.
-     *
-     * @return The endpoint (EndpointId) for this instance.
-     */
-    EndpointId GetEndpoint() const { return mEndpoint; }
-
-private:
-    EndpointId mEndpoint = kInvalidEndpointId;
 };
 
 /**
@@ -84,7 +74,7 @@ class ClosureDimensionEndpoint
 {
 public:
     ClosureDimensionEndpoint(EndpointId endpoint) :
-        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(mEndpoint), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
+        mEndpoint(endpoint), mContext(mEndpoint), mDelegate(), mLogic(mDelegate, mContext), mInterface(mEndpoint, mLogic)
     {}
 
     /**
@@ -107,13 +97,6 @@ public:
      * @return ClusterLogic& Reference to the internal ClusterLogic object.
      */
     ClusterLogic & GetLogic() { return mLogic; }
-
-    /**
-     * @brief Retrieves the endpoint for this instance.
-     *
-     * @return The endpoint (EndpointId) for this instance.
-     */
-    EndpointId GetEndpoint() const { return mEndpoint; }
 
     /**
      * @brief Handles the completion of a stop motion action.
