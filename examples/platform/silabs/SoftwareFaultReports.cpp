@@ -28,6 +28,13 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <uart.h>
 
+// Macro to flush UART TX queue if enabled
+#if SILABS_LOG_OUT_UART
+#define SILABS_UART_FLUSH() uartFlushTxQueue()
+#else
+#define SILABS_UART_FLUSH() ((void) 0)
+#endif
+
 #if !defined(SLI_SI91X_MCU_INTERFACE) || !defined(SLI_SI91X_ENABLE_BLE)
 #include "rail_types.h"
 
@@ -94,10 +101,8 @@ extern "C" void halInternalAssertFailed(const char * filename, int linenumber)
     char faultMessage[kMaxFaultStringLen] = { 0 };
     snprintf(faultMessage, sizeof faultMessage, "Assert failed: %s:%d", filename, linenumber);
     ChipLogError(NotSpecified, "%s", faultMessage);
-#if SILABS_LOG_OUT_UART
-    uartFlushTxQueue();
-#endif // SILABS_LOG_OUT_UART
-#endif
+    SILABS_UART_FLUSH();
+#endif // SILABS_LOG_ENABLED
     configASSERT((volatile void *) NULL);
 }
 #endif
@@ -137,9 +142,7 @@ extern "C" __attribute__((used)) void debugHardfault(uint32_t * sp)
     ChipLogError(NotSpecified, "LR          0x%08lx", lr);
     ChipLogError(NotSpecified, "PC          0x%08lx", pc);
     ChipLogError(NotSpecified, "PSR         0x%08lx", psr);
-#if SILABS_LOG_OUT_UART
-    uartFlushTxQueue();
-#endif // SILABS_LOG_OUT_UART
+    SILABS_UART_FLUSH();
 #endif // SILABS_LOG_ENABLED
 
     configASSERTNULL(NULL);
@@ -204,6 +207,7 @@ extern "C" void vApplicationMallocFailedHook(void)
     const char * faultMessage = "Failed to allocate memory on HEAP.";
 #if SILABS_LOG_ENABLED
     ChipLogError(NotSpecified, "%s", faultMessage);
+    SILABS_UART_FLUSH();
 #endif // SILABS_LOG_ENABLED
     Silabs::OnSoftwareFaultEventHandler(faultMessage);
 
@@ -223,9 +227,7 @@ extern "C" void vApplicationStackOverflowHook(TaskHandle_t pxTask, char * pcTask
     snprintf(faultMessage, sizeof faultMessage, "%s Task overflowed", pcTaskName);
 #if SILABS_LOG_ENABLED
     ChipLogError(NotSpecified, "%s", faultMessage);
-#if SILABS_LOG_OUT_UART
-    uartFlushTxQueue();
-#endif // SILABS_LOG_OUT_UART
+    SILABS_UART_FLUSH();
 #endif // SILABS_LOG_ENABLED
     Silabs::OnSoftwareFaultEventHandler(faultMessage);
 
@@ -307,9 +309,7 @@ extern "C" void RAILCb_AssertFailed(RAIL_Handle_t railHandle, uint32_t errorCode
 #else
     ChipLogError(NotSpecified, "%s", faultMessage);
 #endif // RAIL_ASSERT_DEBUG_STRING
-#if SILABS_LOG_OUT_UART
-    uartFlushTxQueue();
-#endif // SILABS_LOG_OUT_UART
+    SILABS_UART_FLUSH();
 #endif // SILABS_LOG_ENABLED
     Silabs::OnSoftwareFaultEventHandler(faultMessage);
 
