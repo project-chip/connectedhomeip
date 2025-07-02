@@ -43,6 +43,8 @@ config("datachannel_config") {
     "juice",
   ]
 
+  cflags_cc = [ "-Wno-shadow" ]
+
   if (is_clang) {
     # We build static libraries and srtp2 depends on openssl
     # TODO: can we somehow query this dynamically?
