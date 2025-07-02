@@ -58,6 +58,10 @@ public:
     void SetCsrRequestForUpdateNoc(bool isForUpdateNoc) { mIsCsrRequestForUpdateNoc = isForUpdateNoc; }
     void SetUpdateTermsAndConditionsHasBeenInvoked() { mUpdateTermsAndConditionsHasBeenInvoked = true; }
     void RecordSetVidVerificationStatementHasBeenInvoked() { mSetVidVerificationStatementHasBeenInvoked = true; }
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    void RecordAnnounceJointFabricAdministratorHasBeenInvoked() { mAnnounceJointFabricAdministratorHasBeenInvoked = true; }
+    void RecordIcacCsrRequestHasBeenInvoked() { mIcacCsrRequestHasBeenInvoked = true; }
+#endif
 
     /**
      * @brief
@@ -95,6 +99,10 @@ public:
     bool IsCsrRequestForUpdateNoc() const { return mIsCsrRequestForUpdateNoc; }
     bool UpdateTermsAndConditionsHasBeenInvoked() const { return mUpdateTermsAndConditionsHasBeenInvoked; }
     bool HasSetVidVerificationStatementHasBeenInvoked() const { return mSetVidVerificationStatementHasBeenInvoked; }
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    bool AnnounceJointFabricAdministratorHasBeenInvoked() const { return mAnnounceJointFabricAdministratorHasBeenInvoked; }
+    bool IcacCsrRequestHasBeenInvoked() const { return mIcacCsrRequestHasBeenInvoked; }
+#endif
 
     FabricIndex GetFabricIndex() const
     {
@@ -117,6 +125,10 @@ private:
     FabricIndex mFabricIndex                        = kUndefinedFabricIndex;
     bool mUpdateTermsAndConditionsHasBeenInvoked    = false;
     bool mSetVidVerificationStatementHasBeenInvoked = false;
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    bool mAnnounceJointFabricAdministratorHasBeenInvoked = false;
+    bool mIcacCsrRequestHasBeenInvoked                   = false;
+#endif
 
     /**
      * @brief
@@ -153,6 +165,10 @@ private:
         mIsCsrRequestForUpdateNoc                  = false;
         mUpdateTermsAndConditionsHasBeenInvoked    = false;
         mSetVidVerificationStatementHasBeenInvoked = false;
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+        mAnnounceJointFabricAdministratorHasBeenInvoked = false;
+        mIcacCsrRequestHasBeenInvoked                   = false;
+#endif
     }
 
     void FailSafeTimerExpired();
