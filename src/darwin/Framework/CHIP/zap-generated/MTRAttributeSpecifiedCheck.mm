@@ -3994,6 +3994,18 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
     case Attributes::SetpointHoldExpiryTimestamp::Id: {
         return YES;
     }
+    case Attributes::MaxThermostatSuggestions::Id: {
+        return YES;
+    }
+    case Attributes::ThermostatSuggestions::Id: {
+        return YES;
+    }
+    case Attributes::CurrentThermostatSuggestion::Id: {
+        return YES;
+    }
+    case Attributes::ThermostatSuggestionNotFollowingReason::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -6544,7 +6556,7 @@ static BOOL AttributeIsSpecifiedInCommodityMeteringCluster(AttributeId aAttribut
     case Attributes::MeteredQuantityTimestamp::Id: {
         return YES;
     }
-    case Attributes::MeasurementType::Id: {
+    case Attributes::TariffUnit::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {

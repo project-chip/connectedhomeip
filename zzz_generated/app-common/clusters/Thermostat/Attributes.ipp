@@ -152,6 +152,14 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
         return DataModel::Decode(reader, schedules);
     case Attributes::SetpointHoldExpiryTimestamp::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, setpointHoldExpiryTimestamp);
+    case Attributes::MaxThermostatSuggestions::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, maxThermostatSuggestions);
+    case Attributes::ThermostatSuggestions::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, thermostatSuggestions);
+    case Attributes::CurrentThermostatSuggestion::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, currentThermostatSuggestion);
+    case Attributes::ThermostatSuggestionNotFollowingReason::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, thermostatSuggestionNotFollowingReason);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
         return DataModel::Decode(reader, generatedCommandList);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
