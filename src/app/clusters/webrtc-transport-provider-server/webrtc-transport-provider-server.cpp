@@ -317,7 +317,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
             // Is there an allocated stream, delegate handles matching against an allocated stream in the HandleSolicitOffer methoc
             if (!mDelegate.HasAllocatedAudioStreams())
             {
-                ChipLogError(Zcl, "HandleSolicitOffer: audio requested when there are no AllocatedVideoStreams");
+                ChipLogError(Zcl, "HandleSolicitOffer: audio requested when there are no AllocatedAudioStreams");
                 ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidInState);
                 return;
             }
@@ -476,7 +476,7 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         // One of Video Stream ID or Audio Stream ID has to be present
         if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
         {
-            ChipLogError(Zcl, "HandleSolicitOffer: one of VideoStreamID or AudioStreamID must be present");
+            ChipLogError(Zcl, "HandleProvideOffer: one of VideoStreamID or AudioStreamID must be present");
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
             return;
         }

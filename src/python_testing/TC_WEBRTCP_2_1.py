@@ -75,7 +75,7 @@ class TC_WebRTCProvider_2_1(MatterBaseTest, WEBRTCPTestBase):
 
         self.step("precondition")
         # Commission DUT - already done
-        await self.allocated_one_audio_stream()
+        await self.allocate_one_audio_stream()
         await self.allocate_one_video_stream()
 
         endpoint = self.get_endpoint(default=1)

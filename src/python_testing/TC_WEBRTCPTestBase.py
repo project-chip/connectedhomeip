@@ -43,7 +43,7 @@ class WEBRTCPTestBase:
         )
         logger.info(f"Rx'd AllocatedAudioStreams: {aAllocatedAudioStreams}")
         if len(aAllocatedAudioStreams) > 0:
-            return
+            return aAllocatedAudioStreams[0].audioStreamID
 
         # Allocate one for the test steps based on SnapshotCapabilities
         aMicrophoneCapabilities = await self.read_single_attribute_check_success(
@@ -94,7 +94,7 @@ class WEBRTCPTestBase:
         )
         logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
         if len(aAllocatedVideoStreams) > 0:
-            return
+            return aAllocatedVideoStreams[0].videoStreamID
 
         # Allocate one for the test steps
         aStreamUsagePriorities = await self.read_single_attribute_check_success(
