@@ -312,7 +312,7 @@ namespace DayEntriesDataClass_Utils {
 static CHIP_ERROR ValidateListEntry(const DayEntryStruct::Type & entryNewValue, TariffUpdateCtx * aCtx)
 {
     VerifyOrReturnError_LogSend(entryNewValue.startTime < kDayEntryDurationLimit, CHIP_ERROR_INVALID_ARGUMENT,
-                                "DayEntry startTime must be less 1499");
+                                "DayEntry startTime must be less than %u", kDayEntryDurationLimit);
 
     if (CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kRandomization))
     {
