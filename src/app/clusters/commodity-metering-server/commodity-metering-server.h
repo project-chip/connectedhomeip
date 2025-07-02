@@ -52,18 +52,18 @@ public:
         return mMeteredQuantity;
     }
     const DataModel::Nullable<uint32_t> & GetMeteredQuantityTimestamp() const { return mMeteredQuantityTimestamp; }
-    const Globals::TariffUnitEnum & GetTariffUnit() const { return mTariffUnit; }
+    const DataModel::Nullable<Globals::TariffUnitEnum> & GetTariffUnit() const { return mTariffUnit; }
 
     // Internal Application API to set attribute values
     CHIP_ERROR SetMeteredQuantity(const DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> & value);
     CHIP_ERROR SetMeteredQuantityTimestamp(DataModel::Nullable<uint32_t>);
-    CHIP_ERROR SetTariffUnit(Globals::TariffUnitEnum);
+    CHIP_ERROR SetTariffUnit(DataModel::Nullable<Globals::TariffUnitEnum>);
 
 private:
     // Attribute storage
     DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> mMeteredQuantity;
     DataModel::Nullable<uint32_t> mMeteredQuantityTimestamp;
-    Globals::TariffUnitEnum mTariffUnit;
+    DataModel::Nullable<Globals::TariffUnitEnum> mTariffUnit;
 
     CHIP_ERROR CopyMeteredQuantityEntry(Structs::MeteredQuantityStruct::Type & dest,
                                         Platform::ScopedMemoryBuffer<uint32_t> * destTariffComponentIDsBuffer,

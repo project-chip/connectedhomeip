@@ -211,19 +211,26 @@ CHIP_ERROR Instance::SetMeteredQuantityTimestamp(DataModel::Nullable<uint32_t> n
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::SetTariffUnit(TariffUnitEnum newValue)
+CHIP_ERROR Instance::SetTariffUnit(DataModel::Nullable<TariffUnitEnum> newValue)
 {
-    TariffUnitEnum oldValue = mTariffUnit;
+    DataModel::Nullable<TariffUnitEnum> oldValue = mTariffUnit;
 
-    if (EnsureKnownEnumValue(newValue) == TariffUnitEnum::kUnknownEnumValue)
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
-
-    mTariffUnit = newValue;
     if (oldValue != newValue)
     {
-        ChipLogDetail(AppServer, "Endpoint: %d - mTariffUnit updated to %d", mEndpointId, to_underlying(mTariffUnit));
+        if (newValue.IsNull())
+        {
+            mTariffUnit.SetNull();
+        }
+        else if (EnsureKnownEnumValue(newValue.Value()) != TariffUnitEnum::kUnknownEnumValue)
+        {
+            mTariffUnit = newValue;
+            ChipLogDetail(AppServer, "Endpoint: %d - mTariffUnit updated to %d", mEndpointId, to_underlying(mTariffUnit.Value()));
+        }
+        else
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+
         MatterReportingAttributeChangeCallback(mEndpointId, CommodityMetering::Id, TariffUnit::Id);
     }
 
@@ -243,7 +250,11 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         ReturnErrorOnFailure(aEncoder.EncodeList([&list](const auto & encoder) {
             for (const auto & item : list.Value())
             {
-                ReturnErrorOnFailure(encoder.Encode(item));
+                CHIP_ERROR err = encoder.Encode(item);
+                if (err != CHIP_NO_ERROR)
+                {
+                    return err;
+                }
             }
             return CHIP_NO_ERROR;
         }));
