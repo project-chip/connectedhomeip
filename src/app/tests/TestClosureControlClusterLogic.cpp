@@ -1514,7 +1514,8 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_UpdatePositionWhenLatched)
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
-    EXPECT_EQ(logic->HandleMoveTo(Optional<TargetPositionEnum>(TargetPositionEnum::kMoveToFullyOpen), NullOptional, NullOptional), Status::InvalidInState);
+    EXPECT_EQ(logic->HandleMoveTo(Optional<TargetPositionEnum>(TargetPositionEnum::kMoveToFullyOpen), NullOptional, NullOptional),
+              Status::InvalidInState);
 
     DataModel::Nullable<GenericOverallTargetState> readValue;
     EXPECT_EQ(logic->GetOverallTargetState(readValue), CHIP_NO_ERROR);
