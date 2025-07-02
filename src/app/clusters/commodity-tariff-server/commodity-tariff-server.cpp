@@ -593,7 +593,9 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
 
     if (component != nullptr && period != nullptr)
     {
-        response.label = period->label, response.dayEntryIDs = period->dayEntryIDs, response.tariffComponent = *component;
+        response.label = period->label;
+        response.dayEntryIDs = period->dayEntryIDs;
+        response.tariffComponent = *component;
         status = Status::Success;
     }
 
