@@ -35,7 +35,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_asserts import assert_valid_map8
+from chip.testing.matter_asserts import assert_valid_map8, assert_valid_uint16
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from chip.tlv import uint
 from mobly import asserts
@@ -134,7 +134,7 @@ class TC_CLDIM_2_1(MatterBaseTest):
         self.step(5)
         if is_positioning_supported:
             resolution = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Resolution)
-            asserts.assert_is_instance(resolution, uint, "Resolution is not of expected type")
+            assert_valid_uint16(resolution, "Resolution is not of expected type")
             asserts.assert_true(resolution >= 1, "Resolution is less than 1")
             asserts.assert_true(resolution <= 10000, "Resolution is more than 10000")
         else:
