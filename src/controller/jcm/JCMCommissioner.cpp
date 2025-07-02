@@ -357,7 +357,7 @@ JCMTrustVerificationError JCMDeviceCommissioner::VerifyAdministratorInformation(
     }
 
     CATValues cats;
-    auto nocSpan = mInfo.adminNOC.GetSpan();
+    auto nocSpan = mInfo.adminNOC.Span();
     Credentials::ExtractCATsFromOpCert(nocSpan, cats);
 
     if (!cats.ContainsIdentifier(kAdminCATIdentifier))

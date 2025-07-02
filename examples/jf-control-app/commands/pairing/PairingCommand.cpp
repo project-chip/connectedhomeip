@@ -609,7 +609,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
                 static_cast<chip::Controller::JCM::JCMDeviceCommissioner &>(CurrentCommissioner());
             chip::Controller::JCM::JCMTrustVerificationInfo & info = commissioner.GetJCMTrustVerificationInfo();
             /* extract and save the public key of the peer Admin ICAC */
-            err = Credentials::ExtractPublicKeyFromChipCert(info.adminICAC.GetSpan(), adminICACPKSpan);
+            err = Credentials::ExtractPublicKeyFromChipCert(info.adminICAC.Span(), adminICACPKSpan);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Controller, "Joint Commissioning MethodError parsing adminICAC Public Key");

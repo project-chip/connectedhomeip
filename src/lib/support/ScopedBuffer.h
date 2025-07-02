@@ -268,6 +268,8 @@ public:
     template <class U, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible_v<U *, T *>>>
     ScopedMemoryBufferWithSize & CopyFromSpan(const chip::Span<const U> & span)
     {
+        static_assert(std::is_trivially_copyable_v<U>, "Span<const U> must be trivially copyable");
+
         if (span.size() == 0)
         {
             Free();
@@ -278,10 +280,6 @@ public:
         memcpy(ScopedMemoryBuffer<T>::Get(), span.data(), AllocatedSize());
         return *this;
     }
-
-    // Allow creating a CharSpan, ByteSpan from ScopedMemoryBufferWithSize, so we
-    // don't have to reinvent it in various places.
-    chip::Span<const T> GetSpan() { return chip::Span<const T>(ScopedMemoryBuffer<T>::Get(), AllocatedSize()); }
 
 private:
     size_t mCount = 0;
