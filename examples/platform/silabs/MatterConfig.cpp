@@ -210,12 +210,6 @@ void SilabsMatterConfig::AppInit()
     sMainTaskHandle = osThreadNew(ApplicationStart, nullptr, &kMainTaskAttr);
     ChipLogProgress(DeviceLayer, "Starting scheduler");
     VerifyOrDie(sMainTaskHandle); // We can't proceed if the Main Task creation failed.
-    GetPlatform().StartScheduler();
-
-    // Should never get here.
-    chip::Platform::MemoryShutdown();
-    ChipLogProgress(DeviceLayer, "Start Scheduler Failed");
-    appError(CHIP_ERROR_INTERNAL);
 }
 
 CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)

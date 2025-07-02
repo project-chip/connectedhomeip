@@ -16,16 +16,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "sl_component_catalog.h"
-#include "sl_system_init.h"
-#include "sl_system_kernel.h"
+
+#include "sl_main_init.h"
 #include <MatterConfig.h>
 
-int main(void)
+// This is a User definable function in sl_main context, called by sl_main_init before the kernel is started
+void app_init_early(void)
 {
-    sl_system_init();
+}
 
-    // Initialize the application. For example, create periodic timer(s) or
-    // task(s) if the kernel is present.
+// This is a User definable function, in sl_main context, called by start_task_handler once the silabs platform is fully
+// initialized.
+void app_init(void)
+{
+    // Initialize the matter application. For example, create periodic timer(s) or
+    // task(s).
     SilabsMatterConfig::AppInit();
 }
