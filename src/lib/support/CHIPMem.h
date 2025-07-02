@@ -169,6 +169,38 @@ inline void Delete(T * p)
     MemoryFree(p);
 }
 
+/// RAII class for allocation that guarantees that Delete() will be called.
+/// This is effectively a simple unique_ptr, except calling Platform::Delete instead of delete
+template <typename T>
+class AutoDelete
+{
+public:
+    AutoDelete(T * deletable) : mDeletable(deletable) {}
+    ~AutoDelete() { Delete(); }
+
+    // Not copyable or movable
+    AutoDelete(const AutoDelete &)             = delete;
+    AutoDelete(const AutoDelete &&)            = delete;
+    AutoDelete & operator=(const AutoDelete &) = delete;
+
+    inline T * operator->() { return mDeletable; }
+    inline const T * operator->() const { return mDeletable; }
+    inline const T & operator*() const { return *mDeletable; }
+    inline T & operator*() { return *mDeletable; }
+
+    inline bool IsNull() const { return mDeletable == nullptr; }
+
+    void Delete()
+    {
+        VerifyOrReturn(mDeletable != nullptr);
+        Platform::Delete(mDeletable);
+        mDeletable = nullptr;
+    }
+
+private:
+    T * mDeletable;
+};
+
 template <typename T>
 struct Deleter
 {
