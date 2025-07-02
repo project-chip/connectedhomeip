@@ -33,7 +33,9 @@ using Status            = Protocols::InteractionModel::Status;
 #if MATTER_DM_MICROWAVE_OVEN_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT > 0
 
 ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
-    mOperationalStateInstancePtr(OperationalState::GetOperationalStateInstance()),
+    mOperationalStateDelegatePtr(std::make_unique<OperationalStateDelegate>()),
+    mOperationalStateInstancePtr(
+        std::make_unique<OperationalState::Instance>(mOperationalStateDelegatePtr.get(), aClustersEndpoint)),
     mMicrowaveOvenModeInstancePtr(ChefMicrowaveOvenMode::GetInstance(aClustersEndpoint)),
     mMicrowaveOvenControlInstance(this, aClustersEndpoint, MicrowaveOvenControl::Id,
                                   BitMask<MicrowaveOvenControl::Feature>(MicrowaveOvenControl::Feature::kPowerAsNumber,
@@ -42,6 +44,8 @@ ChefMicrowaveOvenDevice::ChefMicrowaveOvenDevice(EndpointId aClustersEndpoint) :
 {
     VerifyOrDie(mOperationalStateInstancePtr != nullptr);
     VerifyOrDie(mMicrowaveOvenModeInstancePtr != nullptr);
+    mOperationalStateInstancePtr->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
+    mOperationalStateInstancePtr->Init();
 }
 
 void ChefMicrowaveOvenDevice::MicrowaveOvenInit()
@@ -76,10 +80,8 @@ ChefMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, ui
 
     if (startAfterSetting)
     {
-
-        OperationalStateDelegate * mOperationalStateDelegate = OperationalState::GetOperationalStateDelegate();
-        GenericOperationalError noError(to_underlying(ErrorStateEnum::kNoError));
-        mOperationalStateDelegate->HandleStartStateCallback(noError);
+        GenericOperationalError noError(static_cast<uint8_t>(ErrorStateEnum::kNoError));
+        mOperationalStateDelegatePtr->HandleStartStateCallback(noError);
     }
 
     return Status::Success;
@@ -88,13 +90,7 @@ ChefMicrowaveOvenDevice::HandleSetCookingParametersCallback(uint8_t cookMode, ui
 Protocols::InteractionModel::Status ChefMicrowaveOvenDevice::HandleModifyCookTimeSecondsCallback(uint32_t finalCookTimeSec)
 {
     mMicrowaveOvenControlInstance.SetCookTimeSec(finalCookTimeSec);
-
-    OperationalStateDelegate * mOperationalStateDelegate = OperationalState::GetOperationalStateDelegate();
-
-    if (mOperationalStateDelegate)
-    {
-        mOperationalStateDelegate->mCountDownTime.SetNonNull(finalCookTimeSec);
-    }
+    mOperationalStateDelegatePtr->mCountDownTime.SetNonNull(finalCookTimeSec);
 
     if (mOperationalStateInstancePtr)
     {
