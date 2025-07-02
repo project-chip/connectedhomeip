@@ -43,7 +43,12 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryMACAddress(MutableByteSpan & buf)
     if (buf.size() != ConfigurationManager::kPrimaryMACAddressLength)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
-    memcpy(buf.data(), deviceInterface_getNetif()->hwaddr, ConfigurationManager::kPrimaryMACAddressLength);
+    struct netif * netif = deviceInterface_getNetif();
+    if (netif == nullptr)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+    memcpy(buf.data(), netif->hwaddr, ConfigurationManager::kPrimaryMACAddressLength);
 
     return CHIP_NO_ERROR;
 }
