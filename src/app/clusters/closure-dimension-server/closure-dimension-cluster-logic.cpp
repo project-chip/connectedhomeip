@@ -609,6 +609,30 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
         targetState.SetNonNull(GenericDimensionStateStruct{});
     }
 
+    // Check if the current position is valid or else return InvalidInState
+    DataModel::Nullable<GenericDimensionStateStruct> currentState;
+    VerifyOrReturnError(GetCurrentState(currentState) == CHIP_NO_ERROR, Status::Failure);
+    VerifyOrReturnError(!currentState.IsNull(), Status::InvalidInState);
+    VerifyOrReturnError(currentState.Value().position.HasValue() && !currentState.Value().position.Value().IsNull(),
+                        Status::InvalidInState);
+
+    // Check for invalid latch transition: current latch is true and target latch is true
+    if (mConformance.HasFeature(Feature::kMotionLatching))
+    {
+        // Return InvalidInState if current latch has no value or is null
+        VerifyOrReturnError(currentState.Value().latch.HasValue(), Status::InvalidInState);
+        VerifyOrReturnError(!currentState.Value().latch.Value().IsNull(), Status::InvalidInState);
+        // If this command is received with only a new position field while the closure is latched, a status code of INVALID_IN_STATE SHALL be returned.
+        if (currentState.Value().latch.Value().Value())
+        {
+            // Return InvalidInState if incoming latch has no value or if incoming position has a value.
+            if (position.HasValue())
+            {
+                VerifyOrReturnError(latch.HasValue() && !latch.Value(), Status::InvalidInState);
+            }
+        }
+    }
+
     // If position field is present and Positioning(PS) feature is not supported, we should not set targetState.position value.
     if (position.HasValue() && mConformance.HasFeature(Feature::kPositioning))
     {
@@ -663,30 +687,6 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
         targetState.Value().speed.SetValue(speed.Value());
     }
 
-    // Check if the current position is valid or else return InvalidInState
-    DataModel::Nullable<GenericDimensionStateStruct> currentState;
-    VerifyOrReturnError(GetCurrentState(currentState) == CHIP_NO_ERROR, Status::Failure);
-    VerifyOrReturnError(!currentState.IsNull(), Status::InvalidInState);
-    VerifyOrReturnError(currentState.Value().position.HasValue() && !currentState.Value().position.Value().IsNull(),
-                        Status::InvalidInState);
-
-    // Check for invalid latch transition: current latch is true and target latch is true
-    if (mConformance.HasFeature(Feature::kMotionLatching))
-    {
-        // Return InvalidInState if current latch has no value or is null
-        VerifyOrReturnError(currentState.Value().latch.HasValue(), Status::InvalidInState);
-        VerifyOrReturnError(!currentState.Value().latch.Value().IsNull(), Status::InvalidInState);
-        if (currentState.Value().latch.Value().Value())
-        {
-            // Return InvalidInState if incoming latch has no value
-            VerifyOrReturnError(latch.HasValue(), Status::InvalidInState);
-            if (latch.Value() && position.HasValue())
-            {
-                VerifyOrReturnError(position.Value() == currentState.Value().position.Value().Value(), Status::InvalidInState);
-            }
-        }
-    }
-
     // Target should only be set when delegate function returns status as Success. Return failure otherwise
     VerifyOrReturnError(mDelegate.HandleSetTarget(position, latch, speed) == Status::Success, Status::Failure);
 
@@ -735,10 +735,9 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
                         Status::InvalidInState);
     if (mConformance.HasFeature(Feature::kMotionLatching))
     {
-        // Return InvalidInState if current latch is true, as the motion is not possible if closure panel is latched.
-        VerifyOrReturnError(!(currentState.Value().latch.HasValue() && !currentState.Value().latch.Value().IsNull() &&
-                              currentState.Value().latch.Value().Value()),
-                            Status::InvalidInState);
+        // Return InvalidInState if current latch doesn't have value or is null or is latched
+        VerifyOrReturnError(currentState.Value().latch.HasValue() && !currentState.Value().latch.Value().IsNull() && 
+        !currentState.Value().latch.Value().Value(), Status::InvalidInState);
     }
     // Derive TargetState Position from StepValue and NumberOfSteps.
     Percent100ths stepValue;

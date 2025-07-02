@@ -542,17 +542,12 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
         // Return InvalidInState if current latch has no value or is null
         VerifyOrReturnError(overallCurrentState.Value().latch.HasValue(), Status::InvalidInState);
         VerifyOrReturnError(!overallCurrentState.Value().latch.Value().IsNull(), Status::InvalidInState);
-        // If current state is latched, we need to validate the incoming latch value
+        // If this command is received with only a new position field while the closure is latched, a status code of INVALID_IN_STATE SHALL be returned.
         if (overallCurrentState.Value().latch.Value().Value())
         {
-            // Return InvalidInState if incoming latch has no value
-            VerifyOrReturnError(latch.HasValue(), Status::InvalidInState);
-            if (latch.Value() && position.HasValue() && overallCurrentState.Value().position.HasValue() &&
-                !overallCurrentState.Value().position.Value().IsNull())
+            if (position.HasValue())
             {
-                CurrentPositionEnum currentPosition = overallCurrentState.Value().position.Value().Value();
-                VerifyOrReturnError(position.Value() == MapCurrentPositionEnumToTargetPosition(currentPosition),
-                                    Status::InvalidInState);
+                VerifyOrReturnError(latch.HasValue() && !latch.Value(), Status::InvalidInState);
             }
         }
     }

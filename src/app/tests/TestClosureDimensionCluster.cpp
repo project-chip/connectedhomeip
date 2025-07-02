@@ -1729,6 +1729,64 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommandWithLimitatio
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_TRUE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::TargetState::Id));
 }
+// HandleSetTarget command should return InvalidInState when CurrentState is latched and position is changed.
+TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand_ChangePositionWhenLatched)
+{
+
+    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
+
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    mockContext.ClearDirtyList();
+
+    DataModel::Nullable<GenericDimensionStateStruct> currentState;
+    GenericDimensionStateStruct setCurrentStateStruct(Optional<Percent100ths>(1000), Optional<bool>(true),
+                                                      Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
+    currentState.SetNonNull(setCurrentStateStruct);
+    EXPECT_EQ(logic->SetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(1000), NullOptional, NullOptional), Status::InvalidInState);
+}
+
+// HandleSetTarget command should return Success when CurrentState is latched and only speed is changed.
+TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand_ChangeSpeedWhenLatched)
+{
+
+    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
+
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    mockContext.ClearDirtyList();
+
+    DataModel::Nullable<GenericDimensionStateStruct> currentState;
+    GenericDimensionStateStruct setCurrentStateStruct(Optional<Percent100ths>(1000), Optional<bool>(true),
+                                                      Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
+    currentState.SetNonNull(setCurrentStateStruct);
+    EXPECT_EQ(logic->SetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->HandleSetTargetCommand(NullOptional, NullOptional, Optional(Globals::ThreeLevelAutoEnum::kHigh)), Status::Success);
+    DataModel::Nullable<GenericDimensionStateStruct> target;
+    EXPECT_EQ(logic->GetTargetState(target), CHIP_NO_ERROR);
+    EXPECT_FALSE(target.IsNull());
+    EXPECT_EQ(target.Value().speed.Value(), Globals::ThreeLevelAutoEnum::kHigh);
+}
+
+// HandleSetTarget command should return Success when CurrentState is latched and only latch is changed.
+TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand_ChangeLatchWhenLatched)
+{
+
+    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
+
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    mockContext.ClearDirtyList();
+
+    DataModel::Nullable<GenericDimensionStateStruct> currentState;
+    GenericDimensionStateStruct setCurrentStateStruct(Optional<Percent100ths>(1000), Optional<bool>(true),
+                                                      Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
+    currentState.SetNonNull(setCurrentStateStruct);
+    EXPECT_EQ(logic->SetCurrentState(currentState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->HandleSetTargetCommand(NullOptional, Optional<bool>(false), NullOptional), Status::Success);
+    DataModel::Nullable<GenericDimensionStateStruct> target;
+    EXPECT_EQ(logic->GetTargetState(target), CHIP_NO_ERROR);
+    EXPECT_FALSE(target.IsNull());
+    EXPECT_EQ(target.Value().latch.Value(), false);
+}
 
 // This test ensures Handle Step command executes as expected. Tests:
 // - Return InvalidInState if CurrentState is unknown.
@@ -1944,6 +2002,35 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommandWithLimitation)
                               Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
     currentState.SetNonNull(setCurrentStateStruct);
     EXPECT_EQ(logic->SetCurrentState(currentState), CHIP_NO_ERROR);
+}
+
+TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommandWhenLatched)
+{
+    conformance.FeatureMap()
+        .Set(Feature::kPositioning)
+        .Set(Feature::kMotionLatching)
+        .Set(Feature::kSpeed)
+        .Set(Feature::kLimitation);
+
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    mockContext.ClearDirtyList();
+
+    DataModel::Nullable<GenericDimensionStateStruct> currentState;
+    Percent100ths stepValue = 10;
+    EXPECT_EQ(logic->SetStepValue(stepValue), CHIP_NO_ERROR);
+
+    // Validating Step with proper arguments
+    GenericDimensionStateStruct setCurrentStateStruct(Optional<Percent100ths>(1000), Optional<bool>(true),
+                                                      Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
+    currentState.SetNonNull(setCurrentStateStruct);
+    EXPECT_EQ(logic->SetCurrentState(currentState), CHIP_NO_ERROR);
+    Structs::RangePercent100thsStruct::Type limitRange = { .min = 1000, .max = 9000 };
+    EXPECT_EQ(logic->SetLimitRange(limitRange), CHIP_NO_ERROR);
+
+    mockContext.ClearDirtyList();
+    EXPECT_EQ(logic->HandleStepCommand(StepDirectionEnum::kIncrease, 10,
+                                       Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kLow)),
+              Protocols::InteractionModel::Status::InvalidInState);
 }
 
 //=========================================================================================
