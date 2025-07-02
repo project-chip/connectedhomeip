@@ -8,5 +8,4 @@
 # scripts/build
 click
 click-option-group
-
--e ${PW_PROJECT_ROOT}/scripts/py_matter_idl
+python-path
