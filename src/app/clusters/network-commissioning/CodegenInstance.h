@@ -26,12 +26,11 @@ namespace app {
 namespace Clusters {
 namespace NetworkCommissioning {
 
-/// Automates integration of a NetworkCommissioningCluster
-/// with the CodegenDataModelInterface.
+/// Automates integration of a NetworkCommissioningCluster with CodegenDataModelProvider.
 ///
-/// This class exists as a compatibility layer with the original
-/// network-commissioning class, however it only exposes Init/Shutdown and
-/// relevant constructors
+/// This class provides a very thin wrapper around the NetworkCommissioningCluster and its
+/// registration within the CodegenDataModelProvider.
+///
 class Instance
 {
 public:
@@ -39,7 +38,10 @@ public:
     using ThreadDriver   = DeviceLayer::NetworkCommissioning::ThreadDriver;
     using EthernetDriver = DeviceLayer::NetworkCommissioning::EthernetDriver;
 
+    /// Calls Init on the cluster and registers the cluster within the CodegenDataModelProvider Registry
     CHIP_ERROR Init();
+
+    /// Calls Shutdown on the cluster and unregisters the cluster from the CodegenDataModelProvider Registry
     void Shutdown();
 
     Instance(EndpointId aEndpointId, WiFiDriver * apDelegate) : mCluster(aEndpointId, apDelegate) {}
