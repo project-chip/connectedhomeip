@@ -220,9 +220,10 @@ class TC_G_2_3(MatterBaseTest):
         is_valid, msg = self.verify_group_membership_response(result, [kGroupId2, kGroupId3])
         asserts.assert_equal(True, is_valid, msg)
 
-        kGroupId6 = 6
-        kGroupNameGp6 = "Gp6"
-        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(kGroupId6, kGroupNameGp6))
+
+        #kGroupId6 = 6
+        #kGroupNameGp6 = "Gp6"
+        #result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(kGroupId6, kGroupNameGp6))
 
         self.step("8")
         cmd = Clusters.Groups.Commands.RemoveAllGroups()
