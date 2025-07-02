@@ -154,7 +154,7 @@ class TC_SEMT_3_1(MatterBaseTest):
         endpoint = self.get_endpoint()
 
         # If TestEventTriggers is not enabled this TC can't be checked properly.
-        if not self.check_pics("DGGEN.S") or not self.check_pics("DGGEN.S.A0008") or not self.check_pics("DGGEN.S.C00.Rsp"):
+        if not (self.check_pics("DGGEN.S") and self.check_pics("DGGEN.S.A0008") and self.check_pics("DGGEN.S.C00.Rsp")):
             asserts.skip("PICS DGGEN.S or DGGEN.S.A0008 or DGGEN.S.C00.Rsp is not True")
 
         self.step("1")
