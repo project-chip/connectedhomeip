@@ -43,7 +43,6 @@ enum PublicPlatformSpecificEventTypes
     kSCMSystemEvent = kRange_PublicPlatformSpecific,
 };
 
-#if CONFIG_ENABLE_SCM1612S_BLE_CONTROLLER
 /**
  * Enumerates scm1612s platform-specific event types that are internal to the
  * Chip Device Layer.
@@ -58,7 +57,6 @@ enum InternalPlatformSpecificEventTypes
     kPlatformSCMBLEIndicationReceived,
 };
 
-#endif
 } // namespace DeviceEventType
 
 /**
@@ -72,7 +70,6 @@ struct ChipDevicePlatformEvent final
         {
             system_event_t event;
         } SCMSystemEvent;
-#if CONFIG_ENABLE_SCM1612S_BLE_CONTROLLER
         struct
         {
             BLE_CONNECTION_OBJECT mConnection;
@@ -95,7 +92,6 @@ struct ChipDevicePlatformEvent final
             BLE_CONNECTION_OBJECT mConnection;
             chip::System::PacketBuffer * mData;
         } BLEIndicationReceived;
-#endif
     };
 };
 }; // namespace DeviceLayer
