@@ -434,7 +434,8 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
                                                    DataModel::Nullable<uint16_t> videoStreamID,
                                                    DataModel::Nullable<uint16_t> audioStreamID)
 {
-    if (mWebrtcTransportMap.find(sessionId) != mWebrtcTransportMap.end())
+    auto it = mWebrtcTransportMap.find(sessionId);
+    if (it != mWebrtcTransportMap.end())
     {
         ChipLogProgress(Camera, "Delete Webrtc Transport for the session: %u", sessionId);
 
@@ -443,8 +444,8 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
         // TODO: Lookup the sessionID to get the Video/Audio StreamID
         ReleaseAudioVideoStreams();
 
-        mMediaController->UnregisterTransport(mWebrtcTransportMap[sessionId].get());
-        mWebrtcTransportMap.erase(sessionId);
+        mMediaController->UnregisterTransport(it->second.get());
+        mWebrtcTransportMap.erase(it);
     }
 
     if (mPeerConnection)
