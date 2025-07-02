@@ -220,18 +220,18 @@ class TC_CLCTRL_2_1(MatterBaseTest):
 
         # STEP 9: Read LatchControlModes attribute if LT is supported
         self.step(9)
-        if not is_latching_supported:
-            asserts.assert_true(
-                attributes.LatchControlModes.attribute_id not in attribute_list,
-                "LatchControlModes attribute should not be present if MotionLatching is not supported")
-            logging.info("LT not supported, LatchControlModes not present")
-
-        else:
+        if is_latching_supported:
             latch_control_modes: uint = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
             logging.info(f"LatchControlModes: {latch_control_modes}")
 
             asserts.assert_less_equal(latch_control_modes, 3, "LatchControlModes attribute is out of range")
             asserts.assert_greater_equal(latch_control_modes, 0, "LatchControlModes attribute is out of range")
+
+        else:
+            asserts.assert_true(
+                attributes.LatchControlModes.attribute_id not in attribute_list,
+                "LatchControlModes attribute should not be present if MotionLatching is not supported")
+            logging.info("LT not supported and LatchControlModes not present")
 
 
 if __name__ == "__main__":
