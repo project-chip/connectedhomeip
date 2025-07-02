@@ -274,9 +274,9 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     // One of Video Stream ID or Audio Stream ID has to be present
     if (!req.videoStreamID.HasValue() && !req.audioStreamID.HasValue())
     {
-            ChipLogError(Zcl, "HandleSolicitOffer: one of VideoStreamID or AudioStreamID must be present");
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-            return;
+        ChipLogError(Zcl, "HandleSolicitOffer: one of VideoStreamID or AudioStreamID must be present");
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
+        return;
     }
 
     // Validate VideoStreamID against AllocatedVideoStreams.
@@ -300,7 +300,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
             if (mDelegate.ValidateVideoStreamID(req.videoStreamID.Value().Value()) != CHIP_NO_ERROR)
             {
                 ChipLogError(Zcl, "HandleSolicitOffer: VideoStreamID %u does not match AllocatedVideoStreams",
-                        req.videoStreamID.Value().Value());
+                             req.videoStreamID.Value().Value());
                 ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
                 return;
             }
