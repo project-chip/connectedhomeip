@@ -245,7 +245,6 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
     event.ClosureEvent.EndpointId = mCurrentActionEndpointId;
     event.Handler                 = InitiateAction;
     AppTask::GetAppTask().PostEvent(&event);
-    SetCurrentAction(CALIBRATE_ACTION);
 
     return Status::Success;
 }
