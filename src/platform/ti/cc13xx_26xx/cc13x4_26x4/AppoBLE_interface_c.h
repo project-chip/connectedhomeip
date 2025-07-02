@@ -79,11 +79,6 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-using namespace ::chip;
-using namespace ::chip::app;
-using namespace ::chip::DeviceLayer;
-using namespace ::chip::DeviceLayer::Internal;
-using namespace chip::Ble;
 
 class DLL_EXPORT AppoBLE_interface
 {
@@ -101,8 +96,8 @@ public:
         uint8_t len;                 // Data length
         uint8_t * pData;             // Pointer to message
         BLE_CONNECTION_OBJECT conId; // Connection ID
-        ChipBleUUID svcId;           // Service ID
-        ChipBleUUID charId;          // Characteristic ID
+        chip::Ble::ChipBleUUID svcId;           // Service ID
+        chip::Ble::ChipBleUUID charId;          // Characteristic ID
     } BLECharApi_msg;
 
     /*
