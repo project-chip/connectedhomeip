@@ -111,8 +111,8 @@ class TC_CLDIM_2_1(MatterBaseTest):
                 asserts.assert_true(isinstance(current_state.latch, bool) or current_state.latch is NullValue,
                                     "Latch is not a boolean or NullValue")
             if is_speed_supported:
-                asserts.assert_less(current_state.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kUnknownValue,
-                                    f"Speed is not in the expected range [0:{Clusters.Globals.Enums.ThreeLevelAutoEnum.kUnknownValue.value - 1}]")
+                asserts.assert_less(current_state.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kUnknownEnumValue,
+                                    f"Speed is not in the expected range [0:{Clusters.Globals.Enums.ThreeLevelAutoEnum.kUnknownEnumValue.value - 1}]")
 
         # STEP 4: Read TargetState attribute
         self.step(4)
@@ -127,8 +127,8 @@ class TC_CLDIM_2_1(MatterBaseTest):
                 asserts.assert_true(isinstance(target_state.latch, bool) or target_state.latch is NullValue,
                                     "Latch is not a boolean or NullValue")
             if is_speed_supported:
-                asserts.assert_less(target_state.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kUnknownValue,
-                                    f"Speed is not in the expected range [0:{Clusters.Globals.Enums.ThreeLevelAutoEnum.kUnknownValue.value - 1}]")
+                asserts.assert_less(target_state.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kUnknownEnumValue,
+                                    f"Speed is not in the expected range [0:{Clusters.Globals.Enums.ThreeLevelAutoEnum.kUnknownEnumValue.value - 1}]")
 
         # STEP 5: Read Resolution attribute
         self.step(5)
