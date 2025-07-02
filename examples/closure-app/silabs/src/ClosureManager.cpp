@@ -24,6 +24,7 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/TimeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
@@ -33,7 +34,8 @@ using namespace chip::app::Clusters::ClosureControl;
 using namespace chip::app::Clusters::ClosureDimension;
 
 namespace {
-constexpr uint32_t kCountdownTimeSeconds = 10;
+constexpr uint32_t kDefaultCountdownTimeSeconds = 10;    // 10 seconds
+constexpr uint32_t kCalibrateTimerMs            = 10000; // 10 seconds
 
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
@@ -124,26 +126,28 @@ void ClosureManager::CancelTimer()
 
 void ClosureManager::InitiateAction(AppEvent * event)
 {
-    Action_t action = static_cast<Action_t>(event->ClosureEvent.Action);
+    Action_t eventAction = static_cast<Action_t>(event->ClosureEvent.Action);
 
     ClosureManager & instance = ClosureManager::GetInstance();
 
-    instance.CancelTimer(); // Cancel any existing timer before starting a new action
-    instance.SetCurrentAction(action);
+    // We should not receive an event for a different action while another action is ongoing.
+    // But due to asynchronous processing of commands and synchronous processing of the stop command,
+    // this can happen if stop is received after InitaiteAction event is posted.
+    // This is a safety check to ensure that we do not initiate a new action while another action is in progress.
+    // If this happens, we log an error and do not proceed with initiating the action.
+    VerifyOrReturn(eventAction == instance.GetCurrentAction(),
+                   ChipLogError(AppServer, "Got Event for %d in InitiateAction while current ongoing action is %d",
+                                to_underlying(eventAction), to_underlying(instance.GetCurrentAction())));
 
-    switch (action)
+    instance.CancelTimer(); // Cancel any existing timer before starting a new action
+
+    switch (eventAction)
     {
     case Action_t::CALIBRATE_ACTION:
         ChipLogDetail(AppServer, "Initiating calibration action");
         // Timer used in sample application to simulate the calibration process.
         // In a real application, this would be replaced with actual calibration logic.
-        instance.StartTimer(kCountdownTimeSeconds * 1000);
-        break;
-    case Action_t::STOP_MOTION_ACTION:
-        ChipLogDetail(AppServer, "Initiating stop motion action");
-        break;
-    case Action_t::STOP_CALIBRATE_ACTION:
-        ChipLogDetail(AppServer, "Initiating stop calibration action");
+        instance.StartTimer(kCalibrateTimerMs);
         break;
     case Action_t::MOVE_TO_ACTION:
         ChipLogDetail(AppServer, "Initiating move to action");
@@ -162,31 +166,31 @@ void ClosureManager::TimerEventHandler(void * timerCbArg)
     // once sClosureTimer expires. Post an event to apptask queue with the actual handler
     // so that the event can be handled in the context of the apptask.
     AppEvent event;
-    event.Type                = AppEvent::kEventType_Closure;
-    event.ClosureEvent.Action = closureManager->GetCurrentAction();
-    event.Handler             = HandleClosureActionCompleteEvent;
+    event.Type                    = AppEvent::kEventType_Closure;
+    event.ClosureEvent.Action     = closureManager->GetCurrentAction();
+    event.ClosureEvent.EndpointId = closureManager->mCurrentActionEndpointId;
+    event.Handler                 = HandleClosureActionCompleteEvent;
     AppTask::GetAppTask().PostEvent(&event);
 }
 
 void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
 {
-    Action_t currentAction = static_cast<ClosureManager::Action_t>(event->ClosureEvent.Action);
+    Action_t currentAction = static_cast<Action_t>(event->ClosureEvent.Action);
+
+    ClosureManager & instance = ClosureManager::GetInstance();
+
+    // We should not receive an event for a different action while another action is ongoing.
+    // But due to asynchronous processing of commands and synchronous processing of the stop command,
+    // this can happen if stop is received after InitaiteAction event is posted.
+    // This is a safety check to ensure that we do not initiate a new action while another action is in progress.
+    // If this happens, we log an error and do not proceed with initiating the action.
+    VerifyOrReturn(currentAction == instance.GetCurrentAction(),
+                   ChipLogError(AppServer, "Got Event for %d in InitiateAction while current ongoing action is %d",
+                                to_underlying(currentAction), to_underlying(instance.GetCurrentAction())));
 
     switch (currentAction)
     {
     case Action_t::CALIBRATE_ACTION:
-        PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager & instance = ClosureManager::GetInstance();
-            instance.HandleClosureActionComplete(instance.GetCurrentAction());
-        });
-        break;
-    case Action_t::STOP_MOTION_ACTION:
-        PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager & instance = ClosureManager::GetInstance();
-            instance.HandleClosureActionComplete(instance.GetCurrentAction());
-        });
-        break;
-    case Action_t::STOP_CALIBRATE_ACTION:
         PlatformMgr().ScheduleWork([](intptr_t) {
             ClosureManager & instance = ClosureManager::GetInstance();
             instance.HandleClosureActionComplete(instance.GetCurrentAction());
@@ -205,23 +209,40 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
 
 chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
 {
-    VerifyOrReturnValue(ep1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
+    VerifyOrReturnValue(ep1.GetLogic().SetCountdownTimeFromDelegate(kDefaultCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set countdown time for calibration"));
 
-    // Post an event to initiate the calibration action asynchronously.
-    AppEvent event;
-    event.Type                = AppEvent::kEventType_Closure;
-    event.ClosureEvent.Action = CALIBRATE_ACTION;
-    event.Handler             = InitiateAction;
-    AppTask::GetAppTask().PostEvent(&event);
+    SetCurrentAction(Action_t::CALIBRATE_ACTION);
+    mCurrentActionEndpointId = ep1.GetEndpointId();
 
     isCalibrationInProgress = true;
+
+    // Post an event to initiate the calibration action asynchronously.
+    // Calibration can be only initiated from Closure Endpoint 1, so we set the endpoint ID to ep1.
+    AppEvent event;
+    event.Type                    = AppEvent::kEventType_Closure;
+    event.ClosureEvent.Action     = GetCurrentAction();
+    event.ClosureEvent.EndpointId = mCurrentActionEndpointId;
+    event.Handler                 = InitiateAction;
+    AppTask::GetAppTask().PostEvent(&event);
+
     return Status::Success;
 }
 
 chip::Protocols::InteractionModel::Status ClosureManager::OnStopCommand()
 {
-    // this function will contain the code for Stop command handling and initiate the stop action.
+    // As Stop should be handled immediately, we will handle it synchronously.
+    // For simulation purposes, we will just log the stop action and contnue to handle the stop action completion.
+    // In a real application, this would be replaced with actual logic to stop the closure action.
+    ChipLogDetail(AppServer, "Handling Stop command for closure action");
+
+    CancelTimer();
+
+    SetCurrentAction(Action_t::STOP_ACTION);
+    mCurrentActionEndpointId = ep1.GetEndpointId();
+
+    HandleClosureActionComplete(Action_t::STOP_ACTION);
+
     return Status::Success;
 }
 
@@ -236,28 +257,47 @@ ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::Closur
 
 void ClosureManager::HandleClosureActionComplete(Action_t action)
 {
+    ClosureManager & instance = ClosureManager::GetInstance();
     switch (action)
     {
     case Action_t::CALIBRATE_ACTION: {
-        GetInstance().ep1.OnCalibrateActionComplete();
-        GetInstance().ep2.OnCalibrateActionComplete();
-        GetInstance().ep3.OnCalibrateActionComplete();
+        instance.ep1.OnCalibrateActionComplete();
+        instance.ep2.OnCalibrateActionComplete();
+        instance.ep3.OnCalibrateActionComplete();
         isCalibrationInProgress = false;
         break;
     }
-    case Action_t::STOP_MOTION_ACTION:
-        // This should handle the completion of a stop motion action.
-        break;
-    case Action_t::STOP_CALIBRATE_ACTION:
-        // This should handle the completion of a stop calibration action.
-        break;
     case Action_t::MOVE_TO_ACTION:
         // This should handle the completion of a move-to action.
         break;
+    case Action_t::STOP_ACTION: {
+        if (isCalibrationInProgress)
+        {
+            ChipLogDetail(AppServer, "Stopping calibration action");
+            instance.ep1.OnStopCalibrateActionComplete();
+            instance.ep2.OnStopCalibrateActionComplete();
+            instance.ep3.OnStopCalibrateActionComplete();
+            isCalibrationInProgress = false;
+        }
+        else if (isMoveToInProgress)
+        {
+            ChipLogDetail(AppServer, "Stopping move to action");
+            instance.ep1.OnStopMotionActionComplete();
+            instance.ep2.OnStopMotionActionComplete();
+            instance.ep3.OnStopMotionActionComplete();
+            isMoveToInProgress = false;
+        }
+        else
+        {
+            ChipLogDetail(AppServer, "No action in progress to stop");
+        }
+        break;
+    }
     default:
         ChipLogError(AppServer, "Invalid action received in HandleClosureAction");
         break;
     }
-    // Reset the current action after handling the closure action
-    GetInstance().SetCurrentAction(Action_t::INVALID_ACTION);
+    // Reset the current action and current action endpoint ID after handling the closure action
+    instance.SetCurrentAction(Action_t::INVALID_ACTION);
+    instance.mCurrentActionEndpointId = chip::kInvalidEndpointId;
 }

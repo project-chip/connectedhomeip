@@ -67,12 +67,20 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
 
 void ClosureDimensionEndpoint::OnStopMotionActionComplete()
 {
-    // This function should handle closure dimension state updation after stopping of motion Action.
+    // Set the Position, latch in OverallTargetState to Null and speed to Auto as the motion has been stopped.
+    GenericDimensionStateStruct targetState =
+        GenericDimensionStateStruct(NullOptional, NullOptional, MakeOptional(Globals::ThreeLevelAutoEnum::kAuto));
+    VerifyOrReturn(mLogic.SetTargetState(DataModel::MakeNullable(targetState)) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set target in OnStopMotionActionComplete"));
 }
 
 void ClosureDimensionEndpoint::OnStopCalibrateActionComplete()
 {
-    // This function should handle closure dimension state updation after stopping of calibration Action.
+    // Current state and target are set to null after calibration is stopped to indicate an unknown state.
+    VerifyOrReturn(mLogic.SetCurrentState(DataModel::NullNullable) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set current state to null in OnStopCalibrateActionComplete"));
+    VerifyOrReturn(mLogic.SetTargetState(DataModel::NullNullable) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set target to null in OnStopCalibrateActionComplete"));
 }
 
 void ClosureDimensionEndpoint::OnCalibrateActionComplete()
