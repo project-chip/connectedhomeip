@@ -119,6 +119,9 @@ static_library("controller") {
   ]
 
   cflags = [ "-Wconversion" ]
+  if (chip_support_webrtc_python_bindings) {
+    public_deps += [ "${chip_root}/src/controller/webrtc:chip_webrtc" ]
+  }
 
   public_configs = [ "${chip_root}/src:includes" ]
 }
