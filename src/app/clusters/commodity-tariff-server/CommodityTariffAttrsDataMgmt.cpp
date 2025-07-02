@@ -642,6 +642,8 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
         else
         {
             // If the AUXLD feature is enabled, the auxiliaryLoad field is required!
+            ChipLogError(NotSpecified, "The auxiliaryLoad field is required when AUXLD feature is enabled");
+            return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
 
