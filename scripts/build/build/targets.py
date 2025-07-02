@@ -127,7 +127,6 @@ def BuildHostTarget():
         TargetPart('simulated-app2', app=HostApp.SIMULATED_APP2,
                    enable_ble=False, enable_wifipaf=False),
         TargetPart('python-bindings', app=HostApp.PYTHON_BINDINGS),
-        TargetPart('python-bindings-webrtc', app=HostApp.PYTHON_BINDINGS_WEBRTC),
         TargetPart('tv-app', app=HostApp.TV_APP),
         TargetPart('tv-casting-app', app=HostApp.TV_CASTING),
         TargetPart('bridge', app=HostApp.BRIDGE),
@@ -205,6 +204,7 @@ def BuildHostTarget():
     target.AppendModifier('chip-casting-simplified', chip_casting_simplified=True).OnlyIfRe('-tv-casting-app')
     target.AppendModifier('googletest', use_googletest=True).OnlyIfRe('-tests')
     target.AppendModifier('terms-and-conditions', terms_and_conditions_required=True)
+    target.AppendModifier('webrtc', enable_webrtc=True)
 
     return target
 

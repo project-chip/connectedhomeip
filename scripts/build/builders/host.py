@@ -68,7 +68,6 @@ class HostApp(Enum):
     SIMULATED_APP1 = auto()
     SIMULATED_APP2 = auto()
     PYTHON_BINDINGS = auto()
-    PYTHON_BINDINGS_WEBRTC = auto()
     EFR32_TEST_RUNNER = auto()
     TV_CASTING = auto()
     BRIDGE = auto()
@@ -128,7 +127,7 @@ class HostApp(Enum):
             return 'placeholder/linux/'
         elif self == HostApp.OTA_REQUESTOR:
             return 'ota-requestor-app/linux'
-        elif self in [HostApp.ADDRESS_RESOLVE, HostApp.TESTS, HostApp.PYTHON_BINDINGS, HostApp.PYTHON_BINDINGS_WEBRTC, HostApp.CERT_TOOL]:
+        elif self in [HostApp.ADDRESS_RESOLVE, HostApp.TESTS, HostApp.PYTHON_BINDINGS, HostApp.CERT_TOOL]:
             return '../'
         elif self == HostApp.EFR32_TEST_RUNNER:
             return '../src/test_driver/efr32'
@@ -243,7 +242,7 @@ class HostApp(Enum):
         elif self == HostApp.OTA_REQUESTOR:
             yield 'chip-ota-requestor-app'
             yield 'chip-ota-requestor-app.map'
-        elif self == HostApp.PYTHON_BINDINGS or self == HostApp.PYTHON_BINDINGS_WEBRTC:
+        elif self == HostApp.PYTHON_BINDINGS:
             yield 'controller/python'  # Directory containing WHL files
         elif self == HostApp.EFR32_TEST_RUNNER:
             yield 'chip_pw_test_runner_wheels'
@@ -372,6 +371,7 @@ class HostBuilder(GnBuilder):
                  chip_casting_simplified: Optional[bool] = None,
                  disable_shell=False,
                  use_googletest=False,
+                 enable_webrtc=False,
                  terms_and_conditions_required: Optional[bool] = None, chip_enable_nfc_based_commissioning=None,
                  ):
         super(HostBuilder, self).__init__(
@@ -507,6 +507,9 @@ class HostBuilder(GnBuilder):
         if chip_casting_simplified is not None:
             self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')
 
+        if enable_webrtc is not None:
+            self.extra_gn_options.append('chip_support_webrtc_python_bindings=true')
+
         if terms_and_conditions_required is not None:
             if terms_and_conditions_required:
                 self.extra_gn_options.append('chip_terms_and_conditions_required=true')
@@ -526,11 +529,6 @@ class HostBuilder(GnBuilder):
             self.build_command = 'src/lib/address_resolve:address-resolve-tool'
         elif app == HostApp.PYTHON_BINDINGS:
             self.extra_gn_options.append('enable_rtti=false')
-            self.extra_gn_options.append('chip_project_config_include_dirs=["//config/python"]')
-            self.build_command = 'chip-repl'
-        elif app == HostApp.PYTHON_BINDINGS_WEBRTC:
-            self.extra_gn_options.append('enable_rtti=false')
-            self.extra_gn_options.append('chip_support_webrtc_python_bindings=true')
             self.extra_gn_options.append('chip_project_config_include_dirs=["//config/python"]')
             self.build_command = 'chip-repl'
 
