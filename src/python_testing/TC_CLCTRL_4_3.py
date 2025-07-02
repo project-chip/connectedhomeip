@@ -251,7 +251,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                                          f"Expected Success status for MoveTo with Position = MoveToFullyClosed, but got: {e}")
 
                 self.step("4e")
-                sub_handler.await_all_expected_report_matches(expected_matches=[current_position_matcher(
+                sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(
                     Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed)], timeout_sec=timeout)
 
             self.step("4f")
@@ -272,7 +272,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.Success,
                                      f"Expected Success status for MoveTo with Latch = True and Position = MoveToFullyOpen, but got: {e}")
             self.step("4h")
-            sub_handler.await_all_expected_report_matches(expected_matches=[current_position_matcher(
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(
                 Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyOpened)], timeout_sec=timeout)
 
         self.step("5a")
@@ -334,7 +334,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                     self.skip_step("5g")
 
                 self.step("5h")
-                sub_handler.await_all_expected_report_matches(expected_matches=[current_latch_matcher(False)], timeout_sec=timeout)
+                sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
                 logging.info("Latch is now False, proceeding with unsupported feature checks")
 
             self.step("5i")
@@ -362,7 +362,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                                          f"Expected Success status for MoveTo with Position = MoveToFullyOpen and Latch = True, but got: {e}")
 
                 self.step("5l")
-                sub_handler.await_all_expected_report_matches(expected_matches=[current_latch_matcher(True)], timeout_sec=timeout)
+                sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(True)], timeout_sec=timeout)
             self.step("5m")
             if format(latch_control_modes, 'b')[0] == 1:
                 logging.info("LatchControlModes Bit 0 is 1, skipping step 5n")
@@ -415,7 +415,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                                          f"Expected Success status for MoveTo with Speed = High, but got: {e}")
 
                 self.step("6e")
-                sub_handler.await_all_expected_report_matches(expected_matches=[current_speed_matcher(
+                sub_handler.await_all_expected_report_matches(expected_matchers=[current_speed_matcher(
                     Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh)], timeout_sec=timeout)
 
             self.step("6f")
@@ -435,7 +435,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.Success,
                                      f"Expected Success status for MoveTo with Latch = True and Speed = Low, but got: {e}")
             self.step("6h")
-            sub_handler.await_all_expected_report_matches(expected_matches=[current_speed_matcher(
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_speed_matcher(
                 Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow)], timeout_sec=timeout)
 
         if is_position_supported:
@@ -528,7 +528,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 self.wait_for_user_input(prompt_msg="Press enter when the device is unlatched")
 
             self.step("8i")
-            sub_handler.await_all_expected_report_matches(expected_matches=[current_latch_matcher(False)], timeout_sec=timeout)
+            sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
 
             self.step("8j")
             if format(latch_control_modes, 'b')[1] == 0:
