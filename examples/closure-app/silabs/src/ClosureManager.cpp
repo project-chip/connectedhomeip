@@ -318,7 +318,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
     DeviceLayer::PlatformMgr().LockChipStack();
     SetCurrentAction(Action_t::CALIBRATE_ACTION);
     mCurrentActionEndpointId = ep1.GetEndpointId();
-    isCalibrationInProgress = true;
+    isCalibrationInProgress  = true;
     DeviceLayer::PlatformMgr().UnlockChipStack();
 
     // Post an event to initiate the calibration action asynchronously.
@@ -347,7 +347,6 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStopCommand()
     mCurrentActionEndpointId = ep1.GetEndpointId();
     DeviceLayer::PlatformMgr().UnlockChipStack();
 
-
     HandleClosureActionComplete(Action_t::STOP_ACTION);
 
     return Status::Success;
@@ -373,11 +372,12 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
 
     // If this command is received while the MainState attribute is currently either in Disengaged, Protected, Calibrating,
     //  SetupRequired or Error, then a status code of INVALID_IN_STATE shall be returned.
-    VerifyOrReturnError(mClosureEndpoint1MainState != MainStateEnum::kDisengaged && mClosureEndpoint1MainState != MainStateEnum::kProtected &&
-                            mClosureEndpoint1MainState != MainStateEnum::kSetupRequired && mClosureEndpoint1MainState != MainStateEnum::kError &&
-                            mClosureEndpoint1MainState != MainStateEnum::kCalibrating,
-                        Status::InvalidInState,
-                        ChipLogError(AppServer, "Step command not allowed in current state: %d", static_cast<int>(mClosureEndpoint1MainState)));
+    VerifyOrReturnError(
+        mClosureEndpoint1MainState != MainStateEnum::kDisengaged && mClosureEndpoint1MainState != MainStateEnum::kProtected &&
+            mClosureEndpoint1MainState != MainStateEnum::kSetupRequired && mClosureEndpoint1MainState != MainStateEnum::kError &&
+            mClosureEndpoint1MainState != MainStateEnum::kCalibrating,
+        Status::InvalidInState,
+        ChipLogError(AppServer, "Step command not allowed in current state: %d", static_cast<int>(mClosureEndpoint1MainState)));
 
     if (isSetTargetInProgress && mCurrentActionEndpointId != endpointId)
     {
@@ -414,12 +414,13 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
     VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetMainState(MainStateEnum::kMoving) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set main state while handling the SetTarget command on Endpoint 1"));
 
-    VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetOverallTargetState(overallTargetState) == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(AppServer, "Failed to set overall target while handling the SetTarget command for Endpoint %d", endpointId));
+    VerifyOrReturnError(
+        mClosureEndpoint1.GetLogic().SetOverallTargetState(overallTargetState) == CHIP_NO_ERROR, Status::Failure,
+        ChipLogError(AppServer, "Failed to set overall target while handling the SetTarget command for Endpoint %d", endpointId));
 
-    VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(kDefaultCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(AppServer, "Failed to set countdown time while handling the SetTarget command for Endpoint %d", endpointId));
-
+    VerifyOrReturnError(
+        mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(kDefaultCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
+        ChipLogError(AppServer, "Failed to set countdown time while handling the SetTarget command for Endpoint %d", endpointId));
 
     // Post an event to initiate the unlatch action asynchronously.
     // Closure panel first performs the unlatch action if it is currently latched,
@@ -449,7 +450,6 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
     // Get the endpoint based on the endpointId
     ClosureDimension::ClosureDimensionEndpoint * panelEp = instance.GetPanelEndpointById(endpointId);
     VerifyOrReturn(panelEp != nullptr, ChipLogError(AppServer, "Invalid instance for endpointId: %u", endpointId));
-
 
     DataModel::Nullable<GenericDimensionStateStruct> panelCurrentState = DataModel::NullNullable;
     DataModel::Nullable<GenericDimensionStateStruct> panelTargetState  = DataModel::NullNullable;
@@ -498,7 +498,8 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
         if (!panelCurrentState.Value().latch.Value().Value() && panelTargetState.Value().latch.Value().Value())
         {
             DataModel::Nullable<GenericOverallCurrentState> mClosureEndpoint1OverallCurrentState = DataModel::NullNullable;
-            VerifyOrReturn(mClosureEndpoint1.GetLogic().GetOverallCurrentState(mClosureEndpoint1OverallCurrentState) == CHIP_NO_ERROR,
+            VerifyOrReturn(mClosureEndpoint1.GetLogic().GetOverallCurrentState(mClosureEndpoint1OverallCurrentState) ==
+                               CHIP_NO_ERROR,
                            ChipLogError(AppServer, "Failed to get overall current state for Endpoint 1"));
             VerifyOrReturn(!mClosureEndpoint1OverallCurrentState.IsNull(),
                            ChipLogError(AppServer, "Overall current state is not set for Endpoint 1"));
@@ -548,7 +549,8 @@ void ClosureManager::HandlePanelUnlatchAction(EndpointId endpointId)
 
         VerifyOrReturn(mClosureEndpoint1.GetLogic().GetOverallCurrentState(mClosureEndpoint1OverallCurrentState) == CHIP_NO_ERROR,
                        ChipLogError(AppServer, "Failed to get current state for Endpoint 1"));
-        VerifyOrReturn(!mClosureEndpoint1OverallCurrentState.IsNull(), ChipLogError(AppServer, "Current state is not set for Endpoint 1"));
+        VerifyOrReturn(!mClosureEndpoint1OverallCurrentState.IsNull(),
+                       ChipLogError(AppServer, "Current state is not set for Endpoint 1"));
 
         // In Real application, this would be replaced with actual unlatch logic.
         ChipLogProgress(AppServer, "Performing unlatch action");
