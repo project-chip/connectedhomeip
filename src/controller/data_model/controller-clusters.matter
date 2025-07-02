@@ -7087,6 +7087,16 @@ cluster Thermostat = 513 {
     kSupportsOff = 0x8;
   }
 
+  bitmap ThermostatSuggestionNotFollowingReasonBitmap : bitmap16 {
+    kDemandResponseEvent = 0x1;
+    kOngoingHold = 0x2;
+    kSchedule = 0x4;
+    kOccupancy = 0x8;
+    kVacationMode = 0x10;
+    kTimeOfUseCostSavings = 0x20;
+    kPreCoolingOrPreHeating = 0x40;
+  }
+
   struct ScheduleTransitionStruct {
     ScheduleDayOfWeekBitmap dayOfWeek = 0;
     int16u transitionTime = 1;
@@ -7124,6 +7134,13 @@ cluster Thermostat = 513 {
     SystemModeEnum systemMode = 0;
     int8u numberOfSchedules = 1;
     ScheduleTypeFeaturesBitmap scheduleTypeFeatures = 2;
+  }
+
+  struct ThermostatSuggestionStruct {
+    int8u uniqueID = 0;
+    octet_string<16> presetHandle = 1;
+    epoch_s effectiveTime = 2;
+    epoch_s expirationTime = 3;
   }
 
   struct WeeklyScheduleTransitionStruct {
@@ -7192,6 +7209,10 @@ cluster Thermostat = 513 {
   attribute access(write: manage) optional PresetStruct presets[] = 80;
   attribute access(write: manage) optional ScheduleStruct schedules[] = 81;
   readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 82;
+  provisional readonly attribute optional int8u maxThermostatSuggestions = 83;
+  provisional readonly attribute optional ThermostatSuggestionStruct thermostatSuggestions[] = 84;
+  provisional readonly attribute optional nullable ThermostatSuggestionStruct currentThermostatSuggestion = 85;
+  provisional readonly attribute optional nullable ThermostatSuggestionNotFollowingReasonBitmap thermostatSuggestionNotFollowingReason = 86;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -7222,12 +7243,26 @@ cluster Thermostat = 513 {
     ScheduleModeBitmap modeToReturn = 1;
   }
 
+  response struct AddThermostatSuggestionResponse = 2 {
+    int8u uniqueID = 0;
+  }
+
   request struct SetActiveScheduleRequestRequest {
     octet_string<16> scheduleHandle = 0;
   }
 
   request struct SetActivePresetRequestRequest {
     nullable octet_string<16> presetHandle = 0;
+  }
+
+  request struct AddThermostatSuggestionRequest {
+    octet_string<16> presetHandle = 0;
+    nullable epoch_s effectiveTime = 1;
+    int16u expirationInMinutes = 2;
+  }
+
+  request struct RemoveThermostatSuggestionRequest {
+    int8u uniqueID = 0;
   }
 
   response struct AtomicResponse = 253 {
@@ -7254,6 +7289,8 @@ cluster Thermostat = 513 {
   command SetActiveScheduleRequest(SetActiveScheduleRequestRequest): DefaultSuccess = 5;
   /** ID */
   command SetActivePresetRequest(SetActivePresetRequestRequest): DefaultSuccess = 6;
+  command access(invoke: manage) AddThermostatSuggestion(AddThermostatSuggestionRequest): AddThermostatSuggestionResponse = 7;
+  command access(invoke: manage) RemoveThermostatSuggestion(RemoveThermostatSuggestionRequest): DefaultSuccess = 8;
   /** Begins, Commits or Cancels an atomic write */
   command access(invoke: manage) AtomicRequest(AtomicRequestRequest): AtomicResponse = 254;
 }
