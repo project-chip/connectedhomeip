@@ -157,7 +157,8 @@ class TC_CLDIM_2_1(MatterBaseTest):
         if is_unit_supported:
             unit = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Unit)
             asserts.assert_is_instance(unit, Clusters.ClosureDimension.Enums.ClosureUnitEnum, "Unit is not of expected type")
-            asserts.assert_true(0 <= unit <= 1, "Unit is not in the expected range [0:1]")
+            asserts.assert_less(unit, Clusters.ClosureDimension.Enums.ClosureUnitEnum.kUnknownEnumValue,
+                                f"Unit is not in the expected range [0:{Clusters.ClosureDimension.Enums.ClosureUnitEnum.kUnknownEnumValue.value - 1}]")
         else:
             logging.info("Unit feature is not supported by the DUT, skipping this step.")
             self.mark_current_step_skipped()
@@ -169,7 +170,8 @@ class TC_CLDIM_2_1(MatterBaseTest):
             if unit_range is not NullValue:
                 asserts.assert_is_instance(unit_range, Clusters.ClosureDimension.Structs.UnitRangeStruct,
                                            "UnitRange is not of expected type")
-                asserts.assert_true(0 <= unit <= 1, "Unit is unknown - cannot check UnitRange")
+                asserts.assert_less(unit, Clusters.ClosureDimension.Enums.ClosureUnitEnum.kUnknownEnumValue,
+                                    "Unit is unknown - cannot check UnitRange")
 
                 if unit == 0:
                     asserts.assert_true(0 <= unit_range.min, "UnitRange.min is not larger than or equal to zero")
@@ -207,7 +209,8 @@ class TC_CLDIM_2_1(MatterBaseTest):
             translation_direction = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TranslationDirection)
             asserts.assert_is_instance(translation_direction, Clusters.ClosureDimension.Enums.TranslationDirectionEnum,
                                        "TranslationDirection is not of expected type")
-            asserts.assert_true(0 <= translation_direction <= 11, "TranslationDirection is not in the expected range [0:11]")
+            asserts.assert_less(translation_direction, Clusters.ClosureDimension.Enums.TranslationDirectionEnum.kUnknownEnumValue,
+                                f"TranslationDirection is not in the expected range [0:{Clusters.ClosureDimension.Enums.TranslationDirectionEnum.kUnknownEnumValue.value - 1}]")
         else:
             logging.info("Translation feature is not supported by the DUT, skipping this step.")
             self.mark_current_step_skipped()
@@ -218,7 +221,8 @@ class TC_CLDIM_2_1(MatterBaseTest):
             rotation_axis = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.RotationAxis)
             asserts.assert_is_instance(rotation_axis, Clusters.ClosureDimension.Enums.RotationAxisEnum,
                                        "RotationAxis is not of expected type")
-            asserts.assert_true(0 <= rotation_axis <= 10, "RotationAxis is not in the expected range [0:10]")
+            asserts.assert_less(rotation_axis, Clusters.ClosureDimension.Enums.RotationAxisEnum.kUnknownEnumValue,
+                                f"RotationAxis is not in the expected range [0:{Clusters.ClosureDimension.Enums.RotationAxisEnum.kUnknownEnumValue.value - 1}]")
         else:
             logging.info("Rotation feature is not supported by the DUT, skipping this step.")
             self.mark_current_step_skipped()
@@ -228,7 +232,8 @@ class TC_CLDIM_2_1(MatterBaseTest):
         if is_rotation_supported:
             overflow = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Overflow)
             asserts.assert_is_instance(overflow, Clusters.ClosureDimension.Enums.OverflowEnum, "Overflow is not of expected type")
-            asserts.assert_true(0 <= overflow <= 10, "Overflow is not in the expected range [0:10]")
+            asserts.assert_less(overflow, Clusters.ClosureDimension.Enums.OverflowEnum.kUnknownEnumValue,
+                                f"Overflow is not in the expected range [0:{Clusters.ClosureDimension.Enums.OverflowEnum.kUnknownEnumValue.value - 1}]")
         else:
             logging.info("Rotation feature is not supported by the DUT, skipping this step.")
             self.mark_current_step_skipped()
@@ -239,7 +244,8 @@ class TC_CLDIM_2_1(MatterBaseTest):
             modulation_type = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.ModulationType)
             asserts.assert_is_instance(modulation_type, Clusters.ClosureDimension.Enums.ModulationTypeEnum,
                                        "ModulationType is not of expected type")
-            asserts.assert_true(0 <= modulation_type <= 4, "ModulationType is not in the expected range [0:4]")
+            asserts.assert_less(modulation_type, Clusters.ClosureDimension.Enums.ModulationTypeEnum.kUnknownEnumValue,
+                                f"ModulationType is not in the expected range [0:{Clusters.ClosureDimension.Enums.ModulationTypeEnum.kUnknownEnumValue.value - 1}]")
         else:
             logging.info("Modulation feature is not supported by the DUT, skipping this step.")
             self.mark_current_step_skipped()
