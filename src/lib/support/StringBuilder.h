@@ -21,7 +21,6 @@
 #include <nlassert.h>
 
 #include "BufferWriter.h"
-#include <lib/core/CHIPSafeCasts.h>
 
 namespace chip {
 
@@ -92,7 +91,9 @@ private:
 };
 
 /// A preallocated sized string builder
-/// Default buffer size is 257
+/// According the specification there are fields with size up to 256
+/// Default buffer size is 257 to have space for the terminating null character
+/// If the buffer size is not enough the value will be truncated
 template <size_t kSize = 257>
 class StringBuilder : public StringBuilderBase
 {
@@ -103,14 +104,8 @@ public:
     /// Constructor for char * and length
     StringBuilder(const char * data, size_t length) : StringBuilder() { AddFormat("%.*s", static_cast<int>(length), data); }
 
-    /// Constructor for uint8_t * and length
-    StringBuilder(const uint8_t * data, size_t length) : StringBuilder(Uint8::to_const_char(data), length) {}
-
     /// Constructor for CharSpan
     StringBuilder(const CharSpan & span) : StringBuilder(span.data(), span.size()) {}
-
-    /// Constructor for ByteSpan
-    StringBuilder(const ByteSpan & span) : StringBuilder(Uint8::to_const_char(span.data()), span.size()) {}
 
 private:
     char mBuffer[kSize];
