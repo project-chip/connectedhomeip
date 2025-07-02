@@ -119,15 +119,24 @@ CHIP_ERROR
 TlsCertificateManagementServer::EncodeProvisionedRootCertificates(EndpointId matterEndpoint, FabricIndex fabric,
                                                                   const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    return mDelegate.LoadedRootCerts(matterEndpoint, fabric,
-                                     [&encoder](auto & cert) -> CHIP_ERROR { return encoder.Encode(cert); });
+    return mDelegate.LoadedRootCerts(matterEndpoint, fabric, [&encoder](auto & cert) -> CHIP_ERROR {
+        TLSCertStruct::Type idOnlyCert;
+        idOnlyCert.fabricIndex = cert.fabricIndex;
+        idOnlyCert.caid        = cert.caid;
+        return encoder.Encode(idOnlyCert);
+    });
 }
 
 CHIP_ERROR
 TlsCertificateManagementServer::EncodeProvisionedClientCertificates(EndpointId matterEndpoint, FabricIndex fabric,
                                                                     const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    return mDelegate.LoadedClientCerts(matterEndpoint, fabric, [&](auto & cert) -> CHIP_ERROR { return encoder.Encode(cert); });
+    return mDelegate.LoadedClientCerts(matterEndpoint, fabric, [&](auto & cert) -> CHIP_ERROR {
+        TLSClientCertificateDetailStruct::Type idOnlyCert;
+        idOnlyCert.fabricIndex = cert.fabricIndex;
+        idOnlyCert.ccdid       = cert.ccdid;
+        return encoder.Encode(idOnlyCert);
+    });
 }
 
 CHIP_ERROR TlsCertificateManagementServer::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
@@ -213,23 +222,80 @@ void TlsCertificateManagementServer::HandleProvisionRootCertificate(HandlerConte
 void TlsCertificateManagementServer::HandleFindRootCertificate(HandlerContext & ctx, const FindRootCertificate::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: FindRootCertificate");
+    CHIP_ERROR result;
+    if (req.caid.IsNull())
+    {
+        result = mDelegate.RootCertsForFabric(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
+                                              [&](auto & certs) -> CHIP_ERROR {
+                                                  FindRootCertificateResponse::Type response;
+                                                  response.certificateDetails = certs;
+                                                  ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+                                                  return CHIP_NO_ERROR;
+                                              });
+    }
+    else
+    {
+        result = mDelegate.FindRootCert(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
+                                        req.caid.Value(), [&](auto & certificate) -> CHIP_ERROR {
+                                            FindRootCertificateResponse::Type response;
+                                            DataModel::List<const TLSCertStruct::Type> details(&certificate, 1);
+                                            response.certificateDetails = details;
+                                            ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+                                            return CHIP_NO_ERROR;
+                                        });
+    }
+    if (result == CHIP_ERROR_NOT_FOUND)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+    }
+    else if (result != CHIP_NO_ERROR)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+    }
 }
 
 void TlsCertificateManagementServer::HandleLookupRootCertificate(HandlerContext & ctx,
                                                                  const LookupRootCertificate::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: LookupRootCertificate");
+    auto result = mDelegate.LookupRootCert(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
+                                           req.fingerprint, [&](auto & certificate) -> CHIP_ERROR {
+                                               LookupRootCertificateResponse::Type response;
+                                               response.caid = certificate.caid;
+                                               ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+                                               return CHIP_NO_ERROR;
+                                           });
+    if (result == CHIP_ERROR_NOT_FOUND)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+    }
+    else if (result != CHIP_NO_ERROR)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+    }
 }
 
 void TlsCertificateManagementServer::HandleRemoveRootCertificate(HandlerContext & ctx,
                                                                  const RemoveRootCertificate::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: RemoveRootCertificate");
+    auto result = mDelegate.RemoveRootCert(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), req.caid);
+    if (result == CHIP_ERROR_NOT_FOUND)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+    }
+    else if (result == CHIP_NO_ERROR)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
+    }
+    else
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+    }
 }
 
 void TlsCertificateManagementServer::HandleGenerateClientCsr(HandlerContext & ctx, const TLSClientCSR::DecodableType & req)
 {
-
     ChipLogDetail(Zcl, "TlsCertificateManagement: TLSClientCSR");
 
     VerifyOrReturn(req.nonce.size() <= 128, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
@@ -268,18 +334,78 @@ void TlsCertificateManagementServer::HandleFindClientCertificate(HandlerContext 
                                                                  const FindClientCertificate::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: FindClientCertificate");
+    CHIP_ERROR result;
+    if (req.ccdid.IsNull())
+    {
+        result = mDelegate.ClientCertsForFabric(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
+                                                [&](auto & certs) -> CHIP_ERROR {
+                                                    FindClientCertificateResponse::Type response;
+                                                    response.certificateDetails = certs;
+                                                    ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+                                                    return CHIP_NO_ERROR;
+                                                });
+    }
+    else
+    {
+        result =
+            mDelegate.FindClientCert(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), req.ccdid.Value(),
+                                     [&](auto & certificate) -> CHIP_ERROR {
+                                         FindClientCertificateResponse::Type response;
+                                         DataModel::List<const TLSClientCertificateDetailStruct::Type> details(&certificate, 1);
+                                         response.certificateDetails = details;
+                                         ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+                                         return CHIP_NO_ERROR;
+                                     });
+    }
+    if (result == CHIP_ERROR_NOT_FOUND)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+    }
+    else if (result != CHIP_NO_ERROR)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+    }
 }
 
 void TlsCertificateManagementServer::HandleLookupClientCertificate(HandlerContext & ctx,
                                                                    const LookupClientCertificate::DecodableType & req)
 {
     ChipLogDetail(Zcl, "TlsCertificateManagement: LookupClientCertificate");
+    auto result = mDelegate.LookupClientCert(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(),
+                                             req.fingerprint, [&](auto & certificate) -> CHIP_ERROR {
+                                                 LookupClientCertificateResponse::Type response;
+                                                 response.ccdid = certificate.ccdid;
+                                                 ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+                                                 return CHIP_NO_ERROR;
+                                             });
+    if (result == CHIP_ERROR_NOT_FOUND)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+    }
+    else if (result != CHIP_NO_ERROR)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+    }
 }
 
 void TlsCertificateManagementServer::HandleRemoveClientCertificate(HandlerContext & ctx,
                                                                    const RemoveClientCertificate::DecodableType & req)
 {
-    ChipLogDetail(Zcl, "TlsCertificateManagement: RemoveRootCertificate");
+    ChipLogDetail(Zcl, "TlsCertificateManagement: RemoveClientCertificate");
+    auto result =
+        mDelegate.RemoveClientCert(ctx.mRequestPath.mEndpointId, ctx.mCommandHandler.GetAccessingFabricIndex(), req.ccdid);
+    if (result == CHIP_ERROR_NOT_FOUND)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::NotFound);
+    }
+    else if (result == CHIP_NO_ERROR)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
+    }
+    else
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Failure);
+    }
 }
 
 /** @brief TlsCertificateManagement Cluster Server Init

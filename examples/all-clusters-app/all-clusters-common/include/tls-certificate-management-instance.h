@@ -31,7 +31,6 @@ namespace Clusters {
 class TlsCertificateManagementCommandDelegate : public TlsCertificateManagementDelegate
 {
     static TlsCertificateManagementCommandDelegate instance;
-    uint16_t mNextRootId = 0;
     Tls::CertificateTable & mCertificateTable;
 
 public:
@@ -44,9 +43,14 @@ public:
 
     CHIP_ERROR LoadedRootCerts(EndpointId matterEndpoint, FabricIndex fabric,
                                LoadedRootCertificateCallback loadedCallback) const override;
+    CHIP_ERROR RootCertsForFabric(EndpointId matterEndpoint, FabricIndex fabric,
+                                  RootCertificateListCallback loadedCallback) const override;
 
-    Protocols::InteractionModel::Status LookupRootCert(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & fingerprint,
-                                                       LoadedRootCertificateCallback loadedCallback) const override;
+    CHIP_ERROR FindRootCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id,
+                            LoadedRootCertificateCallback loadedCallback) const override;
+    CHIP_ERROR LookupRootCert(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & fingerprint,
+                              LoadedRootCertificateCallback loadedCallback) const override;
+    CHIP_ERROR RemoveRootCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCAID id) override;
 
     Protocols::InteractionModel::Status GenerateClientCsr(EndpointId matterEndpoint, FabricIndex fabric,
                                                           const ClientCsrType & request,
@@ -57,10 +61,14 @@ public:
 
     CHIP_ERROR LoadedClientCerts(EndpointId matterEndpoint, FabricIndex fabric,
                                  LoadedClientCertificateCallback loadedCallback) const override;
+    CHIP_ERROR ClientCertsForFabric(EndpointId matterEndpoint, FabricIndex fabric,
+                                    ClientCertificateListCallback loadedCallback) const override;
 
-    Protocols::InteractionModel::Status LookupClientCert(EndpointId matterEndpoint, FabricIndex fabric,
-                                                         const ByteSpan & fingerprint,
-                                                         LoadedClientCertificateCallback loadedCallback) const override;
+    CHIP_ERROR FindClientCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id,
+                              LoadedClientCertificateCallback loadedCallback) const override;
+    CHIP_ERROR LookupClientCert(EndpointId matterEndpoint, FabricIndex fabric, const ByteSpan & fingerprint,
+                                LoadedClientCertificateCallback loadedCallback) const override;
+    CHIP_ERROR RemoveClientCert(EndpointId matterEndpoint, FabricIndex fabric, Tls::TLSCCDID id) override;
 
     static inline TlsCertificateManagementCommandDelegate & getInstance() { return instance; }
 };

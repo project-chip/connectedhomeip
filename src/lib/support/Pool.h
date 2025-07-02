@@ -662,11 +662,11 @@ class ObjectPool<T, N, ObjectPoolMem::kHeap> : public HeapObjectPool<T>
 
 /// RAII class for pool allocation that guarantees that ReleaseObject() will be called.
 /// This is effectively a simple unique_ptr, except calling pool.ReleaseObject instead of delete
-template <typename Releasable, typename PoolT>
+template <typename T, typename PoolT>
 class PoolAutoRelease
 {
 public:
-    PoolAutoRelease(PoolT & pool, Releasable * releasable) : mReleasable(releasable), mPool(pool) {}
+    PoolAutoRelease(PoolT & pool, T * releasable) : mReleasable(releasable), mPool(pool) {}
     ~PoolAutoRelease() { Release(); }
 
     // Not copyable or movable
@@ -674,8 +674,12 @@ public:
     PoolAutoRelease(const PoolAutoRelease &&)            = delete;
     PoolAutoRelease & operator=(const PoolAutoRelease &) = delete;
 
-    inline Releasable * operator->() { return mReleasable; }
-    inline const Releasable * operator->() const { return mReleasable; }
+    inline T * operator->() { return mReleasable; }
+    inline const T * operator->() const { return mReleasable; }
+    inline const T & operator*() const { return *mReleasable; }
+    inline T & operator*() { return *mReleasable; }
+    inline operator const T *() const { return mReleasable; }
+    inline operator T *() { return mReleasable; }
 
     inline bool IsNull() const { return mReleasable == nullptr; }
 
@@ -687,7 +691,7 @@ public:
     }
 
 private:
-    Releasable * mReleasable = nullptr;
+    T * mReleasable;
     PoolT & mPool;
 };
 

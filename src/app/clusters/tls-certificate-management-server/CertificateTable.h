@@ -20,6 +20,7 @@
 
 #include <app/storage/TableEntry.h>
 #include <clusters/TlsCertificateManagement/Structs.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <functional>
 #include <lib/support/CommonIterator.h>
 #include <lib/support/PersistentData.h>
@@ -41,21 +42,33 @@ public:
     using RootCertStruct   = TlsCertificateManagement::Structs::TLSCertStruct::DecodableType;
     using ClientCertStruct = TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::DecodableType;
 
+    struct ClientCertWithKey
+    {
+        ClientCertStruct detail;
+        // TODO(gmarcosb): We probably want to support using a handle here when the key is stored elsewhere,
+        // see for example Symmetric128BitsKeyHandle
+        Crypto::P256SerializedKeypair key;
+    };
+
     using IterateRootCertFnType   = std::function<CHIP_ERROR(CommonIterator<RootCertStruct> & iterator)>;
-    using IterateClientCertFnType = std::function<CHIP_ERROR(CommonIterator<ClientCertStruct> & iterator)>;
+    using IterateClientCertFnType = std::function<CHIP_ERROR(CommonIterator<ClientCertWithKey> & iterator)>;
+    using RootBuffer              = PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES>;
+    using ClientBuffer            = PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES>;
 
     /// @brief a root cert along with an associated buffer for the cert payload. RootCertStruct has a ByteSpan,
     /// and this wrapper ensures that the underlying buffer for the ByteSpan has a long-enough lifetime.
     /// No other functionality from PersistentStore<> is required to be used by the implementation except the underlying buffer.
     struct BufferedRootCert
     {
-        BufferedRootCert(PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> & buffer) : mBuffer(buffer) {}
+        BufferedRootCert(RootBuffer & buffer) : mBuffer(buffer) {}
 
         RootCertStruct mCert;
+        inline const RootCertStruct & GetCert() const { return mCert; }
+        inline RootCertStruct & GetCert() { return mCert; }
 
     private:
         friend class CertificateTable;
-        PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> & mBuffer;
+        RootBuffer & mBuffer;
     };
 
     /// @brief a client cert along with an associated buffer for the cert payload.  ClientCertStruct contains various
@@ -64,13 +77,15 @@ public:
     /// No other functionality from PersistentStore<> is required to be used by the implementation except the underlying buffer.
     struct BufferedClientCert
     {
-        BufferedClientCert(PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> & buffer) : mBuffer(buffer) {}
+        BufferedClientCert(ClientBuffer & buffer) : mBuffer(buffer) {}
 
-        ClientCertStruct mCert;
+        ClientCertWithKey mCertWithKey;
+        inline const ClientCertStruct & GetCert() const { return mCertWithKey.detail; }
+        inline ClientCertStruct & GetCert() { return mCertWithKey.detail; }
 
     private:
         friend class CertificateTable;
-        PersistentStore<CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES> & mBuffer;
+        ClientBuffer & mBuffer;
     };
 
     CertificateTable(){};
@@ -86,26 +101,61 @@ public:
     virtual void Finish()                                        = 0;
 
     // Data
+    /**
+     * @brief If id has a value, updates the existing certificate; otherwise, inserts a new certificate.
+     *
+     * @param buffer[out] a temporary buffer for temporary serialization, if necessary
+     * @param id[in/out] if a value is present, updates the certificate - otherwise, inserts the certificate & returns the ID.
+     * @param entry[in] the value to set
+     */
+    virtual CHIP_ERROR UpsertRootCertificateEntry(FabricIndex fabric_index, Optional<TLSCAID> & id, RootBuffer & buffer,
+                                                  const chip::ByteSpan & certificate) = 0;
 
     /**
-     * @brief Loads the specified (fabric_index, certificate_id) root cert into entry; if the implementation
+     * @brief Loads the specified (fabric_index, id) root cert into entry; if the implementation
      * requires a buffer to load the entry, it is provided via entry.mBuffer
      *
-     * entry[out] the resulting loaded entry, where entry.mCert will contain the loaded certificate
+     * @param entry[out] the resulting loaded entry, where entry.mCert will contain the loaded certificate
      */
-    virtual CHIP_ERROR GetRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id, BufferedRootCert & entry) = 0;
-    virtual CHIP_ERROR HasRootCertificateEntry(FabricIndex fabric_index, TLSCAID certificate_id)                           = 0;
-    virtual CHIP_ERROR IterateRootEntries(FabricIndex fabric, BufferedRootCert & store, IterateRootCertFnType iterateFn)   = 0;
+    virtual CHIP_ERROR GetRootCertificateEntry(FabricIndex fabric_index, TLSCAID id, BufferedRootCert & entry)                = 0;
+    virtual CHIP_ERROR HasRootCertificateEntry(FabricIndex fabric_index, TLSCAID id)                                          = 0;
+    virtual CHIP_ERROR IterateRootCertificates(FabricIndex fabric, BufferedRootCert & store, IterateRootCertFnType iterateFn) = 0;
+    virtual CHIP_ERROR RemoveRootCertificate(FabricIndex fabric, TLSCAID id)                                                  = 0;
+    virtual CHIP_ERROR GetRootCertificateCount(FabricIndex fabric, uint8_t & outCount)                                        = 0;
 
     /**
-     * @brief Loads the specified (fabric_index, certificate_id) client cert into entry; if the implementation
+      * @brief Creates a key pair and assigns a certificate ID for a client certificate, but does not commit. To commit the
+      certificate, use UpdateClientCertificateEntry
+      *  with the id matching the output of this call.
+
+      * @param nonce[in] the nonce to be used for creating nonceSignature
+      * @param id[out] the generated ID for the client certificate
+      * @param csr[out] a DER-encoded certificate signing request using the newly-created key pair
+      * @param nonceSignature[out] a nonce signature
+      */
+    virtual CHIP_ERROR PrepareClientCertificate(FabricIndex fabric, const ByteSpan & nonce, TLSCCDID & id, MutableByteSpan & csr,
+                                                MutableByteSpan & nonceSignature) = 0;
+
+    /**
+     * @brief Updates the existing client certificate. If the certificate was created via PrepareClientCertificate but not yet
+     * committed, commits the respective key pair along with entry.
+     * @param buffer[out] a temporary buffer for temporary serialization, if necessary
+     */
+    virtual CHIP_ERROR UpdateClientCertificateEntry(FabricIndex fabric_index, TLSCCDID id, ClientBuffer & buffer,
+                                                    const ClientCertStruct & entry) = 0;
+
+    /**
+     * @brief Loads the specified (fabric_index, id) client cert into entry; if the implementation
      * requires a buffer to load the entry, it is provided via entry.mBuffer
      *
-     * entry[out] the resulting loaded entry, where entry.mCert will contain the loaded certificate
+     * @param entry[out] the resulting loaded entry, where entry.mCert will contain the loaded certificate
      */
-    virtual CHIP_ERROR GetClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id, BufferedClientCert & entry) = 0;
-    virtual CHIP_ERROR HasClientCertificateEntry(FabricIndex fabric_index, TLSCCDID certificate_id)                             = 0;
-    virtual CHIP_ERROR IterateClientEntries(FabricIndex fabric, BufferedClientCert & store, IterateClientCertFnType iterateFn)  = 0;
+    virtual CHIP_ERROR GetClientCertificateEntry(FabricIndex fabric_index, TLSCCDID id, BufferedClientCert & entry) = 0;
+    virtual CHIP_ERROR HasClientCertificateEntry(FabricIndex fabric_index, TLSCCDID id)                             = 0;
+    virtual CHIP_ERROR IterateClientCertificates(FabricIndex fabric, BufferedClientCert & store,
+                                                 IterateClientCertFnType iterateFn)                                 = 0;
+    virtual CHIP_ERROR RemoveClientCertificate(FabricIndex fabric, TLSCCDID id)                                     = 0;
+    virtual CHIP_ERROR GetClientCertificateCount(FabricIndex fabric, uint8_t & outCount)                            = 0;
 
 protected:
     static inline PersistentStore<CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES> & GetBuffer(BufferedRootCert & bufferedCert)
@@ -120,12 +170,6 @@ protected:
 
 } // namespace Tls
 } // namespace Clusters
-
-namespace DataModel {
-CHIP_ERROR Encode(TLV::TLVWriter & writer, const Clusters::Tls::CertificateTable::ClientCertStruct & data);
-CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex,
-                         const Clusters::Tls::CertificateTable::ClientCertStruct & data);
-} // namespace DataModel
 
 } // namespace app
 } // namespace chip
