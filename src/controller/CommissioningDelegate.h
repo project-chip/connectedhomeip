@@ -873,13 +873,14 @@ public:
      * kSendComplete: CommissioningErrorInfo if there is an error
      * kCleanup: None
      */
-    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData,
-                                         ReadCommissioningInfo, AttestationErrorInfo, CommissioningErrorInfo,
-                                         NetworkCommissioningStatusInfo, TimeZoneResponseInfo
+    struct CommissioningReport
+        : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
+                  AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-                                         ,JCM::JCMTrustVerificationError
+                  ,
+                  JCM::JCMTrustVerificationError
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-                                         >
+                  >
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;
