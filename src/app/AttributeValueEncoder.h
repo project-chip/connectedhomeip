@@ -57,27 +57,30 @@ private:
     // It's important here to not collapse together types for which
     // DataModel::Encode in fact has different behavior (e.g. enum types).
     template <typename T>
-    static const T & BaseEncodableValue(const T & aArg)
+    static constexpr const T & BaseEncodableValue(const T & aArg)
     {
         return aArg;
     }
     template <typename T>
-    static auto BaseEncodableValue(const BitFlags<T> & aArg)
+    static constexpr auto BaseEncodableValue(const BitFlags<T> & aArg)
     {
         return BaseEncodableValue(aArg.Raw());
     }
     template <typename T>
-    static auto BaseEncodableValue(const BitMask<T> & aArg)
+    static constexpr auto BaseEncodableValue(const BitMask<T> & aArg)
     {
         return BaseEncodableValue(aArg.Raw());
     }
-    static uint64_t BaseEncodableValue(uint32_t aArg) { return aArg; }
-    static uint64_t BaseEncodableValue(uint16_t aArg) { return aArg; }
-    static uint64_t BaseEncodableValue(uint8_t aArg) { return aArg; }
-    static int64_t BaseEncodableValue(int32_t aArg) { return aArg; }
-    static int64_t BaseEncodableValue(int16_t aArg) { return aArg; }
-    static int64_t BaseEncodableValue(int8_t aArg) { return aArg; }
+    static constexpr uint64_t BaseEncodableValue(uint32_t aArg) { return aArg; }
+    static constexpr uint64_t BaseEncodableValue(uint16_t aArg) { return aArg; }
+    static constexpr uint64_t BaseEncodableValue(uint8_t aArg) { return aArg; }
+    static constexpr int64_t BaseEncodableValue(int32_t aArg) { return aArg; }
+    static constexpr int64_t BaseEncodableValue(int16_t aArg) { return aArg; }
+    static constexpr int64_t BaseEncodableValue(int8_t aArg) { return aArg; }
 
+    // Determines whether a type should be encoded as-is (if IsBaseType<T> is
+    // true) or transformed to a different type by calling BaseEncodableValue()
+    // on it.
     template <typename T>
     static constexpr bool IsBaseType = std::is_same_v<const T &, decltype(BaseEncodableValue(std::declval<const T &>()))>;
 
