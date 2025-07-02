@@ -271,7 +271,11 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         {
             instance.mClosurePanelEndpoint3.OnPanelMotionActionComplete();
         }
+
+        DeviceLayer::PlatformMgr().LockChipStack();
         instance.isStepActionInProgress = false;
+        DeviceLayer::PlatformMgr().UnlockChipStack();
+
         break;
     default:
         ChipLogError(AppServer, "Invalid action received in HandleClosureAction");
@@ -377,10 +381,11 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
     VerifyOrReturnValue(mClosureEndpoint1.GetLogic().SetOverallTargetState(mClosureEndpoint1Target) == CHIP_NO_ERROR,
                         Status::Failure, ChipLogError(AppServer, "Failed to set overall target for Step command"));
 
+    DeviceLayer::PlatformMgr().LockChipStack();               
     SetCurrentAction(PANEL_STEP_ACTION);
     mCurrentActionEndpointId = endpointId;
-
     isStepActionInProgress = true;
+    DeviceLayer::PlatformMgr().UnlockChipStack();
 
     AppEvent event;
     event.Type                    = AppEvent::kEventType_Closure;
@@ -445,8 +450,12 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
         panelEp->GetLogic().SetCurrentState(panelCurrentState);
 
         instance.CancelTimer(); // Cancel any existing timer before starting a new action
+
+        DeviceLayer::PlatformMgr().LockChipStack();
         instance.SetCurrentAction(PANEL_STEP_ACTION);
         instance.mCurrentActionEndpointId = endpointId;
+        DeviceLayer::PlatformMgr().UnlockChipStack();
+
         instance.StartTimer(kMotionCountdownTimeMs);
 
         return;
