@@ -164,6 +164,14 @@ public:
      */
     void OnPanelMotionActionComplete();
 
+    /**
+     * @brief Retrieves the endpoint ID associated with this Closure Control endpoint.
+     *
+     * @return The EndpointId of this Closure Control endpoint.
+     */
+    EndpointId GetEndpointId() const { return mEndpoint; }
+
+
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
     MatterContext mContext;

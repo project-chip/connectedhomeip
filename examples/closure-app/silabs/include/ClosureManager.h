@@ -233,5 +233,5 @@ private:
      * @param endpointId The identifier of the endpoint to retrieve.
      * @return Pointer to the matching panel endpoint instance, or nullptr if not found.
      */
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * ClosureManager::GetPanelEndpointById(EndpointId endpointId);
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * GetPanelEndpointById(chip::EndpointId endpointId);
 };

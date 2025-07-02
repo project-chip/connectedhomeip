@@ -166,6 +166,13 @@ public:
      */
     void OnPanelMotionActionComplete();
 
+    /**
+     * @brief Retrieves the endpoint ID associated with this Closure Dimension endpoint.
+     *
+     * @return The EndpointId of this Closure Dimension endpoint.
+     */
+    EndpointId GetEndpointId() const { return mEndpoint; }
+
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
     MatterContext mContext;

@@ -37,6 +37,7 @@ using namespace chip::app::Clusters::ClosureDimension;
 namespace {
 constexpr uint32_t kDefaultCountdownTimeSeconds = 10;    // 10 seconds
 constexpr uint32_t kCalibrateTimerMs            = 10000; // 10 seconds
+constexpr uint32_t kMotionCountdownTimeMs    = 1000;  // 1 second
 
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
@@ -238,17 +239,17 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         if (isCalibrationInProgress)
         {
             ChipLogDetail(AppServer, "Stopping calibration action");
-            instance.ep1.OnStopCalibrateActionComplete();
-            instance.ep2.OnStopCalibrateActionComplete();
-            instance.ep3.OnStopCalibrateActionComplete();
+            instance.mClosureEndpoint1.OnStopCalibrateActionComplete();
+            instance.mClosurePanelEndpoint2.OnStopCalibrateActionComplete();
+            instance.mClosurePanelEndpoint3.OnStopCalibrateActionComplete();
             isCalibrationInProgress = false;
         }
         else if (isMoveToInProgress)
         {
             ChipLogDetail(AppServer, "Stopping move to action");
-            instance.ep1.OnStopMotionActionComplete();
-            instance.ep2.OnStopMotionActionComplete();
-            instance.ep3.OnStopMotionActionComplete();
+            instance.mClosureEndpoint1.OnStopMotionActionComplete();
+            instance.mClosurePanelEndpoint2.OnStopMotionActionComplete();
+            instance.mClosurePanelEndpoint3.OnStopMotionActionComplete();
             isMoveToInProgress = false;
         }
         else
@@ -283,16 +284,16 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
 
 chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
 {
-    VerifyOrReturnValue(mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR,
+    VerifyOrReturnValue(mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(kDefaultCountdownTimeSeconds) == CHIP_NO_ERROR,
                         Status::Failure, ChipLogError(AppServer, "Failed to set countdown time for calibration"));
 
     SetCurrentAction(Action_t::CALIBRATE_ACTION);
-    mCurrentActionEndpointId = ep1.GetEndpointId();
+    mCurrentActionEndpointId = mClosureEndpoint1.GetEndpointId();
 
     isCalibrationInProgress = true;
 
     // Post an event to initiate the calibration action asynchronously.
-    // Calibration can be only initiated from Closure Endpoint 1, so we set the endpoint ID to ep1.
+    // Calibration can be only initiated from Closure Endpoint 1, so we set the endpoint ID to mClosureEndpoint1.
     AppEvent event;
     event.Type                    = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action     = GetCurrentAction();
@@ -312,8 +313,9 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStopCommand()
 
     CancelTimer();
 
+    // Stop can be only initiated from Closure Endpoint 1, so we set the endpoint ID to mClosureEndpoint1.
     SetCurrentAction(Action_t::STOP_ACTION);
-    mCurrentActionEndpointId = ep1.GetEndpointId();
+    mCurrentActionEndpointId = mClosureEndpoint1.GetEndpointId();
 
     HandleClosureActionComplete(Action_t::STOP_ACTION);
 
