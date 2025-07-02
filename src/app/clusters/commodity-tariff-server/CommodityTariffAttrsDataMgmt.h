@@ -698,10 +698,7 @@ private:
         kUpdated,     // New value committed
     };
 
-    CHIP_ERROR ValidateNewValue()
-    {
-        return Validate(GetNewValueRef());
-    }
+    CHIP_ERROR ValidateNewValue() { return Validate(GetNewValueRef()); }
 
     bool HasChanged()
     {

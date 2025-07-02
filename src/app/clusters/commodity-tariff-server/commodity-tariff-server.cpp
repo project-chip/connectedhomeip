@@ -673,7 +673,9 @@ void Instance::ForceDayEntriesAttrsUpdate()
     }
 
     // Calculate seconds remaining in current entry
-    const uint16_t minutesRemaining = (entryEndTime >= minutesSinceMidnight) ? (entryEndTime - minutesSinceMidnight) : ((kSecondsPerDay / 60 - minutesSinceMidnight) + entryEndTime);
+    const uint16_t minutesRemaining               = (entryEndTime >= minutesSinceMidnight)
+                      ? (entryEndTime - minutesSinceMidnight)
+                      : ((kSecondsPerDay / 60 - minutesSinceMidnight) + entryEndTime);
     mServerTariffAttrsCtx.forwardAlarmTriggerTime = now + (minutesRemaining * 60);
 
     // Determine update type based on whether we're crossing day boundary
