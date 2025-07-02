@@ -74,10 +74,11 @@ public:
     /**
      *   Called when the commissioning process is complete (with success or error)
      *   Should be overriden by DevicePairingDelegates which are JF compatible
-     *   - trustedIcacPublicKeyB has a value only when Joint Commissioning Method is executed
+     *   - trustedIcacPublicKeyB/peerAdminJFAdminClusterEndpointId have a value only
+     *     when Joint Commissioning Method is executed
      */
     virtual void OnCommissioningComplete(NodeId deviceId, const Optional<Crypto::P256PublicKey> & trustedIcacPublicKeyB,
-                                         CHIP_ERROR error)
+                                         uint16_t peerAdminJFAdminClusterEndpointId, CHIP_ERROR error)
     {
         OnCommissioningComplete(deviceId, error);
     }

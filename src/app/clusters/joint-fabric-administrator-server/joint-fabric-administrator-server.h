@@ -25,9 +25,17 @@ class JointFabricAdministratorServer
 {
 public:
     static JointFabricAdministratorServer & GetInstance(void);
+    void SetPeerJFAdminClusterEndpointId(chip::EndpointId peerJFAdminClusterEndpointId)
+    {
+        mPeerJFAdminClusterEndpointId = peerJFAdminClusterEndpointId;
+    }
+
+    chip::EndpointId GetPeerJFAdminClusterEndpointId() const { return mPeerJFAdminClusterEndpointId; }
 
 private:
     JointFabricAdministratorServer() {}
 
     static JointFabricAdministratorServer sJointFabricAdministratorServerInstance;
+
+    chip::EndpointId mPeerJFAdminClusterEndpointId = chip::kInvalidEndpointId;
 };

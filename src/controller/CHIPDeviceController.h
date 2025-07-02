@@ -1123,6 +1123,7 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     chip::Optional<chip::Crypto::P256PublicKey> mTrustedIcacPublicKeyB;
+    chip::EndpointId mPeerAdminJFAdminClusterEndpointId = chip::kInvalidEndpointId;
 #endif
 };
 
