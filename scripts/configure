@@ -100,7 +100,7 @@ function main() { # ...
 
     if [[ -n "$PROJECT" ]]; then
         PROJECT_PATH="$(cd "${CHIP_ROOT}" 2>/dev/null && cd "${PROJECT}" 2>/dev/null && pwd)"
-        [[ -n "$PROJECT_PATH" && -r "${PROJECT_PATH}/.gn" ]] || fail "Invalid project '${PROJECT}' - missing .gn at '${PROJECT_PATH}'"
+        [[ -n "$PROJECT_PATH" && -r "${PROJECT_PATH}/.gn" ]] || fail "Invalid project '${PROJECT}' (no such directory or missing .gn file)"
     fi
 
     if [[ -n "$PW_ROOT" ]]; then
