@@ -165,10 +165,6 @@ extern "C" __attribute__((naked)) void LogFault_Handler(void)
 }
 
 #ifndef SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
-extern "C" __attribute__((naked)) void NMI_Handler(void)
-{
-    __asm volatile("b LogFault_Handler");
-}
 extern "C" __attribute__((naked)) void HardFault_Handler(void)
 {
     __asm volatile("b LogFault_Handler");
