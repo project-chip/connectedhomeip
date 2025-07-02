@@ -164,13 +164,6 @@ public:
      */
     void OnPanelMotionActionComplete();
 
-    /**
-     * @brief Retrieves the endpoint for this instance.
-     *
-     * @return The endpoint ID (EndpointId) for this instance.
-     */
-    EndpointId GetEndpoint() const { return mEndpoint; }
-
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
     MatterContext mContext;

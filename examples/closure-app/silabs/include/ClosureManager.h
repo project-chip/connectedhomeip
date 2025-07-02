@@ -141,17 +141,14 @@ private:
     bool isCalibrationInProgress = false;
     bool isStepActionInProgress  = false;
 
-    Action_t mCurrentAction                   = Action_t::INVALID_ACTION;
-    chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
-
     // Define the endpoint ID for the Closure
-    static constexpr chip::EndpointId kClosureEndpoint       = 1;
-    static constexpr chip::EndpointId kClosurePanel1Endpoint = 2;
-    static constexpr chip::EndpointId kClosurePanel2Endpoint = 3;
+    static constexpr chip::EndpointId kClosureEndpoint1      = 1;
+    static constexpr chip::EndpointId kClosurePanelEndpoint2 = 2;
+    static constexpr chip::EndpointId kClosurePanelEndpoint3 = 3;
 
-    chip::app::Clusters::ClosureControl::ClosureControlEndpoint ep1{ kClosureEndpoint };
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep2{ kClosurePanel1Endpoint };
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep3{ kClosurePanel2Endpoint };
+    chip::app::Clusters::ClosureControl::ClosureControlEndpoint mClosureEndpoint1{ kClosureEndpoint1 };
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint2{ kClosurePanelEndpoint2 };
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint3{ kClosurePanelEndpoint3 };
 
     /**
      * @brief Starts or restarts the closure function timer with the specified timeout.
@@ -223,4 +220,14 @@ private:
      * @param endpointId The identifier of the endpoint for which the panel step action is to be handled.
      */
     void HandlePanelStepAction(chip::EndpointId endpointId);
+
+    /**
+     * @brief Retrieves the panel endpoint associated with the specified endpoint ID.
+     *
+     * This method searches for the panel instance that matches the given endpoint ID.
+     *
+     * @param endpointId The identifier of the endpoint to retrieve.
+     * @return Pointer to the matching panel endpoint instance, or nullptr if not found.
+     */
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * ClosureManager::GetPanelEndpointById(EndpointId endpointId);
 };
