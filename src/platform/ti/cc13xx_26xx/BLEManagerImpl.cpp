@@ -881,6 +881,11 @@ void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
                 activeConnObj = &sInstance.connList[i];
             }
         }
+        if (activeConnObj == NULL)
+        {
+            BLEMGR_LOG("BLEMGR: BLE Process Application Message: CHIPOBLE_CHAR_CHANGE_EVT, No active connection found");
+            return;
+        }
 
         connHandle = (void *) &activeConnObj->connHandle;
 
