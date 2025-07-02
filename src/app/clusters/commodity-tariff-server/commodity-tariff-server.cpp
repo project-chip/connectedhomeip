@@ -389,7 +389,13 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(CurrentTariffAttrsCtx & aCtx, 
                 {
                     chip::CharSpan srcLabelSpan = current->label.Value().Value();
                     const char * srcLabel       = srcLabelSpan.data();
-                    tmpNullLabel.SetNonNull(chip::CharSpan(strdup(srcLabel), srcLabelSpan.size()));
+                    char * newLabel             = chip::Platform::CopyString(srcLabelSpan.data(), srcLabelSpan.size());
+                    if (newLabel == nullptr)
+                    {
+                        err = CHIP_ERROR_NO_MEMORY;
+                        break; // and handle error after the loop
+                    }
+                    tmpNullLabel.SetNonNull(chip::CharSpan(newLabel, srcLabelSpan.size()));
                 }
 
                 entry.label = MakeOptional(DataModel::Nullable<chip::CharSpan>(tmpNullLabel));
