@@ -12260,6 +12260,28 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedThermostatClusterAddThermostatSuggestionResponseCallback implements ChipClusters.ThermostatCluster.AddThermostatSuggestionResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer uniqueID) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo uniqueIDResponseValue = new CommandResponseInfo("uniqueID", "Integer");
+      responseValues.put(uniqueIDResponseValue, uniqueID);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
   public static class DelegatedThermostatClusterAtomicResponseCallback implements ChipClusters.ThermostatCluster.AtomicResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -12675,6 +12697,69 @@ public class ClusterInfoMapping {
     public void onSuccess(@Nullable Long value) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedThermostatClusterThermostatSuggestionsAttributeCallback implements ChipClusters.ThermostatCluster.ThermostatSuggestionsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.ThermostatClusterThermostatSuggestionStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ThermostatClusterThermostatSuggestionStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedThermostatClusterCurrentThermostatSuggestionAttributeCallback implements ChipClusters.ThermostatCluster.CurrentThermostatSuggestionAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ThermostatClusterThermostatSuggestionStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ThermostatClusterThermostatSuggestionStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedThermostatClusterThermostatSuggestionNotFollowingReasonAttributeCallback implements ChipClusters.ThermostatCluster.ThermostatSuggestionNotFollowingReasonAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
       responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
@@ -20773,7 +20858,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCommodityMeteringClusterMeasurementTypeAttributeCallback implements ChipClusters.CommodityMeteringCluster.MeasurementTypeAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCommodityMeteringClusterTariffUnitAttributeCallback implements ChipClusters.CommodityMeteringCluster.TariffUnitAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -27465,6 +27550,53 @@ public class ClusterInfoMapping {
         thermostatsetActivePresetRequestCommandParams
     );
     thermostatClusterInteractionInfoMap.put("setActivePresetRequest", thermostatsetActivePresetRequestInteractionInfo);
+
+    Map<String, CommandParameterInfo> thermostataddThermostatSuggestionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo thermostataddThermostatSuggestionpresetHandleCommandParameterInfo = new CommandParameterInfo("presetHandle", byte[].class, byte[].class);
+    thermostataddThermostatSuggestionCommandParams.put("presetHandle",thermostataddThermostatSuggestionpresetHandleCommandParameterInfo);
+
+    CommandParameterInfo thermostataddThermostatSuggestioneffectiveTimeCommandParameterInfo = new CommandParameterInfo("effectiveTime", Long.class, Long.class);
+    thermostataddThermostatSuggestionCommandParams.put("effectiveTime",thermostataddThermostatSuggestioneffectiveTimeCommandParameterInfo);
+
+    CommandParameterInfo thermostataddThermostatSuggestionexpirationInMinutesCommandParameterInfo = new CommandParameterInfo("expirationInMinutes", Integer.class, Integer.class);
+    thermostataddThermostatSuggestionCommandParams.put("expirationInMinutes",thermostataddThermostatSuggestionexpirationInMinutesCommandParameterInfo);
+    InteractionInfo thermostataddThermostatSuggestionInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ThermostatCluster) cluster)
+          .addThermostatSuggestion((ChipClusters.ThermostatCluster.AddThermostatSuggestionResponseCallback) callback
+           , (byte[])
+             commandArguments.get("presetHandle")
+
+           , (Long)
+             commandArguments.get("effectiveTime")
+
+           , (Integer)
+             commandArguments.get("expirationInMinutes")
+
+            );
+        },
+        () -> new DelegatedThermostatClusterAddThermostatSuggestionResponseCallback(),
+        thermostataddThermostatSuggestionCommandParams
+      );
+    thermostatClusterInteractionInfoMap.put("addThermostatSuggestion", thermostataddThermostatSuggestionInteractionInfo);
+
+    Map<String, CommandParameterInfo> thermostatremoveThermostatSuggestionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo thermostatremoveThermostatSuggestionuniqueIDCommandParameterInfo = new CommandParameterInfo("uniqueID", Integer.class, Integer.class);
+    thermostatremoveThermostatSuggestionCommandParams.put("uniqueID",thermostatremoveThermostatSuggestionuniqueIDCommandParameterInfo);
+    InteractionInfo thermostatremoveThermostatSuggestionInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ThermostatCluster) cluster)
+        .removeThermostatSuggestion((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("uniqueID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        thermostatremoveThermostatSuggestionCommandParams
+    );
+    thermostatClusterInteractionInfoMap.put("removeThermostatSuggestion", thermostatremoveThermostatSuggestionInteractionInfo);
 
     Map<String, CommandParameterInfo> thermostatatomicRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 

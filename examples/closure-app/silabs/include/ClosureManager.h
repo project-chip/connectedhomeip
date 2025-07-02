@@ -38,8 +38,7 @@ public:
     {
         CALIBRATE_ACTION = 0,
         MOVE_TO_ACTION,
-        STOP_MOTION_ACTION,
-        STOP_CALIBRATE_ACTION,
+        STOP_ACTION,
         SET_TARGET_ACTION,
         PANEL_UNLATCH_ACTION,
 
@@ -140,10 +139,13 @@ public:
 
 private:
     static ClosureManager sClosureMgr;
+
     osTimerId_t mClosureTimer;
 
     bool isCalibrationInProgress = false;
+    bool isMoveToInProgress      = false;
     bool isSetTargetInProgress   = false;
+    
 
     Action_t mCurrentAction                   = Action_t::INVALID_ACTION;
     chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
