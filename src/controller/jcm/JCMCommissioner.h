@@ -26,7 +26,6 @@
 #include <app/ReadClient.h>
 #include <controller/AutoCommissioner.h>
 #include <controller/CHIPDeviceController.h>
-#include <controller/JCMTrustVerification.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>

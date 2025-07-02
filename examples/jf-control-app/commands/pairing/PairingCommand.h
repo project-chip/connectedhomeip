@@ -21,7 +21,7 @@
 #include "../common/CHIPCommand.h"
 #include <controller/CommissioningDelegate.h>
 #include <controller/CurrentFabricRemover.h>
-#include <controller/JCMCommissioner.h>
+#include <controller/jcm/JCMCommissioner.h>
 
 #include <commands/common/CredentialIssuerCommands.h>
 #include <lib/support/Span.h>

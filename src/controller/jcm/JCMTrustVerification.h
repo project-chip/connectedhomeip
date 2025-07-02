@@ -84,13 +84,13 @@ enum JCMTrustVerificationStage : uint8_t
 };
 
 /*
- * enumToString is a utility function that converts a JCMTrustVerificationError enum value
+ * EnumToString is a utility function that converts a JCMTrustVerificationError enum value
  * to its string representation for logging purposes.
  *
  * @param error The JCMTrustVerificationError to convert.
  * @return A string representation of the JCMTrustVerificationError.
  */
-inline std::string enumToString(JCMTrustVerificationError error)
+inline std::string EnumToString(JCMTrustVerificationError error)
 {
     switch (error)
     {
@@ -117,13 +117,13 @@ inline std::string enumToString(JCMTrustVerificationError error)
 }
 
 /*
- * enumToString is a utility function that converts a JCMTrustVerificationStage enum value
+ * EnumToString is a utility function that converts a JCMTrustVerificationStage enum value
  * to its string representation for logging purposes.
  *
  * @param stage The JCMTrustVerificationStage to convert.
  * @return A string representation of the JCMTrustVerificationStage.
  */
-inline std::string enumToString(JCMTrustVerificationStage stage)
+inline std::string EnumToString(JCMTrustVerificationStage stage)
 {
     switch (stage)
     {

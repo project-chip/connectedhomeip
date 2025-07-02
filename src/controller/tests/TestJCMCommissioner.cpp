@@ -20,7 +20,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
 #include <controller/CommissioningDelegate.h>
-#include <controller/JCMCommissioner.h>
+#include <controller/jcm/JCMCommissioner.h>
 #include <credentials/CHIPCert.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>

@@ -215,7 +215,9 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 {
     auto params = CommissioningParameters();
     params.SetSkipCommissioningComplete(mSkipCommissioningComplete.ValueOr(false));
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     params.SetUseJCM(mJCM.ValueOr(false));
+#endif
     if (mBypassAttestationVerifier.ValueOr(false))
     {
         params.SetDeviceAttestationDelegate(this);

@@ -16,12 +16,11 @@
  */
 
 #include "JCMCommissioner.h"
-#include "JCMTrustVerification.h"
+
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/InteractionModelEngine.h>
 #include <controller/CommissioningDelegate.h>
-#include <controller/JCMCommissioner.h>
 #include <credentials/CHIPCert.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>
@@ -46,7 +45,7 @@ CHIP_ERROR JCMDeviceCommissioner::StartJCMTrustVerification()
     TrustVerificationStageFinished(JCMTrustVerificationStage::kIdle, error);
     if (error != JCMTrustVerificationError::kSuccess)
     {
-        ChipLogError(Controller, "JCM: Failed to start Trust Verification: %s", enumToString(error).c_str());
+        ChipLogError(Controller, "JCM: Failed to start Trust Verification: %s", EnumToString(error).c_str());
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -437,7 +436,7 @@ void JCMDeviceCommissioner::PerformTrustVerificationStage(JCMTrustVerificationSt
 void JCMDeviceCommissioner::TrustVerificationStageFinished(JCMTrustVerificationStage completedStage,
                                                            JCMTrustVerificationError error)
 {
-    ChipLogProgress(Controller, "JCM: Trust Verification Stage Finished: %s", enumToString(completedStage).c_str());
+    ChipLogProgress(Controller, "JCM: Trust Verification Stage Finished: %s", EnumToString(completedStage).c_str());
 
     if (mTrustVerificationDelegate != nullptr)
     {
@@ -504,7 +503,7 @@ void JCMDeviceCommissioner::OnTrustVerificationComplete(JCMTrustVerificationErro
     }
     else
     {
-        ChipLogError(Controller, "JCM: Failed in verifying JCM Trust Verification: err %s", enumToString(error).c_str());
+        ChipLogError(Controller, "JCM: Failed in verifying JCM Trust Verification: err %s", EnumToString(error).c_str());
 
         CommissioningDelegate::CommissioningReport report;
         report.Set<JCMTrustVerificationError>(error);
