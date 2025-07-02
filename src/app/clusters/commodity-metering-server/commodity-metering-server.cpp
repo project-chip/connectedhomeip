@@ -144,6 +144,12 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
         return CHIP_NO_ERROR;
     }
 
+    if (newValue.IsNull())
+    {
+        mMeteredQuantity.SetNull();
+        return CHIP_NO_ERROR;
+    }
+
     if (mOwnedMeteredQuantityStructBuffer.Get() != nullptr)
     {
         mOwnedMeteredQuantityStructBuffer.Free();
@@ -176,10 +182,6 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
         mMeteredQuantity =
             MakeNullable(DataModel::List<Structs::MeteredQuantityStruct::Type>(mOwnedMeteredQuantityStructBuffer.Get(), len));
     }
-    else
-    {
-        mMeteredQuantity.SetNull();
-    }
 
     MatterReportingAttributeChangeCallback(mEndpointId, CommodityMetering::Id, MeteredQuantity::Id);
     return CHIP_NO_ERROR;
@@ -189,7 +191,6 @@ CHIP_ERROR Instance::SetMeteredQuantityTimestamp(DataModel::Nullable<uint32_t> n
 {
     DataModel::Nullable<uint32_t> oldValue = mMeteredQuantityTimestamp;
 
-    mMeteredQuantityTimestamp = newValue;
     if (oldValue != newValue)
     {
         if (newValue.IsNull())

@@ -55,10 +55,10 @@ class CommodityMeteringTestEventTriggerHandler : public TestEventTriggerHandler
 public:
     explicit CommodityMeteringTestEventTriggerHandler() {}
 
-    /** This function must return True if the eventTrigger is recognised and handled
-     *  It must return False to allow a higher level TestEvent handler to check other
-     *  clusters that may handle it.
-     */
+    /** This function must return CHIP_NO_ERROR if the eventTrigger is recognised and handled  
+     *  It must return a CHIP_ERROR to allow a higher level TestEvent handler to check other  
+     *  clusters that may handle it.  
+     */  
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override
     {
         eventTrigger = clearEndpointInEventTrigger(eventTrigger);
