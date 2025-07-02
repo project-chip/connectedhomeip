@@ -506,6 +506,7 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
         {
             // Something went wrong! The attribute can't be Null if tariff is active
             ChipLogError(NotSpecified, "The mCurrentDay can't be Null if tariff is active!");
+            return;
         }
 
         Day = Utils::FindDay(mServerTariffAttrsCtx, timestampNow + kSecondsPerDay);
