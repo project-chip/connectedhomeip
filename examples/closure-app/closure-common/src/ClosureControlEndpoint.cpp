@@ -160,12 +160,64 @@ CHIP_ERROR ClosureControlEndpoint::Init()
 
 void ClosureControlEndpoint::OnStopCalibrateActionComplete()
 {
-    // This function should handle closure control state updation after stopping of calibration Action.
+    VerifyOrReturn(mLogic.SetMainState(MainStateEnum::kStopped) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set main state in OnStopCalibrateActionComplete"));
+
+    // After stopping calibration, the overall and target state is explicitly nulled to indicate an unknown state,
+    VerifyOrReturn(mLogic.SetOverallCurrentState(DataModel::NullNullable) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set overall state to null in OnStopCalibrateActionComplete"));
+    VerifyOrReturn(mLogic.SetOverallTargetState(DataModel::NullNullable) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set overall target to null in OnStopCalibrateActionComplete"));
+    VerifyOrReturn(mLogic.SetCountdownTimeFromDelegate(0) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set countdown time to 0 in OnStopCalibrateActionComplete"));
+    VerifyOrReturn(mLogic.GenerateMovementCompletedEvent() == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to generate movement completed event in OnStopCalibrateActionComplete"));
 }
 
 void ClosureControlEndpoint::OnStopMotionActionComplete()
 {
-    // This function should handle closure control state updation after stopping of Motion Action.
+    MainStateEnum presentMainState;
+    VerifyOrReturn(mLogic.GetMainState(presentMainState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get main state in OnStopMotionActionComplete"));
+
+    // If the current main state is WaitingForMotion, it means the device hasn't started moving yet,
+    // so we don't need to update the current state.
+    if (presentMainState != MainStateEnum::kWaitingForMotion)
+    {
+        // Set the OverallState position to PartiallyOpened as motion has been stopped
+        // and the closure is not fully closed or fully opened.
+        auto position = MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened));
+
+        DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
+        VerifyOrReturn(mLogic.GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR,
+                       ChipLogError(AppServer, "Failed to get overall state in OnStopMotionActionComplete"));
+
+        if (overallCurrentState.IsNull())
+        {
+            overallCurrentState.SetNonNull(GenericOverallCurrentState(position, NullOptional, NullOptional, NullOptional));
+        }
+        else
+        {
+            overallCurrentState.Value().position = position;
+        }
+
+        VerifyOrReturn(mLogic.SetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR,
+                       ChipLogError(AppServer, "Failed to set overall state in OnStopMotionActionComplete"));
+    }
+
+    VerifyOrReturn(mLogic.SetMainState(MainStateEnum::kStopped) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set main state in OnStopMotionActionComplete"));
+
+    // Set the Position, latch in OverallTargetState to Null and speed to Auto as the motion has been stopped.
+    GenericOverallTargetState overallTargetState(MakeOptional(DataModel::NullNullable), MakeOptional(DataModel::NullNullable),
+                                                 MakeOptional(Globals::ThreeLevelAutoEnum::kAuto));
+    VerifyOrReturn(mLogic.SetOverallTargetState(DataModel::MakeNullable(overallTargetState)) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set overall target in OnStopMotionActionComplete"));
+
+    VerifyOrReturn(mLogic.SetCountdownTimeFromDelegate(0) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set countdown time to 0 in OnStopMotionActionComplete"));
+    VerifyOrReturn(mLogic.GenerateMovementCompletedEvent() == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to generate movement completed event in OnStopMotionActionComplete"));
 }
 
 void ClosureControlEndpoint::OnCalibrateActionComplete()
