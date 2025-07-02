@@ -660,8 +660,7 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
         }
         else
         {
-            // If the PEAKP feature is enabled, the price field is required!
-            return CHIP_ERROR_INVALID_ARGUMENT;
+            // If the PEAKP feature is enabled, the peakPeriod field is required!
         }
     }
 
