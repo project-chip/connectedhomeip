@@ -86,12 +86,6 @@ bool ClusterLogic::IsSupportedMainState(MainStateEnum mainState) const
     return isSupported;
 }
 
-bool ClusterLogic::IsValidMainStateTransition(MainStateEnum mainState) const
-{
-    // TODO: Implement the MainState state machine to validate transitions
-    return true;
-}
-
 bool ClusterLogic::IsSupportedOverallCurrentStatePositioning(CurrentPositionEnum positioning) const
 {
     bool isSupported = false;
@@ -182,7 +176,6 @@ CHIP_ERROR ClusterLogic::SetMainState(MainStateEnum mainState)
 
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsSupportedMainState(mainState), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    VerifyOrReturnError(IsValidMainStateTransition(mainState), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mainState != mState.mMainState, CHIP_NO_ERROR);
 
     // EngageStateChanged event SHALL be generated when the MainStateEnum attribute changes state to and from disengaged state
@@ -271,7 +264,26 @@ CHIP_ERROR ClusterLogic::SetOverallCurrentState(const DataModel::Nullable<Generi
                                 CHIP_ERROR_INVALID_ARGUMENT);
         }
 
-        // No Validation needed for SecureState as the feild is Mandatory and always present.
+        //TODO: SecureState field Value based on conditions validation will be done after the specification issue #11805 resolution.
+
+        // SecureStateChanged event SHALL be generated when the SecureState field in the OverallCurrentState attribute changes
+        if (!incomingOverallCurrentState.secureState.IsNull())
+        {
+            if (mState.mOverallCurrentState.IsNull() || mState.mOverallCurrentState.Value().secureState.IsNull())
+            {
+                // As secureState field is not set in present current state and incoming current state has value, we generate the event
+                GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value());
+            }
+            else
+            {
+                // If the secureState field is set in both present and incoming current state, we generate the event only if the value
+                // has changed.
+                if (mState.mOverallCurrentState.Value().secureState.Value() != incomingOverallCurrentState.secureState.Value())
+                {
+                    GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value());
+                }
+            }
+        }
     }
 
     mState.mOverallCurrentState = overallCurrentState;
