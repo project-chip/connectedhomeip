@@ -64,16 +64,15 @@ enum class Type : uint8_t
 class PeerAddress
 {
 public:
-    PeerAddress() : mIPAddress(Inet::IPAddress::Any), mTransportType(Type::kUndefined) { mId.mRemoteId = kUndefinedNodeId; }
-    PeerAddress(const Inet::IPAddress & addr, Type type) : mIPAddress(addr), mTransportType(type)
-    {
-        mId.mRemoteId = kUndefinedNodeId;
-    }
-    PeerAddress(Type type) : mTransportType(type) { mId.mRemoteId = kUndefinedNodeId; }
-    PeerAddress(Type type, NodeId remoteId) : mTransportType(type) { mId.mRemoteId = remoteId; }
+    constexpr PeerAddress() : mTransportType(Type::kUndefined), mId{ .mRemoteId = kUndefinedNodeId } {}
+    constexpr PeerAddress(const Inet::IPAddress & addr, Type type) :
+        mIPAddress(addr), mTransportType(type), mId{ .mRemoteId = kUndefinedNodeId }
+    {}
+    constexpr PeerAddress(Type type) : mTransportType(type), mId{ .mRemoteId = kUndefinedNodeId } {}
+    constexpr PeerAddress(Type type, NodeId remoteId) : mTransportType(type), mId{ .mRemoteId = remoteId } {}
 
-    PeerAddress(PeerAddress &&)                  = default;
-    PeerAddress(const PeerAddress &)             = default;
+    constexpr PeerAddress(PeerAddress &&)        = default;
+    constexpr PeerAddress(const PeerAddress &)   = default;
     PeerAddress & operator=(const PeerAddress &) = default;
     PeerAddress & operator=(PeerAddress &&)      = default;
 
@@ -114,25 +113,7 @@ public:
 
     bool IsMulticast() { return Type::kUdp == mTransportType && mIPAddress.IsIPv6Multicast(); }
 
-    bool operator==(const PeerAddress & other) const
-    {
-        // Compare common fields
-        if (mTransportType != other.mTransportType || mIPAddress != other.mIPAddress || mPort != other.mPort ||
-            mInterface != other.mInterface)
-        {
-            return false;
-        }
-
-        // Compare transport-type-specific fields
-        if (mTransportType == Type::kNfc)
-        {
-            return mId.mNFCShortId == other.mId.mNFCShortId;
-        }
-
-        // For other transport types, no additional fields to compare
-        return true;
-    }
-
+    bool operator==(const PeerAddress & other) const;
     bool operator!=(const PeerAddress & other) const { return !(*this == other); }
 
     /// Maximum size of the string outputes by ToString. Format is of the form:
@@ -210,9 +191,9 @@ public:
 
     /****** Factory methods for convenience ******/
 
-    static PeerAddress Uninitialized() { return PeerAddress(Inet::IPAddress::Any, Type::kUndefined); }
+    static constexpr PeerAddress Uninitialized() { return PeerAddress(Type::kUndefined); }
 
-    static PeerAddress BLE() { return PeerAddress(Type::kBle); }
+    static constexpr PeerAddress BLE() { return PeerAddress(Type::kBle); }
 
     // NB: 0xFFFF is not allowed for NFC ShortId.
     static constexpr PeerAddress NFC() { return PeerAddress(kUndefinedNFCShortId()); }
@@ -245,7 +226,7 @@ public:
         return TCP(addr).SetPort(port).SetInterface(interface);
     }
 
-    static PeerAddress WiFiPAF(NodeId remoteId) { return PeerAddress(Type::kWiFiPAF, remoteId); }
+    static constexpr PeerAddress WiFiPAF(NodeId remoteId) { return PeerAddress(Type::kWiFiPAF, remoteId); }
 
     static PeerAddress Multicast(chip::FabricId fabric, chip::GroupId group)
     {

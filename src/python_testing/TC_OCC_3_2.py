@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/occ_3_2_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -29,7 +29,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --app-pipe_prefix /tmp/chip_all_clusters_fifo_
+#       --app-pipe /tmp/occ_3_2_fifo
 #       --endpoint 1
 #       --bool-arg simulate_occupancy:true
 #     factory-reset: true
@@ -44,8 +44,8 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
-                                         await_sequence_of_reports, default_matter_test_main)
+from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator, await_sequence_of_reports
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
@@ -147,7 +147,8 @@ class TC_OCC_3_2(MatterBaseTest):
         self.step("4a")
         if attributes.HoldTime.attribute_id not in attribute_list:
             logging.info("No HoldTime attribute supports. Terminate this test case")
-            self.skip_all_remaining_steps("4b")
+            self.mark_all_remaining_steps_skipped("4b")
+            return
 
         self.step("4b")
         hold_time_limits_dut = await self.read_occ_attribute_expect_success(attribute=attributes.HoldTimeLimits)

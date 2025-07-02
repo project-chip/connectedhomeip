@@ -11,14 +11,23 @@ Below is a diagram describing the state machine for this app.
 
 This app can support most of the tests in the test plans.
 
+## Example to enable named pipes
+
+If the app needs to receive out of band commands it can be done by enabling the
+fifo file path by using the --app-pipe argument.
+
+```bash
+./out/darwin-arm64-rvc/chip-rvc-app --app-pipe /tmp/rvc_fifo
+```
+
 ## Out-of-band messages
 
 Out-of-band messages are available to simulate typical device behaviors and
 allow the app to navigate to all the states. To send an out-of-band message,
-echo the JSON message to the `/tmp/chip_rvc_fifo_<PID>` file. The JSON message
-must have a `"Name"` key that contains the command name. This name is shown in
-the state machine diagram above. Example
-`echo '{"Name": "Charged"}' > /tmp/chip_rvc_fifo_42`.
+echo the JSON message to the fifo file path defined in the argument
+`--app-pipe <fifo_path>`. The JSON message must have a `"Name"` key that
+contains the command name. This name is shown in the state machine diagram
+above. Example: `echo '{"Name": "Charged"}' > /tmp/rvc_fifo`.
 
 ### ServiceArea related messages
 

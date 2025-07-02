@@ -27,7 +27,6 @@ enum class MTRDeviceTypeClass {
     Utility,
     Simple,
     Node, // Might not be a real class, but we have it for Root Node for now.
-    App,
 };
 
 struct MTRDeviceTypeData {
