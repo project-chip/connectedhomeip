@@ -37,7 +37,7 @@ using namespace chip::app::Clusters::ClosureDimension;
 namespace {
 constexpr uint32_t kDefaultCountdownTimeSeconds = 10;    // 10 seconds
 constexpr uint32_t kCalibrateTimerMs            = 10000; // 10 seconds
-constexpr uint32_t kMotionCountdownTimeMs    = 1000;  // 1 second
+constexpr uint32_t kMotionCountdownTimeMs       = 1000;  // 1 second
 
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
