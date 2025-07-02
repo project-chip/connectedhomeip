@@ -305,7 +305,7 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
     for (const auto & entryID : dayEntryIDs)
     {
         auto [current, next] = GetCurrNextItemsById<Structs::DayEntryStruct::Type>(aCtx.DayEntriesMap, entryID);
-        duration             = (1500 - current->startTime);
+        duration             = (kDayEntryDurationLimit - current->startTime);
 
         if (next != nullptr) //( && (next->dayEntryID == entryID + 1)) // Next DayEntry is belong to this day range
         {
