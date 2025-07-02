@@ -135,7 +135,8 @@ class TC_CLDIM_2_1(MatterBaseTest):
         if is_positioning_supported:
             resolution = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.Resolution)
             asserts.assert_is_instance(resolution, uint, "Resolution is not of expected type")
-            asserts.assert_true(1 <= resolution <= 10000, "Resolution is not in the expected range [1:10000]")
+            asserts.assert_true(resolution >= 1, "Resolution is less than 1")
+            asserts.assert_true(resolution <= 10000, "Resolution is more than 10000")
         else:
             logging.info("Positioning feature is not supported by the DUT, skipping this step.")
             self.mark_current_step_skipped()
@@ -145,7 +146,8 @@ class TC_CLDIM_2_1(MatterBaseTest):
         if is_positioning_supported:
             step_value = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.StepValue)
             asserts.assert_is_instance(step_value, uint, "StepValue is not of expected type")
-            asserts.assert_true(1 <= step_value <= 10000, "StepValue is not in the expected range [1:10000]")
+            asserts.assert_true(step_value >= 1, "StepValue is less than 1")
+            asserts.assert_true(step_value <= 10000, "StepValue is more than 10000")
             asserts.assert_true(step_value % resolution == 0, "StepValue is not a multiple of Resolution")
         else:
             logging.info("Positioning feature is not supported by the DUT, skipping this step.")
