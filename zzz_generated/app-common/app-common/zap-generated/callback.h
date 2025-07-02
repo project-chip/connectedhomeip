@@ -7448,6 +7448,18 @@ bool emberAfThermostatClusterSetActivePresetRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::SetActivePresetRequest::DecodableType & commandData);
 /**
+ * @brief Thermostat Cluster AddThermostatSuggestion Command callback (from client)
+ */
+bool emberAfThermostatClusterAddThermostatSuggestionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::AddThermostatSuggestion::DecodableType & commandData);
+/**
+ * @brief Thermostat Cluster RemoveThermostatSuggestion Command callback (from client)
+ */
+bool emberAfThermostatClusterRemoveThermostatSuggestionCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::Thermostat::Commands::RemoveThermostatSuggestion::DecodableType & commandData);
+/**
  * @brief Thermostat Cluster AtomicRequest Command callback (from client)
  */
 bool emberAfThermostatClusterAtomicRequestCallback(

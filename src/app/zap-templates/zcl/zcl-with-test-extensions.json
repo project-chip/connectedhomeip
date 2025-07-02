@@ -794,7 +794,8 @@
         ],
         "Unit Localization": ["TemperatureUnit"],
         "Zone Management": ["TwoDCartesianMax"],
-        "TLS Client Management": ["ClusterRevision", "MaxProvisioned"]
+        "TLS Client Management": ["ClusterRevision", "MaxProvisioned"],
+        "Thermostat": ["CurrentThermostatSuggestion"]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",

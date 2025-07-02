@@ -10384,6 +10384,97 @@ public static class ThermostatClusterScheduleTypeStruct {
     return output.toString();
   }
 }
+public static class ThermostatClusterThermostatSuggestionStruct {
+  public Integer uniqueID;
+  public byte[] presetHandle;
+  public Long effectiveTime;
+  public Long expirationTime;
+  private static final long UNIQUE_ID_ID = 0L;
+  private static final long PRESET_HANDLE_ID = 1L;
+  private static final long EFFECTIVE_TIME_ID = 2L;
+  private static final long EXPIRATION_TIME_ID = 3L;
+
+  public ThermostatClusterThermostatSuggestionStruct(
+    Integer uniqueID,
+    byte[] presetHandle,
+    Long effectiveTime,
+    Long expirationTime
+  ) {
+    this.uniqueID = uniqueID;
+    this.presetHandle = presetHandle;
+    this.effectiveTime = effectiveTime;
+    this.expirationTime = expirationTime;
+  }
+
+  public StructType encodeTlv() {
+    ArrayList<StructElement> values = new ArrayList<>();
+    values.add(new StructElement(UNIQUE_ID_ID, new UIntType(uniqueID)));
+    values.add(new StructElement(PRESET_HANDLE_ID, new ByteArrayType(presetHandle)));
+    values.add(new StructElement(EFFECTIVE_TIME_ID, new UIntType(effectiveTime)));
+    values.add(new StructElement(EXPIRATION_TIME_ID, new UIntType(expirationTime)));
+
+    return new StructType(values);
+  }
+
+  public static ThermostatClusterThermostatSuggestionStruct decodeTlv(BaseTLVType tlvValue) {
+    if (tlvValue == null || tlvValue.type() != TLVType.Struct) {
+      return null;
+    }
+    Integer uniqueID = null;
+    byte[] presetHandle = null;
+    Long effectiveTime = null;
+    Long expirationTime = null;
+    for (StructElement element: ((StructType)tlvValue).value()) {
+      if (element.contextTagNum() == UNIQUE_ID_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          uniqueID = castingValue.value(Integer.class);
+        }
+      } else if (element.contextTagNum() == PRESET_HANDLE_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
+          ByteArrayType castingValue = element.value(ByteArrayType.class);
+          presetHandle = castingValue.value(byte[].class);
+        }
+      } else if (element.contextTagNum() == EFFECTIVE_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          effectiveTime = castingValue.value(Long.class);
+        }
+      } else if (element.contextTagNum() == EXPIRATION_TIME_ID) {
+        if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+          UIntType castingValue = element.value(UIntType.class);
+          expirationTime = castingValue.value(Long.class);
+        }
+      }
+    }
+    return new ThermostatClusterThermostatSuggestionStruct(
+      uniqueID,
+      presetHandle,
+      effectiveTime,
+      expirationTime
+    );
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("ThermostatClusterThermostatSuggestionStruct {\n");
+    output.append("\tuniqueID: ");
+    output.append(uniqueID);
+    output.append("\n");
+    output.append("\tpresetHandle: ");
+    output.append(Arrays.toString(presetHandle));
+    output.append("\n");
+    output.append("\teffectiveTime: ");
+    output.append(effectiveTime);
+    output.append("\n");
+    output.append("\texpirationTime: ");
+    output.append(expirationTime);
+    output.append("\n");
+    output.append("}\n");
+    return output.toString();
+  }
+}
 public static class ThermostatClusterWeeklyScheduleTransitionStruct {
   public Integer transitionTime;
   public @Nullable Integer heatSetpoint;

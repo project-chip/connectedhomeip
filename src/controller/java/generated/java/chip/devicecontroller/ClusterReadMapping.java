@@ -11871,6 +11871,39 @@ public class ClusterReadMapping {
           readThermostatSetpointHoldExpiryTimestampCommandParams
         );
         result.put("readSetpointHoldExpiryTimestampAttribute", readThermostatSetpointHoldExpiryTimestampAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThermostatMaxThermostatSuggestionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThermostatMaxThermostatSuggestionsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThermostatCluster) cluster).readMaxThermostatSuggestionsAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readThermostatMaxThermostatSuggestionsCommandParams
+        );
+        result.put("readMaxThermostatSuggestionsAttribute", readThermostatMaxThermostatSuggestionsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThermostatThermostatSuggestionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThermostatThermostatSuggestionsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThermostatCluster) cluster).readThermostatSuggestionsAttribute(
+              (ChipClusters.ThermostatCluster.ThermostatSuggestionsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThermostatClusterThermostatSuggestionsAttributeCallback(),
+          readThermostatThermostatSuggestionsCommandParams
+        );
+        result.put("readThermostatSuggestionsAttribute", readThermostatThermostatSuggestionsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThermostatThermostatSuggestionNotFollowingReasonCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThermostatThermostatSuggestionNotFollowingReasonAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThermostatCluster) cluster).readThermostatSuggestionNotFollowingReasonAttribute(
+              (ChipClusters.ThermostatCluster.ThermostatSuggestionNotFollowingReasonAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThermostatClusterThermostatSuggestionNotFollowingReasonAttributeCallback(),
+          readThermostatThermostatSuggestionNotFollowingReasonCommandParams
+        );
+        result.put("readThermostatSuggestionNotFollowingReasonAttribute", readThermostatThermostatSuggestionNotFollowingReasonAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readThermostatGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readThermostatGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

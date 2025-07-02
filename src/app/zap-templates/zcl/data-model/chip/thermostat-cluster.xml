@@ -95,6 +95,17 @@ limitations under the License.
     <field name="SupportsNames" mask="0x02"/>
   </bitmap>
 
+  <bitmap name="ThermostatSuggestionNotFollowingReasonBitmap" type="bitmap16" apiMaturity="provisional">
+    <cluster code="0x0201"/>
+    <field name="DemandResponseEvent" mask="0x0001"/>
+    <field name="OngoingHold" mask="0x0002"/>
+    <field name="Schedule" mask="0x0004"/>
+    <field name="Occupancy" mask="0x0008"/>
+    <field name="VacationMode" mask="0x0010"/>
+    <field name="TimeOfUseCostSavings" mask="0x0020"/>
+    <field name="PreCoolingOrPreHeating" mask="0x0040"/>
+  </bitmap>
+
   <enum name="SystemModeEnum" type="enum8">
     <cluster code="0x0201"/>
     <item name="Off" value="0x00"/>
@@ -255,6 +266,14 @@ limitations under the License.
     <item fieldId="3" name="SystemMode" type="SystemModeEnum" optional="true" min="0x0" max="0x9"/>
     <item fieldId="4" name="CoolingSetpoint" type="temperature" optional="true"/>
     <item fieldId="5" name="HeatingSetpoint" type="temperature" optional="true"/>
+  </struct>
+
+  <struct name="ThermostatSuggestionStruct" apiMaturity="provisional">
+    <cluster code="0x0201"/>
+    <item fieldId="0" name="UniqueID" type="int8u"/>
+    <item fieldId="1" name="PresetHandle" type="octet_string" length="16"/>
+    <item fieldId="2" name="EffectiveTime" type="epoch_s"/>
+    <item fieldId="3" name="ExpirationTime" type="epoch_s"/>
   </struct>
 
   <cluster>
@@ -607,6 +626,38 @@ limitations under the License.
     <attribute code="0x0052" side="server" name="SetpointHoldExpiryTimestamp" type="epoch_s" define="SETPOINT_HOLD_EXPIRY_TIMESTAMP" optional="true" isNullable="true">
       <optionalConform/>
     </attribute>
+    <attribute code="0x0053" side="server" name="MaxThermostatSuggestions" define="MAX_THERMOSTAT_SUGGESTIONS" optional="true" type="int8u" min="5" apiMaturity="provisional">
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="TSUGGEST"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute code="0x0054" side="server" name="ThermostatSuggestions" define="THERMOSTAT_SUGGESTIONS" optional="true" type="array" entryType="ThermostatSuggestionStruct" length="255" apiMaturity="provisional">
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="TSUGGEST"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute code="0x0055" side="server" name="CurrentThermostatSuggestion" define="CURRENT_THERMOSTAT_SUGGESTION" optional="true" type="ThermostatSuggestionStruct" isNullable="true" apiMaturity="provisional">
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="TSUGGEST"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </attribute>
+    <attribute code="0x0056" side="server" name="ThermostatSuggestionNotFollowingReason" define="THERMOSTAT_SUGGESTION_NOT_FOLLOWING_REASON" optional="true" type="ThermostatSuggestionNotFollowingReasonBitmap" isNullable="true" max="0x007F" apiMaturity="provisional">
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="TSUGGEST"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </attribute>
     <!-- Client Commands -->
     <command source="client" code="0x00" name="SetpointRaiseLower" optional="false">
       <description>Upon receipt, the attributes for the indicated setpoint(s) SHALL have the amount specified in the Amount field added to them.</description>
@@ -660,6 +711,32 @@ limitations under the License.
       </mandatoryConform>
     </command>
 
+    <command code="0x07" source="client" name="AddThermostatSuggestion" response="AddThermostatSuggestionResponse" apiMaturity="provisional">
+      <description/>
+      <access op="invoke" privilege="manage"/>
+      <arg id="0" name="PresetHandle" type="octet_string" length="16"/>
+      <arg id="1" name="EffectiveTime" type="epoch_s" isNullable="true"/>
+      <arg id="2" name="ExpirationInMinutes" type="int16u" min="30" max="1440"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="TSUGGEST"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </command>
+
+    <command code="0x08" source="client" name="RemoveThermostatSuggestion" apiMaturity="provisional">
+      <description/>
+      <access op="invoke" privilege="manage"/>
+      <arg id="0" name="UniqueID" type="int8u"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="TSUGGEST"/>
+        </mandatoryConform>
+      </otherwiseConform>
+    </command>
+
     <!-- Server Commands/Responses -->
     <command source="server" code="0x00" name="GetWeeklyScheduleResponse" optional="true" disableDefaultResponse="true">
       <description>This command has the same payload format as the Set Weekly Schedule.</description>
@@ -670,6 +747,17 @@ limitations under the License.
       <mandatoryConform>
         <feature name="SCH"/>
       </mandatoryConform>
+    </command>
+
+    <command code="0x02" source="server" name="AddThermostatSuggestionResponse" disableDefaultResponse="true" apiMaturity="provisional">
+      <description/>
+      <arg id="0" name="UniqueID" type="int8u"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <feature name="TSUGGEST"/>
+        </mandatoryConform>
+      </otherwiseConform>
     </command>
 
     <command code="0xFD" source="server" name="AtomicResponse" optional="true">

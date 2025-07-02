@@ -107,7 +107,7 @@ class TC_AVSM_2_1(MatterBaseTest):
             TestStep(
                 19,
                 "TH reads AllocatedSnapshotStreams attribute.",
-                "Verify that the DUT response contains a list of AudioStreamStruct entries.",
+                "Verify that the DUT response contains a list of SnapshotStreamStruct entries.",
             ),
             TestStep(
                 20,

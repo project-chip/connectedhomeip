@@ -58,12 +58,12 @@ class TC_AVSM_2_8(MatterBaseTest, AVSMTestBase):
             TestStep("precondition", "DUT commissioned and preconditions", is_commissioning=True),
             TestStep(
                 1,
-                "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify VDO & (WMARK|OSD) is supported.",
             ),
             TestStep(
                 2,
-                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated video streams in the list is 1. Store StreamID as aStreamID. If WMARK is supported, store WaterMarkEnabled as aWmark. If OSD is supported, store OSDEnabled as aOSD.",
             ),
             TestStep(
@@ -73,7 +73,7 @@ class TC_AVSM_2_8(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 4,
-                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the following: If WMARK is supported, verify WaterMarkEnabled == !aWmark. If OSD is supported, verify OSDEnabled == !aOSD.",
             ),
         ]
@@ -101,9 +101,7 @@ class TC_AVSM_2_8(MatterBaseTest, AVSMTestBase):
         vdoSupport = (aFeatureMap & cluster.Bitmaps.Feature.kVideo) > 0
         wmarkSupport = (aFeatureMap & cluster.Bitmaps.Feature.kWatermark) > 0
         osdSupport = (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) > 0
-        asserts.assert_true(
-            (vdoSupport and (wmarkSupport or osdSupport)), cluster.Bitmaps.Feature.kVideo, "VDO & (WMARK|OSD) is not supported."
-        )
+        asserts.assert_true((vdoSupport and (wmarkSupport or osdSupport)), "VDO & (WMARK|OSD) is not supported.")
 
         self.step(2)
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
@@ -112,24 +110,15 @@ class TC_AVSM_2_8(MatterBaseTest, AVSMTestBase):
         logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
         asserts.assert_equal(len(aAllocatedVideoStreams), 1, "The number of allocated video streams in the list is not 1")
         aStreamID = aAllocatedVideoStreams[0].videoStreamID
-        aWmark = None
-        if wmarkSupport:
-            aWmark = aAllocatedVideoStreams[0].watermarkEnabled
-        aOSD = None
-        if osdSupport:
-            aOSD = aAllocatedVideoStreams[0].OSDEnabled
+        aWmark = aAllocatedVideoStreams[0].watermarkEnabled
+        aOSD = aAllocatedVideoStreams[0].OSDEnabled
 
         self.step(3)
         try:
-            notAWmark = None
-            if wmarkSupport and aWmark is not None:
-                notAWmark = not aWmark
-            notAOSD = None
-            if osdSupport and aOSD is not None:
-                notAOSD = not aOSD
-
             videoStreamModifyCmd = commands.VideoStreamModify(
-                videoStreamID=aStreamID, watermarkEnabled=notAWmark, OSDEnabled=notAOSD
+                videoStreamID=aStreamID,
+                watermarkEnabled=None if aWmark is None else not aWmark,
+                OSDEnabled=None if aOSD is None else not aOSD,
             )
             await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamModifyCmd)
         except InteractionModelError as e:
@@ -141,9 +130,9 @@ class TC_AVSM_2_8(MatterBaseTest, AVSMTestBase):
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
         logger.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
-        if wmarkSupport and aWmark is not None:
+        if wmarkSupport:
             asserts.assert_equal(aAllocatedVideoStreams[0].watermarkEnabled, not aWmark, "WaterMarkEnabled is not !aWmark")
-        if osdSupport and aOSD is not None:
+        if osdSupport:
             asserts.assert_equal(aAllocatedVideoStreams[0].OSDEnabled, not aOSD, "OSDEnabled is not !aOSD")
 
 

@@ -5641,6 +5641,22 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"SetpointHoldExpiryTimestamp";
             break;
 
+        case MTRAttributeIDTypeClusterThermostatAttributeMaxThermostatSuggestionsID:
+            result = @"MaxThermostatSuggestions";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeThermostatSuggestionsID:
+            result = @"ThermostatSuggestions";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeCurrentThermostatSuggestionID:
+            result = @"CurrentThermostatSuggestion";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeThermostatSuggestionNotFollowingReasonID:
+            result = @"ThermostatSuggestionNotFollowingReason";
+            break;
+
         case MTRAttributeIDTypeClusterThermostatAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -10994,6 +11010,14 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"SetActivePresetRequest";
             break;
 
+        case MTRCommandIDTypeClusterThermostatCommandAddThermostatSuggestionID:
+            result = @"AddThermostatSuggestion";
+            break;
+
+        case MTRCommandIDTypeClusterThermostatCommandRemoveThermostatSuggestionID:
+            result = @"RemoveThermostatSuggestion";
+            break;
+
         case MTRCommandIDTypeClusterThermostatCommandAtomicRequestID:
             result = @"AtomicRequest";
             break;
@@ -13350,6 +13374,10 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
 
         case MTRCommandIDTypeClusterThermostatCommandGetWeeklyScheduleResponseID:
             result = @"GetWeeklyScheduleResponse";
+            break;
+
+        case MTRCommandIDTypeClusterThermostatCommandAddThermostatSuggestionResponseID:
+            result = @"AddThermostatSuggestionResponse";
             break;
 
         case MTRCommandIDTypeClusterThermostatCommandAtomicResponseID:
