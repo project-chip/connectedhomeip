@@ -811,7 +811,7 @@ CHIP_ERROR IndividualDaysDataClass::Validate(const ValueType & aValue) const
         for (const auto & item : newList)
         {
             VerifyOrReturnError_LogSend(item.date > tmpDate, CHIP_ERROR_INVALID_ARGUMENT,
-                                        "IndividualDays must be order by startTime");
+                                        "IndividualDays must be ordered by date");
             VerifyOrReturnError(EnsureKnownEnumValue(item.dayType) != DayTypeEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
 
             if (item.dayEntryIDs.empty() || item.dayEntryIDs.size() > kDayStructItemMaxDayEntryIDs)
