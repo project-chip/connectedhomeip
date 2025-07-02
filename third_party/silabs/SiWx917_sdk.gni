@@ -258,6 +258,10 @@ template("siwx917_sdk") {
       "SILABS_LOG_OUT_UART=${sl_uart_log_output}",
       "SUPPORT_CPLUSPLUS=1",
       "SLI_SI91X_LWIP_HOSTED_NETWORK_STACK=1",
+
+      # TODO: This is a workaround for the init issue with the SiWx917
+      "SL_WLAN_EVENT_THREAD_PRIORITY=osPriorityRealtime6",
+      "SL_WLAN_COMMAND_ENGINE_THREAD_PRIORITY=osPriorityRealtime5",
     ]
 
     if (silabs_log_enabled && chip_logging) {

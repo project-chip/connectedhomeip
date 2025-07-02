@@ -170,6 +170,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/controller/SetUpCodePairer.cpp': {'vector'},
 
     'src/controller/ExamplePersistentStorage.cpp': {'fstream', 'string', 'map'},
+    'src/controller/ExamplePersistentStorage.h': {'string'},
 
     # Library meant for non-embedded
     'src/tracing/json/json_tracing.cpp': {'string', 'sstream'},
@@ -204,4 +205,8 @@ ALLOW: Dict[str, Set[str]] = {
     # Not intended for embedded clients
     'src/app/server/JointFabricDatastore.cpp': {'vector'},
     'src/app/server/JointFabricDatastore.h': {'vector'},
+
+    # For webrtc python bindings
+    'src/controller/webrtc/WebRTC.h': {'string'},
+    'src/controller/webrtc/WebRTCClient.h': {'map', 'string'},
 }

@@ -66,6 +66,8 @@ static constexpr uint16_t kMaxImageRotation          = 359; // Spec constraint
 
 namespace Camera {
 
+constexpr const char * kDefaultVideoDevicePath = "/dev/video0";
+
 // Camera defined constants for Pan, Tilt, Zoom bounding values
 constexpr int16_t kMinPanValue  = -90;
 constexpr int16_t kMaxPanValue  = 90;
@@ -79,6 +81,7 @@ public:
     chip::app::Clusters::ChimeDelegate & GetChimeDelegate() override;
     chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() override;
+    chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() override;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
 
     MediaController & GetMediaController() override;
@@ -87,6 +90,8 @@ public:
     ~CameraDevice();
 
     CameraDeviceInterface::CameraHALInterface & GetCameraHALInterface() override { return *this; }
+
+    void Init();
 
     // HAL interface impl
     CameraError InitializeCameraDevice() override;
@@ -266,8 +271,11 @@ public:
 
     std::vector<SnapshotStream> & GetAvailableSnapshotStreams() override { return mSnapshotStreams; }
 
+    void SetVideoDevicePath(const std::string & path) { mVideoDevicePath = path; }
+
 private:
-    int videoDeviceFd = -1;
+    int videoDeviceFd            = -1;
+    std::string mVideoDevicePath = kDefaultVideoDevicePath;
     std::vector<VideoStream> mVideoStreams;       // Vector to hold available video streams
     std::vector<AudioStream> mAudioStreams;       // Vector to hold available audio streams
     std::vector<SnapshotStream> mSnapshotStreams; // Vector to hold available snapshot streams
