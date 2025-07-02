@@ -1760,7 +1760,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand_ChangeSpeedW
                                                       Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
     currentState.SetNonNull(setCurrentStateStruct);
     EXPECT_EQ(logic->SetCurrentState(currentState), CHIP_NO_ERROR);
-    EXPECT_EQ(logic->HandleSetTargetCommand(NullOptional, NullOptional, Optional(Globals::ThreeLevelAutoEnum::kHigh)), Status::Success);
+    EXPECT_EQ(logic->HandleSetTargetCommand(NullOptional, NullOptional, Optional(Globals::ThreeLevelAutoEnum::kHigh)),
+              Status::Success);
     DataModel::Nullable<GenericDimensionStateStruct> target;
     EXPECT_EQ(logic->GetTargetState(target), CHIP_NO_ERROR);
     EXPECT_FALSE(target.IsNull());

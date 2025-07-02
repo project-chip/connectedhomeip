@@ -622,7 +622,8 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
         // Return InvalidInState if current latch has no value or is null
         VerifyOrReturnError(currentState.Value().latch.HasValue(), Status::InvalidInState);
         VerifyOrReturnError(!currentState.Value().latch.Value().IsNull(), Status::InvalidInState);
-        // If this command is received with only a new position field while the closure is latched, a status code of INVALID_IN_STATE SHALL be returned.
+        // If this command is received with only a new position field while the closure is latched, a status code of
+        // INVALID_IN_STATE SHALL be returned.
         if (currentState.Value().latch.Value().Value())
         {
             // Return InvalidInState if incoming latch has no value or if incoming position has a value.
@@ -737,7 +738,8 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     {
         // Return InvalidInState if current latch doesn't have value or is null or is latched
         VerifyOrReturnError(currentState.Value().latch.HasValue() && !currentState.Value().latch.Value().IsNull() &&
-        !currentState.Value().latch.Value().Value(), Status::InvalidInState);
+                                !currentState.Value().latch.Value().Value(),
+                            Status::InvalidInState);
     }
     // Derive TargetState Position from StepValue and NumberOfSteps.
     Percent100ths stepValue;
