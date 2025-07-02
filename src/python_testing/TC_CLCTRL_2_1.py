@@ -96,6 +96,7 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         is_positioning_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPositioning
         is_latching_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
         is_speed_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kSpeed
+        is_instantaneous: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kInstantaneous
 
         logging.info(f"FeatureMap: {feature_map}")
         logging.info(f"-> Positioning supported: \t\t {bool(is_positioning_supported)}")
@@ -105,6 +106,10 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         # STEP 4: Read CountdownTime attribute if supported
         self.step(4)
         if attributes.CountdownTime.attribute_id in attribute_list:
+            if not is_positioning_supported or is_instantaneous:
+                asserts.assert_true(
+                    False, "CountdownTime attribute should not be present if Positioning is not supported or Instantaneous is supported")
+
             countdown_time: typing.Union[None, Nullable, uint] = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
             logging.info(f"CountdownTime: {countdown_time}")
 
@@ -118,16 +123,18 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         self.step(5)
         main_state: Clusters.ClosureControl.Enums.MainStateEnum = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
         logging.info(f"MainState: {main_state, Clusters.ClosureControl.Enums.MainStateEnum(main_state).name}")
-        asserts.assert_less_equal(main_state, Clusters.ClosureControl.Enums.MainStateEnum.kSetupRequired,
-                                  "MainState attribute is out of range")
-        asserts.assert_greater_equal(main_state, Clusters.ClosureControl.Enums.MainStateEnum.kStopped,
-                                     "MainState attribute is out of range")
+        asserts.assert_less(main_state, Clusters.ClosureControl.Enums.MainStateEnum.kUnknownEnumValue,
+                            "MainState attribute is out of range")
+        asserts.assert_greater_equal(main_state, 0, "MainState attribute is out of range")
 
         # STEP 6: Read CurrentErrorList attribute
         self.step(6)
         current_error_list: typing.List[Clusters.ClosureControl.Enums.ClosureErrorEnum] = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentErrorList)
         logging.info(f"CurrentErrorList: {current_error_list}")
+
         asserts.assert_less_equal(len(current_error_list), 10, "CurrentErrorList length is out of range")
+        asserts.assert_true(len(current_error_list) == len(set(current_error_list)), "CurrentErrorList contains duplicate values")
+
         for error in current_error_list:
             # Check if error is a valid value, if the list is not empty
             asserts.assert_less_equal(error, 0xBF, "CurrentErrorList value is out of range")
@@ -146,12 +153,14 @@ class TC_CLCTRL_2_1(MatterBaseTest):
             if is_positioning_supported and overall_current_state.position is not NullValue:
                 logging.info(
                     f"OverallCurrentState.position: {overall_current_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum(overall_current_state.position).name}")
-                asserts.assert_less_equal(
-                    overall_current_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum.kOpenedAtSignature, "OverallCurrentState.position is out of range")
+                asserts.assert_true(isinstance(overall_current_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum),
+                                    "OverallCurrentState.position is not a CurrentPositionEnum value")
+                asserts.assert_less(
+                    overall_current_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum.kUnknownEnumValue, "OverallCurrentState.position is out of range")
                 asserts.assert_greater_equal(
-                    overall_current_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed, "OverallCurrentState.position is out of range")
+                    overall_current_state.position, 0, "OverallCurrentState.position is out of range")
 
-            # Check MotionLatching feature in OverallCurrentState  - LT feature (bit 1)
+            # Check MotionLatching feature in OverallCurrentState - LT feature (bit 1)
             if is_latching_supported and overall_current_state.latch is not NullValue:
                 logging.info(f"OverallCurrentState.latch: {overall_current_state.latch}")
                 asserts.assert_true(isinstance(overall_current_state.latch, bool),
@@ -161,14 +170,15 @@ class TC_CLCTRL_2_1(MatterBaseTest):
             if is_speed_supported:
                 logging.info(
                     f"OverallCurrentState.speed: {overall_current_state.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum(overall_current_state.speed).name}")
-                asserts.assert_less_equal(overall_current_state.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh,
-                                          "OverallCurrentState.speed is out of range")
-                asserts.assert_greater_equal(overall_current_state.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kAuto,
-                                             "OverallCurrentState.speed is out of range")
+                asserts.assert_true(isinstance(overall_current_state.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum),
+                                    "OverallCurrentState.speed is not a ThreeLevelAutoEnum value")
+                asserts.assert_less(overall_current_state.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kUnknownEnumValue,
+                                    "OverallCurrentState.speed is out of range")
+                asserts.assert_greater_equal(overall_current_state.speed, 0, "OverallCurrentState.speed is out of range")
 
             # Check SecureState attribute in OverallCurrentState
-            if is_positioning_supported or is_latching_supported:
-                logging.info(f"OverallCurrentState.secureState: {overall_current_state.secureState}")
+            logging.info(f"OverallCurrentState.secureState: {overall_current_state.secureState}")
+            if overall_current_state.secureState is not NullValue:
                 asserts.assert_true(isinstance(overall_current_state.secureState, bool),
                                     "OverallCurrentState.secureState is not a boolean value")
 
@@ -185,10 +195,12 @@ class TC_CLCTRL_2_1(MatterBaseTest):
             if is_positioning_supported and overall_target.position is not NullValue:  # PS feature (bit 0)
                 logging.info(
                     f"OverallTargetState.position: {overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum(overall_target.position).name}")
-                asserts.assert_less_equal(
-                    overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToSignaturePosition, "OverallTargetState.position is out of range")
+                asserts.assert_true(isinstance(overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum),
+                                    "OverallTargetState.position is not a TargetPositionEnum value")
+                asserts.assert_less(
+                    overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kUnknownEnumValue, "OverallTargetState.position is out of range")
                 asserts.assert_greater_equal(
-                    overall_target.position, Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed, "OverallTargetState.position is out of range")
+                    overall_target.position, 0, "OverallTargetState.position is out of range")
 
             # Check MotionLatching feature in OverallTargetState
             if is_latching_supported and overall_target.latch is not NullValue:  # LT feature (bit 1)
@@ -199,15 +211,21 @@ class TC_CLCTRL_2_1(MatterBaseTest):
             if is_speed_supported:  # SP feature (bit 3)
                 logging.info(
                     f"OverallTargetState.speed: {overall_target.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum(overall_target.speed).name}")
-                asserts.assert_less_equal(overall_target.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh,
-                                          "OverallTargetState.speed is out of range")
-                asserts.assert_greater_equal(overall_target.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kAuto,
+                asserts.assert_true(isinstance(overall_target.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum),
+                                    "OverallTargetState.speed is not a ThreeLevelAutoEnum value")
+                asserts.assert_less(overall_target.speed, Clusters.Globals.Enums.ThreeLevelAutoEnum.kUnknownEnumValue,
+                                    "OverallTargetState.speed is out of range")
+                asserts.assert_greater_equal(overall_target.speed, 0,
                                              "OverallTargetState.speed is out of range")
 
         # STEP 9: Read LatchControlModes attribute if LT is supported
         self.step(9)
         if not is_latching_supported:
-            logging.info("LatchControlModes attribute not supported")
+            asserts.assert_true(
+                attributes.LatchControlModes.attribute_id not in attribute_list,
+                "LatchControlModes attribute should not be present if MotionLatching is not supported")
+            logging.info("LT not supported, LatchControlModes not present")
+
         else:
             latch_control_modes: uint = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
             logging.info(f"LatchControlModes: {latch_control_modes}")
