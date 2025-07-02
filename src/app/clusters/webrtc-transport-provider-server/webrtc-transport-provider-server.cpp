@@ -286,7 +286,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     {
         if (req.videoStreamID.Value().IsNull())
         {
-            // Is there an allocated stream, delegate handles matching against an allocated stream in the HandleSolicitOffer methoc
+            // Is there an allocated stream, delegate handles matching against an allocated stream in the HandleSolicitOffer method
             if (!mDelegate.HasAllocatedVideoStreams())
             {
                 ChipLogError(Zcl, "HandleSolicitOffer: video requested when there are no AllocatedVideoStreams");
