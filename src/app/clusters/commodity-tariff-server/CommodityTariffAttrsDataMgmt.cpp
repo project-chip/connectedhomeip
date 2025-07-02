@@ -780,7 +780,6 @@ void TariffComponentsDataClass::CleanupStructValue(PayloadType & aValue)
     {
         auto & tmp_label = aValue.label.Value();
         MemoryFree(const_cast<char *>(tmp_label.Value().data()));
-        // tmp_label.SetNull();
         aValue.label.ClearValue();
     }
 

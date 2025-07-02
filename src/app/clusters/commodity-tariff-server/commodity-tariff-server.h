@@ -33,10 +33,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/reporting/reporting.h>
-#include <cstdint>
-#include <functional>
-#include <unordered_map>
-#include <unordered_set>
 
 #include "CommodityTariffAttrsDataMgmt.h"
 
@@ -134,7 +130,7 @@ typedef uint32_t epoch_s; ///< Type alias for epoch timestamps in seconds
  * @endcode
  */
 #define X(attrName, attrType)                                                                                                      \
-    class attrName##DataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<attrType>                                                                 \
+    class attrName##DataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<attrType>                                   \
     {                                                                                                                              \
     public:                                                                                                                        \
         attrName##DataClass() : CTC_BaseDataClass<attrType>(Attributes::attrName::Id) {}                                           \
@@ -147,7 +143,7 @@ COMMODITY_TARIFF_PRIMARY_SCALAR_ATTRS
 #undef X
 
 #define X(attrName, attrType)                                                                                                      \
-    class attrName##DataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<attrType>                                                                 \
+    class attrName##DataClass : public CommodityTariffAttrsDataMgmt::CTC_BaseDataClass<attrType>                                   \
     {                                                                                                                              \
     public:                                                                                                                        \
         attrName##DataClass() : CTC_BaseDataClass<attrType>(Attributes::attrName::Id) {}                                           \
