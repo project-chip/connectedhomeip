@@ -65,7 +65,7 @@ class TC_CLCTRL_2_1(MatterBaseTest):
             TestStep(8, "Read the OverallTargetState attribute",
                      "OverallTargetState of the ClosureControl cluster is returned by the DUT and the fields of the struct are validated"),
             TestStep(9, "Read the LatchControlModes attribute",
-                     "LatchControlModes of the ClosureControl cluster is returned by the DUT if the LT feature is supported, otherwise skip"),
+                     "LatchControlModes of the ClosureControl cluster is returned by the DUT if the LT feature is supported"),
         ]
         return steps
 

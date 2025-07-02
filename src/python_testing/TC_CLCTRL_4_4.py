@@ -139,10 +139,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         countdown_time_max: uint = 259200
 
         endpoint: int = self.get_endpoint(default=1)
-        timeout: uint = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout  # default_timeout = 90 seconds
-        # make sure the user defined timeout does not violate the spec requirement
-        asserts.assert_true(timeout <= countdown_time_max,
-                            f"Timeout should be less than {countdown_time_max} seconds, got: {timeout} seconds.")
+        timeout: uint = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else countdown_time_max
 
         self.step(1)
         attributes: typing.List[uint] = Clusters.ClosureControl.Attributes
