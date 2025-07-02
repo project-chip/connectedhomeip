@@ -115,9 +115,10 @@ struct ClusterState
     };
 
     QuieterReportingAttribute<ElapsedS> mCountdownTime{ DataModel::NullNullable };
-    MainStateEnum mMainState                                 = MainStateEnum::kUnknownEnumValue;
-    DataModel::Nullable<GenericOverallState> mOverallState   = DataModel::NullNullable;
-    DataModel::Nullable<GenericOverallTarget> mOverallTarget = DataModel::NullNullable;
+    MainStateEnum mMainState                                             = MainStateEnum::kUnknownEnumValue;
+    DataModel::Nullable<GenericOverallCurrentState> mOverallCurrentState = DataModel::NullNullable;
+    DataModel::Nullable<GenericOverallTargetState> mOverallTargetState   = DataModel::NullNullable;
+    BitFlags<LatchControlModesBitmap> mLatchControlModes;
 
     // CurrentErrorList attribute is not stored here. When it is necessary it will be requested from the delegate to get the current
     // active errors.
@@ -128,8 +129,8 @@ struct ClusterState
  */
 struct ClusterInitParameters
 {
-    MainStateEnum mMainState                               = MainStateEnum::kStopped;
-    DataModel::Nullable<GenericOverallState> mOverallState = DataModel::NullNullable;
+    MainStateEnum mMainState                                             = MainStateEnum::kStopped;
+    DataModel::Nullable<GenericOverallCurrentState> mOverallCurrentState = DataModel::NullNullable;
 };
 
 /**
@@ -169,22 +170,37 @@ public:
 
     CHIP_ERROR GetCountdownTime(DataModel::Nullable<ElapsedS> & countdownTime);
     CHIP_ERROR GetMainState(MainStateEnum & mainState);
-    CHIP_ERROR GetOverallState(DataModel::Nullable<GenericOverallState> & overallState);
-    CHIP_ERROR GetOverallTarget(DataModel::Nullable<GenericOverallTarget> & overallTarget);
+    CHIP_ERROR GetOverallCurrentState(DataModel::Nullable<GenericOverallCurrentState> & overallCurrentState);
+    CHIP_ERROR GetOverallTargetState(DataModel::Nullable<GenericOverallTargetState> & overallTarget);
     // The delegate is expected to return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to indicate end of list
     CHIP_ERROR GetCurrentErrorList(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
+    CHIP_ERROR GetLatchControlModes(BitFlags<LatchControlModesBitmap> & latchControlModes);
+    CHIP_ERROR GetFeatureMap(BitFlags<Feature> & featureMap);
+    CHIP_ERROR GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision);
 
     /**
-     * @brief Set OverallTarget.
+     * @brief Set SetOverallCurrentState.
      *
-     * @param[in] overallTarget OverallTarget Position, Latch and Speed.
+     * @param[in] overallCurrentState SetOverallCurrentState Position, Latch and Speed.
      *
      * @return CHIP_NO_ERROR if set was successful.
      *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
-    CHIP_ERROR SetOverallState(const DataModel::Nullable<GenericOverallState> & overallState);
+    CHIP_ERROR SetOverallCurrentState(const DataModel::Nullable<GenericOverallCurrentState> & overallCurrentState);
+
+    /**
+     * @brief Set OverallTargetState.
+     *
+     * @param[in] overallTarget OverallTargetState Position, Latch and Speed.
+     *
+     * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     */
+    CHIP_ERROR SetOverallTargetState(const DataModel::Nullable<GenericOverallTargetState> & overallTarget);
 
     /**
      * @brief Sets the main state of the cluster.
@@ -200,6 +216,16 @@ public:
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
     CHIP_ERROR SetMainState(MainStateEnum mainState);
+
+    /**
+     * @brief Sets the latch control modes for the closure control cluster.
+     *        This method updates the latch control modes using the provided bit flags.
+     *
+     * @param[in] latchControlModes  Reference to a BitFlags object representing the desired latch control modes.
+     *
+     * @return CHIP_ERROR Returns CHIP_NO_ERROR on success, or an appropriate error code on failure.
+     */
+    CHIP_ERROR SetLatchControlModes(const BitFlags<LatchControlModesBitmap> & latchControlModes);
 
     /**
      * @brief Triggers an update to report a new countdown time from application.
@@ -278,14 +304,14 @@ public:
      * @param[in] EngageValue will indicate if the actuator is Engaged or Disengaged
      *
      * @return CHIP_NO_ERROR if the event is generated successfull
-     *         CHIP_NO_ERROR if hte ManuallyOperable feature is not supported.
+     *         CHIP_NO_ERROR if the ManuallyOperable feature is not supported.
      *         Returns an appropriate error code if event generation fails
      */
     CHIP_ERROR GenerateEngageStateChangedEvent(const bool engageValue);
 
     /**
      * @brief Generates EngageStateChanged event.
-     *        This method should be called whenever when the SecureState field in the OverallState attribute changes.
+     *        This method should be called whenever when the SecureState field in the OverallCurrentState attribute changes.
      *
      * @param[in] secureValue will indicate whether a closure is securing a space against possible unauthorized entry.
      *
@@ -331,7 +357,7 @@ private:
     bool IsValidMainStateTransition(MainStateEnum mainState) const;
 
     /**
-     * @brief Function validates if the requested overallState positioning is supported by the closure.
+     * @brief Function validates if the requested overallCurrentState positioning is supported by the closure.
      *        Function validates against the FeatureMap conformance to validate support.
      *
      * @param positioning requested Positioning to validate
@@ -339,10 +365,10 @@ private:
      * @return true if the requested Positioning is supported
      *        false, otherwise
      */
-    bool IsSupportedOverallStatePositioning(PositioningEnum positioning) const;
+    bool IsSupportedOverallCurrentStatePositioning(CurrentPositionEnum positioning) const;
 
     /**
-     * @brief Function validates if the requested OverallTarget positioning is supported by the closure.
+     * @brief Function validates if the requested OverallTargetState positioning is supported by the closure.
      *        Function validates agaisnt the FeatureMap conformance to validate support.
      *
      * @param positioning requested Positioning to validate
@@ -350,7 +376,7 @@ private:
      * @return true if the requested Positioning is supported
      *        false, otherwise
      */
-    bool IsSupportedOverallTargetPositioning(TargetPositionEnum positioning) const;
+    bool IsSupportedOverallTargetStatePositioning(TargetPositionEnum positioning) const;
 
     /**
      * @brief Updates the countdown time based on the Quiet reporting conditions of the attribute.
@@ -374,18 +400,6 @@ private:
     {
         return SetCountdownTime(countdownTime, false);
     }
-
-    /**
-     * @brief Set OverallTarget.
-     *
-     * @param[in] overallTarget OverallTarget Position, Latch and Speed.
-     *
-     * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
-     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
-     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     */
-    CHIP_ERROR SetOverallTarget(const DataModel::Nullable<GenericOverallTarget> & overallTarget);
 };
 
 } // namespace ClosureControl

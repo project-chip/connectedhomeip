@@ -18,7 +18,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/occ_3_1_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -27,7 +27,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
-#       --app-pipe_prefix /tmp/chip_all_clusters_fifo_
+#       --app-pipe /tmp/occ_3_1_fifo
 #       --bool-arg simulate_occupancy:true
 #     factory-reset: true
 #     quiet: true
@@ -44,8 +44,8 @@ from typing import Any, Optional
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest, TestStep,
-                                         async_test_body, await_sequence_of_reports, default_matter_test_main)
+from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator, EventChangeCallback, await_sequence_of_reports
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 

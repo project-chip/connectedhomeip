@@ -127,6 +127,7 @@ BallastConfiguration
 BarrierControl
 BasicCHIPRegression
 BasicInformation
+Batcher
 baudrate
 BCM
 BD
@@ -309,6 +310,7 @@ ContentLauncher
 contrib
 controllee
 conv
+Cooktop
 CopperConcentrationMeasurement
 Corstone
 cortexa
@@ -1159,6 +1161,7 @@ PRs
 PSA
 PSCAN
 PSECT
+Pseudocode
 PSK
 PSoC
 PTR

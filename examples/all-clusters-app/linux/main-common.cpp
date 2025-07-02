@@ -23,9 +23,7 @@
 #include "air-quality-instance.h"
 #include "app-common/zap-generated/ids/Clusters.h"
 #include "camera-av-settings-user-level-management-instance.h"
-#include "device-energy-management-modes.h"
 #include "dishwasher-mode.h"
-#include "energy-evse-modes.h"
 #include "include/diagnostic-logs-provider-delegate-impl.h"
 #include "include/tv-callbacks.h"
 #include "laundry-dryer-controls-delegate-impl.h"
@@ -40,7 +38,6 @@
 #include "rvc-operational-state-delegate-impl.h"
 #include "tcc-mode.h"
 #include "thermostat-delegate-impl.h"
-#include "water-heater-mode.h"
 
 #include <Options.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -68,8 +65,6 @@
 
 #include <string>
 
-#include <WhmMain.h>
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::DeviceLayer;
@@ -78,7 +73,6 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_all_clusters_fifo_";
 LowPowerManager sLowPowerManager;
 NamedPipeCommands sChipNamedPipeCommands;
 AllClustersCommandDelegate sAllClustersCommandDelegate;
@@ -176,9 +170,8 @@ static Identify gIdentify1 = {
 
 void ApplicationInit()
 {
-    std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
-
-    if (sChipNamedPipeCommands.Start(path, &sAllClustersCommandDelegate) != CHIP_NO_ERROR)
+    std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
+    if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sAllClustersCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         sChipNamedPipeCommands.Stop();
@@ -200,8 +193,6 @@ void ApplicationInit()
                 CHIP_NO_ERROR);
     VerifyOrDie(Clusters::UnitLocalization::UnitLocalizationServer::Instance().SetTemperatureUnit(
                     Clusters::UnitLocalization::TempUnitEnum::kFahrenheit) == CHIP_NO_ERROR);
-
-    Clusters::WaterHeaterManagement::WhmApplicationInit(chip::EndpointId(1));
 
     SetTagList(/* endpoint= */ 0, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp0TagList));
     SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));
@@ -227,12 +218,6 @@ void ApplicationShutdown()
     Clusters::RvcOperationalState::Shutdown();
     Clusters::OvenMode::Shutdown();
     Clusters::OvenCavityOperationalState::Shutdown();
-
-    Clusters::DeviceEnergyManagementMode::Shutdown();
-    Clusters::EnergyEvseMode::Shutdown();
-    Clusters::WaterHeaterMode::Shutdown();
-
-    Clusters::WaterHeaterManagement::WhmApplicationShutdown();
 
     if (sChipNamedPipeCommands.Stop() != CHIP_NO_ERROR)
     {

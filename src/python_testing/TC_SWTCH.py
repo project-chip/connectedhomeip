@@ -23,7 +23,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/switch_2_2_fifo
 #     script-args: >
 #       --test-case test_TC_SWTCH_2_2
 #       --endpoint 1
@@ -34,11 +34,12 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --app-pipe /tmp/switch_2_2_fifo
 #     factory-reset: true
 #     quiet: true
 #   run2:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/switch_fifo
 #     script-args: >
 #       --test-case test_TC_SWTCH_2_3
 #       --test-case test_TC_SWTCH_2_4
@@ -51,11 +52,12 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --app-pipe /tmp/switch_fifo
 #     factory-reset: true
 #     quiet: true
 #   run3:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/switch_fifo
 #     script-args: >
 #       --test-case test_TC_SWTCH_2_3
 #       --test-case test_TC_SWTCH_2_4
@@ -68,25 +70,24 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --app-pipe /tmp/switch_fifo
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 #
 # These tests run on every endpoint regardless of whether a switch is present because they are set up to auto-select.
 
-import json
 import logging
 import queue
 import time
 from datetime import datetime, timedelta
-from typing import Any
 
 import chip.clusters as Clusters
 import test_plan_support
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult
-from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest,
-                                         TestStep, await_sequence_of_reports, default_matter_test_main, has_feature,
+from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator, EventChangeCallback, await_sequence_of_reports
+from chip.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep, default_matter_test_main, has_feature,
                                          run_if_endpoint_matches)
 from chip.tlv import uint
 from mobly import asserts
@@ -123,21 +124,6 @@ class TC_SwitchTests(MatterBaseTest):
         super().setup_test()
         self.is_ci = self._use_button_simulator()
 
-    def _send_named_pipe_command(self, command_dict: dict[str, Any]):
-        app_pid = self.matter_test_config.app_pid
-        if app_pid == 0:
-            asserts.fail("The --app-pid flag must be set when usage of button simulation named pipe is required (e.g. CI)")
-
-        app_pipe = f"/tmp/chip_all_clusters_fifo_{app_pid}"
-        command = json.dumps(command_dict)
-
-        # Sends an out-of-band command to the sample app
-        with open(app_pipe, "w") as outfile:
-            logging.info(f"Sending named pipe command to {app_pipe}: '{command}'")
-            outfile.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests may be flaky).
-        time.sleep(0.1)
-
     def _use_button_simulator(self) -> bool:
         return self.check_pics("PICS_SDK_CI_ONLY") or self.user_params.get("use_button_simulator", False)
 
@@ -145,21 +131,21 @@ class TC_SwitchTests(MatterBaseTest):
         command_dict = {"Name": 'SimulateMultiPress', "EndpointId": endpoint_id,
                         "ButtonId": pressed_position, "MultiPressPressedTimeMillis": 500, "MultiPressReleasedTimeMillis": 500,
                         "MultiPressNumPresses": number_of_presses, "FeatureMap": feature_map, "MultiPressMax": multi_press_max}
-        self._send_named_pipe_command(command_dict)
+        self.write_to_app_pipe(command_dict)
 
     def _send_long_press_named_pipe_command(self, endpoint_id: int, pressed_position: int, feature_map: int):
         command_dict = {"Name": "SimulateLongPress", "EndpointId": endpoint_id,
                         "ButtonId": pressed_position, "LongPressDelayMillis": int(1000 * (SIMULATED_LONG_PRESS_LENGTH_SECONDS - 0.5)),
                         "LongPressDurationMillis": int(1000 * SIMULATED_LONG_PRESS_LENGTH_SECONDS), "FeatureMap": feature_map}
-        self._send_named_pipe_command(command_dict)
+        self.write_to_app_pipe(command_dict)
 
     def _send_latching_switch_named_pipe_command(self, endpoint_id: int, new_position: int):
         command_dict = {"Name": "SimulateLatchPosition", "EndpointId": endpoint_id, "PositionId": new_position}
-        self._send_named_pipe_command(command_dict)
+        self.write_to_app_pipe(command_dict)
 
     def _send_switch_idle_named_pipe_command(self, endpoint_id: int):
         command_dict = {"Name": "SimulateSwitchIdle", "EndpointId": endpoint_id}
-        self._send_named_pipe_command(command_dict)
+        self.write_to_app_pipe(command_dict)
 
     def _ask_for_switch_idle(self, endpoint_id: int, omit_for_simulator: bool = False):
         if not self._use_button_simulator():
@@ -537,7 +523,8 @@ class TC_SwitchTests(MatterBaseTest):
 
         if not has_ms_feature:
             logging.info("Skipping rest of test: SWTCH.S.F01(MS) feature not present")
-            self.skip_all_remaining_steps("2")
+            self.mark_all_remaining_steps_skipped("2")
+            return
 
         # Step 2: Set up subscription to all events and attributes of Switch cluster on the endpoint
         self.step(2)
@@ -752,7 +739,7 @@ class TC_SwitchTests(MatterBaseTest):
             test_multi_press_sequence("6b", count=3)
 
         if not has_msl_feature:
-            self.skip_all_remaining_steps(7)
+            self.mark_all_remaining_steps_skipped(7)
             return
 
         self.step(7)
@@ -918,7 +905,7 @@ class TC_SwitchTests(MatterBaseTest):
 
         self.step("7a")
         if not has_msl_feature:
-            self.skip_all_remaining_steps("7b")
+            self.mark_all_remaining_steps_skipped("7b")
             return
 
         # subscription is already established
