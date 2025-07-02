@@ -641,8 +641,7 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
         }
         else
         {
-            // If the AUXLD feature is enabled, the price field is required!
-            return CHIP_ERROR_INVALID_ARGUMENT;
+            // If the AUXLD feature is enabled, the auxiliaryLoad field is required!
         }
     }
 
