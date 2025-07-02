@@ -853,9 +853,10 @@ CHIP_ERROR CalendarPeriodsDataClass::Validate(const ValueType & aValue) const
         for (const auto & item : newList)
         {
             // Validate dayPatternIDs
-            VerifyOrReturnError_LogSend(
-                !item.dayPatternIDs.empty() && item.dayPatternIDs.size() <= kCalendarPeriodItemMaxDayPatternIDs,
-                CHIP_ERROR_INVALID_ARGUMENT, "DayPatternIDs count must be between 1 and %zu", kCalendarPeriodItemMaxDayPatternIDs);
+            VerifyOrReturnError_LogSend(!item.dayPatternIDs.empty() &&
+                                            item.dayPatternIDs.size() <= kCalendarPeriodItemMaxDayPatternIDs,
+                                        CHIP_ERROR_INVALID_ARGUMENT, "DayPatternIDs count must be between 1 and %" PRIuMAX "",
+                                        kCalendarPeriodItemMaxDayPatternIDs);
 
             // Check for duplicate dayPatternIDs
             VerifyOrReturnError_LogSend(!CommonUtilities::HasDuplicateIDs(item.dayPatternIDs, CalendarPeriodsDayPatternIDs),
