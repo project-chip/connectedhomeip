@@ -281,8 +281,6 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
     instance.mCurrentActionEndpointId = chip::kInvalidEndpointId;
 }
 
-
-
 chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
 {
     VerifyOrReturnValue(mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR,
