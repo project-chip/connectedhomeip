@@ -260,7 +260,7 @@ CHIP_ERROR ClusterLogic::SetUnitRange(const DataModel::Nullable<Structs::UnitRan
     {
         VerifyOrReturnError(unitRange.Value().min >= -360 && unitRange.Value().min <= 360, CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(unitRange.Value().max >= -360 && unitRange.Value().max <= 360, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError((unitRange.Value().max - unitRange.Value().min) <=360, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError((unitRange.Value().max - unitRange.Value().min) <= 360, CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // If the mState unitRange is null, we need to set it to the new value
@@ -569,7 +569,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     {
         // If latch value is true and the Remote Latching feature is not supported, or
         // if latch value is false and the Remote Unlatching feature is not supported, return InvalidInState.
-        if ((latch.Value() &&  !mState.latchControlModes.Has(LatchControlModesBitmap::kRemoteLatching)) ||
+        if ((latch.Value() && !mState.latchControlModes.Has(LatchControlModesBitmap::kRemoteLatching)) ||
             (!latch.Value() && !mState.latchControlModes.Has(LatchControlModesBitmap::kRemoteUnlatching)))
         {
             return Status::InvalidInState;

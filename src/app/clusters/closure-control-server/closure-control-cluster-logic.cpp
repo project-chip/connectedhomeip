@@ -264,20 +264,22 @@ CHIP_ERROR ClusterLogic::SetOverallCurrentState(const DataModel::Nullable<Generi
                                 CHIP_ERROR_INVALID_ARGUMENT);
         }
 
-        //TODO: SecureState field Value based on conditions validation will be done after the specification issue #11805 resolution.
+        // TODO: SecureState field Value based on conditions validation will be done after the specification issue #11805
+        // resolution.
 
         // SecureStateChanged event SHALL be generated when the SecureState field in the OverallCurrentState attribute changes
         if (!incomingOverallCurrentState.secureState.IsNull())
         {
             if (mState.mOverallCurrentState.IsNull() || mState.mOverallCurrentState.Value().secureState.IsNull())
             {
-                // As secureState field is not set in present current state and incoming current state has value, we generate the event
+                // As secureState field is not set in present current state and incoming current state has value, we generate the
+                // event
                 GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value());
             }
             else
             {
-                // If the secureState field is set in both present and incoming current state, we generate the event only if the value
-                // has changed.
+                // If the secureState field is set in both present and incoming current state, we generate the event only if the
+                // value has changed.
                 if (mState.mOverallCurrentState.Value().secureState.Value() != incomingOverallCurrentState.secureState.Value())
                 {
                     GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value());
@@ -502,7 +504,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
     {
         // If latch value is true and the Remote Latching feature is not supported, or
         // if latch value is false and the Remote Unlatching feature is not supported, return InvalidInState.
-        if ((latch.Value() &&  !mState.mLatchControlModes.Has(LatchControlModesBitmap::kRemoteLatching)) ||
+        if ((latch.Value() && !mState.mLatchControlModes.Has(LatchControlModesBitmap::kRemoteLatching)) ||
             (!latch.Value() && !mState.mLatchControlModes.Has(LatchControlModesBitmap::kRemoteUnlatching)))
         {
             return Status::InvalidInState;
