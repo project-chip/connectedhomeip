@@ -381,7 +381,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
     VerifyOrReturnValue(mClosureEndpoint1.GetLogic().SetOverallTargetState(mClosureEndpoint1Target) == CHIP_NO_ERROR,
                         Status::Failure, ChipLogError(AppServer, "Failed to set overall target for Step command"));
 
-    DeviceLayer::PlatformMgr().LockChipStack();               
+    DeviceLayer::PlatformMgr().LockChipStack();
     SetCurrentAction(PANEL_STEP_ACTION);
     mCurrentActionEndpointId = endpointId;
     isStepActionInProgress = true;
