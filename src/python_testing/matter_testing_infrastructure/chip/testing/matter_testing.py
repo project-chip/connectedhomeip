@@ -201,7 +201,6 @@ class MatterTestConfig:
     in_test_commissioning_method: Optional[str] = None
     discriminators: List[int] = field(default_factory=list)
     setup_passcodes: List[int] = field(default_factory=list)
-    commissionee_ip_address_just_for_testing: Optional[str] = None
     # By default, we start with maximized cert chains, as required for RR-1.1.
     # This allows cert tests to be run without re-commissioning for RR-1.1.
     maximize_cert_chains: bool = True
@@ -737,7 +736,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         dut_node_ids: List[int] = self.matter_test_config.dut_node_ids
         setup_payloads: List[SetupPayloadInfo] = self.get_setup_payload_info()
         commissioning_info: CommissioningInfo = CommissioningInfo(
-            commissionee_ip_address_just_for_testing=self.matter_test_config.commissionee_ip_address_just_for_testing,
+
             commissioning_method=self.matter_test_config.commissioning_method,
             thread_operational_dataset=self.matter_test_config.thread_operational_dataset,
             wifi_passphrase=self.matter_test_config.wifi_passphrase,
@@ -1542,11 +1541,6 @@ def populate_commissioning_args(args: argparse.Namespace, config: MatterTestConf
             print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method ble-thread!")
             return False
         config.thread_operational_dataset = args.thread_dataset_hex
-    elif config.commissioning_method == "on-network-ip":
-        if args.ip_addr is None:
-            print("error: missing --ip-addr <IP_ADDRESS> for --commissioning-method on-network-ip")
-            return False
-        config.commissionee_ip_address_just_for_testing = args.ip_addr
 
     if args.case_admin_subject is None:
         # Use controller node ID as CASE admin subject during commissioning if nothing provided
