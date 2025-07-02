@@ -263,7 +263,7 @@ public:
         return *this;
     }
 
-    // Allow creating ScopedMemoryBufferWithSize from CharSpan, ByteSpan, so we
+    // Allow creating ScopedMemoryBufferWithSize from Span, so we
     // don't have to reinvent it in various places.
     template <class U, typename = std::enable_if_t<sizeof(U) == sizeof(T) && std::is_convertible_v<U *, T *>>>
     ScopedMemoryBufferWithSize & CopyFromSpan(const chip::Span<const U> & span)
