@@ -680,11 +680,9 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
         {
             // Return InvalidInState if incoming latch has no value
             VerifyOrReturnError(latch.HasValue(), Status::InvalidInState);
-            if (latch.Value() && position.HasValue() && currentState.Value().position.HasValue() &&
-                !currentState.Value().position.Value().IsNull())
+            if (latch.Value() && position.HasValue())
             {
-                Percent100ths currentPosition = currentState.Value().position.Value().Value();
-                VerifyOrReturnError(position.Value() == currentPosition, Status::InvalidInState);
+                VerifyOrReturnError(position.Value() == currentState.Value().position.Value().Value(), Status::InvalidInState);
             }
         }
     }

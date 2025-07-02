@@ -529,7 +529,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
     VerifyOrReturnError(GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR, Status::Failure);
     VerifyOrReturnError(GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR, Status::Failure);
     VerifyOrReturnError(!overallCurrentState.IsNull(), Status::InvalidInState,
-                        ChipLogError(AppServer, "OverallCurrentState is null"));
+                        ChipLogError(AppServer, "OverallCurrentState is null over endpoint : %d", mMatterContext.GetEndpointId()));
 
     if (overallTargetState.IsNull())
     {

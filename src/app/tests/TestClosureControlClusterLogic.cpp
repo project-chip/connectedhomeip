@@ -1390,14 +1390,14 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_PositioningAndSpeedFeature)
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
 }
 
-TEST_F(TestClosureControlClusterLogic, MoveToCommand_OnlyPosiitonField)
+TEST_F(TestClosureControlClusterLogic, MoveToCommand_OnlyPosititonField)
 {
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
     // Set initial state
     DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
-        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), Optional(true),
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), Optional(false),
                                    Optional(Globals::ThreeLevelAutoEnum::kLow)));
     EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
@@ -1470,7 +1470,7 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_OnlySpeedField)
 
     // Set initial state
     DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
-        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), Optional(true),
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), Optional(false),
                                    Optional(Globals::ThreeLevelAutoEnum::kLow)));
     EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
