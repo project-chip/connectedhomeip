@@ -388,23 +388,20 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(CurrentTariffAttrsCtx & aCtx, 
                 if (!current->label.Value().IsNull())
                 {
                     chip::CharSpan srcLabelSpan = current->label.Value().Value();
-                    const char * srcLabel       = srcLabelSpan.data();
-                    char * newLabel             = chip::Platform::CopyString(srcLabelSpan.data(), srcLabelSpan.size());
-                    if (newLabel == nullptr)
+                    if (!CommodityTariffAttrsDataMgmt::SpanCopier<char>::Copy(current->label.Value().Value(), tmpNullLabel,
+                                                                              srcLabelSpan.size()))
                     {
-                        err = CHIP_ERROR_NO_MEMORY;
-                        break; // and handle error after the loop
+                        return CHIP_ERROR_NO_MEMORY;
                     }
-                    tmpNullLabel.SetNonNull(chip::CharSpan(newLabel, srcLabelSpan.size()));
                 }
 
-                entry.label = MakeOptional(DataModel::Nullable<chip::CharSpan>(tmpNullLabel));
+                entry.label = MakeOptional(tmpNullLabel);
             }
 
             tempList.push_back(entry);
         }
 
-        if ((err = mgmtObj.CreateNewValue(tempList.size())) == CHIP_NO_ERROR)
+        if ((err == CHIP_NO_ERROR) && ((err = mgmtObj.CreateNewValue(tempList.size())) == CHIP_NO_ERROR))
         {
             std::copy(tempList.begin(), tempList.end(), mgmtObj.GetNewValueData());
             mgmtObj.MarkAsAssigned();
@@ -593,10 +590,10 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
 
     if (component != nullptr && period != nullptr)
     {
-        response.label = period->label;
-        response.dayEntryIDs = period->dayEntryIDs;
+        response.label           = period->label;
+        response.dayEntryIDs     = period->dayEntryIDs;
         response.tariffComponent = *component;
-        status = Status::Success;
+        status                   = Status::Success;
     }
 
     if (status != Status::Success)
@@ -676,7 +673,7 @@ void Instance::ForceDayEntriesAttrsUpdate()
     }
 
     // Calculate seconds remaining in current entry
-    const uint16_t minutesRemaining               = entryEndTime - minutesSinceMidnight;
+    const uint16_t minutesRemaining = (entryEndTime >= minutesSinceMidnight) ? (entryEndTime - minutesSinceMidnight) : ((kSecondsPerDay / 60 - minutesSinceMidnight) + entryEndTime);
     mServerTariffAttrsCtx.forwardAlarmTriggerTime = now + (minutesRemaining * 60);
 
     // Determine update type based on whether we're crossing day boundary

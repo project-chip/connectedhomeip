@@ -700,10 +700,6 @@ private:
 
     CHIP_ERROR ValidateNewValue()
     {
-        if constexpr (IsValueNullable())
-        {
-            return Validate(GetNewValueRef().Value());
-        }
         return Validate(GetNewValueRef());
     }
 

@@ -397,10 +397,6 @@ void DayEntriesDataClass::CleanupStructValue(PayloadType & aValue)
 namespace DayPatternsDataClass_Utils {
 static CHIP_ERROR ValidateListEntry(const DayPatternStruct::Type & entryNewValue, std::unordered_set<uint32_t> & seenDeIDs)
 {
-
-    VerifyOrReturnError_LogSend(entryNewValue.daysOfWeek.HasAny(), CHIP_ERROR_INVALID_ARGUMENT,
-                                "The daysOfWeek must have least one bit set!");
-
     if (entryNewValue.dayEntryIDs.empty() || entryNewValue.dayEntryIDs.size() > kDayPatternItemMaxDayEntryIDs)
         return CHIP_ERROR_INVALID_ARGUMENT;
 
@@ -583,11 +579,6 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
 
     VerifyOrReturnError(entryNewValue.tariffComponentID > 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    /*if (!entryNewValue.threshold.IsNull())
-    {
-
-    }*/
-
     // entryNewValue.label
     if (entryNewValue.label.HasValue() && !entryNewValue.label.Value().IsNull())
     {
@@ -603,11 +594,6 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
             const auto & price = entryNewValue.price.Value().Value();
             VerifyOrReturnError(EnsureKnownEnumValue(price.priceType) != TariffPriceTypeEnum::kUnknownEnumValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
-            // TODO - maybe we should implement deeper validation for these fields:
-            // if (price.price.HasValue() && price.price.Value() == 0)
-            //    return CHIP_ERROR_INVALID_ARGUMENT;
-            // if (price.priceLevel.HasValue() && price.priceLevel.Value() == 0)
-            //    return CHIP_ERROR_INVALID_ARGUMENT;
         }
         else
         {
@@ -631,9 +617,6 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
         if (entryNewValue.auxiliaryLoad.HasValue())
         {
             const auto & auxiliaryLoad = entryNewValue.auxiliaryLoad.Value();
-
-            /*VerifyOrReturnError(auxiliaryLoadList.size() <= kAuxSwitchesSettingsMax,
-                CHIP_ERROR_INVALID_ARGUMENT);*/
 
             VerifyOrReturnError(EnsureKnownEnumValue(auxiliaryLoad.requiredState) != AuxiliaryLoadSettingEnum::kUnknownEnumValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
@@ -781,8 +764,7 @@ void TariffComponentsDataClass::CleanupStructValue(PayloadType & aValue)
 
     if (aValue.label.HasValue() && !aValue.label.Value().IsNull())
     {
-        auto & tmp_label = aValue.label.Value();
-        MemoryFree(const_cast<char *>(tmp_label.Value().data()));
+        MemoryFree(const_cast<char *>(aValue.label.Value().Value().data())); 
         aValue.label.ClearValue();
     }
 
@@ -809,8 +791,7 @@ CHIP_ERROR IndividualDaysDataClass::Validate(const ValueType & aValue) const
 
         for (const auto & item : newList)
         {
-            VerifyOrReturnError_LogSend(item.date > tmpDate, CHIP_ERROR_INVALID_ARGUMENT,
-                                        "IndividualDays must be ordered by date");
+            VerifyOrReturnError_LogSend(item.date > tmpDate, CHIP_ERROR_INVALID_ARGUMENT, "IndividualDays must be ordered by date");
             VerifyOrReturnError(EnsureKnownEnumValue(item.dayType) != DayTypeEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
 
             if (item.dayEntryIDs.empty() || item.dayEntryIDs.size() > kDayStructItemMaxDayEntryIDs)

@@ -246,7 +246,7 @@ public:
             }
             else
             {
-                ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data does not changed");
+                ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data does not change");
             }
 
             return;
