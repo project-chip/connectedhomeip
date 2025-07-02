@@ -260,7 +260,7 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
             instance.ep1.OnStopCalibrateActionComplete();
             instance.ep2.OnStopCalibrateActionComplete();
             instance.ep3.OnStopCalibrateActionComplete();
-            
+
             DeviceLayer::PlatformMgr().LockChipStack();
             isCalibrationInProgress = false;
             DeviceLayer::PlatformMgr().UnlockChipStack();

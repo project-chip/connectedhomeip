@@ -150,7 +150,7 @@ private:
     bool isCalibrationInProgress = false;
     bool isMoveToInProgress      = false;
     bool isSetTargetInProgress   = false;
-    
+
     Action_t mCurrentAction                   = Action_t::INVALID_ACTION;
     chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
 
