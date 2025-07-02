@@ -207,7 +207,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
                 self.step("2i")
                 # Check if LatchControlModes Bit 1 is 0
-                if format(latch_control_modes, 'b')[1] == 0:
+                if not latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
                     self.skip_step("2j")
                     self.step("2k")
                     logging.info("LatchControlModes Bit 1 is 0, unlatch device manually")

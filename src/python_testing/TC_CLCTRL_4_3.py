@@ -314,7 +314,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
 
                 self.step("5d")
                 # Check if LatchControlModes Bit 1 is 0
-                if format(latch_control_modes, 'b')[1] == 0:
+                if not latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
                     self.skip_step("5e")
                     self.step("5f")
                     logging.info("LatchControlModes Bit 1 is 0, unlatch device manually")
@@ -347,7 +347,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                                      f"Expected Success status for MoveTo with Position = MoveToFullyOpen, but got: {e}")
 
             self.step("5j")
-            if format(latch_control_modes, 'b')[0] == 0:
+            if not latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
                 logging.info("LatchControlModes Bit 0 is 0, skipping steps 5k and 5l")
                 self.skip_step("5k")
                 self.skip_step("5l")
@@ -364,7 +364,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                 self.step("5l")
                 sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(True)], timeout_sec=timeout)
             self.step("5m")
-            if format(latch_control_modes, 'b')[0] == 1:
+            if latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
                 logging.info("LatchControlModes Bit 0 is 1, skipping step 5n")
                 self.skip_step("5n")
             else:
@@ -494,7 +494,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             logging.info(f"CurrentLatch: {current_latch}")
 
             self.step("8c")
-            if format(latch_control_modes, 'b')[0] == 0:
+            if not latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
                 self.skip_step("8d")
             else:
                 self.step("8d")
@@ -507,7 +507,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                                          f"Expected Success status for MoveTo with Latch = True, but got: {e}")
 
             self.step("8e")
-            if format(latch_control_modes, 'b')[1] == 0:
+            if not latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
                 self.skip_step("8f")
             else:
                 self.step("8f")
@@ -520,7 +520,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                                          f"Expected Success status for MoveTo with Latch = False, but got: {e}")
 
             self.step("8g")
-            if format(latch_control_modes, 'b')[1] == 1:
+            if latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
                 self.skip_step("8h")
             else:
                 self.step("8h")
@@ -531,7 +531,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
 
             self.step("8j")
-            if format(latch_control_modes, 'b')[1] == 0:
+            if not latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
                 self.skip_step("8k")
             else:
                 self.step("8k")
