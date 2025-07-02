@@ -26,19 +26,22 @@ namespace Test {
  * @brief Class acts as an accessor to private methods of the ICDConfigurationData class without needing to give friend access to
  *        each individual test.
  */
-class BleLayerTestAccess {
-    public:
-        BleLayerTestAccess() = delete;
-        BleLayerTestAccess(Ble::BleLayer* layer) : mLayer(layer) {}
+class BleLayerTestAccess
+{
+public:
+    BleLayerTestAccess() = delete;
+    BleLayerTestAccess(Ble::BleLayer * layer) : mLayer(layer) {}
 
-        void SetConnectionDelegate(Ble::BleConnectionDelegate* delegate) { mLayer->mConnectionDelegate = delegate; }
+    void SetConnectionDelegate(Ble::BleConnectionDelegate * delegate) { mLayer->mConnectionDelegate = delegate; }
 
-        // Wrapper for OnConnectionComplete private method
-        void CallOnConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj) {
-            mLayer->OnConnectionComplete(appState, connObj);
-        }
-    private:
-        Ble::BleLayer* mLayer = nullptr;
+    // Wrapper for OnConnectionComplete private method
+    void CallOnConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj)
+    {
+        mLayer->OnConnectionComplete(appState, connObj);
+    }
+
+private:
+    Ble::BleLayer * mLayer = nullptr;
 };
 } // namespace Test
 } // namespace chip
