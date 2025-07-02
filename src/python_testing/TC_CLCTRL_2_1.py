@@ -106,9 +106,8 @@ class TC_CLCTRL_2_1(MatterBaseTest):
         # STEP 4: Read CountdownTime attribute if supported
         self.step(4)
         if attributes.CountdownTime.attribute_id in attribute_list:
-            if not is_positioning_supported or is_instantaneous:
-                asserts.assert_true(
-                    False, "CountdownTime attribute should not be present if Positioning is not supported or Instantaneous is supported")
+            asserts.assert_true(
+                is_positioning_supported and not is_instantaneous, "CountdownTime attribute should not be present if Positioning is not supported or Instantaneous is supported")
 
             countdown_time: typing.Union[None, Nullable, uint] = await self.read_closurecontrol_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
             logging.info(f"CountdownTime: {countdown_time}")
