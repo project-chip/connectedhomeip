@@ -195,7 +195,7 @@ class TC_SEMT_3_1(MatterBaseTest):
 
         self.step("11")
         await self.send_test_event_triggers(eventTrigger=0x0b07000000000001)
-        time.sleep(3)
+        time.sleep(3)  # Wait for the DUT to process the event and update attributes after sending the test event trigger.
 
         self.step("12")
         reported_value = WaitForAttributeReport(self.report_queue, cluster.Attributes.MeteredQuantity)
