@@ -359,7 +359,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(const 
     VerifyOrReturnError(ep3.GetLogic().SetTargetState(DataModel::MakeNullable(ep3Target)) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set target for Endpoint 3"));
 
-    VerifyOrReturnError(ep1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
+    VerifyOrReturnError(ep1.GetLogic().SetCountdownTimeFromDelegate(kDefaultCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
 
     // Set the current action to UNLATCH_ACTION.
