@@ -23,6 +23,7 @@
 #include "closure-dimension-cluster-objects.h"
 #include "closure-dimension-delegate.h"
 #include "closure-dimension-matter-context.h"
+#include <app/cluster-building-blocks/QuieterReporting.h>
 
 namespace chip {
 namespace app {
@@ -387,6 +388,11 @@ private:
     ClusterConformance mConformance;
     DelegateBase & mDelegate;
     MatterContext & mMatterContext;
+
+    // At Present, QuieterReportingAttribute doesnt support Structs.
+    // So, this variable will be used for Quietreporting of current state position.
+    // TODO: Refactor CurrentState Atrribute to use QuieterReportingAttribute once Issue#39801 is resolved
+    QuieterReportingAttribute<Percent100ths> quietReportableCurrentStatePosition{ DataModel::NullNullable };
 };
 
 } // namespace ClosureDimension

@@ -519,7 +519,6 @@ void HandleBrowse(jobjectArray instanceName, jstring serviceType, jlong callback
     }
 
     dispatch(CHIP_NO_ERROR, services.get(), size);
-    // Memory automatically freed when unique_ptr goes out of scope
 }
 
 } // namespace Dnssd
