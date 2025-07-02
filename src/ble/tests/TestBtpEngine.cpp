@@ -425,4 +425,24 @@ TEST_F(TestBtpEngine, HandleCharacteristicReceivedIncorrectSequence)
     EXPECT_EQ(mBtpEngine.RxState(), BtpEngine::kState_Error);
 }
 
+TEST_F(TestBtpEngine, HandleCharacteristicReceivedUnexpectedStandaloneAck)
+{
+    constexpr uint8_t ackPacketData[] = {
+        to_underlying(BtpEngine::HeaderFlags::kFragmentAck),
+        0x00,
+        0x01,
+    };
+
+    auto ackPacket = System::PacketBufferHandle::NewWithData(ackPacketData, sizeof(ackPacketData));
+    EXPECT_FALSE(ackPacket.IsNull());
+
+    SequenceNumber_t receivedAck;
+    bool didReceiveAck;
+    EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(ackPacket), receivedAck, didReceiveAck), BLE_ERROR_INVALID_ACK);
+    EXPECT_TRUE(didReceiveAck);
+    EXPECT_EQ(receivedAck, 0x00);
+    EXPECT_EQ(mBtpEngine.RxState(), BtpEngine::kState_Error);
+}
+
+
 } // namespace
