@@ -58,12 +58,12 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
             TestStep("precondition", "DUT commissioned and preconditions", is_commissioning=True),
             TestStep(
                 1,
-                "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify SNP & (WMARK|OSD) is supported.",
             ),
             TestStep(
                 2,
-                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated snapshot streams in the list is 1. Store StreamID as aStreamID. If WMARK is supported, store WaterMarkEnabled as aWmark. If OSD is supported, store OSDEnabled as aOSD.",
             ),
             TestStep(
@@ -73,7 +73,7 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 4,
-                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the following: If WMARK is supported, verify WaterMarkEnabled == !aWmark. If OSD is supported, verify OSDEnabled == !aOSD.",
             ),
         ]
@@ -104,7 +104,6 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
         logger.info(f"Rx'd snpSupport: {snpSupport}, wmarkSupport: {wmarkSupport}, osdSupport: {osdSupport}")
         asserts.assert_true(
             (snpSupport and (wmarkSupport or osdSupport)),
-            cluster.Bitmaps.Feature.kSnapshot,
             "SNP & (WMARK|OSD) is supported is not supported.",
         )
 

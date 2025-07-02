@@ -78,7 +78,7 @@ config CHIP_APP_FACTORY_DATA
 if CHIP_APP_FACTORY_DATA
     choice CHIP_APP_FACTORY_DATA_IMPL_SELECTION
         prompt "Select AppFactoryData Implementation"
-        default CHIP_APP_FACTORY_DATA_IMPL_PLATFORM if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71
+        default CHIP_APP_FACTORY_DATA_IMPL_PLATFORM if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_RT1060
         default CHIP_APP_FACTORY_DATA_IMPL_PLATFORM if CHIP_ENABLE_SECURE_WHOLE_FACTORY_DATA || CHIP_ENABLE_EL2GO_FACTORY_DATA
         default CHIP_APP_FACTORY_DATA_IMPL_COMMON
 
@@ -109,32 +109,49 @@ config CHIP_APP_LOW_POWER
 
 config CHIP_APP_BUTTON
     bool "App Button"
-    default y
+    default y if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    default n
     help
         Enable the application Button implementation.
 
+choice CHIP_APP_BUTTON_REGISTRATION_SELECTION
+    prompt "App Button Registration Implementation Selection"
+    default CHIP_APP_BUTTON_REGISTRATION_EMPTY if !CHIP_APP_BUTTON
+    default CHIP_APP_BUTTON_REGISTRATION_APP_AND_BLE if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    default CHIP_APP_BUTTON_REGISTRATION_APP_ONLY if CHIP_NXP_PLATFORM_RW61X
+
+    config CHIP_APP_BUTTON_REGISTRATION_EMPTY
+        bool "App Button Registration Empty Implementation"
+        help
+            Enable Button registration empty implementation.
+
+    config CHIP_APP_BUTTON_REGISTRATION_DEFAULT
+        bool "App Button Registration Default Implementation"
+        help
+            Enable button registration default implementation.
+
+    config CHIP_APP_BUTTON_REGISTRATION_APP_AND_BLE
+        select CHIP_APP_BUTTON_APP
+        select CHIP_APP_BUTTON_BLE
+        bool "App Button Registration App and BLE Implementation"
+        help
+            Enable button registration app and ble implementation.
+
+    config CHIP_APP_BUTTON_REGISTRATION_APP_ONLY
+        select CHIP_APP_BUTTON_APP
+        bool "App Button Registration of App Implementation"
+        help
+            Enable button registration app implementation only.
+
+endchoice # CHIP_APP_BUTTON_REGISTRATION_SELECTION
+
 if  CHIP_APP_BUTTON
-    choice CHIP_APP_BUTTON_REGISTRATION_SELECTION
-        prompt "App Button Registration Implementation Selection"
-        default CHIP_APP_BUTTON_REGISTRATION_APP_BLE if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
-        default CHIP_APP_BUTTON_REGISTRATION_EMPTY
-
-        config CHIP_APP_BUTTON_REGISTRATION_EMPTY
-            bool "App Button Registration Empty Implementation"
-            help
-                Enable Button registration empty implementation.
-
-        config CHIP_APP_BUTTON_REGISTRATION_DEFAULT
-            bool "App Button Registration Default Implementation"
-            help
-                Enable button registration default implementation.
-
-        config CHIP_APP_BUTTON_REGISTRATION_APP_BLE
-            bool "App Button Registration App and BLE Implementation"
-            help
-                Enable button registration app and ble implementation.
-
-    endchoice # CHIP_APP_BUTTON_REGISTRATION_SELECTION
+    config CHIP_APP_BUTTON_HANDLE_SDK_NOT_PREDEFINED
+        bool "App button handle is not predefined within the SDK"
+        default n if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+        default y
+        help
+            App button handle is not predefined within the SDK
 
     config CHIP_APP_BUTTON_WITH_TIMER
         bool "App Button with Timer"
@@ -143,13 +160,11 @@ if  CHIP_APP_BUTTON
 
     config CHIP_APP_BUTTON_APP
         bool "App Button Custom"
-        default y if CHIP_APP_BUTTON_REGISTRATION_APP_BLE
         help
             Enable application custom button behavior.
 
     config CHIP_APP_BUTTON_BLE
         bool "App Button BLE" 
-        default y if CHIP_APP_BUTTON_REGISTRATION_APP_BLE
         select CHIP_APP_BUTTON_WITH_TIMER
         help
             Enable application custom button behavior for BLE.

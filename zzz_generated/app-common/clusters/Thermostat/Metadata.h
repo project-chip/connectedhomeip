@@ -276,6 +276,27 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SetpointHoldExpiryTime
                                                           BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
                                                           std::nullopt);
 } // namespace SetpointHoldExpiryTimestamp
+namespace MaxThermostatSuggestions {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxThermostatSuggestions::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace MaxThermostatSuggestions
+namespace ThermostatSuggestions {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ThermostatSuggestions::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace ThermostatSuggestions
+namespace CurrentThermostatSuggestion {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentThermostatSuggestion::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace CurrentThermostatSuggestion
+namespace ThermostatSuggestionNotFollowingReason {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(ThermostatSuggestionNotFollowingReason::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace ThermostatSuggestionNotFollowingReason
 
 } // namespace Attributes
 
@@ -304,6 +325,14 @@ namespace SetActivePresetRequest {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(SetActivePresetRequest::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kOperate);
 } // namespace SetActivePresetRequest
+namespace AddThermostatSuggestion {
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(AddThermostatSuggestion::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
+} // namespace AddThermostatSuggestion
+namespace RemoveThermostatSuggestion {
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(RemoveThermostatSuggestion::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
+} // namespace RemoveThermostatSuggestion
 namespace AtomicRequest {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AtomicRequest::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kManage);

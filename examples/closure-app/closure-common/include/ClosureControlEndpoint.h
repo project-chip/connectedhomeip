@@ -122,7 +122,7 @@ public:
      *
      * This function is called when a motion action has been stopped.
      * It should update the internal state of the closure control endpoint to reflect the
-     * completion of the stop motion action.
+     * stopping of the motion action.
      */
     void OnStopMotionActionComplete();
 
@@ -131,7 +131,7 @@ public:
      *
      * This function is called when the calibration action has been stopped.
      * It should update the internal state of the closure control endpoint to reflect the
-     * completion of the stop calibration action.
+     * stopping of the calibration action.
      */
     void OnStopCalibrateActionComplete();
 

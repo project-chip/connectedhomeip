@@ -123,8 +123,8 @@ public:
      * @brief Handles the completion of a stop motion action.
      *
      * This function is called when a motion action has been stopped.
-     * It should update the internal state of the closure dimension endpoint to reflect
-     * the completion of the stop motion action.
+     * It updates the internal state of the closure dimension endpoint to reflect the
+     * stopping of the motion action.
      */
     void OnStopMotionActionComplete();
 
@@ -132,8 +132,8 @@ public:
      * @brief Handles the completion of the stop calibration action.
      *
      * This function is called when the calibration action has been stopped.
-     * It should update the internal state of the closure dimension endpoint to reflect
-     * the completion of the stop calibration action.
+     * It updates the internal state of the closure dimension endpoint to reflect the
+     * stopping of the calibration action.
      */
     void OnStopCalibrateActionComplete();
 
