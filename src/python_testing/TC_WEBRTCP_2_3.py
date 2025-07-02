@@ -113,9 +113,9 @@ class TC_WebRTCProvider_2_3(MatterBaseTest, WEBRTCPTestBase):
         asserts.assert_equal(len(current_sessions), 0, "CurrentSessions must be empty!")
 
         self.step(2)
-        # Send ProvideOffer with no VideoStreamID and no AudioStreamID 
+        # Send ProvideOffer with no VideoStreamID and no AudioStreamID
         cmd = cluster.Commands.ProvideOffer(
-            webRTCSessionID=NullValue, sdp=test_sdp, streamUsage=3, originatingEndpointID=endpoint) 
+            webRTCSessionID=NullValue, sdp=test_sdp, streamUsage=3, originatingEndpointID=endpoint)
         try:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             asserts.fail("Unexpected success on ProvideOffer with no VideoStreamID or AudioStreamID")
@@ -125,7 +125,7 @@ class TC_WebRTCProvider_2_3(MatterBaseTest, WEBRTCPTestBase):
         self.step(3)
         # Send ProvideOffer with null stream IDs
         cmd = cluster.Commands.ProvideOffer(
-            webRTCSessionID=NullValue, sdp=test_sdp, streamUsage=3, originatingEndpointID=endpoint, videoStreamID=NullValue, audioStreamID=NullValue) 
+            webRTCSessionID=NullValue, sdp=test_sdp, streamUsage=3, originatingEndpointID=endpoint, videoStreamID=NullValue, audioStreamID=NullValue)
         try:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             asserts.fail("Unexpected success on ProvideOffer with Null VideoStreamID and AudioStreamID")

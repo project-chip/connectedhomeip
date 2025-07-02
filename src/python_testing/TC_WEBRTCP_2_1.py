@@ -45,7 +45,6 @@ from mobly import asserts
 from TC_WEBRTCPTestBase import WEBRTCPTestBase
 
 
-
 class TC_WebRTCProvider_2_1(MatterBaseTest, WEBRTCPTestBase):
 
     def desc_TC_WebRTCProvider_2_1(self) -> str:
@@ -97,9 +96,9 @@ class TC_WebRTCProvider_2_1(MatterBaseTest, WEBRTCPTestBase):
         asserts.assert_equal(len(current_sessions), 0, "CurrentSessions must be empty!")
 
         self.step(2)
-        # Send SolicitOffer with no VideoStreamID and no AudioStreamID 
+        # Send SolicitOffer with no VideoStreamID and no AudioStreamID
         cmd = cluster.Commands.SolicitOffer(
-            streamUsage=3, originatingEndpointID=endpoint) 
+            streamUsage=3, originatingEndpointID=endpoint)
         try:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             asserts.fail("Unexpected success on SolicitOffer with no VideoStreamID or AudioStreamID")
@@ -169,7 +168,7 @@ class TC_WebRTCProvider_2_1(MatterBaseTest, WEBRTCPTestBase):
             cluster=cluster,
             attribute=cluster.Attributes.CurrentSessions
         )
- 
+
         asserts.assert_equal(len(current_sessions), 1, "Expected CurrentSessions to be 1")
 
 

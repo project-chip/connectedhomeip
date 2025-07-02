@@ -44,6 +44,7 @@ from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_bod
 from mobly import asserts
 from TC_WEBRTCPTestBase import WEBRTCPTestBase
 
+
 class TC_WebRTCProvider_2_5(MatterBaseTest, WEBRTCPTestBase):
 
     def desc_TC_WebRTCProvider_2_5(self) -> str:
@@ -91,9 +92,9 @@ class TC_WebRTCProvider_2_5(MatterBaseTest, WEBRTCPTestBase):
         asserts.assert_equal(len(current_sessions), 0, "CurrentSessions must be empty!")
 
         self.step(2)
-        # Send SolicitOffer with no VideoStreamID and no AudioStreamID 
+        # Send SolicitOffer with no VideoStreamID and no AudioStreamID
         cmd = cluster.Commands.SolicitOffer(
-            streamUsage=3, originatingEndpointID=endpoint) 
+            streamUsage=3, originatingEndpointID=endpoint)
         try:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             asserts.fail("Unexpected success on SolicitOffer with no VideoStreamID or AudioStreamID")
@@ -103,7 +104,7 @@ class TC_WebRTCProvider_2_5(MatterBaseTest, WEBRTCPTestBase):
         self.step(3)
         # Send SolicitOffer with null stream IDs
         cmd = cluster.Commands.SolicitOffer(
-            streamUsage=3, originatingEndpointID=endpoint, videoStreamID=NullValue, audioStreamID=NullValue) 
+            streamUsage=3, originatingEndpointID=endpoint, videoStreamID=NullValue, audioStreamID=NullValue)
         try:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             asserts.fail("Unexpected success on SolicitOffer with Null VideoStreamID and AudioStreamID")
@@ -116,7 +117,7 @@ class TC_WebRTCProvider_2_5(MatterBaseTest, WEBRTCPTestBase):
         self.step(5)
         # Send SolicitOffer with null audio stream ID, valid video stream ID
         cmd = cluster.Commands.SolicitOffer(
-            streamUsage=3, originatingEndpointID=endpoint, videoStreamID=videoStreamID, audioStreamID=NullValue) 
+            streamUsage=3, originatingEndpointID=endpoint, videoStreamID=videoStreamID, audioStreamID=NullValue)
         try:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             asserts.fail("Unexpected success on SolicitOffer with valid VideoStreamID and Null AudioStreamID")
@@ -129,7 +130,7 @@ class TC_WebRTCProvider_2_5(MatterBaseTest, WEBRTCPTestBase):
         self.step(7)
         # Send SolicitOffer with valid audio stream ID, invalid video stream ID
         cmd = cluster.Commands.SolicitOffer(
-            streamUsage=3, originatingEndpointID=endpoint, videoStreamID=videoStreamID+1, audioStreamID=NullValue) 
+            streamUsage=3, originatingEndpointID=endpoint, videoStreamID=videoStreamID+1, audioStreamID=NullValue)
         try:
             await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
             asserts.fail("Unexpected success on SolicitOffer with invalid VideoStreamID and valid AudioStreamID")
