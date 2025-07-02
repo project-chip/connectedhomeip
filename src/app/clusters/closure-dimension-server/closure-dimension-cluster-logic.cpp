@@ -72,11 +72,11 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance, const Clus
 // When CurrentState.Speed changes, or
 // When CurrentState.Latch changes.
 
-// At present, QuieterReportingAttribute class doesnot support Stucts.
-//  so each field of current state struct are quiet handled independently.
-//  At present , we are using QuieterReportingAttribute class for Position only.
+// At present, QuieterReportingAttribute class does not support Structs.
+//  so each field of current state struct has to be handled independently.
+//  At present, we are using QuieterReportingAttribute class for Position only.
 //  Latch and Speed changes are directly handled by the cluster logic seperately.
-//  i.e Speed and latch changes are not considered when calucalting the atmost 5 seconds quiet reportable changes for Position.
+//  i.e Speed and latch changes are not considered when calucalting the at most 5 seconds quiet reportable changes for Position.
 CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimensionStateStruct> & incomingCurrentState)
 {
     assertChipStackLockedByCurrentThread();
@@ -160,7 +160,7 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
                                 CHIP_ERROR_INVALID_ARGUMENT);
         }
 
-        // Changes to this attribute SHALL only be marked as reportable when speed changes.
+        // Changes to this attribute SHALL be marked as reportable when speed changes.
         if (!mState.currentState.IsNull() && mState.currentState.Value().speed != incomingCurrentState.Value().speed)
         {
             markDirty = true;
