@@ -52,7 +52,7 @@ logger = logging.getLogger(__name__)
 cluster = Clusters.Thermostat
 
 
-class TC_TSTAT_4_2(MatterBaseTest):
+class TC_TSTAT_4_3(MatterBaseTest):
 
     def check_atomic_response(self, response: object, expected_status: Status = Status.Success,
                               expected_overall_status: Status = Status.Success,
@@ -201,58 +201,58 @@ class TC_TSTAT_4_2(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
 
-    def desc_TC_TSTAT_4_2(self) -> str:
+    def desc_TC_TSTAT_4_3(self) -> str:
         """Returns a description of this test"""
-        return "3.2.4 [TC-TSTAT-4-2] Test cases to read/write attributes and invoke commands for Preset feature with server as DUT"
+        return "3.1.5 [TC-TSTAT-4-3] This test case verifies that the DUT can respond to Preset suggestion commands."
 
-    def pics_TC_TSTAT_4_2(self):
+    def pics_TC_TSTAT_4_3(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
         return ["TSTAT.S"]
 
-    def steps_TC_TSTAT_4_2(self) -> list[TestStep]:
+    def steps_TC_TSTAT_4_3(self) -> list[TestStep]:
         steps = [
             TestStep("1", "Commissioning, already done",
                      is_commissioning=True),
-            TestStep("2", "TH writes to the Presets attribute without calling the AtomicRequest command",
-                     " Verify that the write request returns INVALID_IN_STATE error since the client didn't send a request to edit the presets by calling AtomicRequest command."),
-            TestStep("3", "TH writes to the Presets attribute after calling the AtomicRequest begin command but doesn't call AtomicRequest commit",
-                     "Verify that the Presets attribute was not updated since AtomicRequest commit command was not called."),
-            TestStep("4", "TH writes to the Presets attribute after calling the AtomicRequest begin command and calls AtomicRequest commit",
-                     "Verify that the Presets attribute was updated with new presets."),
-            TestStep("5", "TH writes to the Presets attribute with a built-in preset removed",
-                     "Verify that the AtomicRequest commit returned CONSTRAINT_ERROR (0x87)."),
-            TestStep("6", "TH writes to the Presets attribute with a preset removed whose handle matches the value in the ActivePresetHandle attribute",
-                     "Verify that the AtomicRequest commit returned INVALID_IN_STATE (0xcb)."),
-            TestStep("7", "TH writes to the Presets attribute with a built-in preset modified to be not built-in",
-                     "Verify that the AtomicRequest commit returned CONSTRAINT_ERROR (0x87)."),
-            TestStep("8", "TH writes to the Presets attribute with a new preset having builtIn set to true",
-                     "Verify that the AtomicRequest commit returned CONSTRAINT_ERROR (0x87)."),
-            TestStep("9", "TH writes to the Presets attribute with a new preset having a preset handle that doesn't exist in the Presets attribute",
-                     "Verify that the AtomicRequest commit returned NOT_FOUND (0x8b)."),
-            TestStep("10", "TH writes to the Presets attribute with duplicate presets",
-                     "Verify that the AtomicRequest commit returned CONSTRAINT_ERROR (0x87)."),
-            TestStep("11", "TH writes to the Presets attribute with a non built-in preset modified to be built-in",
-                     "Verify that the AtomicRequest commit returned CONSTRAINT_ERROR (0x87)."),
-            TestStep("12", "TH writes to the Presets attribute with a preset that doesn't support names in the PresetTypeFeatures bitmap but has a name",
-                     "Verify that the AtomicRequest commit returned CONSTRAINT_ERROR (0x87)."),
-            TestStep("13", "TH writes to the Presets attribute but calls the AtomicRequest rollback command to cancel the edit request",
-                     "Verify that the edit request was rolled back"),
-            TestStep("14", "TH starts an atomic write, and TH2 attempts to open an atomic write before TH is complete",
-                     "Verify that the atomic request is rejected"),
-            TestStep("15", "TH starts an atomic write, and TH2 attempts to write to presets",
-                     "Verify that the write request is rejected"),
-            TestStep("16", "TH starts an atomic write, and before it's complete, TH2 removes TH's fabric; TH2 then opens an atomic write",
-                     "Verify that the atomic request is successful"),
-            TestStep("17", "TH writes to the Presets attribute with a preset that has a presetScenario not present in PresetTypes attribute",
-                     "Verify that the write request returned CONSTRAINT_ERROR (0x87)."),
-            TestStep("18", "TH writes to the Presets attribute such that the total number of presets is greater than the number of presets supported",
-                     "Verify that the write request returned RESOURCE_EXHAUSTED (0x89)."),
+            TestStep("2", "TH reads the Presets attribute and saves it in a SupportedPresets variable.",
+                     "Verify that the read returned a list of presets with count >=2."),
+            TestStep("3", "TH reads the ActivePresetHandle attribute. TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and the ExpirationInMinutes is set to 1 minute.",
+                     "Verify that the AddThermostatSuggestion command returns INVALID_IN_STATE."),
+            TestStep("4", "TH sends Time Synchronization command to DUT using a time source.",
+                     "Verify that TH and DUT are now time synchronized."),
+            TestStep("5", "TH picks a random preset handle that does not match any entry in the Presets attribute and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp the ExpirationInMinutes is set to 1 minute.",
+                     "Verify that the AddThermostatSuggestion command returns NOT_FOUND."),
+            TestStep("6a", "TH reads the ActivePresetHandle attribute. TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and the ExpirationInMinutes is set to 1 minute. TH reads the CurrentThermostatSuggestion, the ThermostatSuggestionNotFollowingReason and the ActivePresetHandle attributes.",
+                     "Verify that the AddThermostatSuggestion command returns a AddThermostatSuggestionResponse with a distinct value in the UniqueID field. Verify that the ThermostatSuggestions has one entry with the UniqueID field matching the UniqueID sent in the AddThermostatSuggestionResponse. Verify that the CurrentThermostatSuggestion attribute is set to the uniqueID, preset handle, the EffectiveTime, and the EffectiveTime plus ExpirationInMinutes (converted to seconds) passed in the AddThermostatSuggestion command. If the ThermostatSuggestionNotFollowingReason is set to null, verify that the ActivePresetHandle attribute is set to the PresetHandle field of the CurrentThermostatSuggestion attribute."),
+            TestStep("6b", "TH waits until the UTC timestamp specified in the ExpirationTime field in the CurrentThermostatSuggestion for the suggestion to expire.",
+                     "Verify that the entry with the UniqueID matching the UniqueID field in the CurrentThermostatSuggestion attribute is removed from the ThermostatSuggestions attribute and the CurrentThermostatSuggestion attribute is set to null."),
+            TestStep("7a", "TH sets TemperatureSetpointHold to SetpointHoldOn and TemperatureSetpointHoldDuration to null. TH reads the ActivePresetHandle attribute. TH picks any preset handle from the \"SupportedPresets\" variable that does not match the ActivePresetHandle and and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and the ExpirationInMinutes is set to 1 minute. TH reads the CurrentThermostatSuggestion, the ThermostatSuggestionNotFollowingReason and the ActivePresetHandle attributes.",
+                     "Verify that the TemperatureSetpointHold is set to SetpointHoldOn and TemperatureSetpointHoldDuration is set to null. Verify that the AddThermostatSuggestion command returns an AddThermostatSuggestionResponse with a distinct value in the UniqueID field. Verify that the ThermostatSuggestions has one entry with the UniqueID field matching the UniqueID sent in the AddThermostatSuggestionResponse. Verify that the CurrentThermostatSuggestion attribute is set to the uniqueID, preset handle, the EffectiveTime, and the EffectiveTime plus ExpirationInMinutes (converted to seconds) passed in the AddThermostatSuggestion command, the ThermostatSuggestionNotFollowingReason is set to OngoingHold and the ActivePresetHandle attribute is not updated to the PresetHandle field of the CurrentThermostatSuggestion attribute."),
+            TestStep("7b", "TH sets TemperatureSetpointHold to SetpointHoldOff after 10 seconds. TH reads the CurrentThermostatSuggestion, the ThermostatSuggestionNotFollowingReason and the ActivePresetHandle attributes.",
+                     "Verify that the TemperatureSetpointHold is set to SetpointHoldOff. If the ThermostatSuggestionNotFollowingReason is set to null, verify that the ActivePresetHandle attribute is updated to the PresetHandle field of the CurrentThermostatSuggestion attribute."),
+            TestStep("7c", "TH waits until the UTC timestamp specified in the ExpirationTime field in the CurrentThermostatSuggestion for the suggestion to expire.",
+                     "Verify that the entry with the UniqueID matching the UniqueID field in the CurrentThermostatSuggestion attribute is removed from the ThermostatSuggestions attribute and the CurrentThermostatSuggestion attribute is set to null."),
+            TestStep("8a", "TH reads the ActivePresetHandle attribute. TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and the ExpirationInMinutes is set to 1 minute. TH reads the CurrentThermostatSuggestion, the ThermostatSuggestionNotFollowingReason and the ActivePresetHandle attributes.",
+                     "Verify that the AddThermostatSuggestion command returns an AddThermostatSuggestionResponse with a value in the UniqueID field. Verify that the ThermostatSuggestions has one entry with the UniqueID field matching the UniqueID sent in the AddThermostatSuggestionResponse. Verify that the CurrentThermostatSuggestion attribute is set to the uniqueID, preset handle, the EffectiveTime, and the EffectiveTime plus ExpirationInMinutes (converted to seconds) passed in the AddThermostatSuggestion command. If the ThermostatSuggestionNotFollowingReason is set to null, verify that the ActivePresetHandle attribute is set to the PresetHandle field of the CurrentThermostatSuggestion attribute."),
+            TestStep("8b", "TH calls the RemoveThermostatSuggestion command with the UniqueID field set to a value not matching the UniqueID field of the CurrentThermostatSuggestion attribute.",
+                     "Verify that RemoveThermostatSuggestion command returns NOT_FOUND."),
+            TestStep("8c", "TH calls the RemoveThermostatSuggestion command with the UniqueID field set to the UniqueID field of then CurrentThermostatSuggestion attribute.",
+                     "Verify that that RemoveThermostatSuggestion command returns SUCCESS, the entry with the relevant UniqueID is removed from the ThermostatSuggestions attribute and the CurrentThermostatSuggestion attribute is set to null."),   
+            TestStep("9a", "TH reads the ActivePresetHandle attribute and saves it. TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and the ExpirationInMinutes is set to 2 minutes. TH calls the AddThermostatSuggestion command again with the saved ActivePresetHandle attribute value, the EffectiveTime set to the current UTC timestamp and the ExpirationInMinutes is set to 1 minute.",
+                     "Verify that both the AddThermostatSuggestion command return a AddThermostatSuggestionResponse with distinct values in the UniqueID field. TH saves both the UniqueID values. Verify that the ThermostatSuggestions has two entries with the UniqueID field matching one of the UniqueID fields sent in the two AddThermostatSuggestionResponse(s). Verify that the CurrentThermostatSuggestion attribute is set to the uniqueID, preset handle, the EffectiveTime, and the EffectiveTime plus ExpirationInMinutes (converted to seconds) of one of the entries in ThermostatSuggestions. If the ThermostatSuggestionNotFollowingReason is set to null, verify that the ActivePresetHandle attribute is set to the PresetHandle field of the CurrentThermostatSuggestion attribute."), 
+            TestStep("9b", "TH waits until the timestamp value specified in the earliest ExpirationTime field in the two entries in the ThermostatSuggestions attribute.",
+                     "Verify that the entry with the UniqueID that matches the earliest ExpirationTime in the two entries in the ThermostatSuggestions attribute is removed from the ThermostatSuggestions attribute and the CurrentThermostatSuggestion attribute is set to the remaining entry in the ThermostatSuggestions attribute. If the ThermostatSuggestionNotFollowingReason is set to null, verify that the ActivePresetHandle attribute is set to the PresetHandle field of the CurrentThermostatSuggestion attribute."),     
+            TestStep("9c", "TH waits until the UTC timestamp specified in the ExpirationTime field in the CurrentThermostatSuggestion for the suggestion to expire.",
+                     "Verify that the entry with the UniqueID matching the UniqueID field in the CurrentThermostatSuggestion attribute is removed from the ThermostatSuggestions attribute and the CurrentThermostatSuggestion attribute is set to null."), 
+            TestStep("10", "TH reads the ActivePresetHandle attribute. TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp plus 25 hours and the ExpirationInMinutes is set to 30 minutes.",
+                     "Verify that the AddThermostatSuggestion command returns INVALID_COMMAND."), 
+            TestStep("11", "TH reads the MaxThermostatSuggestions attribute. TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and the ExpirationInMinutes is set to 1 minute for the number of times specified in the value of MaxThermostatSuggestions + 1.",
+                     "Verify that the AddThermostatSuggestion command returns SUCCESS and the ThermostatSuggestions attribute has one entry added to it for the first {MaxThermostatSuggestions} times. Verify that when the AddThermostatSuggestion command is called for the {MaxThermostatSuggestions + 1} time, the AddThermostatSuggestion command returns RESOURCE_EXHAUSTED.")
         ]
 
         return steps
 
     @ async_test_body
-    async def test_TC_TSTAT_4_2(self):
+    async def test_TC_TSTAT_4_3(self):
         endpoint = self.get_endpoint()
 
         self.step("1")
