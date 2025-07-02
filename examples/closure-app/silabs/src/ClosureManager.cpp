@@ -263,11 +263,11 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         break;
     case Action_t::PANEL_STEP_ACTION:
         instance.mClosureEndpoint1.OnPanelMotionActionComplete();
-        if (instance.mCurrentActionEndpointId == instance.mClosurePanelEndpoint2.GetEndpoint())
+        if (instance.mCurrentActionEndpointId == instance.mClosurePanelEndpoint2.GetEndpointId())
         {
             instance.mClosurePanelEndpoint2.OnPanelMotionActionComplete();
         }
-        else if (instance.mCurrentActionEndpointId == instance.mClosurePanelEndpoint3.GetEndpoint())
+        else if (instance.mCurrentActionEndpointId == instance.mClosurePanelEndpoint3.GetEndpointId())
         {
             instance.mClosurePanelEndpoint3.OnPanelMotionActionComplete();
         }
@@ -459,11 +459,11 @@ ClosureDimension::ClosureDimensionEndpoint * ClosureManager::GetPanelEndpointByI
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
-    if (endpointId == instance.mClosurePanelEndpoint2.GetEndpoint())
+    if (endpointId == instance.mClosurePanelEndpoint2.GetEndpointId())
     {
         return &instance.mClosurePanelEndpoint2;
     }
-    else if (endpointId == instance.mClosurePanelEndpoint3.GetEndpoint())
+    else if (endpointId == instance.mClosurePanelEndpoint3.GetEndpointId())
     {
         return &instance.mClosurePanelEndpoint3;
     }

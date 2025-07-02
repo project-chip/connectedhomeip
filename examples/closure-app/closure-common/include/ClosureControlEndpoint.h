@@ -171,7 +171,6 @@ public:
      */
     EndpointId GetEndpointId() const { return mEndpoint; }
 
-
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
     MatterContext mContext;
