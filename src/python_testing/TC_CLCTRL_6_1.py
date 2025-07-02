@@ -38,7 +38,8 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback,
+from chip.testing.event_attribute_reporting import EventChangeCallback, ClusterAttributeChangeAccumulator
+from chip.testing.matter_testing import (AttributeMatcher, AttributeValue,
                                          MatterBaseTest, TestStep, async_test_body, default_matter_test_main)
 from mobly import asserts
 
@@ -257,7 +258,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 # STEP 3e: If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip step 3f
                 self.step("3e")
                 sub_handler.reset()
-                
+
                 if (int(bin(LatchControlModes), 2) & (1 << 1)) == 2:
                     logging.info("RemoteUnlatching is True, proceeding to step 3f")
 
