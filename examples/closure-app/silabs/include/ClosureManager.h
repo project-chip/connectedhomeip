@@ -40,7 +40,7 @@ public:
         MOVE_TO_ACTION,
         STOP_ACTION,
         PANEL_STEP_ACTION,
-        
+
         INVALID_ACTION
     };
 
