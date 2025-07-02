@@ -42,8 +42,8 @@ import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest,
-                                         TestStep, async_test_body, default_matter_test_main)
+from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
+                                         default_matter_test_main)
 from chip.tlv import uint
 from mobly import asserts
 
