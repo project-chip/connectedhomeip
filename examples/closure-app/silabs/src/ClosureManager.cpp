@@ -35,7 +35,7 @@ using namespace chip::app::Clusters::ClosureControl;
 using namespace chip::app::Clusters::ClosureDimension;
 
 namespace {
-  
+
 constexpr uint32_t kDefaultCountdownTimeSeconds = 10;    // 10 seconds
 constexpr uint32_t kCalibrateTimerMs            = 10000; // 10 seconds
 constexpr uint32_t kMotionCountdownTimeMs         = 1000; // 1 second for each motion.
