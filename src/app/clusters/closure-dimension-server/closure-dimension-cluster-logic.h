@@ -389,7 +389,6 @@ private:
     DelegateBase & mDelegate;
     MatterContext & mMatterContext;
 
-
     // At Present, QuieterReportingAttribute doesnt support Structs.
     // So, this variable will be used for Quietreporting of current state position.
     // TODO: Refactor CurrentState Atrribute to use QuieterReportingAttribute once Issue#39801 is resolved
