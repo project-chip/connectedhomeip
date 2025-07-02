@@ -569,9 +569,8 @@ void TariffPeriodsDataClass::CleanupStructValue(PayloadType & aValue)
 {
     if (!aValue.label.IsNull() && aValue.label.Value().data())
     {
-        auto & tmp_label = aValue.label;
-        MemoryFree(const_cast<char *>(tmp_label.Value().data()));
-        tmp_label.SetNull();
+        MemoryFree(const_cast<char *>(aValue.label.Value().data()));
+        aValue.label.SetNull();
     }
     CommonUtilities::CleanUpIDs(aValue.dayEntryIDs);
     CommonUtilities::CleanUpIDs(aValue.tariffComponentIDs);
