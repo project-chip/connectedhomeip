@@ -1573,5 +1573,3 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_UpdateLatchWhenLatched)
 
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
 }
-
-
