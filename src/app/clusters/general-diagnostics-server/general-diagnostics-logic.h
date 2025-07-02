@@ -81,6 +81,8 @@ public:
     HandlePayloadTestRequest(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                              const GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType & commandData);
 
+    CHIP_ERROR Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
+
 private:
     TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(ByteSpan enableKey);
     bool IsByteSpanAllZeros(const ByteSpan & byteSpan);
