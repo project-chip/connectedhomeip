@@ -131,8 +131,8 @@ public:
     ///
     // Implementation of BleLayerDelegate
 
-    void OnBleConnectionComplete(BLEEndPoint * endpoint) override {}
-    void OnBleConnectionError(CHIP_ERROR err) override {}
+    void OnBleConnectionComplete(BLEEndPoint * endpoint) override { mOnConnectionCompleteCount++; }
+    void OnBleConnectionError(CHIP_ERROR err) override { mOnConnectionErrorCount++; }
     void OnEndPointConnectComplete(BLEEndPoint * endPoint, CHIP_ERROR err) override {}
     void OnEndPointMessageReceived(BLEEndPoint * endPoint, System::PacketBufferHandle && msg) override {}
     void OnEndPointConnectionClosed(BLEEndPoint * endPoint, CHIP_ERROR err) override {}
@@ -445,13 +445,15 @@ TEST_F(TestBleLayer, NewConnectionByDiscriminatorsSuccess)
         chip::Test::BleLayerTestAccess tempAccess(testLayer);
         EXPECT_NE(testLayer, nullptr);
 
-        testLayer->mOnConnectionCompleteCount++;
+        // testLayer->mOnConnectionCompleteCount++;
         tempAccess.CallOnConnectionComplete(appState, connObj);
     };
     auto OnError = [](void * appState, CHIP_ERROR err) {};
 
     EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_NO_ERROR);
     OnSuccess(this, discriminatorsSpan[0].GetLongValue(), GetConnectionObject());
+    // EXPECT_EQ(mOnConnectionCompleteCount, 1);
+    // EXPECT_EQ(mOnConnectionErrorCount, 0);
 }
 
 }; // namespace Ble
