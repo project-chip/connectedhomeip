@@ -185,7 +185,8 @@ private:
 
         mMeteredQuantityTimestamp.SetNonNull(matterEpoch);
 
-        if (mTariffUnit.Value() == Globals::TariffUnitEnum::kKWh)
+        if ( mTariffUnit.IsNull() ||
+           (mTariffUnit.Value() == Globals::TariffUnitEnum::kKWh) )
         {
             mTariffUnit.SetNonNull(Globals::TariffUnitEnum::kKVAh);
         }
