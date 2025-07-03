@@ -880,7 +880,27 @@ protected:
 
     virtual CHIP_ERROR Validate(const ValueType & aValue) const { return CHIP_NO_ERROR; }
 
-    virtual bool CompareStructValue(const PayloadType & source, const PayloadType & destination) const
+    /**
+     * @brief Compares two structured values for inequality
+     * @param source The new/input value being compared
+     * @param destination The existing/stored value being compared against
+     * @return bool 
+     *   - true if values are different (needs update)
+     *   - false if values are identical (no update needed)
+     * @note This intentionally uses "Compare" in the name but implements "not equal" semantics
+     *       to match the expected behavior in change detection flows.
+     * @warning Must be overridden for any struct payload types. The base implementation
+     *          always returns false (no change) and logs an error.
+     * 
+     * Example override:
+     * @code
+     * bool CompareStructValue(const MyStruct& src, const MyStruct& dst) const override {
+     *     return src.field1 != dst.field1 || 
+     *            src.field2 != dst.field2;
+     * }
+     * @endcode
+     */
+    virtual bool CompareStructValue(const PayloadType& source, const PayloadType& destination) const
     {
         ChipLogError(NotSpecified, "CompareStructValue must be overridden for struct types!");
         return false;
