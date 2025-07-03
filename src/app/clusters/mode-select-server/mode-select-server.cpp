@@ -335,7 +335,8 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
         if (status == Status::Success && !startUpMode.IsNull())
         {
 
-#ifdef MATTER_DM_PLUGIN_ON_OFF
+if (MATTER_DM_PLUGIN_ON_OFF)
+{
             // OnMode with Power Up
             // If the On/Off feature is supported and the On/Off cluster attribute StartUpOnOff is present, with a
             // value of On (turn on at power up), then the CurrentMode attribute SHALL be set to the OnMode attribute
@@ -357,7 +358,7 @@ void emberAfModeSelectClusterServerInitCallback(EndpointId endpointId)
                     }
                 }
             }
-#endif // MATTER_DM_PLUGIN_ON_OFF
+}
 
             BootReasonType bootReason = BootReasonType::kUnspecified;
             CHIP_ERROR error          = DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason);
