@@ -169,6 +169,10 @@ public:
                              OnConnectionByDiscriminatorsCompleteFunct onConnectionComplete,
                              OnConnectionErrorFunct onConnectionError) override
     {
+        if (discriminators.empty())
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
         return CHIP_NO_ERROR;
     }
 
@@ -406,6 +410,23 @@ TEST_F(TestBleLayer, ExceedBleConnectionEndPointLimit)
 
 TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNotInitialized)
 {
+    // Force the layer to become uninitialized
+    Shutdown();
+
+    SetupDiscriminator discriminators[] = { SetupDiscriminator(), SetupDiscriminator() };
+    Span<const SetupDiscriminator> discriminatorsSpan(discriminators, 2);
+
+    auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {};
+    auto OnError   = [](void * appState, CHIP_ERROR err) {};
+
+    EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_ERROR_INCORRECT_STATE);
+}
+
+TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoConnectionDelegate)
+{
+    chip::Test::BleLayerTestAccess access(this);
+    access.SetConnectionDelegate(nullptr);
+
     SetupDiscriminator discriminators[] = { SetupDiscriminator(), SetupDiscriminator() };
     Span<const SetupDiscriminator> discriminatorsSpan(discriminators, 2);
 
@@ -452,6 +473,19 @@ TEST_F(TestBleLayer, NewConnectionByDiscriminatorsSuccess)
     OnSuccess(bleLayerState, discriminatorsSpan[0].GetLongValue(), GetConnectionObject());
     EXPECT_EQ(mOnConnectionCompleteCount, 1);
     EXPECT_EQ(mOnConnectionErrorCount, 0);
+}
+
+TEST_F(TestBleLayer, NewConnectionByDiscriminatorsEmptySpan)
+{
+    chip::Test::BleLayerTestAccess access(this);
+    access.SetConnectionDelegate(this);
+
+    Span<const SetupDiscriminator> discriminatorsSpan;
+
+    auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {};
+    auto OnError   = [](void * appState, CHIP_ERROR err) {};
+
+    EXPECT_NE(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_NO_ERROR);
 }
 
 }; // namespace Ble
