@@ -15,5 +15,5 @@ group("mode-select-server") {
 }
 
 config("includes") {
-      defines = [ "MATTER_DM_PLUGIN_ON_OFF=1" ]
+  defines = [ "MATTER_DM_PLUGIN_ON_OFF=1" ]
 }
