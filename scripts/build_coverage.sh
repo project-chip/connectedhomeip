@@ -242,7 +242,7 @@ genhtml "$COVERAGE_ROOT/lcov_final.info" \
 cp "$CHIP_ROOT/integrations/appengine/webapp_config.yaml" \
     "$COVERAGE_ROOT/webapp_config.yaml"
 
-HTML_INDEX=$(_normpath "$COVERAGE_ROOT/html/index.html")
+HTML_INDEX=$(realpath "$COVERAGE_ROOT/html/index.html")
 if [ -f "$HTML_INDEX" ]; then
     echo
     echo "============================================================"
