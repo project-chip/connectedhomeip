@@ -166,6 +166,13 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     //
     //       See https://github.com/project-chip/connectedhomeip/issues/37410
 
+    auto clusterInfo = serverClusterFinder.Find(path);
+
+    if (clusterInfo == std::nullopt)
+    {
+        return Status::UnsupportedCluster;
+    }
+
     if (auto access_status = ValidateReadAttributeACL(dataModel, subjectDescriptor, path); access_status.has_value())
     {
         status = *access_status;
