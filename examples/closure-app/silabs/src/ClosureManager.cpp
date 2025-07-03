@@ -163,7 +163,9 @@ void ClosureManager::InitiateAction(AppEvent * event)
         ChipLogDetail(AppServer, "Initiating unlatch action");
         // Unlatch action check is a prerequisite for the move to action.
         // In a real application, this would be replaced with actual unlatch logic.
-        instance.StartTimer(kMotionCountdownTimeMs);
+        PlatformMgr().ScheduleWork([](intptr_t) {
+            ClosureManager::GetInstance().HandleClosureUnlatchAction();
+        });
         break;
     case Action_t::SET_TARGET_ACTION:
         ChipLogDetail(AppServer, "Initiating set target action");
@@ -232,14 +234,7 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
         break;
     case Action_t::MOVE_TO_ACTION:
         PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager & instance = ClosureManager::GetInstance();
-            instance.HandleClosureMotionAction();
-        });
-        break;
-    case Action_t::UNLATCH_ACTION:
-        PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager & instance = ClosureManager::GetInstance();
-            instance.HandleClosureUnlatchAction();
+            ClosureManager::GetInstance().HandleClosureMotionAction();
         });
         break;
     case Action_t::SET_TARGET_ACTION:
@@ -316,11 +311,6 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         instance.mClosurePanelEndpoint2.OnMoveToActionComplete();
         instance.mClosurePanelEndpoint3.OnMoveToActionComplete();
         instance.isMoveToInProgress = false;
-        break;
-    case Action_t::UNLATCH_ACTION:
-        // HandleClosureActionComplete should not be called for UNLATCH_ACTION,
-        // as unlatch action is prerequisite for MOVE_TO_ACTION.
-        ChipLogError(AppServer, "HandleClosureActionComplete should not be called for UNLATCH_ACTION");
         break;
     case Action_t::SET_TARGET_ACTION:
         instance.mClosureEndpoint1.OnPanelMotionActionComplete();
@@ -614,7 +604,7 @@ void ClosureManager::HandleClosureMotionAction()
     if (ep1CurrentState.Value().latch.HasValue() && !ep1CurrentState.Value().latch.Value().IsNull() &&
         ep1TargetState.Value().latch.HasValue() && !ep1TargetState.Value().latch.Value().IsNull())
     {
-        // If currently latched (false) and target is unlatched (true), unlatch first before moving
+        // If currently unlatched (false) and target is latched (true), latch after moving to target position.
         if (!ep1CurrentState.Value().latch.Value().Value() && ep1TargetState.Value().latch.Value().Value())
         {
             // In Real application, this would be replaced with actual unlatch logic.
@@ -825,8 +815,14 @@ void ClosureManager::HandleClosureUnlatchAction()
     if (ep1CurrentState.Value().latch.HasValue() && !ep1CurrentState.Value().latch.Value().IsNull() &&
         ep1TargetState.Value().latch.HasValue() && !ep1TargetState.Value().latch.Value().IsNull())
     {
-        // If currently latched (true) and target is unlatched (false), unlatch first before moving
-        if (ep1CurrentState.Value().latch.Value().Value() && !ep1TargetState.Value().latch.Value().Value())
+        bool ep1CurrentLatchValue = ep1CurrentState.Value().latch.Value().Value();
+        bool ep2CurrentLatchValue = ep2CurrentState.Value().latch.HasValue() && !ep2CurrentState.Value().latch.Value().IsNull() &&
+                                    ep2CurrentState.Value().latch.Value().Value();
+        bool ep3CurrentLatchValue = ep3CurrentState.Value().latch.HasValue() && !ep3CurrentState.Value().latch.Value().IsNull() &&
+                                    ep3CurrentState.Value().latch.Value().Value();
+
+        // If currently Closure or any panel is latched (true) and target is unlatched (false), unlatch first before moving
+        if ((ep1CurrentLatchValue || ep2CurrentLatchValue || ep3CurrentLatchValue) && !ep1TargetState.Value().latch.Value().Value())
         {
             // In Real application, this would be replaced with actual unlatch logic.
             ChipLogProgress(AppServer, "Performing unlatch action");
