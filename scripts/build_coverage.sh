@@ -100,7 +100,8 @@ for i in "$@"; do
             shift
             ;;
         --target=*)
-            TEST_TARGET=(${i#*=})
+            TEST_TARGET="${i#*=}"
+            IFS=' ' read -ra TEST_TARGET <<<"$TEST_TARGET"
             shift
             ;;
         -o=* | --output_root=*)
