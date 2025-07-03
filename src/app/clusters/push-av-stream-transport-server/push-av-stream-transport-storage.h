@@ -110,7 +110,7 @@ struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
         return *this;
     }
 
-    TransportTriggerOptionsStorage(Structs::TransportTriggerOptionsStruct::DecodableType & triggerOptions)
+    TransportTriggerOptionsStorage(const Structs::TransportTriggerOptionsStruct::DecodableType & triggerOptions)
     {
         *this = triggerOptions;
     }
@@ -160,6 +160,10 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
             CopySpanToMutableSpan(aCMAFContainerOptions.CENCKey.Value(), CENCKeyBuffer);
             CENCKey.SetValue(CENCKeyBuffer);
         }
+        else
+        {
+            CENCKey.ClearValue();
+        }
 
         metadataEnabled = aCMAFContainerOptions.metadataEnabled;
 
@@ -170,40 +174,17 @@ struct CMAFContainerOptionsStorage : public CMAFContainerOptionsStruct
             CopySpanToMutableSpan(aCMAFContainerOptions.CENCKeyID.Value(), CENCKeyIDBuffer);
             CENCKeyID.SetValue(CENCKeyIDBuffer);
         }
-
-        return *this;
-    }
-
-    CMAFContainerOptionsStorage(Structs::CMAFContainerOptionsStruct::Type & CMAFContainerOptions)
-    {
-
-        chunkDuration = CMAFContainerOptions.chunkDuration;
-
-        if (CMAFContainerOptions.CENCKey.HasValue())
-        {
-            MutableByteSpan CENCKeyBuffer(mCENCKeyBuffer);
-            // ValidateIncomingTransportOptions() function already checked the CENCKeyID length
-            CopySpanToMutableSpan(CMAFContainerOptions.CENCKey.Value(), CENCKeyBuffer);
-            CENCKey.SetValue(CENCKeyBuffer);
-        }
-        else
-        {
-            CENCKey.ClearValue();
-        }
-
-        metadataEnabled = CMAFContainerOptions.metadataEnabled;
-
-        if (CMAFContainerOptions.CENCKey.HasValue())
-        {
-            MutableByteSpan CENCKeyIDBuffer(mCENCKeyIDBuffer);
-            // ValidateIncomingTransportOptions() function already checked the CENCKeyID length
-            CopySpanToMutableSpan(CMAFContainerOptions.CENCKeyID.Value(), CENCKeyIDBuffer);
-            CENCKeyID.SetValue(CENCKeyIDBuffer);
-        }
         else
         {
             CENCKeyID.ClearValue();
         }
+
+        return *this;
+    }
+
+    CMAFContainerOptionsStorage(const Structs::CMAFContainerOptionsStruct::Type & CMAFContainerOptions)
+    {
+        *this = CMAFContainerOptions;
     }
 
 private:
@@ -251,20 +232,7 @@ struct ContainerOptionsStorage : public ContainerOptionsStruct
         return *this;
     }
 
-    ContainerOptionsStorage(Structs::ContainerOptionsStruct::DecodableType & containerOptions)
-    {
-        containerType = containerOptions.containerType;
-
-        if (containerType == ContainerFormatEnum::kCmaf)
-        {
-            mCMAFContainerStorage = containerOptions.CMAFContainerOptions.Value();
-            CMAFContainerOptions.SetValue(mCMAFContainerStorage);
-        }
-        else
-        {
-            CMAFContainerOptions.ClearValue();
-        }
-    }
+    ContainerOptionsStorage(const Structs::ContainerOptionsStruct::DecodableType & containerOptions) { *this = containerOptions; }
 
 private:
     CMAFContainerOptionsStorage mCMAFContainerStorage;
@@ -310,7 +278,7 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         return *this;
     }
 
-    TransportOptionsStorage(Structs::TransportOptionsStruct::DecodableType transportOptions)
+    TransportOptionsStorage & operator=(const Structs::TransportOptionsStruct::DecodableType & transportOptions)
     {
         streamUsage   = transportOptions.streamUsage;
         videoStreamID = transportOptions.videoStreamID;
@@ -331,7 +299,11 @@ struct TransportOptionsStorage : public TransportOptionsStruct
         containerOptions         = mContainerOptionsStorage;
 
         expiryTime = transportOptions.expiryTime;
+
+        return *this;
     }
+
+    TransportOptionsStorage(const Structs::TransportOptionsStruct::DecodableType & transportOptions) { *this = transportOptions; }
 
 private:
     char mUrlBuffer[kMaxUrlLength];
