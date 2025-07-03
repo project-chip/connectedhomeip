@@ -199,7 +199,7 @@ class TC_SEAR_1_2(MatterBaseTest):
                                         f"Progress entry should have a null TotalOperationalTime value (Status is {p.status})")
                 # TODO how to check that InitialTimeEstimate is either null or uint32?
 
-    def TC_SEAR_1_2(self) -> list[str]:
+    def pics_TC_SEAR_1_2(self) -> list[str]:
         return ["SEAR.S"]
 
     @async_test_body
