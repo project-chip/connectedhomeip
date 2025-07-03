@@ -181,10 +181,10 @@ public:
 
     /**
      * @brief Gets the current error list.
-     *        This method is used to retrieve the current error list. 
+     *        This method is used to retrieve the current error list.
      *        The outputSpan must be of size kCurrentErrorListMaxSize.
      * @param[out] outputSpan The span to fill with the current error list.
-     * 
+     *
      * @return CHIP_NO_ERROR if the retrieval was successful.
      *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
      *         CHIP_ERROR_BUFFER_TOO_SMALL if the outputSpan size is not equal to kCurrentErrorListMaxSize.
