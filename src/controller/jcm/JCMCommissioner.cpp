@@ -311,10 +311,12 @@ CHIP_ERROR JCMDeviceCommissioner::ParseExtraCommissioningInfo(ReadCommissioningI
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     if (!params.GetUseJCM().ValueOr(false))
     {
         return DeviceCommissioner::ParseExtraCommissioningInfo(info, params);
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     err = ParseAdminFabricIndexAndEndpointId(info);
     if (err != CHIP_NO_ERROR)
@@ -337,7 +339,7 @@ CHIP_ERROR JCMDeviceCommissioner::ParseExtraCommissioningInfo(ReadCommissioningI
         return err;
     }
 
-    return err;
+    return DeviceCommissioner::ParseExtraCommissioningInfo(info, params);
 }
 
 JCMTrustVerificationError JCMDeviceCommissioner::VerifyAdministratorInformation()
@@ -526,6 +528,7 @@ CHIP_ERROR JCMAutoCommissioner::SetCommissioningParameters(const CommissioningPa
 {
     ReturnErrorOnFailure(AutoCommissioner::SetCommissioningParameters(params));
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     if (params.GetUseJCM().ValueOr(false))
     {
         auto extraReadPaths = params.GetExtraReadPaths();
@@ -538,6 +541,7 @@ CHIP_ERROR JCMAutoCommissioner::SetCommissioningParameters(const CommissioningPa
         // Set the extra read paths for JCM
         mParams.SetExtraReadPaths(Span<app::AttributePathParams>(mTempReadPaths.data(), mTempReadPaths.size()));
     }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     return CHIP_NO_ERROR;
 }

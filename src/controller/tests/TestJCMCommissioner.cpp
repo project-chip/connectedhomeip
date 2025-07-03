@@ -292,7 +292,9 @@ protected:
         mDeviceCommissioner = new JCMDeviceCommissioner();
         mDeviceCommissioner->RegisterTrustVerificationDelegate(&mTrustVerificationDelegate);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
         mCommissioningParams.SetUseJCM(true);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
         mAutoCommissioner.SetCommissioningParameters(mCommissioningParams);
 
         CHIP_ERROR err = mClusterStateCache.SetUp();
