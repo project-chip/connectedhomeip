@@ -62,6 +62,28 @@ public:
     chip::Protocols::InteractionModel::Status OnCalibrateCommand();
 
     /**
+     * @brief Sets the initial state for the ClosureControlEndpoint.
+     *
+     * This method initializes the closure control instance with default values and configurations.
+     *
+     * @param closureControlEndpoint The ClosureControlEndpoint to be initialized.
+     * 
+     * @return CHIP_ERROR Returns CHIP_NO_ERROR on success, or an error code if initialization fails.
+     */
+    CHIP_ERROR SetClosureControlInitialState(chip::app::Clusters::ClosureControl::ClosureControlEndpoint & closureControlEndpoint);
+
+    /**
+     * @brief Sets the initial state for the ClosureDimensionEndpoint.
+     *
+     * This method initializes the closure panel instance with default values and configurations.
+     *
+     * @param closurePanelEndpoint The ClosureDimensionEndpoint to be initialized.
+     * 
+     * @return CHIP_ERROR Returns CHIP_NO_ERROR on success, or an error code if initialization fails.
+     */
+    CHIP_ERROR SetClosurePanelInitialState(chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint & closurePanelEndpoint);
+
+    /**
      * @brief Handles the "MoveTo" command for the closure manager.
      *
      * This method initiates the move to command for the closure system, allowing it to move
