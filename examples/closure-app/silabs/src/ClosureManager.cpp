@@ -55,7 +55,7 @@ constexpr uint8_t kTagClosurePanelLift   = 0x00;
 constexpr uint8_t kTagClosurePanelTilt   = 0x01;
 
 // Define the list of semantic tags for the endpoint
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEp1TagList[] = {
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEndpoint1TagList[] = {
     { .namespaceID = kNamespaceClosure,
       .tag         = kTagClosureCovering,
       .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("Closure.Covering"_span)) },
@@ -64,13 +64,13 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEp1TagList[] = {
       .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("Covering.Venetian"_span)) },
 };
 
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEp2TagList[] = {
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEndpoint2TagList[] = {
     { .namespaceID = kNamespaceClosurePanel,
       .tag         = kTagClosurePanelLift,
       .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("ClosurePanel.Lift"_span)) },
 };
 
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEp3TagList[] = {
+const Clusters::Descriptor::Structs::SemanticTagStruct::Type kEndpoint3TagList[] = {
     { .namespaceID = kNamespaceClosurePanel,
       .tag         = kTagClosurePanelTilt,
       .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("ClosurePanel.Tilt"_span)) },
@@ -97,14 +97,14 @@ void ClosureManager::Init()
     DeviceLayer::PlatformMgr().LockChipStack();
 
     // Closure endpoints initialization
-    ep1.Init();
-    ep2.Init();
-    ep3.Init();
+    mClosureEndpoint1.Init();
+    mClosurePanelEndpoint2.Init();
+    mClosurePanelEndpoint3.Init();
 
     // Set Taglist for Closure endpoints
-    SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEp1TagList));
-    SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEp2TagList));
-    SetTagList(/* endpoint= */ 3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEp3TagList));
+    SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEndpoint1TagList));
+    SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEndpoint2TagList));
+    SetTagList(/* endpoint= */ 3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEndpoint3TagList));
 
     DeviceLayer::PlatformMgr().UnlockChipStack();
 }
@@ -166,6 +166,13 @@ void ClosureManager::InitiateAction(AppEvent * event)
         // In a real application, this would be replaced with actual unlatch logic.
         instance.StartTimer(kMotionCountdownTimeMs);
         break;
+    case Action_t::PANEL_STEP_ACTION:
+        ChipLogDetail(AppServer, "Initiating step action");
+        // Timer used in sample application to simulate the step action process.
+        // In a real application, this would be replaced with actual logic to perform
+        // a step action on the closure.
+        instance.StartTimer(kMotionCountdownTimeMs);
+        break;
     default:
         ChipLogDetail(AppServer, "Invalid action received in InitiateAction");
         return;
@@ -222,23 +229,101 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
             instance.HandleClosureUnlatchAction();
         });
         break;
+    case Action_t::PANEL_STEP_ACTION:
+        PlatformMgr().ScheduleWork([](intptr_t) {
+            ClosureManager & instance = ClosureManager::GetInstance();
+            instance.HandlePanelStepAction(instance.mCurrentActionEndpointId);
+        });
+        break;
     default:
         break;
     }
 }
 
+void ClosureManager::HandleClosureActionComplete(Action_t action)
+{
+    ClosureManager & instance = ClosureManager::GetInstance();
+
+    switch (action)
+    {
+    case Action_t::CALIBRATE_ACTION: {
+        instance.mClosureEndpoint1.OnCalibrateActionComplete();
+        instance.mClosurePanelEndpoint2.OnCalibrateActionComplete();
+        instance.mClosurePanelEndpoint3.OnCalibrateActionComplete();
+        isCalibrationInProgress = false;
+        break;
+    }
+    case Action_t::STOP_ACTION: {
+        if (isCalibrationInProgress)
+        {
+            ChipLogDetail(AppServer, "Stopping calibration action");
+            instance.mClosureEndpoint1.OnStopCalibrateActionComplete();
+            instance.mClosurePanelEndpoint2.OnStopCalibrateActionComplete();
+            instance.mClosurePanelEndpoint3.OnStopCalibrateActionComplete();
+            isCalibrationInProgress = false;
+        }
+        else if (isMoveToInProgress)
+        {
+            ChipLogDetail(AppServer, "Stopping move to action");
+            instance.mClosureEndpoint1.OnStopMotionActionComplete();
+            instance.mClosurePanelEndpoint2.OnStopMotionActionComplete();
+            instance.mClosurePanelEndpoint3.OnStopMotionActionComplete();
+            isMoveToInProgress = false;
+        }
+        else
+        {
+            ChipLogDetail(AppServer, "No action in progress to stop");
+        }
+        break;
+    }
+    case Action_t::MOVE_TO_ACTION:
+        instance.mClosureEndpoint1.OnMoveToActionComplete();
+        instance.mClosurePanelEndpoint2.OnMoveToActionComplete();
+        instance.mClosurePanelEndpoint3.OnMoveToActionComplete();
+        instance.isMoveToInProgress = false;
+        break;
+    case Action_t::UNLATCH_ACTION:
+        // HandleClosureActionComplete should not be called for UNLATCH_ACTION,
+        // as unlatch action is prerequisite for MOVE_TO_ACTION.
+        ChipLogError(AppServer, "HandleClosureActionComplete should not be called for UNLATCH_ACTION");
+        break;
+    case Action_t::PANEL_STEP_ACTION:
+        instance.mClosureEndpoint1.OnPanelMotionActionComplete();
+        if (instance.mCurrentActionEndpointId == instance.mClosurePanelEndpoint2.GetEndpointId())
+        {
+            instance.mClosurePanelEndpoint2.OnPanelMotionActionComplete();
+        }
+        else if (instance.mCurrentActionEndpointId == instance.mClosurePanelEndpoint3.GetEndpointId())
+        {
+            instance.mClosurePanelEndpoint3.OnPanelMotionActionComplete();
+        }
+
+        DeviceLayer::PlatformMgr().LockChipStack();
+        instance.isStepActionInProgress = false;
+        DeviceLayer::PlatformMgr().UnlockChipStack();
+
+        break;
+    default:
+        ChipLogError(AppServer, "Invalid action received in HandleClosureAction");
+        break;
+    }
+    // Reset the current action and current action endpoint ID after handling the closure action
+    instance.SetCurrentAction(Action_t::INVALID_ACTION);
+    instance.mCurrentActionEndpointId = chip::kInvalidEndpointId;
+}
+
 chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
 {
-    VerifyOrReturnValue(ep1.GetLogic().SetCountdownTimeFromDelegate(kDefaultCountdownTimeSeconds) == CHIP_NO_ERROR, Status::Failure,
-                        ChipLogError(AppServer, "Failed to set countdown time for calibration"));
+    VerifyOrReturnValue(mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(kDefaultCountdownTimeSeconds) == CHIP_NO_ERROR,
+                        Status::Failure, ChipLogError(AppServer, "Failed to set countdown time for calibration"));
 
     SetCurrentAction(Action_t::CALIBRATE_ACTION);
-    mCurrentActionEndpointId = ep1.GetEndpointId();
+    mCurrentActionEndpointId = mClosureEndpoint1.GetEndpointId();
 
     isCalibrationInProgress = true;
 
     // Post an event to initiate the calibration action asynchronously.
-    // Calibration can be only initiated from Closure Endpoint 1, so we set the endpoint ID to ep1.
+    // Calibration can be only initiated from Closure Endpoint 1, so we set the endpoint ID to mClosureEndpoint1.
     AppEvent event;
     event.Type                    = AppEvent::kEventType_Closure;
     event.ClosureEvent.Action     = GetCurrentAction();
@@ -258,8 +343,9 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStopCommand()
 
     CancelTimer();
 
+    // Stop can be only initiated from Closure Endpoint 1, so we set the endpoint ID to mClosureEndpoint1.
     SetCurrentAction(Action_t::STOP_ACTION);
-    mCurrentActionEndpointId = ep1.GetEndpointId();
+    mCurrentActionEndpointId = mClosureEndpoint1.GetEndpointId();
 
     HandleClosureActionComplete(Action_t::STOP_ACTION);
 
@@ -546,60 +632,152 @@ void ClosureManager::HandleClosureUnlatchAction()
     instance.HandleClosureMotionAction();
 }
 
-void ClosureManager::HandleClosureActionComplete(Action_t action)
+chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const StepDirectionEnum & direction,
+                                                                        const uint16_t & numberOfSteps,
+                                                                        const Optional<Globals::ThreeLevelAutoEnum> & speed,
+                                                                        const chip::EndpointId & endpointId)
+{
+    MainStateEnum mClosureEndpoint1MainState;
+    VerifyOrReturnError(mClosureEndpoint1.GetLogic().GetMainState(mClosureEndpoint1MainState) == CHIP_NO_ERROR, Status::Failure,
+                        ChipLogError(AppServer, "Failed to get main state for Step command on Endpoint 1"));
+
+    // If this command is received while the MainState attribute is currently either in Disengaged, Protected, Calibrating,
+    //  SetupRequired or Error, then a status code of INVALID_IN_STATE shall be returned.
+    VerifyOrReturnError(
+        mClosureEndpoint1MainState != MainStateEnum::kDisengaged && mClosureEndpoint1MainState != MainStateEnum::kProtected &&
+            mClosureEndpoint1MainState != MainStateEnum::kSetupRequired && mClosureEndpoint1MainState != MainStateEnum::kError &&
+            mClosureEndpoint1MainState != MainStateEnum::kCalibrating,
+        Status::InvalidInState,
+        ChipLogError(AppServer, "Step command not allowed in current state: %d", static_cast<int>(mClosureEndpoint1MainState)));
+
+    if (isStepActionInProgress && mCurrentActionEndpointId != endpointId)
+    {
+        ChipLogError(AppServer, "Step action is already in progress on Endpoint %d", mCurrentActionEndpointId);
+        return Status::Failure;
+    }
+
+    VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetMainState(MainStateEnum::kMoving) == CHIP_NO_ERROR, Status::Failure,
+                        ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
+
+    VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(10) == CHIP_NO_ERROR, Status::Failure,
+                        ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
+
+    // Update Overall Target to Null for the Closure Control on Endpoint 1
+    DataModel::Nullable<GenericOverallTargetState> mClosureEndpoint1Target;
+
+    VerifyOrReturnValue(mClosureEndpoint1.GetLogic().GetOverallTargetState(mClosureEndpoint1Target) == CHIP_NO_ERROR,
+                        Status::Failure, ChipLogError(AppServer, "Failed to get overall target for Step command"));
+
+    if (mClosureEndpoint1Target.IsNull())
+    {
+        mClosureEndpoint1Target.SetNonNull(GenericOverallTargetState{});
+    }
+
+    mClosureEndpoint1Target.Value().position = NullOptional; // Reset position to Null
+
+    VerifyOrReturnValue(mClosureEndpoint1.GetLogic().SetOverallTargetState(mClosureEndpoint1Target) == CHIP_NO_ERROR,
+                        Status::Failure, ChipLogError(AppServer, "Failed to set overall target for Step command"));
+
+    DeviceLayer::PlatformMgr().LockChipStack();
+    SetCurrentAction(PANEL_STEP_ACTION);
+    mCurrentActionEndpointId = endpointId;
+    isStepActionInProgress   = true;
+    DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    AppEvent event;
+    event.Type                    = AppEvent::kEventType_Closure;
+    event.ClosureEvent.Action     = PANEL_STEP_ACTION;
+    event.ClosureEvent.EndpointId = endpointId;
+    event.Handler                 = InitiateAction;
+    AppTask::GetAppTask().PostEvent(&event);
+
+    return Status::Success;
+}
+
+void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
 {
     ClosureManager & instance = ClosureManager::GetInstance();
 
-    switch (action)
+    ClosureDimension::ClosureDimensionEndpoint * panelEp = instance.GetPanelEndpointById(endpointId);
+    VerifyOrReturn(panelEp != nullptr, ChipLogError(AppServer, "Invalid instance for endpointId: %u", endpointId));
+
+    StepDirectionEnum stepDirection = panelEp->GetDelegate().GetStepCommandTargetDirection();
+
+    DataModel::Nullable<GenericDimensionStateStruct> panelCurrentState;
+    DataModel::Nullable<GenericDimensionStateStruct> panelTargetState;
+
+    VerifyOrReturn(panelEp->GetLogic().GetCurrentState(panelCurrentState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get current state for Step action"));
+    VerifyOrReturn(panelEp->GetLogic().GetTargetState(panelTargetState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get target state for Step action"));
+
+    VerifyOrReturn(!panelCurrentState.IsNull(), ChipLogError(AppServer, "Current state is null, Step action Failed"));
+    VerifyOrReturn(!panelTargetState.IsNull(), ChipLogError(AppServer, "Target state  is null, Step action Failed"));
+    VerifyOrReturn(panelCurrentState.Value().position.HasValue() && !panelCurrentState.Value().position.Value().IsNull(),
+                   ChipLogError(AppServer, "Current or target position is not set, Step action Failed"));
+    VerifyOrReturn(panelTargetState.Value().position.HasValue() && !panelTargetState.Value().position.Value().IsNull(),
+                   ChipLogError(AppServer, "Current or target position is not set, Step action Failed"));
+
+    chip::Percent100ths currentPosition = panelCurrentState.Value().position.Value().Value();
+    chip::Percent100ths targetPosition  = panelTargetState.Value().position.Value().Value();
+
+    ChipLogProgress(AppServer, "Current Position: %d, Target Position: %d", currentPosition, targetPosition);
+
+    bool panelTargetReached = (currentPosition == targetPosition);
+    ChipLogProgress(AppServer, "Panel Target Reached: %s", panelTargetReached ? "true" : "false");
+
+    if (!panelTargetReached)
     {
-    case Action_t::CALIBRATE_ACTION: {
-        instance.ep1.OnCalibrateActionComplete();
-        instance.ep2.OnCalibrateActionComplete();
-        instance.ep3.OnCalibrateActionComplete();
-        isCalibrationInProgress = false;
-        break;
-    }
-    case Action_t::MOVE_TO_ACTION:
-        instance.ep1.OnMoveToActionComplete();
-        instance.ep2.OnMoveToActionComplete();
-        instance.ep3.OnMoveToActionComplete();
-        instance.isMoveToInProgress = false;
-        break;
-    case Action_t::UNLATCH_ACTION:
-        // HandleClosureActionComplete should not be called for UNLATCH_ACTION,
-        // as unlatch action is prerequisite for MOVE_TO_ACTION.
-        ChipLogError(AppServer, "HandleClosureActionComplete should not be called for UNLATCH_ACTION");
-        break;
-    case Action_t::STOP_ACTION: {
-        if (isCalibrationInProgress)
+        chip::Percent100ths nextCurrentPosition;
+        chip::Percent100ths stepValue;
+        VerifyOrReturn(panelEp->GetLogic().GetStepValue(stepValue) == CHIP_NO_ERROR,
+                       ChipLogError(AppServer, "Failed to get step value for Step action"));
+
+        // Compute the next position
+        if (stepDirection == StepDirectionEnum::kIncrease)
         {
-            ChipLogDetail(AppServer, "Stopping calibration action");
-            instance.ep1.OnStopCalibrateActionComplete();
-            instance.ep2.OnStopCalibrateActionComplete();
-            instance.ep3.OnStopCalibrateActionComplete();
-            isCalibrationInProgress = false;
-        }
-        else if (isMoveToInProgress)
-        {
-            ChipLogDetail(AppServer, "Stopping move to action");
-            instance.ep1.OnStopMotionActionComplete();
-            instance.ep2.OnStopMotionActionComplete();
-            instance.ep3.OnStopMotionActionComplete();
-            isMoveToInProgress = false;
+            nextCurrentPosition = std::min(static_cast<chip::Percent100ths>(currentPosition + stepValue), targetPosition);
         }
         else
         {
-            ChipLogDetail(AppServer, "No action in progress to stop");
+            nextCurrentPosition = std::max(static_cast<chip::Percent100ths>(currentPosition - stepValue), targetPosition);
         }
-        break;
+
+        panelCurrentState.Value().position.SetValue(DataModel::MakeNullable(nextCurrentPosition));
+        panelEp->GetLogic().SetCurrentState(panelCurrentState);
+
+        instance.CancelTimer(); // Cancel any existing timer before starting a new action
+
+        DeviceLayer::PlatformMgr().LockChipStack();
+        instance.SetCurrentAction(PANEL_STEP_ACTION);
+        instance.mCurrentActionEndpointId = endpointId;
+        DeviceLayer::PlatformMgr().UnlockChipStack();
+
+        instance.StartTimer(kMotionCountdownTimeMs);
+
+        return;
     }
-    default:
-        ChipLogError(AppServer, "Invalid action received in HandleClosureAction");
-        break;
+
+    instance.HandleClosureActionComplete(PANEL_STEP_ACTION);
+}
+
+ClosureDimension::ClosureDimensionEndpoint * ClosureManager::GetPanelEndpointById(EndpointId endpointId)
+{
+    ClosureManager & instance = ClosureManager::GetInstance();
+
+    if (endpointId == instance.mClosurePanelEndpoint2.GetEndpointId())
+    {
+        return &instance.mClosurePanelEndpoint2;
     }
-    // Reset the current action and current action endpoint ID after handling the closure action
-    instance.SetCurrentAction(Action_t::INVALID_ACTION);
-    instance.mCurrentActionEndpointId = chip::kInvalidEndpointId;
+    else if (endpointId == instance.mClosurePanelEndpoint3.GetEndpointId())
+    {
+        return &instance.mClosurePanelEndpoint3;
+    }
+    else
+    {
+        ChipLogError(AppServer, "GetPanelEndpointById called with invalid endpointId: %u", endpointId);
+        return nullptr;
+    }
 }
 
 bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & currentState,

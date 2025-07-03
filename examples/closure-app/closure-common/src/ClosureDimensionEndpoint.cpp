@@ -43,8 +43,8 @@ Status ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direction,
                                             const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     ChipLogProgress(AppServer, "HandleStep");
-    // Add the Step handling logic here
-    return Status::Success;
+    SetStepCommandTargetDirection(direction);
+    return ClosureManager::GetInstance().OnStepCommand(direction, numberOfSteps, speed, GetEndpoint());
 }
 
 CHIP_ERROR ClosureDimensionEndpoint::Init()
@@ -129,4 +129,9 @@ void ClosureDimensionEndpoint::UpdateCurrentStateFromTargetState()
     }
 
     mLogic.SetCurrentState(currentState);
+}
+
+void ClosureDimensionEndpoint::OnPanelMotionActionComplete()
+{
+    UpdateCurrentStateFromTargetState();
 }
