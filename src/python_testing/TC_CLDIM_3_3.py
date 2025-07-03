@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2022 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,7 +40,8 @@ import logging
 import chip.clusters as Clusters
 from chip.clusters import Globals
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest,
+from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest,
                                          TestStep, async_test_body, default_matter_test_main)
 from mobly import asserts
 
@@ -165,7 +166,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         # STEP 2d: Establish wildcard subscription to all attributes"
         self.step("2d")
         sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureDimension)
-        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
+        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
         # STEP 2e: Read CurrentState attribute
         self.step("2e")
@@ -188,13 +189,13 @@ class TC_CLDIM_3_3(MatterBaseTest):
 
             # STEP 2h: If LatchControlModes is manual unlatching, skip step 2i
             self.step("2h")
+            sub_handler.reset()
             if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
                 logging.info("LatchControlModes is manual unlatching. Skipping step 2i.")
                 self.skip_step("2i")
             else:
                 # STEP 2i: Send SetTarget command with Latch=False
                 self.step("2i")
-                sub_handler.reset()
                 try:
                     await self.send_single_cmd(
                         cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=False),
@@ -296,7 +297,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         # STEP 5a: If LimitRange is unsupported, skip step 5b to 5g
         self.step("5a")
         if (not is_positioning_supported) or (not is_limitation_supported):
-            logging.info("Positioning Feature or LimitRange attribute is not supported. Skipping steps 5b to 5g.")
+            logging.info("Positioning feature or Limitation feature is not supported. Skipping steps 5b to 5g.")
             self.skip_step("5b")
             self.skip_step("5c")
             self.skip_step("5d")
@@ -381,7 +382,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         # STEP 7a: If Resolution is unsupported, skip step 7b to 7j
         self.step("7a")
         if (not is_positioning_supported):
-            logging.info("Resolution attribute is not supported. Skipping steps 7b to 7j.")
+            logging.info("Positioning feature is not supported. Skipping steps 7b to 7j.")
             self.skip_step("7b")
             self.skip_step("7c")
             self.skip_step("7d")

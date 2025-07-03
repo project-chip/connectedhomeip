@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2022 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,7 +39,8 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest,
+from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest,
                                          TestStep, async_test_body, default_matter_test_main)
 from mobly import asserts
 
@@ -72,7 +73,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
             TestStep("2d", "Read LatchControlModes attribute"),
             TestStep("2e", "Establish wilcard subscription to all attributes"),
             TestStep("2f", "Read CurrentState attribute"),
-            TestStep("2g", "If Latching feature not supported or state is unlatched, skip steps 2h ti 2l"),
+            TestStep("2g", "If state is unlatched, skip steps 2h to 2l"),
             TestStep("2h", "If LatchControlModes is manual unlatching, skip step 2i"),
             TestStep("2i", "Send SetTarget command with Latch=False"),
             TestStep("2j", "If LatchControlModes is remote unlatching, skip step 2k"),
@@ -141,15 +142,15 @@ class TC_CLDIM_3_2(MatterBaseTest):
         # STEP 2e: Establish wildcard subscription to all attributes"
         self.step("2e")
         sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureDimension)
-        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
+        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
         # STEP 2f: Read CurrentState attribute
         self.step("2f")
         initial_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
-        # STEP 2g: If Latching feature is not supported or state is unlatched, skip steps 2h to 2l
+        # STEP 2g: If state is unlatched, skip steps 2h to 2l
         self.step("2g")
-        if (not is_latching_supported) or (not initial_state.latch):
+        if not initial_state.latch:
             logging.info("Latching feature is not supported or state is unlatched. Skipping steps 2h to 2l.")
             self.skip_step("2h")
             self.skip_step("2i")
@@ -159,13 +160,13 @@ class TC_CLDIM_3_2(MatterBaseTest):
         else:
             # STEP 2h: If LatchControlModes is manual unlatching, skip step 2i
             self.step("2h")
+            sub_handler.reset()
             if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
                 logging.info("LatchControlModes is manual unlatching. Skipping step 2i.")
                 self.skip_step("2i")
             else:
                 # STEP 2i: Send SetTarget command with Latch=False
                 self.step("2i")
-                sub_handler.reset()
                 try:
                     await self.send_single_cmd(
                         cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=False),
@@ -192,6 +193,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
 
         # STEP 3a: If manual latching is required, skip steps 3b and 3c
         self.step("3a")
+        sub_handler.reset()
         if latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
             logging.info("Manual latching is required. Skipping steps 3b and 3c.")
             self.skip_step("3b")
@@ -221,7 +223,6 @@ class TC_CLDIM_3_2(MatterBaseTest):
         else:
             # STEP 3e: Send SetTarget command with Latch=True
             self.step("3e")
-            sub_handler.reset()
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=True),
