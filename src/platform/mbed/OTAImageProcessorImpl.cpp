@@ -213,7 +213,8 @@ exit:
 
     if (buffer)
     {
-        delete buffer;
+        delete[] buffer;
+        buffer = nullptr;
     }
     // Deinitialize the block device
     ret = mBlockDevice->deinit();
