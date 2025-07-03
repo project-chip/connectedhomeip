@@ -1,0 +1,198 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    12.4.1. [TC-CNET-4.1] [WiFi] Verification for attributes check [DUT-Server]
+
+PICS:
+    - CNET.S.F00
+
+config:
+    nodeId: 0x12344321
+    cluster: "Network Commissioning"
+    endpoint: 0
+    PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID:
+        type: octet_string
+        defaultValue: "hex:47524C50726976617465"
+
+tests:
+    - label: "Step 1: Factory reset the DUT"
+      verification: |
+          Reset Devices to factory defaults
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: "Factory Reset the DUT and enter 'y' after success"
+              - name: "expectedValue"
+                value: "y"
+
+    #Issue: https://github.com/project-chip/connectedhomeip/issues/30196
+    - label: "Step 2: Commission TH and DUT over BLE to setup the Wi-Fi"
+      verification: |
+          ./chip-tool pairing ble-wifi 0x12344321 <ssid> <password> <setup-pin-code> <discriminator>
+
+          [1698912271.738597][32363:32366] CHIP:DMG: Received Command Response Data, Endpoint=0 Cluster=0x0000_0030 Command=0x0000_0005
+          [1698912271.738606][32363:32366] CHIP:CTL: Received CommissioningComplete response, errorCode=0
+          [1698912271.738613][32363:32366] CHIP:CTL: Successfully finished commissioning step 'SendComplete'
+          [1698912271.738617][32363:32366] CHIP:CTL: Commissioning stage next step: 'SendComplete' -> 'Cleanup'
+          [1698912271.738622][32363:32366] CHIP:CTL: Performing next commissioning step 'Cleanup'
+          [1698912271.738639][32363:32366] CHIP:IN: SecureSession[0x7fbb04014a50]: MarkForEviction Type:1 LSID:50170
+          [1698912271.738642][32363:32366] CHIP:SC: SecureSession[0x7fbb04014a50, LSID:50170]: State change 'kActive' --> 'kPendingEviction'
+          [1698912271.738666][32363:32366] CHIP:IN: SecureSession[0x7fbb04014a50]: Released - Type:1 LSID:50170
+          [1698912271.738672][32363:32366] CHIP:CTL: Successfully finished commissioning step 'Cleanup'
+          [1698912271.738677][32363:32366] CHIP:TOO: Device commissioning completed with success
+          [1698912271.738691][32363:32366] CHIP:DMG: ICR moving to [AwaitingDe]
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      PICS: PICS_USER_PROMPT
+      arguments:
+          values:
+              - name: "message"
+                value: enter 'y' after successfull Commission"
+              - name: "expectedValue"
+                value: "y"
+
+    - label:
+          "Step 3: TH reads Descriptor Cluster from the DUT with EP0 TH reads
+          ServerList from the DUT"
+      cluster: "Descriptor"
+      command: "readAttribute"
+      attribute: "ServerList"
+      response:
+          constraints:
+              type: list
+              contains: [49]
+
+    - label: "Step 4: TH reads FeatureMap attribute from the DUT"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          value: 1
+          constraints:
+              type: bitmap32
+
+    - label:
+          "Step 5 & 6: TH reads the MaxNetworks attribute from the DUT. TH saves
+          the MaxNetworks attribute value as 'MaxNetworksValue' for future use"
+      PICS: CNET.S.A0000
+      command: "readAttribute"
+      attribute: "MaxNetworks"
+      response:
+          saveAs: MaxNetworksValue
+          constraints:
+              type: int8u
+              minValue: 1
+              maxValue: 255
+
+    - label: "Step 7: TH reads the Networks attribute list from the DUT"
+      PICS: CNET.S.A0001
+      command: "readAttribute"
+      attribute: "Networks"
+      response:
+          constraints:
+              contains:
+                  [
+                      {
+                          NetworkID: PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID,
+                          Connected: true,
+                      },
+                  ]
+
+    - label: "Step 8: TH reads ScanMaxTimeSeconds attribute from the DUT"
+      PICS: CNET.S.A0002
+      command: "readAttribute"
+      attribute: "ScanMaxTimeSeconds"
+      response:
+          constraints:
+              type: int8u
+              minValue: 1
+              maxValue: 255
+
+    - label: "Step 9: TH reads ConnectMaxTimeSeconds attribute from the DUT"
+      PICS: CNET.S.A0003
+      command: "readAttribute"
+      attribute: "ConnectMaxTimeSeconds"
+      response:
+          constraints:
+              type: int8u
+              minValue: 1
+              maxValue: 255
+
+    - label: "Step 10: TH reads InterfaceEnabled attribute from the DUT"
+      PICS: CNET.S.A0004
+      command: "readAttribute"
+      attribute: "InterfaceEnabled"
+      response:
+          value: true
+          constraints:
+              type: boolean
+
+    - label: "Step 11: TH reads LastNetworkingStatus attribute from the DUT"
+      PICS: CNET.S.A0005
+      command: "readAttribute"
+      attribute: "LastNetworkingStatus"
+      response:
+          value: 0
+          constraints:
+              type: NetworkCommissioningStatusEnum
+
+    - label:
+          "Step 12a: TH reads the LastNetworkID attribute from the DUT. TH reads
+          the Networks attribute from the DUT"
+      PICS: CNET.S.A0006
+      command: "readAttribute"
+      attribute: "LastNetworkID"
+      response:
+          value: PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID
+          constraints:
+              type: octet_string
+              minLength: 1
+              maxLength: 32
+
+    - label: "Step 12b: TH reads the Networks attribute list from the DUT"
+      PICS: CNET.S.A0001
+      command: "readAttribute"
+      attribute: "Networks"
+      response:
+          constraints:
+              contains:
+                  [
+                      {
+                          NetworkID: PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID,
+                          Connected: true,
+                      },
+                  ]
+
+    - label:
+          "Step 13: TH reads the LastConnectErrorValue attribute from the DUT"
+      PICS: CNET.S.A0007
+      command: "readAttribute"
+      attribute: "LastConnectErrorValue"
+      response:
+          value: null
+          constraints:
+              type: int32s
+
+    - label: "Step 14: TH reads the SupportedWiFiBands attribute from the DUT"
+      PICS: CNET.S.A0008
+      command: "readAttribute"
+      attribute: "SupportedWiFiBands"
+      response:
+          constraints:
+              type: list
+              minLength: 1
+              maxLength: 6

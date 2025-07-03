@@ -115,17 +115,12 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
         logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
         asserts.assert_equal(len(aAllocatedSnapshotStreams), 1, "The number of allocated snapshot streams in the list is not 1.")
         aStreamID = aAllocatedSnapshotStreams[0].snapshotStreamID
-        aWmark = aAllocatedSnapshotStreams[0].watermarkEnabled
-        aOSD = aAllocatedSnapshotStreams[0].OSDEnabled
+        # TODO: SnapshotStreamStruct does not have WaterMarkEnabled and OSDEnabled fields. Update This.
 
         self.step(3)
         try:
-            cmd = commands.SnapshotStreamModify(
-                snapshotStreamID=aStreamID,
-                watermarkEnabled=None if aWmark is None else not aWmark,
-                OSDEnabled=None if aOSD is None else not aOSD,
-            )
-            await self.send_single_cmd(endpoint=endpoint, cmd=cmd)
+            # TODO: SnapshotStreamStruct does not have WaterMarkEnabled and OSDEnabled fields. Update This.
+            await self.send_single_cmd(endpoint=endpoint, cmd=commands.SnapshotStreamModify(snapshotStreamID=aStreamID))
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
@@ -135,12 +130,7 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
         logger.info(f"Rx'd AllocatedSnapshotStreams: {aAllocatedSnapshotStreams}")
-        if wmarkSupport:
-            asserts.assert_equal(
-                aAllocatedSnapshotStreams[0].watermarkEnabled, not aWmark, "WaterMarkEnabled is not equal to !aWmark"
-            )
-        if osdSupport:
-            asserts.assert_equal(aAllocatedSnapshotStreams[0].OSDEnabled, not aOSD, "OSDEnabled is not equal to !aOSD")
+        # TODO: SnapshotStreamStruct does not have WaterMarkEnabled and OSDEnabled fields. Update This.
 
 
 if __name__ == "__main__":
