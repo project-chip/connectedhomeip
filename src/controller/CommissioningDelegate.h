@@ -871,9 +871,9 @@ public:
      * kSendComplete: CommissioningErrorInfo if there is an error
      * kCleanup: None
      */
-    struct CommissioningReport
-        : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
-                  AttestationErrorInfo, CommissioningErrorInfo, NetworkCommissioningStatusInfo, TimeZoneResponseInfo, JCM::JCMTrustVerificationError>
+    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData,
+                                         ReadCommissioningInfo, AttestationErrorInfo, CommissioningErrorInfo,
+                                         NetworkCommissioningStatusInfo, TimeZoneResponseInfo, JCM::JCMTrustVerificationError>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;
