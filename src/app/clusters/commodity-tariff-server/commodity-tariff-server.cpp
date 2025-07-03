@@ -22,6 +22,7 @@
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
+#include "CommodityTariffConsts.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -29,6 +30,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CommodityTariff;
 using namespace chip::app::Clusters::CommodityTariff::Structs;
 using namespace chip::app::Clusters::CommodityTariff::Attributes;
+using namespace CommodityTariffConsts;
 
 using chip::Protocols::InteractionModel::Status;
 
@@ -422,7 +424,7 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
         {
             continue;
         }
-        duration = (CommodityTariffAttrsDataMgmt::kDayEntryDurationLimit - current->startTime);
+        duration = (kDayEntryDurationLimit - current->startTime);
 
         if (next != nullptr)
         {
@@ -815,7 +817,7 @@ void Instance::ForceDayEntriesAttrsUpdate()
     else
     {
         // Case 3: Default to end of day if no duration or next entry
-        entryEndTime = CommodityTariffAttrsDataMgmt::kDayEntryDurationLimit;
+        entryEndTime = kDayEntryDurationLimit;
     }
 
     // Calculate seconds remaining in current entry

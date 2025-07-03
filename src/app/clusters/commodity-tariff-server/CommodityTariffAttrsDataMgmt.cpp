@@ -19,6 +19,7 @@
 #include "commodity-tariff-server.h"
 #include <cassert>
 #include <cstdint>
+#include "CommodityTariffConsts.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -30,6 +31,7 @@ using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::app::Clusters::CommodityTariff;
 using namespace chip::app::Clusters::CommodityTariff::Structs;
 using namespace chip::app::CommodityTariffAttrsDataMgmt;
+using namespace CommodityTariffConsts;
 
 // static constexpr size_t kAuxSwitchesSettingsMax = 8;
 
