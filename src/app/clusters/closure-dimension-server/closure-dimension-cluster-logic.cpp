@@ -609,31 +609,6 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
         targetState.SetNonNull(GenericDimensionStateStruct{});
     }
 
-    // Check if the current position is valid or else return InvalidInState
-    DataModel::Nullable<GenericDimensionStateStruct> currentState;
-    VerifyOrReturnError(GetCurrentState(currentState) == CHIP_NO_ERROR, Status::Failure);
-    VerifyOrReturnError(!currentState.IsNull(), Status::InvalidInState);
-    VerifyOrReturnError(currentState.Value().position.HasValue() && !currentState.Value().position.Value().IsNull(),
-                        Status::InvalidInState);
-
-    // Check for invalid latch transition: current latch is true and target latch is true
-    if (mConformance.HasFeature(Feature::kMotionLatching))
-    {
-        // Return InvalidInState if current latch has no value or is null
-        VerifyOrReturnError(currentState.Value().latch.HasValue(), Status::InvalidInState);
-        VerifyOrReturnError(!currentState.Value().latch.Value().IsNull(), Status::InvalidInState);
-        // If this command is received with only a new position field while the closure is latched, a status code of
-        // INVALID_IN_STATE SHALL be returned.
-        if (currentState.Value().latch.Value().Value())
-        {
-            // Return InvalidInState if incoming latch has no value or if incoming position has a value.
-            if (position.HasValue())
-            {
-                VerifyOrReturnError(latch.HasValue() && !latch.Value(), Status::InvalidInState);
-            }
-        }
-    }
-
     // If position field is present and Positioning(PS) feature is not supported, we should not set targetState.position value.
     if (position.HasValue() && mConformance.HasFeature(Feature::kPositioning))
     {
@@ -686,6 +661,31 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     {
         VerifyOrReturnError(speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, Status::ConstraintError);
         targetState.Value().speed.SetValue(speed.Value());
+    }
+
+    // Check if the current position is valid or else return InvalidInState
+    DataModel::Nullable<GenericDimensionStateStruct> currentState;
+    VerifyOrReturnError(GetCurrentState(currentState) == CHIP_NO_ERROR, Status::Failure);
+    VerifyOrReturnError(!currentState.IsNull(), Status::InvalidInState);
+    VerifyOrReturnError(currentState.Value().position.HasValue() && !currentState.Value().position.Value().IsNull(),
+                        Status::InvalidInState);
+
+    // Check for invalid latch transition: current latch is true and target latch is true
+    if (mConformance.HasFeature(Feature::kMotionLatching))
+    {
+        // Return InvalidInState if current latch has no value or is null
+        VerifyOrReturnError(currentState.Value().latch.HasValue(), Status::InvalidInState);
+        VerifyOrReturnError(!currentState.Value().latch.Value().IsNull(), Status::InvalidInState);
+        // If this command is received with only a new position field while the closure is latched, a status code of
+        // INVALID_IN_STATE SHALL be returned.
+        if (currentState.Value().latch.Value().Value())
+        {
+            // Return InvalidInState if incoming latch has no value or if incoming position has a value.
+            if (position.HasValue())
+            {
+                VerifyOrReturnError(latch.HasValue() && !latch.Value(), Status::InvalidInState);
+            }
+        }
     }
 
     // Target should only be set when delegate function returns status as Success. Return failure otherwise

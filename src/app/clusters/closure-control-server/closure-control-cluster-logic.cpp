@@ -497,26 +497,6 @@ Protocols::InteractionModel::Status ClusterLogic::HandleStop()
     return Status::Success;
 }
 
-TargetPositionEnum ClusterLogic::MapCurrentPositionEnumToTargetPosition(CurrentPositionEnum currentPosition)
-{
-    switch (currentPosition)
-    {
-    case CurrentPositionEnum::kFullyClosed:
-        return TargetPositionEnum::kMoveToFullyClosed;
-    case CurrentPositionEnum::kFullyOpened:
-        return TargetPositionEnum::kMoveToFullyOpen;
-    case CurrentPositionEnum::kOpenedForPedestrian:
-        return TargetPositionEnum::kMoveToPedestrianPosition;
-    case CurrentPositionEnum::kOpenedForVentilation:
-        return TargetPositionEnum::kMoveToVentilationPosition;
-    case CurrentPositionEnum::kOpenedAtSignature:
-        return TargetPositionEnum::kMoveToSignaturePosition;
-    default:
-        // Handle unmapped or invalid cases
-        return TargetPositionEnum::kUnknownEnumValue;
-    }
-}
-
 Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPositionEnum> position, Optional<bool> latch,
                                                                Optional<Globals::ThreeLevelAutoEnum> speed)
 {
