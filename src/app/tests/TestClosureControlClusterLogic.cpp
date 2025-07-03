@@ -1499,15 +1499,36 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_OnlySpeedField)
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
 }
 
-TEST_F(TestClosureControlClusterLogic, ReadCurrentErrorList)
+TEST_F(TestClosureControlClusterLogic, ReadCurrentErrorList_WhenErrorListIsEmpty)
 {
     conformance.FeatureMap().Set(Feature::kPositioning);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
     ClosureErrorEnum list[10] = {};
-    MutableByteSpan currentErrorList(reinterpret_cast<uint8_t *>(list), sizeof(list));
-    EXPECT_EQ(logic->GetCurrentErrorList(currentErrorList), CHIP_NO_ERROR);
-    EXPECT_TRUE(currentErrorList.empty());
+    Span<ClosureErrorEnum> currentErrorListSpan(list);
+    EXPECT_EQ(logic->GetCurrentErrorList(currentErrorListSpan), CHIP_NO_ERROR);
+    EXPECT_TRUE(currentErrorListSpan.empty());
+}
+
+TEST_F(TestClosureControlClusterLogic, ReadCurrentErrorList_WhenErrorListIsNotEmpty)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+
+    EXPECT_EQ(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
+    mockContext.ResetDirtyFlag();
+    EXPECT_EQ(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kInternalInterference), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
+
+    ClosureErrorEnum list[10] = {};
+    Span<ClosureErrorEnum> currentErrorListSpan(list);
+    EXPECT_EQ(logic->GetCurrentErrorList(currentErrorListSpan), CHIP_NO_ERROR);
+    EXPECT_FALSE(currentErrorListSpan.empty());
+
+    EXPECT_EQ(static_cast<int>(currentErrorListSpan.size()), 2);
+    EXPECT_EQ(static_cast<ClosureErrorEnum>(currentErrorListSpan[0]), ClosureErrorEnum::kBlockedBySensor);
+    EXPECT_EQ(static_cast<ClosureErrorEnum>(currentErrorListSpan[1]), ClosureErrorEnum::kInternalInterference);
 }
 
 TEST_F(TestClosureControlClusterLogic, AddErrorToCurrentErrorList)
@@ -1518,12 +1539,12 @@ TEST_F(TestClosureControlClusterLogic, AddErrorToCurrentErrorList)
     EXPECT_EQ(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor), CHIP_ERROR_INCORRECT_STATE);
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
     ClosureErrorEnum list[10] = {};
-    MutableByteSpan currentErrorList(reinterpret_cast<uint8_t *>(list), sizeof(list));
-    EXPECT_EQ(logic->GetCurrentErrorList(currentErrorList), CHIP_NO_ERROR);
-    EXPECT_FALSE(currentErrorList.empty());
+    Span<ClosureErrorEnum> currentErrorListSpan(list);
+    EXPECT_EQ(logic->GetCurrentErrorList(currentErrorListSpan), CHIP_NO_ERROR);
+    EXPECT_FALSE(currentErrorListSpan.empty());
 
-    EXPECT_EQ(static_cast<int>(currentErrorList.size()), 1);
-    EXPECT_EQ(static_cast<ClosureErrorEnum>(currentErrorList[0]), ClosureErrorEnum::kBlockedBySensor);
+    EXPECT_EQ(static_cast<int>(currentErrorListSpan.size()), 1);
+    EXPECT_EQ(static_cast<ClosureErrorEnum>(currentErrorListSpan[0]), ClosureErrorEnum::kBlockedBySensor);
 }
 
 TEST_F(TestClosureControlClusterLogic, AddDuplicateErrorToCurrentErrorList)
@@ -1541,12 +1562,12 @@ TEST_F(TestClosureControlClusterLogic, AddDuplicateErrorToCurrentErrorList)
     EXPECT_EQ(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor), CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED);
     EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
     ClosureErrorEnum list[10] = {};
-    MutableByteSpan currentErrorList(reinterpret_cast<uint8_t *>(list), sizeof(list));
-    EXPECT_EQ(logic->GetCurrentErrorList(currentErrorList), CHIP_NO_ERROR);
-    EXPECT_FALSE(currentErrorList.empty());
+    Span<ClosureErrorEnum> currentErrorListSpan(list);
+    EXPECT_EQ(logic->GetCurrentErrorList(currentErrorListSpan), CHIP_NO_ERROR);
+    EXPECT_FALSE(currentErrorListSpan.empty());
 
-    EXPECT_EQ(static_cast<int>(currentErrorList.size()), 1);
-    EXPECT_EQ(static_cast<ClosureErrorEnum>(currentErrorList[0]), ClosureErrorEnum::kBlockedBySensor);
+    EXPECT_EQ(static_cast<int>(currentErrorListSpan.size()), 1);
+    EXPECT_EQ(static_cast<ClosureErrorEnum>(currentErrorListSpan[0]), ClosureErrorEnum::kBlockedBySensor);
 }
 
 TEST_F(TestClosureControlClusterLogic, ClearCurrentErrorList)
@@ -1559,19 +1580,37 @@ TEST_F(TestClosureControlClusterLogic, ClearCurrentErrorList)
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
 
     ClosureErrorEnum list[10] = {};
-    MutableByteSpan currentErrorList(reinterpret_cast<uint8_t *>(list), sizeof(list));
-    EXPECT_EQ(logic->GetCurrentErrorList(currentErrorList), CHIP_NO_ERROR);
-    EXPECT_FALSE(currentErrorList.empty());
+    Span<ClosureErrorEnum> currentErrorListSpan(list);
+    EXPECT_EQ(logic->GetCurrentErrorList(currentErrorListSpan), CHIP_NO_ERROR);
+    EXPECT_FALSE(currentErrorListSpan.empty());
 
-    EXPECT_EQ(static_cast<int>(currentErrorList.size()), 1);
-    EXPECT_EQ(static_cast<ClosureErrorEnum>(currentErrorList[0]), ClosureErrorEnum::kBlockedBySensor);
+    EXPECT_EQ(static_cast<int>(currentErrorListSpan.size()), 1);
+    EXPECT_EQ(static_cast<ClosureErrorEnum>(currentErrorListSpan[0]), ClosureErrorEnum::kBlockedBySensor);
 
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
     logic->ClearCurrentErrorList();
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
-    MutableByteSpan emptyErrorList(reinterpret_cast<uint8_t *>(list), sizeof(list));
-    EXPECT_EQ(logic->GetCurrentErrorList(emptyErrorList), CHIP_NO_ERROR);
-    EXPECT_TRUE(emptyErrorList.empty());
+    Span<ClosureErrorEnum> emptyErrorListSpan(list);
+    EXPECT_EQ(logic->GetCurrentErrorList(emptyErrorListSpan), CHIP_NO_ERROR);
+    EXPECT_TRUE(emptyErrorListSpan.empty());
+}
+
+// This test is to ensure that the CurrentErrorList cannot be read when the span buffer is less than the expected size.
+// Span buffer should be at least 10 elements to read the current error list(since max-size of the current-error-list
+// is 10 as per the spec). If buffer is less than 10, it should return CHIP_ERROR_BUFFER_TOO_SMALL.
+TEST_F(TestClosureControlClusterLogic, ReadCurrentErrorList_InvalidBufferSize)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+
+    EXPECT_EQ(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
+    mockContext.ResetDirtyFlag();
+    EXPECT_EQ(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kInternalInterference), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
+    ClosureErrorEnum list[1] = {};
+    Span<ClosureErrorEnum> currentErrorListSpan(list);
+    EXPECT_EQ(logic->GetCurrentErrorList(currentErrorListSpan), CHIP_ERROR_BUFFER_TOO_SMALL);
 }

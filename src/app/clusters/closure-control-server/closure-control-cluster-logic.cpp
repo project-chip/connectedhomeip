@@ -422,15 +422,17 @@ CHIP_ERROR ClusterLogic::GetOverallTargetState(DataModel::Nullable<GenericOveral
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::GetCurrentErrorList(MutableByteSpan & outputSpan)
+CHIP_ERROR ClusterLogic::GetCurrentErrorList(Span<ClosureErrorEnum> & outputSpan)
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(outputSpan.size() == kCurrentErrorListMaxSize, CHIP_ERROR_BUFFER_TOO_SMALL,
                         ChipLogError(AppServer, "Output buffer size is not equal to kCurrentErrorListMaxSize"));
-    ByteSpan currentErrorListSpan(reinterpret_cast<const uint8_t *>(mState.mCurrentErrorList),
-                                  mState.mCurrentErrorCount * sizeof(ClosureErrorEnum));
-    CopySpanToMutableSpan(currentErrorListSpan, outputSpan);
+    for (size_t i = 0; i < mState.mCurrentErrorCount; ++i)
+    {
+        outputSpan[i] = mState.mCurrentErrorList[i];
+    }
+    outputSpan.reduce_size(mState.mCurrentErrorCount);
     return CHIP_NO_ERROR;
 }
 

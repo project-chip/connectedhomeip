@@ -175,10 +175,21 @@ public:
     CHIP_ERROR GetMainState(MainStateEnum & mainState);
     CHIP_ERROR GetOverallCurrentState(DataModel::Nullable<GenericOverallCurrentState> & overallCurrentState);
     CHIP_ERROR GetOverallTargetState(DataModel::Nullable<GenericOverallTargetState> & overallTarget);
-    CHIP_ERROR GetCurrentErrorList(MutableByteSpan & currentErrorList);
     CHIP_ERROR GetLatchControlModes(BitFlags<LatchControlModesBitmap> & latchControlModes);
     CHIP_ERROR GetFeatureMap(BitFlags<Feature> & featureMap);
     CHIP_ERROR GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision);
+
+    /**
+     * @brief Gets the current error list.
+     *        This method is used to retrieve the current error list. 
+     *        The outputSpan must be of size kCurrentErrorListMaxSize.
+     * @param[out] outputSpan The span to fill with the current error list.
+     * 
+     * @return CHIP_NO_ERROR if the retrieval was successful.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     *         CHIP_ERROR_BUFFER_TOO_SMALL if the outputSpan size is not equal to kCurrentErrorListMaxSize.
+     */
+    CHIP_ERROR GetCurrentErrorList(Span<ClosureErrorEnum> & outputSpan);
 
     /**
      * @brief Reads the CurrentErrorList attribute.
