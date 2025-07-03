@@ -48,6 +48,7 @@ COVERAGE_ROOT="$OUTPUT_ROOT/coverage"
 SUPPORTED_CODE=(core clusters all)
 CODE="core"
 QUIET_FLAG=""
+ACCUMULATE=false
 
 skip_gn=false
 TEST_TARGET=check
@@ -62,6 +63,7 @@ help() {
     echo "Misc:"
     echo "    -h, --help              Print this help, then exit."
     echo "    -q, --quiet             Decrease verbosity level."
+    echo "    -a, --accumulate        Accumulate coverage data from previous runs."
     echo
     echo "Build/Output options:"
     echo "    -o, --output_root=DIR   Set the build output directory."
@@ -119,6 +121,10 @@ for i in "$@"; do
             QUIET_FLAG="--quiet"
             shift
             ;;
+        -a | --accumulate)
+            ACCUMULATE=true
+            shift
+            ;;
         *)
             echo "Unknown Option \"$1\""
             echo
@@ -133,6 +139,16 @@ if [[ ! " ${SUPPORTED_CODE[@]} " =~ " ${CODE} " ]]; then
     echo "ERROR: Code $CODE not supported"
     exit 1
 fi
+
+if [[ -d "$OUTPUT_ROOT/obj/src" && "$ACCUMULATE" == false ]]; then
+    lcov --zerocounters --directory "$OUTPUT_ROOT/obj/src" \
+    --ignore-errors format,unsupported,inconsistent,unused \
+    --exclude="$PWD"/zzz_generated/* \
+    --exclude="$PWD"/third_party/* \
+    --exclude=/usr/include/* \
+    $QUIET_FLAG
+fi
+
 
 # ------------------------------------------------------------------------------
 # Build & Test
@@ -224,7 +240,7 @@ fi
 mkdir -p "$COVERAGE_ROOT"
 
 lcov --capture --all --directory "$OUTPUT_ROOT/obj/src" \
-    --ignore-errors format,unsupported,inconsistent \
+    --ignore-errors format,unsupported,inconsistent,unused \
     --exclude="$PWD"/zzz_generated/* \
     --exclude="$PWD"/third_party/* \
     --exclude=/usr/include/* \
