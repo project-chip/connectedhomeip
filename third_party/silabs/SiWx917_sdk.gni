@@ -716,7 +716,6 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sli_net_si91x_utility.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_rsi_utility.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c",
-
       "${wifi_sdk_root}/components/sli_si91x_wifi_event_handler/src/sli_si91x_wifi_event_handler.c",
       "${wifi_sdk_root}/components/sli_wifi_command_engine/src/sli_wifi_command_engine.c",
 
@@ -732,11 +731,11 @@ template("siwx917_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/kernel/stream_buffer.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/tasks.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/timers.c",
-      "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/main.c",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_event_handler.c",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_iostream_handles.c",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_si91x_button_instances.c",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_ulp_timer_init.c",
+      "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/main.c",
       "${matter_support_root}/board-support/si91x/support/hal/rsi_hal_mcu_m4.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/button/src/sl_si91x_button.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/clock_manager/src/sl_si91x_clock_manager.c",

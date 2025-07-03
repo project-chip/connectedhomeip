@@ -21,9 +21,7 @@
 #include <MatterConfig.h>
 
 // This is a User definable function in sl_main context, called by sl_main_init before the kernel is started
-void app_init_early(void)
-{
-}
+void app_init_early(void) {}
 
 // This is a User definable function, in sl_main context, called by start_task_handler once the silabs platform is fully
 // initialized.
