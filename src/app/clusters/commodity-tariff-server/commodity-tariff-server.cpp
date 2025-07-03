@@ -302,7 +302,11 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
     for (const auto & entryID : dayEntryIDs)
     {
         auto [current, next] = GetCurrNextItemsById<Structs::DayEntryStruct::Type>(aCtx.DayEntriesMap, entryID);
-        duration             = (CommodityTariffAttrsDataMgmt::kDayEntryDurationLimit - current->startTime);
+        if (current == nullptr)
+        {
+            continue;
+        }
+        duration = (CommodityTariffAttrsDataMgmt::kDayEntryDurationLimit - current->startTime);
 
         if (next != nullptr)
         {
