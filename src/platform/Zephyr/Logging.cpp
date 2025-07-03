@@ -47,7 +47,7 @@ void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
     snprintfcb(formattedMsg, sizeof(formattedMsg), "[%s]", module);
 
-    const size_t prefixLen = strlen(formattedMsg);
+    const size_t prefixLen = strnlen(formattedMsg, CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE);
     vsnprintfcb(formattedMsg + prefixLen, sizeof(formattedMsg) - prefixLen, msg, v);
 
     const char * allocatedMsg = formattedMsg;

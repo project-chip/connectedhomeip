@@ -234,7 +234,8 @@ CHIP_ERROR UDPEndPointImplSockets::BindInterfaceImpl(IPAddressType addressType, 
         {
             status = CHIP_ERROR_POSIX(errno);
         }
-        else if (setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, interfaceName, socklen_t(strlen(interfaceName))) == -1)
+        else if (setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, interfaceName, socklen_t(strnlen(interfaceName, IF_NAMESIZE))) ==
+                 -1)
         {
             status = CHIP_ERROR_POSIX(errno);
         }
