@@ -633,7 +633,6 @@ void ClosureManager::HandleClosureMotionAction()
     instance.HandleClosureActionComplete(ClosureManager::Action_t::MOVE_TO_ACTION);
 }
 
-
 chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(const Optional<Percent100ths> & position,
                                                                              const Optional<bool> & latch,
                                                                              const Optional<Globals::ThreeLevelAutoEnum> & speed,
