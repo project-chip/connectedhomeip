@@ -166,6 +166,7 @@ void ClosureManager::InitiateAction(AppEvent * event)
         // Timer used in sample application to simulate the panel unlatch process.
         // In a real application, this would be replaced with actual logic to unlatch
         // the closure panel
+        break;
     case Action_t::PANEL_STEP_ACTION:
         ChipLogDetail(AppServer, "Initiating step action");
         // Timer used in sample application to simulate the step action process.
@@ -234,6 +235,7 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
             ClosureManager & instance = ClosureManager::GetInstance();
             instance.HandlePanelUnlatchAction(instance.mCurrentActionEndpointId);
         });
+        break;
     case Action_t::PANEL_STEP_ACTION:
         PlatformMgr().ScheduleWork([](intptr_t) {
             ClosureManager & instance = ClosureManager::GetInstance();
@@ -296,11 +298,11 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         break;
     case Action_t::SET_TARGET_ACTION:
         instance.mClosureEndpoint1.OnPanelMotionActionComplete();
-        if (instance.mCurrentActionEndpointId == instance.mClosurePanelEndpoint2.GetEndpoint())
+        if (instance.mCurrentActionEndpointId == instance.mClosurePanelEndpoint2.GetEndpointId())
         {
             instance.mClosurePanelEndpoint2.OnPanelMotionActionComplete();
         }
-        else if (instance.mCurrentActionEndpointId == instance.mClosurePanelEndpoint3.GetEndpoint())
+        else if (instance.mCurrentActionEndpointId == instance.mClosurePanelEndpoint3.GetEndpointId())
         {
             instance.mClosurePanelEndpoint3.OnPanelMotionActionComplete();
         }
@@ -308,7 +310,7 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         DeviceLayer::PlatformMgr().LockChipStack();
         instance.isSetTargetInProgress = false;
         DeviceLayer::PlatformMgr().UnlockChipStack();
-
+        break;
     case Action_t::PANEL_STEP_ACTION:
         instance.mClosureEndpoint1.OnPanelMotionActionComplete();
         if (instance.mCurrentActionEndpointId == instance.mClosurePanelEndpoint2.GetEndpointId())
