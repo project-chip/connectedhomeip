@@ -383,7 +383,12 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(CurrentTariffAttrsCtx & aCtx, 
         {
             Structs::TariffComponentStruct::Type entry;
             auto current = GetCurrNextItemsById<Structs::TariffComponentStruct::Type>(aCtx.TariffComponentsMap, entryID).first;
-            entry        = *current;
+            if (current == nullptr)
+            {
+                err = CHIP_ERROR_NOT_FOUND;
+                break;
+            }
+            entry = *current;
             if (current->label.HasValue())
             {
                 DataModel::Nullable<chip::CharSpan> tmpNullLabel;
