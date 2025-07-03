@@ -657,17 +657,17 @@ jobs:
             - name: Build linux-x64-jf-control-app
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-jf-control-app
+                  --target linux-x64-jf-control-app-${BUILD_VARIANT}-clang
                   build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-jf-control-app"
+                  && rm -rf out/linux-x64-jf-control-app-${BUILD_VARIANT}-clang"
 
             # TODO: JF admin app app needs variants (probably)
             - name: Build linux-x64-jf-admin-app
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-jf-admin-app
+                  --target linux-x64-jf-admin-app-${BUILD_VARIANT}-clang
                   build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-jf-admin-app"
+                  && rm -rf out/linux-x64-jf-admin-app-${BUILD_VARIANT}-clang"
 
 
             - name: Generate an argument environment file

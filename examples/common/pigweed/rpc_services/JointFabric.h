@@ -4,8 +4,8 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/CHIPDeviceLayer.h>
 
-using namespace chip;
-using namespace chip::Crypto;
+// using namespace chip;
+// using namespace chip::Crypto;
 
 namespace joint_fabric_service {
 
@@ -17,24 +17,24 @@ public:
 private:
     struct OwnershipTransferContext
     {
-        OwnershipTransferContext(uint64_t nodeId, bool jcm, ByteSpan trustedIcacPublicKeyB) : mNodeId(nodeId), mJCM(jcm)
+        OwnershipTransferContext(uint64_t nodeId, bool jcm, chip::ByteSpan trustedIcacPublicKeyB) : mNodeId(nodeId), mJCM(jcm)
         {
-            memcpy(keyRawBytes, trustedIcacPublicKeyB.data(), kP256_PublicKey_Length);
+            memcpy(keyRawBytes, trustedIcacPublicKeyB.data(), chip::Crypto::kP256_PublicKey_Length);
             mTrustedIcacPublicKeyBSerialized = keyRawBytes;
         }
 
         uint64_t mNodeId;
         bool mJCM;
 
-        uint8_t keyRawBytes[kP256_PublicKey_Length] = { 0 };
-        P256PublicKey mTrustedIcacPublicKeyBSerialized;
+        uint8_t keyRawBytes[chip::Crypto::kP256_PublicKey_Length] = { 0 };
+        chip::Crypto::P256PublicKey mTrustedIcacPublicKeyBSerialized;
     };
 
     static void FinalizeCommissioningWork(intptr_t arg)
     {
         OwnershipTransferContext * data = reinterpret_cast<OwnershipTransferContext *>(arg);
-        JFAMgr().FinalizeCommissioning(data->mNodeId, data->mJCM, data->mTrustedIcacPublicKeyBSerialized);
-        Platform::Delete(data);
+        chip::JFAMgr().FinalizeCommissioning(data->mNodeId, data->mJCM, data->mTrustedIcacPublicKeyBSerialized);
+        chip::Platform::Delete(data);
     }
 };
 
