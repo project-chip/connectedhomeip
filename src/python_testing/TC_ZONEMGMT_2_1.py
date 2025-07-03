@@ -49,7 +49,7 @@ class TC_ZONEMGMT_2_1(MatterBaseTest):
         return "[TC-ZONEMGMT-2.1] Attributes with Server as DUT"
 
     def pics_TC_ZONEMGMT_2_1(self):
-        return ["AVSM.S"]
+        return ["ZONEMGMT.S"]
 
     def steps_TC_ZONEMGMT_2_1(self) -> list[TestStep]:
         return [

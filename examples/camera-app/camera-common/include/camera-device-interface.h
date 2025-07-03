@@ -130,7 +130,7 @@ public:
     virtual chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() = 0;
 
     // Getter for ZoneManagement Delegate
-    virtual chip::app::Clusters::ZoneManagement::ZoneMgmtDelegate & GetZoneManagementDelegate() = 0;
+    virtual chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() = 0;
 
     // Getter for the Media Controller
     virtual MediaController & GetMediaController() = 0;
