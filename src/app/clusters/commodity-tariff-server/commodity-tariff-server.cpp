@@ -412,7 +412,7 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
             }
             else if (next->startTime > 0)
             {
-                duration = next->startTime - current->startTime;
+                duration += next->startTime;
             }
         }
 
@@ -668,7 +668,7 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
         {
             tmpDayEntry.SetNonNull(*next);
             tmpDate.SetNonNull(mCurrentDay.Value().date);
-            if (CHIP_NO_ERROR ==
+            if (CHIP_NO_ERROR !=
                 Utils::UpdateTariffComponentAttrsDayEntryById(mServerTariffAttrsCtx, next->dayEntryID,
                                                               mNextTariffComponents_MgmtObj))
             {
