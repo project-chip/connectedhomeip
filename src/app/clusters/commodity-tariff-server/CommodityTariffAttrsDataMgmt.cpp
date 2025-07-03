@@ -274,22 +274,7 @@ bool DayEntriesDataClass::CompareStructValue(const PayloadType & source, const P
 {
     using chip::app::Clusters::CommodityTariff::Structs::operator!=;
 
-    if (source != destination)
-    {
-        return true;
-    }
-
-    if (!CommonUtilities::AreOptionalEqual(source.duration, destination.duration))
-    {
-        return true;
-    }
-
-    if (!CommonUtilities::AreOptionalEqual(source.randomizationOffset, destination.randomizationOffset) ||
-        !CommonUtilities::AreOptionalEqual(source.randomizationType, destination.randomizationType))
-    {
-        return true;
-    }
-    return false;
+    return source != destination;
 }
 
 void DayEntriesDataClass::CleanupStructValue(PayloadType & aValue)

@@ -129,7 +129,8 @@ inline bool operator!=(const DayStruct::Type & lhs, const DayStruct::Type & rhs)
 
 inline bool operator==(const DayEntryStruct::Type & lhs, const DayEntryStruct::Type & rhs)
 {
-    return (lhs.dayEntryID == rhs.dayEntryID) && (lhs.startTime == rhs.startTime);
+    return (lhs.dayEntryID == rhs.dayEntryID) && (lhs.startTime == rhs.startTime) && (lhs.duration == rhs.duration) &&
+           (lhs.randomizationOffset == rhs.randomizationOffset) && (lhs.randomizationType == rhs.randomizationType);
 }
 
 inline bool operator!=(const DayEntryStruct::Type & lhs, const DayEntryStruct::Type & rhs)
