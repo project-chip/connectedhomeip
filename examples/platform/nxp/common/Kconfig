@@ -321,7 +321,7 @@ config CHIP_APP_LED_MANAGER_STATUS_LED
 
 config CHIP_APP_QUEUE_TICKS_TO_WAIT
     string "App queue ticks to wait"
-    default "pdMS_TO_TICKS(10)" if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    default "pdMS_TO_TICKS(10)" if (CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72) && !NXP_USE_LOW_POWER
     default "portMAX_DELAY"
     help
         Define app queue ticks to wait.
