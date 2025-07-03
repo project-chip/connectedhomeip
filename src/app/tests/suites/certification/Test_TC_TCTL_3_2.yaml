@@ -24,15 +24,6 @@ config:
     nodeId: 0x12344321
     cluster: "Temperature Control"
     endpoint: 1
-    Step_5_setTemp:
-        type: temperature
-        defaultValue: 5
-    InvalidTemp:
-        type: temperature
-        defaultValue: 100
-    Step_10_setTemp:
-        type: temperature
-        defaultValue: 50
 
 tests:
     - label:
@@ -85,7 +76,7 @@ tests:
       arguments:
           values:
               - name: "TargetTemperature"
-                value: Step_5_setTemp
+                value: ( minTemp + maxTemp ) / 2
 
     - label: "Wait for 5s"
       cluster: "DelayCommands"
@@ -100,7 +91,7 @@ tests:
       command: "readAttribute"
       attribute: "TemperatureSetpoint"
       response:
-          value: Step_5_setTemp
+          value: ( minTemp + maxTemp ) / 2
 
     - label:
           "Step 7: TH sends command SetTemperatureCommand with an invalid value"
@@ -109,7 +100,7 @@ tests:
       arguments:
           values:
               - name: "TargetTemperature"
-                value: InvalidTemp
+                value: maxTemp + 10
       response:
           error: CONSTRAINT_ERROR
 
@@ -126,7 +117,7 @@ tests:
       command: "readAttribute"
       attribute: "TemperatureSetpoint"
       response:
-          value: Step_5_setTemp
+          value: ( minTemp + maxTemp ) / 2
 
     - label:
           "Step 9: Operate device such that a temperature number cannot be
@@ -152,7 +143,7 @@ tests:
       arguments:
           values:
               - name: "TargetTemperature"
-                value: Step_10_setTemp
+                value: ( minTemp + maxTemp ) / 2
       response:
           error: INVALID_IN_STATE
 
@@ -169,4 +160,4 @@ tests:
       command: "readAttribute"
       attribute: "TemperatureSetpoint"
       response:
-          value: Step_5_setTemp
+          value: ( minTemp + maxTemp ) / 2
