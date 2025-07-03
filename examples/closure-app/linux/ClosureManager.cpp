@@ -142,8 +142,8 @@ CHIP_ERROR ClosureManager::SetClosurePanelInitialState(ClosureDimensionEndpoint 
 {
     ChipLogProgress(AppServer, "ClosurePanelEndpoint SetInitialState");
     DataModel::Nullable<GenericDimensionStateStruct> currentState(
-        GenericDimensionStateStruct(MakeOptional(DataModel::MakeNullable<Percent100ths>(10000)), MakeOptional(DataModel::MakeNullable(true)),
-                                    MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
+        GenericDimensionStateStruct(MakeOptional(DataModel::MakeNullable<Percent100ths>(10000)),
+                                    MakeOptional(DataModel::MakeNullable(true)), MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
     ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetCurrentState(currentState));
 
     DataModel::Nullable<GenericDimensionStateStruct> targetState(
