@@ -123,19 +123,17 @@ CHIP_ERROR ClosureManager::SetClosureControlInitialState(ClosureControlEndpoint 
     ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetCountdownTimeFromDelegate(NullNullable));
     ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetMainState(MainStateEnum::kStopped));
 
-    DataModel::Nullable<GenericOverallCurrentState> overallState(
-        GenericOverallCurrentState(MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed)),
-                                   MakeOptional(DataModel::MakeNullable(true)),
-                                   MakeOptional(Globals::ThreeLevelAutoEnum::kAuto),
-                                   MakeOptional(DataModel::MakeNullable(true))));
+    DataModel::Nullable<GenericOverallCurrentState> overallState(GenericOverallCurrentState(
+        MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed)), MakeOptional(DataModel::MakeNullable(true)),
+        MakeOptional(Globals::ThreeLevelAutoEnum::kAuto), MakeOptional(DataModel::MakeNullable(true))));
     ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetOverallCurrentState(overallState));
     DataModel::Nullable<GenericOverallTargetState> overallTarget(
-        GenericOverallTargetState(MakeOptional(DataModel::NullNullable),
-                                  MakeOptional(DataModel::NullNullable),
+        GenericOverallTargetState(MakeOptional(DataModel::NullNullable), MakeOptional(DataModel::NullNullable),
                                   MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
     ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetOverallTargetState(overallTarget));
     BitFlags<ClosureControl::LatchControlModesBitmap> latchControlModes;
-    latchControlModes.Set(ClosureControl::LatchControlModesBitmap::kRemoteLatching).Set(ClosureControl::LatchControlModesBitmap::kRemoteUnlatching);
+    latchControlModes.Set(ClosureControl::LatchControlModesBitmap::kRemoteLatching)
+        .Set(ClosureControl::LatchControlModesBitmap::kRemoteUnlatching);
     ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetLatchControlModes(latchControlModes));
     return CHIP_NO_ERROR;
 }
@@ -144,14 +142,11 @@ CHIP_ERROR ClosureManager::SetClosurePanelInitialState(ClosureDimensionEndpoint 
 {
     ChipLogProgress(AppServer, "ClosurePanelEndpoint SetInitialState");
     DataModel::Nullable<GenericDimensionStateStruct> currentState(
-        GenericDimensionStateStruct(MakeOptional(10000),
-                                    MakeOptional(true),
-                                    MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
+        GenericDimensionStateStruct(MakeOptional(10000), MakeOptional(true), MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
     ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetCurrentState(currentState));
 
     DataModel::Nullable<GenericDimensionStateStruct> targetState(
-        GenericDimensionStateStruct(MakeOptional(DataModel::NullNullable),
-                                    MakeOptional(DataModel::NullNullable),
+        GenericDimensionStateStruct(MakeOptional(DataModel::NullNullable), MakeOptional(DataModel::NullNullable),
                                     MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
     ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetTargetState(targetState));
 
@@ -159,17 +154,15 @@ CHIP_ERROR ClosureManager::SetClosurePanelInitialState(ClosureDimensionEndpoint 
     ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetStepValue(1000));
     ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetUnit(ClosureUnitEnum::kMillimeter));
     ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetUnitRange(
-        ClosureDimension::Structs::UnitRangeStruct::Type{ .min = static_cast<int16_t>(0),
-                                                          .max = static_cast<int16_t>(10000) }));
+        ClosureDimension::Structs::UnitRangeStruct::Type{ .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(10000) }));
     ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetOverflow(OverflowEnum::kTopInside));
 
-    ClosureDimension::Structs::RangePercent100thsStruct::Type limitRange{
-        .min = static_cast<Percent100ths>(0),
-        .max = static_cast<Percent100ths>(10000)
-    };
+    ClosureDimension::Structs::RangePercent100thsStruct::Type limitRange{ .min = static_cast<Percent100ths>(0),
+                                                                          .max = static_cast<Percent100ths>(10000) };
     ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetLimitRange(limitRange));
     BitFlags<ClosureDimension::LatchControlModesBitmap> latchControlModes;
-    latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching).Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
+    latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching)
+        .Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
     ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetLatchControlModes(latchControlModes));
 
     return CHIP_NO_ERROR;
