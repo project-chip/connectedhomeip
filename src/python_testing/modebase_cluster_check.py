@@ -119,7 +119,7 @@ class ModeBaseClusterChecks:
                 # Check if is tag is common, derived or mfg.
                 is_mfg = (START_MFGTAGS_RANGE <= tag.value <= END_MFGTAGS_RANGE)
                 if not (is_mfg or tag.value in self.mode_tags):
-                    asserts.fail("Mode tag value is not a common, derived or vendor tag.")
+                    asserts.fail(f"Mode tag value: {hex(tag.value)} is not a common tag, run tag or vendor tag")
 
                 # Confirm if tag is common or derived.
                 if not is_mfg:
