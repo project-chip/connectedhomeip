@@ -329,7 +329,7 @@ if CHIP_ENABLE_ICD_SUPPORT
 config CHIP_ICD_SLOW_POLL_INTERVAL
 	int "Intermittently Connected Device slow polling interval (ms)"
 	default 30000 if CHIP_ICD_LIT_SUPPORT
-	default 1000
+	default 2000
 	help
 	  Provides the Intermittently Connected Device slow polling interval in milliseconds while the
 	  device is in the idle mode. It determines the fastest frequency at which the device will be able
@@ -337,7 +337,7 @@ config CHIP_ICD_SLOW_POLL_INTERVAL
 
 config CHIP_ICD_FAST_POLLING_INTERVAL
 	int "Intermittently Connected Device fast polling interval (ms)"
-	default 200
+	default 500
 	help
 	  Provides the Intermittently Connected Device fast polling interval in milliseconds while the
 	  device is in the active mode. It determines the fastest frequency at which the device will be able
@@ -346,8 +346,7 @@ config CHIP_ICD_FAST_POLLING_INTERVAL
 
 config CHIP_ICD_IDLE_MODE_DURATION
 	int "Intermittently Connected Device idle mode duration (s)"
-	default 300 if CHIP_ICD_LIT_SUPPORT
-	default 120
+	default 600
 	help
 	  Provides the Intermittently Connected Device idle mode duration in seconds.
 	  It determines the maximum amount of time the device can stay in the idle mode, which means the
@@ -362,8 +361,7 @@ config CHIP_ICD_IDLE_MODE_INTERVAL_MS
 
 config CHIP_ICD_ACTIVE_MODE_DURATION
 	int "Intermittently Connected Device active mode duration (ms)"
-	default 10000 if CHIP_ICD_LIT_SUPPORT
-	default 300
+	default 10000
 	help
 	  Provides the Intermittently Connected Device active mode duration in milliseconds.
 	  It determines the minimum amount of time the device shall stay in the active mode.
@@ -376,8 +374,7 @@ config CHIP_ICD_ACTIVE_MODE_INTERVAL_MS
 
 config CHIP_ICD_ACTIVE_MODE_THRESHOLD
 	int "Intermittently Connected Device active mode threshold (ms)"
-	default 5000 if CHIP_ICD_LIT_SUPPORT
-	default 300
+	default 5000
 	help
 	  Provides the Intermittently Connected Device active mode threshold in milliseconds.
 	  It determines the minimum amount of time the device shall stay in the active mode after the network activity.
