@@ -15,7 +15,6 @@
 #include <ble/BleLayer.h>
 #include <ble/BleLayerDelegate.h>
 #include <ble/BlePlatformDelegate.h>
-
 namespace chip {
 namespace Ble {
 
