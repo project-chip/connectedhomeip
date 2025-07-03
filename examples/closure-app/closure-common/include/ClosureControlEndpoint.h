@@ -121,7 +121,7 @@ public:
      *
      * This function is called when a motion action has been stopped.
      * It should update the internal state of the closure control endpoint to reflect the
-     * completion of the stop motion action.
+     * stopping of the motion action.
      */
     void OnStopMotionActionComplete();
 
@@ -130,7 +130,7 @@ public:
      *
      * This function is called when the calibration action has been stopped.
      * It should update the internal state of the closure control endpoint to reflect the
-     * completion of the stop calibration action.
+     * stopping of the calibration action.
      */
     void OnStopCalibrateActionComplete();
 
@@ -153,6 +153,22 @@ public:
      * a motion completed event.
      */
     void OnMoveToActionComplete();
+
+    /**
+     * @brief Handles the completion of a panel motion action for closure endpoint.
+     *
+     * This function is called when a panel motion action has been completed.
+     * It updates the internal state of the closure endpoint to reflect
+     * the completion of the panel motion action.
+     */
+    void OnPanelMotionActionComplete();
+
+    /**
+     * @brief Retrieves the endpoint ID associated with this Closure Control endpoint.
+     *
+     * @return The EndpointId of this Closure Control endpoint.
+     */
+    EndpointId GetEndpointId() const { return mEndpoint; }
 
 private:
     EndpointId mEndpoint = kInvalidEndpointId;

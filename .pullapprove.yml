@@ -244,6 +244,14 @@ groups:
       teams: [reviewers-qorvo]
     reviews:
       request: 0 # Do not auto-add
+  shared-reviewers-velux:
+    type: optional
+    conditions:
+      - files.include('*')
+    reviewers:
+      teams: [reviewers-velux]
+    reviews:
+      request: 0 # Do not auto-add
 
   ############################################################
   #  Folder specific review requirements. A PR must meet all

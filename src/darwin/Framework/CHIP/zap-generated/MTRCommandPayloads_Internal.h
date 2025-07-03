@@ -1516,6 +1516,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRThermostatClusterAddThermostatSuggestionResponseParams (InternalMethods)
+
+- (CHIP_ERROR)_setFieldsFromDecodableStruct:(const chip::app::Clusters::Thermostat::Commands::AddThermostatSuggestionResponse::DecodableType &)decodableStruct;
+
+@end
+
 @interface MTRThermostatClusterClearWeeklyScheduleParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
@@ -1529,6 +1535,18 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface MTRThermostatClusterSetActivePresetRequestParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRThermostatClusterAddThermostatSuggestionParams (InternalMethods)
+
+- (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
+
+@end
+
+@interface MTRThermostatClusterRemoveThermostatSuggestionParams (InternalMethods)
 
 - (NSDictionary<NSString *, id> * _Nullable)_encodeAsDataValue:(NSError * __autoreleasing *)error;
 

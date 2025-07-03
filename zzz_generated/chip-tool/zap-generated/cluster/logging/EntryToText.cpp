@@ -3039,6 +3039,14 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Schedules";
         case chip::app::Clusters::Thermostat::Attributes::SetpointHoldExpiryTimestamp::Id:
             return "SetpointHoldExpiryTimestamp";
+        case chip::app::Clusters::Thermostat::Attributes::MaxThermostatSuggestions::Id:
+            return "MaxThermostatSuggestions";
+        case chip::app::Clusters::Thermostat::Attributes::ThermostatSuggestions::Id:
+            return "ThermostatSuggestions";
+        case chip::app::Clusters::Thermostat::Attributes::CurrentThermostatSuggestion::Id:
+            return "CurrentThermostatSuggestion";
+        case chip::app::Clusters::Thermostat::Attributes::ThermostatSuggestionNotFollowingReason::Id:
+            return "ThermostatSuggestionNotFollowingReason";
         case chip::app::Clusters::Thermostat::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::Thermostat::Attributes::AcceptedCommandList::Id:
@@ -4757,8 +4765,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "MeteredQuantity";
         case chip::app::Clusters::CommodityMetering::Attributes::MeteredQuantityTimestamp::Id:
             return "MeteredQuantityTimestamp";
-        case chip::app::Clusters::CommodityMetering::Attributes::MeasurementType::Id:
-            return "MeasurementType";
+        case chip::app::Clusters::CommodityMetering::Attributes::TariffUnit::Id:
+            return "TariffUnit";
         case chip::app::Clusters::CommodityMetering::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::CommodityMetering::Attributes::AcceptedCommandList::Id:
@@ -5796,6 +5804,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "SetActiveScheduleRequest";
         case chip::app::Clusters::Thermostat::Commands::SetActivePresetRequest::Id:
             return "SetActivePresetRequest";
+        case chip::app::Clusters::Thermostat::Commands::AddThermostatSuggestion::Id:
+            return "AddThermostatSuggestion";
+        case chip::app::Clusters::Thermostat::Commands::RemoveThermostatSuggestion::Id:
+            return "RemoveThermostatSuggestion";
         case chip::app::Clusters::Thermostat::Commands::AtomicRequest::Id:
             return "AtomicRequest";
         default:
@@ -6735,6 +6747,8 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
         {
         case chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::Id:
             return "GetWeeklyScheduleResponse";
+        case chip::app::Clusters::Thermostat::Commands::AddThermostatSuggestionResponse::Id:
+            return "AddThermostatSuggestionResponse";
         case chip::app::Clusters::Thermostat::Commands::AtomicResponse::Id:
             return "AtomicResponse";
         default:
