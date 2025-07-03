@@ -16,6 +16,7 @@ private:
     {
         OwnershipTransferContext(uint64_t nodeId, bool jcm, chip::ByteSpan trustedIcacPublicKeyB) : mNodeId(nodeId), mJCM(jcm)
         {
+            VerifyOrDie(trustedIcacPublicKeyB.size() == chip::Crypto::kP256_PublicKey_Length);
             memcpy(keyRawBytes, trustedIcacPublicKeyB.data(), chip::Crypto::kP256_PublicKey_Length);
             mTrustedIcacPublicKeyBSerialized = keyRawBytes;
         }
