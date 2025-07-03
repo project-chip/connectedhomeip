@@ -5,27 +5,13 @@ steps:
           - "-c"
           - |
               git config --global --add safe.directory "*"
-              python scripts/checkout_submodules.py --shallow --recursive --platform linux 
-      id: Submodules
-    - name: "ghcr.io/project-chip/chip-build-vscode:140"
-      args:
-          - "-c"
+              python scripts/checkout_submodules.py --shallow --recursive --platform linux
           - source ./scripts/bootstrap.sh -p linux
-      id: Bootstrap
-      waitFor:
-          - Submodules
-      entrypoint: /usr/bin/bash
-      timeout: 900s
-    - name: "ghcr.io/project-chip/chip-build-vscode:140"
-      args:
-          - >-
-              ./examples/chef/chef.py -b -d rootnode_pump_5f904818cc -t linux &&
-              ./scripts/build_python.sh -i out/python_env &&
-              scripts/run_in_python_env.sh out/python_env './scripts/tests/run_python_test.py --app examples/chef/linux/out/rootnode_pump_5f904818cc --factory-reset --script ./examples/chef/tests/pump_tests.py --script-args "--qr-code MT:Y.K90AFN00KA0648G00 --dut-node-id 0x20 --commissioning-method on-network"'
+          - ./scripts/run_in_build_env.sh
+          - ./examples/chef/chef.py -b -d rootnode_pump_5f904818cc -t linux
+          - ./scripts/build_python.sh -i out/python_env
+          - scripts/run_in_python_env.sh out/python_env './scripts/tests/run_python_test.py --app examples/chef/linux/out/rootnode_pump_5f904818cc --factory-reset --script ./examples/chef/tests/pump_tests.py --script-args "--qr-code MT:Y.K90AFN00KA0648G00 --dut-node-id 0x20 --commissioning-method on-network"'
       id: PumpTest
-      waitFor:
-          - Bootstrap
-      entrypoint: ./scripts/run_in_build_env.sh
 
 logsBucket: matter-build-automation-build-logs
 
