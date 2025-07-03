@@ -20,106 +20,6 @@
 #include <cassert>
 #include <cstdint>
 
-namespace chip {
-
-// Ensure all operators are in the same namespace as their types
-
-// Span comparison operators
-inline bool operator==(const Span<const char> & a, const Span<const char> & b)
-{
-    return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
-}
-
-inline bool operator!=(const Span<const char> & a, const Span<const char> & b)
-{
-    return !(a == b);
-}
-
-inline bool operator==(const Span<const uint32_t> & a, const Span<const uint32_t> & b)
-{
-    return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
-}
-
-inline bool operator!=(const Span<const uint32_t> & a, const Span<const uint32_t> & b)
-{
-    return !(a == b);
-}
-
-namespace app {
-namespace Clusters {
-namespace Globals {
-namespace Structs {
-
-// CurrencyStruct
-inline bool operator==(const CurrencyStruct::Type & lhs, const CurrencyStruct::Type & rhs)
-{
-    return (lhs.currency == rhs.currency) && (lhs.decimalPoints == rhs.decimalPoints);
-}
-
-inline bool operator!=(const CurrencyStruct::Type & lhs, const CurrencyStruct::Type & rhs)
-{
-    return !(lhs == rhs);
-}
-
-// PowerThresholdStruct
-inline bool operator==(const PowerThresholdStruct::Type & lhs, const PowerThresholdStruct::Type & rhs)
-{
-    return (lhs.powerThresholdSource == rhs.powerThresholdSource) && (lhs.powerThreshold == rhs.powerThreshold) &&
-        (lhs.apparentPowerThreshold == rhs.apparentPowerThreshold);
-}
-
-inline bool operator!=(const PowerThresholdStruct::Type & lhs, const PowerThresholdStruct::Type & rhs)
-{
-    return !(lhs == rhs);
-}
-
-} // namespace Structs
-} // namespace Globals
-
-namespace CommodityTariff {
-namespace Structs {
-
-// TariffPriceStruct
-inline bool operator==(const TariffPriceStruct::Type & lhs, const TariffPriceStruct::Type & rhs)
-{
-    return (lhs.priceType == rhs.priceType) && (lhs.price == rhs.price) && (lhs.priceLevel == rhs.priceLevel);
-}
-
-inline bool operator!=(const TariffPriceStruct::Type & lhs, const TariffPriceStruct::Type & rhs)
-{
-    return !(lhs == rhs);
-}
-
-// AuxiliaryLoadSwitchSettingsStruct
-inline bool operator==(const AuxiliaryLoadSwitchSettingsStruct::Type & lhs, const AuxiliaryLoadSwitchSettingsStruct::Type & rhs)
-{
-    return (lhs.number == rhs.number) && (lhs.requiredState == rhs.requiredState);
-}
-
-inline bool operator!=(const AuxiliaryLoadSwitchSettingsStruct::Type & lhs, const AuxiliaryLoadSwitchSettingsStruct::Type & rhs)
-{
-    return !(lhs == rhs);
-}
-
-// PeakPeriodStruct
-inline bool operator==(const PeakPeriodStruct::Type & lhs, const PeakPeriodStruct::Type & rhs)
-{
-    return (lhs.severity == rhs.severity) && (lhs.peakPeriod == rhs.peakPeriod);
-}
-
-inline bool operator!=(const PeakPeriodStruct::Type & lhs, const PeakPeriodStruct::Type & rhs)
-{
-    return !(lhs == rhs);
-}
-
-} // namespace Structs
-} // namespace CommodityTariff
-
-} // namespace Clusters
-
-} // namespace app
-} // namespace chip
-
 using namespace chip;
 using namespace chip::app;
 using namespace chip::Platform;
@@ -372,6 +272,14 @@ CHIP_ERROR DayEntriesDataClass::Validate(const ValueType & aValue) const
 
 bool DayEntriesDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
+    using chip::app::Clusters::CommodityTariff::Structs::operator!=;
+
+    if (source != destination)
+    {
+        return true;
+    }
+
+
     if (!CommonUtilities::AreOptionalEqual(source.duration, destination.duration))
     {
         return true;
@@ -811,8 +719,8 @@ CHIP_ERROR IndividualDaysDataClass::Validate(const ValueType & aValue) const
 
 bool IndividualDaysDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
-    return (source.date != destination.date || source.dayType != destination.dayType ||
-            source.dayEntryIDs != destination.dayEntryIDs);
+    using chip::app::Clusters::CommodityTariff::Structs::operator!=;
+    return (source != destination);
 }
 
 void IndividualDaysDataClass::CleanupStructValue(PayloadType & aValue)

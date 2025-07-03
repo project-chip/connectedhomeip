@@ -295,7 +295,7 @@ private:
     bool TariffDataUpd_Init(TariffUpdateCtx & UpdCtx)
     {
 #define X(attrName, attrType)                                                                                                      \
-    if (m##attrName##_MgmtObj.UpdateBegin(&UpdCtx, TariffDataUpd_AttrChangeCb) != CHIP_NO_ERROR)                                   \
+    if (m##attrName##_MgmtObj.UpdateBegin(&UpdCtx, TariffDataUpd_AttrChangeCb, true) != CHIP_NO_ERROR)                                   \
     {                                                                                                                              \
         return false;                                                                                                              \
     }
@@ -329,6 +329,7 @@ protected:
 struct CurrentTariffAttrsCtx
 {
     Delegate * TariffProvider;
+    EndpointId EndpointId;
 
     std::map<uint32_t, const Structs::DayPatternStruct::Type *> DayPatternsMap;
     std::map<uint32_t, const Structs::DayEntryStruct::Type *> DayEntriesMap;
@@ -376,6 +377,8 @@ public:
     void ForceDaysAttrsUpdate();
     void ForceDayEntriesAttrsUpdate();
 
+    void TariffComponentUpd_AttrChangeCb(uint32_t aAttrId, void * CbCtx);
+
 private:
     enum class UpdateEventCode
     {
@@ -405,7 +408,8 @@ private:
     // Current attributes storage
 #define X(attrName, attrType)                                                                                                      \
     attrType m##attrName;                                                                                                          \
-    attrType & Get##attrName() { return m##attrName; }
+    attrType & Get##attrName() { return m##attrName; }                                                                             \
+    CHIP_ERROR Set##attrName( attrType & newValue ) { return SetValue(m##attrName, newValue, Attributes::attrName::Id); }
     COMMODITY_TARIFF_CURRENT_SINGLE_ATTRIBUTES
 #undef X
 
@@ -414,6 +418,9 @@ private:
     attrType & Get##attrName() { return m##attrName##_MgmtObj.GetValue(); }
     COMMODITY_TARIFF_CURRENT_LIST_ATTRIBUTES
 #undef X
+
+    template <typename T>
+    CHIP_ERROR SetValue(T & currValue, T & newValue, uint32_t attrId);
 
     void TariffDataUpdatedCb(bool is_erased);
     void ResetCurrentAttributes();

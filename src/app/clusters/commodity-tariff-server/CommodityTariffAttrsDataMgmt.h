@@ -27,7 +27,121 @@
 #include <type_traits>
 
 namespace chip {
+
+// Span comparison operators
+inline bool operator==(const Span<const char> & a, const Span<const char> & b)
+{
+    return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
+}
+
+inline bool operator!=(const Span<const char> & a, const Span<const char> & b)
+{
+    return !(a == b);
+}
+
+inline bool operator==(const Span<const uint32_t> & a, const Span<const uint32_t> & b)
+{
+    return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
+}
+
+inline bool operator!=(const Span<const uint32_t> & a, const Span<const uint32_t> & b)
+{
+    return !(a == b);
+}
+
 namespace app {
+
+namespace Clusters {
+namespace Globals {
+namespace Structs {
+
+// CurrencyStruct
+inline bool operator==(const CurrencyStruct::Type & lhs, const CurrencyStruct::Type & rhs)
+{
+    return (lhs.currency == rhs.currency) && (lhs.decimalPoints == rhs.decimalPoints);
+}
+
+inline bool operator!=(const CurrencyStruct::Type & lhs, const CurrencyStruct::Type & rhs)
+{
+    return !(lhs == rhs);
+}
+
+// PowerThresholdStruct
+inline bool operator==(const PowerThresholdStruct::Type & lhs, const PowerThresholdStruct::Type & rhs)
+{
+    return (lhs.powerThresholdSource == rhs.powerThresholdSource) && (lhs.powerThreshold == rhs.powerThreshold) &&
+        (lhs.apparentPowerThreshold == rhs.apparentPowerThreshold);
+}
+
+inline bool operator!=(const PowerThresholdStruct::Type & lhs, const PowerThresholdStruct::Type & rhs)
+{
+    return !(lhs == rhs);
+}
+
+} // namespace Structs
+} // namespace Globals
+
+namespace CommodityTariff {
+namespace Structs {
+
+// TariffPriceStruct
+inline bool operator==(const TariffPriceStruct::Type & lhs, const TariffPriceStruct::Type & rhs)
+{
+    return (lhs.priceType == rhs.priceType) && (lhs.price == rhs.price) && (lhs.priceLevel == rhs.priceLevel);
+}
+
+inline bool operator!=(const TariffPriceStruct::Type & lhs, const TariffPriceStruct::Type & rhs)
+{
+    return !(lhs == rhs);
+}
+
+// AuxiliaryLoadSwitchSettingsStruct
+inline bool operator==(const AuxiliaryLoadSwitchSettingsStruct::Type & lhs, const AuxiliaryLoadSwitchSettingsStruct::Type & rhs)
+{
+    return (lhs.number == rhs.number) && (lhs.requiredState == rhs.requiredState);
+}
+
+inline bool operator!=(const AuxiliaryLoadSwitchSettingsStruct::Type & lhs, const AuxiliaryLoadSwitchSettingsStruct::Type & rhs)
+{
+    return !(lhs == rhs);
+}
+
+// PeakPeriodStruct
+inline bool operator==(const PeakPeriodStruct::Type & lhs, const PeakPeriodStruct::Type & rhs)
+{
+    return (lhs.severity == rhs.severity) && (lhs.peakPeriod == rhs.peakPeriod);
+}
+
+inline bool operator!=(const PeakPeriodStruct::Type & lhs, const PeakPeriodStruct::Type & rhs)
+{
+    return !(lhs == rhs);
+}
+
+inline bool operator==(const DayStruct::Type & lhs, const DayStruct::Type & rhs)
+{
+    return (lhs.date == rhs.date) && (lhs.dayType == rhs.dayType) && (lhs.dayEntryIDs == rhs.dayEntryIDs);
+}
+
+inline bool operator!=(const DayStruct::Type & lhs, const DayStruct::Type & rhs)
+{
+    return !(lhs == rhs);
+}
+
+inline bool operator==(const DayEntryStruct::Type & lhs, const DayEntryStruct::Type & rhs)
+{
+    return (lhs.dayEntryID == rhs.dayEntryID) && (lhs.startTime == rhs.startTime);
+}
+
+inline bool operator!=(const DayEntryStruct::Type & lhs, const DayEntryStruct::Type & rhs)
+{
+    return !(lhs == rhs);
+}
+
+
+} // namespace Structs
+} // namespace CommodityTariff
+
+} // namespace Clusters
 
 namespace CommodityTariffAttrsDataMgmt {
 
@@ -303,7 +417,7 @@ struct IsStruct
  * 3. **Validation Phase**:
  *    @code
  *    /// Validate and prepare for commit
- *    err = dataObj.UpdateBegin(context, callback);
+ *    err = dataObj.UpdateBegin(context, callback, valid_is_req);
  *    @endcode
  *    - Runs custom validation
  *    - State: kAssigned → kValidated
@@ -570,7 +684,7 @@ public:
      * @return CHIP_NO_ERROR if validation succeeds
      * @retval CHIP_ERROR_INCORRECT_STATE if not in kAssigned state
      */
-    CHIP_ERROR UpdateBegin(void * aUpdCtx, void (*aUpdCb)(uint32_t, void *))
+    CHIP_ERROR UpdateBegin(void * aUpdCtx, void (*aUpdCb)(uint32_t, void *), bool valid_is_req)
     {
         /* Skip if the attribute object has no new attached data */
         if (mUpdateState == UpdateState::kIdle)
@@ -586,7 +700,7 @@ public:
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         // Bypass validation if ctx not set
-        if (aUpdCtx != nullptr)
+        if (valid_is_req && aUpdCtx != nullptr)
         {
             mAuxData = aUpdCtx;
             err      = ValidateNewValue();
