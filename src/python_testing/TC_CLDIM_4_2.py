@@ -39,11 +39,28 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest,
+                                         TestStep, async_test_body, default_matter_test_main)
 from mobly import asserts
 
 
+def current_latch_matcher(latch: bool) -> AttributeMatcher:
+    def predicate(report: AttributeValue) -> bool:
+        if report.attribute != Clusters.ClosureDimension.Attributes.CurrentState:
+            return False
+        if report.value.latch == latch:
+            return True
+        else:
+            return False
+    return AttributeMatcher.from_callable(description=f"CurrentState.Latch is {latch}", matcher=predicate)
+
+
 class TC_CLDIM_4_2(MatterBaseTest):
+    async def read_cldim_attribute_expect_success(self, endpoint, attribute):
+        cluster = Clusters.Objects.ClosureDimension
+        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
+
     def desc_TC_CLDIM_4_2(self) -> str:
         return "[TC-CLDIM-4.2] Step Command Input Sanity Check with DUT as Server"
 
@@ -52,6 +69,15 @@ class TC_CLDIM_4_2(MatterBaseTest):
             TestStep(1, "Commissioning, already done", is_commissioning=True),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "If Positioning feature is not supported, skip remaining steps"),
+            TestStep("2c", "Establish wilcard subscription to all attributes"),
+            TestStep("2d", "Read CurrentState attribute"),
+            TestStep("2e", "If Latching feature not supported or state is unlatched, skip steps 2h ti 2m"),
+            TestStep("2f", "Read LatchControlModes attribute"),
+            TestStep("2g", "If LatchControlModes is manual unlatching, skip step 2h"),
+            TestStep("2h", "Send SetTarget command with Latch=False"),
+            TestStep("2i", "If LatchControlModes is remote unlatching, skip step 2j"),
+            TestStep("2j", "Manually unlatch the device"),
+            TestStep("2k", "Wait for CurrentState.Latched to be False"),
             TestStep(3, "Send Step command with invalid Direction"),
             TestStep(4, "Send Step command with invalid Speed"),
             TestStep(5, "Send Step command with NumberOfSteps = 0"),
@@ -67,6 +93,7 @@ class TC_CLDIM_4_2(MatterBaseTest):
     @async_test_body
     async def test_TC_CLDIM_4_2(self):
         endpoint = self.get_endpoint(default=1)
+        timeout = self.matter_test_config.timeout if self.matter_test_config.timeout is not None else self.default_timeout
         attributes = Clusters.ClosureDimension.Attributes
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
@@ -81,13 +108,71 @@ class TC_CLDIM_4_2(MatterBaseTest):
         )
 
         is_positioning_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
+        is_latching_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
 
         # STEP 2b: If Positioning feature is not supported, skip remaining steps
         self.step("2b")
         if not is_positioning_supported:
             logging.info("Positioning feature is not supported. Skipping remaining steps.")
-            self.skip_all_remaining_steps("3")
+            self.skip_all_remaining_steps("2c")
             return
+
+        # STEP 2c: Establish wildcard subscription to all attributes"
+        self.step("2c")
+        sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureDimension)
+        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
+
+        # STEP 2d: Read CurrentState attribute
+        self.step("2d")
+        initial_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
+
+        # STEP 2e: If Latching feature is not supported or state is unlatched, skip steps 2h to 2m
+        self.step("2e")
+        if (not is_latching_supported) or (not initial_state.latch):
+            logging.info("Latching feature is not supported or state is unlatched. Skipping steps 2f to 2k.")
+            self.skip_step("2f")
+            self.skip_step("2g")
+            self.skip_step("2h")
+            self.skip_step("2i")
+            self.skip_step("2j")
+            self.skip_step("2k")
+        else:
+            # STEP 2f: Read LatchControlModes attribute
+            self.step("2f")
+            latch_control_modes = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.LatchControlModes)
+
+            # STEP 2g: If LatchControlModes is manual unlatching, skip step 2h
+            self.step("2g")
+            sub_handler.reset()
+            if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
+                logging.info("LatchControlModes is manual unlatching. Skipping step 2h.")
+                self.skip_step("2h")
+            else:
+                # STEP 2h: Send SetTarget command with Latch=False
+                self.step("2h")
+                try:
+                    await self.send_single_cmd(
+                        cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=False),
+                        endpoint=endpoint
+                    )
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+
+            # STEP 2i: If LatchControlModes is remote unlatching, skip step 2j
+            self.step("2i")
+            if latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
+                logging.info("LatchControlModes is remote unlatching. Skipping step 2j.")
+                self.skip_step("2j")
+            else:
+                # STEP 2j: Manually unlatch the device
+                self.step("2j")
+                test_step = "Manual unlatch the device"
+                self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when ready.")
+
+            # STEP 2k: Wait for CurrentState.Latched to be False
+            self.step("2k")
+            sub_handler.await_all_expected_report_matches(
+                expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
 
         # STEP 3: Send Step command with invalid Direction
         self.step(3)
