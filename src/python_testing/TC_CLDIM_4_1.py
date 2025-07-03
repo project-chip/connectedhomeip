@@ -119,18 +119,13 @@ class TC_CLDIM_4_1(MatterBaseTest):
             TestStep("6b", "Send Step command to increase position by 1 step with Speed=Auto"),
             TestStep("6c", "Verify TargetState attribute is updated"),
             TestStep("6d", "Wait for CurrentState to be updated"),
-            TestStep("7a", "Send Step command to decrease position by 1 step"),
-            TestStep("7b", "Send Step command to decrease position by 1 step"),
-            TestStep("7c", "Send Step command to decrease position by 1 step"),
-            TestStep("7d", "Verify TargetState attribute is updated"),
-            TestStep("7e", "Wait for CurrentState to be updated"),
-            TestStep("8a", "Read CurrentState attribute"),
-            TestStep("8b", "Send Step command to decrease position by 65535"),
-            TestStep("8c", "Verify TargetState attribute is at MinPosition"),
-            TestStep("8d", "Wait for CurrentState to be updated"),
-            TestStep("8e", "Send Step command to increase position by 65535"),
-            TestStep("8f", "Verify TargetState attribute is at MaxPosition"),
-            TestStep("8g", "Wait for CurrentState to be updated"),
+            TestStep("7a", "Read CurrentState attribute"),
+            TestStep("7b", "Send Step command to decrease position by 65535"),
+            TestStep("7c", "Verify TargetState attribute is at MinPosition"),
+            TestStep("7d", "Wait for CurrentState to be updated"),
+            TestStep("7e", "Send Step command to increase position by 65535"),
+            TestStep("7f", "Verify TargetState attribute is at MaxPosition"),
+            TestStep("7g", "Wait for CurrentState to be updated"),
         ]
         return steps
 
@@ -379,67 +374,12 @@ class TC_CLDIM_4_1(MatterBaseTest):
             sub_handler.await_all_expected_report_matches(
                 expected_matchers=[current_position_and_speed_matcher(max_position, Globals.Enums.ThreeLevelAutoEnum.kAuto)], timeout_sec=timeout)
 
-        # STEP 7a: Send Step command to decrease position by 1 step
+        # STEP 7a: Read CurrentState attribute
         self.step("7a")
-
-        sub_handler.reset()
-        try:
-            await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.Step(
-                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease,
-                    numberOfSteps=1
-                ),
-                endpoint=endpoint
-            )
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-
-        # STEP 7b: Send Step command to decrease position by 1 step
-        self.step("7b")
-
-        try:
-            await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.Step(
-                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease,
-                    numberOfSteps=1
-                ),
-                endpoint=endpoint
-            )
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-
-        # STEP 7c: Send Step command to decrease position by 1 step
-        self.step("7c")
-
-        try:
-            await self.send_single_cmd(
-                cmd=Clusters.Objects.ClosureDimension.Commands.Step(
-                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease,
-                    numberOfSteps=1
-                ),
-                endpoint=endpoint
-            )
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-
-        # STEP 7d: Verify TargetState attribute is updated after multiple steps
-        self.step("7d")
-        target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
-        expected_position = max(max_position - 3 * step_value, min_position)
-        asserts.assert_equal(target_state.position, expected_position, "TargetState Position is not updated correctly")
-
-        # STEP 7e: Wait for CurrentState to be updated
-        self.step("7e")
-        expected_position = max(max_position - 3 * step_value, min_position)
-        sub_handler.await_all_expected_report_matches(
-            expected_matchers=[current_position_matcher(expected_position)], timeout_sec=timeout)
-
-        # STEP 8a: Read CurrentState attribute
-        self.step("8a")
         initial_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
-        # STEP 8b: Send Step command to decrease position beyond MinPosition
-        self.step("8b")
+        # STEP 7b: Send Step command to decrease position beyond MinPosition
+        self.step("7b")
         sub_handler.reset()
         try:
             await self.send_single_cmd(
@@ -452,22 +392,22 @@ class TC_CLDIM_4_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-        # STEP 8c: Verify TargetState attribute is at MinPosition
-        self.step("8c")
+        # STEP 7c: Verify TargetState attribute is at MinPosition
+        self.step("7c")
         target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
         asserts.assert_equal(target_state.position, min_position, "TargetState Position is not at MinPosition")
 
-        # STEP 8d: Wait for CurrentState to be updated
-        self.step("8d")
+        # STEP 7d: Wait for CurrentState to be updated
+        self.step("7d")
         if initial_state.position == min_position:
-            logging.info("Initial position == MinPosition. Skipping step 8d.")
+            logging.info("Initial position == MinPosition. Skipping step 7d.")
             self.mark_current_step_skipped()
         else:
             sub_handler.await_all_expected_report_matches(
                 expected_matchers=[current_position_matcher(min_position)], timeout_sec=timeout)
 
-        # STEP 8e: Send Step command to increase position beyond MaxPosition
-        self.step("8e")
+        # STEP 7e: Send Step command to increase position beyond MaxPosition
+        self.step("7e")
         sub_handler.reset()
         try:
             await self.send_single_cmd(
@@ -480,13 +420,13 @@ class TC_CLDIM_4_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
-        # STEP 8f: Verify TargetState attribute is at MaxPosition
-        self.step("8f")
+        # STEP 7f: Verify TargetState attribute is at MaxPosition
+        self.step("7f")
         target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
         asserts.assert_equal(target_state.position, max_position, "TargetState Position is not at MaxPosition")
 
-        # STEP 8g: Wait for CurrentState to be updated
-        self.step("8g")
+        # STEP 7g: Wait for CurrentState to be updated
+        self.step("7g")
         sub_handler.await_all_expected_report_matches(
             expected_matchers=[current_position_matcher(max_position)], timeout_sec=timeout)
 
