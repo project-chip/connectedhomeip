@@ -29,15 +29,11 @@ namespace Clusters {
 
 struct GeneralDiagnosticsEnabledAttributes
 {
-    bool enableNetworkInterfaces : 1;
-    bool enableRebootCount : 1;
-    bool enableUpTime : 1;
     bool enableTotalOperationalHours : 1;
     bool enableBootReason : 1;
     bool enableActiveHardwareFaults : 1;
     bool enableActiveRadioFaults : 1;
     bool enableActiveNetworkFaults : 1;
-    bool enableTestEventTriggersEnabled : 1;
 };
 
 class GeneralDiagnosticsLogic
