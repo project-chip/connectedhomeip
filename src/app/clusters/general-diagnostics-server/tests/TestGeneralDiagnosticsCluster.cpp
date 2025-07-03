@@ -45,11 +45,11 @@ struct TestGeneralDiagnosticsCluster : public ::testing::Test
 TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
 {
     const GeneralDiagnosticsEnabledAttributes enabledAttributes{
-        .enableTotalOperationalHours    = false,
-        .enableBootReason               = false,
-        .enableActiveHardwareFaults     = false,
-        .enableActiveRadioFaults        = false,
-        .enableActiveNetworkFaults      = false,
+        .enableTotalOperationalHours = false,
+        .enableBootReason            = false,
+        .enableActiveHardwareFaults  = false,
+        .enableActiveRadioFaults     = false,
+        .enableActiveNetworkFaults   = false,
     };
 
     GeneralDiagnosticsCluster cluster(enabledAttributes);
@@ -64,11 +64,11 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         {
         };
         const GeneralDiagnosticsEnabledAttributes enabledAttributes{
-            .enableTotalOperationalHours    = false,
-            .enableBootReason               = false,
-            .enableActiveHardwareFaults     = false,
-            .enableActiveRadioFaults        = false,
-            .enableActiveNetworkFaults      = false,
+            .enableTotalOperationalHours = false,
+            .enableBootReason            = false,
+            .enableActiveHardwareFaults  = false,
+            .enableActiveRadioFaults     = false,
+            .enableActiveNetworkFaults   = false,
         };
         NullProvider nullProvider;
     }
