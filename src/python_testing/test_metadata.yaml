@@ -131,6 +131,12 @@ not_automated:
     - name: TC_WEBRTCPTestBase.py
       reason:
           Shared code for the WebRTC Provider Cluster, not a standalone test.
+    - name: TC_WEBRTCR_2_3.py
+      reason: 
+          Camera Controller App does not support stream allocation requests
+    - name: TC_WEBRTCR_2_4.py
+      reason: 
+          Camera Controller App does not support stream allocation requests
     - name: TC_CLCTRL_2_1.py
       reason:
           Closure app on master branch does not support this test script yet.
