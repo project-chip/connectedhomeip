@@ -302,7 +302,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         Raises:
             AssertionError if verification fails
         """
-        if hasattr(cluster_obj, 'cluster_id'):  
+        if hasattr(cluster_obj, 'cluster_id'):
             cluster = ClusterObjects.ALL_CLUSTERS[cluster_obj.cluster_id]
             attribute_ids = list(read_request.tlvAttributes[endpoint][cluster_obj.cluster_id].keys())
 
@@ -849,7 +849,8 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         await self.default_controller.ReadAttribute(self.dut_node_id, ([]),
                                                     payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
 
-        # Note: The SuppressResponse field verification is handled at the transport layer and is not directly accessible during test execution.
+        # Note: The SuppressResponse field verification is handled at the
+        # transport layer and is not directly accessible during test execution.
 
         # Step 19: TH sends a Read Request Message to the DUT to read a non-global attribute on a given endpoint.
         self.step(19)
