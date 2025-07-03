@@ -175,7 +175,7 @@ public:
     CHIP_ERROR GetMainState(MainStateEnum & mainState);
     CHIP_ERROR GetOverallCurrentState(DataModel::Nullable<GenericOverallCurrentState> & overallCurrentState);
     CHIP_ERROR GetOverallTargetState(DataModel::Nullable<GenericOverallTargetState> & overallTarget);
-    CHIP_ERROR GetCurrentErrorList(DataModel::List<const ClosureErrorEnum> & currentErrorList);
+    CHIP_ERROR GetCurrentErrorList(MutableByteSpan & currentErrorList);
     CHIP_ERROR GetLatchControlModes(BitFlags<LatchControlModesBitmap> & latchControlModes);
     CHIP_ERROR GetFeatureMap(BitFlags<Feature> & featureMap);
     CHIP_ERROR GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision);

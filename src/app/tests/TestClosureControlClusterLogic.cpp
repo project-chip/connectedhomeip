@@ -1504,7 +1504,8 @@ TEST_F(TestClosureControlClusterLogic, ReadCurrentErrorList)
     conformance.FeatureMap().Set(Feature::kPositioning);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
-    DataModel::List<const ClosureErrorEnum> currentErrorList;
+    ClosureErrorEnum list[10] = {};
+    MutableByteSpan currentErrorList(reinterpret_cast<uint8_t *>(list), sizeof(list));
     EXPECT_EQ(logic->GetCurrentErrorList(currentErrorList), CHIP_NO_ERROR);
     EXPECT_TRUE(currentErrorList.empty());
 }
@@ -1516,13 +1517,13 @@ TEST_F(TestClosureControlClusterLogic, AddErrorToCurrentErrorList)
 
     EXPECT_EQ(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor), CHIP_ERROR_INCORRECT_STATE);
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
-
-    DataModel::List<const ClosureErrorEnum> currentErrorList;
+    ClosureErrorEnum list[10] = {};
+    MutableByteSpan currentErrorList(reinterpret_cast<uint8_t *>(list), sizeof(list));
     EXPECT_EQ(logic->GetCurrentErrorList(currentErrorList), CHIP_NO_ERROR);
     EXPECT_FALSE(currentErrorList.empty());
 
     EXPECT_EQ(static_cast<int>(currentErrorList.size()), 1);
-    EXPECT_EQ(currentErrorList[0], ClosureErrorEnum::kBlockedBySensor);
+    EXPECT_EQ(static_cast<ClosureErrorEnum>(currentErrorList[0]), ClosureErrorEnum::kBlockedBySensor);
 }
 
 TEST_F(TestClosureControlClusterLogic, AddDuplicateErrorToCurrentErrorList)
@@ -1539,12 +1540,13 @@ TEST_F(TestClosureControlClusterLogic, AddDuplicateErrorToCurrentErrorList)
 
     EXPECT_EQ(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor), CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED);
     EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
-    DataModel::List<const ClosureErrorEnum> currentErrorList;
+    ClosureErrorEnum list[10] = {};
+    MutableByteSpan currentErrorList(reinterpret_cast<uint8_t *>(list), sizeof(list));
     EXPECT_EQ(logic->GetCurrentErrorList(currentErrorList), CHIP_NO_ERROR);
     EXPECT_FALSE(currentErrorList.empty());
 
     EXPECT_EQ(static_cast<int>(currentErrorList.size()), 1);
-    EXPECT_EQ(currentErrorList[0], ClosureErrorEnum::kBlockedBySensor);
+    EXPECT_EQ(static_cast<ClosureErrorEnum>(currentErrorList[0]), ClosureErrorEnum::kBlockedBySensor);
 }
 
 TEST_F(TestClosureControlClusterLogic, ClearCurrentErrorList)
@@ -1556,20 +1558,20 @@ TEST_F(TestClosureControlClusterLogic, ClearCurrentErrorList)
     EXPECT_EQ(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor), CHIP_ERROR_INCORRECT_STATE);
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
 
-    DataModel::List<const ClosureErrorEnum> currentErrorList;
+    ClosureErrorEnum list[10] = {};
+    MutableByteSpan currentErrorList(reinterpret_cast<uint8_t *>(list), sizeof(list));
     EXPECT_EQ(logic->GetCurrentErrorList(currentErrorList), CHIP_NO_ERROR);
     EXPECT_FALSE(currentErrorList.empty());
 
     EXPECT_EQ(static_cast<int>(currentErrorList.size()), 1);
-    EXPECT_EQ(currentErrorList[0], ClosureErrorEnum::kBlockedBySensor);
+    EXPECT_EQ(static_cast<ClosureErrorEnum>(currentErrorList[0]), ClosureErrorEnum::kBlockedBySensor);
 
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
     logic->ClearCurrentErrorList();
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
-
-    currentErrorList.reduce_size(0);
-    EXPECT_EQ(logic->GetCurrentErrorList(currentErrorList), CHIP_NO_ERROR);
-    EXPECT_TRUE(currentErrorList.empty());
+    MutableByteSpan emptyErrorList(reinterpret_cast<uint8_t *>(list), sizeof(list));
+    EXPECT_EQ(logic->GetCurrentErrorList(emptyErrorList), CHIP_NO_ERROR);
+    EXPECT_TRUE(emptyErrorList.empty());
 }
