@@ -36,6 +36,7 @@
 
 set -o pipefail
 shopt -s extglob
+unset CDPATH
 
 function usage() { # status
     info "Usage: $0 [OPTIONS] [--project=... [PROJECT OPTIONS]]"
