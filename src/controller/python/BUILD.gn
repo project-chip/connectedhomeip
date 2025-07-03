@@ -99,6 +99,7 @@ shared_library("ChipDeviceCtrl") {
         "chip/webrtc/RTCClient.cpp",
         "chip/webrtc/WebRTC.cpp",
         "chip/webrtc/WebRTC.h",
+        "chip/webrtc/WebRTCTransportCluster.cpp",
       ]
     }
     defines += [ "CHIP_CONFIG_MAX_GROUPS_PER_FABRIC=50" ]
@@ -250,8 +251,11 @@ chip_python_wheel_action("chip-core") {
         sources += [
           "chip/webrtc/__init__.py",
           "chip/webrtc/library_handle.py",
+          "chip/webrtc/peer_connection.py",
           "chip/webrtc/types.py",
+          "chip/webrtc/utils.py",
           "chip/webrtc/webrtc_client.py",
+          "chip/webrtc/webrtc_manager.py",
         ]
       }
 

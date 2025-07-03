@@ -22,6 +22,10 @@ from .types import (
     GatheringCompleteCallbackType,
     IceCandidateCallbackType,
     LocalDescriptionCallbackType,
+    OnAnswerCallbackFunct,
+    OnEndCallbackFunct,
+    OnICECandidatesCallbackFunct,
+    OnOfferCallbackFunct,
     StateChangeCallback,
     WebRTCClientHandle,
 )
@@ -65,3 +69,41 @@ def _GetWebRTCLibraryHandle() -> CDLL:
         lib.pychip_webrtc_client_set_state_change_callback.argtypes = [WebRTCClientHandle, StateChangeCallback]
 
     return lib
+
+
+def get_webrtc_requestor_handle() -> CDLL:
+    lib = GetLibraryHandle()
+
+    if not lib.pychip_WebRTCTransportRequestor_InitCallbacks.argtypes:
+        lib.pychip_WebRTCTransportRequestor_Init.argtypes = []
+        lib.pychip_WebRTCTransportRequestor_InitCallbacks.argtypes = [
+            OnOfferCallbackFunct, OnAnswerCallbackFunct, OnICECandidatesCallbackFunct,
+            OnEndCallbackFunct]
+    return lib
+
+
+class WebRTCRequestorNativeBindings:
+    """This class is intended to be used only by WebRTCManager.
+
+    Exposes python methods for accessing native APIs. Also holds
+    reference to the callback objects for WebRTC Requestor delegates.
+    """
+
+    def __init__(self):
+        self.handle_offer_cb = OnOfferCallbackFunct(self.handle_offer)
+        self.handle_answer_cb = OnAnswerCallbackFunct(self.handle_answer)
+        self.handle_ice_candidates_cb = OnICECandidatesCallbackFunct(self.handle_ice_candidates)
+        self.handle_end_cb = OnEndCallbackFunct(self.handle_end)
+
+    def init_webrtc_requestor_server(self):
+        handle = get_webrtc_requestor_handle()
+        handle.pychip_WebRTCTransportRequestor_Init()
+
+    def set_webrtc_requestor_delegate_callbacks(self):
+        handle = get_webrtc_requestor_handle()
+        handle.pychip_WebRTCTransportRequestor_InitCallbacks(
+            self.handle_offer_cb,
+            self.handle_answer_cb,
+            self.handle_ice_candidates_cb,
+            self.handle_end_cb
+        )
