@@ -412,3 +412,15 @@ const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpo
     // no known attributes even for OTA
     return nullptr;
 }
+
+Protocols::InteractionModel::Status emberAfReadAttribute(unsigned short, unsigned int, unsigned int, unsigned char *,
+                                                         unsigned short)
+{
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+}
+
+Protocols::InteractionModel::Status emberAfWriteAttribute(unsigned short, unsigned int, unsigned int, unsigned char *,
+                                                          unsigned char)
+{
+    return Protocols::InteractionModel::Status::UnsupportedAttribute;
+}

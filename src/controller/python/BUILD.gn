@@ -20,6 +20,7 @@ import("$dir_pw_build/python.gni")
 
 import("${chip_root}/build/chip/python_wheel.gni")
 import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/controller/flags.gni")
 import("${chip_root}/src/platform/python.gni")
 import("${chip_root}/src/system/system.gni")
@@ -172,6 +173,10 @@ shared_library("ChipDeviceCtrl") {
       "${chip_root}/src/tracing/perfetto:event_storage",
       "${chip_root}/src/tracing/perfetto:simple_initialization",
     ]
+
+    if (chip_build_controller_dynamic_server) {
+      deps += [ "${chip_root}/src/controller:nodatamodel" ]
+    }
   } else {
     public_deps += [ "$chip_data_model" ]
   }
