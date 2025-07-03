@@ -417,7 +417,6 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNotInitialized)
 
 TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoBleTransportLayer)
 {
-
     chip::Test::BleLayerTestAccess access(this);
     access.SetConnectionDelegate(this);
     mBleTransport = nullptr;
@@ -443,17 +442,16 @@ TEST_F(TestBleLayer, NewConnectionByDiscriminatorsSuccess)
     auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {
         BleLayer * testLayer = static_cast<BleLayer *>(appState);
         chip::Test::BleLayerTestAccess tempAccess(testLayer);
-        EXPECT_NE(testLayer, nullptr);
 
-        // testLayer->mOnConnectionCompleteCount++;
         tempAccess.CallOnConnectionComplete(appState, connObj);
     };
-    auto OnError = [](void * appState, CHIP_ERROR err) {};
+    auto OnError             = [](void * appState, CHIP_ERROR err) {};
+    BleLayer * bleLayerState = this;
 
     EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_NO_ERROR);
-    OnSuccess(this, discriminatorsSpan[0].GetLongValue(), GetConnectionObject());
-    // EXPECT_EQ(mOnConnectionCompleteCount, 1);
-    // EXPECT_EQ(mOnConnectionErrorCount, 0);
+    OnSuccess(bleLayerState, discriminatorsSpan[0].GetLongValue(), GetConnectionObject());
+    EXPECT_EQ(mOnConnectionCompleteCount, 1);
+    EXPECT_EQ(mOnConnectionErrorCount, 0);
 }
 
 }; // namespace Ble
