@@ -190,7 +190,7 @@ MdnsContexts::~MdnsContexts()
     while (iter != mContexts.cend())
     {
         Delete(*iter);
-        mContexts.erase(iter);
+        iter = mContexts.erase(iter);
     }
 }
 
