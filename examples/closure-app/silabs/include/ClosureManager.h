@@ -249,7 +249,7 @@ private:
     bool GetPanelNextPosition(const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & currentState,
                               const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & targetState,
                               chip::app::DataModel::Nullable<chip::Percent100ths> & nextPosition);
-  
+
     /**
      * @brief Handles a single step action for the panel associated with the specified endpoint.
      *
