@@ -40,7 +40,8 @@ import logging
 import chip.clusters as Clusters
 from chip.clusters import Globals
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest,
+from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest,
                                          TestStep, async_test_body, default_matter_test_main)
 from mobly import asserts
 
@@ -183,7 +184,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         # STEP 2e: Establish wildcard subscription to all attributes"
         self.step("2e")
         sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureDimension)
-        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
+        await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
         # STEP 2f: Read CurrentState attribute
         self.step("2f")
@@ -206,13 +207,13 @@ class TC_CLDIM_4_1(MatterBaseTest):
 
             # STEP 2i: If LatchControlModes is manual unlatching, skip step 2j
             self.step("2i")
+            sub_handler.reset()
             if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
                 logging.info("LatchControlModes is manual unlatching. Skipping step 2j.")
                 self.skip_step("2j")
             else:
                 # STEP 2j: Send SetTarget command with Latch=False
                 self.step("2j")
-                sub_handler.reset()
                 try:
                     await self.send_single_cmd(
                         cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=False),
