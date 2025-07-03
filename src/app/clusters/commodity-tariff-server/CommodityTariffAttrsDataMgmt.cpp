@@ -253,7 +253,7 @@ CHIP_ERROR TariffInfoDataClass::Validate(const ValueType & aValue) const
                                 CHIP_ERROR_INVALID_ARGUMENT);
         }
 
-        if (CommonUtilities::HasFeatureInCtx((TariffUpdateCtx *) mAuxData, CommodityTariff::Feature::kPricing))
+        if (CommonUtilities::HasFeatureInCtx(static_cast<TariffUpdateCtx *>(mAuxData), CommodityTariff::Feature::kPricing))
         {
             if (newValue.currency.HasValue() && !newValue.currency.Value().IsNull())
             {
