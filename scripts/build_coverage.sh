@@ -78,7 +78,7 @@ help() {
     echo "    --python                In addition to unit tests, run Python-based tests."
     echo "                            Both can be combined if needed."
     echo
-    echo "    --target=TARGET         Specific test target to run for unit tests (e.g. 'TestEmberAttributeBuffer.run')."
+    echo "    --target=TARGET         Specify one or more test targets to run for unit tests (e.g. 'TestEmberAttributeBuffer.run' or 'TestBleLayer.run TestBtpEngine.run')."
     echo
 }
 
@@ -157,7 +157,7 @@ if [ "$skip_gn" == false ]; then
     #
     # 1) Always run unit tests
     #
-    ninja -C "$OUTPUT_ROOT" "$TEST_TARGET"
+    ninja -C "$OUTPUT_ROOT" $TEST_TARGET
 
     #
     # 2) Run YAML tests if requested
