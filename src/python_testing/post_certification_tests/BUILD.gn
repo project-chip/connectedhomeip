@@ -23,7 +23,12 @@ idt_files = [
   "${chip_root}/src/python_testing/TC_DA_1_7.py",
 ]
 
-credentials_files = [ "${chip_root}/credentials/fetch_paa_certs_from_dcl.py" ]
+copy("idt_files") {
+  sources = idt_files
+  outputs = [ "${root_out_dir}/ddd/{{source_name_part}}.txt" ]
+}
+
+# credentials_files = [ "${chip_root}/credentials/fetch_paa_certs_from_dcl.py" ]
 
 _version = "1.4.2"
 
@@ -52,13 +57,15 @@ pw_python_distribution("matter-post-certification-tests") {
     include_extra_files_in_package_data = true
   }
 
-  extra_files = []
+  public_deps = [ ":idt_files" ]
 
-  foreach(file, idt_files) {
-    extra_files +=
-        [ "${file} > chip/testing/idt/" + get_path_info(file, "file") ]
-  }
-  foreach(file, credentials_files) {
-    extra_files += [ "${file} > credentials/" + get_path_info(file, "file") ]
-  }
+  # idt_files_outputs = get_target_outputs(":idt_files")
+
+  extra_files =
+      [ "${root_out_dir}/ddd/TC_DA_1_2.txt > chip/testing/idt/TC_DA_1_2.txt" ]
+
+  # foreach(file, idt_files_outputs) {
+  #   extra_files +=
+  #       [ "${file} > chip/testing/idt/" + get_path_info(file, "file") ]
+  # }
 }
