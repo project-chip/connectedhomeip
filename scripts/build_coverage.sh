@@ -51,7 +51,7 @@ QUIET_FLAG=""
 ACCUMULATE=false
 
 skip_gn=false
-TEST_TARGET=check
+TEST_TARGET=(check)
 
 # By default, do not run YAML or Python tests
 ENABLE_YAML=false
@@ -100,7 +100,7 @@ for i in "$@"; do
             shift
             ;;
         --target=*)
-            TEST_TARGET="${i#*=}"
+            TEST_TARGET=(${i#*=})
             shift
             ;;
         -o=* | --output_root=*)
@@ -142,11 +142,11 @@ fi
 
 if [[ -d "$OUTPUT_ROOT/obj/src" && "$ACCUMULATE" == false ]]; then
     lcov --zerocounters --directory "$OUTPUT_ROOT/obj/src" \
-    --ignore-errors format,unsupported,inconsistent,unused \
-    --exclude="$PWD"/zzz_generated/* \
-    --exclude="$PWD"/third_party/* \
-    --exclude=/usr/include/* \
-    $QUIET_FLAG
+        --ignore-errors format,unsupported,inconsistent,unused \
+        --exclude="$PWD"/zzz_generated/* \
+        --exclude="$PWD"/third_party/* \
+        --exclude=/usr/include/* \
+        $QUIET_FLAG
 fi
 
 
@@ -173,7 +173,7 @@ if [ "$skip_gn" == false ]; then
     #
     # 1) Always run unit tests
     #
-    ninja -C "$OUTPUT_ROOT" $TEST_TARGET
+    ninja -C "$OUTPUT_ROOT" "${TEST_TARGET[@]}"
 
     #
     # 2) Run YAML tests if requested
