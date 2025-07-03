@@ -369,8 +369,14 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    mPeerConnection->setRemoteDescription(sdpAnswer);
+    if (mWebrtcTransportMap.find(sessionId) == mWebrtcTransportMap.end())
+    {
+        mWebrtcTransportMap[sessionId] =
+            std::unique_ptr<WebrtcTransport>(new WebrtcTransport(sessionId, mPeerId.GetNodeId(), mPeerConnection));
+    }
+    AcquireAudioVideoStreams();
 
+    mPeerConnection->setRemoteDescription(sdpAnswer);
     MoveToState(State::SendingICECandidates);
     ScheduleICECandidatesSend();
 
@@ -417,6 +423,10 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId,
         }
     }
 
+    // Schedule sending Ice Candidates when remote candidates are received. This keeps the exchange simple
+    MoveToState(State::SendingICECandidates);
+    ScheduleICECandidatesSend();
+
     return CHIP_NO_ERROR;
 }
 
@@ -424,7 +434,8 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
                                                    DataModel::Nullable<uint16_t> videoStreamID,
                                                    DataModel::Nullable<uint16_t> audioStreamID)
 {
-    if (mWebrtcTransportMap.find(sessionId) != mWebrtcTransportMap.end())
+    auto it = mWebrtcTransportMap.find(sessionId);
+    if (it != mWebrtcTransportMap.end())
     {
         ChipLogProgress(Camera, "Delete Webrtc Transport for the session: %u", sessionId);
 
@@ -433,7 +444,15 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
         // TODO: Lookup the sessionID to get the Video/Audio StreamID
         ReleaseAudioVideoStreams();
 
-        mWebrtcTransportMap.erase(sessionId);
+        mMediaController->UnregisterTransport(it->second.get());
+        mWebrtcTransportMap.erase(it);
+    }
+
+    if (mPeerConnection)
+    {
+        ChipLogProgress(Camera, "Closing peer connection: %u", sessionId);
+        mPeerConnection->close();
+        mPeerConnection.reset();
     }
 
     if (mCurrentSessionId == sessionId)
