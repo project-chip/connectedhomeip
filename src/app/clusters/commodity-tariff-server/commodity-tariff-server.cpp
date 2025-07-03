@@ -712,19 +712,26 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
 void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::GetTariffComponent::DecodableType & commandData)
 {
     Commands::GetTariffComponentResponse::Type response;
-    Status status = Status::NotFound;
+    Status status = Status::Failure;
 
-    auto component = Utils::GetCurrNextItemsById<Structs::TariffComponentStruct::Type>(mServerTariffAttrsCtx.TariffComponentsMap,
-                                                                                       commandData.tariffComponentID)
-                         .first;
-    auto period = Utils::FindTariffPeriodByTariffComponentId(mServerTariffAttrsCtx, commandData.tariffComponentID);
-
-    if (component != nullptr && period != nullptr)
+    if (mServerTariffAttrsCtx.TariffProvider == nullptr)
     {
-        response.label           = period->label;
-        response.dayEntryIDs     = period->dayEntryIDs;
-        response.tariffComponent = *component;
-        status                   = Status::Success;
+        ChipLogError(NotSpecified, "The tariff is not active");
+    }
+    else
+    {
+        status = Status::NotFound;
+        auto component = Utils::GetCurrNextItemsById<Structs::TariffComponentStruct::Type>(mServerTariffAttrsCtx.TariffComponentsMap,
+                                                                                           commandData.tariffComponentID).first;
+        auto period = Utils::FindTariffPeriodByTariffComponentId(mServerTariffAttrsCtx, commandData.tariffComponentID);
+
+        if (component != nullptr && period != nullptr)
+        {
+            response.label           = period->label;
+            response.dayEntryIDs     = period->dayEntryIDs;
+            response.tariffComponent = *component;
+            status                   = Status::Success;
+        }
     }
 
     if (status != Status::Success)
@@ -739,16 +746,24 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
 void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEntry::DecodableType & commandData)
 {
     Commands::GetDayEntryResponse::Type response;
-    Status status = Status::NotFound;
+    Status status = Status::Failure;
 
-    auto entry =
-        Utils::GetCurrNextItemsById<Structs::DayEntryStruct::Type>(mServerTariffAttrsCtx.DayEntriesMap, commandData.dayEntryID)
-            .first;
-
-    if (entry != nullptr)
+    if (mServerTariffAttrsCtx.TariffProvider == nullptr)
     {
-        response.dayEntry = *entry;
-        status            = Status::Success;
+        ChipLogError(NotSpecified, "The tariff is not active");
+    }
+    else
+    {
+        status = Status::NotFound;
+        auto entry =
+            Utils::GetCurrNextItemsById<Structs::DayEntryStruct::Type>(mServerTariffAttrsCtx.DayEntriesMap, commandData.dayEntryID)
+                .first;
+
+        if (entry != nullptr)
+        {
+            response.dayEntry = *entry;
+            status            = Status::Success;
+        }        
     }
 
     if (status != Status::Success)
