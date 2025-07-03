@@ -248,8 +248,8 @@ class PeerConnection(WebRTCClient):
         return self._peer_state == PeerConnectionState.CONNECTED
 
     async def send_command(self, *args, **kwargs):
-        """Sends a command using WebRTC Provdier Client. **This should be used to send 
-        ProvideOffer and SolicitOffer Commands only as these commands require custom 
+        """Sends a command using WebRTC Provdier Client. **This should be used to send
+        ProvideOffer and SolicitOffer Commands only as these commands require custom
         response handling.** Rest of the remaining commands can be sent via the default command sender.
 
         Parameters:

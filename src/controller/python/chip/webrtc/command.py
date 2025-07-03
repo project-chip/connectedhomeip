@@ -19,19 +19,14 @@ import builtins
 import ctypes
 
 from ..clusters.ClusterObjects import ClusterCommand
-from ..clusters.Command import (
-    AsyncCommandTransaction,
-    CommandPath,
-    _OnCommandSenderDoneCallback,
-    _OnCommandSenderErrorCallback,
-    _OnCommandSenderResponseCallback,
-)
+from ..clusters.Command import (AsyncCommandTransaction, CommandPath, _OnCommandSenderDoneCallback, _OnCommandSenderErrorCallback,
+                                _OnCommandSenderResponseCallback)
 from ..native import PyChipError
 from .library_handle import _GetWebRTCLibraryHandle
 
 
 class WebRTCProviderCommand:
-    """ Sends WebRTC provider commands `ProvideOffer`/`SolicitOffer` using WebRTC Provider Client.
+    """Sends WebRTC provider commands `ProvideOffer`/`SolicitOffer` using WebRTC Provider Client.
 
     python is simply too slow on its own to upsert the webrtc session struct after receiving
     `ProvideOfferResponse`/`SolicitOfferResponse`, by which time webrtc requestor server could

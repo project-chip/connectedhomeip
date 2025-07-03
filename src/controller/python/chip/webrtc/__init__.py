@@ -18,4 +18,4 @@
 from .peer_connection import IceCandiate, IceCandidateList, PeerConnection
 from .webrtc_manager import WebRTCManager
 
-__all__ = ['PeerConnection', 'WebRTCManager', 'IceCandiate', 'IceCandidateList']
+__all__ = ["PeerConnection", "WebRTCManager", "IceCandiate", "IceCandidateList"]
