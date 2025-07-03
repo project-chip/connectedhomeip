@@ -91,7 +91,7 @@ private:
 };
 
 /// A preallocated sized string builder
-/// According the specification there are fields with size up to 256
+/// According to the specification there are fields with size up to 256
 /// Default buffer size is 257 to have space for the terminating null character
 /// If the buffer size is not enough the value will be truncated
 template <size_t kSize = 257>
