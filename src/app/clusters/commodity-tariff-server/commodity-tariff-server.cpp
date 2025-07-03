@@ -97,80 +97,96 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 
     // List attributes (using proper chunking)
     case DayEntries::Id: {
-        return aEncoder.EncodeList([this](const auto & encoder) {
-            const auto & entries = mDelegate.GetDayEntries();
-            for (const auto & entry : entries.Value())
-            {
+        const auto & entries = mDelegate.GetDayEntries();
+        if (entries.IsNull()) {
+            return aEncoder.EncodeNull();
+        }
+        return aEncoder.EncodeList([&entries](const auto & encoder) {
+            for (const auto & entry : entries.Value()) {
                 ReturnErrorOnFailure(encoder.Encode(entry));
             }
             return CHIP_NO_ERROR;
         });
     }
     case DayPatterns::Id: {
-        return aEncoder.EncodeList([this](const auto & encoder) {
-            const auto & patterns = mDelegate.GetDayPatterns();
-            for (const auto & pattern : patterns.Value())
-            {
+        const auto & patterns = mDelegate.GetDayPatterns();
+        if (patterns.IsNull()) {
+            return aEncoder.EncodeNull();
+        }
+        return aEncoder.EncodeList([&patterns](const auto & encoder) {
+            for (const auto & pattern : patterns.Value()) {
                 ReturnErrorOnFailure(encoder.Encode(pattern));
             }
             return CHIP_NO_ERROR;
         });
     }
     case CalendarPeriods::Id: {
-        return aEncoder.EncodeList([this](const auto & encoder) {
-            const auto & periods = mDelegate.GetCalendarPeriods();
-            for (const auto & period : periods.Value())
-            {
+        const auto & periods = mDelegate.GetCalendarPeriods();
+        if (periods.IsNull()) {
+            return aEncoder.EncodeNull();
+        }
+        return aEncoder.EncodeList([&periods](const auto & encoder) {
+            for (const auto & period : periods.Value()) {
                 ReturnErrorOnFailure(encoder.Encode(period));
             }
             return CHIP_NO_ERROR;
         });
     }
     case IndividualDays::Id: {
-        return aEncoder.EncodeList([this](const auto & encoder) {
-            const auto & days = mDelegate.GetIndividualDays();
-            for (const auto & day : days.Value())
-            {
+        const auto & days = mDelegate.GetIndividualDays();
+        if (days.IsNull()) {
+            return aEncoder.EncodeNull();
+        }
+        return aEncoder.EncodeList([&days](const auto & encoder) {
+            for (const auto & day : days.Value()) {
                 ReturnErrorOnFailure(encoder.Encode(day));
             }
             return CHIP_NO_ERROR;
         });
     }
     case TariffComponents::Id: {
-        return aEncoder.EncodeList([this](const auto & encoder) {
-            const auto & components = mDelegate.GetTariffComponents();
-            for (const auto & component : components.Value())
-            {
+        const auto & components = mDelegate.GetTariffComponents();
+        if (components.IsNull()) {
+            return aEncoder.EncodeNull();
+        }
+        return aEncoder.EncodeList([&components](const auto & encoder) {
+            for (const auto & component : components.Value()) {
                 ReturnErrorOnFailure(encoder.Encode(component));
             }
             return CHIP_NO_ERROR;
         });
     }
     case TariffPeriods::Id: {
-        return aEncoder.EncodeList([this](const auto & encoder) {
-            const auto & periods = mDelegate.GetTariffPeriods();
-            for (const auto & period : periods.Value())
-            {
+        const auto & periods = mDelegate.GetTariffPeriods();
+        if (periods.IsNull()) {
+            return aEncoder.EncodeNull();
+        }
+        return aEncoder.EncodeList([&periods](const auto & encoder) {
+            for (const auto & period : periods.Value()) {
                 ReturnErrorOnFailure(encoder.Encode(period));
             }
             return CHIP_NO_ERROR;
         });
     }
     case CurrentTariffComponents::Id: {
-        return aEncoder.EncodeList([this](const auto & encoder) {
-            const auto & components = GetCurrentTariffComponents();
-            for (const auto & component : components.Value())
-            {
+        const auto & components = GetCurrentTariffComponents();
+        if (components.IsNull()) {
+            return aEncoder.EncodeNull();
+        }
+        return aEncoder.EncodeList([&components](const auto & encoder) {
+            for (const auto & component : components.Value()) {
                 ReturnErrorOnFailure(encoder.Encode(component));
             }
             return CHIP_NO_ERROR;
         });
     }
     case NextTariffComponents::Id: {
-        return aEncoder.EncodeList([this](const auto & encoder) {
-            const auto & components = GetNextTariffComponents();
-            for (const auto & component : components.Value())
-            {
+        const auto & components = GetNextTariffComponents();
+        if (components.IsNull()) {
+            return aEncoder.EncodeNull();
+        }
+        return aEncoder.EncodeList([&components](const auto & encoder) {
+            for (const auto & component : components.Value()) {
                 ReturnErrorOnFailure(encoder.Encode(component));
             }
             return CHIP_NO_ERROR;
