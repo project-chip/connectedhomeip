@@ -200,7 +200,7 @@ CHIP_ERROR Instance::SetMeteredQuantityTimestamp(DataModel::Nullable<uint32_t> n
         else
         {
             ChipLogDetail(AppServer, "MeteredQuantityTimestamp updated to %lu",
-                          static_cast<unsigned long int>(mMeteredQuantityTimestamp.Value()));
+                          static_cast<unsigned long int>(newValue.Value()));
         }
 
         mMeteredQuantityTimestamp = newValue;
@@ -246,18 +246,25 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     switch (aPath.mAttributeId)
     {
     case MeteredQuantity::Id: {
-        auto list = GetMeteredQuantity();
-        ReturnErrorOnFailure(aEncoder.EncodeList([&list](const auto & encoder) {
-            for (const auto & item : list.Value())
-            {
-                CHIP_ERROR err = encoder.Encode(item);
-                if (err != CHIP_NO_ERROR)
+        if (GetMeteredQuantity().IsNull())
+        {
+            ReturnErrorOnFailure(aEncoder.Encode(GetMeteredQuantity()));
+        }
+        else
+        {
+            auto list = GetMeteredQuantity().Value();
+            ReturnErrorOnFailure(aEncoder.EncodeList([&list](const auto & encoder) {
+                for (const auto & item : list)
                 {
-                    return err;
+                    CHIP_ERROR err = encoder.Encode(item);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        return err;
+                    }
                 }
-            }
-            return CHIP_NO_ERROR;
-        }));
+                return CHIP_NO_ERROR;
+            }));
+        }
         break;
     }
 
