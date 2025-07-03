@@ -33,10 +33,6 @@ namespace app {
 namespace Clusters {
 namespace CommodityMetering {
 
-// Some constraints for lists limitation ( does'nt defined in spec )
-constexpr uint8_t kMaxMeteredQuantityEntries                    = 128;
-constexpr uint8_t kMaxTariffComponentIDsPerMeteredQuantityEntry = 128;
-
 class Instance : public AttributeAccessInterface
 {
 public:
@@ -68,10 +64,6 @@ private:
     CHIP_ERROR CopyMeteredQuantityEntry(Structs::MeteredQuantityStruct::Type & dest,
                                         Platform::ScopedMemoryBuffer<uint32_t> * destTariffComponentIDsBuffer,
                                         const Structs::MeteredQuantityStruct::Type & src);
-
-    Platform::ScopedMemoryBuffer<uint32_t>
-        mOwnedMeteredQuantityTariffComponentIDsBuffer[kMaxMeteredQuantityEntries][kMaxTariffComponentIDsPerMeteredQuantityEntry];
-    Platform::ScopedMemoryBuffer<Structs::MeteredQuantityStruct::Type> mOwnedMeteredQuantityStructBuffer;
 
     EndpointId mEndpointId = 0;
 
