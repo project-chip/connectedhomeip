@@ -401,12 +401,21 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(CurrentTariffAttrsCtx & aCtx, 
             tempList.push_back(entry);
         }
 
-        if ((err == CHIP_NO_ERROR) && ((err = mgmtObj.CreateNewValue(tempList.size())) == CHIP_NO_ERROR))
+        if (err == CHIP_NO_ERROR)
         {
-            std::copy(tempList.begin(), tempList.end(), mgmtObj.GetNewValueData());
-            mgmtObj.MarkAsAssigned();
-            mgmtObj.UpdateBegin(nullptr, nullptr);
-            mgmtObj.UpdateCommit();
+            if ((err = mgmtObj.CreateNewValue(tempList.size())) == CHIP_NO_ERROR)
+            {
+                std::copy(tempList.begin(), tempList.end(), mgmtObj.GetNewValueData());
+                mgmtObj.MarkAsAssigned();
+                if ((err = mgmtObj.UpdateBegin(nullptr, nullptr)) == CHIP_NO_ERROR)
+                {
+                    mgmtObj.UpdateCommit(); // Success path
+                }
+                else
+                {
+                    mgmtObj.UpdateEnd(); // Clean up on validation failure
+                }
+            }
         }
         else
         {
