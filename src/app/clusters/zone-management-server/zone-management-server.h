@@ -22,7 +22,6 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/StatusResponse.h>
-#include <app/reporting/reporting.h>
 
 #include <app/SafeAttributePersistenceProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -121,12 +120,12 @@ struct ZoneInformationStorage : ZoneInformationStruct
  *  Defines interfaces for implementing application-specific logic for various aspects of the ZoneManagement Cluster.
  *  Specifically, it defines interfaces for the command handling and loading of the allocated streams.
  */
-class ZoneMgmtDelegate
+class Delegate
 {
 public:
-    ZoneMgmtDelegate() = default;
+    Delegate() = default;
 
-    virtual ~ZoneMgmtDelegate() = default;
+    virtual ~Delegate() = default;
 
     /**
      *    @brief Command Delegate for creation of TwoDCartesianZone with the provided parameters.
@@ -246,7 +245,7 @@ public:
      * @param aTwoDCartesianMax                 The maximum X and Y points that are allowed for TwoD Cartesian Zones.
      *
      */
-    ZoneMgmtServer(ZoneMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
+    ZoneMgmtServer(Delegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
                    const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxUserDefinedZones, uint8_t aMaxZones,
                    uint8_t aSensitivityMax, const TwoDCartesianVertexStruct & aTwoDCartesianMax);
 
@@ -291,7 +290,7 @@ public:
     Protocols::InteractionModel::Status GenerateZoneStoppedEvent(uint16_t zoneID, ZoneEventStoppedReasonEnum stopReason);
 
 private:
-    ZoneMgmtDelegate & mDelegate;
+    Delegate & mDelegate;
     EndpointId mEndpointId;
     const BitFlags<Feature> mFeatures;
     const BitFlags<OptionalAttribute> mOptionalAttrs;
