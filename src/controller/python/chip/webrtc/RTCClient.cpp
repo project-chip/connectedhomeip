@@ -67,4 +67,24 @@ void pychip_webrtc_client_set_ice_candidate_callback(void * client, IceCandidate
 {
     chip::webrtc::webrtc_client_set_ice_candidate_callback(client, cb, user_data);
 }
+
+const char * pychip_webrtc_get_local_description(WebRTCClientHandle handle)
+{
+    return chip::webrtc::webrtc_get_local_description(handle);
+}
+
+int pychip_webrtc_get_peer_connection_state(WebRTCClientHandle handle)
+{
+    return chip::webrtc::webrtc_get_peer_connection_state(handle);
+}
+
+void pychip_webrtc_client_set_gathering_complete_callback(WebRTCClientHandle handle, GatheringCompleteCallback cb)
+{
+    chip::webrtc::webrtc_client_set_gathering_complete_callback(handle, cb);
+}
+
+void pychip_webrtc_client_set_state_change_callback(WebRTCClientHandle handle, OnStateChangeCallback cb)
+{
+    chip::webrtc::webrtc_client_set_state_change_callback(handle, cb);
+}
 }

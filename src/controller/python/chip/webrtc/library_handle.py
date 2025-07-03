@@ -15,10 +15,16 @@
 #  limitations under the License.
 #
 
-from ctypes import CDLL, c_char_p, c_void_p
+from ctypes import CDLL, c_char_p, c_int, c_void_p
 
 from ..native import GetLibraryHandle, HandleFlags, PyChipError
-from .types import IceCandidateCallbackType, LocalDescriptionCallbackType, WebRTCClientHandle
+from .types import (
+    GatheringCompleteCallbackType,
+    IceCandidateCallbackType,
+    LocalDescriptionCallbackType,
+    StateChangeCallback,
+    WebRTCClientHandle,
+)
 
 
 def _GetWebRTCLibraryHandle() -> CDLL:
@@ -48,5 +54,14 @@ def _GetWebRTCLibraryHandle() -> CDLL:
         lib.pychip_webrtc_client_set_local_description_callback.argtypes = [
             WebRTCClientHandle, LocalDescriptionCallbackType, c_void_p]
         lib.pychip_webrtc_client_set_ice_candidate_callback.argtypes = [WebRTCClientHandle, IceCandidateCallbackType, c_void_p]
+
+        lib.pychip_webrtc_get_local_description.argtypes = [WebRTCClientHandle]
+        lib.pychip_webrtc_get_local_description.restype = c_char_p
+
+        lib.pychip_webrtc_get_peer_connection_state.argtypes = [WebRTCClientHandle]
+        lib.pychip_webrtc_get_peer_connection_state.restype = c_int
+
+        lib.pychip_webrtc_client_set_gathering_complete_callback.argtypes = [WebRTCClientHandle, GatheringCompleteCallbackType]
+        lib.pychip_webrtc_client_set_state_change_callback.argtypes = [WebRTCClientHandle, StateChangeCallback]
 
     return lib

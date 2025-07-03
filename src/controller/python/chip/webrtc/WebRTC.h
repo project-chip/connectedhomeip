@@ -26,6 +26,8 @@ typedef void * WebRTCClientHandle;
 
 typedef void (*LocalDescriptionCallback)(const char * sdp, const char * type, void * user_data);
 typedef void (*IceCandidateCallback)(const char * candidate, const char * mid, void * user_data);
+typedef void (*GatheringCompleteCallback)();
+typedef void (*OnStateChangeCallback)(int state);
 
 /**
  * @brief Creates a new WebRTC client instance.
@@ -118,6 +120,45 @@ void webrtc_client_set_local_description_callback(WebRTCClientHandle handle, Loc
  * @param user_data User-defined data for the callback.
  */
 void webrtc_client_set_ice_candidate_callback(WebRTCClientHandle handle, IceCandidateCallback cb, void * user_data);
+
+/**
+ * @brief Retrieves the local description of the WebRTC client associated with the given handle.
+ *
+ * Called when latest sdp is required.
+ *
+ * @param handle The handle of the WebRTC client.
+ * @return const char* A pointer to the local description string, or nullptr if the client is not found.
+ */
+const char * webrtc_get_local_description(WebRTCClientHandle handle);
+
+/**
+ * @brief Retrieves the current state of the peer connection for the WebRTC client associated with the given handle.
+ *
+ * Called when latest peer connection state is required.
+ *
+ * @param handle The handle of the WebRTC client.
+ * @return int The state of the peer connection. Possible values are defined in the libdatachannel.
+ * @note This function returns -1 if the client is not found.
+ */
+int webrtc_get_peer_connection_state(WebRTCClientHandle handle);
+
+/**
+ * @brief Sets a callback for when the gathering process for ICE candidates is complete.
+ *
+ *
+ * @param handle The handle of the WebRTC client.
+ * @param cb The callback function to be invoked when ice candidate gathering is complete.
+ */
+void webrtc_client_set_gathering_complete_callback(WebRTCClientHandle handle, GatheringCompleteCallback cb);
+
+/**
+ * @brief Sets a callback for when the state of the peer connection changes.
+ *
+ *
+ * @param handle The handle of the WebRTC client.
+ * @param cb The callback function to be invoked when the peer connection state changes.
+ */
+void webrtc_client_set_state_change_callback(WebRTCClientHandle handle, OnStateChangeCallback cb);
 
 } // namespace webrtc
 } // namespace chip

@@ -14,8 +14,10 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-from ctypes import CFUNCTYPE, c_char_p, c_void_p
+from ctypes import CFUNCTYPE, c_char_p, c_int, c_void_p
 
 WebRTCClientHandle = c_void_p
 LocalDescriptionCallbackType = CFUNCTYPE(None, c_char_p, c_char_p, c_void_p)
 IceCandidateCallbackType = CFUNCTYPE(None, c_char_p, c_char_p, c_void_p)
+GatheringCompleteCallbackType = CFUNCTYPE(None)
+StateChangeCallback = CFUNCTYPE(None, c_int)

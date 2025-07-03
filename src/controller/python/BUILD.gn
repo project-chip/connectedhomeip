@@ -251,6 +251,7 @@ chip_python_wheel_action("chip-core") {
           "chip/webrtc/__init__.py",
           "chip/webrtc/library_handle.py",
           "chip/webrtc/types.py",
+          "chip/webrtc/webrtc_client.py",
         ]
       }
 

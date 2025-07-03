@@ -34,6 +34,7 @@ static_library("chip_webrtc") {
   ]
 
   deps = [
+    "${chip_root}/src/app:interaction-model",
     "${chip_root}/src/lib/support",
     "${chip_root}/third_party/libdatachannel:libdatachannel",
   ]

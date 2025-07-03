@@ -16,10 +16,19 @@
  */
 
 #include "WebRTCClient.h"
+
+#include <arpa/inet.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
 namespace webrtc {
+
+constexpr int kVideoH264PayloadType = 96; // 96 is just the first value in the dynamic RTP payload‑type range (96‑127).
+constexpr int kVideoBitRate         = 3000;
+
+constexpr const char * kStreamDestIp    = "127.0.0.1";
+constexpr uint16_t kVideoStreamDestPort = 5000;
 
 WebRTCClient::WebRTCClient()
 {
@@ -30,12 +39,14 @@ WebRTCClient::~WebRTCClient()
 {
     if (mPeerConnection == nullptr)
         return;
-
+    Disconnect();
     delete mPeerConnection;
 }
 
 CHIP_ERROR WebRTCClient::CreatePeerConnection(const std::string & stunUrl)
 {
+    rtc::InitLogger(rtc::LogLevel::None);
+
     if (mPeerConnection != nullptr)
     {
         ChipLogError(NotSpecified, "PeerConnection exists already!");
@@ -58,17 +69,66 @@ CHIP_ERROR WebRTCClient::CreatePeerConnection(const std::string & stunUrl)
     }
 
     mPeerConnection->onLocalDescription([this](rtc::Description desc) {
+        mLocalDescription = std::string(desc);
         if (mLocalDescriptionCallback)
+            mLocalDescriptionCallback(mLocalDescription.c_str(), desc.typeString());
+    });
+
+    mPeerConnection->onLocalCandidate([this](rtc::Candidate candidate) {
+        std::string candidateStr = std::string(candidate);
+        mLocalCandidates.push_back(candidateStr);
+        if (mIceCandidateCallback)
+            mIceCandidateCallback(candidate.candidate(), candidate.mid());
+    });
+
+    mPeerConnection->onStateChange([this](rtc::PeerConnection::State state) {
+        if (mStateChangeCallback)
+            mStateChangeCallback(static_cast<int>(state));
+        if (state == rtc::PeerConnection::State::Disconnected || state == rtc::PeerConnection::State::Failed ||
+            state == rtc::PeerConnection::State::Closed)
         {
-            mLocalDescriptionCallback(rtc::Description::typeToString(desc.type()), desc.typeString());
+            CloseRTPSocket();
         }
     });
 
-    mPeerConnection->onLocalCandidate([this](rtc::Candidate cand) {
-        if (mIceCandidateCallback)
+    mPeerConnection->onGatheringStateChange([this](rtc::PeerConnection::GatheringState state) {
+        if (state == rtc::PeerConnection::GatheringState::Complete)
         {
-            mIceCandidateCallback(cand.candidate(), cand.mid());
+            if (mGatheringCompleteCallback)
+                mGatheringCompleteCallback();
+
+            auto desc = mPeerConnection->localDescription();
+            // Update local description to include ice candidates since gathering is complete
+            if (desc.has_value())
+                mLocalDescription = desc.value();
         }
+    });
+
+    // Create UDP socket for RTP forwarding
+    mRTPSocket = socket(AF_INET, SOCK_DGRAM, 0);
+    if (mRTPSocket == -1)
+    {
+        ChipLogError(Camera, "Failed to create RTP socket: %s", strerror(errno));
+        return CHIP_ERROR_POSIX(errno);
+    }
+
+    sockaddr_in addr     = {};
+    addr.sin_family      = AF_INET;
+    addr.sin_addr.s_addr = inet_addr(kStreamDestIp);
+    addr.sin_port        = htons(kVideoStreamDestPort);
+
+    rtc::Description::Video media("video", rtc::Description::Direction::RecvOnly);
+    media.addH264Codec(kVideoH264PayloadType);
+    media.setBitrate(kVideoBitRate);
+    mTrack = mPeerConnection->addTrack(media);
+
+    auto depacketizer = std::make_shared<rtc::H264RtpDepacketizer>();
+    mTrack->setMediaHandler(depacketizer);
+
+    mTrack->onFrame([this, addr](rtc::binary message, rtc::FrameInfo frameInfo) {
+        // send H264 frames to sock so that a client can pick it up to dispaly it.
+        sendto(mRTPSocket, reinterpret_cast<const char *>(message.data()), size_t(message.size()), 0,
+               reinterpret_cast<const struct sockaddr *>(&addr), sizeof(addr));
     });
 
     return CHIP_NO_ERROR;
@@ -118,6 +178,52 @@ void WebRTCClient::AddIceCandidate(const std::string & candidate, const std::str
     mPeerConnection->addRemoteCandidate(rtc::Candidate(candidate, mid));
 }
 
+void WebRTCClient::CloseRTPSocket()
+{
+    if (mRTPSocket != -1)
+    {
+        ChipLogProgress(Camera, "Closing RTP socket");
+        close(mRTPSocket);
+        mRTPSocket = -1;
+    }
+}
+
+void WebRTCClient::Disconnect()
+{
+    ChipLogProgress(Camera, "Disconnecting WebRTC session");
+
+    // Close the peer connection
+    if (mPeerConnection)
+    {
+        mPeerConnection->close();
+    }
+
+    // Close the RTP socket
+    CloseRTPSocket();
+
+    // Reset track
+    mTrack.reset();
+
+    // Clear local states
+    mLocalDescription.clear();
+    mLocalCandidates.clear();
+}
+
+const char * WebRTCClient::GetLocalDescription()
+{
+    return mLocalDescription.c_str();
+}
+
+int WebRTCClient::GetPeerConnectionState()
+{
+    if (mPeerConnection == nullptr)
+    {
+        return -1; // Invalid state
+    }
+
+    return static_cast<int>(mPeerConnection->state());
+}
+
 void WebRTCClient::OnLocalDescription(std::function<void(const std::string &, const std::string &)> callback)
 {
     mLocalDescriptionCallback = callback;
@@ -126,6 +232,16 @@ void WebRTCClient::OnLocalDescription(std::function<void(const std::string &, co
 void WebRTCClient::OnIceCandidate(std::function<void(const std::string &, const std::string &)> callback)
 {
     mIceCandidateCallback = callback;
+}
+
+void WebRTCClient::OnGatheringComplete(std::function<void()> callback)
+{
+    mGatheringCompleteCallback = callback;
+}
+
+void WebRTCClient::OnStateChange(std::function<void(int)> callback)
+{
+    mStateChangeCallback = callback;
 }
 
 } // namespace webrtc
