@@ -314,7 +314,7 @@ config CHIP_APP_LED_MANAGER_LIGHT_LED_INDEX
 
 config CHIP_APP_LED_MANAGER_STATUS_LED
     int "App Led Status"
-    default 1 if (CHIP_NXP_PLATFORM_MCXW72 && !NXP_USE_LOW_POWER) || CHIP_NXP_PLATFORM_RW61X
+    default 1 if !NXP_USE_LOW_POWER || CHIP_NXP_PLATFORM_RW61X
     default 0
     help
         Enable status LED by setting value to 1, or disable with value 0.
