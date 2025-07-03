@@ -62,16 +62,6 @@ struct Type;
 struct DecodableType;
 } // namespace UpdateTwoDCartesianZone
 
-namespace GetTwoDCartesianZone {
-struct Type;
-struct DecodableType;
-} // namespace GetTwoDCartesianZone
-
-namespace GetTwoDCartesianZoneResponse {
-struct Type;
-struct DecodableType;
-} // namespace GetTwoDCartesianZoneResponse
-
 namespace RemoveZone {
 struct Type;
 struct DecodableType;
@@ -194,73 +184,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace UpdateTwoDCartesianZone
-namespace GetTwoDCartesianZone {
-enum class Fields : uint8_t
-{
-    kZoneID = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetTwoDCartesianZone::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-
-    Optional<DataModel::Nullable<uint16_t>> zoneID;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = Clusters::ZoneManagement::Commands::GetTwoDCartesianZoneResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::GetTwoDCartesianZone::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    Optional<DataModel::Nullable<uint16_t>> zoneID;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace GetTwoDCartesianZone
-namespace GetTwoDCartesianZoneResponse {
-enum class Fields : uint8_t
-{
-    kZones = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetTwoDCartesianZoneResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-
-    DataModel::List<const Structs::TwoDCartesianZoneStruct::Type> zones;
-
-    CHIP_ERROR Encode(DataModel::FabricAwareTLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::GetTwoDCartesianZoneResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ZoneManagement::Id; }
-
-    DataModel::DecodableList<Structs::TwoDCartesianZoneStruct::DecodableType> zones;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace GetTwoDCartesianZoneResponse
 namespace RemoveZone {
 enum class Fields : uint8_t
 {

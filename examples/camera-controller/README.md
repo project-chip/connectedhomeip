@@ -48,14 +48,6 @@ sudo apt install \
 
 ### 2. Building the Applications
 
-You can either build the applications for a local Linux machine or cross-compile
-them for a Raspberry Pi.
-
-Option A: Build for a Local Linux (x86_64) Demonstration
-
-This is the simplest method for testing the camera pipeline on a single Linux
-computer.
-
 1. Initialize the Build Environment This command configures your shell with the
    necessary build tools. You only need to run this once per terminal session.
 
@@ -65,7 +57,20 @@ source scripts/activate.sh
 
 2. Build the Camera App (Device)
 
+Follow the build instructions from examples/camera-app/linux/README.md
+
+3. Build the Camera Controller (Client)
+
+You can either build the applications for a local Linux machine or cross-compile
+them for a Raspberry Pi.
+
+Option A: Build for a Local Linux (x86_64)
+
+This is the simplest method for testing the camera pipeline on a single Linux
+computer.
+
 ```
+# Navigate to the examples directory
 cd examples/camera-controller/
 
 # Compile the Linux x86‑64 camera‑controller target
@@ -80,30 +85,11 @@ The resulting executable is placed in:
 out/linux-x64-camera-controller/chip-camera-controller.
 ```
 
-3. Build the Camera Controller (Client)
+Option B: Cross-Compile for Raspberry Pi (arm64)
 
-```
-# Navigate to the examples directory
-cd examples/camera-controller/
-
-cd examples/camera-app/
-
-# Compile the Linux x86‑64 camera‑app target
-./scripts/build/build_examples.py \
-    --target linux-x64-camera \
-    build
-```
-
-The resulting executable is placed in:
-
-```
-out/linux-x64-camera/chip-camera-app.
-```
-
-Option B: Cross-Compile for Raspberry Pi (arm64) To run an application on a
-Raspberry Pi, you must cross-compile it from an x86_64 host machine. The
-recommended method is to use the provided Docker build environment to ensure all
-dependencies are correct.
+To run an application on a Raspberry Pi, you must cross-compile it from an
+x86_64 host machine. The recommended method is to use the provided Docker build
+environment to ensure all dependencies are correct.
 
 1. Pull the Cross-Compilation Docker Image
 
@@ -158,8 +144,14 @@ Terminal 1: Start the Camera App (Device)
 1. Launch the chip-camera-app binary. The --camera-deferred-offer flag prepares
    the camera to stream upon request from the controller.
 
+Clean up any existing configurations (first-time pairing only):
+
 ```
-./out/linux-x64-camera-app/chip-camera-app --camera-deferred-offer
+sudo rm -rf /tmp/chip_*
+```
+
+```
+./out/linux-x64-camera/chip-camera-app --camera-deferred-offer
 ```
 
 Terminal 2: Launch and Use the Camera Controller (Client)

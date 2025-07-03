@@ -110,6 +110,67 @@ public:
      */
     ClosureControlDelegate & GetDelegate() { return mDelegate; }
 
+    /**
+     * @brief Returns a reference to the ClusterLogic instance associated with this object.
+     *
+     * @return ClusterLogic& Reference to the internal ClusterLogic object.
+     */
+    ClusterLogic & GetLogic() { return mLogic; }
+
+    /**
+     * @brief Handles the completion of a stop motion action.
+     *
+     * This function is called when a motion action has been stopped.
+     * It should update the internal state of the closure control endpoint to reflect the
+     * stopping of the motion action.
+     */
+    void OnStopMotionActionComplete();
+
+    /**
+     * @brief Handles the completion of the stop calibration action.
+     *
+     * This function is called when the calibration action has been stopped.
+     * It should update the internal state of the closure control endpoint to reflect the
+     * stopping of the calibration action.
+     */
+    void OnStopCalibrateActionComplete();
+
+    /**
+     * @brief Handles the completion of a calibration action.
+     *
+     * This method is called when the calibration process is finished.
+     * It should update the internal state of the closure control endpoint to reflect the
+     * completion of the calibration action, resets the countdown timer and generates
+     * a motion completed event.
+     */
+    void OnCalibrateActionComplete();
+
+    /**
+     * @brief Handles the completion of a motion action for closure control.
+     *
+     * This function is called when a move-to action has finished executing.
+     * It should update the internal state of the closure control endpoint to reflect the
+     * completion of the move-to action, resets the countdown timer and generates
+     * a motion completed event.
+     */
+    void OnMoveToActionComplete();
+
+    /**
+     * @brief Handles the completion of a panel motion action for closure endpoint.
+     *
+     * This function is called when a panel motion action has been completed.
+     * It updates the internal state of the closure endpoint to reflect
+     * the completion of the panel motion action.
+     */
+    void OnPanelMotionActionComplete();
+
+    /**
+     * @brief Retrieves the endpoint ID associated with this Closure Control endpoint.
+     *
+     * @return The EndpointId of this Closure Control endpoint.
+     */
+    EndpointId GetEndpointId() const { return mEndpoint; }
+
 private:
     EndpointId mEndpoint = kInvalidEndpointId;
     MatterContext mContext;
