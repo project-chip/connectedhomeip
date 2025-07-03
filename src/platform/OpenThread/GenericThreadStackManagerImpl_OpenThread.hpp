@@ -46,7 +46,6 @@
 #include <openthread/srp_client.h>
 #endif
 
-#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
@@ -72,28 +71,7 @@ namespace Internal {
 
 static_assert(OPENTHREAD_API_VERSION >= 219, "OpenThread version too old");
 
-// Network commissioning
 namespace {
-#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
-NetworkCommissioning::GenericThreadDriver sGenericThreadDriver;
-app::Clusters::NetworkCommissioning::Instance
-    sThreadNetworkCommissioningInstance(CHIP_DEVICE_CONFIG_THREAD_NETWORK_ENDPOINT_ID /* Endpoint Id */, &sGenericThreadDriver);
-#endif
-
-void initNetworkCommissioningThreadDriver()
-{
-#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
-    sThreadNetworkCommissioningInstance.Init();
-#endif
-}
-
-void resetGenericThreadDriver()
-{
-#ifndef _NO_GENERIC_THREAD_NETWORK_COMMISSIONING_DRIVER_
-    sGenericThreadDriver.ClearNetwork();
-#endif
-}
-
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 CHIP_ERROR ReadDomainNameComponent(const char *& in, char * out, size_t outSize)
 {
@@ -1182,8 +1160,6 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
 
     err = ConfigureThreadStack(otInst);
 
-    initNetworkCommissioningThreadDriver();
-
 exit:
     return err;
 }
@@ -1264,7 +1240,12 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo()
     otThreadSetEnabled(mOTInst, false);
     otIp6SetEnabled(mOTInst, false);
     otInstanceErasePersistentInfo(mOTInst);
-    resetGenericThreadDriver();
+
+    if (mpCommissioningDriver)
+    {
+        mpCommissioningDriver->ClearNetwork();
+    }
+
     Impl()->UnlockThreadStack();
 }
 

@@ -21,6 +21,7 @@ RUN set -x \
     patch \
     qemu-system-arm \
     xz-utils \
+    gdb-multiarch \
     # Cleanup
     && apt-get clean \
     && rm -rf /var/lib/apt/lists \

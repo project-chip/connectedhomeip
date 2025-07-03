@@ -39,10 +39,10 @@ OUTPUT_ROOT="$CHIP_ROOT/out/python_lib"
 
 declare enable_ble=true
 declare enable_ipv4=true
-declare enable_wifi_paf=true
+declare wifi_paf_config=""
 declare chip_detail_logging=false
-declare chip_mdns
-declare case_retry_delta
+declare chip_mdns=minimal
+declare chip_case_retry_delta
 declare install_virtual_env
 declare clean_virtual_env=yes
 declare install_pytest_requirements=yes
@@ -59,22 +59,22 @@ help() {
 Input Options:
   -g, --gn_args ARGS                                        Additional verbatim arguments to pass to the gn command.
                                                             May be specified multiple times.
-  -b, --enable_ble          <true/false>                    Enable BLE in the controller (default=true)
-  -p, --enable_wifi_paf     <true/false>                    Enable Wi-Fi PAF discovery in the controller (default=true)
-  -4, --enable_ipv4         <true/false>                    Enable IPv4 in the controller (default=false)
+  -b, --enable_ble          <true/false>                    Enable BLE in the controller (default=$enable_ble)
+  -p, --enable_wifi_paf     <true/false>                    Enable Wi-Fi PAF discovery in the controller (default=SDK default behavior)
+  -4, --enable_ipv4         <true/false>                    Enable IPv4 in the controller (default=$enable_ipv4)
   -d, --chip_detail_logging <true/false>                    Specify ChipDetailLoggingValue as true or false.
-                                                            By default it is false.
+                                                            By default it is $chip_detail_logging.
   -m, --chip_mdns           ChipMDNSValue                   Specify ChipMDNSValue as platform or minimal.
-                                                            By default it is minimal.
+                                                            By default it is $chip_mdns.
   -t --time_between_case_retries MRPActiveRetryInterval     Specify MRPActiveRetryInterval value
                                                             Default is 300 ms
   -i, --install_virtual_env <path>                          Create a virtual environment with the wheels installed
                                                             <path> represents where the virtual environment is to be created.
   -c, --clean_virtual_env  <yes|no>                         When installing a virtual environment, create/clean it first.
-                                                            Defaults to yes.
+                                                            Defaults to $clean_virtual_env.
   --include_pytest_deps  <yes|no>                           Install requirements.txt for running scripts/tests and
                                                             src/python_testing scripts.
-                                                            Defaults to yes.
+                                                            Defaults to $install_pytest_requirements.
   -j, --jupyter-lab                                         Install jupyterlab requirements.
   -E, --extra_packages PACKAGE                              Install extra Python packages from PyPI.
                                                             May be specified multiple times.
@@ -99,11 +99,12 @@ while (($#)); do
             shift
             ;;
         --enable_wifi_paf | -p)
-            enable_wifi_paf=$2
-            if [[ "$enable_wifi_paf" != "true" && "$enable_wifi_paf" != "false" ]]; then
-                echo "enable_wifi_paf should have a true/false value, not '$enable_wifi_paf'"
+            declare wifi_paf_arg="$2"
+            if [[ "$wifi_paf_arg" != "true" && "$wifi_paf_arg" != "false" ]]; then
+                echo "enable_wifi_paf should have a true/false value, not '$wifi_paf_arg'"
                 exit
             fi
+            wifi_paf_config="chip_device_config_enable_wifipaf=$wifi_paf_arg"
             shift
             ;;
         --enable_ipv4 | -4)
@@ -174,9 +175,6 @@ while (($#)); do
     shift
 done
 
-# Expand extra GN args properly
-all_extra_gn_args="${extra_gn_args[@]}"
-
 # Print input values
 echo "Building Python environment with the following configuration:"
 echo "  chip_detail_logging=\"$chip_detail_logging\""
@@ -184,11 +182,13 @@ echo "  chip_mdns=\"$chip_mdns\""
 echo "  chip_case_retry_delta=\"$chip_case_retry_delta\""
 echo "  pregen_dir=\"$pregen_dir\""
 echo "  enable_ble=\"$enable_ble\""
-echo "  enable_wifi_paf=\"$enable_wifi_paf\""
+if [[ -n $wifi_paf_config ]]; then
+    echo "  $wifi_paf_config"
+fi
 echo "  enable_ipv4=\"$enable_ipv4\""
 
-if [[ -n "${all_extra_gn_args}" ]]; then
-    echo "In addition, the following extra args will added to gn command line: $all_extra_gn_args"
+if [[ ${#extra_gn_args[@]} -gt 0 ]]; then
+    echo "In addition, the following extra args will added to gn command line: ${extra_gn_args[*]}"
 fi
 
 # Ensure we have a compilation environment
@@ -209,14 +209,35 @@ source "$CHIP_ROOT/scripts/activate.sh"
 export SYSTEM_VERSION_COMPAT=0
 
 # Generates ninja files
-[[ -n "$chip_mdns" ]] && chip_mdns_arg="chip_mdns=\"$chip_mdns\"" || chip_mdns_arg=""
-[[ -n "$chip_case_retry_delta" ]] && chip_case_retry_arg="chip_case_retry_delta=$chip_case_retry_delta" || chip_case_retry_arg=""
-[[ -n "$pregen_dir" ]] && pregen_dir_arg="chip_code_pre_generated_directory=\"$pregen_dir\"" || pregen_dir_arg=""
+gn_args=(
+    # Make all possible human readable tracing available.
+    "matter_log_json_payload_hex=true"
+    "matter_log_json_payload_decode_full=true"
+    "matter_enable_tracing_support=true"
+    # Setup selected configuration.
+    "chip_detail_logging=$chip_detail_logging"
+    "chip_project_config_include_dirs=[\"//config/python\"]"
+    "chip_config_network_layer_ble=$enable_ble"
+    "chip_enable_ble=$enable_ble"
+    "chip_inet_config_enable_ipv4=$enable_ipv4"
+    "chip_crypto=\"boringssl\""
+)
+if [[ -n "$chip_mdns" ]]; then
+    gn_args+=("chip_mdns=\"$chip_mdns\"")
+fi
+if [[ -n "$chip_case_retry_delta" ]]; then
+    gn_args+=("chip_case_retry_delta=$chip_case_retry_delta")
+fi
+if [[ -n "$pregen_dir" ]]; then
+    gn_args+=("chip_code_pre_generated_directory=\"$pregen_dir\"")
+fi
+if [[ -n $wifi_paf_config ]]; then
+    args+=("$wifi_paf_config")
+fi
+# Append extra arguments provided by the user.
+gn_args+=("${extra_gn_args[@]}")
 
-# Make all possible human redable tracing available.
-tracing_options="matter_log_json_payload_hex=true matter_log_json_payload_decode_full=true matter_enable_tracing_support=true"
-
-gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="$tracing_options chip_detail_logging=$chip_detail_logging chip_project_config_include_dirs=[\"//config/python\"] $chip_mdns_arg $chip_case_retry_arg $pregen_dir_arg chip_config_network_layer_ble=$enable_ble chip_enable_ble=$enable_ble chip_inet_config_enable_ipv4=$enable_ipv4 chip_device_config_enable_wifipaf=$enable_wifi_paf chip_crypto=\"boringssl\" $all_extra_gn_args"
+gn --root="$CHIP_ROOT" gen "$OUTPUT_ROOT" --args="${gn_args[*]}"
 
 # Compile Python wheels
 ninja -C "$OUTPUT_ROOT" python_wheels

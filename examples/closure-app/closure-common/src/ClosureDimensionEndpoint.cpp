@@ -17,6 +17,7 @@
  */
 
 #include <ClosureDimensionEndpoint.h>
+#include <ClosureManager.h>
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -26,20 +27,24 @@ using namespace chip::app::Clusters::ClosureDimension;
 
 using Protocols::InteractionModel::Status;
 
-Status PrintOnlyDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
-                                          const Optional<Globals::ThreeLevelAutoEnum> & speed)
+namespace {
+constexpr Percent100ths kFullClosedTargetPosition = 10000; // Default target position in 100ths of a percent
+} // namespace
+
+Status ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> & pos, const Optional<bool> & latch,
+                                                 const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     ChipLogProgress(AppServer, "HandleSetTarget");
     // Add the SetTarget handling logic here
     return Status::Success;
 }
 
-Status PrintOnlyDelegate::HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
-                                     const Optional<Globals::ThreeLevelAutoEnum> & speed)
+Status ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
+                                            const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     ChipLogProgress(AppServer, "HandleStep");
-    // Add the Step handling logic here
-    return Status::Success;
+    SetStepCommandTargetDirection(direction);
+    return ClosureManager::GetInstance().OnStepCommand(direction, numberOfSteps, speed, GetEndpoint());
 }
 
 CHIP_ERROR ClosureDimensionEndpoint::Init()
@@ -58,4 +63,42 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
     ReturnErrorOnFailure(mLogic.Init(conformance, clusterInitParameters));
     ReturnErrorOnFailure(mInterface.Init());
     return CHIP_NO_ERROR;
+}
+
+void ClosureDimensionEndpoint::OnStopMotionActionComplete()
+{
+    // Set the Position, latch in OverallTargetState to Null and speed to Auto as the motion has been stopped.
+    GenericDimensionStateStruct targetState =
+        GenericDimensionStateStruct(NullOptional, NullOptional, MakeOptional(Globals::ThreeLevelAutoEnum::kAuto));
+    VerifyOrReturn(mLogic.SetTargetState(DataModel::MakeNullable(targetState)) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set target in OnStopMotionActionComplete"));
+}
+
+void ClosureDimensionEndpoint::OnStopCalibrateActionComplete()
+{
+    // Current state and target are set to null after calibration is stopped to indicate an unknown state.
+    VerifyOrReturn(mLogic.SetCurrentState(DataModel::NullNullable) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set current state to null in OnStopCalibrateActionComplete"));
+    VerifyOrReturn(mLogic.SetTargetState(DataModel::NullNullable) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to set target to null in OnStopCalibrateActionComplete"));
+}
+
+void ClosureDimensionEndpoint::OnCalibrateActionComplete()
+{
+    DataModel::Nullable<GenericDimensionStateStruct> currentState(
+        GenericDimensionStateStruct(MakeOptional(DataModel::MakeNullable(kFullClosedTargetPosition)),
+                                    MakeOptional(DataModel::MakeNullable(true)), MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
+    DataModel::Nullable<GenericDimensionStateStruct> targetState{ DataModel::NullNullable };
+    mLogic.SetCurrentState(currentState);
+    mLogic.SetTargetState(targetState);
+}
+
+void ClosureDimensionEndpoint::OnMoveToActionComplete()
+{
+    // This function should handle closure dimension state updation after MoveTo Action.
+}
+
+void ClosureDimensionEndpoint::OnPanelMotionActionComplete()
+{
+    UpdateCurrentStateFromTargetState();
 }

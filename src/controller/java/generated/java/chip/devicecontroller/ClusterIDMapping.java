@@ -11353,8 +11353,9 @@ public class ClusterIDMapping {
             CountdownTime(0L),
             MainState(1L),
             CurrentErrorList(2L),
-            OverallState(3L),
-            OverallTarget(4L),
+            OverallCurrentState(3L),
+            OverallTargetState(4L),
+            LatchControlModes(5L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -11479,7 +11480,7 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             CurrentState(0L),
-            Target(1L),
+            TargetState(1L),
             Resolution(2L),
             StepValue(3L),
             Unit(4L),
@@ -11489,6 +11490,7 @@ public class ClusterIDMapping {
             RotationAxis(8L),
             Overflow(9L),
             ModulationType(10L),
+            LatchControlModes(11L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -11964,6 +11966,10 @@ public class ClusterIDMapping {
             Presets(80L),
             Schedules(81L),
             SetpointHoldExpiryTimestamp(82L),
+            MaxThermostatSuggestions(83L),
+            ThermostatSuggestions(84L),
+            CurrentThermostatSuggestion(85L),
+            ThermostatSuggestionNotFollowingReason(86L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -12015,6 +12021,8 @@ public class ClusterIDMapping {
             ClearWeeklySchedule(3L),
             SetActiveScheduleRequest(5L),
             SetActivePresetRequest(6L),
+            AddThermostatSuggestion(7L),
+            RemoveThermostatSuggestion(8L),
             AtomicRequest(254L),;
             private final long id;
             Command(long id) {
@@ -12112,6 +12120,40 @@ public class ClusterIDMapping {
                     }
                     public static SetActivePresetRequestCommandField value(int id) throws NoSuchFieldError {
                         for (SetActivePresetRequestCommandField field : SetActivePresetRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum AddThermostatSuggestionCommandField {PresetHandle(0),EffectiveTime(1),ExpirationInMinutes(2),;
+                    private final int id;
+                    AddThermostatSuggestionCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static AddThermostatSuggestionCommandField value(int id) throws NoSuchFieldError {
+                        for (AddThermostatSuggestionCommandField field : AddThermostatSuggestionCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum RemoveThermostatSuggestionCommandField {UniqueID(0),;
+                    private final int id;
+                    RemoveThermostatSuggestionCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static RemoveThermostatSuggestionCommandField value(int id) throws NoSuchFieldError {
+                        for (RemoveThermostatSuggestionCommandField field : RemoveThermostatSuggestionCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -17343,10 +17385,9 @@ public class ClusterIDMapping {
         public enum Command {
             CreateTwoDCartesianZone(0L),
             UpdateTwoDCartesianZone(2L),
-            GetTwoDCartesianZone(3L),
-            RemoveZone(5L),
-            CreateOrUpdateTrigger(6L),
-            RemoveTrigger(7L),;
+            RemoveZone(3L),
+            CreateOrUpdateTrigger(4L),
+            RemoveTrigger(5L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -17392,23 +17433,6 @@ public class ClusterIDMapping {
                     }
                     public static UpdateTwoDCartesianZoneCommandField value(int id) throws NoSuchFieldError {
                         for (UpdateTwoDCartesianZoneCommandField field : UpdateTwoDCartesianZoneCommandField.values()) {
-                        if (field.getID() == id) {
-                            return field;
-                        }
-                        }
-                        throw new NoSuchFieldError();
-                    }
-                }public enum GetTwoDCartesianZoneCommandField {ZoneID(0),;
-                    private final int id;
-                    GetTwoDCartesianZoneCommandField(int id) {
-                        this.id = id;
-                    }
-
-                    public int getID() {
-                        return id;
-                    }
-                    public static GetTwoDCartesianZoneCommandField value(int id) throws NoSuchFieldError {
-                        for (GetTwoDCartesianZoneCommandField field : GetTwoDCartesianZoneCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -17521,7 +17545,7 @@ public class ClusterIDMapping {
             AllocatedVideoStreams(15L),
             AllocatedAudioStreams(16L),
             AllocatedSnapshotStreams(17L),
-            RankedVideoStreamPrioritiesList(18L),
+            StreamUsagePriorities(18L),
             SoftRecordingPrivacyModeEnabled(19L),
             SoftLivestreamPrivacyModeEnabled(20L),
             HardPrivacyModeOn(21L),
@@ -17650,7 +17674,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum VideoStreamAllocateCommandField {StreamUsage(0),VideoCodec(1),MinFrameRate(2),MaxFrameRate(3),MinResolution(4),MaxResolution(5),MinBitRate(6),MaxBitRate(7),MinFragmentLen(8),MaxFragmentLen(9),WatermarkEnabled(10),OSDEnabled(11),;
+                }public enum VideoStreamAllocateCommandField {StreamUsage(0),VideoCodec(1),MinFrameRate(2),MaxFrameRate(3),MinResolution(4),MaxResolution(5),MinBitRate(6),MaxBitRate(7),MinKeyFrameInterval(8),MaxKeyFrameInterval(9),WatermarkEnabled(10),OSDEnabled(11),;
                     private final int id;
                     VideoStreamAllocateCommandField(int id) {
                         this.id = id;
@@ -20281,7 +20305,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             MeteredQuantity(0L),
             MeteredQuantityTimestamp(1L),
-            MeasurementType(2L),
+            TariffUnit(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),

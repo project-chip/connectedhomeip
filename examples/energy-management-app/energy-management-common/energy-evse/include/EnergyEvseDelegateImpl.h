@@ -36,6 +36,10 @@ namespace EnergyEvse {
 // chip::app::Clusters::EnergyEvse::TargetDayOfWeekBitmap)
 constexpr uint8_t kAllTargetDaysMask = 0x7f;
 
+// A sensible minimum limit for mains voltage (100V) to avoid accidental use
+// of 100mV instead of 100000mV
+constexpr int64_t kMinimumMainsVoltage_mV = 100000;
+
 /* Local state machine Events to allow simpler handling of state transitions */
 enum EVSEStateMachineEvent
 {
@@ -214,6 +218,8 @@ public:
     // Internal API to allow an EVSE to change its internal state etc
     Status HwSetMaxHardwareCurrentLimit(int64_t currentmA);
     int64_t HwGetMaxHardwareCurrentLimit() { return mMaxHardwareCurrentLimit; }
+    Status HwSetNominalMainsVoltage(int64_t voltage_mV);
+    int64_t HwGetNominalMainsVoltage() { return mNominalMainsVoltage; }
     Status HwSetCircuitCapacity(int64_t currentmA);
     Status HwSetCableAssemblyLimit(int64_t currentmA);
     int64_t HwGetCableAssemblyLimit() { return mCableAssemblyCurrentLimit; }
@@ -282,7 +288,10 @@ public:
 
     /* SOC attributes */
     DataModel::Nullable<Percent> GetStateOfCharge() override;
+    CHIP_ERROR SetStateOfCharge(DataModel::Nullable<Percent>);
     DataModel::Nullable<int64_t> GetBatteryCapacity() override;
+    CHIP_ERROR SetBatteryCapacity(DataModel::Nullable<int64_t>);
+
     /* PNC attributes*/
     DataModel::Nullable<CharSpan> GetVehicleID() override;
     /* Session SESS attributes */
@@ -304,7 +313,9 @@ private:
     int64_t mCableAssemblyCurrentLimit              = 0; /* Cable limit detected when cable is plugged in, in mA */
     int64_t mMaximumChargingCurrentLimitFromCommand = 0; /* Value of current maximum limit when charging enabled */
     int64_t mActualChargingCurrentLimit             = 0;
-    StateEnum mHwState                              = StateEnum::kNotPluggedIn; /* Hardware state */
+    int64_t mNominalMainsVoltage                    = 230000; /* Assume a sensible default mains voltage */
+
+    StateEnum mHwState = StateEnum::kNotPluggedIn; /* Hardware state */
 
     /* Variables to hold State and SupplyState in case a fault is raised */
     StateEnum mStateBeforeFault             = StateEnum::kUnknownEnumValue;

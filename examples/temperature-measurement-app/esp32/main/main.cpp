@@ -30,7 +30,6 @@
 #include <common/Esp32AppServer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <diagnostic-logs-provider-delegate-impl.h>
 #include <platform/ESP32/ESP32Utils.h>
 
 #include <cmath>
@@ -53,10 +52,11 @@
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
 #ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-#include <tracing/esp32_diagnostic_trace/DiagnosticTracing.h>
-static uint8_t endUserBuffer[CONFIG_END_USER_BUFFER_SIZE]; // Global static buffer used to store diagnostics
-using namespace chip::Tracing::Diagnostics;
-CircularDiagnosticBuffer diagnosticStorage(endUserBuffer, CONFIG_END_USER_BUFFER_SIZE);
+#include <diagnostic-logs-provider-delegate-impl.h>
+static uint8_t retrievalBuffer[CONFIG_RETRIEVAL_BUFFER_SIZE]; // Global static buffer used to retrieve diagnostics
+static uint8_t endUserBuffer[CONFIG_END_USER_BUFFER_SIZE];    // Global static buffer used to store diagnostics
+
+using namespace chip::app::Clusters::DiagnosticLogs;
 #endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 
 namespace {
@@ -82,10 +82,6 @@ static AppDeviceCallbacks EchoCallbacks;
 static void InitServer(intptr_t context)
 {
     Esp32AppServer::Init(); // Init ZCL Data Model and CHIP App Server AND Initialize device attestation config
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-    static ESP32Diagnostics diagnosticBackend(&diagnosticStorage);
-    Tracing::Register(diagnosticBackend);
-#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 }
 
 extern "C" void app_main()
@@ -140,12 +136,17 @@ extern "C" void app_main()
     chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
 }
 
-using namespace chip::app::Clusters::DiagnosticLogs;
+#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
 void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
 {
-    auto & logProvider = LogProvider::GetInstance();
-#ifdef CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE
-    logProvider.SetDiagnosticStorageInstance(&diagnosticStorage);
-#endif
+    auto & logProvider                        = LogProvider::GetInstance();
+    LogProvider::LogProviderInit providerInit = {
+        .endUserBuffer       = endUserBuffer,
+        .endUserBufferSize   = CONFIG_END_USER_BUFFER_SIZE,
+        .retrievalBuffer     = retrievalBuffer,
+        .retrievalBufferSize = CONFIG_RETRIEVAL_BUFFER_SIZE,
+    };
+    logProvider.Init(providerInit);
     DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
 }
+#endif // CONFIG_ENABLE_ESP_DIAGNOSTICS_TRACE

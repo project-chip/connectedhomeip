@@ -57,17 +57,10 @@ public:
     CHIP_ERROR Init();
 
     void InvokeCommand(HandlerContext & handlerContext) override;
-
-private:
-    CommandHandlerInterface * mOriginalCommandHandlerInterface = nullptr;
 };
 
 CHIP_ERROR AdministratorCommissioningCommandHandler::Init()
 {
-    mOriginalCommandHandlerInterface =
-        CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(kRootEndpointId, AdministratorCommissioning::Id);
-    VerifyOrReturnError(mOriginalCommandHandlerInterface, CHIP_ERROR_INTERNAL);
-    ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(mOriginalCommandHandlerInterface));
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
     return CHIP_NO_ERROR;
 }
@@ -81,8 +74,6 @@ void AdministratorCommissioningCommandHandler::InvokeCommand(HandlerContext & ha
     if (handlerContext.mRequestPath.mCommandId != AdministratorCommissioning::Commands::OpenCommissioningWindow::Id ||
         endpointId == kRootEndpointId)
     {
-        // Proceed with default handling in Administrator Commissioning Server
-        mOriginalCommandHandlerInterface->InvokeCommand(handlerContext);
         return;
     }
 
@@ -207,7 +198,6 @@ void BridgedDeviceInformationCommandHandler::InvokeCommand(HandlerContext & hand
     handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, status);
 }
 
-BridgedAdministratorCommissioning gBridgedAdministratorCommissioning;
 BridgedDeviceBasicInformationImpl gBridgedDeviceBasicInformationAttributes;
 AdministratorCommissioningCommandHandler gAdministratorCommissioningCommandHandler;
 BridgedDeviceInformationCommandHandler gBridgedDeviceInformationCommandHandler;
@@ -225,7 +215,6 @@ CHIP_ERROR BridgeInit(FabricAdminDelegate * delegate)
 
     BridgedDeviceManager::Instance().Init();
     FabricBridge::Instance().SetDelegate(delegate);
-    ReturnErrorOnFailure(gBridgedAdministratorCommissioning.Init());
     ReturnErrorOnFailure(CommissionerControlInit(delegate));
 
     return CHIP_NO_ERROR;

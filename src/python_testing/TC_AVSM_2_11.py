@@ -38,6 +38,7 @@
 import logging
 
 import chip.clusters as Clusters
+from chip.clusters import Globals
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
@@ -58,22 +59,22 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
             TestStep("precondition", "DUT commissioned and preconditions", is_commissioning=True),
             TestStep(
                 1,
-                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated snapshot streams in the list is 1. Store StreamID as aStreamID.",
             ),
             TestStep(
                 2,
-                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
+                "TH reads AllocatedVideoStreams attribute from CameraAVStreamManagement Cluster on DUT.",
                 "Verify the number of allocated video streams in the list is 0.",
             ),
             TestStep(
                 3,
-                "TH reads AllocatedAudioStreams attribute from CameraAVStreamManagement Cluster on TH_SERVER",
+                "TH reads AllocatedAudioStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the number of allocated audio streams in the list is 0.",
             ),
             TestStep(
                 4,
-                "TH reads SupportedStreamUsages attribute from CameraAVStreamManagement Cluster on TH_SERVER.",
+                "TH reads SupportedStreamUsages attribute from CameraAVStreamManagement Cluster on DUT.",
                 "Store this value in aSupportedStreamUsages.",
             ),
             TestStep(
@@ -94,12 +95,12 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
             TestStep(
                 8,
                 "TH sends the SetStreamPriorities command with StreamPriorities containing a StreamUsage not in aSupportedStreamUsages.",
-                "DUT responds with a INVALID_DATA_TYPE status code.",
+                "DUT responds with a DYNAMIC_CONSTRAINT_ERROR status code.",
             ),
             TestStep(
                 9,
                 "TH sends the SetStreamPriorities command with StreamPriorities containing duplicate StreamUsage values from aSupportedStreamUsages.",
-                "DUT responds with a CONSTRAINT_ERROR status code.",
+                "DUT responds with a ALREADY_EXISTS status code.",
             ),
         ]
 
@@ -148,18 +149,13 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
 
         self.step(5)
         try:
-            await self.send_single_cmd(
-                endpoint=endpoint, cmd=commands.SetStreamPriorities(streamPriorities=(aSupportedStreamUsages[:-1]))
-            )
-            asserts.assert_true(
-                False,
-                "Unexpected success when expecting INVALID_IN_STATE due to StreamPriorities set as a subset of aSupportedStreamUsages",
-            )
+            await self.send_single_cmd(endpoint=endpoint, cmd=commands.SetStreamPriorities(streamPriorities=aSupportedStreamUsages))
+            asserts.fail("Unexpected success when expecting INVALID_IN_STATE due to allocated SnapshotStream")
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
                 Status.InvalidInState,
-                "Unexpected error returned when expecting INVALID_IN_STATE due to StreamPriorities set as a subset of aSupportedStreamUsages",
+                "Unexpected error returned expecting INVALID_IN_STATE due to allocated SnapshotStream",
             )
             pass
 
@@ -181,19 +177,18 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
 
         self.step(8)
         try:
-            notSupportedStreamUsage = next((e for e in cluster.Enums.StreamUsageEnum if e not in aSupportedStreamUsages), None)
+            notSupportedStreamUsage = next((e for e in Globals.Enums.StreamUsageEnum if e not in aSupportedStreamUsages), None)
             await self.send_single_cmd(
                 endpoint=endpoint, cmd=commands.SetStreamPriorities(streamPriorities=([notSupportedStreamUsage]))
             )
-            asserts.assert_true(
-                False,
-                "Unexpected success when expecting INVALID_DATA_TYPE due to StreamPriorities containing a StreamUsage not in aSupportedStreamUsages",
+            asserts.fail(
+                "Unexpected success when expecting DYNAMIC_CONSTRAINT_ERROR due to StreamPriorities containing a StreamUsage not in aSupportedStreamUsages"
             )
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
-                Status.InvalidDataType,
-                "Unexpected error returned expecting INVALID_DATA_TYPE due to StreamPriorities containing a StreamUsage not in aSupportedStreamUsages",
+                Status.DynamicConstraintError,
+                "Unexpected error returned expecting DYNAMIC_CONSTRAINT_ERROR due to StreamPriorities containing a StreamUsage not in aSupportedStreamUsages",
             )
             pass
 
@@ -203,15 +198,14 @@ class TC_AVSM_2_11(MatterBaseTest, AVSMTestBase):
                 endpoint=endpoint,
                 cmd=commands.SetStreamPriorities(streamPriorities=(aSupportedStreamUsages + aSupportedStreamUsages)),
             )
-            asserts.assert_true(
-                False,
-                "Unexpected success when expecting CONSTRAINT_ERROR due to StreamPriorities containing duplicate StreamUsage values from aSupportedStreamUsages",
+            asserts.fail(
+                "Unexpected success when expecting ALREADY_EXISTS due to StreamPriorities containing duplicate StreamUsage values from aSupportedStreamUsages",
             )
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status,
-                Status.ConstraintError,
-                "Unexpected error returned when expecting CONSTRAINT_ERROR due to StreamPriorities containing duplicate StreamUsage values from aSupportedStreamUsages",
+                Status.AlreadyExists,
+                "Unexpected error returned when expecting ALREADY_EXISTS due to StreamPriorities containing duplicate StreamUsage values from aSupportedStreamUsages",
             )
             pass
 

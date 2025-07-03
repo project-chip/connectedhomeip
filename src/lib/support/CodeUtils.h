@@ -235,6 +235,33 @@
     } while (false)
 
 /**
+ *  @def ReturnValueOnFailure(expr)
+ *
+ *  @brief
+ *    Returns value if the expression returns an error. For a CHIP_ERROR expression, this means any value other
+ *    than CHIP_NO_ERROR. For an integer expression, this means non-zero.
+ *
+ *  Example usage:
+ *
+ *  @code
+ *    ReturnValueOnFailure(channel->SendMsg(msg), Status::Failure);
+ *  @endcode
+ *
+ *  @param[in]  expr        An expression to be tested.
+ *  @param[in]  value       A value to return if @a expr is an error.
+ *  @param[in]  ...         Statements to execute before returning. Optional.
+ */
+#define ReturnValueOnFailure(expr, value, ...)                                                                                     \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        auto __err = (expr);                                                                                                       \
+        if (!::chip::ChipError::IsSuccess(__err))                                                                                  \
+        {                                                                                                                          \
+            return value;                                                                                                          \
+        }                                                                                                                          \
+    } while (false)
+
+/**
  *  @def VerifyOrReturn(expr, ...)
  *
  *  @brief
@@ -527,6 +554,41 @@ inline void chipDie(void)
     nlABORT_ACTION(aCondition, ChipLogError(Support, "VerifyOrDie failure at %s:%d: %s", __FILE__, __LINE__, #aCondition))
 #else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 #define VerifyOrDie(aCondition) VerifyOrDieWithoutLogging(aCondition)
+#endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+
+/**
+ *  @def SuccessOrDie(error)
+ *
+ *  @brief
+ *    This checks for the specified error, which is expected to
+ *    commonly be successful (CHIP_NO_ERROR), forces an immediate abort if the status
+ *    is unsuccessful.
+ *
+ *
+ *  Example Usage:
+ *
+ *  @code
+ *  uint8_t* AllocateBuffer()
+ *  {
+ *      uint8_t* buffer;
+ *      SuccessOrDie(ChipAllocateBuffer(buffer));
+ *      return buffer;
+ *  }
+ *  @endcode
+ *
+ *  @param[in]  error  A ChipError object to be evaluated against success (CHIP_NO_ERROR).
+ *
+ */
+#if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE && CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE_NO_COND
+#define SuccessOrDie(error)                                                                                                        \
+    nlABORT_ACTION(::chip::ChipError::IsSuccess((error)),                                                                          \
+                   ChipLogError(Support, "SuccessOrDie failure %s at %s:%d", ErrorStr((error)), __FILE__, __LINE__))
+#elif CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+#define SuccessOrDie(error)                                                                                                        \
+    nlABORT_ACTION(::chip::ChipError::IsSuccess((error)),                                                                          \
+                   ChipLogError(Support, "SuccessOrDie failure %s at %s:%d: %s", ErrorStr((error)), __FILE__, __LINE__, #error))
+#else // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+#define SuccessOrDie(error) VerifyOrDieWithoutLogging(::chip::ChipError::IsSuccess((error)))
 #endif // CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
 
 /**

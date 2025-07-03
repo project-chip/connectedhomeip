@@ -151,6 +151,8 @@ def BuildHostTarget():
         TargetPart('terms-and-conditions', app=HostApp.TERMS_AND_CONDITIONS),
         TargetPart('camera', app=HostApp.CAMERA),
         TargetPart('camera-controller', app=HostApp.CAMERA_CONTROLLER),
+        TargetPart('jf-control-app', app=HostApp.JF_CONTROL),
+        TargetPart('jf-admin-app', app=HostApp.JF_ADMIN),
     ]
 
     if (HostBoard.NATIVE.PlatformName() == 'darwin'):
@@ -202,6 +204,7 @@ def BuildHostTarget():
     target.AppendModifier('chip-casting-simplified', chip_casting_simplified=True).OnlyIfRe('-tv-casting-app')
     target.AppendModifier('googletest', use_googletest=True).OnlyIfRe('-tests')
     target.AppendModifier('terms-and-conditions', terms_and_conditions_required=True)
+    target.AppendModifier('webrtc', enable_webrtc=True)
 
     return target
 
@@ -758,6 +761,7 @@ def BuildIMXTarget():
     ])
 
     target.AppendModifier('release', release=True)
+    target.AppendModifier('trusty', trusty=True)
 
     return target
 
@@ -814,7 +818,6 @@ def BuildTelinkTarget():
     target.AppendModifier('thread-analyzer', thread_analyzer_config=True)
     target.AppendModifier('precompiled-ot', precompiled_ot_config=True)
     target.AppendModifier('tflm', tflm_config=True)
-    target.AppendModifier('newlib', newlib_libc_config=True)
 
     return target
 

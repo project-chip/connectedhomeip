@@ -28,31 +28,23 @@ using namespace chip::app::Clusters::AdministratorCommissioning;
 
 namespace bridge {
 
-CHIP_ERROR BridgedAdministratorCommissioning::Init()
+BridgedAdministratorCommissioning::BridgedAdministratorCommissioning(BridgedDevice & device) :
+    AttributeAccessInterface(MakeOptional(device.GetEndpointId()), chip::app::Clusters::AdministratorCommissioning::Id),
+    mDevice(device)
 {
-    // We expect initialization after emberAfInit(). This allows us to unregister the existing
-    // AccessAttributeInterface for AdministratorCommissioning and register ourselves, ensuring we
-    // get the callback for reading attribute. If the read is not intended for a bridged device we will
-    // forward it to the original attribute interface that we are unregistering.
-    mOriginalAttributeInterface = AttributeAccessInterfaceRegistry::Instance().Get(kRootEndpointId, AdministratorCommissioning::Id);
-    VerifyOrReturnError(mOriginalAttributeInterface, CHIP_ERROR_INTERNAL);
-    AttributeAccessInterfaceRegistry::Instance().Unregister(mOriginalAttributeInterface);
     VerifyOrDie(AttributeAccessInterfaceRegistry::Instance().Register(this));
-    return CHIP_NO_ERROR;
+}
+
+BridgedAdministratorCommissioning::~BridgedAdministratorCommissioning()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
 CHIP_ERROR BridgedAdministratorCommissioning::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == Clusters::AdministratorCommissioning::Id);
-    EndpointId endpointId  = aPath.mEndpointId;
-    BridgedDevice * device = BridgedDeviceManager::Instance().GetDevice(endpointId);
-
-    if (!device)
-    {
-        VerifyOrDie(mOriginalAttributeInterface);
-        return mOriginalAttributeInterface->Read(aPath, aEncoder);
-    }
-    auto attr = device->GetAdminCommissioningAttributes();
+    VerifyOrDie(aPath.mEndpointId == mDevice.GetEndpointId());
+    auto attr = mDevice.GetAdminCommissioningAttributes();
 
     switch (aPath.mAttributeId)
     {

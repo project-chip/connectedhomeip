@@ -101,15 +101,15 @@ class AVSMTestBase:
             endpoint=endpoint, cluster=cluster, attribute=attr.MicrophoneCapabilities
         )
         logger.info(f"Rx'd MicrophoneCapabilities: {aMicrophoneCapabilities}")
-        aRankedStreamPriorities = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.RankedVideoStreamPrioritiesList
+        aStreamUsagePriorities = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
-        logger.info(f"Rx'd RankedVideoStreamPrioritiesList : {aRankedStreamPriorities}")
-        asserts.assert_greater(len(aRankedStreamPriorities), 0, "RankedVideoStreamPrioritiesList is empty")
+        logger.info(f"Rx'd StreamUsagePriorities : {aStreamUsagePriorities}")
+        asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
 
         try:
             adoStreamAllocateCmd = commands.AudioStreamAllocate(
-                streamUsage=aRankedStreamPriorities[0],
+                streamUsage=aStreamUsagePriorities[0],
                 audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
                 channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
                 sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
@@ -146,10 +146,10 @@ class AVSMTestBase:
             return
 
         # Allocate one for the test steps
-        aRankedStreamPriorities = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attr.RankedVideoStreamPrioritiesList
+        aStreamUsagePriorities = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
-        logger.info(f"Rx'd RankedVideoStreamPrioritiesList: {aRankedStreamPriorities}")
+        logger.info(f"Rx'd StreamUsagePriorities: {aStreamUsagePriorities}")
         aRateDistortionTradeOffPoints = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.RateDistortionTradeOffPoints
         )
@@ -172,12 +172,12 @@ class AVSMTestBase:
         osd = True if (aFeatureMap & cluster.Bitmaps.Feature.kOnScreenDisplay) != 0 else None
 
         try:
-            asserts.assert_greater(len(aRankedStreamPriorities), 0, "RankedVideoStreamPrioritiesList is empty")
+            asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
             asserts.assert_greater(len(aRateDistortionTradeOffPoints), 0, "RateDistortionTradeOffPoints is empty")
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
-                streamUsage=aRankedStreamPriorities[0],
+                streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=15,  # An acceptable value for min frame rate
+                minFrameRate=30,  # An acceptable value for min frame rate
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewport,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -185,8 +185,8 @@ class AVSMTestBase:
                 ),
                 minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
                 maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                minFragmentLen=4000,
-                maxFragmentLen=4000,
+                minKeyFrameInterval=4000,
+                maxKeyFrameInterval=4000,
                 watermarkEnabled=watermark,
                 OSDEnabled=osd
             )

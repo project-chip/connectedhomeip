@@ -29,7 +29,7 @@ namespace Clusters {
 namespace ClosureDimension {
 namespace Structs {
 
-namespace CurrentStateStruct {
+namespace DimensionStateStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
     DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
@@ -66,7 +66,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     }
 }
 
-} // namespace CurrentStateStruct
+} // namespace DimensionStateStruct
 
 namespace RangePercent100thsStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
@@ -101,45 +101,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace RangePercent100thsStruct
-
-namespace TargetStruct {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
-{
-    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
-    encoder.Encode(to_underlying(Fields::kPosition), position);
-    encoder.Encode(to_underlying(Fields::kLatch), latch);
-    encoder.Encode(to_underlying(Fields::kSpeed), speed);
-    return encoder.Finalize();
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    detail::StructDecodeIterator __iterator(reader);
-    while (true)
-    {
-        uint8_t __context_tag = 0;
-        CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
-        ReturnErrorOnFailure(err);
-
-        if (__context_tag == to_underlying(Fields::kPosition))
-        {
-            err = DataModel::Decode(reader, position);
-        }
-        else if (__context_tag == to_underlying(Fields::kLatch))
-        {
-            err = DataModel::Decode(reader, latch);
-        }
-        else if (__context_tag == to_underlying(Fields::kSpeed))
-        {
-            err = DataModel::Decode(reader, speed);
-        }
-
-        ReturnErrorOnFailure(err);
-    }
-}
-
-} // namespace TargetStruct
 
 namespace UnitRangeStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const

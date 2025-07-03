@@ -35,7 +35,7 @@ namespace Clusters {
 namespace EnergyEvse {
 
 // Spec-defined constraints
-constexpr int64_t kMinimumChargeCurrent         = 0;
+constexpr int64_t kMinimumChargeCurrentLimit    = 0;
 constexpr uint32_t kMaxRandomizationDelayWindow = 86400;
 constexpr uint8_t kEvseTargetsMaxNumberOfDays   = 7;
 constexpr uint8_t kEvseTargetsMaxTargetsPerDay  = 10;

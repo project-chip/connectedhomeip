@@ -39,7 +39,7 @@ public:
     bool CanChangeMPTZ() override;
 
     CHIP_ERROR LoadMPTZPresets(std::vector<MPTZPresetHelper> & mptzPresetHelpers) override;
-    CHIP_ERROR LoadDPTZStreams(std::vector<DPTZStruct> dptzStreams) override;
+    CHIP_ERROR LoadDPTZStreams(std::vector<DPTZStruct> & dptzStreams) override;
     CHIP_ERROR PersistentAttributesLoadedCallback() override;
 
     /**
@@ -53,10 +53,11 @@ public:
                                                          Optional<uint8_t> aZoom) override;
     Protocols::InteractionModel::Status MPTZSavePreset(uint8_t aPreset) override;
     Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t aPreset) override;
-    Protocols::InteractionModel::Status DPTZSetViewport(uint16_t aVideoStreamID, Structs::ViewportStruct::Type aViewport) override;
+    Protocols::InteractionModel::Status DPTZSetViewport(uint16_t aVideoStreamID,
+                                                        Globals::Structs::ViewportStruct::Type aViewport) override;
     Protocols::InteractionModel::Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX,
                                                          Optional<int16_t> aDeltaY, Optional<int8_t> aZoomDelta,
-                                                         Structs::ViewportStruct::Type & aViewport) override;
+                                                         Globals::Structs::ViewportStruct::Type & aViewport) override;
 
     void SetCameraDeviceHAL(CameraDeviceInterface * aCameraDevice);
 
@@ -65,7 +66,7 @@ public:
      */
     void VideoStreamAllocated(uint16_t aStreamID) override;
     void VideoStreamDeallocated(uint16_t aStreamID) override;
-    void DefaultViewportUpdated(Structs::ViewportStruct::Type aViewport) override;
+    void DefaultViewportUpdated(Globals::Structs::ViewportStruct::Type aViewport) override;
 
 private:
     CameraDeviceInterface * mCameraDeviceHAL = nullptr;

@@ -160,7 +160,7 @@ bool TestDACRevocationDelegateImpl::IsEntryInRevocationSet(const std::string & a
     }
     else
     {
-        ChipLogDetail(NotSpecified, "No revocation data available");
+        ChipLogProgress(NotSpecified, "No revocation data available");
         // No revocation data available
         return false;
     }
@@ -307,6 +307,7 @@ void TestDACRevocationDelegateImpl::CheckForRevokedDACChain(
 
     if (mDeviceAttestationRevocationSetPath.empty() && mRevocationData.empty())
     {
+        ChipLogProgress(NotSpecified, "WARNING: No revocation information available. Revocation checks will be skipped!");
         onCompletion->mCall(onCompletion->mContext, info, attestationError);
         return;
     }

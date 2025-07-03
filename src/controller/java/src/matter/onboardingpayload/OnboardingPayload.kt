@@ -83,37 +83,30 @@ const val kQRCodePrefix = "MT:"
 class OnboardingPayload(
   /** Version info of the OnboardingPayload: version SHALL be 0 */
   var version: Int = 0,
-
   /** The CHIP device vendor ID: Vendor ID SHALL be between 1 and 0xFFF4. */
   var vendorId: Int = 0,
-
   /** The CHIP device product ID: Product ID SHALL BE greater than 0. */
   var productId: Int = 0,
-
   /** Commissioning flow: 0 = standard, 1 = requires user action, 2 = custom */
   var commissioningFlow: Int = 0,
-
   /**
    * The CHIP device supported rendezvous flags: At least one DiscoveryCapability must be included.
    */
   var discoveryCapabilities: MutableSet<DiscoveryCapability> = mutableSetOf(),
-
   /** The CHIP device discriminator: */
   var discriminator: Int = 0,
-
   /**
    * If hasShortDiscriminator is true, the discriminator value contains just the high 4 bits of the
    * full discriminator. For example, if hasShortDiscriminator is true and discriminator is 0xA,
    * then the full discriminator can be anything in the range 0xA00 to 0xAFF.
    */
   var hasShortDiscriminator: Boolean = false,
-
   /**
    * The CHIP device setup PIN code: setupPINCode SHALL be greater than 0. Also invalid setupPINCode
    * is {000000000, 11111111, 22222222, 33333333, 44444444, 55555555, 66666666, 77777777, 88888888,
    * 99999999, 12345678, 87654321}.
    */
-  var setupPinCode: Long = 0
+  var setupPinCode: Long = 0,
 ) {
   var optionalQRCodeInfo: HashMap<Int, OptionalQRCodeInfo> = HashMap()
   private val optionalVendorData: HashMap<Int, OptionalQRCodeInfo> = HashMap()
@@ -126,7 +119,7 @@ class OnboardingPayload(
     commissioningFlow: Int,
     discoveryCapabilities: MutableSet<DiscoveryCapability>,
     discriminator: Int,
-    setupPinCode: Long
+    setupPinCode: Long,
   ) : this(
     version,
     vendorId,
@@ -135,7 +128,7 @@ class OnboardingPayload(
     discoveryCapabilities,
     discriminator,
     false,
-    setupPinCode
+    setupPinCode,
   )
 
   override fun equals(other: Any?): Boolean {
@@ -152,8 +145,8 @@ class OnboardingPayload(
       setupPinCode == other.setupPinCode
   }
 
-  override fun toString(): String {
-    return "OnboardingPayload(" +
+  override fun toString(): String =
+    "OnboardingPayload(" +
       "version=$version, " +
       "vendorId=$vendorId, " +
       "productId=$productId, " +
@@ -166,7 +159,6 @@ class OnboardingPayload(
       "optionalVendorData=$optionalVendorData, " +
       "optionalExtensionData=$optionalExtensionData" +
       ")"
-  }
 
   fun addOptionalQRCodeInfo(info: OptionalQRCodeInfo) {
     optionalQRCodeInfo[info.tag] = info
@@ -207,7 +199,12 @@ class OnboardingPayload(
     }
 
     val allValid =
-      setOf(DiscoveryCapability.BLE, DiscoveryCapability.ON_NETWORK, DiscoveryCapability.SOFT_AP)
+      setOf(
+        DiscoveryCapability.BLE,
+        DiscoveryCapability.ON_NETWORK,
+        DiscoveryCapability.SOFT_AP,
+        DiscoveryCapability.NFC
+      )
 
     // If discoveryCapabilities is not empty and discoveryCapabilities contains values outside
     // of allValid
@@ -346,9 +343,7 @@ class OnboardingPayload(
    * @param tag Tag to be checked
    * @return True if the tag is of Common type, False otherwise
    */
-  private fun isCommonTag(tag: Int): Boolean {
-    return tag < 0x80
-  }
+  private fun isCommonTag(tag: Int): Boolean = tag < 0x80
 
   /**
    * Checks if the tag is vendor-specific Spec 5.1.4.1 Manufacture-specific tag numbers are in the
@@ -357,9 +352,7 @@ class OnboardingPayload(
    * @param tag Tag to be checked
    * @return True if the tag is Vendor-specific, False otherwise
    */
-  private fun isVendorTag(tag: Int): Boolean {
-    return !isCommonTag(tag)
-  }
+  private fun isVendorTag(tag: Int): Boolean = !isCommonTag(tag)
 
   /**
    * A function to add an optional vendor data
@@ -367,7 +360,10 @@ class OnboardingPayload(
    * @param tag tag number in the [0x80-0xFF] range
    * @param data String representation of data to add
    */
-  fun addOptionalVendorData(tag: Int, data: String) {
+  fun addOptionalVendorData(
+    tag: Int,
+    data: String,
+  ) {
     val info = OptionalQRCodeInfo()
     info.tag = tag
     info.type = OptionalQRCodeInfoType.TYPE_STRING
@@ -382,7 +378,10 @@ class OnboardingPayload(
    * @param tag 7 bit [0-127] tag number
    * @param data Integer representation of data to add
    */
-  fun addOptionalVendorData(tag: Int, data: Int) {
+  fun addOptionalVendorData(
+    tag: Int,
+    data: Int,
+  ) {
     val info = OptionalQRCodeInfo()
     info.tag = tag
     info.type = OptionalQRCodeInfoType.TYPE_INT32
@@ -468,9 +467,8 @@ class OnboardingPayload(
    * @param tag 7 bit [0-127] tag number
    * @return retrieved OptionalQRCodeInfo object
    */
-  private fun getOptionalVendorData(tag: Int): OptionalQRCodeInfo {
-    return optionalVendorData[tag] ?: throw OnboardingPayloadException("Key not found")
-  }
+  private fun getOptionalVendorData(tag: Int): OptionalQRCodeInfo =
+    optionalVendorData[tag] ?: throw OnboardingPayloadException("Key not found")
 
   /**
    * A function to retrieve an optional QR Code info extended object
@@ -478,9 +476,8 @@ class OnboardingPayload(
    * @param tag 8 bit [128-255] tag number
    * @return retrieved OptionalQRCodeInfoExtension object
    */
-  private fun getOptionalExtensionData(tag: Int): OptionalQRCodeInfoExtension {
-    return optionalExtensionData[tag] ?: throw OnboardingPayloadException("Key not found")
-  }
+  private fun getOptionalExtensionData(tag: Int): OptionalQRCodeInfoExtension =
+    optionalExtensionData[tag] ?: throw OnboardingPayloadException("Key not found")
 
   /**
    * A function to retrieve the associated expected numeric value for a tag
@@ -520,9 +517,8 @@ class OnboardingPayload(
     return true
   }
 
-  private fun isVendorIdValidOperationally(vendorId: Int): Boolean {
-    return vendorId != VendorId.UNSPECIFIED.value && vendorId <= VendorId.TESTVENDOR4.value
-  }
+  private fun isVendorIdValidOperationally(vendorId: Int): Boolean =
+    vendorId != VendorId.UNSPECIFIED.value && vendorId <= VendorId.TESTVENDOR4.value
 
   companion object {
     private fun isValidSetupPIN(setupPIN: Long): Boolean {
@@ -543,32 +539,33 @@ class OnboardingPayload(
         setupPIN != 87654321L)
     }
 
-    private fun longToShortValue(longValue: Int): Int {
-      return (longValue shr (kDiscriminatorLongBits - kDiscriminatorShortBits))
-    }
+    private fun longToShortValue(longValue: Int): Int =
+      (longValue shr (kDiscriminatorLongBits - kDiscriminatorShortBits))
 
-    private fun shortToLongValue(shortValue: Int): Int {
-      return (shortValue shl (kDiscriminatorLongBits - kDiscriminatorShortBits))
-    }
+    private fun shortToLongValue(shortValue: Int): Int =
+      (shortValue shl (kDiscriminatorLongBits - kDiscriminatorShortBits))
   }
 }
 
-class UnrecognizedQrCodeException(qrCode: String) :
-  Exception(String.format("Invalid QR code string: %s", qrCode), null) {
+class UnrecognizedQrCodeException(
+  qrCode: String,
+) : Exception(String.format("Invalid QR code string: %s", qrCode), null) {
   companion object {
     private const val serialVersionUID = 1L
   }
 }
 
-class InvalidManualPairingCodeFormatException(entryCode: String) :
-  Exception(String.format("Invalid format for entry code string: %s", entryCode), null) {
+class InvalidManualPairingCodeFormatException(
+  entryCode: String,
+) : Exception(String.format("Invalid format for entry code string: %s", entryCode), null) {
   companion object {
     private const val serialVersionUID = 1L
   }
 }
 
-class OnboardingPayloadException(message: String) :
-  Exception(String.format("Failed to encode Onboarding payload to buffer: %s", message)) {
+class OnboardingPayloadException(
+  message: String,
+) : Exception(String.format("Failed to encode Onboarding payload to buffer: %s", message)) {
   companion object {
     private const val serialVersionUID = 1L
   }

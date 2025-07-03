@@ -329,6 +329,13 @@ struct TestGlobalStruct {
   optional nullable TestGlobalEnum myEnum = 2;
 }
 
+struct ViewportStruct {
+  int16u x1 = 0;
+  int16u y1 = 1;
+  int16u x2 = 2;
+  int16u y2 = 3;
+}
+
 fabric_scoped struct WebRTCSessionStruct {
   int16u id = 0;
   node_id peerNodeID = 1;
@@ -848,7 +855,7 @@ cluster GeneralCommissioning = 48 {
 
 /** Functionality to configure, enable, disable network credentials and access on a Matter device. */
 cluster NetworkCommissioning = 49 {
-  revision 1; // NOTE: Default/not specifically set
+  revision 2;
 
   enum NetworkCommissioningStatusEnum : enum8 {
     kSuccess = 0;
@@ -1622,7 +1629,7 @@ cluster ThreadBorderRouterManagement = 1106 {
   }
 
   readonly attribute char_string<63> borderRouterName = 0;
-  readonly attribute octet_string<254> borderAgentID = 1;
+  readonly attribute octet_string<16> borderAgentID = 1;
   readonly attribute int16u threadVersion = 2;
   readonly attribute boolean interfaceEnabled = 3;
   readonly attribute nullable int64u activeDatasetTimestamp = 4;
@@ -1646,14 +1653,14 @@ cluster ThreadBorderRouterManagement = 1106 {
     octet_string<254> pendingDataset = 0;
   }
 
-  /** Command to request the active operational dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session */
+  /** This command SHALL be used to request the active operational dataset of the Thread network to which the border router is connected. */
   command access(invoke: manage) GetActiveDatasetRequest(): DatasetResponse = 0;
-  /** Command to request the pending dataset of the Thread network to which the border router is connected. This command must be sent over a valid CASE session */
+  /** This command SHALL be used to request the pending dataset of the Thread network to which the border router is connected. */
   command access(invoke: manage) GetPendingDatasetRequest(): DatasetResponse = 1;
-  /** Command to set or update the active Dataset of the Thread network to which the Border Router is connected. */
-  command access(invoke: manage) SetActiveDatasetRequest(SetActiveDatasetRequestRequest): DefaultSuccess = 3;
-  /** Command set or update the pending Dataset of the Thread network to which the Border Router is connected. */
-  command access(invoke: manage) SetPendingDatasetRequest(SetPendingDatasetRequestRequest): DefaultSuccess = 4;
+  /** This command SHALL be used to set the active Dataset of the Thread network to which the Border Router is connected, when there is no active dataset already. */
+  timed command access(invoke: manage) SetActiveDatasetRequest(SetActiveDatasetRequestRequest): DefaultSuccess = 3;
+  /** This command SHALL be used to set or update the pending Dataset of the Thread network to which the Border Router is connected, if the Border Router supports PANChange Feature. */
+  timed command access(invoke: manage) SetPendingDatasetRequest(SetPendingDatasetRequestRequest): DefaultSuccess = 4;
 }
 
 endpoint 0 {
@@ -1779,9 +1786,6 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute activeHardwareFaults;
-    callback attribute activeRadioFaults;
-    callback attribute activeNetworkFaults;
     callback attribute testEventTriggersEnabled default = false;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -1796,7 +1800,7 @@ endpoint 0 {
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
     ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
     handle command OpenBasicCommissioningWindow;

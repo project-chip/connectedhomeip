@@ -23,6 +23,7 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestDefaultICDCheckInBackOffStrategy.cpp",
+    "TestICDConfigurationData.cpp",
     "TestICDManager.cpp",
     "TestICDMonitoringTable.cpp",
   ]

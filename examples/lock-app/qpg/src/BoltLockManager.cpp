@@ -264,7 +264,7 @@ void BoltLockManager::TimerEventHandler(TimerHandle_t xTimer)
     event.Type               = AppEvent::kEventType_Timer;
     event.TimerEvent.Context = lock;
     event.Handler            = ActuatorMovementTimerEventHandler;
-    GetAppTask().PostEvent(&event);
+    AppTask::GetAppTask().PostEvent(&event);
 }
 
 void BoltLockManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)

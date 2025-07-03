@@ -132,7 +132,8 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
             // Validate header signature and store header content to NVM
             // Note: this will initialize progress storage structure; do not call anything else before it
             uint16_t headerSize;
-            VerifyOrReturnError(true != qvCHIP_OtaValidateandStoreHeader(block.data(), block.size(), &headerSize, nullptr, 128),
+            VerifyOrReturnError(qvCHIP_OtaStatusSuccess ==
+                                    qvCHIP_OtaValidateandStoreHeader(block.data(), block.size(), &headerSize, nullptr, 128),
                                 CHIP_ERROR_INTEGRITY_CHECK_FAILED);
 
             // Get and store provider location
