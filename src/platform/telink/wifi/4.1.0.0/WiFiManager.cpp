@@ -334,7 +334,7 @@ void WiFiManager::ScanResultHandler(Platform::UniquePtr<uint8_t> data, size_t le
     // Contrary to other handlers, offload accumulating of the scan results from the CHIP thread to the caller's thread
     const wifi_scan_result * scanResult = reinterpret_cast<const wifi_scan_result *>(data.get());
 
-    ChipLogDetail(DeviceLayer, "Found SSID: %s", StringBuilder(scanResult->ssid, scanResult->ssid_length).c_str());
+    ChipLogDetail(DeviceLayer, "Found SSID: %s", StringBuilder(Uint8::to_const_char(scanResult->ssid), scanResult->ssid_length).c_str());
 
     if (Instance().mDirectedScanning)
     {
