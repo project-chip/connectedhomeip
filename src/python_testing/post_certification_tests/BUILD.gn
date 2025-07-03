@@ -25,7 +25,7 @@ idt_files = [
 
 copy("idt_files") {
   sources = idt_files
-  outputs = [ "${root_out_dir}/ddd/{{source_name_part}}.txt" ]
+  outputs = [ "${root_out_dir}/ddd/{{source_file_part}}" ]
 }
 
 # credentials_files = [ "${chip_root}/credentials/fetch_paa_certs_from_dcl.py" ]
@@ -62,7 +62,7 @@ pw_python_distribution("matter-post-certification-tests") {
   # idt_files_outputs = get_target_outputs(":idt_files")
 
   extra_files =
-      [ "${root_out_dir}/ddd/TC_DA_1_2.txt > chip/testing/idt/TC_DA_1_2.txt" ]
+      [ "${root_out_dir}/ddd/TC_DA_1_2.py > chip/testing/idt/TC_DA_1_2.py" ]
 
   # foreach(file, idt_files_outputs) {
   #   extra_files +=
