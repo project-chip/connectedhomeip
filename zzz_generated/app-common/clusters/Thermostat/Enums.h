@@ -319,6 +319,18 @@ enum class ScheduleTypeFeaturesBitmap : uint16_t
     kSupportsNames     = 0x4,
     kSupportsOff       = 0x8,
 };
+
+// Bitmap for ThermostatSuggestionNotFollowingReasonBitmap
+enum class ThermostatSuggestionNotFollowingReasonBitmap : uint16_t
+{
+    kDemandResponseEvent    = 0x1,
+    kOngoingHold            = 0x2,
+    kSchedule               = 0x4,
+    kOccupancy              = 0x8,
+    kVacationMode           = 0x10,
+    kTimeOfUseCostSavings   = 0x20,
+    kPreCoolingOrPreHeating = 0x40,
+};
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app

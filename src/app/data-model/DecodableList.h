@@ -308,6 +308,51 @@ public:
     }
 };
 
+template <typename X, std::enable_if_t<!DataModel::IsFabricScoped<X>::value, bool> = true>
+inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, DecodableList<X> list)
+{
+    TLV::TLVType type;
+
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Array, type));
+    auto iterator = list.begin();
+    while (iterator.Next())
+    {
+        ReturnErrorOnFailure(Encode(writer, TLV::AnonymousTag(), iterator.GetValue()));
+    }
+    ReturnErrorOnFailure(iterator.GetStatus());
+    return writer.EndContainer(type);
+}
+
+template <typename X, std::enable_if_t<DataModel::IsFabricScoped<X>::value, bool> = true>
+inline CHIP_ERROR EncodeForWrite(TLV::TLVWriter & writer, TLV::Tag tag, DecodableList<X> list)
+{
+    TLV::TLVType type;
+
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Array, type));
+    auto iterator = list.begin();
+    while (iterator.Next())
+    {
+        ReturnErrorOnFailure(EncodeForWrite(writer, TLV::AnonymousTag(), iterator.GetValue()));
+    }
+    ReturnErrorOnFailure(iterator.GetStatus());
+    return writer.EndContainer(type);
+}
+
+template <typename X, std::enable_if_t<DataModel::IsFabricScoped<X>::value, bool> = true>
+inline CHIP_ERROR EncodeForRead(TLV::TLVWriter & writer, TLV::Tag tag, FabricIndex accessingFabricIndex, DecodableList<X> list)
+{
+    TLV::TLVType type;
+
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Array, type));
+    auto iterator = list.begin();
+    while (iterator.Next())
+    {
+        ReturnErrorOnFailure(EncodeForRead(writer, TLV::AnonymousTag(), accessingFabricIndex, iterator.GetValue()));
+    }
+    ReturnErrorOnFailure(iterator.GetStatus());
+    return writer.EndContainer(type);
+}
+
 } // namespace DataModel
 } // namespace app
 } // namespace chip

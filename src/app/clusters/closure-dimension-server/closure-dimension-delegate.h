@@ -40,9 +40,9 @@ public:
     /**
      * @brief This function handles SetTarget command implementaion.
      *
-     * @param [in] position Target position to be set
-     * @param [in] latch Target Latch to be set
-     * @param [in] speed Target speed to be set
+     * @param [in] position TargetState position to be set
+     * @param [in] latch TargetState Latch to be set
+     * @param [in] speed TargetState speed to be set
      *
      * @return Success when succesfully handled.
      *         Error when handle SetTarget fails.

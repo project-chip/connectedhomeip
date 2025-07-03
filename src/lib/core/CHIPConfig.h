@@ -1941,5 +1941,46 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif // CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
 
 /**
+ * @def CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES
+ *
+ * @brief The maximum number of bytes taken by the TLS root certificate in persistent storage. This needs
+ * to be increased if the size of TLSCertStruct changes.
+ *
+ * @note The default is based on real-world testing of serialization for the worst case allowed by the spec.
+ */
+#ifndef CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES
+#define CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES 3200
+#endif // CHIP_CONFIG_TLS_PERSISTED_ROOT_CERT_BYTES
+
+/**
+ * @def CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES
+ *
+ * @brief The maximum number of bytes taken by the TLS client certificate in persistent storage. This needs
+ * to be increased if the size of TLSClientCertificateDetailStruct changes.
+ *
+ * @note The default is based on real-world testing of serialization for the worst case allowed by the spec.
+ */
+#ifndef CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES
+#define CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES 31000
+#endif // CHIP_CONFIG_TLS_PERSISTED_CLIENT_CERT_BYTES
+
+/**
+ * @def CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
+ *
+ * @brief The maximum number of client certificates per fabric for the TLS table
+ */
+#ifndef CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
+#define CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE 5
+#endif // CHIP_CONFIG_TLS_MAX_CLIENT_CERTS_PER_FABRIC_TABLE_SIZE
+
+/**
+ * @def CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
+ *
+ * @brief The maximum number of root certificates per fabric for the TLS table
+ */
+#ifndef CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
+#define CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE 5
+#endif // CHIP_CONFIG_TLS_MAX_ROOT_PER_FABRIC_CERTS_TABLE_SIZE
+/**
  * @}
  */

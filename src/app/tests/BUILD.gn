@@ -192,6 +192,7 @@ source_set("closure-dimension-test-srcs") {
   ]
   public_deps = [
     "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/cluster-building-blocks:cluster-building-blocks",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
