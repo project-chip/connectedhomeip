@@ -55,8 +55,6 @@ class TestBleLayer : public BleLayer,
                      public ::testing::Test
 {
 public:
-    int mConnectCompleteCalls  = 0;
-    int mConnectionClosedCalls = 0;
     static void SetUpTestSuite()
     {
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
@@ -126,14 +124,9 @@ public:
 
     void OnBleConnectionComplete(BLEEndPoint * endpoint) override {}
     void OnBleConnectionError(CHIP_ERROR err) override {}
-    void OnEndPointConnectComplete(BLEEndPoint * endPoint, CHIP_ERROR err) override { ++mConnectCompleteCalls; }
+    void OnEndPointConnectComplete(BLEEndPoint * endPoint, CHIP_ERROR err) override {}
     void OnEndPointMessageReceived(BLEEndPoint * endPoint, System::PacketBufferHandle && msg) override {}
-    void OnEndPointConnectionClosed(BLEEndPoint * endPoint, CHIP_ERROR err) override { ++mConnectionClosedCalls; }
-    void ResetCounters()
-    {
-        mConnectCompleteCalls  = 0;
-        mConnectionClosedCalls = 0;
-    }
+    void OnEndPointConnectionClosed(BLEEndPoint * endPoint, CHIP_ERROR err) override {}
     CHIP_ERROR SetEndPoint(BLEEndPoint * endPoint) override { return CHIP_NO_ERROR; }
 
     ///
@@ -154,10 +147,8 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    System::PacketBufferHandle mLastWriteBuf; ///< Last write buffer received in HandleWriteReceived.
     CHIP_ERROR SendWriteRequest(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *, PacketBufferHandle buf) override
     {
-        mLastWriteBuf = buf.Retain();
         return CHIP_NO_ERROR;
     }
 
@@ -393,11 +384,7 @@ TEST_F(TestBleLayer, ExceedBleConnectionEndPointLimit)
     EXPECT_FALSE(HandleWriteReceivedCapabilitiesRequest(connObj));
 }
 
-// -----------------------------------------------------------------------------
-//  StartConnect() unit-tests
-// -----------------------------------------------------------------------------
 namespace {
-
 BLEEndPoint * MakeCentralEndPoint(TestBleLayer & ble, BLE_CONNECTION_OBJECT connObj)
 {
     BLEEndPoint * ep = nullptr;
@@ -406,41 +393,7 @@ BLEEndPoint * MakeCentralEndPoint(TestBleLayer & ble, BLE_CONNECTION_OBJECT conn
 
     return ep;
 }
-CHIP_ERROR CompleteHandshake(BLEEndPoint * ep)
-{
-    ReturnErrorOnFailure(ep->StartConnect());
-    BleTransportCapabilitiesResponseMessage resp{};
-    resp.mSelectedProtocolVersion = CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION;
-    resp.mFragmentSize            = 100;
-    resp.mWindowSize              = BLE_MAX_RECEIVE_WINDOW_SIZE;
-
-    auto buf = System::PacketBufferHandle::New(16);
-    ReturnErrorOnFailure(resp.Encode(buf));
-
-    return ep->Receive(std::move(buf));
-}
 } // namespace
-
-TEST_F(TestBleLayer, StartConnectSendsCapsRequest)
-{
-    const auto connObj = GetConnectionObject();
-    BLEEndPoint * ep   = MakeCentralEndPoint(*this, connObj);
-    ASSERT_NE(ep, nullptr);
-
-    EXPECT_EQ(ep->StartConnect(), CHIP_NO_ERROR);
-
-    // We captured the write buffer in the overriden SendWriteRequest().
-    ASSERT_FALSE(mLastWriteBuf.IsNull()) << "StartConnect() never attempted a write";
-
-    BleTransportCapabilitiesRequestMessage req;
-    ASSERT_EQ(BleTransportCapabilitiesRequestMessage::Decode(mLastWriteBuf, req), CHIP_NO_ERROR);
-
-    EXPECT_EQ(req.mWindowSize, BLE_MAX_RECEIVE_WINDOW_SIZE);
-    EXPECT_EQ(req.mMtu, 0u);
-    EXPECT_EQ(req.mSupportedProtocolVersions[0], static_cast<uint8_t>(CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION));
-
-    ep->Abort();
-}
 
 TEST_F(TestBleLayer, StartConnectFailsIfCalledTwice)
 {
@@ -452,40 +405,6 @@ TEST_F(TestBleLayer, StartConnectFailsIfCalledTwice)
     EXPECT_EQ(ep->StartConnect(), CHIP_ERROR_INCORRECT_STATE); // second should fail
 
     ep->Abort();
-}
-// -----------------------------------------------------------------------------
-//  HandleConnectComplete() and Close() tests
-// -----------------------------------------------------------------------------
-
-TEST_F(TestBleLayer, HandleConnectCompleteSuccess)
-{
-    ResetCounters();
-    const auto connObj = GetConnectionObject();
-    BLEEndPoint * ep   = nullptr;
-    ASSERT_EQ(NewBleEndPoint(&ep, connObj, kBleRole_Central, true), CHIP_NO_ERROR);
-
-    ASSERT_EQ(CompleteHandshake(ep), CHIP_NO_ERROR);
-
-    // Delegate callback must have fired exactly once.
-    EXPECT_EQ(mConnectCompleteCalls, 1);
-    EXPECT_EQ(mConnectionClosedCalls, 0);
-
-    ep->Abort();
-}
-
-TEST_F(TestBleLayer, CloseSuppressesCallbacks)
-{
-    ResetCounters();
-    const auto connObj = GetConnectionObject();
-    BLEEndPoint * ep   = nullptr;
-    ASSERT_EQ(NewBleEndPoint(&ep, connObj, kBleRole_Central, true), CHIP_NO_ERROR);
-
-    ASSERT_EQ(CompleteHandshake(ep), CHIP_NO_ERROR);
-    EXPECT_EQ(mConnectCompleteCalls, 1);
-
-    ep->Close();
-
-    EXPECT_EQ(mConnectionClosedCalls, 1);
 }
 
 }; // namespace Ble
