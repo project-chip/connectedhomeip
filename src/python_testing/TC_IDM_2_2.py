@@ -302,7 +302,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         Raises:
             AssertionError if verification fails
         """
-        if hasattr(cluster_obj, 'cluster_id'):  # cluster_obj is an Attribute
+        if hasattr(cluster_obj, 'cluster_id'):  
             cluster = ClusterObjects.ALL_CLUSTERS[cluster_obj.cluster_id]
             attribute_ids = list(read_request.tlvAttributes[endpoint][cluster_obj.cluster_id].keys())
 
@@ -761,8 +761,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         # Step 14: TH sends a Read Request Message to the DUT to read a particular attribute with the DataVersionFilter Field not set.
         # DUT sends back the attribute value with the DataVersion of the cluster. TH sends a write request to the same cluster to write to any attribute.
-        # TH sends a second read request to read an attribute from the same
-        # cluster with the DataVersionFilter Field set with the dataversion value
+        # TH sends a second read request to read an attribute from the same cluster with the DataVersionFilter Field set with the dataversion value
         # received before.
         self.step(14)
         read_request14, filtered_read14 = await self._test_read_operation(operation_type='data_version_filter',
@@ -770,7 +769,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                                                                           cluster=Clusters.BasicInformation,
                                                                           attribute=Clusters.BasicInformation.Attributes.NodeLabel,
                                                                           test_value="Hello World")
-        # Check if filtered_read14 contains the new value
         if filtered_read14 and 0 in filtered_read14:
             data_version14 = filtered_read14[0][Clusters.BasicInformation][Clusters.Attribute.DataVersion]
             asserts.assert_equal(filtered_read14[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.NodeLabel],
@@ -780,8 +778,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
 
         # Step 15: TH sends a Read Request Message to the DUT to read all attributes on a cluster with the DataVersionFilter Field not set.
         # DUT sends back the all the attribute values with the DataVersion of the cluster. TH sends a write request to the same cluster to write to any attribute.
-        # TH sends a second read request to read all the attributes from the same
-        # cluster with the DataVersionFilter Field set with the dataversion value
+        # TH sends a second read request to read all the attributes from the same cluster with the DataVersionFilter Field set with the dataversion value
         # received before.
         self.step(15)
         read_request15, filtered_read15 = await self._test_read_operation(operation_type='data_version_filter',
@@ -790,7 +787,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                                                                           attribute=Clusters.BasicInformation.Attributes.NodeLabel,
                                                                           test_value="Goodbye World")
 
-        # Check if filtered_read15 contains the new value
         if filtered_read15 and 0 in filtered_read15:
             data_version15 = filtered_read15[0][Clusters.BasicInformation][Clusters.Attribute.DataVersion]
             asserts.assert_equal(filtered_read15[0][Clusters.BasicInformation][Clusters.BasicInformation.Attributes.NodeLabel],
@@ -823,6 +819,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                                                                 attribute=Clusters.Descriptor.Attributes.ServerList,
                                                                 other_cluster=Clusters.BasicInformation,
                                                                 other_attribute=Clusters.BasicInformation.Attributes.NodeLabel)
+
         # Verify that cluster A was filtered and cluster B was not.
         asserts.assert_in(0, read_both17, "Endpoint 0 missing in response for step 17")
         asserts.assert_not_in(Clusters.Descriptor, read_both17[0], "Cluster A (Descriptor) should have been filtered out")
@@ -852,8 +849,7 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
         await self.default_controller.ReadAttribute(self.dut_node_id, ([]),
                                                     payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
 
-        # Note: The SuppressResponse field verification is handled at the transport layer
-        # and is not directly accessible during test execution.
+        # Note: The SuppressResponse field verification is handled at the transport layer and is not directly accessible during test execution.
 
         # Step 19: TH sends a Read Request Message to the DUT to read a non-global attribute on a given endpoint.
         self.step(19)
@@ -875,7 +871,6 @@ class TC_IDM_2_2(MatterBaseTest, BasicCompositionTests):
                                                                          subject_id=self.matter_test_config.controller_node_id + 1)
 
         # Verify that the ACL read response contains the expected data
-        # The limited_access operation returns ACL read data, not general cluster data
         asserts.assert_true(self.endpoint in read_request21.attributes, f"Endpoint {self.endpoint} missing in response")
         asserts.assert_true(Clusters.AccessControl in read_request21.attributes[self.endpoint],
                             "Clusters.AccessControl not in response")
