@@ -1262,7 +1262,7 @@ CameraAvSettingsUserLevelManagement::Delegate & CameraDevice::GetCameraAVSetting
     return mCameraAVSettingsUserLevelManager;
 }
 
-ZoneMgmtDelegate & CameraDevice::GetZoneManagementDelegate()
+ZoneManagement::Delegate & CameraDevice::GetZoneManagementDelegate()
 {
     return mZoneManager;
 }
