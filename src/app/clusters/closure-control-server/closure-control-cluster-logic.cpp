@@ -373,7 +373,7 @@ void ClusterLogic::ClearCurrentErrorList()
     assertChipStackLockedByCurrentThread();
     VerifyOrDieWithMsg(mIsInitialized, AppServer, "ClearCurrentErrorList called before Initialization of closure");
     // Clearing the error list array by setting all elements to kUnknownEnumValue
-    for(size_t i = 0; i < mState.mCurrentErrorCount; ++i)
+    for (size_t i = 0; i < mState.mCurrentErrorCount; ++i)
     {
         mState.mCurrentErrorList[i] = ClosureErrorEnum::kUnknownEnumValue;
     }
