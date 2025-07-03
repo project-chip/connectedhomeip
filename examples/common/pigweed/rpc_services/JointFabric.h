@@ -4,9 +4,6 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/CHIPDeviceLayer.h>
 
-// using namespace chip;
-// using namespace chip::Crypto;
-
 namespace joint_fabric_service {
 
 class JointFabric : public pw_rpc::nanopb::JointFabric::Service<JointFabric>
