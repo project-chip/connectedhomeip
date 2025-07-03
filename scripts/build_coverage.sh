@@ -146,7 +146,7 @@ if [[ -d "$OUTPUT_ROOT/obj/src" && "$ACCUMULATE" == false ]]; then
         --exclude="$PWD"/zzz_generated/* \
         --exclude="$PWD"/third_party/* \
         --exclude=/usr/include/* \
-        $QUIET_FLAG
+        ${QUIET_FLAG:+"$QUIET_FLAG"}
 fi
 
 # ------------------------------------------------------------------------------
@@ -244,7 +244,7 @@ lcov --capture --all --directory "$OUTPUT_ROOT/obj/src" \
     --exclude="$PWD"/third_party/* \
     --exclude=/usr/include/* \
     --output-file "$COVERAGE_ROOT/lcov_final.info" \
-    $QUIET_FLAG
+    ${QUIET_FLAG:+"$QUIET_FLAG"}
 
 genhtml "$COVERAGE_ROOT/lcov_final.info" \
     --ignore-errors inconsistent,category,count \
@@ -252,7 +252,7 @@ genhtml "$COVERAGE_ROOT/lcov_final.info" \
     --output-directory "$COVERAGE_ROOT/html" \
     --title "SHA:$(git rev-parse HEAD)" \
     --header-title "Matter SDK Coverage Report" \
-    $QUIET_FLAG
+    ${QUIET_FLAG:+"$QUIET_FLAG"}
 
 cp "$CHIP_ROOT/integrations/appengine/webapp_config.yaml" \
     "$COVERAGE_ROOT/webapp_config.yaml"
