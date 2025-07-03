@@ -677,8 +677,8 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
             if (CHIP_NO_ERROR !=
                 Utils::UpdateTariffComponentAttrsDayEntryById(mServerTariffAttrsCtx, next->dayEntryID,
                                                               mNextTariffComponents_MgmtObj))
+            {
                 ChipLogError(NotSpecified, "Unable to update the NextTariffComponents attribute!");
-                ChipLogError(NotSpecified, "Unable to update the CurrentTariffComponents attribute!");
             }
         }
 
