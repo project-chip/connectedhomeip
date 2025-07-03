@@ -54,7 +54,11 @@ matter_add_gn_arg_bool("chip_system_config_use_openthread_inet_endpoints" CONFIG
 
 if(CONFIG_DEBUG)
     matter_add_gn_arg_bool("optimize_debug" true)
-    matter_add_gn_arg_string("optimize_debug_level" "0")
+    if(CONFIG_CHIP_NXP_PLATFORM_MCXW71)
+        matter_add_gn_arg_string("optimize_debug_level" "g")
+    else()
+        matter_add_gn_arg_string("optimize_debug_level" "0")
+    endif()
     matter_add_gn_arg_string("symbol_level" "2")
 else()
     matter_add_gn_arg_bool("is_debug" false)
