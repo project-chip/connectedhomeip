@@ -28,17 +28,6 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-namespace {
-
-constexpr DataModel::AttributeEntry kAttributes[] = {
-    Attributes::NetworkInterfaces::kMetadataEntry,
-    Attributes::RebootCount::kMetadataEntry,
-    Attributes::UpTime::kMetadataEntry,
-    Attributes::TestEventTriggersEnabled::kMetadataEntry,
-};
-
-} // namespace
-
 // Max decodable count allowed is 2048.
 constexpr uint16_t kMaxPayloadTestRequestCount = 2048;
 
@@ -149,35 +138,42 @@ GeneralDiagnosticsLogic::HandlePayloadTestRequest(CommandHandler & handler, cons
 
 CHIP_ERROR GeneralDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
+    using namespace GeneralDiagnostics::Attributes;
+
     // Mandatory attributes
-    ReturnErrorOnFailure(builder.ReferenceExisting(kAttributes));
+    ReturnErrorOnFailure(builder.AppendElements({
+        NetworkInterfaces::kMetadataEntry,
+        RebootCount::kMetadataEntry,
+        UpTime::kMetadataEntry,
+        TestEventTriggersEnabled::kMetadataEntry,
+    }));
 
     // Ensure we have space for all optional attributes (there will be 5 at most)
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(5 + DefaultServerCluster::GlobalAttributes().size()));
 
     if (mEnabledAttributes.enableTotalOperationalHours)
     {
-        ReturnErrorOnFailure(builder.Append(Attributes::TotalOperationalHours::kMetadataEntry));
+        ReturnErrorOnFailure(builder.Append(TotalOperationalHours::kMetadataEntry));
     }
 
     if (mEnabledAttributes.enableBootReason)
     {
-        ReturnErrorOnFailure(builder.Append(Attributes::BootReason::kMetadataEntry));
+        ReturnErrorOnFailure(builder.Append(BootReason::kMetadataEntry));
     }
 
     if (mEnabledAttributes.enableActiveHardwareFaults)
     {
-        ReturnErrorOnFailure(builder.Append(Attributes::ActiveHardwareFaults::kMetadataEntry));
+        ReturnErrorOnFailure(builder.Append(ActiveHardwareFaults::kMetadataEntry));
     }
 
     if (mEnabledAttributes.enableActiveRadioFaults)
     {
-        ReturnErrorOnFailure(builder.Append(Attributes::ActiveRadioFaults::kMetadataEntry));
+        ReturnErrorOnFailure(builder.Append(ActiveRadioFaults::kMetadataEntry));
     }
 
     if (mEnabledAttributes.enableActiveNetworkFaults)
     {
-        ReturnErrorOnFailure(builder.Append(Attributes::ActiveNetworkFaults::kMetadataEntry));
+        ReturnErrorOnFailure(builder.Append(ActiveNetworkFaults::kMetadataEntry));
     }
 
     return builder.AppendElements(DefaultServerCluster::GlobalAttributes());

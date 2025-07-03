@@ -45,18 +45,33 @@ struct TestGeneralDiagnosticsCluster : public ::testing::Test
 TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
 {
     const GeneralDiagnosticsEnabledAttributes enabledAttributes{
-        .enableNetworkInterfaces        = false,
-        .enableRebootCount              = false,
-        .enableUpTime                   = false,
         .enableTotalOperationalHours    = false,
         .enableBootReason               = false,
         .enableActiveHardwareFaults     = false,
         .enableActiveRadioFaults        = false,
         .enableActiveNetworkFaults      = false,
-        .enableTestEventTriggersEnabled = false,
     };
 
     GeneralDiagnosticsCluster cluster(enabledAttributes);
+    ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
+}
+
+TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
+{
+    {
+        // everything returns empty here ..
+        class NullProvider : public DeviceLayer::DiagnosticDataProvider
+        {
+        };
+        const GeneralDiagnosticsEnabledAttributes enabledAttributes{
+            .enableTotalOperationalHours    = false,
+            .enableBootReason               = false,
+            .enableActiveHardwareFaults     = false,
+            .enableActiveRadioFaults        = false,
+            .enableActiveNetworkFaults      = false,
+        };
+        NullProvider nullProvider;
+    }
 }
 
 } // namespace

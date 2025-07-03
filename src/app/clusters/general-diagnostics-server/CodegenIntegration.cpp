@@ -60,15 +60,11 @@ void emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
     const GeneralDiagnosticsEnabledAttributes enabledAttributes{
-        .enableNetworkInterfaces        = IsAttributeEnabled(endpointId, Attributes::NetworkInterfaces::Id),
-        .enableRebootCount              = IsAttributeEnabled(endpointId, Attributes::RebootCount::Id),
-        .enableUpTime                   = IsAttributeEnabled(endpointId, Attributes::UpTime::Id),
         .enableTotalOperationalHours    = IsAttributeEnabled(endpointId, Attributes::TotalOperationalHours::Id),
         .enableBootReason               = IsAttributeEnabled(endpointId, Attributes::BootReason::Id),
         .enableActiveHardwareFaults     = IsAttributeEnabled(endpointId, Attributes::ActiveHardwareFaults::Id),
         .enableActiveRadioFaults        = IsAttributeEnabled(endpointId, Attributes::ActiveRadioFaults::Id),
         .enableActiveNetworkFaults      = IsAttributeEnabled(endpointId, Attributes::ActiveNetworkFaults::Id),
-        .enableTestEventTriggersEnabled = IsAttributeEnabled(endpointId, Attributes::TestEventTriggersEnabled::Id),
     };
 
     gServer.Create(enabledAttributes);
