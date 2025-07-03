@@ -706,14 +706,20 @@ public:
             err      = ValidateNewValue();
         }
 
-        if (aUpdCb != nullptr)
-        {
-            mAuxCb = aUpdCb;
-        }
+
 
         if (err == CHIP_NO_ERROR)
         {
+            if (aUpdCb != nullptr)
+            {
+                mAuxCb = aUpdCb;
+            }
+
             mUpdateState = UpdateState::kValidated;
+        }
+        else
+        {
+            ChipLogError(NotSpecified, "The value if attr %d is not valid!", mAttrId);
         }
 
         return err;
