@@ -15,47 +15,38 @@
 #  limitations under the License.
 #
 
-import ctypes
-from ctypes import CFUNCTYPE, c_char_p, c_void_p
+from ctypes import CDLL, c_char_p, c_void_p
 
-from ..native import GetLibraryHandle, HandleFlags, NativeLibraryHandleMethodArguments, PyChipError
-
-LocalDescriptionCallbackType = CFUNCTYPE(None, c_char_p, c_char_p, c_void_p)
-IceCandidateCallbackType = CFUNCTYPE(None, c_char_p, c_char_p, c_void_p)
+from ..native import GetLibraryHandle, HandleFlags, PyChipError
+from .types import IceCandidateCallbackType, LocalDescriptionCallbackType, WebRTCClientHandle
 
 
-def _GetWebRTCLibraryHandle() -> ctypes.CDLL:
+def _GetWebRTCLibraryHandle() -> CDLL:
     """ Get the native library handle with webrtc method initialization.
 
       Retreives the CHIP native library handle and attaches signatures to
       native methods.
-      """
+    """
 
     # Getting a handle without requiring init, as webrtc methods
     # do not require chip stack startup
-    handle = GetLibraryHandle(HandleFlags(0))
+    lib = GetLibraryHandle(HandleFlags(0))
 
     # Uses one of the type decorators as an indicator for everything being
     # initialized.
-    if not handle.pychip_webrtc_CreateWebrtcClient.argtypes:
-        setter = NativeLibraryHandleMethodArguments(handle)
-        setter.Set('pychip_webrtc_client_create',
-                   ctypes.c_void_p, [None])
-        setter.Set('pychip_webrtc_client_destroy',
-                   ctypes.c_void_p, [c_void_p])
-        setter.Set('pychip_webrtc_client_create_peer_connection',
-                   PyChipError, [c_void_p, c_char_p])
-        setter.Set('pychip_webrtc_client_create_offer',
-                   ctypes.c_void_p, [c_void_p])
-        setter.Set('pychip_webrtc_client_create_answer',
-                   ctypes.c_void_p, [c_void_p])
-        setter.Set('pychip_webrtc_client_set_remote_description',
-                   ctypes.c_void_p, [c_void_p, c_char_p, c_char_p])
-        setter.Set('pychip_webrtc_client_add_ice_candidate',
-                   ctypes.c_void_p, [c_void_p, c_char_p, c_char_p])
-        setter.Set('pychip_webrtc_client_set_local_description_callback',
-                   ctypes.c_void_p, [c_void_p, LocalDescriptionCallbackType, c_void_p])
-        setter.Set('pychip_webrtc_client_set_ice_candidate_callback',
-                   ctypes.c_void_p, [c_void_p, IceCandidateCallbackType, c_void_p])
+    if not lib.pychip_webrtc_client_create.argtypes:
+        lib.pychip_webrtc_client_create.restype = WebRTCClientHandle
+        lib.pychip_webrtc_client_destroy.argtypes = [WebRTCClientHandle]
 
-    return handle
+        lib.pychip_webrtc_client_create_peer_connection.restype = PyChipError
+        lib.pychip_webrtc_client_create_peer_connection.argtypes = [WebRTCClientHandle, c_char_p]
+        lib.pychip_webrtc_client_create_offer.argtypes = [WebRTCClientHandle]
+        lib.pychip_webrtc_client_create_answer.argtypes = [WebRTCClientHandle]
+        lib.pychip_webrtc_client_set_remote_description.argtypes = [WebRTCClientHandle, c_char_p, c_char_p]
+        lib.pychip_webrtc_client_add_ice_candidate.argtypes = [WebRTCClientHandle, c_char_p, c_char_p]
+
+        lib.pychip_webrtc_client_set_local_description_callback.argtypes = [
+            WebRTCClientHandle, LocalDescriptionCallbackType, c_void_p]
+        lib.pychip_webrtc_client_set_ice_candidate_callback.argtypes = [WebRTCClientHandle, IceCandidateCallbackType, c_void_p]
+
+    return lib

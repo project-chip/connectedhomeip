@@ -14,47 +14,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
+from ctypes import CFUNCTYPE, c_char_p, c_void_p
 
-from ctypes import CFUNCTYPE, POINTER, c_char_p, c_int, c_uint32
-
-
-class ErrorType(c_int):
-    InvalidLocalOffer = 0
-    InvalidRemoteOffer = 1
-
-
-# Define the callback types using ctypes
-SdpOfferCallback_t = CFUNCTYPE(
-    None,  # void return
-    c_char_p, c_uint32  # sdp offer and peer id
-)
-
-SdpAnswerCallback_t = CFUNCTYPE(
-    None,  # void return
-    c_char_p, c_uint32  # sdp answer and peer id
-)
-
-StatsCallback_t = CFUNCTYPE(
-    None,  # void return
-    c_char_p, c_uint32  # stats and peer id
-)
-
-IceCallback_t = CFUNCTYPE(
-    None,  # void return
-    POINTER(c_char_p), c_uint32  # ice candidate and peer id
-)
-
-ErrorCallback_t = CFUNCTYPE(
-    None,  # void return
-    ErrorType, c_uint32  # error message and peer id
-)
-
-PeerConnectedCallback_t = CFUNCTYPE(
-    None,  # void return
-    c_uint32  # peer id
-)
-
-PeerDisconnectedCallback_t = CFUNCTYPE(
-    None,  # void return
-    c_uint32  # peer id
-)
+WebRTCClientHandle = c_void_p
+LocalDescriptionCallbackType = CFUNCTYPE(None, c_char_p, c_char_p, c_void_p)
+IceCandidateCallbackType = CFUNCTYPE(None, c_char_p, c_char_p, c_void_p)
