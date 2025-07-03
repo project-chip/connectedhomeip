@@ -862,10 +862,10 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdService
         ChipLogError(Discovery, "Failed to allocate resolve context");
         return CHIP_ERROR_NO_MEMORY;
     }
-    CHIP_ERROR error                = CHIP_NO_ERROR;
-    resolveContext->mInstance       = this;
-    resolveContext->mCallback       = callback;
-    resolveContext->mContext        = context;
+    CHIP_ERROR error          = CHIP_NO_ERROR;
+    resolveContext->mInstance = this;
+    resolveContext->mCallback = callback;
+    resolveContext->mContext  = context;
 
     if (!interface.IsPresent())
     {
