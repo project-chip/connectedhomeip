@@ -225,6 +225,11 @@ void CHIPCommand::MaybeTearDownStack()
     {
         ShutdownCommissioner(commissioner.first);
     }
+    mCommissioners.clear();
+    sICDClientStorage.Shutdown();
+    sCheckInHandler.Shutdown();
+    sGroupDataProvider.Finish();
+    DeviceControllerFactory::GetInstance().Shutdown();
 
     StopTracing();
 }
