@@ -40,6 +40,8 @@ public:
         MOVE_TO_ACTION,
         UNLATCH_ACTION,
         STOP_ACTION,
+        SET_TARGET_ACTION,
+        PANEL_UNLATCH_ACTION,
         PANEL_STEP_ACTION,
 
         INVALID_ACTION
@@ -104,6 +106,26 @@ public:
     chip::Protocols::InteractionModel::Status OnStopCommand();
 
     /**
+     * @brief Handles the SetTarget command for a closure panel.
+     *
+     * This method processes the SetTarget command, based on target position,
+     * latch , and speed for the closure panel at the given endpoint.
+     *
+     * @param[in] position  Optional target position as a percentage in hundredths (0-10000).
+     * @param[in] latch     Optional latch state (true to latch, false to unlatch).
+     * @param[in] speed     Optional speed setting as a ThreeLevelAutoEnum value.
+     * @param[in] endpointId The endpoint identifier for the closure panel.
+     *
+     * @return chip::Protocols::InteractionModel::Status
+     *         Returns Status::Success if the SetTarget command is handled successfully,
+     *         or an appropriate error status otherwise.
+     */
+    chip::Protocols::InteractionModel::Status
+    OnSetTargetCommand(const chip::Optional<chip::Percent100ths> & position, const chip::Optional<bool> & latch,
+                       const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
+                       const chip::EndpointId endpointId);
+
+    /**
      * @brief Handles the Step command for the ClosureDimension cluster.
      *
      * This method processes and initiates step motion in a specified direction for a given number of steps,
@@ -139,8 +161,14 @@ private:
 
     osTimerId_t mClosureTimer;
 
+    // Below Progress variables and mCurrentAction, mCurrentActionEndpointId should be set only in
+    // chip task context. Incase if these variables are to be set in other task context, then we should
+    // make them thread-safe using mutex or other synchronization mechanisms. Presently, we use
+    // DeviceLayer::PlatformMgr().LockChipStack() and DeviceLayer::PlatformMgr().UnlockChipStack()
+    // to ensure that these variables are set in thread safe manner in chip task context.
     bool isCalibrationInProgress = false;
     bool isMoveToInProgress      = false;
+    bool isSetTargetInProgress   = false;
     bool isStepActionInProgress  = false;
 
     Action_t mCurrentAction                   = Action_t::INVALID_ACTION;
@@ -249,6 +277,28 @@ private:
     bool GetPanelNextPosition(const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & currentState,
                               const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & targetState,
                               chip::app::DataModel::Nullable<chip::Percent100ths> & nextPosition);
+
+    /**
+     * @brief Handles the SetTarget motion action for a panel endpoint.
+     *
+     * This method Performs the update the current positions of panel endpoint to next position
+     * and when target position is reached, it performs the latch action if required.
+     *
+     * @param endpointId The identifier of the endpoint for which the panel target action should be handled.
+     */
+    void HandlePanelSetTargetAction(chip::EndpointId endpointId);
+
+    /**
+     * @brief Handles the unlatch action for a closure panel.
+     *
+     * This method performs the unlatch action if required for the specified closure panel endpoint.
+     * It updates the current state of the panel and sets the target state accordingly and then calls
+     * HandlePanelSetTargetAction to move the panel to the target position.
+     *
+     * @param endpointId The identifier of the endpoint for which the unlatch action should be handled.
+     */
+    void HandlePanelUnlatchAction(chip::EndpointId endpointId);
+
 
     /**
      * @brief Handles a single step action for the panel associated with the specified endpoint.
