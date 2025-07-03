@@ -473,4 +473,23 @@ TEST_F(TestBtpEngine, HandleAckReceivedIncorrectSequence)
     EXPECT_EQ(mBtpEngine.ExpectingAck(), 1);
 }
 
+TEST_F(TestBtpEngine, HandleCharacteristicReceivedWithPadding)
+{
+    constexpr uint8_t packetData[] = {
+        to_underlying(BtpEngine::HeaderFlags::kStartMessage) | to_underlying(BtpEngine::HeaderFlags::kEndMessage),
+        0x01,
+        0x01,
+        0x00,
+        0xff,
+    };
+
+    auto packet = System::PacketBufferHandle::NewWithData(packetData, 10);
+
+    SequenceNumber_t receivedAck;
+    bool didReceiveAck;
+    EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(packet), receivedAck, didReceiveAck), CHIP_NO_ERROR);
+    EXPECT_EQ(mBtpEngine.RxState(), BtpEngine::kState_Complete);
+    EXPECT_EQ(packet->DataLength(), 10);
+}
+
 } // namespace
