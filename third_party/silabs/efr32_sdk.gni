@@ -373,6 +373,7 @@ template("efr32_sdk") {
 
         # wifi component
         "${wifi_sdk_root}/components/protocol/wifi/inc",
+        "${wifi_sdk_root}/components/sli_wifi_command_engine/inc",
 
         # si91x_support component
         "${wifi_sdk_root}/components/si91x_support/inc",
@@ -598,6 +599,7 @@ template("efr32_sdk") {
           "SLI_SI917=1",
           "CHIP_9117",
           "SL_WIFI_COMPONENT_INCLUDED",
+          "SLI_SI91X_LWIP_HOSTED_NETWORK_STACK",
         ]
       } else if (use_wf200) {
         defines += [
