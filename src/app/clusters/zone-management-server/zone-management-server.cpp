@@ -46,7 +46,7 @@ namespace app {
 namespace Clusters {
 namespace ZoneManagement {
 
-ZoneMgmtServer::ZoneMgmtServer(ZoneMgmtDelegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
+ZoneMgmtServer::ZoneMgmtServer(Delegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
                                const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxUserDefinedZones, uint8_t aMaxZones,
                                uint8_t aSensitivityMax, const TwoDCartesianVertexStruct & aTwoDCartesianMax) :
     CommandHandlerInterface(MakeOptional(aEndpointId), ZoneManagement::Id),
@@ -144,6 +144,7 @@ CHIP_ERROR ZoneMgmtServer::SetSensitivity(uint8_t aSensitivity)
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
+    mSensitivity = aSensitivity;
     mDelegate.OnAttributeChanged(Attributes::Sensitivity::Id);
     MatterReportingAttributeChangeCallback(ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Sensitivity::Id));
 
@@ -229,45 +230,33 @@ void ZoneMgmtServer::InvokeCommand(HandlerContext & handlerContext)
     case Commands::CreateTwoDCartesianZone::Id:
         ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Creating TwoDCartesian Zone", mEndpointId);
 
-        if (!HasFeature(Feature::kTwoDimensionalCartesianZone) || !HasFeature(Feature::kUserDefined))
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
-        }
-        else
-        {
-            HandleCommand<Commands::CreateTwoDCartesianZone::DecodableType>(
-                handlerContext,
-                [this](HandlerContext & ctx, const auto & commandData) { HandleCreateTwoDCartesianZone(ctx, commandData); });
-        }
+        VerifyOrReturn(HasFeature(Feature::kTwoDimensionalCartesianZone) && HasFeature(Feature::kUserDefined),
+                       handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand));
+
+        HandleCommand<Commands::CreateTwoDCartesianZone::DecodableType>(
+            handlerContext,
+            [this](HandlerContext & ctx, const auto & commandData) { HandleCreateTwoDCartesianZone(ctx, commandData); });
         return;
 
     case Commands::UpdateTwoDCartesianZone::Id:
         ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Updating TwoDCartesian Zone", mEndpointId);
 
-        if (!HasFeature(Feature::kTwoDimensionalCartesianZone) || !HasFeature(Feature::kUserDefined))
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
-        }
-        else
-        {
-            HandleCommand<Commands::UpdateTwoDCartesianZone::DecodableType>(
-                handlerContext,
-                [this](HandlerContext & ctx, const auto & commandData) { HandleUpdateTwoDCartesianZone(ctx, commandData); });
-        }
+        VerifyOrReturn(HasFeature(Feature::kTwoDimensionalCartesianZone) && HasFeature(Feature::kUserDefined),
+                       handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand));
+
+        HandleCommand<Commands::UpdateTwoDCartesianZone::DecodableType>(
+            handlerContext,
+            [this](HandlerContext & ctx, const auto & commandData) { HandleUpdateTwoDCartesianZone(ctx, commandData); });
         return;
 
     case Commands::RemoveZone::Id:
         ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Removing TwoDCartesian Zone", mEndpointId);
 
-        if (!HasFeature(Feature::kUserDefined))
-        {
-            handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand);
-        }
-        else
-        {
-            HandleCommand<Commands::RemoveZone::DecodableType>(
-                handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleRemoveZone(ctx, commandData); });
-        }
+        VerifyOrReturn(HasFeature(Feature::kUserDefined),
+                       handlerContext.mCommandHandler.AddStatus(handlerContext.mRequestPath, Status::UnsupportedCommand));
+
+        HandleCommand<Commands::RemoveZone::DecodableType>(
+            handlerContext, [this](HandlerContext & ctx, const auto & commandData) { HandleRemoveZone(ctx, commandData); });
         return;
 
     case Commands::CreateOrUpdateTrigger::Id:
@@ -454,6 +443,7 @@ void ZoneMgmtServer::HandleCreateTwoDCartesianZone(HandlerContext & ctx,
 
     if (ZoneUtil::IsZoneSelfIntersecting(twoDCartVertices))
     {
+        ChipLogError(Zcl, "HandleCreateTwoDCartesianZone: Found self-intersecting polygon vertices for zone");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
         return;
     }
@@ -549,6 +539,7 @@ void ZoneMgmtServer::HandleUpdateTwoDCartesianZone(HandlerContext & ctx,
 
     if (ZoneUtil::IsZoneSelfIntersecting(twoDCartVertices))
     {
+        ChipLogError(Zcl, "HandleUpdateTwoDCartesianZone: Found self-intersecting polygon vertices for zone");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
         return;
     }

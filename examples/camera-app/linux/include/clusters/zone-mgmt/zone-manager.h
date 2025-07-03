@@ -38,7 +38,7 @@ struct TwoDCartZone
 /**
  * The application delegate to define the options & implement commands.
  */
-class ZoneManager : public ZoneMgmtDelegate, public CameraDeviceInterface::CameraHALInterface::ZoneEventCallback
+class ZoneManager : public Delegate, public CameraDeviceInterface::CameraHALInterface::ZoneEventCallback
 {
 public:
     Protocols::InteractionModel::Status CreateTwoDCartesianZone(const TwoDCartesianZoneStorage & zone,
