@@ -166,6 +166,7 @@ void ClosureManager::InitiateAction(AppEvent * event)
         // Timer used in sample application to simulate the panel unlatch process.
         // In a real application, this would be replaced with actual logic to unlatch
         // the closure panel
+        instance.StartTimer(kMotionCountdownTimeMs);
         break;
     case Action_t::PANEL_STEP_ACTION:
         ChipLogDetail(AppServer, "Initiating step action");
