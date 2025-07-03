@@ -54,7 +54,7 @@ group("default") {
     } else if (chip_device_platform == "SiWx917") {
       deps += [ "${chip_root}/src/platform/silabs/SiWx917:logging" ]
     } else if (chip_device_platform == "linux") {
-      deps += [ "${chip_root}/src/platform/Linux:logging" ]
+      deps += [ ":stdio" ]
     } else if (chip_device_platform == "tizen") {
       deps += [ "${chip_root}/src/platform/Tizen:logging" ]
     } else if (chip_device_platform == "qpg") {

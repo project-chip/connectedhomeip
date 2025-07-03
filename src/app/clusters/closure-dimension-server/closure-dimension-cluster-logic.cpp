@@ -32,7 +32,8 @@ using namespace chip::app::Clusters::ClosureDimension::Attributes;
 
 namespace {
 
-constexpr Percent100ths kPercents100thsMaxValue = 10000;
+constexpr Percent100ths kPercents100thsMaxValue    = 10000;
+constexpr uint64_t kPositionQuietReportingInterval = 5000;
 
 } // namespace
 
@@ -63,13 +64,27 @@ CHIP_ERROR ClusterLogic::Init(const ClusterConformance & conformance, const Clus
     return CHIP_NO_ERROR;
 }
 
-// TODO: CurrentState should be QuietReporting.
+// Specification rules for CurrentState quiet reporting:
+// Changes to this attribute SHALL only be marked as reportable in the following cases:
+// When the Position changes from null to any other value and vice versa, or
+// At most once every 5 seconds when the Position changes from one non-null value to another non-null value, or
+// When Target.Position is reached, or
+// When CurrentState.Speed changes, or
+// When CurrentState.Latch changes.
+
+// At present, QuieterReportingAttribute class does not support Structs.
+//  so each field of current state struct has to be handled independently.
+//  At present, we are using QuieterReportingAttribute class for Position only.
+//  Latch and Speed changes are directly handled by the cluster logic seperately.
+//  i.e Speed and latch changes are not considered when calucalting the at most 5 seconds quiet reportable changes for Position.
 CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimensionStateStruct> & incomingCurrentState)
 {
     assertChipStackLockedByCurrentThread();
 
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState.currentState != incomingCurrentState, CHIP_NO_ERROR);
+
+    bool markDirty = false;
 
     if (!incomingCurrentState.IsNull())
     {
@@ -82,8 +97,40 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
 
             if (!incomingCurrentState.Value().position.Value().IsNull())
             {
+
                 VerifyOrReturnError(incomingCurrentState.Value().position.Value().Value() <= kPercents100thsMaxValue,
                                     CHIP_ERROR_INVALID_ARGUMENT);
+            }
+
+            bool targetPositionReached = false;
+            auto now                   = System::SystemClock().GetMonotonicTimestamp();
+
+            // Logic to determine if target position is reached.
+            // If the target position is reached, current state attribute will be marked dirty and reported.
+            if (!mState.targetState.IsNull() && mState.targetState.Value().position.HasValue() &&
+                !mState.targetState.Value().position.Value().IsNull() &&
+                mState.targetState.Value().position == incomingCurrentState.Value().position)
+            {
+                targetPositionReached = true;
+            }
+
+            if (targetPositionReached)
+            {
+                auto predicate =
+                    [](const decltype(quietReportableCurrentStatePosition)::SufficientChangePredicateCandidate &) -> bool {
+                    return true;
+                };
+                markDirty |= (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.Value().position.Value(), now,
+                                                                           predicate) == AttributeDirtyState::kMustReport);
+            }
+            else
+            {
+                // Predicate to report at most once every 5 seconds when the Position changes from one non-null value to another
+                // non-null value, or when the Position changes from null to any other value and vice versa
+                System::Clock::Milliseconds64 reportInterval = System::Clock::Milliseconds64(kPositionQuietReportingInterval);
+                auto predicate = quietReportableCurrentStatePosition.GetPredicateForSufficientTimeSinceLastDirty(reportInterval);
+                markDirty |= (quietReportableCurrentStatePosition.SetValue(incomingCurrentState.Value().position.Value(), now,
+                                                                           predicate) == AttributeDirtyState::kMustReport);
             }
         }
 
@@ -93,6 +140,12 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
             //  If the latching member is present in the incoming CurrentState, we need to check if the MotionLatching
             //  feature is supported by the closure. If the MotionLatching feature is not supported, return an error.
             VerifyOrReturnError(mConformance.HasFeature(Feature::kMotionLatching), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        }
+
+        // Changes to this attribute SHALL only be marked as reportable when latch changes.
+        if (!mState.currentState.IsNull() && mState.currentState.Value().latch != incomingCurrentState.Value().latch)
+        {
+            markDirty = true;
         }
 
         // Validate the incoming Speed value has valid input parameters and FeatureMap conformance.
@@ -106,10 +159,26 @@ CHIP_ERROR ClusterLogic::SetCurrentState(const DataModel::Nullable<GenericDimens
                                     Globals::ThreeLevelAutoEnum::kUnknownEnumValue,
                                 CHIP_ERROR_INVALID_ARGUMENT);
         }
+
+        // Changes to this attribute SHALL be marked as reportable when speed changes.
+        if (!mState.currentState.IsNull() && mState.currentState.Value().speed != incomingCurrentState.Value().speed)
+        {
+            markDirty = true;
+        }
+    }
+
+    // If the current state is null and the incoming current state is not null and vice versa, we need to mark dirty.
+    if (mState.currentState.IsNull() != incomingCurrentState.IsNull())
+    {
+        markDirty = true;
     }
 
     mState.currentState = incomingCurrentState;
-    mMatterContext.MarkDirty(Attributes::CurrentState::Id);
+
+    if (markDirty)
+    {
+        mMatterContext.MarkDirty(Attributes::CurrentState::Id);
+    }
 
     return CHIP_NO_ERROR;
 }
