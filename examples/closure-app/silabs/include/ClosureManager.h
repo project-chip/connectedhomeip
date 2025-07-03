@@ -41,6 +41,7 @@ public:
         STOP_ACTION,
         SET_TARGET_ACTION,
         PANEL_UNLATCH_ACTION,
+        PANEL_STEP_ACTION,
 
         INVALID_ACTION
     };
@@ -124,6 +125,23 @@ public:
                        const chip::EndpointId endpointId);
 
     /**
+     * @brief Handles the Step command for the ClosureDimension cluster.
+     *
+     * This method processes and initiates step motion in a specified direction for a given number of steps,
+     * optionally at a specified speed, on the provided panel endpoint.
+     *
+     * @param direction The direction in which to perform the step operation.
+     * @param numberOfSteps The number of steps to move in the specified direction.
+     * @param speed Optional speed setting for the step operation.
+     * @param endpointId The endpoint on which to perform the operation.
+     * @return chip::Protocols::InteractionModel::Status Status of the command execution.
+     */
+    chip::Protocols::InteractionModel::Status
+    OnStepCommand(const chip::app::Clusters::ClosureDimension::StepDirectionEnum & direction, const uint16_t & numberOfSteps,
+                  const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
+                  const chip::EndpointId & endpointId);
+
+    /**
      * @brief Sets the current action being performed by the closure device.
      *
      * @param action The action to set, represented as chip::app::Clusters::ClosureControl::Action_t.
@@ -150,18 +168,19 @@ private:
     bool isCalibrationInProgress = false;
     bool isMoveToInProgress      = false;
     bool isSetTargetInProgress   = false;
+    bool isStepActionInProgress  = false;
 
     Action_t mCurrentAction                   = Action_t::INVALID_ACTION;
     chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
 
     // Define the endpoint ID for the Closure
-    static constexpr chip::EndpointId kClosureEndpoint       = 1;
-    static constexpr chip::EndpointId kClosurePanel1Endpoint = 2;
-    static constexpr chip::EndpointId kClosurePanel2Endpoint = 3;
+    static constexpr chip::EndpointId kClosureEndpoint1      = 1;
+    static constexpr chip::EndpointId kClosurePanelEndpoint2 = 2;
+    static constexpr chip::EndpointId kClosurePanelEndpoint3 = 3;
 
-    chip::app::Clusters::ClosureControl::ClosureControlEndpoint ep1{ kClosureEndpoint };
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep2{ kClosurePanel1Endpoint };
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep3{ kClosurePanel2Endpoint };
+    chip::app::Clusters::ClosureControl::ClosureControlEndpoint mClosureEndpoint1{ kClosureEndpoint1 };
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint2{ kClosurePanelEndpoint2 };
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint3{ kClosurePanelEndpoint3 };
 
     /**
      * @brief Starts or restarts the closure function timer with the specified timeout.
@@ -244,4 +263,24 @@ private:
      * @param endpointId The identifier of the endpoint for which the unlatch action should be handled.
      */
     void HandlePanelUnlatchAction(chip::EndpointId endpointId);
+
+    /**
+     * @brief Handles a single step action for the panel associated with the specified endpoint.
+     *
+     * This method processes a panel step action for the panel endpoint and updates the current position to
+     * reflect the next step position and triggers timer if target is not reached.
+     *
+     * @param endpointId The identifier of the endpoint for which the panel step action is to be handled.
+     */
+    void HandlePanelStepAction(chip::EndpointId endpointId);
+
+    /**
+     * @brief Retrieves the panel endpoint associated with the specified endpoint ID.
+     *
+     * This method searches for the panel instance that matches the given endpoint ID.
+     *
+     * @param endpointId The identifier of the endpoint to retrieve.
+     * @return Pointer to the matching panel endpoint instance, or nullptr if not found.
+     */
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * GetPanelEndpointById(chip::EndpointId endpointId);
 };
