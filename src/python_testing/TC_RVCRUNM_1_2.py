@@ -57,14 +57,12 @@ class TC_RVCRUNM_1_2(MatterBaseTest, ModeBaseClusterChecks):
     @async_test_body
     async def test_TC_RVCRUNM_1_2(self):
         self.endpoint = self.get_endpoint()
-
-        # attributes = Clusters.RvcRunMode.Attributes
+        supported_modes = []
 
         self.print_step(1, "Commissioning, already done")
-
         if self.check_pics("RVCRUNM.S.A0000"):
-            self.print_step(2, "Read SupportedModes attribute")
 
+            self.print_step(2, "Read SupportedModes attribute")
             # Verify common checks for Mode Base as described in the TC-RVCRUNM-1.2
             supported_modes = await self.check_supported_modes_and_labels(self.endpoint)
 
