@@ -137,7 +137,6 @@ inline bool operator!=(const DayEntryStruct::Type & lhs, const DayEntryStruct::T
     return !(lhs == rhs);
 }
 
-
 } // namespace Structs
 } // namespace CommodityTariff
 

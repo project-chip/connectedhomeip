@@ -16,12 +16,12 @@
 
 #include "commodity-tariff-server.h"
 
+#include "CommodityTariffAttrsDataMgmt.h"
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
-#include "CommodityTariffAttrsDataMgmt.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -55,8 +55,6 @@ bool Instance::HasFeature(Feature aFeature) const
 {
     return mFeature.Has(aFeature);
 }
-
-
 
 // AttributeAccessInterface
 CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
@@ -101,7 +99,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case DayEntries::Id: {
         return aEncoder.EncodeList([this](const auto & encoder) {
             const auto & entries = mDelegate.GetDayEntries();
-            for (const auto & entry : entries.Value()) {
+            for (const auto & entry : entries.Value())
+            {
                 ReturnErrorOnFailure(encoder.Encode(entry));
             }
             return CHIP_NO_ERROR;
@@ -110,7 +109,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case DayPatterns::Id: {
         return aEncoder.EncodeList([this](const auto & encoder) {
             const auto & patterns = mDelegate.GetDayPatterns();
-            for (const auto & pattern : patterns.Value()) {
+            for (const auto & pattern : patterns.Value())
+            {
                 ReturnErrorOnFailure(encoder.Encode(pattern));
             }
             return CHIP_NO_ERROR;
@@ -119,7 +119,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case CalendarPeriods::Id: {
         return aEncoder.EncodeList([this](const auto & encoder) {
             const auto & periods = mDelegate.GetCalendarPeriods();
-            for (const auto & period : periods.Value()) {
+            for (const auto & period : periods.Value())
+            {
                 ReturnErrorOnFailure(encoder.Encode(period));
             }
             return CHIP_NO_ERROR;
@@ -128,7 +129,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case IndividualDays::Id: {
         return aEncoder.EncodeList([this](const auto & encoder) {
             const auto & days = mDelegate.GetIndividualDays();
-            for (const auto & day : days.Value()) {
+            for (const auto & day : days.Value())
+            {
                 ReturnErrorOnFailure(encoder.Encode(day));
             }
             return CHIP_NO_ERROR;
@@ -137,7 +139,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case TariffComponents::Id: {
         return aEncoder.EncodeList([this](const auto & encoder) {
             const auto & components = mDelegate.GetTariffComponents();
-            for (const auto & component : components.Value()) {
+            for (const auto & component : components.Value())
+            {
                 ReturnErrorOnFailure(encoder.Encode(component));
             }
             return CHIP_NO_ERROR;
@@ -146,7 +149,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case TariffPeriods::Id: {
         return aEncoder.EncodeList([this](const auto & encoder) {
             const auto & periods = mDelegate.GetTariffPeriods();
-            for (const auto & period : periods.Value()) {
+            for (const auto & period : periods.Value())
+            {
                 ReturnErrorOnFailure(encoder.Encode(period));
             }
             return CHIP_NO_ERROR;
@@ -155,7 +159,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case CurrentTariffComponents::Id: {
         return aEncoder.EncodeList([this](const auto & encoder) {
             const auto & components = GetCurrentTariffComponents();
-            for (const auto & component : components.Value()) {
+            for (const auto & component : components.Value())
+            {
                 ReturnErrorOnFailure(encoder.Encode(component));
             }
             return CHIP_NO_ERROR;
@@ -164,7 +169,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     case NextTariffComponents::Id: {
         return aEncoder.EncodeList([this](const auto & encoder) {
             const auto & components = GetNextTariffComponents();
-            for (const auto & component : components.Value()) {
+            for (const auto & component : components.Value())
+            {
                 ReturnErrorOnFailure(encoder.Encode(component));
             }
             return CHIP_NO_ERROR;
@@ -296,9 +302,9 @@ static void TariffComponentUpd_AttrChangeCb(uint32_t aAttrId, void * CbCtx)
 {
     if (CbCtx != nullptr)
     {
-        EndpointId * pEndpointId = (EndpointId*) CbCtx;
+        EndpointId * pEndpointId = (EndpointId *) CbCtx;
         ChipLogProgress(NotSpecified, "EGW-CTC: The value for attribute (Id %d) updated", aAttrId);
-        MatterReportingAttributeChangeCallback(* pEndpointId, CommodityTariff::Id, aAttrId);        
+        MatterReportingAttributeChangeCallback(*pEndpointId, CommodityTariff::Id, aAttrId);
     }
 }
 
@@ -538,7 +544,7 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(CurrentTariffAttrsCtx & aCtx, 
 static void AttrsCtxInit(Delegate & aTariffProvider, CurrentTariffAttrsCtx & aCtx, EndpointId aEndpointId)
 {
     aCtx.TariffProvider = &aTariffProvider;
-    aCtx.EndpointId = aEndpointId;
+    aCtx.EndpointId     = aEndpointId;
 
     Utils::ListToMap<Structs::DayPatternStruct::Type, &Structs::DayPatternStruct::Type::dayPatternID>(
         aTariffProvider.GetDayPatterns().Value(), aCtx.DayPatternsMap);
@@ -662,8 +668,8 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
         SetCurrentDayEntryDate(tmpDate);
 
         tmpDayEntry.SetNull();
-        tmpDate.SetNull(); 
-    
+        tmpDate.SetNull();
+
         if (next != nullptr)
         {
             tmpDayEntry.SetNonNull(*next);

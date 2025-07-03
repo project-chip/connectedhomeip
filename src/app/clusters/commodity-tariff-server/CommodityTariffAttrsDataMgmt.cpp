@@ -279,7 +279,6 @@ bool DayEntriesDataClass::CompareStructValue(const PayloadType & source, const P
         return true;
     }
 
-
     if (!CommonUtilities::AreOptionalEqual(source.duration, destination.duration))
     {
         return true;

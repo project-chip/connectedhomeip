@@ -295,7 +295,7 @@ private:
     bool TariffDataUpd_Init(TariffUpdateCtx & UpdCtx)
     {
 #define X(attrName, attrType)                                                                                                      \
-    if (m##attrName##_MgmtObj.UpdateBegin(&UpdCtx, TariffDataUpd_AttrChangeCb, true) != CHIP_NO_ERROR)                                   \
+    if (m##attrName##_MgmtObj.UpdateBegin(&UpdCtx, TariffDataUpd_AttrChangeCb, true) != CHIP_NO_ERROR)                             \
     {                                                                                                                              \
         return false;                                                                                                              \
     }
@@ -409,7 +409,7 @@ private:
 #define X(attrName, attrType)                                                                                                      \
     attrType m##attrName;                                                                                                          \
     attrType & Get##attrName() { return m##attrName; }                                                                             \
-    CHIP_ERROR Set##attrName( attrType & newValue ) { return SetValue(m##attrName, newValue, Attributes::attrName::Id); }
+    CHIP_ERROR Set##attrName(attrType & newValue) { return SetValue(m##attrName, newValue, Attributes::attrName::Id); }
     COMMODITY_TARIFF_CURRENT_SINGLE_ATTRIBUTES
 #undef X
 
