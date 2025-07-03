@@ -7902,6 +7902,42 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRThermostatClusterThermostatSuggestionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _uniqueID = @(0);
+
+        _presetHandle = [NSData data];
+
+        _effectiveTime = @(0);
+
+        _expirationTime = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterThermostatSuggestionStruct alloc] init];
+
+    other.uniqueID = self.uniqueID;
+    other.presetHandle = self.presetHandle;
+    other.effectiveTime = self.effectiveTime;
+    other.expirationTime = self.expirationTime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: uniqueID:%@; presetHandle:%@; effectiveTime:%@; expirationTime:%@; >", NSStringFromClass([self class]), _uniqueID, [_presetHandle base64EncodedStringWithOptions:0], _effectiveTime, _expirationTime];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRThermostatClusterWeeklyScheduleTransitionStruct
 - (instancetype)init
 {
