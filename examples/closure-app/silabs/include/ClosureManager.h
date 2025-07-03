@@ -299,7 +299,6 @@ private:
      */
     void HandlePanelUnlatchAction(chip::EndpointId endpointId);
 
-
     /**
      * @brief Handles a single step action for the panel associated with the specified endpoint.
      *
