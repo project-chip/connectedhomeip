@@ -78,7 +78,7 @@ public:
 
     Protocols::InteractionModel::Status SnapshotStreamDeallocate(const uint16_t streamID);
 
-    void OnRankedStreamPrioritiesChanged();
+    void OnStreamUsagePrioritiesChanged();
 
     void OnAttributeChanged(AttributeId attributeId);
 

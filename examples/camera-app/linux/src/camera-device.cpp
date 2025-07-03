@@ -37,6 +37,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
+using namespace chip::app::Clusters::WebRTCTransportProvider;
 
 using namespace Camera;
 
@@ -314,13 +315,6 @@ GstElement * CreateSnapshotPipelineLibcamerasrc(const SnapshotPipelineConfig & c
 
 CameraDevice::CameraDevice()
 {
-    InitializeCameraDevice();
-
-    InitializeStreams();
-
-    // Initialize WebRTC connnection
-    mWebRTCProviderManager.Init();
-
     // Set the CameraHALInterface in CameraAVStreamManager and CameraAVsettingsUserLevelManager.
     mCameraAVStreamManager.SetCameraDeviceHAL(this);
     mCameraAVSettingsUserLevelManager.SetCameraDeviceHAL(this);
@@ -340,6 +334,13 @@ CameraDevice::~CameraDevice()
     }
 }
 
+void CameraDevice::Init()
+{
+    InitializeCameraDevice();
+    InitializeStreams();
+    mWebRTCProviderManager.Init();
+}
+
 CameraError CameraDevice::InitializeCameraDevice()
 {
     static bool gstreamerInitialized = false;
@@ -350,12 +351,10 @@ CameraError CameraDevice::InitializeCameraDevice()
         gstreamerInitialized = true;
     }
 
-    // TODO: Replace hardcoded device file with device passed in from
-    // camera-app.
-    videoDeviceFd = open("/dev/video0", O_RDWR);
+    videoDeviceFd = open(mVideoDevicePath.c_str(), O_RDWR);
     if (videoDeviceFd == -1)
     {
-        ChipLogError(Camera, "Error opening video device: %s", strerror(errno));
+        ChipLogError(Camera, "Error opening video device: %s at %s", strerror(errno), mVideoDevicePath.c_str());
         return CameraError::ERROR_INIT_FAILED;
     }
 
@@ -628,7 +627,7 @@ CameraError CameraDevice::StartVideoStream(uint16_t streamID)
     // Create Gstreamer video pipeline
     CameraError error = CameraError::SUCCESS;
     GstElement * videoPipeline =
-        CreateVideoPipeline("/dev/video0", it->videoStreamParams.minResolution.width, it->videoStreamParams.minResolution.height,
+        CreateVideoPipeline(mVideoDevicePath, it->videoStreamParams.minResolution.width, it->videoStreamParams.minResolution.height,
                             it->videoStreamParams.minFrameRate, error);
     if (videoPipeline == nullptr)
     {
@@ -803,7 +802,7 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
     // Create the GStreamer pipeline
     CameraError error             = CameraError::SUCCESS;
     GstElement * snapshotPipeline = CreateSnapshotPipeline(
-        "/dev/video0", it->snapshotStreamParams.minResolution.width, it->snapshotStreamParams.minResolution.height,
+        mVideoDevicePath, it->snapshotStreamParams.minResolution.width, it->snapshotStreamParams.minResolution.height,
         it->snapshotStreamParams.quality, it->snapshotStreamParams.frameRate, "capture_snapshot.jpg", error);
     if (snapshotPipeline == nullptr)
     {
@@ -893,6 +892,11 @@ VideoSensorParamsStruct & CameraDevice::GetVideoSensorParams()
     return videoSensorParams;
 }
 
+bool CameraDevice::GetCameraSupportsHDR()
+{
+    return true;
+}
+
 bool CameraDevice::GetCameraSupportsNightVision()
 {
     return true;
@@ -901,6 +905,26 @@ bool CameraDevice::GetCameraSupportsNightVision()
 bool CameraDevice::GetNightVisionUsesInfrared()
 {
     return false;
+}
+
+bool CameraDevice::GetCameraSupportsWatermark()
+{
+    return true;
+}
+
+bool CameraDevice::GetCameraSupportsOSD()
+{
+    return true;
+}
+
+bool CameraDevice::GetCameraSupportsSoftPrivacy()
+{
+    return true;
+}
+
+bool CameraDevice::GetCameraSupportsImageControl()
+{
+    return true;
 }
 
 VideoResolutionStruct & CameraDevice::GetMinViewport()
@@ -934,7 +958,11 @@ AudioCapabilitiesStruct & CameraDevice::GetMicrophoneCapabilities()
 
 AudioCapabilitiesStruct & CameraDevice::GetSpeakerCapabilities()
 {
-    static AudioCapabilitiesStruct speakerCapabilities = {};
+    static std::array<AudioCodecEnum, 2> audioCodecs   = { AudioCodecEnum::kOpus, AudioCodecEnum::kAacLc };
+    static std::array<uint32_t, 2> sampleRates         = { 48000, 32000 }; // Sample rates in Hz
+    static std::array<uint8_t, 2> bitDepths            = { 24, 32 };
+    static AudioCapabilitiesStruct speakerCapabilities = { kSpeakerMaxChannelCount, chip::Span<AudioCodecEnum>(audioCodecs),
+                                                           chip::Span<uint32_t>(sampleRates), chip::Span<uint8_t>(bitDepths) };
     return speakerCapabilities;
 }
 
@@ -946,6 +974,13 @@ std::vector<SnapshotCapabilitiesStruct> & CameraDevice::GetSnapshotCapabilities(
                                                                               false,
                                                                               chip::MakeOptional(static_cast<bool>(false)) } };
     return snapshotCapabilities;
+}
+
+CameraError CameraDevice::SetNightVision(TriStateAutoEnum nightVision)
+{
+    mNightVision = nightVision;
+
+    return CameraError::SUCCESS;
 }
 
 uint32_t CameraDevice::GetMaxNetworkBandwidth()
@@ -971,18 +1006,49 @@ std::vector<StreamUsageEnum> & CameraDevice::GetSupportedStreamUsages()
     return supportedStreamUsage;
 }
 
-CameraError CameraDevice::SetViewport(const ViewportStruct & viewPort)
+CameraError CameraDevice::SetViewport(const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewPort)
 {
     mViewport = viewPort;
 
     return CameraError::SUCCESS;
 }
 
-CameraError CameraDevice::SetViewport(VideoStream & stream, const ViewportStruct & viewport)
+CameraError CameraDevice::SetViewport(VideoStream & stream,
+                                      const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewport)
 {
     ChipLogDetail(Camera, "Setting per stream viewport for stream %d.", stream.videoStreamParams.videoStreamID);
     ChipLogDetail(Camera, "New viewport. x1=%d, x2=%d, y1=%d, y2=%d.", viewport.x1, viewport.x2, viewport.y1, viewport.y2);
     stream.viewport = viewport;
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::SetSoftRecordingPrivacyModeEnabled(bool softRecordingPrivacyMode)
+{
+    mSoftRecordingPrivacyModeEnabled = softRecordingPrivacyMode;
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::SetSoftLivestreamPrivacyModeEnabled(bool softLivestreamPrivacyMode)
+{
+    mSoftLivestreamPrivacyModeEnabled = softLivestreamPrivacyMode;
+
+    return CameraError::SUCCESS;
+}
+
+// Mute/Unmute speaker.
+CameraError CameraDevice::SetSpeakerMuted(bool muteSpeaker)
+{
+    mSpeakerMuted = muteSpeaker;
+
+    return CameraError::SUCCESS;
+}
+
+// Set speaker volume level.
+CameraError CameraDevice::SetSpeakerVolume(uint8_t speakerVol)
+{
+    mSpeakerVol = speakerVol;
+
     return CameraError::SUCCESS;
 }
 
@@ -998,6 +1064,49 @@ CameraError CameraDevice::SetMicrophoneMuted(bool muteMicrophone)
 CameraError CameraDevice::SetMicrophoneVolume(uint8_t microphoneVol)
 {
     mMicrophoneVol = microphoneVol;
+
+    return CameraError::SUCCESS;
+}
+
+// Set image rotation attributes
+CameraError CameraDevice::SetImageRotation(uint16_t imageRotation)
+{
+    mImageRotation = imageRotation;
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::SetImageFlipHorizontal(bool imageFlipHorizontal)
+{
+    mImageFlipHorizontal = imageFlipHorizontal;
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::SetImageFlipVertical(bool imageFlipVertical)
+{
+    mImageFlipVertical = imageFlipVertical;
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::SetLocalVideoRecordingEnabled(bool localVideoRecordingEnabled)
+{
+    mLocalVideoRecordingEnabled = localVideoRecordingEnabled;
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::SetLocalSnapshotRecordingEnabled(bool localSnapshotRecordingEnabled)
+{
+    mLocalSnapshotRecordingEnabled = localSnapshotRecordingEnabled;
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::SetStatusLightEnabled(bool statusLightEnabled)
+{
+    mStatusLightEnabled = statusLightEnabled;
 
     return CameraError::SUCCESS;
 }
@@ -1060,8 +1169,8 @@ void CameraDevice::InitializeVideoStreams()
                                   { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
                                   kMinBitRateBps /* MinBitRate */,
                                   kMaxBitRateBps /* MaxBitRate */,
-                                  kMinFragLenMsec /* MinFragmentLen */,
-                                  kMaxFragLenMsec /* MaxFragmentLen */,
+                                  kMinKeyFrameIntervalMsec /* MinKeyFrameInterval */,
+                                  kMaxKeyFrameIntervalMsec /* MaxKeyFrameInterval */,
                                   chip::MakeOptional(static_cast<bool>(false)) /* WMark */,
                                   chip::MakeOptional(static_cast<bool>(false)) /* OSD */,
                                   0 /* RefCount */ },
@@ -1111,6 +1220,11 @@ WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
 }
 
 CameraAVStreamMgmtDelegate & CameraDevice::GetCameraAVStreamMgmtDelegate()
+{
+    return mCameraAVStreamManager;
+}
+
+CameraAVStreamController & CameraDevice::GetCameraAVStreamMgmtController()
 {
     return mCameraAVStreamManager;
 }
