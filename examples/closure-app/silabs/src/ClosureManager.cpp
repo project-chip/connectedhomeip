@@ -257,11 +257,11 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         instance.mClosureEndpoint1.OnCalibrateActionComplete();
         instance.mClosurePanelEndpoint2.OnCalibrateActionComplete();
         instance.mClosurePanelEndpoint3.OnCalibrateActionComplete();
-      
+
         DeviceLayer::PlatformMgr().LockChipStack();
         isCalibrationInProgress = false;
         DeviceLayer::PlatformMgr().UnlockChipStack();
-      
+
         break;
     }
     case Action_t::STOP_ACTION: {
@@ -271,7 +271,7 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
             instance.mClosureEndpoint1.OnStopCalibrateActionComplete();
             instance.mClosurePanelEndpoint2.OnStopCalibrateActionComplete();
             instance.mClosurePanelEndpoint3.OnStopCalibrateActionComplete();
-          
+
             DeviceLayer::PlatformMgr().LockChipStack();
             isCalibrationInProgress = false;
             DeviceLayer::PlatformMgr().UnlockChipStack();
@@ -282,7 +282,7 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
             instance.mClosureEndpoint1.OnStopMotionActionComplete();
             instance.mClosurePanelEndpoint2.OnStopMotionActionComplete();
             instance.mClosurePanelEndpoint3.OnStopMotionActionComplete();
-            
+
             DeviceLayer::PlatformMgr().LockChipStack();
             isMoveToInProgress = false;
             DeviceLayer::PlatformMgr().UnlockChipStack();
