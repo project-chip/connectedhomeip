@@ -25,8 +25,11 @@ static_library("chip_webrtc") {
   sources = [
     "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.cpp",
     "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h",
+    "${chip_root}/src/controller/python/chip/native/PyChipError.h",
     "WebRTCClient.cpp",
     "WebRTCClient.h",
+    "WebRTCTransportProviderClient.cpp",
+    "WebRTCTransportProviderClient.h",
     "WebRTCTransportRequestorManager.cpp",
     "WebRTCTransportRequestorManager.h",
   ]
@@ -39,7 +42,9 @@ static_library("chip_webrtc") {
 
   deps = [
     "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/server",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
     "${chip_root}/third_party/libdatachannel:libdatachannel",
   ]
 

@@ -18,6 +18,7 @@
 import asyncio
 import logging
 
+from .command import WebRTCProviderCommand
 from .types import Events, IceCandiate, IceCandidateList, PeerConnectionState
 from .utils import AsyncEventQueue
 from .webrtc_client import WebRTCClient
@@ -68,9 +69,9 @@ class PeerConnection(WebRTCClient):
         self.dut_node_id = node_id
         self.fabric_index = fabric_index
         self.endpoint = endpoint
-
-        # ! CHECK THIS PARRT
-        # ! get_webrtc_library_handle().pychip_WebRTCTransportProvider_Init(self._handle, self.dut_node_id, self.fabric_index, self.endpoint)
+        self._command_sender = WebRTCProviderCommand()
+        self._command_sender.init(self._handle, self.dut_node_id, self.fabric_index, self.endpoint)
+        self._command_sender.init_callback(self._handle)
 
         # Set native callbacks
         self.on_ice_candidate(self.on_ice_candidate_cb)
@@ -245,6 +246,20 @@ class PeerConnection(WebRTCClient):
         # get latest state
         self._peer_state = PeerConnectionState(self.get_peer_connection_state())
         return self._peer_state == PeerConnectionState.CONNECTED
+
+    async def send_command(self, *args, **kwargs):
+        """Sends a command using WebRTC Provdier Client. **This should be used to send 
+        ProvideOffer and SolicitOffer Commands only as these commands require custom 
+        response handling.** Rest of the remaining commands can be sent via the default command sender.
+
+        Parameters:
+            endpoint (int): The endpoint ID of the peer device for the command.
+            cmd (ClusterObjects.ClusterCommand): Payload of the command to be sent.
+
+        Returns:
+            Response Type if applicable.
+        """
+        return await self._command_sender.send_webrtc_provider_command(self._handle, *args, **kwargs)
 
     # Callbacks from WebRTC Client Library
     def on_ice_candidate_cb(self, candidate: str, mid: str) -> None:

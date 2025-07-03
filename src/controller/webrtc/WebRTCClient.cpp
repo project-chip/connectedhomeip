@@ -32,7 +32,8 @@ constexpr uint16_t kVideoStreamDestPort = 5000;
 
 WebRTCClient::WebRTCClient()
 {
-    mPeerConnection = nullptr;
+    mPeerConnection          = nullptr;
+    mTransportProviderClient = std::make_unique<WebRTCTransportProviderClient>();
 }
 
 WebRTCClient::~WebRTCClient()
@@ -242,6 +243,25 @@ void WebRTCClient::OnGatheringComplete(std::function<void()> callback)
 void WebRTCClient::OnStateChange(std::function<void(int)> callback)
 {
     mStateChangeCallback = callback;
+}
+
+void WebRTCClient::WebRTCProviderClientInit(uint32_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
+{
+    mTransportProviderClient->Init(nodeId, fabricIndex, endpoint);
+}
+
+PyChipError WebRTCClient::SendCommand(void * appContext, uint16_t endpointId, uint32_t clusterId, uint32_t commandId,
+                                      const uint8_t * payload, size_t length)
+{
+    return mTransportProviderClient->SendCommand(appContext, endpointId, clusterId, commandId, payload, length);
+}
+
+void WebRTCClient::WebRTCProviderClientInitCallbacks(OnCommandSenderResponseCallback onCommandSenderResponseCallback,
+                                                     OnCommandSenderErrorCallback onCommandSenderErrorCallback,
+                                                     OnCommandSenderDoneCallback onCommandSenderDoneCallback)
+{
+    mTransportProviderClient->InitCallbacks(onCommandSenderResponseCallback, onCommandSenderErrorCallback,
+                                            onCommandSenderDoneCallback);
 }
 
 } // namespace webrtc

@@ -14,7 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#pragma once
 
+#include <controller/python/chip/native/PyChipError.h>
+#include <controller/webrtc/WebRTCTransportProviderClient.h>
 #include <lib/core/CHIPError.h>
 #include <string>
 
@@ -159,6 +162,56 @@ void webrtc_client_set_gathering_complete_callback(WebRTCClientHandle handle, Ga
  * @param cb The callback function to be invoked when the peer connection state changes.
  */
 void webrtc_client_set_state_change_callback(WebRTCClientHandle handle, OnStateChangeCallback cb);
+
+/**
+ * @brief Initializes the WebRTC provider client handle with node ID, fabric index, and endpoint.
+ *
+ *
+ * @param handle The handle of the WebRTC client.
+ * @param nodeId The node ID associated with the peer.
+ * @param fabricIndex The fabric index associated with the peer.
+ * @param endpoint The endpoint associated with the peer.
+ *
+ * @return void
+ *
+ * @note This function assumes that the handle is valid and exists in the global clients map.
+ */
+void webrtc_provider_client_init(WebRTCClientHandle handle, uint32_t nodeId, uint8_t fabricIndex, uint16_t endpoint);
+
+/**
+ * @brief Initializes the WebRTC client handle with webrtc provider client command sender callbacks.
+ *
+ * @param handle The handle of the WebRTC client.
+ * @param onCommandSenderResponseCallback Callback for handling command sender response.
+ * @param onCommandSenderErrorCallback Callback for handling command sender error.
+ * @param onCommandSenderDoneCallback Callback for handling command sender completion.
+ *
+ * @return void
+ *
+ * @note This function assumes that the handle is valid and exists in the global clients map.
+ *
+ */
+void webrtc_provider_client_init_commandsender_callbacks(WebRTCClientHandle handle,
+                                                         OnCommandSenderResponseCallback onCommandSenderResponseCallback,
+                                                         OnCommandSenderErrorCallback onCommandSenderErrorCallback,
+                                                         OnCommandSenderDoneCallback onCommandSenderDoneCallback);
+
+/**
+ * @brief Sends a command using WebRTC provider client.
+ *
+ * @param handle The handle of the WebRTC client.
+ * @param appContext Python closure to invoke CommandSenderCallbacks.
+ * @param endpointId The endpoint ID to which the command is sent.
+ * @param clusterId The cluster ID associated with the command.
+ * @param commandId The command ID to be sent.
+ * @param payload The payload data of the command.
+ * @param length The length of the payload data.
+ *
+ * @return PyChipError
+ *
+ */
+PyChipError webrtc_provider_client_send_command(WebRTCClientHandle handle, void * appContext, uint16_t endpointId,
+                                                uint32_t clusterId, uint32_t commandId, const uint8_t * payload, size_t length);
 
 } // namespace webrtc
 } // namespace chip

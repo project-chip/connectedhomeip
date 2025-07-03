@@ -87,4 +87,25 @@ void pychip_webrtc_client_set_state_change_callback(WebRTCClientHandle handle, O
 {
     chip::webrtc::webrtc_client_set_state_change_callback(handle, cb);
 }
+
+void pychip_webrtc_provider_client_init(WebRTCClientHandle handle, uint32_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
+{
+    chip::webrtc::webrtc_provider_client_init(handle, nodeId, fabricIndex, endpoint);
+}
+
+void pychip_webrtc_provider_client_init_commandsender_callbacks(WebRTCClientHandle handle,
+                                                                OnCommandSenderResponseCallback onCommandSenderResponseCallback,
+                                                                OnCommandSenderErrorCallback onCommandSenderErrorCallback,
+                                                                OnCommandSenderDoneCallback onCommandSenderDoneCallback)
+{
+    chip::webrtc::webrtc_provider_client_init_commandsender_callbacks(handle, onCommandSenderResponseCallback,
+                                                                      onCommandSenderErrorCallback, onCommandSenderDoneCallback);
+}
+
+PyChipError pychip_webrtc_provider_client_send_command(WebRTCClientHandle handle, void * appContext, uint16_t endpointId,
+                                                       uint32_t clusterId, uint32_t commandId, const uint8_t * payload,
+                                                       size_t length)
+{
+    return chip::webrtc::webrtc_provider_client_send_command(handle, appContext, endpointId, clusterId, commandId, payload, length);
+}
 }

@@ -250,6 +250,7 @@ chip_python_wheel_action("chip-core") {
       if (chip_support_webrtc_python_bindings) {
         sources += [
           "chip/webrtc/__init__.py",
+          "chip/webrtc/command.py",
           "chip/webrtc/library_handle.py",
           "chip/webrtc/peer_connection.py",
           "chip/webrtc/types.py",
