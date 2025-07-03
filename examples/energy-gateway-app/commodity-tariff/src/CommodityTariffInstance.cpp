@@ -20,6 +20,7 @@
 #include <csetjmp>
 
 #include "CommodityTariffJsonParser.h"
+#include <app/clusters/commodity-tariff-server/CommodityTariffConsts.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -30,6 +31,7 @@ using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::app::Clusters::CommodityTariff;
 using namespace chip::app::Clusters::CommodityTariff::Attributes;
 using namespace chip::app::Clusters::CommodityTariff::Structs;
+using namespace CommodityTariffConsts;
 
 using chip::Protocols::InteractionModel::Status;
 
@@ -182,11 +184,11 @@ CHIP_ERROR JsonParser<TariffPeriodStructType, TariffPeriodsDataClass>::ParseFrom
     SuccessOrExit(err);
 
     // Parse DayEntryIDs
-    err = ParseIDArray(json.get("DayEntryIDs", Json::Value()), output.dayEntryIDs, CommodityTariffAttrsDataMgmt::kDayEntriesAttrMaxLength);
+    err = ParseIDArray(json.get("DayEntryIDs", Json::Value()), output.dayEntryIDs, kDayEntriesAttrMaxLength);
     SuccessOrExit(err);
 
     // Parse TariffComponentIDs
-    err = ParseIDArray(json.get("TariffComponentIDs", Json::Value()), output.tariffComponentIDs, CommodityTariffAttrsDataMgmt::kTariffComponentsAttrMaxLength);
+    err = ParseIDArray(json.get("TariffComponentIDs", Json::Value()), output.tariffComponentIDs, kTariffComponentsAttrMaxLength);
     SuccessOrExit(err);
 
 exit:
@@ -197,7 +199,7 @@ exit:
 
 CHIP_ERROR TariffPeriods_LoadFromJson(const Json::Value & json, TariffPeriodsDataClass & MgmtObj)
 {
-    return JsonParser<TariffPeriodStructType, TariffPeriodsDataClass>::LoadFromJson(json, MgmtObj, CommodityTariffAttrsDataMgmt::kTariffPeriodsAttrMaxLength);
+    return JsonParser<TariffPeriodStructType, TariffPeriodsDataClass>::LoadFromJson(json, MgmtObj, kTariffPeriodsAttrMaxLength);
 }
 
 // DayEntriesDataClass
@@ -431,7 +433,7 @@ CHIP_ERROR JsonParser<TariffComponentStructType, TariffComponentsDataClass>::Par
 CHIP_ERROR TariffComponents_LoadFromJson(const Json::Value & json, TariffComponentsDataClass & MgmtObj)
 {
     return JsonParser<TariffComponentStructType, TariffComponentsDataClass>::LoadFromJson(json, MgmtObj,
-                                                                                          CommodityTariffAttrsDataMgmt::kTariffComponentsAttrMaxLength);
+                                                                                          kTariffComponentsAttrMaxLength);
 }
 
 // DayPatternsDataClass
@@ -484,7 +486,7 @@ CHIP_ERROR JsonParser<DayPatternStructType, DayPatternsDataClass>::ParseFromJson
     });
     SuccessOrExit(err);
 
-    err = ParseIDArray(json.get("DayEntryIDs", Json::Value()), output.dayEntryIDs, CommodityTariffAttrsDataMgmt::kDayEntriesAttrMaxLength);
+    err = ParseIDArray(json.get("DayEntryIDs", Json::Value()), output.dayEntryIDs, kDayEntriesAttrMaxLength);
     SuccessOrExit(err);
 exit:
     return err;
@@ -492,7 +494,7 @@ exit:
 
 CHIP_ERROR DayPatterns_LoadFromJson(const Json::Value & json, DayPatternsDataClass & MgmtObj)
 {
-    return JsonParser<DayPatternStructType, DayPatternsDataClass>::LoadFromJson(json, MgmtObj, CommodityTariffAttrsDataMgmt::kDayPatternsAttrMaxLength);
+    return JsonParser<DayPatternStructType, DayPatternsDataClass>::LoadFromJson(json, MgmtObj, kDayPatternsAttrMaxLength);
 }
 
 // IndividualDaysDataClass
@@ -518,7 +520,7 @@ CHIP_ERROR JsonParser<DayStructType, IndividualDaysDataClass>::ParseFromJson(con
     });
     SuccessOrExit(err);
 
-    err = ParseIDArray(json.get("DayEntryIDs", Json::Value()), output.dayEntryIDs, CommodityTariffAttrsDataMgmt::kDayEntriesAttrMaxLength);
+    err = ParseIDArray(json.get("DayEntryIDs", Json::Value()), output.dayEntryIDs, kDayEntriesAttrMaxLength);
     SuccessOrExit(err);
 exit:
     return err;
@@ -526,7 +528,7 @@ exit:
 
 CHIP_ERROR IndividualDays_LoadFromJson(const Json::Value & json, IndividualDaysDataClass & MgmtObj)
 {
-    return JsonParser<DayStructType, IndividualDaysDataClass>::LoadFromJson(json, MgmtObj, CommodityTariffAttrsDataMgmt::kIndividualDaysAttrMaxLength);
+    return JsonParser<DayStructType, IndividualDaysDataClass>::LoadFromJson(json, MgmtObj, kIndividualDaysAttrMaxLength);
 }
 
 // CalendarPeriodsDataClass
@@ -559,7 +561,7 @@ CHIP_ERROR JsonParser<CalendarPeriodStructType, CalendarPeriodsDataClass>::Parse
         output.startDate.SetNull();
     }
 
-    err = ParseIDArray(json.get("DayPatternIDs", Json::Value()), output.dayPatternIDs, CommodityTariffAttrsDataMgmt::kCalendarPeriodItemMaxDayPatternIDs);
+    err = ParseIDArray(json.get("DayPatternIDs", Json::Value()), output.dayPatternIDs, kCalendarPeriodItemMaxDayPatternIDs);
     SuccessOrExit(err);
 exit:
     return err;
@@ -567,7 +569,7 @@ exit:
 
 CHIP_ERROR CalendarPeriods_LoadFromJson(const Json::Value & json, CalendarPeriodsDataClass & MgmtObj)
 {
-    return JsonParser<CalendarPeriodStructType, CalendarPeriodsDataClass>::LoadFromJson(json, MgmtObj, CommodityTariffAttrsDataMgmt::kCalendarPeriodsAttrMaxLength);
+    return JsonParser<CalendarPeriodStructType, CalendarPeriodsDataClass>::LoadFromJson(json, MgmtObj, kCalendarPeriodsAttrMaxLength);
 }
 } // namespace JSON_Utilities
 

@@ -18,11 +18,13 @@
 #pragma once
 
 #include <json/json.h>
+#include <app/clusters/commodity-tariff-server/CommodityTariffConsts.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::CommodityTariffAttrsDataMgmt;
+using namespace CommodityTariffConsts;
 
 namespace JSON_Utilities {
 template <typename StructType, typename DataClass, bool IsList = true>

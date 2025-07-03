@@ -20,6 +20,7 @@
 #include <json/json.h>
 
 #include <app/clusters/commodity-tariff-server/commodity-tariff-server.h>
+#include <app/clusters/commodity-tariff-server/CommodityTariffAttrsDataMgmt.h>
 #include <app/util/af-types.h>
 #include <lib/core/CHIPError.h>
 
