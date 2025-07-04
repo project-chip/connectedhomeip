@@ -29,7 +29,7 @@ class EventManagementTestEventTriggerHandler : public app::GenericEventManagemen
 {
 public:
     EventManagementTestEventTriggerHandler(
-        chip::app::Clusters::GeneralDiagnosticsCluster * generalDiagnosticsClusterInstance = nullptr) :
+        chip::app::Clusters::GeneralDiagnosticsCluster<chip::app::Clusters::DeviceLayerGeneralDiagnosticsLogic> * generalDiagnosticsClusterInstance = nullptr) :
         app::GenericEventManagementTestEventTriggerHandler(generalDiagnosticsClusterInstance)
     {}
 
