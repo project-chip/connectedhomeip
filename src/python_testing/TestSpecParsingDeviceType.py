@@ -322,15 +322,16 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         self.test.xml_device_types = self.xml_device_types
         self.test.xml_clusters = self.xml_clusters
 
+        # Start with a good device, then add or remove clusters as necessary
         if no_descriptor:
             self.test.endpoints = {1: {}}
             self.test.endpoints_tlv = {1: {}}
         else:
             # build the temperature sensor device type
             attrs = create_minimal_dt(xml_device_types=self.xml_device_types, xml_clusters=self.xml_clusters,
-                                      device_type_id=0x302, is_tlv_endpoint=False)
+                                      device_type_id=0x302, is_tlv_endpoint=False, server_override=server_list)
             attrs_tlv = create_minimal_dt(
-                xml_device_types=self.xml_device_types, xml_clusters=self.xml_clusters, device_type_id=0x302, is_tlv_endpoint=True)
+                xml_device_types=self.xml_device_types, xml_clusters=self.xml_clusters, device_type_id=0x302, is_tlv_endpoint=True, server_override=server_list)
             # override with the desired device type id
             if bad_device_id:
                 known_ids = list(self.test.xml_device_types.keys())
