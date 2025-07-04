@@ -21,7 +21,10 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 
 chip_test_suite("tests") {
   output_name = "libaccesstest"
-  test_sources = [ "TestAccessControl.cpp" ]
+  test_sources = [
+    "TestAccessControl.cpp",
+    "TestProviderDeviceTypeResolver.cpp",
+  ]
 
   cflags = [ "-Wconversion" ]
   public_deps = [
