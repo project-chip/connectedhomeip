@@ -57,9 +57,6 @@ class CommissioningInfo:
     Represents the information required for commissioning a device.
 
     Attributes:
-        commissionee_ip_address_just_for_testing (Optional[str]):
-            The IP address of the commissionee used only for testing purposes.
-
         commissioning_method (Optional[str]):
             The method by which the device is being commissioned.
 
@@ -79,7 +76,6 @@ class CommissioningInfo:
         tc_user_response_to_simulate (Optional[int]):
             The user response to simulate for the Terms and Conditions, if applicable.
     """
-    commissionee_ip_address_just_for_testing: Optional[str] = None
     commissioning_method: Optional[str] = None
     thread_operational_dataset: Optional[bytes] = None
     wifi_passphrase: Optional[str] = None
@@ -288,7 +284,6 @@ class CommissionDeviceTest(base_test.BaseTestClass):
         meta_config = test_config.user_params['meta_config']
         self.dut_node_ids: List[int] = meta_config['dut_node_ids']
         self.commissioning_info: CommissioningInfo = CommissioningInfo(
-            commissionee_ip_address_just_for_testing=meta_config['commissionee_ip_address_just_for_testing'],
             commissioning_method=meta_config['commissioning_method'],
             thread_operational_dataset=meta_config['thread_operational_dataset'],
             wifi_passphrase=meta_config['wifi_passphrase'],
