@@ -30,6 +30,16 @@ from mobly import asserts
 from TC_DeviceConformance import DeviceConformanceTests, get_supersets
 
 
+def run_against_all_spec_revisions(body):
+    def runner(self: "MatterBaseTest", *args, **kwargs):
+        for revision in PrebuiltDataModelDirectory:
+            print(f"-------------- Testing against spec revision {revision.dirname}")
+            self.xml_clusters, self.xml_cluster_problems = build_xml_clusters(revision)
+            self.xml_device_types, self.xml_device_types_problems = build_xml_device_types(revision)
+            body(self, *args, **kwargs)
+    return runner
+
+
 class TestSpecParsingDeviceType(MatterBaseTest):
     # This just tests that the current spec can be parsed without failures
     def test_spec_device_parsing(self):
@@ -427,6 +437,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
             asserts.assert_false(problems, f"Unexpected problems on device type {id}")
             asserts.assert_true(success, f"Unexpected failure on device type {id}")
 
+    @run_against_all_spec_revisions
     def test_disallowed_cluster(self):
         for id, dt in self.xml_device_types.items():
             expected_problems = 0

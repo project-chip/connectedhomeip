@@ -31,7 +31,7 @@ import chip.clusters as Clusters
 import chip.testing.conformance as conformance_support
 from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecisionWithChoice,
                                       ConformanceException, ConformanceParseParameters, feature, is_disallowed, mandatory, optional,
-                                      or_operation, parse_callable_from_xml, parse_device_type_callable_from_xml)
+                                      or_operation, parse_callable_from_xml)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
                                          EventPathLocation, FeaturePathLocation, ProblemLocation, ProblemNotice, ProblemSeverity)
@@ -873,7 +873,9 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                 if tmp_problem:
                     problems.append(tmp_problem)
                     continue
-                conformance = parse_device_type_callable_from_xml(conformance_xml)
+                cluster_conformance_params = ConformanceParseParameters(
+                    feature_map=cluster_definition_xml[cid].feature_map, attribute_map=cluster_definition_xml[cid].attribute_map, command_map=cluster_definition_xml[cid].command_map)
+                conformance = parse_callable_from_xml(conformance_xml, cluster_conformance_params)
                 side_dict = {'server': ClusterSide.SERVER, 'client': ClusterSide.CLIENT}
                 side = side_dict[c.attrib['side']]
                 name = c.attrib['name']
@@ -920,7 +922,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                             if tmp_problem:
                                 # It's not actually a problem if there is no conformance override - it might be a constraint override. Just continue
                                 continue
-                            conformance_override = parse_device_type_callable_from_xml(conformance_xml)
+                            conformance_override = parse_callable_from_xml(conformance_xml, cluster_conformance_params)
 
                             map_id = [map[n] for n in map.keys() if _fuzzy_name(n) == _fuzzy_name(name)]
                             if len(map_id) == 0:
