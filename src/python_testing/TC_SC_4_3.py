@@ -42,7 +42,6 @@ import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mobly import asserts
-from zeroconf.const import _TYPE_AAAA, _TYPES
 
 '''
 Purpose
@@ -285,24 +284,13 @@ class TC_SC_4_3(MatterBaseTest):
         # TH performs a query for the AAAA record against the target listed in the SRV record.
         # Verify AAAA record is returned
         self.step(8)
-
         quada_record = await mdns.get_quada_record(
             hostname=hostname,
             log_output=True
         )
 
-        # answer_record_type = quada_record.get_type(quada_record.type)
-        quada_record_type = _TYPES[_TYPE_AAAA]
-
         # Verify AAAA record is returned
-        asserts.assert_equal(hostname, quada_record.hostname, f"Server name mismatch: {hostname} vs {quada_record.hostname}")
-        asserts.assert_equal(quada_record_type, quada_record.record_type,
-                             f"Record type should be {quada_record_type} but got {quada_record.record_type}")
-
-        # Verify the AAAA record contains an IPv6 address
-        logging.info("Verify the AAAA record contains a valid IPv6 address")
-        is_valid_ipv6_addr = self.is_valid_ipv6_address(quada_record.address)
-        asserts.assert_true(is_valid_ipv6_addr, f"Address '{quada_record.address}' is not a valid IPv6 address.")
+        asserts.assert_greater(len(quada_record.addresses), 0, f"No AAAA addresses were resolved")
 
         # # *** STEP 9 ***
         # TH verifies the following from the returned records: The hostname must be a fixed-length twelve-character (or sixteen-character)
@@ -384,6 +372,12 @@ class TC_SC_4_3(MatterBaseTest):
             t_value = operational_record.txt_record['T']
             result, message = self.verify_t_value(t_value)
             asserts.assert_true(result, message)
+
+        # Verify the AAAA record contains an IPv6 address
+        logging.info("Verify the AAAA record contains a valid IPv6 address")
+        ipv6_address = quada_record.addresses[0].address
+        is_valid_ipv6_addr = self.is_valid_ipv6_address(ipv6_address)
+        asserts.assert_true(is_valid_ipv6_addr, f"Address '{ipv6_address}' is not a valid IPv6 address.")
 
         # # *** STEP 10 ***
         # TH performs a DNS-SD browse for _I<hhhh>._sub._matter._tcp.local, where <hhhh> is the 64-bit compressed

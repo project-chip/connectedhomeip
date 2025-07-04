@@ -15,54 +15,43 @@
 #    limitations under the License.
 #
 
-
-import enum
 from random import randint
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from zeroconf import (BadTypeInNameException, DNSOutgoing, DNSQuestion, DNSQuestionType, ServiceInfo, Zeroconf, current_time_millis,
                       service_type_name)
-from zeroconf.const import (_CLASS_IN, _DUPLICATE_QUESTION_INTERVAL, _FLAGS_QR_QUERY, _LISTENER_TIME, _MDNS_PORT, _TYPE_A,
-                            _TYPE_AAAA, _TYPE_SRV, _TYPE_TXT)
+from zeroconf.const import (_CLASS_IN, _DUPLICATE_QUESTION_INTERVAL, _FLAGS_QR_QUERY, _MDNS_PORT, _TYPE_AAAA, _LISTENER_TIME)
+from zeroconf._services.info import float_
+
 
 _AVOID_SYNC_DELAY_RANDOM_INTERVAL = (20, 120)
 
 
-@enum.unique
-class DNSRecordType(enum.Enum):
-    """An MDNS record type.
-
-    "A" - A MDNS record type
-    "AAAA" - AAAA MDNS record type
-    "SRV" - SRV MDNS record type
-    "TXT" - TXT MDNS record type
-    """
-
-    A = 0
-    AAAA = 1
-    SRV = 2
-    TXT = 3
-
-
 class MdnsAsyncServiceInfo(ServiceInfo):
-    def __init__(self, name: str, type_: str) -> None:
-        super().__init__(type_=type_, name=name)
+    def __init__(self, name: str | None = None, type_: str | None = None, server: str | None = None) -> None:
+        if server and not (name and type_):
+            # Use server-only mode (for address resolution)
+            super().__init__(type_="", name="", server=server)
+            self._name = None
+            self.type = None
+            self.server = server
+            return
 
-        if type_ and not type_.endswith(service_type_name(name, strict=False)):
+        if not type_.endswith(service_type_name(name, strict=False)):
             raise BadTypeInNameException
 
+        super().__init__(type_=type_, name=name, server=server)
         self._name = name
         self.type = type_
-        self.key = name.lower()
+        self.server = server
 
     async def async_request(
         self,
         zc: Zeroconf,
         timeout: float,
-        question_type: Optional[DNSQuestionType] = None,
-        addr: Optional[str] = None,
+        question_type: DNSQuestionType | None = None,
+        addr: str | None = None,
         port: int = _MDNS_PORT,
-        record_type: DNSRecordType = None
     ) -> bool:
         """Returns true if the service could be discovered on the
         network, and updates this object with details discovered.
@@ -73,6 +62,12 @@ class MdnsAsyncServiceInfo(ServiceInfo):
         mDNS multicast address and port. This is useful for directing
         requests to a specific host that may be able to respond across
         subnets.
+
+        This override of **zeroconf.ServiceInfo.async_request** disables
+        known-answer caching and clears the cache to ensure a fresh
+        response each time. Unlike the original implementation, which
+        sends all questions at once, this version sends one question
+        type at a time (e.g., SRV, TXT, AAAA).
         """
         if not zc.started:
             await zc.async_wait_for_start()
@@ -83,21 +78,30 @@ class MdnsAsyncServiceInfo(ServiceInfo):
             assert zc.loop is not None
 
         first_request = True
-        delay = _LISTENER_TIME
+        delay = self._get_initial_delay()
         next_ = now
         last = now + timeout
+        record_type = next(iter(self._query_record_types))
         try:
+            self.async_clear_cache()
             zc.async_add_listener(self, None)
             while not self._is_complete:
                 if last <= now:
                     return False
                 if next_ <= now:
                     this_question_type = question_type or DNSQuestionType.QU if first_request else DNSQuestionType.QM
-                    out: DNSOutgoing = self._generate_request_query(this_question_type, record_type)
                     first_request = False
 
-                    if out.questions:
-                        zc.async_send(out, addr, port)
+                    # Prepare outgoing mDNS query message with
+                    # a single question and record type.
+                    out = DNSOutgoing(_FLAGS_QR_QUERY)
+                    question = DNSQuestion(self._name, record_type, _CLASS_IN)
+                    question.unicast = question_type is DNSQuestionType.QU
+                    out.add_question(question)
+
+                    # Send the query to the specified address and port.
+                    zc.async_send(out, addr, port)
+
                     next_ = now + delay
                     next_ += randint(*_AVOID_SYNC_DELAY_RANDOM_INTERVAL)
 
@@ -111,25 +115,18 @@ class MdnsAsyncServiceInfo(ServiceInfo):
 
         return True
 
-    def _generate_request_query(self, question_type: DNSQuestionType, record_type: DNSRecordType) -> DNSOutgoing:
-        """Generate the request query."""
-        out = DNSOutgoing(_FLAGS_QR_QUERY)
-        name = self._name
-        qu_question = question_type is DNSQuestionType.QU
+    def _get_initial_delay(self) -> float_:
+        return _LISTENER_TIME
 
-        record_types = {
-            DNSRecordType.SRV: (_TYPE_SRV, "Requesting MDNS SRV record..."),
-            DNSRecordType.TXT: (_TYPE_TXT, "Requesting MDNS TXT record..."),
-            DNSRecordType.A: (_TYPE_A, "Requesting MDNS A record..."),
-            DNSRecordType.AAAA: (_TYPE_AAAA, "Requesting MDNS AAAA record..."),
-        }
+class AddressResolverIPv6(MdnsAsyncServiceInfo):
+    """Resolve a host name to an IPv6 address."""
 
-        # Iterate over record types, add question uppon match
-        for r_type, (type_const, message) in record_types.items():
-            if record_type is None or record_type == r_type:
-                print(message)
-                question = DNSQuestion(name, type_const, _CLASS_IN)
-                question.unicast = qu_question
-                out.add_question(question)
+    def __init__(self, server: str) -> None:
+        """Initialize the AddressResolver."""
+        super().__init__(server, server, server=server)
+        self._query_record_types = {_TYPE_AAAA}
 
-        return out
+    @property
+    def _is_complete(self) -> bool:
+        """The ServiceInfo has all expected properties."""
+        return bool(self._ipv6_addresses)

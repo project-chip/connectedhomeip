@@ -15,89 +15,23 @@
 #    limitations under the License.
 #
 
-import ipaddress
 import json
 import logging
 from asyncio import Event, TimeoutError, ensure_future, wait_for
-from dataclasses import asdict, dataclass, field
-from datetime import datetime
+from dataclasses import asdict
 from enum import Enum
-from typing import Dict, List, Optional, cast
-
-from mdns_discovery.mdns_async_service_info import DNSRecordType, MdnsAsyncServiceInfo
+from time import sleep, time
+from typing import Dict, List, Optional
+from mdns_discovery.mdns_async_service_info import MdnsAsyncServiceInfo, AddressResolverIPv6
+from mdns_discovery.data_clases.quada_record import QuadaRecord
+from mdns_discovery.data_clases.mdns_service_info import MdnsServiceInfo
 from zeroconf import IPVersion, ServiceListener, ServiceStateChange, Zeroconf
 from zeroconf._dns import DNSAddress
 from zeroconf._engine import AsyncListener
 from zeroconf._protocol.incoming import DNSIncoming
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconf, AsyncZeroconfServiceTypes
-
+from zeroconf.const import (_TYPE_SRV, _TYPE_TXT, _TYPE_AAAA)
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class MdnsServiceInfo:
-    # The unique name of the mDNS service.
-    service_name: str
-
-    # The instance name of the service.
-    instance_name: str
-
-    # The domain name of the machine hosting the service.
-    server: str
-
-    # The network port on which the service is available.
-    port: int
-
-    # A list of IP addresses associated with the service.
-    addresses: list[str]
-
-    # A dictionary of key-value pairs representing the service's metadata.
-    txt_record: dict[str, str]
-
-    # The priority of the service, used in service selection when multiple instances are available.
-    priority: int
-
-    # The network interface index on which the service is advertised.
-    interface_index: int
-
-    # The relative weight for records with the same priority, used in load balancing.
-    weight: int
-
-    # The time-to-live value for the host name in the DNS record.
-    host_ttl: int
-
-    # The time-to-live value for other records associated with the service.
-    other_ttl: int
-
-    # The service type of the service, typically indicating the service protocol and domain.
-    service_type: Optional[str] = None
-
-
-@dataclass
-class MdnsAddressInfo:
-    # The domain name (hostname) associated with the address record.
-    hostname: str
-
-    # The type of DNS record (e.g., 'A' or 'AAAA').
-    record_type: str
-
-    # The resolved IPv6 address for the given name.
-    address: str
-
-
-@dataclass
-class TxtData:
-    # The full mDNS service instance name
-    service_name: str
-
-    # The hostname associated with the service
-    hostname: str
-
-    # A dictionary of key-value pairs extracted from the TXT record
-    txt_value: Optional[dict[str, str]]
-
-    # Timestamp when the TXT data was created or observed
-    created_at: datetime = field(default_factory=datetime.utcnow)
 
 
 class MdnsServiceType(Enum):
@@ -132,8 +66,6 @@ class MdnsDiscovery:
 
     DISCOVERY_TIMEOUT_SEC = 15
 
-    txt_data_cache: list[TxtData] = []
-
     def __init__(self, verbose_logging: bool = False):
         """
         Initializes the MdnsDiscovery instance.
@@ -146,7 +78,7 @@ class MdnsDiscovery:
             - get_all_services
         """
         # An instance of Zeroconf to manage mDNS operations.
-        self._azc = AsyncZeroconf(ip_version=IPVersion.V6Only)
+        self._azc = AsyncZeroconf(ip_version=IPVersion.All)
 
         # A dictionary to store discovered services.
         self._discovered_services = {}
@@ -162,6 +94,8 @@ class MdnsDiscovery:
 
         # Verbose logging
         self._verbose_logging = verbose_logging
+        
+        # sleep(3)
 
     # Public methods
     async def get_commissioner_service(self, log_output: bool = False,
@@ -328,34 +262,27 @@ class MdnsDiscovery:
 
         # Prepare and perform query
         service_info = MdnsAsyncServiceInfo(name=service_name, type_=service_type)
-
+        self._azc.zeroconf.cache.cache.clear()  # Clear the cache to ensure fresh data
+        service_info._query_record_types = {_TYPE_SRV}
         is_discovered = await service_info.async_request(
             self._azc.zeroconf,
-            discovery_timeout_sec * 1000,
-            record_type=DNSRecordType.SRV)
-
-        if is_discovered:
-            if service_info.decoded_properties:
-                # Cache the TXT record data
-                logging.info("Caching TXT data.")
-                self.txt_data_cache.append(TxtData(
-                    service_name=service_info.name,
-                    hostname=service_info.server,
-                    txt_value=service_info.decoded_properties
-                ))
+            discovery_timeout_sec * 1000)
 
         # Adds service to discovered services
         if is_discovered:
             mdns_service_info = self._to_mdns_service_info_class(service_info)
-        self._discovered_services = {}
-        self._discovered_services[service_type] = []
-        if mdns_service_info is not None:
-            self._discovered_services[service_type].append(mdns_service_info)
+            self._discovered_services = {}
+            self._discovered_services[service_type] = []
+            if mdns_service_info is not None:
+                self._discovered_services[service_type].append(mdns_service_info)
 
-        if log_output:
-            self._log_output()
+            if log_output:
+                self._log_output()
 
-        return mdns_service_info
+            return mdns_service_info
+        else:
+            logger.error(f"SRV Record for service '{service_name}' of type '{service_type}' not found.")
+            return None
 
     async def get_txt_record(self, service_name: str,
                              service_type: str = None,
@@ -385,7 +312,6 @@ class MdnsDiscovery:
         """
         logger.info(f"Looking for MDNS record, type 'TXT', service name '{service_name}'")
         mdns_service_info = None
-        txt_from_cache = None
 
         # Adds service listener
         service_listener = MdnsServiceListener()
@@ -403,38 +329,15 @@ class MdnsDiscovery:
 
         # Prepare and perform query
         service_info = MdnsAsyncServiceInfo(name=service_name, type_=service_type)
-
+        self._azc.zeroconf.cache.cache.clear()  # Clear the cache to ensure fresh data
+        service_info._query_record_types = {_TYPE_SRV}
         is_discovered = await service_info.async_request(
             self._azc.zeroconf,
-            discovery_timeout_sec * 1000,
-            record_type=DNSRecordType.TXT)
+            discovery_timeout_sec * 1000)
 
+        # Adds service to discovered services
         if is_discovered:
-            if not service_info.decoded_properties:
-                logging.info(
-                    f"TXT Record found but no properties for service '{service_name}' of type '{service_type}', attempting to recover from cache...")
-
-                # Look for TXT data in the cache
-                txt_data = next(
-                    (d for d in reversed(self.txt_data_cache) if d.service_name == service_name and d.hostname == service_info.server),
-                    {}
-                )
-                if txt_data:
-                    logging.info("TXT data recovered from cache.")
-                    txt_from_cache = txt_data.txt_value
-            else:
-                # Cache the TXT record data
-                logging.info("Caching TXT data.")
-                self.txt_data_cache.append(TxtData(
-                    service_name=service_info.name,
-                    hostname=service_info.server,
-                    txt_value=service_info.decoded_properties
-                ))
-
-            # Adds service to discovered services
             mdns_service_info = self._to_mdns_service_info_class(service_info)
-            if txt_from_cache:
-                mdns_service_info.txt_record = txt_from_cache
             self._discovered_services = {}
             self._discovered_services[service_type] = []
             if mdns_service_info is not None:
@@ -451,7 +354,7 @@ class MdnsDiscovery:
     async def get_quada_record(self, hostname: str,
                                discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
                                log_output: bool = False
-                               ) -> Optional[MdnsAddressInfo]:
+                               ) -> Optional[QuadaRecord]:
         """
         Asynchronously retrieves the AAAA (IPv6) record of a device on the local network via mDNS.
 
@@ -465,47 +368,42 @@ class MdnsDiscovery:
             log_output (bool, optional): Whether to log the discovered information. Defaults to False.
 
         Returns:
-            Optional[MdnsAddressInfo]: An MdnsAddressInfo object containing the IPv6 address,
-            record type, and hostname if found, otherwise None.
+            Returns a QuadaRecord containing the resolved IPv6 addresses, or None if resolution fails.
         """
         logger.info(f"Looking for MDNS record, type 'AAAA',  hostname '{hostname}'")
 
-        service_type = MdnsServiceType.OPERATIONAL.value
-        service_info = MdnsAsyncServiceInfo(name=hostname, type_=service_type)
-        mdns_address_info = None
-
-        await service_info.async_request(
+        # Perform AAAA query
+        addr_resolver = AddressResolverIPv6(server=hostname)
+        self._azc.zeroconf.cache.cache.clear()  # Clear the cache to ensure fresh data
+        is_discovered = await addr_resolver.async_request(
             self._azc.zeroconf,
-            timeout=discovery_timeout_sec * 1000,
-            record_type=DNSRecordType.AAAA
-        )
+            timeout=discovery_timeout_sec * 1000)
 
-        for protocols in self._azc.zeroconf.engine.protocols:
-            listener = cast(AsyncListener, protocols)
-            if not listener.data:
-                continue
+        if not is_discovered:
+            logger.warning(f"No AAAA record found for '{hostname}' within {discovery_timeout_sec}s")
+            return None
 
-            dns_incoming = DNSIncoming(listener.data)
-            if not dns_incoming.data:
-                continue
+        # Verify incoming record type is AAAA
+        # self._verify_quada_record(self._azc.zeroconf.engine.protocols)
 
-            answers = dns_incoming.answers()
-            if not answers:
-                continue
-
-            dns_address: DNSAddress = answers.pop(0)
-            mdns_address_info = self._to_mdns_address_info_class(dns_address)
+        # Get IPv6 addresses
+        ipv6_addresses = addr_resolver.ip_addresses_by_version(version=IPVersion.V6Only)
+        if ipv6_addresses:
+            quada_record = QuadaRecord.build(ipv6_addresses)
 
         # Adds service to discovered services
-        if mdns_address_info:
+        if is_discovered:
             self._discovered_services = {}
-            self._discovered_services[service_type] = []
-            self._discovered_services[service_type].append(mdns_address_info)
+            self._discovered_services[hostname] = []
+            for addr in quada_record.addresses:
+                self._discovered_services[hostname].append(addr)
 
             if log_output:
                 self._log_output()
+                
+            return quada_record
 
-        return mdns_address_info
+        return None
 
     # Private methods
     async def _discover(self,
@@ -612,7 +510,6 @@ class MdnsDiscovery:
         """
         # Get service info
         service_info = AsyncServiceInfo(service_type, service_name)
-        service_info.async_clear_cache()
         is_service_discovered = await service_info.async_request(zeroconf, 3000)
 
         if is_service_discovered:
@@ -658,24 +555,6 @@ class MdnsDiscovery:
 
         return mdns_service_info
 
-    def _to_mdns_address_info_class(self, dns_address: DNSAddress) -> MdnsAddressInfo:
-        """
-        Converts a DNSAddress object into an MdnsAddressInfo data class.
-
-        Args:
-            dns_address (DNSAddress): The dns address to convert.
-
-        Returns:
-            MdnsAddressInfo: The converted dns address as a data class.
-        """
-        mdns_address_info = MdnsAddressInfo(
-            hostname=dns_address.name,
-            record_type=dns_address.get_type(dns_address.type),
-            address=str(ipaddress.IPv6Address(dns_address.address))
-        )
-
-        return mdns_address_info
-
     def _get_instance_name(self, service_info: AsyncServiceInfo) -> str:
         if service_info.type:
             return service_info.name[: len(service_info.name) - len(service_info.type) - 1]
@@ -717,6 +596,42 @@ class MdnsDiscovery:
                 return self._discovered_services[service_type.value][0]
         else:
             return None
+
+    @staticmethod
+    def _verify_quada_record(protocols: List[AsyncListener]) -> None:
+        """
+        Verifies that at least one protocol contains a valid DNSAddress of type AAAA.
+
+        Raises:
+            TypeError: If a DNS answer is not a DNSAddress.
+            ValueError: If a DNSAddress is not of type AAAA.
+            LookupError: If no valid AAAA record is found in any protocol.
+        """
+        for protocol in protocols:
+            if not protocol.data:
+                continue
+
+            dns_incoming = DNSIncoming(protocol.data)
+            if not dns_incoming.data:
+                continue
+
+            answers = dns_incoming.answers()
+
+            if not answers:
+                raise ValueError("No answers found in DNS response")
+
+            dns_object = answers.pop(0)
+
+            if not isinstance(dns_object, DNSAddress):
+                continue
+
+            if dns_object.type != _TYPE_AAAA:
+                raise ValueError(f"Expected AAAA (type {_TYPE_AAAA}), got type {dns_object.type}")
+
+            # Valid record found, no need to continue
+            return
+
+        raise LookupError("No valid AAAA DNSAddress found in protocols")
 
     def _log_output(self) -> str:
         """
