@@ -196,6 +196,11 @@ CLUSTER_NAME_FIXES = {0x0036: 'WiFi Network Diagnostics', 0x042a: 'PM25 Concentr
 DEVICE_TYPE_NAME_FIXES = {0x010b: 'Dimmable Plug-In Unit', 0x010a: 'On/Off Plug-in Unit'}
 
 
+# fuzzy match to name because some of the old specs weren't careful here
+def _fuzzy_name(to_fuzz: str):
+    return to_fuzz.lower().strip().replace(' ', '').replace('/', '')
+
+
 def get_location_from_element(element: ElementTree.Element, cluster_id: Optional[int]):
     if cluster_id is None:
         cluster_id = 0
@@ -898,7 +903,7 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                         return
 
                     container = c.find(f'{override_element_type}s')
-                    if not container:
+                    if container is None:
                         return
 
                     elements = container.iter(override_element_type)
@@ -916,16 +921,20 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                                 # It's not actually a problem if there is no conformance override - it might be a constraint override. Just continue
                                 continue
                             conformance_override = parse_device_type_callable_from_xml(conformance_xml)
-                            override[map[name]] = conformance_override
-                        except KeyError as ex:
-                            # The thermostat in particular explicitly disallows some zigbee things that don't appear in the spec due to
-                            # ifdefs. We can ignore problems if the device type spec disallows things that don't exist.
-                            if is_disallowed(conformance_override):
-                                logging.info(
-                                    f"Ignoring unknown {override_element_type} {name} in cluster {cid} because the conformance is disallowed")
-                                continue
-                            problems.append(ProblemNotice("Parse Device Type XML", location=location,
-                                            severity=ProblemSeverity.WARNING, problem=f"Unknown {override_element_type} {name} in cluster {cid} - map = {map} {ex}"))
+
+                            map_id = [map[n] for n in map.keys() if _fuzzy_name(n) == _fuzzy_name(name)]
+                            if len(map_id) == 0:
+                                # The thermostat in particular explicitly disallows some zigbee things that don't appear in the spec due to
+                                # ifdefs. We can ignore problems if the device type spec disallows things that don't exist.
+                                if is_disallowed(conformance_override):
+                                    logging.info(
+                                        f"Ignoring unknown {override_element_type} {name} in cluster {cid} because the conformance is disallowed")
+                                    continue
+                                problems.append(ProblemNotice("Parse Device Type XML", location=location,
+                                                severity=ProblemSeverity.WARNING, problem=f"Unknown {override_element_type} {name} in cluster {cid} - map = {map}"))
+                            else:
+                                override[map_id[0]] = conformance_override
+
                         except ConformanceException as ex:
                             problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                             severity=ProblemSeverity.WARNING, problem=f"Unable to parse {override_element_type} conformance for {name} in cluster {cid}"))
