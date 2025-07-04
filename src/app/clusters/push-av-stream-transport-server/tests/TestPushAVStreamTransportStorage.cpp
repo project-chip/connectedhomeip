@@ -39,14 +39,12 @@ public:
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
-TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
+TEST_F(TestPushAVStreamTransportStorage, TestTransportTriggerOptionsStorage)
 {
     uint8_t tlvBuffer[512];
     TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
     TransportTriggerOptionsDecodableStruct triggerOptions;
     DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> decodedList;
-    TransportOptionsDecodableStruct transportOptions;
-
     /*Test TransportOptionsStorage*/
 
     // Create a TransportMotionTriggerTimeControlStruct object
@@ -181,10 +179,12 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
     EXPECT_EQ(motionZone2Base.zone.Value(), 2);
     EXPECT_TRUE(motionZone2Base.sensitivity.HasValue());
     EXPECT_EQ(motionZone2Base.sensitivity.Value(), 10);
+}
 
-    /*Test CMAFContainerOptionsStorage*/
-
+TEST_F(TestPushAVStreamTransportStorage, TestCMAFContainerOptionsStorage)
+{
     CMAFContainerOptionsStruct cmafContainerOptions;
+    /*Test CMAFContainerOptionsStorage*/
 
     cmafContainerOptions.chunkDuration = 1000;
     cmafContainerOptions.metadataEnabled.SetValue(true);
@@ -197,6 +197,10 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
 
     CMAFContainerOptionsStorage cmafContainerOptionsStorage(cmafContainerOptions);
 
+    // Clear the cencKey and cencKeyID strings to test deep copy of cencKey and cencKeyID
+    cencKey.clear();
+    cencKeyID.clear();
+
     EXPECT_EQ(cmafContainerOptionsStorage.chunkDuration, 1000);
     EXPECT_TRUE(cmafContainerOptionsStorage.metadataEnabled.HasValue());
     EXPECT_TRUE(cmafContainerOptionsStorage.metadataEnabled.Value());
@@ -204,13 +208,13 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
     std::string cencKeyStr(cmafContainerOptionsStorage.CENCKey.Value().data(),
                            cmafContainerOptionsStorage.CENCKey.Value().data() + cmafContainerOptionsStorage.CENCKey.Value().size());
 
-    EXPECT_EQ(cencKeyStr, cencKey);
+    EXPECT_EQ(cencKeyStr, "1234567890ABCDEF");
 
     std::string cencKeyIDStr(cmafContainerOptionsStorage.CENCKeyID.Value().data(),
                              cmafContainerOptionsStorage.CENCKeyID.Value().data() +
                                  cmafContainerOptionsStorage.CENCKeyID.Value().size());
 
-    EXPECT_EQ(cencKeyIDStr, cencKeyID);
+    EXPECT_EQ(cencKeyIDStr, "1234567890ABCDEF");
 
     CMAFContainerOptionsStorage cmafContainerOptionsStorageCopy(cmafContainerOptionsStorage);
 
@@ -222,13 +226,13 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
                                cmafContainerOptionsStorageCopy.CENCKey.Value().data() +
                                    cmafContainerOptionsStorageCopy.CENCKey.Value().size());
 
-    EXPECT_EQ(cencKeyStrCopy, cencKey);
+    EXPECT_EQ(cencKeyStrCopy, "1234567890ABCDEF");
 
     std::string cencKeyIDStrCopy(cmafContainerOptionsStorageCopy.CENCKeyID.Value().data(),
                                  cmafContainerOptionsStorageCopy.CENCKeyID.Value().data() +
                                      cmafContainerOptionsStorageCopy.CENCKeyID.Value().size());
 
-    EXPECT_EQ(cencKeyIDStrCopy, cencKeyID);
+    EXPECT_EQ(cencKeyIDStrCopy, "1234567890ABCDEF");
 
     // Accessing buffer using base struct
 
@@ -241,13 +245,28 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
     std::string cencKeyStrBase(BaseCMAFContainerOptions.CENCKey.Value().data(),
                                BaseCMAFContainerOptions.CENCKey.Value().data() + BaseCMAFContainerOptions.CENCKey.Value().size());
 
-    EXPECT_EQ(cencKeyStrBase, cencKey);
+    EXPECT_EQ(cencKeyStrBase, "1234567890ABCDEF");
 
     std::string cencKeyIDStrBase(BaseCMAFContainerOptions.CENCKeyID.Value().data(),
                                  BaseCMAFContainerOptions.CENCKeyID.Value().data() +
                                      BaseCMAFContainerOptions.CENCKeyID.Value().size());
 
-    EXPECT_EQ(cencKeyIDStrBase, cencKeyID);
+    EXPECT_EQ(cencKeyIDStrBase, "1234567890ABCDEF");
+}
+
+TEST_F(TestPushAVStreamTransportStorage, TestContainerOptionsStorage)
+{
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    /*Test CMAFContainerOptionsStorage*/
+
+    cmafContainerOptions.chunkDuration = 1000;
+    cmafContainerOptions.metadataEnabled.SetValue(true);
+
+    std::string cencKey   = "1234567890ABCDEF";
+    std::string cencKeyID = "1234567890ABCDEF";
+
+    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
+    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
 
     /*Test ContainerOptionsStorage*/
 
@@ -260,6 +279,10 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
 
     ContainerOptionsStorage containerOptionsStorage(containerOptions);
 
+    // Clear the cencKey and cencKeyID strings to test deep copy of cencKey and cencKeyID
+    cencKey.clear();
+    cencKeyID.clear();
+
     EXPECT_EQ(containerOptionsStorage.containerType, ContainerFormatEnum::kCmaf);
     EXPECT_TRUE(containerOptionsStorage.CMAFContainerOptions.HasValue());
     EXPECT_EQ(containerOptionsStorage.CMAFContainerOptions.Value().chunkDuration, 1000);
@@ -270,13 +293,13 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
                                     containerOptionsStorage.CMAFContainerOptions.Value().CENCKey.Value().data() +
                                         containerOptionsStorage.CMAFContainerOptions.Value().CENCKey.Value().size());
 
-    EXPECT_EQ(cencKeyStrContainer, cencKey);
+    EXPECT_EQ(cencKeyStrContainer, "1234567890ABCDEF");
 
     std::string cencKeyIDStrContainer(containerOptionsStorage.CMAFContainerOptions.Value().CENCKeyID.Value().data(),
                                       containerOptionsStorage.CMAFContainerOptions.Value().CENCKeyID.Value().data() +
                                           containerOptionsStorage.CMAFContainerOptions.Value().CENCKeyID.Value().size());
 
-    EXPECT_EQ(cencKeyIDStrContainer, cencKeyID);
+    EXPECT_EQ(cencKeyIDStrContainer, "1234567890ABCDEF");
 
     ContainerOptionsStorage containerOptionsStorageCopy(containerOptionsStorage);
 
@@ -290,13 +313,13 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
                                         containerOptionsStorageCopy.CMAFContainerOptions.Value().CENCKey.Value().data() +
                                             containerOptionsStorageCopy.CMAFContainerOptions.Value().CENCKey.Value().size());
 
-    EXPECT_EQ(cencKeyStrContainerCopy, cencKey);
+    EXPECT_EQ(cencKeyStrContainerCopy, "1234567890ABCDEF");
 
     std::string cencKeyIDStrContainerCopy(containerOptionsStorageCopy.CMAFContainerOptions.Value().CENCKeyID.Value().data(),
                                           containerOptionsStorageCopy.CMAFContainerOptions.Value().CENCKeyID.Value().data() +
                                               containerOptionsStorageCopy.CMAFContainerOptions.Value().CENCKeyID.Value().size());
 
-    EXPECT_EQ(cencKeyIDStrContainerCopy, cencKeyID);
+    EXPECT_EQ(cencKeyIDStrContainerCopy, "1234567890ABCDEF");
 
     // Accessing buffer using base struct
 
@@ -312,13 +335,92 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
                                         BaseContainerOptions.CMAFContainerOptions.Value().CENCKey.Value().data() +
                                             BaseContainerOptions.CMAFContainerOptions.Value().CENCKey.Value().size());
 
-    EXPECT_EQ(containerCENCKeyStrBase, cencKey);
+    EXPECT_EQ(containerCENCKeyStrBase, "1234567890ABCDEF");
 
     std::string containerCENCKeyIDStrBase(BaseContainerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().data(),
                                           BaseContainerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().data() +
                                               BaseContainerOptions.CMAFContainerOptions.Value().CENCKeyID.Value().size());
 
-    EXPECT_EQ(containerCENCKeyIDStrBase, cencKeyID);
+    EXPECT_EQ(containerCENCKeyIDStrBase, "1234567890ABCDEF");
+}
+
+TEST_F(TestPushAVStreamTransportStorage, TestTransportOptionsStorage)
+{
+    uint8_t tlvBuffer[512];
+    TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> decodedList;
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    ContainerOptionsStruct containerOptions;
+    TransportOptionsDecodableStruct transportOptions;
+
+    /*Test TransportOptionsStorage*/
+
+    // Create a TransportMotionTriggerTimeControlStruct object
+    motionTimeControl.initialDuration      = 5000;
+    motionTimeControl.augmentationDuration = 2000;
+    motionTimeControl.maxDuration          = 30000;
+    motionTimeControl.blindDuration        = 1000;
+
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kMotion;
+
+    // Create transport zone options structs
+    Structs::TransportZoneOptionsStruct::Type zone1;
+    zone1.zone.SetNonNull(1);
+    zone1.sensitivity.SetValue(5);
+
+    Structs::TransportZoneOptionsStruct::Type zone2;
+    zone2.zone.SetNonNull(2);
+    zone2.sensitivity.SetValue(10);
+
+    // Encode them into a TLV buffer
+    TLV::TLVWriter writer;
+    writer.Init(tlvBuffer, sizeof(tlvBuffer));
+
+    TLV::TLVWriter containerWriter;
+    CHIP_ERROR err;
+
+    err = writer.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = DataModel::Encode(containerWriter, TLV::AnonymousTag(), zone1);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = DataModel::Encode(containerWriter, TLV::AnonymousTag(), zone2);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = writer.CloseContainer(containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    size_t encodedLen = writer.GetLengthWritten();
+
+    // Decode the TLV into a DecodableList
+    TLV::TLVReader reader;
+    reader.Init(tlvBuffer, static_cast<uint32_t>(encodedLen));
+    err = reader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = decodedList.Decode(reader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    triggerOptions.motionZones.SetValue(DataModel::MakeNullable(decodedList));
+    triggerOptions.motionSensitivity.SetValue(DataModel::MakeNullable((uint8_t) 5));
+    triggerOptions.motionTimeControl.SetValue(motionTimeControl);
+    triggerOptions.maxPreRollLen.SetValue(1000);
+
+    /*Test CMAFContainerOptionsStorage*/
+
+    cmafContainerOptions.chunkDuration = 1000;
+    cmafContainerOptions.metadataEnabled.SetValue(true);
+
+    std::string cencKey   = "1234567890ABCDEF";
+    std::string cencKeyID = "1234567890ABCDEF";
+
+    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
+    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
+
+    containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
 
     /*Test TransportOptionsStorage*/
     triggerOptions.triggerType = TransportTriggerTypeEnum::kMotion;
@@ -341,13 +443,15 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
 
     TransportOptionsStorage transportOptionsStorage(transportOptions);
 
+    url.clear(); // Clear the url string to test deep copy of url
+
     EXPECT_EQ(transportOptionsStorage.streamUsage, StreamUsageEnum::kAnalysis);
     EXPECT_EQ(transportOptionsStorage.videoStreamID.Value(), (uint16_t) 1);
     EXPECT_EQ(transportOptionsStorage.audioStreamID.Value(), (uint16_t) 2);
     EXPECT_EQ(transportOptionsStorage.endpointID, 1);
-    EXPECT_EQ(transportOptionsStorage.url.size(), url.size());
+
     std::string transportOptionsUrlStr(transportOptionsStorage.url.data(), transportOptionsStorage.url.size());
-    EXPECT_EQ(transportOptionsUrlStr, url);
+    EXPECT_EQ(transportOptionsUrlStr, "rtsp://192.168.1.100:554/stream");
 
     TransportOptionsStorage transportOptionsStorageCopy(transportOptionsStorage);
 
@@ -355,9 +459,9 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
     EXPECT_EQ(transportOptionsStorageCopy.videoStreamID.Value(), (uint16_t) 1);
     EXPECT_EQ(transportOptionsStorageCopy.audioStreamID.Value(), (uint16_t) 2);
     EXPECT_EQ(transportOptionsStorageCopy.endpointID, 1);
-    EXPECT_EQ(transportOptionsStorageCopy.url.size(), url.size());
+
     std::string transportOptionsUrlStrCopy(transportOptionsStorageCopy.url.data(), transportOptionsStorageCopy.url.size());
-    EXPECT_EQ(transportOptionsUrlStrCopy, url);
+    EXPECT_EQ(transportOptionsUrlStrCopy, "rtsp://192.168.1.100:554/stream");
 
     // Accessing buffer using base struct
 
@@ -367,9 +471,107 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
     EXPECT_EQ(BaseTransportOptions.videoStreamID.Value(), (uint16_t) 1);
     EXPECT_EQ(BaseTransportOptions.audioStreamID.Value(), (uint16_t) 2);
     EXPECT_EQ(BaseTransportOptions.endpointID, 1);
-    EXPECT_EQ(BaseTransportOptions.url.size(), url.size());
+
     std::string transportOptionsUrlStrBase(BaseTransportOptions.url.data(), BaseTransportOptions.url.size());
-    EXPECT_EQ(transportOptionsUrlStrBase, url);
+    EXPECT_EQ(transportOptionsUrlStrBase, "rtsp://192.168.1.100:554/stream");
+}
+
+TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
+{
+    uint8_t tlvBuffer[512];
+    TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    DataModel::DecodableList<Structs::TransportZoneOptionsStruct::DecodableType> decodedList;
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    ContainerOptionsStruct containerOptions;
+    TransportOptionsDecodableStruct transportOptions;
+
+    /*Test TransportOptionsStorage*/
+
+    // Create a TransportMotionTriggerTimeControlStruct object
+    motionTimeControl.initialDuration      = 5000;
+    motionTimeControl.augmentationDuration = 2000;
+    motionTimeControl.maxDuration          = 30000;
+    motionTimeControl.blindDuration        = 1000;
+
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kMotion;
+
+    // Create transport zone options structs
+    Structs::TransportZoneOptionsStruct::Type zone1;
+    zone1.zone.SetNonNull(1);
+    zone1.sensitivity.SetValue(5);
+
+    Structs::TransportZoneOptionsStruct::Type zone2;
+    zone2.zone.SetNonNull(2);
+    zone2.sensitivity.SetValue(10);
+
+    // Encode them into a TLV buffer
+    TLV::TLVWriter writer;
+    writer.Init(tlvBuffer, sizeof(tlvBuffer));
+
+    TLV::TLVWriter containerWriter;
+    CHIP_ERROR err;
+
+    err = writer.OpenContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = DataModel::Encode(containerWriter, TLV::AnonymousTag(), zone1);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = DataModel::Encode(containerWriter, TLV::AnonymousTag(), zone2);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = writer.CloseContainer(containerWriter);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    size_t encodedLen = writer.GetLengthWritten();
+
+    // Decode the TLV into a DecodableList
+    TLV::TLVReader reader;
+    reader.Init(tlvBuffer, static_cast<uint32_t>(encodedLen));
+    err = reader.Next();
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    err = decodedList.Decode(reader);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    triggerOptions.motionZones.SetValue(DataModel::MakeNullable(decodedList));
+    triggerOptions.motionSensitivity.SetValue(DataModel::MakeNullable((uint8_t) 5));
+    triggerOptions.motionTimeControl.SetValue(motionTimeControl);
+    triggerOptions.maxPreRollLen.SetValue(1000);
+
+    /*Test CMAFContainerOptionsStorage*/
+
+    cmafContainerOptions.chunkDuration = 1000;
+    cmafContainerOptions.metadataEnabled.SetValue(true);
+
+    std::string cencKey   = "1234567890ABCDEF";
+    std::string cencKeyID = "1234567890ABCDEF";
+
+    cmafContainerOptions.CENCKey.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKey.c_str()), cencKey.size()));
+    cmafContainerOptions.CENCKeyID.SetValue(ByteSpan(reinterpret_cast<const uint8_t *>(cencKeyID.c_str()), cencKeyID.size()));
+
+    containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+
+    /*Test TransportOptionsStorage*/
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kMotion;
+    triggerOptions.motionZones.SetValue(DataModel::MakeNullable(decodedList));
+
+    triggerOptions.motionSensitivity.SetValue(DataModel::MakeNullable((uint8_t) 5));
+    triggerOptions.motionTimeControl.SetValue(motionTimeControl);
+    triggerOptions.maxPreRollLen.SetValue(1000);
+
+    transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
+    transportOptions.videoStreamID.SetValue(1);
+    transportOptions.audioStreamID.SetValue(2);
+    transportOptions.endpointID       = 1;
+    std::string url                   = "rtsp://192.168.1.100:554/stream";
+    transportOptions.url              = Span(url.data(), url.size());
+    transportOptions.triggerOptions   = triggerOptions;
+    transportOptions.ingestMethod     = IngestMethodsEnum::kCMAFIngest;
+    transportOptions.containerOptions = containerOptions;
+    transportOptions.expiryTime.SetValue(1000);
 
     /*Test TransportConfigurationStorage*/
 
@@ -377,16 +579,18 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
 
     TransportConfigurationStorage transportConfigurationStorage(1, transportOptionsPtr);
 
+    url.clear(); // Clear the url string to test deep copy of url
+
     EXPECT_EQ(transportConfigurationStorage.connectionID, 1);
     EXPECT_EQ(transportConfigurationStorage.transportStatus, TransportStatusEnum::kInactive);
     EXPECT_EQ(transportConfigurationStorage.transportOptions.Value().streamUsage, StreamUsageEnum::kAnalysis);
     EXPECT_EQ(transportConfigurationStorage.transportOptions.Value().videoStreamID.Value(), (uint16_t) 1);
     EXPECT_EQ(transportConfigurationStorage.transportOptions.Value().audioStreamID.Value(), (uint16_t) 2);
     EXPECT_EQ(transportConfigurationStorage.transportOptions.Value().endpointID, 1);
-    EXPECT_EQ(transportConfigurationStorage.transportOptions.Value().url.size(), url.size());
+
     std::string transportOptionsUrlStrConfiguration(transportConfigurationStorage.transportOptions.Value().url.data(),
                                                     transportConfigurationStorage.transportOptions.Value().url.size());
-    EXPECT_EQ(transportOptionsUrlStrConfiguration, url);
+    EXPECT_EQ(transportOptionsUrlStrConfiguration, "rtsp://192.168.1.100:554/stream");
 
     TransportConfigurationStorage transportConfigurationStorageCopy(transportConfigurationStorage);
 
@@ -396,10 +600,10 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
     EXPECT_EQ(transportConfigurationStorageCopy.transportOptions.Value().videoStreamID.Value(), (uint16_t) 1);
     EXPECT_EQ(transportConfigurationStorageCopy.transportOptions.Value().audioStreamID.Value(), (uint16_t) 2);
     EXPECT_EQ(transportConfigurationStorageCopy.transportOptions.Value().endpointID, 1);
-    EXPECT_EQ(transportConfigurationStorageCopy.transportOptions.Value().url.size(), url.size());
+
     std::string transportOptionsUrlStrConfigurationCopy(transportConfigurationStorageCopy.transportOptions.Value().url.data(),
                                                         transportConfigurationStorageCopy.transportOptions.Value().url.size());
-    EXPECT_EQ(transportOptionsUrlStrConfigurationCopy, url);
+    EXPECT_EQ(transportOptionsUrlStrConfigurationCopy, "rtsp://192.168.1.100:554/stream");
 
     // Accessing buffer using base struct
 
@@ -412,10 +616,10 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportConfigurationStorage)
     EXPECT_EQ(BaseTransportConfiguration.transportOptions.Value().videoStreamID.Value(), (uint16_t) 1);
     EXPECT_EQ(BaseTransportConfiguration.transportOptions.Value().audioStreamID.Value(), (uint16_t) 2);
     EXPECT_EQ(BaseTransportConfiguration.transportOptions.Value().endpointID, 1);
-    EXPECT_EQ(BaseTransportConfiguration.transportOptions.Value().url.size(), url.size());
+
     std::string transportOptionsUrlStrConfigurationBase(BaseTransportConfiguration.transportOptions.Value().url.data(),
                                                         BaseTransportConfiguration.transportOptions.Value().url.size());
-    EXPECT_EQ(transportOptionsUrlStrConfigurationBase, url);
+    EXPECT_EQ(transportOptionsUrlStrConfigurationBase, "rtsp://192.168.1.100:554/stream");
 
     /*Test TransportConfigurationStorage with null transport options*/
 
