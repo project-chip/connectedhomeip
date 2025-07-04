@@ -48,10 +48,7 @@ def main_state_matcher(main_state: Clusters.ClosureControl.Enums.MainStateEnum) 
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureControl.Attributes.MainState:
             return False
-        if report.value == main_state:
-            return True
-        else:
-            return False
+        return report.value == main_state
     return AttributeMatcher.from_callable(description=f"MainState is {main_state}", matcher=predicate)
 
 
@@ -59,10 +56,7 @@ def current_position_matcher(current_position: Clusters.ClosureControl.Enums.Cur
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureControl.Attributes.OverallCurrentState:
             return False
-        if report.value.position == current_position:
-            return True
-        else:
-            return False
+        return report.value.position == current_position
     return AttributeMatcher.from_callable(description=f"OverallCurrentState.Position is {current_position}", matcher=predicate)
 
 
@@ -70,10 +64,7 @@ def current_latch_matcher(current_latch: bool) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureControl.Attributes.OverallCurrentState:
             return False
-        if report.value.latch == current_latch:
-            return True
-        else:
-            return False
+        return report.value.latch == current_latch
     return AttributeMatcher.from_callable(description=f"OverallCurrentState.Latch is {current_latch}", matcher=predicate)
 
 
