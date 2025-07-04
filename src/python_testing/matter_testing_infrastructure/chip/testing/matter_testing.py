@@ -492,6 +492,11 @@ class MatterBaseTest(base_test.BaseTestClass):
     #
 
     def setup_class(self):
+        """Set up the test class before running any tests.
+
+        Initializes cluster mapping, step tracking, and global test state.
+        Called once per test class by the Mobly framework.
+        """
         super().setup_class()
 
         # Mappings of cluster IDs to names and metadata.
@@ -517,6 +522,11 @@ class MatterBaseTest(base_test.BaseTestClass):
         super().teardown_class()
 
     def setup_test(self):
+        """Set up for each individual test execution.
+
+        Resets test state, starts timers, and notifies runner hooks.
+        Called before each test method by the Mobly framework.
+        """
         self.current_step_index = 0
         self.test_start_time = datetime.now(timezone.utc)
         self.step_start_time = datetime.now(timezone.utc)
@@ -537,10 +547,11 @@ class MatterBaseTest(base_test.BaseTestClass):
                 self.step(1)
 
     def on_fail(self, record):
-        ''' Called by Mobly on test failure
+        """Handle test failure callback from Mobly framework.
 
-            record is of type TestResultRecord
-        '''
+        Args:
+            record: TestResultRecord containing failure information.
+        """
         self.failed = True
         if self.runner_hook and not self.is_commissioning:
             exception = record.termination_signal.exception
@@ -606,10 +617,11 @@ class MatterBaseTest(base_test.BaseTestClass):
                                           """))
 
     def on_pass(self, record):
-        ''' Called by Mobly on test pass
+        """Handle test success callback from Mobly framework.
 
-            record is of type TestResultRecord
-        '''
+        Args:
+            record: TestResultRecord containing test results.
+        """
         if self.runner_hook and not self.is_commissioning:
             # What is request? This seems like an implementation detail for the runner
             # TODO: As with failure, I have no idea what logger, logs or request are meant to be
@@ -633,10 +645,11 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.runner_hook.test_stop(exception=None, duration=test_duration)
 
     def on_skip(self, record):
-        ''' Called by Mobly on test skip
+        """Handle test skip callback from Mobly framework.
 
-            record is of type TestResultRecord
-        '''
+        Args:
+            record: TestResultRecord containing skip information.
+        """
         if self.runner_hook and not self.is_commissioning:
             test_duration = (datetime.now(timezone.utc) - self.test_start_time) / timedelta(microseconds=1)
             test_name = self.current_test_info.name
@@ -767,6 +780,14 @@ class MatterBaseTest(base_test.BaseTestClass):
         return [] if pics is None else pics
 
     def _get_defined_pics(self, test: str) -> Optional[list[str]]:
+        """Retrieve PICS list from a 'pics_*' function if it exists.
+
+        Args:
+            test: Name of the test to get PICS for.
+
+        Returns:
+            List of PICS strings if pics function exists, None otherwise.
+        """
         steps_name = f'pics_{test.removeprefix("test_")}'
         try:
             fn = getattr(self, steps_name)
@@ -799,6 +820,16 @@ class MatterBaseTest(base_test.BaseTestClass):
     #
 
     def step(self, step: typing.Union[int, str]):
+        """Execute a test step and manage step progression.
+
+        Validates step order, prints step information, and notifies runner hooks.
+
+        Args:
+            step: The step number or identifier to execute.
+
+        Raises:
+            AssertionError: If steps are called out of order or step doesn't exist.
+        """
         test_name = self.current_test_info.name
         steps = self.get_test_steps(test_name)
 
@@ -825,13 +856,25 @@ class MatterBaseTest(base_test.BaseTestClass):
         self.step_skipped = False
 
     def print_step(self, stepnum: typing.Union[int, str], title: str) -> None:
+        """Print test step information to logs.
+
+        Args:
+            stepnum: The step number or identifier.
+            title: The descriptive title of the step.
+        """
         logging.info(f'***** Test Step {stepnum} : {title}')
 
     def skip_step(self, step):
+        """Execute and immediately mark a step as skipped.
+
+        Args:
+            step: The step number or identifier to skip.
+        """
         self.step(step)
         self.mark_current_step_skipped()
 
     def mark_current_step_skipped(self):
+        """Mark the current step as skipped and log the skip."""
         try:
             steps = self.get_test_steps(self.current_test_info.name)
             if self.current_step_index == 0:
@@ -909,6 +952,14 @@ class MatterBaseTest(base_test.BaseTestClass):
     #
 
     def check_pics(self, pics_key: str) -> bool:
+        """Check if a PICS (Protocol Implementation Conformance Statement) key is enabled.
+
+        Args:
+            pics_key: The PICS key to check.
+
+        Returns:
+            True if the PICS key is enabled, False otherwise.
+        """
         return self.matter_test_config.pics.get(pics_key.strip(), False)
 
     def pics_guard(self, pics_condition: bool):
@@ -997,6 +1048,14 @@ class MatterBaseTest(base_test.BaseTestClass):
     #
 
     async def commission_devices(self) -> bool:
+        """Commission all configured DUT devices.
+
+        Uses the default controller to commission devices based on setup payloads
+        and commissioning configuration.
+
+        Returns:
+            True if commissioning succeeded, False otherwise.
+        """
         dev_ctrl: ChipDeviceCtrl.ChipDeviceController = self.default_controller
         dut_node_ids: List[int] = self.matter_test_config.dut_node_ids
         setup_payloads: List[SetupPayloadInfo] = self.get_setup_payload_info()
@@ -1013,6 +1072,19 @@ class MatterBaseTest(base_test.BaseTestClass):
         return await commission_devices(dev_ctrl, dut_node_ids, setup_payloads, commissioning_info)
 
     async def open_commissioning_window(self, dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, timeout: int = 900) -> CustomCommissioningParameters:
+        """Open a commissioning window on the target device.
+
+        Args:
+            dev_ctrl: Device controller to use, defaults to default_controller.
+            node_id: Node ID of target device, defaults to dut_node_id.
+            timeout: Commissioning window timeout in seconds.
+
+        Returns:
+            Custom commissioning parameters for the opened window.
+
+        Raises:
+            AssertionError: If opening the commissioning window fails.
+        """
         rnd_discriminator = random.randint(0, 4095)
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
@@ -1029,6 +1101,18 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     async def read_single_attribute(
             self, dev_ctrl: ChipDeviceCtrl.ChipDeviceController, node_id: int, endpoint: int, attribute: object, fabricFiltered: bool = True) -> object:
+        """Read a single attribute value from a device.
+
+        Args:
+            dev_ctrl: Device controller to use for the read operation.
+            node_id: Node ID of the target device.
+            endpoint: Endpoint ID where the attribute resides.
+            attribute: The attribute to read.
+            fabricFiltered: Whether to apply fabric filtering.
+
+        Returns:
+            The attribute value.
+        """
         result = await dev_ctrl.ReadAttribute(node_id, [(endpoint, attribute)], fabricFiltered=fabricFiltered)
         data = result[endpoint]
         return list(data.values())[0][attribute]
@@ -1193,6 +1277,19 @@ class MatterBaseTest(base_test.BaseTestClass):
             dev_ctrl: Optional[ChipDeviceCtrl.ChipDeviceController] = None, node_id: Optional[int] = None, endpoint: Optional[int] = None,
             timedRequestTimeoutMs: typing.Union[None, int] = None,
             payloadCapability: int = ChipDeviceCtrl.TransportPayloadCapability.MRP_PAYLOAD) -> object:
+        """Send a single command to a Matter device.
+
+        Args:
+            cmd: The cluster command to send.
+            dev_ctrl: Device controller, defaults to default_controller.
+            node_id: Target node ID, defaults to dut_node_id.
+            endpoint: Target endpoint, defaults to configured endpoint.
+            timedRequestTimeoutMs: Timeout for timed requests in milliseconds.
+            payloadCapability: Transport payload capability setting.
+
+        Returns:
+            Command response object.
+        """
         if dev_ctrl is None:
             dev_ctrl = self.default_controller
         if node_id is None:
@@ -1240,7 +1337,17 @@ class MatterBaseTest(base_test.BaseTestClass):
         asserts.assert_equal(test_event_enabled, True, "TestEventTriggersEnabled is False")
 
     def _update_legacy_test_event_triggers(self, eventTrigger: int) -> int:
-        """ This function updates eventTriged if legacy flag is activated. """
+        """Update event trigger if legacy flag is set.
+
+        Args:
+            eventTrigger: The base event trigger value.
+
+        Returns:
+            Updated event trigger with endpoint information.
+
+        Raises:
+            ValueError: If target endpoint is out of valid range.
+        """
         target_endpoint = 0
 
         if self.matter_test_config.legacy:
@@ -1265,12 +1372,36 @@ class MatterBaseTest(base_test.BaseTestClass):
     #
 
     def record_error(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
+        """Record an error-level problem during test execution.
+
+        Args:
+            test_name: Name of the test where the problem occurred.
+            location: Location information for the problem.
+            problem: Description of the problem.
+            spec_location: Specification reference (optional).
+        """
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.ERROR, problem, spec_location))
 
     def record_warning(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
+        """Record a warning-level problem during test execution.
+
+        Args:
+            test_name: Name of the test where the problem occurred.
+            location: Location information for the problem.
+            problem: Description of the problem.
+            spec_location: Specification reference (optional).
+        """
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.WARNING, problem, spec_location))
 
     def record_note(self, test_name: str, location: ProblemLocation, problem: str, spec_location: str = ""):
+        """Record a note-level problem during test execution.
+
+        Args:
+            test_name: Name of the test where the problem occurred.
+            location: Location information for the problem.
+            problem: Description of the problem.
+            spec_location: Specification reference (optional).
+        """
         self.problems.append(ProblemNotice(test_name, location, ProblemSeverity.NOTE, problem, spec_location))
 
     def wait_for_user_input(self,
