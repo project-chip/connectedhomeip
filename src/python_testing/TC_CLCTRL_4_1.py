@@ -49,10 +49,7 @@ def main_state_matcher(main_state: Clusters.ClosureControl.Enums.MainStateEnum) 
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureControl.Attributes.MainState:
             return False
-        if report.value == main_state:
-            return True
-        else:
-            return False
+        return report.value == main_state
     return AttributeMatcher.from_callable(description=f"MainState is {main_state}", matcher=predicate)
 
 
@@ -60,10 +57,7 @@ def current_position_matcher(current_position: Clusters.ClosureControl.Enums.Cur
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureControl.Attributes.OverallCurrentState:
             return False
-        if report.value.position == current_position:
-            return True
-        else:
-            return False
+        return report.value.position == current_position
     return AttributeMatcher.from_callable(description=f"OverallCurrentState.Position is {current_position}", matcher=predicate)
 
 
@@ -71,10 +65,7 @@ def current_speed_matcher(current_speed: Clusters.Globals.Enums.ThreeLevelAutoEn
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureControl.Attributes.OverallCurrentState:
             return False
-        if report.value.speed == current_speed:
-            return True
-        else:
-            return False
+        return report.value.speed == current_speed
     return AttributeMatcher.from_callable(description=f"OverallCurrentState.speed is {current_speed}", matcher=predicate)
 
 
@@ -82,10 +73,7 @@ def current_latch_matcher(current_latch: bool) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureControl.Attributes.OverallCurrentState:
             return False
-        if report.value.latch == current_latch:
-            return True
-        else:
-            return False
+        return report.value.latch == current_latch
     return AttributeMatcher.from_callable(description=f"OverallCurrentState.Latch is {current_latch}", matcher=predicate)
 
 
@@ -255,14 +243,12 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             if overall_current_state is None:
                 logging.error("OverallCurrentState is None")
                 asserts.assert_true(False, "OverallCurrentState is None.")
-                return
 
             CurrentPosition = overall_current_state.position
             asserts.assert_in(CurrentPosition, Clusters.ClosureControl.Enums.CurrentPositionEnum,
                               "OverallCurrentState.position is not in the expected range")
         else:
             asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
-            return
 
         # STEP 3b: If CurrentPosition = FullyClosed, skip steps 3c to 3d
         self.step("3b")
@@ -281,7 +267,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                ), endpoint=endpoint)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -309,13 +295,11 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 if overall_current_state is None:
                     logging.error("OverallCurrentState is None")
                     asserts.assert_true(False, "OverallCurrentState is None.")
-                    return
 
                 CurrentLatch = overall_current_state.latch
                 asserts.assert_in(CurrentLatch, [True, False], "OverallCurrentState.latch is not in the expected range")
             else:
                 asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
-                return
 
             # STEP 3g: If the attribute is supported on the cluster, TH reads from the DUT the LatchControlModes attribute
             self.step("3g")
@@ -328,7 +312,6 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                     logging.error("LatchControlModes is None")
             else:
                 asserts.assert_true(False, "LatchControlModes attribute is not supported.")
-                return
 
             # STEP 3h: If CurrentLatch = True, skip steps 3i to 3m
             self.step("3h")
@@ -356,7 +339,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                     try:
                         await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                             latch=True
-                        ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                        ), endpoint=endpoint)
                     except InteractionModelError as e:
                         asserts.assert_equal(
                             e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -388,12 +371,10 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                     if overall_current_state is None:
                         logging.error("OverallCurrentState is None")
                         asserts.assert_true(False, "OverallCurrentState is None.")
-                        return
 
                     asserts.assert_true(overall_current_state.latch, "OverallCurrentState.latch is not True")
                 else:
                     asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
-                    return
 
             # STEP 3n: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
             self.step("3n")
@@ -405,7 +386,6 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                                     "MainState is not in the expected state")
             else:
                 asserts.assert_true(False, "MainState attribute is not supported.")
-                return
 
             # STEP 4a: TH sends command MoveTo with Position = MoveToFullyOpen
             self.step("4a")
@@ -413,7 +393,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                ), endpoint=endpoint)
                 asserts.fail("Expected InvalidInState error, but command succeeded.")
             except InteractionModelError as e:
                 asserts.assert_equal(
@@ -433,7 +413,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 try:
                     await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                         latch=False
-                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                    ), endpoint=endpoint)
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -500,14 +480,12 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 if overall_current_state is None:
                     logging.error("OverallCurrentState is None")
                     asserts.assert_true(False, "OverallCurrentState is None.")
-                    return
 
                 CurrentSpeed = overall_current_state.speed
                 asserts.assert_in(CurrentSpeed, Clusters.Globals.Enums.ThreeLevelAutoEnum,
                                   "OverallCurrentState.speed is not in the expected range")
             else:
                 asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
-                return
 
             # STEP 6c: If CurrentSpeed = Low, skip steps 6d to 6e
             self.step("6c")
@@ -528,7 +506,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 try:
                     await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                         speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow
-                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                    ), endpoint=endpoint)
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -548,7 +526,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         try:
             await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                 position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToSignaturePosition,
-            ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+            ), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -564,7 +542,6 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                                  "OverallTarget.position is not MoveToSignaturePosition")
         else:
             asserts.assert_true(False, "OverallTargetState attribute is not supported.")
-            return
 
         # STEP 7c: Wait until TH receives a subscription report with OverallCurrentState.Position = OpenedAtSignature
         self.step("7c")
@@ -599,7 +576,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToVentilationPosition,
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                ), endpoint=endpoint)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -615,7 +592,6 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                                      "OverallTargetState.position is not MoveToVentilationPosition")
             else:
                 asserts.assert_true(False, "OverallTargetState attribute is not supported.")
-                return
 
             # STEP 8d: Wait until TH receives a subscription report with OverallCurrentState.Position = OpenedForVentilation
             self.step("8d")
@@ -650,7 +626,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToPedestrianPosition,
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                ), endpoint=endpoint)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -666,7 +642,6 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                                      "OverallTarget.position is not MoveToPedestrianPosition")
             else:
                 asserts.assert_true(False, "OverallTargetState attribute is not supported.")
-                return
 
             # STEP 9d: Wait until TH receives a subscription report with OverallCurrentState.Position = OpenedForPedestrian
             self.step("9d")
@@ -689,7 +664,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         try:
             await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                 position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-            ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+            ), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -705,7 +680,6 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                                  "OverallTargetState.position is not MoveToFullyOpen")
         else:
             asserts.assert_true(False, "OverallTargetState attribute is not supported.")
-            return
 
         # STEP 10c: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyOpened
         self.step("10c")
@@ -728,7 +702,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         try:
             await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                 position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
-            ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+            ), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -744,7 +718,6 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                                  "OverallTargetState.position is not MoveToFullyClosed")
         else:
             asserts.assert_true(False, "OverallTargetState attribute is not supported.")
-            return
 
         # STEP 11c: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed
         self.step("11c")
@@ -781,7 +754,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                ), endpoint=endpoint)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -797,7 +770,6 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                                      "OverallTargetState.speed is not High")
             else:
                 asserts.assert_true(False, "OverallTargetState attribute is not supported.")
-                return
 
             # STEP 12d: Wait until TH receives a subscription report with OverallCurrentState.Speed = High
             self.step("12d")
@@ -813,7 +785,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                ), endpoint=endpoint)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -829,7 +801,6 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                                      "OverallTargetState.speed is not Low")
             else:
                 asserts.assert_true(False, "OverallTargetState attribute is not supported.")
-                return
 
             # STEP 12g: Wait until TH receives a subscription report with OverallCurrentState.Speed = Low
             self.step("12g")
@@ -862,7 +833,6 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                                      "MainState is not Protected")
             else:
                 asserts.assert_true(False, "MainState attribute is not supported.")
-                return
 
             # STEP 13d: TH sends command MoveTo with Position = MoveToFullyOpen
             self.step("13d")
@@ -870,7 +840,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                ), endpoint=endpoint)
                 asserts.fail("Expected InvalidInState error, but command succeeded.")
             except InteractionModelError as e:
                 asserts.assert_equal(
@@ -895,11 +865,8 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 logging.info(f"MainState: {main_state}")
                 is_stopped = main_state == Clusters.ClosureControl.Enums.MainStateEnum.kStopped
                 asserts.assert_true(is_stopped, "MainState is not in the expected state")
-                if is_stopped:
-                    logging.info("MainState is in the stopped state")
             else:
                 asserts.assert_true(False, "MainState attribute is not supported.")
-                return
         else:
             logging.info("Position feature not supported, skipping steps 13b to 13f")
             self.skip_step("13b")
@@ -932,7 +899,6 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                                      "MainState is not Disengaged")
             else:
                 asserts.assert_true(False, "MainState attribute is not supported.")
-                return
 
             # STEP 14d: TH sends command MoveTo with Position = MoveToFullyOpen
             self.step("14d")
@@ -940,7 +906,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                ), endpoint=endpoint)
                 asserts.fail("Expected InvalidInState error, but command succeeded.")
             except InteractionModelError as e:
                 asserts.assert_equal(
@@ -965,11 +931,8 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 logging.info(f"MainState: {main_state}")
                 is_stopped = main_state == Clusters.ClosureControl.Enums.MainStateEnum.kStopped
                 asserts.assert_true(is_stopped, "MainState is not in the expected state")
-                if is_stopped:
-                    logging.info("MainState is in the stopped state")
             else:
                 asserts.assert_true(False, "MainState attribute is not supported.")
-                return
         else:
             logging.info("ManuallyOperable feature not supported, skipping steps 14b to 14f")
             self.skip_step("14b")
@@ -989,7 +952,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     postion=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                ), endpoint=endpoint)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -1005,7 +968,6 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                                      "OverallTargetState.position is not MoveToFullyOpen")
             else:
                 asserts.assert_true(False, "OverallTargetState attribute is not supported.")
-                return
 
             # STEP 15d: If the attribute is supported on the cluster, wait 2 seconds and TH reads from the DUT the OverallCurrentState.Position = FullyOpened.
             self.step("15d")
@@ -1019,14 +981,12 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 if overall_current_state is None:
                     logging.error("OverallCurrentState is None")
                     asserts.assert_true(False, "OverallCurrentState is None.")
-                    return
 
                 logging.info(f"OverallCurrentState: {overall_current_state}")
                 asserts.assert_equal(overall_current_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyOpened,
                                      "OverallCurrentState.position is not FullyOpened")
             else:
                 asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
-                return
 
             # STEP 15e: Wait until TH receives a subscription report with MainState = Stopped.
             self.step("15e")
@@ -1042,7 +1002,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                ), endpoint=endpoint)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -1058,7 +1018,6 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                                      "OverallTargetState.position is not MoveToFullyClosed")
             else:
                 asserts.assert_true(False, "OverallTargetState attribute is not supported.")
-                return
 
             # STEP 15h: If the attribute is supported on the cluster, wait 2 secounds and TH reads from the DUT the OverallCurrentState.Position = FullyClosed.
             self.step("15h")
@@ -1071,14 +1030,12 @@ class TC_CLCTRL_4_1(MatterBaseTest):
                 if overall_current_state is None:
                     logging.error("OverallCurrentState is None")
                     asserts.assert_true(False, "OverallCurrentState is None.")
-                    return
 
                 logging.info(f"OverallCurrentState: {overall_current_state}")
                 asserts.assert_equal(overall_current_state.position, Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyClosed,
                                      "OverallCurrentState.position is not FullyClosed")
             else:
                 asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
-                return
 
             # STEP 15i: Wait until TH receives a subscription report with MainState = Stopped.
             self.step("15i")

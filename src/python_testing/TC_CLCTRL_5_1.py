@@ -37,7 +37,6 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
 from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
@@ -49,10 +48,7 @@ def main_state_matcher(main_state: Clusters.ClosureControl.Enums.MainStateEnum) 
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureControl.Attributes.MainState:
             return False
-        if report.value == main_state:
-            return True
-        else:
-            return False
+        return report.value == main_state
     return AttributeMatcher.from_callable(description=f"MainState is {main_state}", matcher=predicate)
 
 
@@ -60,10 +56,7 @@ def current_position_matcher(current_position: Clusters.ClosureControl.Enums.Cur
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureControl.Attributes.OverallCurrentState:
             return False
-        if report.value.position == current_position:
-            return True
-        else:
-            return False
+        return report.value.position == current_position
     return AttributeMatcher.from_callable(description=f"OverallCurrentState.Position is {current_position}", matcher=predicate)
 
 
@@ -71,10 +64,7 @@ def current_latch_matcher(current_latch: bool) -> AttributeMatcher:
     def predicate(report: AttributeValue) -> bool:
         if report.attribute != Clusters.ClosureControl.Attributes.OverallCurrentState:
             return False
-        if report.value.latch == current_latch:
-            return True
-        else:
-            return False
+        return report.value.latch == current_latch
     return AttributeMatcher.from_callable(description=f"OverallCurrentState.Latch is {current_latch}", matcher=predicate)
 
 
@@ -179,7 +169,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
         self.step("2b")
 
         if is_is_feature_supported:
-            logging.info("Instantanous feature is supported, skipping test case")
+            logging.info("Instantaneous feature is supported, skipping test case")
 
             # Skipping all remainig steps
             for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
@@ -206,7 +196,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
         sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureControl)
         await sub_handler.start(dev_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
-        # STEP 3a:If the LT feature is not supported on the cluster, skip steps 3a to 3j.
+        # STEP 3a:If the LT feature is not supported on the cluster, skip steps 3b to 3j.
         self.step("3a")
 
         if is_lt_feature_supported:
@@ -221,13 +211,11 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                 if overall_current_state is None:
                     logging.error("OverallCurrentState is None")
                     asserts.assert_true(False, "OverallCurrentState is None.")
-                    return
 
                 CurrentLatch = overall_current_state.latch
                 asserts.assert_in(CurrentLatch, [True, False], "OverallCurrentState.latch is not in the expected range")
             else:
                 asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
-                return
 
             # STEP 3c: If the attribute is supported on the cluster, TH reads from the DUT the LatchControlModes attribute
             self.step("3c")
@@ -239,7 +227,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                     logging.error("LatchControlModes is None")
             else:
                 asserts.assert_true(False, "LatchControlModes attribute is not supported.")
-                return
 
             # STEP 3d: If CurrentLatch = True, skip steps 3e to 3i
             self.step("3d")
@@ -256,7 +243,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             else:
                 logging.info("CurrentLatch is False, proceeding to steps 3e to 3i")
 
-                # STEP 3e: If LatchControlModes Bit 0 = 0 (RemoteLatching = False), skip step 3o
+                # STEP 3e: If LatchControlModes Bit 0 = 0 (RemoteLatching = False), skip step 3f
                 self.step("3e")
                 if (int(bin(LatchControlModes), 2) & 1) == 1:
                     logging.info("RemoteLatching is True, proceeding to step 3f")
@@ -267,7 +254,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                     try:
                         await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                             latch=True
-                        ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                        ), endpoint=endpoint)
                     except InteractionModelError as e:
                         asserts.assert_equal(
                             e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -306,7 +293,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                                     "MainState is not in the expected state")
             else:
                 asserts.assert_true(False, "MainState attribute is not supported.")
-                return
 
         else:
             logging.info("Motion Latching feature not supported, skipping steps 3b to 3j")
@@ -350,7 +336,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                 try:
                     await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                         latch=False
-                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                    ), endpoint=endpoint)
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -360,7 +346,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                 self.step("4d")
 
                 try:
-                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Stop(), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                    await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Stop(), endpoint=endpoint)
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command Stop: {e.status}")
@@ -375,12 +361,10 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                     if overall_current_state is None:
                         logging.error("OverallCurrentState is None")
                         asserts.assert_true(False, "OverallCurrentState is None.")
-                        return
 
                     asserts.assert_true(overall_current_state.latch, "OverallCurrentState.latch is not True")
                 else:
                     asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
-                    return
 
                 # STEP 4f: TH sends command MoveTo with Latch = False
                 self.step("4f")
@@ -388,7 +372,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                 try:
                     await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                         latch=False
-                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                    ), endpoint=endpoint)
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -443,14 +427,12 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                 if overall_current_state is None:
                     logging.error("OverallCurrentState is None")
                     asserts.assert_true(False, "OverallCurrentState is None.")
-                    return
 
                 CurrentPosition = overall_current_state.position
                 asserts.assert_in(CurrentPosition, Clusters.ClosureControl.Enums.CurrentPositionEnum,
                                   "OverallCurrentState.position is not in the expected range")
             else:
                 asserts.assert_true(False, "OverallCurrentState attribute is not supported.")
-                return
 
             # STEP 5c: If CurrentPosition is FullyClosed, skip steps 5d and 5e.
             self.step("5c")
@@ -469,7 +451,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                 try:
                     await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                         position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
-                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                    ), endpoint=endpoint)
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -500,7 +482,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                ), endpoint=endpoint)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -516,14 +498,13 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                                     "MainState is not in the expected state")
             else:
                 asserts.assert_true(False, "MainState attribute is not supported.")
-                return
 
             # STEP 6d: TH sends command Stop to DUT.
             self.step("6d")
 
             sub_handler.reset()
             try:
-                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Stop(), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Stop(), endpoint=endpoint)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command Stop: {e.status}")
@@ -552,7 +533,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             self.step("7b")
 
             try:
-                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Calibrate(), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Calibrate(), endpoint=endpoint)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command Calibrate: {e.status}")
@@ -568,14 +549,13 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                                     "MainState is not in the expected state")
             else:
                 asserts.assert_true(False, "MainState attribute is not supported.")
-                return
 
             # STEP 7d: TH sends command Stop to DUT.
             self.step("7d")
 
             sub_handler.reset()
             try:
-                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Stop(), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Stop(), endpoint=endpoint)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command Stop: {e.status}")
@@ -602,7 +582,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
         self.step("8b")
 
         mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
-        asserts.assert_not_equal(mainstate, NullValue, "MainState attribute is NullValue")
         # Check if the MainState attribute has the expected values
         asserts.assert_equal(mainstate, Clusters.ClosureControl.Enums.MainStateEnum.kSetupRequired,
                              "MainState is not in the expected state")
@@ -611,7 +590,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
         self.step("8c")
 
         try:
-            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Stop(), endpoint=endpoint, timedRequestTimeoutMs=1000)
+            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Stop(), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command Stop: {e.status}")
@@ -621,7 +600,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
         self.step("8d")
 
         mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
-        asserts.assert_not_equal(mainstate, NullValue, "MainState attribute is NullValue")
         # Check if the MainState attribute has the expected values
         asserts.assert_equal(mainstate, Clusters.ClosureControl.Enums.MainStateEnum.kSetupRequired,
                              "MainState is not in the expected state")
@@ -652,7 +630,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             self.step("9c")
 
             mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
-            asserts.assert_not_equal(mainstate, NullValue, "MainState attribute is NullValue")
             # Check if the MainState attribute has the expected values
             asserts.assert_equal(mainstate, Clusters.ClosureControl.Enums.MainStateEnum.kProtected,
                                  "MainState is not in the expected state")
@@ -661,7 +638,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             self.step("9d")
 
             try:
-                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Stop(), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Stop(), endpoint=endpoint)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command Stop: {e.status}")
@@ -671,7 +648,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             self.step("9e")
 
             mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
-            asserts.assert_not_equal(mainstate, NullValue, "MainState attribute is NullValue")
             # Check if the MainState attribute has the expected values
             asserts.assert_equal(mainstate, Clusters.ClosureControl.Enums.MainStateEnum.kProtected,
                                  "MainState is not in the expected state")
@@ -702,7 +678,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             self.step("10c")
 
             mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
-            asserts.assert_not_equal(mainstate, NullValue, "MainState attribute is NullValue")
             # Check if the MainState attribute has the expected values
             asserts.assert_equal(mainstate, Clusters.ClosureControl.Enums.MainStateEnum.kDisengaged,
                                  "MainState is not in the expected state")
@@ -711,7 +686,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             self.step("10d")
 
             try:
-                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Stop(), endpoint=endpoint, timedRequestTimeoutMs=1000)
+                await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Stop(), endpoint=endpoint)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command Stop: {e.status}")
@@ -721,7 +696,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             self.step("10e")
 
             mainstate = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.MainState)
-            asserts.assert_not_equal(mainstate, NullValue, "MainState attribute is NullValue")
             # Check if the MainState attribute has the expected values
             asserts.assert_equal(mainstate, Clusters.ClosureControl.Enums.MainStateEnum.kDisengaged,
                                  "MainState is not in the expected state")
