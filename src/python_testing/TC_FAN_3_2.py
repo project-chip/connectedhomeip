@@ -44,7 +44,7 @@ from typing import Any
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.interaction_model import Status
-from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.event_attribute_reporting import AttributeCallback
 from chip.testing.matter_asserts import assert_valid_uint8
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
@@ -145,11 +145,11 @@ class TC_FAN_3_2(MatterBaseTest):
         attr = cluster.Attributes
 
         self.subscriptions = [
-            ClusterAttributeChangeAccumulator(cluster, attr.PercentSetting),
-            ClusterAttributeChangeAccumulator(cluster, attr.PercentCurrent),
-            ClusterAttributeChangeAccumulator(cluster, attr.FanMode),
-            ClusterAttributeChangeAccumulator(cluster, attr.SpeedSetting),
-            ClusterAttributeChangeAccumulator(cluster, attr.SpeedCurrent)
+            AttributeCallback(cluster, attr.PercentSetting),
+            AttributeCallback(cluster, attr.PercentCurrent),
+            AttributeCallback(cluster, attr.FanMode),
+            AttributeCallback(cluster, attr.SpeedSetting),
+            AttributeCallback(cluster, attr.SpeedCurrent)
         ]
 
         for sub in self.subscriptions:

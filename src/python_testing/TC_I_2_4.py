@@ -43,7 +43,7 @@ import time
 import chip.clusters as Clusters
 import test_plan_support
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.event_attribute_reporting import AttributeCallback
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 
@@ -123,7 +123,7 @@ class TC_I_2_4(MatterBaseTest):
         cluster = Clusters.Identify
 
         self.step(2)
-        sub_handler = ClusterAttributeChangeAccumulator(cluster)
+        sub_handler = AttributeCallback(expected_cluster=cluster)
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint)
 
         # Verify Q requirements for IdentifyTime attribute by write to IdentifyTime
