@@ -35,8 +35,8 @@ pw_python_package("post-certification-tests-module") {
     }
   }
 
-  # NOTE: including the `__init__.py` file is required in order  
-  # setuptools could recognize it as a Python package, this is 
+  # NOTE: including the `__init__.py` file is required in order
+  # setuptools could recognize it as a Python package, this is
   # needed for including extra files into the Python wheel.
   sources = [ "chip/__init__.py" ]
 }
