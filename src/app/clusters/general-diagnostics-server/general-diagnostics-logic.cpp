@@ -179,13 +179,14 @@ CHIP_ERROR GeneralDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel::
     return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
 }
 
-CHIP_ERROR GeneralDiagnosticsLogic::AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) {
+CHIP_ERROR GeneralDiagnosticsLogic::AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+{
     static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
         Commands::TestEventTrigger::kMetadataEntry,
         Commands::TimeSnapshot::kMetadataEntry,
-    #if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
+#if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
         Commands::PayloadTestRequest::kMetadataEntry,
-    #endif
+#endif
     };
     return builder.ReferenceExisting(kAcceptedCommands);
 }

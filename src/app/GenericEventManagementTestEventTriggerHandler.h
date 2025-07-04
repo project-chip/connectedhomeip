@@ -32,9 +32,13 @@ public:
         mGeneralDiagnosticsCluster(generalDiagnosticsClusterInstance)
     {}
 
-    Clusters::GeneralDiagnosticsCluster<Clusters::DeviceLayerGeneralDiagnosticsLogic> * GetGeneralDiagnosticsClusterInstance() { return mGeneralDiagnosticsCluster; }
+    Clusters::GeneralDiagnosticsCluster<Clusters::DeviceLayerGeneralDiagnosticsLogic> * GetGeneralDiagnosticsClusterInstance()
+    {
+        return mGeneralDiagnosticsCluster;
+    }
 
-    void SetGeneralDiagnosticsClusterInstance(Clusters::GeneralDiagnosticsCluster<Clusters::DeviceLayerGeneralDiagnosticsLogic> * generalDiagnosticsClusterInstance)
+    void SetGeneralDiagnosticsClusterInstance(
+        Clusters::GeneralDiagnosticsCluster<Clusters::DeviceLayerGeneralDiagnosticsLogic> * generalDiagnosticsClusterInstance)
     {
         mGeneralDiagnosticsCluster = generalDiagnosticsClusterInstance;
     }
@@ -44,7 +48,7 @@ protected:
 
 private:
     void FillUpEventLoggingBufferWithFakeSoftwareFault(size_t bufferSize);
-    virtual void TriggerSoftwareFaultEvent(const char * faultRecordString)      = 0;
+    virtual void TriggerSoftwareFaultEvent(const char * faultRecordString)                                         = 0;
     Clusters::GeneralDiagnosticsCluster<Clusters::DeviceLayerGeneralDiagnosticsLogic> * mGeneralDiagnosticsCluster = nullptr;
 };
 

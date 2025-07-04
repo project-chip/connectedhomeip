@@ -94,12 +94,12 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
         ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
         ASSERT_EQ(expectedBuilder.AppendElements({
-            GeneralDiagnostics::Attributes::NetworkInterfaces::kMetadataEntry,
-            GeneralDiagnostics::Attributes::RebootCount::kMetadataEntry,
-            GeneralDiagnostics::Attributes::UpTime::kMetadataEntry,
-            GeneralDiagnostics::Attributes::TestEventTriggersEnabled::kMetadataEntry,
-        }),
-        CHIP_NO_ERROR);
+                      GeneralDiagnostics::Attributes::NetworkInterfaces::kMetadataEntry,
+                      GeneralDiagnostics::Attributes::RebootCount::kMetadataEntry,
+                      GeneralDiagnostics::Attributes::UpTime::kMetadataEntry,
+                      GeneralDiagnostics::Attributes::TestEventTriggersEnabled::kMetadataEntry,
+                  }),
+                  CHIP_NO_ERROR);
 
         ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
     }

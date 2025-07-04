@@ -42,10 +42,7 @@ public:
     GeneralDiagnosticsLogic(const GeneralDiagnosticsEnabledAttributes enabledAttributes) : mEnabledAttributes(enabledAttributes) {}
     virtual ~GeneralDiagnosticsLogic() = default;
 
-    CHIP_ERROR GetRebootCount(uint16_t & rebootCount) const
-    {
-        return GetDiagnosticDataProvider().GetRebootCount(rebootCount);
-    }
+    CHIP_ERROR GetRebootCount(uint16_t & rebootCount) const { return GetDiagnosticDataProvider().GetRebootCount(rebootCount); }
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) const
     {
         return GetDiagnosticDataProvider().GetTotalOperationalHours(totalOperationalHours);
@@ -110,7 +107,7 @@ class InjectedDiagnosticsGeneralDiagnosticsLogic : public GeneralDiagnosticsLogi
 {
 public:
     InjectedDiagnosticsGeneralDiagnosticsLogic(DeviceLayer::DiagnosticDataProvider & provider,
-                                                const GeneralDiagnosticsEnabledAttributes enabledAttributes) :
+                                               const GeneralDiagnosticsEnabledAttributes enabledAttributes) :
         GeneralDiagnosticsLogic(enabledAttributes),
         mProvider(provider)
     {}

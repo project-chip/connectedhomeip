@@ -44,7 +44,7 @@ void GeneralDiagnosticsCluster<LOGIC>::OnDeviceReboot(BootReasonEnum bootReason)
 
 template <typename LOGIC>
 void GeneralDiagnosticsCluster<LOGIC>::OnHardwareFaultsDetect(const GeneralFaults<kMaxHardwareFaults> & previous,
-                                                       const GeneralFaults<kMaxHardwareFaults> & current)
+                                                              const GeneralFaults<kMaxHardwareFaults> & current)
 {
     VerifyOrReturn(mContext != nullptr);
     NotifyAttributeChanged(ActiveHardwareFaults::Id);
@@ -61,7 +61,7 @@ void GeneralDiagnosticsCluster<LOGIC>::OnHardwareFaultsDetect(const GeneralFault
 
 template <typename LOGIC>
 void GeneralDiagnosticsCluster<LOGIC>::OnRadioFaultsDetect(const GeneralFaults<kMaxRadioFaults> & previous,
-                                                    const GeneralFaults<kMaxRadioFaults> & current)
+                                                           const GeneralFaults<kMaxRadioFaults> & current)
 {
     VerifyOrReturn(mContext != nullptr);
     NotifyAttributeChanged(ActiveRadioFaults::Id);
@@ -76,7 +76,7 @@ void GeneralDiagnosticsCluster<LOGIC>::OnRadioFaultsDetect(const GeneralFaults<k
 
 template <typename LOGIC>
 void GeneralDiagnosticsCluster<LOGIC>::OnNetworkFaultsDetect(const GeneralFaults<kMaxNetworkFaults> & previous,
-                                                      const GeneralFaults<kMaxNetworkFaults> & current)
+                                                             const GeneralFaults<kMaxNetworkFaults> & current)
 {
     VerifyOrReturn(mContext != nullptr);
     NotifyAttributeChanged(ActiveNetworkFaults::Id);
