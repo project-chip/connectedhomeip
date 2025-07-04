@@ -438,8 +438,8 @@ class TestSpecParsingDeviceType(MatterBaseTest):
             if expected_problems == 0:
                 continue
             success, problems = self.test.check_device_type(fail_on_extra_clusters=True)
-            if problems:
-                print(problems)
+            for p in problems:
+                print(p)
             asserts.assert_equal(len(problems), expected_problems, "Unexpected number of problems")
             asserts.assert_false(success, "Unexpected success running test that should fail")
 
