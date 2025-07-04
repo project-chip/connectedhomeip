@@ -114,6 +114,27 @@ Protocols::InteractionModel::Status ZoneManager::RemoveTrigger(uint16_t zoneID)
     }
 }
 
+CHIP_ERROR ZoneManager::LoadZones(std::vector<ZoneInformationStorage> & aZones)
+{
+    aZones.clear();
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ZoneManager::LoadTriggers(std::vector<ZoneTriggerControlStruct> & aTriggers)
+{
+    aTriggers.clear();
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ZoneManager::PersistentAttributesLoadedCallback()
+{
+    ChipLogError(Camera, "Persistent attributes loaded");
+
+    return CHIP_NO_ERROR;
+}
+
 void ZoneManager::OnAttributeChanged(AttributeId attributeId)
 {
     ChipLogProgress(Camera, "Attribute changed for AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));

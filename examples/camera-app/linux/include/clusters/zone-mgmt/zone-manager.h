@@ -56,6 +56,12 @@ public:
 
     void OnAttributeChanged(AttributeId attributeId) override;
 
+    CHIP_ERROR LoadZones(std::vector<ZoneInformationStorage> & aZones) override;
+
+    CHIP_ERROR LoadTriggers(std::vector<ZoneTriggerControlStruct> & aTriggers) override;
+
+    CHIP_ERROR PersistentAttributesLoadedCallback() override;
+
     void OnZoneTriggeredEvent(uint16_t zoneId,
                               chip::app::Clusters::ZoneManagement::ZoneEventTriggeredReasonEnum triggerReason) override;
 

@@ -199,6 +199,24 @@ public:
      */
     virtual void OnAttributeChanged(AttributeId attributeId) = 0;
 
+    /**
+     *  @brief Callback into the delegate once persistent attributes managed by
+     *  the Cluster have been loaded from Storage.
+     */
+    virtual CHIP_ERROR PersistentAttributesLoadedCallback() = 0;
+
+    /**
+     * Delegate function to load the created zones and triggers.
+     * The application is responsible for persisting them. The Load APIs
+     * would be used to load the persisted zones and triggers into the cluster
+     * server list members at initialization.
+     * Once loaded, the cluster server can serve Reads on these
+     * attributes.
+     */
+    virtual CHIP_ERROR LoadZones(std::vector<ZoneInformationStorage> & aZones) = 0;
+
+    virtual CHIP_ERROR LoadTriggers(std::vector<ZoneTriggerControlStruct> & aTriggers) = 0;
+
 private:
     friend class ZoneMgmtServer;
 
@@ -317,6 +335,11 @@ private:
      * @return appropriately mapped CHIP_ERROR if applicable
      */
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+
+    /**
+     * Helper function that loads all the persistent attributes from the KVS.
+     */
+    void LoadPersistentAttributes();
 
     CHIP_ERROR ReadAndEncodeZones(const AttributeValueEncoder::ListEncodeHelper & encoder);
 

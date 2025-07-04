@@ -115,9 +115,8 @@ private:
         OrientationEnum o4 = CrossProduct(p2, q2, q1);
 
         // General case
-        if (o1 != OrientationEnum::kCollinear && o2 != OrientationEnum::kCollinear &&
-            o3 != OrientationEnum::kCollinear && o4 != OrientationEnum::kCollinear &&
-            o1 != o2 && o3 != o4)
+        if (o1 != OrientationEnum::kCollinear && o2 != OrientationEnum::kCollinear && o3 != OrientationEnum::kCollinear &&
+            o4 != OrientationEnum::kCollinear && o1 != o2 && o3 != o4)
         {
             return true;
         }

@@ -99,6 +99,8 @@ CHIP_ERROR ZoneMgmtServer::Init()
     VerifyOrReturnError(mSensitivityMax >= 2 && mSensitivityMax <= 10, CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(Zcl, "ZoneManagement[ep=%d]: SensitivityMax configuration error", mEndpointId));
 
+    LoadPersistentAttributes();
+
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(CommandHandlerInterfaceRegistry::Instance().RegisterCommandHandler(this));
 
@@ -113,6 +115,43 @@ bool ZoneMgmtServer::HasFeature(Feature feature) const
 bool ZoneMgmtServer::SupportsOptAttr(OptionalAttribute aOptionalAttr) const
 {
     return mOptionalAttrs.Has(aOptionalAttr);
+}
+
+void ZoneMgmtServer::LoadPersistentAttributes()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // Load Zones
+    err = mDelegate.LoadZones(mZones);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to load zones from the KVS.", mEndpointId);
+    }
+
+    // Load Triggers
+    err = mDelegate.LoadTriggers(mTriggers);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to load triggers from the KVS.", mEndpointId);
+    }
+
+    // Load Sensitivity
+    uint8_t sensitivity = 0;
+    err                 = GetSafeAttributePersistenceProvider()->ReadScalarValue(
+        ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Sensitivity::Id), sensitivity);
+    if (err == CHIP_NO_ERROR)
+    {
+        mSensitivity = sensitivity;
+        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Loaded Sensitivity as %u", mEndpointId, mSensitivity);
+    }
+    else
+    {
+        ChipLogDetail(Zcl, "ZoneManagement[ep=%d]: Unable to load the Sensitivity from the KVS. Defaulting to %u", mEndpointId,
+                      mSensitivity);
+    }
+
+    // Signal delegate that all persistent configuration attributes have been loaded.
+    mDelegate.PersistentAttributesLoadedCallback();
 }
 
 CHIP_ERROR ZoneMgmtServer::ReadAndEncodeZones(const AttributeValueEncoder::ListEncodeHelper & encoder)
@@ -144,7 +183,13 @@ CHIP_ERROR ZoneMgmtServer::SetSensitivity(uint8_t aSensitivity)
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
+    // Set the value
     mSensitivity = aSensitivity;
+
+    // Persist the set value in storage
+    auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Sensitivity::Id);
+    ReturnErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, mSensitivity));
+
     mDelegate.OnAttributeChanged(Attributes::Sensitivity::Id);
     MatterReportingAttributeChangeCallback(ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Sensitivity::Id));
 
