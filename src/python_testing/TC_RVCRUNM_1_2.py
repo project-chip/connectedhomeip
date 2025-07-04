@@ -49,7 +49,6 @@ class TC_RVCRUNM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         MatterBaseTest.__init__(self, *args)
         ModeBaseClusterChecks.__init__(self,
                                        modebase_derived_cluster=cluster_rvcrunm_mode)
-        self.endpoint = 0
 
     def pics_TC_RVCRUNM_1_2(self) -> list[str]:
         return ["RVCRUNM.S"]
