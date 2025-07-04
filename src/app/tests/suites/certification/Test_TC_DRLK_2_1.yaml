@@ -321,7 +321,7 @@ tests:
 
           ./chip-tool doorlock read door-open-events 1 1
 
-          Via the TH (chip-tool), verify that the DoorOpenEvents attribute value as 10.
+          Via the TH (chip-tool), verify that the DoorOpenEvents attribute value is 0.
 
           [1654675019.286903][3337:3342] CHIP:DMG:                                        status = 0x86 (UNSUPPORTED_ATTRIBUTE),
           [1654675019.286939][3337:3342] CHIP:DMG:                                },
@@ -375,7 +375,7 @@ tests:
 
           ./chip-tool doorlock read door-closed-events 1 1
 
-          Via the TH (chip-tool), verify that the DoorClosedEvents attribute value as 11.
+          Via the TH (chip-tool), verify that the DoorClosedEvents attribute value is 0.
 
           [1654675103.637778][3346:3351] CHIP:DMG:                                StatusIB =
           [1654675103.637816][3346:3351] CHIP:DMG:                                {
