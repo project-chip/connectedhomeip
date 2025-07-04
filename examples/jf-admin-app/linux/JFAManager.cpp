@@ -59,6 +59,11 @@ CHIP_ERROR JFAManager::FinalizeCommissioning(NodeId nodeId, bool isJCM, P256Publ
     return CHIP_NO_ERROR;
 }
 
+void JFAManager::SetJFARpc(JFARpc & aJFARpc)
+{
+    mJFARpc = &aJFARpc;
+}
+
 void JFAManager::HandleCommissioningCompleteEvent()
 {
     for (const auto & fb : mServer->GetFabricTable())
