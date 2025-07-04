@@ -105,9 +105,13 @@ class TC_SC_3_4(MatterBaseTest):
 
         expectedErrorCode = CHIP_ERROR_CODES.get(expectedErrorName)
 
-        with asserts.assert_raises(ChipStackError) as e:
+        try:
             await self.th.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000)
-        asserts.assert_equal(e.exception.err,  expectedErrorCode, f"Expected to return {expectedErrorName}")
+            asserts.fail(
+                "Unexpected success return from CASE Establishment after injecting fault, CASE Establishment should have failed")
+        except ChipStackError as e:
+            asserts.assert_equal(e.err,  expectedErrorCode,
+                                 f"Expected to return {expectedErrorName}")
 
     def ensure_fault_injection_point_was_reached(self, faultID):
         asserts.assert_equal(GetFaultCounter(faultID), 1)
@@ -122,7 +126,7 @@ class TC_SC_3_4(MatterBaseTest):
         # DUT Should be Commissioned Already, Now we try to Establish a CASE Session with it
         try:
             await self.th.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000)
-        except ChipStackError as e:  # chipstack-ok: This disables ChipStackError linter check. Can not use assert_raises because error is not expected
+        except ChipStackError as e:
             asserts.fail(
                 f"Unexpected Failure, TH Should be able to establish a CASE Session with DUT \nError = {e}")
 
@@ -154,7 +158,7 @@ class TC_SC_3_4(MatterBaseTest):
         self.th.MarkSessionForEviction(nodeid=self.dut_node_id)
         try:
             await self.th.GetConnectedDevice(nodeid=self.dut_node_id, allowPASE=False, timeoutMs=1000)
-        except ChipStackError as e:  # chipstack-ok: This disables ChipStackError linter check. Can not use assert_raises because error is not expected
+        except ChipStackError as e:
             asserts.fail(
                 f"Unexpected CASE Establishment Failure, CASE Should have succeeded. Having an invalid InitiatorResumeMIC should have resulted in CASE falling back to the standard CASE without resumption. \nError = {e}")
         self.ensure_fault_injection_point_was_reached(faultID=CHIPFaultId.CASECorruptInitiatorResumeMIC)

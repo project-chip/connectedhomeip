@@ -449,7 +449,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                                                                                 cluster=Clusters.Objects.DoorLock,
                                                                                 attribute=Clusters.DoorLock.Attributes.NumberOfAliroEndpointKeysSupported)
             if self.max_aliro_keys_supported < 2:
-                self.skip_all_remaining_steps("13")
+                self.mark_all_remaining_steps_skipped("13")
                 return
         self.step("12b")
         if self.pics_guard(self.check_pics("DRLK.S.F08") and self.check_pics("DRLK.S.C1a.Rsp")):
@@ -590,7 +590,8 @@ class TC_DRLK_2_13(MatterBaseTest):
             if self.max_aliro_keys_supported > self.numberofcredentialsupportedperuser:
                 logging.info(
                     "Skipping execution from Step 29a to step 35 since 'max_aliro_keys_supported > numberofcredentialsupportedperuser' as per test plan spec")
-                self.skip_all_remaining_steps("29a")
+                self.mark_all_remaining_steps_skipped("29a")
+                return
             else:
                 # Perform setUser as we have removed user in previous step and SetCredentials always expects a user with index to be present
                 self.step("29a")

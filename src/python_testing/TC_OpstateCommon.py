@@ -86,13 +86,11 @@ class EventSpecificChangeCallback:
 
 
 class TC_OPSTATE_BASE():
-    def setup_base(self, test_info=None, app_pipe="/tmp/chip_all_clusters_fifo_"):
-
+    def setup_base(self, test_info=None):
         asserts.assert_true(test_info is not None,
                             "You shall define the test info!")
 
         self.test_info = test_info
-        self.app_pipe = app_pipe
 
         if self.test_info.cluster == Clusters.OperationalState:
             self.device = "Generic"
@@ -103,18 +101,10 @@ class TC_OPSTATE_BASE():
 
     def init_test(self):
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid == 0:
-                app_pid = get_pid("chip-all-clusters-app")
-                if app_pid is None:
-                    asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
-            self.app_pid = app_pid
 
     def send_raw_manual_or_pipe_command(self, command: dict, msg: str):
         if self.is_ci:
-            self.write_to_app_pipe(command, app_pipe_prefix=self.app_pipe, app_pid=self.app_pid)
-            time.sleep(0.1)
+            self.write_to_app_pipe(command)
         else:
             prompt = msg if msg is not None else "Press Enter when ready."
             prompt += '\n'
@@ -143,7 +133,7 @@ class TC_OPSTATE_BASE():
             found = next((mydevice for mydevice in mandatedevicetypes if mydevice["devicetype"] == device.deviceType), None)
             if found is not None:
                 logging.info("Found matching device type for OpCompletion Event mandate %s", found["devicetype"])
-                if found["revision"] == device.revision:
+                if found["revision"] <= device.revision:
                     logging.info("Revision matches")
                     return True
                 else:
@@ -1044,7 +1034,7 @@ class TC_OPSTATE_BASE():
 
         # STEP 2: Verify the PICS is set, if not, skip the entire TC. If yes, set up a subscription to the OperationCompletion event
         if not opcomplete_pics:
-            self.skip_all_remaining_steps(2)
+            self.mark_all_remaining_steps_skipped(2)
             return
 
         self.step(2)
