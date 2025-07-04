@@ -36,7 +36,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum, IntFlag
 from itertools import chain
-from typing import Any, Callable, Iterable, List, Optional, Tuple, Type, Union
+from typing import Any, Callable, List, Optional, Tuple, Type, Union
 
 import chip.testing.conversions as conversions
 import chip.testing.decorators as decorators
@@ -59,6 +59,7 @@ import chip.native
 import chip.testing.global_stash as global_stash
 from chip.ChipStack import ChipStack
 from chip.clusters import Attribute, ClusterObjects
+from chip.clusters.Attribute import TypedAttributePath
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
@@ -1196,6 +1197,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                 starting_step_idx = idx
                 break
         asserts.assert_is_not_none(starting_step_idx, "mark_step_ranges_skipped was provided with invalid starting_step_num")
+        # Help mypy understand starting_step_idx is not None after the assert
+        assert starting_step_idx is not None
 
         ending_step_idx = None
         # If ending_step_number is None, we skip all steps until the end of the test
@@ -1206,6 +1209,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                     break
 
             asserts.assert_is_not_none(ending_step_idx, "mark_step_ranges_skipped was provided with invalid ending_step_num")
+            # Help mypy understand ending_step_idx is not None after the assert
+            assert ending_step_idx is not None
             asserts.assert_greater(ending_step_idx, starting_step_idx,
                                    "mark_step_ranges_skipped was provided with ending_step_num that is before starting_step_num")
             skipping_steps = steps[starting_step_idx:ending_step_idx+1]
