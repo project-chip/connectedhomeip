@@ -35,11 +35,10 @@ pw_python_package("post-certification-tests-module") {
     }
   }
 
-  # NOTE: production_device_checks.py is included here because `sources` is
-  # a mandatory parameter. It is also included in `extra_files` to place it
-  # in the correct directory in the final wheel. This duplication is a known
-  # issue due to build system limitations.
-  sources = [ "production_device_checks.py" ]
+  # NOTE: including the `__init__.py` file is required in order  
+  # setuptools could recognize it as a Python package, this is 
+  # needed for including extra files into the Python wheel.
+  sources = [ "chip/__init__.py" ]
 }
 
 pw_python_distribution("matter-post-certification-tests") {
