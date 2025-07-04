@@ -123,6 +123,15 @@ public:
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
+
+    struct EnableInfiniteReads
+    {
+        EnableInfiniteReads() { Instance().mAllowInfiniteReads = true; }
+        ~EnableInfiniteReads() { Instance().mAllowInfiniteReads = false; }
+    };
+
+private:
+    bool mAllowInfiniteReads = false;
 };
 
 } // namespace DataModelTests
