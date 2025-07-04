@@ -134,28 +134,68 @@ public:
      * @brief
      *   Called after the current device is rebooted.
      */
-    void OnDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason);
+    void OnDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason) {
+        VerifyOrReturn(mContext != nullptr);
+        NotifyAttributeChanged(GeneralDiagnostics::Attributes::BootReason::Id);
+
+        GeneralDiagnostics::Events::BootReason::Type event{ bootReason };
+
+        (void) mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
+    }
 
     /**
      * @brief
      *   Called when the Node detects a hardware fault has been raised.
      */
     void OnHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
-                                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current);
+                                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & current) {
+        VerifyOrReturn(mContext != nullptr);
+        NotifyAttributeChanged(GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id);
+
+        // Record HardwareFault event
+        DataModel::List<const GeneralDiagnostics::HardwareFaultEnum> currentList(reinterpret_cast<const GeneralDiagnostics::HardwareFaultEnum *>(current.data()),
+                                                            current.size());
+        DataModel::List<const GeneralDiagnostics::HardwareFaultEnum> previousList(reinterpret_cast<const GeneralDiagnostics::HardwareFaultEnum *>(previous.data()),
+                                                            previous.size());
+        GeneralDiagnostics::Events::HardwareFaultChange::Type event{ currentList, previousList };
+
+        (void) mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
+    }
 
     /**
      * @brief
      *   Called when the Node detects a radio fault has been raised.
      */
     void OnRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & previous,
-                             const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current);
+                             const DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & current) {
+        VerifyOrReturn(mContext != nullptr);
+        NotifyAttributeChanged(GeneralDiagnostics::Attributes::ActiveRadioFaults::Id);
+
+        // Record RadioFault event
+        DataModel::List<const GeneralDiagnostics::RadioFaultEnum> currentList(reinterpret_cast<const GeneralDiagnostics::RadioFaultEnum *>(current.data()), current.size());
+        DataModel::List<const GeneralDiagnostics::RadioFaultEnum> previousList(reinterpret_cast<const GeneralDiagnostics::RadioFaultEnum *>(previous.data()), previous.size());
+        GeneralDiagnostics::Events::RadioFaultChange::Type event{ currentList, previousList };
+
+        (void) mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
+    }
 
     /**
      * @brief
      *   Called when the Node detects a network fault has been raised.
      */
     void OnNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
-                               const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
+                               const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current) {
+        VerifyOrReturn(mContext != nullptr);
+        NotifyAttributeChanged(GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id);
+
+        // Record NetworkFault event
+        DataModel::List<const GeneralDiagnostics::NetworkFaultEnum> currentList(reinterpret_cast<const GeneralDiagnostics::NetworkFaultEnum *>(current.data()), current.size());
+        DataModel::List<const GeneralDiagnostics::NetworkFaultEnum> previousList(reinterpret_cast<const GeneralDiagnostics::NetworkFaultEnum *>(previous.data()),
+                                                            previous.size());
+        GeneralDiagnostics::Events::NetworkFaultChange::Type event{ currentList, previousList };
+
+        (void) mContext->interactionContext->eventsGenerator->GenerateEvent(event, kRootEndpointId);
+    }
 
 private:
     template <typename T>
