@@ -410,12 +410,14 @@ TEST_F(TestBleLayer, ExceedBleConnectionEndPointLimit)
 
 TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNotInitialized)
 {
-    // Force the layer to become uninitialized
+    // Simulate BleLayer not being initialized by calling Shutdown
     Shutdown();
 
+    // Create a list of discriminators
     SetupDiscriminator discriminators[] = { SetupDiscriminator(), SetupDiscriminator() };
     Span<const SetupDiscriminator> discriminatorsSpan(discriminators, 2);
 
+    // Define success and error callbacks
     auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {};
     auto OnError   = [](void * appState, CHIP_ERROR err) {};
 
@@ -424,6 +426,7 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNotInitialized)
 
 TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoConnectionDelegate)
 {
+    // Set up the BleLayerTestAccess accessor class to manipulate the BleConnectionDelegate of BLeLayer
     chip::Test::BleLayerTestAccess access(this);
     access.SetConnectionDelegate(nullptr);
 
@@ -454,7 +457,6 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoBleTransportLayer)
 TEST_F(TestBleLayer, NewConnectionByDiscriminatorsSuccess)
 {
     chip::Test::BleLayerTestAccess access(this);
-
     access.SetConnectionDelegate(this);
 
     SetupDiscriminator discriminators[] = { SetupDiscriminator(), SetupDiscriminator() };
@@ -472,11 +474,16 @@ TEST_F(TestBleLayer, NewConnectionByDiscriminatorsSuccess)
     BleLayer * bleLayerState = this;
 
     EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_NO_ERROR);
+
+    // Simulate a successful connection by calling the success callback directly
     OnSuccess(bleLayerState, discriminatorsSpan[0].GetLongValue(), GetConnectionObject());
+
+    // Verify that the success callback was called
     EXPECT_EQ(mOnConnectionCompleteCount, 1);
     EXPECT_EQ(mOnConnectionErrorCount, 0);
 }
 
+// Checks that the connection could not be established due to an error
 TEST_F(TestBleLayer, NewConnectionByDiscriminatorsError)
 {
     chip::Test::BleLayerTestAccess access(this);
@@ -501,7 +508,11 @@ TEST_F(TestBleLayer, NewConnectionByDiscriminatorsError)
     BleLayer * bleLayerState = this;
 
     EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_NO_ERROR);
+
+    // Call the error callback directly to simulate an error
     OnError(bleLayerState, CHIP_ERROR_CONNECTION_ABORTED);
+
+    // Verify that the error callback was called
     EXPECT_EQ(mOnConnectionCompleteCount, 0);
     EXPECT_EQ(mOnConnectionErrorCount, 1);
 }
