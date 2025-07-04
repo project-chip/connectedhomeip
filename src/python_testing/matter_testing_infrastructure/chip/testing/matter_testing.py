@@ -652,34 +652,42 @@ class MatterBaseTest(base_test.BaseTestClass):
     # This value will be overridden if a timeout is supplied on the command line.
     @property
     def default_timeout(self) -> int:
+        """The default timeout in seconds for async operations in a test."""
         return 90
 
     @property
     def runner_hook(self) -> TestRunnerHooks:
+        """Accesses the Test Runner Hooks for external reporting."""
         return global_stash.unstash_globally(self.user_params.get("hooks"))
 
     @property
     def matter_test_config(self) -> MatterTestConfig:
+        """Accesses the global Matter test configuration object."""
         return global_stash.unstash_globally(self.user_params.get("matter_test_config"))
 
     @property
     def default_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
+        """Accesses the default device controller instance for the test."""
         return global_stash.unstash_globally(self.user_params.get("default_controller"))
 
     @property
     def matter_stack(self) -> MatterStackState:
+        """Accesses the Matter stack state object."""
         return global_stash.unstash_globally(self.user_params.get("matter_stack"))
 
     @property
     def certificate_authority_manager(self) -> chip.CertificateAuthority.CertificateAuthorityManager:
+        """Accesses the Certificate Authority Manager."""
         return global_stash.unstash_globally(self.user_params.get("certificate_authority_manager"))
 
     @property
     def dut_node_id(self) -> int:
+        """Returns the primary DUT (Device Under Test) node ID."""
         return self.matter_test_config.dut_node_ids[0]
 
     @property
     def is_pics_sdk_ci_only(self) -> bool:
+        """Checks if the 'PICS_SDK_CI_ONLY' PICS flag is enabled."""
         return self.check_pics('PICS_SDK_CI_ONLY')
 
     #
@@ -687,6 +695,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     #
 
     def get_endpoint(self, default: Optional[int] = 0) -> int:
+        """Gets the target endpoint ID from config, with a fallback default."""
         return self.matter_test_config.endpoint if self.matter_test_config.endpoint is not None else default
 
     def get_wifi_ssid(self, default: Optional[str] = 0) -> str:
@@ -732,6 +741,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         return [TestStep(1, "Run entire test")] if steps is None else steps
 
     def get_defined_test_steps(self, test: str) -> Optional[list[TestStep]]:
+        """Retrieves test steps from a 'steps_*' function, using a cache."""
         steps_name = f'steps_{test.removeprefix("test_")}'
         if test in self.cached_steps:
             return self.cached_steps[test]
