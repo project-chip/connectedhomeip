@@ -334,7 +334,7 @@ template("chip_codegen") {
         "--source-dir",
         _generation_dir,
         "--target-dir",
-        target_gen_dir,
+        rebase_path(target_gen_dir, root_build_dir),
       ]
 
       inputs = []
