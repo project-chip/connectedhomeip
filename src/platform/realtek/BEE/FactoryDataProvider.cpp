@@ -120,6 +120,7 @@ CHIP_ERROR FactoryDataProvider::Init()
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "ReadFactoryData failed!");
+            free(buffer);
             return err;
         }
         err = decoder.DecodeFactoryData(buffer, &mFactoryData, factorydata_len);
@@ -141,6 +142,7 @@ CHIP_ERROR FactoryDataProvider::Init()
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DeviceLayer, "DecodeFactoryData failed!");
+            free(buffer);
             return err;
         }
 
