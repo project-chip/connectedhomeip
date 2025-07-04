@@ -16,7 +16,7 @@ not_automated:
           Closure app on the master branch does not support this test script yet
     - name: TC_CLCTRL_6_1.py
       reason:
-          Closure app on the master branch does not support this test script yet    
+          Closure app on the master branch does not support this test script yet
     - name: TC_CNET_4_2.py
       reason: It has no CI execution block, it not executed in CI
     - name: TC_CNET_4_1.py
