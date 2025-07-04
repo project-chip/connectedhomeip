@@ -55,6 +55,18 @@ class TC_ACE_1_2(MatterBaseTest):
         asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
 
     async def steps_subscribe_breadcrumb(self, print_steps: bool):
+        """
+        Step to subscribe to the Breadcrumb attribute from the DUT.
+
+        This function starts a subscription to the Breadcrumb attribute of the GeneralCommissioning cluster and sets up an update callback for later verification.
+
+        Parameters:
+            print_steps (bool): If True, prints step descriptions.
+
+        Returns:
+            AttributeCallback: The callback object associated with the subscription.
+        """
+
         if print_steps:
             self.print_step(3, "TH2 subscribes to the Breadcrumb attribute")
         subscription_breadcrumb = await self.TH2.ReadAttribute(
@@ -66,6 +78,16 @@ class TC_ACE_1_2(MatterBaseTest):
         return breadcrumb_cb
 
     async def steps_receive_breadcrumb(self, breadcrumb_cb: AttributeCallback, print_steps: bool):
+        """
+        Step that triggers a change to the Breadcrumb attribute and waits for the subscription report.
+
+        This function writes a new valaue to the Breadcrumb attribute and waits for the AttributeCallback to receive and report the update.
+
+        Parameters:
+            breadcrumb_cb (AttributeCallback): The callback previously set up to track Breadcrumb updates.
+            print_steps (bool): If True, prints step descriptions.
+        """
+
         if print_steps:
             self.print_step(9, "TH1 writes the breadcrumb attribute")
         await self.default_controller.WriteAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.GeneralCommissioning.Attributes.Breadcrumb(self.breadcrumb))])
@@ -76,6 +98,16 @@ class TC_ACE_1_2(MatterBaseTest):
         self.breadcrumb = self.breadcrumb + 1
 
     async def steps_admin_subscription_error(self, print_steps: bool):
+        """
+        Step that validates error handling when subscribing to attributes/events with invalid permissions.
+
+        This function attempts to subscribe to ACL and AccessControlEntryChanged attributes with a user that lacks the required permissions.
+        It asserts that the expected ChipStackError is raised (INVALID_ACTION)
+
+        Parameters:
+            print_steps (bool): If True, prints step descriptions.
+        """
+
         if print_steps:
             self.print_step(13, "Subscribe to the ACL attribute, expect INVALID_ACTION")
 

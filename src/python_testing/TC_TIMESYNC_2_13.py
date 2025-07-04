@@ -48,6 +48,19 @@ from mobly import asserts
 
 class TC_TIMESYNC_2_13(MatterBaseTest):
     def wait_for_trusted_time_souce_event(self, timeout, cb):
+        """
+        Waits for the MissingTrustedTimeSource event and validates its type.
+
+        This function blocks for up to timeout seconds, waiting for the MissingTrustedTimeSource event to be received.
+
+        Parameters:
+            timeout (float): Seconds to wait for the event.
+            cb (EventCallback): The event callback object from which the event is pulled.
+
+        Raises:
+            AssertionError: If no event is received before timeout or if the event type is incorrect.
+        """
+
         try:
             ret = cb.get_block(block=True, timeout=timeout)
             asserts.assert_true(type_matches(received_value=ret.Data,

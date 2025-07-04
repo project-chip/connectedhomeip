@@ -62,6 +62,22 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
         await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetUTCTime(UTCTime=utc, granularity=Clusters.Objects.TimeSynchronization.Enums.GranularityEnum.kMillisecondsGranularity))
 
     def wait_for_dst_status(self, th_utc, wait_s, expect_active, cb):
+        """
+        Waits for the DSTStatus event to be received and validates its contents.
+
+        This function waits for the DSTStatus event to be received via the given callback. 
+        It verifies that the event type is correct and that the field DSTOffsetAcive matches the expected value.
+
+        Parameters:
+            th_utc (int): The UTC time in seconds used for timeout.
+            wait_s (int): Additional wait time in secods.
+            expect_active (bool): Expected value of the DSTOffsetActive field in the event.
+            cb: The callback object from which the event will be pulled.
+
+        Raises:
+            AssertionError: If no event is received in time, the type is incorrect or the value does not match.
+        """
+
         timeout = get_wait_seconds_from_set_time(th_utc, wait_s)
         try:
             ret = cb.get_block(block=True, timeout=timeout)

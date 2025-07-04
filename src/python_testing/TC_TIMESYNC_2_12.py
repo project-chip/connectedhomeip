@@ -62,6 +62,22 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
         await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetUTCTime(UTCTime=utc, granularity=Clusters.Objects.TimeSynchronization.Enums.GranularityEnum.kMillisecondsGranularity))
 
     def wait_for_tz_status(self, th_utc, wait_s, expected_offset, expected_name, cb):
+        """
+        Waits for the TimeZoneStatus event to be received and validates its contents.
+
+        This function blocks for a calculated timeout duration and waits for the TimeZoneStatus event to be received.
+
+        Parameters:
+            th_utc (int): The UTC time in seconds used for timeout.
+            wait_s (int): Additional wait time in seconds.
+            expected_offset (int): The expected offset value in the event's data.
+            expected_name (str): The expected name string in the event's data.
+            cb: The callback object from which the event will be pulled.
+
+        Raises:
+            AssertionError: If no event is received in time, the type is incorrect or the values do not match.
+        """
+
         timeout = get_wait_seconds_from_set_time(th_utc, wait_s)
         try:
             ret = cb.get_block(block=True, timeout=timeout)
