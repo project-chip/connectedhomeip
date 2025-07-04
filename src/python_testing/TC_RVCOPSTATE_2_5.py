@@ -228,14 +228,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
                                                Clusters.RvcRunMode.Enums.ModeTag.kIdle)
 
         else:
-            self.skip_step("2")
-            self.skip_step("3")
-            self.skip_step("4")
-            self.skip_step("5")
-            self.skip_step("6")
-            self.skip_step("7")
-            self.skip_step("8")
-            self.skip_step("9")
+            self.mark_all_remaining_steps_skipped("2")
             logging.info(
                 "Device does not support mandatory Attributes/Commands which is required to run this test case, skipped all the test steps")
 
