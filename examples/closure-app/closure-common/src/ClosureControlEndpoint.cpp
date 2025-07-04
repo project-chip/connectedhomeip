@@ -237,3 +237,47 @@ void ClosureControlEndpoint::OnMoveToActionComplete()
 {
     // This function should handle closure control state updation after completion of Motion Action.
 }
+
+void ClosureControlEndpoint::OnPanelMotionActionComplete()
+{
+    mLogic.SetMainState(MainStateEnum::kStopped);
+
+    // Set the OverallState position to PartiallyOpened as motion has been stopped
+    auto position = MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened));
+
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
+    DataModel::Nullable<GenericOverallTargetState> overallTargetState;
+
+    VerifyOrReturn(mLogic.GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get OverallCurrentState"));
+    VerifyOrReturn(mLogic.GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get OverallTargetState"));
+
+    if (overallCurrentState.IsNull())
+    {
+        overallCurrentState.SetNonNull(GenericOverallCurrentState(position, NullOptional, NullOptional, NullOptional));
+    }
+    else
+    {
+        overallCurrentState.Value().position = position;
+    }
+
+    // Set latch and speed to their target values if they are set in the overall target.
+    if (!overallTargetState.IsNull())
+    {
+        if (overallTargetState.Value().latch.HasValue() && !overallTargetState.Value().latch.Value().IsNull())
+        {
+            overallCurrentState.Value().latch.SetValue(DataModel::MakeNullable(overallTargetState.Value().latch.Value().Value()));
+        }
+
+        if (overallTargetState.Value().speed.HasValue())
+        {
+            // If the target speed was Auto, we set it to Auto.
+            overallCurrentState.Value().speed.SetValue(overallTargetState.Value().speed.Value());
+        }
+    }
+    mLogic.SetOverallCurrentState(overallCurrentState);
+
+    mLogic.SetCountdownTimeFromDelegate(0);
+    mLogic.GenerateMovementCompletedEvent();
+}

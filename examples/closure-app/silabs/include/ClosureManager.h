@@ -39,6 +39,9 @@ public:
         CALIBRATE_ACTION = 0,
         MOVE_TO_ACTION,
         STOP_ACTION,
+        SET_TARGET_ACTION,
+        PANEL_UNLATCH_ACTION,
+        PANEL_STEP_ACTION,
 
         INVALID_ACTION
     };
@@ -102,6 +105,43 @@ public:
     chip::Protocols::InteractionModel::Status OnStopCommand();
 
     /**
+     * @brief Handles the SetTarget command for a closure panel.
+     *
+     * This method processes the SetTarget command, based on target position,
+     * latch , and speed for the closure panel at the given endpoint.
+     *
+     * @param[in] position  Optional target position as a percentage in hundredths (0-10000).
+     * @param[in] latch     Optional latch state (true to latch, false to unlatch).
+     * @param[in] speed     Optional speed setting as a ThreeLevelAutoEnum value.
+     * @param[in] endpointId The endpoint identifier for the closure panel.
+     *
+     * @return chip::Protocols::InteractionModel::Status
+     *         Returns Status::Success if the SetTarget command is handled successfully,
+     *         or an appropriate error status otherwise.
+     */
+    chip::Protocols::InteractionModel::Status
+    OnSetTargetCommand(const chip::Optional<chip::Percent100ths> & position, const chip::Optional<bool> & latch,
+                       const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
+                       const chip::EndpointId endpointId);
+
+    /**
+     * @brief Handles the Step command for the ClosureDimension cluster.
+     *
+     * This method processes and initiates step motion in a specified direction for a given number of steps,
+     * optionally at a specified speed, on the provided panel endpoint.
+     *
+     * @param direction The direction in which to perform the step operation.
+     * @param numberOfSteps The number of steps to move in the specified direction.
+     * @param speed Optional speed setting for the step operation.
+     * @param endpointId The endpoint on which to perform the operation.
+     * @return chip::Protocols::InteractionModel::Status Status of the command execution.
+     */
+    chip::Protocols::InteractionModel::Status
+    OnStepCommand(const chip::app::Clusters::ClosureDimension::StepDirectionEnum & direction, const uint16_t & numberOfSteps,
+                  const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed,
+                  const chip::EndpointId & endpointId);
+
+    /**
      * @brief Sets the current action being performed by the closure device.
      *
      * @param action The action to set, represented as chip::app::Clusters::ClosureControl::Action_t.
@@ -120,20 +160,27 @@ private:
 
     osTimerId_t mClosureTimer;
 
+    // Below Progress variables and mCurrentAction, mCurrentActionEndpointId should be set only in
+    // chip task context. Incase if these variables are to be set in other task context, then we should
+    // make them thread-safe using mutex or other synchronization mechanisms. Presently, we use
+    // DeviceLayer::PlatformMgr().LockChipStack() and DeviceLayer::PlatformMgr().UnlockChipStack()
+    // to ensure that these variables are set in thread safe manner in chip task context.
     bool isCalibrationInProgress = false;
     bool isMoveToInProgress      = false;
+    bool isSetTargetInProgress   = false;
+    bool isStepActionInProgress  = false;
 
     Action_t mCurrentAction                   = Action_t::INVALID_ACTION;
     chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
 
     // Define the endpoint ID for the Closure
-    static constexpr chip::EndpointId kClosureEndpoint       = 1;
-    static constexpr chip::EndpointId kClosurePanel1Endpoint = 2;
-    static constexpr chip::EndpointId kClosurePanel2Endpoint = 3;
+    static constexpr chip::EndpointId kClosureEndpoint1      = 1;
+    static constexpr chip::EndpointId kClosurePanelEndpoint2 = 2;
+    static constexpr chip::EndpointId kClosurePanelEndpoint3 = 3;
 
-    chip::app::Clusters::ClosureControl::ClosureControlEndpoint ep1{ kClosureEndpoint };
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep2{ kClosurePanel1Endpoint };
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint ep3{ kClosurePanel2Endpoint };
+    chip::app::Clusters::ClosureControl::ClosureControlEndpoint mClosureEndpoint1{ kClosureEndpoint1 };
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint2{ kClosurePanelEndpoint2 };
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint3{ kClosurePanelEndpoint3 };
 
     /**
      * @brief Starts or restarts the closure function timer with the specified timeout.
@@ -195,4 +242,45 @@ private:
      * @param timerCbArg Pointer to the callback argument (unused).
      */
     static void TimerEventHandler(void * timerCbArg);
+
+    /**
+     * @brief Handles the SetTarget motion action for a panel endpoint.
+     *
+     * This method Performs the update the current positions of panel endpoint to next position
+     * and when target position is reached, it performs the latch action if required.
+     *
+     * @param endpointId The identifier of the endpoint for which the panel target action should be handled.
+     */
+    void HandlePanelSetTargetAction(chip::EndpointId endpointId);
+
+    /**
+     * @brief Handles the unlatch action for a closure panel.
+     *
+     * This method performs the unlatch action if required for the specified closure panel endpoint.
+     * It updates the current state of the panel and sets the target state accordingly and then calls
+     * HandlePanelSetTargetAction to move the panel to the target position.
+     *
+     * @param endpointId The identifier of the endpoint for which the unlatch action should be handled.
+     */
+    void HandlePanelUnlatchAction(chip::EndpointId endpointId);
+
+    /**
+     * @brief Handles a single step action for the panel associated with the specified endpoint.
+     *
+     * This method processes a panel step action for the panel endpoint and updates the current position to
+     * reflect the next step position and triggers timer if target is not reached.
+     *
+     * @param endpointId The identifier of the endpoint for which the panel step action is to be handled.
+     */
+    void HandlePanelStepAction(chip::EndpointId endpointId);
+
+    /**
+     * @brief Retrieves the panel endpoint associated with the specified endpoint ID.
+     *
+     * This method searches for the panel instance that matches the given endpoint ID.
+     *
+     * @param endpointId The identifier of the endpoint to retrieve.
+     * @return Pointer to the matching panel endpoint instance, or nullptr if not found.
+     */
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * GetPanelEndpointById(chip::EndpointId endpointId);
 };

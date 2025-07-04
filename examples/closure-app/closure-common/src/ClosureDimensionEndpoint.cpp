@@ -36,15 +36,15 @@ Status ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> &
 {
     ChipLogProgress(AppServer, "HandleSetTarget");
     // Add the SetTarget handling logic here
-    return Status::Success;
+    return ClosureManager::GetInstance().OnSetTargetCommand(pos, latch, speed, GetEndpoint());
 }
 
 Status ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
                                             const Optional<Globals::ThreeLevelAutoEnum> & speed)
 {
     ChipLogProgress(AppServer, "HandleStep");
-    // Add the Step handling logic here
-    return Status::Success;
+    SetStepCommandTargetDirection(direction);
+    return ClosureManager::GetInstance().OnStepCommand(direction, numberOfSteps, speed, GetEndpoint());
 }
 
 CHIP_ERROR ClosureDimensionEndpoint::Init()
@@ -96,4 +96,9 @@ void ClosureDimensionEndpoint::OnCalibrateActionComplete()
 void ClosureDimensionEndpoint::OnMoveToActionComplete()
 {
     // This function should handle closure dimension state updation after MoveTo Action.
+}
+
+void ClosureDimensionEndpoint::OnPanelMotionActionComplete()
+{
+    UpdateCurrentStateFromTargetState();
 }
