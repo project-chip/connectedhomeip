@@ -43,7 +43,7 @@ public:
                 { .deviceTypeId = 0x0000'0001, .deviceTypeRevision = 1 },
                 { .deviceTypeId = 0x0000'0002, .deviceTypeRevision = 1 },
             };
-            return builder.AppendElements(chip::Span<const DeviceTypeEntry>(types, sizeof(types)/sizeof(types[0])));
+            return builder.AppendElements(chip::Span(types));
         }
         if (endpointId == 2)
         {
@@ -51,7 +51,7 @@ public:
             constexpr DeviceTypeEntry types[] = {
                 { .deviceTypeId = 0x0000'0003, .deviceTypeRevision = 1 },
             };
-            return builder.AppendElements(chip::Span<const DeviceTypeEntry>(types, sizeof(types)/sizeof(types[0])));
+            return builder.AppendElements(chip::Span(types));
         }
         return CHIP_NO_ERROR;
     }
