@@ -49,6 +49,8 @@ set(SRC_DIRS_LIST
                       "${CHEF}/common/clusters/media-playback/"
                       "${CHEF}/common/clusters/oven-cavity-operational-state/"
                       "${CHEF}/common/clusters/oven-mode/"
+                      "${CHEF}/common/clusters/microwave-oven-mode/"
+                      "${CHEF}/common/clusters/microwave-oven-control/"
                       "${CHEF}/common/clusters/refrigerator-and-temperature-controlled-cabinet-mode/"
                       "${CHEF}/common/clusters/resource-monitoring/"
                       "${CHEF}/common/clusters/switch/"
