@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,27 +20,40 @@
 
 #include <lib/support/Span.h>
 #include <platform/silabs/multi-ota/OTATlvProcessor.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "sl_si91x_protocol_types.h"
+#ifdef __cplusplus
+}
+#endif
 
 namespace chip {
 
-class OTAFirmwareProcessor : public OTATlvProcessor
+class OTAWiFiFirmwareProcessor : public OTATlvProcessor
 {
+
 public:
     CHIP_ERROR ApplyAction() override;
     CHIP_ERROR FinalizeAction() override;
 
 private:
-    CHIP_ERROR ProcessInternal(ByteSpan & block) override;
-    CHIP_ERROR ProcessDescriptor(ByteSpan & block);
-
+    uint8_t mFWchunkType                    = SL_FWUP_RPS_HEADER;
+    bool mReset                             = false;
     bool mDescriptorProcessed               = false;
     static constexpr size_t kAlignmentBytes = 64;
-    static uint32_t mWriteOffset; // End of last written block
-    static uint8_t mSlotId;       // Bootloader storage slot
-    // Bootloader storage API requires the buffer size to be a multiple of 4.
-    static uint8_t writeBuffer[kAlignmentBytes] __attribute__((aligned(4)));
-    // Offset indicates how far the write buffer has been filled
-    static uint16_t writeBufOffset;
+    static constexpr size_t kBlockSize      = 1024;
+
+    CHIP_ERROR ProcessInternal(ByteSpan & block) override;
+
+    /**
+     * This function accumulates the descriptor data from the provided block,
+     * invokes the registered descriptor processing callback with the accumulated data
+     *
+     *  @param[in/out] block The ByteSpan containing the descriptor data to process. ByteSpan is used as output of the block
+     * processing as well.
+     */
+    CHIP_ERROR ProcessDescriptor(ByteSpan & block);
 };
 
 } // namespace chip
