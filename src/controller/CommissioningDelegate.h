@@ -66,6 +66,10 @@ enum CommissioningStage : uint8_t
     kWiFiNetworkEnable,          ///< Send ConnectNetwork (0x31:6) command to the device for the WiFi network
     kThreadNetworkEnable,        ///< Send ConnectNetwork (0x31:6) command to the device for the Thread network
     kEvictPreviousCaseSessions,  ///< Evict previous stale case sessions from a commissioned device with this node ID before
+    kWaitForDeviceInstallation,  ///< Wait until the user has installed and powered on the device. Step used in case of
+                                 ///< NFC Commissioning without power.
+                                 ///< When the user has confirmed the installation of the device, the application should
+                                 ///< call ContinueCommissioningOverOperationalNetwork()
     kFindOperationalForStayActive, ///< Perform operational discovery and establish a CASE session with the device for ICD
                                    ///< StayActive command
     kFindOperationalForCommissioningComplete, ///< Perform operational discovery and establish a CASE session with the device for
@@ -837,6 +841,13 @@ struct GeneralCommissioningInfo
     app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum locationCapability =
         app::Clusters::GeneralCommissioning::RegulatoryLocationTypeEnum::kIndoorOutdoor;
     ;
+    bool isCommissioningWithoutPower = false;
+};
+
+struct PowerSourceClusterInfo
+{
+    app::Clusters::PowerSource::PowerSourceStatusEnum status =
+        app::Clusters::PowerSource::PowerSourceStatusEnum::kUnspecified;
 };
 
 // ICDManagementClusterInfo is populated when the controller reads information from
@@ -883,6 +894,7 @@ struct ReadCommissioningInfo
     NetworkClusters network;
     BasicClusterInfo basic;
     GeneralCommissioningInfo general;
+    PowerSourceClusterInfo power;
     bool requiresUTC                  = false;
     bool requiresTimeZone             = false;
     bool requiresDefaultNTP           = false;
@@ -957,6 +969,7 @@ public:
      * kWiFiNetworkEnable: NetworkCommissioningStatusInfo if there is an error
      * kThreadNetworkEnable: NetworkCommissioningStatusInfo if there is an error
      * kEvictPreviousCaseSessions: None
+     * kWaitForDeviceInstallation: None
      * kFindOperationalForStayActive OperationalNodeFoundData
      * kFindOperationalForCommissioningComplete: OperationalNodeFoundData
      * kICDSendStayActive: CommissioningErrorInfo if there is an error
