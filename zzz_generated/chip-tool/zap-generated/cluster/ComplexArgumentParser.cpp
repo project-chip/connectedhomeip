@@ -7152,13 +7152,31 @@ ComplexArgumentParser::Setup(const char * label,
     // Copy to track which members we already processed.
     Json::Value valueCopy(value);
 
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("CMAFContainerOptionsStruct.fragmentDuration", "fragmentDuration",
+                                                                  value.isMember("fragmentDuration")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("CMAFContainerOptionsStruct.chunkDuration", "chunkDuration",
                                                                   value.isMember("chunkDuration")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("CMAFContainerOptionsStruct.segmentGroup", "segmentGroup",
+                                                                  value.isMember("segmentGroup")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("CMAFContainerOptionsStruct.trackName", "trackName", value.isMember("trackName")));
 
     char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "fragmentDuration");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.fragmentDuration, value["fragmentDuration"]));
+    valueCopy.removeMember("fragmentDuration");
+
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "chunkDuration");
     ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.chunkDuration, value["chunkDuration"]));
     valueCopy.removeMember("chunkDuration");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "segmentGroup");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.segmentGroup, value["segmentGroup"]));
+    valueCopy.removeMember("segmentGroup");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "trackName");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.trackName, value["trackName"]));
+    valueCopy.removeMember("trackName");
 
     if (value.isMember("CENCKey"))
     {
@@ -7167,13 +7185,6 @@ ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("CENCKey");
 
-    if (value.isMember("metadataEnabled"))
-    {
-        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "metadataEnabled");
-        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.metadataEnabled, value["metadataEnabled"]));
-    }
-    valueCopy.removeMember("metadataEnabled");
-
     if (value.isMember("CENCKeyID"))
     {
         snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "CENCKeyID");
@@ -7181,16 +7192,26 @@ ComplexArgumentParser::Setup(const char * label,
     }
     valueCopy.removeMember("CENCKeyID");
 
+    if (value.isMember("metadataEnabled"))
+    {
+        snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "metadataEnabled");
+        ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.metadataEnabled, value["metadataEnabled"]));
+    }
+    valueCopy.removeMember("metadataEnabled");
+
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
 void ComplexArgumentParser::Finalize(
     chip::app::Clusters::PushAvStreamTransport::Structs::CMAFContainerOptionsStruct::Type & request)
 {
+    ComplexArgumentParser::Finalize(request.fragmentDuration);
     ComplexArgumentParser::Finalize(request.chunkDuration);
+    ComplexArgumentParser::Finalize(request.segmentGroup);
+    ComplexArgumentParser::Finalize(request.trackName);
     ComplexArgumentParser::Finalize(request.CENCKey);
-    ComplexArgumentParser::Finalize(request.metadataEnabled);
     ComplexArgumentParser::Finalize(request.CENCKeyID);
+    ComplexArgumentParser::Finalize(request.metadataEnabled);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
