@@ -21,7 +21,7 @@
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
 
-PushAVUploader::PushAVUploader() : mIsRunning(false) {}
+PushAVUploader::PushAVUploader(PushAVCertPath certPath) : mCertPath(certPath), mIsRunning(false) {}
 
 PushAVUploader::~PushAVUploader()
 {
@@ -115,12 +115,6 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
         return;
     }
 
-    // TODO: Remove these values and get details from trasport/recoder
-    PushAVCertPath path;
-    path.mRootCert = "/home/test/.pavstest/certs/server/root.pem";
-    path.mDevCert  = "/home/test/.pavstest/certs/device/dev.pem";
-    path.mDevKey   = "/home/test/.pavstest/certs/device/dev.key";
-
     std::ifstream file(data.first.c_str(), std::ios::binary);
     if (!file)
     {
@@ -152,9 +146,9 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, true);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
     curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE, static_cast<curl_off_t>(size));
-    curl_easy_setopt(curl, CURLOPT_CAINFO, path.mRootCert.c_str());
-    curl_easy_setopt(curl, CURLOPT_SSLCERT, path.mDevCert.c_str());
-    curl_easy_setopt(curl, CURLOPT_SSLKEY, path.mDevKey.c_str());
+    curl_easy_setopt(curl, CURLOPT_CAINFO, mCertPath.mRootCert.c_str());
+    curl_easy_setopt(curl, CURLOPT_SSLCERT, mCertPath.mDevCert.c_str());
+    curl_easy_setopt(curl, CURLOPT_SSLKEY, mCertPath.mDevKey.c_str());
     curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
     curl_easy_setopt(curl, CURLOPT_READFUNCTION, PushAvUploadCb);
     curl_easy_setopt(curl, CURLOPT_READDATA, &upload);

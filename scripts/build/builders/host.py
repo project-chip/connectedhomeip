@@ -590,8 +590,6 @@ class HostBuilder(GnBuilder):
         if self.board == HostBoard.ARM64:
             self.build_env['PKG_CONFIG_PATH'] = os.path.join(
                 self.SysRootPath('SYSROOT_AARCH64'), 'lib/aarch64-linux-gnu/pkgconfig')
-            self.build_env['PKG_CONFIG_PATH'] = self.build_env['PKG_CONFIG_PATH'] + ':' + \
-                '/usr/lib/x86_64-linux-gnu/pkgconfig' + ':' + '/usr/lib/aarch64-linux-gnu/pkgconfig'
         if self.app == HostApp.TESTS and self.use_coverage and self.use_clang and self.fuzzing_type == HostFuzzingType.NONE:
             # Every test is expected to have a distinct build ID, so `%m` will be
             # distinct.
