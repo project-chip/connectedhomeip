@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <cctype>
 #include <nlassert.h>
 
 #include "BufferWriter.h"
@@ -89,12 +90,22 @@ private:
     }
 };
 
-/// a preallocated sized string builder
-template <size_t kSize>
+/// A preallocated sized string builder
+/// According to the specification there are fields with size up to 256
+/// Default buffer size is 257 to have space for the terminating null character
+/// If the buffer size is not enough the value will be truncated
+template <size_t kSize = 257>
 class StringBuilder : public StringBuilderBase
 {
 public:
+    /// Default constructor
     StringBuilder() : StringBuilderBase(mBuffer, kSize) {}
+
+    /// Constructor for char * and length
+    StringBuilder(const char * data, size_t length) : StringBuilder() { AddFormat("%.*s", static_cast<int>(length), data); }
+
+    /// Constructor for CharSpan
+    StringBuilder(const CharSpan & span) : StringBuilder(span.data(), span.size()) {}
 
 private:
     char mBuffer[kSize];
