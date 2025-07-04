@@ -220,25 +220,6 @@ if (chip_device_platform == "cc13x4_26x4") {
   _chip_device_layer = "stm32"
 }
 
-if (chip_device_platform != "external") {
-  chip_ble_platform_config_include = ""
-  chip_device_platform_config_include = ""
-  chip_platform_config_include = ""
-  chip_inet_platform_config_include = ""
-  chip_system_platform_config_include = ""
-  chip_system_layer_impl_config_file = ""
-} else {
-  declare_args() {
-    chip_ble_platform_config_include = ""
-    chip_device_platform_config_include = ""
-    chip_platform_config_include = ""
-    chip_inet_platform_config_include = ""
-    chip_system_platform_config_include = ""
-    chip_system_layer_impl_config_file = ""
-    chip_external_platform_include_dir = ""
-  }
-}
-
 declare_args() {
   # If true, disables KVS implementation for the platform.  May not be
   # supported on all platforms.
@@ -251,17 +232,31 @@ declare_args() {
 assert(!chip_disable_platform_kvs || chip_device_platform == "darwin",
        "Can only disable KVS on some platforms")
 
-if (_chip_device_layer != "none" && chip_device_platform != "external") {
-  chip_ble_platform_config_include =
-      "<platform/" + _chip_device_layer + "/BlePlatformConfig.h>"
-  chip_device_platform_config_include =
-      "<platform/" + _chip_device_layer + "/CHIPDevicePlatformConfig.h>"
-  chip_platform_config_include =
-      "<platform/" + _chip_device_layer + "/CHIPPlatformConfig.h>"
-  chip_inet_platform_config_include =
-      "<platform/" + _chip_device_layer + "/InetPlatformConfig.h>"
-  chip_system_platform_config_include =
-      "<platform/" + _chip_device_layer + "/SystemPlatformConfig.h>"
+declare_args() {
+  # Overridable for custom platforms ("external" or "none") as well as
+  # individually overridable
+  if (_chip_device_layer != "none" && chip_device_platform != "external") {
+    chip_ble_platform_config_include =
+        "<platform/" + _chip_device_layer + "/BlePlatformConfig.h>"
+    chip_device_platform_config_include =
+        "<platform/" + _chip_device_layer + "/CHIPDevicePlatformConfig.h>"
+    chip_platform_config_include =
+        "<platform/" + _chip_device_layer + "/CHIPPlatformConfig.h>"
+    chip_inet_platform_config_include =
+        "<platform/" + _chip_device_layer + "/InetPlatformConfig.h>"
+    chip_system_platform_config_include =
+        "<platform/" + _chip_device_layer + "/SystemPlatformConfig.h>"
+  } else {
+    chip_ble_platform_config_include = ""
+    chip_device_platform_config_include = ""
+    chip_platform_config_include = ""
+    chip_inet_platform_config_include = ""
+    chip_system_platform_config_include = ""
+  }
+
+  # always overridable, default to nothing
+  chip_system_layer_impl_config_file = ""
+  chip_external_platform_include_dir = ""
 }
 
 declare_args() {

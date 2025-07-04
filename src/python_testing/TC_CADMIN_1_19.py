@@ -31,11 +31,12 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
-                                         async_test_body, default_matter_test_main)
+from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.matter_testing import AttributeValue, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from support_modules.cadmin_support import CADMINSupport
 
@@ -95,7 +96,7 @@ class TC_CADMIN_1_19(MatterBaseTest):
         self.max_window_duration = duration.maxCumulativeFailsafeSeconds
 
         self.step(3)
-        fabrics = await self.support.get_fabrics(th=self.th1)
+        fabrics = await self.support.get_fabrics(th=self.th1, fabric_filtered=False)
         initial_number_of_fabrics = len(fabrics)
 
         self.step(4)
@@ -141,19 +142,18 @@ class TC_CADMIN_1_19(MatterBaseTest):
         next_fabric = current_fabrics + 1
         fids_ca2 = self.certificate_authority_manager.NewCertificateAuthority(caIndex=next_fabric)
         fids_fa2 = fids_ca2.NewFabricAdmin(vendorId=0xFFF1, fabricId=next_fabric)
-        try:
+        with asserts.assert_raises(ChipStackError) as cm:
             fids2 = fids_fa2.NewController(nodeId=next_fabric)
             await fids2.CommissionOnNetwork(
                 nodeId=self.dut_node_id, setupPinCode=params.commissioningParameters.setupPinCode,
-                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator)
-
-        except ChipStackError as e:
-            # When attempting to create a new controller we are expected to get the following response:
-            # src/credentials/FabricTable.cpp:833: CHIP Error 0x0000000B: No memory
-            # Since the FabricTable is full and unable to create any new fabrics
-            self.print_step("Max number of fabrics", "reached")
-            asserts.assert_equal(e.err,  0x0000000B,
-                                 "Expected to return table is full since max number of fabrics has been created already")
+                filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=params.randomDiscriminator
+            )
+        # When attempting to create a new controller we are expected to get the following response:
+        # src/credentials/FabricTable.cpp:833: CHIP Error 0x0000000B: No memory
+        # Since the FabricTable is full and unable to create any new fabrics
+        self.print_step("Max number of fabrics", "reached")
+        asserts.assert_equal(cm.exception.err,  0x0000000B,
+                             "Expected to return table is full since max number of fabrics has been created already")
 
         self.step(9)
         for fab_idx in fabric_idxs:

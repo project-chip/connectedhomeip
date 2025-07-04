@@ -19,7 +19,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/soil_2_2_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -27,7 +27,7 @@
 #       --passcode 20202021
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --endpoint 1
-#       --app-pipe_prefix /tmp/chip_all_clusters_fifo_
+#       --app-pipe /tmp/soil_2_2_fifo
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -35,7 +35,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from random import randrange
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
@@ -81,10 +80,9 @@ class TC_SOIL_2_2(MatterBaseTest):
         max_bound = soil_moisture_limits.maxMeasuredValue
 
         if self.is_pics_sdk_ci_only:
-            # Set the initial soil moisture, since it inits as null. Pick a random value between min_bound and max_bound
-            irand = randrange(min_bound, max_bound)
-            logging.info(f"Simulated soil moisture value: {irand}")
-            self.write_to_app_pipe({"Name": "SetSimulatedSoilMoisture", "SoilMoistureValue": irand, "EndpointId": endpoint})
+            # Set the initial soil moisture to the min_bound value, since it inits as null.
+            logging.info(f"Simulated soil moisture value: {min_bound}")
+            self.write_to_app_pipe({"Name": "SetSimulatedSoilMoisture", "SoilMoistureValue": min_bound, "EndpointId": endpoint})
 
         self.step(3)
         measurement = await self.read_soil_attribute_expect_success(endpoint=endpoint, attribute=attributes.SoilMoistureMeasuredValue)
@@ -94,10 +92,9 @@ class TC_SOIL_2_2(MatterBaseTest):
 
         self.step(4)
         if self.is_pics_sdk_ci_only:
-            # Simulate a change in soil moisture. Pick a random value between min_bound and max_bound
-            irand = randrange(min_bound, max_bound)
-            logging.info(f"Simulated soil moisture value: {irand}")
-            self.write_to_app_pipe({"Name": "SetSimulatedSoilMoisture", "SoilMoistureValue": irand, "EndpointId": endpoint})
+            # Simulate a change in soil moisture, changing to max_bound.
+            logging.info(f"Simulated soil moisture value: {max_bound}")
+            self.write_to_app_pipe({"Name": "SetSimulatedSoilMoisture", "SoilMoistureValue": max_bound, "EndpointId": endpoint})
 
         else:
             self.wait_for_user_input(

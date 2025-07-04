@@ -44,7 +44,8 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import AttributePath, TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
-from chip.testing.matter_testing import AttributeChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.event_attribute_reporting import AttributeChangeCallback
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 '''
@@ -66,7 +67,8 @@ https://github.com/CHIP-Specifications/chip-test-plans/blob/master/src/interacti
 class TC_IDM_4_2(MatterBaseTest):
 
     def steps_TC_IDM_4_2(self):
-        return [TestStep(0, "CR1 reads the ServerList attribute from the Descriptor cluster on EP0.",
+        return [TestStep('precondition', "TH commissions DUT if required", is_commissioning=True),
+                TestStep(0, "CR1 reads the ServerList attribute from the Descriptor cluster on EP0.",
                          "If the ICD Management cluster ID (70,0x46) is present, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = IdleModeDuration and min_interval_floor_s to 0, otherwise, set SUBSCRIPTION_MAX_INTERVAL_PUBLISHER_LIMIT_SEC = 60 mins and min_interval_floor_s to 3."),
                 TestStep(1, "CR1 sends a subscription message to the DUT with MaxIntervalCeiling set to a value greater than subscription_max_interval_publisher_limit_sec. DUT sends a report data action to the TH. CR1 sends a success status response to the DUT. DUT sends a Subscribe Response Message to the CR1 to activate the subscription.",
                          "Verify on the CR1, a report data message is received. Verify it contains the following data Report data - data of the attribute/event requested earlier. Verify on the CR1 the Subscribe Response has the following fields, SubscriptionId - Verify it is of type uint32. MaxInterval - Verify it is of type uint32. Verify that the MaxInterval is less than or equal to MaxIntervalCeiling."),
@@ -172,6 +174,8 @@ class TC_IDM_4_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_IDM_4_2(self):
+        # commissioning step - done prior to test start
+        self.step('precondition')
 
         # Test setup
         cluster_rev_attr = Clusters.BasicInformation.Attributes.ClusterRevision
@@ -335,7 +339,7 @@ class TC_IDM_4_2(MatterBaseTest):
         # it doesn't have access to
         # "INVALID_ACTION" status response expected
 
-        try:
+        with asserts.assert_raises(ChipStackError) as cm:
             await CR2.ReadAttribute(
                 nodeid=self.dut_node_id,
                 # Attribute from a cluster controller 2 has no access to
@@ -344,11 +348,8 @@ class TC_IDM_4_2(MatterBaseTest):
                 reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
                 autoResubscribe=False
             )
-            asserts.fail("Expected exception not thrown")
-        except ChipStackError as e:
-            # Verify that the DUT returns an "INVALID_ACTION" status response
-            asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
-                                 "Incorrect error response for subscription to unallowed cluster")
+        asserts.assert_equal(cm.exception.err, INVALID_ACTION_ERROR_CODE,
+                             "Incorrect error response for subscription to unallowed cluster")
 
         # *** Step 4 ***
         # Setup CR2 such that it does not have access to all attributes on a specific cluster and
@@ -371,7 +372,7 @@ class TC_IDM_4_2(MatterBaseTest):
         # Controller 2 tries to subscribe to all attributes from a cluster
         # it doesn't have access to
         # "INVALID_ACTION" status response expected
-        try:
+        with asserts.assert_raises(ChipStackError) as cm:
             await CR2.ReadAttribute(
                 nodeid=self.dut_node_id,
                 # Cluster controller 2 has no access to
@@ -380,11 +381,9 @@ class TC_IDM_4_2(MatterBaseTest):
                 reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
                 autoResubscribe=False
             )
-            raise ValueError("Expected exception not thrown")
-        except ChipStackError as e:
-            # Verify that the DUT returns an "INVALID_ACTION" status response
-            asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
-                                 "Incorrect error response for subscription to unallowed cluster")
+        # Verify that the DUT returns an "INVALID_ACTION" status response
+        asserts.assert_equal(cm.exception.err, INVALID_ACTION_ERROR_CODE,
+                             "Incorrect error response for subscription to unallowed cluster")
 
         await self.write_dut_acl(CR1, dut_acl_original)
         acl_list = await self.get_dut_acl(CR1)
@@ -414,7 +413,7 @@ class TC_IDM_4_2(MatterBaseTest):
         # Controller 2 tries to subscribe to all attributes from all clusters
         # on an endpoint it doesn't have access to
         # "INVALID_ACTION" status response expected
-        try:
+        with asserts.assert_raises(ChipStackError) as cm:
             await CR2.ReadAttribute(
                 nodeid=self.dut_node_id,
                 # Endpoint controller 2 has no access to
@@ -423,10 +422,8 @@ class TC_IDM_4_2(MatterBaseTest):
                 reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
                 autoResubscribe=False
             )
-            raise ValueError("Expected exception not thrown")
-        except ChipStackError as e:
-            # Verify that the DUT returns an "INVALID_ACTION" status response
-            asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
+        # Verify that the DUT returns an "INVALID_ACTION" status response
+            asserts.assert_equal(cm.exception.err, INVALID_ACTION_ERROR_CODE,
                                  "Incorrect error response for subscription to unallowed endpoint")
 
         # *** Step 6 ***
@@ -443,7 +440,7 @@ class TC_IDM_4_2(MatterBaseTest):
         # Controller 2 tries to subscribe to all attributes from all clusters
         # from all endpoints on a node it doesn't have access to
         # "INVALID_ACTION" status response expected
-        try:
+        with asserts.assert_raises(ChipStackError) as cm:
             await CR2.ReadAttribute(
                 # Node controller 2 has no access to
                 nodeid=self.dut_node_id,
@@ -452,12 +449,9 @@ class TC_IDM_4_2(MatterBaseTest):
                 reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
                 autoResubscribe=False
             )
-            raise ValueError("Expected exception not thrown")
-        except ChipStackError as e:
             # Verify that the DUT returns an "INVALID_ACTION" status response
-            asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
+            asserts.assert_equal(cm.exception.err, INVALID_ACTION_ERROR_CODE,
                                  "Incorrect error response for subscription to unallowed node")
-
         # *** Step 7 ***
         # CR1 sends a subscription request action for an attribute with an empty
         # DataVersionFilters field. DUT sends a report data action with the data
@@ -660,24 +654,20 @@ class TC_IDM_4_2(MatterBaseTest):
 
         # Attempt a subscription with both AttributeRequests and EventRequests as empty
         sub_cr1_step13 = None
-        try:
+        with asserts.assert_raises(ChipStackError) as cm:
             sub_cr1_step13 = await CR1.Read(
                 nodeid=self.dut_node_id,
                 attributes=[],
                 events=[],
                 reportInterval=(min_interval_floor_sec, max_interval_ceiling_sec),
             )
-            raise ValueError("Expected exception not thrown")
-        except ChipStackError as e:
-            # Verify that the DUT sends back a Status Response Action with the INVALID_ACTION Status Code
-            asserts.assert_equal(e.err, INVALID_ACTION_ERROR_CODE,
-                                 "Incorrect error response for subscription with empty AttributeRequests and EventRequests")
+        # Verify that the DUT sends back a Status Response Action with the INVALID_ACTION Status Code
+        asserts.assert_equal(cm.exception.err, INVALID_ACTION_ERROR_CODE,
+                             "Incorrect error response for subscription with empty AttributeRequests and EventRequests")
 
-            # Verify no subscription is established
-            with asserts.assert_raises(AttributeError):
-                sub_cr1_step13.subscriptionId
-        except Exception:
-            asserts.fail("Expected exception was not thrown")
+        # Verify no subscription is established
+        with asserts.assert_raises(AttributeError):
+            sub_cr1_step13.subscriptionId
 
 
 if __name__ == "__main__":

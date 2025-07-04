@@ -41,8 +41,8 @@ import time
 
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
-from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
-                                         has_cluster, run_if_endpoint_matches)
+from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 from test_plan_support import commission_if_required, read_attribute, verify_success
 
@@ -289,7 +289,7 @@ class TC_CC_2_3(MatterBaseTest):
 
         self.step(33)
         if cc.Attributes.RemainingTime.attribute_id not in attribute_list or not supports_ct:
-            self.skip_all_remaining_steps(34)
+            self.mark_all_remaining_steps_skipped(34)
             return
 
         self.step(34)
