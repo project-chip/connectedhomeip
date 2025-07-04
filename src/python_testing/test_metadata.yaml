@@ -144,14 +144,17 @@ not_automated:
       reason:
           Closure app on master branch does not support this test script yet.
     - name: TC_PAVST_2_1.py
-      reason: Depends on PushAV cluster. Will be enabled once local tests
-          are fully verified.
+      reason:
+          Depends on PushAV cluster. Will be enabled once local tests are fully
+          verified.
     - name: TC_PAVST_2_2.py
-      reason: Depends on PushAV cluster. Will be enabled once local tests
-          are fully verified.
+      reason:
+          Depends on PushAV cluster. Will be enabled once local tests are fully
+          verified.
     - name: TC_PAVST_2_9.py
-      reason: Depends on PushAV cluster. Will be enabled once local tests
-          are fully verified.
+      reason:
+          Depends on PushAV cluster. Will be enabled once local tests are fully
+          verified.
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
