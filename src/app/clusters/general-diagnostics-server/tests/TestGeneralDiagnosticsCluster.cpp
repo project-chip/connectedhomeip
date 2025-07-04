@@ -82,7 +82,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         ASSERT_EQ(commands[0].commandId, GeneralDiagnostics::Commands::TestEventTrigger::Id);
         ASSERT_EQ(commands[0].GetInvokePrivilege(),
                   GeneralDiagnostics::Commands::TestEventTrigger::kMetadataEntry.GetInvokePrivilege());
-        
+
         ASSERT_EQ(commands[1].commandId, GeneralDiagnostics::Commands::TimeSnapshot::Id);
         ASSERT_EQ(commands[1].GetInvokePrivilege(),
                   GeneralDiagnostics::Commands::TimeSnapshot::kMetadataEntry.GetInvokePrivilege());
@@ -93,7 +93,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
         ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
-        ASSERT_EQ(expectedBuilder.AppendElements({ 
+        ASSERT_EQ(expectedBuilder.AppendElements({
             GeneralDiagnostics::Attributes::NetworkInterfaces::kMetadataEntry,
             GeneralDiagnostics::Attributes::RebootCount::kMetadataEntry,
             GeneralDiagnostics::Attributes::UpTime::kMetadataEntry,

@@ -180,7 +180,7 @@ CHIP_ERROR GeneralDiagnosticsLogic::Attributes(ReadOnlyBufferBuilder<DataModel::
 }
 
 CHIP_ERROR GeneralDiagnosticsLogic::AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) {
-    static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = { 
+    static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
         Commands::TestEventTrigger::kMetadataEntry,
         Commands::TimeSnapshot::kMetadataEntry,
     #if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
