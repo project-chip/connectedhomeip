@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2022 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -71,7 +71,7 @@ class TC_CLDIM_4_2(MatterBaseTest):
             TestStep("2b", "If Positioning feature is not supported, skip remaining steps"),
             TestStep("2c", "Establish wilcard subscription to all attributes"),
             TestStep("2d", "Read CurrentState attribute"),
-            TestStep("2e", "If Latching feature not supported or state is unlatched, skip steps 2h ti 2m"),
+            TestStep("2e", "If Latching feature not supported or state is unlatched, skip steps 2f to 2k"),
             TestStep("2f", "Read LatchControlModes attribute"),
             TestStep("2g", "If LatchControlModes is manual unlatching, skip step 2h"),
             TestStep("2h", "Send SetTarget command with Latch=False"),
@@ -126,7 +126,7 @@ class TC_CLDIM_4_2(MatterBaseTest):
         self.step("2d")
         initial_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentState)
 
-        # STEP 2e: If Latching feature is not supported or state is unlatched, skip steps 2h to 2m
+        # STEP 2e: If Latching feature is not supported or state is unlatched, skip steps 2f to 2k
         self.step("2e")
         if (not is_latching_supported) or (not initial_state.latch):
             logging.info("Latching feature is not supported or state is unlatched. Skipping steps 2f to 2k.")

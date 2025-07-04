@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2022 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -96,7 +96,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
             TestStep("2d", "If Limitation feature is supported, read LimitRange attribute"),
             TestStep("2e", "Establish wilcard subscription to all attributes"),
             TestStep("2f", "Read CurrentState attribute"),
-            TestStep("2g", "If Latching feature not supported or state is unlatched, skip steps 2h ti 2m"),
+            TestStep("2g", "If Latching feature not supported or state is unlatched, skip steps 2h to 2m"),
             TestStep("2h", "Read LatchControlModes attribute"),
             TestStep("2i", "If LatchControlModes is manual unlatching, skip step 2j"),
             TestStep("2j", "Send SetTarget command with Latch=False"),
