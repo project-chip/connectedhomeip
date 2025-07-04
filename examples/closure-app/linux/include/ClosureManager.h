@@ -142,29 +142,27 @@ private:
     chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint3{ kClosurePanelEndpoint3 };
 
     /**
-     * @brief Stores the current endpoint ID being managed or operated on.
+     * @brief Tracks the endpoint's current action being performed by the ClosureManager.
      *
-     * Initialized to an invalid endpoint ID and updated as needed during operations.
-     */
-    chip::EndpointId mCurrentEndpointId = chip::kInvalidEndpointId;
-
-    /**
-     * @brief Tracks the current action being performed by the ClosureManager.
-     *
+     * These variables are used to determine the type of action currently being executed on the closure endpoints.
      * Initialized to an invalid action and updated as needed during operations.
      */
-    ClosureAction mCurrentAction = ClosureAction::kInvalidAction;
+    ClosureAction mEp1CurrentAction = ClosureAction::kInvalidAction;
+    ClosureAction mEp2CurrentAction = ClosureAction::kInvalidAction;
+    ClosureAction mEp3CurrentAction = ClosureAction::kInvalidAction;
 
     /**
-     * @brief Timer callback handler for closure actions.
+     * @brief Timer callback handlers for closure actions over specific endpoints.
      *
-     * This static method is called when the timer for a closure action expires.
+     * These static methods are called when the timer for a closure action expires.
      * It is responsible for handling the completion or progression of closure-related actions.
      *
      * @param layer Pointer to the system layer that triggered the timer.
      * @param aAppState Application-specific state or context passed to the timer.
      */
-    static void HandleClosureActionTimer(chip::System::Layer * layer, void * aAppState);
+    static void HandleEp1ClosureActionTimer(chip::System::Layer * layer, void * aAppState);
+    static void HandleEp2ClosureActionTimer(chip::System::Layer * layer, void * aAppState);
+    static void HandleEp3ClosureActionTimer(chip::System::Layer * layer, void * aAppState);
 
     /**
      * @brief Handles the completion of a Calibrate action.
@@ -242,7 +240,7 @@ private:
                               chip::app::DataModel::Nullable<chip::Percent100ths> & nextPosition);
 
     bool mIsCalibrationActionInProgress = false;
-    bool mIsMoveToActionInProgress      = false;
-    bool mIsSetTargetActionInProgress   = false;
-    bool mIsStepActionInProgress        = false;
+    bool mEp1MotionInProgress            = false;
+    bool mEp2MotionInProgress            = false;
+    bool mEp3MotionInProgress            = false;
 };

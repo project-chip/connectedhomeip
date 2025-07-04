@@ -114,29 +114,32 @@ void ClosureManager::Init()
 
 chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
 {
-    // Cancel any existing timer for closure action
-    DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
+    // Cancel any existing timers for closure actions over all endpoints
+    DeviceLayer::SystemLayer().CancelTimer(HandleEp1ClosureActionTimer, this);
+    DeviceLayer::SystemLayer().CancelTimer(HandleEp2ClosureActionTimer, this);
+    DeviceLayer::SystemLayer().CancelTimer(HandleEp3ClosureActionTimer, this);
+
+    mEp1CurrentAction                 = ClosureAction::kCalibrateAction;
+    mIsCalibrationActionInProgress = true;
 
     // For sample application, we are using a timer to simulate the hardware calibration action.
     // In a real application, this would be replaced with actual calibration logic and call HandleClosureActionComplete.
     VerifyOrReturnValue(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kCountdownTimeSeconds),
-                                                              HandleClosureActionTimer, nullptr) == CHIP_NO_ERROR,
+                                                              HandleEp1ClosureActionTimer, nullptr) == CHIP_NO_ERROR,
                         Status::Failure, ChipLogError(AppServer, "Failed to start closure action timer"));
-    mCurrentAction                 = ClosureAction::kCalibrateAction;
-    mCurrentEndpointId             = kClosureEndpoint1;
-    mIsCalibrationActionInProgress = true;
+    
 
-    ChipLogProgress(AppServer, "ClosureManager: Calibration action started for endpoint %d", mCurrentEndpointId);
-
+    ChipLogProgress(AppServer, "ClosureManager: Calibration action started for endpoint 1");
     return Status::Success;
 }
 
 chip::Protocols::InteractionModel::Status ClosureManager::OnStopCommand()
 {
-    // Cancel any existing timer for closure action
-    DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
-    mCurrentAction     = ClosureAction::kStopAction;
-    mCurrentEndpointId = kClosureEndpoint1;
+    // Cancel any existing timers for closure action
+    DeviceLayer::SystemLayer().CancelTimer(HandleEp1ClosureActionTimer, this);
+    DeviceLayer::SystemLayer().CancelTimer(HandleEp2ClosureActionTimer, this);
+    DeviceLayer::SystemLayer().CancelTimer(HandleEp3ClosureActionTimer, this);
+    mEp1CurrentAction = ClosureAction::kStopAction;
     HandleStopActionComplete();
     return Status::Success;
 }
@@ -146,7 +149,7 @@ ClosureManager::OnMoveToCommand(const Optional<TargetPositionEnum> & position, c
                                 const Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> & speed)
 {
     // Cancel any existing timer for closure action
-    DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
+    (void) DeviceLayer::SystemLayer().CancelTimer(HandleEp1ClosureActionTimer, this);
 
     // Update the target state for the closure panels based on the MoveTo command.
     // This closure sample app assumes that the closure panels are represented by two endpoints:
@@ -238,9 +241,9 @@ ClosureManager::OnMoveToCommand(const Optional<TargetPositionEnum> & position, c
     VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(kCountdownTimeSeconds) == CHIP_NO_ERROR,
                         Status::Failure, ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
 
-    DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kMotionCountdownTimeMs), HandleClosureActionTimer, this);
-    mCurrentAction            = ClosureAction::kMoveToAction;
-    mIsMoveToActionInProgress = true;
+    mEp1CurrentAction       = ClosureAction::kMoveToAction;
+    mEp1MotionInProgress    = true;
+    DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kMotionCountdownTimeMs), HandleEp1ClosureActionTimer, this);
     return Status::Success;
 }
 
@@ -262,18 +265,22 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
     return Status::Success;
 }
 
-void ClosureManager::HandleClosureActionTimer(System::Layer * layer, void * aAppState)
+void ClosureManager::HandleEp1ClosureActionTimer(System::Layer * layer, void * aAppState)
 {
     // Mark aAppState as unused to avoid compiler warnings
     // Will be used in closure dimension cluster Commands
     (void) aAppState;
 
     ClosureManager & instance = ClosureManager::GetInstance();
+    ChipLogError(AppServer, "HandleEp1ClosureActionTimer called with current action: %d", static_cast<int>(instance.mEp1CurrentAction));
 
-    switch (instance.mCurrentAction)
+    switch (instance.mEp1CurrentAction)
     {
     case ClosureAction::kCalibrateAction:
         instance.HandleCalibrateActionComplete();
+        break;
+    case ClosureAction::kStopAction:
+        // Add logic to handle Stop action completion
         break;
     case ClosureAction::kMoveToAction:
         instance.HandleClosureMotionAction();
@@ -281,6 +288,23 @@ void ClosureManager::HandleClosureActionTimer(System::Layer * layer, void * aApp
     case ClosureAction::kLatchAction:
         // Add logic to handle Latch action completion
         break;
+    default:
+        ChipLogError(AppServer, "Invalid action received in HandleEp1ClosureActionTimer");
+        break;
+    }
+}
+
+void ClosureManager::HandleEp2ClosureActionTimer(System::Layer * layer, void * aAppState)
+{
+    // Mark aAppState as unused to avoid compiler warnings
+    // Will be used in closure dimension cluster Commands
+    (void) aAppState;
+
+    ClosureManager & instance = ClosureManager::GetInstance();
+    ChipLogError(AppServer, "HandleEp2ClosureActionTimer called with current action: %d", static_cast<int>(instance.mEp2CurrentAction));
+
+    switch (instance.mEp2CurrentAction)
+    {
     case ClosureAction::kSetTargetAction:
         // Add logic to handle SetTarget action completion
         break;
@@ -291,7 +315,33 @@ void ClosureManager::HandleClosureActionTimer(System::Layer * layer, void * aApp
         // Add logic to handle Panel Latch action completion
         break;
     default:
-        ChipLogError(AppServer, "Invalid action received in HandleClosureActionTimer");
+        ChipLogError(AppServer, "Invalid action received in HandleEp3ClosureActionTimer");
+        break;
+    }
+}
+
+void ClosureManager::HandleEp3ClosureActionTimer(System::Layer * layer, void * aAppState)
+{
+    // Mark aAppState as unused to avoid compiler warnings
+    // Will be used in closure dimension cluster Commands
+    (void) aAppState;
+
+    ClosureManager & instance = ClosureManager::GetInstance();
+    ChipLogError(AppServer, "HandleEp3ClosureActionTimer called with current action: %d", static_cast<int>(instance.mEp3CurrentAction));
+
+    switch (instance.mEp3CurrentAction)
+    {
+    case ClosureAction::kSetTargetAction:
+        // Add logic to handle SetTarget action completion
+        break;
+    case ClosureAction::kStepAction:
+        // Add logic to handle Step action completion
+        break;
+    case ClosureAction::kPanelLatchAction:
+        // Add logic to handle Panel Latch action completion
+        break;
+    default:
+        ChipLogError(AppServer, "Invalid action received in HandleEp3ClosureActionTimer");
         break;
     }
 }
@@ -396,7 +446,10 @@ void ClosureManager::HandleClosureMotionAction()
     // If the closure target is not reached, we will reschedule the timer for motion action
     if (isProgressPossible)
     {
-        DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(1), HandleClosureActionTimer, this);
+        mEp1CurrentAction            = ClosureAction::kMoveToAction;
+        mEp1MotionInProgress         = true;
+        DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kMotionCountdownTimeMs), HandleEp1ClosureActionTimer, this);
+        ChipLogProgress(AppServer, "Rescheduled HandleEp1ClosureActionTimer for motion action");
         return;
     }
 
@@ -465,8 +518,7 @@ void ClosureManager::HandleCalibrateActionComplete()
     mClosurePanelEndpoint2.OnCalibrateActionComplete();
     mClosurePanelEndpoint3.OnCalibrateActionComplete();
     mIsCalibrationActionInProgress = false;
-    mCurrentAction                 = ClosureAction::kInvalidAction;
-    mCurrentEndpointId             = chip::kInvalidEndpointId;
+    mEp1CurrentAction                 = ClosureAction::kInvalidAction;
 }
 
 void ClosureManager::HandleStopActionComplete()
@@ -480,13 +532,13 @@ void ClosureManager::HandleStopActionComplete()
         mClosurePanelEndpoint3.OnStopCalibrateActionComplete();
         mIsCalibrationActionInProgress = false;
     }
-    else if (mIsMoveToActionInProgress)
+    else if (mEp1MotionInProgress)
     {
         ChipLogDetail(AppServer, "Stopping move to action");
         mClosureEndpoint1.OnStopMotionActionComplete();
         mClosurePanelEndpoint2.OnStopMotionActionComplete();
         mClosurePanelEndpoint3.OnStopMotionActionComplete();
-        mIsMoveToActionInProgress = false;
+        mEp1MotionInProgress = false;
     }
     else
     {
@@ -500,9 +552,8 @@ void ClosureManager::HandleMoveToActionComplete()
     mClosureEndpoint1.OnMoveToActionComplete();
     mClosurePanelEndpoint2.OnMoveToActionComplete();
     mClosurePanelEndpoint3.OnMoveToActionComplete();
-    mIsMoveToActionInProgress = false;
-    mCurrentAction            = ClosureAction::kInvalidAction;
-    mCurrentEndpointId        = chip::kInvalidEndpointId;
+    mEp1MotionInProgress = false;
+    mEp1CurrentAction            = ClosureAction::kInvalidAction;
 }
 
 void ClosureManager::HandleSetTargetActionComplete()
