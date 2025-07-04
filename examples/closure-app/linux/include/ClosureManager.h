@@ -143,20 +143,6 @@ private:
     chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint3{ kClosurePanelEndpoint3 };
 
     /**
-     * @brief Stores the current endpoint ID being managed or operated on.
-     *
-     * Initialized to an invalid endpoint ID and updated as needed during operations.
-     */
-    chip::EndpointId mCurrentEndpointId = chip::kInvalidEndpointId;
-
-    /**
-     * @brief Tracks the current action being performed by the ClosureManager.
-     *
-     * Initialized to an invalid action and updated as needed during operations.
-     */
-    ClosureAction mCurrentAction = ClosureAction::kInvalidAction;
-
-    /**
      * @brief Gets the current panel instance being operated on.
      *
      * This method returns a pointer to the ClosureDimensionEndpoint instance
@@ -164,8 +150,7 @@ private:
      *
      * @return Pointer to the current panel instance, or nullptr if not found.
      */
-    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint *
-    ClosureManager::GetCurrentPanelInstance(chip::EndpointId endpointId);
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * GetCurrentPanelInstance(chip::EndpointId endpointId);
     /**
      * @brief Timer callback handler for closure actions.
      *
@@ -247,7 +232,7 @@ private:
      *
      * @param action The action that has been completed.
      */
-    void HandlePanelSetTargetActionComplete();
+    void HandlePanelSetTargetActionComplete(chip::EndpointId endpointId);
 
     /**
      * @brief Handles the completion of a Step action.
@@ -257,7 +242,7 @@ private:
      *
      * @param action The action that has been completed.
      */
-    void HandlePanelStepActionComplete();
+    void HandlePanelStepActionComplete(chip::EndpointId endpointId);
 
     bool mIsCalibrationActionInProgress       = false;
     bool mIsMoveToActionInProgress            = false;

@@ -162,12 +162,6 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
                         Status::InvalidInState,
                         ChipLogError(AppServer, "Step command not allowed in current state: %d", static_cast<int>(ep1MainState)));
 
-    if (mIsSetTargetActionInProgress && mCurrentActionEndpointId != endpointId)
-    {
-        ChipLogError(AppServer, "SetTarget action is already in progress on Endpoint %d", mCurrentActionEndpointId);
-        return Status::Failure;
-    }
-
     // Update OverallTarget of Closure based on SetTarget command.
     DataModel::Nullable<GenericOverallTargetState> overallTargetState;
     VerifyOrReturnError(mClosureEndpoint1.GetLogic().GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR, Status::Failure,
@@ -204,17 +198,31 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(con
     VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetMainState(MainStateEnum::kMoving) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set main state for SetTarget command on Endpoint 1"));
 
-    (void) DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
-
     // Post an event to initiate the unlatch action asynchronously.
     // Closure panel first performs the unlatch action if it is currently latched,
     // and then continues with the SetTarget action.
     // This is to ensure that the panel can move to the target position without being latched.
-    mCurrentAction               = ClosureManager::ClosureAction::kPanelUnLatchAction;
-    mCurrentActionEndpointId     = endpointId;
-    mIsSetTargetActionInProgress = true;
-    (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kMotionCountdownTimeMs), HandleClosureActionTimer,
-                                                 this);
+    if (endpointId == kClosurePanelEndpoint2)
+    {
+        mEp2CurrentAction           = ClosureManager::ClosureAction::kSetTargetAction;
+        mEp2MotionInProgress        = true;
+        (void) DeviceLayer::SystemLayer().CancelTimer(HandleEp2ClosureActionTimer, this);
+        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kMotionCountdownTimeMs), HandleEp2ClosureActionTimer, this);
+        ChipLogError(AppServer, "Triggered HandleEp2ClosureActionTimer for SetTarget command on Endpoint 2");
+    }
+    else if (endpointId == kClosurePanelEndpoint3)
+    {
+        mEp3CurrentAction           = ClosureManager::ClosureAction::kSetTargetAction;
+        mEp3MotionInProgress        = true;
+        (void) DeviceLayer::SystemLayer().CancelTimer(HandleEp3ClosureActionTimer, this);
+        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kMotionCountdownTimeMs), HandleEp3ClosureActionTimer, this);
+        ChipLogError(AppServer, "Triggered HandleEp3ClosureActionTimer for SetTarget command on Endpoint 3");
+    }
+    else
+    {
+        ChipLogError(AppServer, "Invalid endpoint ID for SetTarget command: %d", endpointId);
+        return Status::Failure;
+    }
 
     return Status::Success;
 }
@@ -235,12 +243,6 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
                             ep1MainState != MainStateEnum::kCalibrating,
                         Status::InvalidInState,
                         ChipLogError(AppServer, "Step command not allowed in current state: %d", static_cast<int>(ep1MainState)));
-
-    if (mIsStepActionInProgress && mCurrentActionEndpointId != endpointId)
-    {
-        ChipLogError(AppServer, "Step action is already in progress on Endpoint %d", mCurrentActionEndpointId);
-        return Status::Failure;
-    }
 
     VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetMainState(MainStateEnum::kMoving) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
@@ -264,12 +266,27 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStepCommand(const St
     VerifyOrReturnValue(mClosureEndpoint1.GetLogic().SetOverallTargetState(ep1Target) == CHIP_NO_ERROR, Status::Failure,
                         ChipLogError(AppServer, "Failed to set overall target for Step command"));
 
-    (void) DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
-    mCurrentAction           = ClosureManager::ClosureAction::kStepAction;
-    mCurrentActionEndpointId = endpointId;
-    mIsStepActionInProgress  = true;
-    (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kMotionCountdownTimeMs), HandleClosureActionTimer,
-                                                 this);
+    if (endpointId == kClosurePanelEndpoint2)
+    {
+        mEp2CurrentAction           = ClosureManager::ClosureAction::kStepAction;
+        mEp2MotionInProgress        = true;
+        (void) DeviceLayer::SystemLayer().CancelTimer(HandleEp2ClosureActionTimer, this);
+        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kMotionCountdownTimeMs), HandleEp2ClosureActionTimer, this);
+        ChipLogError(AppServer, "Triggered HandleEp2ClosureActionTimer for Step command on Endpoint 2");
+    }
+    else if (endpointId == kClosurePanelEndpoint3)
+    {
+        mEp3CurrentAction           = ClosureManager::ClosureAction::kStepAction;
+        mEp3MotionInProgress        = true;
+        (void) DeviceLayer::SystemLayer().CancelTimer(HandleEp3ClosureActionTimer, this);
+        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kMotionCountdownTimeMs), HandleEp3ClosureActionTimer, this);
+        ChipLogError(AppServer, "Triggered HandleEp3ClosureActionTimer for Step command on Endpoint 3");
+    }
+    else
+    {
+        ChipLogError(AppServer, "Invalid endpoint ID for SetTarget command: %d", endpointId);
+        return Status::Failure;
+    }
     return Status::Success;
 }
 
@@ -355,7 +372,19 @@ void ClosureManager::HandlePanelUnlatchAction(EndpointId endpointId)
     }
 
     // Cancel any active timers before starting the panel movement
-    (void) DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
+    if (endpointId == kClosurePanelEndpoint2)
+    {
+        (void) DeviceLayer::SystemLayer().CancelTimer(HandleEp2ClosureActionTimer, this);
+    }
+    else if (endpointId == kClosurePanelEndpoint3)
+    {
+        (void) DeviceLayer::SystemLayer().CancelTimer(HandleEp3ClosureActionTimer, this);
+    }
+    else
+    {
+        ChipLogError(AppServer, "Invalid endpoint ID for SetTarget command: %d", endpointId);
+        return;
+    }
 
     instance.HandlePanelSetTargetAction(endpointId);
 }
@@ -409,13 +438,28 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
         ChipLogProgress(AppServer, "EndPoint %d Current Position: %d, Target Position: %d", endpointId, nextPosition.Value(),
                         panelTargetState.Value().position.Value().Value());
     }
+
     if (panelProgressPossible)
     {
-        (void) DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
-        mCurrentAction     = ClosureManager::ClosureAction::kSetTargetAction;
-        mCurrentEndpointId = endpointId;
-        // Start the timer to continue with the SetTarget action
-        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(1), HandleClosureActionTimer, this);
+        // Start the timer for the respective endpoint to continue with the SetTarget action
+        if (endpointId == kClosurePanelEndpoint2)
+        {
+            mEp2CurrentAction     = ClosureManager::ClosureAction::kSetTargetAction;
+            (void) DeviceLayer::SystemLayer().CancelTimer(HandleEp2ClosureActionTimer, this);
+            (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kMotionCountdownTimeMs), HandleEp2ClosureActionTimer, this);
+            ChipLogError(AppServer, "Triggered HandleEp2ClosureActionTimer for SetTarget Action command on Endpoint 2");
+        }
+        else if (endpointId == kClosurePanelEndpoint3)
+        {
+            mEp3CurrentAction     = ClosureManager::ClosureAction::kSetTargetAction;
+            (void) DeviceLayer::SystemLayer().CancelTimer(HandleEp3ClosureActionTimer, this);
+            (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kMotionCountdownTimeMs), HandleEp3ClosureActionTimer, this);
+            ChipLogError(AppServer, "Triggered HandleEp3ClosureActionTimer for SetTarget Action command on Endpoint 3");
+        }
+        else
+        {
+            ChipLogError(AppServer, "Invalid endpoint ID for SetTarget command: %d", endpointId);
+        }
         return;
     }
 
@@ -444,7 +488,7 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
         }
     }
     // If the target position is reached, call the HandlePanelSetTargetActionComplete method to complete the action
-    HandlePanelSetTargetActionComplete();
+    HandlePanelSetTargetActionComplete(endpointId);
 }
 
 void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
@@ -501,15 +545,29 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
         ep->GetLogic().SetCurrentState(panelCurrentState);
 
         // Cancel any existing timer before starting a new action
-        (void) DeviceLayer::SystemLayer().CancelTimer(HandleClosureActionTimer, this);
-        instance.mCurrentAction           = ClosureManager::ClosureAction::kStepAction;
-        instance.mCurrentActionEndpointId = endpointId;
-        (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(1), HandleClosureActionTimer, this);
+        if (endpointId == kClosurePanelEndpoint2)
+        {
+            instance.mEp2CurrentAction           = ClosureManager::ClosureAction::kStepAction;
+            (void) DeviceLayer::SystemLayer().CancelTimer(HandleEp2ClosureActionTimer, this);
+            (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kMotionCountdownTimeMs), HandleEp2ClosureActionTimer, this);
+            ChipLogError(AppServer, "Triggered HandleEp2ClosureActionTimer for Step Action command on Endpoint 2");
+        }
+        else if (endpointId == kClosurePanelEndpoint3)
+        {
+            instance.mEp3CurrentAction           = ClosureManager::ClosureAction::kStepAction;
+            (void) DeviceLayer::SystemLayer().CancelTimer(HandleEp3ClosureActionTimer, this);
+            (void) DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(kMotionCountdownTimeMs), HandleEp3ClosureActionTimer, this);
+            ChipLogError(AppServer, "Triggered HandleEp3ClosureActionTimer for Step Action command on Endpoint 3");
+        }
+        else
+        {
+            ChipLogError(AppServer, "Invalid endpoint ID for SetTarget command: %d", endpointId);
+        }
         return;
     }
 
     // If the target position is reached, we can complete the action
-    HandlePanelStepActionComplete();
+    HandlePanelStepActionComplete(endpointId);
 }
 
 void ClosureManager::HandleCalibrateActionComplete()
@@ -534,44 +592,57 @@ void ClosureManager::HandleMoveToActionComplete()
     // Add logic to handle MoveTo action completion
 }
 
-void ClosureManager::HandlePanelSetTargetActionComplete()
+void ClosureManager::HandlePanelSetTargetActionComplete(chip::EndpointId endpointId)
 {
     ChipLogProgress(AppServer, "HandleSetTargetActionComplete called");
 
     ClosureManager & instance = ClosureManager::GetInstance();
     instance.mClosureEndpoint1.OnPanelMotionActionComplete();
-    if (instance.mCurrentActionEndpointId == instance.mClosurePanelEndpoint2.GetEndpoint())
+
+    if (endpointId == instance.mClosurePanelEndpoint2.GetEndpoint())
     {
         instance.mClosurePanelEndpoint2.OnPanelMotionActionComplete();
+        instance.mEp2CurrentAction               = ClosureAction::kInvalidAction;
+        instance.mEp2MotionInProgress            = false;
     }
-    else if (instance.mCurrentActionEndpointId == instance.mClosurePanelEndpoint3.GetEndpoint())
+    else if (endpointId == instance.mClosurePanelEndpoint3.GetEndpoint())
     {
         instance.mClosurePanelEndpoint3.OnPanelMotionActionComplete();
+        instance.mEp3CurrentAction               = ClosureAction::kInvalidAction;
+        instance.mEp3MotionInProgress            = false;
+    } else
+    {
+        ChipLogError(AppServer, "Invalid endpoint ID for SetTarget command: %d", endpointId);
+        return;
     }
-    instance.mIsSetTargetActionInProgress = false;
-    instance.mCurrentAction               = ClosureAction::kInvalidAction;
-    instance.mCurrentEndpointId           = chip::kInvalidEndpointId;
 
-    ChipLogProgress(AppServer, "SetTarget action completed for Endpoint %d", instance.mCurrentEndpointId);
+
+    ChipLogProgress(AppServer, "SetTarget action completed for Endpoint %d", endpointId);
 }
 
-void ClosureManager::HandlePanelStepActionComplete()
+void ClosureManager::HandlePanelStepActionComplete(chip::EndpointId endpointId)
 {
     ChipLogProgress(AppServer, "HandleStepActionComplete called");
 
     ClosureManager & instance = ClosureManager::GetInstance();
     instance.mClosureEndpoint1.OnPanelMotionActionComplete();
-    if (instance.mCurrentActionEndpointId == instance.mClosurePanelEndpoint2.GetEndpoint())
+    if (endpointId == instance.mClosurePanelEndpoint2.GetEndpoint())
     {
         instance.mClosurePanelEndpoint2.OnPanelMotionActionComplete();
+        instance.mEp2CurrentAction               = ClosureAction::kInvalidAction;
+        instance.mEp2MotionInProgress            = false;
     }
-    else if (instance.mCurrentActionEndpointId == instance.mClosurePanelEndpoint3.GetEndpoint())
+    else if (endpointId == instance.mClosurePanelEndpoint3.GetEndpoint())
     {
         instance.mClosurePanelEndpoint3.OnPanelMotionActionComplete();
+        instance.mEp3CurrentAction               = ClosureAction::kInvalidAction;
+        instance.mEp3MotionInProgress            = false;
     }
-    instance.mIsStepActionInProgress = false;
-    instance.mCurrentAction          = ClosureAction::kInvalidAction;
-    instance.mCurrentEndpointId      = chip::kInvalidEndpointId;
+    else
+    {
+        ChipLogError(AppServer, "Invalid endpoint ID for Step command: %d", endpointId);
+        return;
+    }
 
-    ChipLogProgress(AppServer, "Step action completed for Endpoint %d", instance.mCurrentEndpointId);
+    ChipLogProgress(AppServer, "Step action completed for Endpoint %d", endpointId);
 }
