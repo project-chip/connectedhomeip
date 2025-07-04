@@ -36,7 +36,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
             print(str(d))
 
     def teardown_test(self):
-        super().teardown_test
+        super().teardown_test()
         if self.problems:
             print(self.problems)
 
