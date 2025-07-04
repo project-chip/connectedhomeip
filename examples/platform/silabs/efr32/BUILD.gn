@@ -121,7 +121,11 @@ config("efr32-common-config") {
 }
 
 source_set("efr32-common") {
-  deps = [ "${silabs_common_plat_dir}/provision:storage" ]
+  deps = [
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
+    "${chip_root}/src/app/clusters/software-diagnostics-server:software-fault-listener",
+    "${silabs_common_plat_dir}/provision:storage",
+  ]
   defines = []
   public_deps = []
   public_configs = [
@@ -185,6 +189,11 @@ source_set("efr32-common") {
     ]
   }
 
+  if (sl_enable_rgb_led) {
+    sources += [ "${silabs_common_plat_dir}/led/RGBLEDWidget.cpp" ]
+    include_dirs = [ "${silabs_common_plat_dir}/rgb_led" ]
+  }
+
   if (chip_build_libshell) {
     deps += [ ":matter-shell" ]
 
@@ -194,7 +203,7 @@ source_set("efr32-common") {
   }
 
   public_deps += [
-    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
     "${chip_root}/src/app/server",
     "${chip_root}/src/data-model-providers/codegen:instance-header",
     "${chip_root}/src/lib",

@@ -53,7 +53,6 @@ pw_python_package("build_examples") {
     "builders/imx.py",
     "builders/infineon.py",
     "builders/mbed.py",
-    "builders/mw320.py",
     "builders/nrf.py",
     "builders/nxp.py",
     "builders/openiotsdk.py",

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -51,9 +51,11 @@ are the sole property of their respective owners.
 
 This notice and disclaimer must be included on all copies of this document.
 
-Connectivity Standards Alliance +
-508 Second Street, Suite 206 +
+Connectivity Standards Alliance
+508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x004A" name="Laundry Dryer Controls Cluster" revision="1">
   <revisionHistory>
@@ -84,13 +86,20 @@ Davis, CA 95616, USA
       <entry type="DrynessLevelEnum"/>
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="countBetween" from="1" to="4"/>
+      <constraint>
+        <countBetween>
+          <from value="1"/>
+          <to value="4"/>
+        </countBetween>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="SelectedDrynessLevel" type="DrynessLevelEnum" default="desc">
       <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
-      <quality changeOmitted="false" nullable="true" scene="false" persistence="volatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality nullable="true"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
   </attributes>
 </cluster>

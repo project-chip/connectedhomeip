@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include "DiagnosticDataProviderImplNxp.h"
 
 #ifdef CONFIG_WIFI_NXP
+#include <platform/Zephyr/InetUtils.h>
 #include <platform/Zephyr/wifi/WiFiManager.h>
 #endif
 
@@ -102,7 +103,7 @@ CHIP_ERROR DiagnosticDataProviderImplNxp::GetWiFiBeaconLostCount(uint32_t & beac
 {
     WiFiManager::NetworkStatistics stats;
     CHIP_ERROR err  = WiFiManager::Instance().GetNetworkStatistics(stats);
-    beaconLostCount = stats.mBeaconsLostCount - mOldStats.beaconLostCount;
+    beaconLostCount = stats.mBeaconsLostCount;
     return err;
 }
 
@@ -110,7 +111,7 @@ CHIP_ERROR DiagnosticDataProviderImplNxp::GetWiFiBeaconRxCount(uint32_t & beacon
 {
     WiFiManager::NetworkStatistics stats;
     CHIP_ERROR err = WiFiManager::Instance().GetNetworkStatistics(stats);
-    beaconRxCount  = stats.mBeaconsSuccessCount - mOldStats.beaconRxCount;
+    beaconRxCount  = stats.mBeaconsSuccessCount;
     return err;
 }
 
@@ -118,7 +119,7 @@ CHIP_ERROR DiagnosticDataProviderImplNxp::GetWiFiPacketMulticastRxCount(uint32_t
 {
     WiFiManager::NetworkStatistics stats;
     CHIP_ERROR err         = WiFiManager::Instance().GetNetworkStatistics(stats);
-    packetMulticastRxCount = stats.mPacketMulticastRxCount - mOldStats.packetMulticastRxCount;
+    packetMulticastRxCount = stats.mPacketMulticastRxCount;
     return err;
 }
 
@@ -126,7 +127,7 @@ CHIP_ERROR DiagnosticDataProviderImplNxp::GetWiFiPacketMulticastTxCount(uint32_t
 {
     WiFiManager::NetworkStatistics stats;
     CHIP_ERROR err         = WiFiManager::Instance().GetNetworkStatistics(stats);
-    packetMulticastTxCount = stats.mPacketMulticastTxCount - mOldStats.packetMulticastTxCount;
+    packetMulticastTxCount = stats.mPacketMulticastTxCount;
     return err;
 }
 
@@ -134,7 +135,7 @@ CHIP_ERROR DiagnosticDataProviderImplNxp::GetWiFiPacketUnicastRxCount(uint32_t &
 {
     WiFiManager::NetworkStatistics stats;
     CHIP_ERROR err       = WiFiManager::Instance().GetNetworkStatistics(stats);
-    packetUnicastRxCount = stats.mPacketUnicastRxCount - mOldStats.packetUnicastRxCount;
+    packetUnicastRxCount = stats.mPacketUnicastRxCount;
     return err;
 }
 
@@ -142,7 +143,7 @@ CHIP_ERROR DiagnosticDataProviderImplNxp::GetWiFiPacketUnicastTxCount(uint32_t &
 {
     WiFiManager::NetworkStatistics stats;
     CHIP_ERROR err       = WiFiManager::Instance().GetNetworkStatistics(stats);
-    packetUnicastTxCount = stats.mPacketUnicastTxCount - mOldStats.packetUnicastTxCount;
+    packetUnicastTxCount = stats.mPacketUnicastTxCount;
     return err;
 }
 
@@ -150,29 +151,22 @@ CHIP_ERROR DiagnosticDataProviderImplNxp::GetWiFiOverrunCount(uint64_t & overrun
 {
     WiFiManager::NetworkStatistics stats;
     CHIP_ERROR err = WiFiManager::Instance().GetNetworkStatistics(stats);
-    overrunCount   = static_cast<uint64_t>(stats.mOverRunCount) - mOldStats.overrunCount;
+    overrunCount   = static_cast<uint64_t>(stats.mOverRunCount);
     return err;
 }
 
 CHIP_ERROR DiagnosticDataProviderImplNxp::ResetWiFiNetworkDiagnosticsCounts()
 {
-    /* NET_REQUEST_STATS_RESET_WIFI can be used with net_mgmt API to achieve this.
-     * NXP WiFi Driver doesn't support this command yet.
-     * Workaround to reset the statistics manually in the Matter layer.
-     */
-    WiFiManager::NetworkStatistics stats;
-    CHIP_ERROR err = WiFiManager::Instance().GetNetworkStatistics(stats);
-    if (err == CHIP_NO_ERROR)
+    net_if * iface = InetUtils::GetWiFiInterface();
+    VerifyOrReturnError(iface != nullptr, INET_ERROR_UNKNOWN_INTERFACE);
+
+    if (net_mgmt(NET_REQUEST_STATS_RESET_WIFI, iface, NULL, 0))
     {
-        mOldStats.beaconLostCount        = stats.mBeaconsLostCount;
-        mOldStats.beaconRxCount          = stats.mBeaconsSuccessCount;
-        mOldStats.packetMulticastRxCount = stats.mPacketMulticastRxCount;
-        mOldStats.packetMulticastTxCount = stats.mPacketMulticastTxCount;
-        mOldStats.packetUnicastRxCount   = stats.mPacketUnicastRxCount;
-        mOldStats.packetUnicastTxCount   = stats.mPacketUnicastTxCount;
-        mOldStats.overrunCount           = static_cast<uint64_t>(stats.mOverRunCount);
+        ChipLogError(DeviceLayer, "WiFi statistics reset failed");
+        return CHIP_ERROR_INTERNAL;
     }
-    return err;
+
+    return CHIP_NO_ERROR;
 }
 #endif
 

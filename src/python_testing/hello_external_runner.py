@@ -27,7 +27,7 @@ from chip.testing.matter_testing import MatterTestConfig, get_test_info, run_tes
 from hello_test import HelloTest
 
 try:
-    from matter_yamltests.hooks import TestRunnerHooks
+    from matter.yamltests.hooks import TestRunnerHooks
 except ImportError:
     class TestRunnerHooks:
         pass

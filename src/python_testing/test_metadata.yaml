@@ -3,7 +3,21 @@
 not_automated:
     - name: MinimalRepresentation.py
       reason: Code/Test not being used or not shared code for any other tests
+    - name: TC_AVSMTestBase.py
+      reason: Shared code for TC_AVSM, not a standalone test
+    - name: TC_CNET_4_2.py
+      reason: It has no CI execution block, it not executed in CI
+    - name: TC_CNET_4_1.py
+      reason: Required commissioning not implemented on CI
     - name: TC_CNET_4_4.py
+      reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_9.py
+      reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_12.py
+      reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_15.py
+      reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_22.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_DGGEN_3_2.py
       reason:
@@ -19,16 +33,14 @@ not_automated:
       reason: Shared code for TC_EWATERHTR, not a standalone test
     - name: TC_EnergyReporting_Utils.py
       reason: Shared code for TC_EEM and TC_EPM, not a standalone test
+    - name: TC_EGCTestBase.py
+      reason: Shared code for TC_EGC, not a standalone test
     - name: TC_OpstateCommon.py
       reason: Shared code for TC_OPSTATE, not a standalone test
     - name: TC_pics_checker.py
       reason:
           Currently isn't enabled because we don't have any examples with
           conformant PICS
-    - name: TC_TMP_2_1.py
-      reason:
-          src/python_testing/test_testing/test_TC_TMP_2_1.py is the Unit test of
-          this test
     - name: TC_OCC_3_1.py
       reason:
           There are CI issues for the test cases that implements manually
@@ -45,10 +57,16 @@ not_automated:
       reason: Unit test - does not run against an app
     - name: TC_DEMTestBase.py
       reason: Shared code for TC_DEM, not a standalone test
+    - name: TC_EGCTestBase.py
+      reason: Shared code for TC_EGC, not a standalone test
+    - name: TC_SEPRTestBase.py
+      reason: Shared code for TC_SEPR, not a standalone test
     - name: TestConformanceTest.py
       reason:
           Unit test of the conformance test (TC_DeviceConformance) - does not
           run against an app
+    - name: TestDefaultWarnings.py
+      reason: Unit test - does not run against an app
     - name: TestIdChecks.py
       reason: Unit test - does not run against an app
     - name: TestSpecParsingDeviceType.py
@@ -83,6 +101,48 @@ not_automated:
       reason: Code/Test not being used or not shared code for any other tests
     - name: modebase_cluster_check.py
       reason: Shared code for Modebase derived clusters, not a standalone test.
+    - name: TC_AVSUMTestBase.py
+      reason:
+          Shared code for Camera AV Settings (TC_AVSUM*), not a standalone test.
+    - name: TC_WEBRTC_1_1.py
+      reason:
+          Depends on Python WebRTC bindings. Will be enabled once local tests
+          are fully verified.
+    - name: TC_WEBRTC_1_2.py
+      reason:
+          Depends on Python WebRTC bindings. Will be enabled once local tests
+          are fully verified.
+    - name: TC_WEBRTC_1_3.py
+      reason:
+          Depends on Python WebRTC bindings. Will be enabled once local tests
+          are fully verified.
+    - name: TC_WEBRTC_1_4.py
+      reason:
+          Depends on Python WebRTC bindings. Will be enabled once local tests
+          are fully verified.
+    - name: TC_WEBRTC_1_5.py
+      reason:
+          Depends on Python WebRTC bindings. Will be enabled once local tests
+          are fully verified.
+    - name: TC_WEBRTC_Utils.py
+      reason: Helper methods for WebRTC TCs, not a standalone test.
+    - name: TC_CHIMETestBase.py
+      reason: Shared code for the Chime Cluster, not a standalone test.
+    - name: TC_CLCTRL_2_1.py
+      reason:
+          Closure app on master branch does not support this test script yet.
+    - name: TC_CLCTRL_4_2.py
+      reason:
+          Closure app on master branch does not support this test script yet.
+    - name: TC_CLCTRL_4_3.py
+      reason:
+          Closure app on master branch does not support this test script yet.
+    - name: TC_CLCTRL_4_4.py
+      reason:
+          Closure app on master branch does not support this test script yet.
+    - name: TC_CLDIM_2_1.py
+      reason:
+          Closure app on master branch does not support this test script yet.
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially

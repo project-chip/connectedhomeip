@@ -175,7 +175,7 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
             return CHIP_ERROR_READ_FAILED;
         }
 
-        if (pAes128Key != NULL)
+        if (pAesKey != NULL)
         {
             /* Decrypt data if a key has been set */
             res = ReadEncryptedData(&mFactoryData.factoryDataBuffer[i * 16], &currentBlock[0]);
@@ -192,17 +192,6 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
     }
 
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR FactoryDataProviderImpl::SetAes128Key(const uint8_t * keyAes128)
-{
-    CHIP_ERROR error = CHIP_ERROR_INVALID_ARGUMENT;
-    if (keyAes128 != nullptr)
-    {
-        pAes128Key = keyAes128;
-        error      = CHIP_NO_ERROR;
-    }
-    return error;
 }
 
 CHIP_ERROR FactoryDataProviderImpl::SetEncryptionMode(EncryptionMode mode)
@@ -227,7 +216,7 @@ CHIP_ERROR FactoryDataProviderImpl::ReadEncryptedData(uint8_t * dest, uint8_t * 
 
     mbedtls_aes_init(&aesCtx);
 
-    if (mbedtls_aes_setkey_dec(&aesCtx, pAes128Key, 128U) != 0)
+    if (mbedtls_aes_setkey_dec(&aesCtx, pAesKey, pAESKeySize) != 0)
     {
         return CHIP_ERROR_INTERNAL;
     }
@@ -240,6 +229,11 @@ CHIP_ERROR FactoryDataProviderImpl::ReadEncryptedData(uint8_t * dest, uint8_t * 
     mbedtls_aes_free(&aesCtx);
 
     return CHIP_NO_ERROR;
+}
+
+FactoryDataProvider & FactoryDataPrvdImpl()
+{
+    return FactoryDataProviderImpl::sInstance;
 }
 
 } // namespace DeviceLayer

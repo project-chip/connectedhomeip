@@ -43,6 +43,7 @@ limitations under the License.
     <item value="0x4000" name="DeepClean"/>
     <item value="0x4001" name="Vacuum"/>
     <item value="0x4002" name="Mop"/>
+    <item value="0x4003" name="Vacuum then Mop"/>
   </enum>
 
   <cluster>

@@ -26,6 +26,8 @@ namespace Access {
 // Using bitfield values so privilege set and auth mode can be stored together.
 // Privilege set can have more than one value expressed (e.g. View,
 // ProxyView, and Operate).
+// NOTE: Every time this enum class changes, we need to update the constexpr
+// "kAllPrivilegeBits" below.
 enum class Privilege : uint8_t
 {
     kView       = 1 << 0,
@@ -34,6 +36,15 @@ enum class Privilege : uint8_t
     kManage     = 1 << 3,
     kAdminister = 1 << 4
 };
+
+// Constant expression that contains all the values
+// defined inside the enum class "Privilege", and only those values.
+constexpr uint8_t kAllPrivilegeBits =             //
+    static_cast<uint8_t>(Privilege::kView) |      //
+    static_cast<uint8_t>(Privilege::kProxyView) | //
+    static_cast<uint8_t>(Privilege::kOperate) |   //
+    static_cast<uint8_t>(Privilege::kManage) |    //
+    static_cast<uint8_t>(Privilege::kAdminister);
 
 } // namespace Access
 } // namespace chip

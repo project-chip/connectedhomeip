@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -105,15 +105,10 @@ Davis, CA 95616, USA
       <item value="3" name="Director" summary="A director of the video media content; for example, “Spike Lee”">
         <mandatoryConform/>
       </item>
-      <item value="4" name="Event" summary="An event is a reference to a type of event; examples would include sports, music, or other types of events.
-                        For example, searching for &quot;Football games&quot; would search for a 'game' event entity and a 'football' sport entity.">
+      <item value="4" name="Event" summary="An event is a reference to a type of event; examples would include sports, music, or other types of events. For example, searching for &quot;Football games&quot; would search for a &apos;game&apos; event entity and a &apos;football&apos; sport entity.">
         <mandatoryConform/>
       </item>
-      <item value="5" name="Franchise" summary="A franchise is a video entity which can represent a number of video entities, like movies or TV shows.
-                        For example, take the fictional franchise &quot;Intergalactic Wars&quot; which represents a collection of movie trilogies,
-                        as well as animated and live action TV shows. This entity type was introduced to account for requests by customers
-                        such as &quot;Find Intergalactic Wars movies&quot;, which would search for all 'Intergalactic Wars' programs of the MOVIE MediaType,
-                        rather than attempting to match to a single title.">
+      <item value="5" name="Franchise" summary="A franchise is a video entity which can represent a number of video entities, like movies or TV shows. For example, take the fictional franchise &quot;Intergalactic Wars&quot; which represents a collection of movie trilogies, as well as animated and live action TV shows. This entity type was introduced to account for requests by customers such as &quot;Find Intergalactic Wars movies&quot;, which would search for all &apos;Intergalactic Wars&apos; programs of the MOVIE MediaType, rather than attempting to match to a single title.">
         <mandatoryConform/>
       </item>
       <item value="6" name="Genre" summary="Genre represents the genre of video media content such as action, drama or comedy.">
@@ -182,17 +177,23 @@ Davis, CA 95616, USA
     <struct name="AdditionalInfoStruct">
       <field id="0" name="Name" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="256"/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
       </field>
       <field id="1" name="Value" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="8192"/>
+        <constraint>
+          <maxLength value="8192"/>
+        </constraint>
       </field>
     </struct>
     <struct name="BrandingInformationStruct">
       <field id="0" name="ProviderName" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="256"/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
       </field>
       <field id="1" name="Background" type="StyleInformationStruct" default="MS">
         <optionalConform/>
@@ -233,7 +234,9 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="Value" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="1024"/>
+        <constraint>
+          <maxLength value="1024"/>
+        </constraint>
       </field>
       <field id="2" name="ExternalIDList" type="list" default="empty">
         <entry type="AdditionalInfoStruct"/>
@@ -264,12 +267,18 @@ Davis, CA 95616, USA
     <struct name="StyleInformationStruct">
       <field id="0" name="ImageURL" type="string" default="MS">
         <optionalConform/>
-        <constraint type="maxLength" value="8192"/>
+        <constraint>
+          <maxLength value="8192"/>
+        </constraint>
       </field>
       <field id="1" name="Color" type="string" default="MS">
         <optionalConform/>
-        <constraint type="maxLength" value="7"/>
-        <constraint type="maxLength" value="9"/>
+        <constraint>
+          <allowed value="7"/>
+        </constraint>
+        <constraint>
+          <allowed value="9"/>
+        </constraint>
       </field>
       <field id="2" name="Size" type="DimensionStruct" default="MS">
         <optionalConform/>
@@ -278,10 +287,12 @@ Davis, CA 95616, USA
     <struct name="TrackPreferenceStruct">
       <field id="0" name="LanguageCode" type="string">
         <mandatoryConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
       <field id="1" name="Characteristics" type="list" default="null">
-        <entry type="ref_CharacteristicEnum"/>
+        <entry type="CharacteristicEnum"/>
         <quality nullable="true"/>
         <optionalConform/>
       </field>
@@ -296,18 +307,22 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="AcceptHeader" type="list" default="empty">
       <entry type="string">
-        <constraint type="maxLength" value="1024"/>
+        <constraint>
+          <maxLength value="1024"/>
+        </constraint>
       </entry>
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="UP"/>
       </mandatoryConform>
-      <constraint type="maxCount" value="100"/>
+      <constraint>
+        <maxCount value="100"/>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="SupportedStreamingProtocols" type="SupportedProtocolsBitmap" default="0">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="nonVolatile" reportable="false" sourceAttribution="false" quieterReporting="false"/>
+      <quality persistence="nonVolatile"/>
       <mandatoryConform>
         <feature name="UP"/>
       </mandatoryConform>
@@ -321,11 +336,15 @@ Davis, CA 95616, USA
       </mandatoryConform>
       <field id="0" name="Search" type="ContentSearchStruct">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="1" name="AutoPlay" type="bool">
         <mandatoryConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
       <field id="2" name="Data" type="string" default="MS">
         <optionalConform/>
@@ -333,9 +352,11 @@ Davis, CA 95616, USA
       <field id="3" name="PlaybackPreferences" type="PlaybackPreferencesStruct" default="MS">
         <optionalConform/>
       </field>
-      <field id="4" name="UseCurrentContext" type="bool" default="TRUE">
+      <field id="4" name="UseCurrentContext" type="bool" default="true">
         <optionalConform/>
-        <constraint type="desc"/>
+        <constraint>
+          <desc/>
+        </constraint>
       </field>
     </command>
     <command id="0x01" name="LaunchURL" direction="commandToServer" response="LauncherResponse">

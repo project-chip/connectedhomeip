@@ -411,7 +411,6 @@ static MTROTAProviderDelegateImpl * sOTAProviderDelegate;
         NSNumber * blockIndex, NSNumber * bytesToSkip, BlockQueryCompletion completion) {
         XCTAssertEqualObjects(nodeID, nodeID);
         XCTAssertEqual(controller, sController);
-        XCTAssertEqualObjects(blockSize, @(1024)); // Seems to always be 1024.
         XCTAssertEqualObjects(blockIndex, @(lastBlockIndex + 1));
         XCTAssertEqualObjects(bytesToSkip, @(0)); // Don't expect to see skips here.
         // Make sure we actually end up with multiple blocks.
@@ -1099,7 +1098,6 @@ static BOOL sStackInitRan = NO;
         NSNumber * blockIndex, NSNumber * bytesToSkip, BlockQueryCompletion completion) {
         XCTAssertEqualObjects(nodeID, @(kDeviceId1));
         XCTAssertEqual(controller, sController);
-        XCTAssertEqualObjects(blockSize, @(1024)); // Seems to always be 1024.
         XCTAssertEqualObjects(blockIndex, @(lastBlockIndex + 1));
         XCTAssertEqualObjects(bytesToSkip, @(0)); // Don't expect to see skips here.
         // Make sure we actually end up with multiple blocks.
@@ -1178,7 +1176,6 @@ static BOOL sStackInitRan = NO;
             NSNumber * blockIndex, NSNumber * bytesToSkip, BlockQueryCompletion completion) {
             XCTAssertEqualObjects(nodeID, @(kDeviceId2));
             XCTAssertEqual(controller, sController);
-            XCTAssertEqualObjects(blockSize, @(1024)); // Seems to always be 1024.
             XCTAssertEqualObjects(blockIndex, @(lastBlockIndex + 1));
             XCTAssertEqualObjects(bytesToSkip, @(0)); // Don't expect to see skips here.
             // Make sure we actually end up with multiple blocks.

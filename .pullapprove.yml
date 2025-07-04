@@ -126,6 +126,14 @@ groups:
       teams: [reviewers-google]
     reviews:
       request: 0 # Do not auto-add
+  shared-reviewers-geo:
+    type: optional
+    conditions:
+      - files.include('*')
+    reviewers:
+      teams: [reviewers-geo]
+    reviews:
+      request: 0 # Do not auto-add
   shared-reviewers-grundfos:
     type: optional
     conditions:
@@ -236,9 +244,56 @@ groups:
       teams: [reviewers-qorvo]
     reviews:
       request: 0 # Do not auto-add
+  shared-reviewers-velux:
+    type: optional
+    conditions:
+      - files.include('*')
+    reviewers:
+      teams: [reviewers-velux]
+    reviews:
+      request: 0 # Do not auto-add
 
   ############################################################
-  #  Base Required Reviewers
+  #  Folder specific review requirements. A PR must meet all
+  #  folder specific review requirements for all folders that
+  #  it touches with specific requirements defined.
+  ############################################################
+
+  folder-reviewers-scripts-build-integrations-docker:
+    type: optional
+    conditions:
+      - "files.include('scripts/build/*') or files.include('integrations/docker/*')"
+    reviewers:
+      users:
+        - andy31415
+    reviews:
+      # 1 review request will be sent at a time
+      request: 1
+
+  folder-reviewers-google:
+    type: required
+    conditions:
+      - "files.include('examples/chef/*') or files.include('integrations/cloudbuild/*')"
+    requirements:
+      - "len(groups.approved.include('shared-reviewers-google')) >= 1 or \
+        len(groups.approved.include('shared-reviewers-*')) >= 2"
+    reviews:
+      required: 0
+
+  folder-reviewers-apple:
+    type: required
+    conditions:
+      - "files.include('src/darwin/*').exclude('src/darwin/Framework/CHIP/zap-generated/*') or \
+        files.include('src/platform/Darwin/*')"
+    reviewers:
+      teams: [reviewers-apple]
+    reviews:
+      request: 0
+      required: 1
+
+  ############################################################
+  #  Base Required Reviewers. If PR touches a path not covered
+  #  by any folder specific review requirements.
   ############################################################
   required-reviewers:
     description: >
@@ -247,6 +302,14 @@ groups:
       This is the main group of required reviews for general pull
       requests.
     type: required
+    conditions:
+      # If PR touches a region not covered by any custom review paths, base condition is required.
+      - "files\
+              .exclude('examples/chef/*')\
+              .exclude('integrations/cloudbuild/*')\
+              .exclude('src/darwin/*')\
+              .exclude('src/platform/Darwin/*') or \
+        files.include('src/darwin/Framework/CHIP/zap-generated/*')"
     requirements:
       - len(groups.approved.include('shared-reviewers-*')) >= 2
     reviews:

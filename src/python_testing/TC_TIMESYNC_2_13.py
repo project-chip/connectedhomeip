@@ -41,7 +41,8 @@ import time
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, SimpleEventCallback, async_test_body, default_matter_test_main, type_matches
+from chip.testing.event_attribute_reporting import SimpleEventCallback
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
 
@@ -55,7 +56,7 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
             asserts.fail("Did not receive MissingTrustedTimeSouce event")
 
     def pics_TC_TIMESYNC_2_13(self) -> list[str]:
-        return ["TIMESYNC.S.F01"]
+        return ["TIMESYNC.S.F03"]
 
     @async_test_body
     async def test_TC_TIMESYNC_2_13(self):

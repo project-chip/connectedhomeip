@@ -2,7 +2,7 @@
  *
  *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2021 Google LLC.
- *    Copyright 2024 NXP
+ *    Copyright 2024, 2025 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,6 +29,10 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 #include <platform/nxp/common/NetworkCommissioningDriver.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+
+#if CONFIG_CHIP_ETHERNET
+#include <platform/nxp/common/Ethernet/NxpEthDriver.h>
+#endif
 
 #ifdef ENABLE_CHIP_SHELL
 #include "AppCLIBase.h"
@@ -81,6 +85,14 @@ chip::DeviceLayer::NetworkCommissioning::WiFiDriver * chip::NXP::App::AppTaskFre
         &(::chip::DeviceLayer::NetworkCommissioning::NXPWiFiDriver::GetInstance()));
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
+
+#if CONFIG_CHIP_ETHERNET
+chip::DeviceLayer::NetworkCommissioning::EthernetDriver * chip::NXP::App::AppTaskFreeRTOS::GetEthernetDriverInstance()
+{
+    return static_cast<chip::DeviceLayer::NetworkCommissioning::EthernetDriver *>(
+        &(::chip::DeviceLayer::NetworkCommissioning::NxpEthDriver::Instance()));
+}
+#endif
 
 CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::AppMatter_Register()
 {

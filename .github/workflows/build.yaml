@@ -43,7 +43,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:125
+            image: ghcr.io/project-chip/chip-build:140
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -75,27 +75,49 @@ jobs:
               uses: github/codeql-action/init@v3
               with:
                   languages: "cpp"
+                  queries: security-extended, security-and-quality
             - name: Setup Build
               run: scripts/build/gn_gen.sh --args="chip_config_memory_debug_checks=true chip_config_memory_debug_dmalloc=false"
             - name: Run Build
               run: scripts/run_in_build_env.sh "ninja -C ./out"
             - name: Run Tests
               run: scripts/tests/gn_tests.sh
+            - name: Clean out build output
+              run: rm -rf ./out
+
+            # Do not run below steps with CodeQL since we are getting "Out of runner space issues" with CodeQL and their added coverage is limited
             - name: Set up Build Without Detail Logging
+              if: inputs.run-codeql != true
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false"
             - name: Run Build Without Detail Logging
+              if: inputs.run-codeql != true
               run: scripts/run_in_build_env.sh "ninja -C ./out"
+            - name: Cleanout build output
+              if: inputs.run-codeql != true
+              run: rm -rf ./out
             - name: Set up Build Without Progress Logging
+              if: inputs.run-codeql != true
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false chip_progress_logging=false"
             - name: Run Build Without Progress Logging
+              if: inputs.run-codeql != true
               run: scripts/run_in_build_env.sh "ninja -C ./out"
+            - name: Clean out build output
+              if: inputs.run-codeql != true
+              run: rm -rf ./out
             - name: Set up Build Without Error Logging
+              if: inputs.run-codeql != true
               run: scripts/build/gn_gen.sh --args="chip_detail_logging=false chip_progress_logging=false chip_error_logging=false"
             - name: Run Build Without Error Logging
+              if: inputs.run-codeql != true
               run: scripts/run_in_build_env.sh "ninja -C ./out"
+            - name: Clean out build output
+              if: inputs.run-codeql != true
+              run: rm -rf ./out
             - name: Set up Build Without Logging
+              if: inputs.run-codeql != true
               run: scripts/build/gn_gen.sh --args="chip_logging=false"
             - name: Run Build Without Logging
+              if: inputs.run-codeql != true
               run: scripts/run_in_build_env.sh "ninja -C ./out"
             - name: Uploading core files
               uses: actions/upload-artifact@v4
@@ -128,10 +150,10 @@ jobs:
         name: Build on Linux (fake, gcc_release, clang, simulated)
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:125
+            image: ghcr.io/project-chip/chip-build:140
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -161,11 +183,13 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
-            - name: Initialize CodeQL
-              if: ${{ inputs.run-codeql  }}
-              uses: github/codeql-action/init@v3
-              with:
-                  languages: "cpp"
+            # CodeQL + this job is consistently failing (in the step "Run Tests with sanitizers")
+            # deactivate until a better workaround is found
+            # - name: Initialize CodeQL
+            #   if: ${{ inputs.run-codeql  }}
+            #   uses: github/codeql-action/init@v3
+            #   with:
+            #       languages: "cpp"
             - name: Setup and Build Simulated Device
               run: |
                   BUILD_TYPE=simulated
@@ -270,11 +294,13 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target linux-fake-tests build"
-            - name: Perform CodeQL Analysis
-              if: ${{ inputs.run-codeql  }}
-              uses: ./.github/actions/perform-codeql-analysis
-              with:
-                language: cpp
+            # CodeQL + this job is consistently failing (in the step "Run Tests with sanitizers")
+            # deactivate until a better solution is found
+            # - name: Perform CodeQL Analysis
+            #   if: ${{ inputs.run-codeql  }}
+            #   uses: ./.github/actions/perform-codeql-analysis
+            #   with:
+            #     language: cpp
 
             - name: Uploading core files
               uses: actions/upload-artifact@v4
@@ -302,10 +328,10 @@ jobs:
         name: Build on Linux (python_lib)
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:125
+            image: ghcr.io/project-chip/chip-build:140
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -367,10 +393,10 @@ jobs:
         name: Build on Linux (python lighting-app)
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
 
         container:
-            image: ghcr.io/project-chip/chip-build:125
+            image: ghcr.io/project-chip/chip-build:140
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/log_output:/tmp/test_logs"
@@ -400,7 +426,7 @@ jobs:
     build_darwin:
         name: Build on Darwin (clang, simulated)
         runs-on: macos-13
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]'  && inputs.run-codeql != true
 
         steps:
             - name: Checkout
@@ -415,11 +441,12 @@ jobs:
             - name: Try to ensure the directory for diagnostic log collection exists
               run: |
                   mkdir -p ~/Library/Logs/DiagnosticReports || true
-            - name: Initialize CodeQL
-              if: ${{ inputs.run-codeql  }}
-              uses: github/codeql-action/init@v3
-              with:
-                  languages: "cpp"
+            #  Build on Darwin + CodeQL often takes 6 hours (which is more than the maximum allowed by GitHub Runners), Deactivate it until we can investigate this
+            # - name: Initialize CodeQL
+            #   if: ${{ inputs.run-codeql  }}
+            #   uses: github/codeql-action/init@v3
+            #   with:
+            #       languages: "cpp"
 
             - name: Setup and Build Simulated Device
               run: |
@@ -462,7 +489,7 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                     "./scripts/run-clang-tidy-on-compile-commands.py \
                        --compile-database out/default/compile_commands.json \
-                       --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/|CodegenDataModel_Write|QuieterReporting' \
+                       --file-exclude-regex '/(repo|zzz_generated|lwip/standalone)/|CodegenDataModel_Write|QuieterReporting|TestPascalString' \
                        --file-list-file out/changed_files.txt \
                        check \
                     "
@@ -473,11 +500,12 @@ jobs:
                   name: crash-log-darwin
                   path: ~/Library/Logs/DiagnosticReports/
 
-            - name: Perform CodeQL Analysis
-              if: ${{ inputs.run-codeql  }}
-              uses: ./.github/actions/perform-codeql-analysis
-              with:
-                language: cpp
+            #  Build on Darwin + CodeQL often takes 6 hours (which is more than the maximum allowed by GitHub Runners), Deactivate it until we can investigate this
+            # - name: Perform CodeQL Analysis
+            #   if: ${{ inputs.run-codeql  }}
+            #   uses: ./.github/actions/perform-codeql-analysis
+            #   with:
+            #     language: cpp
 
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
@@ -488,11 +516,11 @@ jobs:
         env:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
 
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:125
+            image: ghcr.io/project-chip/chip-build:140
             options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=0 net.ipv6.conf.all.forwarding=0"
 

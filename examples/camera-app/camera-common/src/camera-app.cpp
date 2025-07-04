@@ -23,6 +23,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
+using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 
 template <typename T>
 using List   = chip::app::DataModel::List<T>;
@@ -41,30 +42,194 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         std::make_unique<WebRTCTransportProviderServer>(mCameraDevice->GetWebRTCProviderDelegate(), mEndpoint);
 
     // Fetch all initialization parameters for CameraAVStreamMgmt Server
-    BitFlags<Feature> features;
-    features.Set(Feature::kSnapshot);
+    BitFlags<CameraAvStreamManagement::Feature> features;
     BitFlags<OptionalAttribute> optionalAttrs;
-    optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVision);
-    optionalAttrs.Set(chip::app::Clusters::CameraAvStreamManagement::OptionalAttribute::kNightVisionIllum);
-    uint32_t maxConcurrentVideoEncoders  = mCameraDevice->GetCameraHALInterface().GetMaxConcurrentVideoEncoders();
+    features.Set(CameraAvStreamManagement::Feature::kSnapshot);
+    features.Set(CameraAvStreamManagement::Feature::kVideo);
+
+    // Enable the Watermark and OSD features if camera supports
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsWatermark())
+    {
+        features.Set(CameraAvStreamManagement::Feature::kWatermark);
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsOSD())
+    {
+        features.Set(CameraAvStreamManagement::Feature::kOnScreenDisplay);
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsSoftPrivacy())
+    {
+        features.Set(CameraAvStreamManagement::Feature::kPrivacy);
+    }
+
+    // Check microphone support to set Audio feature
+    if (mCameraDevice->GetCameraHALInterface().HasMicrophone())
+    {
+        features.Set(CameraAvStreamManagement::Feature::kAudio);
+        optionalAttrs.Set(OptionalAttribute::kMicrophoneAGCEnabled);
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().HasLocalStorage())
+    {
+        features.Set(CameraAvStreamManagement::Feature::kLocalStorage);
+    }
+
+    // Check if camera has speaker
+    if (mCameraDevice->GetCameraHALInterface().HasSpeaker())
+    {
+        features.Set(CameraAvStreamManagement::Feature::kSpeaker);
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsHDR())
+    {
+        features.Set(CameraAvStreamManagement::Feature::kHighDynamicRange);
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsNightVision())
+    {
+        features.Set(CameraAvStreamManagement::Feature::kNightVision);
+        optionalAttrs.Set(OptionalAttribute::kNightVisionIllum);
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().HasHardPrivacySwitch())
+    {
+        optionalAttrs.Set(OptionalAttribute::kHardPrivacyModeOn);
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().HasStatusLight())
+    {
+        optionalAttrs.Set(OptionalAttribute::kStatusLightEnabled);
+        optionalAttrs.Set(OptionalAttribute::kStatusLightBrightness);
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsImageControl())
+    {
+        features.Set(CameraAvStreamManagement::Feature::kImageControl);
+        optionalAttrs.Set(OptionalAttribute::kImageFlipVertical);
+        optionalAttrs.Set(OptionalAttribute::kImageFlipHorizontal);
+        optionalAttrs.Set(OptionalAttribute::kImageRotation);
+    }
+
+    uint32_t maxConcurrentVideoEncoders  = mCameraDevice->GetCameraHALInterface().GetMaxConcurrentEncoders();
     uint32_t maxEncodedPixelRate         = mCameraDevice->GetCameraHALInterface().GetMaxEncodedPixelRate();
     VideoSensorParamsStruct sensorParams = mCameraDevice->GetCameraHALInterface().GetVideoSensorParams();
-    bool nightVisionCapable              = mCameraDevice->GetCameraHALInterface().GetNightVisionCapable();
+    bool nightVisionUsesInfrared         = mCameraDevice->GetCameraHALInterface().GetNightVisionUsesInfrared();
     VideoResolutionStruct minViewport    = mCameraDevice->GetCameraHALInterface().GetMinViewport();
-    std::vector<RateDistortionTradeOffStruct> rateDistortionTradeOffPoints = {};
-    uint32_t maxContentBufferSize                                          = 1024;
-    AudioCapabilitiesStruct micCapabilities{};
-    AudioCapabilitiesStruct spkrCapabilities{};
-    TwoWayTalkSupportTypeEnum twowayTalkSupport               = TwoWayTalkSupportTypeEnum::kNotSupported;
-    std::vector<SnapshotParamsStruct> supportedSnapshotParams = {};
-    uint32_t maxNetworkBandwidth                              = 64;
-    std::vector<StreamUsageEnum> supportedStreamUsages        = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+    std::vector<RateDistortionTradeOffStruct> rateDistortionTradeOffPoints =
+        mCameraDevice->GetCameraHALInterface().GetRateDistortionTradeOffPoints();
+
+    uint32_t maxContentBufferSize               = mCameraDevice->GetCameraHALInterface().GetMaxContentBufferSize();
+    AudioCapabilitiesStruct micCapabilities     = mCameraDevice->GetCameraHALInterface().GetMicrophoneCapabilities();
+    AudioCapabilitiesStruct spkrCapabilities    = mCameraDevice->GetCameraHALInterface().GetSpeakerCapabilities();
+    TwoWayTalkSupportTypeEnum twowayTalkSupport = TwoWayTalkSupportTypeEnum::kNotSupported;
+    std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = mCameraDevice->GetCameraHALInterface().GetSnapshotCapabilities();
+    uint32_t maxNetworkBandwidth                                 = mCameraDevice->GetCameraHALInterface().GetMaxNetworkBandwidth();
+    std::vector<StreamUsageEnum> supportedStreamUsages = mCameraDevice->GetCameraHALInterface().GetSupportedStreamUsages();
+    std::vector<StreamUsageEnum> streamUsagePriorities = mCameraDevice->GetCameraHALInterface().GetStreamUsagePriorities();
 
     // Instantiate the CameraAVStreamMgmt Server
     mAVStreamMgmtServerPtr = std::make_unique<CameraAVStreamMgmtServer>(
         mCameraDevice->GetCameraAVStreamMgmtDelegate(), mEndpoint, features, optionalAttrs, maxConcurrentVideoEncoders,
-        maxEncodedPixelRate, sensorParams, nightVisionCapable, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize,
-        micCapabilities, spkrCapabilities, twowayTalkSupport, supportedSnapshotParams, maxNetworkBandwidth, supportedStreamUsages);
+        maxEncodedPixelRate, sensorParams, nightVisionUsesInfrared, minViewport, rateDistortionTradeOffPoints, maxContentBufferSize,
+        micCapabilities, spkrCapabilities, twowayTalkSupport, snapshotCapabilities, maxNetworkBandwidth, supportedStreamUsages,
+        streamUsagePriorities);
+
+    // Fetch all initialization parameters for CameraAVSettingsUserLevelMgmt Server
+    BitFlags<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(
+        CameraAvSettingsUserLevelManagement::Feature::kDigitalPTZ, CameraAvSettingsUserLevelManagement::Feature::kMechanicalPan,
+        CameraAvSettingsUserLevelManagement::Feature::kMechanicalTilt,
+        CameraAvSettingsUserLevelManagement::Feature::kMechanicalZoom,
+        CameraAvSettingsUserLevelManagement::Feature::kMechanicalPresets);
+    BitFlags<CameraAvSettingsUserLevelManagement::OptionalAttributes, uint32_t> avsumAttrs(
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPosition,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMaxPresets,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kMptzPresets,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kDptzStreams,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kZoomMax,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMin,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kTiltMax,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMin,
+        CameraAvSettingsUserLevelManagement::OptionalAttributes::kPanMax);
+    const uint8_t appMaxPresets = 5;
+
+    // Instantiate the CameraAVSettingsUserLevelMgmt Server
+    mAVSettingsUserLevelMgmtServerPtr = std::make_unique<CameraAvSettingsUserLevelMgmtServer>(
+        mEndpoint, mCameraDevice->GetCameraAVSettingsUserLevelMgmtDelegate(), avsumFeatures, avsumAttrs, appMaxPresets);
+
+    mAVSettingsUserLevelMgmtServerPtr->SetPanMin(mCameraDevice->GetCameraHALInterface().GetPanMin());
+    mAVSettingsUserLevelMgmtServerPtr->SetPanMax(mCameraDevice->GetCameraHALInterface().GetPanMax());
+    mAVSettingsUserLevelMgmtServerPtr->SetTiltMin(mCameraDevice->GetCameraHALInterface().GetTiltMin());
+    mAVSettingsUserLevelMgmtServerPtr->SetTiltMax(mCameraDevice->GetCameraHALInterface().GetTiltMax());
+    mAVSettingsUserLevelMgmtServerPtr->SetZoomMax(mCameraDevice->GetCameraHALInterface().GetZoomMax());
+}
+
+void CameraApp::InitializeCameraAVStreamMgmt()
+{
+    // Set the attribute defaults
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsHDR())
+    {
+        mAVStreamMgmtServerPtr->SetHDRModeEnabled(mCameraDevice->GetCameraHALInterface().GetHDRMode());
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsSoftPrivacy())
+    {
+        mAVStreamMgmtServerPtr->SetSoftRecordingPrivacyModeEnabled(
+            mCameraDevice->GetCameraHALInterface().GetSoftRecordingPrivacyModeEnabled());
+        mAVStreamMgmtServerPtr->SetSoftLivestreamPrivacyModeEnabled(
+            mCameraDevice->GetCameraHALInterface().GetSoftLivestreamPrivacyModeEnabled());
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().HasHardPrivacySwitch())
+    {
+        mAVStreamMgmtServerPtr->SetHardPrivacyModeOn(mCameraDevice->GetCameraHALInterface().GetHardPrivacyMode());
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsNightVision())
+    {
+        mAVStreamMgmtServerPtr->SetNightVision(mCameraDevice->GetCameraHALInterface().GetNightVision());
+    }
+
+    mAVStreamMgmtServerPtr->SetViewport(mCameraDevice->GetCameraHALInterface().GetViewport());
+
+    if (mCameraDevice->GetCameraHALInterface().HasSpeaker())
+    {
+        mAVStreamMgmtServerPtr->SetSpeakerMuted(mCameraDevice->GetCameraHALInterface().GetSpeakerMuted());
+        mAVStreamMgmtServerPtr->SetSpeakerVolumeLevel(mCameraDevice->GetCameraHALInterface().GetSpeakerVolume());
+        mAVStreamMgmtServerPtr->SetSpeakerMaxLevel(mCameraDevice->GetCameraHALInterface().GetSpeakerMaxLevel());
+        mAVStreamMgmtServerPtr->SetSpeakerMinLevel(mCameraDevice->GetCameraHALInterface().GetSpeakerMinLevel());
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().HasMicrophone())
+    {
+        mAVStreamMgmtServerPtr->SetMicrophoneMuted(mCameraDevice->GetCameraHALInterface().GetMicrophoneMuted());
+        mAVStreamMgmtServerPtr->SetMicrophoneVolumeLevel(mCameraDevice->GetCameraHALInterface().GetMicrophoneVolume());
+        mAVStreamMgmtServerPtr->SetMicrophoneMaxLevel(mCameraDevice->GetCameraHALInterface().GetMicrophoneMaxLevel());
+        mAVStreamMgmtServerPtr->SetMicrophoneMinLevel(mCameraDevice->GetCameraHALInterface().GetMicrophoneMinLevel());
+    }
+
+    // Video and Snapshot features are already enabled.
+    if (mCameraDevice->GetCameraHALInterface().HasLocalStorage())
+    {
+        mAVStreamMgmtServerPtr->SetLocalVideoRecordingEnabled(
+            mCameraDevice->GetCameraHALInterface().GetLocalVideoRecordingEnabled());
+        mAVStreamMgmtServerPtr->SetLocalSnapshotRecordingEnabled(
+            mCameraDevice->GetCameraHALInterface().GetLocalSnapshotRecordingEnabled());
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().HasStatusLight())
+    {
+        mAVStreamMgmtServerPtr->SetStatusLightEnabled(mCameraDevice->GetCameraHALInterface().GetStatusLightEnabled());
+    }
+
+    if (mCameraDevice->GetCameraHALInterface().GetCameraSupportsImageControl())
+    {
+        mAVStreamMgmtServerPtr->SetImageRotation(mCameraDevice->GetCameraHALInterface().GetImageRotation());
+        mAVStreamMgmtServerPtr->SetImageFlipVertical(mCameraDevice->GetCameraHALInterface().GetImageFlipVertical());
+        mAVStreamMgmtServerPtr->SetImageFlipHorizontal(mCameraDevice->GetCameraHALInterface().GetImageFlipHorizontal());
+    }
+
+    mAVStreamMgmtServerPtr->Init();
 }
 
 void CameraApp::InitCameraDeviceClusters()
@@ -74,7 +239,9 @@ void CameraApp::InitCameraDeviceClusters()
 
     mChimeServerPtr->Init();
 
-    mAVStreamMgmtServerPtr->Init();
+    mAVSettingsUserLevelMgmtServerPtr->Init();
+
+    InitializeCameraAVStreamMgmt();
 }
 
 static constexpr EndpointId kCameraEndpointId = 1;

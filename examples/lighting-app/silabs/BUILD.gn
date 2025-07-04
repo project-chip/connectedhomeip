@@ -87,6 +87,9 @@ if (wifi_soc) {
         "PW_RPC_ENABLED",
       ]
     }
+    if (sl_enable_rgb_led) {
+      include_dirs += [ "${examples_common_plat_dir}/rgb_led" ]
+    }
   }
 } else {
   efr32_sdk("sdk") {
@@ -101,6 +104,7 @@ if (wifi_soc) {
       "${examples_plat_dir}",
       "${chip_root}/src/lib",
       "${examples_common_plat_dir}",
+      "${examples_common_plat_dir}/rgb_led",
     ]
 
     if (use_wf200) {
@@ -122,6 +126,9 @@ if (wifi_soc) {
         "HAL_VCOM_ENABLE=1",
         "PW_RPC_ENABLED",
       ]
+    }
+    if (sl_enable_rgb_led) {
+      include_dirs += [ "${examples_common_plat_dir}/rgb_led" ]
     }
   }
 }

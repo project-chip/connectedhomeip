@@ -30,15 +30,13 @@ public:
     CHIP_ERROR GetVendorId(uint16_t & vendorId) override;
     CHIP_ERROR GetProductId(uint16_t & productId) override;
 
+    DeviceInstanceInfoProviderImpl() : DeviceInstanceInfoProviderImpl(ConfigurationManagerImpl::GetDefaultInstance()) {}
     DeviceInstanceInfoProviderImpl(ConfigurationManagerImpl & configManager) :
         Internal::GenericDeviceInstanceInfoProvider<Internal::PosixConfig>(configManager)
     {}
 };
 
-inline DeviceInstanceInfoProviderImpl & DeviceInstanceInfoProviderMgrImpl()
-{
-    static DeviceInstanceInfoProviderImpl sInstance(ConfigurationManagerImpl::GetDefaultInstance());
-    return sInstance;
-}
+DeviceInstanceInfoProviderImpl & DeviceInstanceInfoProviderMgrImpl();
+
 } // namespace DeviceLayer
 } // namespace chip

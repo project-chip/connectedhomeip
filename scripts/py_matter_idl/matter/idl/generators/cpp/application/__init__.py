@@ -12,53 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
+from .application_generator import CppApplicationGenerator
 
-from matter.idl.generators import CodeGenerator, GeneratorStorage
-from matter.idl.generators.cluster_selection import server_side_clusters
-from matter.idl.matter_idl_types import Idl
-
-
-class CppApplicationGenerator(CodeGenerator):
-    """
-    Generation of cpp code for application implementation for matter.
-    """
-
-    def __init__(self, storage: GeneratorStorage, idl: Idl, **kargs):
-        """
-        Inintialization is specific for java generation and will add
-        filters as required by the java .jinja templates to function.
-        """
-        super().__init__(storage, idl, fs_loader_searchpath=os.path.dirname(__file__))
-
-    def internal_render_all(self):
-        """
-        Renders the cpp and header files required for applications
-        """
-
-        # Header containing a macro to initialize all cluster plugins
-        self.internal_render_one_output(
-            template_path="PluginApplicationCallbacksHeader.jinja",
-            output_file_name="app/PluginApplicationCallbacks.h",
-            vars={
-                'clusters': server_side_clusters(self.idl)
-            }
-        )
-
-        # Source for __attribute__(weak) implementations of all cluster
-        # initialization methods
-        self.internal_render_one_output(
-            template_path="CallbackStubSource.jinja",
-            output_file_name="app/callback-stub.cpp",
-            vars={
-                'clusters': server_side_clusters(self.idl)
-            }
-        )
-
-        self.internal_render_one_output(
-            template_path="ClusterCallbacksSource.jinja",
-            output_file_name="app/cluster-callbacks.cpp",
-            vars={
-                'clusters': server_side_clusters(self.idl)
-            }
-        )
+__all__ = ['CppApplicationGenerator']

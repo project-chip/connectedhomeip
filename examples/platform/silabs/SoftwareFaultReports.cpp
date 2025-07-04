@@ -19,13 +19,21 @@
 #include "SoftwareFaultReports.h"
 #include "FreeRTOSConfig.h"
 #include "silabs_utils.h"
-#include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
+#include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 #include <app/util/attribute-storage.h>
 #include <cmsis_os2.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <uart.h>
+
+// Macro to flush UART TX queue if enabled
+#if SILABS_LOG_OUT_UART
+#define SILABS_UART_FLUSH() uartFlushTxQueue()
+#else
+#define SILABS_UART_FLUSH() ((void) 0)
+#endif
 
 #if !defined(SLI_SI91X_MCU_INTERFACE) || !defined(SLI_SI91X_ENABLE_BLE)
 #include "rail_types.h"
@@ -72,7 +80,8 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
     softwareFault.id = taskDetails.xTaskNumber;
     softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(faultRecordString), strlen(faultRecordString)));
 
-    SystemLayer().ScheduleLambda([&softwareFault] { SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault); });
+    SystemLayer().ScheduleLambda(
+        [&softwareFault] { Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault); });
     // Allow some time for the Fault event to be sent as the next action after exiting this function
     // is typically an assert or reboot.
     // Depending on the task at fault, it is possible the event can't be transmitted.
@@ -83,6 +92,20 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
 } // namespace Silabs
 } // namespace DeviceLayer
 } // namespace chip
+
+// This method is already implemented in the Zigbee stack and is required by the Zigbee
+#ifndef SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
+extern "C" void halInternalAssertFailed(const char * filename, int linenumber)
+{
+#if SILABS_LOG_ENABLED
+    char faultMessage[kMaxFaultStringLen] = { 0 };
+    snprintf(faultMessage, sizeof faultMessage, "Assert failed: %s:%d", filename, linenumber);
+    ChipLogError(NotSpecified, "%s", faultMessage);
+    SILABS_UART_FLUSH();
+#endif // SILABS_LOG_ENABLED
+    configASSERT((volatile void *) NULL);
+}
+#endif
 
 #if HARD_FAULT_LOG_ENABLE
 /**
@@ -119,24 +142,56 @@ extern "C" __attribute__((used)) void debugHardfault(uint32_t * sp)
     ChipLogError(NotSpecified, "LR          0x%08lx", lr);
     ChipLogError(NotSpecified, "PC          0x%08lx", pc);
     ChipLogError(NotSpecified, "PSR         0x%08lx", psr);
+    SILABS_UART_FLUSH();
 #endif // SILABS_LOG_ENABLED
 
     configASSERTNULL(NULL);
 }
 
 /**
- * Override default hard-fault handler
+ * Log a fault to the debugHardfault function.
+ * This function is called by the fault handlers to log the fault details.
  */
+
+extern "C" __attribute__((naked)) void LogFault_Handler(void)
+{
+    uint32_t * sp;
+    __asm volatile("tst lr, #4 \n"
+                   "ite eq \n"
+                   "mrseq %0, msp \n"
+                   "mrsne %0, psp \n"
+                   : "=r"(sp));
+    debugHardfault(sp);
+}
+
+#ifndef SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
 extern "C" __attribute__((naked)) void HardFault_Handler(void)
 {
-    __asm volatile("tst lr, #4                                    \n"
-                   "ite eq                                        \n"
-                   "mrseq r0, msp                                 \n"
-                   "mrsne r0, psp                                 \n"
-                   "ldr r1, debugHardfault_address                \n"
-                   "bx r1                                         \n"
-                   "debugHardfault_address: .word debugHardfault  \n");
+    __asm volatile("b LogFault_Handler");
 }
+extern "C" __attribute__((naked)) void mpu_fault_handler(void)
+{
+    __asm volatile("b LogFault_Handler");
+}
+extern "C" __attribute__((naked)) void BusFault_Handler(void)
+{
+    __asm volatile("b LogFault_Handler");
+}
+extern "C" __attribute__((naked)) void UsageFault_Handler(void)
+{
+    __asm volatile("b LogFault_Handler");
+}
+#if (__CORTEX_M >= 23U)
+extern "C" __attribute__((naked)) void SecureFault_Handler(void)
+{
+    __asm volatile("b LogFault_Handler");
+}
+#endif // (__CORTEX_M >= 23U)
+extern "C" __attribute__((naked)) void DebugMon_Handler(void)
+{
+    __asm volatile("b LogFault_Handler");
+}
+#endif // !SL_CATALOG_ZIGBEE_STACK_COMMON_PRESENT
 
 extern "C" void vApplicationMallocFailedHook(void)
 {
@@ -148,7 +203,8 @@ extern "C" void vApplicationMallocFailedHook(void)
     const char * faultMessage = "Failed to allocate memory on HEAP.";
 #if SILABS_LOG_ENABLED
     ChipLogError(NotSpecified, "%s", faultMessage);
-#endif
+    SILABS_UART_FLUSH();
+#endif // SILABS_LOG_ENABLED
     Silabs::OnSoftwareFaultEventHandler(faultMessage);
 
     /* Force an assert. */
@@ -167,7 +223,8 @@ extern "C" void vApplicationStackOverflowHook(TaskHandle_t pxTask, char * pcTask
     snprintf(faultMessage, sizeof faultMessage, "%s Task overflowed", pcTaskName);
 #if SILABS_LOG_ENABLED
     ChipLogError(NotSpecified, "%s", faultMessage);
-#endif
+    SILABS_UART_FLUSH();
+#endif // SILABS_LOG_ENABLED
     Silabs::OnSoftwareFaultEventHandler(faultMessage);
 
     /* Force an assert. */
@@ -248,6 +305,7 @@ extern "C" void RAILCb_AssertFailed(RAIL_Handle_t railHandle, uint32_t errorCode
 #else
     ChipLogError(NotSpecified, "%s", faultMessage);
 #endif // RAIL_ASSERT_DEBUG_STRING
+    SILABS_UART_FLUSH();
 #endif // SILABS_LOG_ENABLED
     Silabs::OnSoftwareFaultEventHandler(faultMessage);
 

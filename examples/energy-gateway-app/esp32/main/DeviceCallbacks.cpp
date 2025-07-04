@@ -25,7 +25,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-static const char * TAG = "energy-management-app-callbacks";
+static const char * TAG = "energy-gateway-app-callbacks";
 
 using namespace chip;
 using namespace chip::Inet;

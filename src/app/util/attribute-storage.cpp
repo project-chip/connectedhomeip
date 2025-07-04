@@ -14,22 +14,25 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+#include "lib/support/Span.h"
 #include <app/util/attribute-storage.h>
-
-#include <app/util/attribute-storage-detail.h>
 
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/InteractionModelEngine.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
+#include <app/persistence/PascalString.h>
 #include <app/reporting/reporting.h>
+#include <app/util/attribute-metadata.h>
+#include <app/util/attribute-storage-detail.h>
 #include <app/util/config.h>
 #include <app/util/ember-io-storage.h>
 #include <app/util/ember-strings.h>
 #include <app/util/endpoint-config-api.h>
 #include <app/util/generic-callbacks.h>
-#include <app/util/persistence/AttributePersistenceProvider.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/LockTracker.h>
@@ -173,6 +176,24 @@ uint16_t emberAfIndexFromEndpointIncludingDisabledEndpoints(EndpointId endpoint)
     return findIndexFromEndpoint(endpoint, false /* ignoreDisabledEndpoints */);
 }
 
+CHIP_ERROR ValidateDataContent(ByteSpan span, const EmberAfAttributeMetadata * am)
+{
+    if (emberAfIsStringAttributeType(am->attributeType))
+    {
+        VerifyOrReturnValue(Storage::ShortPascalBytes::IsValid(span), CHIP_ERROR_INCORRECT_STATE);
+        return CHIP_NO_ERROR;
+    }
+
+    if (emberAfIsLongStringAttributeType(am->attributeType))
+    {
+        VerifyOrReturnValue(Storage::LongPascalBytes::IsValid(span), CHIP_ERROR_INCORRECT_STATE);
+        return CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnValue(span.size() == am->size, CHIP_ERROR_INCORRECT_STATE);
+    return CHIP_NO_ERROR;
+}
+
 } // anonymous namespace
 
 // Initial configuration
@@ -282,6 +303,14 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberA
                                      const Span<DataVersion> & dataVersionStorage, Span<const EmberAfDeviceType> deviceTypeList,
                                      EndpointId parentEndpointId)
 {
+    return emberAfSetDynamicEndpointWithEpUniqueId(index, id, ep, dataVersionStorage, deviceTypeList, {}, parentEndpointId);
+}
+
+CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, EndpointId id, const EmberAfEndpointType * ep,
+                                                   const Span<DataVersion> & dataVersionStorage,
+                                                   Span<const EmberAfDeviceType> deviceTypeList, CharSpan endpointUniqueId,
+                                                   EndpointId parentEndpointId)
+{
     auto realIndex = index + FIXED_ENDPOINT_COUNT;
 
     if (realIndex >= MAX_ENDPOINT_COUNT)
@@ -336,6 +365,19 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, const EmberA
     emAfEndpoints[index].deviceTypeList = deviceTypeList;
     emAfEndpoints[index].endpointType   = ep;
     emAfEndpoints[index].dataVersions   = dataVersionStorage.data();
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+    MutableCharSpan targetSpan(emAfEndpoints[index].endpointUniqueId);
+    if (CopyCharSpanToMutableCharSpan(endpointUniqueId, targetSpan) != CHIP_NO_ERROR)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    // Ensure that the size of emAfEndpoints[index].endpointUniqueId fits within uint8_t
+    static_assert(sizeof(emAfEndpoints[0].endpointUniqueId) <= UINT8_MAX,
+                  "The size of emAfEndpoints[index].endpointUniqueId must fit within uint8_t");
+
+    emAfEndpoints[index].endpointUniqueIdSize = static_cast<uint8_t>(targetSpan.size());
+#endif
     // Start the endpoint off as disabled.
     emAfEndpoints[index].bitmask.Clear(EmberAfEndpointOptions::isEnabled);
     emAfEndpoints[index].parentEndpointId = parentEndpointId;
@@ -499,15 +541,20 @@ const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpo
 
 static uint8_t * singletonAttributeLocation(const EmberAfAttributeMetadata * am)
 {
-    const EmberAfAttributeMetadata * m = &(generatedAttributes[0]);
-    uint16_t index                     = 0;
-    while (m < am)
+
+    uint16_t index = 0;
+    // NOLINTNEXTLINE(bugprone-sizeof-expression)
+    if constexpr (sizeof(generatedAttributes) > 0)
     {
-        if (m->IsSingleton() && !m->IsExternal())
+        const EmberAfAttributeMetadata * m = &(generatedAttributes[0]);
+        while (m < am)
         {
-            index = static_cast<uint16_t>(index + m->size);
+            if (m->IsSingleton() && !m->IsExternal())
+            {
+                index = static_cast<uint16_t>(index + m->size);
+            }
+            m++;
         }
-        m++;
     }
     return (uint8_t *) (singletonAttributeData + index);
 }
@@ -1094,7 +1141,20 @@ CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,
     tag = emAfEndpoints[endpointIndex].tagList[index];
     return CHIP_NO_ERROR;
 }
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+CHIP_ERROR emberAfGetEndpointUniqueIdForEndPoint(EndpointId endpoint, MutableCharSpan & epUniqueIdMutSpan)
+{
+    uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
 
+    if (endpointIndex == 0xFFFF)
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
+
+    CharSpan epUniqueIdSpan(emAfEndpoints[endpointIndex].endpointUniqueId, emAfEndpoints[endpointIndex].endpointUniqueIdSize);
+    return CopyCharSpanToMutableCharSpan(epUniqueIdSpan, epUniqueIdMutSpan);
+}
+#endif
 CHIP_ERROR emberAfSetDeviceTypeList(EndpointId endpoint, Span<const EmberAfDeviceType> deviceTypeList)
 {
     uint16_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
@@ -1245,7 +1305,12 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, Optional<ClusterId> clusterI
                     VerifyOrDieWithMsg(attrStorage != nullptr, Zcl, "Attribute persistence needs a persistence provider");
                     MutableByteSpan bytes(attrData);
                     CHIP_ERROR err =
-                        attrStorage->ReadValue(ConcreteAttributePath(de->endpoint, cluster->clusterId, am->attributeId), am, bytes);
+                        attrStorage->ReadValue(ConcreteAttributePath(de->endpoint, cluster->clusterId, am->attributeId), bytes);
+                    if (err == CHIP_NO_ERROR)
+                    {
+                        err = ValidateDataContent(bytes, am);
+                    }
+
                     if (err == CHIP_NO_ERROR)
                     {
                         ptr = attrData;

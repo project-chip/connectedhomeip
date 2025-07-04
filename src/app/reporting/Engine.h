@@ -168,6 +168,15 @@ private:
                                                        bool * apHasMoreChunks, bool * apHasEncodedData);
     CHIP_ERROR BuildSingleReportDataEventReports(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler,
                                                  bool aBufferIsUsed, bool * apHasMoreChunks, bool * apHasEncodedData);
+
+    /**
+     * Encodes StatusIB event reports for non-wildcard paths that fail to be validated:
+     *   - invalid paths (invalid endpoint/cluster id)
+     *   - failure to validate ACL (cannot fetch ACL requirement or ACL failure)
+     *
+     * Returns CHIP_NO_ERROR if encoding succeeds, returns error code on a fatal error (generally failure to encode EventStatusIB
+     * values).
+     */
     CHIP_ERROR CheckAccessDeniedEventPaths(TLV::TLVWriter & aWriter, bool & aHasEncodedData, ReadHandler * apReadHandler);
 
     // If version match, it means don't send, if version mismatch, it means send.

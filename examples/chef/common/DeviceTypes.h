@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
-#include <app/data-model-provider/MetadataList.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/ReadOnlyBuffer.h>
 
 namespace chef {
 namespace DeviceTypes {
@@ -30,6 +30,7 @@ namespace DeviceTypes {
 constexpr chip::DeviceTypeId kCookSurfaceDeviceId                  = 0x0077;
 constexpr chip::DeviceTypeId kCooktopDeviceId                      = 0x0078;
 constexpr chip::DeviceTypeId kOvenDeviceId                         = 0x007B;
+constexpr chip::DeviceTypeId kPumpDeviceId                         = 0x0303;
 constexpr chip::DeviceTypeId kRefrigeratorDeviceId                 = 0x0070;
 constexpr chip::DeviceTypeId kTemperatureControlledCabinetDeviceId = 0x0071;
 
@@ -63,7 +64,7 @@ bool EndpointHasDeviceType(chip::EndpointId endpoint, chip::DeviceTypeId deviceT
  * Returns a list of all endpoints that have the specified device type in their respective device types list.
  * Endpoints list is fetched using DataModelProvider. Device type match is checked using EndpointHasDeviceType.
  */
-chip::app::DataModel::ListBuilder<chip::EndpointId> GetAllEndpointsHavingDeviceType(chip::DeviceTypeId deviceTypeId);
+chip::ReadOnlyBuffer<chip::EndpointId> GetAllEndpointsHavingDeviceType(chip::DeviceTypeId deviceTypeId);
 
 } // namespace DeviceTypes
 } // namespace chef

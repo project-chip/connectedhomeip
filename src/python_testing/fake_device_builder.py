@@ -23,8 +23,8 @@ from chip.testing.spec_parsing import XmlCluster, XmlDeviceType
 from chip.tlv import uint
 
 
-def _is_mandatory(conformance):
-    return conformance(0, [], []).decision == ConformanceDecision.MANDATORY
+def _is_mandatory(conformance, feature_map=0):
+    return conformance(feature_map, [], []).decision == ConformanceDecision.MANDATORY
 
 
 def _get_field_by_label(cl_object: Clusters.ClusterObjects.ClusterObject, label: str) -> Optional[Clusters.ClusterObjects.ClusterObjectFieldDescriptor]:
@@ -34,8 +34,12 @@ def _get_field_by_label(cl_object: Clusters.ClusterObjects.ClusterObject, label:
     return None
 
 
-def _create_minimal_cluster(xml_clusters: dict[uint, XmlCluster], cluster_id: int, is_tlv_endpoint: bool) -> dict[int, Any]:
+def create_minimal_cluster(xml_clusters: dict[uint, XmlCluster], cluster_id: int, is_tlv_endpoint: bool) -> dict[int, Any]:
     attrs = {}
+    mandatory_features = [mask for mask, f in xml_clusters[cluster_id].features.items() if _is_mandatory(f.conformance)]
+    feature_map = 0
+    for mask in mandatory_features:
+        feature_map |= mask
 
     mandatory_attributes = [id for id, a in xml_clusters[cluster_id].attributes.items() if _is_mandatory(a.conformance)]
     mandatory_accepted_commands = [id for id, a in xml_clusters[cluster_id].accepted_commands.items()
@@ -79,7 +83,7 @@ def create_minimal_dt(xml_clusters: dict[uint, XmlCluster], xml_device_types: di
 
     for s in required_servers:
         endpoint[s if is_tlv_endpoint else Clusters.ClusterObjects.ALL_CLUSTERS[s]
-                 ] = _create_minimal_cluster(xml_clusters, s, is_tlv_endpoint)
+                 ] = create_minimal_cluster(xml_clusters, s, is_tlv_endpoint)
 
     # Descriptor
     attr = Clusters.Descriptor.Attributes

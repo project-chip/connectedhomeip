@@ -48,6 +48,12 @@ CHIP_ERROR EvseTargetsDelegate::Init(PersistentStorageDelegate * targetStore)
     return CHIP_NO_ERROR;
 }
 
+void EvseTargetsDelegate::Shutdown()
+{
+    // Remove FabricDelegate
+    chip::Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+}
+
 const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & EvseTargetsDelegate::GetTargets()
 {
     return mChargingTargetSchedulesList;

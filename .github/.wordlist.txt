@@ -127,6 +127,7 @@ BallastConfiguration
 BarrierControl
 BasicCHIPRegression
 BasicInformation
+Batcher
 baudrate
 BCM
 BD
@@ -255,6 +256,7 @@ ClusterName
 ClusterObjectTests
 ClusterRevision
 ClusterTestGeneration
+CMAC
 cmake
 CMakeLists
 CMD
@@ -270,6 +272,7 @@ CodeGenerator
 CodeLab
 codelabs
 ColorControl
+Combinators
 Comcast
 Commandline
 CommandHandlerInterface
@@ -307,6 +310,7 @@ ContentLauncher
 contrib
 controllee
 conv
+Cooktop
 CopperConcentrationMeasurement
 Corstone
 cortexa
@@ -369,6 +373,7 @@ decrypt
 decrypted
 DEDEDEDE
 deepnote
+deepwiki
 DefaultOTAProviders
 DefaultOTARequestor
 DefaultOTARequestorDriver
@@ -755,10 +760,12 @@ itsfoss
 IW
 JDK
 jinja
+JCM
 JLink
 JLinkExe
 JLinkRTTClient
 JN
+jf
 jni
 jpg
 jre
@@ -1154,6 +1161,7 @@ PRs
 PSA
 PSCAN
 PSECT
+Pseudocode
 PSK
 PSoC
 PTR
@@ -1295,6 +1303,7 @@ semver
 SendButton
 SendNewInputEvent
 sendto
+SEPR
 seqdiag
 SERIALDEVICE
 serialno

@@ -185,3 +185,19 @@ depends on ENABLE_PW_RPC
             about available pin numbers for UART.
 
 endmenu
+
+menu "Energy Gateway Example App Configuration"
+
+    config CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_PRICE_TRIGGER
+        bool "Enable SEPR (CommodityPrice) triggers"
+        default "n"
+        help
+            Enable test triggers used by the Commodity Price tests
+
+    config CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_GRID_CONDITIONS_TRIGGER
+        bool "Enable EGC (ElectricalGridConditions) triggers"
+        default "n"
+        help
+            Enable test triggers used by the Electrical Grid Conditions tests
+        
+endmenu
