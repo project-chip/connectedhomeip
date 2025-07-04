@@ -866,8 +866,10 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                     location = DeviceTypePathLocation(device_type_id=id)
                     problems.append(ProblemNotice("Parse Device Type XML", location=location,
                                     severity=ProblemSeverity.WARNING, problem=f"Unknown cluster id {c.attrib['id']}"))
-                # TODO: remove this once we get a new DM XML scrape after https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/10214 goes in
-                if cid == 0x0005:
+                # Workaround for 1.3 device types with zigbee clusters and old scenes
+                # This is OK because there are other tests that ensure that unknown clusters do not appear on the device
+                if cid not in cluster_definition_xml:
+                    logging.info(f"Skipping unknown cluster {cid:04X}")
                     continue
                 conformance_xml, tmp_problem = get_conformance(c, cid)
                 if tmp_problem:
@@ -884,9 +886,6 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                 cluster = XmlDeviceTypeClusterRequirements(name=name, side=side, conformance=conformance)
 
                 def append_overrides(override_element_type: str):
-                    # Workaround for 1.3 device types with zigbee clusters and old scenes
-                    if cid not in cluster_definition_xml:
-                        return
                     if override_element_type == 'feature':
                         # The device types use feature name rather than feature code. So we need to build a new map.
                         map = {f.name: id for id, f in cluster_definition_xml[cid].features.items()}
