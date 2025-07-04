@@ -27,16 +27,19 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#       --PICS <your pics>
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
-
+import enum
+import asyncio
 import chip.clusters as Clusters
 from chip.interaction_model import Status
 from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
-from chip.testing.matter_testing import AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
 
@@ -59,12 +62,21 @@ def error_enum_to_text(error_enum):
             return "GenericFailure(0x02)"
         elif error_enum == RvcStatusEnum.InvalidInMode:
             return "InvalidInMode(0x03)"
-
     raise AttributeError("Unknown Enum value")
+
+def verify_mode_tag_in_supported_modes(supported_modes, mode_value, expected_tag):
+    for entry in supported_modes:
+        if entry.mode == mode_value:
+            tag_values = [tag.value for tag in entry.modeTags]
+            logging.info(f"Matched SupportedMode entry: {entry}, ModeTags: {tag_values}")
+            asserts.assert_in(expected_tag.value, tag_values,
+                              f"Expected ModeTag '{expected_tag.name}' (0x{expected_tag.value:04x}) not found in ModeTags: {tag_values}")
+            return
+    asserts.fail(f"No SupportedModes entry matched CurrentMode value {mode_value}")
 
 
 class TC_RVCOPSTATE_2_5(MatterBaseTest):
-    
+
     min_report_interval_sec = 0
     max_report_interval_sec = 30
 
@@ -74,7 +86,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
     def steps_TC_RVCOPSTATE_2_5(self) -> list[TestStep]:
         steps = [
             TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "TH reads the SupportedModes attribute of the RVC Run Mode cluster",
+            TestStep("2", "TH reads the SupportedModes attribute of the RVC Run Mode cluster"),
             TestStep("3", "TH establishes a subscription to the CurrentMode attribute of the RVC Run Mode cluster of the DUT"),
             TestStep("4", "TH sends a RVC Run Mode cluster ChangeToMode command to the DUT with NewMode set to PIXIT.CLEANMODE"),
             TestStep("5", "Wait for DUT to leave dock and begin cleaning activities"),
@@ -95,48 +107,141 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
         cluster = Clusters.Objects.RvcRunMode
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
+    async def read_supported_mode(self, endpoint):
+        return await self.read_rvcrunm_attribute_expect_success(endpoint=endpoint,
+                                                              attribute=Clusters.RvcRunMode.Attributes.SupportedModes)
+
+    async def read_current_mode_with_check(self, expected_mode, endpoint):
+        run_mode = await self.read_rvcrunm_attribute_expect_success(endpoint=endpoint,
+                                                              attribute=Clusters.RvcRunMode.Attributes.CurrentMode)
+        asserts.assert_true(run_mode == expected_mode,
+                            "Expected the current mode to be %i, got %i" % (expected_mode, run_mode))
+        return run_mode
+
+    async def send_change_to_mode_cmd(self, new_mode) -> Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse:
+        ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
+                                         endpoint=self.endpoint)
+        return ret
+
     async def send_change_to_mode_with_check(self, new_mode, expected_error):
         response = await self.send_change_to_mode_cmd(new_mode)
         asserts.assert_true(response.status == expected_error,
                             "Expected a ChangeToMode response status of %s, got %s" %
                             (error_enum_to_text(expected_error), error_enum_to_text(response.status)))
 
+    async def send_go_home_cmd(self) -> Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse:
+        ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcOperationalState.Commands.GoHome(),
+                                         endpoint=self.endpoint)
+        asserts.assert_true(type_matches(ret, Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse),
+                            "Unexpected return type for GoHome")
+        return ret
+
+    async def send_go_home_cmd_with_check(self, expected_error):
+        ret = await self.send_go_home_cmd()
+        asserts.assert_equal(ret.commandResponseState.errorStateID, expected_error,
+                             "errorStateID(%s) should be %s" % (ret.commandResponseState.errorStateID,
+                                                                error_enum_to_text(expected_error)))
+
+
     @async_test_body
     async def test_TC_RVCOPSTATE_2_5(self):
 
-        self.endpoint = self.get_endpoint()
-        self.mode_clean = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.CLEANMODE']
+        self.endpoint = self.get_endpoint(default=1)
 
         # Commission DUT to TH
         self.step("1")
-
         self.print_step(1, "Commissioning, already done")
 
-        # TH reads the SupportedModes attribute of the RVC Run Mode cluster
-        self.step("2")
-        supported_run_modes_dut = await self.read_rvcrunm_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
-        # Logging the SupportedModes Attribute output responses from the DUT:
-        logging.info("SupportedModes: %s" % (supported_run_modes_dut))
-        # As per SPEC, the SupportedModes must have at least two entries
-        asserts.assert_greater_equal(len(supported_run_modes_dut), 2, "SupportedModes must have at least two entries!")
+        if self.pics_guard(self.check_pics("RVCOPSTATE.S.A0004") and self.check_pics("RVCOPSTATE.S.C80.Rsp")
+                           and self.check_pics("RVCRUNM.S.A0000") and self.check_pics("RVCRUNM.S.A0001")):
 
-        # TH establishes a subscription to the CurrentMode attribute of the RVC Run Mode cluster of the DUT
-        self.step("3")
-        current_mode_accumulator = ClusterAttributeChangeAccumulator(
-            Clusters.RvcRunMode,
-            Clusters.RvcRunMode.Attributes.CurrentMode)
-        await current_mode_accumulator.start(
-            self.dut_node_id, endpoint=self.endpoint,
-            min_interval_sec=self.min_report_interval_sec,
-            max_interval_sec=self.max_report_interval_sec)
+            # TH reads the SupportedModes attribute of the RVC Run Mode cluster
+            self.step("2")
+            supported_run_modes_dut = await self.read_supported_mode(endpoint=self.endpoint)
+            # Logging the SupportedModes Attribute output responses from the DUT:
+            logging.info("SupportedModes: %s" % (supported_run_modes_dut))
+            # As per SPEC, the SupportedModes must have at least two entries
+            asserts.assert_greater_equal(len(supported_run_modes_dut), 2, "SupportedModes must have at least two entries!")
 
-        # TH sends a RVC Run Mode cluster ChangeToMode command to the DUT with NewMode set to PIXIT.CLEANMODE
-        self.step("4")
-        await self.send_change_to_mode_with_check(self.mode_clean, RvcStatusEnum.Success)
-        # This step is not described in the test plan, but it ought to be
-        await self.read_current_mode_with_check(self.mode_clean)
+            # Dynamically extract Idle and Cleaning mode from SupportedModes
+            idle_mode = next((m.mode for m in supported_run_modes_dut
+                              if Clusters.RvcRunMode.Enums.ModeTag.kIdle.value in [t.value for t in m.modeTags]), None)
+            cleaning_mode = next((m.mode for m in supported_run_modes_dut
+                                  if Clusters.RvcRunMode.Enums.ModeTag.kCleaning.value in [t.value for t in m.modeTags]),
+                                 None)
+            asserts.assert_is_not_none(idle_mode, "Idle mode not found in SupportedModes!")
+            asserts.assert_is_not_none(cleaning_mode, "Cleaning mode not found in SupportedModes!")
+
+            # TH establishes a subscription to the CurrentMode attribute of the RVC Run Mode cluster of the DUT
+            self.step("3")
+            current_mode_accumulator = ClusterAttributeChangeAccumulator(
+                Clusters.RvcRunMode,
+                Clusters.RvcRunMode.Attributes.CurrentMode)
+            await current_mode_accumulator.start(
+                dev_ctrl=self.default_controller,
+                node_id=self.dut_node_id, endpoint=self.endpoint,
+                min_interval_sec=self.min_report_interval_sec,
+                max_interval_sec=self.max_report_interval_sec)
+
+            # TH sends a RVC Run Mode cluster ChangeToMode command to the DUT with NewMode set to PIXIT.CLEANMODE
+            self.step("4")
+            await self.send_change_to_mode_with_check(cleaning_mode, RvcStatusEnum.Success)
+            # This step is not described in the test plan, but it ought to be
+            await self.read_current_mode_with_check(cleaning_mode, endpoint=self.endpoint)
+
+            # Wait for DUT to leave dock and begin cleaning activities
+            self.step("5")
+            current_mode_match = AttributeMatcher.from_callable(
+                "CurrentMode is CLEANING",
+                lambda report: report.value == cleaning_mode)
+            # Wait for attribute reports to match
+            current_mode_accumulator.await_all_expected_report_matches([current_mode_match], timeout_sec=10)
+
+            await asyncio.sleep(1)
+
+            # TH reads CurrentMode attribute of the RVC Run Mode cluster
+            self.step("6")
+            cleaning_run_mode_dut = await self.read_current_mode_with_check(cleaning_mode, endpoint=self.endpoint)
+            # Logging the CurrentMode Attribute output responses from the DUT:
+            logging.info(f"CurrentMode: {cleaning_run_mode_dut}")
+            verify_mode_tag_in_supported_modes(supported_run_modes_dut, cleaning_run_mode_dut,
+                                               Clusters.RvcRunMode.Enums.ModeTag.kCleaning)
+
+            # TH sends GoHome command to the DUT
+            self.step("7")
+            await self.send_go_home_cmd_with_check(Clusters.OperationalState.Enums.ErrorStateEnum.kNoError)
+
+            # Wait for DUT to return to dock and complete docking-related activities
+            self.step("8")
+            current_mode_match = AttributeMatcher.from_callable(
+                "CurrentMMode is IDLE",
+                lambda report: report.value == idle_mode)
+            # Wait for attribute reports to match
+            current_mode_accumulator.await_all_expected_report_matches([current_mode_match], timeout_sec=10)
+
+            # TH reads CurrentMode attribute of the RVC Run Mode cluster
+            self.step("9")
+            post_docking_run_mode_dut = await self.read_current_mode_with_check(expected_mode=idle_mode,endpoint=self.endpoint)
+            # Logging the CurrentMode Attribute output responses from the DUT:
+            logging.info(f"CurrentMode: {post_docking_run_mode_dut}")
+            verify_mode_tag_in_supported_modes(supported_run_modes_dut, post_docking_run_mode_dut,
+                                               Clusters.RvcRunMode.Enums.ModeTag.kIdle)
+
+        else:
+            self.skip_step("2")
+            self.skip_step("3")
+            self.skip_step("4")
+            self.skip_step("5")
+            self.skip_step("6")
+            self.skip_step("7")
+            self.skip_step("8")
+            self.skip_step("9")
+            logging.info(
+                "Device does not support mandatory Attributes/Commands which is required to run this test case, skipped all the test steps")
 
 
+if __name__ == "__main__":
+    default_matter_test_main()
 
 
 
