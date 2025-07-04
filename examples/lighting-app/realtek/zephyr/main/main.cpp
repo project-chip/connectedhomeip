@@ -16,10 +16,10 @@
  *    limitations under the License.
  */
 
+#include "AppTask.h"
 #include <system/SystemError.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/reboot.h>
-#include "AppTask.h"
 
 #ifdef CONFIG_CHIP_PW_RPC
 #include "Rpc.h"
@@ -29,23 +29,22 @@ LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
 
-#include <openthread/instance.h>
-#include <openthread/platform/time.h>
-#include <openthread/platform/alarm-milli.h>
-#include <openthread/platform/alarm-micro.h>
-#include <openthread-system.h>
-#include "soc.h"
 #include "rtl_wdt.h"
+#include "soc.h"
+#include <openthread-system.h>
+#include <openthread/instance.h>
+#include <openthread/platform/alarm-micro.h>
+#include <openthread/platform/alarm-milli.h>
+#include <openthread/platform/time.h>
 
-extern "C"
-{
+extern "C" {
 // replace misc.c
 
 extern void WDG_SystemReset(WDTMode_TypeDef wdt_mode, int reset_reason);
-void __wrap_otPlatReset(otInstance *aInstance)
+void __wrap_otPlatReset(otInstance * aInstance)
 {
- 	ARG_UNUSED(aInstance);
-	WDG_SystemReset(RESET_ALL, 0xff);
+    ARG_UNUSED(aInstance);
+    WDG_SystemReset(RESET_ALL, 0xff);
 }
 }
 

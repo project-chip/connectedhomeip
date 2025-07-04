@@ -48,7 +48,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  * It is called exactly once for each endpoint where cluster is present.
  *
  * @param endpoint   Ver.: always
- * 
+ *
  */
 void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
