@@ -104,7 +104,8 @@ commandHandler->AddResponse(path, kReplyCommandId, replyEncoder);
 ### Decoupling of `CommandHandlerInterface` from EmberTestCodegenModelViaMocks.cpp:1513:77 Metadata
 
 CommandHandler Interface was coupled with Ember data in ways that caused bugs if
-not set up correctly, updates were made for decoupling, now this data is provided
+not set up correctly, updates were made for decoupling, now this data is
+provided
 
 With this the interfaces
 [`CommandHandlerInterface::RetrieveGeneratedCommands`](#enumerateacceptedcommands-to-retrieveacceptedcommands),
@@ -255,4 +256,3 @@ To use default attribute persistence, you need to pass in a
 `PersistentStorageDelegate` to `CodegenDataModelProviderInstance`. See example
 changes in [36658](https://github.com/project-chip/connectedhomeip/pull/36658)
 ).
-
