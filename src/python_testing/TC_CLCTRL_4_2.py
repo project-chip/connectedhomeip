@@ -233,6 +233,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
 
             self.step("2k")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
+            sub_handler.reset()
 
         self.step("3a")
         if latch_control_modes != 0:
@@ -269,6 +270,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
             self.step("3e")
             self.wait_for_user_input(prompt_msg="Manually unlatch the device and press enter when done")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
+            sub_handler.reset()
 
         self.step("4a")
         if latch_control_modes != 1:
@@ -310,6 +312,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
             self.step("4h")
             self.wait_for_user_input(prompt_msg="Manually unlatch the device and press enter when done")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
+            sub_handler.reset()
 
         self.step("5a")
         if latch_control_modes != 2:
@@ -353,6 +356,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
             self.step("5h")
             sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(
                 Clusters.ClosureControl.Enums.MainStateEnum.kStopped)], timeout_sec=timeout)
+            sub_handler.reset()
 
         self.step("6a")
         if latch_control_modes != 3:
@@ -404,6 +408,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
             self.step("6k")
             sub_handler.await_all_expected_report_matches(expected_matchers=[main_state_matcher(
                 Clusters.ClosureControl.Enums.MainStateEnum.kStopped)], timeout_sec=timeout)
+            sub_handler.reset()
 
 
 if __name__ == "__main__":
