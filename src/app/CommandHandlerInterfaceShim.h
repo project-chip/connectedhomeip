@@ -36,7 +36,8 @@ namespace app {
 /// @tparam  TClusterIds A list of the IDs the shim will search the metadata of, leave empty to search for the metadata in all
 ///          clusters
 template <ClusterId... TClusterIds>
-class CommandHandlerInterfaceShim : public CommandHandlerInterface {
+class CommandHandlerInterfaceShim : public CommandHandlerInterface
+{
 
     using CommandHandlerInterface::CommandHandlerInterface;
 
@@ -48,10 +49,10 @@ private:
 
 public:
     CHIP_ERROR RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
+                                        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
     {
         size_t commandCount = 0;
-        CHIP_ERROR err = CHIP_NO_ERROR;
+        CHIP_ERROR err      = CHIP_NO_ERROR;
 
         auto counter = SplitLambda([&](CommandId commandId) {
             commandCount++;
@@ -63,9 +64,12 @@ public:
 
         auto appender = SplitLambda([&](CommandId commandId) {
             auto opt_entry = GetEntry(cluster, commandId);
-            if (!opt_entry) {
+            if (!opt_entry)
+            {
                 err = CHIP_ERROR_NOT_FOUND;
-            } else {
+            }
+            else
+            {
                 err = builder.Append(*entry);
             }
             return err == CHIP_NO_ERROR ? Loop::Continue : Loop::Break;

@@ -10,7 +10,8 @@ struct SplitLambdaCallerImpl;
 
 // Detail -- Specialization to extract Argument typed from the callable
 template <class TReturn, class TCallable, class... TArgs>
-struct SplitLambdaCallerImpl<TReturn (TCallable::*)(TArgs...) const> {
+struct SplitLambdaCallerImpl<TReturn (TCallable::*)(TArgs...) const>
+{
 
     // This call function knows the arguments and provides the signature required for the C-like callbacks
     static TReturn Call(TArgs... args, void * context)
@@ -41,14 +42,12 @@ struct SplitLambdaCallerImpl<TReturn (TCallable::*)(TArgs...) const> {
 ///         return api_function(on_api_update_my_vars.Caller(), on_api_update_my_vars.Context());
 ///     }
 template <class TCallable>
-struct SplitLambda : detail::SplitLambdaCallerImpl<decltype(&TCallable::operator())> {
+struct SplitLambda : detail::SplitLambdaCallerImpl<decltype(&TCallable::operator())>
+{
     TCallable callable;
 
-    SplitLambda(TCallable callable_)
-        : callable(callable_)
-    {
-    }
-    SplitLambda(SplitLambda &) = delete; // Cannot be copied
+    SplitLambda(TCallable callable_) : callable(callable_) {}
+    SplitLambda(SplitLambda &)  = delete; // Cannot be copied
     SplitLambda(SplitLambda &&) = delete; // Cannot be moved
 
     inline void * Context() { return static_cast<void *>(&callable); }
