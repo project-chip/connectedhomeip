@@ -240,7 +240,7 @@ private:
                               chip::app::DataModel::Nullable<chip::Percent100ths> & nextPosition);
 
     bool mIsCalibrationActionInProgress = false;
-    bool mEp1MotionInProgress            = false;
-    bool mEp2MotionInProgress            = false;
-    bool mEp3MotionInProgress            = false;
+    bool mEp1MotionInProgress           = false;
+    bool mEp2MotionInProgress           = false;
+    bool mEp3MotionInProgress           = false;
 };
