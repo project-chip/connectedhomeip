@@ -182,7 +182,8 @@ public:
     /**
      * @brief Gets the current error list.
      *        This method is used to retrieve the current error list.
-     *        The outputSpan must initially be of size kCurrentErrorListMaxSize and will be resized to the correct size for the list.
+     *        The outputSpan must initially be of size kCurrentErrorListMaxSize and will be resized to the correct size for the
+     * list.
      * @param[out] outputSpan The span to fill with the current error list.
      *
      * @return CHIP_NO_ERROR if the retrieval was successful.
