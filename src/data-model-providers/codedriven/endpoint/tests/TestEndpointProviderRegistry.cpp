@@ -3,8 +3,8 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/Descriptor/ClusterId.h>
-#include <data-model-providers/endpoint/EndpointProviderRegistry.h>
-#include <data-model-providers/endpoint/SpanEndpointProvider.h>
+#include <data-model-providers/codedriven/endpoint/EndpointProviderRegistry.h>
+#include <data-model-providers/codedriven/endpoint/SpanEndpointProvider.h>
 
 #include <algorithm>
 #include <array>
