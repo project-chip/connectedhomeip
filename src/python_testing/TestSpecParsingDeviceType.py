@@ -33,15 +33,21 @@ from TC_DeviceConformance import DeviceConformanceTests, get_supersets
 def run_against_all_spec_revisions(body):
     def runner(self: "MatterBaseTest", *args, **kwargs):
         for revision in PrebuiltDataModelDirectory:
-            print(f"-------------- Testing against spec revision {revision.dirname}")
-            self.xml_clusters, self.xml_cluster_problems = build_xml_clusters(revision)
-            self.xml_device_types, self.xml_device_types_problems = build_xml_device_types(revision)
+            self._create_xmls(revision)
             body(self, *args, **kwargs)
     return runner
 
 
 class TestSpecParsingDeviceType(MatterBaseTest):
-    # This just tests that the current spec can be parsed without failures
+    def _create_xmls(self, revision: PrebuiltDataModelDirectory):
+        print(f"-------------- Testing against spec revision {revision.dirname}")
+        self.xml_clusters, self.xml_cluster_problems = build_xml_clusters(revision)
+        self.xml_device_types, self.xml_device_types_problems = build_xml_device_types(revision)
+        # Let's just build a dictionary of device types to IDs becasue I need them and we don't have codegen
+        self.dt_ids = {re.sub('[ -/]*', '', dt.name.lower()): id for id, dt in self.xml_device_types.items()}
+
+    # This just tests that the prebuilt specs can be parsed without failures
+    @run_against_all_spec_revisions
     def test_spec_device_parsing(self):
         for id, d in self.xml_device_types.items():
             print(str(d))
@@ -52,18 +58,11 @@ class TestSpecParsingDeviceType(MatterBaseTest):
             print(self.problems)
 
     def setup_class(self):
-        # Latest fully qualified release
-        self.xml_clusters, self.xml_cluster_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
-        self.xml_device_types, self.xml_device_types_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_4)
-
         self.device_type_id = 0xBBEF
         self.revision = 2
         self.classification_class = "simple"
         self.classification_scope = "endpoint"
         self.clusters = {0x0003: "Identify", 0x0004: "Groups"}
-
-        # Let's just build a dictionary of device types to IDs becasue I need them and we don't have codegen
-        self.dt_ids = {re.sub('[ -/]*', '', dt.name.lower()): id for id, dt in self.xml_device_types.items()}
 
         # Conformance support tests the different types of conformance for clusters, so here we just want to ensure that we're correctly parsing the XML into python
         # adds the same attributes and features to every cluster. This is fine for testing.
@@ -294,6 +293,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         # If we get here, the problems are as expected, don't need to report the problems on teardown
         self.problems = []
 
+    @run_against_all_spec_revisions
     def test_overrides_real(self):
         # Check that some known overrides are present
         # Onoff light has element requirements with conformance for commands and features, and attribute requirements for constraints, which should be ignored for now.
@@ -364,6 +364,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         self.test.endpoints_tlv = {1: endpoint_tlv}
 
     # Test with temp sensor with temp sensor, identify and descriptor
+    @run_against_all_spec_revisions
     def test_ts_minimal_clusters(self):
         self.create_test([Clusters.TemperatureMeasurement.id, Clusters.Identify.id, Clusters.Descriptor.id])
         success, problems = self.test.check_device_type(fail_on_extra_clusters=True)
@@ -372,6 +373,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         asserts.assert_true(success, "Failure on Temperature Sensor device type test")
 
     # Temp sensor with temp sensor, identify, descriptor, binding
+    @run_against_all_spec_revisions
     def test_ts_minimal_with_binding(self):
         self.create_test([Clusters.TemperatureMeasurement.id, Clusters.Identify.id, Clusters.Binding.id, Clusters.Descriptor.id])
         success, problems = self.test.check_device_type(fail_on_extra_clusters=True)
@@ -381,6 +383,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         asserts.assert_false(problems, "Found problems on Temperature sensor device type test")
 
     # Temp sensor with temp sensor, identify, descriptor, fixed label
+    @run_against_all_spec_revisions
     def test_ts_minimal_with_label(self):
         self.create_test([Clusters.TemperatureMeasurement.id, Clusters.Identify.id, Clusters.FixedLabel.id, Clusters.Descriptor.id])
         success, problems = self.test.check_device_type(fail_on_extra_clusters=True)
@@ -390,6 +393,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         asserts.assert_false(problems, "Found problems on Temperature sensor device type test")
 
     # Temp sensor with temp sensor, descriptor
+    @run_against_all_spec_revisions
     def test_ts_missing_identify(self):
         self.create_test([Clusters.TemperatureMeasurement.id, Clusters.Descriptor.id])
         success, problems = self.test.check_device_type(fail_on_extra_clusters=True)
@@ -399,6 +403,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         asserts.assert_false(success, "Unexpected success running test that should fail")
 
     # endpoint 1 empty
+    @run_against_all_spec_revisions
     def test_endpoint_missing_descriptor(self):
         self.create_test([], no_descriptor=True)
         success, problems = self.test.check_device_type(fail_on_extra_clusters=True)
@@ -408,6 +413,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         asserts.assert_false(success, "Unexpected success running test that should fail")
 
     # Temp sensor with temp sensor, descriptor, identify, onoff
+    @run_against_all_spec_revisions
     def test_ts_extra_cluster(self):
         self.create_test([Clusters.TemperatureMeasurement.id, Clusters.Identify.id, Clusters.Descriptor.id, Clusters.OnOff.id])
         success, problems = self.test.check_device_type(fail_on_extra_clusters=True)
@@ -420,6 +426,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         asserts.assert_equal(len(problems), 1, "Did not receive expected warning for extra clusters")
         asserts.assert_true(success, "Unexpected failure")
 
+    @run_against_all_spec_revisions
     def test_bad_device_type_id_device_type_test(self):
         self.create_test([], bad_device_id=True)
         success, problems = self.test.check_device_type(fail_on_extra_clusters=True)
@@ -428,6 +435,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         asserts.assert_equal(len(problems), 1, "Unexpected number of problems")
         asserts.assert_false(success, "Unexpected success running test that should fail")
 
+    @run_against_all_spec_revisions
     def test_all_device_types(self):
         for id in self.xml_device_types.keys():
             self.create_good_device(id)
@@ -484,6 +492,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         asserts.assert_equal(set(one_three.keys())-set(one_four_two.keys()),
                              set(), "There are some 1.3 device types that are unexpectedly not included in the 1.4.2 spec")
 
+    @run_against_all_spec_revisions
     def test_application_device_type_on_root(self):
         self.test = DeviceConformanceTests()
         self.test.xml_device_types = self.xml_device_types
@@ -513,6 +522,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         problems = self.test.check_root_endpoint_for_application_device_types()
         asserts.assert_equal(len(problems), 1, "Did not get expected problem on root node with application device type")
 
+    @run_against_all_spec_revisions
     def test_superset_parsing_released_spec(self):
         # Testing superset parsing from the spec since it requires multiple device types to be parsed together
         for d in self.xml_device_types.values():
@@ -528,12 +538,17 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         asserts.assert_in(expected_light_superset, supersets, "Did not find expected light superset")
         asserts.assert_in(expected_dimmer_switch, supersets, "Did not find expected switch superset")
 
+    def test_superset_parsing_mounted(self):
         # 1.4.2 has some interesting stuff where we have equivalent device types, so check that explicitly
-        xml_device_types_1_4_2, _ = build_xml_device_types(PrebuiltDataModelDirectory.k1_4_2)
-        supersets = get_supersets(xml_device_types_1_4_2)
+        self._create_xmls(PrebuiltDataModelDirectory.k1_4_2)
+        supersets = get_supersets(self.xml_device_types)
 
         expected_onoff_plugin = set([self.dt_ids['mountedonoffcontrol'], self.dt_ids['onoffpluginunit']])
         expected_dimmable_plugin = set([self.dt_ids['mounteddimmableloadcontrol'], self.dt_ids['dimmablepluginunit']])
+        expected_light_superset = set([self.dt_ids['extendedcolorlight'],
+                                       self.dt_ids['colortemperaturelight'], self.dt_ids['dimmablelight'], self.dt_ids['onofflight']])
+        expected_dimmer_switch = set([self.dt_ids['colordimmerswitch'],
+                                     self.dt_ids['dimmerswitch'], self.dt_ids['onofflightswitch']])
 
         asserts.assert_in(expected_light_superset, supersets, "Did not find expected light superset")
         asserts.assert_in(expected_dimmer_switch, supersets, "Did not find expected switch superset")
@@ -568,6 +583,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         asserts.assert_in(set([1, 2, 3]), supersets, "Did not find expected superset in tree")
         asserts.assert_in(set([4, 3]), supersets, "Did not find expected superset in tree")
 
+    @run_against_all_spec_revisions
     def test_supersets_on_endpoints_mocks(self):
         superset_tree = self._build_superset_tree()
 
@@ -642,6 +658,7 @@ class TestSpecParsingDeviceType(MatterBaseTest):
         problems = self.test.check_all_application_device_types_superset()
         asserts.assert_equal(len(problems), 1, "Did not find expected problem when testing with mixed subsets")
 
+    @run_against_all_spec_revisions
     def test_supersets_on_endpoints_spec_ids(self):
         self.test = DeviceConformanceTests()
         self.test.xml_device_types = self.xml_device_types

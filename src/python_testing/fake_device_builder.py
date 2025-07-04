@@ -80,11 +80,13 @@ def create_minimal_dt(xml_clusters: dict[uint, XmlCluster], xml_device_types: di
         Does NOT take into account overrides yet.
     '''
     endpoint = {}
+    mandatory_servers = [id for id, c in xml_device_types[device_type_id].server_clusters.items()
+                         if _is_mandatory(c.conformance)]
     if server_override:
         required_servers = server_override
     else:
-        required_servers = [id for id, c in xml_device_types[device_type_id].server_clusters.items()
-                            if _is_mandatory(c.conformance)]
+        required_servers = mandatory_servers
+
     required_clients = [id for id, c in xml_device_types[device_type_id].client_clusters.items()
                         if _is_mandatory(c.conformance)]
     device_type_revision = xml_device_types[device_type_id].revision
@@ -93,7 +95,7 @@ def create_minimal_dt(xml_clusters: dict[uint, XmlCluster], xml_device_types: di
         additional_features = []
         additional_attributes = []
         additional_commands = []
-        if apply_dt_element_overrides:
+        if apply_dt_element_overrides and s in mandatory_servers:
             additional_features = [id for id, conformance in xml_device_types[device_type_id]
                                    .server_clusters[s].feature_overrides.items() if _is_mandatory(conformance)]
             additional_attributes = [id for id, conformance in xml_device_types[device_type_id]
