@@ -110,6 +110,7 @@ class TC_CLDIM_4_2(MatterBaseTest):
 
         is_positioning_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
         is_latching_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
+        is_speed_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
 
         # STEP 2b: If Positioning feature is not supported, skip remaining steps
         self.step("2b")
@@ -192,7 +193,7 @@ class TC_CLDIM_4_2(MatterBaseTest):
 
         # STEP 4: Send Step command with invalid Speed
         self.step(4)
-        if feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed:
+        if is_speed_supported:
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.Step(
