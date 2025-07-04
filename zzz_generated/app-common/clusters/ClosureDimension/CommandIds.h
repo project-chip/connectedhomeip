@@ -19,6 +19,14 @@ namespace Step {
 inline constexpr CommandId Id = 0x00000001;
 } // namespace Step
 
+namespace GroupedSetTarget {
+inline constexpr CommandId Id = 0x00000002;
+} // namespace GroupedSetTarget
+
+namespace GroupedStep {
+inline constexpr CommandId Id = 0x00000003;
+} // namespace GroupedStep
+
 } // namespace Commands
 } // namespace ClosureDimension
 } // namespace Clusters

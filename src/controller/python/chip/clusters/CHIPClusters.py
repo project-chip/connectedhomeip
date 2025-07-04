@@ -7796,6 +7796,15 @@ class ChipClusters:
                 "args": {
                 },
             },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "GroupedMoveTo",
+                "args": {
+                    "position": "int",
+                    "latch": "bool",
+                    "speed": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -7882,6 +7891,24 @@ class ChipClusters:
             0x00000001: {
                 "commandId": 0x00000001,
                 "commandName": "Step",
+                "args": {
+                    "direction": "int",
+                    "numberOfSteps": "int",
+                    "speed": "int",
+                },
+            },
+            0x00000002: {
+                "commandId": 0x00000002,
+                "commandName": "GroupedSetTarget",
+                "args": {
+                    "position": "int",
+                    "latch": "bool",
+                    "speed": "int",
+                },
+            },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "GroupedStep",
                 "args": {
                     "direction": "int",
                     "numberOfSteps": "int",

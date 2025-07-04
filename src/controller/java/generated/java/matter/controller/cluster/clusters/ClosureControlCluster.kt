@@ -138,7 +138,7 @@ class ClosureControlCluster(
     position: UByte?,
     latch: Boolean?,
     speed: UByte?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration,
   ) {
     val commandId: UInt = 1u
 
@@ -166,11 +166,43 @@ class ClosureControlCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun calibrate(timedInvokeTimeout: Duration? = null) {
+  suspend fun calibrate(timedInvokeTimeout: Duration) {
     val commandId: UInt = 2u
 
     val tlvWriter = TlvWriter()
     tlvWriter.startStructure(AnonymousTag)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun groupedMoveTo(
+    position: UByte?,
+    latch: Boolean?,
+    speed: UByte?,
+    timedInvokeTimeout: Duration? = null,
+  ) {
+    val commandId: UInt = 3u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_POSITION_REQ: Int = 0
+    position?.let { tlvWriter.put(ContextSpecificTag(TAG_POSITION_REQ), position) }
+
+    val TAG_LATCH_REQ: Int = 1
+    latch?.let { tlvWriter.put(ContextSpecificTag(TAG_LATCH_REQ), latch) }
+
+    val TAG_SPEED_REQ: Int = 2
+    speed?.let { tlvWriter.put(ContextSpecificTag(TAG_SPEED_REQ), speed) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

@@ -10930,6 +10930,10 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
             result = @"Calibrate";
             break;
 
+        case MTRCommandIDTypeClusterClosureControlCommandGroupedMoveToID:
+            result = @"GroupedMoveTo";
+            break;
+
         default:
             result = [NSString stringWithFormat:@"<Unknown commandID %u>", commandID];
             break;
@@ -10946,6 +10950,14 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterClosureDimensionCommandStepID:
             result = @"Step";
+            break;
+
+        case MTRCommandIDTypeClusterClosureDimensionCommandGroupedSetTargetID:
+            result = @"GroupedSetTarget";
+            break;
+
+        case MTRCommandIDTypeClusterClosureDimensionCommandGroupedStepID:
+            result = @"GroupedStep";
             break;
 
         default:

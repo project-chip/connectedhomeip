@@ -126,7 +126,6 @@ public:
     }
     Status HandleCalibrateCommand() override { return Status::Success; }
 
-    bool IsManualLatchingNeeded() override { return false; }
     bool IsReadyToMove() override { return true; }
     ElapsedS GetCalibrationCountdownTime() override { return 30; }
     ElapsedS GetMovingCountdownTime() override { return 20; }
