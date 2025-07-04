@@ -35,7 +35,7 @@ typedef struct UploadDataInfo
 class PushAVUploader
 {
 public:
-    typedef struct CerficatesInfo
+    typedef struct CertificatesInfo
     {
         std::string mRootCert;
         std::string mDevCert;
