@@ -25,7 +25,6 @@ RUN case ${TARGETPLATFORM} in \
     ;; \
     esac
 
-
 # base build and check tools and libraries layer
 RUN set -x \
     && apt-get update \
