@@ -36,7 +36,7 @@ Status ClosureDimensionDelegate::HandleSetTarget(const Optional<Percent100ths> &
 {
     ChipLogProgress(AppServer, "HandleSetTarget");
     // Add the SetTarget handling logic here
-    return Status::Success;
+    return ClosureManager::GetInstance().OnSetTargetCommand(pos, latch, speed, GetEndpoint());
 }
 
 Status ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direction, const uint16_t & numberOfSteps,
@@ -95,7 +95,40 @@ void ClosureDimensionEndpoint::OnCalibrateActionComplete()
 
 void ClosureDimensionEndpoint::OnMoveToActionComplete()
 {
-    // This function should handle closure dimension state updation after MoveTo Action.
+    UpdateCurrentStateFromTargetState();
+}
+
+void ClosureDimensionEndpoint::UpdateCurrentStateFromTargetState()
+{
+    DataModel::Nullable<GenericDimensionStateStruct> currentState;
+    DataModel::Nullable<GenericDimensionStateStruct> targetState;
+
+    VerifyOrReturn(mLogic.GetCurrentState(currentState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get current state, Updating CurrentState From TargetState Failed"));
+    VerifyOrReturn(mLogic.GetTargetState(targetState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get target state, Updating CurrentState From TargetState Failed"));
+
+    VerifyOrReturn(!targetState.IsNull(),
+                   ChipLogError(AppServer, "Target state is null, Updating CurrentState From TargetState Failed"));
+    VerifyOrReturn(!currentState.IsNull(),
+                   ChipLogError(AppServer, "Current state is null, Updating CurrentState From TargetState Failed"));
+
+    if (targetState.Value().position.HasValue() && !targetState.Value().position.Value().IsNull())
+    {
+        currentState.Value().position.SetValue(DataModel::MakeNullable(targetState.Value().position.Value().Value()));
+    }
+
+    if (targetState.Value().latch.HasValue() && !targetState.Value().latch.Value().IsNull())
+    {
+        currentState.Value().latch.SetValue(DataModel::MakeNullable(targetState.Value().latch.Value().Value()));
+    }
+
+    if (targetState.Value().speed.HasValue())
+    {
+        currentState.Value().speed.SetValue(targetState.Value().speed.Value());
+    }
+
+    mLogic.SetCurrentState(currentState);
 }
 
 void ClosureDimensionEndpoint::OnPanelMotionActionComplete()
