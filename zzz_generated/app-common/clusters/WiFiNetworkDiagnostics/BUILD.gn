@@ -74,7 +74,7 @@ source_set("elements") {
 }
 
 source_set("metadata") {
-  sources = [ "Metadata.h" ]
+  sources = [ "Metadata.h", "MetadataProvider.h"]
   public_deps = [
     ":ids",
     "${chip_root}/src/app/data-model-provider:metadata",
