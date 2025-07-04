@@ -38,6 +38,7 @@
 import logging
 
 import chip.clusters as Clusters
+from chip.clusters import Globals
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
 from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
@@ -178,7 +179,7 @@ class TC_CLDIM_4_2(MatterBaseTest):
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
-                    direction=2,  # Invalid Direction
+                    direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kUnknownEnumValue,
                     numberOfSteps=1
                 ),
                 endpoint=endpoint
@@ -197,7 +198,7 @@ class TC_CLDIM_4_2(MatterBaseTest):
                     cmd=Clusters.Objects.ClosureDimension.Commands.Step(
                         direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease,
                         numberOfSteps=1,
-                        speed=4,  # Invalid Speed
+                        speed=Globals.Enums.ThreeLevelAutoEnum.kUnknownEnumValue,
                     ),
                     endpoint=endpoint
                 )
