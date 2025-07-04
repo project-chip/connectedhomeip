@@ -31579,7 +31579,7 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="ACErrorCode", Tag=0x00000044, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="ACLouverPosition", Tag=0x00000045, Type=typing.Optional[Thermostat.Enums.ACLouverPositionEnum]),
                 ClusterObjectFieldDescriptor(Label="ACCoilTemperature", Tag=0x00000046, Type=typing.Union[None, Nullable, int]),
-                ClusterObjectFieldDescriptor(Label="ACCapacityformat", Tag=0x00000047, Type=typing.Optional[Thermostat.Enums.ACCapacityFormatEnum]),
+                ClusterObjectFieldDescriptor(Label="ACCapacityFormat", Tag=0x00000047, Type=typing.Optional[Thermostat.Enums.ACCapacityFormatEnum]),
                 ClusterObjectFieldDescriptor(Label="presetTypes", Tag=0x00000048, Type=typing.Optional[typing.List[Thermostat.Structs.PresetTypeStruct]]),
                 ClusterObjectFieldDescriptor(Label="scheduleTypes", Tag=0x00000049, Type=typing.Optional[typing.List[Thermostat.Structs.ScheduleTypeStruct]]),
                 ClusterObjectFieldDescriptor(Label="numberOfPresets", Tag=0x0000004A, Type=typing.Optional[uint]),
@@ -31650,7 +31650,7 @@ class Thermostat(Cluster):
     ACErrorCode: typing.Optional[uint] = None
     ACLouverPosition: typing.Optional[Thermostat.Enums.ACLouverPositionEnum] = None
     ACCoilTemperature: typing.Union[None, Nullable, int] = None
-    ACCapacityformat: typing.Optional[Thermostat.Enums.ACCapacityFormatEnum] = None
+    ACCapacityFormat: typing.Optional[Thermostat.Enums.ACCapacityFormatEnum] = None
     presetTypes: typing.Optional[typing.List[Thermostat.Structs.PresetTypeStruct]] = None
     scheduleTypes: typing.Optional[typing.List[Thermostat.Structs.ScheduleTypeStruct]] = None
     numberOfPresets: typing.Optional[uint] = None
@@ -33017,7 +33017,7 @@ class Thermostat(Cluster):
             value: typing.Union[None, Nullable, int] = None
 
         @dataclass
-        class ACCapacityformat(ClusterAttributeDescriptor):
+        class ACCapacityFormat(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000201
