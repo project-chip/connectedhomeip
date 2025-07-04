@@ -538,7 +538,6 @@ void ClosureManager::HandleEp3ClosureActionTimer(System::Layer * layer, void * a
     }
 }
 
-
 void ClosureManager::HandlePanelUnlatchAction(EndpointId endpointId)
 {
     ClosureManager & instance = ClosureManager::GetInstance();
