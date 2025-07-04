@@ -239,13 +239,28 @@ fi
 # ------------------------------------------------------------------------------
 mkdir -p "$COVERAGE_ROOT"
 
-lcov --capture --all --directory "$OUTPUT_ROOT/obj/src" \
+lcov --capture --initial --directory "$OUTPUT_ROOT/obj/src" \
     --ignore-errors format,unsupported,inconsistent,unused \
     --exclude="$PWD"/zzz_generated/* \
     --exclude="$PWD"/third_party/* \
     --exclude=/usr/include/* \
+    --output-file "$COVERAGE_ROOT/lcov_base.info" \
+    "${QUIET_FLAG[@]}"
+
+lcov --capture --directory "$OUTPUT_ROOT/obj/src" \
+    --ignore-errors format,unsupported,inconsistent,unused \
+    --exclude="$PWD"/zzz_generated/* \
+    --exclude="$PWD"/third_party/* \
+    --exclude=/usr/include/* \
+    --output-file "$COVERAGE_ROOT/lcov_test.info" \
+    "${QUIET_FLAG[@]}"
+
+lcov --ignore-errors format,unsupported,inconsistent,unused \
+    --add-tracefile "$COVERAGE_ROOT/lcov_base.info" \
+    --add-tracefile "$COVERAGE_ROOT/lcov_test.info" \
     --output-file "$COVERAGE_ROOT/lcov_final.info" \
     "${QUIET_FLAG[@]}"
+
 
 genhtml "$COVERAGE_ROOT/lcov_final.info" \
     --ignore-errors inconsistent,category,count \
