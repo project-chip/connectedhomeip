@@ -18,8 +18,8 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-logic.h>
-#include <app/server/Server.h>
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <app/server/Server.h>
 #include <clusters/GeneralDiagnostics/ClusterId.h>
 #include <clusters/GeneralDiagnostics/Metadata.h>
 #include <platform/GeneralFaults.h>
@@ -29,8 +29,7 @@ namespace app {
 namespace Clusters {
 
 template <typename LOGIC>
-class GeneralDiagnosticsCluster : public DefaultServerCluster,
-                                  private LOGIC
+class GeneralDiagnosticsCluster : public DefaultServerCluster, private LOGIC
 {
 public:
     template <typename... Args>
@@ -39,7 +38,8 @@ public:
     {}
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                AttributeValueEncoder & encoder) override {
+                                                AttributeValueEncoder & encoder) override
+    {
         switch (request.path.mAttributeId)
         {
         case GeneralDiagnostics::Attributes::NetworkInterfaces::Id: {
@@ -89,9 +89,9 @@ public:
         case GeneralDiagnostics::Attributes::FeatureMap::Id: {
             uint32_t features = 0;
 
-    #if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
+#if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
             features |= to_underlying(Clusters::GeneralDiagnostics::Feature::kDataModelTest);
-    #endif // CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
+#endif // CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
 
             return encoder.Encode(features);
         }
@@ -106,7 +106,8 @@ public:
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                chip::TLV::TLVReader & input_arguments,
-                                                               CommandHandler * handler) override {
+                                                               CommandHandler * handler) override
+    {
         switch (request.path.mCommandId)
         {
         case GeneralDiagnostics::Commands::TestEventTrigger::Id: {
@@ -158,7 +159,8 @@ public:
 
 private:
     template <typename T>
-    CHIP_ERROR EncodeValue(T value, CHIP_ERROR readError, AttributeValueEncoder & encoder) {
+    CHIP_ERROR EncodeValue(T value, CHIP_ERROR readError, AttributeValueEncoder & encoder)
+    {
         if (readError == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
         {
             value = {};
@@ -171,7 +173,8 @@ private:
     }
 
     template <typename T>
-    CHIP_ERROR EncodeListOfValues(T valueList, CHIP_ERROR readError, AttributeValueEncoder & aEncoder) {
+    CHIP_ERROR EncodeListOfValues(T valueList, CHIP_ERROR readError, AttributeValueEncoder & aEncoder)
+    {
         if (readError == CHIP_NO_ERROR)
         {
             readError = aEncoder.EncodeList([&valueList](const auto & encoder) -> CHIP_ERROR {
@@ -191,7 +194,8 @@ private:
         return readError;
     }
 
-    bool IsTestEventTriggerEnabled() {
+    bool IsTestEventTriggerEnabled()
+    {
         auto * triggerDelegate = chip::Server::GetInstance().GetTestEventTriggerDelegate();
         if (triggerDelegate == nullptr)
         {
@@ -204,7 +208,6 @@ private:
         }
         return true;
     }
-
 };
 } // namespace Clusters
 } // namespace app
