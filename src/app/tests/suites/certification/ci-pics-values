@@ -3021,3 +3021,13 @@ THNETDIR.S=1
 
 # Wi-Fi Network Management Cluster
 WIFINM.S=1
+
+# Commodity Metering
+
+#Server
+SEMT.S=1
+
+#Attributes
+SEMT.S.A0000=1
+SEMT.S.A0001=1
+SEMT.S.A0002=1

@@ -10313,3 +10313,20 @@ PICS:
           "Does the device implement the Wi-Fi Network Management cluster as a
           server"
       id: WIFINM.S
+
+    #
+    # Commodity Metering Cluster
+    #
+    - label:
+          "Does the device implement the Commodity Metering Cluster as a server?"
+      id: SEMT.S
+
+    # Server attributes
+    - label: "Does the device implement the MeteredQuantity attribute?"
+      id: SEMT.S.A0000
+
+    - label: "Does the device implement the MeteredQuantityTimestamp attribute?"
+      id: SEMT.S.A0001
+
+    - label: "Does the device implement the TariffUnit attribute?"
+      id: SEMT.S.A0002
