@@ -40,6 +40,8 @@ public:
         mLayer->OnConnectionComplete(appState, connObj);
     }
 
+    void CallOnConnectionError(void * appState, CHIP_ERROR err) { mLayer->OnConnectionError(appState, err); }
+
 private:
     Ble::BleLayer * mLayer = nullptr;
 };
