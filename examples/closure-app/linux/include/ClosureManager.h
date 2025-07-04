@@ -63,6 +63,28 @@ public:
     chip::Protocols::InteractionModel::Status OnCalibrateCommand();
 
     /**
+     * @brief Sets the initial state for the ClosureControlEndpoint.
+     *
+     * This method initializes the closure control instance with default values and configurations.
+     *
+     * @param closureControlEndpoint The ClosureControlEndpoint to be initialized.
+     *
+     * @return CHIP_ERROR Returns CHIP_NO_ERROR on success, or an error code if initialization fails.
+     */
+    CHIP_ERROR SetClosureControlInitialState(chip::app::Clusters::ClosureControl::ClosureControlEndpoint & closureControlEndpoint);
+
+    /**
+     * @brief Sets the initial state for the ClosureDimensionEndpoint.
+     *
+     * This method initializes the closure panel instance with default values and configurations.
+     *
+     * @param closurePanelEndpoint The ClosureDimensionEndpoint to be initialized.
+     *
+     * @return CHIP_ERROR Returns CHIP_NO_ERROR on success, or an error code if initialization fails.
+     */
+    CHIP_ERROR SetClosurePanelInitialState(chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint & closurePanelEndpoint);
+
+    /**
      * @brief Handles the "MoveTo" command for the closure manager.
      *
      * This method initiates the move to command for the closure system, allowing it to move
@@ -151,16 +173,29 @@ private:
      * @return Pointer to the current panel instance, or nullptr if not found.
      */
     chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * GetCurrentPanelInstance(chip::EndpointId endpointId);
+     
     /**
-     * @brief Timer callback handler for closure actions.
+     * @brief Tracks the endpoint's current action being performed by the ClosureManager.
      *
-     * This static method is called when the timer for a closure action expires.
+     * These variables are used to determine the type of action currently being executed on the closure endpoints.
+     * Initialized to an invalid action and updated as needed during operations.
+     */
+    ClosureAction mEp1CurrentAction = ClosureAction::kInvalidAction;
+    ClosureAction mEp2CurrentAction = ClosureAction::kInvalidAction;
+    ClosureAction mEp3CurrentAction = ClosureAction::kInvalidAction;
+
+    /**
+     * @brief Timer callback handlers for closure actions over specific endpoints.
+     *
+     * These static methods are called when the timer for a closure action expires.
      * It is responsible for handling the completion or progression of closure-related actions.
      *
      * @param layer Pointer to the system layer that triggered the timer.
      * @param aAppState Application-specific state or context passed to the timer.
      */
-    static void HandleClosureActionTimer(chip::System::Layer * layer, void * aAppState);
+    static void HandleEp1ClosureActionTimer(chip::System::Layer * layer, void * aAppState);
+    static void HandleEp2ClosureActionTimer(chip::System::Layer * layer, void * aAppState);
+    static void HandleEp3ClosureActionTimer(chip::System::Layer * layer, void * aAppState);
 
     /**
      * @brief Handles the step action for a panel endpoint.
@@ -244,9 +279,33 @@ private:
      */
     void HandlePanelStepActionComplete(chip::EndpointId endpointId);
 
-    bool mIsCalibrationActionInProgress       = false;
-    bool mIsMoveToActionInProgress            = false;
-    bool mIsSetTargetActionInProgress         = false;
-    bool mIsStepActionInProgress              = false;
-    chip::EndpointId mCurrentActionEndpointId = chip::kInvalidEndpointId;
+    /**
+     * @brief Handles the motion action for the closure system.
+     *
+     * This method is called when a move-to action has been initiated,
+     * allowing for any necessary updates or state changes.
+     */
+    void HandleClosureMotionAction();
+
+    /**
+     * @brief Calculates the next position for a panel based on the closure panel state.
+     *
+     * This function determines the next position by incrementing or decrementing current position of the panel
+     * by a fixed step (1000 units) towards the target position, ensuring it does not overshoot the target.
+     *
+     * @param[in]  currentState   The current state of the panel, containing the current position.
+     * @param[in]  targetState    The target state of the panel, containing the desired position.
+     * @param[out] nextPosition   A reference to a Nullable object that will be updated with the next current position.
+     *
+     * @return true if the next position was updated and movement is required; false if no update is needed
+     *         or if either the current or target position is not set.
+     */
+    bool GetPanelNextPosition(const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & currentState,
+                              const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & targetState,
+                              chip::app::DataModel::Nullable<chip::Percent100ths> & nextPosition);
+
+    bool mIsCalibrationActionInProgress = false;
+    bool mEp1MotionInProgress           = false;
+    bool mEp2MotionInProgress           = false;
+    bool mEp3MotionInProgress           = false;
 };
