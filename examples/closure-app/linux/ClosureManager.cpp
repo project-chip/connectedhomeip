@@ -497,13 +497,40 @@ void ClosureManager::HandleEp2ClosureActionTimer(System::Layer * layer, void * a
     switch (instance.mEp2CurrentAction)
     {
     case ClosureAction::kSetTargetAction:
-        instance.HandlePanelSetTargetAction(instance.mCurrentActionEndpointId);
+        instance.HandlePanelSetTargetAction(kClosurePanelEndpoint2);
         break;
     case ClosureAction::kStepAction:
-        instance.HandlePanelStepAction(instance.mCurrentActionEndpointId);
+        instance.HandlePanelStepAction(kClosurePanelEndpoint2);
         break;
     case ClosureAction::kPanelUnLatchAction:
-        instance.HandlePanelUnlatchAction(instance.mCurrentActionEndpointId);
+        instance.HandlePanelUnlatchAction(kClosurePanelEndpoint2);
+        break;
+    default:
+        ChipLogError(AppServer, "Invalid action received in HandleEp2ClosureActionTimer");
+        break;
+    }
+}
+
+void ClosureManager::HandleEp3ClosureActionTimer(System::Layer * layer, void * aAppState)
+{
+    // Mark aAppState as unused to avoid compiler warnings
+    // Will be used in closure dimension cluster Commands
+    (void) aAppState;
+
+    ClosureManager & instance = ClosureManager::GetInstance();
+    ChipLogError(AppServer, "HandleEp3ClosureActionTimer called with current action: %d",
+                 static_cast<int>(instance.mEp3CurrentAction));
+
+    switch (instance.mEp3CurrentAction)
+    {
+    case ClosureAction::kSetTargetAction:
+        instance.HandlePanelSetTargetAction(kClosurePanelEndpoint3);
+        break;
+    case ClosureAction::kStepAction:
+        instance.HandlePanelStepAction(kClosurePanelEndpoint3);
+        break;
+    case ClosureAction::kPanelLatchAction:
+        instance.HandlePanelUnlatchAction(kClosurePanelEndpoint3);
         break;
     default:
         ChipLogError(AppServer, "Invalid action received in HandleEp3ClosureActionTimer");
@@ -574,24 +601,8 @@ void ClosureManager::HandlePanelUnlatchAction(EndpointId endpointId)
     instance.HandlePanelSetTargetAction(endpointId);
 }
 
-ClosureDimensionEndpoint * ClosureManager::GetCurrentPanelInstance(EndpointId endpointId)
-{
-    ClosureManager & instance = ClosureManager::GetInstance();
-    if (endpointId == instance.mClosurePanelEndpoint2.GetEndpoint())
-    {
-        return &instance.mClosurePanelEndpoint2;
-    }
-    else if (endpointId == instance.mClosurePanelEndpoint3.GetEndpoint())
-    {
-        return &instance.mClosurePanelEndpoint3;
-    }
-    return nullptr;
-}
-
 void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
 {
-    ClosureManager & instance = ClosureManager::GetInstance();
-
     // Get the endpoint instance based on the endpointId
     chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * ep = GetCurrentPanelInstance(endpointId);
     VerifyOrReturn(ep != nullptr,
@@ -757,32 +768,6 @@ void ClosureManager::HandlePanelStepAction(EndpointId endpointId)
 
     // If the target position is reached, we can complete the action
     HandlePanelStepActionComplete(endpointId);
-
-void ClosureManager::HandleEp3ClosureActionTimer(System::Layer * layer, void * aAppState)
-{
-    // Mark aAppState as unused to avoid compiler warnings
-    // Will be used in closure dimension cluster Commands
-    (void) aAppState;
-
-    ClosureManager & instance = ClosureManager::GetInstance();
-    ChipLogError(AppServer, "HandleEp3ClosureActionTimer called with current action: %d",
-                 static_cast<int>(instance.mEp3CurrentAction));
-
-    switch (instance.mEp3CurrentAction)
-    {
-    case ClosureAction::kSetTargetAction:
-        // Add logic to handle SetTarget action completion
-        break;
-    case ClosureAction::kStepAction:
-        // Add logic to handle Step action completion
-        break;
-    case ClosureAction::kPanelLatchAction:
-        // Add logic to handle Panel Latch action completion
-        break;
-    default:
-        ChipLogError(AppServer, "Invalid action received in HandleEp3ClosureActionTimer");
-        break;
-    }
 }
 
 void ClosureManager::HandleClosureMotionAction()
@@ -950,6 +935,20 @@ bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & cu
     return true;
 }
 
+ClosureDimensionEndpoint * ClosureManager::GetCurrentPanelInstance(EndpointId endpointId)
+{
+    ClosureManager & instance = ClosureManager::GetInstance();
+    if (endpointId == instance.mClosurePanelEndpoint2.GetEndpointId())
+    {
+        return &instance.mClosurePanelEndpoint2;
+    }
+    else if (endpointId == instance.mClosurePanelEndpoint3.GetEndpointId())
+    {
+        return &instance.mClosurePanelEndpoint3;
+    }
+    return nullptr;
+}
+
 void ClosureManager::HandleCalibrateActionComplete()
 {
     ChipLogProgress(AppServer, "HandleCalibrateActionComplete called");
@@ -1003,13 +1002,13 @@ void ClosureManager::HandlePanelSetTargetActionComplete(chip::EndpointId endpoin
     ClosureManager & instance = ClosureManager::GetInstance();
     instance.mClosureEndpoint1.OnPanelMotionActionComplete();
 
-    if (endpointId == instance.mClosurePanelEndpoint2.GetEndpoint())
+    if (endpointId == instance.mClosurePanelEndpoint2.GetEndpointId())
     {
         instance.mClosurePanelEndpoint2.OnPanelMotionActionComplete();
         instance.mEp2CurrentAction    = ClosureAction::kInvalidAction;
         instance.mEp2MotionInProgress = false;
     }
-    else if (endpointId == instance.mClosurePanelEndpoint3.GetEndpoint())
+    else if (endpointId == instance.mClosurePanelEndpoint3.GetEndpointId())
     {
         instance.mClosurePanelEndpoint3.OnPanelMotionActionComplete();
         instance.mEp3CurrentAction    = ClosureAction::kInvalidAction;
@@ -1030,13 +1029,13 @@ void ClosureManager::HandlePanelStepActionComplete(chip::EndpointId endpointId)
 
     ClosureManager & instance = ClosureManager::GetInstance();
     instance.mClosureEndpoint1.OnPanelMotionActionComplete();
-    if (endpointId == instance.mClosurePanelEndpoint2.GetEndpoint())
+    if (endpointId == instance.mClosurePanelEndpoint2.GetEndpointId())
     {
         instance.mClosurePanelEndpoint2.OnPanelMotionActionComplete();
         instance.mEp2CurrentAction    = ClosureAction::kInvalidAction;
         instance.mEp2MotionInProgress = false;
     }
-    else if (endpointId == instance.mClosurePanelEndpoint3.GetEndpoint())
+    else if (endpointId == instance.mClosurePanelEndpoint3.GetEndpointId())
     {
         instance.mClosurePanelEndpoint3.OnPanelMotionActionComplete();
         instance.mEp3CurrentAction    = ClosureAction::kInvalidAction;
