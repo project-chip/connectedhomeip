@@ -20,7 +20,7 @@ import("${chip_root}/build/config/compiler/compiler.gni")
 import("${chip_root}/build/config/mac/mac_sdk.gni")
 import("${chip_root}/src/inet/inet.gni")
 
-import("//build/args.gni")
+import("${chip_root}/examples/darwin-framework-tool/build/args.gni")
 
 action("framework") {
   script = "${chip_root}/scripts/build/build_darwin_framework.py"
@@ -38,7 +38,7 @@ action("framework") {
     "--out_path",
     "${darwin_framework_out_dir}",
     "--target",
-    "Matter Framework",
+    "darwin-framework-tool",
     "--log_path",
     rebase_path("${root_build_dir}/darwin_framework_build.log", root_build_dir),
     "--target_arch",
@@ -88,10 +88,40 @@ action("framework") {
     args += [ "--no-enable-encoding-sentinel-enum-values" ]
   }
 
+  if (enable_leak_checking) {
+    args += [ "--leak-checking" ]
+  } else {
+    args += [ "--no-leak-checking" ]
+  }
+
+  if (enable_provisional_features) {
+    args += [ "--enable-provisional" ]
+  } else {
+    args += [ "--no-enable-provisional" ]
+  }
+
   if (defined(use_network_framework) && use_network_framework) {
     args += [ "--use-network-framework" ]
   } else {
     args += [ "--no-use-network-framework" ]
+  }
+
+  if (defined(use_mac_catalyst) && use_mac_catalyst) {
+    args += [
+      "--use-mac-catalyst",
+      "--xcconfig_path",
+      rebase_path(
+          "${chip_root}/src/darwin/Framework/Configs/darwin-framework-tool.catalyst.xcconfig",
+          root_build_dir),
+    ]
+  } else {
+    args += [ "--no-use-mac-catalyst" ]
+  }
+
+  if (chip_codesign) {
+    args += [ "--enable-codesigning" ]
+  } else {
+    args += [ "--no-enable-codesigning" ]
   }
 
   output_name = "Matter.framework"
