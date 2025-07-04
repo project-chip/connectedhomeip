@@ -225,8 +225,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
             else:
                 # STEP 2l: Manually unlatch the device
                 self.step("2l")
-                test_step = "Manual unlatch the device"
-                self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when ready.")
+                self.wait_for_user_input(prompt_msg="Manual unlatch the device, and press Enter when ready.")
 
             # STEP 2m: Wait for CurrentState.Latched to be False
             self.step("2m")
