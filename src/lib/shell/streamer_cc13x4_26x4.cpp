@@ -21,12 +21,12 @@
  */
 
 #include "streamer.h"
+#include "ti_drivers_config.h"
 #include <lib/shell/Engine.h>
 #include <lib/shell/streamer.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
-
-#include "ti_drivers_config.h"
+#include <platform/ti/cc13xx_26xx/Logging.h>
 
 #include <ti/drivers/UART2.h>
 
@@ -34,45 +34,9 @@ namespace chip {
 namespace Shell {
 
 #ifndef SHELL_STREAMER_APP_SPECIFIC
-
-UART2_Handle sStreamUartHandle = NULL;
-
-#if !MATTER_CC13XX_26XX_PLATFORM_LOG_ENABLED
-extern "C" int cc13xx_26xxLogInit(void)
-{
-    return 0;
-}
-
-extern "C" void cc13xx_26xxVLog(const char * msg, va_list v)
-{
-    if (NULL != sStreamUartHandle)
-    {
-        static char sDebugUartBuffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
-        size_t ret;
-
-        ret = vsnprintf(sDebugUartBuffer, sizeof(sDebugUartBuffer), msg, v);
-        if (0 < ret)
-        {
-            // PuTTY likes \r\n
-            size_t len                = (ret + 2U) < sizeof(sDebugUartBuffer) ? (ret + 2) : sizeof(sDebugUartBuffer);
-            sDebugUartBuffer[len - 2] = '\r';
-            sDebugUartBuffer[len - 1] = '\n';
-
-            UART2_write(sStreamUartHandle, sDebugUartBuffer, len, NULL);
-        }
-    }
-}
-#endif // !MATTER_CC13XX_26XX_PLATFORM_LOG_ENABLED
-
 int streamer_cc13xx_26xx_init(streamer_t * streamer)
 {
-    UART2_Params uartParams;
-
-    UART2_Params_init(&uartParams);
-    // Most params can be default because we only send data, we don't receive
-    uartParams.baudRate = 115200;
-
-    sStreamUartHandle = UART2_open(CONFIG_UART_STREAMER, &uartParams);
+    uartConsoleInit();
     return 0;
 }
 
@@ -81,7 +45,7 @@ ssize_t streamer_cc13xx_26xx_read(streamer_t * streamer, char * buf, size_t len)
     (void) streamer;
     size_t ret;
 
-    UART2_read(sStreamUartHandle, buf, len, &ret);
+    ret = uartConsoleRead(buf, len);
 
     return ret;
 }
@@ -89,7 +53,7 @@ ssize_t streamer_cc13xx_26xx_read(streamer_t * streamer, char * buf, size_t len)
 ssize_t streamer_cc13xx_26xx_write(streamer_t * streamer, const char * buf, size_t len)
 {
     (void) streamer;
-    return UART2_write(sStreamUartHandle, buf, len, NULL);
+    return uartConsoleWrite(buf, len);
 }
 
 static streamer_t streamer_cc13xx_26xx = {
