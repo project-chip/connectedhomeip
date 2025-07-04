@@ -458,6 +458,8 @@ TEST_F(TestBleLayer, NewConnectionByDiscriminatorsSuccess)
     access.SetConnectionDelegate(this);
 
     SetupDiscriminator discriminators[] = { SetupDiscriminator(), SetupDiscriminator() };
+    discriminators[0].SetLongValue(1234);
+    discriminators[1].SetLongValue(3333);
     Span<const SetupDiscriminator> discriminatorsSpan(discriminators, 2);
 
     auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {
@@ -466,13 +468,42 @@ TEST_F(TestBleLayer, NewConnectionByDiscriminatorsSuccess)
 
         tempAccess.CallOnConnectionComplete(appState, connObj);
     };
-    auto OnError             = [](void * appState, CHIP_ERROR err) {};
+    auto OnError             = [](void * appState, CHIP_ERROR err) { FAIL() << "OnError should not be called in this test"; };
     BleLayer * bleLayerState = this;
 
     EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_NO_ERROR);
     OnSuccess(bleLayerState, discriminatorsSpan[0].GetLongValue(), GetConnectionObject());
     EXPECT_EQ(mOnConnectionCompleteCount, 1);
     EXPECT_EQ(mOnConnectionErrorCount, 0);
+}
+
+TEST_F(TestBleLayer, NewConnectionByDiscriminatorsError)
+{
+    chip::Test::BleLayerTestAccess access(this);
+
+    access.SetConnectionDelegate(this);
+
+    SetupDiscriminator discriminators[] = { SetupDiscriminator(), SetupDiscriminator() };
+    discriminators[0].SetLongValue(1234);
+    discriminators[1].SetLongValue(3333);
+    Span<const SetupDiscriminator> discriminatorsSpan(discriminators, 2);
+
+    auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {
+        FAIL() << "OnSuccess should not be called in this test";
+    };
+
+    auto OnError = [](void * appState, CHIP_ERROR err) {
+        BleLayer * testLayer = static_cast<BleLayer *>(appState);
+        chip::Test::BleLayerTestAccess tempAccess(testLayer);
+
+        tempAccess.CallOnConnectionError(appState, err);
+    };
+    BleLayer * bleLayerState = this;
+
+    EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_NO_ERROR);
+    OnError(bleLayerState, CHIP_ERROR_CONNECTION_ABORTED);
+    EXPECT_EQ(mOnConnectionCompleteCount, 0);
+    EXPECT_EQ(mOnConnectionErrorCount, 1);
 }
 
 TEST_F(TestBleLayer, NewConnectionByDiscriminatorsEmptySpan)
