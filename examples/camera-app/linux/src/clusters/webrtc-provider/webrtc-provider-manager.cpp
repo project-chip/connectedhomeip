@@ -272,8 +272,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     {
         if (args.videoStreamId.Value().IsNull())
         {
-            // TODO: Automatically select the closest matching video stream for the StreamUsage requested by looking at the and the
-            // server MAY allocate a new video stream if there are available resources.
+            // TODO: Automatically select the closest matching video stream for the StreamUsage requested.
         }
         else
         {
@@ -291,8 +290,7 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideOffer(const ProvideOfferRequestAr
     {
         if (args.audioStreamId.Value().IsNull())
         {
-            // TODO: Automatically select the closest matching audio stream for the StreamUsage requested and the server MAY
-            // allocate a new audio stream if there are available resources.
+            // TODO: Automatically select the closest matching audio stream for the StreamUsage requested
         }
         else
         {
