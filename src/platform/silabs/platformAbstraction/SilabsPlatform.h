@@ -55,8 +55,6 @@ public:
     static SilabsButtonCb mButtonCallback;
     uint8_t GetButtonState(uint8_t button) override;
 
-    void StartScheduler(void) override;
-
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
     // RGB LEDs
     bool GetRGBLedState(uint8_t led) override;

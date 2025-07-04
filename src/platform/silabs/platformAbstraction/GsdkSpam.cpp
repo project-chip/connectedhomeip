@@ -27,7 +27,6 @@
 #include "sl_se_manager_types.h"
 #include <sl_se_manager_extmem.h>
 #endif // _SILICON_LABS_32B_SERIES_2
-#include "sl_system_kernel.h"
 
 #ifdef ENABLE_WSTK_LEDS
 extern "C" {
@@ -222,11 +221,6 @@ CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
     return CHIP_NO_ERROR;
 }
 #endif // ENABLE_WSTK_LEDS
-
-void SilabsPlatform::StartScheduler()
-{
-    sl_system_kernel_start();
-}
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 extern "C" void sl_button_on_change(const sl_button_t * handle)
