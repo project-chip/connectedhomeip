@@ -60,7 +60,7 @@ void webrtc_client_destroy(WebRTCClientHandle handle);
  *
  * @return CHIP_ERROR on error, CHIP_NO_ERROR.
  */
-CHIP_ERROR webrtc_client_create_peer_connection(WebRTCClientHandle handle, const char * stun_url);
+PyChipError webrtc_client_create_peer_connection(WebRTCClientHandle handle, const char * stun_url);
 
 /**
  * @brief Generates a local SDP offer for the peer connection.
@@ -130,7 +130,7 @@ void webrtc_client_set_ice_candidate_callback(WebRTCClientHandle handle, IceCand
  * Called when latest sdp is required.
  *
  * @param handle The handle of the WebRTC client.
- * @return const char* A pointer to the local description string, or nullptr if the client is not found.
+ * @return const char* A pointer to the local description string, or empty string if the client is not found.
  */
 const char * webrtc_get_local_description(WebRTCClientHandle handle);
 

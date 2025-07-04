@@ -49,16 +49,17 @@ void webrtc_client_destroy(WebRTCClientHandle handle)
     g_clients.erase(handle);
 }
 
-CHIP_ERROR webrtc_client_create_peer_connection(WebRTCClientHandle handle, const char * stun_url)
+PyChipError webrtc_client_create_peer_connection(WebRTCClientHandle handle, const char * stun_url)
 {
     std::lock_guard<std::mutex> lock(g_mutex);
     auto it = g_clients.find(handle);
     if (it != g_clients.end())
     {
-        return it->second->CreatePeerConnection(stun_url);
+        CHIP_ERROR err = it->second->CreatePeerConnection(stun_url);
+        return ToPyChipError(err);
     }
 
-    return CHIP_NO_ERROR;
+    return ToPyChipError(CHIP_NO_ERROR);
 }
 
 void webrtc_client_create_offer(WebRTCClientHandle handle)
@@ -132,7 +133,7 @@ const char * webrtc_get_local_description(WebRTCClientHandle handle)
     {
         return it->second->GetLocalDescription();
     }
-    return nullptr;
+    return "";
 }
 
 int webrtc_get_peer_connection_state(WebRTCClientHandle handle)

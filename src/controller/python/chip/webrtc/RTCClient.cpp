@@ -33,7 +33,7 @@ void pychip_webrtc_client_destroy(void * client)
     chip::webrtc::webrtc_client_destroy(client);
 }
 
-CHIP_ERROR pychip_webrtc_client_create_peer_connection(void * client, char * stun_url)
+PyChipError pychip_webrtc_client_create_peer_connection(void * client, char * stun_url)
 {
     return chip::webrtc::webrtc_client_create_peer_connection(client, stun_url);
 }

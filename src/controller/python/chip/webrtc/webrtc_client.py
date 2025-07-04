@@ -47,8 +47,8 @@ class WebRTCClient:
         self._lib.pychip_webrtc_client_add_ice_candidate(self._handle, candidate.encode("utf-8"), mid.encode("utf-8"))
 
     def on_local_description(self, callback):
-        def c_callback(sdp, type_, user_data):
-            callback(sdp.decode("utf-8"), type_.decode("utf-8"))
+        def c_callback(sdp, type, user_data):
+            callback(sdp.decode("utf-8"), type.decode("utf-8"))
 
         self._local_desc_cb = LocalDescriptionCallbackType(c_callback)
         self._lib.pychip_webrtc_client_set_local_description_callback(self._handle, self._local_desc_cb, None)
@@ -71,11 +71,11 @@ class WebRTCClient:
             callback()
 
         self._gathering_cb = GatheringCompleteCallbackType(c_callback)
-        self._lib.pychip_webrtc_client_set_gathering_complete_callback(self._handle, self._gathering_cb, None)
+        self._lib.pychip_webrtc_client_set_gathering_complete_callback(self._handle, self._gathering_cb)
 
     def on_state_change(self, callback):
         def c_callback(state):
             callback(state)
 
         self._on_state_change_cb = StateChangeCallback(c_callback)
-        self._lib.pychip_webrtc_client_set_state_change_callback(self._handle, self._on_state_change_cb, None)
+        self._lib.pychip_webrtc_client_set_state_change_callback(self._handle, self._on_state_change_cb)
