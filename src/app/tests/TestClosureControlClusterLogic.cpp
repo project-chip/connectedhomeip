@@ -1527,8 +1527,8 @@ TEST_F(TestClosureControlClusterLogic, ReadCurrentErrorList_WhenErrorListIsNotEm
     EXPECT_FALSE(currentErrorListSpan.empty());
 
     EXPECT_EQ(static_cast<int>(currentErrorListSpan.size()), 2);
-    EXPECT_EQ(static_cast<ClosureErrorEnum>(currentErrorListSpan[0]), ClosureErrorEnum::kBlockedBySensor);
-    EXPECT_EQ(static_cast<ClosureErrorEnum>(currentErrorListSpan[1]), ClosureErrorEnum::kInternalInterference);
+    EXPECT_EQ(currentErrorListSpan[0], ClosureErrorEnum::kBlockedBySensor);
+    EXPECT_EQ(currentErrorListSpan[1], ClosureErrorEnum::kInternalInterference);
 }
 
 TEST_F(TestClosureControlClusterLogic, AddErrorToCurrentErrorList)
@@ -1544,7 +1544,7 @@ TEST_F(TestClosureControlClusterLogic, AddErrorToCurrentErrorList)
     EXPECT_FALSE(currentErrorListSpan.empty());
 
     EXPECT_EQ(static_cast<int>(currentErrorListSpan.size()), 1);
-    EXPECT_EQ(static_cast<ClosureErrorEnum>(currentErrorListSpan[0]), ClosureErrorEnum::kBlockedBySensor);
+    EXPECT_EQ(currentErrorListSpan[0], ClosureErrorEnum::kBlockedBySensor);
 }
 
 TEST_F(TestClosureControlClusterLogic, AddDuplicateErrorToCurrentErrorList)
@@ -1567,7 +1567,7 @@ TEST_F(TestClosureControlClusterLogic, AddDuplicateErrorToCurrentErrorList)
     EXPECT_FALSE(currentErrorListSpan.empty());
 
     EXPECT_EQ(static_cast<int>(currentErrorListSpan.size()), 1);
-    EXPECT_EQ(static_cast<ClosureErrorEnum>(currentErrorListSpan[0]), ClosureErrorEnum::kBlockedBySensor);
+    EXPECT_EQ(currentErrorListSpan[0], ClosureErrorEnum::kBlockedBySensor);
 }
 
 TEST_F(TestClosureControlClusterLogic, ClearCurrentErrorList)
@@ -1585,7 +1585,7 @@ TEST_F(TestClosureControlClusterLogic, ClearCurrentErrorList)
     EXPECT_FALSE(currentErrorListSpan.empty());
 
     EXPECT_EQ(static_cast<int>(currentErrorListSpan.size()), 1);
-    EXPECT_EQ(static_cast<ClosureErrorEnum>(currentErrorListSpan[0]), ClosureErrorEnum::kBlockedBySensor);
+    EXPECT_EQ(currentErrorListSpan[0], ClosureErrorEnum::kBlockedBySensor);
 
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
