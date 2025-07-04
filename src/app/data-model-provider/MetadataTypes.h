@@ -251,6 +251,14 @@ struct AcceptedCommandEntry
 
     [[nodiscard]] constexpr bool HasFlags(CommandQualityFlags f) const { return (mask.flags & to_underlying(f)) != 0; }
 
+    bool operator==(const AcceptedCommandEntry & other) const
+    {
+        return (commandId == other.commandId) && (mask.flags == other.mask.flags) &&
+            (mask.invokePrivilege == other.mask.invokePrivilege);
+    }
+
+    bool operator!=(const AcceptedCommandEntry & other) const { return !(*this == other); }
+
 private:
     // Constant used to narrow binary expressions
     static constexpr uint8_t kCmdQualityBits = 3;

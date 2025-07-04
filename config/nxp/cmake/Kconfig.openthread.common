@@ -43,12 +43,18 @@ config OT_EXTERNAL_PLATFORM
 config OT_PROJECT_CORE_CONFIG_FILE
 	string "OT configuration file used by OT gn build system"
 	default "examples/platform/nxp/mcxw71_k32w1/app/project_include/openthread/OpenThreadConfig.h" if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71
-	default "third_party/nxp/nxp_matter_support/examples/platform/mcxw72/app/project_include/openthread/OpenThreadConfig.h" if CHIP_NXP_PLATFORM_MCXW72
-	default "third_party/nxp/nxp_matter_support/examples/platform/rt/rw61x/app/project_include/openthread/OpenThreadConfig.h" if CHIP_NXP_PLATFORM_RW61X
-	default "third_party/nxp/nxp_matter_support/examples/platform/rt/rt1060/app/project_include/openthread/OpenThreadConfig.h" if CHIP_NXP_PLATFORM_RT1060
-	default "third_party/nxp/nxp_matter_support/examples/platform/rt/rt1170/app/project_include/openthread/OpenThreadConfig.h" if CHIP_NXP_PLATFORM_RT1170
+	default "$(CHIP_ROOT)/third_party/nxp/nxp_matter_support/examples/platform/mcxw72/app/project_include/openthread/OpenThreadConfig.h" if CHIP_NXP_PLATFORM_MCXW72
+	default "$(CHIP_ROOT)/third_party/nxp/nxp_matter_support/examples/platform/rt/rw61x/app/project_include/openthread/OpenThreadConfig.h" if CHIP_NXP_PLATFORM_RW61X
+	default "$(CHIP_ROOT)/third_party/nxp/nxp_matter_support/examples/platform/rt/rt1060/app/project_include/openthread/OpenThreadConfig.h" if CHIP_NXP_PLATFORM_RT1060
+	default "$(CHIP_ROOT)/third_party/nxp/nxp_matter_support/examples/platform/rt/rt1170/app/project_include/openthread/OpenThreadConfig.h" if CHIP_NXP_PLATFORM_RT1170
 	help
 	  OT configuration file used by OT gn build system.
+
+config OT_PROJECT_LIB_CONFIG_FILE
+	string "OT project lib config file"
+	default "$(CHIP_ROOT)/third_party/nxp/nxp_matter_support/examples/platform/rt/rw61x/app/project_include/openthread/OpenThreadProjectLibConfig.h" if CHIP_NXP_PLATFORM_RW61X
+	help
+	  OT lib config file.
 
 config OT_CORE_CONFIG_PLATFORM_CHECK_FILE
 	string "OT core configuration check file used by OT gn build system"
@@ -67,7 +73,7 @@ config OT_CORE_CONFIG_DEPS
     default "third_party/openthread/platforms/nxp/mcxw72:openthread_core_config_mcxw72" if CHIP_NXP_PLATFORM_MCXW72
 	default "third_party/openthread/platforms/nxp/rt/rw61x:openthread_core_config_rw61x" if CHIP_NXP_PLATFORM_RW61X
 	default "third_party/openthread/platforms/nxp/rt/rt1060:openthread_core_config_rt1060" if CHIP_NXP_PLATFORM_RT1060
-			default "third_party/openthread/platforms/nxp/rt/rt1170:openthread_core_config_rt1170" if CHIP_NXP_PLATFORM_RT1170
+	default "third_party/openthread/platforms/nxp/rt/rt1170:openthread_core_config_rt1170" if CHIP_NXP_PLATFORM_RT1170
 	help
 	  OT core configuration gn deps file used by OT gn build system
 
