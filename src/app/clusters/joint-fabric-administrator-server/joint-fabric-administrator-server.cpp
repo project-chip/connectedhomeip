@@ -102,7 +102,7 @@ void MatterJointFabricAdministratorPluginServerInitCallback()
     AttributeAccessInterfaceRegistry::Instance().Register(&gJointFabricAdministratorAttrAccess);
 }
 
-// TODO
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 bool emberAfJointFabricAdministratorClusterICACCSRRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::JointFabricAdministrator::Commands::ICACCSRRequest::DecodableType & commandData)
@@ -111,10 +111,20 @@ bool emberAfJointFabricAdministratorClusterICACCSRRequestCallback(
 
     ChipLogProgress(Zcl, "JointFabricAdministrator: Received a ICACCSRRequest command");
 
+    auto nonDefaultStatus = Status::Success;
+
+    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+    VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
+                 nonDefaultStatus = Status::FailsafeRequired);
+    VerifyOrExit(failSafeContext.AnnounceJointFabricAdministratorHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
+
+    failSafeContext.RecordIcacCsrRequestHasBeenInvoked();
+
+exit:
+    commandObj->AddStatus(commandPath, nonDefaultStatus);
     return true;
 }
 
-// TODO
 bool emberAfJointFabricAdministratorClusterAddICACCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::JointFabricAdministrator::Commands::AddICAC::DecodableType & commandData)
@@ -123,10 +133,18 @@ bool emberAfJointFabricAdministratorClusterAddICACCallback(
 
     ChipLogProgress(Zcl, "JointFabricAdministrator: Received a AddICAC command");
 
+    auto nonDefaultStatus = Status::Success;
+
+    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+    VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
+                 nonDefaultStatus = Status::FailsafeRequired);
+    VerifyOrExit(failSafeContext.IcacCsrRequestHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
+
+exit:
+    commandObj->AddStatus(commandPath, nonDefaultStatus);
     return true;
 }
 
-// TODO
 bool emberAfJointFabricAdministratorClusterOpenJointCommissioningWindowCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::JointFabricAdministrator::Commands::OpenJointCommissioningWindow::DecodableType & commandData)
@@ -138,7 +156,6 @@ bool emberAfJointFabricAdministratorClusterOpenJointCommissioningWindowCallback(
     return true;
 }
 
-// TODO
 bool emberAfJointFabricAdministratorClusterTransferAnchorRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::JointFabricAdministrator::Commands::TransferAnchorRequest::DecodableType & commandData)
@@ -148,7 +165,6 @@ bool emberAfJointFabricAdministratorClusterTransferAnchorRequestCallback(
     return true;
 }
 
-// TODO
 bool emberAfJointFabricAdministratorClusterTransferAnchorCompleteCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::JointFabricAdministrator::Commands::TransferAnchorComplete::DecodableType & commandData)
@@ -158,15 +174,71 @@ bool emberAfJointFabricAdministratorClusterTransferAnchorCompleteCallback(
     return true;
 }
 
-// TODO
 bool emberAfJointFabricAdministratorClusterAnnounceJointFabricAdministratorCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::JointFabricAdministrator::Commands::AnnounceJointFabricAdministrator::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("AnnounceJointFabricAdministrator", "JointFabricAdministrator");
 
+    ChipLogProgress(JointFabric, "emberAfJointFabricAdministratorClusterAnnounceJointFabricAdministratorCallback: %u",
+                    commandData.endpointID);
+    auto nonDefaultStatus = Status::Success;
+
+    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+    VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
+                 nonDefaultStatus = Status::FailsafeRequired);
+    VerifyOrExit(commandData.endpointID != kInvalidEndpointId, nonDefaultStatus = Status::ConstraintError);
+
+    JointFabricAdministratorServer::GetInstance().SetPeerJFAdminClusterEndpointId(commandData.endpointID);
+    failSafeContext.RecordAnnounceJointFabricAdministratorHasBeenInvoked();
+
+exit:
+    commandObj->AddStatus(commandPath, nonDefaultStatus);
     return true;
 }
+#else
+bool emberAfJointFabricAdministratorClusterICACCSRRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricAdministrator::Commands::ICACCSRRequest::DecodableType & commandData)
+{
+    return true;
+}
+
+bool emberAfJointFabricAdministratorClusterAddICACCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricAdministrator::Commands::AddICAC::DecodableType & commandData)
+{
+    return true;
+}
+
+bool emberAfJointFabricAdministratorClusterOpenJointCommissioningWindowCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricAdministrator::Commands::OpenJointCommissioningWindow::DecodableType & commandData)
+{
+    return true;
+}
+
+bool emberAfJointFabricAdministratorClusterTransferAnchorRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricAdministrator::Commands::TransferAnchorRequest::DecodableType & commandData)
+{
+    return true;
+}
+
+bool emberAfJointFabricAdministratorClusterTransferAnchorCompleteCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricAdministrator::Commands::TransferAnchorComplete::DecodableType & commandData)
+{
+    return true;
+}
+
+bool emberAfJointFabricAdministratorClusterAnnounceJointFabricAdministratorCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::JointFabricAdministrator::Commands::AnnounceJointFabricAdministrator::DecodableType & commandData)
+{
+    return true;
+}
+#endif
 
 JointFabricAdministratorServer JointFabricAdministratorServer::sJointFabricAdministratorServerInstance;
 

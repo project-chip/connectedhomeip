@@ -54,7 +54,7 @@ CHIP_ERROR JFAManager::FinalizeCommissioning(NodeId nodeId, bool isJCM, P256Publ
 
     ScopedNodeId scopedNodeId = ScopedNodeId(nodeId, jfFabricIndex);
 
-    ConnectToNode(scopedNodeId, kStandardCommissioningComplete);
+    ConnectToNode(scopedNodeId, isJCM ? kJCMCommissioning : kStandardCommissioningComplete);
 
     return CHIP_NO_ERROR;
 }
@@ -128,6 +128,10 @@ void JFAManager::OnConnected(void * context, Messaging::ExchangeManager & exchan
         jfaManager->SendCommissioningComplete();
         break;
     }
+    case kJCMCommissioning: {
+        jfaManager->AnnounceJointFabricAdministrator(jfaManager->jfaAdminClusterEndpointId);
+        break;
+    }
 
     default:
         break;
@@ -143,6 +147,75 @@ void JFAManager::OnConnectionFailure(void * context, const ScopedNodeId & peerId
                  ChipLogValueX64(peerId.GetNodeId()), peerId.GetFabricIndex());
 
     jfaManager->ReleaseSession();
+}
+
+CHIP_ERROR JFAManager::AnnounceJointFabricAdministrator(EndpointId jfAdminClusterEndpoint)
+{
+    JointFabricAdministrator::Commands::AnnounceJointFabricAdministrator::Type request;
+
+    if (!mExchangeMgr)
+    {
+        return CHIP_ERROR_UNINITIALIZED;
+    }
+
+    ChipLogProgress(JointFabric, "AnnounceJointFabricAdministrator: invoke cluster command.");
+    Controller::ClusterBase cluster(*mExchangeMgr, mSessionHolder.Get().Value(), jfAdminClusterEndpoint);
+    return cluster.InvokeCommand(request, this, OnAnnounceJointFabricAdministratorResponse,
+                                 OnAnnounceJointFabricAdministratorFailure);
+}
+
+void JFAManager::OnAnnounceJointFabricAdministratorResponse(void * context, const chip::app::DataModel::NullObjectType & data)
+{
+    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
+    VerifyOrDie(jfaManagerCore != nullptr);
+
+    ChipLogProgress(JointFabric, "OnAnnounceJointFabricAdministratorResponse");
+
+    /* TODO: https://github.com/project-chip/connectedhomeip/issues/38202 */
+    jfaManagerCore->SendICACSRRequest();
+}
+
+void JFAManager::OnAnnounceJointFabricAdministratorFailure(void * context, CHIP_ERROR error)
+{
+    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
+    VerifyOrDie(jfaManagerCore != nullptr);
+    jfaManagerCore->ReleaseSession();
+
+    ChipLogError(JointFabric, "OnAnnounceJointFabricAdministratorFailure: %s\n", chip::ErrorStr(error));
+}
+
+CHIP_ERROR JFAManager::SendICACSRRequest()
+{
+    JointFabricAdministrator::Commands::ICACCSRRequest::Type request;
+
+    if (!mExchangeMgr)
+    {
+        return CHIP_ERROR_UNINITIALIZED;
+    }
+
+    ChipLogProgress(JointFabric, "SendICACSRRequest: invoke cluster command.");
+
+    /* endpoint 1 should be replaced with the endpoint id received from jf-control-app */
+    Controller::ClusterBase cluster(*mExchangeMgr, mSessionHolder.Get().Value(), 1);
+    return cluster.InvokeCommand(request, this, OnSendICACSRRequestResponse, OnSendICACSRRequestFailure);
+}
+
+void JFAManager::OnSendICACSRRequestResponse(void * context,
+                                             const JointFabricAdministrator::Commands::ICACCSRResponse::DecodableType & icaccsr)
+{
+    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
+    VerifyOrDie(jfaManagerCore != nullptr);
+
+    ChipLogProgress(JointFabric, "OnSendICACSRRequestResponse");
+}
+
+void JFAManager::OnSendICACSRRequestFailure(void * context, CHIP_ERROR error)
+{
+    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
+    VerifyOrDie(jfaManagerCore != nullptr);
+    jfaManagerCore->ReleaseSession();
+
+    ChipLogError(JointFabric, "OnSendICACSRRequestFailure: %s\n", chip::ErrorStr(error));
 }
 
 CHIP_ERROR JFAManager::SendCommissioningComplete()

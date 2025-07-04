@@ -43,6 +43,7 @@ private:
     enum OnConnectedAction
     {
         kStandardCommissioningComplete = 0,
+        kJCMCommissioning              = 1,
     };
 
     friend JFAManager & JFAMgr(void);
@@ -59,12 +60,23 @@ private:
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
     OnConnectedAction mOnConnectedAction = kStandardCommissioningComplete;
     FabricId jfFabricIndex               = kUndefinedFabricId;
+    EndpointId jfaAdminClusterEndpointId = 1;
 
     void ConnectToNode(ScopedNodeId scopedNodeId, OnConnectedAction onConnectedAction);
     CHIP_ERROR SendCommissioningComplete();
+    CHIP_ERROR AnnounceJointFabricAdministrator(EndpointId jfAdminClusterEndpoint);
+    CHIP_ERROR SendICACSRRequest();
+
     static void OnCommissioningCompleteResponse(
         void * context, const app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
     static void OnCommissioningCompleteFailure(void * context, CHIP_ERROR error);
+    static void OnAnnounceJointFabricAdministratorResponse(void * context, const chip::app::DataModel::NullObjectType &);
+    static void OnAnnounceJointFabricAdministratorFailure(void * context, CHIP_ERROR error);
+    static void
+    OnSendICACSRRequestResponse(void * context,
+                                const app::Clusters::JointFabricAdministrator::Commands::ICACCSRResponse::DecodableType & icaccsr);
+    static void OnSendICACSRRequestFailure(void * context, CHIP_ERROR error);
+
     void ReleaseSession();
 };
 
