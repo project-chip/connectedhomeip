@@ -28,13 +28,13 @@ class GenericEventManagementTestEventTriggerHandler : public TestEventTriggerHan
 {
 public:
     GenericEventManagementTestEventTriggerHandler(
-        chip::app::Clusters::GeneralDiagnosticsCluster * generalDiagnosticsClusterInstance) :
+        Clusters::GeneralDiagnosticsCluster<Clusters::DeviceLayerGeneralDiagnosticsLogic> * generalDiagnosticsClusterInstance) :
         mGeneralDiagnosticsCluster(generalDiagnosticsClusterInstance)
     {}
 
-    chip::app::Clusters::GeneralDiagnosticsCluster * GetGeneralDiagnosticsClusterInstance() { return mGeneralDiagnosticsCluster; }
+    Clusters::GeneralDiagnosticsCluster<Clusters::DeviceLayerGeneralDiagnosticsLogic> * GetGeneralDiagnosticsClusterInstance() { return mGeneralDiagnosticsCluster; }
 
-    void SetGeneralDiagnosticsClusterInstance(chip::app::Clusters::GeneralDiagnosticsCluster * generalDiagnosticsClusterInstance)
+    void SetGeneralDiagnosticsClusterInstance(Clusters::GeneralDiagnosticsCluster<Clusters::DeviceLayerGeneralDiagnosticsLogic> * generalDiagnosticsClusterInstance)
     {
         mGeneralDiagnosticsCluster = generalDiagnosticsClusterInstance;
     }
@@ -45,7 +45,7 @@ protected:
 private:
     void FillUpEventLoggingBufferWithFakeSoftwareFault(size_t bufferSize);
     virtual void TriggerSoftwareFaultEvent(const char * faultRecordString)      = 0;
-    chip::app::Clusters::GeneralDiagnosticsCluster * mGeneralDiagnosticsCluster = nullptr;
+    Clusters::GeneralDiagnosticsCluster<Clusters::DeviceLayerGeneralDiagnosticsLogic> * mGeneralDiagnosticsCluster = nullptr;
 };
 
 } // namespace app

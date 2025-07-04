@@ -40,31 +40,31 @@ class GeneralDiagnosticsLogic
 {
 public:
     GeneralDiagnosticsLogic(const GeneralDiagnosticsEnabledAttributes enabledAttributes) : mEnabledAttributes(enabledAttributes) {}
-    ~GeneralDiagnosticsLogic() = default;
+    virtual ~GeneralDiagnosticsLogic() = default;
 
     CHIP_ERROR GetRebootCount(uint16_t & rebootCount) const
     {
-        return chip::DeviceLayer::GetDiagnosticDataProvider().GetRebootCount(rebootCount);
+        return GetDiagnosticDataProvider().GetRebootCount(rebootCount);
     }
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) const
     {
-        return chip::DeviceLayer::GetDiagnosticDataProvider().GetTotalOperationalHours(totalOperationalHours);
+        return GetDiagnosticDataProvider().GetTotalOperationalHours(totalOperationalHours);
     }
     CHIP_ERROR GetBootReason(chip::app::Clusters::GeneralDiagnostics::BootReasonEnum & bootReason) const
     {
-        return chip::DeviceLayer::GetDiagnosticDataProvider().GetBootReason(bootReason);
+        return GetDiagnosticDataProvider().GetBootReason(bootReason);
     }
     CHIP_ERROR GetActiveHardwareFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & hardwareFaults) const
     {
-        return chip::DeviceLayer::GetDiagnosticDataProvider().GetActiveHardwareFaults(hardwareFaults);
+        return GetDiagnosticDataProvider().GetActiveHardwareFaults(hardwareFaults);
     }
     CHIP_ERROR GetActiveRadioFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> & radioFaults) const
     {
-        return chip::DeviceLayer::GetDiagnosticDataProvider().GetActiveRadioFaults(radioFaults);
+        return GetDiagnosticDataProvider().GetActiveRadioFaults(radioFaults);
     }
     CHIP_ERROR GetActiveNetworkFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & networkFaults) const
     {
-        return chip::DeviceLayer::GetDiagnosticDataProvider().GetActiveNetworkFaults(networkFaults);
+        return GetDiagnosticDataProvider().GetActiveNetworkFaults(networkFaults);
     }
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
 
@@ -79,10 +79,47 @@ public:
 
     CHIP_ERROR Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
 
+    CHIP_ERROR AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder);
+
 private:
     TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(ByteSpan enableKey);
     bool IsByteSpanAllZeros(const ByteSpan & byteSpan);
     const GeneralDiagnosticsEnabledAttributes mEnabledAttributes;
+
+protected:
+    [[nodiscard]] virtual DeviceLayer::DiagnosticDataProvider & GetDiagnosticDataProvider() const = 0;
+};
+
+/// Minimal class that uses DeviceLayer (singleton) diagnostics provider
+class DeviceLayerGeneralDiagnosticsLogic : public GeneralDiagnosticsLogic
+{
+public:
+    DeviceLayerGeneralDiagnosticsLogic(const GeneralDiagnosticsEnabledAttributes enabledAttributes) :
+        GeneralDiagnosticsLogic(enabledAttributes)
+    {}
+
+protected:
+    [[nodiscard]] DeviceLayer::DiagnosticDataProvider & GetDiagnosticDataProvider() const override
+    {
+        return DeviceLayer::GetDiagnosticDataProvider();
+    }
+};
+
+/// Minimal class that uses an injected diagnostics provider (i.e. uses RAM but is unit testable)
+class InjectedDiagnosticsGeneralDiagnosticsLogic : public GeneralDiagnosticsLogic
+{
+public:
+    InjectedDiagnosticsGeneralDiagnosticsLogic(DeviceLayer::DiagnosticDataProvider & provider,
+                                                const GeneralDiagnosticsEnabledAttributes enabledAttributes) :
+        GeneralDiagnosticsLogic(enabledAttributes),
+        mProvider(provider)
+    {}
+
+protected:
+    [[nodiscard]] DeviceLayer::DiagnosticDataProvider & GetDiagnosticDataProvider() const override { return mProvider; }
+
+private:
+    DeviceLayer::DiagnosticDataProvider & mProvider;
 };
 
 } // namespace Clusters

@@ -32,9 +32,7 @@ static_assert((GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.
               GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 0);
 
 namespace {
-LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gServer;
-
-} // namespace
+LazyRegisteredServerCluster<GeneralDiagnosticsCluster<DeviceLayerGeneralDiagnosticsLogic>> gServer;
 
 // compile-time evaluated method if "is <EP>::GeneralDiagnostics::<ATTR>" enabled
 constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
@@ -55,6 +53,7 @@ constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId
     }
     return false;
 }
+} // namespace
 
 void emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 {

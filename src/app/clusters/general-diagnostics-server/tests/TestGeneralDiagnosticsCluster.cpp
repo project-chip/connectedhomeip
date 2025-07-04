@@ -52,7 +52,7 @@ TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
         .enableActiveNetworkFaults   = false,
     };
 
-    GeneralDiagnosticsCluster cluster(enabledAttributes);
+    GeneralDiagnosticsCluster<DeviceLayerGeneralDiagnosticsLogic> cluster(enabledAttributes);
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
 }
 
@@ -71,6 +71,37 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
             .enableActiveNetworkFaults   = false,
         };
         NullProvider nullProvider;
+        InjectedDiagnosticsGeneralDiagnosticsLogic diag(nullProvider, enabledAttributes);
+
+        // Check mandatory commands are present
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
+        ASSERT_EQ(diag.AcceptedCommands(commandsBuilder), CHIP_NO_ERROR);
+        ReadOnlyBuffer<DataModel::AcceptedCommandEntry> commands = commandsBuilder.TakeBuffer();
+        ASSERT_EQ(commands.size(), 2u);
+
+        ASSERT_EQ(commands[0].commandId, GeneralDiagnostics::Commands::TestEventTrigger::Id);
+        ASSERT_EQ(commands[0].GetInvokePrivilege(),
+                  GeneralDiagnostics::Commands::TestEventTrigger::kMetadataEntry.GetInvokePrivilege());
+        
+        ASSERT_EQ(commands[1].commandId, GeneralDiagnostics::Commands::TimeSnapshot::Id);
+        ASSERT_EQ(commands[1].GetInvokePrivilege(),
+                  GeneralDiagnostics::Commands::TimeSnapshot::kMetadataEntry.GetInvokePrivilege());
+
+        // Everything is unimplemented, so attributes are just the global and mandatory ones.
+        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
+        ASSERT_EQ(diag.Attributes(attributesBuilder), CHIP_NO_ERROR);
+
+        ReadOnlyBufferBuilder<DataModel::AttributeEntry> expectedBuilder;
+        ASSERT_EQ(expectedBuilder.ReferenceExisting(DefaultServerCluster::GlobalAttributes()), CHIP_NO_ERROR);
+        ASSERT_EQ(expectedBuilder.AppendElements({ 
+            GeneralDiagnostics::Attributes::NetworkInterfaces::kMetadataEntry,
+            GeneralDiagnostics::Attributes::RebootCount::kMetadataEntry,
+            GeneralDiagnostics::Attributes::UpTime::kMetadataEntry,
+            GeneralDiagnostics::Attributes::TestEventTriggersEnabled::kMetadataEntry,
+        }),
+        CHIP_NO_ERROR);
+
+        ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
     }
 }
 
