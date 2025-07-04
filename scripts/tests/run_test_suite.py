@@ -267,6 +267,12 @@ def cmd_list(context):
     '--network-manager-app',
     help='what network-manager app to use')
 @click.option(
+    '--energy-gateway-app',
+    help='what energy-gateway app to use')
+@click.option(
+    '--energy-management-app',
+    help='what energy-management app to use')
+@click.option(
     '--chip-repl-yaml-tester',
     help='what python script to use for running yaml tests using chip-repl as controller')
 @click.option(
@@ -297,7 +303,8 @@ def cmd_list(context):
     help='Number of tests that are expected to fail in each iteration.  Overall test will pass if the number of failures matches this.  Nonzero values require --keep-going')
 @click.pass_context
 def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app,
-            fabric_bridge_app, tv_app, bridge_app, lit_icd_app, microwave_oven_app, rvc_app, network_manager_app, chip_repl_yaml_tester,
+            fabric_bridge_app, tv_app, bridge_app, lit_icd_app, microwave_oven_app, rvc_app, network_manager_app,
+            energy_gateway_app, energy_management_app, chip_repl_yaml_tester,
             chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures):
     if expected_failures != 0 and not keep_going:
         logging.exception(f"'--expected-failures {expected_failures}' used without '--keep-going'")
@@ -340,6 +347,12 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     if network_manager_app is None:
         network_manager_app = paths_finder.get('matter-network-manager-app')
 
+    if energy_gateway_app is None:
+        energy_gateway_app = paths_finder.get('chip-energy-gateway-app')
+
+    if energy_management_app is None:
+        energy_management_app = paths_finder.get('chip-energy-management-app')
+
     if chip_repl_yaml_tester is None:
         chip_repl_yaml_tester = paths_finder.get('yamltest_with_chip_repl_tester.py')
 
@@ -363,13 +376,15 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         microwave_oven_app=[microwave_oven_app],
         rvc_app=[rvc_app],
         network_manager_app=[network_manager_app],
+        energy_gateway_app=[energy_gateway_app],
+        energy_management_app=[energy_management_app],
         chip_repl_yaml_tester_cmd=['python3'] + [chip_repl_yaml_tester],
         chip_tool_with_python_cmd=['python3'] + [chip_tool_with_python],
     )
 
     if sys.platform == 'linux':
-        chiptest.linux.PrepareNamespacesForTestExecution(
-            context.obj.in_unshare)
+        ns = chiptest.linux.IsolatedNetworkNamespace(
+            unshared=context.obj.in_unshare)
         paths = chiptest.linux.PathsWithNetworkNamespaces(paths)
 
     logging.info("Each test will be executed %d times" % iterations)
@@ -380,7 +395,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
     def cleanup():
         apps_register.uninit()
         if sys.platform == 'linux':
-            chiptest.linux.ShutdownNamespaceForTestExecution()
+            ns.terminate()
 
     for i in range(iterations):
         logging.info("Starting iteration %d" % (i+1))
@@ -434,8 +449,7 @@ if sys.platform == 'linux':
               'network namespaces)'))
     @click.pass_context
     def cmd_shell(context):
-        chiptest.linux.PrepareNamespacesForTestExecution(
-            context.obj.in_unshare)
+        chiptest.linux.IsolatedNetworkNamespace(unshared=context.obj.in_unshare)
         os.execvpe("bash", ["bash"], os.environ.copy())
 
 
