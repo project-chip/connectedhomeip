@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ServiceArea::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::ServiceArea::Attributes;
         switch (attributeId)
@@ -36,7 +36,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ServiceArea:
         case Progress::Id:
             return Progress::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -44,7 +44,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ServiceArea:
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::ServiceArea::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::ServiceArea::Commands;
         switch (commandId)
@@ -55,7 +55,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Servic
             return SkipArea::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

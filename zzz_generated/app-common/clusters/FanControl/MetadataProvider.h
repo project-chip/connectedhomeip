@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::FanControl::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::FanControl::Attributes;
         switch (attributeId)
@@ -48,7 +48,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::FanControl::
         case AirflowDirection::Id:
             return AirflowDirection::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -56,7 +56,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::FanControl::
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::FanControl::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::FanControl::Commands;
         switch (commandId)
@@ -65,7 +65,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::FanCon
             return Step::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

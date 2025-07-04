@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::FlowMeasurement::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::FlowMeasurement::Attributes;
         switch (attributeId)
@@ -32,7 +32,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::FlowMeasurem
         case Tolerance::Id:
             return Tolerance::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -40,14 +40,14 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::FlowMeasurem
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::FlowMeasurement::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::FlowMeasurement::Commands;
         switch (commandId)
         {
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

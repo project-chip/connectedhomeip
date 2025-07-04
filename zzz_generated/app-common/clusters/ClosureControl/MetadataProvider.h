@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ClosureControl::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::ClosureControl::Attributes;
         switch (attributeId)
@@ -29,12 +29,14 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ClosureContr
             return MainState::kMetadataEntry;
         case CurrentErrorList::Id:
             return CurrentErrorList::kMetadataEntry;
-        case OverallState::Id:
-            return OverallState::kMetadataEntry;
-        case OverallTarget::Id:
-            return OverallTarget::kMetadataEntry;
+        case OverallCurrentState::Id:
+            return OverallCurrentState::kMetadataEntry;
+        case OverallTargetState::Id:
+            return OverallTargetState::kMetadataEntry;
+        case LatchControlModes::Id:
+            return LatchControlModes::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -42,7 +44,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ClosureContr
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::ClosureControl::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::ClosureControl::Commands;
         switch (commandId)
@@ -55,7 +57,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Closur
             return Calibrate::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Messages::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::Messages::Attributes;
         switch (attributeId)
@@ -28,7 +28,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Messages::Id
         case ActiveMessageIDs::Id:
             return ActiveMessageIDs::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -36,7 +36,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Messages::Id
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Messages::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::Messages::Commands;
         switch (commandId)
@@ -47,7 +47,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Messag
             return CancelMessagesRequest::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

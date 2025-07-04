@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::CommodityTariff::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::CommodityTariff::Attributes;
         switch (attributeId)
@@ -62,7 +62,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::CommodityTar
         case DefaultRandomizationType::Id:
             return DefaultRandomizationType::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -70,7 +70,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::CommodityTar
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::CommodityTariff::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::CommodityTariff::Commands;
         switch (commandId)
@@ -81,7 +81,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Commod
             return GetDayEntry::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

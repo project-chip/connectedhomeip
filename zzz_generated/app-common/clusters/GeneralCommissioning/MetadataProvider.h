@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::GeneralCommissioning::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::GeneralCommissioning::Attributes;
         switch (attributeId)
@@ -48,7 +48,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::GeneralCommi
         case NetworkRecoveryReason::Id:
             return NetworkRecoveryReason::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -56,7 +56,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::GeneralCommi
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::GeneralCommissioning::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::GeneralCommissioning::Commands;
         switch (commandId)
@@ -71,7 +71,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Genera
             return SetTCAcknowledgements::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

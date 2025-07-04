@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::IcdManagement::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::IcdManagement::Attributes;
         switch (attributeId)
@@ -44,7 +44,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::IcdManagemen
         case MaximumCheckInBackOff::Id:
             return MaximumCheckInBackOff::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -52,7 +52,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::IcdManagemen
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::IcdManagement::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::IcdManagement::Commands;
         switch (commandId)
@@ -65,7 +65,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::IcdMan
             return StayActiveRequest::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

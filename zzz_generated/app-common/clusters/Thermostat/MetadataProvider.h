@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Thermostat::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::Thermostat::Attributes;
         switch (attributeId)
@@ -143,8 +143,16 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Thermostat::
             return Schedules::kMetadataEntry;
         case SetpointHoldExpiryTimestamp::Id:
             return SetpointHoldExpiryTimestamp::kMetadataEntry;
+        case MaxThermostatSuggestions::Id:
+            return MaxThermostatSuggestions::kMetadataEntry;
+        case ThermostatSuggestions::Id:
+            return ThermostatSuggestions::kMetadataEntry;
+        case CurrentThermostatSuggestion::Id:
+            return CurrentThermostatSuggestion::kMetadataEntry;
+        case ThermostatSuggestionNotFollowingReason::Id:
+            return ThermostatSuggestionNotFollowingReason::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -152,7 +160,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Thermostat::
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Thermostat::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::Thermostat::Commands;
         switch (commandId)
@@ -169,11 +177,15 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Thermo
             return SetActiveScheduleRequest::kMetadataEntry;
         case SetActivePresetRequest::Id:
             return SetActivePresetRequest::kMetadataEntry;
+        case AddThermostatSuggestion::Id:
+            return AddThermostatSuggestion::kMetadataEntry;
+        case RemoveThermostatSuggestion::Id:
+            return RemoveThermostatSuggestion::kMetadataEntry;
         case AtomicRequest::Id:
             return AtomicRequest::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

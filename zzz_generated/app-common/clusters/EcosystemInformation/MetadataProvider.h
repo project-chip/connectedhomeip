@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::EcosystemInformation::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::EcosystemInformation::Attributes;
         switch (attributeId)
@@ -28,7 +28,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::EcosystemInf
         case LocationDirectory::Id:
             return LocationDirectory::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -36,14 +36,14 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::EcosystemInf
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::EcosystemInformation::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::EcosystemInformation::Commands;
         switch (commandId)
         {
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

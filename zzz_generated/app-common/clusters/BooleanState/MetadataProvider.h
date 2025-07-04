@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::BooleanState::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::BooleanState::Attributes;
         switch (attributeId)
@@ -26,7 +26,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::BooleanState
         case StateValue::Id:
             return StateValue::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -34,14 +34,14 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::BooleanState
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::BooleanState::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::BooleanState::Commands;
         switch (commandId)
         {
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

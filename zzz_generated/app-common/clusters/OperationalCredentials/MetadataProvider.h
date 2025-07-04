@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::OperationalCredentials::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::OperationalCredentials::Attributes;
         switch (attributeId)
@@ -36,7 +36,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::OperationalC
         case CurrentFabricIndex::Id:
             return CurrentFabricIndex::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -44,7 +44,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::OperationalC
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::OperationalCredentials::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::OperationalCredentials::Commands;
         switch (commandId)
@@ -71,7 +71,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Operat
             return SignVIDVerificationRequest::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

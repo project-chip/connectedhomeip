@@ -18,13 +18,13 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ProxyConfiguration::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::ProxyConfiguration::Attributes;
         switch (attributeId)
         {
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -32,14 +32,14 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ProxyConfigu
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::ProxyConfiguration::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::ProxyConfiguration::Commands;
         switch (commandId)
         {
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

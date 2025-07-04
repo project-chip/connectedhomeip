@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ElectricalEnergyMeasurement::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::ElectricalEnergyMeasurement::Attributes;
         switch (attributeId)
@@ -36,7 +36,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ElectricalEn
         case CumulativeEnergyReset::Id:
             return CumulativeEnergyReset::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -44,14 +44,14 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ElectricalEn
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::ElectricalEnergyMeasurement::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::ElectricalEnergyMeasurement::Commands;
         switch (commandId)
         {
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

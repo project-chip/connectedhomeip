@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::IlluminanceMeasurement::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::IlluminanceMeasurement::Attributes;
         switch (attributeId)
@@ -34,7 +34,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::IlluminanceM
         case LightSensorType::Id:
             return LightSensorType::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -42,14 +42,14 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::IlluminanceM
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::IlluminanceMeasurement::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::IlluminanceMeasurement::Commands;
         switch (commandId)
         {
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

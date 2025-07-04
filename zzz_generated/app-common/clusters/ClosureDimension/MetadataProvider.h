@@ -18,15 +18,15 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ClosureDimension::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::ClosureDimension::Attributes;
         switch (attributeId)
         {
         case CurrentState::Id:
             return CurrentState::kMetadataEntry;
-        case Target::Id:
-            return Target::kMetadataEntry;
+        case TargetState::Id:
+            return TargetState::kMetadataEntry;
         case Resolution::Id:
             return Resolution::kMetadataEntry;
         case StepValue::Id:
@@ -45,8 +45,10 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ClosureDimen
             return Overflow::kMetadataEntry;
         case ModulationType::Id:
             return ModulationType::kMetadataEntry;
+        case LatchControlModes::Id:
+            return LatchControlModes::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -54,7 +56,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ClosureDimen
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::ClosureDimension::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::ClosureDimension::Commands;
         switch (commandId)
@@ -65,7 +67,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Closur
             return Step::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

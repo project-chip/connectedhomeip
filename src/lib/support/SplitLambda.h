@@ -8,17 +8,21 @@ namespace detail {
 template <typename T>
 struct SplitLambdaCallerImpl;
 
-template <class TReturn, class TLambda, class... TArgs>
-struct SplitLambdaCallerImpl<TReturn (TLambda::*)(TArgs...) const>
-{
-    static TReturn Call(TArgs... args, void * context) { return (*static_cast<TLambda *>(context))(std::forward<TArgs>(args)...); }
-};
+// Detail -- Specialization to extract Argument typed from the callable
+template <class TReturn, class TCallable, class... TArgs>
+struct SplitLambdaCallerImpl<TReturn (TCallable::*)(TArgs...) const> {
 
+    // This call function knows the arguments and provides the signature required for the C-like callbacks
+    static TReturn Call(TArgs... args, void * context)
+    {
+        return (*static_cast<TCallable *>(context))(std::forward<TArgs>(args)...);
+    }
+};
 } // namespace detail
 
 /// @brief Helper Object to use Lambdas through C-Like APIs where context is split from the callback.
 ///        This incurs no runtime code execution; just keeps everything typesafe.
-/// @tparam TLambda
+/// @tparam TCallable
 /// @example
 ///     /* FunctionAPI */
 ///     int api_function(void (*callback) (int api_value, void * context), void * context );
@@ -36,20 +40,22 @@ struct SplitLambdaCallerImpl<TReturn (TLambda::*)(TArgs...) const>
 ///         /*Call API */
 ///         return api_function(on_api_update_my_vars.Caller(), on_api_update_my_vars.Context());
 ///     }
-template <class TLambda>
-struct SplitLambda : detail::SplitLambdaCallerImpl<decltype(&TLambda::operator())>
-{
-    TLambda callable;
+template <class TCallable>
+struct SplitLambda : detail::SplitLambdaCallerImpl<decltype(&TCallable::operator())> {
+    TCallable callable;
 
-    SplitLambda(TLambda callable_) : callable(callable_) {}
-    SplitLambda(SplitLambda &)  = delete; // Cannot be copied
+    SplitLambda(TCallable callable_)
+        : callable(callable_)
+    {
+    }
+    SplitLambda(SplitLambda &) = delete; // Cannot be copied
     SplitLambda(SplitLambda &&) = delete; // Cannot be moved
 
     inline void * Context() { return static_cast<void *>(&callable); }
     inline auto Caller() { return &this->Call; }
 };
 
-template <class TLambda>
-SplitLambda(TLambda callable_) -> SplitLambda<TLambda>;
+template <class TCallable>
+SplitLambda(TCallable callable_) -> SplitLambda<TCallable>;
 
 } // namespace chip

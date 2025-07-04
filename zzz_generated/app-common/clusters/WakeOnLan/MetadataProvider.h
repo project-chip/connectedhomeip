@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::WakeOnLan::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::WakeOnLan::Attributes;
         switch (attributeId)
@@ -28,7 +28,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::WakeOnLan::I
         case LinkLocalAddress::Id:
             return LinkLocalAddress::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -36,14 +36,14 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::WakeOnLan::I
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::WakeOnLan::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::WakeOnLan::Commands;
         switch (commandId)
         {
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

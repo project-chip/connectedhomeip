@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::CommodityPrice::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::CommodityPrice::Attributes;
         switch (attributeId)
@@ -32,7 +32,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::CommodityPri
         case PriceForecast::Id:
             return PriceForecast::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -40,7 +40,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::CommodityPri
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::CommodityPrice::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::CommodityPrice::Commands;
         switch (commandId)
@@ -51,7 +51,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Commod
             return GetDetailedForecastRequest::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

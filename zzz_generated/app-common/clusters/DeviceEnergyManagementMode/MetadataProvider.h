@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::DeviceEnergyManagementMode::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::DeviceEnergyManagementMode::Attributes;
         switch (attributeId)
@@ -28,7 +28,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::DeviceEnergy
         case CurrentMode::Id:
             return CurrentMode::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -36,7 +36,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::DeviceEnergy
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::DeviceEnergyManagementMode::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::DeviceEnergyManagementMode::Commands;
         switch (commandId)
@@ -45,7 +45,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Device
             return ChangeToMode::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

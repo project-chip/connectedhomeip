@@ -1,7 +1,7 @@
 // DO NOT EDIT MANUALLY - Generated file
 //
 // This file provides a function to query into the MetadataProviders without
-// instansiating but the necessary Metadata
+// instantiating any unnecessary metadata.
 //
 // based on src/controller/data_model/controller-clusters.matter
 #pragma once
@@ -287,18 +287,17 @@
 #include <clusters/ZoneManagement/Ids.h>
 #include <clusters/ZoneManagement/MetadataProvider.h>
 #include <lib/core/DataModelTypes.h>
+#include <optional>
 
 namespace chip {
 namespace app {
 namespace DataModel {
 
 // Implements a search for the AcceptedCommandEntry in multiple clusters
-// If no Clusters are provided it will search all clusters
-// Replacement for old Accepted Command Entry from Ember metadata using the ClusterMetadataProvider
-// Provided for legacy compatibility
-// We provide this function for convenience, however it is not expected to be used long-term
+// If no Clusters are provided it will search all clusters.
+// We provide this function for convenience, however it is not expected to be used long-term.
 template <ClusterId... TClusterIds>
-DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(ClusterId id, CommandId command)
+std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId id, CommandId command)
 {
     using namespace chip::app::Clusters;
     if constexpr (sizeof...(TClusterIds) == 0 || ((TClusterIds == AccessControl::Id) || ...))
@@ -1011,7 +1010,7 @@ DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(ClusterId id, CommandId 
             return ClusterMetadataProvider<DataModel::AcceptedCommandEntry, ZoneManagement::Id>::EntryFor(command);
     }
 
-    return DataModel::AcceptedCommandEntry{};
+    return std::nullopt;
 }
 
 } // namespace DataModel

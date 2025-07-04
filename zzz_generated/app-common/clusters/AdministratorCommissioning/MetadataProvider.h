@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::AdministratorCommissioning::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::AdministratorCommissioning::Attributes;
         switch (attributeId)
@@ -30,7 +30,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Administrato
         case AdminVendorId::Id:
             return AdminVendorId::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -38,7 +38,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Administrato
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::AdministratorCommissioning::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::AdministratorCommissioning::Commands;
         switch (commandId)
@@ -51,7 +51,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Admini
             return RevokeCommissioning::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

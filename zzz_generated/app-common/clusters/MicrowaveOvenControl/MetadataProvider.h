@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::MicrowaveOvenControl::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::MicrowaveOvenControl::Attributes;
         switch (attributeId)
@@ -42,7 +42,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::MicrowaveOve
         case WattRating::Id:
             return WattRating::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -50,7 +50,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::MicrowaveOve
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::MicrowaveOvenControl::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::MicrowaveOvenControl::Commands;
         switch (commandId)
@@ -61,7 +61,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Microw
             return AddMoreTime::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

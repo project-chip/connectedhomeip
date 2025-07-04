@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::DoorLock::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::DoorLock::Attributes;
         switch (attributeId)
@@ -114,7 +114,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::DoorLock::Id
         case NumberOfAliroEndpointKeysSupported::Id:
             return NumberOfAliroEndpointKeysSupported::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -122,7 +122,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::DoorLock::Id
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::DoorLock::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::DoorLock::Commands;
         switch (commandId)
@@ -171,7 +171,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::DoorLo
             return ClearAliroReaderConfig::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

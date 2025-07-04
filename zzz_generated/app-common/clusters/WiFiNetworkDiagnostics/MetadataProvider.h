@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::WiFiNetworkDiagnostics::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::WiFiNetworkDiagnostics::Attributes;
         switch (attributeId)
@@ -50,7 +50,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::WiFiNetworkD
         case OverrunCount::Id:
             return OverrunCount::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -58,7 +58,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::WiFiNetworkD
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::WiFiNetworkDiagnostics::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::WiFiNetworkDiagnostics::Commands;
         switch (commandId)
@@ -67,7 +67,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::WiFiNe
             return ResetCounts::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

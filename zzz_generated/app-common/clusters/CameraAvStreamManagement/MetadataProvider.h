@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::CameraAvStreamManagement::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::CameraAvStreamManagement::Attributes;
         switch (attributeId)
@@ -59,8 +59,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::CameraAvStre
             return AllocatedAudioStreams::kMetadataEntry;
         case AllocatedSnapshotStreams::Id:
             return AllocatedSnapshotStreams::kMetadataEntry;
-        case RankedVideoStreamPrioritiesList::Id:
-            return RankedVideoStreamPrioritiesList::kMetadataEntry;
+        case StreamUsagePriorities::Id:
+            return StreamUsagePriorities::kMetadataEntry;
         case SoftRecordingPrivacyModeEnabled::Id:
             return SoftRecordingPrivacyModeEnabled::kMetadataEntry;
         case SoftLivestreamPrivacyModeEnabled::Id:
@@ -106,7 +106,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::CameraAvStre
         case StatusLightBrightness::Id:
             return StatusLightBrightness::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -114,7 +114,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::CameraAvStre
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::CameraAvStreamManagement::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::CameraAvStreamManagement::Commands;
         switch (commandId)
@@ -141,7 +141,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Camera
             return CaptureSnapshot::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

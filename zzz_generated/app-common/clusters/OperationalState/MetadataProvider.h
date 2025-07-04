@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::OperationalState::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::OperationalState::Attributes;
         switch (attributeId)
@@ -36,7 +36,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::OperationalS
         case OperationalError::Id:
             return OperationalError::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -44,7 +44,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::OperationalS
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::OperationalState::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::OperationalState::Commands;
         switch (commandId)
@@ -59,7 +59,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Operat
             return Resume::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

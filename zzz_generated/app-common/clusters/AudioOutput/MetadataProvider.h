@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::AudioOutput::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::AudioOutput::Attributes;
         switch (attributeId)
@@ -28,7 +28,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::AudioOutput:
         case CurrentOutput::Id:
             return CurrentOutput::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -36,7 +36,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::AudioOutput:
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::AudioOutput::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::AudioOutput::Commands;
         switch (commandId)
@@ -47,7 +47,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::AudioO
             return RenameOutput::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

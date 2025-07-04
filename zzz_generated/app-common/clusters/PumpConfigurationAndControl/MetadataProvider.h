@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::PumpConfigurationAndControl::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::PumpConfigurationAndControl::Attributes;
         switch (attributeId)
@@ -70,7 +70,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::PumpConfigur
         case ControlMode::Id:
             return ControlMode::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -78,14 +78,14 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::PumpConfigur
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::PumpConfigurationAndControl::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::PumpConfigurationAndControl::Commands;
         switch (commandId)
         {
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

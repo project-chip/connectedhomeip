@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::GeneralDiagnostics::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::GeneralDiagnostics::Attributes;
         switch (attributeId)
@@ -42,7 +42,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::GeneralDiagn
         case TestEventTriggersEnabled::Id:
             return TestEventTriggersEnabled::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -50,7 +50,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::GeneralDiagn
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::GeneralDiagnostics::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::GeneralDiagnostics::Commands;
         switch (commandId)
@@ -63,7 +63,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Genera
             return PayloadTestRequest::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

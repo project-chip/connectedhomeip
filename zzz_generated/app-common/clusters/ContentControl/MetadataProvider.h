@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ContentControl::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::ContentControl::Attributes;
         switch (attributeId)
@@ -40,7 +40,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ContentContr
         case BlockUnrated::Id:
             return BlockUnrated::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -48,7 +48,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ContentContr
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::ContentControl::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::ContentControl::Commands;
         switch (commandId)
@@ -75,7 +75,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Conten
             return SetScheduledContentRatingThreshold::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

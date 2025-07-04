@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ActivatedCarbonFilterMonitoring::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::ActivatedCarbonFilterMonitoring::Attributes;
         switch (attributeId)
@@ -36,7 +36,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ActivatedCar
         case ReplacementProductList::Id:
             return ReplacementProductList::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -44,7 +44,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ActivatedCar
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::ActivatedCarbonFilterMonitoring::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::ActivatedCarbonFilterMonitoring::Commands;
         switch (commandId)
@@ -53,7 +53,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Activa
             return ResetCondition::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

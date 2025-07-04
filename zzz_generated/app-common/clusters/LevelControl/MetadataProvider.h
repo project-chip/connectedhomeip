@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::LevelControl::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::LevelControl::Attributes;
         switch (attributeId)
@@ -52,7 +52,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::LevelControl
         case StartUpCurrentLevel::Id:
             return StartUpCurrentLevel::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -60,7 +60,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::LevelControl
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::LevelControl::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::LevelControl::Commands;
         switch (commandId)
@@ -85,7 +85,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::LevelC
             return MoveToClosestFrequency::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

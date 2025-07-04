@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::SampleMei::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::SampleMei::Attributes;
         switch (attributeId)
@@ -26,7 +26,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::SampleMei::I
         case FlipFlop::Id:
             return FlipFlop::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -34,7 +34,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::SampleMei::I
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::SampleMei::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::SampleMei::Commands;
         switch (commandId)
@@ -45,7 +45,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Sample
             return AddArguments::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

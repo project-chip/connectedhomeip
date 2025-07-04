@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::TlsCertificateManagement::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::TlsCertificateManagement::Attributes;
         switch (attributeId)
@@ -32,7 +32,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::TlsCertifica
         case ProvisionedClientCertificates::Id:
             return ProvisionedClientCertificates::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -40,7 +40,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::TlsCertifica
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::TlsCertificateManagement::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::TlsCertificateManagement::Commands;
         switch (commandId)
@@ -65,7 +65,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::TlsCer
             return RemoveClientCertificate::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

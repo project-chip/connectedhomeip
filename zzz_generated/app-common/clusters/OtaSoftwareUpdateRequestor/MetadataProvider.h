@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::OtaSoftwareUpdateRequestor::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::OtaSoftwareUpdateRequestor::Attributes;
         switch (attributeId)
@@ -32,7 +32,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::OtaSoftwareU
         case UpdateStateProgress::Id:
             return UpdateStateProgress::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -40,7 +40,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::OtaSoftwareU
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::OtaSoftwareUpdateRequestor::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::OtaSoftwareUpdateRequestor::Commands;
         switch (commandId)
@@ -49,7 +49,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::OtaSof
             return AnnounceOTAProvider::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

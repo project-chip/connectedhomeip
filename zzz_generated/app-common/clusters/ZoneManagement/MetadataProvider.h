@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ZoneManagement::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::ZoneManagement::Attributes;
         switch (attributeId)
@@ -38,7 +38,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ZoneManageme
         case TwoDCartesianMax::Id:
             return TwoDCartesianMax::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -46,7 +46,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ZoneManageme
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::ZoneManagement::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::ZoneManagement::Commands;
         switch (commandId)
@@ -55,8 +55,6 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::ZoneMa
             return CreateTwoDCartesianZone::kMetadataEntry;
         case UpdateTwoDCartesianZone::Id:
             return UpdateTwoDCartesianZone::kMetadataEntry;
-        case GetTwoDCartesianZone::Id:
-            return GetTwoDCartesianZone::kMetadataEntry;
         case RemoveZone::Id:
             return RemoveZone::kMetadataEntry;
         case CreateOrUpdateTrigger::Id:
@@ -65,7 +63,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::ZoneMa
             return RemoveTrigger::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

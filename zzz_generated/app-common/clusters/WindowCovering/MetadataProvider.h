@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::WindowCovering::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::WindowCovering::Attributes;
         switch (attributeId)
@@ -68,7 +68,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::WindowCoveri
         case SafetyStatus::Id:
             return SafetyStatus::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -76,7 +76,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::WindowCoveri
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::WindowCovering::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::WindowCovering::Commands;
         switch (commandId)
@@ -97,7 +97,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Window
             return GoToTiltPercentage::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

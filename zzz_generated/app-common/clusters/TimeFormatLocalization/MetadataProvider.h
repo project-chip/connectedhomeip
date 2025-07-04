@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::TimeFormatLocalization::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::TimeFormatLocalization::Attributes;
         switch (attributeId)
@@ -30,7 +30,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::TimeFormatLo
         case SupportedCalendarTypes::Id:
             return SupportedCalendarTypes::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -38,14 +38,14 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::TimeFormatLo
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::TimeFormatLocalization::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::TimeFormatLocalization::Commands;
         switch (commandId)
         {
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

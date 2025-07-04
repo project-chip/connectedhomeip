@@ -6,6 +6,7 @@
 // based on {{input_name}}
 #pragma once
 
+#include <optional>
 #include <lib/core/DataModelTypes.h>
 
 {%- for cluster in clusters | sort(attribute='name') %}
@@ -19,10 +20,10 @@ namespace app {
 namespace DataModel {
 
 // Implements a search for the AcceptedCommandEntry in multiple clusters
-// If no Clusters are provided it will search all clusters
+// If no Clusters are provided it will search all clusters.
 // We provide this function for convenience, however it is not expected to be used long-term.
 template <ClusterId... TClusterIds>
-DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(ClusterId id, CommandId command)
+std::optional<DataModel::AcceptedCommandEntry> AcceptedCommandEntryFor(ClusterId id, CommandId command)
 {
     using namespace chip::app::Clusters; 
     {%- for cluster in clusters | sort(attribute='name') %}
@@ -33,7 +34,7 @@ DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(ClusterId id, CommandId 
     }
     {%- endfor%}
 
-    return DataModel::AcceptedCommandEntry{};
+    return std::nullopt;
 }
 
 } // namespace DataModel

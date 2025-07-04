@@ -36,21 +36,22 @@ namespace app {
 /// @tparam  TClusterIds A list of the IDs the shim will search the metadata of, leave empty to search for the metadata in all
 ///          clusters
 template <ClusterId... TClusterIds>
-class CommandHandlerInterfaceShim : public CommandHandlerInterface
-{
+class CommandHandlerInterfaceShim : public CommandHandlerInterface {
 
     using CommandHandlerInterface::CommandHandlerInterface;
 
-    DataModel::AcceptedCommandEntry GetEntry(const ConcreteClusterPath & cluster, CommandId command)
+private:
+    std::optional<DataModel::AcceptedCommandEntry> GetEntry(const ConcreteClusterPath & cluster, CommandId command)
     {
         return DataModel::AcceptedCommandEntryFor<TClusterIds...>(cluster.mClusterId, command);
     }
 
+public:
     CHIP_ERROR RetrieveAcceptedCommands(const ConcreteClusterPath & cluster,
-                                        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
+        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
     {
         size_t commandCount = 0;
-        CHIP_ERROR err      = CHIP_NO_ERROR;
+        CHIP_ERROR err = CHIP_NO_ERROR;
 
         auto counter = SplitLambda([&](CommandId commandId) {
             commandCount++;
@@ -61,7 +62,12 @@ class CommandHandlerInterfaceShim : public CommandHandlerInterface
         ReturnErrorOnFailure(builder.EnsureAppendCapacity(commandCount));
 
         auto appender = SplitLambda([&](CommandId commandId) {
-            err = builder.Append(GetEntry(cluster, commandId));
+            auto opt_entry = GetEntry(cluster, commandId);
+            if (!opt_entry) {
+                err = CHIP_ERROR_NOT_FOUND;
+            } else {
+                err = builder.Append(*entry);
+            }
             return err == CHIP_NO_ERROR ? Loop::Continue : Loop::Break;
         });
 

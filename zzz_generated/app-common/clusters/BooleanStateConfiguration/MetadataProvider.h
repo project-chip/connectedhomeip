@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::BooleanStateConfiguration::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::BooleanStateConfiguration::Attributes;
         switch (attributeId)
@@ -40,7 +40,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::BooleanState
         case SensorFault::Id:
             return SensorFault::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -48,7 +48,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::BooleanState
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::BooleanStateConfiguration::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::BooleanStateConfiguration::Commands;
         switch (commandId)
@@ -59,7 +59,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Boolea
             return EnableDisableAlarm::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

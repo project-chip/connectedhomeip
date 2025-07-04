@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::NitrogenDioxideConcentrationMeasurement::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::NitrogenDioxideConcentrationMeasurement::Attributes;
         switch (attributeId)
@@ -46,7 +46,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::NitrogenDiox
         case LevelValue::Id:
             return LevelValue::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -54,14 +54,14 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::NitrogenDiox
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::NitrogenDioxideConcentrationMeasurement::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::NitrogenDioxideConcentrationMeasurement::Commands;
         switch (commandId)
         {
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

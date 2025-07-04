@@ -398,8 +398,8 @@ NetworkCommissioningLogic::HandleAddOrUpdateWiFiNetwork(CommandHandler & handler
     // - 26 hexadecimal ASCII characters: WEP-128 104-bit hex raw PSK
     // - 8..63 bytes: WPA/WPA2/WPA3 passphrase
     // - 64 bytes: WPA/WPA2/WPA3 raw hex PSK
-    // Note 10 hex WEP64 and 13 bytes / 26 hex WEP128 passphrase are covered by 8~63 bytes WPA passphrase, so we don't check
-    // WEP64 hex and WEP128 passphrase.
+    // Note 10 hex WEP64 and 13 bytes / 26 hex WEP128 passphrase are covered by 8~63 bytes WPA passphrase, so we don't check WEP64
+    // hex and WEP128 passphrase.
     if (req.credentials.size() == ValidWiFiCredentialLength::kOpen || req.credentials.size() == ValidWiFiCredentialLength::kWEP64 ||
         (req.credentials.size() >= ValidWiFiCredentialLength::kMinWPAPSK &&
          req.credentials.size() <= ValidWiFiCredentialLength::kMaxWPAPSK))

@@ -120,7 +120,7 @@ CHIP_ERROR TestClusterCommandHandler::RetrieveAcceptedCommands(const ConcreteClu
 
     // We just have one command id.
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(1));
-    ReturnErrorOnFailure(builder.Append({ Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::Id, {}, {} }));
+    ReturnErrorOnFailure(builder.Append(Clusters::UnitTesting::Commands::TestSimpleArgumentRequest::kMetadataEntry));
     return CHIP_NO_ERROR;
 }
 

@@ -421,11 +421,6 @@ def getCodegenTemplates():
     targets = []
 
     targets.append(JinjaCodegenTarget(
-        generator="cpp-sdk",
-        idl_path="src/controller/data_model/controller-clusters.matter",
-        output_directory="zzz_generated/app-common/clusters"))
-
-    targets.append(JinjaCodegenTarget(
         generator="java-class",
         idl_path="src/controller/data_model/controller-clusters.matter",
         output_directory="src/controller/java/generated"))
@@ -439,6 +434,11 @@ def getCodegenTemplates():
         generator="summary-markdown",
         idl_path="src/controller/data_model/controller-clusters.matter",
         output_directory="docs/ids_and_codes"))
+
+    targets.append(JinjaCodegenTarget(
+        generator="cpp-sdk",
+        idl_path="src/controller/data_model/controller-clusters.matter",
+        output_directory="zzz_generated/app-common/clusters"))
 
     return targets
 

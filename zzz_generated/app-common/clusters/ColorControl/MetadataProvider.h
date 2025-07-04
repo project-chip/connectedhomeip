@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ColorControl::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::ColorControl::Attributes;
         switch (attributeId)
@@ -128,7 +128,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ColorControl
         case StartUpColorTemperatureMireds::Id:
             return StartUpColorTemperatureMireds::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -136,7 +136,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ColorControl
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::ColorControl::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::ColorControl::Commands;
         switch (commandId)
@@ -181,7 +181,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::ColorC
             return StepColorTemperature::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

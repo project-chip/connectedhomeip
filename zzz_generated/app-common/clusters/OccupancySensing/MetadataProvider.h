@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::OccupancySensing::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::OccupancySensing::Attributes;
         switch (attributeId)
@@ -52,7 +52,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::OccupancySen
         case PhysicalContactUnoccupiedToOccupiedThreshold::Id:
             return PhysicalContactUnoccupiedToOccupiedThreshold::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -60,14 +60,14 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::OccupancySen
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::OccupancySensing::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::OccupancySensing::Commands;
         switch (commandId)
         {
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

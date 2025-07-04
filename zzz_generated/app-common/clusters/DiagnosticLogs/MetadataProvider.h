@@ -18,13 +18,13 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::DiagnosticLogs::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::DiagnosticLogs::Attributes;
         switch (attributeId)
         {
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -32,7 +32,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::DiagnosticLo
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::DiagnosticLogs::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::DiagnosticLogs::Commands;
         switch (commandId)
@@ -41,7 +41,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Diagno
             return RetrieveLogsRequest::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };

@@ -18,7 +18,7 @@ namespace DataModel {
 template <>
 struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ThreadNetworkDiagnostics::Id>
 {
-    static constexpr DataModel::AttributeEntry EntryFor(AttributeId attributeId)
+    static constexpr std::optional<DataModel::AttributeEntry> EntryFor(AttributeId attributeId)
     {
         using namespace Clusters::ThreadNetworkDiagnostics::Attributes;
         switch (attributeId)
@@ -154,7 +154,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ThreadNetwor
         case Rloc16::Id:
             return Rloc16::kMetadataEntry;
         default:
-            return AttributeEntry({}, {}, std::nullopt, std::nullopt);
+            return std::nullopt;
         }
     }
 };
@@ -162,7 +162,7 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ThreadNetwor
 template <>
 struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::ThreadNetworkDiagnostics::Id>
 {
-    static constexpr DataModel::AcceptedCommandEntry EntryFor(CommandId commandId)
+    static constexpr std::optional<DataModel::AcceptedCommandEntry> EntryFor(CommandId commandId)
     {
         using namespace Clusters::ThreadNetworkDiagnostics::Commands;
         switch (commandId)
@@ -171,7 +171,7 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Thread
             return ResetCounts::kMetadataEntry;
 
         default:
-            return AcceptedCommandEntry();
+            return std::nullopt;
         }
     }
 };
