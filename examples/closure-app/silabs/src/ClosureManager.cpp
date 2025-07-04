@@ -314,7 +314,7 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         DeviceLayer::PlatformMgr().LockChipStack();
         instance.isMoveToInProgress = false;
         DeviceLayer::PlatformMgr().UnlockChipStack();
-        
+
         break;
     case Action_t::SET_TARGET_ACTION:
         instance.mClosureEndpoint1.OnPanelMotionActionComplete();
