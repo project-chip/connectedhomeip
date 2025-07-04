@@ -127,7 +127,7 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnCalibrateCommand()
     VerifyOrReturnValue(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kCountdownTimeSeconds),
                                                               HandleEp1ClosureActionTimer, nullptr) == CHIP_NO_ERROR,
                         Status::Failure, ChipLogError(AppServer, "Failed to start closure action timer"));
-    
+
 
     ChipLogProgress(AppServer, "ClosureManager: Calibration action started for endpoint 1");
     return Status::Success;
