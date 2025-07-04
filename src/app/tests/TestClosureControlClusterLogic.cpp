@@ -1599,7 +1599,7 @@ TEST_F(TestClosureControlClusterLogic, ClearCurrentErrorList)
 
 // This test is to ensure that the CurrentErrorList cannot be read when the span buffer is less than the expected size.
 // Span buffer should be at least 10 elements to read the current error list(since max-size of the current-error-list
-// is 10 as per the spec). If buffer is less than 10, it should return CHIP_ERROR_BUFFER_TOO_SMALL.
+// is 10 as per the spec). If buffer is not equal to 10, it should return CHIP_ERROR_BUFFER_TOO_SMALL.
 TEST_F(TestClosureControlClusterLogic, ReadCurrentErrorList_InvalidBufferSize)
 {
     conformance.FeatureMap().Set(Feature::kPositioning);
@@ -1613,4 +1613,7 @@ TEST_F(TestClosureControlClusterLogic, ReadCurrentErrorList_InvalidBufferSize)
     ClosureErrorEnum list[1] = {};
     Span<ClosureErrorEnum> currentErrorListSpan(list);
     EXPECT_EQ(logic->GetCurrentErrorList(currentErrorListSpan), CHIP_ERROR_BUFFER_TOO_SMALL);
+    ClosureErrorEnum list2[11] = {};
+    Span<ClosureErrorEnum> currentErrorListSpan2(list2);
+    EXPECT_NE(logic->GetCurrentErrorList(currentErrorListSpan2), CHIP_NO_ERROR);
 }
