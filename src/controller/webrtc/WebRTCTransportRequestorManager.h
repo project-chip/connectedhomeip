@@ -63,7 +63,7 @@ public:
     void UpsertSession(const chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type & session);
 
 private:
-    WebRTCTransportRequestorManager() : mWebRTCRequestorServer(webRTCRequesterDynamicEndpointId, *this) {};
+    WebRTCTransportRequestorManager() : mWebRTCRequestorServer(webRTCRequesterDynamicEndpointId, *this){};
     ~WebRTCTransportRequestorManager() = default;
 
 #if CHIP_DEVICE_CONFIG_DYNAMIC_SERVER

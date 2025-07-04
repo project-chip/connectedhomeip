@@ -43,7 +43,7 @@ public:
     using StreamUsageEnum = chip::app::Clusters::Globals::StreamUsageEnum;
 
     WebRTCTransportProviderClient() :
-        mOnConnectedCallback(OnDeviceConnected, this), mOnConnectionFailureCallback(OnDeviceConnectionFailure, this) {};
+        mOnConnectedCallback(OnDeviceConnected, this), mOnConnectionFailureCallback(OnDeviceConnectionFailure, this){};
     ~WebRTCTransportProviderClient() = default;
 
     // methods to be called from python
