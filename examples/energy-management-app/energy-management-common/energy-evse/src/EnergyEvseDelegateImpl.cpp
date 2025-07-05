@@ -623,16 +623,7 @@ CHIP_ERROR EnergyEvseDelegate::HwGetVehicleID(DataModel::Nullable<MutableCharSpa
         return CHIP_NO_ERROR;
     }
 
-    MutableCharSpan & buffer = outValue.Value();
-    if (buffer.size() < mVehicleID.Value().size())
-    {
-        return CHIP_ERROR_BUFFER_TOO_SMALL;
-    }
-
-    memcpy(buffer.data(), mVehicleID.Value().data(), mVehicleID.Value().size());
-    buffer.reduce_size(mVehicleID.Value().size());
-
-    return CHIP_NO_ERROR;
+    return CopyCharSpanToMutableCharSpan(mVehicleID.Value(), outValue.Value());
 }
 
 /**
