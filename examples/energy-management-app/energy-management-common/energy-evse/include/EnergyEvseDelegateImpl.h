@@ -122,7 +122,7 @@ class EnergyEvseDelegate : public EnergyEvse::Delegate
 {
 public:
     EnergyEvseDelegate(EvseTargetsDelegate & aDelegate) : EnergyEvse::Delegate() { mEvseTargetsDelegate = &aDelegate; }
-    ~EnergyEvseDelegate();
+    ~EnergyEvseDelegate() {}
 
     EvseTargetsDelegate * GetEvseTargetsDelegate() { return mEvseTargetsDelegate; }
 
