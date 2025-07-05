@@ -7939,18 +7939,6 @@ bool emberAfPushAvStreamTransportClusterFindTransportCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::PushAvStreamTransport::Commands::FindTransport::DecodableType & commandData);
 /**
- * @brief Commodity Tariff Cluster GetTariffComponent Command callback (from client)
- */
-bool emberAfCommodityTariffClusterGetTariffComponentCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommodityTariff::Commands::GetTariffComponent::DecodableType & commandData);
-/**
- * @brief Commodity Tariff Cluster GetDayEntry Command callback (from client)
- */
-bool emberAfCommodityTariffClusterGetDayEntryCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::CommodityTariff::Commands::GetDayEntry::DecodableType & commandData);
-/**
  * @brief Joint Fabric Datastore Cluster AddKeySet Command callback (from client)
  */
 bool emberAfJointFabricDatastoreClusterAddKeySetCallback(
