@@ -597,7 +597,7 @@ Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
 
     if (newValue.size() > kMaxVehicleIDBufSize)
     {
-        ChipLogError(AppServer, "HwSetVehicleID - input too long");
+        ChipLogError(AppServer, "HwSetVehicleID - input too long. Max size = %d", kMaxVehicleIDBufSize);
         return Status::Failure;
     }
 
