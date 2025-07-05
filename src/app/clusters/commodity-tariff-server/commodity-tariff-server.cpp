@@ -415,7 +415,7 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
 {
     const Structs::DayEntryStruct::Type * currentPtr = nullptr;
     const Structs::DayEntryStruct::Type * nextPtr    = nullptr;
-    uint16_t duration                                = 0;
+    *nextUpdInterval = 0;
 
     for (const auto & entryID : dayEntryIDs)
     {
@@ -424,30 +424,38 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
         {
             continue;
         }
-        duration = (kDayEntryDurationLimit - current->startTime);
 
-        if (next != nullptr)
+        // Default: Current entry lasts until end of day
+        uint16_t duration = (kDayEntryDurationLimit - current->startTime);
+
+        if (current->duration.HasValue())
         {
-            nextPtr = next;
-
-            if (current->duration.HasValue())
+            duration = current->duration.Value();  
+        }
+        else if (next != nullptr && next->startTime < kDayEntryDurationLimit) 
+        {
+            if (next->startTime <= current->startTime)
             {
-                duration = current->duration.Value();
+                // Next entry is on the following day
+                duration = (kDayEntryDurationLimit - current->startTime) + next->startTime;
             }
-            else if (next->startTime > 0)
+            else
             {
-                duration += next->startTime;
+                // Next entry is on the same day
+                duration = next->startTime - current->startTime;
             }
         }
 
-        if (current->startTime <= minutesSinceMidnight && (current->startTime + duration) > minutesSinceMidnight)
+        // Check if current entry matches the current time
+        if (current->startTime <= minutesSinceMidnight &&
+            (current->startTime + duration) > minutesSinceMidnight)
         {
             currentPtr = current;
+            nextPtr    = next;
+            *nextUpdInterval = duration - (minutesSinceMidnight - current->startTime);
             break;
         }
     }
-
-    *nextUpdInterval = duration;
 
     return { currentPtr, nextPtr };
 }
@@ -680,6 +688,9 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
             {
                 ChipLogError(NotSpecified, "Unable to update the CurrentTariffComponents attribute!");
             }
+            ChipLogDetail(NotSpecified,
+                "ForceDayEntriesAttrsUpdate: current day entry: %u",
+                tmpDayEntry.Value().dayEntryID);
         }
 
         SetCurrentDayEntry(tmpDayEntry);
@@ -691,20 +702,31 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
         if (next != nullptr)
         {
             tmpDayEntry.SetNonNull(*next);
-            tmpDate.SetNonNull(mCurrentDay.Value().date);
             if (CHIP_NO_ERROR !=
                 Utils::UpdateTariffComponentAttrsDayEntryById(mServerTariffAttrsCtx, next->dayEntryID,
                                                               mNextTariffComponents_MgmtObj))
             {
                 ChipLogError(NotSpecified, "Unable to update the NextTariffComponents attribute!");
             }
+            ChipLogDetail(NotSpecified,
+                "ForceDayEntriesAttrsUpdate: current day entry: %u",
+                tmpDayEntry.Value().dayEntryID);
         }
 
         SetNextDayEntry(tmpDayEntry);
-        SetNextDayEntryDate(tmpDate);
 
         if (nextUpdInterval > 0)
         {
+            mServerTariffAttrsCtx.dayEntriesUpdDelay = timestampNow + nextUpdInterval*60;
+            if ( (nextUpdInterval >= (kDayEntryDurationLimit-minutesSinceMidnight) ) && !mNextDay.IsNull() )
+            {
+                tmpDate.SetNonNull(mNextDay.Value().date);
+            }
+            else
+            {
+                tmpDate.SetNonNull(mCurrentDay.Value().date);
+            }
+            SetNextDayEntryDate(tmpDate);
             ScheduleDayEntryUpdate(nextUpdInterval);
         }
     }
@@ -791,50 +813,32 @@ void Instance::ForceDaysAttrsUpdate()
 
 void Instance::ForceDayEntriesAttrsUpdate()
 {
-    // Early return if we don't have valid current day data
-    if (mCurrentDayEntryDate.IsNull() || mCurrentDayEntry.IsNull())
+    if(mServerTariffAttrsCtx.dayEntriesUpdDelay)
     {
-        ChipLogDetail(NotSpecified, "ForceDayEntriesAttrsUpdate: No current day entry set");
-        return;
+        mServerTariffAttrsCtx.forwardAlarmTriggerTime = mServerTariffAttrsCtx.dayEntriesUpdDelay;
+        mServerTariffAttrsCtx.dayEntriesUpdDelay = 0;        
+
+        ChipLogDetail(NotSpecified,
+            "ForceDayEntriesAttrsUpdate:\n \
+            current day entry: %u,\n \
+            current day entry date: %d,\n \
+            next day entry date: %d,\n \
+            now ts %d,\n \
+            since midnight: %d",
+            mCurrentDayEntry.Value().dayEntryID,
+            mCurrentDayEntryDate.Value(),
+            mNextDayEntryDate.Value(),
+            mServerTariffAttrsCtx.forwardAlarmTriggerTime,
+            static_cast<uint32_t>(mServerTariffAttrsCtx.forwardAlarmTriggerTime % kSecondsPerDay) );
+        if ( mServerTariffAttrsCtx.forwardAlarmTriggerTime - mCurrentDay.Value().date >= kSecondsPerDay)
+        {
+            UpdateCurrentAttrs(UpdateEventCode::DaysUpdating);                
+        }
+        else
+        {
+            UpdateCurrentAttrs(UpdateEventCode::DayEntryUpdating);   
+        }
     }
-
-    const uint32_t now                  = GetCurrentTimestamp();
-    const uint16_t minutesSinceMidnight = static_cast<uint16_t>((now % kSecondsPerDay) / 60);
-    const auto & currentEntry           = mCurrentDayEntry.Value();
-
-    // Calculate end time of current entry
-    uint16_t entryEndTime = 0;
-    if (currentEntry.duration.HasValue())
-    {
-        // Case 1: Entry has explicit duration
-        entryEndTime = currentEntry.startTime + currentEntry.duration.Value();
-    }
-    else if (!mNextDayEntry.IsNull())
-    {
-        // Case 2: Use next entry's start time as our end time
-        entryEndTime = mNextDayEntry.Value().startTime;
-    }
-    else
-    {
-        // Case 3: Default to end of day if no duration or next entry
-        entryEndTime = kDayEntryDurationLimit;
-    }
-
-    // Calculate seconds remaining in current entry
-    const uint16_t minutesRemaining               = (entryEndTime >= minutesSinceMidnight)
-                      ? (entryEndTime - minutesSinceMidnight)
-                      : ((kSecondsPerDay / 60 - minutesSinceMidnight) + entryEndTime);
-    mServerTariffAttrsCtx.forwardAlarmTriggerTime = now + (minutesRemaining * 60);
-
-    // Determine update type based on whether we're crossing day boundary
-    const bool isNewDayTransition =
-        (mServerTariffAttrsCtx.forwardAlarmTriggerTime - mCurrentDayEntryDate.Value()) >= kSecondsPerDay;
-    const UpdateEventCode updateType = isNewDayTransition ? UpdateEventCode::DaysUpdating : UpdateEventCode::DayEntryUpdating;
-
-    ChipLogDetail(NotSpecified, "ForceDayEntriesAttrsUpdate: Triggering %s update in %u minutes",
-                  isNewDayTransition ? "day" : "entry", minutesRemaining);
-
-    UpdateCurrentAttrs(updateType);
 }
 
 } // namespace CommodityTariff

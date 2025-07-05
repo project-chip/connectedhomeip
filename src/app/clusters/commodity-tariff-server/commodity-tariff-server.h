@@ -33,6 +33,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/StatusIB.h>
 #include <app/reporting/reporting.h>
+#include <cstdint>
 
 #include "CommodityTariffAttrsDataMgmt.h"
 
@@ -335,6 +336,7 @@ struct CurrentTariffAttrsCtx
     std::map<uint32_t, const Structs::DayEntryStruct::Type *> DayEntriesMap;
     std::map<uint32_t, const Structs::TariffComponentStruct::Type *> TariffComponentsMap;
 
+    uint32_t dayEntriesUpdDelay;
     uint32_t forwardAlarmTriggerTime;
 };
 
