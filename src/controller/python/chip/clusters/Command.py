@@ -293,7 +293,7 @@ def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(future: Future, eventLo
 
 async def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPath: CommandPath, payload: ClusterCommand,
                       timedRequestTimeoutMs: Union[None, int] = None, interactionTimeoutMs: Union[None, int] = None,
-                      busyWaitMs: Union[None, int] = None, suppressResponse: Union[None, bool] = None) -> PyChipError:
+                      busyWaitMs: Union[None, int] = None, suppressResponse: Union[None, bool] = None, allowLargePayload: Union[None, bool] = None) -> PyChipError:
     ''' Send a cluster-object encapsulated command to a device and does the following:
             - On receipt of a successful data response, returns the cluster-object equivalent through the provided future.
             - None (on a successful response containing no data)
@@ -323,7 +323,8 @@ async def SendCommand(future: Future, eventLoop, responseType: Type, device, com
             commandPath.ClusterId, commandPath.CommandId, payloadTLV, len(payloadTLV),
             ctypes.c_uint16(0 if interactionTimeoutMs is None else interactionTimeoutMs),
             ctypes.c_uint16(0 if busyWaitMs is None else busyWaitMs),
-            ctypes.c_bool(False if suppressResponse is None else suppressResponse)
+            ctypes.c_bool(False if suppressResponse is None else suppressResponse),
+            ctypes.c_bool(False if allowLargePayload is None else allowLargePayload)
         ))
 
 
@@ -467,7 +468,7 @@ def Init():
         setter = NativeLibraryHandleMethodArguments(handle)
 
         setter.Set('pychip_CommandSender_SendCommand',
-                   PyChipError, [py_object, c_void_p, c_uint16, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16, c_uint16, c_bool])
+                   PyChipError, [py_object, c_void_p, c_uint16, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16, c_uint16, c_bool, c_bool])
         setter.Set('pychip_CommandSender_SendBatchCommands',
                    PyChipError, [py_object, c_void_p, c_uint16, c_uint16, c_uint16, c_bool, POINTER(PyInvokeRequestData), c_size_t])
         setter.Set('pychip_CommandSender_TestOnlySendBatchCommands',
