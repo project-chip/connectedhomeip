@@ -1,13 +1,13 @@
 |                                         |   Pass Rate |
 |:----------------------------------------|------------:|
-| tests                                   |          88 |
-| cancel-workflows-on-failing-ci          |          98 |
-| build-example-telink                    |         100 |
+| tests                                   |          62 |
 | codeql                                  |         100 |
+| build-example-telink                    |         100 |
+| build-example-esp32                     |         100 |
 | tv-casting-example-darwin               |         100 |
 | lint-code-base                          |         100 |
 | darwin-tests                            |         100 |
-| build-example-esp32                     |         100 |
+| darwin                                  |         100 |
 | minimal-build-linux-configure           |         100 |
 | full-builds-android                     |         100 |
 | build-example-linux-standalone          |         100 |
@@ -15,7 +15,8 @@
 | build-example-efr32                     |         100 |
 | build-example-ti-cc32xx                 |         100 |
 | build-example-linux-arm                 |         100 |
-| darwin                                  |         100 |
+| bloat-check                             |         100 |
+| mypy-type-validation                    |         100 |
 | build-example-infineon                  |         100 |
 | builds                                  |         100 |
 | build-example-nuttx                     |         100 |
@@ -31,13 +32,13 @@
 | build-example-nrf-connect-sdk           |         100 |
 | delete-old-artifacts                    |         100 |
 | build-example-tizen                     |         100 |
-| bloat-check                             |         100 |
 | zap                                     |         100 |
 | build-example-asr                       |         100 |
-| build-example-ameba                     |         100 |
 | issue-labeler                           |         100 |
+| build-example-ameba                     |         100 |
 | build-example-nxp                       |         100 |
 | process-stale-issues-and-prs            |         100 |
 | build-example-i-mx-linux                |         100 |
 | build-chef-ci-examples-on-all-platforms |         100 |
+| cancel-workflows-on-failing-ci          |         100 |
 | test-tv-casting-example                 |         100 |
