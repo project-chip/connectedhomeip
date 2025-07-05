@@ -24,7 +24,6 @@
 #include <app/InteractionModelEngine.h>
 #include <app/clusters/zone-management-server/zone-management-server.h>
 #include <app/reporting/reporting.h>
-#include <app/util/attribute-storage.h>
 #include <app/util/util.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
@@ -77,18 +76,6 @@ CHIP_ERROR ZoneMgmtServer::Init()
                             ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxUserDefinedZones configuration error", mEndpointId));
         VerifyOrReturnError(mMaxZones >= mMaxUserDefinedZones, CHIP_ERROR_INVALID_ARGUMENT,
                             ChipLogError(Zcl, "ZoneManagement[ep=%d]: MaxZones configuration error", mEndpointId));
-        int mfgCount = 0;
-        for (const auto & zone : mZones)
-        {
-            if (zone.zoneSource == ZoneSourceEnum::kMfg)
-            {
-                mfgCount++;
-            }
-        }
-        VerifyOrReturnError(mfgCount == (mMaxZones - mMaxUserDefinedZones), CHIP_ERROR_INVALID_ARGUMENT,
-                            ChipLogError(Zcl,
-                                         "ZoneManagement[ep=%d]: MfgZones + MaxUserDefinedZones must be equal to MaxZones count",
-                                         mEndpointId));
     }
     else
     {
