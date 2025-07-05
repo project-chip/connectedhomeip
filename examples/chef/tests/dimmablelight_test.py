@@ -27,7 +27,7 @@ class TC_DIMMABLELIGHT(MatterBaseTest):
     """Tests for chef dimmablelight device."""
 
     def desc_TC_DIMMABLELIGHT(self) -> str:
-        return "[TC_DIMMABLELIGHT] chef dimmablelight fnuctionality tesst."
+        return "[TC_DIMMABLELIGHT] chef dimmablelight functionality test."
 
     def steps_TC_DIMMABLELIGHT(self):
         return [TestStep(1, "[TC_DIMMABLELIGHT] Commissioning already done.", is_commissioning=True)]
