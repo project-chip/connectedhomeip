@@ -23,6 +23,7 @@
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/clusters/chime-server/chime-server.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
+#include <app/clusters/zone-management-server/zone-management-server.h>
 
 using chip::app::Clusters::CameraAvStreamManagement::AudioCapabilitiesStruct;
 using chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct;
@@ -127,6 +128,9 @@ public:
 
     // Getter for CameraAVSettingsUserLevelManagement Delegate
     virtual chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() = 0;
+
+    // Getter for ZoneManagement Delegate
+    virtual chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() = 0;
 
     // Getter for the Media Controller
     virtual MediaController & GetMediaController() = 0;
@@ -340,6 +344,58 @@ public:
         virtual int16_t GetTiltMin() = 0;
         virtual int16_t GetTiltMax() = 0;
         virtual uint8_t GetZoomMax() = 0;
+
+        // Get the maximum number of zones supported by camera.
+        virtual uint8_t GetMaxZones() = 0;
+
+        // Get the maximum number of user-defined zones supported by camera.
+        virtual uint8_t GetMaxUserDefinedZones() = 0;
+
+        // Get the maximum sensitivity level supported by camera.
+        virtual uint8_t GetSensitivityMax() = 0;
+
+        // Get/Set the Zone Detection sensitivity(1 to SensitivityMax)
+        virtual uint8_t GetDetectionSensitivity()                         = 0;
+        virtual CameraError SetDetectionSensitivity(uint8_t aSensitivity) = 0;
+
+        // Create a zone trigger
+        virtual CameraError
+        CreateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) = 0;
+
+        // Update a zone trigger
+        virtual CameraError
+        UpdateZoneTrigger(const chip::app::Clusters::ZoneManagement::ZoneTriggerControlStruct & zoneTrigger) = 0;
+
+        // Remove a zone trigger
+        virtual CameraError RemoveZoneTrigger(uint16_t zoneID) = 0;
+
+        class ZoneEventCallback
+        {
+        public:
+            virtual ~ZoneEventCallback() = default;
+
+            /*
+             * Callback for ZoneTriggered event. This notification callback
+             * would be called by the camera-device to generate and Log a
+             * ZoneTriggered event.
+             */
+            virtual void OnZoneTriggeredEvent(uint16_t zoneId,
+                                              chip::app::Clusters::ZoneManagement::ZoneEventTriggeredReasonEnum triggerReason)
+            {
+                return;
+            }
+
+            /*
+             * Callback for ZoneStopped event. This notification callback
+             * would be called by the camera-device to generate and Log a
+             * ZoneStopped event.
+             */
+            virtual void OnZoneStoppedEvent(uint16_t zoneId,
+                                            chip::app::Clusters::ZoneManagement::ZoneEventStoppedReasonEnum stopReason)
+            {
+                return;
+            }
+        };
     };
 
     virtual CameraHALInterface & GetCameraHALInterface() = 0;
