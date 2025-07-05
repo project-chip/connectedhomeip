@@ -272,9 +272,8 @@ public:
     /**
      * @brief Initialise the Zone Management server instance.
      * This function must be called after defining a ZoneMgmtServer class object.
-     * @return Returns an error if the given endpoint and cluster ID have not been enabled in zap or if the
-     * CommandHandler or AttributeHandler registration fails, else returns CHIP_NO_ERROR.
-     * This method also checks if the feature setting is valid, if invalid it will return CHIP_ERROR_INVALID_ARGUMENT.
+     * @return Returns an error if some of the constraint/feature validation checks fail or
+     * the CommandHandler or AttributeHandler registration fails, else returns CHIP_NO_ERROR.
      */
     CHIP_ERROR Init();
 
@@ -303,7 +302,7 @@ public:
     Protocols::InteractionModel::Status AddOrUpdateTrigger(const ZoneTriggerControlStruct & trigger);
     Protocols::InteractionModel::Status RemoveTrigger(uint16_t zoneId);
 
-    // Send Zone events
+    // Generate Zone events
     Protocols::InteractionModel::Status GenerateZoneTriggeredEvent(uint16_t zoneID, ZoneEventTriggeredReasonEnum triggerReason);
     Protocols::InteractionModel::Status GenerateZoneStoppedEvent(uint16_t zoneID, ZoneEventStoppedReasonEnum stopReason);
 
@@ -322,7 +321,7 @@ private:
 
     std::vector<ZoneInformationStorage> mZones;
     std::vector<ZoneTriggerControlStruct> mTriggers;
-    uint8_t mSensitivity;
+    uint8_t mSensitivity = 0;
 
     /**
      * IM-level implementation of read
