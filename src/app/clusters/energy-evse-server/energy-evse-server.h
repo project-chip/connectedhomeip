@@ -185,7 +185,11 @@ public:
         mDelegate.SetEndpointId(aEndpointId);
         mDelegate.SetInstance(this);
     }
-    ~Instance() { Shutdown(); }
+    ~Instance()
+    {
+        mDelegate.SetInstance(nullptr);
+        Shutdown();
+    }
 
     CHIP_ERROR Init();
     void Shutdown();
