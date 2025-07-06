@@ -323,7 +323,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("9")
         # Wait 7 seconds
-        self.debug("Waiting for 7 seconds for discharge timer to expire")
+        logger.info("Waiting for 7 seconds for discharge timer to expire")
         time.sleep(7)
 
         self.step("9a")
@@ -359,7 +359,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("10")
         # Wait 5 seconds
-        self.debug("Waiting for 5 seconds for charging timer to expire")
+        logger.info("Waiting for 5 seconds for charging timer to expire")
         time.sleep(5)
 
         self.step("10a")
