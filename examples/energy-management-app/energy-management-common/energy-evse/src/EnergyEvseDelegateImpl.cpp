@@ -220,9 +220,14 @@ void EnergyEvseDelegate::HandleEnabledStateExpiration(uint32_t matterEpoch)
         ComputeMaxChargeCurrentLimit();
 
         // Change to discharging-only if discharging is still enabled
-        if (!dischargingEnabledUntil.IsNull() && !dischargingExpired)
+        if (!dischargingExpired)
         {
             SetSupplyState(SupplyStateEnum::kDischargingEnabled);
+        }
+        else
+        {
+            // If both charging and discharging have expired, disable the EVSE
+            Disable();
         }
     }
 
@@ -236,16 +241,15 @@ void EnergyEvseDelegate::HandleEnabledStateExpiration(uint32_t matterEpoch)
         ComputeMaxDischargeCurrentLimit();
 
         // Change to charging-only if charging is still enabled
-        if (!chargingEnabledUntil.IsNull() && !chargingExpired)
+        if (!chargingExpired)
         {
             SetSupplyState(SupplyStateEnum::kChargingEnabled);
         }
-    }
-
-    // If both expired or are now null, disable the EVSE
-    if (GetChargingEnabledUntil().IsNull() && GetDischargingEnabledUntil().IsNull())
-    {
-        Disable();
+        else
+        {
+            // If both charging and discharging have expired, disable the EVSE
+            Disable();
+        }
     }
 }
 
@@ -320,6 +324,9 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
     else if (mSupplyState == SupplyStateEnum::kEnabled)
     {
         HandleEnabledStateExpiration(matterEpoch);
+        // Call ourselves again now that one of our 2 timers has expired
+        // The other timer expiry may need to be scheduled now
+        ScheduleCheckOnEnabledTimeout();
     }
 
     return Status::Success;
@@ -916,6 +923,9 @@ Status EnergyEvseDelegate::HandleEVDemandEvent()
          * but we can't charge or discharge now - leave it as kPluggedInDemand */
         SetState(StateEnum::kPluggedInDemand);
         break;
+    case SupplyStateEnum::kUnknownEnumValue:
+        ChipLogError(AppServer, "EVSE: HandleEVDemandEvent called in unexpected SupplyState");
+        return Status::Failure;
     default:
         break;
     }
@@ -947,8 +957,29 @@ Status EnergyEvseDelegate::HandleChargingEnabledEvent()
         return status;
     }
 
-    /* update SupplyState to say that charging is now enabled */
-    SetSupplyState(SupplyStateEnum::kChargingEnabled);
+    switch (mSupplyState)
+    {
+    case SupplyStateEnum::kDisabled:
+        // it was kDisabled, then the state becomes kChargingEnabled
+        SetSupplyState(SupplyStateEnum::kChargingEnabled);
+        break;
+    case SupplyStateEnum::kChargingEnabled:
+        // No change
+        break;
+    case SupplyStateEnum::kDischargingEnabled:
+        // If the SupplyState was already kChargingEnabled the state becomes kEnabled
+        SetSupplyState(SupplyStateEnum::kEnabled);
+        break;
+    case SupplyStateEnum::kDisabledError:
+    case SupplyStateEnum::kDisabledDiagnostics:
+        break;
+    case SupplyStateEnum::kEnabled:
+        // No change
+        break;
+    case SupplyStateEnum::kUnknownEnumValue:
+        ChipLogError(AppServer, "EVSE: ChargingEnabledEvent called in unexpected SupplyState");
+        return Status::Failure;
+    }
 
     switch (mState)
     {
@@ -961,14 +992,11 @@ Status EnergyEvseDelegate::HandleChargingEnabledEvent()
         SendEnergyTransferStartedEvent();
         break;
     case StateEnum::kPluggedInCharging:
-        break;
     case StateEnum::kPluggedInDischarging:
-        /* Switched from discharging to charging */
-        SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVSEStopped);
-
-        ComputeMaxChargeCurrentLimit();
-        SetState(StateEnum::kPluggedInCharging);
-        SendEnergyTransferStartedEvent();
+        /* Switching from Discharging to Charging is controlled via PowerAdjust
+           command from DEM - we don't do anything specific here
+           and we do not send EnergyTransferStopped and StartedEvents when switching
+           from Discharging to Charging and vice-versa. */
         break;
     default:
         break;
@@ -987,17 +1015,28 @@ Status EnergyEvseDelegate::HandleDischargingEnabledEvent()
         return status;
     }
 
-    /* update SupplyState
-     If the SupplyState was already kChargingEnabled the state becomes kEnabled
-     else if it was kDisabled, then the state becomes kDischargingEnabled
-     */
-    if (mSupplyState == SupplyStateEnum::kChargingEnabled)
+    switch (mSupplyState)
     {
-        SetSupplyState(SupplyStateEnum::kEnabled);
-    }
-    else if (mSupplyState == SupplyStateEnum::kDisabled)
-    {
+    case SupplyStateEnum::kDisabled:
+        // it was kDisabled, then the state becomes kDischargingEnabled
         SetSupplyState(SupplyStateEnum::kDischargingEnabled);
+        break;
+    case SupplyStateEnum::kChargingEnabled:
+        // If the SupplyState was already kChargingEnabled the state becomes kEnabled
+        SetSupplyState(SupplyStateEnum::kEnabled);
+        break;
+    case SupplyStateEnum::kDischargingEnabled:
+        // No change
+        break;
+    case SupplyStateEnum::kDisabledError:
+    case SupplyStateEnum::kDisabledDiagnostics:
+        break;
+    case SupplyStateEnum::kEnabled:
+        // No change
+        break;
+    case SupplyStateEnum::kUnknownEnumValue:
+        ChipLogError(AppServer, "EVSE: DischargingEnabledEvent called in unexpected SupplyState");
+        return Status::Failure;
     }
 
     switch (mState)
@@ -1006,17 +1045,10 @@ Status EnergyEvseDelegate::HandleDischargingEnabledEvent()
     case StateEnum::kPluggedInNoDemand:
         break;
     case StateEnum::kPluggedInDemand:
-        ComputeMaxDischargeCurrentLimit();
-        SetState(StateEnum::kPluggedInDischarging);
-        SendEnergyTransferStartedEvent(); // TODO lookat this - should we send this?
-        break;
     case StateEnum::kPluggedInCharging:
-        /* Switched from charging to discharging */ // TODO look at this - should we send this?
-        SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVSEStopped);
-
+        /* Discharging is controlled from DEM PowerAdjust command - we don't change state here or send events here */
         ComputeMaxDischargeCurrentLimit();
-        SetState(StateEnum::kPluggedInDischarging);
-        SendEnergyTransferStartedEvent();
+        ComputeMaxDischargeCurrentLimit();
         break;
     case StateEnum::kPluggedInDischarging:
     default:
@@ -1036,7 +1068,7 @@ Status EnergyEvseDelegate::HandleDisabledEvent()
         return status;
     }
 
-    /* update SupplyState to say that charging is now disabled */
+    /* update SupplyState to disabled */
     SetSupplyState(SupplyStateEnum::kDisabled);
 
     switch (mState)
