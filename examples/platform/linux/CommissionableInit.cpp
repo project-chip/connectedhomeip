@@ -41,9 +41,15 @@ template <typename T>
 CHIP_ERROR ReadOptionalConfigValue(PosixConfig::Key key, Optional<T> & outValue)
 {
     CHIP_ERROR err = PosixConfig::ReadConfigValue(key, outValue.Emplace());
-    VerifyOrReturnError(IsNotFound(err), err);
-    outValue.ClearValue();
-    return CHIP_NO_ERROR;
+    if (err != CHIP_NO_ERROR)
+    {
+        outValue.ClearValue();
+        if (IsNotFound(err))
+        {
+            err = CHIP_NO_ERROR; // value is optional, not found is OK
+        }
+    }
+    return err;
 }
 
 CHIP_ERROR ReadOptionalConfigValueBin(PosixConfig::Key key, size_t bufSize, chip::Optional<std::vector<uint8_t>> & outValue)
@@ -58,9 +64,12 @@ CHIP_ERROR ReadOptionalConfigValueBin(PosixConfig::Key key, size_t bufSize, chip
     else
     {
         outValue.ClearValue();
-        VerifyOrReturnError(IsNotFound(err), err);
+        if (IsNotFound(err))
+        {
+            err = CHIP_NO_ERROR; // value is optional, not found is OK
+        }
     }
-    return CHIP_NO_ERROR;
+    return err;
 }
 
 CHIP_ERROR GetPinCodeAndVerifier(const LinuxDeviceOptions & options, chip::Optional<uint32_t> & outPinCode,
