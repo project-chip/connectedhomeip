@@ -194,8 +194,7 @@ static bool IsTimeExpired(const DataModel::Nullable<uint32_t> & timeValue, uint3
  * (either charging or discharging) and the timer expires.
  * It checks if the charging or discharging enabled times have expired
  * and updates the EVSE state accordingly.
- * If both charging and discharging have expired or are null,
- * it disables the EVSE.
+ * If both charging and discharging have expired or are Zero, it disables the EVSE.
  * If only one has expired, it updates the state to the other enabled state.
  * If both are still valid, it does nothing.
  */
@@ -967,7 +966,7 @@ Status EnergyEvseDelegate::HandleChargingEnabledEvent()
         // No change
         break;
     case SupplyStateEnum::kDischargingEnabled:
-        // If the SupplyState was already kChargingEnabled the state becomes kEnabled
+        // If the SupplyState was already kDischargingEnabled the state becomes kEnabled
         SetSupplyState(SupplyStateEnum::kEnabled);
         break;
     case SupplyStateEnum::kDisabledError:
