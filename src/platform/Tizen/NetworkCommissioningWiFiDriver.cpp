@@ -49,13 +49,13 @@ CHIP_ERROR TizenWiFiDriver::Init(BaseDriver::NetworkStatusChangeCallback * netwo
 
     err = PersistedStorage::KeyValueStoreMgr().Get(kWiFiCredentialsKeyName, mSavedNetwork.credentials,
                                                    sizeof(mSavedNetwork.credentials), &credentialsLen);
-    if (err == CHIP_ERROR_NOT_FOUND)
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         return CHIP_NO_ERROR;
     }
 
     err = PersistedStorage::KeyValueStoreMgr().Get(kWiFiSSIDKeyName, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid), &ssidLen);
-    if (err == CHIP_ERROR_NOT_FOUND)
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
         return CHIP_NO_ERROR;
     }

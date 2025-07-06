@@ -252,6 +252,8 @@ jobs:
                         --target linux-x64-microwave-oven-${BUILD_VARIANT} \
                         --target linux-x64-rvc-${BUILD_VARIANT} \
                         --target linux-x64-network-manager-${BUILD_VARIANT} \
+                        --target linux-x64-energy-gateway-${BUILD_VARIANT} \
+                        --target linux-x64-energy-management-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -275,6 +277,8 @@ jobs:
                      --microwave-oven-app ./out/linux-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
                      --rvc-app ./out/linux-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
                      --network-manager-app ./out/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --energy-gateway-app ./out/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+                     --energy-management-app ./out/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
@@ -317,6 +321,8 @@ jobs:
                      --microwave-oven-app ./out/linux-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
                      --rvc-app ./out/linux-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
                      --network-manager-app ./out/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --energy-gateway-app ./out/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+                     --energy-management-app ./out/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
             - name: Run Tests using chip-repl (including slow)
               if: github.event_name == 'push'
@@ -337,6 +343,8 @@ jobs:
                      --microwave-oven-app ./out/linux-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
                      --rvc-app ./out/linux-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
                      --network-manager-app ./out/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --energy-gateway-app ./out/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+                     --energy-management-app ./out/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
             - name: Uploading core files
               uses: actions/upload-artifact@v4
@@ -404,6 +412,8 @@ jobs:
                         --target darwin-x64-microwave-oven-${BUILD_VARIANT} \
                         --target darwin-x64-rvc-${BUILD_VARIANT} \
                         --target darwin-x64-network-manager-${BUILD_VARIANT} \
+                        --target darwin-x64-energy-gateway-${BUILD_VARIANT} \
+                        --target darwin-x64-energy-management-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -428,6 +438,8 @@ jobs:
                      --microwave-oven-app ./out/darwin-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
                      --rvc-app ./out/darwin-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
                      --network-manager-app ./out/darwin-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --energy-gateway-app ./out/darwin-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+                     --energy-management-app ./out/darwin-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
@@ -637,9 +649,9 @@ jobs:
             - name: Build linux-x64-python-bindings
               run: >-
                   ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
-                  --target linux-x64-python-bindings
+                  --target linux-x64-python-bindings-webrtc
                   build --copy-artifacts-to objdir-clone
-                  && rm -rf out/linux-x64-python-bindings"
+                  && rm -rf out/linux-x64-python-bindings-webrtc"
 
             # TODO: JS admin app app needs variants (probably)
             - name: Build linux-x64-jf-control-app
