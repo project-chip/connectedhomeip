@@ -70,12 +70,20 @@ class EEVSEBaseTestHelper:
     async def send_enable_charge_command(self, endpoint: int = None, charge_until: int = None, timedRequestTimeoutMs: int = 3000,
                                          min_charge: int = 6000, max_charge: int = 32000, expected_status: Status = Status.Success):
         try:
-            await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.EnableCharging(
-                chargingEnabledUntil=charge_until,
-                minimumChargeCurrent=min_charge,
-                maximumChargeCurrent=max_charge),
-                endpoint=endpoint,
-                timedRequestTimeoutMs=timedRequestTimeoutMs)
+            if (charge_until is None):
+                # Omit the chargingEnabledUntil field
+                await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.EnableCharging(
+                    minimumChargeCurrent=min_charge,
+                    maximumChargeCurrent=max_charge),
+                    endpoint=endpoint,
+                    timedRequestTimeoutMs=timedRequestTimeoutMs)
+            else:
+                await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.EnableCharging(
+                    chargingEnabledUntil=charge_until,
+                    minimumChargeCurrent=min_charge,
+                    maximumChargeCurrent=max_charge),
+                    endpoint=endpoint,
+                    timedRequestTimeoutMs=timedRequestTimeoutMs)
 
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status,
@@ -84,11 +92,18 @@ class EEVSEBaseTestHelper:
     async def send_enable_discharge_command(self, endpoint: int = None, discharge_until: int = None, timedRequestTimeoutMs: int = 3000,
                                             max_discharge: int = 32000, expected_status: Status = Status.Success):
         try:
-            await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.EnableDischarging(
-                dischargingEnabledUntil=discharge_until,
-                maximumDischargeCurrent=max_discharge),
-                endpoint=endpoint,
-                timedRequestTimeoutMs=timedRequestTimeoutMs)
+            if (discharge_until is None):
+                # Omit the dischargingEnabledUntil field
+                await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.EnableDischarging(
+                    maximumDischargeCurrent=max_discharge),
+                    endpoint=endpoint,
+                    timedRequestTimeoutMs=timedRequestTimeoutMs)
+            else:
+                await self.send_single_cmd(cmd=Clusters.EnergyEvse.Commands.EnableDischarging(
+                    dischargingEnabledUntil=discharge_until,
+                    maximumDischargeCurrent=max_discharge),
+                    endpoint=endpoint,
+                    timedRequestTimeoutMs=timedRequestTimeoutMs)
 
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status,
