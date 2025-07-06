@@ -62,7 +62,6 @@ Status EnergyEvseDelegate::Disable()
 
     /* update MaximumDischargeCurrent to 0 */
     mMaximumDischargingCurrentLimitFromCommand = 0;
-    SetMaximumDischargeCurrent(0);
     ComputeMaxDischargeCurrentLimit();
 
     return HandleStateMachineEvent(EVSEStateMachineEvent::DisabledEvent);
@@ -211,7 +210,15 @@ void EnergyEvseDelegate::HandleEnabledStateExpiration(uint32_t matterEpoch)
 
     if (chargingExpired)
     {
-        SetChargingEnabledUntil(DataModel::Nullable<uint32_t>()); // set to null
+        // set to zero to indicate disabled
+        SetChargingEnabledUntil(DataModel::Nullable<uint32_t>(0));
+
+        // update MinimumChargeCurrent & MaximumChargeCurrent to 0
+        SetMinimumChargeCurrent(0);
+
+        mMaximumChargingCurrentLimitFromCommand = 0;
+        ComputeMaxChargeCurrentLimit();
+
         // Change to discharging-only if discharging is still enabled
         if (!dischargingEnabledUntil.IsNull() && !dischargingExpired)
         {
@@ -221,7 +228,13 @@ void EnergyEvseDelegate::HandleEnabledStateExpiration(uint32_t matterEpoch)
 
     if (dischargingExpired)
     {
-        SetDischargingEnabledUntil(DataModel::Nullable<uint32_t>()); // set to null
+        // set to zero to indicate disabled
+        SetDischargingEnabledUntil(DataModel::Nullable<uint32_t>(0));
+
+        // update MaximumDischargeCurrent to 0
+        mMaximumDischargingCurrentLimitFromCommand = 0;
+        ComputeMaxDischargeCurrentLimit();
+
         // Change to charging-only if charging is still enabled
         if (!chargingEnabledUntil.IsNull() && !chargingExpired)
         {
@@ -882,6 +895,18 @@ Status EnergyEvseDelegate::HandleEVDemandEvent()
     case SupplyStateEnum::kDischargingEnabled:
         ComputeMaxDischargeCurrentLimit();
         SetState(StateEnum::kPluggedInDischarging);
+        SendEnergyTransferStartedEvent();
+        break;
+    case SupplyStateEnum::kEnabled:
+        /* We are enabled for both charging and discharging
+        since the vehicle is asking for demand, we should start charging
+        NOTE: for discharging the PowerAdjustment feature of DEM is used.
+        This assumes we are not in TimeOfUse mode and charging should begin
+        as soon as the vehicle asks for demand.
+        */
+        ComputeMaxChargeCurrentLimit();
+        ComputeMaxDischargeCurrentLimit();
+        SetState(StateEnum::kPluggedInCharging);
         SendEnergyTransferStartedEvent();
         break;
     case SupplyStateEnum::kDisabled:
