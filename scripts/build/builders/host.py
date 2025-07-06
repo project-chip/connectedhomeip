@@ -509,6 +509,7 @@ class HostBuilder(GnBuilder):
 
         if enable_webrtc:
             self.extra_gn_options.append('chip_support_webrtc_python_bindings=true')
+            self.extra_gn_options.append('chip_build_controller_dynamic_server=true')
 
         if terms_and_conditions_required is not None:
             if terms_and_conditions_required:

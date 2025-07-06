@@ -75,7 +75,6 @@ PyChipError WebRTCTransportProviderClient::SendCommand(void * appContext, uint16
 void WebRTCTransportProviderClient::OnResponse(chip::app::CommandSender * client, const chip::app::ConcreteCommandPath & path,
                                                const chip::app::StatusIB & status, chip::TLV::TLVReader * data)
 {
-    MoveToState(State::Idle);
     ChipLogProgress(Camera, "WebRTCTransportProviderClient: OnResponse received for cluster: 0x%" PRIx32 " command: 0x%" PRIx32,
                     path.mClusterId, path.mCommandId);
 
@@ -138,13 +137,11 @@ void WebRTCTransportProviderClient::OnResponse(chip::app::CommandSender * client
         gOnCommandSenderResponseCallback(
             mAppContext, path.mEndpointId, path.mClusterId, path.mCommandId, 0, to_underlying(status.mStatus),
             status.mClusterStatus.has_value() ? *status.mClusterStatus : kUndefinedClusterStatus, buffer, size);
-        mAppContext = nullptr;
     }
 }
 
 void WebRTCTransportProviderClient::OnError(const chip::app::CommandSender * client, CHIP_ERROR error)
 {
-    MoveToState(State::Idle);
     ChipLogError(Camera, "WebRTCTransportProviderClient: OnError for command %u: %" CHIP_ERROR_FORMAT,
                  static_cast<unsigned>(mCommandType), error.Format());
     StatusIB status(error);
@@ -158,7 +155,6 @@ void WebRTCTransportProviderClient::OnError(const chip::app::CommandSender * cli
                                       // exception.
                                       error.IsIMStatus() ? ToPyChipError(CHIP_NO_ERROR) : ToPyChipError(error));
     }
-    mAppContext = nullptr;
 }
 
 void WebRTCTransportProviderClient::OnDone(chip::app::CommandSender * client)
@@ -169,6 +165,7 @@ void WebRTCTransportProviderClient::OnDone(chip::app::CommandSender * client)
     {
         gOnCommandSenderDoneCallback(mAppContext);
     }
+    // Reset python closure
     mAppContext = nullptr;
     // Reset command type, free up the CommandSender
     mCommandType = CommandType::kUndefined;
