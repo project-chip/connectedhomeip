@@ -144,7 +144,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("11f", "TH reads from the DUT the MaximumDischargeCurrent",
                      "Value has to be minimum value of MaximumDischargeCurrent and CircuitCapacity"),
             TestStep("12", "TH sends command Disable",
-                     "Verify DUT responds w/ status SUCCESS(0x00)"),
+                     "Verify DUT responds w/ status SUCCESS(0x00) and event EnergyTransferStopped sent with reason EvseStopped"),
             TestStep("12a", "TH reads from the DUT the SupplyState",
                      "Value has to be 0x00 (Disabled)"),
             TestStep("12b", "TH reads from the DUT the ChargingEnabledUntil",
@@ -428,8 +428,14 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("12")
         # TH sends command Disable
-        # Verify DUT responds w/ status SUCCESS(0x00)
+        # Verify DUT responds w/ status SUCCESS(0x00) and
+        # event EnergyTransferStopped sent with reason EvseStopped
         await self.send_disable_command()
+        event_data = events_callback.wait_for_event_report(
+            Clusters.EnergyEvse.Events.EnergyTransferStopped)
+        expected_reason = Clusters.EnergyEvse.Enums.EnergyTransferStoppedReasonEnum.kEVSEStopped
+        asserts.assert_equal(expected_reason, event_data.reason,
+                             f"EnergyTransferStopped event reason was {event_data.reason}, expected {expected_reason}")
 
         self.step("12a")
         # TH reads from the DUT the SupplyState
