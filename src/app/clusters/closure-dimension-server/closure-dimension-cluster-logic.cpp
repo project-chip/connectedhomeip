@@ -735,7 +735,7 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     {
         if (currentState.Value().latch.HasValue() && !currentState.Value().latch.Value().IsNull())
         {
-            VerifyOrReturnError(!currentState.Value().latch.Value().Value(), Status::InvalidInState, 
+            VerifyOrReturnError(!currentState.Value().latch.Value().Value(), Status::InvalidInState,
                                ChipLogError(AppServer, "Step command cannot be processed when current latch is True"));
         }
         // Return InvalidInState if currentState is latched
