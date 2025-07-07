@@ -67,7 +67,7 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
                         CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(Zcl,
                                      "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. At least one of "
-                                     "Pan, Tilt, Zoom or Digital PTZ must be supported",
+                                     "Mechanical Pan, Tilt, Zoom or Digital PTZ must be supported",
                                      mEndpointId));
 
     // All of the attributes are dependent on Feature Flags being set, ensure that this is the case
