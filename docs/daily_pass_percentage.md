@@ -1,13 +1,13 @@
 |                                         |   Pass Rate |
 |:----------------------------------------|------------:|
-| tests                                   |          62 |
-| codeql                                  |         100 |
+| recent-fail-summary                     |           0 |
+| tests                                   |          50 |
 | build-example-telink                    |         100 |
-| build-example-esp32                     |         100 |
+| codeql                                  |         100 |
 | tv-casting-example-darwin               |         100 |
 | lint-code-base                          |         100 |
 | darwin-tests                            |         100 |
-| darwin                                  |         100 |
+| build-example-esp32                     |         100 |
 | minimal-build-linux-configure           |         100 |
 | full-builds-android                     |         100 |
 | build-example-linux-standalone          |         100 |
@@ -15,13 +15,12 @@
 | build-example-efr32                     |         100 |
 | build-example-ti-cc32xx                 |         100 |
 | build-example-linux-arm                 |         100 |
+| darwin                                  |         100 |
 | bloat-check                             |         100 |
-| mypy-type-validation                    |         100 |
 | build-example-infineon                  |         100 |
-| builds                                  |         100 |
 | build-example-nuttx                     |         100 |
+| builds                                  |         100 |
 | build-example-stm32                     |         100 |
-| recent-fail-summary                     |         100 |
 | unit-integration-tests                  |         100 |
 | build-example-bouffalolab               |         100 |
 | build-example-qpg                       |         100 |
