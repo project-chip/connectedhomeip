@@ -108,9 +108,9 @@ class TC_CLDIM_4_2(MatterBaseTest):
             attribute=attributes.FeatureMap
         )
 
-        is_positioning_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
-        is_latching_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
-        is_speed_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
+        is_positioning_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
+        is_latching_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
+        is_speed_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
 
         # STEP 2b: If Positioning feature is not supported, skip remaining steps
         self.step("2b")
