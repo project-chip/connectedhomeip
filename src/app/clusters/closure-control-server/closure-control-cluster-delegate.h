@@ -64,17 +64,6 @@ public:
     virtual Protocols::InteractionModel::Status HandleCalibrateCommand() = 0;
 
     /**
-     * @brief This function returns the current error at the specified index of CurrentErrorList.
-     *
-     * @param [in] index Index of the error to be retrieved
-     * @param [out] closureError Current error at the specified index
-     *
-     * @return CHIP_NO_ERROR if the error is retrieved successfully
-     *         CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if there are no more errors to retrieve
-     */
-    virtual CHIP_ERROR GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError) = 0;
-
-    /**
      * @brief Checks whether the closure can move (as opposed to still needing pre-motion stages to complete).
      *
      * @return true if closure is ready to move

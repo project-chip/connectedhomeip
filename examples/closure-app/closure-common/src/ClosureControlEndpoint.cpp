@@ -24,6 +24,7 @@
 
 using namespace chip;
 using namespace chip::app::Clusters::ClosureControl;
+using namespace chip::app::DataModel;
 
 using Protocols::InteractionModel::Status;
 
@@ -69,13 +70,6 @@ Status ClosureControlDelegate::HandleStopCommand()
     return ClosureManager::GetInstance().OnStopCommand();
 }
 
-CHIP_ERROR ClosureControlDelegate::GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError)
-{
-    // This function should return the current error at the specified index.
-    // For now, we dont have a ErrorList implemented, so will return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED.
-    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-}
-
 bool ClosureControlDelegate::IsReadyToMove()
 {
     // This function should return true if the closure is ready to move.
@@ -113,19 +107,26 @@ CHIP_ERROR ClosureControlDelegate::HandleEventTrigger(uint64_t eventTrigger)
     switch (trigger)
     {
     case ClosureControlTestEventTrigger::kMainStateIsSetupRequired:
-        return logic->SetMainState(MainStateEnum::kSetupRequired);
+        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kSetupRequired));
+        break;
     case ClosureControlTestEventTrigger::kMainStateIsProtected:
-        return logic->SetMainState(MainStateEnum::kProtected);
+        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kProtected));
+        break;
     case ClosureControlTestEventTrigger::kMainStateIsError:
-        return logic->SetMainState(MainStateEnum::kError);
+        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kError));
+        ReturnErrorOnFailure(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor));
+        break;
     case ClosureControlTestEventTrigger::kMainStateIsDisengaged:
-        return logic->SetMainState(MainStateEnum::kDisengaged);
+        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kDisengaged));
+        break;
     case ClosureControlTestEventTrigger::kClearEvent:
-        // TODO : Implement logic to clear test event after Test plan Spec issue #5429 is resolved.
-        return CHIP_ERROR_NOT_IMPLEMENTED;
+        ReturnErrorOnFailure(logic->SetMainState(MainStateEnum::kStopped));
+        logic->ClearCurrentErrorList();
+        break;
     default:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ClosureControlEndpoint::Init()
@@ -228,7 +229,63 @@ void ClosureControlEndpoint::OnCalibrateActionComplete()
 
 void ClosureControlEndpoint::OnMoveToActionComplete()
 {
-    // This function should handle closure control state updation after completion of Motion Action.
+    UpdateCurrentStateFromTargetState();
+    mLogic.SetMainState(MainStateEnum::kStopped);
+    mLogic.SetCountdownTimeFromDelegate(0);
+    mLogic.GenerateMovementCompletedEvent();
+}
+
+void ClosureControlEndpoint::UpdateCurrentStateFromTargetState()
+{
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
+    DataModel::Nullable<GenericOverallTargetState> overallTargetState;
+
+    VerifyOrReturn(mLogic.GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get overall state from closure Endpoint"));
+    VerifyOrReturn(mLogic.GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get overall target from closure Endpoint"));
+
+    VerifyOrReturn(!overallTargetState.IsNull(), ChipLogError(AppServer, "Current overall target is null, Move to action Failed"));
+    VerifyOrReturn(!overallCurrentState.IsNull(), ChipLogError(AppServer, "Current overall state is null, Move to action Failed"));
+
+    if (overallTargetState.Value().position.HasValue() && !overallTargetState.Value().position.Value().IsNull())
+    {
+        // Map the target position to the current positioning enum.
+        CurrentPositionEnum currentPositioning =
+            MapTargetPositionToCurrentPositioning(overallTargetState.Value().position.Value().Value());
+        overallCurrentState.Value().position.SetValue(MakeNullable(currentPositioning));
+    }
+
+    if (overallTargetState.Value().latch.HasValue() && !overallTargetState.Value().latch.Value().IsNull())
+    {
+        overallCurrentState.Value().latch.SetValue(MakeNullable(overallTargetState.Value().latch.Value().Value()));
+    }
+
+    if (overallTargetState.Value().speed.HasValue())
+    {
+        overallCurrentState.Value().speed.SetValue(overallTargetState.Value().speed.Value());
+    }
+
+    mLogic.SetOverallCurrentState(overallCurrentState);
+}
+
+CurrentPositionEnum ClosureControlEndpoint::MapTargetPositionToCurrentPositioning(TargetPositionEnum value)
+{
+    switch (value)
+    {
+    case TargetPositionEnum::kMoveToFullyClosed:
+        return CurrentPositionEnum::kFullyClosed;
+    case TargetPositionEnum::kMoveToFullyOpen:
+        return CurrentPositionEnum::kFullyOpened;
+    case TargetPositionEnum::kMoveToPedestrianPosition:
+        return CurrentPositionEnum::kOpenedForPedestrian;
+    case TargetPositionEnum::kMoveToVentilationPosition:
+        return CurrentPositionEnum::kOpenedForVentilation;
+    case TargetPositionEnum::kMoveToSignaturePosition:
+        return CurrentPositionEnum::kOpenedAtSignature;
+    default:
+        return CurrentPositionEnum::kUnknownEnumValue;
+    }
 }
 
 void ClosureControlEndpoint::OnPanelMotionActionComplete()
