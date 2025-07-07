@@ -1567,9 +1567,9 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand)
     EXPECT_EQ(logic->HandleSetTargetCommand(NullOptional, Optional<bool>(false), NullOptional), Status::InvalidInState);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::TargetState::Id));
-    latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching).Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
+    latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching)
+        .Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
     EXPECT_EQ(logic->SetLatchControlModes(latchControlModes), CHIP_NO_ERROR);
-
 
     // Validating SetTargetState with invalid speed
     mockContext.ClearDirtyList();
@@ -1628,7 +1628,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommandWithLimitatio
 
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     BitFlags<LatchControlModesBitmap> latchControlModes;
-    latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching).Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
+    latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching)
+        .Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
     EXPECT_EQ(logic->SetLatchControlModes(latchControlModes), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
 

@@ -1265,7 +1265,8 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_AllFeatures)
 {
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
     BitFlags<LatchControlModesBitmap> latchControlModes;
-    latchControlModes.Set(ClosureControl::LatchControlModesBitmap::kRemoteLatching).Set(ClosureControl::LatchControlModesBitmap::kRemoteUnlatching);
+    latchControlModes.Set(ClosureControl::LatchControlModesBitmap::kRemoteLatching)
+        .Set(ClosureControl::LatchControlModesBitmap::kRemoteUnlatching);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     EXPECT_EQ(logic->SetLatchControlModes(latchControlModes), CHIP_NO_ERROR);
 
@@ -1343,7 +1344,8 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_OnlyMotionLatchingFeature)
 {
     conformance.FeatureMap().Set(Feature::kMotionLatching);
     BitFlags<LatchControlModesBitmap> latchControlModes;
-    latchControlModes.Set(ClosureControl::LatchControlModesBitmap::kRemoteLatching).Set(ClosureControl::LatchControlModesBitmap::kRemoteUnlatching);
+    latchControlModes.Set(ClosureControl::LatchControlModesBitmap::kRemoteLatching)
+        .Set(ClosureControl::LatchControlModesBitmap::kRemoteUnlatching);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     EXPECT_EQ(logic->SetLatchControlModes(latchControlModes), CHIP_NO_ERROR);
 
@@ -1453,7 +1455,8 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_OnlyLatchField)
 {
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
     BitFlags<LatchControlModesBitmap> latchControlModes;
-    latchControlModes.Set(ClosureControl::LatchControlModesBitmap::kRemoteLatching).Set(ClosureControl::LatchControlModesBitmap::kRemoteUnlatching);
+    latchControlModes.Set(ClosureControl::LatchControlModesBitmap::kRemoteLatching)
+        .Set(ClosureControl::LatchControlModesBitmap::kRemoteUnlatching);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     EXPECT_EQ(logic->SetLatchControlModes(latchControlModes), CHIP_NO_ERROR);
 
