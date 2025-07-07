@@ -3937,7 +3937,7 @@ DataModelLogger::LogValue(const char * label, size_t indent,
 
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
-                          const chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::DecodableType & value)
+                          const chip::app::Clusters::ClosureDimension::Structs::DimensionStateStruct::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
     {
@@ -3987,39 +3987,6 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Max'");
-            return err;
-        }
-    }
-    DataModelLogger::LogString(indent, "}");
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
-                                     const chip::app::Clusters::ClosureDimension::Structs::TargetStruct::DecodableType & value)
-{
-    DataModelLogger::LogString(label, indent, "{");
-    {
-        CHIP_ERROR err = LogValue("Position", indent + 1, value.position);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Position'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Latch", indent + 1, value.latch);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Latch'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Speed", indent + 1, value.speed);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'Speed'");
             return err;
         }
     }
@@ -4432,6 +4399,48 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ScheduleTypeFeatures'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+DataModelLogger::LogValue(const char * label, size_t indent,
+                          const chip::app::Clusters::Thermostat::Structs::ThermostatSuggestionStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("UniqueID", indent + 1, value.uniqueID);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'UniqueID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PresetHandle", indent + 1, value.presetHandle);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PresetHandle'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("EffectiveTime", indent + 1, value.effectiveTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'EffectiveTime'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ExpirationTime", indent + 1, value.expirationTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ExpirationTime'");
             return err;
         }
     }
@@ -11485,6 +11494,14 @@ CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
+                                     const Thermostat::Commands::AddThermostatSuggestionResponse::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    ReturnErrorOnFailure(DataModelLogger::LogValue("uniqueID", indent + 1, value.uniqueID));
+    DataModelLogger::LogString(indent, "}");
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent,
                                      const Thermostat::Commands::AtomicResponse::DecodableType & value)
 {
     DataModelLogger::LogString(label, indent, "{");
@@ -17348,14 +17365,16 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case ClosureDimension::Attributes::CurrentState::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::CurrentStateStruct::DecodableType> value;
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::DimensionStateStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("CurrentState", 1, value);
         }
-        case ClosureDimension::Attributes::Target::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::TargetStruct::DecodableType> value;
+        case ClosureDimension::Attributes::TargetState::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::ClosureDimension::Structs::DimensionStateStruct::DecodableType>
+                value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Target", 1, value);
+            return DataModelLogger::LogValue("TargetState", 1, value);
         }
         case ClosureDimension::Attributes::Resolution::Id: {
             chip::Percent100ths value;
@@ -17401,6 +17420,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             chip::app::Clusters::ClosureDimension::ModulationTypeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("ModulationType", 1, value);
+        }
+        case ClosureDimension::Attributes::LatchControlModes::Id: {
+            chip::BitMask<chip::app::Clusters::ClosureDimension::LatchControlModesBitmap> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("LatchControlModes", 1, value);
         }
         case ClosureDimension::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -17939,6 +17963,30 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             chip::app::DataModel::Nullable<uint32_t> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SetpointHoldExpiryTimestamp", 1, value);
+        }
+        case Thermostat::Attributes::MaxThermostatSuggestions::Id: {
+            uint8_t value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaxThermostatSuggestions", 1, value);
+        }
+        case Thermostat::Attributes::ThermostatSuggestions::Id: {
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Thermostat::Structs::ThermostatSuggestionStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ThermostatSuggestions", 1, value);
+        }
+        case Thermostat::Attributes::CurrentThermostatSuggestion::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::Structs::ThermostatSuggestionStruct::DecodableType>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("CurrentThermostatSuggestion", 1, value);
+        }
+        case Thermostat::Attributes::ThermostatSuggestionNotFollowingReason::Id: {
+            chip::app::DataModel::Nullable<
+                chip::BitMask<chip::app::Clusters::Thermostat::ThermostatSuggestionNotFollowingReasonBitmap>>
+                value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("ThermostatSuggestionNotFollowingReason", 1, value);
         }
         case Thermostat::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -21704,10 +21752,10 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeteredQuantityTimestamp", 1, value);
         }
-        case CommodityMetering::Attributes::MeasurementType::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> value;
+        case CommodityMetering::Attributes::TariffUnit::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TariffUnitEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("MeasurementType", 1, value);
+            return DataModelLogger::LogValue("TariffUnit", 1, value);
         }
         case CommodityMetering::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
@@ -22762,6 +22810,11 @@ CHIP_ERROR DataModelLogger::LogCommand(const chip::app::ConcreteCommandPath & pa
             Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("GetWeeklyScheduleResponse", 1, value);
+        }
+        case Thermostat::Commands::AddThermostatSuggestionResponse::Id: {
+            Thermostat::Commands::AddThermostatSuggestionResponse::DecodableType value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("AddThermostatSuggestionResponse", 1, value);
         }
         case Thermostat::Commands::AtomicResponse::Id: {
             Thermostat::Commands::AtomicResponse::DecodableType value;

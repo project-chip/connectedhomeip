@@ -20,9 +20,9 @@ namespace MeteredQuantityTimestamp {
 inline constexpr AttributeId Id = 0x00000001;
 } // namespace MeteredQuantityTimestamp
 
-namespace MeasurementType {
+namespace TariffUnit {
 inline constexpr AttributeId Id = 0x00000002;
-} // namespace MeasurementType
+} // namespace TariffUnit
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

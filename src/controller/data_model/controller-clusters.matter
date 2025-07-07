@@ -6553,7 +6553,7 @@ provisional cluster ClosureControl = 260 {
   command access(invoke: manage) Calibrate(): DefaultSuccess = 2;
 }
 
-/** Ceiling values are dedicated for closures that close a ceiling, such as horizontal awnings, pergolas, etc. */
+/** This cluster provides an interface to reflect and control a closure's range of movement, usually involving a panel, by using 6-axis framework. */
 provisional cluster ClosureDimension = 261 {
   revision 1;
 
@@ -6616,10 +6616,6 @@ provisional cluster ClosureDimension = 261 {
     kBackward = 9;
     kDepthMask = 10;
     kDepthSymmetry = 11;
-    kCeilingSimple = 12;
-    kCeilingMask = 13;
-    kCeilingSidedSymmetry = 14;
-    kCeilingCenteredSymmetry = 15;
   }
 
   bitmap Feature : bitmap32 {
@@ -6633,9 +6629,14 @@ provisional cluster ClosureDimension = 261 {
     kModulation = 0x80;
   }
 
-  struct CurrentStateStruct {
-    optional percent100ths position = 0;
-    optional boolean latch = 1;
+  bitmap LatchControlModesBitmap : bitmap8 {
+    kRemoteLatching = 0x1;
+    kRemoteUnlatching = 0x2;
+  }
+
+  struct DimensionStateStruct {
+    optional nullable percent100ths position = 0;
+    optional nullable boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
   }
 
@@ -6644,19 +6645,13 @@ provisional cluster ClosureDimension = 261 {
     percent100ths max = 1;
   }
 
-  struct TargetStruct {
-    optional percent100ths position = 0;
-    optional boolean latch = 1;
-    optional ThreeLevelAutoEnum speed = 2;
-  }
-
   struct UnitRangeStruct {
     int16s min = 0;
     int16s max = 1;
   }
 
-  readonly attribute nullable CurrentStateStruct currentState = 0;
-  readonly attribute nullable TargetStruct target = 1;
+  readonly attribute nullable DimensionStateStruct currentState = 0;
+  readonly attribute nullable DimensionStateStruct targetState = 1;
   readonly attribute optional percent100ths resolution = 2;
   readonly attribute optional percent100ths stepValue = 3;
   readonly attribute optional ClosureUnitEnum unit = 4;
@@ -6666,6 +6661,7 @@ provisional cluster ClosureDimension = 261 {
   readonly attribute optional RotationAxisEnum rotationAxis = 8;
   readonly attribute optional OverflowEnum overflow = 9;
   readonly attribute optional ModulationTypeEnum modulationType = 10;
+  readonly attribute optional LatchControlModesBitmap latchControlModes = 11;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -6684,9 +6680,9 @@ provisional cluster ClosureDimension = 261 {
     optional ThreeLevelAutoEnum speed = 2;
   }
 
-  /** This command is used to move a dimension of the device to a target position. */
+  /** This command is used to move a dimension of the closure to a target position. */
   command SetTarget(SetTargetRequest): DefaultSuccess = 0;
-  /** This command is used to move a dimension of the device to a target position by a number of steps. */
+  /** Upon receipt, this SHALL move a dimension of the closure to a target position by a number of steps. */
   command Step(StepRequest): DefaultSuccess = 1;
 }
 
@@ -7091,6 +7087,16 @@ cluster Thermostat = 513 {
     kSupportsOff = 0x8;
   }
 
+  bitmap ThermostatSuggestionNotFollowingReasonBitmap : bitmap16 {
+    kDemandResponseEvent = 0x1;
+    kOngoingHold = 0x2;
+    kSchedule = 0x4;
+    kOccupancy = 0x8;
+    kVacationMode = 0x10;
+    kTimeOfUseCostSavings = 0x20;
+    kPreCoolingOrPreHeating = 0x40;
+  }
+
   struct ScheduleTransitionStruct {
     ScheduleDayOfWeekBitmap dayOfWeek = 0;
     int16u transitionTime = 1;
@@ -7128,6 +7134,13 @@ cluster Thermostat = 513 {
     SystemModeEnum systemMode = 0;
     int8u numberOfSchedules = 1;
     ScheduleTypeFeaturesBitmap scheduleTypeFeatures = 2;
+  }
+
+  struct ThermostatSuggestionStruct {
+    int8u uniqueID = 0;
+    octet_string<16> presetHandle = 1;
+    epoch_s effectiveTime = 2;
+    epoch_s expirationTime = 3;
   }
 
   struct WeeklyScheduleTransitionStruct {
@@ -7196,6 +7209,10 @@ cluster Thermostat = 513 {
   attribute access(write: manage) optional PresetStruct presets[] = 80;
   attribute access(write: manage) optional ScheduleStruct schedules[] = 81;
   readonly attribute optional nullable epoch_s setpointHoldExpiryTimestamp = 82;
+  provisional readonly attribute optional int8u maxThermostatSuggestions = 83;
+  provisional readonly attribute optional ThermostatSuggestionStruct thermostatSuggestions[] = 84;
+  provisional readonly attribute optional nullable ThermostatSuggestionStruct currentThermostatSuggestion = 85;
+  provisional readonly attribute optional nullable ThermostatSuggestionNotFollowingReasonBitmap thermostatSuggestionNotFollowingReason = 86;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -7226,12 +7243,26 @@ cluster Thermostat = 513 {
     ScheduleModeBitmap modeToReturn = 1;
   }
 
+  response struct AddThermostatSuggestionResponse = 2 {
+    int8u uniqueID = 0;
+  }
+
   request struct SetActiveScheduleRequestRequest {
     octet_string<16> scheduleHandle = 0;
   }
 
   request struct SetActivePresetRequestRequest {
     nullable octet_string<16> presetHandle = 0;
+  }
+
+  request struct AddThermostatSuggestionRequest {
+    octet_string<16> presetHandle = 0;
+    nullable epoch_s effectiveTime = 1;
+    int16u expirationInMinutes = 2;
+  }
+
+  request struct RemoveThermostatSuggestionRequest {
+    int8u uniqueID = 0;
   }
 
   response struct AtomicResponse = 253 {
@@ -7258,6 +7289,8 @@ cluster Thermostat = 513 {
   command SetActiveScheduleRequest(SetActiveScheduleRequestRequest): DefaultSuccess = 5;
   /** ID */
   command SetActivePresetRequest(SetActivePresetRequestRequest): DefaultSuccess = 6;
+  command access(invoke: manage) AddThermostatSuggestion(AddThermostatSuggestionRequest): AddThermostatSuggestionResponse = 7;
+  command access(invoke: manage) RemoveThermostatSuggestion(RemoveThermostatSuggestionRequest): DefaultSuccess = 8;
   /** Begins, Commits or Cancels an atomic write */
   command access(invoke: manage) AtomicRequest(AtomicRequestRequest): AtomicResponse = 254;
 }
@@ -11236,7 +11269,7 @@ provisional cluster MeterIdentification = 2822 {
 }
 
 /** The Commodity Metering Cluster provides the mechanism for communicating commodity consumption information within a premises. */
-cluster CommodityMetering = 2823 {
+provisional cluster CommodityMetering = 2823 {
   revision 1;
 
   shared enum MeasurementTypeEnum : enum16 {
@@ -11266,7 +11299,7 @@ cluster CommodityMetering = 2823 {
 
   readonly attribute nullable MeteredQuantityStruct meteredQuantity[] = 0;
   readonly attribute nullable epoch_s meteredQuantityTimestamp = 1;
-  readonly attribute nullable MeasurementTypeEnum measurementType = 2;
+  readonly attribute nullable TariffUnitEnum tariffUnit = 2;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
