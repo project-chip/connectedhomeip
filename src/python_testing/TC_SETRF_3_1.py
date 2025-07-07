@@ -31,6 +31,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --hex-arg enableKey:00112233445566778899aabbccddeeff
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
@@ -43,7 +44,6 @@
 
 import logging
 import queue
-import time
 
 import chip.clusters as Clusters
 import test_plan_support
@@ -101,7 +101,7 @@ class TC_SETRF_3_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         super().__init__(*args)
 
     async def subscribe_attribute(self):
-        """Implements subscription to PowerThreshold attribute with minInterval=5 and maxInterval=30
+        """Implements subscription to TariffInfo attribute with minInterval=5 and maxInterval=30
         """
 
         self.default_controller: ChipDeviceController
@@ -132,24 +132,42 @@ class TC_SETRF_3_1(MatterBaseTest, CommodityTariffTestBaseHelper):
 
         steps = [
             TestStep("1", "Commissioning, already done", test_plan_support.commission_if_required(), is_commissioning=True),
-            TestStep("2", "TH establishes a subscription to TariffInfo attribute."),
-            TestStep("3", "TH reads TariffInfo attribute and saves the initial value as saved."),
-            TestStep("4", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster."),
-            TestStep("5", "TH sends TestEventTrigger command for Full Tariff Set Test Event."),
-            TestStep("6", "TH awaits a ReportDataMessage containing a TariffInfo attribute with 30s timeout."),
-            TestStep("7", "TH reads TariffInfo attribute and saves the initial value as saved."),
-            TestStep("8", "TH sends TestEventTrigger command for Full Tariff Set Test Event."),
-            TestStep("9", "TH awaits a ReportDataMessage containing a TariffInfo attribute with 30s timeout."),
-            TestStep("10", "TH reads TariffInfo attribute and saves the initial value as saved."),
-            TestStep("11", "TH sends TestEventTrigger command for Test Event Clear."),
-            TestStep("12", "TH awaits a ReportDataMessage containing a TariffInfo attribute with 30s timeout."),
-            TestStep("13", "TH removes the subscription to PowerThreshold attribute.", "Subscription successfully removed."),
+            TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
+                     "TestEventTriggersEnabled is True"),
+            TestStep("3", "TH sends TestEventTrigger command for Test Event Clear.",
+                     "DUT replies with SUCCESS status code."),
+            TestStep("4", "TH establishes a subscription to TariffInfo attribute.", "Subscription successfully established."),
+            TestStep("5", "TH reads TariffInfo attribute and saves the initial value as tariff_info.", """
+                          - DUT replies a value of TariffInformationStruct type;
+                          - Values is saved in tariff_info."""),
+            TestStep("6", "TH sends TestEventTrigger command for Fake Tariff Set Test Event.",
+                     "DUT replies with SUCCESS status code."),
+            TestStep("7", "TH awaits a ReportDataMessage containing a TariffInfo attribute with 30s timeout.", """
+                          Verify the report is received and the value does not match the tariff_info value."""),
+            TestStep("8", "TH reads TariffInfo attribute and saves the initial value as tariff_info.", """
+                          - DUT replies a value of TariffInformationStruct type;
+                          - Values is saved in tariff_info."""),
+            TestStep("9", "TH sends TestEventTrigger command for Fake Tariff Set Test Event.",
+                          "DUT replies with SUCCESS status code."),
+            TestStep("10", "TH awaits a ReportDataMessage containing a TariffInfo attribute with 30s timeout.", """
+                          Verify the report is received and the value does not match the tariff_info value."""),
+            TestStep("11", "TH reads TariffInfo attribute and saves the initial value as tariff_info.", """
+                          - DUT replies a value of TariffInformationStruct type;
+                          - Values is saved in tariff_info."""),
+            TestStep("12", "TH sends TestEventTrigger command for Test Event Clear.",
+                           "DUT replies with SUCCESS status code."),
+            TestStep("13", "TH awaits a ReportDataMessage containing a TariffInfo attribute with 30s timeout.", """
+                          Verify the report is received and the value does not match the tariff_info value."""),
+            TestStep("14", "TH removes the subscription to PowerThreshold attribute.", "Subscription successfully removed."),
+            TestStep("15", "TH sends TestEventTrigger command to General Diagnostics Cluster for Test Event Clear",
+                     "DUT replies with SUCCESS status code."),
         ]
 
         return steps
 
     @async_test_body
     async def test_TC_SETRF_3_1(self):
+        """Implementation of test case TC_SETRF_3_1."""
 
         endpoint = self.get_endpoint()
 
@@ -158,51 +176,72 @@ class TC_SETRF_3_1(MatterBaseTest, CommodityTariffTestBaseHelper):
             asserts.skip("PICS DGGEN.S or DGGEN.S.A0008 or DGGEN.S.C00.Rsp is not True")
 
         self.step("1")
+        # Commissioning
 
         self.step("2")
-        await self.subscribe_attribute()
-
-        self.step("3")
-        saved_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
-                                                                     attribute=cluster.Attributes.TariffInfo)
-
-        self.step("4")
+        # TH reads TestEventTriggersEnabled attribute, expected to be True
         await self.check_test_event_triggers_enabled()
 
+        self.step("3")
+        # TH sends TestEventTrigger command for Test Event Clear
+        await self.send_test_event_trigger_clear()
+
+        self.step("4")
+        # TH establishes a subscription to TariffInfo attribute
+        await self.subscribe_attribute()
+
         self.step("5")
-        await self.send_test_event_triggers(eventTrigger=0x0700000000000000)
-        time.sleep(3)
+        # TH reads TariffInfo attribute and saves the initial value as tariff_info
+        tariff_info = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
+                                                                     attribute=cluster.Attributes.TariffInfo)
 
         self.step("6")
-        reported_value = WaitForAttributeReport(self.report_queue, cluster.Attributes.TariffInfo)
-        asserts.assert_not_equal(reported_value, saved_value, "Reported value should be different from saved value")
+        # TH sends TestEventTrigger command for Fake Tariff Set Test Event
+        await self.send_test_event_trigger_for_fake_data()
 
         self.step("7")
-        saved_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
-                                                                     attribute=cluster.Attributes.TariffInfo)
+        # TH awaits a ReportDataMessage containing a TariffInfo attribute
+        # Verify the report is received and the value does not match the tariff_info value
+        reported_value = WaitForAttributeReport(self.report_queue, cluster.Attributes.TariffInfo)
+        asserts.assert_not_equal(reported_value, tariff_info, "Reported value should be different from saved value")
 
         self.step("8")
-        await self.send_test_event_triggers(eventTrigger=0x0700000000000000)
-        time.sleep(3)
-
-        self.step("9")
-        reported_value = WaitForAttributeReport(self.report_queue, cluster.Attributes.TariffInfo)
-        asserts.assert_not_equal(reported_value, saved_value, "Reported value should be different from saved value")
-
-        self.step("10")
-        saved_value = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
+        # TH reads TariffInfo attribute and saves the initial value as tariff_info
+        tariff_info = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
                                                                      attribute=cluster.Attributes.TariffInfo)
 
+        self.step("9")
+        # TH sends TestEventTrigger command for Fake Tariff Set Test Event
+        await self.send_test_event_trigger_for_fake_data()
+
+        self.step("10")
+        # TH awaits a ReportDataMessage containing a TariffInfo attribute
+        # Verify the report is received and the value does not match the tariff_info value
+        reported_value = WaitForAttributeReport(self.report_queue, cluster.Attributes.TariffInfo)
+        asserts.assert_not_equal(reported_value, tariff_info, "Reported value should be different from saved value")
+
         self.step("11")
-        await self.send_test_event_triggers(eventTrigger=0x0700000000000001)
-        time.sleep(3)
+        # TH reads TariffInfo attribute and saves the initial value as tariff_info
+        tariff_info = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster,
+                                                                     attribute=cluster.Attributes.TariffInfo)
 
         self.step("12")
-        reported_value = WaitForAttributeReport(self.report_queue, cluster.Attributes.TariffInfo)
-        asserts.assert_not_equal(reported_value, saved_value, "Reported value should be different from saved value")
+        # TH sends TestEventTrigger command for Test Event Clear
+        await self.send_test_event_trigger_clear()
 
         self.step("13")
+        # TH awaits a ReportDataMessage containing a TariffInfo attribute
+        # Verify the report is received and the value does not match the tariff_info value
+        reported_value = WaitForAttributeReport(self.report_queue, cluster.Attributes.TariffInfo)
+        asserts.assert_not_equal(reported_value, tariff_info, "Reported value should be different from saved value")
+
+        self.step("14")
+        # TH removes the subscription to TariffInfo attribute
         self.subscription.Shutdown()
+
+        self.step("15")
+        # TH sends TestEventTrigger command to General Diagnostics Cluster for Test Event Clear
+        await self.send_test_event_trigger_clear()
 
 
 if __name__ == "__main__":

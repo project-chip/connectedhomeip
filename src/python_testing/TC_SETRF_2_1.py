@@ -31,6 +31,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --hex-arg enableKey:00112233445566778899aabbccddeeff
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
@@ -93,8 +94,10 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
             TestStep("18", "TH reads NextTariffComponents attribute.", "DUT replies with null value of Nullable type."),
             TestStep("19", "TH reads DefaultRandomizationOffset attribute.", "DUT replies with null value of Nullable type."),
             TestStep("20", "TH reads DefaultRandomizationType attribute.", "DUT replies with null value of Nullable type."),
-            TestStep("21", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster"),
-            TestStep("22", "TH sends TestEventTrigger command to General Diagnostics Cluster for Full Tariff Set Test Event"),
+            TestStep("21", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
+                           "TestEventTriggersEnabled is True"),
+            TestStep("22", "TH sends TestEventTrigger command to General Diagnostics Cluster for Full Tariff Set Test Event",
+                           "DUT replies with SUCCESS status code."),
             TestStep("23", "TH reads TariffInfo attribute.", """
                      - DUT replies a value of TariffInformationStruct type;
                      - Contains Currency field if PICS SETRF.S.F00 is True."""),
@@ -154,24 +157,30 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
                      - Contains PeakPeriod field if PICS SETRF.S.F03 is True;
                      - Contains PowerThreshold field if PICS SETRF.S.F04 is True."""),
             TestStep("40", "TH reads DefaultRandomizationOffset attribute.", "DUT replies a value of int16 value."),
-            TestStep("41", "TH reads DefaultRandomizationType attribute."),
-            TestStep("42", "Reset Cluster state to defaults.", "DUT replies a value of DayEntryRandomizationType value."),
+            TestStep("41", "TH reads DefaultRandomizationType attribute.",
+                     "DUT replies a value of DayEntryRandomizationType value."),
+            TestStep("42", "TH sends TestEventTrigger command to General Diagnostics Cluster for Test Event Clear",
+                           "DUT replies with SUCCESS status code."),
         ]
+
         return steps
 
     @async_test_body
     async def test_TC_SETRF_2_1(self):
+        """Implements test procedure for test case TC_SETRF_2_1."""
 
         endpoint = self.get_endpoint()
         attributes = cluster.Attributes
 
-        # If TestEventTriggers is not enabled this TC can't be checked properly.
+        # If TestEventTriggers is not enabled this TC can't be checked properly and has to be skipped.
         if not self.check_pics("DGGEN.S") or not self.check_pics("DGGEN.S.A0008") or not self.check_pics("DGGEN.S.C00.Rsp"):
             asserts.skip("PICS DGGEN.S or DGGEN.S.A0008 or DGGEN.S.C00.Rsp is not True")
 
         self.step("1")
+        # Commissioning
 
         self.step("2")
+        # TH reads TariffInfo attribute, expects a Null
         val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffInfo
         )
@@ -179,6 +188,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_is_instance(val, Nullable, "TariffInfo attribute must be a Nullable")
 
         self.step("3")
+        # TH reads TariffUnit attribute, expects a Null
         val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffUnit
         )
@@ -186,6 +196,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_is_instance(val, Nullable, "TariffUnit attribute must be a Nullable")
 
         self.step("4")
+        # TH reads StartDate attribute, expects a Null
         val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.StartDate
         )
@@ -193,6 +204,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_is_instance(val, Nullable, "StartDate attribute must be a Nullable")
 
         self.step("5")
+        # TH reads DayEntries attribute, expects a Null
         val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayEntries
         )
@@ -200,6 +212,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_is_instance(val, Nullable, "DayEntries attribute must be a Nullable")
 
         self.step("6")
+        # TH reads DayPatterns attribute, expects a Null
         val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayPatterns
         )
@@ -207,6 +220,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_is_instance(val, Nullable, "DayPatterns attribute must be a Nullable")
 
         self.step("7")
+        # TH reads CalendarPeriods attribute, expects a Null
         val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CalendarPeriods
         )
@@ -214,6 +228,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_is_instance(val, Nullable, "CalendarPeriods attribute must be a Nullable")
 
         self.step("8")
+        # TH reads IndividualDays attribute, expects a Null
         val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.IndividualDays
         )
@@ -221,6 +236,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_is_instance(val, Nullable, "IndividualDays attribute must be a Nullable")
 
         self.step("9")
+        # TH reads CurrentDay attribute, expects a Null
         val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDay
         )
@@ -228,6 +244,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_is_instance(val, Nullable, "CurrentDay attribute must be a Nullable")
 
         self.step("10")
+        # TH reads NextDay attribute, expects a Null
         val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDay
         )
@@ -235,6 +252,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_is_instance(val, Nullable, "NextDay attribute must be a Nullable")
 
         self.step("11")
+        # TH reads CurrentDayEntry attribute, expects a Null
         val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDayEntry
         )
@@ -242,6 +260,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_is_instance(val, Nullable, "CurrentDayEntry attribute must be a Nullable")
 
         self.step("12")
+        # TH reads CurrentDayEntryDate attribute, expects a Null
         val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDayEntryDate
         )
@@ -249,6 +268,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_is_instance(val, Nullable, "CurrentDayEntryDate attribute must be a Nullable")
 
         self.step("13")
+        # TH reads NextDayEntry attribute, expects a Null
         val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDayEntry
         )
@@ -256,6 +276,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_is_instance(val, Nullable, "NextDayEntry attribute must be a Nullable")
 
         self.step("14")
+        # TH reads NextDayEntryDate attribute, expects a Null
         val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDayEntryDate
         )
@@ -263,6 +284,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_is_instance(val, Nullable, "NextDayEntryDate attribute must be a Nullable")
 
         self.step("15")
+        # TH reads TariffComponents attribute, expects a Null
         val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffComponents
         )
@@ -270,6 +292,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_is_instance(val, Nullable, "TariffComponents attribute must be a Nullable")
 
         self.step("16")
+        # TH reads TariffPeriods attribute, expects a Null
         val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffPeriods
         )
@@ -277,6 +300,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_is_instance(val, Nullable, "TariffPeriods attribute must be a Nullable")
 
         self.step("17")
+        # TH reads CurrentTariffComponents attribute, expects a Null
         val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentTariffComponents
         )
@@ -284,6 +308,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_is_instance(val, Nullable, "CurrentTariffComponents attribute must be a Nullable")
 
         self.step("18")
+        # TH reads NextTariffComponents attribute, expects a Null
         val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextTariffComponents
         )
@@ -291,7 +316,8 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_is_instance(val, Nullable, "NextTariffComponents attribute must be a Nullable")
 
         self.step("19")
-        if not self.check_pics("SETRF.S.A0011"):
+        # TH reads DefaultRandomizationOffset attribute, expects a Null
+        if not self.check_pics("SETRF.S.A0011"):  # Checks that appropriate feature is enabled
             logger.info("PICS SETRF.S.A0011 is not True")
             self.mark_current_step_skipped()
 
@@ -302,7 +328,8 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_is_instance(val, Nullable, "DefaultRandomizationOffset attribute must be a Nullable")
 
         self.step("20")
-        if not self.check_pics("SETRF.S.A0012"):
+        # TH reads DefaultRandomizationType attribute, expects a Null
+        if not self.check_pics("SETRF.S.A0012"):  # Checks that appropriate feature is enabled
             logger.info("PICS SETRF.S.A0012 is not True")
             self.mark_current_step_skipped()
 
@@ -313,12 +340,15 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_is_instance(val, Nullable, "DefaultRandomizationType attribute must be a Nullable")
 
         self.step("21")
+        # TH reads TestEventTriggersEnabled attribute, expects a True
         await self.check_test_event_triggers_enabled()
 
         self.step("22")
+        # TH sends TestEventTrigger to propagate fake test data (similar to real data) to attributes
         await self.send_test_event_trigger_for_fake_data()
 
         self.step("23")
+        # TH reads TariffInfo attribute, expects a TariffInformationStruct
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffInfo)
         if val is not NullValue:
             asserts.assert_true(isinstance(
@@ -328,6 +358,8 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
                 asserts.assert_true(val.currency is not None, "Currency must have real value or can be Null")
 
         self.step("24")
+        # TH reads TariffUnit attribute, expects a TariffUnitEnum
+        # Value has to be in range 0 - 8
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffUnit)
         if val is not NullValue:
             matter_asserts.assert_valid_enum(
@@ -335,11 +367,13 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
             asserts.assert_true(val >= 0 and val <= 8, "TariffUnit must be in range 0 - 8")
 
         self.step("25")
+        # TH reads StartDate attribute, expects a uint32
         self.StartDate = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.StartDate)
         if self.StartDate is not NullValue:
             matter_asserts.assert_valid_uint32(self.StartDate, 'StartDate')
 
         self.step("26")
+        # TH reads DayEntries attribute, expects a list of DayEntryStruct
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayEntries)
         if val is not NullValue:
             matter_asserts.assert_list(val, "DayEntries attribute must return a list")
@@ -349,6 +383,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
                 await self.checkDayEntryStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
         self.step("27")
+        # TH reads DayPatterns attribute, expects a list of DayPatternStruct
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayPatterns)
         if val is not NullValue:
             matter_asserts.assert_list(val, "DayPatterns attribute must return a list")
@@ -358,6 +393,9 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
                 await self.checkDayPatternStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
         self.step("28")
+        # TH reads CalendarPeriods attribute, expects a list of CalendarPeriodStruct sorted by StartDate field in increasing order
+        # CalendarPeriods must have at least 1 entries and at most 4 entries
+        # If StartDate attribute is not available, CalendarPeriods[0].startDate must be Null
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CalendarPeriods)
         if val is not NullValue:
             matter_asserts.assert_list(val, "CalendarPeriods attribute must return a list")
@@ -376,6 +414,9 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
                                     "If StartDate is Null, the first CalendarPeriod item Start Date field must also be Null")
 
         self.step("29")
+        # TH reads IndividualDays attribute, expects a list of DayStruct
+        # IndividualDays must have at most 50 entries
+        # IndividualDays must be sorted by Date in increasing order
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.IndividualDays)
         if val is not NullValue:
             matter_asserts.assert_list(val, "IndividualDays attribute must return a list")
@@ -389,6 +430,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
                                     "IndividualDays must be sorted by Date in increasing order!")
 
         self.step("30")
+        # TH reads CurrentDay attribute, expects a DayStruct
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDay)
         if val is not NullValue:
             asserts.assert_true(isinstance(
@@ -396,6 +438,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
             await self.checkDayStruct(endpoint=endpoint, cluster=cluster, struct=val)
 
         self.step("31")
+        # TH reads NextDay attribute, expects a DayStruct
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDay)
         if val is not NullValue:
             asserts.assert_true(isinstance(
@@ -403,6 +446,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
             await self.checkDayStruct(endpoint=endpoint, cluster=cluster, struct=val)
 
         self.step("32")
+        # TH reads CurrentDayEntry attribute, expects a DayEntryStruct
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDayEntry)
         if val is not NullValue:
             asserts.assert_true(isinstance(
@@ -410,11 +454,13 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
             await self.checkDayEntryStruct(endpoint=endpoint, cluster=cluster, struct=val)
 
         self.step("33")
+        # TH reads CurrentDayEntryDate attribute, expects a uint32
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDayEntryDate)
         if val is not NullValue:
             matter_asserts.assert_valid_uint32(val, 'CurrentDayEntryDate')
 
         self.step("34")
+        # TH reads NextDayEntry attribute, expects a DayEntryStruct
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDayEntry)
         if val is not NullValue:
             asserts.assert_true(isinstance(
@@ -422,11 +468,14 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
             await self.checkDayEntryStruct(endpoint=endpoint, cluster=cluster, struct=val)
 
         self.step("35")
+        # TH reads NextDayEntryDate attribute, expects a uint32
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDayEntryDate)
         if val is not NullValue:
             matter_asserts.assert_valid_uint32(val, 'NextDayEntryDate')
 
         self.step("36")
+        # TH reads TariffComponents attribute, expects a list of TariffComponentStruct
+        # TariffComponents must have at least 1 entries
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffComponents)
         if val is not NullValue:
             matter_asserts.assert_list(val, "TariffComponents attribute must return a list")
@@ -437,6 +486,8 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
             asserts.assert_greater_equal(len(val), 1, "TariffComponents must have at least 1 entries!")
 
         self.step("37")
+        # TH reads TariffPeriods attribute, expects a list of TariffPeriodStruct
+        # TariffPeriods must have at least 1 entries
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffPeriods)
         if val is not NullValue:
             matter_asserts.assert_list(val, "TariffPeriods attribute must return a list")
@@ -447,6 +498,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
             asserts.assert_greater_equal(len(val), 1, "TariffPeriods must have at least 1 entries!")
 
         self.step("38")
+        # TH reads CurrentTariffComponents attribute, expects a list of TariffComponentStruct
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentTariffComponents)
         if val is not NullValue:
             matter_asserts.assert_list(val, "CurrentTariffComponents attribute must return a list")
@@ -456,6 +508,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
                 await self.checkTariffComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
         self.step("39")
+        # TH reads NextTariffComponents attribute, expects a list of TariffComponentStruct
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextTariffComponents)
         if val is not NullValue:
             matter_asserts.assert_list(val, "NextTariffComponents attribute must return a list")
@@ -465,20 +518,22 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
                 await self.checkTariffComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
         self.step("40")
-        if not self.check_pics("SETRF.S.A0011"):
+        if not self.check_pics("SETRF.S.A0011"):  # Checks if attribute is supported
             logger.info("PICS SETRF.S.A0011 is not True")
             self.mark_current_step_skipped()
 
+        # TH reads DefaultRandomizationOffset attribute, expects a int16
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.DefaultRandomizationOffset):
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DefaultRandomizationOffset)
             if val is not NullValue:
                 matter_asserts.assert_valid_int16(val, 'DefaultRandomizationOffset')
 
         self.step("41")
-        if not self.check_pics("SETRF.S.A0012"):
+        if not self.check_pics("SETRF.S.A0012"):  # Checks if attribute is supported
             logger.info("PICS SETRF.S.A0012 is not True")
             self.mark_current_step_skipped()
 
+        # TH reads DefaultRandomizationType attribute, expects a DayEntryRandomizationTypeEnum
         if await self.attribute_guard(endpoint=endpoint, attribute=attributes.DefaultRandomizationType):
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DefaultRandomizationType)
             if val is not NullValue:
@@ -486,6 +541,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
                     val, "DefaultRandomizationType attribute must return a DayEntryRandomizationTypeEnum", cluster.Enums.DayEntryRandomizationTypeEnum)
 
         self.step("42")
+        # TH sends TestEventTrigger command for Test Event Clear in order to reset cluster state to defaults
         self.send_test_event_trigger_clear()
 
 
