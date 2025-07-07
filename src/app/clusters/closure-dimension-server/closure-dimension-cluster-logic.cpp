@@ -670,21 +670,14 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     VerifyOrReturnError(currentState.Value().position.HasValue() && !currentState.Value().position.Value().IsNull(),
                         Status::InvalidInState);
 
-    // Check for invalid latch transition: current latch is true and target latch is true
+    // If this command requests a position change while the Latch field of the CurrentState is True (Latched), and the Latch field of this command
+    // is not set to False (Unlatched), a status code of INVALID_IN_STATE SHALL be returned.
     if (mConformance.HasFeature(Feature::kMotionLatching))
     {
-        // Return InvalidInState if current latch has no value or is null
-        VerifyOrReturnError(currentState.Value().latch.HasValue(), Status::InvalidInState);
-        VerifyOrReturnError(!currentState.Value().latch.Value().IsNull(), Status::InvalidInState);
-        // If this command is received with only a new position field while the closure is latched, a status code of
-        // INVALID_IN_STATE SHALL be returned.
-        if (currentState.Value().latch.Value().Value())
+        if (position.HasValue() && currentState.Value().latch.HasValue() && !currentState.Value().latch.Value().IsNull() && currentState.Value().latch.Value().Value())
         {
-            // Return InvalidInState if incoming latch has no value or if incoming position has a value.
-            if (position.HasValue())
-            {
-                VerifyOrReturnError(latch.HasValue() && !latch.Value(), Status::InvalidInState);
-            }
+            VerifyOrReturnError(latch.HasValue() && !latch.Value(), Status::InvalidInState,
+                                ChipLogError(AppServer, "Latch is True in State, but SetTarget command does not set latch to False when position change is requested"));
         }
     }
 

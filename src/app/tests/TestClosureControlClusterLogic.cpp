@@ -1499,7 +1499,8 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_OnlySpeedField)
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
 }
 
-TEST_F(TestClosureControlClusterLogic, MoveToCommand_UpdatePositionWhenLatched)
+// HandleMoveTo command when the cluster is in a latched state and incoming command changes position without unlatching.
+TEST_F(TestClosureControlClusterLogic, TestHandleMoveToCommand_ChangePositionWithoutIncomingLatchWhenLatched)
 {
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
@@ -1514,6 +1515,33 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_UpdatePositionWhenLatched)
     mockContext.ResetReportedAttributeId();
 
     EXPECT_EQ(logic->HandleMoveTo(Optional<TargetPositionEnum>(TargetPositionEnum::kMoveToFullyOpen), NullOptional, NullOptional),
+              Status::InvalidInState);
+
+    DataModel::Nullable<GenericOverallTargetState> readValue;
+    EXPECT_EQ(logic->GetOverallTargetState(readValue), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(readValue.IsNull());
+
+    EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
+    
+}    
+
+// HandleMoveTo command when the cluster is in a latched state and incoming command changes the position.
+TEST_F(TestClosureControlClusterLogic, MoveToCommand_UpdatePositionWhenLatched)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+
+    // Set initial state
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), Optional(true),
+                                   Optional(Globals::ThreeLevelAutoEnum::kLow)));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
+
+    mockContext.ResetDirtyFlag();
+    mockContext.ResetReportedAttributeId();
+
+    EXPECT_EQ(logic->HandleMoveTo(Optional<TargetPositionEnum>(TargetPositionEnum::kMoveToFullyOpen), Optional<bool>(true), NullOptional),
               Status::InvalidInState);
 
     DataModel::Nullable<GenericOverallTargetState> readValue;

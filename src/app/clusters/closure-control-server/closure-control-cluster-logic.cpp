@@ -519,17 +519,12 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
     }
     if (mConformance.HasFeature(Feature::kMotionLatching))
     {
-        // Return InvalidInState if current latch has no value or is null
-        VerifyOrReturnError(overallCurrentState.Value().latch.HasValue(), Status::InvalidInState);
-        VerifyOrReturnError(!overallCurrentState.Value().latch.Value().IsNull(), Status::InvalidInState);
-        // If this command is received with only a new position field while the closure is latched, a status code of
-        // INVALID_IN_STATE SHALL be returned.
-        if (overallCurrentState.Value().latch.Value().Value())
+        // If this command requests a position change while the Latch field of the OverallCurrentState is True (Latched), and the Latch field of this command is 
+        // not set to False (Unlatched), a status code of INVALID_IN_STATE SHALL be returned.
+        if (position.HasValue() && overallCurrentState.Value().latch.HasValue() && !overallCurrentState.Value().latch.Value().IsNull() && overallCurrentState.Value().latch.Value().Value())
         {
-            if (position.HasValue())
-            {
-                VerifyOrReturnError(latch.HasValue() && !latch.Value(), Status::InvalidInState);
-            }
+            VerifyOrReturnError(latch.HasValue() && !latch.Value(), Status::InvalidInState, 
+                                ChipLogError(AppServer, "Latch is True in OverallCurrentState, but MoveTo command does not set latch to False when position change is requested"));
         }
     }
 
