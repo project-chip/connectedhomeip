@@ -523,6 +523,13 @@ namespace {
 constexpr uint32_t kRpcTimeoutMs     = 1000;
 constexpr uint32_t kDefaultChannelId = 1;
 
+struct ICACCSRContext
+{
+    ICACCSRContext(uint64_t fabricId) : mAnchorFabricId(fabricId) {}
+
+    uint64_t mAnchorFabricId;
+};
+
 ::pw_rpc::nanopb::JointFabric::Client rpcClient(chip::rpc::client::GetDefaultRpcClient(), kDefaultChannelId);
 
 std::mutex responseMutex;
@@ -550,7 +557,7 @@ CHIP_ERROR WaitForResponse(CallType & call)
 }
 
 // Callback function to be called when the RPC response is received
-void OnOwnershipTransferDone(const _pw_protobuf_Empty & response, ::pw::Status status)
+void OnRPCTransferDone(const _pw_protobuf_Empty & response, ::pw::Status status)
 {
     std::lock_guard<std::mutex> lock(responseMutex);
     responseReceived = true;
@@ -559,11 +566,58 @@ void OnOwnershipTransferDone(const _pw_protobuf_Empty & response, ::pw::Status s
 
     if (status.ok())
     {
-        ChipLogProgress(JointFabric, "OnOwnershipTransferDone RPC call succeeded!");
+        ChipLogProgress(JointFabric, "OnRPCTransferDone RPC call succeeded!");
     }
     else
     {
-        ChipLogProgress(JointFabric, "OnOwnershipTransferDone RPC call failed with status: %d\n", status.code());
+        ChipLogProgress(JointFabric, "OnRPCTransferDone RPC call failed with status: %d\n", status.code());
+    }
+}
+
+static void GenerateICACCSRWork(intptr_t arg)
+{
+    ICACCSRContext * data = reinterpret_cast<ICACCSRContext *>(arg);
+    ICACCSR reply;
+
+    // TODO: call the function that creates the ICAC CSR and populate reply
+
+    Platform::Delete(data);
+
+    // RPC call to JFA to reply with the ICAC CSR
+    auto call = rpcClient.ReplyWithICACCSR(reply, OnRPCTransferDone);
+    if (!call.active())
+    {
+        ChipLogError(JointFabric, "RPC, ReplyWithICACCSR Call Error");
+        return;
+    }
+
+    CHIP_ERROR err = WaitForResponse(call);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(JointFabric, "GenerateICACCSRWork, WaitForResponse Error");
+    }
+}
+
+void OnGetICACSROnNext(const ICACCSROptions & rpcIcacOptions)
+{
+    ChipLogProgress(JointFabric, "OnGetICACSROnNext, fabricId: %ld", rpcIcacOptions.anchor_fabric_id);
+
+    ICACCSRContext * options = Platform::New<ICACCSRContext>(rpcIcacOptions.anchor_fabric_id);
+    if (options)
+    {
+        DeviceLayer::PlatformMgr().ScheduleWork(GenerateICACCSRWork, reinterpret_cast<intptr_t>(options));
+    }
+}
+
+void OnGetICACSROnDone(::pw::Status status)
+{
+    if (status.ok())
+    {
+        ChipLogProgress(JointFabric, "GetICACCSR RPC Stream successfully closed!");
+    }
+    else
+    {
+        ChipLogProgress(JointFabric, "GetICACCSR RPC Stream closed with error: %d\n", status.code());
     }
 }
 
@@ -605,7 +659,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
                 static_cast<chip::Controller::JCM::JCMDeviceCommissioner &>(CurrentCommissioner());
             chip::Controller::JCM::JCMTrustVerificationInfo & info = commissioner.GetJCMTrustVerificationInfo();
             /* extract and save the public key of the peer Admin ICAC */
-            err = Credentials::ExtractPublicKeyFromChipCert(info.adminICAC.GetSpan(), adminICACPKSpan);
+            err = Credentials::ExtractPublicKeyFromChipCert(info.adminICAC.Span(), adminICACPKSpan);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Controller, "Joint Commissioning MethodError parsing adminICAC Public Key");
