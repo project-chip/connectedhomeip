@@ -2049,7 +2049,7 @@ void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const
     mPairingDelegate->OnCommissioningComplete(nodeId, mTrustedIcacPublicKeyB, completionStatus.err);
     mTrustedIcacPublicKeyB.ClearValue();
 #else
-    mPairingDelegate->OnCommissioningComplete(nodeId, NullOptional, completionStatus.err);
+    mPairingDelegate->OnCommissioningComplete(nodeId, completionStatus.err);
 #endif
 
     PeerId peerId(GetCompressedFabricId(), nodeId);
