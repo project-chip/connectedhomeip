@@ -33,12 +33,12 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import base64
 import logging
 import os
 import random
 import tempfile
-import asyncio
 from configparser import ConfigParser
 
 import chip.clusters as Clusters
