@@ -545,7 +545,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
         overallTargetState.Value().latch.SetValue(DataModel::MakeNullable(latch.Value()));
     }
 
-    if (speed.HasValue() & mConformance.HasFeature(Feature::kSpeed))
+    if (speed.HasValue() && mConformance.HasFeature(Feature::kSpeed))
     {
         VerifyOrReturnError(speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, Status::ConstraintError);
 

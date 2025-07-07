@@ -217,7 +217,7 @@ void ClosureControlEndpoint::OnCalibrateActionComplete()
 {
     DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(GenericOverallCurrentState(
         MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed)), MakeOptional(DataModel::MakeNullable(true)),
-        MakeOptional(Globals::ThreeLevelAutoEnum::kAuto), MakeOptional(DataModel::MakeNullable(true))));
+        MakeOptional(Globals::ThreeLevelAutoEnum::kAuto), DataModel::MakeNullable(true)));
     DataModel::Nullable<GenericOverallTargetState> overallTargetState = DataModel::NullNullable;
 
     mLogic.SetMainState(MainStateEnum::kStopped);
