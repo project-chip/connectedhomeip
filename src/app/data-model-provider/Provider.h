@@ -41,7 +41,7 @@ namespace DataModel {
 ///   - class is allowed to attempt to cache indexes/locations for faster
 ///     lookups of things (e.g during iterations)
 class Provider : public ProviderMetadataTree
-{ 
+{
 public:
     virtual ~Provider() = default;
 

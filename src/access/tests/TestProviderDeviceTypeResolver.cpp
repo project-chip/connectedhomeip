@@ -19,10 +19,10 @@
 #include "access/ProviderDeviceTypeResolver.h"
 #include <pw_unit_test/framework.h>
 
-#include <app/data-model-provider/Provider.h>
 #include <app/data-model-provider/MetadataTypes.h>
+#include <app/data-model-provider/Provider.h>
+#include <lib/support/CHIPMem.h>
 #include <lib/support/ReadOnlyBuffer.h>
-#include <lib/support/CHIPMem.h> 
 
 using namespace chip;
 using namespace chip::app;
@@ -57,25 +57,43 @@ public:
     }
 
     // The following methods are not used in this test, but must be implemented as they are pure virtual in the Provider interface.
-    CHIP_ERROR SemanticTags(EndpointId, ReadOnlyBufferBuilder<Clusters::Descriptor::Structs::SemanticTagStruct::Type> &) override { return CHIP_NO_ERROR; }
-    CHIP_ERROR ClientClusters(EndpointId, ReadOnlyBufferBuilder<ClusterId> &)                                            override { return CHIP_NO_ERROR; }
-    CHIP_ERROR ServerClusters(EndpointId, ReadOnlyBufferBuilder<ServerClusterEntry> &)                                   override { return CHIP_NO_ERROR; }
-    CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<EndpointEntry> &)                                                         override { return CHIP_NO_ERROR; }
-    CHIP_ERROR EventInfo(const ConcreteEventPath &, EventEntry &)                                                        override { return CHIP_NO_ERROR; }
-    CHIP_ERROR Attributes(const ConcreteClusterPath &, ReadOnlyBufferBuilder<AttributeEntry> &)                          override { return CHIP_NO_ERROR; }
-    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath &, ReadOnlyBufferBuilder<CommandId> &)                        override { return CHIP_NO_ERROR; }
-    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath &, ReadOnlyBufferBuilder<AcceptedCommandEntry> &)              override { return CHIP_NO_ERROR; }
-    CHIP_ERROR Shutdown()                                                                                                override { return CHIP_NO_ERROR; }
-    void Temporary_ReportAttributeChanged(const AttributePathParams &)                        override {}
-    ActionReturnStatus ReadAttribute(const ReadAttributeRequest &, AttributeValueEncoder &)   override { return Protocols::InteractionModel::Status::Success; }
-    ActionReturnStatus WriteAttribute(const WriteAttributeRequest &, AttributeValueDecoder &) override { return Protocols::InteractionModel::Status::Success; }
-    void ListAttributeWriteNotification(const ConcreteAttributePath &, ListWriteOperation)    override {}
-    std::optional<ActionReturnStatus> InvokeCommand(const InvokeRequest &, TLV::TLVReader &, CommandHandler *) override { return Protocols::InteractionModel::Status::Success; }
+    CHIP_ERROR SemanticTags(EndpointId, ReadOnlyBufferBuilder<Clusters::Descriptor::Structs::SemanticTagStruct::Type> &) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR ClientClusters(EndpointId, ReadOnlyBufferBuilder<ClusterId> &) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR ServerClusters(EndpointId, ReadOnlyBufferBuilder<ServerClusterEntry> &) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<EndpointEntry> &) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR EventInfo(const ConcreteEventPath &, EventEntry &) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR Attributes(const ConcreteClusterPath &, ReadOnlyBufferBuilder<AttributeEntry> &) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath &, ReadOnlyBufferBuilder<CommandId> &) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath &, ReadOnlyBufferBuilder<AcceptedCommandEntry> &) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR Shutdown() override { return CHIP_NO_ERROR; }
+    void Temporary_ReportAttributeChanged(const AttributePathParams &) override {}
+    ActionReturnStatus ReadAttribute(const ReadAttributeRequest &, AttributeValueEncoder &) override
+    {
+        return Protocols::InteractionModel::Status::Success;
+    }
+    ActionReturnStatus WriteAttribute(const WriteAttributeRequest &, AttributeValueDecoder &) override
+    {
+        return Protocols::InteractionModel::Status::Success;
+    }
+    void ListAttributeWriteNotification(const ConcreteAttributePath &, ListWriteOperation) override {}
+    std::optional<ActionReturnStatus> InvokeCommand(const InvokeRequest &, TLV::TLVReader &, CommandHandler *) override
+    {
+        return Protocols::InteractionModel::Status::Success;
+    }
 };
 
 // Hook required by DynamicProviderDeviceTypeResolver
 FakeProvider gFakeProvider;
-Provider * GetFakeProvider() { return &gFakeProvider; }
+Provider * GetFakeProvider()
+{
+    return &gFakeProvider;
+}
 
 } // unnamed namespace
 
@@ -88,17 +106,11 @@ public:
     // a gateway or hub, e.g. a controller that can communicate with various devices.
     DynamicProviderDeviceTypeResolver resolver{ &GetFakeProvider };
 
-    static void SetUpTestSuite()
-    {
-        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
-    }
-    static void TearDownTestSuite()
-    {
-        chip::Platform::MemoryShutdown();
-    }
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 };
 
-// Checks that the system can correctly identify when a specific device type (like a smart bulb or sensor) 
+// Checks that the system can correctly identify when a specific device type (like a smart bulb or sensor)
 // is actually present on a given endpoint (for example, a particular room or appliance port).
 TEST_F(TestDeviceTypeResolver, PositiveMatches)
 {
@@ -107,7 +119,7 @@ TEST_F(TestDeviceTypeResolver, PositiveMatches)
     EXPECT_TRUE(resolver.IsDeviceTypeOnEndpoint(0x0000'0003, 2));
 }
 
-// Checks that the system does not mistakenly identify a device type as present on an endpoint where it 
+// Checks that the system does not mistakenly identify a device type as present on an endpoint where it
 // doesn’t actually exist (for example, asking if a light switch is in the kitchen when it isn't).
 TEST_F(TestDeviceTypeResolver, NegativeMatches)
 {
