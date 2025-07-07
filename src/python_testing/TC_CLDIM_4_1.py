@@ -189,7 +189,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         self.step("2g")
         if (not is_latching_supported) or (not initial_state.latch):
             logging.info("Latching feature is not supported or state is unlatched. Skipping steps 2h to 2m.")
-self.mark_step_range_skipped("2h", "2m")
+            self.mark_step_range_skipped("2h", "2m")
         else:
             # STEP 2h: Read LatchControlModes attribute
             self.step("2h")
@@ -298,7 +298,7 @@ self.mark_step_range_skipped("2h", "2m")
         self.step("5a")
         if not is_speed_supported:
             logging.info("Speed feature is not supported. Skipping steps 5b to 5d.")
-            mark_step_range_skipped("5b", "5d")
+            self.mark_step_range_skipped("5b", "5d")
         else:
             # STEP 5b: Send Step command to decrease position by 1 step with Speed=High
             self.step("5b")
@@ -333,7 +333,7 @@ self.mark_step_range_skipped("2h", "2m")
         self.step("6a")
         if not is_speed_supported:
             logging.info("Speed feature is not supported. Skipping steps 6b to 6d.")
-            mark_step_range_skipped("6b", "6d")
+            self.mark_step_range_skipped("6b", "6d")
         else:
             # STEP 6b: Send Step command to increase position by 1 step with Speed=Auto
             self.step("6b")
