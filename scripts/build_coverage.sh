@@ -38,15 +38,12 @@ _install_lcov() {
 
 _install_lcov
 
-_normpath() {
-    python3 -c "import os.path; print(os.path.normpath('$@'))"
-}
-
+# Get absolute path from a relative and normalize (e.g "foo/bar/../baz" -> "/path/to/foo/baz")
 _abspath() {
     python3 -c "import os.path; print(os.path.abspath('$@'))"
 }
 
-CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
+CHIP_ROOT=$(_abspath "$(dirname "$0")/..")
 OUTPUT_ROOT="$CHIP_ROOT/out/coverage"
 COVERAGE_ROOT="$OUTPUT_ROOT/coverage"
 SUPPORTED_CODE=(core clusters all)
@@ -145,6 +142,7 @@ if [[ ! " ${SUPPORTED_CODE[@]} " =~ " ${CODE} " ]]; then
     exit 1
 fi
 
+# Set coverage data to zero if not accumulating
 if [[ -d "$OUTPUT_ROOT/obj/src" && "$ACCUMULATE" == false ]]; then
     lcov --zerocounters --directory "$OUTPUT_ROOT/obj/src" \
         --ignore-errors format,unsupported,inconsistent,unused \
