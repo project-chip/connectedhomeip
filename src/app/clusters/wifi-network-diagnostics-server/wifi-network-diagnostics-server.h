@@ -18,28 +18,106 @@
 
 #pragma once
 
+#include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/WiFiNetworkDiagnostics/ClusterId.h>
+#include <clusters/WiFiNetworkDiagnostics/Enums.h>
+#include <clusters/WiFiNetworkDiagnostics/Metadata.h>
+#include <lib/core/DataModelTypes.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 
-class WiFiDiagnosticsServer : public DeviceLayer::WiFiDiagnosticsDelegate
+struct WiFiNetworkDiagnosticsEnabledAttributes
+{
+    bool enableBssid : 1;
+    bool enableSecurityType : 1;
+    bool enableWiFiVersion : 1;
+    bool enableChannelNumber : 1;
+    bool enableRssi : 1;
+    bool enableBeaconLostCount : 1;
+    bool enableBeaconRxCount : 1;
+    bool enablePacketMulticastRxCount : 1;
+    bool enablePacketMulticastTxCount : 1;
+    bool enablePacketUnicastRxCount : 1;
+    bool enablePacketUnicastTxCount : 1;
+    bool enableCurrentMaxRate : 1;
+    bool enableOverrunCount : 1;
+};
+
+class WiFiDiagnosticsServerLogic : public DeviceLayer::WiFiDiagnosticsDelegate
 {
 public:
-    static WiFiDiagnosticsServer & Instance();
+    WiFiDiagnosticsServerLogic(DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
+                               const WiFiNetworkDiagnosticsEnabledAttributes & enabledAttributes,
+                               BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
+        mDiagnosticProvider(diagnosticProvider), mEnabledAttributes(enabledAttributes), mFeatureFlags(featureFlags)
+    {}
 
-    // Gets called when the Node detects Node’s Wi-Fi connection has been disconnected.
+    template <typename T, typename Type>
+    CHIP_ERROR ReadIfSupported(CHIP_ERROR (DeviceLayer::DiagnosticDataProvider::*getter)(T &), Type & data,
+                               AttributeValueEncoder & aEncoder);
+
+    CHIP_ERROR ReadWiFiBssId(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadSecurityType(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadWiFiVersion(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadChannelNumber(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadWiFiRssi(AttributeValueEncoder & aEncoder);
+
+#ifdef WI_FI_NETWORK_DIAGNOSTICS_ENABLE_RESET_COUNTS_CMD
+    CHIP_ERROR HandleResetCounts()
+    {
+        mDiagnosticProvider.ResetWiFiNetworkDiagnosticsCounts();
+        return CHIP_NO_ERROR;
+    }
+#endif
+
+    // Gets called when the Node detects Node's Wi-Fi connection has been disconnected.
     void OnDisconnectionDetected(uint16_t reasonCode) override;
 
     // Gets called when the Node fails to associate or authenticate an access point.
     void OnAssociationFailureDetected(uint8_t associationFailureCause, uint16_t status) override;
 
-    // Gets when the Node’s connection status to a Wi-Fi network has changed.
+    // Gets when the Node's connection status to a Wi-Fi network has changed.
     void OnConnectionStatusChanged(uint8_t connectionStatus) override;
 
+    // Getter methods for private members
+    const BitFlags<WiFiNetworkDiagnostics::Feature> & GetFeatureFlags() const { return mFeatureFlags; }
+    const WiFiNetworkDiagnosticsEnabledAttributes & GetEnabledAttributes() const { return mEnabledAttributes; }
+
 private:
-    static WiFiDiagnosticsServer instance;
+    DeviceLayer::DiagnosticDataProvider & mDiagnosticProvider;
+    const WiFiNetworkDiagnosticsEnabledAttributes mEnabledAttributes;
+    const BitFlags<WiFiNetworkDiagnostics::Feature> mFeatureFlags;
+};
+
+class WiFiDiagnosticsServer : public DefaultServerCluster
+{
+public:
+    WiFiDiagnosticsServer(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
+                          const WiFiNetworkDiagnosticsEnabledAttributes & enabledAttributes,
+                          BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
+        DefaultServerCluster({ endpointId, WiFiNetworkDiagnostics::Id }),
+        mLogic(diagnosticProvider, enabledAttributes, featureFlags)
+    {}
+
+    // Server cluster implementation
+
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override;
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
+    std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
+                                                               chip::TLV::TLVReader & input_arguments,
+                                                               CommandHandler * handler) override;
+
+    WiFiDiagnosticsServerLogic & GetLogic() { return mLogic; }
+
+private:
+    WiFiDiagnosticsServerLogic mLogic;
 };
 
 } // namespace Clusters
