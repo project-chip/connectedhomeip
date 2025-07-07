@@ -35,9 +35,11 @@ from chip.testing.matter_testing import AttributeMatcher, ClusterAttributeChange
 from mdns_discovery import mdns_discovery
 from mobly import asserts
 
+
 class CommissioningWindowOption(IntEnum):
     ORIGINAL_SETUP_CODE = 0  # kOriginalSetupCode: Original commissioning window (PASE)
     TOKEN_WITH_RANDOM_PIN = 1  # kTokenWithRandomPIN: Enhanced commissioning window (ECM)
+
 
 class CADMINSupport:
     def __init__(self, test_instance):
