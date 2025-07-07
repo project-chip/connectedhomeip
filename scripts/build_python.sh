@@ -47,6 +47,7 @@ declare install_virtual_env
 declare clean_virtual_env=yes
 declare install_pytest_requirements=yes
 declare install_jupyterlab=no
+declare chip_device_config_enable_joint_fabric=true
 declare -a extra_packages
 declare -a extra_gn_args
 
