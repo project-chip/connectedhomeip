@@ -5,6 +5,24 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python Debugger: Current File with Arguments",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": [
+                // "--target",
+                // "linux-x64-jf-admin-app",
+                // "build"
+                "--string-arg",
+                "jfc_server_app:${workspaceFolder}/examples/jf-control-app/out2/debug/jfc-app",
+                "--string-arg",
+                "jfa_server_app:${workspaceFolder}/examples/jf-admin-app/linux/out2/debug/jfa-app"
+                // "--string-arg",
+                // "th_server_app:${workspaceFolder}/examples/all-clusters-app/linux/out/debug/chip-all-clusters-app"
+            ]
+        },
+        {
             "name": "Python: Mock Server Tests",
             "type": "debugpy",
             "request": "launch",
