@@ -34,11 +34,11 @@ class TC_DIMMABLELIGHT(MatterBaseTest):
 
     async def _read_on_off(self):
         return await self.read_single_attribute_check_success(
-            endpoint=self._PUMP_ENDPOINT, cluster=Clusters.Objects.OnOff, attribute=Clusters.Objects.OnOff.Attributes.OnOff)
+            endpoint=self._DIMMABLELIGHT_ENDPOINT, cluster=Clusters.Objects.OnOff, attribute=Clusters.Objects.OnOff.Attributes.OnOff)
 
     async def _read_current_level(self):
         return await self.read_single_attribute_check_success(
-            endpoint=self._PUMP_ENDPOINT, cluster=Clusters.Objects.LevelControl, attribute=Clusters.Objects.LevelControl.Attributes.CurrentLevel)
+            endpoint=self._DIMMABLELIGHT_ENDPOINT, cluster=Clusters.Objects.LevelControl, attribute=Clusters.Objects.LevelControl.Attributes.CurrentLevel)
 
     def desc_TC_DIMMABLELIGHT(self) -> str:
         return "[TC_DIMMABLELIGHT] chef dimmablelight functionality test."
