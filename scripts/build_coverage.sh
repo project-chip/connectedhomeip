@@ -42,6 +42,10 @@ _normpath() {
     python3 -c "import os.path; print(os.path.normpath('$@'))"
 }
 
+_abspath() {
+    python3 -c "import os.path; print(os.path.abspath('$@'))"
+}
+
 CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
 OUTPUT_ROOT="$CHIP_ROOT/out/coverage"
 COVERAGE_ROOT="$OUTPUT_ROOT/coverage"
@@ -272,7 +276,7 @@ genhtml "$COVERAGE_ROOT/lcov_final.info" \
 cp "$CHIP_ROOT/integrations/appengine/webapp_config.yaml" \
     "$COVERAGE_ROOT/webapp_config.yaml"
 
-HTML_INDEX=$(realpath "$COVERAGE_ROOT/html/index.html")
+HTML_INDEX=$(_abspath "$COVERAGE_ROOT/html/index.html")
 if [ -f "$HTML_INDEX" ]; then
     echo
     echo "============================================================"
