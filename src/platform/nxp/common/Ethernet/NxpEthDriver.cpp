@@ -119,9 +119,11 @@ NetworkIterator * NxpEthDriver::GetNetworks()
     EthernetNetworkIterator * iterator = new EthernetNetworkIterator();
 
     uint8_t interface_index = netif_get_index(&netif_app);
-    /* +1 for end char, example of interface name: eth_1*/
-    iterator->interfaceNameLen = std::min(strlen("eth_") + sizeof(interface_index) + 1, sizeof(iterator->interfaceName));
-    snprintf((char *) iterator->interfaceName, iterator->interfaceNameLen, "eth_%d", interface_index);
+    int len = snprintf(reinterpret_cast<char *>(iterator->interfaceName), sizeof(iterator->interfaceName), "eth_%u", interface_index);
+    if (len > 0 && static_cast<size_t>(len) < sizeof(iterator->interfaceName))
+    {
+        iterator->interfaceNameLen = static_cast<uint8_t>(len);
+    }
 
     return iterator;
 }
