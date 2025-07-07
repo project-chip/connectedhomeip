@@ -191,8 +191,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
         sub_handler.reset()
         if latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
             logging.info("Manual latching is required. Skipping steps 3b and 3c.")
-            self.skip_step("3b")
-            self.skip_step("3c")
+            self.mark_step_range_skipped("3b", "3c")
         else:
             # STEP 3b: Send SetTarget command with Latch=True
             self.step("3b")
@@ -212,8 +211,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
         # STEP 3d: If manual latching is not required, skip steps 3e to 3f
         self.step("3d")
         if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
-            self.skip_step("3e")
-            self.skip_step("3f")
+            self.mark_step_range_skipped("3e", "3f")
         else:
             # STEP 3e: Send SetTarget command with Latch=True
             self.step("3e")
@@ -272,8 +270,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
         self.step("5b")
         if not latch_control_modes & Clusters.ClosureDimension.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
             logging.info("Manual latching is not required. Skipping steps 5c to 5d.")
-            self.skip_step("5c")
-            self.skip_step("5d")
+            self.mark_step_range_skipped("5c", "5d")
             return
         else:
             # STEP 5c: Send SetTarget command with Latch=False

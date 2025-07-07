@@ -176,12 +176,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         self.step("2f")
         if (not is_latching_supported) or (not initial_state.latch):
             logging.info("Latching feature is not supported or state is unlatched. Skipping steps 2g to 2l.")
-            self.skip_step("2g")
-            self.skip_step("2h")
-            self.skip_step("2i")
-            self.skip_step("2j")
-            self.skip_step("2k")
-            self.skip_step("2l")
+            self.mark_step_range_skipped("2g", "2l")
         else:
             # STEP 2g: Read LatchControlModes attribute
             self.step("2g")
@@ -236,10 +231,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         self.step("4a")
         if is_positioning_supported:
             logging.info("Positioning feature is supported. Skipping steps 4b to 4e.")
-            self.skip_step("4b")
-            self.skip_step("4c")
-            self.skip_step("4d")
-            self.skip_step("4e")
+            self.mark_step_range_skipped("4b", "4e")
         else:
             # STEP 4b: Send SetTarget command with Position MaxPosition
             self.step("4b")
@@ -297,12 +289,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         self.step("5a")
         if (not is_positioning_supported) or (not is_limitation_supported):
             logging.info("Positioning feature or Limitation feature is not supported. Skipping steps 5b to 5g.")
-            self.skip_step("5b")
-            self.skip_step("5c")
-            self.skip_step("5d")
-            self.skip_step("5e")
-            self.skip_step("5f")
-            self.skip_step("5g")
+            self.mark_step_range_skipped("5b", "5g")
         else:
             # STEP 5b: Send SetTarget command with Position 0%
             self.step("5b")
@@ -382,15 +369,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         self.step("7a")
         if (not is_positioning_supported):
             logging.info("Positioning feature is not supported. Skipping steps 7b to 7j.")
-            self.skip_step("7b")
-            self.skip_step("7c")
-            self.skip_step("7d")
-            self.skip_step("7e")
-            self.skip_step("7f")
-            self.skip_step("7g")
-            self.skip_step("7h")
-            self.skip_step("7i")
-            self.skip_step("7j")
+            self.mark_step_range_skipped("7b", "7j")
         else:
             # STEP 7b: Read CurrentState attribute
             self.step("7b")
