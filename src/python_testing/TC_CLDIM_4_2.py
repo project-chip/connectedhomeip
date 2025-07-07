@@ -108,9 +108,9 @@ class TC_CLDIM_4_2(MatterBaseTest):
             attribute=attributes.FeatureMap
         )
 
-        is_positioning_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
-        is_latching_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
-        is_speed_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
+        is_positioning_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
+        is_latching_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
+        is_speed_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
 
         # STEP 2b: If Positioning feature is not supported, skip remaining steps
         self.step("2b")
@@ -132,12 +132,7 @@ class TC_CLDIM_4_2(MatterBaseTest):
         self.step("2e")
         if (not is_latching_supported) or (not initial_state.latch):
             logging.info("Latching feature is not supported or state is unlatched. Skipping steps 2f to 2k.")
-            self.skip_step("2f")
-            self.skip_step("2g")
-            self.skip_step("2h")
-            self.skip_step("2i")
-            self.skip_step("2j")
-            self.skip_step("2k")
+            mark_step_range_skipped("2f", "2k")
         else:
             # STEP 2f: Read LatchControlModes attribute
             self.step("2f")

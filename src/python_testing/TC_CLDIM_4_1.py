@@ -152,10 +152,10 @@ class TC_CLDIM_4_1(MatterBaseTest):
         self.step("2a")
         feature_map = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
 
-        is_positioning_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
-        is_latching_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
-        is_limitation_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kLimitation
-        is_speed_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
+        is_positioning_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
+        is_latching_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
+        is_limitation_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kLimitation
+        is_speed_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
 
         # STEP 2b: If Positioning feature is not supported, skip remaining steps
         self.step("2b")
@@ -189,12 +189,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         self.step("2g")
         if (not is_latching_supported) or (not initial_state.latch):
             logging.info("Latching feature is not supported or state is unlatched. Skipping steps 2h to 2m.")
-            self.skip_step("2h")
-            self.skip_step("2i")
-            self.skip_step("2j")
-            self.skip_step("2k")
-            self.skip_step("2l")
-            self.skip_step("2m")
+self.mark_step_range_skipped("2h", "2m")
         else:
             # STEP 2h: Read LatchControlModes attribute
             self.step("2h")
@@ -303,9 +298,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         self.step("5a")
         if not is_speed_supported:
             logging.info("Speed feature is not supported. Skipping steps 5b to 5d.")
-            self.skip_step("5b")
-            self.skip_step("5c")
-            self.skip_step("5d")
+            mark_step_range_skipped("5b", "5d")
         else:
             # STEP 5b: Send Step command to decrease position by 1 step with Speed=High
             self.step("5b")
@@ -340,9 +333,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
         self.step("6a")
         if not is_speed_supported:
             logging.info("Speed feature is not supported. Skipping steps 6b to 6d.")
-            self.skip_step("6b")
-            self.skip_step("6c")
-            self.skip_step("6d")
+            mark_step_range_skipped("6b", "6d")
         else:
             # STEP 6b: Send Step command to increase position by 1 step with Speed=Auto
             self.step("6b")
