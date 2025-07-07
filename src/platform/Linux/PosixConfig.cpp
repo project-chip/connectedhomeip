@@ -213,11 +213,12 @@ CHIP_ERROR PosixConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
         err = gChipLinuxFactoryStorage.ReadValueStr(kConfigKey_UniqueId.Name, buf, bufSize, outLen);
         if (err == CHIP_NO_ERROR && outLen > 0)
         {
-            // If any of this fails, just return the existing err == CHIP_NO_ERROR.
-            SuccessOrExit(storage->WriteValueStr(kConfigKey_UniqueId.Name, buf));
-            SuccessOrExit(storage->Commit());
-            SuccessOrExit(gChipLinuxFactoryStorage.WriteValueStr(kConfigKey_UniqueId.Name, ""));
-            SuccessOrExit(gChipLinuxFactoryStorage.Commit());
+            // If any of these steps fail, ignore the error and just return the existing
+            // err == CHIP_NO_ERROR, since we successfully returned the UniqueId from Factory.
+            SuccessOrExit(/* ignored = */ storage->WriteValueStr(kConfigKey_UniqueId.Name, buf));
+            SuccessOrExit(/* ignored = */ storage->Commit());
+            SuccessOrExit(/* ignored = */ gChipLinuxFactoryStorage.WriteValueStr(kConfigKey_UniqueId.Name, ""));
+            SuccessOrExit(/* ignored = */ gChipLinuxFactoryStorage.Commit());
             ChipLogProgress(DeviceLayer, "NVS migrated %s from %s to %s namespace", key.Name, kConfigNamespace_ChipFactory,
                             key.Namespace);
         }
