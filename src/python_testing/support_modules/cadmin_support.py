@@ -25,6 +25,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from time import sleep
 from typing import Any, Optional
+from enum import IntEnum
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
@@ -34,6 +35,9 @@ from chip.testing.matter_testing import AttributeMatcher, ClusterAttributeChange
 from mdns_discovery import mdns_discovery
 from mobly import asserts
 
+class CommissioningWindowOption(IntEnum):
+    ORIGINAL_SETUP_CODE = 0  # kOriginalSetupCode: Original commissioning window (PASE)
+    TOKEN_WITH_RANDOM_PIN = 1  # kTokenWithRandomPIN: Enhanced commissioning window (ECM)
 
 class CADMINSupport:
     def __init__(self, test_instance):
@@ -81,7 +85,7 @@ class CADMINSupport:
         Returns:
             Clock skew factor in milliseconds (1% of duration or 100ms, whichever is greater)
         """
-        skew_percentage = 0.01  # 1%
+        skew_percentage = 1 / 100.0
         skew_ms = max(int(duration_seconds * 1000 * skew_percentage), 100)
         return skew_ms
 
@@ -121,7 +125,7 @@ class CADMINSupport:
     async def wait_for_window_status_change(
         self,
         window_status_accumulator: ClusterAttributeChangeAccumulator,
-        expected_status: int,
+        is_open_expected: bool,
         timeout_sec: float = 10.0
     ) -> bool:
         """
@@ -129,27 +133,27 @@ class CADMINSupport:
 
         Args:
             window_status_accumulator: The subscription accumulator
-            expected_status: Expected window status (0=closed, 1=open)
+            is_open_expected: Expected window status (False=closed, True=open)
             timeout_sec: Timeout in seconds
 
         Returns:
             True if status changed to expected value, False if timeout
         """
-        status_name = "CLOSED" if expected_status == 0 else "OPEN"
-        logging.info(f"Waiting for window status to change to {status_name} (status={expected_status})")
+        status_name = "CLOSED" if is_open_expected == False else "OPEN"
+        logging.info(f"Waiting for window status to change to {status_name} (status={is_open_expected})")
         logging.info(f"Timeout set to: {timeout_sec}s")
 
         status_match = AttributeMatcher.from_callable(
-            f"WindowStatus is {expected_status}",
-            lambda report: report.value == expected_status
+            f"WindowStatus is {is_open_expected}",
+            lambda report: report.value == is_open_expected
         )
 
         try:
             window_status_accumulator.await_all_expected_report_matches([status_match], timeout_sec=timeout_sec)
-            logging.info(f"✅ Window status changed to {status_name} (status={expected_status})")
+            logging.info(f"✅ Window status changed to {status_name} (status={is_open_expected})")
             return True
         except asyncio.TimeoutError as e:
-            logging.error(f"❌ Timeout waiting for window status {expected_status} ({status_name}): {e}")
+            logging.error(f"❌ Timeout waiting for window status {is_open_expected} ({status_name}): {e}")
             logging.error(f"Timeout occurred after {timeout_sec}s")
             return False
 
@@ -217,8 +221,10 @@ class CADMINSupport:
             Dictionary with monitoring results
         """
         start_time = datetime.now()
+        timeout_buffer_sec = 10
         clock_skew_ms = self.calculate_clock_skew_factor(expected_duration_seconds)
         max_allowed_duration = expected_duration_seconds + (clock_skew_ms / 1000)
+        monitoring_timeout = max_allowed_duration + timeout_buffer_sec
 
         logging.info("=== COMMISSIONING WINDOW MONITORING STARTED ===")
         logging.info(f"Monitoring commissioning window closure for node {node_id}")
@@ -241,8 +247,8 @@ class CADMINSupport:
             # Wait for window to close (status = 0)
             window_closed = await self.wait_for_window_status_change(
                 window_status_accumulator=window_status_accumulator,
-                expected_status=0,
-                timeout_sec=max_allowed_duration + 10  # Add 10s buffer
+                is_open_expected=False,
+                timeout_sec=monitoring_timeout
             )
 
             # Calculate actual duration
@@ -256,7 +262,7 @@ class CADMINSupport:
             if not window_closed:
                 timing_valid = False
                 logging.error("❌ WINDOW DID NOT CLOSE WITHIN EXPECTED TIME")
-                logging.error(f"Monitoring timed out after {max_allowed_duration + 10}s")
+                logging.error(f"Monitoring timed out after {monitoring_timeout}s")
             elif actual_duration > max_allowed_duration:
                 timing_valid = False
                 logging.error("❌ WINDOW CLOSED TOO LATE")
@@ -291,7 +297,7 @@ class CADMINSupport:
         timeout: int,
         node_id: int,
         discriminator: int = None,
-        option: int = 1,
+        commissioning_option: CommissioningWindowOption = CommissioningWindowOption.TOKEN_WITH_RANDOM_PIN,
         iteration: int = 10000,
         min_interval_sec: int = 0,
         max_interval_sec: int = 30
@@ -304,7 +310,9 @@ class CADMINSupport:
             timeout: Window timeout in seconds
             node_id: Target node ID
             discriminator: Optional discriminator value
-            option: Commissioning option (default: 1)
+            commissioning_option: Commissioning window option (CommissioningWindowOption, default: TOKEN_WITH_RANDOM_PIN)
+                - ORIGINAL_SETUP_CODE (0): Original commissioning window (PASE)
+                - TOKEN_WITH_RANDOM_PIN (1): Enhanced commissioning window (ECM)
             iteration: Number of iterations (default: 10000)
             min_interval_sec: Minimum reporting interval for subscription
             max_interval_sec: Maximum reporting interval for subscription
@@ -326,7 +334,7 @@ class CADMINSupport:
             timeout=timeout,
             node_id=node_id,
             discriminator=discriminator,
-            option=option,
+            commissioning_option=commissioning_option,
             iteration=iteration
         )
 
@@ -338,7 +346,7 @@ class CADMINSupport:
         timeout: int,
         node_id: int,
         discriminator: int = None,
-        option: int = 1,
+        commissioning_option: CommissioningWindowOption = CommissioningWindowOption.TOKEN_WITH_RANDOM_PIN,
         iteration: int = 10000
     ) -> CommissioningParameters:
         """
@@ -349,7 +357,9 @@ class CADMINSupport:
             timeout: Window timeout in seconds
             node_id: Target node ID
             discriminator: Optional discriminator value
-            option: Commissioning option (default: 1)
+            commissioning_option: Commissioning window option (CommissioningWindowOption, default: TOKEN_WITH_RANDOM_PIN)
+                - ORIGINAL_SETUP_CODE (0): Original commissioning window (PASE)
+                - TOKEN_WITH_RANDOM_PIN (1): Enhanced commissioning window (ECM)
             iteration: Number of iterations (default: 10000)
         """
         try:
@@ -358,7 +368,7 @@ class CADMINSupport:
                 timeout=timeout,
                 iteration=iteration,
                 discriminator=discriminator if discriminator is not None else random.randint(0, 4095),
-                option=option
+                option=commissioning_option.value
             )
             return params
         except Exception as e:
