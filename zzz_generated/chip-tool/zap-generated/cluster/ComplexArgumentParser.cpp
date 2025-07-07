@@ -4948,6 +4948,52 @@ void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::S
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
+                                        chip::app::Clusters::Thermostat::Structs::ThermostatSuggestionStruct::Type & request,
+                                        Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("ThermostatSuggestionStruct.uniqueID", "uniqueID", value.isMember("uniqueID")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThermostatSuggestionStruct.presetHandle", "presetHandle",
+                                                                  value.isMember("presetHandle")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThermostatSuggestionStruct.effectiveTime", "effectiveTime",
+                                                                  value.isMember("effectiveTime")));
+    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("ThermostatSuggestionStruct.expirationTime", "expirationTime",
+                                                                  value.isMember("expirationTime")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "uniqueID");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.uniqueID, value["uniqueID"]));
+    valueCopy.removeMember("uniqueID");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "presetHandle");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.presetHandle, value["presetHandle"]));
+    valueCopy.removeMember("presetHandle");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "effectiveTime");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.effectiveTime, value["effectiveTime"]));
+    valueCopy.removeMember("effectiveTime");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "expirationTime");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.expirationTime, value["expirationTime"]));
+    valueCopy.removeMember("expirationTime");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::Thermostat::Structs::ThermostatSuggestionStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.uniqueID);
+    ComplexArgumentParser::Finalize(request.presetHandle);
+    ComplexArgumentParser::Finalize(request.effectiveTime);
+    ComplexArgumentParser::Finalize(request.expirationTime);
+}
+
+CHIP_ERROR ComplexArgumentParser::Setup(const char * label,
                                         chip::app::Clusters::Thermostat::Structs::WeeklyScheduleTransitionStruct::Type & request,
                                         Json::Value & value)
 {
