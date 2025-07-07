@@ -329,8 +329,8 @@ protected:
 
 struct CurrentTariffAttrsCtx
 {
-    Delegate * TariffProvider;
-    EndpointId EndpointId;
+    Delegate * mTariffProvider;
+    EndpointId mEndpointId;
 
     std::map<uint32_t, const Structs::DayPatternStruct::Type *> DayPatternsMap;
     std::map<uint32_t, const Structs::DayEntryStruct::Type *> DayEntriesMap;
