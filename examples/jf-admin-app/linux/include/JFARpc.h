@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2025 Project CHIP Authors
- *    Copyright (c) 2025 Nest Labs, Inc.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,19 +18,16 @@
 
 #pragma once
 
-#include "BaseAppEvent.h"
+#include <lib/core/CHIPError.h>
 
-struct AppEvent : public BaseAppEvent
+namespace chip {
+
+class JFARpc
 {
-    enum AppEventTypes
-    {
-        kEventType_Closure = BaseAppEvent::kEventType_Max + 1,
-        kEventType_Install,
-    };
-
-    struct
-    {
-        uint8_t Action;
-        uint16_t EndpointId;
-    } ClosureEvent;
+public:
+    virtual ~JFARpc() {}
+    virtual CHIP_ERROR GetICACCSRForJF(uint64_t anchorFabricId, MutableByteSpan & icacCSR) = 0;
+    virtual void CloseStreams()                                                            = 0;
 };
+
+} // namespace chip
