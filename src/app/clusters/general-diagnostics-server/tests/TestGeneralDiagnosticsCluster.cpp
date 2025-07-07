@@ -108,8 +108,8 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         class AllProvider : public DeviceLayer::DiagnosticDataProvider
         {
         public:
-            CHIP_ERROR GetRebootCount(uint16_t & rebootCount) override 
-            { 
+            CHIP_ERROR GetRebootCount(uint16_t & rebootCount) override
+            {
                 rebootCount = 123;
                 return CHIP_NO_ERROR;
             }
