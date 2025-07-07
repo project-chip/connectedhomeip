@@ -178,7 +178,7 @@ class TC_JFADMIN_2_2(MatterBaseTest):
 
         self.step("2")
         try:
-            resp = await self.send_single_cmd(
+            await self.send_single_cmd(
                 dev_ctrl=devCtrlEcoA,
                 node_id=1,
                 endpoint=1,
