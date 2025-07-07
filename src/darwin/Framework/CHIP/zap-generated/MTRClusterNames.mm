@@ -8989,6 +8989,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"TariffUnit";
             break;
 
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeMaximumMeteredQuantitiesID:
+            result = @"MaximumMeteredQuantities";
+            break;
+
         case MTRAttributeIDTypeClusterCommodityMeteringAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;

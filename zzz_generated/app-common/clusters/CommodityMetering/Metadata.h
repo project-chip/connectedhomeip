@@ -34,6 +34,11 @@ namespace TariffUnit {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(TariffUnit::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace TariffUnit
+namespace MaximumMeteredQuantities {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MaximumMeteredQuantities::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace MaximumMeteredQuantities
 
 } // namespace Attributes
 

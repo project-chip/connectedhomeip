@@ -19248,6 +19248,17 @@ public class ClusterReadMapping {
           readCommodityMeteringTariffUnitCommandParams
         );
         result.put("readTariffUnitAttribute", readCommodityMeteringTariffUnitAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommodityMeteringMaximumMeteredQuantitiesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommodityMeteringMaximumMeteredQuantitiesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommodityMeteringCluster) cluster).readMaximumMeteredQuantitiesAttribute(
+              (ChipClusters.CommodityMeteringCluster.MaximumMeteredQuantitiesAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedCommodityMeteringClusterMaximumMeteredQuantitiesAttributeCallback(),
+          readCommodityMeteringMaximumMeteredQuantitiesCommandParams
+        );
+        result.put("readMaximumMeteredQuantitiesAttribute", readCommodityMeteringMaximumMeteredQuantitiesAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readCommodityMeteringGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readCommodityMeteringGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

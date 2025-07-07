@@ -24,6 +24,10 @@ namespace TariffUnit {
 inline constexpr AttributeId Id = 0x00000002;
 } // namespace TariffUnit
 
+namespace MaximumMeteredQuantities {
+inline constexpr AttributeId Id = 0x00000003;
+} // namespace MaximumMeteredQuantities
+
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
 } // namespace GeneratedCommandList

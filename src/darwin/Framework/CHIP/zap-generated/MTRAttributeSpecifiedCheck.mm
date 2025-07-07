@@ -6559,6 +6559,9 @@ static BOOL AttributeIsSpecifiedInCommodityMeteringCluster(AttributeId aAttribut
     case Attributes::TariffUnit::Id: {
         return YES;
     }
+    case Attributes::MaximumMeteredQuantities::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }

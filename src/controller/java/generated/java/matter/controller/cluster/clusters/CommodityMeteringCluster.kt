@@ -70,6 +70,17 @@ class CommodityMeteringCluster(
     object SubscriptionEstablished : TariffUnitAttributeSubscriptionState()
   }
 
+  class MaximumMeteredQuantitiesAttribute(val value: UShort?)
+
+  sealed class MaximumMeteredQuantitiesAttributeSubscriptionState {
+    data class Success(val value: UShort?) : MaximumMeteredQuantitiesAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) :
+      MaximumMeteredQuantitiesAttributeSubscriptionState()
+
+    object SubscriptionEstablished : MaximumMeteredQuantitiesAttributeSubscriptionState()
+  }
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -392,6 +403,101 @@ class CommodityMeteringCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(TariffUnitAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readMaximumMeteredQuantitiesAttribute(): MaximumMeteredQuantitiesAttribute {
+    val ATTRIBUTE_ID: UInt = 3u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Maximummeteredquantities attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UShort? =
+      if (!tlvReader.isNull()) {
+        tlvReader.getUShort(AnonymousTag)
+      } else {
+        tlvReader.getNull(AnonymousTag)
+        null
+      }
+
+    return MaximumMeteredQuantitiesAttribute(decodedValue)
+  }
+
+  suspend fun subscribeMaximumMeteredQuantitiesAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<MaximumMeteredQuantitiesAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 3u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            MaximumMeteredQuantitiesAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Maximummeteredquantities attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UShort? =
+            if (!tlvReader.isNull()) {
+              tlvReader.getUShort(AnonymousTag)
+            } else {
+              tlvReader.getNull(AnonymousTag)
+              null
+            }
+
+          decodedValue?.let { emit(MaximumMeteredQuantitiesAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(MaximumMeteredQuantitiesAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
