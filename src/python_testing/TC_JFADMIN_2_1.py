@@ -108,11 +108,11 @@ class TC_JFADMIN_2_1(MatterBaseTest):
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork 1 {self.jfadmin_fabric_a_passcode} --anchor true",
-            expected_output="[JF] Anchor Administrator commissioned with sucess")
+            expected_output="[JF] Anchor Administrator commissioned with success")
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
-        jfcStorage.read(self.storage_fabric_a+'/chip_tool_config.alpha.ini')
+        jfcStorage.read(os.path.join(self.storage_fabric_a, 'chip_tool_config.alpha.ini'))
         self.ecoACtrlStorage = {
             "sdk-config": {
                 "ExampleOpCredsCAKey1": jfcStorage.get("Default", "ExampleOpCredsCAKey0"),
@@ -171,7 +171,7 @@ class TC_JFADMIN_2_1(MatterBaseTest):
             nodeid=1, attributes=[(1, Clusters.JointFabricAdministrator.Attributes.AdministratorFabricIndex)],
             returnClusterObject=True)
         attributeAdminFabricIndex = response[1][Clusters.JointFabricAdministrator].administratorFabricIndex
-        asserts.assert_greater_equal(1, attributeAdminFabricIndex,
+        asserts.assert_greater_equal(attributeAdminFabricIndex, 1,
                                      "AdministratorFabricIndex is < 1. Expected AdministratorFabricIndex >= 1")
         asserts.assert_less_equal(attributeAdminFabricIndex, 255,
                                   "AdministratorFabricIndex is > 255. Expected AdministratorFabricIndex <= 255")
@@ -181,7 +181,7 @@ class TC_JFADMIN_2_1(MatterBaseTest):
             nodeid=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
             returnClusterObject=True)
         asserts.assert_equal(attributeAdminFabricIndex,
-                             response[0][Clusters.OperationalCredentials].fabrics[0].fabricIndex, "AdministartorFabricIndex != fabricIndex")
+                             response[0][Clusters.OperationalCredentials].fabrics[0].fabricIndex, "AdministratorFabricIndex != fabricIndex")
 
 
 if __name__ == "__main__":

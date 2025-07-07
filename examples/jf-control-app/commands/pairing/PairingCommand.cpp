@@ -560,7 +560,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, const Optional<Crypt
     {
         if (!mSkipCommissioningComplete.ValueOr(false))
         {
-            ChipLogProgress(JointFabric, "Anchor Administrator commissioned with sucess");
+            ChipLogProgress(JointFabric, "Anchor Administrator commissioned with success");
             mAnchorNodeId = nodeId;
         }
         else
