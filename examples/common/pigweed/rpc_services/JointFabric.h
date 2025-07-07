@@ -1,4 +1,5 @@
 #include "JFAManager.h"
+#include "JFARpc.h"
 #include "joint_fabric_service/joint_fabric_service.rpc.pb.h"
 
 #include <crypto/CHIPCryptoPAL.h>
@@ -9,10 +10,17 @@ using namespace chip::Crypto;
 
 namespace joint_fabric_service {
 
-class JointFabric : public pw_rpc::nanopb::JointFabric::Service<JointFabric>
+class JointFabric : public pw_rpc::nanopb::JointFabric::Service<JointFabric>, public JFARpc
 {
 public:
+    /*RPC from jfc-client to jfa-server */
     ::pw::Status TransferOwnership(const ::OwnershipContext & request, ::pw_protobuf_Empty & response);
+    void GetICACCSR(const ::pw_protobuf_Empty & request, ServerWriter<::ICACCSROptions> & writer);
+    ::pw::Status ReplyWithICACCSR(const ::ICACCSR & ICACCSRBytes, ::pw_protobuf_Empty & response);
+
+    /* JFARpc overrides */
+    CHIP_ERROR GetICACCSRForJF(uint64_t anchorFabricId, MutableByteSpan & icacCSR);
+    void CloseStreams();
 
 private:
     struct OwnershipTransferContext
@@ -35,6 +43,8 @@ private:
         JFAMgr().FinalizeCommissioning(data->mNodeId, data->mJCM, data->mTrustedIcacPublicKeyBSerialized);
         Platform::Delete(data);
     }
+
+    ServerWriter<::ICACCSROptions> rpcStreamGetICACCSR;
 };
 
 } // namespace joint_fabric_service

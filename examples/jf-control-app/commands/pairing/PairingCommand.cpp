@@ -65,6 +65,8 @@ CHIP_ERROR PairingCommand::RunCommand()
         static_cast<chip::Controller::JCM::JCMDeviceCommissioner &>(CurrentCommissioner());
     commissioner.RegisterPairingDelegate(this);
     commissioner.RegisterTrustVerificationDelegate(this);
+    chip::CASEAuthTag administratorCAT   = GetAdminCATWithVersion(CHIP_CONFIG_ADMINISTRATOR_CAT_INITIAL_VERSION);
+    NodeId administratorCaseAdminSubject = NodeIdFromCASEAuthTag(administratorCAT);
 
     // This check is to ensure that the --anchor and --jcm options are not used together.  If they are return an immediate error.
     if (mJCM.ValueOr(false) && mAnchor.ValueOr(false))
@@ -73,22 +75,9 @@ CHIP_ERROR PairingCommand::RunCommand()
         return CHIP_ERROR_BAD_REQUEST;
     }
 
-    /* TODO: if JFA is onboarded get the Anchor CAT initial version from JF_DS@GroupList (through RPC)
-     * https://github.com/project-chip/connectedhomeip/issues/39443
-     */
-    chip::CASEAuthTag anchorCAT   = GetAnchorCATWithVersion(CHIP_CONFIG_ANCHOR_CAT_INITIAL_VERSION);
-    NodeId anchorCaseAdminSubject = NodeIdFromCASEAuthTag(anchorCAT);
-
-    /* TODO: if JFA is onboarded get the administrator CAT initial version from JF_DS@GroupList (through RPC)
-     * https://github.com/project-chip/connectedhomeip/issues/39443
-     */
-    chip::CASEAuthTag administratorCAT   = GetAdminCATWithVersion(CHIP_CONFIG_ADMINISTRATOR_CAT_INITIAL_VERSION);
-    NodeId administratorCaseAdminSubject = NodeIdFromCASEAuthTag(administratorCAT);
-
-    // JFA will be issued a NOC with Anchor CAT and Administrator CAT
-    mCASEAuthTags = MakeOptional(std::vector<uint32_t>{ administratorCAT, anchorCAT });
-
     NodeId anchorNodeId = GetAnchorNodeId();
+
+    // Check if the Anchor Administrator is not already commissioned.
     if (anchorNodeId == chip::kUndefinedNodeId)
     {
         // The Anchor Administrator is not already commissioned, check if the mAnchor option is set.
@@ -100,6 +89,11 @@ CHIP_ERROR PairingCommand::RunCommand()
             ChipLogError(JointFabric, "Please first commission the Anchor Administrator: add `--anchor true` parameter");
             return CHIP_ERROR_NOT_CONNECTED;
         }
+
+        chip::CASEAuthTag anchorCAT = GetAnchorCATWithVersion(CHIP_CONFIG_ANCHOR_CAT_INITIAL_VERSION);
+
+        // JFA will be issued a NOC with Anchor CAT and Administrator CAT
+        mCASEAuthTags = MakeOptional(std::vector<uint32_t>{ administratorCAT, anchorCAT });
     }
     else if (mAnchor.ValueOr(false))
     {
@@ -115,26 +109,15 @@ CHIP_ERROR PairingCommand::RunCommand()
         mSkipCommissioningComplete = MakeOptional(true);
     }
 
-    mDeviceIsICD = false;
-
     // Clear the CATs in OperationalCredentialsIssuer
     mCredIssuerCmds->SetCredentialIssuerCATValues(kUndefinedCATs);
 
     // All the AddNOC commands invoked by JFC will have
     // the value below for the CaseAdminSubject field
-    if (mJCM.ValueOr(false))
-    {
-        // JFA-B will be issued a NOC with Administrator CAT
-        mCASEAuthTags = MakeOptional(std::vector<uint32_t>{ administratorCAT });
+    (static_cast<ExampleCredentialIssuerCommands *>(mCredIssuerCmds))
+        ->SetCredentialIssuerCaseAdminSubject(administratorCaseAdminSubject);
 
-        (static_cast<ExampleCredentialIssuerCommands *>(mCredIssuerCmds))
-            ->SetCredentialIssuerCaseAdminSubject(anchorCaseAdminSubject);
-    }
-    else
-    {
-        (static_cast<ExampleCredentialIssuerCommands *>(mCredIssuerCmds))
-            ->SetCredentialIssuerCaseAdminSubject(administratorCaseAdminSubject);
-    }
+    mDeviceIsICD = false;
 
     if (mCASEAuthTags.HasValue() && mCASEAuthTags.Value().size() <= kMaxSubjectCATAttributeCount)
     {
@@ -215,9 +198,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 {
     auto params = CommissioningParameters();
     params.SetSkipCommissioningComplete(mSkipCommissioningComplete.ValueOr(false));
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     params.SetUseJCM(mJCM.ValueOr(false));
-#endif
     if (mBypassAttestationVerifier.ValueOr(false))
     {
         params.SetDeviceAttestationDelegate(this);
@@ -596,6 +577,21 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
         {
             ChipLogProgress(JointFabric, "Anchor Administrator (nodeId=%ld) commissioned with success", nodeId);
             SetAnchorNodeId(nodeId);
+
+            _pw_protobuf_Empty request;
+
+            ::pw::rpc::NanopbClientReader<::ICACCSROptions> localStream =
+                rpcClient.GetICACCSR(request, OnGetICACSROnNext, OnGetICACSROnDone);
+            if (!localStream.active())
+            {
+                ChipLogError(JointFabric, "RPC: Opening GetICACCSROptions Stream Error");
+                SetCommandExitStatus(CHIP_ERROR_SHUT_DOWN);
+                return;
+            }
+            else
+            {
+                rpcStreamGetICACCSR = std::move(localStream);
+            }
         }
         else
         {
@@ -609,7 +605,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
                 static_cast<chip::Controller::JCM::JCMDeviceCommissioner &>(CurrentCommissioner());
             chip::Controller::JCM::JCMTrustVerificationInfo & info = commissioner.GetJCMTrustVerificationInfo();
             /* extract and save the public key of the peer Admin ICAC */
-            err = Credentials::ExtractPublicKeyFromChipCert(info.adminICAC.Span(), adminICACPKSpan);
+            err = Credentials::ExtractPublicKeyFromChipCert(info.adminICAC.GetSpan(), adminICACPKSpan);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(Controller, "Joint Commissioning MethodError parsing adminICAC Public Key");
@@ -625,7 +621,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
                 ChipLogProgress(JointFabric, "trustedIcacPublicKeyB[%li] = %02X", i, request.trustedIcacPublicKeyB.bytes[i]);
             }
 
-            auto call = rpcClient.TransferOwnership(request, OnOwnershipTransferDone);
+            auto call = rpcClient.TransferOwnership(request, OnRPCTransferDone);
             if (!call.active())
             {
                 ChipLogError(JointFabric, "RPC: OwnershipTransfer Call Error");
