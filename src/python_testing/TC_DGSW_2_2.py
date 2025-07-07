@@ -32,7 +32,6 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --enable-key 000102030405060708090a0b0c0d0e0f
@@ -47,10 +46,6 @@ from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, Tes
 
 
 class TC_DGSW_2_2(MatterBaseTest):
-
-    @staticmethod
-    def is_valid_octet_string(value):
-        return isinstance(value, (bytes, bytearray))
 
     async def send_software_fault_test_event_trigger(self):
         await self.send_test_event_triggers(eventTrigger=0x0034000000000000)
@@ -75,7 +70,7 @@ class TC_DGSW_2_2(MatterBaseTest):
 
     def desc_TC_DGSW_2_2(self) -> str:
         """Returns a description of this test"""
-        return "[TC-DGSW-2.2] Attributes with Server as DUT"
+        return "[TC-DGSW-2.2] Event Functionality with Server as DUT"
 
     def pics_TC_DGSW_2_2(self) -> list[str]:
         return ["DGSW.S"]
@@ -100,7 +95,7 @@ class TC_DGSW_2_2(MatterBaseTest):
         await events_callback.start(
             self.default_controller,     # The controller
             self.dut_node_id,            # DUT's node id
-            endpoint                     # The endpoint on which we expect Wi-Fi events
+            endpoint                     # The endpoint on which we expect SoftwareDiagnostics events
         )
 
         # STEP 2: DUT sends an event report to TH. TH reads a list of SoftwareFault structs from DUT.
