@@ -33,7 +33,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
 import base64
 import logging
 import os
@@ -51,6 +50,8 @@ from mobly import asserts
 
 
 class TC_JCM_1_2(MatterBaseTest):
+
+    ANCHOR_CAT = 0xFFFE0001
 
     @async_test_body
     async def setup_class(self):
@@ -266,15 +267,12 @@ class TC_JCM_1_2(MatterBaseTest):
             )
 
             expected_WStatus = Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kEnhancedWindowOpen
-
-            actual_WStatus = window_status[endpoint]
-            outer_key = list(actual_WStatus.keys())[endpoint]
-            inner_key = list(actual_WStatus[outer_key].keys())[endpoint+1]
+            actual_WStatus_value = window_status[endpoint][Clusters.AdministratorCommissioning][Clusters.AdministratorCommissioning.Attributes.WindowStatus]
 
             asserts.assert_equal(
                 expected_WStatus,
-                actual_WStatus[outer_key][inner_key],
-                f"Commissioning window not properly opened. Expected: {expected_WStatus}, Got: {actual_WStatus}"
+                actual_WStatus_value,
+                f"Commissioning window not properly opened. Expected: {expected_WStatus}, Got: {actual_WStatus_value}"
             )
 
             return params
@@ -369,7 +367,7 @@ class TC_JCM_1_2(MatterBaseTest):
             if _tag == 22 and _value == int(self.ecoBCATs, 16):
                 # Administrator CAT present inside the Subject Field of the NOC
                 _admin_cat_found = True
-            elif _tag == 22 and _value == int("FFFE0001", 16):
+            elif _tag == 22 and _value == self.ANCHOR_CAT:
                 # Anchor CAT present inside the Subject Field of the NOC
                 _anchor_cat_found = True
             if _admin_cat_found and _anchor_cat_found:
