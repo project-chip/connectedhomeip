@@ -42,7 +42,6 @@
 """Define Matter test case TC_SETRF_2_1."""
 
 import logging
-import time
 
 import chip.clusters as Clusters
 import test_plan_support
@@ -75,235 +74,90 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
 
         steps = [
             TestStep("1", "Commissioning, already done", test_plan_support.commission_if_required(), is_commissioning=True),
-            TestStep("2", "Read TariffInfo attribute"),
-            TestStep("3", "Read TariffUnit attribute"),
-            TestStep("4", "Read StartDate attribute"),
-            TestStep("5", "Read DayEntries attribute"),
-            TestStep("6", "Read DayPatterns attribute"),
-            TestStep("7", "Read CalendarPeriods attribute"),
-            TestStep("8", "Read IndividualDays attribute"),
-            TestStep("9", "Read CurrentDay attribute"),
-            TestStep("10", "Read NextDay attribute"),
-            TestStep("11", "Read CurrentDayEntry attribute"),
-            TestStep("12", "Read CurrentDayEntryDate attribute"),
-            TestStep("13", "Read NextDayEntry attribute"),
-            TestStep("14", "Read NextDayEntryDate attribute"),
-            TestStep("15", "Read TariffComponents attribute"),
-            TestStep("16", "Read TariffPeriods attribute"),
-            TestStep("17", "Read CurrentTariffComponents attribute"),
-            TestStep("18", "Read NextTariffComponents attribute"),
-            TestStep("19", "Read DefaultRandomizationOffset attribute"),
-            TestStep("20", "Read DefaultRandomizationType attribute"),
+            TestStep("2", "TH reads TariffInfo attribute.", "DUT replies with null value of Nullable type."),
+            TestStep("3", "TH reads TariffUnit attribute.", "DUT replies with null value of Nullable type."),
+            TestStep("4", "TH reads StartDate attribute.", "DUT replies with null value of Nullable type."),
+            TestStep("5", "TH reads DayEntries attribute.", "DUT replies with null value of Nullable type."),
+            TestStep("6", "TH reads DayPatterns attribute.", "DUT replies with null value of Nullable type."),
+            TestStep("7", "TH reads CalendarPeriods attribute.", "DUT replies with null value of Nullable type."),
+            TestStep("8", "TH reads IndividualDays attribute.", "DUT replies with null value of Nullable type."),
+            TestStep("9", "TH reads CurrentDay attribute.", "DUT replies with null value of Nullable type."),
+            TestStep("10", "TH reads NextDay attribute.", "DUT replies with null value of Nullable type."),
+            TestStep("11", "TH reads CurrentDayEntry attribute.", "DUT replies with null value of Nullable type."),
+            TestStep("12", "TH reads CurrentDayEntryDate attribute.", "DUT replies with null value of Nullable type."),
+            TestStep("13", "TH reads NextDayEntry attribute.", "DUT replies with null value of Nullable type."),
+            TestStep("14", "TH reads NextDayEntryDate attribute.", "DUT replies with null value of Nullable type."),
+            TestStep("15", "TH reads TariffComponents attribute.", "DUT replies with null value of Nullable type."),
+            TestStep("16", "TH reads TariffPeriods attribute.", "DUT replies with null value of Nullable type."),
+            TestStep("17", "TH reads CurrentTariffComponents attribute.", "DUT replies with null value of Nullable type."),
+            TestStep("18", "TH reads NextTariffComponents attribute.", "DUT replies with null value of Nullable type."),
+            TestStep("19", "TH reads DefaultRandomizationOffset attribute.", "DUT replies with null value of Nullable type."),
+            TestStep("20", "TH reads DefaultRandomizationType attribute.", "DUT replies with null value of Nullable type."),
             TestStep("21", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster"),
             TestStep("22", "TH sends TestEventTrigger command to General Diagnostics Cluster for Full Tariff Set Test Event"),
-            TestStep("23", "Read TariffInfo attribute"),
-            TestStep("24", "Read TariffUnit attribute"),
-            TestStep("25", "Read StartDate attribute"),
-            TestStep("26", "Read DayEntries attribute"),
-            TestStep("27", "Read DayPatterns attribute"),
-            TestStep("28", "Read CalendarPeriods attribute"),
-            TestStep("29", "Read IndividualDays attribute"),
-            TestStep("30", "Read CurrentDay attribute"),
-            TestStep("31", "Read NextDay attribute"),
-            TestStep("32", "Read CurrentDayEntry attribute"),
-            TestStep("33", "Read CurrentDayEntryDate attribute"),
-            TestStep("34", "Read NextDayEntry attribute"),
-            TestStep("35", "Read NextDayEntryDate attribute"),
-            TestStep("36", "Read TariffComponents attribute"),
-            TestStep("37", "Read TariffPeriods attribute"),
-            TestStep("38", "Read CurrentTariffComponents attribute"),
-            TestStep("39", "Read NextTariffComponents attribute"),
-            TestStep("40", "Read DefaultRandomizationOffset attribute"),
-            TestStep("41", "Read DefaultRandomizationType attribute"),
+            TestStep("23", "TH reads TariffInfo attribute.", """
+                     - DUT replies a value of TariffInformationStruct type;
+                     - Contains Currency field if PICS SETRF.S.F00 is True."""),
+            TestStep("24", "TH reads TariffUnit attribute.", """
+                     - DUT replies a value of enum8 (TariffUnitEnum) type;
+                     - Value is in range 0 - 8."""),
+            TestStep("25", "TH reads StartDate attribute.", "DUT replies an value of epoch-s type."),
+            TestStep("26", "TH reads DayEntries attribute.", """
+                     - DUT replies a value that is a list of DayEntryStruct entries;
+                     - Contains RandomizationOffset and RandomizationType fields if PICS SETRF.S.F05 is True;"""),
+            TestStep("27", "TH reads DayPatterns attribute.", """DUT replies a value that is a list of DayPatternStruct entries."""),
+            TestStep("28", "TH reads CalendarPeriods attribute.", """
+                     - DUT replies a value that is a list of CalendarPeriodStruct entries;
+                     - Verify that the list length between 1 and 4 entries;
+                     - The calendar periods in this list are arranged in increasing order by the value of StartDate field;
+                     - If and only if the value of the StartDate attribute is null, the value of the StartDate field on the first
+                       CalendarPeriodStruct in the CalendarPeriods attribute SHALL also be null."""),
+            TestStep("29", "TH reads IndividualDays attribute.", """
+                     - DUT replies a value that is a list of DayStruct entries;
+                     - Verify that the list has no more than 50 entries;
+                     - The DayStruct in this list SHALL be arranged in increasing order by the value of Date field."""),
+            TestStep("30", "TH reads CurrentDay attribute.", "DUT replies a value of DayStruct type."),
+            TestStep("31", "TH reads NextDay attribute.", "DUT replies a value of DayStruct type."),
+            TestStep("32", "TH reads CurrentDayEntry attribute.", """
+                     - DUT a value of DayEntryStruct type;
+                     - Contains RandomizationOffset and RandomizationType fields if PICS SETRF.S.F05 is True;"""),
+            TestStep("33", "TH reads CurrentDayEntryDate attribute.", "DUT replies an value of epoch-s type."),
+            TestStep("34", "TH reads NextDayEntry attribute.", """
+                     - DUT a value of DayEntryStruct type;
+                     - Contains RandomizationOffset and RandomizationType fields if PICS SETRF.S.F05 is True;"""),
+            TestStep("35", "TH reads NextDayEntryDate attribute.", "DUT replies an value of epoch-s type."),
+            TestStep("36", "TH reads TariffComponents attribute.", """
+                     - DUT replies a value that is a list of TariffComponentStruct entries;
+                     - Verify that the list has 1 or more entries;
+                     - Contains Price field if PICS SETRF.S.F00 is True;
+                     - Contains FriendlyCredit field if PICS SETRF.S.F01 is True;
+                     - Contains AuxiliaryLoad field if PICS SETRF.S.F02 is True;
+                     - Contains PeakPeriod field if PICS SETRF.S.F03 is True;
+                     - Contains PowerThreshold field if PICS SETRF.S.F04 is True."""),
+            TestStep("37", "TH reads TariffPeriods attribute.", """
+                     - DUT replies a value that is a list of TariffPeriodStruct entries;
+                     - Verify that the list has 1 or more entries."""),
+            TestStep("38", "TH reads CurrentTariffComponents attribute.", """
+                     - DUT replies a value that is a list of TariffComponentStruct entries;
+                     - Verify that the list has 1 or more entries;
+                     - Contains Price field if PICS SETRF.S.F00 is True;
+                     - Contains FriendlyCredit field if PICS SETRF.S.F01 is True;
+                     - Contains AuxiliaryLoad field if PICS SETRF.S.F02 is True;
+                     - Contains PeakPeriod field if PICS SETRF.S.F03 is True;
+                     - Contains PowerThreshold field if PICS SETRF.S.F04 is True."""),
+            TestStep("39", "TH reads NextTariffComponents attribute.", """
+                     - DUT replies a value that is a list of TariffComponentStruct entries;
+                     - Verify that the list has 1 or more entries;
+                     - Contains Price field if PICS SETRF.S.F00 is True;
+                     - Contains FriendlyCredit field if PICS SETRF.S.F01 is True;
+                     - Contains AuxiliaryLoad field if PICS SETRF.S.F02 is True;
+                     - Contains PeakPeriod field if PICS SETRF.S.F03 is True;
+                     - Contains PowerThreshold field if PICS SETRF.S.F04 is True."""),
+            TestStep("40", "TH reads DefaultRandomizationOffset attribute.", "DUT replies a value of int16 value."),
+            TestStep("41", "TH reads DefaultRandomizationType attribute."),
+            TestStep("42", "Reset Cluster state to defaults.", "DUT replies a value of DayEntryRandomizationType value."),
         ]
         return steps
-
-    # StartDate = None
-    # StartTime = None
-
-    # async def checkAuxiliaryLoadSwitchSettingsStruct(self,
-    #                                                  endpoint: int = None,
-    #                                                  cluster: Clusters.CommodityTariff = None,
-    #                                                  struct: Clusters.CommodityTariff.Structs.AuxiliaryLoadSwitchSettingsStruct = None):
-    #     matter_asserts.assert_valid_uint8(struct.number, 'Number')
-    #     matter_asserts.assert_valid_enum(
-    #         struct.requiredState, "RequiredState attribute must return a AuxiliaryLoadSettingEnum", cluster.Enums.AuxiliaryLoadSettingEnum)
-
-    # async def checkCalendarPeriodStruct(self,
-    #                                     endpoint: int = None,
-    #                                     cluster: Clusters.CommodityTariff = None,
-    #                                     struct: Clusters.CommodityTariff.Structs.CalendarPeriodStruct = None):
-    #     if struct.startDate is not NullValue:
-    #         matter_asserts.assert_valid_uint32(struct.startDate, 'StartDate')
-    #         asserts.assert_greater_equal(struct.startDate, self.StartDate)
-    #     matter_asserts.assert_list(struct.dayPatternIDs, "DayPatternIDs attribute must return a list")
-    #     matter_asserts.assert_list_element_type(
-    #         struct.dayPatternIDs, int, "DayPatternIDs attribute must contain int elements")
-    #     asserts.assert_greater_equal(len(struct.dayPatternIDs), 1, "DayPatternIDs must have at least 1 entries!")
-    #     asserts.assert_less_equal(len(struct.dayPatternIDs), 7, "DayPatternIDs must have at most 7 entries!")
-
-    # async def checkCurrencyStruct(self,
-    #                               endpoint: int = None,
-    #                               cluster: Clusters.CommodityTariff = None,
-    #                               struct: Globals.Structs.CurrencyStruct = None):
-    #     matter_asserts.assert_valid_uint16(struct.currency, 'Currency')
-    #     asserts.assert_less_equal(struct.currency, 999)
-    #     matter_asserts.assert_valid_uint8(struct.decimalPoints, 'DecimalPoints')
-
-    # async def checkDayEntryStruct(self,
-    #                               endpoint: int = None,
-    #                               cluster: Clusters.CommodityTariff = None,
-    #                               struct: Clusters.CommodityTariff.Structs.DayEntryStruct = None):
-    #     matter_asserts.assert_valid_uint32(struct.dayEntryID, 'DayEntryID')
-    #     matter_asserts.assert_valid_uint16(struct.startTime, 'StartTime')
-    #     asserts.assert_less_equal(struct.startTime, 1499)
-    #     if struct.duration is not None:
-    #         matter_asserts.assert_valid_uint16(struct.duration, 'Duration')
-    #         asserts.assert_less_equal(struct.duration, 1500 - struct.startTime)
-    #     if self.check_pics("SETRF.S.F05"):
-    #         matter_asserts.assert_valid_int16(struct.randomizationOffset, 'RandomizationOffset')
-    #         matter_asserts.assert_valid_enum(
-    #             struct.randomizationType, "RandomizationType attribute must return a DayEntryRandomizationTypeEnum", cluster.Enums.DayEntryRandomizationTypeEnum)
-    #     else:
-    #         asserts.assert_is_none(struct.randomizationOffset, "RandomizationOffset must be None")
-    #         asserts.assert_is_none(struct.randomizationType, "RandomizationType must be None")
-
-    # async def checkDayPatternStruct(self,
-    #                                 endpoint: int = None,
-    #                                 cluster: Clusters.CommodityTariff = None,
-    #                                 struct: Clusters.CommodityTariff.Structs.DayPatternStruct = None):
-    #     matter_asserts.assert_valid_uint32(struct.dayPatternID, 'DayPatternID')
-    #     matter_asserts.is_valid_int_value(struct.daysOfWeek)
-    #     # Check bitmap value less than or equal to (Sunday | Monday | Tuesday | Wednesday | Thursday | Friday | Saturday)
-    #     asserts.assert_less_equal(struct.daysOfWeek, 127)
-    #     matter_asserts.assert_list(struct.dayEntryIDs, "DayEntryIDs attribute must return a list")
-    #     matter_asserts.assert_list_element_type(
-    #         struct.dayEntryIDs, int, "DayEntryIDs attribute must contain int elements")
-    #     asserts.assert_greater_equal(len(struct.dayEntryIDs), 1, "DayEntryIDs must have at least 1 entries!")
-    #     asserts.assert_less_equal(len(struct.dayEntryIDs), 96, "DayEntryIDs must have at most 96 entries!")
-
-    # async def checkDayStruct(self,
-    #                          endpoint: int = None,
-    #                          cluster: Clusters.CommodityTariff = None,
-    #                          struct: Clusters.CommodityTariff.Structs.DayStruct = None):
-    #     matter_asserts.assert_valid_uint32(struct.date, 'Date')
-    #     matter_asserts.assert_valid_enum(
-    #         struct.dayType, "DayType attribute must return a DayTypeEnum", cluster.Enums.DayTypeEnum)
-    #     matter_asserts.assert_list(struct.dayEntryIDs, "DayEntryIDs attribute must return a list")
-    #     matter_asserts.assert_list_element_type(
-    #         struct.dayEntryIDs, int, "DayEntryIDs attribute must contain int elements")
-    #     asserts.assert_greater_equal(len(struct.dayEntryIDs), 1, "DayEntryIDs must have at least 1 entries!")
-    #     asserts.assert_less_equal(len(struct.dayEntryIDs), 96, "DayEntryIDs must have at most 96 entries!")
-
-    # async def checkPeakPeriodStruct(self,
-    #                                 endpoint: int = None,
-    #                                 cluster: Clusters.CommodityTariff = None,
-    #                                 struct: Clusters.CommodityTariff.Structs.PeakPeriodStruct = None):
-    #     matter_asserts.assert_valid_enum(
-    #         struct.severity, "Severity attribute must return a PeakPeriodSeverityEnum", cluster.Enums.PeakPeriodSeverityEnum)
-    #     matter_asserts.assert_valid_uint16(struct.peakPeriod, 'PeakPeriod')
-    #     asserts.assert_greater_equal(struct.peakPeriod, 1)
-
-    # async def checkPowerThresholdStruct(self,
-    #                                     endpoint: int = None,
-    #                                     cluster: Clusters.CommodityTariff = None,
-    #                                     struct: Globals.Structs.PowerThresholdStruct = None):
-    #     if struct.powerThreshold is not None:
-    #         matter_asserts.assert_valid_int64(struct.powerThreshold, 'PowerThreshold')
-    #     if struct.apparentPowerThreshold is not None:
-    #         matter_asserts.assert_valid_int64(struct.apparentPowerThreshold, 'ApparentPowerThreshold')
-    #     if struct.powerThresholdSource is not NullValue:
-    #         matter_asserts.assert_valid_enum(
-    #             struct.powerThresholdSource, "PowerThresholdSource attribute must return a PowerThresholdSourceEnum", Globals.Enums.PowerThresholdSourceEnum)
-
-    # async def checkTariffComponentStruct(self,
-    #                                      endpoint: int = None,
-    #                                      cluster: Clusters.CommodityTariff = None,
-    #                                      struct: Clusters.CommodityTariff.Structs.TariffComponentStruct = None):
-    #     matter_asserts.assert_valid_uint32(struct.tariffComponentID, 'TariffComponentID')
-    #     if self.check_pics("SETRF.S.F00"):
-    #         if struct.price is not NullValue:
-    #             asserts.assert_true(isinstance(
-    #                 struct.price, cluster.Structs.TariffPriceStruct), "struct.price must be of type TariffPriceStruct")
-    #             await self.checkTariffPriceStruct(endpoint=endpoint, cluster=cluster, struct=struct.price)
-    #     else:
-    #         asserts.assert_is_none(struct.price, "Price must be None")
-    #     if self.check_pics("SETRF.S.F01"):
-    #         matter_asserts.assert_valid_bool(struct.friendlyCredit, 'FriendlyCredit')
-    #     else:
-    #         asserts.assert_is_none(struct.friendlyCredit, "FriendlyCredit must be None")
-    #     if self.check_pics("SETRF.S.F02"):
-    #         asserts.assert_true(isinstance(
-    #             struct.auxiliaryLoad, cluster.Structs.AuxiliaryLoadSwitchSettingsStruct), "struct.auxiliaryLoad must be of type AuxiliaryLoadSwitchSettingsStruct")
-    #         await self.checkAuxiliaryLoadSwitchSettingsStruct(endpoint=endpoint, cluster=cluster, struct=struct.auxiliaryLoad)
-    #     else:
-    #         asserts.assert_is_none(struct.auxiliaryLoad, "AuxiliaryLoad must be None")
-    #     if self.check_pics("SETRF.S.F03"):
-    #         asserts.assert_true(isinstance(
-    #             struct.peakPeriod, cluster.Structs.PeakPeriodStruct), "struct.peakPeriod must be of type PeakPeriodStruct")
-    #         await self.checkPeakPeriodStruct(endpoint=endpoint, cluster=cluster, struct=struct.peakPeriod)
-    #     else:
-    #         asserts.assert_is_none(struct.peakPeriod, "PeakPeriod must be None")
-    #     if self.check_pics("SETRF.S.F04"):
-    #         asserts.assert_true(isinstance(
-    #             struct.powerThreshold, Globals.Structs.PowerThresholdStruct), "struct.powerThreshold must be of type PowerThresholdStruct")
-    #         await self.checkPowerThresholdStruct(endpoint=endpoint, cluster=cluster, struct=struct.powerThreshold)
-    #     else:
-    #         asserts.assert_is_none(struct.powerThreshold, "PowerThreshold must be None")
-    #     if struct.threshold is not NullValue:
-    #         matter_asserts.assert_valid_uint32(struct.threshold, 'Threshold')
-    #     if struct.label is not NullValue and struct.label is not None:
-    #         matter_asserts.assert_is_string(struct.label, "Label must be a string")
-    #         asserts.assert_less_equal(len(struct.label), 128, "Label must have length at most 128!")
-    #     if struct.predicted is not None:
-    #         matter_asserts.assert_valid_bool(struct.predicted, 'Predicted')
-
-    # async def checkTariffInformationStruct(self,
-    #                                        endpoint: int = None,
-    #                                        cluster: Clusters.CommodityTariff = None,
-    #                                        struct: Clusters.CommodityTariff.Structs.TariffInformationStruct = None):
-    #     if struct.tariffLabel is not NullValue:
-    #         matter_asserts.assert_is_string(struct.tariffLabel, "TariffLabel must be a string")
-    #         asserts.assert_less_equal(len(struct.tariffLabel), 128, "TariffLabel must have length at most 128!")
-    #     if struct.providerName is not NullValue:
-    #         matter_asserts.assert_is_string(struct.providerName, "ProviderName must be a string")
-    #         asserts.assert_less_equal(len(struct.providerName), 128, "ProviderName must have length at most 128!")
-    #     if struct.currency is not NullValue:
-    #         asserts.assert_true(isinstance(
-    #             struct.currency, Globals.Structs.CurrencyStruct), "struct.currency must be of type CurrencyStruct")
-    #         await self.checkCurrencyStruct(endpoint=endpoint, cluster=cluster, struct=struct.currency)
-    #     if struct.blockMode is not NullValue:
-    #         matter_asserts.assert_valid_enum(
-    #             struct.blockMode, "BlockMode attribute must return a BlockModeEnum", cluster.Enums.BlockModeEnum)
-
-    # async def checkTariffPeriodStruct(self,
-    #                                   endpoint: int = None,
-    #                                   cluster: Clusters.CommodityTariff = None,
-    #                                   struct: Clusters.CommodityTariff.Structs.TariffPeriodStruct = None):
-    #     if struct.label is not NullValue:
-    #         matter_asserts.assert_is_string(struct.label, "Label must be a string")
-    #         asserts.assert_less_equal(len(struct.label), 128, "Label must have length at most 128!")
-    #     matter_asserts.assert_list(struct.dayEntryIDs, "DayEntryIDs attribute must return a list")
-    #     matter_asserts.assert_list_element_type(
-    #         struct.dayEntryIDs, int, "DayEntryIDs attribute must contain int elements")
-    #     asserts.assert_greater_equal(len(struct.dayEntryIDs), 1, "DayEntryIDs must have at least 1 entries!")
-    #     asserts.assert_less_equal(len(struct.dayEntryIDs), 20, "DayEntryIDs must have at most 20 entries!")
-    #     matter_asserts.assert_list(struct.tariffComponentIDs, "TariffComponentIDs attribute must return a list")
-    #     matter_asserts.assert_list_element_type(
-    #         struct.tariffComponentIDs, int, "TariffComponentIDs attribute must contain int elements")
-    #     asserts.assert_greater_equal(len(struct.tariffComponentIDs), 1, "TariffComponentIDs must have at least 1 entries!")
-    #     asserts.assert_less_equal(len(struct.tariffComponentIDs), 20, "TariffComponentIDs must have at most 20 entries!")
-
-    # async def checkTariffPriceStruct(self,
-    #                                  endpoint: int = None,
-    #                                  cluster: Clusters.CommodityTariff = None,
-    #                                  struct: Clusters.CommodityTariff.Structs.TariffPriceStruct = None):
-    #     matter_asserts.assert_valid_enum(
-    #         struct.priceType, "PriceType attribute must return a TariffPriceTypeEnum", Globals.Enums.TariffPriceTypeEnum)
-    #     if struct.price is not None:
-    #         matter_asserts.assert_valid_int64(struct.price, 'Price')
-    #     if struct.priceLevel is not None:
-    #         matter_asserts.assert_valid_int16(struct.priceLevel, 'PriceLevel')
 
     @async_test_body
     async def test_TC_SETRF_2_1(self):
@@ -462,8 +316,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         await self.check_test_event_triggers_enabled()
 
         self.step("22")
-        await self.send_test_event_triggers(eventTrigger=0x0700000000000000)
-        time.sleep(3)
+        await self.send_test_event_trigger_for_fake_data()
 
         self.step("23")
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffInfo)
@@ -631,6 +484,9 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
             if val is not NullValue:
                 matter_asserts.assert_valid_enum(
                     val, "DefaultRandomizationType attribute must return a DayEntryRandomizationTypeEnum", cluster.Enums.DayEntryRandomizationTypeEnum)
+
+        self.step("42")
+        self.send_test_event_trigger_clear()
 
 
 if __name__ == "__main__":

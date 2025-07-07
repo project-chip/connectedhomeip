@@ -16,6 +16,7 @@
 
 
 import logging
+import time
 
 import chip.clusters as Clusters
 from chip.clusters import Globals
@@ -27,14 +28,25 @@ logger = logging.getLogger(__name__)
 
 
 class CommodityTariffTestBaseHelper:
+    """This class contains supporting methods for the CommodityTariff test cases."""
 
     StartDate = None
     StartTime = None
+
+    # Test event trigger IDs
+    EventTriggerFakeData = 0x0700000000000000
+    EventTriggerClear = 0x0700000000000001
+    EventTriggerChangeDay = 0x0700000000000002
+    EventTriggerChangeTime = 0x0700000000000003
 
     async def checkAuxiliaryLoadSwitchSettingsStruct(self,
                                                      endpoint: int = None,
                                                      cluster: Clusters.CommodityTariff = None,
                                                      struct: Clusters.CommodityTariff.Structs.AuxiliaryLoadSwitchSettingsStruct = None):
+        """
+        Checks the correctness of the AuxiliaryLoadSwitchSettingsStruct data type entries.
+        """
+
         matter_asserts.assert_valid_uint8(struct.number, 'Number')
         matter_asserts.assert_valid_enum(
             struct.requiredState, "RequiredState attribute must return a AuxiliaryLoadSettingEnum", cluster.Enums.AuxiliaryLoadSettingEnum)
@@ -43,6 +55,9 @@ class CommodityTariffTestBaseHelper:
                                         endpoint: int = None,
                                         cluster: Clusters.CommodityTariff = None,
                                         struct: Clusters.CommodityTariff.Structs.CalendarPeriodStruct = None):
+        """
+        Checks the correctness of the CalendarPeriodStruct data type entries."""
+
         if struct.startDate is not NullValue:
             matter_asserts.assert_valid_uint32(struct.startDate, 'StartDate')
             asserts.assert_greater_equal(struct.startDate, self.StartDate)
@@ -56,6 +71,9 @@ class CommodityTariffTestBaseHelper:
                                   endpoint: int = None,
                                   cluster: Clusters.CommodityTariff = None,
                                   struct: Globals.Structs.CurrencyStruct = None):
+        """
+        Checks the correctness of the CurrencyStruct data type entries."""
+
         matter_asserts.assert_valid_uint16(struct.currency, 'Currency')
         asserts.assert_less_equal(struct.currency, 999)
         matter_asserts.assert_valid_uint8(struct.decimalPoints, 'DecimalPoints')
@@ -64,6 +82,9 @@ class CommodityTariffTestBaseHelper:
                                   endpoint: int = None,
                                   cluster: Clusters.CommodityTariff = None,
                                   struct: Clusters.CommodityTariff.Structs.DayEntryStruct = None):
+        """
+        Checks the correctness of the DayEntryStruct data type entries."""
+
         matter_asserts.assert_valid_uint32(struct.dayEntryID, 'DayEntryID')
         matter_asserts.assert_valid_uint16(struct.startTime, 'StartTime')
         asserts.assert_less_equal(struct.startTime, 1499)
@@ -82,6 +103,9 @@ class CommodityTariffTestBaseHelper:
                                     endpoint: int = None,
                                     cluster: Clusters.CommodityTariff = None,
                                     struct: Clusters.CommodityTariff.Structs.DayPatternStruct = None):
+        """
+        Checks the correctness of the DayPatternStruct data type entries."""
+
         matter_asserts.assert_valid_uint32(struct.dayPatternID, 'DayPatternID')
         matter_asserts.is_valid_int_value(struct.daysOfWeek)
         # Check bitmap value less than or equal to (Sunday | Monday | Tuesday | Wednesday | Thursday | Friday | Saturday)
@@ -96,6 +120,9 @@ class CommodityTariffTestBaseHelper:
                              endpoint: int = None,
                              cluster: Clusters.CommodityTariff = None,
                              struct: Clusters.CommodityTariff.Structs.DayStruct = None):
+        """
+        Checks the correctness of the DayStruct data type entries."""
+
         matter_asserts.assert_valid_uint32(struct.date, 'Date')
         matter_asserts.assert_valid_enum(
             struct.dayType, "DayType attribute must return a DayTypeEnum", cluster.Enums.DayTypeEnum)
@@ -109,6 +136,9 @@ class CommodityTariffTestBaseHelper:
                                     endpoint: int = None,
                                     cluster: Clusters.CommodityTariff = None,
                                     struct: Clusters.CommodityTariff.Structs.PeakPeriodStruct = None):
+        """
+        Checks the correctness of the PeakPeriodStruct data type entries."""
+
         matter_asserts.assert_valid_enum(
             struct.severity, "Severity attribute must return a PeakPeriodSeverityEnum", cluster.Enums.PeakPeriodSeverityEnum)
         matter_asserts.assert_valid_uint16(struct.peakPeriod, 'PeakPeriod')
@@ -118,6 +148,9 @@ class CommodityTariffTestBaseHelper:
                                         endpoint: int = None,
                                         cluster: Clusters.CommodityTariff = None,
                                         struct: Globals.Structs.PowerThresholdStruct = None):
+        """
+        Checks the correctness of the PowerThresholdStruct data type entries."""
+
         if struct.powerThreshold is not None:
             matter_asserts.assert_valid_int64(struct.powerThreshold, 'PowerThreshold')
         if struct.apparentPowerThreshold is not None:
@@ -130,6 +163,9 @@ class CommodityTariffTestBaseHelper:
                                          endpoint: int = None,
                                          cluster: Clusters.CommodityTariff = None,
                                          struct: Clusters.CommodityTariff.Structs.TariffComponentStruct = None):
+        """
+        Checks the correctness of the TariffComponentStruct data type entries."""
+
         matter_asserts.assert_valid_uint32(struct.tariffComponentID, 'TariffComponentID')
         if self.check_pics("SETRF.S.F00"):
             if struct.price is not NullValue:
@@ -172,6 +208,9 @@ class CommodityTariffTestBaseHelper:
                                            endpoint: int = None,
                                            cluster: Clusters.CommodityTariff = None,
                                            struct: Clusters.CommodityTariff.Structs.TariffInformationStruct = None):
+        """
+        Checks the correctness of the TariffInformationStruct data type entries."""
+
         if struct.tariffLabel is not NullValue:
             matter_asserts.assert_is_string(struct.tariffLabel, "TariffLabel must be a string")
             asserts.assert_less_equal(len(struct.tariffLabel), 128, "TariffLabel must have length at most 128!")
@@ -190,6 +229,9 @@ class CommodityTariffTestBaseHelper:
                                       endpoint: int = None,
                                       cluster: Clusters.CommodityTariff = None,
                                       struct: Clusters.CommodityTariff.Structs.TariffPeriodStruct = None):
+        """
+        Checks the correctness of the TariffPeriodStruct data type entries."""
+
         if struct.label is not NullValue:
             matter_asserts.assert_is_string(struct.label, "Label must be a string")
             asserts.assert_less_equal(len(struct.label), 128, "Label must have length at most 128!")
@@ -208,9 +250,37 @@ class CommodityTariffTestBaseHelper:
                                      endpoint: int = None,
                                      cluster: Clusters.CommodityTariff = None,
                                      struct: Clusters.CommodityTariff.Structs.TariffPriceStruct = None):
+        """
+        Checks the correctness of the TariffPriceStruct data type entries."""
+
         matter_asserts.assert_valid_enum(
             struct.priceType, "PriceType attribute must return a TariffPriceTypeEnum", Globals.Enums.TariffPriceTypeEnum)
         if struct.price is not None:
             matter_asserts.assert_valid_int64(struct.price, 'Price')
         if struct.priceLevel is not None:
             matter_asserts.assert_valid_int16(struct.priceLevel, 'PriceLevel')
+
+    async def send_test_event_trigger_for_fake_data(self):
+        """Sends test event triggers to propagate fake data to the attributes instead of Null
+           values that are default values after cluster initialization."""
+
+        await self.send_test_event_triggers(eventTrigger=self.EventTriggerFakeData)
+        time.sleep(3)  # Wait some time to be sure that fake data is propagated
+
+    async def send_test_event_trigger_clear(self):
+        """Reset cluster state to default (Null) values."""
+
+        await self.send_test_event_triggers(eventTrigger=self.EventTriggerClear)
+        time.sleep(3)  # Wait some time to be sure that the cluster state has been reset
+
+    async def send_test_event_trigger_change_day(self):
+        """This test event trigger ensure time shifting on 24h to simulate a day change."""
+
+        await self.send_test_event_triggers(eventTrigger=self.EventTriggerChangeDay)
+        time.sleep(3)  # Wait some time to be sure that test event triggers takes effect
+
+    async def send_test_event_trigger_change_time(self):
+        """This test event trigger ensure time shifting on 4h to simulate a time change."""
+
+        await self.send_test_event_triggers(eventTrigger=self.EventTriggerChangeTime)
+        time.sleep(3)  # Wait some time to be sure that test event triggers takes effect
