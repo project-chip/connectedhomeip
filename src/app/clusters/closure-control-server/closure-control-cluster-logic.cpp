@@ -28,10 +28,6 @@ namespace ClosureControl {
 
 using namespace Protocols::InteractionModel;
 
-namespace {
-constexpr uint8_t kCurrentErrorListSize = 10;
-} // namespace
-
 /*
     ClusterLogic Implementation
 */
@@ -352,6 +348,40 @@ CHIP_ERROR ClusterLogic::SetLatchControlModes(const BitFlags<LatchControlModesBi
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ClusterLogic::AddErrorToCurrentErrorList(ClosureErrorEnum error)
+{
+    assertChipStackLockedByCurrentThread();
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(EnsureKnownEnumValue(error) != ClosureErrorEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mState.mCurrentErrorCount < kCurrentErrorListMaxSize, CHIP_ERROR_PROVIDER_LIST_EXHAUSTED,
+                        ChipLogError(AppServer, "Error list is full"));
+    // Check for duplicates
+    for (size_t i = 0; i < mState.mCurrentErrorCount; ++i)
+    {
+        VerifyOrReturnError(mState.mCurrentErrorList[i] != error, CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED,
+                            ChipLogError(AppServer, "Error already exists in the list"));
+    }
+    mState.mCurrentErrorList[mState.mCurrentErrorCount++] = error;
+    DataModel::List<const ClosureErrorEnum> currentErrorList(mState.mCurrentErrorList, mState.mCurrentErrorCount);
+    mMatterContext.MarkDirty(Attributes::CurrentErrorList::Id);
+    ReturnLogErrorOnFailure(GenerateOperationalErrorEvent(currentErrorList));
+    return CHIP_NO_ERROR;
+}
+
+void ClusterLogic::ClearCurrentErrorList()
+{
+    assertChipStackLockedByCurrentThread();
+    VerifyOrDieWithMsg(mIsInitialized, AppServer, "ClearCurrentErrorList called before Initialization of closure");
+    // Clearing the error list array by setting all elements to kUnknownEnumValue
+    for (size_t i = 0; i < mState.mCurrentErrorCount; ++i)
+    {
+        mState.mCurrentErrorList[i] = ClosureErrorEnum::kUnknownEnumValue;
+    }
+    // Reset the current error count to 0
+    mState.mCurrentErrorCount = 0;
+    mMatterContext.MarkDirty(Attributes::CurrentErrorList::Id);
+}
+
 // TODO: Move the CountdownTime handling to Delegate
 CHIP_ERROR ClusterLogic::GetCountdownTime(DataModel::Nullable<ElapsedS> & countdownTime)
 {
@@ -392,28 +422,30 @@ CHIP_ERROR ClusterLogic::GetOverallTargetState(DataModel::Nullable<GenericOveral
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClusterLogic::GetCurrentErrorList(const AttributeValueEncoder::ListEncodeHelper & encoder)
+CHIP_ERROR ClusterLogic::GetCurrentErrorList(Span<ClosureErrorEnum> & outputSpan)
 {
-    // List can contain at most only 10 Error
-    for (size_t i = 0; i < kCurrentErrorListSize; i++)
+    assertChipStackLockedByCurrentThread();
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(outputSpan.size() == kCurrentErrorListMaxSize, CHIP_ERROR_BUFFER_TOO_SMALL,
+                        ChipLogError(AppServer, "Output buffer size is not equal to kCurrentErrorListMaxSize"));
+    for (size_t i = 0; i < mState.mCurrentErrorCount; ++i)
     {
-        ClosureErrorEnum error;
+        outputSpan[i] = mState.mCurrentErrorList[i];
+    }
+    outputSpan.reduce_size(mState.mCurrentErrorCount);
+    return CHIP_NO_ERROR;
+}
 
-        CHIP_ERROR err = mDelegate.GetCurrentErrorAtIndex(i, error);
-
-        // Convert CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to CHIP_NO_ERROR
-        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
-        {
-            return CHIP_NO_ERROR;
-        }
-
-        // Return for other errors occurred apart from CHIP_ERROR_PROVIDER_LIST_EXHAUSTED
-        ReturnErrorOnFailure(err);
-
+CHIP_ERROR ClusterLogic::ReadCurrentErrorListAttribute(const AttributeValueEncoder::ListEncodeHelper & encoder)
+{
+    assertChipStackLockedByCurrentThread();
+    VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    for (size_t i = 0; i < mState.mCurrentErrorCount; i++)
+    {
+        ClosureErrorEnum error = mState.mCurrentErrorList[i];
         // Encode the error
         ReturnErrorOnFailure(encoder.Encode(error));
     }
-
     return CHIP_NO_ERROR;
 }
 
