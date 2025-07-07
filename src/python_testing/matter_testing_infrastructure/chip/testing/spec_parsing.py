@@ -932,13 +932,13 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                                         f"Ignoring unknown {override_element_type} {name} in cluster {cid} because the conformance is disallowed")
                                     continue
                                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
-                                                severity=ProblemSeverity.WARNING, problem=f"Unknown {override_element_type} {name} in cluster {cid} - map = {map}"))
+                                                severity=ProblemSeverity.WARNING, problem=f"Unknown {override_element_type} {name} in cluster 0x{cid:04X} - map = {map}"))
                             else:
                                 override[map_id[0]] = conformance_override
 
                         except ConformanceException as ex:
                             problems.append(ProblemNotice("Parse Device Type XML", location=location,
-                                            severity=ProblemSeverity.WARNING, problem=f"Unable to parse {override_element_type} conformance for {name} in cluster {cid}"))
+                                            severity=ProblemSeverity.WARNING, problem=f"Unable to parse {override_element_type} conformance for {name} in cluster 0x{cid:04X} - {ex}"))
 
                 append_overrides('feature')
                 append_overrides('attribute')
@@ -949,10 +949,10 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                 else:
                     device_types[id].client_clusters[cid] = cluster
 
-            except ConformanceException:
+            except ConformanceException as ex:
                 location = DeviceTypePathLocation(device_type_id=id, cluster_id=cid)
                 problems.append(ProblemNotice("Parse Device Type XML", location=location,
-                                severity=ProblemSeverity.WARNING, problem="Unable to parse conformance for cluster"))
+                                severity=ProblemSeverity.WARNING, problem=f"Unable to parse conformance for cluster - {ex}"))
             # NOTE: Spec currently does a bad job of matching these exactly to the names and codes
             # so this will need a bit of fancy handling here to get this right.
     return device_types, problems
