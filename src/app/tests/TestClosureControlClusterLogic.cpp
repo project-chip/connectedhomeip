@@ -627,6 +627,28 @@ TEST_F(TestClosureControlClusterLogic, SetCountdownTimeFromDelegate_Invalid)
     EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
 }
 
+TEST_F(TestClosureControlClusterLogic, SetCountdownTimeFromDelegate_NoPositioningFeature)
+{
+    conformance.FeatureMap().Set(Feature::kMotionLatching);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+
+    DataModel::Nullable<ElapsedS> countdownTime;
+
+    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(countdownTime), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    EXPECT_EQ(logic->GetCountdownTime(countdownTime), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+}
+
+TEST_F(TestClosureControlClusterLogic, SetCountdownTimeFromDelegate_InstantaneousFeature)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kInstantaneous);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+
+    DataModel::Nullable<ElapsedS> countdownTime;
+
+    EXPECT_EQ(logic->SetCountdownTimeFromDelegate(countdownTime), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    EXPECT_EQ(logic->GetCountdownTime(countdownTime), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+}
+
 TEST_F(TestClosureControlClusterLogic, SetCountdownTimeFromDelegate_ValidChange)
 {
     conformance.FeatureMap().Set(Feature::kPositioning);
@@ -1242,7 +1264,10 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_InvalidState)
 TEST_F(TestClosureControlClusterLogic, MoveToCommand_AllFeatures)
 {
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
+    BitFlags<LatchControlModesBitmap> latchControlModes;
+    latchControlModes.Set(ClosureControl::LatchControlModesBitmap::kRemoteLatching).Set(ClosureControl::LatchControlModesBitmap::kRemoteUnlatching);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->SetLatchControlModes(latchControlModes), CHIP_NO_ERROR);
 
     // Set initial state
     DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
@@ -1317,7 +1342,10 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_OnlyPositioningFeature)
 TEST_F(TestClosureControlClusterLogic, MoveToCommand_OnlyMotionLatchingFeature)
 {
     conformance.FeatureMap().Set(Feature::kMotionLatching);
+    BitFlags<LatchControlModesBitmap> latchControlModes;
+    latchControlModes.Set(ClosureControl::LatchControlModesBitmap::kRemoteLatching).Set(ClosureControl::LatchControlModesBitmap::kRemoteUnlatching);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->SetLatchControlModes(latchControlModes), CHIP_NO_ERROR);
 
     // Set initial state
     DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
@@ -1336,7 +1364,6 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_OnlyMotionLatchingFeature)
     DataModel::Nullable<ElapsedS> coundowntime;
     EXPECT_EQ(logic->GetOverallTargetState(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetMainState(state), CHIP_NO_ERROR);
-    EXPECT_EQ(logic->GetCountdownTime(coundowntime), CHIP_NO_ERROR);
 
     EXPECT_FALSE(readValue.IsNull());
     EXPECT_FALSE(readValue.Value().position.HasValue());
@@ -1344,10 +1371,6 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_OnlyMotionLatchingFeature)
     EXPECT_FALSE(readValue.Value().speed.HasValue());
 
     EXPECT_EQ(state, MainStateEnum::kMoving);
-
-    EXPECT_FALSE(coundowntime.IsNull());
-    EXPECT_EQ(coundowntime.Value(), static_cast<ElapsedS>(20));
-
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
 }
 
@@ -1429,7 +1452,10 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_OnlyPosiitonField)
 TEST_F(TestClosureControlClusterLogic, MoveToCommand_OnlyLatchField)
 {
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
+    BitFlags<LatchControlModesBitmap> latchControlModes;
+    latchControlModes.Set(ClosureControl::LatchControlModesBitmap::kRemoteLatching).Set(ClosureControl::LatchControlModesBitmap::kRemoteUnlatching);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->SetLatchControlModes(latchControlModes), CHIP_NO_ERROR);
 
     // Set initial state
     DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(

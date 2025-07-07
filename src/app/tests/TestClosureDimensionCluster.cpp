@@ -1135,7 +1135,7 @@ TEST_F(TestClosureDimensionClusterLogic, TestUnitRange)
     mockContext.ClearDirtyList();
     // Invalid degree Values
     EXPECT_EQ(logic->SetUnit(ClosureUnitEnum::kDegree), CHIP_NO_ERROR);
-    invalidUnitRange.max = 180;
+    invalidUnitRange.max = 390;
     invalidUnitRange.min = 0;
     testUnitRange        = DataModel::Nullable<Structs::UnitRangeStruct::Type>(invalidUnitRange);
     EXPECT_EQ(logic->SetUnitRange(testUnitRange), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1144,8 +1144,17 @@ TEST_F(TestClosureDimensionClusterLogic, TestUnitRange)
     mockContext.ClearDirtyList();
     // Invalid degree Values
     EXPECT_EQ(logic->SetUnit(ClosureUnitEnum::kDegree), CHIP_NO_ERROR);
-    invalidUnitRange.max = -180;
+    invalidUnitRange.max = -390;
     invalidUnitRange.min = 0;
+    testUnitRange        = DataModel::Nullable<Structs::UnitRangeStruct::Type>(invalidUnitRange);
+    EXPECT_EQ(logic->SetUnitRange(testUnitRange), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::UnitRange::Id));
+
+    mockContext.ClearDirtyList();
+    // Invalid degree range
+    EXPECT_EQ(logic->SetUnit(ClosureUnitEnum::kDegree), CHIP_NO_ERROR);
+    invalidUnitRange.max = -180;
+    invalidUnitRange.min = 270;
     testUnitRange        = DataModel::Nullable<Structs::UnitRangeStruct::Type>(invalidUnitRange);
     EXPECT_EQ(logic->SetUnitRange(testUnitRange), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::UnitRange::Id));
@@ -1160,9 +1169,9 @@ TEST_F(TestClosureDimensionClusterLogic, TestUnitRange)
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::UnitRange::Id));
 
     mockContext.ClearDirtyList();
-    // Invalid millimdegreeeter Values
+    // Invalid degree range
     EXPECT_EQ(logic->SetUnit(ClosureUnitEnum::kDegree), CHIP_NO_ERROR);
-    invalidUnitRange.max = 90;
+    invalidUnitRange.max = 190;
     invalidUnitRange.min = -180;
     testUnitRange        = DataModel::Nullable<Structs::UnitRangeStruct::Type>(invalidUnitRange);
     EXPECT_EQ(logic->SetUnitRange(testUnitRange), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1548,12 +1557,19 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand)
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::TargetState::Id));
 
     // Validating SetTargetState with manual latch
+    BitFlags<LatchControlModesBitmap> latchControlModes;
+    EXPECT_EQ(logic->SetLatchControlModes(latchControlModes), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
-    mockDelegate.SetManualLatching(true);
-    EXPECT_EQ(logic->HandleSetTargetCommand(NullOptional, Optional<bool>(true), NullOptional), Status::InvalidAction);
+    EXPECT_EQ(logic->HandleSetTargetCommand(NullOptional, Optional<bool>(true), NullOptional), Status::InvalidInState);
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
     EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::TargetState::Id));
-    mockDelegate.SetManualLatching(false);
+    mockContext.ClearDirtyList();
+    EXPECT_EQ(logic->HandleSetTargetCommand(NullOptional, Optional<bool>(false), NullOptional), Status::InvalidInState);
+    EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::CurrentState::Id));
+    EXPECT_FALSE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::TargetState::Id));
+    latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching).Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
+    EXPECT_EQ(logic->SetLatchControlModes(latchControlModes), CHIP_NO_ERROR);
+
 
     // Validating SetTargetState with invalid speed
     mockContext.ClearDirtyList();
@@ -1611,6 +1627,9 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommandWithLimitatio
         .Set(Feature::kLimitation);
 
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    BitFlags<LatchControlModesBitmap> latchControlModes;
+    latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching).Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
+    EXPECT_EQ(logic->SetLatchControlModes(latchControlModes), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
 
     DataModel::Nullable<GenericDimensionStateStruct> currentState;
@@ -1877,7 +1896,6 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleStepCommandWithLimitation)
 TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingPositionNonNulltoNull)
 {
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
-    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
 
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
@@ -1915,7 +1933,6 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingPositionN
 TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingPositionNulltoNonNull)
 {
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
-    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
 
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
@@ -1953,7 +1970,6 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingPositionN
 TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingPositionChangeValueWithoutDelay)
 {
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
-    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
 
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
@@ -1991,7 +2007,6 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingPositionC
 TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingPositionChangeValueWithDelay)
 {
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
-    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
 
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
@@ -2053,7 +2068,6 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingPositionC
 TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingLatchNulltoValue)
 {
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
-    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
 
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
@@ -2091,7 +2105,6 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingLatchNull
 TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingLatchValuetoNull)
 {
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
-    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
 
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
@@ -2129,7 +2142,6 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingLatchValu
 TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingLatchValueChange)
 {
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
-    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
 
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
@@ -2167,7 +2179,6 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingLatchValu
 TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingSpeedNullOptionaltoValue)
 {
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
-    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
 
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
@@ -2205,7 +2216,6 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingSpeedNull
 TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingSpeedValuetoNullOptional)
 {
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
-    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
 
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
@@ -2243,7 +2253,6 @@ TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingSpeedValu
 TEST_F(TestClosureDimensionClusterLogic, TestCurrentStateQuietReportingSpeedValueChange)
 {
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
-    conformance.OptionalAttributes().Clear(OptionalAttributeEnum::kOverflow);
 
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
     mockContext.ClearDirtyList();
