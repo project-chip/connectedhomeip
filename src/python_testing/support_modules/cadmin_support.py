@@ -141,7 +141,7 @@ class CADMINSupport:
         Returns:
             True if status changed to expected value, False if timeout
         """
-        status_name = "CLOSED" if is_open_expected == False else "OPEN"
+        status_name = "CLOSED" if not is_open_expected else "OPEN"
         logging.info(f"Waiting for window status to change to {status_name} (status={is_open_expected})")
         logging.info(f"Timeout set to: {timeout_sec}s")
 
