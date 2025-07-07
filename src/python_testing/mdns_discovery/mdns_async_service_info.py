@@ -20,8 +20,8 @@ from typing import TYPE_CHECKING
 
 from zeroconf import (BadTypeInNameException, DNSOutgoing, DNSQuestion, DNSQuestionType, ServiceInfo, Zeroconf, current_time_millis,
                       service_type_name)
-from zeroconf.const import (_CLASS_IN, _DUPLICATE_QUESTION_INTERVAL, _FLAGS_QR_QUERY, _MDNS_PORT, _TYPE_AAAA, _LISTENER_TIME)
 from zeroconf._services.info import float_
+from zeroconf.const import _CLASS_IN, _DUPLICATE_QUESTION_INTERVAL, _FLAGS_QR_QUERY, _LISTENER_TIME, _MDNS_PORT, _TYPE_AAAA
 
 
 _AVOID_SYNC_DELAY_RANDOM_INTERVAL = (20, 120)
@@ -117,6 +117,7 @@ class MdnsAsyncServiceInfo(ServiceInfo):
 
     def _get_initial_delay(self) -> float_:
         return _LISTENER_TIME
+
 
 class AddressResolverIPv6(MdnsAsyncServiceInfo):
     """Resolve a host name to an IPv6 address."""

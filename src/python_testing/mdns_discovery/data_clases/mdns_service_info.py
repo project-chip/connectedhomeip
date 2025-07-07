@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
+
 @dataclass
 class MdnsServiceInfo:
     # The unique name of the mDNS service.

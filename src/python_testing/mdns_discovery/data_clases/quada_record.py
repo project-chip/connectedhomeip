@@ -1,9 +1,10 @@
 import socket
-from typing import Union
 from dataclasses import dataclass
 from ipaddress import IPv6Address
-from typing import Optional
+from typing import Optional, Union
+
 from zeroconf._utils.ipaddress import (ZeroconfIPv6Address)
+
 
 @dataclass
 class AddressTypeInfo:

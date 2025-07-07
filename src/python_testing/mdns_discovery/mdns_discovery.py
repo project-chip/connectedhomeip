@@ -17,16 +17,18 @@
 
 import json
 import logging
-from asyncio import Event, TimeoutError, ensure_future, wait_for, sleep
+from asyncio import Event, TimeoutError, ensure_future, sleep, wait_for
 from dataclasses import asdict
 from enum import Enum
 from typing import Dict, List, Optional
-from mdns_discovery.mdns_async_service_info import MdnsAsyncServiceInfo, AddressResolverIPv6
-from mdns_discovery.data_clases.quada_record import QuadaRecord
+
 from mdns_discovery.data_clases.mdns_service_info import MdnsServiceInfo
+from mdns_discovery.data_clases.quada_record import QuadaRecord
+from mdns_discovery.mdns_async_service_info import AddressResolverIPv6, MdnsAsyncServiceInfo
 from zeroconf import IPVersion, ServiceListener, ServiceStateChange, Zeroconf
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconf, AsyncZeroconfServiceTypes
-from zeroconf.const import (_TYPE_SRV, _TYPE_TXT)
+from zeroconf.const import _TYPE_SRV, _TYPE_TXT
+
 logger = logging.getLogger(__name__)
 
 
@@ -90,8 +92,6 @@ class MdnsDiscovery:
 
         # Verbose logging
         self._verbose_logging = verbose_logging
-        
-        # sleep(3)
 
     # Public methods
     async def get_commissioner_service(self, log_output: bool = False,
@@ -253,7 +253,8 @@ class MdnsDiscovery:
             try:
                 await wait_for(service_listener.updated_event.wait(), discovery_timeout_sec)
             except TimeoutError:
-                logger.info(f"Service lookup for {service_name} timeout ({discovery_timeout_sec} seconds) reached without an update.")
+                logger.info(
+                    f"Service lookup for {service_name} timeout ({discovery_timeout_sec} seconds) reached without an update.")
             finally:
                 await azc.async_remove_service_listener(service_listener)
 
@@ -286,6 +287,27 @@ class MdnsDiscovery:
                              discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
                              log_output: bool = False
                              ) -> Optional[MdnsServiceInfo]:
+        """
+        Asynchronously discovers the TXT record associated with an mDNS service.
+
+        This method attempts to locate and retrieve the TXT record for a given service name 
+        and service type on the local network. It first listens for service announcements, 
+        then sends an active mDNS query for TXT records. If the TXT record is not found 
+        through the standard response, it attempts to recover it from the local Zeroconf cache.
+
+        Args:
+            service_name (str): The full mDNS service instance name.
+                Example: '974B15BD2CC5278E-0000000012344321._matter._tcp.local.'
+            service_type (str, optional): The service type.
+                Example: '_matter._tcp.local.' If None, only the name will be used.
+            discovery_timeout_sec (float, optional): Maximum time to wait for discovery.
+                Defaults to DISCOVERY_TIMEOUT_SEC.
+            log_output (bool, optional): If True, logs discovered service info. Defaults to False.
+
+        Returns:
+            Optional[MdnsServiceInfo]: An MdnsServiceInfo object containing the TXT record and 
+            other metadata, or None if the service could not be resolved.
+        """
         logger.info(f"Looking for MDNS record, type 'TXT', service name '{service_name}'")
 
         txt_record = None
@@ -308,31 +330,10 @@ class MdnsDiscovery:
         return txt_record
 
     async def _get_txt_record(self, service_name: str,
-                             service_type: str = None,
-                             discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
-                             log_output: bool = False
-                             ) -> Optional[MdnsServiceInfo]:
-        """
-        Asynchronously discovers the TXT record associated with an mDNS service.
-
-        This method attempts to locate and retrieve the TXT record for a given service name 
-        and service type on the local network. It first listens for service announcements, 
-        then sends an active mDNS query for TXT records. If the TXT record is not found 
-        through the standard response, it attempts to recover it from the local Zeroconf cache.
-
-        Args:
-            service_name (str): The full mDNS service instance name.
-                Example: '974B15BD2CC5278E-0000000012344321._matter._tcp.local.'
-            service_type (str, optional): The service type.
-                Example: '_matter._tcp.local.' If None, only the name will be used.
-            discovery_timeout_sec (float, optional): Maximum time to wait for discovery.
-                Defaults to DISCOVERY_TIMEOUT_SEC.
-            log_output (bool, optional): If True, logs discovered service info. Defaults to False.
-
-        Returns:
-            Optional[MdnsServiceInfo]: An MdnsServiceInfo object containing the TXT record and 
-            other metadata, or None if the service could not be resolved.
-        """
+                              service_type: str = None,
+                              discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
+                              log_output: bool = False
+                              ) -> Optional[MdnsServiceInfo]:
         async with AsyncZeroconf() as azc:
             mdns_service_info = None
 
@@ -346,7 +347,8 @@ class MdnsDiscovery:
             try:
                 await wait_for(service_listener.updated_event.wait(), discovery_timeout_sec)
             except TimeoutError:
-                logger.info(f"Service lookup for {service_name} timeout ({discovery_timeout_sec} seconds) reached without an update.")
+                logger.info(
+                    f"Service lookup for {service_name} timeout ({discovery_timeout_sec} seconds) reached without an update.")
             finally:
                 await azc.async_remove_service_listener(service_listener)
 
