@@ -171,7 +171,7 @@ class TC_JFADMIN_2_1(MatterBaseTest):
             nodeid=1, attributes=[(1, Clusters.JointFabricAdministrator.Attributes.AdministratorFabricIndex)],
             returnClusterObject=True)
         attributeAdminFabricIndex = response[1][Clusters.JointFabricAdministrator].administratorFabricIndex
-        asserts.assert_greater_equal(1, attributeAdminFabricIndex,
+        asserts.assert_greater_equal(attributeAdminFabricIndex, 1,
                                      "AdministratorFabricIndex is < 1. Expected AdministratorFabricIndex >= 1")
         asserts.assert_less_equal(attributeAdminFabricIndex, 255,
                                   "AdministratorFabricIndex is > 255. Expected AdministratorFabricIndex <= 255")
