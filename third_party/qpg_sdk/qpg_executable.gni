@@ -212,6 +212,7 @@ template("qpg_executable") {
         "0xc400",
         "--compression",
         "lzma",
+        "--matter"
       ]
 
       ota_header_options += [
