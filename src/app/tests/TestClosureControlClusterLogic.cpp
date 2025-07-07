@@ -1523,8 +1523,8 @@ TEST_F(TestClosureControlClusterLogic, TestHandleMoveToCommand_ChangePositionWit
     EXPECT_TRUE(readValue.IsNull());
 
     EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
-    
-}    
+
+}
 
 // HandleMoveTo command when the cluster is in a latched state and incoming command changes the position.
 TEST_F(TestClosureControlClusterLogic, MoveToCommand_UpdatePositionWhenLatched)
