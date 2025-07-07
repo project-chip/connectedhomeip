@@ -73,10 +73,10 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci_linux"
 
-    chef_dimmablelight_device_test:
-        name: Chef - Dimmablelight functional test (Linux)
+    chef_device_functional_test:
+        name: Chef - Device functional tests (Linux)
         if: github.actor != 'restyled-io[bot]'
-        timeout-minutes: 60
+        timeout-minutes: 90
         runs-on: ubuntu-latest
         container:
             image: ghcr.io/project-chip/chip-build:140
@@ -106,12 +106,9 @@ jobs:
             - name: Build python env
               run: scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/python_env'
 
-            - name: Build chef app
-              run: ./examples/chef/chef.py -b -d rootnode_dimmablelight_bCwGYSDpoe -t linux
-              
-            - name: Run Tests
+            - name: Dimmablelight tests
               run: |
-                  mkdir -p out/trace_data
+                  ./examples/chef/chef.py -b -d rootnode_dimmablelight_bCwGYSDpoe -t linux
                   scripts/run_in_python_env.sh out/python_env './scripts/tests/run_python_test.py --app examples/chef/linux/out/rootnode_dimmablelight_bCwGYSDpoe --factory-reset --script ./examples/chef/tests/dimmablelight_test.py --script-args "--commissioning-method on-network --discriminator 3840 --passcode 20202021"'
 
     chef_esp32:
