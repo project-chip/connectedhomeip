@@ -23,9 +23,9 @@ import logging
 import random
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from enum import IntEnum
 from time import sleep
 from typing import Any, Optional
-from enum import IntEnum
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
