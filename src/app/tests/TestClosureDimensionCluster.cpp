@@ -1730,7 +1730,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommandWithLimitatio
     EXPECT_TRUE(HasAttributeChanges(mockContext.GetDirtyList(), Attributes::TargetState::Id));
 }
 
-// HandleSetTarget command should return InvalidInState when CurrentState is latched and SetTarget command changes position without latch.
+// HandleSetTarget command should return InvalidInState when CurrentState is latched and SetTarget command changes position without
+// latch.
 TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand_ChangePositionWithoutIncomingLatchWhenLatched)
 {
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kMotionLatching).Set(Feature::kSpeed);
@@ -1760,7 +1761,8 @@ TEST_F(TestClosureDimensionClusterLogic, TestHandleSetTargetCommand_ChangePositi
                                                       Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kAuto));
     currentState.SetNonNull(setCurrentStateStruct);
     EXPECT_EQ(logic->SetCurrentState(currentState), CHIP_NO_ERROR);
-    EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(1000), Optional<bool>(true), NullOptional), Status::InvalidInState);
+    EXPECT_EQ(logic->HandleSetTargetCommand(Optional<Percent100ths>(1000), Optional<bool>(true), NullOptional),
+              Status::InvalidInState);
 }
 
 // HandleSetTarget command should return Success when CurrentState is latched and only speed is changed.
