@@ -733,10 +733,12 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
                         Status::InvalidInState);
     if (mConformance.HasFeature(Feature::kMotionLatching))
     {
-        // Return InvalidInState if current latch doesn't have value or is null or is latched
-        VerifyOrReturnError(currentState.Value().latch.HasValue() && !currentState.Value().latch.Value().IsNull() &&
-                                !currentState.Value().latch.Value().Value(),
-                            Status::InvalidInState);
+        if (currentState.Value().latch.HasValue() && !currentState.Value().latch.Value().IsNull())
+        {
+            VerifyOrReturnError(!currentState.Value().latch.Value().Value(), Status::InvalidInState, 
+                               ChipLogError(AppServer, "Step command cannot be processed when current latch is True"));
+        }
+        // Return InvalidInState if currentState is latched
     }
     // Derive TargetState Position from StepValue and NumberOfSteps.
     Percent100ths stepValue;
