@@ -1363,7 +1363,6 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_OnlyMotionLatchingFeature)
 
     DataModel::Nullable<GenericOverallTargetState> readValue;
     MainStateEnum state;
-    DataModel::Nullable<ElapsedS> coundowntime;
     EXPECT_EQ(logic->GetOverallTargetState(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetMainState(state), CHIP_NO_ERROR);
 
