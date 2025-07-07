@@ -65,7 +65,8 @@ class TC_DIMMABLELIGHT(MatterBaseTest):
         asserts.assert_equal(await self._read_on_off(), True)
         for level in [self._MIN_BRIGHTNESS_LEVEL, self._MID_BRIGHTNESS_LEVEL, self._MAX_BRIGHTNESS_LEVEL]:
             await self.send_single_cmd(
-                cmd=Clusters.Objects.LevelControl.Commands.MoveToLevel(level=level),
+                cmd=Clusters.Objects.LevelControl.Commands.MoveToLevel(
+                    level=level),
                 dev_ctrl=self.default_controller,
                 node_id=self.dut_node_id,
                 endpoint=self._DIMMABLELIGHT_ENDPOINT,
