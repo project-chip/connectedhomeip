@@ -152,7 +152,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
         self.step("2g")
         if not initial_state.latch:
             logging.info("Latching feature is not supported or state is unlatched. Skipping steps 2h to 2l.")
-            mark_step_range_skipped("2h", "2l")
+            self.mark_step_range_skipped("2h", "2l")
         else:
             # STEP 2h: If LatchControlModes is manual unlatching, skip step 2i
             self.step("2h")

@@ -186,7 +186,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         self.step("2f")
         if (not is_latching_supported) or (not initial_state.latch):
             logging.info("Latching feature is not supported or state is unlatched. Skipping steps 2g to 2l.")
-            mark_step_range_skipped("2g", "2l")
+            self.mark_step_range_skipped("2g", "2l")
         else:
             # STEP 2g: Read LatchControlModes attribute
             self.step("2g")
@@ -228,7 +228,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         self.step("3a")
         if initial_state.position == max_position:
             logging.info("Initial Position is already at MaxPosition. Skipping steps 3b to 3d.")
-            mark_step_range_skipped("3b", "3d")
+            self.mark_step_range_skipped("3b", "3d")
         else:
             # STEP 3b: Set Position to MaxPosition
             self.step("3b")
@@ -255,7 +255,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         self.step("4a")
         if (not is_speed_supported) or (initial_state.speed == Globals.Enums.ThreeLevelAutoEnum.kMedium):
             logging.info("Speed feature is not supported. Skipping steps 4b to 4d.")
-            mark_step_range_skipped("4b", "4d")
+            self.mark_step_range_skipped("4b", "4d")
         else:
             # STEP 4b: Set Speed to Medium
             self.step("4b")
@@ -305,7 +305,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         self.step("6a")
         if not is_speed_supported:
             logging.info("Speed feature is not supported. Skipping steps 6b to 6d.")
-            mark_step_range_skipped("6b", "6d")
+            self.mark_step_range_skipped("6b", "6d")
         else:
             # STEP 6b: Set Position to MaxPosition and Speed to High
             self.step("6b")
