@@ -29,12 +29,12 @@ from typing import Callable, Optional, Union
 
 import chip.clusters as Clusters
 import chip.testing.conformance as conformance_support
-from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecision, ConformanceException,
-                                      ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
-                                      parse_callable_from_xml, parse_device_type_callable_from_xml)
+from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceDecisionWithChoice,
+                                      ConformanceException, ConformanceParseParameters, feature, is_disallowed, mandatory, optional,
+                                      or_operation, parse_callable_from_xml, parse_device_type_callable_from_xml)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
-                                         EventPathLocation, FeaturePathLocation, ProblemLocation, ProblemNotice, ProblemSeverity)
+from chip.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
+                                          EventPathLocation, FeaturePathLocation, ProblemLocation, ProblemNotice, ProblemSeverity)
 from chip.tlv import uint
 
 _PRIVILEGE_STR = {
@@ -55,7 +55,7 @@ class SpecParsingException(Exception):
 
 
 # passing in feature map, attribute list, command list
-ConformanceCallable = Callable[[uint, list[uint], list[uint]], ConformanceDecision]
+ConformanceCallable = Callable[[uint, list[uint], list[uint]], ConformanceDecisionWithChoice]
 
 
 @dataclass
@@ -92,7 +92,7 @@ class XmlAttribute:
 class XmlCommand:
     id: int
     name: str
-    conformance: Callable[[uint], ConformanceDecision]
+    conformance: ConformanceCallable
     privilege: Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
 
     def __str__(self):
