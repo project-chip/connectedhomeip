@@ -432,8 +432,6 @@ void ZoneMgmtServer::HandleCreateTwoDCartesianZone(HandlerContext & ctx,
         return;
     }
 
-    VerifyOrReturn(mZones.size() < mMaxZones, ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ConstraintError));
-
     VerifyOrReturn(mUserDefinedZonesCount < mMaxUserDefinedZones,
                    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted));
 
