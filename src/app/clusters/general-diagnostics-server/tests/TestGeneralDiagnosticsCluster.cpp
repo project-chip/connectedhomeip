@@ -123,7 +123,8 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
                 bootReason = GeneralDiagnostics::BootReasonEnum::kSoftwareReset;
                 return CHIP_NO_ERROR;
             }
-            CHIP_ERROR GetActiveHardwareFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & hardwareFaults) override
+            CHIP_ERROR
+            GetActiveHardwareFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & hardwareFaults) override
             {
                 return CHIP_NO_ERROR;
             }
@@ -131,19 +132,20 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
             {
                 return CHIP_NO_ERROR;
             }
-            CHIP_ERROR GetActiveNetworkFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & networkFaults) override
+            CHIP_ERROR
+            GetActiveNetworkFaults(chip::DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & networkFaults) override
             {
                 return CHIP_NO_ERROR;
             }
         };
 
         // Enable all the optional attributes
-        const GeneralDiagnosticsEnabledAttributes enabledAttributes {
+        const GeneralDiagnosticsEnabledAttributes enabledAttributes{
             .enableTotalOperationalHours = true,
-            .enableBootReason = true,
-            .enableActiveHardwareFaults = true,
-            .enableActiveRadioFaults = true,
-            .enableActiveNetworkFaults = true,
+            .enableBootReason            = true,
+            .enableActiveHardwareFaults  = true,
+            .enableActiveRadioFaults     = true,
+            .enableActiveNetworkFaults   = true,
         };
 
         AllProvider allProvider;
@@ -185,7 +187,7 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 
         // Check proper read/write of values and returns
-        uint16_t rebootCount = 0;
+        uint16_t rebootCount      = 0;
         uint32_t operationalHours = 0;
         GeneralDiagnostics::BootReasonEnum bootReasonValue;
         DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> hardwareFaults;
