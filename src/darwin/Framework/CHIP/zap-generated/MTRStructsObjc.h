@@ -1848,6 +1848,14 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 @property (nonatomic, copy) NSNumber * _Nonnull scheduleTypeFeatures MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 @end
 
+MTR_PROVISIONALLY_AVAILABLE
+@interface MTRThermostatClusterThermostatSuggestionStruct : NSObject <NSCopying>
+@property (nonatomic, copy) NSNumber * _Nonnull uniqueID MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSData * _Nonnull presetHandle MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull effectiveTime MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSNumber * _Nonnull expirationTime MTR_PROVISIONALLY_AVAILABLE;
+@end
+
 MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4))
 @interface MTRThermostatClusterWeeklyScheduleTransitionStruct : NSObject <NSCopying>
 @property (nonatomic, copy) NSNumber * _Nonnull transitionTime MTR_AVAILABLE(ios(17.4), macos(14.4), watchos(10.4), tvos(17.4));
