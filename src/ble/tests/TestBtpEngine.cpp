@@ -364,7 +364,7 @@ TEST_F(TestBtpEngine, EncodeStandAloneAckMultiFragmentMessage)
     constexpr uint8_t packetData2[] = { to_underlying(BtpEngine::HeaderFlags::kEndMessage), 0x03, 0xff };
 
     auto packet0 = System::PacketBufferHandle::NewWithData(packetData0, sizeof(packetData0));
-    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(5));
+    EXPECT_EQ(packet0->DataLength(), static_cast<size_t>(sizeof(packetData0)));
 
     SequenceNumber_t receivedAck;
     bool didReceiveAck;
@@ -372,13 +372,13 @@ TEST_F(TestBtpEngine, EncodeStandAloneAckMultiFragmentMessage)
     EXPECT_EQ(mBtpEngine.RxState(), BtpEngine::kState_InProgress);
 
     auto packet1 = System::PacketBufferHandle::NewWithData(packetData1, sizeof(packetData1));
-    EXPECT_EQ(packet1->DataLength(), static_cast<size_t>(3));
+    EXPECT_EQ(packet1->DataLength(), static_cast<size_t>(sizeof(packetData1)));
 
     EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(packet1), receivedAck, didReceiveAck), CHIP_NO_ERROR);
     EXPECT_EQ(mBtpEngine.RxState(), BtpEngine::kState_InProgress);
 
     auto packet2 = System::PacketBufferHandle::NewWithData(packetData2, sizeof(packetData2));
-    EXPECT_EQ(packet2->DataLength(), static_cast<size_t>(3));
+    EXPECT_EQ(packet2->DataLength(), static_cast<size_t>(sizeof(packetData2)));
 
     EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(packet2), receivedAck, didReceiveAck), CHIP_NO_ERROR);
     EXPECT_EQ(mBtpEngine.RxState(), BtpEngine::kState_Complete);
@@ -427,18 +427,18 @@ TEST_F(TestBtpEngine, HandleCharacteristicReceivedIncorrectSequence)
 
 TEST_F(TestBtpEngine, HandleCharacteristicReceivedUnexpectedStandaloneAck)
 {
-    constexpr uint8_t ackPacketData[] = {
+    constexpr uint8_t ackPacketData0[] = {
         to_underlying(BtpEngine::HeaderFlags::kFragmentAck),
         0x00,
         0x01,
     };
 
-    auto ackPacket = System::PacketBufferHandle::NewWithData(ackPacketData, sizeof(ackPacketData));
-    EXPECT_FALSE(ackPacket.IsNull());
+    auto ackPacket0 = System::PacketBufferHandle::NewWithData(ackPacketData0, sizeof(ackPacketData0));
+    EXPECT_FALSE(ackPacket0.IsNull());
 
     SequenceNumber_t receivedAck;
     bool didReceiveAck;
-    EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(ackPacket), receivedAck, didReceiveAck), BLE_ERROR_INVALID_ACK);
+    EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(ackPacket0), receivedAck, didReceiveAck), BLE_ERROR_INVALID_ACK);
     EXPECT_TRUE(didReceiveAck);
     EXPECT_EQ(receivedAck, 0x00);
     EXPECT_EQ(mBtpEngine.RxState(), BtpEngine::kState_Error);
@@ -447,27 +447,27 @@ TEST_F(TestBtpEngine, HandleCharacteristicReceivedUnexpectedStandaloneAck)
 TEST_F(TestBtpEngine, HandleAckReceivedIncorrectSequence)
 {
     size_t dataLength = 30;
-    auto packet = System::PacketBufferHandle::New(dataLength);
-    packet->SetDataLength(dataLength);
+    auto packet0 = System::PacketBufferHandle::New(dataLength);
+    packet0->SetDataLength(dataLength);
 
-    EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(packet.Retain(), false));
+    EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), false));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_InProgress);
 
     EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(nullptr, false));
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Complete);
 
-    constexpr uint8_t ackPacketData[] = {
+    constexpr uint8_t ackPacketData0[] = {
         to_underlying(BtpEngine::HeaderFlags::kFragmentAck),
         0x00,
         0x02,
     };
 
-    auto ackPacket = System::PacketBufferHandle::NewWithData(ackPacketData, sizeof(ackPacketData));
-    EXPECT_FALSE(ackPacket.IsNull());
+    auto ackPacket0 = System::PacketBufferHandle::NewWithData(ackPacketData0, sizeof(ackPacketData0));
+    EXPECT_FALSE(ackPacket0.IsNull());
 
     SequenceNumber_t receivedAck;
     bool didReceiveAck;
-    EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(ackPacket), receivedAck, didReceiveAck), BLE_ERROR_INVALID_BTP_SEQUENCE_NUMBER);
+    EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(ackPacket0), receivedAck, didReceiveAck), BLE_ERROR_INVALID_BTP_SEQUENCE_NUMBER);
     EXPECT_TRUE(didReceiveAck);
     EXPECT_EQ(receivedAck, 0x00);
     EXPECT_EQ(mBtpEngine.ExpectingAck(), 1);
@@ -475,7 +475,7 @@ TEST_F(TestBtpEngine, HandleAckReceivedIncorrectSequence)
 
 TEST_F(TestBtpEngine, HandleCharacteristicReceivedWithPadding)
 {
-    constexpr uint8_t packetData[] = {
+    constexpr uint8_t packetData0[] = {
         to_underlying(BtpEngine::HeaderFlags::kStartMessage) | to_underlying(BtpEngine::HeaderFlags::kEndMessage),
         0x01,
         0x01,
@@ -483,60 +483,61 @@ TEST_F(TestBtpEngine, HandleCharacteristicReceivedWithPadding)
         0xff,
     };
 
-    auto packet = System::PacketBufferHandle::NewWithData(packetData, 10);
-
+    auto packet0 = System::PacketBufferHandle::NewWithData(packetData0, 10);
     SequenceNumber_t receivedAck;
     bool didReceiveAck;
-    EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(packet), receivedAck, didReceiveAck), CHIP_NO_ERROR);
+    EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(packet0), receivedAck, didReceiveAck), CHIP_NO_ERROR);
     EXPECT_EQ(mBtpEngine.RxState(), BtpEngine::kState_Complete);
-    EXPECT_EQ(packet->DataLength(), 10);
+    EXPECT_EQ(mBtpEngine.TakeRxPacket()->DataLength(), static_cast<size_t>(1));
 }
 
 TEST_F(TestBtpEngine, IsValidAckOnSequenceWraparound)
 {
-    const uint8_t num = 100;
+    const uint8_t invalidAckValue = 100;
 
-    auto packet = System::PacketBufferHandle::New(5000);
-    packet->SetDataLength(5000);
+    size_t packetLength = mBtpEngine.sDefaultFragmentSize - kTransferProtocolMaxHeaderSize + kTransferProtocolAckSize + 256 * (mBtpEngine.sDefaultFragmentSize - kTransferProtocolMidFragmentMaxHeaderSize + kTransferProtocolAckSize);
+    auto packet0 = System::PacketBufferHandle::New(packetLength);
+    packet0->SetDataLength(packetLength);
 
-    EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(packet.Retain(), false));
+    EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(packet0.Retain(), false));
 
     int count = 0;
-    while (mBtpEngine.TxState() == BtpEngine::kState_InProgress && count < 257)
+    while (count < 256)
     {
         EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(nullptr, false));
         count++;
         if (count % 10 == 0 && mBtpEngine.ExpectingAck())
         {
-            uint8_t ackData[] = {
+            uint8_t ackData0[] = {
                 to_underlying(BtpEngine::HeaderFlags::kFragmentAck),
                 static_cast<uint8_t>(count % 256),
                 static_cast<uint8_t>((count + 1) % 256),
             };
-            auto ackPacket = System::PacketBufferHandle::NewWithData(ackData, sizeof(ackData));
+            auto ackPacket0 = System::PacketBufferHandle::NewWithData(ackData0, sizeof(ackData0));
             SequenceNumber_t receivedAck;
             bool didReceiveAck;
-            EXPECT_NE(mBtpEngine.HandleCharacteristicReceived(std::move(ackPacket), receivedAck, didReceiveAck), CHIP_NO_ERROR);
+            EXPECT_NE(mBtpEngine.HandleCharacteristicReceived(std::move(ackPacket0), receivedAck, didReceiveAck), CHIP_NO_ERROR);
             EXPECT_TRUE(didReceiveAck);
             EXPECT_EQ(receivedAck, count % 256);
         }
     }
+    EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Complete);
 
-    constexpr uint8_t ackPacketData[] = {
+    constexpr uint8_t ackPacketData0[] = {
         to_underlying(BtpEngine::HeaderFlags::kFragmentAck),
-        num,
+        invalidAckValue,
         0xFF,
     };
 
-    auto ackPacket = System::PacketBufferHandle::NewWithData(ackPacketData, sizeof(ackPacketData));
-    EXPECT_FALSE(ackPacket.IsNull());
+    auto ackPacket0 = System::PacketBufferHandle::NewWithData(ackPacketData0, sizeof(ackPacketData0));
+    EXPECT_FALSE(ackPacket0.IsNull());
 
     SequenceNumber_t receivedAck;
     bool didReceiveAck;
-    EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(ackPacket), receivedAck, didReceiveAck), BLE_ERROR_INVALID_ACK);
+    EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(ackPacket0), receivedAck, didReceiveAck), BLE_ERROR_INVALID_ACK);
     EXPECT_EQ(mBtpEngine.RxState(), BtpEngine::kState_Error);
     EXPECT_TRUE(didReceiveAck);
-    EXPECT_EQ(receivedAck, num);
+    EXPECT_EQ(receivedAck, invalidAckValue);
 }
 
 
