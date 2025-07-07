@@ -148,8 +148,8 @@ fi
 if [[ -d "$OUTPUT_ROOT/obj/src" && "$ACCUMULATE" == false ]]; then
     lcov --zerocounters --directory "$OUTPUT_ROOT/obj/src" \
         --ignore-errors format,unsupported,inconsistent,unused \
-        --exclude="$PWD"/zzz_generated/* \
-        --exclude="$PWD"/third_party/* \
+        --exclude="$CHIP_ROOT"/zzz_generated/* \
+        --exclude="$CHIP_ROOT"/third_party/* \
         --exclude=/usr/include/* \
         "${QUIET_FLAG[@]}"
 fi
@@ -245,16 +245,16 @@ mkdir -p "$COVERAGE_ROOT"
 
 lcov --capture --initial --directory "$OUTPUT_ROOT/obj/src" \
     --ignore-errors format,unsupported,inconsistent,unused \
-    --exclude="$PWD"/zzz_generated/* \
-    --exclude="$PWD"/third_party/* \
+    --exclude="$CHIP_ROOT"/zzz_generated/* \
+    --exclude="$CHIP_ROOT"/third_party/* \
     --exclude=/usr/include/* \
     --output-file "$COVERAGE_ROOT/lcov_base.info" \
     "${QUIET_FLAG[@]}"
 
 lcov --capture --directory "$OUTPUT_ROOT/obj/src" \
     --ignore-errors format,unsupported,inconsistent,unused \
-    --exclude="$PWD"/zzz_generated/* \
-    --exclude="$PWD"/third_party/* \
+    --exclude="$CHIP_ROOT"/zzz_generated/* \
+    --exclude="$CHIP_ROOT"/third_party/* \
     --exclude=/usr/include/* \
     --output-file "$COVERAGE_ROOT/lcov_test.info" \
     "${QUIET_FLAG[@]}"
