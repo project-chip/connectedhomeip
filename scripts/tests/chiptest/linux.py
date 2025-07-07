@@ -215,4 +215,5 @@ def PathsWithNetworkNamespaces(paths: ApplicationPaths) -> ApplicationPaths:
         bridge_app='ip netns exec app'.split() + paths.bridge_app,
         chip_repl_yaml_tester_cmd='ip netns exec tool'.split() + paths.chip_repl_yaml_tester_cmd,
         chip_tool_with_python_cmd='ip netns exec tool'.split() + paths.chip_tool_with_python_cmd,
+        closure_app='ip netns exec app'.split() + paths.closure_app,
     )
