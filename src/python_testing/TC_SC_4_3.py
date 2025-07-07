@@ -117,7 +117,7 @@ class TC_SC_4_3(MatterBaseTest):
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
         operational_subtype = f'_I{compressed_fabric_id:016X}._sub.{MdnsServiceType.OPERATIONAL.value}'
         if log_result:
-            logging.info(f"Operational Subtype: {operational_subtype}")
+            logging.info(f"\n\n\tOperational Subtype: {operational_subtype}\n")
         return operational_subtype
 
     @staticmethod
@@ -273,6 +273,7 @@ class TC_SC_4_3(MatterBaseTest):
         operational_record = await mdns.get_txt_record(
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
+            discovery_timeout_sec=3,
             log_output=True
         )
 
