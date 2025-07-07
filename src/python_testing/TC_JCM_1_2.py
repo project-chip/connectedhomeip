@@ -243,8 +243,8 @@ class TC_JCM_1_2(MatterBaseTest):
         # Open enhanced commissioning window using Administrator Commissioning cluster of jfa-app@EcoB
         # Using devCtrlEcoB Python Controller
         # Parameters matching: pairing open-commissioning-window 11 0 400 1000 {jfa-app--discriminator@EcoB}
-        _ocw_timeout       = 400  # 400 seconds ~ 6.5 minutes
-        _ocw_iteration     = 1000
+        _ocw_timeout = 400  # 400 seconds ~ 6.5 minutes
+        _ocw_iteration = 1000
 
         try:
             # Open Enhanced Commissioning Window using Administrator Commissioning Cluster
@@ -283,7 +283,6 @@ class TC_JCM_1_2(MatterBaseTest):
             logging.error(f"Failed to open commissioning window: {e}")
             asserts.fail(f"Could not open commissioning window on node {nodeid}: {e}")
 
-
     async def _joint_commission_EcoB_admin(self, devCtrl, nodeid, passcode, endpoint):
         """Commission jfa-app from Ecosystem B into Ecosystem A using Joint Commissioning"""
 
@@ -304,7 +303,6 @@ class TC_JCM_1_2(MatterBaseTest):
         except Exception as e:
             logging.error(f"Joint Commissioning failed: {e}")
             asserts.fail(f"Could not perform Joint Commissioning on node {nodeid}: {e}")
-
 
     @async_test_body
     async def test_TC_JCM_1_2(self):
@@ -331,18 +329,16 @@ class TC_JCM_1_2(MatterBaseTest):
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
             catTags=[int(self.ecoBCATs, 16)])
 
-
         self.step("1")
         logging.info("On Ecosystem B, use jfc-app for opening a commissioning window in jfa-app using Python Controller")
 
         # Parameters matching: pairing open-commissioning-window 11 0 400 1000 {jfa-app--discriminator@EcoB}
         _ocw_nodeid = 11     # jfa-app node ID in Ecosystem B
         _ocw_endpoint = 0
-        _ocw_discriminator = self.jfadmin_fabric_b_discriminator # jfa-app discriminator in Ecosystem B
+        _ocw_discriminator = self.jfadmin_fabric_b_discriminator  # jfa-app discriminator in Ecosystem B
 
         # Open enhanced commissioning window using Administrator Commissioning cluster of jfa-app@EcoB
         _ocw_params = await self._open_commissioning_window_in_EcoB(devCtrlEcoB, _ocw_nodeid, _ocw_discriminator, _ocw_endpoint)
-
 
         self.step("2")
         logging.info("On Ecosystem A, use jfc-app for commissioning jfa-app at EcosystemB using Python Controller")
@@ -356,7 +352,6 @@ class TC_JCM_1_2(MatterBaseTest):
 
         # Perform Joint Commissioning using Ecosystem A jfc-app
         await self._joint_commission_EcoB_admin(self.fabric_a_ctrl, _jcm_nodeid, _ocw_params.setupPinCode, _jcm_endpoint)
-
 
         self.step("3")
         logging.info("On jfc-app@EcoB used a non-filtered fabric read for reading the NOC from Fabric Index=2")
