@@ -118,9 +118,9 @@ class TC_CLDIM_3_2(MatterBaseTest):
         self.step("2a")
         feature_map = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
 
-        is_positioning_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
-        is_latching_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
-        is_limitation_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kLimitation
+        is_positioning_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
+        is_latching_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
+        is_limitation_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kLimitation
 
         # STEP 2b: If MotionLatching Feature is not supported, skip remaining steps
         self.step("2b")
@@ -152,11 +152,7 @@ class TC_CLDIM_3_2(MatterBaseTest):
         self.step("2g")
         if not initial_state.latch:
             logging.info("Latching feature is not supported or state is unlatched. Skipping steps 2h to 2l.")
-            self.skip_step("2h")
-            self.skip_step("2i")
-            self.skip_step("2j")
-            self.skip_step("2k")
-            self.skip_step("2l")
+            mark_step_range_skipped("2h", "2l")
         else:
             # STEP 2h: If LatchControlModes is manual unlatching, skip step 2i
             self.step("2h")

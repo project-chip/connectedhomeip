@@ -106,7 +106,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
             TestStep("2c", "Read LimitRange attribute"),
             TestStep("2d", "Establish wilcard subscription to all attributes"),
             TestStep("2e", "Read CurrentState attribute"),
-            TestStep("2f", "If Latching feature not supported or state is unlatched, skip steps 2g ti 2l"),
+            TestStep("2f", "If Latching feature is not supported or state is unlatched, skip steps 2g to 2l"),
             TestStep("2g", "Read LatchControlModes attribute"),
             TestStep("2h", "If LatchControlModes is manual unlatching, skip step 2i"),
             TestStep("2i", "Send SetTarget command with Latch=False"),
@@ -154,10 +154,10 @@ class TC_CLDIM_3_1(MatterBaseTest):
         self.step("2a")
         feature_map = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
 
-        is_positioning_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
-        is_latching_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
-        is_limitation_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kLimitation
-        is_speed_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
+        is_positioning_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
+        is_latching_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
+        is_limitation_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kLimitation
+        is_speed_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
 
         # STEP 2b: If Positioning Feature is not supported, skip remaining steps
         self.step("2b")
@@ -186,12 +186,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         self.step("2f")
         if (not is_latching_supported) or (not initial_state.latch):
             logging.info("Latching feature is not supported or state is unlatched. Skipping steps 2g to 2l.")
-            self.skip_step("2g")
-            self.skip_step("2h")
-            self.skip_step("2i")
-            self.skip_step("2j")
-            self.skip_step("2k")
-            self.skip_step("2l")
+            mark_step_range_skipped("2g", "2l")
         else:
             # STEP 2g: Read LatchControlModes attribute
             self.step("2g")
@@ -233,9 +228,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         self.step("3a")
         if initial_state.position == max_position:
             logging.info("Initial Position is already at MaxPosition. Skipping steps 3b to 3d.")
-            self.skip_step("3b")
-            self.skip_step("3c")
-            self.skip_step("3d")
+            mark_step_range_skipped("3b", "3d")
         else:
             # STEP 3b: Set Position to MaxPosition
             self.step("3b")
@@ -262,9 +255,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         self.step("4a")
         if (not is_speed_supported) or (initial_state.speed == Globals.Enums.ThreeLevelAutoEnum.kMedium):
             logging.info("Speed feature is not supported. Skipping steps 4b to 4d.")
-            self.skip_step("4b")
-            self.skip_step("4c")
-            self.skip_step("4d")
+            mark_step_range_skipped("4b", "4d")
         else:
             # STEP 4b: Set Speed to Medium
             self.step("4b")
@@ -314,9 +305,7 @@ class TC_CLDIM_3_1(MatterBaseTest):
         self.step("6a")
         if not is_speed_supported:
             logging.info("Speed feature is not supported. Skipping steps 6b to 6d.")
-            self.skip_step("6b")
-            self.skip_step("6c")
-            self.skip_step("6d")
+            mark_step_range_skipped("6b", "6d")
         else:
             # STEP 6b: Set Position to MaxPosition and Speed to High
             self.step("6b")

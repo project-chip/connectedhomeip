@@ -84,7 +84,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             TestStep("2c", "If Positioning feature is supportes, read Resolution attribute"),
             TestStep("2d", "Establish wilcard subscription to all attributes"),
             TestStep("2e", "Read CurrentState attribute"),
-            TestStep("2f", "If Latching feature not supported or state is unlatched, skip steps 2g ti 2l"),
+            TestStep("2f", "If Latching feature is not supported or state is unlatched, skip steps 2g to 2l"),
             TestStep("2g", "Read LatchControlModes attribute"),
             TestStep("2h", "If LatchControlModes is manual unlatching, skip step 2i"),
             TestStep("2i", "Send SetTarget command with Latch=False"),
@@ -105,7 +105,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             TestStep("5f", "Verify TargetState attribute is updated"),
             TestStep("5g", "Wait for CurrentState.Position to be updated to 100%"),
             TestStep(6, "Send SetTarget command with invalid Position"),
-            TestStep("7a", "If Resolution is unsupported, skip step 7b to 7j"),
+            TestStep("7a", "If Positioning feature is unsupported, skip step 7b to 7j"),
             TestStep("7b", "Read CurrentState attribute"),
             TestStep("7c", "Send SetTarget command with Position not a multiple of Resolution"),
             TestStep("7d", "Verify TargetState attribute is updated"),
@@ -145,10 +145,10 @@ class TC_CLDIM_3_3(MatterBaseTest):
         self.step("2a")
         feature_map = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
 
-        is_positioning_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
-        is_latching_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
-        is_limitation_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kLimitation
-        is_speed_supported = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
+        is_positioning_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
+        is_latching_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
+        is_limitation_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kLimitation
+        is_speed_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
 
         # STEP 2b: Read LimitRange attribute if supported
         self.step("2b")
