@@ -23,7 +23,6 @@ from zeroconf import (BadTypeInNameException, DNSOutgoing, DNSQuestion, DNSQuest
 from zeroconf._services.info import float_
 from zeroconf.const import _CLASS_IN, _DUPLICATE_QUESTION_INTERVAL, _FLAGS_QR_QUERY, _LISTENER_TIME, _MDNS_PORT, _TYPE_AAAA
 
-
 _AVOID_SYNC_DELAY_RANDOM_INTERVAL = (20, 120)
 
 
