@@ -221,7 +221,6 @@
     ],
     "SoftwareDiagnostics": [
         "Test_TC_DGSW_2_1",
-        "Test_TC_DGSW_2_2",
         "Test_TC_DGSW_2_3"
     ],
     "EthernetNetworkDiagnostics": [],
