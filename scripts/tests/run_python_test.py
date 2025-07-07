@@ -213,8 +213,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                 target=forward_fifo, args=(app_stdin_pipe, app_process.p.stdin, app_stdin_forwarding_stop_event))
             app_stdin_forwarding_thread.start()
         else:
-            logging.info("No app_stdin_pipe.")
-            # app_process.p.stdin.close()
+            app_process.p.stdin.close()
 
     script_command = [
         script,

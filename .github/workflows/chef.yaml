@@ -109,7 +109,8 @@ jobs:
             - name: Dimmablelight tests
               run: |
                   ./examples/chef/chef.py -b -d rootnode_dimmablelight_bCwGYSDpoe -t linux
-                  scripts/run_in_python_env.sh out/python_env './scripts/tests/run_python_test.py --app examples/chef/linux/out/rootnode_dimmablelight_bCwGYSDpoe --factory-reset --script ./examples/chef/tests/dimmablelight_test.py --script-args "--commissioning-method on-network --discriminator 3840 --passcode 20202021"'
+                  touch /tmp/chef_stdin.txt
+                  scripts/run_in_python_env.sh out/python_env './scripts/tests/run_python_test.py --app examples/chef/linux/out/rootnode_dimmablelight_bCwGYSDpoe --factory-reset --script ./examples/chef/tests/dimmablelight_test.py --script-args "--commissioning-method on-network --discriminator 3840 --passcode 20202021" --app-stdin-pipe /tmp/chef_stdin.txt'
 
     chef_esp32:
         name: Chef - ESP32 CI Examples
