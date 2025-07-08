@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "wifi-network-diagnostics-server.h"
+#include "wifi-network-diagnostics-cluster.h"
 
 #include <app/EventLogging.h>
 #include <clusters/WiFiNetworkDiagnostics/Attributes.h>
