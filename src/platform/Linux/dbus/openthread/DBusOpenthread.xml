@@ -68,18 +68,6 @@ the OpenThread integration with the Matter SDK.
     <method name="Reset" />
 
     <!--
-    The current link mode.
-
-    This property is a struct with the following fields:
-      bool rx_on_when_idle    // whether the radio receiving is on when idle
-      bool device_type        // ftd or mtd
-      bool network_data       // full or stable
-    -->
-    <property name="LinkMode" type="(bbb)" access="readwrite">
-      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
-    </property>
-
-    <!--
     The current device role.
 
     Possible values are:
@@ -91,40 +79,6 @@ the OpenThread integration with the Matter SDK.
     -->
     <property name="DeviceRole" type="s" access="read">
       <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="true"/>
-    </property>
-
-    <!--
-    The 64-bit extended address.
-    -->
-    <property name="ExtendedAddress" type="t" access="read">
-      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
-    </property>
-
-    <!--
-    The list of current external route rules.
-
-    The structure definition for a single route rule:
-      struct {
-        struct {
-          uint8[] prefix_bytes
-          uint8 prefix_length
-        }
-        uint16 rloc
-        uint8 preference
-        bool stable
-        bool next_hop_is_self
-      }
-    -->
-    <property name="ExternalRoutes" type="a((ayy)qybb)" access="read">
-      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
-    </property>
-
-    <!--
-    The Thread active dataset TLV in binary form.
-    -->
-    <property name="ActiveDatasetTlvs" type="ay" access="readwrite">
-      <annotation name="org.gtk.GDBus.C.ForceGVariant" value="true"/>
-      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
     </property>
 
   </interface>
