@@ -17,14 +17,14 @@
 
 #pragma once
 
+#include <srp/SrpCommon.h>
+
 /**
     @brief File contains the Matter Client Implementation
 */
 
 namespace chip {
 namespace srp {
-
-#include <srp/SrpCommon.h>
 
 class Client
 {
