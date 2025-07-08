@@ -181,7 +181,7 @@ class HostApp(Enum):
         elif self == HostApp.JF_ADMIN:
             return 'jf-admin-app/linux'
         elif self == HostApp.CLOSURE:
-            return 'closure/linux'
+            return 'closure-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
