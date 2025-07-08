@@ -29,7 +29,7 @@ from unittest.mock import MagicMock
 
 import chip.testing.global_stash as global_stash
 from chip.clusters import Attribute
-from chip.testing.matter_global_defaults import DEFAULT_LOG_PATH
+from chip.testing.matter_testing_defaults import DEFAULT_LOG_PATH
 from mobly import signals
 from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
 from mobly.test_runner import TestRunner

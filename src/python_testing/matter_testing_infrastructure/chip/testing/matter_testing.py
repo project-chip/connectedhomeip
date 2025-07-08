@@ -68,8 +68,8 @@ from chip.storage import PersistentStorage
 from chip.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
                                         get_setup_payload_info_config)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.matter_global_defaults import (DEFAULT_ADMIN_VENDOR_ID, DEFAULT_CONTROLLER_NODE_ID, DEFAULT_DUT_NODE_ID,
-                                                 DEFAULT_LOG_PATH, DEFAULT_STORAGE_PATH, DEFAULT_TRUST_ROOT_INDEX)
+from chip.testing.matter_testing_defaults import (DEFAULT_ADMIN_VENDOR_ID, DEFAULT_CONTROLLER_NODE_ID, DEFAULT_DUT_NODE_ID,
+                                                  DEFAULT_LOG_PATH, DEFAULT_STORAGE_PATH, DEFAULT_TRUST_ROOT_INDEX)
 from chip.testing.pics import read_pics_from_file
 from chip.testing.runner import TestRunnerHooks, TestStep
 from chip.tlv import uint
