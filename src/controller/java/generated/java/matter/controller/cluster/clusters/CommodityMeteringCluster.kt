@@ -430,7 +430,7 @@ class CommodityMeteringCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "MaximumMeteredQuantities attribute not found in response" }
+    requireNotNull(attributeData) { "Maximummeteredquantities attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -481,7 +481,7 @@ class CommodityMeteringCluster(
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "MaximumMeteredQuantities attribute not found in Node State update"
+            "Maximummeteredquantities attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
@@ -494,7 +494,7 @@ class CommodityMeteringCluster(
               null
             }
 
-          emit(MaximumMeteredQuantitiesAttributeSubscriptionState.Success(decodedValue))
+          decodedValue?.let { emit(MaximumMeteredQuantitiesAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(MaximumMeteredQuantitiesAttributeSubscriptionState.SubscriptionEstablished)
