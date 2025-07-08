@@ -105,10 +105,11 @@ class TC_AVSUM_2_3(MatterBaseTest, AVSUMTestBase):
         attribute_list = await self.read_avsum_attribute_expect_success(endpoint, attributes.AttributeList)
 
         if not (self.has_feature_mpan | self.has_feature_mtilt | self.has_feature_mzoom):
-            asserts.fail("One of MPAN, MTILT, or MZOOM is mandatory")
+            asserts.fail("One of MPAN, MTILT, or MZOOM is mandatory for command support")
 
         self.step(2)
-        asserts.assert_in(attributes.MPTZPosition.attribute_id, attribute_list, "MPTZPosition attribute is mandatory.")
+        asserts.assert_in(attributes.MPTZPosition.attribute_id, attribute_list,
+                          "MPTZPosition attribute is mandatory for command support.")
         mptzposition_dut = await self.read_avsum_attribute_expect_success(endpoint, attributes.MPTZPosition)
         initialPan = mptzposition_dut.pan
         initialTilt = mptzposition_dut.tilt
