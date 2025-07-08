@@ -86,14 +86,17 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
     def steps_TC_RVCOPSTATE_2_5(self) -> list[TestStep]:
         steps = [
             TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "TH reads the SupportedModes attribute of the RVC Run Mode cluster"),
-            TestStep("3", "TH establishes a subscription to the CurrentMode attribute of the RVC Run Mode cluster of the DUT"),
-            TestStep("4", "TH sends a RVC Run Mode cluster ChangeToMode command to the DUT with NewMode set to PIXIT.CLEANMODE"),
-            TestStep("5", "Wait for DUT to leave dock and begin cleaning activities"),
-            TestStep("6", "TH reads CurrentMode attribute of the RVC Run Mode cluster"),
-            TestStep("7", "TH sends GoHome command to the DUT"),
-            TestStep("8", "Wait for DUT to return to dock and complete docking-related activities"),
-            TestStep("9", "TH reads CurrentMode attribute of the RVC Run Mode cluster"),
+            TestStep("2", "Manually put the device in a RVC Run Mode cluster mode with the Idle mode"),
+            TestStep("3", "TH reads the SupportedModes attribute of the RVC Run Mode cluster"),
+            TestStep("4", "TH establishes a subscription to the CurrentMode attribute of the RVC Run Mode cluster of the DUT"),
+            TestStep("5", "TH sends a RVC Run Mode cluster ChangeToMode command to the DUT with NewMode set to PIXIT.CLEANMODE"),
+            TestStep("6", "Wait for DUT to leave dock and begin cleaning activities"),
+            TestStep("7", "TH reads CurrentMode attribute of the RVC Run Mode cluster"),
+            TestStep("8", "TH sends GoHome command to the DUT"),
+            TestStep("9", "Manually put the device in the Docked(0x42) operational state"),
+            TestStep("10", "TH reads the OperationalState attribute"),
+            TestStep("11", "Wait for DUT to return to dock and complete docking-related activities"),
+            TestStep("12", "TH reads CurrentMode attribute of the RVC Run Mode cluster"),
         ]
         return steps
 
@@ -107,6 +110,10 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
         cluster = Clusters.Objects.RvcRunMode
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
+    async def read_rvcopstate_attribute_expect_success(self, endpoint, attribute):
+        cluster = Clusters.Objects.RvcOperationalState
+        return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
+
     async def read_supported_mode(self, endpoint):
         return await self.read_rvcrunm_attribute_expect_success(endpoint=endpoint,
                                                               attribute=Clusters.RvcRunMode.Attributes.SupportedModes)
@@ -117,6 +124,10 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
         asserts.assert_true(run_mode == expected_mode,
                             "Expected the current mode to be %i, got %i" % (expected_mode, run_mode))
         return run_mode
+
+    async def read_operational_state(self, endpoint):
+        return await self.read_rvcopstate_attribute_expect_success(endpoint=endpoint,
+                                                              attribute=Clusters.RvcOperationalState.Attributes.OperationalState)
 
     async def send_change_to_mode_cmd(self, new_mode) -> Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
@@ -147,16 +158,25 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
     async def test_TC_RVCOPSTATE_2_5(self):
 
         self.endpoint = self.get_endpoint(default=1)
+        # Allow some user input steps to be skipped if running under CI
+        self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 
         # Commission DUT to TH
         self.step("1")
         self.print_step(1, "Commissioning, already done")
 
         if self.pics_guard(self.check_pics("RVCOPSTATE.S.A0004") and self.check_pics("RVCOPSTATE.S.C80.Rsp")
-                           and self.check_pics("RVCRUNM.S.A0000") and self.check_pics("RVCRUNM.S.A0001")):
+                           and self.check_pics("RVCRUNM.S.A0000") and self.check_pics("RVCRUNM.S.A0001")
+                           and self.check_pics("RVCRUNM.S.M.CAN_MANUALLY_CONTROLLED")):
+
+            # Manually put the device in a RVC Run Mode cluster mode with the Idle mode tag
+            self.step("2")
+            if not self.is_ci:
+                step_name_idle_mode = "Manually put the device in the Idle mode"
+                self.wait_for_user_input(prompt_msg=f"{step_name_idle_mode}, and press Enter when ready.")
 
             # TH reads the SupportedModes attribute of the RVC Run Mode cluster
-            self.step("2")
+            self.step("3")
             supported_run_modes_dut = await self.read_supported_mode(endpoint=self.endpoint)
             # Logging the SupportedModes Attribute output responses from the DUT:
             logging.info("SupportedModes: %s" % (supported_run_modes_dut))
@@ -173,7 +193,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
             asserts.assert_is_not_none(cleaning_mode, "Cleaning mode not found in SupportedModes!")
 
             # TH establishes a subscription to the CurrentMode attribute of the RVC Run Mode cluster of the DUT
-            self.step("3")
+            self.step("4")
             current_mode_accumulator = ClusterAttributeChangeAccumulator(
                 Clusters.RvcRunMode,
                 Clusters.RvcRunMode.Attributes.CurrentMode)
@@ -184,13 +204,13 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
                 max_interval_sec=self.max_report_interval_sec)
 
             # TH sends a RVC Run Mode cluster ChangeToMode command to the DUT with NewMode set to PIXIT.CLEANMODE
-            self.step("4")
+            self.step("5")
             await self.send_change_to_mode_with_check(cleaning_mode, RvcStatusEnum.Success)
             # This step is not described in the test plan, but it ought to be
             await self.read_current_mode_with_check(cleaning_mode, endpoint=self.endpoint)
 
             # Wait for DUT to leave dock and begin cleaning activities
-            self.step("5")
+            self.step("6")
             current_mode_match = AttributeMatcher.from_callable(
                 "CurrentMode is CLEANING",
                 lambda report: report.value == cleaning_mode)
@@ -200,7 +220,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
             await asyncio.sleep(1)
 
             # TH reads CurrentMode attribute of the RVC Run Mode cluster
-            self.step("6")
+            self.step("7")
             cleaning_run_mode_dut = await self.read_current_mode_with_check(cleaning_mode, endpoint=self.endpoint)
             # Logging the CurrentMode Attribute output responses from the DUT:
             logging.info(f"CurrentMode: {cleaning_run_mode_dut}")
@@ -208,19 +228,34 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
                                                Clusters.RvcRunMode.Enums.ModeTag.kCleaning)
 
             # TH sends GoHome command to the DUT
-            self.step("7")
+            self.step("8")
             await self.send_go_home_cmd_with_check(Clusters.OperationalState.Enums.ErrorStateEnum.kNoError)
 
+            self.step("9")
+            if not self.is_ci:
+                step_name_for_docked_state = "Manually put the device in the Docked(0x42) operational state"
+                self.wait_for_user_input(prompt_msg=f"{step_name_for_docked_state}, and press Enter when ready.")
+
+            # TH reads the OperationalState attribute
+            self.step("10")
+            current_operational_state = await self.read_operational_state(endpoint=self.endpoint)
+            # Logging the OperationalState Attribute output responses from the DUT:
+            logging.info(f"OperationalState: {current_operational_state}")
+            expected_value  = Clusters.RvcOperationalState.Enums.OperationalStateEnum.kDocked
+            asserts.assert_equal(current_operational_state, expected_value,
+                                 "OperationalState(%s) should be %s" % (current_operational_state,
+                                                                        expected_value))
+
             # Wait for DUT to return to dock and complete docking-related activities
-            self.step("8")
+            self.step("11")
             current_mode_match = AttributeMatcher.from_callable(
-                "CurrentMMode is IDLE",
+                "CurrentMode is IDLE",
                 lambda report: report.value == idle_mode)
             # Wait for attribute reports to match
             current_mode_accumulator.await_all_expected_report_matches([current_mode_match], timeout_sec=10)
 
             # TH reads CurrentMode attribute of the RVC Run Mode cluster
-            self.step("9")
+            self.step("12")
             post_docking_run_mode_dut = await self.read_current_mode_with_check(expected_mode=idle_mode,endpoint=self.endpoint)
             # Logging the CurrentMode Attribute output responses from the DUT:
             logging.info(f"CurrentMode: {post_docking_run_mode_dut}")
