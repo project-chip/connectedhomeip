@@ -125,7 +125,7 @@ void Instance::Shutdown()
 }
 
 static CHIP_ERROR CopyMeteredQuantityEntry(const Structs::MeteredQuantityStruct::Type & src,
-                                                    Structs::MeteredQuantityStruct::Type & dest)
+                                           Structs::MeteredQuantityStruct::Type & dest)
 {
     dest.quantity = src.quantity;
 
@@ -146,8 +146,8 @@ static void CleanUpIDs(DataModel::List<const uint32_t> & IDs)
     }
 }
 
- static void CleanupMeteredQuantityData(DataModel::List<Structs::MeteredQuantityStruct::Type> & aValue)
- {
+static void CleanupMeteredQuantityData(DataModel::List<Structs::MeteredQuantityStruct::Type> & aValue)
+{
     if (aValue.data() != nullptr)
     {
         for (auto & item : aValue)
@@ -158,7 +158,7 @@ static void CleanUpIDs(DataModel::List<const uint32_t> & IDs)
         Platform::MemoryFree(aValue.data());
         aValue = DataModel::List<Structs::MeteredQuantityStruct::Type>();
     }
- }
+}
 
 CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> & newValue)
 {
@@ -181,8 +181,7 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
 
         if (len == 0)
         {
-            mMeteredQuantity =
-                MakeNullable(DataModel::List<Structs::MeteredQuantityStruct::Type>());
+            mMeteredQuantity = MakeNullable(DataModel::List<Structs::MeteredQuantityStruct::Type>());
         }
         else
         {
@@ -197,12 +196,10 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
             {
                 // Deep copy each MeteredQuantityStruct in the newValue list
 
-                ReturnLogErrorOnFailure(CopyMeteredQuantityEntry(
-                    newValue.Value()[idx], buffer[idx]));
+                ReturnLogErrorOnFailure(CopyMeteredQuantityEntry(newValue.Value()[idx], buffer[idx]));
             }
 
-            mMeteredQuantity =
-                MakeNullable(DataModel::List<Structs::MeteredQuantityStruct::Type>(buffer.Get(), len));
+            mMeteredQuantity = MakeNullable(DataModel::List<Structs::MeteredQuantityStruct::Type>(buffer.Get(), len));
         }
     }
 

@@ -55,6 +55,7 @@ public:
     CHIP_ERROR SetMeteredQuantityTimestamp(DataModel::Nullable<uint32_t>);
     CHIP_ERROR SetTariffUnit(DataModel::Nullable<Globals::TariffUnitEnum>);
     CHIP_ERROR SetMaximumMeteredQuantities(DataModel::Nullable<uint16_t>);
+
 private:
     // Attribute storage
     DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> mMeteredQuantity;
