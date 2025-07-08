@@ -74,7 +74,7 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
             }
             if (!matchedVideoStream) 
             {
-                return CHIP_ERROR_BAD_REQUEST;
+                return CHIP_ERROR_NOT_FOUND;
             }
         }
         else 
@@ -106,7 +106,7 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
             }
             if (!matchedAudioStream)
             {
-                return CHIP_ERROR_BAD_REQUEST;
+                return CHIP_ERROR_NOT_FOUND;
             }
         }
         else 
@@ -124,7 +124,7 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
 
     if (!matchedAudioStream && !matchedVideoStream)
     {
-        return CHIP_ERROR_BAD_REQUEST;
+        return CHIP_ERROR_NOT_FOUND;
     }
     return CHIP_NO_ERROR;
 }
