@@ -481,7 +481,7 @@ class CommodityMeteringCluster(
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Maximummeteredquantities attribute not found in Node State update"
+            "MaximumMeteredQuantities attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
