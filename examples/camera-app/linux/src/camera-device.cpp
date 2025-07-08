@@ -1204,9 +1204,9 @@ void CameraDevice::InitializeSnapshotStreams()
                                         90 /* Quality */,
                                         0 /* RefCount */,
                                         false /* EncodedPixels */,
-                                        false /* HardareEncoder */ 
+                                        false /* HardareEncoder */
                                       },
-                                      false, 
+                                      false,
                                       nullptr };
 
     mSnapshotStreams.push_back(snapshotStream);

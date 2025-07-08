@@ -1941,7 +1941,7 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamAllocate(HandlerContext & ctx
             ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: WatermarkEnabled provided but Watermark Feature not set", mEndpointId);
             ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
         });
-    }   
+    }
 
     // If OSDEnabled is provided then the OSD feature has to be supported
     if (commandData.OSDEnabled.HasValue())
@@ -2019,7 +2019,7 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamModify(HandlerContext & ctx,
     if (commandData.watermarkEnabled.HasValue() || commandData.OSDEnabled.HasValue())
     {
         status = mDelegate.SnapshotStreamModify(snapshotStreamID, isWaterMarkEnabled, isOSDEnabled);
-    }    
+    }
 
     if (status == Status::Success)
     {
