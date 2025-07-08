@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "wifi-network-diagnostics-server.h"
+#include "wifi-network-diagnostics-cluster.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/static-cluster-config/WiFiNetworkDiagnostics.h>
 #include <app/util/attribute-storage.h>
