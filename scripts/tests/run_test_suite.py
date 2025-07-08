@@ -352,7 +352,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
 
     if energy_management_app is None:
         energy_management_app = paths_finder.get('chip-energy-management-app')
-    
+
     if closure_app is None:
         closure_app = paths_finder.get('closure-app')
 
