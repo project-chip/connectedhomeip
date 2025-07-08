@@ -516,7 +516,6 @@ class MdnsDiscovery:
         if unlock_service:
             # Get service information
             ensure_future(self._query_service_info(
-                zeroconf,
                 service_type,
                 name)
             )
@@ -526,13 +525,12 @@ class MdnsDiscovery:
                 self._discovered_services[service_type] = []
             self._discovered_services[service_type].append(PtrRecord(service_type=service_type, service_name=name))
 
-    async def _query_service_info(self, zeroconf: Zeroconf, service_type: str, service_name: str) -> None:
+    async def _query_service_info(self, service_type: str, service_name: str) -> None:
         """
         This method queries for service details such as its address, port, and TXT records
         containing metadata.
 
         Args:
-            zeroconf (Zeroconf): The Zeroconf instance used for managing network operations and service discovery.
             service_type (str): The type of the mDNS service being queried.
             service_name (str): The specific service name of the mDNS service to query. This service name uniquely
             identifies the service instance within the local network.
@@ -540,27 +538,47 @@ class MdnsDiscovery:
         Returns:
             None: This method does not return any value.
         """
-        # Get service info
-        service_info = AsyncServiceInfo(service_type, service_name)
-        service_info._query_record_types = {_TYPE_SRV, _TYPE_TXT, _TYPE_A, _TYPE_AAAA}
-        service_info.async_clear_cache()
-        is_service_discovered = await service_info.async_request(zeroconf, 3000)
+        async with AsyncZeroconf() as azc:
+            mdns_service_info = None
+            discovery_timeout_sec = 3
 
-        if is_service_discovered:
-            if self._verbose_logging:
-                logger.warning("Service discovered for %s/%s.", service_name, service_type)
+            # Adds service listener
+            service_listener = MdnsServiceListener()
+            await azc.async_add_service_listener(service_type, service_listener)
 
-            mdns_service_info = self._to_mdns_service_info_class(service_info)
+            # Wait for the add/update service event or timeout
+            # This is necessary whem requesting TXT records,
+            # as the service may not be immediately available
+            try:
+                await wait_for(service_listener.updated_event.wait(), discovery_timeout_sec)
+            except TimeoutError:
+                logger.info(
+                    f"Service lookup for {service_name} timeout ({discovery_timeout_sec} seconds) reached without an update.")
+            finally:
+                await azc.async_remove_service_listener(service_listener)
 
-            if service_type not in self._discovered_services:
-                self._discovered_services[service_type] = []
+            # Prepare and perform query
+            service_info = MdnsAsyncServiceInfo(name=service_name, type_=service_type)
+            service_info._query_record_types = {_TYPE_SRV, _TYPE_TXT, _TYPE_A, _TYPE_AAAA}
+            is_discovered = await service_info.async_request(
+                azc.zeroconf,
+                discovery_timeout_sec * 1000)
 
-            if mdns_service_info is not None:
-                self._discovered_services[service_type].append(mdns_service_info)
-        elif self._verbose_logging:
-            logger.warning("Service information not found.")
+            if is_discovered:
+                if self._verbose_logging:
+                    logger.warning("Service discovered for %s/%s.", service_name, service_type)
 
-        self._event.set()
+                mdns_service_info = self._to_mdns_service_info_class(service_info)
+
+                if service_type not in self._discovered_services:
+                    self._discovered_services[service_type] = []
+
+                if mdns_service_info is not None:
+                    self._discovered_services[service_type].append(mdns_service_info)
+            elif self._verbose_logging:
+                logger.warning("Service information not found.")
+
+            self._event.set()
 
     def _to_mdns_service_info_class(self, service_info: AsyncServiceInfo) -> MdnsServiceInfo:
         """
