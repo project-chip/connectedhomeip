@@ -108,6 +108,10 @@ struct SpanCopier
 
 Instance::~Instance()
 {
+    if (!mMeteredQuantity.IsNull())
+    {
+        CleanupMeteredQuantityData(mMeteredQuantity.Value());
+    }
     Shutdown();
 }
 
