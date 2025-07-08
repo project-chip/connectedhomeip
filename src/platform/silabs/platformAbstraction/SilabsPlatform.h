@@ -56,7 +56,7 @@ public:
     uint8_t GetButtonState(uint8_t button) override;
 
 #if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
-	void StartScheduler(void) override;
+    void StartScheduler(void) override;
 #endif // SL_CATALOG_CUSTOM_MAIN_PRESENT
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
