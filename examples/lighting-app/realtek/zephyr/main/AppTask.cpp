@@ -214,11 +214,6 @@ CHIP_ERROR AppTask::Init()
         LOG_ERR("PlatformMgr().StartEventLoopTask() failed");
     }
 
-#if CONFIG_ENABLE_CHIP_SHELL
-    chip::Shell::Engine::Root().Init();
-    chip::Shell::Engine::Root().RunMainLoop();
-#endif
-
     return err;
 }
 

@@ -64,7 +64,6 @@ private:
     static void PostEvent(const AppEvent & event);
     static void DispatchEvent(const AppEvent & event);
     static void FunctionTimerEventHandler(const AppEvent & event);
-    static void StartBLEAdvertisementHandler(const AppEvent & event);
     static void UpdateLedStateEventHandler(const AppEvent & event);
 
     static void ChipEventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
@@ -74,7 +73,6 @@ private:
     static void UpdateStatusLED();
     static void LEDStateUpdateHandler(LEDWidget & ledWidget);
     static void FunctionHandler(const AppEvent & event);
-    static void StartBLEAdvertisementAndLightActionEventHandler(const AppEvent & event);
 
     FunctionEvent mFunction   = FunctionEvent::NoneSelected;
     bool mFunctionTimerActive = false;

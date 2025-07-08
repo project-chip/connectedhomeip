@@ -16,7 +16,7 @@
 cmake_minimum_required(VERSION 3.13.1)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
-get_filename_component(REALTEK_COMMON ${CHIP_ROOT}/examples/platform/realtek/bee REALPATH)
+get_filename_component(REALTEK_COMMON ${CHIP_ROOT}/examples/platform/realtek REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 
 # if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.overlay")
@@ -57,18 +57,16 @@ target_include_directories(app PRIVATE
                            main/include
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/lighting-app
-                           ${REALTEK_COMMON}/common/include
-                           ${REALTEK_COMMON}/ota
-                           ${REALTEK_COMMON}/app/include
-                           ${REALTEK_COMMON}/../zephyr
+                           ${REALTEK_COMMON}/bee/ota
+                           ${REALTEK_COMMON}/zephyr
                            ${ZEPHYR_BASE}/../modules/hal/realtek/bee/drivers/wdt/inc)
 
 target_sources(app PRIVATE
                main/main.cpp
                main/AppTask.cpp
                main/ZclCallbacks.cpp
-               ${REALTEK_COMMON}/../zephyr/LEDWidget.cpp
-               ${REALTEK_COMMON}/../zephyr/matter_button.c)
+               ${REALTEK_COMMON}/zephyr/LEDWidget.cpp
+               ${REALTEK_COMMON}/zephyr/matter_button.c)
 
 target_link_options(app
               PUBLIC
@@ -84,7 +82,7 @@ chip_configure_data_model(app
 )
 
 if(CONFIG_CHIP_OTA_REQUESTOR)
-  target_sources(app PRIVATE ${REALTEK_COMMON}/ota/OTAInitializer.cpp)
+  target_sources(app PRIVATE ${REALTEK_COMMON}/bee/ota/OTAInitializer.cpp)
 endif()
 
 # Fix for unused swap parameter in: zephyr/include/zephyr/arch/riscv/irq.h:70
@@ -203,15 +201,15 @@ pw_proto_library(thread_service
 target_sources(app PRIVATE
   ../../common/pigweed/RpcService.cpp
   ../../common/pigweed/realtek/PigweedLoggerMutex.cpp
-  ${REALTEK_COMMON}/Rpc.cpp
-  ${REALTEK_COMMON}/PigweedLogger.cpp
+  ${REALTEK_COMMON}/bee/Rpc.cpp
+  ${REALTEK_COMMON}/bee/PigweedLogger.cpp
 )
 
 target_include_directories(app PRIVATE
   ${PIGWEED_ROOT}/pw_sys_io/public
   ${CHIP_ROOT}/src/lib/support
   ${CHIP_ROOT}/src/system
-  ${REALTEK_COMMON}
+  ${REALTEK_COMMON}/bee
   ../../common
   ../../common/pigweed
   ../../common/pigweed/realtek)

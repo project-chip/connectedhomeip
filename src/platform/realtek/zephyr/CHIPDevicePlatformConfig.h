@@ -40,7 +40,7 @@
 // realtek platform does not support ethernet yet, but we need this config defined as we share the Zephyr platform
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 #define CHIP_DEVICE_CONFIG_ENABLE_ETHERNET 0
-#endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNETv
+#endif // CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
 

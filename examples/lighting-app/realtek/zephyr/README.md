@@ -14,7 +14,7 @@ The example is based on:
 
 ## Supported Device
 
--   [RTL8762GN]
+-   RTL8762GN
 
 ## Introduction
 

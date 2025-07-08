@@ -25,22 +25,12 @@ extern "C" {
 
 CHIP_ERROR FactoryDataDecoder::ReadFactoryData(uint8_t * buffer, uint16_t * pfactorydata_len)
 {
-    uint32_t ret = 0;
-    // ret          = ReadFactory(buffer, pfactorydata_len);
-    if (ret != 0)
-        return CHIP_ERROR_INTERNAL;
-
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR FactoryDataDecoder::DecodeFactoryData(uint8_t * buffer, FactoryData * fdata, uint16_t factorydata_len)
 {
-    uint32_t ret = 0;
-    // ret          = DecodeFactory(buffer, fdata, factorydata_len);
-    if (ret != 0)
-        return CHIP_ERROR_INTERNAL;
-
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 }
 } // namespace DeviceLayer

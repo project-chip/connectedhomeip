@@ -150,7 +150,7 @@ config CHIP_LOG_SIZE_OPTIMIZATION
 	  Disables some log levels for specific Matter log modules that provide
 	  information that is too detailed to be used in most cases. You can find
 	  full configuration enabled by this option in the
-	  platform/telink/CHIPPlatformConfig.h file.
+	  platform/realtek/zephyr/CHIPPlatformConfig.h file.
 
 config CHIP_BUTTON_MANAGER_IRQ_MODE
 	bool "Use GPIO in an IRQ mode instead of polling the GPIO"
