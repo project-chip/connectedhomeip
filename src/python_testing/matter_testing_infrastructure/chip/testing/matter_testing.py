@@ -88,8 +88,7 @@ _DEFAULT_TRUST_ROOT_INDEX = 1
 
 
 class TestError(Exception):
-    def __init__(self, msg):
-        self.msg = msg
+    pass
 
 
 def default_paa_rootstore_from_root(root_path: pathlib.Path) -> Optional[pathlib.Path]:
