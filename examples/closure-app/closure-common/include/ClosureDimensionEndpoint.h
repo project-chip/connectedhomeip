@@ -179,6 +179,14 @@ private:
     ClosureDimensionDelegate mDelegate;
     ClusterLogic mLogic;
     Interface mInterface;
+
+    /**
+     * @brief Updates the current state of the closure dimension endpoint from the target state.
+     *
+     * This function retrieves the target state and updates the current state accordingly.
+     * It ensures that the current state reflects the latest target position, latch status, and speed.
+     */
+    void UpdateCurrentStateFromTargetState();
 };
 
 } // namespace ClosureDimension
