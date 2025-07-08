@@ -161,7 +161,7 @@ class WEBRTCPTestBase:
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        
+
         if not any(stream.videoStreamID == videoStreamID for stream in aAllocatedVideoStreams):
             asserts.fail(f"Video Stream with ID {videoStreamID} not found as expected")
 
@@ -174,6 +174,6 @@ class WEBRTCPTestBase:
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
         )
-        
+
         if not any(stream.audioStreamID == audioStreamID for stream in aAllocatedAudioStreams):
             asserts.fail(f"Audio Stream with ID {audioStreamID} not found as expected")
