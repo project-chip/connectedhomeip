@@ -273,6 +273,9 @@ def cmd_list(context):
     '--energy-management-app',
     help='what energy-management app to use')
 @click.option(
+    '--closure-app',
+    help='what closure app to use')
+@click.option(
     '--chip-repl-yaml-tester',
     help='what python script to use for running yaml tests using chip-repl as controller')
 @click.option(
