@@ -65,7 +65,7 @@ SpanEndpoint::Builder & SpanEndpoint::Builder::SetDeviceTypes(Span<const DataMod
     return *this;
 }
 
-std::variant<SpanEndpoint, CHIP_ERROR> SpanEndpoint::Builder::build()
+std::variant<SpanEndpoint, CHIP_ERROR> SpanEndpoint::Builder::Build()
 {
     if (mEndpointId == kInvalidEndpointId || mServerClusters.empty())
     {
@@ -82,7 +82,9 @@ std::variant<SpanEndpoint, CHIP_ERROR> SpanEndpoint::Builder::build()
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        if (cluster->GetPaths().front().mClusterId == chip::app::Clusters::Descriptor::Id)
+        // A given ServerClusterInterface can serve multiple endpoints. We only care about the
+        // path that matches the endpoint we are building.
+        if (cluster->PathsContains({ mEndpointId, Clusters::Descriptor::Id }))
         {
             foundDescriptor = true;
         }
@@ -100,7 +102,7 @@ std::variant<SpanEndpoint, CHIP_ERROR> SpanEndpoint::Builder::build()
 
 CHIP_ERROR
 SpanEndpoint::SemanticTags(
-    ReadOnlyBufferBuilder<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> & out) const
+    ReadOnlyBufferBuilder<Clusters::Descriptor::Structs::SemanticTagStruct::Type> & out) const
 {
     return out.ReferenceExisting(mSemanticTags);
 }
@@ -119,9 +121,10 @@ ServerClusterInterface * SpanEndpoint::GetServerCluster(ClusterId clusterId) con
 {
     for (auto * serverCluster : mServerClusters)
     {
-        // Don't check for serverCluster != nullptr as it's checked in Register()
-        // Don't check for serverCluster->GetPaths().empty() as it's guaranteed by the interface contract
-        if (serverCluster->GetPaths().front().mClusterId == clusterId)
+        // Don't check for serverCluster != nullptr or empty paths, as these are validated in Builder::Build().
+        // A given ServerClusterInterface can serve multiple endpoints. We need to find the one
+        // that handles the given clusterId on this specific endpoint.
+        if (serverCluster->PathsContains({ mEndpointEntry.id, clusterId }))
         {
             return serverCluster;
         }
@@ -129,7 +132,7 @@ ServerClusterInterface * SpanEndpoint::GetServerCluster(ClusterId clusterId) con
     return nullptr;
 }
 
-CHIP_ERROR SpanEndpoint::ServerClusterInterfaces(ReadOnlyBufferBuilder<ServerClusterInterface *> & out) const
+CHIP_ERROR SpanEndpoint::ServerClusters(ReadOnlyBufferBuilder<ServerClusterInterface *> & out) const
 {
     return out.ReferenceExisting(mServerClusters);
 }

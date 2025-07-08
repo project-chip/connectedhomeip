@@ -4,6 +4,9 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <data-model-providers/codedriven/endpoint/SpanEndpoint.h>
 
+#include <initializer_list>
+#include <vector>
+
 #include <clusters/Descriptor/ClusterId.h>
 #include <clusters/OnOff/ClusterId.h>
 
@@ -17,11 +20,22 @@ class MockServerCluster : public DefaultServerCluster
 {
 public:
     MockServerCluster(ConcreteClusterPath path, DataVersion dataVersion, BitFlags<DataModel::ClusterQualityFlags> flags) :
-        DefaultServerCluster(path), mPath(path), mDataVersion(dataVersion), mFlags(flags)
+        DefaultServerCluster(path), mPaths({ path }), mDataVersion(dataVersion), mFlags(flags)
     {}
+
+    // New constructor for multiple paths
+    MockServerCluster(std::initializer_list<ConcreteClusterPath> paths, DataVersion dataVersion,
+                      BitFlags<DataModel::ClusterQualityFlags> flags) :
+        DefaultServerCluster(paths.size() > 0 ? *paths.begin() : ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId)),
+        mPaths(paths), mDataVersion(dataVersion), mFlags(flags)
+    {}
+
     ~MockServerCluster() override = default; // NOLINT(modernize-use-override)
 
-    chip::Span<const ConcreteClusterPath> GetPaths() const override { return chip::Span<const ConcreteClusterPath>(&mPath, 1); }
+    chip::Span<const ConcreteClusterPath> GetPaths() const override
+    {
+        return chip::Span<const ConcreteClusterPath>(mPaths.data(), mPaths.size());
+    }
     chip::DataVersion GetDataVersion(const ConcreteClusterPath &) const override { return mDataVersion; }
     BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags(const ConcreteClusterPath &) const override { return mFlags; }
 
@@ -67,7 +81,7 @@ public:
     bool shutdownCalled = false;
 
 private:
-    ConcreteClusterPath mPath;
+    std::vector<ConcreteClusterPath> mPaths;
     DataVersion mDataVersion;
     BitFlags<DataModel::ClusterQualityFlags> mFlags;
 };
@@ -77,7 +91,7 @@ using namespace chip::app;
 TEST(TestSpanEndpoint, InstantiateDefaultConstructor)
 {
     // Test default constructor initializes to invalid/default values
-    auto result = SpanEndpoint::Builder(kInvalidEndpointId).build();
+    auto result = SpanEndpoint::Builder(kInvalidEndpointId).Build();
     // Building with kInvalidEndpointId should fail, provider is default constructed
     ASSERT_TRUE(std::holds_alternative<CHIP_ERROR>(result));
     ASSERT_EQ(std::get<CHIP_ERROR>(result), CHIP_ERROR_INVALID_ARGUMENT);
@@ -96,7 +110,7 @@ TEST(TestSpanEndpoint, InstantiateWithParameters)
                       .SetComposition(composition)
                       .SetParentId(parentId)
                       .SetServerClusters(Span<ServerClusterInterface *>(serverClusters))
-                      .build();
+                      .Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(result));
 
     const auto & provider = std::get<SpanEndpoint>(result);
@@ -130,7 +144,7 @@ TEST(TestSpanEndpoint, InstantiateWithAllParameters)
                       .SetClientClusters(Span<const chip::ClusterId>(clientClusters))
                       .SetSemanticTags(Span<const SemanticTag>(semanticTags))
                       .SetDeviceTypes(Span<const DeviceTypeEntry>(deviceTypes))
-                      .build();
+                      .Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(result));
 
     const auto & provider = std::get<SpanEndpoint>(result);
@@ -140,7 +154,7 @@ TEST(TestSpanEndpoint, InstantiateWithAllParameters)
     ASSERT_EQ(entry.compositionPattern, composition);
 
     ReadOnlyBufferBuilder<chip::app::ServerClusterInterface *> serverBuilder;
-    ASSERT_EQ(provider.ServerClusterInterfaces(serverBuilder), CHIP_NO_ERROR);
+    ASSERT_EQ(provider.ServerClusters(serverBuilder), CHIP_NO_ERROR);
     ASSERT_EQ(serverBuilder.Size(), std::size(serverClusters));
 
     ReadOnlyBufferBuilder<chip::ClusterId> clientBuilder;
@@ -166,12 +180,12 @@ TEST(TestSpanEndpoint, SetAndGetServerClusters)
     ServerClusterInterface * serverClusters[] = { &descriptorCluster, &serverCluster1, &serverCluster2 };
 
     auto result =
-        SpanEndpoint::Builder(kTestEndpoint).SetServerClusters(Span<ServerClusterInterface *>(serverClusters)).build();
+        SpanEndpoint::Builder(kTestEndpoint).SetServerClusters(Span<ServerClusterInterface *>(serverClusters)).Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(result));
 
     const auto & provider = std::get<SpanEndpoint>(result);
     ReadOnlyBufferBuilder<ServerClusterInterface *> builder;
-    ASSERT_EQ(provider.ServerClusterInterfaces(builder), CHIP_NO_ERROR);
+    ASSERT_EQ(provider.ServerClusters(builder), CHIP_NO_ERROR);
     auto retrievedClusters = builder.TakeBuffer();
     ASSERT_EQ(retrievedClusters.size(), std::size(serverClusters));
     EXPECT_EQ(retrievedClusters[0], &descriptorCluster);
@@ -193,7 +207,7 @@ TEST(TestSpanEndpoint, SetInvalidServerClusters)
     ServerClusterInterface * serverClustersWithNull[] = { &descriptorCluster, &serverCluster1, nullptr };
     auto result                                       = SpanEndpoint::Builder(kTestEndpoint)
                       .SetServerClusters(Span<ServerClusterInterface *>(serverClustersWithNull))
-                      .build();
+                      .Build();
     ASSERT_TRUE(std::holds_alternative<CHIP_ERROR>(result));
     EXPECT_EQ(std::get<CHIP_ERROR>(result), CHIP_ERROR_INVALID_ARGUMENT);
 }
@@ -208,7 +222,7 @@ TEST(TestSpanEndpoint, SetAndGetClientClusters)
     auto result                            = SpanEndpoint::Builder(kTestEndpoint)
                       .SetServerClusters(Span<ServerClusterInterface *>(serverClusters))
                       .SetClientClusters(Span<const chip::ClusterId>(clientClusters))
-                      .build();
+                      .Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(result));
 
     const auto & provider = std::get<SpanEndpoint>(result);
@@ -231,7 +245,7 @@ TEST(TestSpanEndpoint, SetAndGetSemanticTags)
     auto result                      = SpanEndpoint::Builder(kTestEndpoint)
                       .SetServerClusters(Span<ServerClusterInterface *>(serverClusters))
                       .SetSemanticTags(Span<const SemanticTag>(semanticTags))
-                      .build();
+                      .Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(result));
 
     const auto & provider = std::get<SpanEndpoint>(result);
@@ -255,7 +269,7 @@ TEST(TestSpanEndpoint, SetAndGetDeviceTypes)
     auto result                         = SpanEndpoint::Builder(kTestEndpoint)
                       .SetServerClusters(Span<ServerClusterInterface *>(serverClusters))
                       .SetDeviceTypes(Span<const DeviceTypeEntry>(deviceTypes))
-                      .build();
+                      .Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(result));
 
     const auto & provider = std::get<SpanEndpoint>(result);
@@ -279,7 +293,7 @@ TEST(TestSpanEndpoint, BuildWithSpecificEndpointEntry)
                       .SetParentId(newEntry.parentId)
                       .SetServerClusters(Span<ServerClusterInterface *>(serverClusters))
                       .SetComposition(newEntry.compositionPattern)
-                      .build();
+                      .Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(result));
 
     const auto & provider       = std::get<SpanEndpoint>(result);
@@ -300,13 +314,13 @@ TEST(TestSpanEndpoint, BuildWithEmptySpans)
                       .SetClientClusters(Span<const chip::ClusterId>())
                       .SetSemanticTags(Span<const SemanticTag>())
                       .SetDeviceTypes(Span<const DataModel::DeviceTypeEntry>())
-                      .build();
+                      .Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(result));
     const auto & provider = std::get<SpanEndpoint>(result);
 
     // Verify server clusters are present (at least the descriptor)
     ReadOnlyBufferBuilder<ServerClusterInterface *> serverBuilder;
-    ASSERT_EQ(provider.ServerClusterInterfaces(serverBuilder), CHIP_NO_ERROR);
+    ASSERT_EQ(provider.ServerClusters(serverBuilder), CHIP_NO_ERROR);
     ASSERT_EQ(serverBuilder.Size(), 1u);                // Should have the descriptor cluster
     ASSERT_EQ(provider.GetServerCluster(123), nullptr); // Check GetServerCluster with no clusters
 
@@ -331,9 +345,9 @@ TEST(TestSpanEndpoint, BuildFailsWithEmptyServerClusterList)
     constexpr EndpointId kTestEndpoint = 1; // A valid endpoint ID for testing
     auto result                        = SpanEndpoint::Builder(kTestEndpoint)
                       .SetServerClusters(Span<ServerClusterInterface *>()) // Empty span
-                      .build();
+                      .Build();
     ASSERT_TRUE(std::holds_alternative<CHIP_ERROR>(result)) << "Build should fail with an empty server cluster list.";
-    // This assertion expects that the build() method (or future versions) will validate this.
+    // This assertion expects that the Build() method (or future versions) will validate this.
     EXPECT_EQ(std::get<CHIP_ERROR>(result), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
@@ -344,9 +358,9 @@ TEST(TestSpanEndpoint, BuildFailsWithoutDescriptorCluster)
     ServerClusterInterface * serverClusters[] = { &onOffCluster };
 
     auto result =
-        SpanEndpoint::Builder(kTestEndpoint).SetServerClusters(Span<ServerClusterInterface *>(serverClusters)).build();
+        SpanEndpoint::Builder(kTestEndpoint).SetServerClusters(Span<ServerClusterInterface *>(serverClusters)).Build();
     ASSERT_TRUE(std::holds_alternative<CHIP_ERROR>(result)) << "Build should fail without Descriptor cluster.";
-    // This assertion expects that the build() method (or future versions) will validate this.
+    // This assertion expects that the Build() method (or future versions) will validate this.
     EXPECT_EQ(std::get<CHIP_ERROR>(result), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
@@ -359,7 +373,7 @@ TEST(TestSpanEndpoint, BuildSucceedsWithDescriptorCluster)
     ServerClusterInterface * serverClusters[] = { &descriptorCluster, &onOffCluster };
 
     auto result =
-        SpanEndpoint::Builder(kTestEndpoint).SetServerClusters(Span<ServerClusterInterface *>(serverClusters)).build();
+        SpanEndpoint::Builder(kTestEndpoint).SetServerClusters(Span<ServerClusterInterface *>(serverClusters)).Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(result))
         << "Build should succeed with Descriptor cluster. Error: "
         << (std::holds_alternative<CHIP_ERROR>(result) ? chip::ErrorStr(std::get<CHIP_ERROR>(result)) : "Not a CHIP_ERROR");
@@ -371,4 +385,73 @@ TEST(TestSpanEndpoint, BuildSucceedsWithDescriptorCluster)
         EXPECT_NE(provider.GetServerCluster(chip::app::Clusters::Descriptor::Id), nullptr);
         EXPECT_NE(provider.GetServerCluster(chip::app::Clusters::OnOff::Id), nullptr);
     }
+}
+
+TEST(TestSpanEndpoint, MultiPathClusterPathResolution)
+{
+    constexpr EndpointId kEndpointA   = 1;
+    constexpr EndpointId kEndpointB   = 2;
+    constexpr ClusterId kDescriptorId = chip::app::Clusters::Descriptor::Id;
+    constexpr ClusterId kOnOffId      = chip::app::Clusters::OnOff::Id;
+
+    // Scenario 1: Test Builder::Build() succeeds even if the Descriptor cluster path is not first.
+    {
+        // This cluster interface provides the Descriptor cluster for Endpoint A,
+        // but a path for another endpoint/cluster is listed first.
+        MockServerCluster descriptorCluster({ { kEndpointB, kOnOffId }, // Path for another endpoint/cluster is first.
+                                              { kEndpointA, kDescriptorId } },
+                                            1, {});
+        ServerClusterInterface * serverClusters[] = { &descriptorCluster };
+
+        // Try to build an endpoint for Endpoint A.
+        auto buildResult = SpanEndpoint::Builder(kEndpointA).SetServerClusters(Span<ServerClusterInterface *>(serverClusters)).Build();
+
+        // A correct implementation iterates, finds `{kEndpointA, kDescriptorId}`, and succeeds.
+        ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(buildResult))
+            << "Build should succeed because the implementation now correctly checks all paths for the Descriptor cluster.";
+    }
+
+    // Scenario 2: Test GetServerCluster() succeeds even if the desired cluster path is not first.
+    {
+        // This cluster interface provides the OnOff cluster for Endpoint A,
+        // but a path for another endpoint/cluster is listed first.
+        MockServerCluster onOffCluster({ { kEndpointB, kDescriptorId }, // Path for another endpoint/cluster is first.
+                                         { kEndpointA, kOnOffId } },
+                                       1, {});
+        // We also need a valid descriptor cluster for Endpoint A to successfully build the endpoint.
+        MockServerCluster descriptorForEpA({ kEndpointA, kDescriptorId }, 1, {});
+        ServerClusterInterface * serverClusters[] = { &descriptorForEpA, &onOffCluster };
+
+        // Build an endpoint for Endpoint A. This should succeed.
+        auto buildResult = SpanEndpoint::Builder(kEndpointA).SetServerClusters(Span<ServerClusterInterface *>(serverClusters)).Build();
+        ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(buildResult)) << "Build for GetServerCluster test failed unexpectedly.";
+        const auto & provider = std::get<SpanEndpoint>(buildResult);
+
+        // Try to get the OnOff cluster.
+        ServerClusterInterface * retrievedCluster = provider.GetServerCluster(kOnOffId);
+
+        // A correct implementation iterates through all paths of `onOffCluster`, finds `{kEndpointA, kOnOffId}`,
+        // and returns `&onOffCluster`.
+        EXPECT_EQ(retrievedCluster, &onOffCluster)
+            << "GetServerCluster should succeed because the implementation now correctly checks all paths.";
+    }
+}
+
+TEST(TestSpanEndpoint, BuildFailsWithInvalidClusterAfterDescriptor)
+{
+    constexpr EndpointId kTestEndpoint = 1;
+    MockServerCluster descriptorCluster({ kTestEndpoint, chip::app::Clusters::Descriptor::Id }, 1, {});
+    MockServerCluster onOffCluster({ kTestEndpoint, chip::app::Clusters::OnOff::Id }, 1, {});
+
+    // This list has the descriptor first, but an invalid cluster later.
+    // The builder must iterate through the entire list to validate all entries.
+    ServerClusterInterface * serverClusters[] = { &descriptorCluster, &onOffCluster, nullptr };
+
+    auto result =
+        SpanEndpoint::Builder(kTestEndpoint).SetServerClusters(Span<ServerClusterInterface *>(serverClusters)).Build();
+
+    // The build should fail because of the nullptr entry, even though the descriptor was found.
+    ASSERT_TRUE(std::holds_alternative<CHIP_ERROR>(result))
+        << "Build should fail due to an invalid cluster even if the descriptor is found first.";
+    EXPECT_EQ(std::get<CHIP_ERROR>(result), CHIP_ERROR_INVALID_ARGUMENT);
 }

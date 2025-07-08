@@ -65,7 +65,7 @@ public:
         // Returns a std::variant containing either the successfully built SpanEndpoint
         // or a CHIP_ERROR if the build failed (e.g., due to invalid arguments).
         // Callers should check the variant's active alternative before use.
-        std::variant<SpanEndpoint, CHIP_ERROR> build();
+        std::variant<SpanEndpoint, CHIP_ERROR> Build();
 
     private:
         EndpointId mEndpointId;
@@ -79,11 +79,14 @@ public:
 
     ~SpanEndpoint() override = default;
 
-    // Delete copy and move constructors and assignment operators
+    // Delete copy constructor and assignment operator. SpanEndpoint holds non-owning data (Spans).
+    // This helps prevent accidental copies that could lead multiple objects pointing to the same external data.
     SpanEndpoint(const SpanEndpoint &)             = delete;
     SpanEndpoint & operator=(const SpanEndpoint &) = delete;
-    SpanEndpoint(SpanEndpoint &&)                  = default; // Allow move
-    SpanEndpoint & operator=(SpanEndpoint &&)      = default; // Allow move
+
+    // Allow move semantics for SpanEndpoint.
+    SpanEndpoint(SpanEndpoint &&)                  = default;
+    SpanEndpoint & operator=(SpanEndpoint &&)      = default;
 
     const DataModel::EndpointEntry & GetEndpointEntry() const override { return mEndpointEntry; }
 
@@ -94,7 +97,7 @@ public:
 
     // Getter for ServerClusterInterface, returns nullptr if the cluster is not found.
     ServerClusterInterface * GetServerCluster(ClusterId clusterId) const override;
-    CHIP_ERROR ServerClusterInterfaces(ReadOnlyBufferBuilder<ServerClusterInterface *> & out) const override;
+    CHIP_ERROR ServerClusters(ReadOnlyBufferBuilder<ServerClusterInterface *> & out) const override;
 
 private:
     // Private constructor for Builder

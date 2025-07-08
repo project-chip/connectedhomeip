@@ -39,7 +39,7 @@ class EndpointInterface
 public:
     virtual ~EndpointInterface() = default;
 
-    using SemanticTag = chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type;
+    using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
 
     virtual const DataModel::EndpointEntry & GetEndpointEntry() const = 0;
 
@@ -66,7 +66,7 @@ public:
      * @param[out] out The buffer to fill with ServerClusterInterface pointers.
      * @return CHIP_NO_ERROR on success or CHIP_ERROR_NO_MEMORY if the buffer is too small.
      */
-    virtual CHIP_ERROR ServerClusterInterfaces(ReadOnlyBufferBuilder<ServerClusterInterface *> & out) const = 0;
+    virtual CHIP_ERROR ServerClusters(ReadOnlyBufferBuilder<ServerClusterInterface *> & out) const = 0;
 };
 
 } // namespace app
