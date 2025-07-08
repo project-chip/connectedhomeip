@@ -54,7 +54,7 @@ settings are as follows:
     This will NOT be reflected in the UI. It is up to the device manufacture to
     ensure the device is conformant with the specification. Conformance can be
     checked using the conformance checker test
-    [TC_DeviceConformance.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/test_testing/TC_DeviceConformance.py)
+    [TC_DeviceConformance.py](https://github.com/project-chip/connectedhomeip/blob/master/src/python_testing/TC_DeviceConformance.py)
 
 -   Client/Server - For Matter, all attributes will be server
 -   Mfg code - applies only to manufacturer specific attributes
