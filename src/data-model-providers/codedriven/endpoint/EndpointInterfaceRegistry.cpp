@@ -22,7 +22,7 @@ namespace app {
 
 CHIP_ERROR EndpointInterfaceRegistry::Register(EndpointInterfaceRegistration & entry)
 {
-    VerifyOrReturnError(entry.next == nullptr, CHIP_ERROR_INVALID_ARGUMENT); // Should not be part of another list
+    VerifyOrReturnError(entry.next == nullptr, CHIP_ERROR_INVALID_ARGUMENT);              // Should not be part of another list
     VerifyOrReturnError(entry.endpointInterface != nullptr, CHIP_ERROR_INVALID_ARGUMENT); // Should not be null
 
     auto newEndpointId = entry.endpointInterface->GetEndpointEntry().id;

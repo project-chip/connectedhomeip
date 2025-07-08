@@ -96,13 +96,11 @@ std::variant<SpanEndpoint, CHIP_ERROR> SpanEndpoint::Builder::Build()
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    return SpanEndpoint(mEndpointId, mComposition, mParentId, mServerClusters, mClientClusters, mSemanticTags,
-                                mDeviceTypes);
+    return SpanEndpoint(mEndpointId, mComposition, mParentId, mServerClusters, mClientClusters, mSemanticTags, mDeviceTypes);
 }
 
 CHIP_ERROR
-SpanEndpoint::SemanticTags(
-    ReadOnlyBufferBuilder<Clusters::Descriptor::Structs::SemanticTagStruct::Type> & out) const
+SpanEndpoint::SemanticTags(ReadOnlyBufferBuilder<Clusters::Descriptor::Structs::SemanticTagStruct::Type> & out) const
 {
     return out.ReferenceExisting(mSemanticTags);
 }
@@ -139,9 +137,8 @@ CHIP_ERROR SpanEndpoint::ServerClusters(ReadOnlyBufferBuilder<ServerClusterInter
 
 // Private constructor for Builder
 SpanEndpoint::SpanEndpoint(EndpointId id, DataModel::EndpointCompositionPattern composition, EndpointId parentId,
-                                           Span<ServerClusterInterface *> serverClusters, Span<const ClusterId> clientClusters,
-                                           Span<const SemanticTag> semanticTags,
-                                           Span<const DataModel::DeviceTypeEntry> deviceTypes) :
+                           Span<ServerClusterInterface *> serverClusters, Span<const ClusterId> clientClusters,
+                           Span<const SemanticTag> semanticTags, Span<const DataModel::DeviceTypeEntry> deviceTypes) :
     mEndpointEntry({ id, parentId, composition }),
     mDeviceTypes(deviceTypes), mSemanticTags(semanticTags), mClientClusters(clientClusters), mServerClusters(serverClusters)
 {}

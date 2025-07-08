@@ -85,8 +85,8 @@ public:
     SpanEndpoint & operator=(const SpanEndpoint &) = delete;
 
     // Allow move semantics for SpanEndpoint.
-    SpanEndpoint(SpanEndpoint &&)                  = default;
-    SpanEndpoint & operator=(SpanEndpoint &&)      = default;
+    SpanEndpoint(SpanEndpoint &&)             = default;
+    SpanEndpoint & operator=(SpanEndpoint &&) = default;
 
     const DataModel::EndpointEntry & GetEndpointEntry() const override { return mEndpointEntry; }
 
@@ -102,8 +102,8 @@ public:
 private:
     // Private constructor for Builder
     SpanEndpoint(EndpointId id, DataModel::EndpointCompositionPattern composition, EndpointId parentId,
-                         Span<ServerClusterInterface *> serverClusters, Span<const ClusterId> clientClusters,
-                         Span<const SemanticTag> semanticTags, Span<const DataModel::DeviceTypeEntry> deviceTypes);
+                 Span<ServerClusterInterface *> serverClusters, Span<const ClusterId> clientClusters,
+                 Span<const SemanticTag> semanticTags, Span<const DataModel::DeviceTypeEntry> deviceTypes);
 
     // Iteration methods
     // GetEndpointEntry is already public

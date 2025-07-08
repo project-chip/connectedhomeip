@@ -92,7 +92,7 @@ TEST(TestEndpointInterfaceRegistry, RegisterMultipleProviders)
                              .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
                              .Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result1));
-    auto provider1     = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result1)));
+    auto provider1 = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result1)));
 
     MinimalServerCluster descriptorCluster2(kTestEndpointId2, chip::app::Clusters::Descriptor::Id);
     std::array<ServerClusterInterface *, 1> serverClustersArrayWithDescriptor2 = { &descriptorCluster2 };
@@ -272,16 +272,16 @@ TEST(TestEndpointInterfaceRegistry, RegisterInvalidArgs)
     // To test this, we need two valid providers and registrations.
     MinimalServerCluster descriptorForList1(kListId1ForArgsTest, chip::app::Clusters::Descriptor::Id);
     std::array<ServerClusterInterface *, 1> serverClustersForList1 = { &descriptorForList1 };
-    auto build_result_list1 = SpanEndpoint::Builder(kListId1ForArgsTest)
+    auto build_result_list1                                        = SpanEndpoint::Builder(kListId1ForArgsTest)
                                   .SetServerClusters(serverClustersForList1)
                                   .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
                                   .Build();
     ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result_list1));
-    auto providerForList1   = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result_list1)));
+    auto providerForList1 = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result_list1)));
 
     MinimalServerCluster descriptorForList2(kListId2ForArgsTest, chip::app::Clusters::Descriptor::Id);
     std::array<ServerClusterInterface *, 1> serverClustersForList2 = { &descriptorForList2 };
-    auto build_result_list2 = SpanEndpoint::Builder(kListId2ForArgsTest)
+    auto build_result_list2                                        = SpanEndpoint::Builder(kListId2ForArgsTest)
                                   .SetServerClusters(serverClustersForList2)
                                   .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
                                   .Build();
@@ -315,16 +315,15 @@ TEST(TestEndpointInterfaceRegistry, StressTestRegistration)
     cluster_storage.reserve(kNumProviders);
     for (int i = 0; i < kNumProviders; ++i)
     {
-        EndpointId id     = static_cast<EndpointId>(i + 1);
+        EndpointId id = static_cast<EndpointId>(i + 1);
         cluster_storage.push_back(std::make_unique<MinimalServerCluster>(id, chip::app::Clusters::Descriptor::Id));
         std::array<ServerClusterInterface *, 1> serverClusters = { cluster_storage.back().get() };
-        auto build_result = SpanEndpoint::Builder(id)
+        auto build_result                                      = SpanEndpoint::Builder(id)
                                 .SetServerClusters(serverClusters)
                                 .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
                                 .Build();
         ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result));
-        providers_storage.push_back(
-            std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result))));
+        providers_storage.push_back(std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result))));
         ids.push_back(id);
         registrations.emplace_back(*providers_storage.back()); // Create registration from the provider
     }

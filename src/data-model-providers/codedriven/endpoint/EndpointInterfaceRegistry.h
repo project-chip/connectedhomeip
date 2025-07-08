@@ -39,10 +39,8 @@ struct EndpointInterfaceRegistration
     EndpointInterface * const endpointInterface;
     EndpointInterfaceRegistration * next;
 
-    constexpr EndpointInterfaceRegistration(EndpointInterface & interface,
-                                           EndpointInterfaceRegistration * next_item = nullptr) :
-        endpointInterface(&interface),
-        next(next_item)
+    constexpr EndpointInterfaceRegistration(EndpointInterface & interface, EndpointInterfaceRegistration * next_item = nullptr) :
+        endpointInterface(&interface), next(next_item)
     {}
     EndpointInterfaceRegistration(EndpointInterfaceRegistration && other) = default;
 
@@ -124,8 +122,8 @@ public:
 
 private:
     EndpointInterfaceRegistration * mRegistrations = nullptr;
-    EndpointInterface * mCachedInterface  = nullptr;
-    EndpointId mCachedEndpointId                  = kInvalidEndpointId;
+    EndpointInterface * mCachedInterface           = nullptr;
+    EndpointId mCachedEndpointId                   = kInvalidEndpointId;
 };
 
 } // namespace app
