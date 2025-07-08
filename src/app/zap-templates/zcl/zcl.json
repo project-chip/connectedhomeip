@@ -234,7 +234,8 @@
         "Commodity Metering": [
             "MeteredQuantity",
             "MeteredQuantityTimestamp",
-            "TariffUnit"
+            "TariffUnit",
+            "MaximumMeteredQuantities"
         ],
         "Descriptor": ["ClusterRevision", "FeatureMap"],
         "Device Energy Management": [
