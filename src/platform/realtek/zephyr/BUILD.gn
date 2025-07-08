@@ -48,6 +48,7 @@ static_library("realtek_zephyr") {
     "KeyValueStoreManagerImpl.h",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
+    "bee4-mbedtls-config.h",
   ]
 
   deps = [ "${chip_root}/src/platform/logging:headers" ]

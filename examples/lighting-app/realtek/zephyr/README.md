@@ -84,8 +84,8 @@ Complete the following steps to build the sample:
         $ cd examples/lighting-app/realtek/zephyr
         ```
 
-2.  Run the following command to build the example, with the build target name
-    of the Realtek's kit you own, for example `rtl8762gn_evb`:
+2.  Run the following command to build the example with the build target name,
+    for example `rtl8762gn_evb`:
 
             ```
             $ west build -b rtl8762gn_evb
