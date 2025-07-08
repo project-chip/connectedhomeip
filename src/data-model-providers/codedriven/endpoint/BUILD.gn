@@ -15,11 +15,11 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 source_set("endpoint") {
   sources = [
-    "EndpointProviderInterface.h",
-    "EndpointProviderRegistry.cpp",
-    "EndpointProviderRegistry.h",
-    "SpanEndpointProvider.cpp",
-    "SpanEndpointProvider.h",
+    "EndpointInterface.h",
+    "EndpointInterfaceRegistry.cpp",
+    "EndpointInterfaceRegistry.h",
+    "SpanEndpoint.cpp",
+    "SpanEndpoint.h",
   ]
 
   public_deps = [

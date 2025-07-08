@@ -14,7 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "SpanEndpointProvider.h"
+#include "SpanEndpoint.h"
 
 #include <app/ConcreteClusterPath.h>
 #include <app/server-cluster/ServerClusterContext.h>
@@ -27,45 +27,45 @@ namespace chip {
 namespace app {
 
 // Builder implementation
-SpanEndpointProvider::Builder::Builder(EndpointId id) : mEndpointId(id) {}
+SpanEndpoint::Builder::Builder(EndpointId id) : mEndpointId(id) {}
 
-SpanEndpointProvider::Builder & SpanEndpointProvider::Builder::SetComposition(DataModel::EndpointCompositionPattern composition)
+SpanEndpoint::Builder & SpanEndpoint::Builder::SetComposition(DataModel::EndpointCompositionPattern composition)
 {
     mComposition = composition;
     return *this;
 }
 
-SpanEndpointProvider::Builder & SpanEndpointProvider::Builder::SetParentId(EndpointId parentId)
+SpanEndpoint::Builder & SpanEndpoint::Builder::SetParentId(EndpointId parentId)
 {
     mParentId = parentId;
     return *this;
 }
 
-SpanEndpointProvider::Builder & SpanEndpointProvider::Builder::SetServerClusters(Span<ServerClusterInterface *> serverClusters)
+SpanEndpoint::Builder & SpanEndpoint::Builder::SetServerClusters(Span<ServerClusterInterface *> serverClusters)
 {
     mServerClusters = serverClusters;
     return *this;
 }
 
-SpanEndpointProvider::Builder & SpanEndpointProvider::Builder::SetClientClusters(Span<const ClusterId> clientClusters)
+SpanEndpoint::Builder & SpanEndpoint::Builder::SetClientClusters(Span<const ClusterId> clientClusters)
 {
     mClientClusters = clientClusters;
     return *this;
 }
 
-SpanEndpointProvider::Builder & SpanEndpointProvider::Builder::SetSemanticTags(Span<const SemanticTag> semanticTags)
+SpanEndpoint::Builder & SpanEndpoint::Builder::SetSemanticTags(Span<const SemanticTag> semanticTags)
 {
     mSemanticTags = semanticTags;
     return *this;
 }
 
-SpanEndpointProvider::Builder & SpanEndpointProvider::Builder::SetDeviceTypes(Span<const DataModel::DeviceTypeEntry> deviceTypes)
+SpanEndpoint::Builder & SpanEndpoint::Builder::SetDeviceTypes(Span<const DataModel::DeviceTypeEntry> deviceTypes)
 {
     mDeviceTypes = deviceTypes;
     return *this;
 }
 
-std::variant<SpanEndpointProvider, CHIP_ERROR> SpanEndpointProvider::Builder::build()
+std::variant<SpanEndpoint, CHIP_ERROR> SpanEndpoint::Builder::build()
 {
     if (mEndpointId == kInvalidEndpointId || mServerClusters.empty())
     {
@@ -94,28 +94,28 @@ std::variant<SpanEndpointProvider, CHIP_ERROR> SpanEndpointProvider::Builder::bu
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    return SpanEndpointProvider(mEndpointId, mComposition, mParentId, mServerClusters, mClientClusters, mSemanticTags,
+    return SpanEndpoint(mEndpointId, mComposition, mParentId, mServerClusters, mClientClusters, mSemanticTags,
                                 mDeviceTypes);
 }
 
 CHIP_ERROR
-SpanEndpointProvider::SemanticTags(
+SpanEndpoint::SemanticTags(
     ReadOnlyBufferBuilder<chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> & out) const
 {
     return out.ReferenceExisting(mSemanticTags);
 }
 
-CHIP_ERROR SpanEndpointProvider::DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const
+CHIP_ERROR SpanEndpoint::DeviceTypes(ReadOnlyBufferBuilder<DataModel::DeviceTypeEntry> & out) const
 {
     return out.ReferenceExisting(mDeviceTypes);
 }
 
-CHIP_ERROR SpanEndpointProvider::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const
+CHIP_ERROR SpanEndpoint::ClientClusters(ReadOnlyBufferBuilder<ClusterId> & out) const
 {
     return out.ReferenceExisting(mClientClusters);
 }
 
-ServerClusterInterface * SpanEndpointProvider::GetServerCluster(ClusterId clusterId) const
+ServerClusterInterface * SpanEndpoint::GetServerCluster(ClusterId clusterId) const
 {
     for (auto * serverCluster : mServerClusters)
     {
@@ -129,13 +129,13 @@ ServerClusterInterface * SpanEndpointProvider::GetServerCluster(ClusterId cluste
     return nullptr;
 }
 
-CHIP_ERROR SpanEndpointProvider::ServerClusterInterfaces(ReadOnlyBufferBuilder<ServerClusterInterface *> & out) const
+CHIP_ERROR SpanEndpoint::ServerClusterInterfaces(ReadOnlyBufferBuilder<ServerClusterInterface *> & out) const
 {
     return out.ReferenceExisting(mServerClusters);
 }
 
 // Private constructor for Builder
-SpanEndpointProvider::SpanEndpointProvider(EndpointId id, DataModel::EndpointCompositionPattern composition, EndpointId parentId,
+SpanEndpoint::SpanEndpoint(EndpointId id, DataModel::EndpointCompositionPattern composition, EndpointId parentId,
                                            Span<ServerClusterInterface *> serverClusters, Span<const ClusterId> clientClusters,
                                            Span<const SemanticTag> semanticTags,
                                            Span<const DataModel::DeviceTypeEntry> deviceTypes) :
