@@ -175,7 +175,10 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
     }
     else
     {
-        CleanupMeteredQuantityData(mMeteredQuantity.Value());
+        if (!mMeteredQuantity.IsNull())
+        {
+            CleanupMeteredQuantityData(mMeteredQuantity.Value());
+        }
 
         const size_t len = newValue.Value().size();
 
