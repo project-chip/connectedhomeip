@@ -279,16 +279,15 @@ void ClosureControlEndpoint::UpdateCurrentStateFromTargetState()
     if (mLogic.GetConformance().FeatureMap().Has(Feature::kPositioning))
     {
         isClosureInSecureState &= overallCurrentState.Value().position.HasValue() &&
-        !overallCurrentState.Value().position.Value().IsNull() &&
-        overallCurrentState.Value().position.Value().Value() == CurrentPositionEnum::kFullyClosed;
+            !overallCurrentState.Value().position.Value().IsNull() &&
+            overallCurrentState.Value().position.Value().Value() == CurrentPositionEnum::kFullyClosed;
     }
 
     // Next, check if motion latching is enabled and latch is true.
     if (mLogic.GetConformance().FeatureMap().Has(Feature::kMotionLatching))
     {
         isClosureInSecureState &= overallCurrentState.Value().latch.HasValue() &&
-        !overallCurrentState.Value().latch.Value().IsNull() &&
-        overallCurrentState.Value().latch.Value().Value() == true;
+            !overallCurrentState.Value().latch.Value().IsNull() && overallCurrentState.Value().latch.Value().Value() == true;
     }
 
     overallCurrentState.Value().secureState.SetValue(MakeNullable(isClosureInSecureState));
