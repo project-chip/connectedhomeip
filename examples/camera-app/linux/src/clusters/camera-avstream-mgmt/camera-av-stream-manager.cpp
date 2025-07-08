@@ -49,10 +49,83 @@ void CameraAVStreamManager::SetCameraDeviceHAL(CameraDeviceInterface * aCameraDe
 }
 
 CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
-                                                      const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                                      const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
+                                                      Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                                      Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
 {
-    // TODO: Validates the requested stream usage against the camera's resource management and stream priority policies.
+    // The server ensures that at least one stream Id has a value, and that there are streams allocated
+    // If a stream id(s) are provided, ensure that the requested Stream Usage matches the allocation
+    // If they're Null, look for a stream ID that matches the usage
+    bool matchedVideoStream = false;
+    bool matchedAudioStream = false;
+
+    if (videoStreamId.HasValue()) 
+    {
+        const std::vector<VideoStreamStruct> & allocatedVideoStreams = GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();
+        if (videoStreamId.Value().IsNull())
+        {
+            for (const auto & stream : allocatedVideoStreams)
+            {
+                if (stream.streamUsage == streamUsage)
+                {
+                    videoStreamId.Emplace(stream.videoStreamID);
+                    matchedVideoStream = true;
+                    break;
+                }
+            }
+            if (!matchedVideoStream) 
+            {
+                return CHIP_ERROR_BAD_REQUEST;
+            }
+        }
+        else 
+        {
+            for (const auto & stream : allocatedVideoStreams)
+            {
+                if (stream.videoStreamID == videoStreamId.Value().Value())
+                {
+                    matchedVideoStream = (stream.streamUsage == streamUsage);
+                    break;
+                }
+            }
+        }
+    }
+
+    if (audioStreamId.HasValue()) 
+    {
+        const std::vector<AudioStreamStruct> & allocatedAudioStreams = GetCameraAVStreamMgmtServer()->GetAllocatedAudioStreams();
+        if (audioStreamId.Value().IsNull())
+        {
+            for (const auto & stream : allocatedAudioStreams)
+            {
+                if (stream.streamUsage == streamUsage)
+                {
+                    audioStreamId.Emplace(stream.audioStreamID);
+                    matchedAudioStream = true;
+                    break;
+                }
+            }
+            if (!matchedAudioStream)
+            {
+                return CHIP_ERROR_BAD_REQUEST;
+            }
+        }
+        else 
+        {
+            for (const auto & stream : allocatedAudioStreams)
+            {
+                if (stream.audioStreamID == audioStreamId.Value().Value())
+                {
+                    matchedAudioStream = (stream.streamUsage == streamUsage);
+                    break;
+                }
+            }
+        }
+    }
+
+    if (!matchedAudioStream && !matchedVideoStream)
+    {
+        return CHIP_ERROR_BAD_REQUEST;
+    }
     return CHIP_NO_ERROR;
 }
 

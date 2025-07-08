@@ -34,8 +34,8 @@ public:
     virtual ~CameraAVStreamController() = default;
 
     virtual CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage,
-                                           const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
-                                           const Optional<DataModel::Nullable<uint16_t>> & audioStreamId) = 0;
+                                           Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+                                           Optional<DataModel::Nullable<uint16_t>> & audioStreamId) = 0;
 
     virtual CHIP_ERROR ValidateVideoStreamID(uint16_t videoStreamId) = 0;
 
