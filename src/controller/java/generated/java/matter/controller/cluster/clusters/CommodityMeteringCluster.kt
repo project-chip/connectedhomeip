@@ -494,7 +494,7 @@ class CommodityMeteringCluster(
               null
             }
 
-          decodedValue?.let { emit(MaximumMeteredQuantitiesAttributeSubscriptionState.Success(it)) }
+          emit(MaximumMeteredQuantitiesAttributeSubscriptionState.Success(decodedValue))
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(MaximumMeteredQuantitiesAttributeSubscriptionState.SubscriptionEstablished)
