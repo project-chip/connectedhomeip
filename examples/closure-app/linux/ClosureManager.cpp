@@ -103,7 +103,7 @@ void ClosureManager::Init()
     ChipLogProgress(AppServer, "Initial state for Closure Panel Endpoint 2 set successfully");
     VerifyOrDie(SetClosurePanelInitialState(mClosurePanelEndpoint3) == CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Initial state for Closure Panel Endpoint 3 set successfully");
-    
+
     TestEventTriggerDelegate * pTestEventDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
 
     if (pTestEventDelegate != nullptr)
