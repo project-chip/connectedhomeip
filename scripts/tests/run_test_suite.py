@@ -304,7 +304,7 @@ def cmd_list(context):
 @click.pass_context
 def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, ota_requestor_app,
             fabric_bridge_app, tv_app, bridge_app, lit_icd_app, microwave_oven_app, rvc_app, network_manager_app,
-            energy_gateway_app, energy_management_app, chip_repl_yaml_tester,
+            energy_gateway_app, energy_management_app, closure_app, chip_repl_yaml_tester,
             chip_tool_with_python, pics_file, keep_going, test_timeout_seconds, expected_failures):
     if expected_failures != 0 and not keep_going:
         logging.exception(f"'--expected-failures {expected_failures}' used without '--keep-going'")
@@ -352,6 +352,9 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
 
     if energy_management_app is None:
         energy_management_app = paths_finder.get('chip-energy-management-app')
+    
+    if closure_app is None:
+        closure_app = paths_finder.get('closure-app')
 
     if chip_repl_yaml_tester is None:
         chip_repl_yaml_tester = paths_finder.get('yamltest_with_chip_repl_tester.py')
@@ -378,6 +381,7 @@ def cmd_run(context, iterations, all_clusters_app, lock_app, ota_provider_app, o
         network_manager_app=[network_manager_app],
         energy_gateway_app=[energy_gateway_app],
         energy_management_app=[energy_management_app],
+        closure_app=[closure_app],
         chip_repl_yaml_tester_cmd=['python3'] + [chip_repl_yaml_tester],
         chip_tool_with_python_cmd=['python3'] + [chip_tool_with_python],
     )
