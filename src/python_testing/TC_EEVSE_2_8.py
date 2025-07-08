@@ -74,7 +74,7 @@ class TC_EEVSE_2_8(MatterBaseTest, EEVSEBaseTestHelper):
             TestStep("4", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for EVSE Set VehicleID Test Event",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep("5", "TH reads from the DUT the VehicleID attribute.",
-                     "Verify that the DUT response contains a string value"),
+                     "Verify that the DUT response contains a string value with length <= 32 characters."),
         ]
 
         return steps
@@ -98,6 +98,7 @@ class TC_EEVSE_2_8(MatterBaseTest, EEVSEBaseTestHelper):
         self.step("5")
         value = await self.read_evse_attribute_expect_success(attribute="VehicleID")
         asserts.assert_is_instance(value, str, "VehicleID must be a string")
+        asserts.assert_less_equal(len(value), 32, "VehicleID length must be less than or equal to 32 characters")
 
 
 if __name__ == "__main__":
