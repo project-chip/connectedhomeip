@@ -72,6 +72,8 @@ not_automated:
       reason: Code/Test not being used or not shared code for any other tests
     - name: TestConformanceSupport.py
       reason: Unit test - does not run against an app
+    - name: TC_CHIMETestBase.py
+      reason: Shared code for Chime, not a standalone test
     - name: TestChoiceConformanceSupport.py
       reason: Unit test - does not run against an app
     - name: TC_DEMTestBase.py
