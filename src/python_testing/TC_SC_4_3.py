@@ -317,7 +317,7 @@ class TC_SC_4_3(MatterBaseTest):
         )
 
         # Verify AAAA record is returned
-        asserts.assert_greater(len(quada_record.addresses), 0, f"No AAAA addresses were resolved")
+        asserts.assert_greater(len(quada_record.addresses), 0, f"No AAAA addresses were resolved for hostname '{hostname}'")
 
         # # *** STEP 9 ***
         # TH verifies the following from the returned records: The hostname must be a fixed-length twelve-character (or sixteen-character)

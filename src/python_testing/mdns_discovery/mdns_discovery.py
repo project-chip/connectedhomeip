@@ -17,7 +17,7 @@
 
 import json
 import logging
-from asyncio import Event, TimeoutError, ensure_future, sleep, wait_for
+from asyncio import Event, TimeoutError, ensure_future, wait_for
 from dataclasses import asdict
 from enum import Enum
 from functools import partial
