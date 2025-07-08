@@ -76,6 +76,11 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
                 "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the following: If WMARK is supported, verify WaterMarkEnabled == !aWmark. If OSD is supported, verify OSDEnabled == !aOSD.",
             ),
+            TestStep(
+                5,
+                "TH sends the SnapshotStreamModify command with SnapshotStreamID set to aStreamID. Neither WaterMarkEnabled nor OSDEnabled is provided. Verify Succcess.",
+                "DUT responds with a SUCCESS status code.",
+            ),
         ]
 
     @run_if_endpoint_matches(
@@ -116,6 +121,7 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
         aStreamID = aAllocatedSnapshotStreams[0].snapshotStreamID
         aWmark = aAllocatedSnapshotStreams[0].watermarkEnabled
         aOSD = aAllocatedSnapshotStreams[0].OSDEnabled
+        aWmark = aOSD = None
 
         self.step(3)
         try:
@@ -141,6 +147,17 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
         if osdSupport:
             asserts.assert_equal(aAllocatedSnapshotStreams[0].OSDEnabled, not aOSD, "OSDEnabled is not equal to !aOSD")
 
+        self.step(5)
+        try:
+            cmd = commands.SnapshotStreamModify(
+                snapshotStreamID=aStreamID,
+                watermarkEnabled=None,
+                OSDEnabled=None,
+            )
+            await self.send_single_cmd(endpoint=endpoint, cmd=cmd)
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            pass
 
 if __name__ == "__main__":
     default_matter_test_main()

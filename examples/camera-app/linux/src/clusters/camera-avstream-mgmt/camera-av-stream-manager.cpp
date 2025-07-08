@@ -278,6 +278,17 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
             {
                 stream.isAllocated = true;
 
+                // Set the optional Watermark and OSD values if provided in the allocation
+                if (allocateArgs.watermarkEnabled.HasValue())
+                {
+                    stream.snapshotStreamParams.watermarkEnabled = allocateArgs.watermarkEnabled;
+                }
+
+                if (allocateArgs.OSDEnabled.HasValue())
+                {
+                    stream.snapshotStreamParams.OSDEnabled = allocateArgs.OSDEnabled;
+                }
+
                 // Start the snapshot stream for serving.
                 mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(outStreamID);
 

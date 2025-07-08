@@ -1202,8 +1202,11 @@ void CameraDevice::InitializeSnapshotStreams()
                                         { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution*/,
                                         { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
                                         90 /* Quality */,
-                                        0 /* RefCount */ },
-                                      false,
+                                        0 /* RefCount */,
+                                        false /* EncodedPixels */,
+                                        false /* HardareEncoder */ 
+                                      },
+                                      false, 
                                       nullptr };
 
     mSnapshotStreams.push_back(snapshotStream);
