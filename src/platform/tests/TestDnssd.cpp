@@ -82,8 +82,8 @@ class TestDnssd : public ::testing::Test
 public: // protected
     static void SetUpTestSuite()
     {
-        EXPECT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
-        EXPECT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+        ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
+        ASSERT_EQ(chip::DeviceLayer::PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
     }
     static void TearDownTestSuite()
     {
@@ -114,7 +114,7 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
     auto * ctx = static_cast<TestDnssd *>(context);
     char addrBuf[100];
 
-    EXPECT_NE(result, nullptr);
+    ASSERT_NE(result, nullptr);
     EXPECT_EQ(error, CHIP_NO_ERROR);
 
     if (!addresses.empty())
@@ -124,6 +124,8 @@ static void HandleResolve(void * context, DnssdService * result, const chip::Spa
     }
 
     EXPECT_EQ(result->mTextEntrySize, 1u);
+    // must have at least 1 entry to check next key/val expectations.
+    ASSERT_GE(result->mTextEntrySize, 1u);
     EXPECT_STREQ(result->mTextEntries[0].mKey, "key");
     EXPECT_STREQ(reinterpret_cast<const char *>(result->mTextEntries[0].mData), "val");
 

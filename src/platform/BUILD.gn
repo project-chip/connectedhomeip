@@ -18,6 +18,7 @@ import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/linux/pkg_config.gni")
 import("${chip_root}/build/chip/buildconfig_header.gni")
+import("${chip_root}/src/system/system.gni")
 
 import("device.gni")
 
@@ -197,7 +198,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
     if (chip_device_platform == "cc13x4_26x4") {
       device_layer_target_define = "CC13X4_26X4"
-      defines += [ "CHIP_DEVICE_LAYER_TARGET=cc13xx_26xx/cc13x4_26x4" ]
+      defines += [ "CHIP_DEVICE_LAYER_TARGET=ti/cc13xx_26xx/cc13x4_26x4" ]
     } else if (chip_device_platform == "cc32xx") {
       device_layer_target_define = "CC32XX"
       defines += [ "CHIP_DEVICE_LAYER_TARGET=cc32xx" ]
@@ -546,7 +547,6 @@ if (chip_device_platform != "none") {
       "../include/platform/internal/GenericPlatformManagerImpl_POSIX.h",
       "../include/platform/internal/GenericPlatformManagerImpl_POSIX.ipp",
       "../include/platform/internal/GenericPlatformManagerImpl_Zephyr.h",
-      "../include/platform/internal/GenericPlatformManagerImpl_Zephyr.ipp",
       "../include/platform/internal/testing/ConfigUnitTest.h",
       "CommissionableDataProvider.cpp",
       "DeviceControlServer.cpp",
@@ -561,6 +561,14 @@ if (chip_device_platform != "none") {
       "PlatformEventSupport.cpp",
       "RuntimeOptionsProvider.cpp",
     ]
+
+    if (current_os == "zephyr") {
+      if (chip_system_config_use_sockets) {
+        sources += [ "../include/platform/internal/GenericPlatformManagerImpl_ZephyrSelect.ipp" ]
+      } else {
+        sources += [ "../include/platform/internal/GenericPlatformManagerImpl_ZephyrNoSelect.ipp" ]
+      }
+    }
 
     # Linux has its own NetworkCommissioningThreadDriver
     if (chip_enable_openthread && chip_device_platform != "linux" &&
@@ -582,7 +590,7 @@ if (chip_device_platform != "none") {
     ]
 
     if (chip_device_platform == "cc13x4_26x4") {
-      _platform_target = "cc13xx_26xx/cc13x4_26x4"
+      _platform_target = "ti/cc13xx_26xx/cc13x4_26x4"
     } else if (chip_device_platform == "cc32xx") {
       _platform_target = "cc32xx"
     } else if (chip_device_platform == "darwin") {

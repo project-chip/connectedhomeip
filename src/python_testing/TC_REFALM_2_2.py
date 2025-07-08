@@ -24,7 +24,7 @@
 #     app: ${ALL_CLUSTERS_APP}
 #     factory-reset: true
 #     quiet: true
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/refalm_2_2_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -34,21 +34,21 @@
 #       --int-arg PIXIT.REFALM.AlarmThreshold:1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --app-pipe /tmp/refalm_2_2_fifo
 # === END CI TEST ARGUMENTS ===
 
-import json
 import logging
 import typing
 from dataclasses import dataclass
 from time import sleep
-from typing import Any
 
 import chip.clusters as Clusters
 from chip import ChipUtility
 from chip.clusters.ClusterObjects import ClusterCommand, ClusterObjectDescriptor, ClusterObjectFieldDescriptor
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing import matter_asserts
-from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.event_attribute_reporting import EventChangeCallback
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from chip.tlv import uint
 from mobly import asserts
 
@@ -172,29 +172,14 @@ class TC_REFALM_2_2(MatterBaseTest):
         logger.info(f"Sleeping for {self.refalm_threshold_seconds} seconds defined at PIXIT.REFALM.AlarmThreshold")
         sleep(self.refalm_threshold_seconds)
 
-    def _send_named_pipe_command(self, command_dict: dict[str, Any]):
-        app_pid = self.matter_test_config.app_pid
-        if app_pid == 0:
-            asserts.fail("The --app-pid flag must be set when usage of door state simulation named pipe is required (e.g. CI)")
-
-        app_pipe = f"/tmp/chip_all_clusters_fifo_{app_pid}"
-        command = json.dumps(command_dict)
-
-        # Sends an out-of-band command to the sample app
-        with open(app_pipe, "w") as outfile:
-            logging.info(f"Sending named pipe command to {app_pipe}: '{command}'")
-            outfile.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests may be flaky).
-        sleep(0.1)
-
     def _send_open_door_command(self):
         command_dict = {"Name": "SetRefrigeratorDoorStatus", "EndpointId": self.endpoint,
                         "DoorOpen": Clusters.RefrigeratorAlarm.Bitmaps.AlarmBitmap.kDoorOpen}
-        self._send_named_pipe_command(command_dict)
+        self.write_to_app_pipe(command_dict)
 
     def _send_close_door_commnad(self):
         command_dict = {"Name": "SetRefrigeratorDoorStatus", "EndpointId": self.endpoint, "DoorOpen": 0}
-        self._send_named_pipe_command(command_dict)
+        self.write_to_app_pipe(command_dict)
 
     @async_test_body
     async def test_TC_REFALM_2_2(self):

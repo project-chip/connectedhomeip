@@ -29,6 +29,10 @@
 #include <data-model-providers/codegen/Instance.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#endif
+
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
 #endif
@@ -77,6 +81,11 @@ app::Clusters::NetworkCommissioning::Instance
 app::Clusters::NetworkCommissioning::Instance
     sEthernetNetworkCommissioningInstance(CONFIG_ETHERNET_NETWORK_ENDPOINT_ID /* Endpoint Id */,
                                           &(NetworkCommissioning::ESPEthernetDriver::GetInstance()));
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER
+app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver>
+    sThreadNetworkDriver(CONFIG_THREAD_NETWORK_ENDPOINT_ID);
 #endif
 
 #if defined(CONFIG_WIFI_NETWORK_ENDPOINT_ID) && defined(CONFIG_THREAD_NETWORK_ENDPOINT_ID)
@@ -215,6 +224,9 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 #endif // CHIP_DEVICE_CONFIG_ETHERNET_NETWORK_DRIVER
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#ifdef CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER
+    sThreadNetworkDriver.Init();
+#endif // CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER
     if (chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned() &&
         (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0))
     {

@@ -19,6 +19,7 @@
 #pragma once
 
 #include "../common/CHIPCommand.h"
+#include "joint_fabric_service/joint_fabric_service.rpc.pb.h"
 #include <controller/CommissioningDelegate.h>
 #include <controller/CurrentFabricRemover.h>
 
@@ -42,6 +43,7 @@ enum class PairingMode
     AlreadyDiscoveredByIndex,
     AlreadyDiscoveredByIndexWithCode,
     OnNetwork,
+    Nfc,
 };
 
 enum class PairingNetworkType
@@ -118,6 +120,11 @@ public:
             AddArgument("use-only-onnetwork-discovery", 0, 1, &mUseOnlyOnNetworkDiscovery);
             break;
         case PairingMode::Ble:
+            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
+            AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
+            break;
+        case PairingMode::Nfc:
+            AddArgument("skip-commissioning-complete", 0, 1, &mSkipCommissioningComplete);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode.emplace());
             AddArgument("discriminator", 0, 4096, &mDiscriminator.emplace());
             break;
@@ -228,7 +235,8 @@ public:
     void OnPairingComplete(CHIP_ERROR error) override;
     void OnPairingDeleted(CHIP_ERROR error) override;
     void OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info) override;
-    void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
+    void OnCommissioningComplete(NodeId nodeId, const chip::Optional<chip::Crypto::P256PublicKey> & trustedIcacPublicKeyB,
+                                 CHIP_ERROR err) override;
     void OnICDRegistrationComplete(chip::ScopedNodeId deviceId, uint32_t icdCounter) override;
     void OnICDStayActiveComplete(chip::ScopedNodeId deviceId, uint32_t promisedActiveDuration) override;
 
@@ -309,6 +317,7 @@ private:
     uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
 
     chip::Optional<bool> mExecuteJCM;
+    ::pw::rpc::NanopbClientReader<::ICACCSROptions> rpcStreamGetICACCSR;
 
     // For unpair
     chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;

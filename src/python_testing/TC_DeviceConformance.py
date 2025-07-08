@@ -45,9 +45,9 @@ from chip.testing.choice_conformance import (evaluate_attribute_choice_conforman
 from chip.testing.conformance import ConformanceDecision, conformance_allowed
 from chip.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttributeIds, cluster_id_type,
                                                device_type_id_type, is_valid_device_type_id)
-from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
-                                         MatterBaseTest, ProblemNotice, ProblemSeverity, TestStep, async_test_body,
-                                         default_matter_test_main)
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
+                                          ProblemNotice, ProblemSeverity)
 from chip.testing.spec_parsing import CommandType, XmlDeviceType
 from chip.tlv import uint
 
@@ -181,10 +181,10 @@ class DeviceConformanceTests(BasicCompositionTests):
                     cluster[GlobalAttributeIds.GENERATED_COMMAND_LIST_ID]
 
                 # Feature conformance checking
+                location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
+                                                 attribute_id=GlobalAttributeIds.FEATURE_MAP_ID)
                 feature_masks = [1 << i for i in range(32) if feature_map & (1 << i)]
                 for f in feature_masks:
-                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id,
-                                                     attribute_id=GlobalAttributeIds.FEATURE_MAP_ID)
                     if cluster_id == Clusters.AccessControl.id and f == Clusters.AccessControl.Bitmaps.Feature.kManagedDevice:
                         # Managed ACL is treated as a special case because it is only allowed if other endpoints support NIM and disallowed otherwise.
                         if not self._has_device_type_supporting_macl():
@@ -268,7 +268,6 @@ class DeviceConformanceTests(BasicCompositionTests):
                     success = False
                 problems.extend(feature_choice_problems + attribute_choice_problems + command_choice_problem)
 
-        print(f'success = {success}')
         return success, problems
 
     def check_revisions(self, ignore_in_progress: bool):

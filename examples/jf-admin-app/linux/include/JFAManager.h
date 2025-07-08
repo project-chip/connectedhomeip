@@ -27,6 +27,8 @@
 
 #include <lib/core/CHIPError.h>
 
+#include "JFARpc.h"
+
 namespace chip {
 
 class JFAManager
@@ -36,7 +38,9 @@ public:
 
     CHIP_ERROR Init(Server & server);
     void HandleCommissioningCompleteEvent();
-    CHIP_ERROR FinalizeCommissioning(NodeId nodeId);
+    CHIP_ERROR FinalizeCommissioning(NodeId nodeId, bool isJCM, chip::Crypto::P256PublicKey & trustedIcacPublicKeyB);
+
+    void SetJFARpc(JFARpc & aJFARpc);
 
 private:
     // Various actions to take when OnConnected callback is called
@@ -54,6 +58,7 @@ private:
     Server * mServer                          = nullptr;
     CASESessionManager * mCASESessionManager  = nullptr;
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
+    JFARpc * mJFARpc                          = nullptr;
     SessionHolder mSessionHolder;
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;

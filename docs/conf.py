@@ -12,7 +12,7 @@ sys.path.insert(0, str(MATTER_BASE / "docs" / "_extensions"))
 # -- Project information -----------------------------------------------------
 
 project = "Matter"
-copyright = "2020-2023, Matter Contributors"
+copyright = "2020-2025, Matter Contributors"
 author = "Matter Contributors"
 version = "1.0.0"
 
@@ -58,6 +58,7 @@ myst_heading_anchors = 6
 suppress_warnings = [
     "myst.header",
     "myst.anchor",
+    "myst.xref_missing",
 ]
 myst_enable_extensions = ["html_image"]
 
@@ -86,3 +87,4 @@ external_content_link_prefixes = [
     "data_model/",
 ]
 external_content_link_extensions = [".md", ".png", ".jpg", ".svg"]
+external_content_keep = ['**/ChipDeviceCtrlAPI.md']

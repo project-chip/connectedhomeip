@@ -30,6 +30,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::Controller;
+using namespace chip::Crypto;
 
 JFAManager JFAManager::sJFA;
 
@@ -41,18 +42,26 @@ CHIP_ERROR JFAManager::Init(Server & server)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR JFAManager::FinalizeCommissioning(NodeId nodeId)
+CHIP_ERROR JFAManager::FinalizeCommissioning(NodeId nodeId, bool isJCM, P256PublicKey & trustedIcacPublicKeyB)
 {
     if (jfFabricIndex == kUndefinedFabricId)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
+    ChipLogProgress(JointFabric, "FinalizeCommissioning for NodeID: 0x" ChipLogFormatX64 ", isJCM = %d", ChipLogValueX64(nodeId),
+                    isJCM);
+
     ScopedNodeId scopedNodeId = ScopedNodeId(nodeId, jfFabricIndex);
 
     ConnectToNode(scopedNodeId, kStandardCommissioningComplete);
 
     return CHIP_NO_ERROR;
+}
+
+void JFAManager::SetJFARpc(JFARpc & aJFARpc)
+{
+    mJFARpc = &aJFARpc;
 }
 
 void JFAManager::HandleCommissioningCompleteEvent()
