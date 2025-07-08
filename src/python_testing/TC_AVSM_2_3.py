@@ -121,7 +121,6 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
         aStreamID = aAllocatedSnapshotStreams[0].snapshotStreamID
         aWmark = aAllocatedSnapshotStreams[0].watermarkEnabled
         aOSD = aAllocatedSnapshotStreams[0].OSDEnabled
-        aWmark = aOSD = None
 
         self.step(3)
         try:
