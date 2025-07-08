@@ -142,6 +142,8 @@ CHIP_ERROR Instance::Init()
 {
     mMeteredQuantity.SetNull();
     mMeteredQuantityTimestamp.SetNull();
+    mTariffUnit.SetNull();
+    mMaximumMeteredQuantities.SetNull();
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
@@ -177,6 +179,10 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
     {
         mMeteredQuantity.SetNull();
     }
+    else if (mMaximumMeteredQuantities.IsNull())
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
     else
     {
         if (!mMeteredQuantity.IsNull())
@@ -190,7 +196,7 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
         {
             mMeteredQuantity = MakeNullable(DataModel::List<Structs::MeteredQuantityStruct::Type>());
         }
-        else
+        else if (len <= mMaximumMeteredQuantities.Value())
         {
             Platform::ScopedMemoryBuffer<Structs::MeteredQuantityStruct::Type> buffer;
 
@@ -208,6 +214,10 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
 
             mMeteredQuantity = MakeNullable(DataModel::List<Structs::MeteredQuantityStruct::Type>(buffer.Get(), len));
             (void)buffer.Release();
+        }
+        else
+        {
+            return CHIP_ERROR_INVALID_LIST_LENGTH;
         }
     }
 
@@ -266,7 +276,7 @@ CHIP_ERROR Instance::SetTariffUnit(DataModel::Nullable<TariffUnitEnum> newValue)
 
 CHIP_ERROR Instance::SetMaximumMeteredQuantities(DataModel::Nullable<uint16_t> newValue)
 {
-    DataModel::Nullable<uint16_t> oldValue = mMeteredQuantities;
+    DataModel::Nullable<uint16_t> oldValue = mMaximumMeteredQuantities;
 
     if (oldValue != newValue)
     {
@@ -274,12 +284,16 @@ CHIP_ERROR Instance::SetMaximumMeteredQuantities(DataModel::Nullable<uint16_t> n
         {
             ChipLogDetail(AppServer, "MaximumMeteredQuantities updated to Null");
         }
-        else
+        else if (newValue.Value() >= 1)
         {
             ChipLogDetail(AppServer, "MaximumMeteredQuantities updated to %lu", static_cast<unsigned long int>(newValue.Value()));
         }
+        else
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
 
-        mMeteredQuantities = newValue;
+        mMaximumMeteredQuantities = newValue;
 
         MatterReportingAttributeChangeCallback(mEndpointId, CommodityMetering::Id, MaximumMeteredQuantities::Id);
     }

@@ -49,7 +49,7 @@ public:
     }
     const DataModel::Nullable<uint32_t> & GetMeteredQuantityTimestamp() const { return mMeteredQuantityTimestamp; }
     const DataModel::Nullable<Globals::TariffUnitEnum> & GetTariffUnit() const { return mTariffUnit; }
-    const DataModel::Nullable<uint16_t> & GetMaximumMeteredQuantities() const { return mMeteredQuantities; }
+    const DataModel::Nullable<uint16_t> & GetMaximumMeteredQuantities() const { return mMaximumMeteredQuantities; }
     // Internal Application API to set attribute values
     CHIP_ERROR SetMeteredQuantity(const DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> & value);
     CHIP_ERROR SetMeteredQuantityTimestamp(DataModel::Nullable<uint32_t>);
@@ -61,7 +61,7 @@ private:
     DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> mMeteredQuantity;
     DataModel::Nullable<uint32_t> mMeteredQuantityTimestamp;
     DataModel::Nullable<Globals::TariffUnitEnum> mTariffUnit;
-    DataModel::Nullable<uint16_t> mMeteredQuantities;
+    DataModel::Nullable<uint16_t> mMaximumMeteredQuantities;
 
     EndpointId mEndpointId = 0;
 
