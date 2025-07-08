@@ -29,8 +29,8 @@ namespace srp {
 class Client
 {
 public:
-    SrpClient()  = default;
-    ~SrpClient() = default;
+    Client()  = default;
+    ~Client() = default;
 };
 
 } // namespace srp

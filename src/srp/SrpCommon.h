@@ -18,7 +18,7 @@
 #pragma once
 
 /**
- * @brief File contains common structures, class or types that are common to the Matter SRP Client or Server Implementaion
+ * @brief File contains common structures, class or types that are common to the Matter SRP Client or Server Implementation
  */
 
 namespace chip {
