@@ -395,7 +395,7 @@ class TC_ACL_2_8(MatterBaseTest):
         self._validate_events_th1(events_unfiltered, f1, f2, False)
 
         # Below event filtering and parsing is currently required in the event that the DUT is not reset before running this test.
-        added_event, changed_event = self._get_relevant_acl_events(events, self.th1.nodeId, [self.th1.nodeId, 1111])
+        added_event, changed_event = self._get_relevant_acl_events(events_filtered, self.th1.nodeId, [self.th1.nodeId, 1111])
         logging.info(f"TH1 Events: added_event={added_event}, changed_event={changed_event}")
 
         # Verify event contents match expected sequence
@@ -437,7 +437,7 @@ class TC_ACL_2_8(MatterBaseTest):
         )
         self._validate_events_th2(events_unfiltered, f1, f2, False)
 
-        added_event, changed_event = self._get_relevant_acl_events(events, self.th2.nodeId, [self.th2.nodeId, 2222])
+        added_event, changed_event = self._get_relevant_acl_events(events_filtered, self.th2.nodeId, [self.th2.nodeId, 2222])
         logging.info(f"TH2 Events: added_event={added_event}, changed_event={changed_event}")
 
         # Verify event contents match expected sequence
