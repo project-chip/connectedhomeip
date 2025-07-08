@@ -145,10 +145,10 @@ class TC_CLDIM_3_3(MatterBaseTest):
         self.step("2a")
         feature_map = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
 
-        is_positioning_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
-        is_latching_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
-        is_limitation_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kLimitation
-        is_speed_supported : bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
+        is_positioning_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kPositioning
+        is_latching_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kMotionLatching
+        is_limitation_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kLimitation
+        is_speed_supported: bool = feature_map & Clusters.ClosureDimension.Bitmaps.Feature.kSpeed
 
         # STEP 2b: Read LimitRange attribute if supported
         self.step("2b")
@@ -319,26 +319,18 @@ class TC_CLDIM_3_3(MatterBaseTest):
             # STEP 5e: Send SetTarget command with Position 100%
             self.step("5e")
             sub_handler.reset()
-            if max_position < 10000:
-                try:
-                    await self.send_single_cmd(
-                        cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=10000),
-                        endpoint=endpoint
-                    )
-                except InteractionModelError as e:
-                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            else:
-                logging.info("MaxPosition not < 10000. Skipping step 5e.")
-                self.mark_current_step_skipped()
+            try:
+                await self.send_single_cmd(
+                    cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=10000),
+                    endpoint=endpoint
+                )
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
             # STEP 5f: Verify TargetState attribute is updated
             self.step("5f")
-            if max_position < 10000:
-                target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
-                asserts.assert_equal(target_state.position, max_position, "TargetState Position does not match MaxPosition")
-            else:
-                logging.info("MaxPosition not < 10000. Skipping step 5f.")
-                self.mark_current_step_skipped()
+            target_state = await self.read_cldim_attribute_expect_success(endpoint=endpoint, attribute=attributes.TargetState)
+            asserts.assert_equal(target_state.position, max_position, "TargetState Position does not match MaxPosition")
 
             # STEP 5g: Wait for CurrentState.Position to be updated to 100%
             self.step("5g")
