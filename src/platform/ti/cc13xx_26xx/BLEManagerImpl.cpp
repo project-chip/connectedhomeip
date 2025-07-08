@@ -42,7 +42,7 @@ extern void cc13xx_26xxLog(const char * aFormat, ...);
 
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
+
 #ifdef CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include <ble/Ble.h>

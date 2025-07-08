@@ -114,7 +114,6 @@ typedef struct
 {
     uint8_t len;  // data length
     void * pData; // pointer to message
-
 } CHIPoBLEIndEvt_t;
 
 typedef struct
