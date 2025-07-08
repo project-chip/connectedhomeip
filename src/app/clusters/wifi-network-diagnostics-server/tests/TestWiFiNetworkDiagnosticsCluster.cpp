@@ -228,8 +228,8 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
         };
 
         const WiFiNetworkDiagnosticsEnabledAttributes enabledAttributes{
-            .enableBeaconRxCount          = true,
             .enableBeaconLostCount        = true,
+            .enableBeaconRxCount          = true,
             .enablePacketMulticastRxCount = true,
             .enablePacketMulticastTxCount = true,
             .enablePacketUnicastRxCount   = true,
