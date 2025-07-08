@@ -364,9 +364,9 @@ Structs::DayStruct::Type FindDay(CurrentTariffAttrsCtx & aCtx, uint32_t timestam
     uint32_t DayStartTS                 = timestamp - (timestamp % kSecondsPerDay);
 
     // First check IndividualDays
-    if (!aCtx.TariffProvider->GetIndividualDays().IsNull())
+    if (!aCtx.mTariffProvider->GetIndividualDays().IsNull())
     {
-        for (const auto & day : aCtx.TariffProvider->GetIndividualDays().Value())
+        for (const auto & day : aCtx.mTariffProvider->GetIndividualDays().Value())
         {
             if ((day.date >= DayStartTS) && (day.date < (DayStartTS + kSecondsPerDay)))
             {
@@ -375,9 +375,9 @@ Structs::DayStruct::Type FindDay(CurrentTariffAttrsCtx & aCtx, uint32_t timestam
         }
     }
 
-    if (!aCtx.TariffProvider->GetCalendarPeriods().IsNull())
+    if (!aCtx.mTariffProvider->GetCalendarPeriods().IsNull())
     {
-        for (const auto & period : aCtx.TariffProvider->GetCalendarPeriods().Value())
+        for (const auto & period : aCtx.mTariffProvider->GetCalendarPeriods().Value())
         {
             if (period.startDate.IsNull() ||
                 ((period.startDate.Value() >= DayStartTS) && (period.startDate.Value() < (DayStartTS + kSecondsPerDay))))
@@ -437,7 +437,7 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
             if (next->startTime <= current->startTime)
             {
                 // Next entry is on the following day
-                duration = (kDayEntryDurationLimit - current->startTime) + next->startTime;
+                duration = static_cast<uint16_t>((kDayEntryDurationLimit - current->startTime) + next->startTime);
             }
             else
             {
@@ -452,7 +452,7 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
         {
             currentPtr = current;
             nextPtr    = next;
-            *nextUpdInterval = duration - (minutesSinceMidnight - current->startTime);
+            *nextUpdInterval = static_cast<uint16_t>(duration - (minutesSinceMidnight - current->startTime));
             break;
         }
     }
@@ -462,7 +462,7 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
 
 const Structs::TariffPeriodStruct::Type * FindTariffPeriodByDayEntryId(CurrentTariffAttrsCtx & aCtx, uint32_t dayEntryID)
 {
-    for (const auto & period : aCtx.TariffProvider->GetTariffPeriods().Value())
+    for (const auto & period : aCtx.mTariffProvider->GetTariffPeriods().Value())
     {
         for (const auto & entryID : period.dayEntryIDs)
         {
@@ -478,7 +478,7 @@ const Structs::TariffPeriodStruct::Type * FindTariffPeriodByDayEntryId(CurrentTa
 
 const Structs::TariffPeriodStruct::Type * FindTariffPeriodByTariffComponentId(CurrentTariffAttrsCtx & aCtx, uint32_t componentID)
 {
-    for (const auto & period : aCtx.TariffProvider->GetTariffPeriods().Value())
+    for (const auto & period : aCtx.mTariffProvider->GetTariffPeriods().Value())
     {
         for (const auto & entryID : period.tariffComponentIDs)
         {
@@ -542,7 +542,7 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(CurrentTariffAttrsCtx & aCtx, 
             {
                 std::copy(tempList.begin(), tempList.end(), mgmtObj.GetNewValueData());
                 mgmtObj.MarkAsAssigned();
-                if ((err = mgmtObj.UpdateBegin(&aCtx.EndpointId, TariffComponentUpd_AttrChangeCb, false)) == CHIP_NO_ERROR)
+                if ((err = mgmtObj.UpdateBegin(&aCtx.mEndpointId, TariffComponentUpd_AttrChangeCb, false)) == CHIP_NO_ERROR)
                 {
                     mgmtObj.UpdateCommit(); // Success path
                 }
@@ -569,8 +569,8 @@ CHIP_ERROR UpdateTariffComponentAttrsDayEntryById(CurrentTariffAttrsCtx & aCtx, 
 
 static void AttrsCtxInit(Delegate & aTariffProvider, CurrentTariffAttrsCtx & aCtx, EndpointId aEndpointId)
 {
-    aCtx.TariffProvider = &aTariffProvider;
-    aCtx.EndpointId     = aEndpointId;
+    aCtx.mTariffProvider = &aTariffProvider;
+    aCtx.mEndpointId     = aEndpointId;
 
     Utils::ListToMap<Structs::DayPatternStruct::Type, &Structs::DayPatternStruct::Type::dayPatternID>(
         aTariffProvider.GetDayPatterns().Value(), aCtx.DayPatternsMap);
@@ -585,7 +585,7 @@ static void AttrsCtxDeinit(CurrentTariffAttrsCtx & aCtx)
     aCtx.DayPatternsMap.clear();
     aCtx.DayEntriesMap.clear();
     aCtx.TariffComponentsMap.clear();
-    aCtx.TariffProvider = nullptr;
+    aCtx.mTariffProvider = nullptr;
 }
 
 void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
@@ -601,7 +601,7 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
         mServerTariffAttrsCtx.forwardAlarmTriggerTime = 0;
     }
 
-    if (mServerTariffAttrsCtx.TariffProvider == nullptr && aEvt != UpdateEventCode::TariffUpdated)
+    if (mServerTariffAttrsCtx.mTariffProvider == nullptr && aEvt != UpdateEventCode::TariffUpdated)
     {
         return;
     }
@@ -738,7 +738,7 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
     Commands::GetTariffComponentResponse::Type response;
     Status status = Status::Failure;
 
-    if (mServerTariffAttrsCtx.TariffProvider == nullptr)
+    if (mServerTariffAttrsCtx.mTariffProvider == nullptr)
     {
         ChipLogError(NotSpecified, "The tariff is not active");
     }
@@ -772,7 +772,7 @@ void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEnt
     Commands::GetDayEntryResponse::Type response;
     Status status = Status::Failure;
 
-    if (mServerTariffAttrsCtx.TariffProvider == nullptr)
+    if (mServerTariffAttrsCtx.mTariffProvider == nullptr)
     {
         ChipLogError(NotSpecified, "The tariff is not active");
     }
