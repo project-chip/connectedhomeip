@@ -151,3 +151,29 @@ class WEBRTCPTestBase:
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
+
+    async def validate_allocated_video_stream(self, videoStreamID):
+        endpoint = self.get_endpoint(default=1)
+        cluster = Clusters.CameraAvStreamManagement
+        attr = Clusters.CameraAvStreamManagement.Attributes
+
+        # Make sure the DUT allocated sterams as requested
+        aAllocatedVideoStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
+        )
+        
+        if not any(stream.videoStreamID == videoStreamID for stream in aAllocatedVideoStreams):
+            asserts.fail(f"Video Stream with ID {videoStreamID} not found as expected")
+
+    async def validate_allocated_audio_stream(self, audioStreamID):
+        endpoint = self.get_endpoint(default=1)
+        cluster = Clusters.CameraAvStreamManagement
+        attr = Clusters.CameraAvStreamManagement.Attributes
+
+        # Make sure the DUT allocated sterams as requested
+        aAllocatedAudioStreams = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedAudioStreams
+        )
+        
+        if not any(stream.audioStreamID == audioStreamID for stream in aAllocatedAudioStreams):
+            asserts.fail(f"Audio Stream with ID {audioStreamID} not found as expected")

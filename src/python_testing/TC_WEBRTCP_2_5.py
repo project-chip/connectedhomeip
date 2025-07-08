@@ -113,6 +113,7 @@ class TC_WebRTCProvider_2_5(MatterBaseTest, WEBRTCPTestBase):
 
         self.step(4)
         videoStreamID = await self.allocate_one_video_stream()
+        await self.validate_allocated_video_stream(videoStreamID)
 
         self.step(5)
         # Send SolicitOffer with null audio stream ID, valid video stream ID
@@ -126,6 +127,7 @@ class TC_WebRTCProvider_2_5(MatterBaseTest, WEBRTCPTestBase):
 
         self.step(6)
         audioStreamID = await self.allocate_one_audio_stream()
+        await self.validate_allocated_audio_stream(audioStreamID)
 
         self.step(7)
         # Send SolicitOffer with valid audio stream ID, invalid video stream ID

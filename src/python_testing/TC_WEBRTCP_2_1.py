@@ -75,8 +75,11 @@ class TC_WebRTCProvider_2_1(MatterBaseTest, WEBRTCPTestBase):
 
         self.step("precondition")
         # Commission DUT - already done
-        await self.allocate_one_audio_stream()
-        await self.allocate_one_video_stream()
+        audioStreamID = await self.allocate_one_audio_stream()
+        videoStreamID = await self.allocate_one_video_stream()
+
+        await self.validate_allocated_audio_stream(audioStreamID)
+        await self.validate_allocated_video_stream(videoStreamID)
 
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.WebRTCTransportProvider

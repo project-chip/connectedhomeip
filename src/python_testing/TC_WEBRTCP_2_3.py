@@ -136,6 +136,9 @@ class TC_WebRTCProvider_2_3(MatterBaseTest, WEBRTCPTestBase):
         audioStreamID = await self.allocate_one_audio_stream()
         videoStreamID = await self.allocate_one_video_stream()
 
+        await self.validate_allocated_audio_stream(audioStreamID)
+        await self.validate_allocated_video_stream(videoStreamID)
+
         self.step(5)
         # Send ProvideOffer with VideoStreamID that doesn't match AllocatedVideoStreams
         cmd = cluster.Commands.ProvideOffer(
