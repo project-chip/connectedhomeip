@@ -596,14 +596,6 @@ class MdnsDiscovery:
         else:
             return service_info.name
 
-    def _service_exists(self, service_name: str, service_type: str) -> bool:
-        return any(
-            s.service_name == service_name and
-            s.service_type == service_type
-            for service_list in self._discovered_services.values()
-            for s in service_list
-        )
-
     def _log_output(self) -> str:
         """
         Converts the discovered services to a JSON string and logs it.
