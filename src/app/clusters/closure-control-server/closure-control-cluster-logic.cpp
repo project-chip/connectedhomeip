@@ -272,7 +272,7 @@ CHIP_ERROR ClusterLogic::SetOverallCurrentState(const DataModel::Nullable<Generi
             // supported by the closure. If the Speed feature is not supported, return an error.
             VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) || mConformance.HasFeature(Feature::kMotionLatching),
                                 CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-            
+
             if (!incomingOverallCurrentState.secureState.Value().IsNull())
             {
                 // SecureStateChanged event SHALL be generated when the SecureState field in the OverallCurrentState attribute changes
