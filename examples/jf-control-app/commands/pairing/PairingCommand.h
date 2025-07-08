@@ -19,6 +19,7 @@
 #pragma once
 
 #include "../common/CHIPCommand.h"
+#include "joint_fabric_service/joint_fabric_service.rpc.pb.h"
 #include <controller/CommissioningDelegate.h>
 #include <controller/CurrentFabricRemover.h>
 
@@ -316,6 +317,7 @@ private:
     uint8_t mRandomGeneratedICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
 
     chip::Optional<bool> mExecuteJCM;
+    ::pw::rpc::NanopbClientReader<::ICACCSROptions> rpcStreamGetICACCSR;
 
     // For unpair
     chip::Platform::UniquePtr<chip::Controller::CurrentFabricRemover> mCurrentFabricRemover;
