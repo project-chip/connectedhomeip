@@ -2463,13 +2463,20 @@ class ChipDeviceControllerBase():
 class ChipDeviceController(ChipDeviceControllerBase):
     ''' 
     The ChipDeviceCommissioner binding, named as ChipDeviceController
-
-    TODO: This class contains DEPRECATED functions, we should update the test scripts to avoid the usage of those functions.
     '''
+    # TODO: This class contains DEPRECATED functions, we should update the test scripts to avoid the usage of those functions.
 
-    def __init__(self, opCredsContext: ctypes.c_void_p, fabricId: int, nodeId: int, adminVendorId: int, catTags: typing.List[int] = [
-    ], paaTrustStorePath: str = "", useTestCommissioner: bool = False, fabricAdmin: typing.Optional[FabricAdmin.FabricAdmin] = None, name: str = '', keypair: typing.Optional[p256keypair.P256Keypair] = None):
-        assert fabricAdmin is not None  # fabricAdmin must be provided
+    def __init__(self,
+                 opCredsContext: ctypes.c_void_p,
+                 fabricId: int,
+                 nodeId: int,
+                 adminVendorId: int,
+                 fabricAdmin: FabricAdmin.FabricAdmin,
+                 catTags: typing.List[int] = [],
+                 paaTrustStorePath: str = "",
+                 useTestCommissioner: bool = False,
+                 name: str = '',
+                 keypair: typing.Optional[p256keypair.P256Keypair] = None):
         super().__init__(
             name or
             f"caIndex({fabricAdmin.caIndex:x})/fabricId(0x{fabricId:016X})/nodeId(0x{nodeId:016X})"
