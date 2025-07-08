@@ -113,6 +113,12 @@ not_automated:
     - name: TC_CLDIM_3_3.py
       reason:
           Closure app on master branch does not support this test script yet.
+    - name: TC_CLDIM_4_1.py
+      reason:
+          Closure app on master branch does not support this test script yet.
+    - name: TC_CLDIM_4_2.py
+      reason:
+          Closure app on master branch does not support this test script yet.
     - name: TC_WEBRTC_1_1.py
       reason:
           Depends on Python WebRTC bindings. Will be enabled once local tests
