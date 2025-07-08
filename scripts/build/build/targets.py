@@ -204,6 +204,7 @@ def BuildHostTarget():
     target.AppendModifier('chip-casting-simplified', chip_casting_simplified=True).OnlyIfRe('-tv-casting-app')
     target.AppendModifier('googletest', use_googletest=True).OnlyIfRe('-tests')
     target.AppendModifier('terms-and-conditions', terms_and_conditions_required=True)
+    target.AppendModifier('webrtc', enable_webrtc=True)
 
     return target
 
