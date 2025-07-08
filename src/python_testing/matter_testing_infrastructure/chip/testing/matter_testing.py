@@ -60,7 +60,6 @@ from chip.storage import PersistentStorage
 from chip.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_devices,
                                         get_setup_payload_info_config)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.pics import read_pics_from_file
 from chip.testing.problem_notices import AttributePathLocation, ClusterMapper, ProblemLocation, ProblemNotice, ProblemSeverity
 from chip.testing.runner import TestRunnerHooks, TestStep
 from chip.tlv import uint
