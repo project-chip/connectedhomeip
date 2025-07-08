@@ -20,7 +20,7 @@
 #include <srp/SRPCommon.h>
 
 /**
-    @brief File contains the Matter Client Implementation
+    @brief File contains the Matter SRP Client Implementation
 */
 
 namespace chip {
