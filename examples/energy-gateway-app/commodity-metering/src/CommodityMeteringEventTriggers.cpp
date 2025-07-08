@@ -61,6 +61,7 @@ private:
     DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> mMeteredQuantity;
     DataModel::Nullable<uint32_t> mMeteredQuantityTimestamp;
     DataModel::Nullable<Globals::TariffUnitEnum> mTariffUnit;
+    DataModel::Nullable<uint16_t> mMaximumMeteredQuantities;
 
     std::array<const Structs::MeteredQuantityStruct::Type, 2> GetMeteredQuantityDataSample(uint8_t presetIdx)
     {
@@ -151,6 +152,7 @@ private:
     {
         mInstance = GetInstance();
         VerifyOrDieWithMsg(mInstance, AppServer, "CommodityMetering instance is null");
+        mMaximumMeteredQuantities = mInstance->GetMaximumMeteredQuantities();
         SaveMeteredQuantity(mInstance->GetMeteredQuantity());
         mMeteredQuantityTimestamp = mInstance->GetMeteredQuantityTimestamp();
         mTariffUnit               = mInstance->GetTariffUnit();
@@ -161,12 +163,14 @@ private:
         ClearMeteredQuantity();
         mMeteredQuantityTimestamp.SetNull();
         mTariffUnit.SetNull();
+        mMaximumMeteredQuantities.SetNull();
     }
 
     void RestoreAttributes() const
     {
         if (mInstance)
         {
+            mInstance->SetMaximumMeteredQuantities(mMaximumMeteredQuantities);
             mInstance->SetMeteredQuantity(mMeteredQuantity);
             mInstance->SetMeteredQuantityTimestamp(mMeteredQuantityTimestamp);
             mInstance->SetTariffUnit(mTariffUnit);
@@ -189,10 +193,12 @@ private:
            (mTariffUnit.Value() == Globals::TariffUnitEnum::kKWh) )
         {
             mTariffUnit.SetNonNull(Globals::TariffUnitEnum::kKVAh);
+            mMaximumMeteredQuantities.SetNonNull(3);
         }
         else
         {
             mTariffUnit.SetNonNull(Globals::TariffUnitEnum::kKWh);
+            mMaximumMeteredQuantities.SetNonNull(2);
         }
 
         auto MQSampleArray =
@@ -204,6 +210,7 @@ private:
         DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> nullableList;
 
         nullableList.SetNonNull(std::move(tmpList));
+        mInstance->SetMaximumMeteredQuantities(mMaximumMeteredQuantities);
         mInstance->SetMeteredQuantity(nullableList);
         mInstance->SetMeteredQuantityTimestamp(mMeteredQuantityTimestamp);
         mInstance->SetTariffUnit(mTariffUnit);
