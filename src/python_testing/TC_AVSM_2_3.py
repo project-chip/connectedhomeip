@@ -159,5 +159,6 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
 
+
 if __name__ == "__main__":
     default_matter_test_main()
