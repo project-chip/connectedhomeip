@@ -54,7 +54,7 @@
 
 // use SPI handle for EXP header (configured in project settings)
 extern SPIDRV_Handle_t sl_spidrv_exp_handle;
-static uint8_t dummy_buffer[MAX_DATA_PACKET_SIZE]   = { 0 };
+static uint8_t dummy_buffer[MAX_DATA_PACKET_SIZE]     = { 0 };
 static sl_si91x_host_init_configuration_t init_config = { 0 };
 
 uint32_t rx_ldma_channel;
