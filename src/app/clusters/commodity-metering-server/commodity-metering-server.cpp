@@ -42,6 +42,7 @@ namespace app {
 namespace Clusters {
 namespace CommodityMetering {
 
+// Some constraints for lists limitation
 constexpr uint8_t kMaxTariffComponentIDsPerMeteredQuantityEntry = 128;
 
 namespace {
@@ -176,9 +177,14 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
     {
         CleanupMeteredQuantityData(mMeteredQuantity.Value());
 
-        const size_t len = newValue.IsNull() ? 0 : newValue.Value().size();
+        const size_t len = newValue.Value().size();
 
-        if (len)
+        if (len == 0)
+        {
+            mMeteredQuantity =
+                MakeNullable(DataModel::List<Structs::MeteredQuantityStruct::Type>());
+        }
+        else
         {
             Platform::ScopedMemoryBuffer<Structs::MeteredQuantityStruct::Type> buffer;
 
