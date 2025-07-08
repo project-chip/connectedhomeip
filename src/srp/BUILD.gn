@@ -20,8 +20,8 @@ source_set("common") {
 
 source_set("client") {
   sources = [
-    "SrpClient.cpp",
-    "SrpClient.h",
+    "SRPClient.cpp",
+    "SRPClient.h",
   ]
 
   public_deps = [ ":common" ]
