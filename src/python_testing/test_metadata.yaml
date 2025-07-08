@@ -5,18 +5,18 @@ not_automated:
       reason: Code/Test not being used or not shared code for any other tests
     - name: TC_AVSMTestBase.py
       reason: Shared code for TC_AVSM, not a standalone test
-    - name: TC_AVSM_2_2.py
-      reason: Camera App does not support all features required for this TC
-    - name: TC_AVSM_2_5.py
-      reason: Camera App does not support all features required for this TC
-    - name: TC_AVSM_2_7.py
-      reason: Camera App does not support all features required for this TC
-    - name: TC_AVSM_2_8.py
-      reason: Camera App does not support all features required for this TC
-    - name: TC_AVSM_2_9.py
-      reason: Camera App does not support all features required for this TC
-    - name: TC_AVSM_2_11.py
-      reason: Camera App does not support all features required for this TC
+    - name: TC_CLCTRL_3_1.py
+      reason:
+          Closure app on the master branch does not support this test script yet
+    - name: TC_CLCTRL_4_1.py
+      reason:
+          Closure app on the master branch does not support this test script yet
+    - name: TC_CLCTRL_5_1.py
+      reason:
+          Closure app on the master branch does not support this test script yet
+    - name: TC_CLCTRL_6_1.py
+      reason:
+          Closure app on the master branch does not support this test script yet
     - name: TC_CNET_4_2.py
       reason: It has no CI execution block, it not executed in CI
     - name: TC_CNET_4_1.py
@@ -116,6 +116,21 @@ not_automated:
     - name: TC_AVSUMTestBase.py
       reason:
           Shared code for Camera AV Settings (TC_AVSUM*), not a standalone test.
+    - name: TC_CLDIM_3_1.py
+      reason:
+          Closure app on master branch does not support this test script yet.
+    - name: TC_CLDIM_3_2.py
+      reason:
+          Closure app on master branch does not support this test script yet.
+    - name: TC_CLDIM_3_3.py
+      reason:
+          Closure app on master branch does not support this test script yet.
+    - name: TC_CLDIM_4_1.py
+      reason:
+          Closure app on master branch does not support this test script yet.
+    - name: TC_CLDIM_4_2.py
+      reason:
+          Closure app on master branch does not support this test script yet.
     - name: TC_WEBRTC_1_1.py
       reason:
           Depends on Python WebRTC bindings. Will be enabled once local tests
@@ -140,6 +155,21 @@ not_automated:
       reason: Helper methods for WebRTC TCs, not a standalone test.
     - name: TC_CHIMETestBase.py
       reason: Shared code for the Chime Cluster, not a standalone test.
+    - name: TC_CLCTRL_2_1.py
+      reason:
+          Closure app on master branch does not support this test script yet.
+    - name: TC_CLCTRL_4_2.py
+      reason:
+          Closure app on master branch does not support this test script yet.
+    - name: TC_CLCTRL_4_3.py
+      reason:
+          Closure app on master branch does not support this test script yet.
+    - name: TC_CLCTRL_4_4.py
+      reason:
+          Closure app on master branch does not support this test script yet.
+    - name: TC_CLDIM_2_1.py
+      reason:
+          Closure app on master branch does not support this test script yet.
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
