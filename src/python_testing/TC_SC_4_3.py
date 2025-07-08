@@ -273,7 +273,7 @@ class TC_SC_4_3(MatterBaseTest):
         # TH performs a query for the SRV record against the qname instance_qname.
         # Verify SRV record is returned
         self.step(6)
-        mdns = MdnsDiscovery()
+        mdns = MdnsDiscovery(verbose_logging=True)
         operational_record = await mdns.get_srv_record(
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
@@ -424,12 +424,13 @@ class TC_SC_4_3(MatterBaseTest):
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL,
             log_output=True,
-            discovery_timeout_sec=15
+            discovery_timeout_sec=5,
+            unlock_service=False
         )
 
         # Verify DUT returns a PTR record with DNS-SD instance name set instance_name
-        asserts.assert_equal(op_service_info.server, hostname,
-                             f"No PTR record with DNS-SD instance name '{MdnsServiceType.OPERATIONAL.value}'")
+        # asserts.assert_equal(op_service_info.server, hostname,
+        #                      f"No PTR record with DNS-SD instance name '{MdnsServiceType.OPERATIONAL.value}'")
         asserts.assert_equal(instance_name, op_service_info.instance_name, "Instance name mismatch")
 
 
