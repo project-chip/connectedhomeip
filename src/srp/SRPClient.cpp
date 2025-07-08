@@ -15,4 +15,4 @@
  *    limitations under the License.
  */
 
-#include <srp/SrpClient.h>
+#include <srp/SRPClient.h>

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <srp/SrpCommon.h>
+#include <srp/SRPCommon.h>
 
 /**
     @brief File contains the Matter Client Implementation
