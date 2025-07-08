@@ -429,9 +429,8 @@ class TC_SC_4_3(MatterBaseTest):
         )
 
         # Verify DUT returns a PTR record with DNS-SD instance name set instance_name
-        # asserts.assert_equal(op_service_info.server, hostname,
-        #                      f"No PTR record with DNS-SD instance name '{MdnsServiceType.OPERATIONAL.value}'")
-        asserts.assert_equal(instance_name, op_service_info.instance_name, "Instance name mismatch")
+        asserts.assert_equal(instance_name, op_service_info.instance_name,
+                             f"Instance name '{instance_name}' not present in PTR record ('{op_service_info.instance_name}')")
 
 
 if __name__ == "__main__":
