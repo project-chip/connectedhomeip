@@ -220,11 +220,6 @@ class TC_G_2_3(MatterBaseTest):
         is_valid, msg = self.verify_group_membership_response(result, [kGroupId2, kGroupId3])
         asserts.assert_equal(True, is_valid, msg)
 
-
-        #kGroupId6 = 6
-        #kGroupNameGp6 = "Gp6"
-        #result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.AddGroup(kGroupId6, kGroupNameGp6))
-
         self.step("8")
         cmd = Clusters.Groups.Commands.RemoveAllGroups()
         await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveAllGroups())
@@ -236,11 +231,17 @@ class TC_G_2_3(MatterBaseTest):
         asserts.assert_equal(resp[0].Status, Status.Success, "GroupKeyMap attribute write failed")
 
         self.step("9b")
-        result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Identify.Commands.Identify(0x0078))
+        if await self.command_guard(endpoint=self.matter_test_config.endpoint, command=Clusters.Identify.Commands.Identify):
+            result = await th1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Identify.Commands.Identify(0x0078))
+        else:
+            self.mark_current_step_skipped()
 
         self.step("9c")
-        result = await self.read_single_attribute(dev_ctrl=th1, node_id=self.dut_node_id, endpoint=1, attribute=Clusters.Identify.Attributes.IdentifyTime)
-        asserts.assert_equal(result, int("0x0078", 16), "IdentifyTime attribute has a very different 0x0078 hex value")
+        if await self.attribute_guard(endpoint=self.matter_test_config.endpoint, attribute=Clusters.Identify.Attributes.IdentifyTime):
+            result = await self.read_single_attribute(dev_ctrl=th1, node_id=self.dut_node_id, endpoint=1, attribute=Clusters.Identify.Attributes.IdentifyTime)
+            asserts.assert_equal(result, int("0x0078", 16), "IdentifyTime attribute has a very different 0x0078 hex value")
+        else:
+            self.mark_current_step_skipped()
 
         self.step("10")
         kGroupId6 = 6
@@ -306,9 +307,6 @@ class TC_G_2_3(MatterBaseTest):
                     Clusters.Groups.Commands.AddGroupIfIdentifying(kGroupId, f"Gp{kGroupId}"))
         except Exception as e:
             logging.exception("Error while sending command AddGroupIfIdentify %s", e)
-
-        groupTableList: List[Clusters.GroupKeyManagement.Attributes.GroupTable] = await self.read_single_attribute(
-            dev_ctrl=th1, node_id=self.dut_node_id, endpoint=0, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
 
         self.step("16a")
         GroupKeyMapStruct = Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct
