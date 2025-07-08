@@ -22,7 +22,5 @@
  */
 
 namespace chip {
-namespace srp {
-
-} // namespace srp
+namespace srp {} // namespace srp
 } // namespace chip
