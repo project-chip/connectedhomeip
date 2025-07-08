@@ -198,6 +198,8 @@ class TestTarget(Enum):
     MWO = auto()
     RVC = auto()
     NETWORK_MANAGER = auto()
+    ENERGY_GATEWAY = auto()
+    ENERGY_MANAGEMENT = auto()
 
 
 @dataclass
@@ -216,13 +218,16 @@ class ApplicationPaths:
     chip_tool_with_python_cmd: typing.List[str]
     rvc_app: typing.List[str]
     network_manager_app: typing.List[str]
+    energy_gateway_app: typing.List[str]
+    energy_management_app: typing.List[str]
 
     def items(self):
         return [self.chip_tool, self.all_clusters_app, self.lock_app,
                 self.fabric_bridge_app, self.ota_provider_app, self.ota_requestor_app,
                 self.tv_app, self.bridge_app, self.lit_icd_app,
                 self.microwave_oven_app, self.chip_repl_yaml_tester_cmd,
-                self.chip_tool_with_python_cmd, self.rvc_app, self.network_manager_app]
+                self.chip_tool_with_python_cmd, self.rvc_app, self.network_manager_app,
+                self.energy_gateway_app, self.energy_management_app]
 
     def items_with_key(self):
         """
@@ -252,6 +257,8 @@ class ApplicationPaths:
             ),
             (self.rvc_app, "chip-rvc-app"),
             (self.network_manager_app, "matter-network-manager-app"),
+            (self.energy_gateway_app, "chip-energy-gateway-app"),
+            (self.energy_management_app, "chip-energy-management-app"),
         ]
 
 
@@ -372,6 +379,10 @@ class TestDefinition:
                 target_app = paths.rvc_app
             elif self.target == TestTarget.NETWORK_MANAGER:
                 target_app = paths.network_manager_app
+            elif self.target == TestTarget.ENERGY_GATEWAY:
+                target_app = paths.energy_gateway_app
+            elif self.target == TestTarget.ENERGY_MANAGEMENT:
+                target_app = paths.energy_management_app
             else:
                 raise Exception("Unknown test target - "
                                 "don't know which application to run")
