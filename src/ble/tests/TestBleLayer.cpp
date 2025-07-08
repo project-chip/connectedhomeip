@@ -426,7 +426,7 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNotInitialized)
 
 TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoConnectionDelegate)
 {
-    // Set up the BleLayerTestAccess accessor class to manipulate the BleConnectionDelegate of BLeLayer
+    // Set up the BleLayerTestAccess accessor class to manipulate the BleConnectionDelegate of BleLayer
     chip::Test::BleLayerTestAccess access(this);
     access.SetConnectionDelegate(nullptr);
 
