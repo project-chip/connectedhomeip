@@ -371,6 +371,7 @@ class HostBuilder(GnBuilder):
                  chip_casting_simplified: Optional[bool] = None,
                  disable_shell=False,
                  use_googletest=False,
+                 enable_webrtc=False,
                  terms_and_conditions_required: Optional[bool] = None, chip_enable_nfc_based_commissioning=None,
                  ):
         super(HostBuilder, self).__init__(
@@ -505,6 +506,9 @@ class HostBuilder(GnBuilder):
 
         if chip_casting_simplified is not None:
             self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')
+
+        if enable_webrtc:
+            self.extra_gn_options.append('chip_support_webrtc_python_bindings=true')
 
         if terms_and_conditions_required is not None:
             if terms_and_conditions_required:

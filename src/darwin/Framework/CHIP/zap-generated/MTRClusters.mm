@@ -11973,9 +11973,9 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeClosureDimensionID) attributeID:@(MTRAttributeIDTypeClusterClosureDimensionAttributeCurrentStateID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeTargetWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeTargetStateWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeClosureDimensionID) attributeID:@(MTRAttributeIDTypeClusterClosureDimensionAttributeTargetID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeClosureDimensionID) attributeID:@(MTRAttributeIDTypeClusterClosureDimensionAttributeTargetStateID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeResolutionWithParams:(MTRReadParams * _Nullable)params
@@ -12021,6 +12021,11 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeModulationTypeWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeClosureDimensionID) attributeID:@(MTRAttributeIDTypeClusterClosureDimensionAttributeModulationTypeID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeLatchControlModesWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeClosureDimensionID) attributeID:@(MTRAttributeIDTypeClusterClosureDimensionAttributeLatchControlModesID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -12515,6 +12520,60 @@ using chip::System::Clock::Timeout;
     auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
 
     using RequestType = Thermostat::Commands::SetActivePresetRequest::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:nil
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)addThermostatSuggestionWithParams:(MTRThermostatClusterAddThermostatSuggestionParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(void (^)(MTRThermostatClusterAddThermostatSuggestionResponseParams * _Nullable data, NSError * _Nullable error))completion
+{
+    if (params == nil) {
+        params = [[MTRThermostatClusterAddThermostatSuggestionParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(response, error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Thermostat::Commands::AddThermostatSuggestion::Type;
+    [self.device _invokeKnownCommandWithEndpointID:self.endpointID
+                                         clusterID:@(RequestType::GetClusterId())
+                                         commandID:@(RequestType::GetCommandId())
+                                    commandPayload:params
+                                    expectedValues:expectedValues
+                             expectedValueInterval:expectedValueIntervalMs
+                                timedInvokeTimeout:timedInvokeTimeoutMs
+                       serverSideProcessingTimeout:params.serverSideProcessingTimeout
+                                     responseClass:MTRThermostatClusterAddThermostatSuggestionResponseParams.class
+                                             queue:self.callbackQueue
+                                        completion:responseHandler];
+}
+
+- (void)removeThermostatSuggestionWithParams:(MTRThermostatClusterRemoveThermostatSuggestionParams *)params expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueIntervalMs completion:(MTRStatusCompletion)completion
+{
+    if (params == nil) {
+        params = [[MTRThermostatClusterRemoveThermostatSuggestionParams
+            alloc] init];
+    }
+
+    auto responseHandler = ^(id _Nullable response, NSError * _Nullable error) {
+        completion(error);
+    };
+
+    auto * timedInvokeTimeoutMs = params.timedInvokeTimeoutMs;
+
+    using RequestType = Thermostat::Commands::RemoveThermostatSuggestion::Type;
     [self.device _invokeKnownCommandWithEndpointID:self.endpointID
                                          clusterID:@(RequestType::GetClusterId())
                                          commandID:@(RequestType::GetCommandId())
@@ -13172,6 +13231,26 @@ using chip::System::Clock::Timeout;
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeSetpointHoldExpiryTimestampWithParams:(MTRReadParams * _Nullable)params
 {
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeSetpointHoldExpiryTimestampID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeMaxThermostatSuggestionsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeMaxThermostatSuggestionsID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeThermostatSuggestionsWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeThermostatSuggestionsID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeCurrentThermostatSuggestionWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeCurrentThermostatSuggestionID) params:params];
+}
+
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeThermostatSuggestionNotFollowingReasonWithParams:(MTRReadParams * _Nullable)params
+{
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeThermostatID) attributeID:@(MTRAttributeIDTypeClusterThermostatAttributeThermostatSuggestionNotFollowingReasonID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
@@ -22484,9 +22563,9 @@ using chip::System::Clock::Timeout;
     return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityMeteringID) attributeID:@(MTRAttributeIDTypeClusterCommodityMeteringAttributeMeteredQuantityTimestampID) params:params];
 }
 
-- (NSDictionary<NSString *, id> * _Nullable)readAttributeMeasurementTypeWithParams:(MTRReadParams * _Nullable)params
+- (NSDictionary<NSString *, id> * _Nullable)readAttributeTariffUnitWithParams:(MTRReadParams * _Nullable)params
 {
-    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityMeteringID) attributeID:@(MTRAttributeIDTypeClusterCommodityMeteringAttributeMeasurementTypeID) params:params];
+    return [self.device readAttributeWithEndpointID:self.endpointID clusterID:@(MTRClusterIDTypeCommodityMeteringID) attributeID:@(MTRAttributeIDTypeClusterCommodityMeteringAttributeTariffUnitID) params:params];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeGeneratedCommandListWithParams:(MTRReadParams * _Nullable)params
