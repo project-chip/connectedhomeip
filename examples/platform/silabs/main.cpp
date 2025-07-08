@@ -17,6 +17,7 @@
  *    limitations under the License.
  */
 
+#include "sl_component_catalog.h"
 // Use sl_system for projects upgraded to 2025.6, identified by the presence of SL_CATALOG_CUSTOM_MAIN_PRESENT
 #if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
 #include "sl_system_init.h"
