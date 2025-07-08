@@ -287,10 +287,10 @@ class MdnsDiscovery:
                 return None
 
     async def get_txt_record(self, service_name: str,
-                            service_type: str = None,
-                            discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
-                            log_output: bool = False
-                            ) -> Optional[MdnsServiceInfo]:
+                             service_type: str = None,
+                             discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
+                             log_output: bool = False
+                             ) -> Optional[MdnsServiceInfo]:
 
         async with AsyncZeroconf() as azc:
             mdns_service_info = None
