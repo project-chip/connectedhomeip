@@ -37,11 +37,17 @@
 import logging
 
 import chip.clusters as Clusters
+from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
 from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
                                          default_matter_test_main)
 from mobly import asserts
+
+triggerProtected = 0x0104000000000001
+triggerDisengaged = 0x0104000000000002
+triggerSetupRequired = 0x0104000000000003
+triggerClear = 0x0104000000000004
 
 
 def main_state_matcher(main_state: Clusters.ClosureControl.Enums.MainStateEnum) -> AttributeMatcher:
@@ -87,7 +93,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             TestStep("3a", "If the LT feature is not supported on the cluster, skip steps 3a to 3j."),
             TestStep("3b", "If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState.Latch attribute."),
             TestStep("3c", "If the attribute is supported on the cluster, TH reads from the DUT the LatchControlModes attribute."),
-            TestStep("3d", "If CurrentLatch = True, skip steps 3e to 3j."),
+            TestStep("3d", "If CurrentLatch = True, skip steps 3e to 3i."),
             TestStep("3e", "If LatchControlModes Bit 0 = 0 (RemoteLatching = False), skip step 3f."),
             TestStep("3f", "TH sends command MoveTo with Latch = True."),
             TestStep("3g", "If LatchControlModes Bit 0 = 1 (RemoteLatching = True), skip step 3h."),
@@ -158,24 +164,19 @@ class TC_CLCTRL_5_1(MatterBaseTest):
 
         feature_map = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.FeatureMap)
         logging.info(f"FeatureMap: {feature_map}")
-        is_is_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kInstantaneous
-        is_ps_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPositioning
-        is_cl_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kCalibration
-        is_lt_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
-        is_pt_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kProtection
-        is_mo_feature_supported = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kManuallyOperable
+        is_is_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kInstantaneous
+        is_ps_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kPositioning
+        is_cl_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kCalibration
+        is_lt_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kMotionLatching
+        is_pt_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kProtection
+        is_mo_feature_supported: bool = feature_map & Clusters.ClosureControl.Bitmaps.Feature.kManuallyOperable
 
         # STEP 2b: If the IS feature is supported on the cluster, skip remaining steps and end test case.
         self.step("2b")
 
         if is_is_feature_supported:
             logging.info("Instantaneous feature is supported, skipping test case")
-
-            # Skipping all remainig steps
-            for step in self.get_test_steps(self.current_test_info.name)[self.current_step_index:]:
-                self.step(step.test_plan_number)
-                logging.info("Test step skipped")
-
+            self.mark_all_remaining_steps_skipped("2c")
             return
 
         # STEP 2c: TH reads TestEventTrigger attribute from the General Diagnostic Cluster
@@ -208,9 +209,8 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             if attributes.OverallCurrentState.attribute_id in attribute_list:
                 overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
                 logging.info(f"OverallCurrentState: {overall_current_state}")
-                if overall_current_state is None:
-                    logging.error("OverallCurrentState is None")
-                    asserts.assert_true(False, "OverallCurrentState is None.")
+                if overall_current_state is NullValue:
+                    asserts.assert_true(False, "OverallCurrentState is NullValue.")
 
                 CurrentLatch = overall_current_state.latch
                 asserts.assert_in(CurrentLatch, [True, False], "OverallCurrentState.latch is not in the expected range")
@@ -223,8 +223,8 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             if attributes.LatchControlModes.attribute_id in attribute_list:
                 LatchControlModes = await self.read_clctrl_attribute_expect_success(endpoint, attributes.LatchControlModes)
                 logging.info(f"LatchControlModes: {LatchControlModes}")
-                if LatchControlModes is None:
-                    logging.error("LatchControlModes is None")
+                if LatchControlModes is NullValue:
+                    asserts.assert_true(False, "LatchControlModes is NullValue.")
             else:
                 asserts.assert_true(False, "LatchControlModes attribute is not supported.")
 
@@ -235,19 +235,32 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                 logging.info("CurrentLatch is True, skipping steps 3e to 3i")
 
                 # Skipping steps 3e to 3i
-                self.skip_step("3e")
-                self.skip_step("3f")
-                self.skip_step("3g")
-                self.skip_step("3h")
-                self.skip_step("3i")
+                self.mark_step_range_skipped("3e", "3i")
             else:
                 logging.info("CurrentLatch is False, proceeding to steps 3e to 3i")
+                sub_handler.reset()
 
                 # STEP 3e: If LatchControlModes Bit 0 = 0 (RemoteLatching = False), skip step 3f
                 self.step("3e")
-                if (int(bin(LatchControlModes), 2) & 1) == 1:
-                    logging.info("RemoteLatching is True, proceeding to step 3f")
 
+                if not LatchControlModes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
+                    logging.info("LatchControlModes Bit 0 is 0 (RemoteLatching = False), skipping step 3f")
+                    self.skip_step("3f")
+
+                    # STEP 3g: If LatchControlModes Bit 0 = 1 (RemoteLatching = True), skip step 3h
+                    self.step("3g")
+
+                    logging.info("RemoteLatching is False, proceeding to step 3h")
+
+                    # STEP 3h: Latch the DUT manually to set OverallCurrentState.Latch to True
+                    self.step("3h")
+
+                    logging.info("Latch the DUT manually to set OverallCurrentState.Latch to True")
+                    # Simulating manual latching by waiting for user input
+                    self.wait_for_user_input(promt_msg="Press Enter after latching the DUT...")
+                    logging.info("Manual latching completed.")
+                else:
+                    logging.info("LatchControlModes Bit 0 is 1 (RemoteLatching = True), proceeding to step 3f")
                     # STEP 3f: TH sends command MoveTo with Latch = True
                     self.step("3f")
 
@@ -261,20 +274,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                         pass
                     self.step("3g")
                     self.skip_step("3h")
-                elif (int(bin(LatchControlModes), 2) & 1) == 0:
-                    self.skip_step("3f")
-                    # STEP 3g: If LatchControlModes Bit 0 = 1 (RemoteLatching = True), skip step 3h
-                    self.step("3g")
-
-                    logging.info("RemoteLatching is False, proceeding to step 3h")
-
-                    # STEP 3h: Latch the DUT manually to set OverallCurrentState.Latch to True
-                    self.step("3h")
-
-                    logging.info("Latch the DUT manually to set OverallCurrentState.Latch to True")
-                    # Simulating manual latching by waiting for user input
-                    input("Press Enter after latching the DUT...")
-                    logging.info("Manual latching completed.")
 
                 # STEP 3i: Wait until TH receives a subscription report with OverallCurrentState.Latch = True
                 self.step("3i")
@@ -298,15 +297,8 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             logging.info("Motion Latching feature not supported, skipping steps 3b to 3j")
 
             # Skipping steps 3b to 3j
-            self.skip_step("3b")
-            self.skip_step("3c")
-            self.skip_step("3d")
-            self.skip_step("3e")
-            self.skip_step("3f")
-            self.skip_step("3g")
-            self.skip_step("3h")
-            self.skip_step("3i")
-            self.skip_step("3j")
+            self.mark_step_range_skipped("3b", "3j")
+
         # STEP 4a: If the LT feature is not supported on the cluster, skip steps 4b to 4i.
         self.step("4a")
 
@@ -314,21 +306,29 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             logging.info("Motion Latching feature not supported, skipping steps 4b to 4i")
 
             # Skipping steps 4b to 4i
-            self.skip_step("4b")
-            self.skip_step("4c")
-            self.skip_step("4d")
-            self.skip_step("4e")
-            self.skip_step("4f")
-            self.skip_step("4g")
-            self.skip_step("4h")
-            self.skip_step("4i")
+            self.mark_step_range_skipped("4b", "4i")
         else:
 
             # STEP 4b: If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip steps 4c to 4f
             self.step("4b")
 
-            if (int(bin(LatchControlModes), 2) & (1 << 1)) == 2:
-                logging.info("RemoteUnlatching is True, proceeding steps 4c to 4f")
+            if not LatchControlModes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteUnlatching:
+                logging.info("LatchControlModes Bit 1 is 0 (RemoteUnlatching = False), skipping steps 4c to 4f")
+                self.mark_step_range_skipped("4c", "4f")
+                # STEP 4g: If LatchControlModes Bit 1 = 1 (RemoteUnlatching = True), skip step 4h
+                self.step("4g")
+
+                logging.info("RemoteUnlatching is False, proceeding to step 4h")
+
+                # STEP 4h: Unlatch the DUT manually to set OverallCurrentState.Latch to False
+                self.step("4h")
+
+                logging.info("Unlatch the DUT manually to set OverallCurrentState.Latch to False")
+                # Simulating manual unlatching by waiting for user input
+                self.wait_for_user_input(promt_msg="Press Enter after unlatching the DUT...")
+                logging.info("Manual unlatching completed.")
+            else:
+                logging.info("LatchControlModes Bit 1 is 1 (RemoteUnlatching = True), proceeding to steps 4c to 4f")
 
                 # STEP 4c: TH sends command MoveTo with Latch = False
                 self.step("4c")
@@ -358,9 +358,8 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                 if attributes.OverallCurrentState.attribute_id in attribute_list:
                     overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
                     logging.info(f"OverallCurrentState: {overall_current_state}")
-                    if overall_current_state is None:
-                        logging.error("OverallCurrentState is None")
-                        asserts.assert_true(False, "OverallCurrentState is None.")
+                    if overall_current_state is NullValue:
+                        asserts.assert_true(False, "OverallCurrentState is NullValue.")
 
                     asserts.assert_true(overall_current_state.latch, "OverallCurrentState.latch is not True")
                 else:
@@ -380,24 +379,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
 
                 self.step("4g")
                 self.skip_step("4h")
-            elif (int(bin(LatchControlModes), 2) & (1 << 1)) == 0:
-                self.skip_step("4c")
-                self.skip_step("4d")
-                self.skip_step("4e")
-                self.skip_step("4f")
-
-                # STEP 4g: If LatchControlModes Bit 1 = 1 (RemoteUnlatching = True), skip step 4h
-                self.step("4g")
-
-                logging.info("RemoteUnlatching is False, proceeding to step 4h")
-
-                # STEP 4h: Unlatch the DUT manually to set OverallCurrentState.Latch to False
-                self.step("4h")
-
-                logging.info("Unlatch the DUT manually to set OverallCurrentState.Latch to False")
-                # Simulating manual unlatching by waiting for user input
-                input("Press Enter after unlatching the DUT...")
-                logging.info("Manual unlatching completed.")
 
             # STEP 4i: Wait until TH receives a subscription report with OverallCurrentState.Latch = False
             self.step("4i")
@@ -413,10 +394,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             logging.info("Positioning Latching feature not supported, skipping steps 5b to 5e")
 
             # Skipping steps 5b to 5e
-            self.skip_step("5b")
-            self.skip_step("5c")
-            self.skip_step("5d")
-            self.skip_step("5e")
+            self.mark_step_range_skipped("5b", "5e")
         else:
             # STEP 5b: If the attribute is supported on the cluster. TH reads from the DUT the OverallCurrentState attribute.
             self.step("5b")
@@ -424,9 +402,8 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             if attributes.OverallCurrentState.attribute_id in attribute_list:
                 overall_current_state = await self.read_clctrl_attribute_expect_success(endpoint, attributes.OverallCurrentState)
                 logging.info(f"OverallCurrentState: {overall_current_state}")
-                if overall_current_state is None:
-                    logging.error("OverallCurrentState is None")
-                    asserts.assert_true(False, "OverallCurrentState is None.")
+                if overall_current_state is NullValue:
+                    asserts.assert_true(False, "OverallCurrentState is NullValue.")
 
                 CurrentPosition = overall_current_state.position
                 asserts.assert_in(CurrentPosition, Clusters.ClosureControl.Enums.CurrentPositionEnum,
@@ -471,10 +448,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             logging.info("Positioning Latching feature not supported, skipping steps 6b to 6e")
 
             # Skipping steps 6b to 6e
-            self.skip_step("6b")
-            self.skip_step("6c")
-            self.skip_step("6d")
-            self.skip_step("6e")
+            self.mark_step_range_skipped("6b", "6e")
         else:
             # STEP 6b: TH sends command MoveTo to DUT, with Position = MoveToFullyOpen
             self.step("6b")
@@ -524,10 +498,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             logging.info("Calibration Latching feature not supported, skipping steps 7b to 7e")
 
             # Skipping steps 7b to 7e
-            self.skip_step("7b")
-            self.skip_step("7c")
-            self.skip_step("7d")
-            self.skip_step("7e")
+            self.mark_step_range_skipped("7b", "7e")
         else:
             # STEP 7b: TH sends command Calibrate to DUT
             self.step("7b")
@@ -572,7 +543,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
         self.step("8a")
 
         try:
-            await self.send_test_event_triggers(eventTrigger=0x0104000000000003)  # SetupRequired
+            await self.send_test_event_triggers(eventTrigger=triggerSetupRequired)  # SetupRequired
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
@@ -611,16 +582,13 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             logging.info("Protected feature not supported, skipping steps 9b to 9e")
 
             # Skipping steps 9b to 9e
-            self.skip_step("9b")
-            self.skip_step("9c")
-            self.skip_step("9d")
-            self.skip_step("9e")
+            self.mark_step_range_skipped("9b", "9e")
         else:
             # STEP 9b: TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Protected Test Event
             self.step("9b")
 
             try:
-                await self.send_test_event_triggers(eventTrigger=0x0104000000000001)  # Protected
+                await self.send_test_event_triggers(eventTrigger=triggerProtected)  # Protected
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
@@ -659,16 +627,13 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             logging.info("Manual Operable feature not supported, skipping steps 10b to 10e")
 
             # Skipping steps 10b to 10e
-            self.skip_step("10b")
-            self.skip_step("10c")
-            self.skip_step("10d")
-            self.skip_step("10e")
+            self.mark_step_range_skipped("10b", "10e")
         else:
             # STEP 10b: TH sends TestEventTrigger command to General Diagnostic Cluster on Endpoint 0 with EnableKey field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.CLCTRL.TEST_EVENT_TRIGGER for MainState is Disengaged Test Event
             self.step("10b")
 
             try:
-                await self.send_test_event_triggers(eventTrigger=0x0104000000000002)  # Disengaged
+                await self.send_test_event_triggers(eventTrigger=triggerDisengaged)  # Disengaged
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
@@ -704,7 +669,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
         self.step("11")
 
         try:
-            await self.send_test_event_triggers(eventTrigger=0x0104000000000004)  # Test Event Clear
+            await self.send_test_event_triggers(eventTrigger=triggerClear)  # Test Event Clear
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
