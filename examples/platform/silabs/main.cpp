@@ -17,7 +17,12 @@
  *    limitations under the License.
  */
 
+// Use sl_system for projects upgraded to 2025.6, identified by the presence of SL_CATALOG_CUSTOM_MAIN_PRESENT
+#if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
+#include "sl_system_init.h"
+#else
 #include "sl_main_init.h"
+#endif
 #include <MatterConfig.h>
 
 // This is a User definable function in sl_main context, called by sl_main_init before the kernel is started
@@ -31,3 +36,12 @@ void app_init(void)
     // task(s).
     SilabsMatterConfig::AppInit();
 }
+
+#if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
+int main(void)
+{
+    app_init_early();
+    sl_system_init();
+    app_init();
+}
+#endif

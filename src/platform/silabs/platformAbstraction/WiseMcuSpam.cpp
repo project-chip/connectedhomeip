@@ -152,6 +152,12 @@ CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
     return CHIP_NO_ERROR;
 }
 #endif // ENABLE_WSTK_LEDS
+#if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
+void SilabsPlatform::StartScheduler()
+{
+    vTaskStartScheduler();
+}
+#endif // SL_CATALOG_CUSTOM_MAIN_PRESENT
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
 bool SilabsPlatform::GetRGBLedState(uint8_t led)
