@@ -2517,7 +2517,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         return self._caIndex
 
     @property
-    def fabricAdmin(self) -> typing.Optional[FabricAdmin.FabricAdmin]:
+    def fabricAdmin(self) -> FabricAdmin.FabricAdmin:
         return self._fabricAdmin
 
     async def Commission(self, nodeid) -> int:
