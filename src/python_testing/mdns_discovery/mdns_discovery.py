@@ -15,21 +15,21 @@
 #    limitations under the License.
 #
 
-from functools import partial
 import json
 import logging
 from asyncio import Event, TimeoutError, ensure_future, sleep, wait_for
 from dataclasses import asdict
 from enum import Enum
+from functools import partial
 from typing import Dict, List, Optional
 
 from mdns_discovery.data_clases.mdns_service_info import MdnsServiceInfo
-from mdns_discovery.data_clases.quada_record import QuadaRecord
 from mdns_discovery.data_clases.ptr_record import PtrRecord
+from mdns_discovery.data_clases.quada_record import QuadaRecord
 from mdns_discovery.mdns_async_service_info import AddressResolverIPv6, MdnsAsyncServiceInfo
 from zeroconf import IPVersion, ServiceListener, ServiceStateChange, Zeroconf
 from zeroconf.asyncio import AsyncServiceBrowser, AsyncServiceInfo, AsyncZeroconf, AsyncZeroconfServiceTypes
-from zeroconf.const import _TYPE_SRV, _TYPE_TXT, _TYPE_A, _TYPE_AAAA
+from zeroconf.const import _TYPE_A, _TYPE_AAAA, _TYPE_SRV, _TYPE_TXT
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +66,7 @@ class MdnsDiscovery:
 
     DISCOVERY_TIMEOUT_SEC = 15
 
-    ip_version=IPVersion.V6Only
+    ip_version = IPVersion.V6Only
 
     def __init__(self, verbose_logging: bool = False):
         """
@@ -287,10 +287,10 @@ class MdnsDiscovery:
                 return None
 
     async def get_txt_record(self, service_name: str,
-                              service_type: str = None,
-                              discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
-                              log_output: bool = False
-                              ) -> Optional[MdnsServiceInfo]:
+                            service_type: str = None,
+                            discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
+                            log_output: bool = False
+                            ) -> Optional[MdnsServiceInfo]:
 
         async with AsyncZeroconf() as azc:
             mdns_service_info = None
@@ -411,7 +411,7 @@ class MdnsDiscovery:
 
         await self._discover(
             discovery_timeout_sec=discovery_timeout_sec,
-            log_output = log_output,
+            log_output=log_output,
             unlock_service=unlock_service,
         )
 
