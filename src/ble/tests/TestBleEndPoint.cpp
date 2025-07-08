@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <type_traits>
 #include <utility>
 
 #include <pw_unit_test/framework.h>
@@ -20,12 +21,21 @@ namespace Ble {
 
 DLL_EXPORT BleLayerDelegate * mBleTransport = nullptr;
 
-static uint8_t dummyConnObjs[256];
 static unsigned int gConnCounter = 0;
+template <typename T>
+static inline typename std::enable_if<std::is_integral<T>::value, T>::type MakeConnObj(unsigned int n)
+{
+    return static_cast<T>(n);
+}
+template <typename T>
+static inline typename std::enable_if<std::is_pointer<T>::value, T>::type MakeConnObj(unsigned int n)
+{
+    return reinterpret_cast<T>(static_cast<uintptr_t>(n));
+}
 
 static BLE_CONNECTION_OBJECT NextConnectionObject()
 {
-    return reinterpret_cast<BLE_CONNECTION_OBJECT>(&dummyConnObjs[(++gConnCounter) % 256]);
+    return MakeConnObj<BLE_CONNECTION_OBJECT>(++gConnCounter);
 }
 
 /* Test fixture for testing BLEEndPoint behavior */
