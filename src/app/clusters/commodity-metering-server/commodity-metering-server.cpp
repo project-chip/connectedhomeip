@@ -106,6 +106,29 @@ struct SpanCopier
 };
 } // namespace
 
+static void CleanUpIDs(DataModel::List<const uint32_t> & IDs)
+{
+    if (!IDs.empty() && IDs.data())
+    {
+        Platform::MemoryFree(const_cast<uint32_t *>(IDs.data()));
+        IDs = DataModel::List<const uint32_t>();
+    }
+}
+
+static void CleanupMeteredQuantityData(DataModel::List<Structs::MeteredQuantityStruct::Type> & aValue)
+{
+    if (aValue.data() != nullptr)
+    {
+        for (auto & item : aValue)
+        {
+            CleanUpIDs(item.tariffComponentIDs);
+        }
+
+        Platform::MemoryFree(aValue.data());
+        aValue = DataModel::List<Structs::MeteredQuantityStruct::Type>();
+    }
+}
+
 Instance::~Instance()
 {
     if (!mMeteredQuantity.IsNull())
@@ -139,29 +162,6 @@ static CHIP_ERROR CopyMeteredQuantityEntry(const Structs::MeteredQuantityStruct:
     }
 
     return CHIP_NO_ERROR;
-}
-
-static void CleanUpIDs(DataModel::List<const uint32_t> & IDs)
-{
-    if (!IDs.empty() && IDs.data())
-    {
-        Platform::MemoryFree(const_cast<uint32_t *>(IDs.data()));
-        IDs = DataModel::List<const uint32_t>();
-    }
-}
-
-static void CleanupMeteredQuantityData(DataModel::List<Structs::MeteredQuantityStruct::Type> & aValue)
-{
-    if (aValue.data() != nullptr)
-    {
-        for (auto & item : aValue)
-        {
-            CleanUpIDs(item.tariffComponentIDs);
-        }
-
-        Platform::MemoryFree(aValue.data());
-        aValue = DataModel::List<Structs::MeteredQuantityStruct::Type>();
-    }
 }
 
 CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> & newValue)
@@ -207,7 +207,7 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
             }
 
             mMeteredQuantity = MakeNullable(DataModel::List<Structs::MeteredQuantityStruct::Type>(buffer.Get(), len));
-            buffer.Release();
+            (void)buffer.Release();
         }
     }
 
