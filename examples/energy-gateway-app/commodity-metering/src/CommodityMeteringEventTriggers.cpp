@@ -189,8 +189,7 @@ private:
 
         mMeteredQuantityTimestamp.SetNonNull(matterEpoch);
 
-        if ( mTariffUnit.IsNull() ||
-           (mTariffUnit.Value() == Globals::TariffUnitEnum::kKWh) )
+        if (mTariffUnit.IsNull() || (mTariffUnit.Value() == Globals::TariffUnitEnum::kKWh))
         {
             mTariffUnit.SetNonNull(Globals::TariffUnitEnum::kKVAh);
             mMaximumMeteredQuantities.SetNonNull(3);
