@@ -98,7 +98,7 @@ using Nullable = DataModel::Nullable<T>;
  *
  * Code at time of setting new value has:
  *
- *     uint8_t newValue = driver.GetNewValueData();
+ *     uint8_t newValue = driver.GetNewValue();
  *     auto now = SystemClock().GetMonotonicTimestamp();
  *     if (mAttrib.SetValue(newValue, now) == AttributeDirtyState::kMustReport)
  *     {
