@@ -40,8 +40,8 @@ import tempfile
 from configparser import ConfigParser
 
 import chip.clusters as Clusters
-from chip.interaction_model import InteractionModelError
 from chip import CertificateAuthority
+from chip.interaction_model import InteractionModelError
 from chip.storage import PersistentStorage
 from chip.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
