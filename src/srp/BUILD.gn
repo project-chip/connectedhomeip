@@ -15,7 +15,7 @@
 import("args.gni")
 
 source_set("common") {
-  sources = [ "SrpCommon.h" ]
+  sources = [ "SRPCommon.h" ]
 }
 
 source_set("client") {
