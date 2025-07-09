@@ -15152,7 +15152,7 @@ class ChipClusters:
                 "writable": True,
             },
             0x000000FE: {
-                "attributeName": "UnsupportedAttributeRequiringAdminNotInZAP",
+                "attributeName": "UnsupportedAttributeRequiringAdminPrivilege",
                 "attributeId": 0x000000FE,
                 "type": "bool",
                 "reportable": True,

@@ -65709,7 +65709,7 @@ public class ChipClusters {
     private static final long CLUSTER_ERROR_BOOLEAN_ATTRIBUTE_ID = 50L;
     private static final long GLOBAL_ENUM_ATTRIBUTE_ID = 51L;
     private static final long GLOBAL_STRUCT_ATTRIBUTE_ID = 52L;
-    private static final long UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_NOT_IN_ZAP_ATTRIBUTE_ID = 254L;
+    private static final long UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_PRIVILEGE_ATTRIBUTE_ID = 254L;
     private static final long UNSUPPORTED_ATTRIBUTE_ID = 255L;
     private static final long READ_FAILURE_CODE_ATTRIBUTE_ID = 12288L;
     private static final long FAILURE_INT32_U_ATTRIBUTE_ID = 12289L;
@@ -68846,9 +68846,9 @@ public class ChipClusters {
         }, GLOBAL_STRUCT_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readUnsupportedAttributeRequiringAdminNotInZAPAttribute(
+    public void readUnsupportedAttributeRequiringAdminPrivilegeAttribute(
         BooleanAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_NOT_IN_ZAP_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_PRIVILEGE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -68856,21 +68856,21 @@ public class ChipClusters {
             Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_NOT_IN_ZAP_ATTRIBUTE_ID, true);
+        }, UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_PRIVILEGE_ATTRIBUTE_ID, true);
     }
 
-    public void writeUnsupportedAttributeRequiringAdminNotInZAPAttribute(DefaultClusterCallback callback, Boolean value) {
-      writeUnsupportedAttributeRequiringAdminNotInZAPAttribute(callback, value, 0);
+    public void writeUnsupportedAttributeRequiringAdminPrivilegeAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeUnsupportedAttributeRequiringAdminPrivilegeAttribute(callback, value, 0);
     }
 
-    public void writeUnsupportedAttributeRequiringAdminNotInZAPAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+    public void writeUnsupportedAttributeRequiringAdminPrivilegeAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new BooleanType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_NOT_IN_ZAP_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_PRIVILEGE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
-    public void subscribeUnsupportedAttributeRequiringAdminNotInZAPAttribute(
+    public void subscribeUnsupportedAttributeRequiringAdminPrivilegeAttribute(
         BooleanAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_NOT_IN_ZAP_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_PRIVILEGE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -68878,7 +68878,7 @@ public class ChipClusters {
             Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_NOT_IN_ZAP_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_PRIVILEGE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readUnsupportedAttribute(

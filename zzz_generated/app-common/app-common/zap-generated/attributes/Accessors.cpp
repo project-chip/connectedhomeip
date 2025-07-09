@@ -40563,7 +40563,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
 
 } // namespace GlobalEnum
 
-namespace UnsupportedAttributeRequiringAdminNotInZAP {
+namespace UnsupportedAttributeRequiringAdminPrivilege {
 
 Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value)
 {
@@ -40608,7 +40608,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value)
     return emberAfWriteAttribute(endpoint, Clusters::UnitTesting::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
-} // namespace UnsupportedAttributeRequiringAdminNotInZAP
+} // namespace UnsupportedAttributeRequiringAdminPrivilege
 
 namespace Unsupported {
 

@@ -17505,7 +17505,7 @@ private:
 | * ClusterErrorBoolean                                               | 0x0032 |
 | * GlobalEnum                                                        | 0x0033 |
 | * GlobalStruct                                                      | 0x0034 |
-| * UnsupportedAttributeRequiringAdminNotInZAP                        | 0x00FE |
+| * UnsupportedAttributeRequiringAdminPrivilege                       | 0x00FE |
 | * Unsupported                                                       | 0x00FF |
 | * ReadFailureCode                                                   | 0x3000 |
 | * FailureInt32U                                                     | 0x3001 |
@@ -31189,8 +31189,8 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
         make_unique<ReadAttribute>(Id, "cluster-error-boolean", Attributes::ClusterErrorBoolean::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "global-enum", Attributes::GlobalEnum::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "global-struct", Attributes::GlobalStruct::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "unsupported-attribute-requiring-admin-not-in-zap",
-                                   Attributes::UnsupportedAttributeRequiringAdminNotInZAP::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "unsupported-attribute-requiring-admin-privilege",
+                                   Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id, credsIssuerConfig),      //
         make_unique<ReadAttribute>(Id, "unsupported", Attributes::Unsupported::Id, credsIssuerConfig),                   //
         make_unique<ReadAttribute>(Id, "read-failure-code", Attributes::ReadFailureCode::Id, credsIssuerConfig),         //
         make_unique<ReadAttribute>(Id, "failure-int32u", Attributes::FailureInt32U::Id, credsIssuerConfig),              //
@@ -31345,8 +31345,8 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
             Id, "global-enum", 0, UINT8_MAX, Attributes::GlobalEnum::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::Clusters::Globals::Structs::TestGlobalStruct::Type>>(
             Id, "global-struct", Attributes::GlobalStruct::Id, WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<bool>>(Id, "unsupported-attribute-requiring-admin-not-in-zap", 0, 1,
-                                          Attributes::UnsupportedAttributeRequiringAdminNotInZAP::Id, WriteCommandType::kWrite,
+        make_unique<WriteAttribute<bool>>(Id, "unsupported-attribute-requiring-admin-privilege", 0, 1,
+                                          Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "unsupported", 0, 1, Attributes::Unsupported::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig), //
@@ -31516,8 +31516,8 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
         make_unique<SubscribeAttribute>(Id, "cluster-error-boolean", Attributes::ClusterErrorBoolean::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "global-enum", Attributes::GlobalEnum::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "global-struct", Attributes::GlobalStruct::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "unsupported-attribute-requiring-admin-not-in-zap",
-                                        Attributes::UnsupportedAttributeRequiringAdminNotInZAP::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "unsupported-attribute-requiring-admin-privilege",
+                                        Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id, credsIssuerConfig),      //
         make_unique<SubscribeAttribute>(Id, "unsupported", Attributes::Unsupported::Id, credsIssuerConfig),                   //
         make_unique<SubscribeAttribute>(Id, "read-failure-code", Attributes::ReadFailureCode::Id, credsIssuerConfig),         //
         make_unique<SubscribeAttribute>(Id, "failure-int32u", Attributes::FailureInt32U::Id, credsIssuerConfig),              //

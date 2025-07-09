@@ -52927,7 +52927,7 @@ class UnitTesting(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterErrorBoolean", Tag=0x00000032, Type=bool),
                 ClusterObjectFieldDescriptor(Label="globalEnum", Tag=0x00000033, Type=Globals.Enums.TestGlobalEnum),
                 ClusterObjectFieldDescriptor(Label="globalStruct", Tag=0x00000034, Type=Globals.Structs.TestGlobalStruct),
-                ClusterObjectFieldDescriptor(Label="unsupportedAttributeRequiringAdminNotInZAP", Tag=0x000000FE, Type=typing.Optional[bool]),
+                ClusterObjectFieldDescriptor(Label="unsupportedAttributeRequiringAdminPrivilege", Tag=0x000000FE, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="unsupported", Tag=0x000000FF, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="readFailureCode", Tag=0x00003000, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="failureInt32U", Tag=0x00003001, Type=typing.Optional[uint]),
@@ -53024,7 +53024,7 @@ class UnitTesting(Cluster):
     clusterErrorBoolean: bool = False
     globalEnum: Globals.Enums.TestGlobalEnum = 0
     globalStruct: Globals.Structs.TestGlobalStruct = field(default_factory=lambda: Globals.Structs.TestGlobalStruct())
-    unsupportedAttributeRequiringAdminNotInZAP: typing.Optional[bool] = None
+    unsupportedAttributeRequiringAdminPrivilege: typing.Optional[bool] = None
     unsupported: typing.Optional[bool] = None
     readFailureCode: typing.Optional[uint] = None
     failureInt32U: typing.Optional[uint] = None
@@ -54874,7 +54874,7 @@ class UnitTesting(Cluster):
             value: Globals.Structs.TestGlobalStruct = field(default_factory=lambda: Globals.Structs.TestGlobalStruct())
 
         @dataclass
-        class UnsupportedAttributeRequiringAdminNotInZAP(ClusterAttributeDescriptor):
+        class UnsupportedAttributeRequiringAdminPrivilege(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0xFFF1FC05

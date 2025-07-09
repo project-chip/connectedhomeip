@@ -52986,8 +52986,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::UnsupportedAttributeRequiringAdminNotInZAP::Id: {
-            using TypeInfo = Attributes::UnsupportedAttributeRequiringAdminNotInZAP::TypeInfo;
+        case Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id: {
+            using TypeInfo = Attributes::UnsupportedAttributeRequiringAdminPrivilege::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

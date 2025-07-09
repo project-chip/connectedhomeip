@@ -19824,17 +19824,17 @@ public class ClusterReadMapping {
           readUnitTestingGlobalEnumCommandParams
         );
         result.put("readGlobalEnumAttribute", readUnitTestingGlobalEnumAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readUnitTestingUnsupportedAttributeRequiringAdminNotInZAPCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readUnitTestingUnsupportedAttributeRequiringAdminNotInZAPAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readUnitTestingUnsupportedAttributeRequiringAdminPrivilegeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readUnitTestingUnsupportedAttributeRequiringAdminPrivilegeAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.UnitTestingCluster) cluster).readUnsupportedAttributeRequiringAdminNotInZAPAttribute(
+            ((ChipClusters.UnitTestingCluster) cluster).readUnsupportedAttributeRequiringAdminPrivilegeAttribute(
               (ChipClusters.BooleanAttributeCallback) callback
             );
           },
           () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
-          readUnitTestingUnsupportedAttributeRequiringAdminNotInZAPCommandParams
+          readUnitTestingUnsupportedAttributeRequiringAdminPrivilegeCommandParams
         );
-        result.put("readUnsupportedAttributeRequiringAdminNotInZAPAttribute", readUnitTestingUnsupportedAttributeRequiringAdminNotInZAPAttributeInteractionInfo);
+        result.put("readUnsupportedAttributeRequiringAdminPrivilegeAttribute", readUnitTestingUnsupportedAttributeRequiringAdminPrivilegeAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readUnitTestingUnsupportedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readUnitTestingUnsupportedAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

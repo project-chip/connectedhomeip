@@ -9217,8 +9217,8 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"GlobalStruct";
             break;
 
-        case MTRAttributeIDTypeClusterUnitTestingAttributeUnsupportedAttributeRequiringAdminNotInZAPID:
-            result = @"UnsupportedAttributeRequiringAdminNotInZAP";
+        case MTRAttributeIDTypeClusterUnitTestingAttributeUnsupportedAttributeRequiringAdminPrivilegeID:
+            result = @"UnsupportedAttributeRequiringAdminPrivilege";
             break;
 
         case MTRAttributeIDTypeClusterUnitTestingAttributeUnsupportedID:

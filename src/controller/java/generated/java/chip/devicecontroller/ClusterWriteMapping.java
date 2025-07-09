@@ -4525,28 +4525,28 @@ public class ClusterWriteMapping {
       writeUnitTestingGlobalEnumCommandParams
     );
     writeUnitTestingInteractionInfo.put("writeGlobalEnumAttribute", writeUnitTestingGlobalEnumAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writeUnitTestingUnsupportedAttributeRequiringAdminNotInZAPCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo unitTestingunsupportedAttributeRequiringAdminNotInZAPCommandParameterInfo =
+    Map<String, CommandParameterInfo> writeUnitTestingUnsupportedAttributeRequiringAdminPrivilegeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo unitTestingunsupportedAttributeRequiringAdminPrivilegeCommandParameterInfo =
         new CommandParameterInfo(
             "value", 
             Boolean.class, 
             Boolean.class 
         );
-    writeUnitTestingUnsupportedAttributeRequiringAdminNotInZAPCommandParams.put(
+    writeUnitTestingUnsupportedAttributeRequiringAdminPrivilegeCommandParams.put(
         "value",
-        unitTestingunsupportedAttributeRequiringAdminNotInZAPCommandParameterInfo
+        unitTestingunsupportedAttributeRequiringAdminPrivilegeCommandParameterInfo
     );
-    InteractionInfo writeUnitTestingUnsupportedAttributeRequiringAdminNotInZAPAttributeInteractionInfo = new InteractionInfo(
+    InteractionInfo writeUnitTestingUnsupportedAttributeRequiringAdminPrivilegeAttributeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.UnitTestingCluster) cluster).writeUnsupportedAttributeRequiringAdminNotInZAPAttribute(
+        ((ChipClusters.UnitTestingCluster) cluster).writeUnsupportedAttributeRequiringAdminPrivilegeAttribute(
           (DefaultClusterCallback) callback,
           (Boolean) commandArguments.get("value")
         );
       },
       () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeUnitTestingUnsupportedAttributeRequiringAdminNotInZAPCommandParams
+      writeUnitTestingUnsupportedAttributeRequiringAdminPrivilegeCommandParams
     );
-    writeUnitTestingInteractionInfo.put("writeUnsupportedAttributeRequiringAdminNotInZAPAttribute", writeUnitTestingUnsupportedAttributeRequiringAdminNotInZAPAttributeInteractionInfo);
+    writeUnitTestingInteractionInfo.put("writeUnsupportedAttributeRequiringAdminPrivilegeAttribute", writeUnitTestingUnsupportedAttributeRequiringAdminPrivilegeAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeUnitTestingUnsupportedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo unitTestingunsupportedCommandParameterInfo =
         new CommandParameterInfo(

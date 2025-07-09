@@ -8656,7 +8656,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     }
   }
 
-  suspend fun readUnsupportedAttributeRequiringAdminNotInZAPAttribute(): Boolean? {
+  suspend fun readUnsupportedAttributeRequiringAdminPrivilegeAttribute(): Boolean? {
     val ATTRIBUTE_ID: UInt = 254u
 
     val attributePath =
@@ -8679,7 +8679,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
       }
 
     requireNotNull(attributeData) {
-      "Unsupportedattributerequiringadminnotinzap attribute not found in response"
+      "Unsupportedattributerequiringadminprivilege attribute not found in response"
     }
 
     // Decode the TLV data into the appropriate type
@@ -8694,7 +8694,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     return decodedValue
   }
 
-  suspend fun writeUnsupportedAttributeRequiringAdminNotInZAPAttribute(
+  suspend fun writeUnsupportedAttributeRequiringAdminPrivilegeAttribute(
     value: Boolean,
     timedWriteTimeout: Duration? = null,
   ) {
@@ -8737,7 +8737,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
     }
   }
 
-  suspend fun subscribeUnsupportedAttributeRequiringAdminNotInZAPAttribute(
+  suspend fun subscribeUnsupportedAttributeRequiringAdminPrivilegeAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
@@ -8773,7 +8773,7 @@ class UnitTestingCluster(private val controller: MatterController, private val e
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Unsupportedattributerequiringadminnotinzap attribute not found in Node State update"
+            "Unsupportedattributerequiringadminprivilege attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type

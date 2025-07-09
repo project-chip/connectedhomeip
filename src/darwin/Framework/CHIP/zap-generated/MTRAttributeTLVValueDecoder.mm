@@ -21816,8 +21816,8 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
         }
         return value;
     }
-    case Attributes::UnsupportedAttributeRequiringAdminNotInZAP::Id: {
-        using TypeInfo = Attributes::UnsupportedAttributeRequiringAdminNotInZAP::TypeInfo;
+    case Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id: {
+        using TypeInfo = Attributes::UnsupportedAttributeRequiringAdminPrivilege::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {

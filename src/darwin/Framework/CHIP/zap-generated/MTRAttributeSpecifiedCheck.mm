@@ -6731,7 +6731,7 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
     case Attributes::GlobalStruct::Id: {
         return YES;
     }
-    case Attributes::UnsupportedAttributeRequiringAdminNotInZAP::Id: {
+    case Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id: {
         return YES;
     }
     case Attributes::Unsupported::Id: {
