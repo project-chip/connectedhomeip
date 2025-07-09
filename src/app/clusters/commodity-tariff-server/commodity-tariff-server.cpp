@@ -614,7 +614,7 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
     // Only for test purposes
     if (mServerTariffAttrsCtx.mForwardAlarmTriggerTime)
     {
-        timestampNow                                  = mServerTariffAttrsCtx.mForwardAlarmTriggerTime;
+        timestampNow                                   = mServerTariffAttrsCtx.mForwardAlarmTriggerTime;
         mServerTariffAttrsCtx.mForwardAlarmTriggerTime = 0;
     }
 

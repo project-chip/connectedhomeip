@@ -19,7 +19,7 @@
 #pragma once
 
 #include <cstddef>
-#include <cstdint> 
+#include <cstdint>
 namespace CommodityTariffConsts {
 static constexpr size_t kDefaultStringValuesMaxBufLength = 128u;
 static constexpr size_t kDefaultListAttrMaxLength        = 128u;
