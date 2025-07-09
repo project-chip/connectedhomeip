@@ -51,7 +51,8 @@ jobs:
         run: |
           ./scripts/run_in_python_env.sh out/venv "mypy \
             --config-file=src/python_testing/matter_testing_infrastructure/mypy.ini \
-            src/controller/python/chip/ChipDeviceCtrl.py" | grep 'ChipDeviceCtrl.py'
+            --strict \
+            src/controller/python/chip/ChipDeviceCtrl.py"
       
       - name: Run mypy validation
         run: |
