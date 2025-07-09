@@ -25,10 +25,9 @@ from chip.testing.matter_testing import MatterBaseTest
 from chip.testing.problem_notices import AttributePathLocation, CommandPathLocation, ProblemLocation
 from chip.testing.runner import default_matter_test_main
 from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types
+from DeviceConformanceTests import DeviceConformanceTests
 from fake_device_builder import create_minimal_cluster, create_minimal_dt
 from mobly import asserts
-
-from DeviceConformanceTests import DeviceConformanceTests
 
 
 def create_onoff_endpoint(endpoint: int) -> dict[int, dict[int, dict[int, Any]]]:
