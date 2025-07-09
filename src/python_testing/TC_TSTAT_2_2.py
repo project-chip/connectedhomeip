@@ -36,7 +36,6 @@
 
 import logging
 import time
-
 from typing import Optional
 
 import chip.clusters as Clusters
