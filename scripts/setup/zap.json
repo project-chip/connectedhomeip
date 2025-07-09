@@ -6,6 +6,7 @@
                 "linux-amd64",
                 "linux-arm64",
                 "mac-amd64",
+                "mac-arm64",
                 "windows-amd64"
             ],
             "tags": ["version:2@v2025.05.14.1"]
