@@ -650,7 +650,7 @@ CHIP_ERROR ThermostatAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INCORRECT_STATE, ChipLogError(Zcl, "Delegate is null"));
 
         return aEncoder.EncodeList([delegate](const auto & encoder) -> CHIP_ERROR {
-            for (uint8_t i = 0; true; i++)
+for (size_t i = 0; true; i++)
             {
                 ThermostatSuggestionStructWithOwnedMembers thermostatSuggestion;
                 auto err = delegate->GetThermostatSuggestionAtIndex(i, thermostatSuggestion);
