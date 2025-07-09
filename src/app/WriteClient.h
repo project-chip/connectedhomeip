@@ -253,7 +253,7 @@ public:
 
     enum class TestListEncodingOverride
     {
-        kNotApplicable,
+        kNoOverride,
         kForceLegacyEncoding
     };
 
@@ -268,7 +268,7 @@ public:
      * support legacy WriteClients
      */
     CHIP_ERROR PutPreencodedAttribute(const ConcreteDataAttributePath & attributePath, const TLV::TLVReader & data,
-                                      TestListEncodingOverride encodingBehavior = TestListEncodingOverride::kNotApplicable);
+                                      TestListEncodingOverride encodingBehavior = TestListEncodingOverride::kNoOverride);
 
     /**
      *  Once SendWriteRequest returns successfully, the WriteClient will

@@ -380,7 +380,7 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
         }
 
         auto listEncodingOverride = forceLegacyListEncoding ? WriteClient::TestListEncodingOverride::kForceLegacyEncoding
-                                                            : WriteClient::TestListEncodingOverride::kNotApplicable;
+                                                            : WriteClient::TestListEncodingOverride::kNoOverride;
 
         SuccessOrExit(err = client->PutPreencodedAttribute(
                           chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion),
