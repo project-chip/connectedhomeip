@@ -1411,8 +1411,8 @@ def json_named_arg(s: str) -> Tuple[str, object]:
 
 
 def bool_named_arg(s: str) -> Tuple[str, bool]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false|True|False|TRUE|FALSE)|(?P<decimal_value>[01]))$"
-    match = re.match(regex, s)
+    regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
+    match = re.match(regex, s, re.IGNORECASE)
     if not match:
         raise ValueError("Invalid bool argument format, does not match %s" % regex)
 
