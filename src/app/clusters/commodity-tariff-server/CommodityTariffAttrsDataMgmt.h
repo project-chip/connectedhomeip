@@ -693,7 +693,7 @@ public:
         }
         else
         {
-            ChipLogError(NotSpecified, "The value if attr %d is not valid!", mAttrId);
+            ChipLogError(NotSpecified, "The value of attr %d is not valid!", mAttrId);
         }
 
         return err;

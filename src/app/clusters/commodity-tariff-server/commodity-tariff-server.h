@@ -182,8 +182,8 @@ struct TariffUpdateCtx
     std::unordered_set<uint32_t> CalendarPeriodsDayPatternIDs; /* IDs mentioned in CalendarPeriods items */
 
     BitMask<Feature> mFeature;
-    EndpointId aEndpoint;
-    bool AnyHasChanged = false;
+    EndpointId mEndpoint;
+    bool mAnyHasChanged = false;
 };
 
 /**
@@ -222,7 +222,7 @@ public:
      */
     void TariffDataUpdate()
     {
-        TariffUpdateCtx UpdCtx = { .mFeature = mFeature, .aEndpoint = mEndpointId };
+        TariffUpdateCtx UpdCtx = { .mFeature = mFeature, .mEndpoint = mEndpointId };
 
         if (!TariffDataUpd_Init(UpdCtx))
         {
@@ -236,7 +236,7 @@ public:
         {
             TariffDataUpd_Commit();
 
-            if (UpdCtx.AnyHasChanged)
+            if (UpdCtx.mAnyHasChanged)
             {
                 ChipLogProgress(NotSpecified, "EGW-CTC: Tariff data applied");
 
@@ -288,8 +288,8 @@ private:
     {
         TariffUpdateCtx * UpdCtx = (TariffUpdateCtx *) CbCtx;
         ChipLogProgress(NotSpecified, "EGW-CTC: The value for attribute (Id %d) updated", aAttrId);
-        MatterReportingAttributeChangeCallback(UpdCtx->aEndpoint, CommodityTariff::Id, aAttrId);
-        UpdCtx->AnyHasChanged = true;
+        MatterReportingAttributeChangeCallback(UpdCtx->mEndpoint, CommodityTariff::Id, aAttrId);
+        UpdCtx->mAnyHasChanged = true;
     }
 
     // Primary attrs update pipeline methods
@@ -336,7 +336,7 @@ struct CurrentTariffAttrsCtx
     std::map<uint32_t, const Structs::DayEntryStruct::Type *> DayEntriesMap;
     std::map<uint32_t, const Structs::TariffComponentStruct::Type *> TariffComponentsMap;
 
-    uint32_t forwardAlarmTriggerTime;
+    uint32_t mForwardAlarmTriggerTime;
 };
 
 /**
@@ -377,7 +377,11 @@ public:
 
     void TariffComponentUpd_AttrChangeCb(uint32_t aAttrId, void * CbCtx);
 
-    void SetupTestTimeShiftInterval(uint32_t time);
+    /**
+     * @brief Passes the specified time offset value to the context variable that is used to override the real-time stamp.
+     * In depends on the time shift value may triggered DaysUpdating or DayEntryUpdating event handling.
+     */
+    void SetupTimeShiftOffset(uint32_t offset);
 
 private:
     enum class UpdateEventCode

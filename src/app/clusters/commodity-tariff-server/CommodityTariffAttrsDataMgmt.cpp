@@ -355,7 +355,6 @@ bool DayPatternsDataClass::CompareStructValue(const PayloadType & source, const 
     }
 
     return (source.dayEntryIDs != destination.dayEntryIDs);
-    ;
 }
 
 void DayPatternsDataClass::CleanupStructValue(PayloadType & aValue)
@@ -565,10 +564,6 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
         }
     }
 
-    /*if (entryNewValue.predicted.HasValue())
-    {
-
-    }*/
     return CHIP_NO_ERROR;
 }
 } // namespace TariffComponentsDataClass_Utils

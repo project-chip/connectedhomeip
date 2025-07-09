@@ -612,10 +612,10 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
     ChipLogProgress(NotSpecified, "EGW-CTC: UpdateEventCode: %x", static_cast<std::underlying_type_t<UpdateEventCode>>(aEvt));
 
     // Only for test purposes
-    if (mServerTariffAttrsCtx.forwardAlarmTriggerTime)
+    if (mServerTariffAttrsCtx.mForwardAlarmTriggerTime)
     {
-        timestampNow                                  = mServerTariffAttrsCtx.forwardAlarmTriggerTime;
-        mServerTariffAttrsCtx.forwardAlarmTriggerTime = 0;
+        timestampNow                                  = mServerTariffAttrsCtx.mForwardAlarmTriggerTime;
+        mServerTariffAttrsCtx.mForwardAlarmTriggerTime = 0;
     }
 
     if (mServerTariffAttrsCtx.mTariffProvider == nullptr && aEvt != UpdateEventCode::TariffUpdated)
@@ -812,16 +812,16 @@ void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEnt
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-/*
- * Schedules an update after specified delay and determines event type
- * (day change or entry update) based on whether it crosses midnight
+/**
+ * @brief Passes the specified time offset value to the context variable that is used to override the real-time stamp.
+ * In depens on the time shift value may triggered DaysUpdating or DayEntryUpdating event handling.
  */
-void Instance::SetupTestTimeShiftInterval(uint32_t delay)
+void Instance::SetupTimeShiftOffset(uint32_t offset)
 {
-    mServerTariffAttrsCtx.forwardAlarmTriggerTime = delay;
+    mServerTariffAttrsCtx.mForwardAlarmTriggerTime = offset;
 
     // Determine if this update crosses day boundary
-    const bool crossesMidnight      = (mServerTariffAttrsCtx.forwardAlarmTriggerTime) % kSecondsPerDay == 0;
+    const bool crossesMidnight      = (mServerTariffAttrsCtx.mForwardAlarmTriggerTime) % kSecondsPerDay == 0;
     const UpdateEventCode eventType = crossesMidnight ? UpdateEventCode::DaysUpdating : UpdateEventCode::DayEntryUpdating;
 
     UpdateCurrentAttrs(eventType);
