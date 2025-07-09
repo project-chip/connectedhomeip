@@ -188,7 +188,7 @@ static bool IsTimeExpired(const DataModel::Nullable<uint32_t> & timeValue, uint3
 /**
  * @brief    Helper function to handle timer expiration when in enabled state
  *
- * @param matterEpoch Current time in Matter epoch seconds
+ * @param matterEpochSeconds Current time in Matter epoch seconds
  * This function is called when the EVSE is in an enabled state
  * (either charging or discharging) and the timer expires.
  * It checks if the charging or discharging enabled times have expired
@@ -197,14 +197,14 @@ static bool IsTimeExpired(const DataModel::Nullable<uint32_t> & timeValue, uint3
  * If only one has expired, it updates the state to the other enabled state.
  * If both are still valid, it does nothing.
  */
-void EnergyEvseDelegate::HandleEnabledStateExpiration(uint32_t matterEpoch)
+void EnergyEvseDelegate::HandleEnabledStateExpiration(uint32_t matterEpochSeconds)
 {
 
     DataModel::Nullable<uint32_t> chargingEnabledUntil    = GetChargingEnabledUntil();
     DataModel::Nullable<uint32_t> dischargingEnabledUntil = GetDischargingEnabledUntil();
 
-    bool chargingExpired    = IsTimeExpired(chargingEnabledUntil, matterEpoch);
-    bool dischargingExpired = IsTimeExpired(dischargingEnabledUntil, matterEpoch);
+    bool chargingExpired    = IsTimeExpired(chargingEnabledUntil, matterEpochSeconds);
+    bool dischargingExpired = IsTimeExpired(dischargingEnabledUntil, matterEpochSeconds);
 
     if (chargingExpired)
     {
@@ -275,7 +275,7 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
         break;
     case SupplyStateEnum::kEnabled:
         // For enabled state, use the earliest of charging or discharging timeout
-        enabledUntilTime = getEarliestTime(GetChargingEnabledUntil(), GetDischargingEnabledUntil());
+        enabledUntilTime = GetEarliestTime(GetChargingEnabledUntil(), GetDischargingEnabledUntil());
         break;
     default:
         // In all other states the EVSE is disabled, no timer needed
@@ -288,8 +288,8 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
         return Status::Success;
     }
 
-    uint32_t matterEpoch = 0;
-    CHIP_ERROR err       = System::Clock::GetClock_MatterEpochS(matterEpoch);
+    uint32_t matterEpochSeconds = 0;
+    CHIP_ERROR err              = System::Clock::GetClock_MatterEpochS(matterEpochSeconds);
     if (err == CHIP_ERROR_REAL_TIME_NOT_SYNCED)
     {
         // Real time isn't sync'd - check again in 30 seconds
@@ -303,11 +303,11 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
         return Status::Failure; // Can't get time, skip scheduling
     }
 
-    if (enabledUntilTime.Value() > matterEpoch)
+    if (enabledUntilTime.Value() > matterEpochSeconds)
     {
         // Timer hasn't expired yet - schedule future check
-        uint32_t delta = enabledUntilTime.Value() - matterEpoch;
-        ChipLogDetail(AppServer, "Setting EVSE Enable check timer for %lu seconds", static_cast<unsigned long >(delta));
+        uint32_t delta = enabledUntilTime.Value() - matterEpochSeconds;
+        ChipLogDetail(AppServer, "Setting EVSE Enable check timer for %lu seconds", static_cast<unsigned long>(delta));
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(delta), EvseCheckTimerExpiry, this);
         return Status::Success;
     }
@@ -321,7 +321,7 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
     }
     else if (mSupplyState == SupplyStateEnum::kEnabled)
     {
-        HandleEnabledStateExpiration(matterEpoch);
+        HandleEnabledStateExpiration(matterEpochSeconds);
         // Call ourselves again now that one of our 2 timers has expired
         // The other timer expiry may need to be scheduled now
         ScheduleCheckOnEnabledTimeout();
@@ -1943,8 +1943,8 @@ bool EnergyEvseDelegate::IsEvsePluggedIn()
 void EvseSession::StartSession(EndpointId endpointId, int64_t chargingMeterValue, int64_t dischargingMeterValue)
 {
     /* Get Timestamp */
-    uint32_t matterEpoch = 0;
-    CHIP_ERROR err       = System::Clock::GetClock_MatterEpochS(matterEpoch);
+    uint32_t matterEpochSeconds = 0;
+    CHIP_ERROR err              = System::Clock::GetClock_MatterEpochS(matterEpochSeconds);
     if (err != CHIP_NO_ERROR)
     {
         /* Note that the error will be also be logged inside GetErrorTS() -
@@ -1952,7 +1952,7 @@ void EvseSession::StartSession(EndpointId endpointId, int64_t chargingMeterValue
         ChipLogError(AppServer, "EVSE: Unable to get current time when starting session - err:%" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
-    mStartTime = matterEpoch;
+    mStartTime = matterEpochSeconds;
 
     mSessionEnergyChargedAtStart    = chargingMeterValue;
     mSessionEnergyDischargedAtStart = dischargingMeterValue;
@@ -2010,8 +2010,8 @@ void EvseSession::StopSession(EndpointId endpointId, int64_t chargingMeterValue,
 void EvseSession::RecalculateSessionDuration(EndpointId endpointId)
 {
     /* Get Timestamp */
-    uint32_t matterEpoch = 0;
-    CHIP_ERROR err       = System::Clock::GetClock_MatterEpochS(matterEpoch);
+    uint32_t matterEpochSeconds = 0;
+    CHIP_ERROR err              = System::Clock::GetClock_MatterEpochS(matterEpochSeconds);
     if (err != CHIP_NO_ERROR)
     {
         /* Note that the error will be also be logged inside GetErrorTS() -
@@ -2021,7 +2021,7 @@ void EvseSession::RecalculateSessionDuration(EndpointId endpointId)
         return;
     }
 
-    uint32_t duration = matterEpoch - mStartTime;
+    uint32_t duration = matterEpochSeconds - mStartTime;
     mSessionDuration  = MakeNullable(duration);
     MatterReportingAttributeChangeCallback(endpointId, EnergyEvse::Id, SessionDuration::Id);
 }
