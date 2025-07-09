@@ -49,6 +49,8 @@ _chip_build_example() {
     if [[ -z "$command" ]]; then
         case "$prev" in
             --target)
+                readarray -t COMPREPLY < <(compgen -W "$("$1" targets --format=completion "$cur")" -- "$cur")
+                compopt -o nospace
                 return
                 ;;
             --repo | --out-prefix | --pregen-dir)
