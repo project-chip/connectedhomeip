@@ -62,13 +62,13 @@ namespace {
 enum class TagCertificate : uint8_t
 {
     kCertificateId,
+    kCertificatePayload,
     kClientCertificateNextId,
     kRootCertificateNextId,
     kStoredFabricIndex,
     kRootCertMapping,
     kClientCertMapping,
-    kClientCertDetail,
-    kClientCertKey
+    kClientCertDetail
 };
 
 enum class CertificateType : uint8_t
@@ -405,12 +405,13 @@ CHIP_ERROR RootSerializer::DeserializeId(TLV::TLVReader & reader, CertificateId 
 template <>
 CHIP_ERROR RootSerializer::SerializeData(TLV::TLVWriter & writer, const CertificateTable::RootCertStruct & data)
 {
-    return data.EncodeForWrite(writer, TLV::AnonymousTag());
+    return data.EncodeForWrite(writer, TLV::ContextTag(TagCertificate::kCertificatePayload));
 }
 
 template <>
 CHIP_ERROR RootSerializer::DeserializeData(TLV::TLVReader & reader, CertificateTable::RootCertStruct & data)
 {
+    ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::ContextTag(TagCertificate::kCertificatePayload)));
     return data.Decode(reader);
 }
 
@@ -488,27 +489,21 @@ CHIP_ERROR ClientSerializer::DeserializeId(TLV::TLVReader & reader, CertificateI
 template <>
 CHIP_ERROR ClientSerializer::SerializeData(TLV::TLVWriter & writer, const CertificateTable::ClientCertWithKey & data)
 {
-    TLV::TLVType container;
-    ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(TagCertificate::kClientCertDetail), data.detail));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(TagCertificate::kClientCertKey), data.key.Span()));
-    return writer.EndContainer(container);
+    return DataModel::Encode(writer, TLV::ContextTag(TagCertificate::kCertificatePayload), data.key.Span());
 }
 
 template <>
 CHIP_ERROR ClientSerializer::DeserializeData(TLV::TLVReader & reader, CertificateTable::ClientCertWithKey & data)
 {
-    TLV::TLVType container;
-    ReturnErrorOnFailure(reader.EnterContainer(container));
     ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagCertificate::kClientCertDetail)));
     ReturnErrorOnFailure(data.detail.Decode(reader));
-    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagCertificate::kClientCertKey)));
+    ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TagCertificate::kCertificatePayload)));
     ByteSpan key;
     ReturnErrorOnFailure(reader.Get(key));
     data.key.SetLength(key.size());
     MutableByteSpan keyAsSpan(data.key.Bytes(), data.key.Length());
-    ReturnErrorOnFailure(CopySpanToMutableSpan(key, keyAsSpan));
-    return reader.ExitContainer(container);
+    return CopySpanToMutableSpan(key, keyAsSpan);
 }
 
 template <>
@@ -564,7 +559,7 @@ CHIP_ERROR CertificateTableImpl::UpsertRootCertificateEntry(FabricIndex fabric, 
         GlobalCertificateData globalData(mEndpointId);
         ReturnErrorOnFailure(globalData.Load(mStorage));
         ReturnErrorOnFailure(globalData.GetNextRootCertificateId(fabric, localId));
-        ReturnErrorOnFailure(globalData.Save());
+        ReturnErrorOnFailure(globalData.Save(mStorage));
     }
 
     CertificateId tableId(localId);
@@ -639,7 +634,7 @@ CHIP_ERROR CertificateTableImpl::PrepareClientCertificate(FabricIndex fabric, co
     // Update the next ID
     TLSCCDID localId;
     ReturnErrorOnFailure(globalData.GetNextClientCertificateId(fabric, localId));
-    ReturnErrorOnFailure(globalData.Save());
+    ReturnErrorOnFailure(globalData.Save(mStorage));
 
     ReturnErrorOnFailure(keyPair.Initialize(Crypto::ECPKeyTarget::ECDSA));
     nextAvailable->certificateId.SetValue(localId);
