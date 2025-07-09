@@ -28,8 +28,10 @@ struct AppEvent : public BaseAppEvent
         kEventType_Closure = BaseAppEvent::kEventType_Max + 1,
         kEventType_Install,
     };
+
     struct
     {
         uint8_t Action;
+        uint16_t EndpointId;
     } ClosureEvent;
 };

@@ -11300,7 +11300,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedClosureControlClusterOverallStateAttributeCallback implements ChipClusters.ClosureControlCluster.OverallStateAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedClosureControlClusterOverallCurrentStateAttributeCallback implements ChipClusters.ClosureControlCluster.OverallCurrentStateAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -11308,9 +11308,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(@Nullable ChipStructs.ClosureControlClusterOverallStateStruct value) {
+    public void onSuccess(@Nullable ChipStructs.ClosureControlClusterOverallCurrentStateStruct value) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureControlClusterOverallStateStruct");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureControlClusterOverallCurrentStateStruct");
       responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
@@ -11321,7 +11321,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedClosureControlClusterOverallTargetAttributeCallback implements ChipClusters.ClosureControlCluster.OverallTargetAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedClosureControlClusterOverallTargetStateAttributeCallback implements ChipClusters.ClosureControlCluster.OverallTargetStateAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -11329,9 +11329,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(@Nullable ChipStructs.ClosureControlClusterOverallTargetStruct value) {
+    public void onSuccess(@Nullable ChipStructs.ClosureControlClusterOverallTargetStateStruct value) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureControlClusterOverallTargetStruct");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureControlClusterOverallTargetStateStruct");
       responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
@@ -11413,9 +11413,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(@Nullable ChipStructs.ClosureDimensionClusterCurrentStateStruct value) {
+    public void onSuccess(@Nullable ChipStructs.ClosureDimensionClusterDimensionStateStruct value) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureDimensionClusterCurrentStateStruct");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureDimensionClusterDimensionStateStruct");
       responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
@@ -11426,7 +11426,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedClosureDimensionClusterTargetAttributeCallback implements ChipClusters.ClosureDimensionCluster.TargetAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedClosureDimensionClusterTargetStateAttributeCallback implements ChipClusters.ClosureDimensionCluster.TargetStateAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -11434,9 +11434,9 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(@Nullable ChipStructs.ClosureDimensionClusterTargetStruct value) {
+    public void onSuccess(@Nullable ChipStructs.ClosureDimensionClusterDimensionStateStruct value) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureDimensionClusterTargetStruct");
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ClosureDimensionClusterDimensionStateStruct");
       responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
@@ -12260,6 +12260,28 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedThermostatClusterAddThermostatSuggestionResponseCallback implements ChipClusters.ThermostatCluster.AddThermostatSuggestionResponseCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer uniqueID) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+
+      CommandResponseInfo uniqueIDResponseValue = new CommandResponseInfo("uniqueID", "Integer");
+      responseValues.put(uniqueIDResponseValue, uniqueID);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
   public static class DelegatedThermostatClusterAtomicResponseCallback implements ChipClusters.ThermostatCluster.AtomicResponseCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -12675,6 +12697,69 @@ public class ClusterInfoMapping {
     public void onSuccess(@Nullable Long value) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Long");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedThermostatClusterThermostatSuggestionsAttributeCallback implements ChipClusters.ThermostatCluster.ThermostatSuggestionsAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.ThermostatClusterThermostatSuggestionStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.ThermostatClusterThermostatSuggestionStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedThermostatClusterCurrentThermostatSuggestionAttributeCallback implements ChipClusters.ThermostatCluster.CurrentThermostatSuggestionAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable ChipStructs.ThermostatClusterThermostatSuggestionStruct value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "ChipStructs.ThermostatClusterThermostatSuggestionStruct");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedThermostatClusterThermostatSuggestionNotFollowingReasonAttributeCallback implements ChipClusters.ThermostatCluster.ThermostatSuggestionNotFollowingReasonAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
       responseValues.put(commandResponseInfo, value);
       callback.onSuccess(responseValues);
     }
@@ -17945,29 +18030,6 @@ public class ClusterInfoMapping {
       callback.onFailure(error);
     }
   }
-
-  public static class DelegatedZoneManagementClusterGetTwoDCartesianZoneResponseCallback implements ChipClusters.ZoneManagementCluster.GetTwoDCartesianZoneResponseCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(ArrayList<ChipStructs.ZoneManagementClusterTwoDCartesianZoneStruct> zones) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-
-      // zones: TwoDCartesianZoneStruct
-      // Conversion from this type to Java is not properly implemented yet
-
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception error) {
-      callback.onFailure(error);
-    }
-  }
   public static class DelegatedZoneManagementClusterZonesAttributeCallback implements ChipClusters.ZoneManagementCluster.ZonesAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -20796,7 +20858,7 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCommodityMeteringClusterMeasurementTypeAttributeCallback implements ChipClusters.CommodityMeteringCluster.MeasurementTypeAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCommodityMeteringClusterTariffUnitAttributeCallback implements ChipClusters.CommodityMeteringCluster.TariffUnitAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -27489,6 +27551,53 @@ public class ClusterInfoMapping {
     );
     thermostatClusterInteractionInfoMap.put("setActivePresetRequest", thermostatsetActivePresetRequestInteractionInfo);
 
+    Map<String, CommandParameterInfo> thermostataddThermostatSuggestionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo thermostataddThermostatSuggestionpresetHandleCommandParameterInfo = new CommandParameterInfo("presetHandle", byte[].class, byte[].class);
+    thermostataddThermostatSuggestionCommandParams.put("presetHandle",thermostataddThermostatSuggestionpresetHandleCommandParameterInfo);
+
+    CommandParameterInfo thermostataddThermostatSuggestioneffectiveTimeCommandParameterInfo = new CommandParameterInfo("effectiveTime", Long.class, Long.class);
+    thermostataddThermostatSuggestionCommandParams.put("effectiveTime",thermostataddThermostatSuggestioneffectiveTimeCommandParameterInfo);
+
+    CommandParameterInfo thermostataddThermostatSuggestionexpirationInMinutesCommandParameterInfo = new CommandParameterInfo("expirationInMinutes", Integer.class, Integer.class);
+    thermostataddThermostatSuggestionCommandParams.put("expirationInMinutes",thermostataddThermostatSuggestionexpirationInMinutesCommandParameterInfo);
+    InteractionInfo thermostataddThermostatSuggestionInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ThermostatCluster) cluster)
+          .addThermostatSuggestion((ChipClusters.ThermostatCluster.AddThermostatSuggestionResponseCallback) callback
+           , (byte[])
+             commandArguments.get("presetHandle")
+
+           , (Long)
+             commandArguments.get("effectiveTime")
+
+           , (Integer)
+             commandArguments.get("expirationInMinutes")
+
+            );
+        },
+        () -> new DelegatedThermostatClusterAddThermostatSuggestionResponseCallback(),
+        thermostataddThermostatSuggestionCommandParams
+      );
+    thermostatClusterInteractionInfoMap.put("addThermostatSuggestion", thermostataddThermostatSuggestionInteractionInfo);
+
+    Map<String, CommandParameterInfo> thermostatremoveThermostatSuggestionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo thermostatremoveThermostatSuggestionuniqueIDCommandParameterInfo = new CommandParameterInfo("uniqueID", Integer.class, Integer.class);
+    thermostatremoveThermostatSuggestionCommandParams.put("uniqueID",thermostatremoveThermostatSuggestionuniqueIDCommandParameterInfo);
+    InteractionInfo thermostatremoveThermostatSuggestionInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ThermostatCluster) cluster)
+        .removeThermostatSuggestion((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("uniqueID")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        thermostatremoveThermostatSuggestionCommandParams
+    );
+    thermostatClusterInteractionInfoMap.put("removeThermostatSuggestion", thermostatremoveThermostatSuggestionInteractionInfo);
+
     Map<String, CommandParameterInfo> thermostatatomicRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 
     CommandParameterInfo thermostatatomicRequestrequestTypeCommandParameterInfo = new CommandParameterInfo("requestType", Integer.class, Integer.class);
@@ -28371,7 +28480,7 @@ public class ClusterInfoMapping {
         , (byte[])
         commandArguments.get("activeDataset")
         , (Optional<Long>)
-        commandArguments.get("breadcrumb")
+        commandArguments.get("breadcrumb"), 10000
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -28388,7 +28497,7 @@ public class ClusterInfoMapping {
         ((ChipClusters.ThreadBorderRouterManagementCluster) cluster)
         .setPendingDatasetRequest((DefaultClusterCallback) callback
         , (byte[])
-        commandArguments.get("pendingDataset")
+        commandArguments.get("pendingDataset"), 10000
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -29442,24 +29551,6 @@ public class ClusterInfoMapping {
         zoneManagementupdateTwoDCartesianZoneCommandParams
     );
     zoneManagementClusterInteractionInfoMap.put("updateTwoDCartesianZone", zoneManagementupdateTwoDCartesianZoneInteractionInfo);
-
-    Map<String, CommandParameterInfo> zoneManagementgetTwoDCartesianZoneCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-
-    CommandParameterInfo zoneManagementgetTwoDCartesianZonezoneIDCommandParameterInfo = new CommandParameterInfo("zoneID", Optional.class, Integer.class);
-    zoneManagementgetTwoDCartesianZoneCommandParams.put("zoneID",zoneManagementgetTwoDCartesianZonezoneIDCommandParameterInfo);
-    InteractionInfo zoneManagementgetTwoDCartesianZoneInteractionInfo = new InteractionInfo(
-      (cluster, callback, commandArguments) -> {
-        ((ChipClusters.ZoneManagementCluster) cluster)
-          .getTwoDCartesianZone((ChipClusters.ZoneManagementCluster.GetTwoDCartesianZoneResponseCallback) callback
-           , (Optional<Integer>)
-             commandArguments.get("zoneID")
-
-            );
-        },
-        () -> new DelegatedZoneManagementClusterGetTwoDCartesianZoneResponseCallback(),
-        zoneManagementgetTwoDCartesianZoneCommandParams
-      );
-    zoneManagementClusterInteractionInfoMap.put("getTwoDCartesianZone", zoneManagementgetTwoDCartesianZoneInteractionInfo);
 
     Map<String, CommandParameterInfo> zoneManagementremoveZoneCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
 

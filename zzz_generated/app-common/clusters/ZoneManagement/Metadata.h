@@ -61,10 +61,6 @@ namespace UpdateTwoDCartesianZone {
 inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(UpdateTwoDCartesianZone::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
 } // namespace UpdateTwoDCartesianZone
-namespace GetTwoDCartesianZone {
-inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(GetTwoDCartesianZone::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
-} // namespace GetTwoDCartesianZone
 namespace RemoveZone {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(RemoveZone::Id, BitFlags<DataModel::CommandQualityFlags>(),
                                                                 Access::Privilege::kManage);

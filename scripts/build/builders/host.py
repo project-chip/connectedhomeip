@@ -91,6 +91,8 @@ class HostApp(Enum):
     TERMS_AND_CONDITIONS = auto()
     CAMERA = auto()
     CAMERA_CONTROLLER = auto()
+    JF_CONTROL = auto()
+    JF_ADMIN = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -173,6 +175,10 @@ class HostApp(Enum):
             return 'camera-app/linux'
         elif self == HostApp.CAMERA_CONTROLLER:
             return 'camera-controller'
+        elif self == HostApp.JF_CONTROL:
+            return 'jf-control-app'
+        elif self == HostApp.JF_ADMIN:
+            return 'jf-admin-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -303,6 +309,10 @@ class HostApp(Enum):
         elif self == HostApp.CAMERA_CONTROLLER:
             yield 'chip-camera-controller'
             yield 'chip-camera-controller.map'
+        elif self == HostApp.JF_CONTROL:
+            yield 'jfc-app'
+        elif self == HostApp.JF_ADMIN:
+            yield 'jfa-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -361,6 +371,7 @@ class HostBuilder(GnBuilder):
                  chip_casting_simplified: Optional[bool] = None,
                  disable_shell=False,
                  use_googletest=False,
+                 enable_webrtc=False,
                  terms_and_conditions_required: Optional[bool] = None, chip_enable_nfc_based_commissioning=None,
                  ):
         super(HostBuilder, self).__init__(
@@ -495,6 +506,9 @@ class HostBuilder(GnBuilder):
 
         if chip_casting_simplified is not None:
             self.extra_gn_options.append(f'chip_casting_simplified={str(chip_casting_simplified).lower()}')
+
+        if enable_webrtc:
+            self.extra_gn_options.append('chip_support_webrtc_python_bindings=true')
 
         if terms_and_conditions_required is not None:
             if terms_and_conditions_required:
