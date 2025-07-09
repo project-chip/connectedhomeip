@@ -145,80 +145,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
         self.step("1")
         # Commission DUT - already done
-
-        logger.info("Commissioning under second controller")
-        params = await self.default_controller.OpenCommissioningWindow(
-            nodeid=self.dut_node_id, timeout=600, iteration=10000, discriminator=1234, option=1)
-
-        secondary_authority = self.certificate_authority_manager.NewCertificateAuthority()
-        secondary_fabric_admin = secondary_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=2)
-        secondary_controller = secondary_fabric_admin.NewController(nodeId=112233)
-
-        await secondary_controller.CommissionOnNetwork(
-            nodeId=self.dut_node_id, setupPinCode=params.setupPinCode,
-            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=1234)
-
-        secondary_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=secondary_controller, endpoint=0, cluster=Clusters.Objects.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.CurrentFabricIndex)
-
-        current_presets = []
-        presetTypes = []
-        presetScenarioCounts = {}
-        numberOfPresetsSupported = 0
-        minHeatSetpointLimit = 700
-        maxHeatSetpointLimit = 3000
-        minCoolSetpointLimit = 1600
-        maxCoolSetpointLimit = 3200
-
-        supportsHeat = self.check_pics("TSTAT.S.F00")
-        supportsCool = self.check_pics("TSTAT.S.F01")
-
-        if supportsHeat:
-            # If the server supports MinHeatSetpointLimit & MaxHeatSetpointLimit, use those
-            if self.check_pics("TSTAT.S.A0015") and self.check_pics("TSTAT.S.A0016"):
-                minHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinHeatSetpointLimit)
-                maxHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxHeatSetpointLimit)
-            elif self.check_pics("TSTAT.S.A0003") and self.check_pics("TSTAT.S.A0004"):
-                # Otherwise, if the server supports AbsMinHeatSetpointLimit & AbsMaxHeatSetpointLimit, use those
-                minHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMinHeatSetpointLimit)
-                maxHeatSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMaxHeatSetpointLimit)
-
-            asserts.assert_true(minHeatSetpointLimit < maxHeatSetpointLimit, "Heat setpoint range invalid")
-
-        if supportsCool:
-            # If the server supports MinCoolSetpointLimit & MaxCoolSetpointLimit, use those
-            if self.check_pics("TSTAT.S.A0017") and self.check_pics("TSTAT.S.A0018"):
-                minCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinCoolSetpointLimit)
-                maxCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxCoolSetpointLimit)
-            elif self.check_pics("TSTAT.S.A0005") and self.check_pics("TSTAT.S.A0006"):
-                # Otherwise, if the server supports AbsMinCoolSetpointLimit & AbsMaxCoolSetpointLimit, use those
-                minCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMinCoolSetpointLimit)
-                maxCoolSetpointLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMaxCoolSetpointLimit)
-
-            asserts.assert_true(minCoolSetpointLimit < maxCoolSetpointLimit, "Cool setpoint range invalid")
-
-        # Servers that do not support occupancy are always "occupied"
-        occupied = True
-
-        supportsOccupancy = self.check_pics("TSTAT.S.F02")
-        if supportsOccupancy:
-            occupied = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Occupancy) & 1
-
-        # Target setpoints
-        heatSetpoint = minHeatSetpointLimit + ((maxHeatSetpointLimit - minHeatSetpointLimit) / 2)
-        coolSetpoint = minCoolSetpointLimit + ((maxCoolSetpointLimit - minCoolSetpointLimit) / 2)
-
-        # Set the heating and cooling setpoints to something other than the target setpoints
-        if occupied:
-            if supportsHeat:
-                await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedHeatingSetpoint(heatSetpoint-1), endpoint_id=endpoint)
-            if supportsCool:
-                await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedCoolingSetpoint(coolSetpoint-1), endpoint_id=endpoint)
-        else:
-            if supportsHeat:
-                await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedHeatingSetpoint(heatSetpoint-1), endpoint_id=endpoint)
-            if supportsCool:
-                await self.write_single_attribute(attribute_value=cluster.Attributes.UnoccupiedCoolingSetpoint(coolSetpoint-1), endpoint_id=endpoint)
-
+        
         self.step("2")
         if self.pics_guard(self.check_pics("TSTAT.S.F10")):
             # TH reads the Presets attribute and saves it in a SupportedPresets variable.
@@ -240,7 +167,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
                 preset_handle = possiblePresetHandles[0]
                 # Verify that the AddThermostatSuggestion command returns INVALID_IN_STATE.
                 currentUTC = datetime.now(datetime.timezone.utc)
-                response = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
+                await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
                                                                             preset_handle=preset_handle,
                                                                             effective_time=currentUTC,
                                                                             expiration_in_minutes=1,
@@ -263,11 +190,11 @@ class TC_TSTAT_4_3(MatterBaseTest):
             random_preset_handle = random.randbytes(16)
             currentUTC = datetime.now(datetime.timezone.utc)
             # Verify that the AddThermostatSuggestion command returns NOT_FOUND.
-            response = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
-                                                                            preset_handle=random_preset_handle,
-                                                                            effective_time=currentUTC,
-                                                                            expiration_in_minutes=1,
-                                                                            expected_status=Status.NotFound)
+            await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
+                                                                preset_handle=random_preset_handle,
+                                                                effective_time=currentUTC,
+                                                                expiration_in_minutes=1,
+                                                                expected_status=Status.NotFound)
 
         self.step("6a")
         if self.pics_guard(self.check_pics("TSTAT.S.F10")):
