@@ -2728,6 +2728,7 @@ endpoint 1 {
     ram      attribute minSetpointDeadBand default = 0x19;
     ram      attribute controlSequenceOfOperation default = 0x04;
     persist  attribute systemMode default = 0x01;
+    ram      attribute thermostatRunningMode default = 0;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
