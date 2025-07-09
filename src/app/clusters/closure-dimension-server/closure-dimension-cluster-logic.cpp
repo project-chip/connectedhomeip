@@ -731,6 +731,7 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     VerifyOrReturnError(!currentState.IsNull(), Status::InvalidInState);
     VerifyOrReturnError(currentState.Value().position.HasValue() && !currentState.Value().position.Value().IsNull(),
                         Status::InvalidInState);
+    
     if (mConformance.HasFeature(Feature::kMotionLatching))
     {
         if (currentState.Value().latch.HasValue() && !currentState.Value().latch.Value().IsNull())
@@ -743,6 +744,7 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
         }
         // Return InvalidInState if currentState is latched
     }
+
     // Derive TargetState Position from StepValue and NumberOfSteps.
     Percent100ths stepValue;
     VerifyOrReturnError(GetStepValue(stepValue) == CHIP_NO_ERROR, Status::Failure);
