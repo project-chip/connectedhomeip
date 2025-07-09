@@ -17,8 +17,8 @@
  */
 #pragma once
 
-#include <json/json.h>
 #include <app/clusters/commodity-tariff-server/CommodityTariffConsts.h>
+#include <json/json.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -115,8 +115,7 @@ public:
             tempList.push_back(entry);
         }
 
-        if ( (err == CHIP_NO_ERROR) && 
-             ((err = mgmtObj.CreateNewValue(tempList.size())) == CHIP_NO_ERROR) )
+        if ((err == CHIP_NO_ERROR) && ((err = mgmtObj.CreateNewValue(tempList.size())) == CHIP_NO_ERROR))
         {
             std::copy(tempList.begin(), tempList.end(), mgmtObj.GetNewValueData());
             mgmtObj.MarkAsAssigned();
