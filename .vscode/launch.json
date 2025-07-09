@@ -60,7 +60,7 @@
                 "--enable-key",
                 "00112233445566778899aabbccddeeff",
                 "--tariff-file",
-                "./DefaultTariff.json"
+                "./tariff_sample_1.json"
             ],
             "cwd": "${workspaceFolder}/examples/energy-gateway-app/commodity-tariff"
         },
