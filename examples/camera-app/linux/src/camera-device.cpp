@@ -18,6 +18,7 @@
 
 #include "camera-device.h"
 #include <AppMain.h>
+#include <Options.h>
 #include <fcntl.h> // For file descriptor operations
 #include <filesystem>
 #include <fstream>
@@ -322,8 +323,11 @@ CameraDevice::CameraDevice()
     // Provider manager uses the Media controller to register WebRTC Transport with media controller for AV source data
     mWebRTCProviderManager.SetMediaController(&mMediaController);
 
+    mWebRTCRequestorManager.SetMediaController(&mMediaController);
+
     // Set the CameraDevice interface in WebRTCManager
     mWebRTCProviderManager.SetCameraDevice(this);
+    mWebRTCRequestorManager.SetCameraDevice(this);
 }
 
 CameraDevice::~CameraDevice()
@@ -1223,6 +1227,11 @@ WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
     return mWebRTCProviderManager;
 }
 
+WebRTCTransportRequestor::WebRTCTransportRequestorDelegate & CameraDevice::GetWebRTCRequestorDelegate()
+{
+    return mWebRTCRequestorManager;
+}
+
 CameraAVStreamMgmtDelegate & CameraDevice::GetCameraAVStreamMgmtDelegate()
 {
     return mCameraAVStreamManager;
@@ -1241,4 +1250,25 @@ CameraAvSettingsUserLevelManagement::Delegate & CameraDevice::GetCameraAVSetting
 MediaController & CameraDevice::GetMediaController()
 {
     return mMediaController;
+}
+
+void CameraDevice::DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    if (!LinuxDeviceOptions::GetInstance().cameraInitiatedSession)
+        return;
+
+    using namespace chip::DeviceLayer;
+    switch (event->Type)
+    {
+    case DeviceEventType::kCommissioningComplete:
+        ChipLogProgress(DeviceLayer, "Commissioning complete triggering provide offer send");
+        mWebRTCRequestorManager.ScheduleProvideOfferSend();
+        break;
+    case DeviceEventType::kSecureSessionEstablished:
+        ChipLogProgress(DeviceLayer, "Secure session established Setting peerId and endpoint");
+        chip::ScopedNodeId peerId(event->SecureSessionEstablished.PeerNodeId, event->SecureSessionEstablished.FabricIndex);
+        mWebRTCRequestorManager.Init(peerId, kWebRTCRequesterDynamicEndpointId);
+        break;
+    }
+    return;
 }

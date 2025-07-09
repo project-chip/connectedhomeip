@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 #include "camera-app.h"
+#include <platform/PlatformManager.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -40,6 +41,11 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     // Instantiate WebRTCTransport Provider
     mWebRTCTransportProviderPtr =
         std::make_unique<WebRTCTransportProviderServer>(mCameraDevice->GetWebRTCProviderDelegate(), mEndpoint);
+
+    // Instantiate WebRTCTransport Requestor
+    mWebRTCTransportRequestorPtr = std::make_unique<WebRTCTransportRequestor::WebRTCTransportRequestorServer>(
+        mEndpoint, mCameraDevice->GetWebRTCRequestorDelegate());
+    mCameraDevice->SetWebRTCRequestorServer(mWebRTCTransportRequestorPtr.get());
 
     // Fetch all initialization parameters for CameraAVStreamMgmt Server
     BitFlags<CameraAvStreamManagement::Feature> features;
@@ -237,6 +243,8 @@ void CameraApp::InitCameraDeviceClusters()
     // Initialize Cluster Servers
     mWebRTCTransportProviderPtr->Init();
 
+    mWebRTCTransportRequestorPtr->Init();
+
     mChimeServerPtr->Init();
 
     mAVSettingsUserLevelMgmtServerPtr->Init();
@@ -254,10 +262,20 @@ void CameraAppInit(CameraDeviceInterface * cameraDevice)
     gCameraApp.get()->InitCameraDeviceClusters();
 
     ChipLogDetail(Camera, "CameraAppInit: Initialized Camera clusters");
+
+    DeviceLayer::PlatformMgr().AddEventHandler(CameraApp::DeviceEventCallback, reinterpret_cast<intptr_t>(nullptr));
 }
 
 void CameraAppShutdown()
 {
     ChipLogDetail(Camera, "CameraAppShutdown: Shutting down Camera app");
+    DeviceLayer::PlatformMgr().RemoveEventHandler(CameraApp::DeviceEventCallback, reinterpret_cast<intptr_t>(nullptr));
     gCameraApp = nullptr;
+}
+
+void CameraApp::DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    ChipLogProgress(DeviceLayer, "DeviceEventCallback : %d", event->Type);
+    if (gCameraApp != nullptr && gCameraApp.get()->mCameraDevice != nullptr)
+        gCameraApp.get()->mCameraDevice->DeviceEventCallback(event, arg);
 }
