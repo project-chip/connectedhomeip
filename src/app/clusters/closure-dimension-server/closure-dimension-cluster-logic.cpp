@@ -681,7 +681,8 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
                 latch.HasValue() && !latch.Value(), Status::InvalidInState,
                 ChipLogError(
                     AppServer,
-                    "Latch is True in State, but SetTarget command does not set latch to False when position change is requested"));
+                    "Latch is True in State, but SetTarget command does not set latch to False" 
+                    "when position change is requested on endpoint : %d", mMatterContext.GetEndpointId()));
         }
     }
 
@@ -736,7 +737,8 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
         if (currentState.Value().latch.HasValue() && !currentState.Value().latch.Value().IsNull())
         {
             VerifyOrReturnError(!currentState.Value().latch.Value().Value(), Status::InvalidInState,
-                                ChipLogError(AppServer, "Step command cannot be processed when current latch is True"));
+                                ChipLogError(AppServer, "Step command cannot be processed when current latch is True"
+                                             "on endpoint : %d", mMatterContext.GetEndpointId()));
         }
         // Return InvalidInState if currentState is latched
     }

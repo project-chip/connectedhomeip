@@ -509,7 +509,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
     VerifyOrReturnError(GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR, Status::Failure);
     VerifyOrReturnError(GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR, Status::Failure);
     VerifyOrReturnError(!overallCurrentState.IsNull(), Status::InvalidInState,
-                        ChipLogError(AppServer, "OverallCurrentState is null over endpoint : %d", mMatterContext.GetEndpointId()));
+                        ChipLogError(AppServer, "OverallCurrentState is null on endpoint : %d", mMatterContext.GetEndpointId()));
 
     if (overallTargetState.IsNull())
     {
@@ -527,7 +527,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
             VerifyOrReturnError(latch.HasValue() && !latch.Value(), Status::InvalidInState,
                                 ChipLogError(AppServer,
                                              "Latch is True in OverallCurrentState, but MoveTo command does not set latch to False "
-                                             "when position change is requested"));
+                                             "when position change is requested on endpoint : %d", mMatterContext.GetEndpointId()));
         }
     }
 
