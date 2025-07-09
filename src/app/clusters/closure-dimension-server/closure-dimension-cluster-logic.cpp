@@ -681,7 +681,7 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
                 latch.HasValue() && !latch.Value(), Status::InvalidInState,
                 ChipLogError(
                     AppServer,
-                    "Latch is True in State, but SetTarget command does not set latch to False" 
+                    "Latch is True in State, but SetTarget command does not set latch to False"
                     "when position change is requested on endpoint : %d", mMatterContext.GetEndpointId()));
         }
     }
