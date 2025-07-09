@@ -28,11 +28,16 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::CommodityTariff;
 using namespace chip::app::Clusters::CommodityTariff::Structs;
 
+static constexpr uint32_t kSecondsPer4hr = 14400; // 4 hours in seconds
+
 uint8_t presetIndex = 0;
 
+static uint8_t days_ctr = 0;
+static uint8_t entries_ctr = 0;
+bool first_start = true;
 namespace TariffPresets {
-static constexpr const char * kTariff1 = "./full_complex_tariff_1.json";
-static constexpr const char * kTariff2 = "./full_complex_tariff_2.json";
+static constexpr const char * kTariff1 = "./tariff_sample_1.json";
+static constexpr const char * kTariff2 = "./tariff_sample_2.json";
 
 // Array of all presets
 static constexpr std::array<const char *, 2> kAllPresets =  {kTariff1, kTariff2 };
@@ -78,24 +83,76 @@ void SetTestEventTrigger_TariffDataClear()
     dg->CleanupTariffData();
 }
 
-void SetTestEventTrigger_ForcedOneDayForward()
+static uint32_t GetCurrentTimestamp(void)
+{
+    System::Clock::Microseconds64 utcTimeUnix;
+    uint64_t chipEpochTime;
+    System::SystemClock().GetClock_RealTime(utcTimeUnix);
+    UnixEpochToChipEpochMicros(utcTimeUnix.count(), chipEpochTime);
+
+    return static_cast<uint32_t>(chipEpochTime / chip::kMicrosecondsPerSecond);
+}
+
+/* 
+ * Forces a day change event by scheduling update at the end of current day
+ * Adds remaining time until midnight to trigger next day event
+ */
+void SetTestEventTrigger_TimeShift24h()
 {
    CommodityTariffInstance * instance = GetCommodityTariffInstance();
 
    if (instance)
    {
-        instance->ForceDaysAttrsUpdate();
+        const uint32_t now = GetCurrentTimestamp();
+        const uint32_t secondsSinceMidnight = now % kSecondsPerDay;
+        const uint32_t delay = (now - secondsSinceMidnight) + (days_ctr++)*kSecondsPerDay;
+
+        entries_ctr = 0;
+        instance->SetupTestTimeShiftInterval(delay);
    }
 }
 
-void SetTestEventTrigger_ForcedDayEntryForward()
+/* 
+ * Forces a day entry update by scheduling at next 4-hour interval
+ * Handles midnight crossing and resets counter when day changes
+ */
+void SetTestEventTrigger_TimeShift4h()
 {
    CommodityTariffInstance * instance = GetCommodityTariffInstance();
 
    if (instance)
    {
-        instance->ForceDayEntriesAttrsUpdate();
+        const uint32_t now = GetCurrentTimestamp();
+        const uint32_t secondsSinceMidnight = now % kSecondsPerDay;
+        uint32_t delay = (now - secondsSinceMidnight);
+
+        if (first_start)
+        {
+            entries_ctr = static_cast<uint8_t>(floor(secondsSinceMidnight / kSecondsPer4hr));
+            first_start = false;
+        }
+
+        delay += ++entries_ctr * kSecondsPer4hr;
+
+        ChipLogDetail(NotSpecified,
+                    "ForceDayEntriesAttrsUpdate: entry upd delay: %d",
+                    delay);
+        
+        if (delay % kSecondsPerDay == 0) {
+            SetTestEventTrigger_TimeShift24h();
+        } else {
+            // Move to next 4-hour interval for next call
+            delay += days_ctr*kSecondsPerDay;
+            instance->SetupTestTimeShiftInterval( delay);
+        }
    }
+}
+
+void SetTestEventTrigger_TimeShiftDisable()
+{
+    days_ctr = 0;
+    entries_ctr = 0;
+    first_start = true;
 }
 
 bool HandleCommodityTariffTestEventTrigger(uint64_t eventTrigger)
@@ -112,15 +169,18 @@ bool HandleCommodityTariffTestEventTrigger(uint64_t eventTrigger)
         ChipLogProgress(Support, "[CommodityTariff-Test-Event] => Tariff Data Clear");
         SetTestEventTrigger_TariffDataClear();
         break;
-    case CommodityTariffTrigger::kForcedOneDayForward:
+    case CommodityTariffTrigger::kTimeShift24h:
         ChipLogProgress(Support, "[CommodityTariff-Test-Event] => Forced OneDay Forward");
-        SetTestEventTrigger_ForcedOneDayForward();
+        SetTestEventTrigger_TimeShift24h();
         break;
-    case CommodityTariffTrigger::kForcedOneDayEntryForward:
+    case CommodityTariffTrigger::kTimeShift4h:
         ChipLogProgress(Support, "[CommodityTariff-Test-Event] => Forced DayEntry Forward");
-        SetTestEventTrigger_ForcedDayEntryForward();
+        SetTestEventTrigger_TimeShift4h();
         break;
-
+    case CommodityTariffTrigger::kTimeShiftDisable:
+        ChipLogProgress(Support, "[CommodityTariff-Test-Event] => Forced DayEntry Forward");
+        SetTestEventTrigger_TimeShiftDisable();
+        break;
     default:
         return false;
     }
