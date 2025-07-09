@@ -31,7 +31,8 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import AttributeMatcher, ClusterAttributeChangeAccumulator
+from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.matter_testing import AttributeMatcher
 from mdns_discovery import mdns_discovery
 from mobly import asserts
 
