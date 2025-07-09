@@ -59,7 +59,7 @@ public:
     void SetUpdateTermsAndConditionsHasBeenInvoked() { mUpdateTermsAndConditionsHasBeenInvoked = true; }
     void RecordSetVidVerificationStatementHasBeenInvoked() { mSetVidVerificationStatementHasBeenInvoked = true; }
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    void RecordIcacCsrRequestHasBeenInvoked() { mIcacCsrRequestHasBeenInvoked = true; }
+    void SetAddICACHasBeenInvoked() { mAddICACHasBeenInvoked = true; }
 #endif
 
     /**
@@ -99,7 +99,7 @@ public:
     bool UpdateTermsAndConditionsHasBeenInvoked() const { return mUpdateTermsAndConditionsHasBeenInvoked; }
     bool HasSetVidVerificationStatementHasBeenInvoked() const { return mSetVidVerificationStatementHasBeenInvoked; }
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    bool IcacCsrRequestHasBeenInvoked() const { return mIcacCsrRequestHasBeenInvoked; }
+    bool AddICACCommandHasBeenInvoked() const { return mAddICACHasBeenInvoked; }
 #endif
 
     FabricIndex GetFabricIndex() const
@@ -124,7 +124,7 @@ private:
     bool mUpdateTermsAndConditionsHasBeenInvoked    = false;
     bool mSetVidVerificationStatementHasBeenInvoked = false;
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    bool mIcacCsrRequestHasBeenInvoked = false;
+    bool mAddICACHasBeenInvoked = false;
 #endif
 
     /**
@@ -163,7 +163,7 @@ private:
         mUpdateTermsAndConditionsHasBeenInvoked    = false;
         mSetVidVerificationStatementHasBeenInvoked = false;
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-        mIcacCsrRequestHasBeenInvoked = false;
+        mAddICACHasBeenInvoked = false;
 #endif
     }
 

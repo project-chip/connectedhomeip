@@ -22,8 +22,8 @@ MutableByteSpan icacCSRSpan{ icacCSRBuf };
 
     if (request.jcm && (Crypto::kP256_PublicKey_Length != request.trustedIcacPublicKeyB.size))
     {
-        return pw::Status::OutOfRange();
         ChipLogError(JointFabric, "Invalid ICAC Public Key Size");
+        return pw::Status::OutOfRange();
     }
 
     if (request.jcm && request.peerAdminJFAdminClusterEndpointId == kInvalidEndpointId)

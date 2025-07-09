@@ -103,6 +103,13 @@ void MatterJointFabricAdministratorPluginServerInitCallback()
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+const FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler)
+{
+    FabricIndex index = aCommandHandler->GetAccessingFabricIndex();
+    ChipLogDetail(Zcl, "JointFabric: Finding fabric with fabricIndex 0x%x", static_cast<unsigned>(index));
+    return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
+}
+
 bool __attribute__((weak)) emberAfJointFabricAdministratorClusterGetIcacCsr(MutableByteSpan & icacCsr)
 {
     return false;
@@ -113,23 +120,25 @@ bool emberAfJointFabricAdministratorClusterICACCSRRequestCallback(
     const chip::app::Clusters::JointFabricAdministrator::Commands::ICACCSRRequest::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("ICACCSRRequest", "JointFabricAdministrator");
-
     ChipLogProgress(Zcl, "JointFabricAdministrator: Received an ICACCSRRequest command");
 
     auto nonDefaultStatus = Status::Success;
+    const FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj);
+    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+
     uint8_t buf[Credentials::kMaxDERCertLength];
     MutableByteSpan icacCsr(buf, Credentials::kMaxDERCertLength);
     Commands::ICACCSRResponse::Type response;
 
-    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+    // If current fabric is not available, command was invoked over PASE which is not legal
+    VerifyOrExit(fabricInfo != nullptr, nonDefaultStatus = Status::InvalidCommand);
+
     VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
                  nonDefaultStatus = Status::FailsafeRequired);
 
-    /* TODO spec.: If this command is received from a peer against FabricFabric Table Vendor ID Verification
-    Procedure hasn’t been executed then it SHALL fail with a JfVidNotVerified status code sent back to
-    the initiator */
-
-    failSafeContext.RecordIcacCsrRequestHasBeenInvoked();
+    /* TODO spec.: If the <<ref_FabricTableVendorIdVerificationProcedure, FabricFabric Table Vendor ID Verification Procedure>>
+     * has not been executed against the initiator of this command, the command SHALL fail
+     * with a <<ref_JFVidNotVerified, JfVidNotVerified>> status code SHALL be sent back to the initiator.*/
 
     VerifyOrExit(emberAfJointFabricAdministratorClusterGetIcacCsr(icacCsr) == true, nonDefaultStatus = Status::Failure);
     response.icaccsr = icacCsr;
@@ -149,15 +158,22 @@ bool emberAfJointFabricAdministratorClusterAddICACCallback(
     const chip::app::Clusters::JointFabricAdministrator::Commands::AddICAC::DecodableType & commandData)
 {
     MATTER_TRACE_SCOPE("AddICAC", "JointFabricAdministrator");
-
-    ChipLogProgress(Zcl, "JointFabricAdministrator: Received a AddICAC command");
+    ChipLogProgress(Zcl, "JointFabricAdministrator: Received an AddICAC command");
 
     auto nonDefaultStatus = Status::Success;
-
+    const FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj);
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+
+    // If current fabric is not available, command was invoked over PASE which is not legal
+    VerifyOrExit(fabricInfo != nullptr, nonDefaultStatus = Status::InvalidCommand);
+
     VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
                  nonDefaultStatus = Status::FailsafeRequired);
-    VerifyOrExit(failSafeContext.IcacCsrRequestHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
+
+    VerifyOrExit(!failSafeContext.AddICACCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
+    failSafeContext.SetAddICACHasBeenInvoked();
+
+    /* TODO: implement rest of the AddICAC checks */
 
 exit:
     commandObj->AddStatus(commandPath, nonDefaultStatus);

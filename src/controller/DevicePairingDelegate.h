@@ -78,7 +78,7 @@ public:
      *     when Joint Commissioning Method is executed
      */
     virtual void OnCommissioningComplete(NodeId deviceId, const Optional<Crypto::P256PublicKey> & trustedIcacPublicKeyB,
-                                         uint16_t peerAdminJFAdminClusterEndpointId, CHIP_ERROR error)
+                                         EndpointId peerAdminJFAdminClusterEndpointId, CHIP_ERROR error)
     {
         OnCommissioningComplete(deviceId, error);
     }
