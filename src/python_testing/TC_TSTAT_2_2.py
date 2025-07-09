@@ -110,13 +110,13 @@ class TC_TSTAT_2_2(MatterBaseTest):
         return steps
 
     async def check_setpoint_event(self,
-                            events_callback: EventChangeCallback,
-                            attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
-                            system_mode: Clusters.Thermostat.Enums.SystemModeEnum,
-                            occupancy: Clusters.Thermostat.Bitmaps.OccupancyBitmap,
-                            endpoint: Optional[int] = None,
-                            dev_ctrl: ChipDeviceCtrl = None) -> Status:
-        
+                                   events_callback: EventChangeCallback,
+                                   attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor,
+                                   system_mode: Clusters.Thermostat.Enums.SystemModeEnum,
+                                   occupancy: Clusters.Thermostat.Bitmaps.OccupancyBitmap,
+                                   endpoint: Optional[int] = None,
+                                   dev_ctrl: ChipDeviceCtrl = None) -> Status:
+
         event_data = events_callback.wait_for_event_report(cluster.Events.SetpointChange)
 
         asserts.assert_equal(system_mode, event_data.systemMode)
@@ -127,11 +127,11 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
         setpoint = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
         asserts.assert_equal(setpoint, event_data.currentSetpoint)
-            
+
     def flush_events(self, events_callback: EventChangeCallback, wait_sec: float = 0.5):
         time.sleep(wait_sec)
         events_callback.flush_events()
-    
+
     @ async_test_body
     async def test_TC_TSTAT_2_2(self):
         endpoint = self.get_endpoint()
@@ -201,8 +201,8 @@ class TC_TSTAT_2_2(MatterBaseTest):
             hasEventsFeature = True
             events_callback = EventChangeCallback(cluster)
             await events_callback.start(self.default_controller,
-                                    self.dut_node_id,
-                                    endpoint=endpoint)
+                                        self.dut_node_id,
+                                        endpoint=endpoint)
 
         ControlSequenceOfOperation = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ControlSequenceOfOperation)
 
@@ -292,7 +292,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
         if self.pics_guard(hasCoolingFeature):
             # Test Harness Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint attribute
             await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedCoolingSetpoint(MaxCoolSetpointLimitValue), endpoint_id=endpoint)
-        
+
             if hasEventsFeature:
                 await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedCoolingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kCool,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint, dev_ctrl=self.default_controller)
 
@@ -340,7 +340,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
         self.step("3c")
 
-        if self.pics_guard(hasHeatingFeature):        
+        if self.pics_guard(hasHeatingFeature):
             # Test Harness Writes the limit of MinHeatSetpointLimit to OccupiedHeatingSetpoint attribute
             await self.write_single_attribute(attribute_value=cluster.Attributes.OccupiedHeatingSetpoint(MinHeatSetpointLimitValue), endpoint_id=endpoint)
 
@@ -794,7 +794,6 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
             if hasEventsFeature:
                 await self.check_setpoint_event(events_callback=events_callback, attribute=cluster.Attributes.OccupiedHeatingSetpoint, system_mode=cluster.Enums.SystemModeEnum.kHeat,  occupancy=cluster.Bitmaps.OccupancyBitmap.kOccupied, endpoint=endpoint)
-
 
         self.step("15")
 
