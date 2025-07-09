@@ -37,6 +37,7 @@ public:
         kSetTargetAction,
         kStepAction,
         kPanelLatchAction,
+        kPanelUnLatchAction, // New action for unlatching the panel before SetTarget
 
         kInvalidAction
     };
@@ -48,6 +49,14 @@ public:
      * for the Closure Application to function properly.
      */
     void Init();
+
+    /**
+     * @brief Shuts down the ClosureManager.
+     *
+     * This method clear up the necessary resources and configurations required
+     * for the Closure Application to shutdown properly.
+     */
+    void Shutdown();
 
     static ClosureManager & GetInstance() { return sInstance; }
 
@@ -164,6 +173,16 @@ private:
     chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint mClosurePanelEndpoint3{ kClosurePanelEndpoint3 };
 
     /**
+     * @brief Gets the current panel instance being operated on.
+     *
+     * This method returns a pointer to the ClosureDimensionEndpoint instance
+     * corresponding to the current endpoint ID.
+     *
+     * @return Pointer to the current panel instance, or nullptr if not found.
+     */
+    chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint * GetCurrentPanelInstance(chip::EndpointId endpointId);
+
+    /**
      * @brief Tracks the endpoint's current action being performed by the ClosureManager.
      *
      * These variables are used to determine the type of action currently being executed on the closure endpoints.
@@ -185,6 +204,38 @@ private:
     static void HandleEp1ClosureActionTimer(chip::System::Layer * layer, void * aAppState);
     static void HandleEp2ClosureActionTimer(chip::System::Layer * layer, void * aAppState);
     static void HandleEp3ClosureActionTimer(chip::System::Layer * layer, void * aAppState);
+
+    /**
+     * @brief Handles the step action for a panel endpoint.
+     *
+     * This method updates the current position of the panel endpoint based on the step action
+     * and checks if the target position is reached. If so, it performs the latch action
+     * if required.
+     *
+     * @param endpointId The identifier of the endpoint for which the panel step action should be handled.
+     */
+    void HandlePanelStepAction(chip::EndpointId endpointId);
+
+    /**
+     * @brief Handles the SetTarget motion action for a panel endpoint.
+     *
+     * This method Performs the update the current positions of panel endpoint to next position
+     * and when target position is reached, it performs the latch action if required.
+     *
+     * @param endpointId The identifier of the endpoint for which the panel target action should be handled.
+     */
+    void HandlePanelSetTargetAction(chip::EndpointId endpointId);
+
+    /**
+     * @brief Handles the unlatch action for a closure panel.
+     *
+     * This method performs the unlatch action if required for the specified closure panel endpoint.
+     * It updates the current state of the panel and sets the target state accordingly and then calls
+     * HandlePanelSetTargetAction to move the panel to the target position.
+     *
+     * @param endpointId The identifier of the endpoint for which the unlatch action should be handled.
+     */
+    void HandlePanelUnlatchAction(chip::EndpointId endpointId);
 
     /**
      * @brief Handles the completion of a Calibrate action.
@@ -224,7 +275,7 @@ private:
      *
      * @param action The action that has been completed.
      */
-    void HandleSetTargetActionComplete();
+    void HandlePanelSetTargetActionComplete(chip::EndpointId endpointId);
 
     /**
      * @brief Handles the completion of a Step action.
@@ -234,7 +285,7 @@ private:
      *
      * @param action The action that has been completed.
      */
-    void HandleStepActionComplete();
+    void HandlePanelStepActionComplete(chip::EndpointId endpointId);
 
     /**
      * @brief Handles the motion action for the closure system.
