@@ -128,7 +128,7 @@ void SetTestEventTrigger_TimeShift4h()
 
         if (first_start)
         {
-            entries_ctr = static_cast<uint8_t>(floor(secondsSinceMidnight / kSecondsPer4hr));
+            entries_ctr = static_cast<uint8_t>(secondsSinceMidnight / kSecondsPer4hr);
             first_start = false;
         }
 
