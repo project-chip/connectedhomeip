@@ -207,6 +207,7 @@ _chip_tool() {
 }
 
 complete -F _chip_build_example scripts/build/build_examples.py
+complete -F _chip_build_example build_examples.py
 
 complete -F _chip_app chip-air-purifier-app
 complete -F _chip_app chip-all-clusters-app
