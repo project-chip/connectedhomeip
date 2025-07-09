@@ -53,10 +53,10 @@
 # === END CI TEST ARGUMENTS ===
 
 import json
+from typing import Any
 
 from chip.testing.conversions import bytes_from_hex
 from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from typing import Any
 from mobly import asserts
 
 
