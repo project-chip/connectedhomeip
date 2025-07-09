@@ -269,7 +269,7 @@ void Instance::ResetCurrentAttributes()
     mNextTariffComponents_MgmtObj.Cleanup();
 }
 
-static uint32_t GetCurrentTimestamp(void)
+static uint32_t GetCurrentTimestamp()
 {
     System::Clock::Microseconds64 utcTimeUnix;
     uint64_t chipEpochTime;
