@@ -41,6 +41,13 @@ from mobly import asserts
 
 
 class TC_ACL_2_5(MatterBaseTest):
+
+    async def write_attribute_with_encoding_option(self, controller, node_id, path, forceLegacyListEncoding):
+        if forceLegacyListEncoding:
+            return await controller.TestOnlyWriteAttributeWithLegacyList(node_id, path)
+        else:
+            return await controller.WriteAttribute(node_id, path)
+
     async def internal_test_TC_ACL_2_5(self, force_legacy_encoding: bool):
         self.step(1)
         self.th1 = self.default_controller
@@ -82,7 +89,8 @@ class TC_ACL_2_5(MatterBaseTest):
         logging.info(f"Writing extension with data {D_OK_EMPTY.hex()}")
         extension_attr = Clusters.AccessControl.Attributes.Extension
         extensions_list = [extension]
-        result = await self.default_controller.WriteAttribute(
+        result = await self.write_attribute_with_encoding_option(
+            self.default_controller,
             self.dut_node_id,
             [(0, extension_attr(value=extensions_list))],
             forceLegacyListEncoding=force_legacy_encoding
@@ -149,7 +157,8 @@ class TC_ACL_2_5(MatterBaseTest):
         # Write the new extension
         logging.info(f"Writing new extension with data {D_OK_SINGLE.hex()}")
         extensions_list = [new_extension]
-        result = await self.default_controller.WriteAttribute(
+        result = await self.write_attribute_with_encoding_option(
+            self.default_controller,
             self.dut_node_id,
             [(0, extension_attr(value=extensions_list))],
             forceLegacyListEncoding=force_legacy_encoding
@@ -235,7 +244,8 @@ class TC_ACL_2_5(MatterBaseTest):
         # This should fail with CONSTRAINT_ERROR
         logging.info("Attempting to write extension that exceeds max length (should fail)")
         extensions_list = [too_long_extension]
-        a = await self.default_controller.WriteAttribute(
+        a = await self.write_attribute_with_encoding_option(
+            self.default_controller,
             self.dut_node_id,
             [(0, extension_attr(value=extensions_list))],
             forceLegacyListEncoding=force_legacy_encoding
@@ -289,7 +299,8 @@ class TC_ACL_2_5(MatterBaseTest):
         # This should fail with CONSTRAINT_ERROR
         logging.info("Attempting to write multiple extensions (should fail)")
         extensions_list = [extension, new_extension]
-        b = await self.default_controller.WriteAttribute(
+        b = await self.write_attribute_with_encoding_option(
+            self.default_controller,
             self.dut_node_id,
             [(0, extension_attr(value=extensions_list))],
             forceLegacyListEncoding=force_legacy_encoding
@@ -341,7 +352,8 @@ class TC_ACL_2_5(MatterBaseTest):
         # Write an empty list to clear all extensions
         logging.info("Writing empty extension list to clear all extensions...")
         extensions_list2 = []
-        result = await self.default_controller.WriteAttribute(
+        result = await self.write_attribute_with_encoding_option(
+            self.default_controller,
             self.dut_node_id,
             [(0, extension_attr(value=extensions_list2))],
             forceLegacyListEncoding=force_legacy_encoding
