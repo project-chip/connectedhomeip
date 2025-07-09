@@ -66,6 +66,13 @@ class TC_ACL_2_3(MatterBaseTest):
         current_fabric_index = await self.read_single_attribute_check_success(dev_ctrl=th, endpoint=0, cluster=cluster, attribute=attribute)
         return current_fabric_index
 
+    async def write_attribute_with_encoding_option(self, controller, node_id, path, forceLegacyListEncoding):
+
+        if forceLegacyListEncoding:
+            return await controller.TestOnlyWriteAttributeWithLegacyList(node_id, path)
+        else:
+            return await controller.WriteAttribute(node_id, path)
+
     async def internal_test_TC_ACL_2_3(self, force_legacy_encoding: bool):
         self.step(1)
         self.th1 = self.default_controller
@@ -241,11 +248,12 @@ class TC_ACL_2_3(MatterBaseTest):
         extension12 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=D_OK_SINGLE)
         extensions_list11 = [extension11, extension12]
-        result11 = await self.th1.WriteAttribute(
-            self.dut_node_id,
-            [(0, ac_extension_attr(value=extensions_list11))],
-            forceLegacyListEncoding=force_legacy_encoding
-        )
+
+        result11 = await self.write_attribute_with_encoding_option(self.th1,
+                                                                   self.dut_node_id,
+                                                                   [(0, ac_extension_attr(value=extensions_list11))],
+                                                                   forceLegacyListEncoding=force_legacy_encoding)
+
         logging.info(f"Write result: {str(result11)}")
         asserts.assert_equal(
             result11[0].Status,
