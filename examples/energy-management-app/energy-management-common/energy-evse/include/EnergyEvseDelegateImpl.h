@@ -122,7 +122,7 @@ class EnergyEvseDelegate : public EnergyEvse::Delegate
 {
 public:
     EnergyEvseDelegate(EvseTargetsDelegate & aDelegate) : EnergyEvse::Delegate() { mEvseTargetsDelegate = &aDelegate; }
-    ~EnergyEvseDelegate() {}
+    ~EnergyEvseDelegate() { CancelActiveTimers(); }
 
     EvseTargetsDelegate * GetEvseTargetsDelegate() { return mEvseTargetsDelegate; }
 
@@ -207,6 +207,7 @@ public:
      * on ChargingEnabledUntil / DischargingEnabledUntil expiring.
      */
     Status ScheduleCheckOnEnabledTimeout();
+    void CancelActiveTimers();
 
     /**
      * @brief   Helper function to handle timer expiration when in enabled state

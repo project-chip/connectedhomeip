@@ -320,6 +320,12 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
     return Status::Success;
 }
 
+void EnergyEvseDelegate::CancelActiveTimers()
+{
+    // Cancel the EVSE check timer if it is active
+    DeviceLayer::SystemLayer().CancelTimer(EvseCheckTimerExpiry, this);
+}
+
 void EnergyEvseDelegate::EvseCheckTimerExpiry(System::Layer * systemLayer, void * delegate)
 {
     EnergyEvseDelegate * dg = reinterpret_cast<EnergyEvseDelegate *>(delegate);
