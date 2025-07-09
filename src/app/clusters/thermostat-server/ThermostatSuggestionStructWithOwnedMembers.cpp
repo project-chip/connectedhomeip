@@ -101,8 +101,6 @@ uint8_t ThermostatSuggestionStructWithOwnedMembers::GetUniqueID() const
 
 const ByteSpan & ThermostatSuggestionStructWithOwnedMembers::GetPresetHandle() const
 {
-ChipLogProgress(Zcl, "ThermostatSuggestionStructWithOwnedMembers GetPresetHandle:");
-    ChipLogByteSpan(Zcl, presetHandle);
     return presetHandle;
 }
 
