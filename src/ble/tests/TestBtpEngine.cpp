@@ -413,7 +413,7 @@ TEST_F(TestBtpEngine, EncodeStandAloneAckMultiFragmentMessage)
     EXPECT_EQ(ackPacket->Start()[2], 0x00); // Sequence number of the Ack packet itself
 }
 
-// Test that the BTP engine handles attempting to start a new message without acknowledging the previous one.
+// Test handling a characteristic received with an incorrect sequence number.
 TEST_F(TestBtpEngine, HandleCharacteristicReceivedIncorrectSequence)
 {
     // Create a packet buffer with a single message and check that it is created successfully.
@@ -471,7 +471,7 @@ TEST_F(TestBtpEngine, HandleCharacteristicReceivedUnexpectedStandaloneAck)
     EXPECT_EQ(mBtpEngine.RxState(), BtpEngine::kState_Error);
 }
 
-// Test handling an ACK packet with an incorrect sequence number.
+// Test handling acknowledgment received with an incorrect sequence number.
 TEST_F(TestBtpEngine, HandleAckReceivedIncorrectSequence)
 {
     // Create a packet buffer with a 30-byte payload and set its data length to 30.
@@ -534,7 +534,7 @@ TEST_F(TestBtpEngine, HandleCharacteristicReceivedWithPadding)
 // Test that the BTP engine correctly handles an ACK packet with a sequence wraparound.
 TEST_F(TestBtpEngine, IsValidAckOnSequenceWraparound)
 {
-    const uint8_t invalidAckValue = 100;
+    const uint8_t invalidAckValue = 95;
 
     // Create a packet buffer with a large payload that will result in 257 fragments (to test sequence number wraparound).
     size_t packetLength = mBtpEngine.sDefaultFragmentSize - kTransferProtocolMaxHeaderSize + kTransferProtocolAckSize +
@@ -552,21 +552,21 @@ TEST_F(TestBtpEngine, IsValidAckOnSequenceWraparound)
         EXPECT_TRUE(mBtpEngine.HandleCharacteristicSend(nullptr, false));
         count++;
 
-        // Every 10 packets, simulate receiving an ACK.
-        if (count % 10 == 0 && mBtpEngine.ExpectingAck())
+        // Every 10 packets, simulate receiving an ACK to test ACK validation during transmission.
+        if (count % 10 == 0)
         {
-            // Create an ACK packet with the current count as the sequence number.
+            // Create an ACK packet with proper sequence number that BTP engine expects.
             uint8_t ackData0[] = {
                 to_underlying(BtpEngine::HeaderFlags::kFragmentAck), // Header flags for ACK
                 static_cast<uint8_t>(count % 256),                   // Acknowledgment number for the received packet
-                static_cast<uint8_t>((count + 1) % 256),             // Sequence number of the ACK packet itself
+                static_cast<uint8_t>(count / 10),                    // Sequence number of the ACK packet itself
             };
             auto ackPacket0 = System::PacketBufferHandle::NewWithData(ackData0, sizeof(ackData0));
 
             // Handle the ACK packet - this should succeed in normal flow.
             SequenceNumber_t receivedAck;
             bool didReceiveAck;
-            EXPECT_NE(mBtpEngine.HandleCharacteristicReceived(std::move(ackPacket0), receivedAck, didReceiveAck), CHIP_NO_ERROR);
+            EXPECT_EQ(mBtpEngine.HandleCharacteristicReceived(std::move(ackPacket0), receivedAck, didReceiveAck), CHIP_NO_ERROR);
             EXPECT_TRUE(didReceiveAck);
             EXPECT_EQ(receivedAck, count % 256);
         }
@@ -575,10 +575,10 @@ TEST_F(TestBtpEngine, IsValidAckOnSequenceWraparound)
     EXPECT_EQ(mBtpEngine.TxState(), BtpEngine::kState_Complete);
 
     // Create an ACK packet with an invalid ACK number and check that it is created successfully.
-    constexpr uint8_t ackPacketData0[] = {
+    uint8_t ackPacketData0[] = {
         to_underlying(BtpEngine::HeaderFlags::kFragmentAck),
-        invalidAckValue, // Invalid ACK number
-        0xFF,            // Sequence number of the ACK packet itself
+        invalidAckValue,                      // Invalid ACK number
+        static_cast<uint8_t>(count / 10 + 1), // Sequence number of the ACK packet itself
     };
     auto ackPacket0 = System::PacketBufferHandle::NewWithData(ackPacketData0, sizeof(ackPacketData0));
     EXPECT_FALSE(ackPacket0.IsNull());
