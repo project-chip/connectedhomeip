@@ -87,3 +87,17 @@ source_set("enums") {
   ]
   public_configs = [ ":includes" ]
 }
+
+source_set("enums") {
+  sources = [
+    "${chip_app_zap_dir}/app-common/zap-generated/cluster-enums-check.h",
+    "${chip_app_zap_dir}/app-common/zap-generated/cluster-enums.h",
+    "CompatEnumNames.h",
+  ]
+
+  deps = [
+    "${chip_root}/zzz_generated/app-common/clusters:all-enums",
+    "${chip_root}/zzz_generated/app-common/clusters/shared:enums",
+  ]
+  public_configs = [ ":includes" ]
+}

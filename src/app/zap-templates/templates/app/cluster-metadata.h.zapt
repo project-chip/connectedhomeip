@@ -1,0 +1,9 @@
+{{> header}}
+// This file is generated from Clusters.h.zapt
+
+#pragma once
+
+{{#zcl_clusters}}
+#include <clusters/{{asUpperCamelCase label}}/Metadata.h>
+#include <clusters/{{asUpperCamelCase label}}/MetadataProvider.h>
+{{/zcl_clusters}}
