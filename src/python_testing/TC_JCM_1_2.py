@@ -233,7 +233,7 @@ class TC_JCM_1_2(MatterBaseTest):
 
     def steps_TC_JCM_1_2(self) -> list[TestStep]:
         return [
-            TestStep("1", "On Ecosystem B, use jfc-app for opening a commissioning window in jfa-app using Python Controller"
+            TestStep("1", "On Ecosystem B, use jfc-app for opening a joint commissioning window in jfa-app using Python Controller"
                      "Check this Commissioning Window opens successfully with correct parameters"),
             TestStep("2", "On Ecosystem A, use jfc-app for commissioning jfa-app at EcosystemB using Python Controller"
                      "Verify Joint Commissioning completes successfully with --execute-jcm functionality"),
@@ -241,18 +241,18 @@ class TC_JCM_1_2(MatterBaseTest):
                      "Parse the NOC bytes and Checked that it contains the Administrator CAT")
         ]
 
-    async def _open_commissioning_window_in_EcoB(self, devCtrl, nodeid, discriminator, endpoint):
-        """Open commissioning window on jfa-app in Ecosystem B using Python Controller"""
+    async def _open_joint_commissioning_window_in_EcoB(self, devCtrl, nodeid, discriminator, endpoint):
+        """Open Joint commissioning window on jfa-app in Ecosystem B using Python Controller"""
 
-        # Open enhanced commissioning window using Administrator Commissioning cluster of jfa-app@EcoB
+        # Open joint commissioning window using Administrator Commissioning cluster of jfa-app@EcoB
         # Using devCtrlEcoB Python Controller
-        # Parameters matching: pairing open-commissioning-window 11 0 400 1000 {jfa-app--discriminator@EcoB}
+        # Parameters matching: jcm open-joint-commissioning-window 11 1 400 1000 {jfa-app--discriminator@EcoB}
         _ocw_timeout = 400  # 400 seconds ~ 6.5 minutes
         _ocw_iteration = 1000
 
         try:
-            # Open Enhanced Commissioning Window using Administrator Commissioning Cluster
-            params = await devCtrl.OpenCommissioningWindow(
+            # Open Joint Commissioning Window using Administrator Commissioning Cluster
+            params = await devCtrl.OpenJointCommissioningWindow(
                 nodeid=nodeid,
                 timeout=_ocw_timeout,
                 iteration=_ocw_iteration,
@@ -260,7 +260,7 @@ class TC_JCM_1_2(MatterBaseTest):
                 option=1
             )
 
-            logging.info(f"Successfully opened Enhanced Commissioning Window on node {nodeid}")
+            logging.info(f"Successfully opened Joint Commissioning Window on node {nodeid}")
             logging.info(f"Discriminator: {discriminator}, Timeout: {_ocw_timeout}s, setupPinCode: {params.setupPinCode}")
 
             # Verify commissioning window is open by reading WindowStatus attribute
