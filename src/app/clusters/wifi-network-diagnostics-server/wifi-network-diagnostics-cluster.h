@@ -48,7 +48,8 @@ public:
     WiFiDiagnosticsServerLogic(DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
                                const WiFiNetworkDiagnosticsEnabledAttributes & enabledAttributes,
                                BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
-        mDiagnosticProvider(diagnosticProvider), mEnabledAttributes(enabledAttributes), mFeatureFlags(featureFlags)
+        mDiagnosticProvider(diagnosticProvider),
+        mEnabledAttributes(enabledAttributes), mFeatureFlags(featureFlags)
     {}
 
     template <typename T, typename Type>
