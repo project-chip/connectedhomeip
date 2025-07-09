@@ -112,6 +112,14 @@ const Clusters::Descriptor::Structs::SemanticTagStruct::Type kLeftTagList[] = { 
 #include "oven-cavity-operational-state/chef-oven-cavity-operational-state.h"
 #endif // MATTER_DM_PLUGIN_OVEN_CAVITY_OPERATIONAL_STATE_SERVER
 
+#ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
+#include "microwave-oven-mode/chef-microwave-oven-mode.h"
+#endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
+#include "microwave-oven-control/chef-microwave-oven-control.h"
+#endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
+
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
                                                                          uint8_t * buffer, uint16_t maxReadLength)
@@ -523,6 +531,16 @@ void ApplicationInit()
     ChipLogProgress(NotSpecified, "Initializing OvenMode cluster.");
     ChefOvenMode::InitChefOvenModeCluster();
 #endif // MATTER_DM_PLUGIN_OVEN_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
+    ChipLogProgress(NotSpecified, "Initializing MicrowaveOvenMode cluster.");
+    ChefMicrowaveOvenMode::InitChefMicrowaveOvenModeCluster();
+#endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_MODE_SERVER
+
+#ifdef MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
+    ChipLogProgress(NotSpecified, "Initializing MicrowaveOvenControl cluster.");
+    InitChefMicrowaveOvenControlCluster();
+#endif // MATTER_DM_PLUGIN_MICROWAVE_OVEN_CONTROL_SERVER
 }
 
 void ApplicationShutdown()
