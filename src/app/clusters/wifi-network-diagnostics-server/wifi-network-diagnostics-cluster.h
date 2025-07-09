@@ -32,11 +32,6 @@ namespace Clusters {
 
 struct WiFiNetworkDiagnosticsEnabledAttributes
 {
-    bool enableBssid : 1;
-    bool enableSecurityType : 1;
-    bool enableWiFiVersion : 1;
-    bool enableChannelNumber : 1;
-    bool enableRssi : 1;
     bool enableBeaconLostCount : 1;
     bool enableBeaconRxCount : 1;
     bool enablePacketMulticastRxCount : 1;
@@ -53,8 +48,7 @@ public:
     WiFiDiagnosticsServerLogic(DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
                                const WiFiNetworkDiagnosticsEnabledAttributes & enabledAttributes,
                                BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
-        mDiagnosticProvider(diagnosticProvider),
-        mEnabledAttributes(enabledAttributes), mFeatureFlags(featureFlags)
+        mDiagnosticProvider(diagnosticProvider), mEnabledAttributes(enabledAttributes), mFeatureFlags(featureFlags)
     {}
 
     template <typename T, typename Type>
