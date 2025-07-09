@@ -283,7 +283,7 @@ void ClosureControlEndpoint::UpdateCurrentStateFromTargetState()
             !overallCurrentState.Value().latch.Value().IsNull() && overallCurrentState.Value().latch.Value().Value() == true;
     }
 
-    overallCurrentState.Value().secureState.SetValue(MakeNullable(isClosureInSecureState));
+    overallCurrentState.Value().secureState.SetNonNull(isClosureInSecureState);
 
     mLogic.SetOverallCurrentState(overallCurrentState);
 }
