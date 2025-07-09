@@ -165,7 +165,7 @@ Status EnergyEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t>
  *
  * If either time is null, it returns the other time. If both are non-null, it returns the earlier one.
  */
-static DataModel::Nullable<uint32_t> getEarliestTime(const DataModel::Nullable<uint32_t> & time1,
+static DataModel::Nullable<uint32_t> GetEarliestTime(const DataModel::Nullable<uint32_t> & time1,
                                                      const DataModel::Nullable<uint32_t> & time2)
 {
     if (time1.IsNull())
@@ -184,7 +184,7 @@ static DataModel::Nullable<uint32_t> getEarliestTime(const DataModel::Nullable<u
  */
 static bool IsTimeExpired(const DataModel::Nullable<uint32_t> & timeValue, uint32_t currentTime)
 {
-    return !timeValue.IsNull() && (static_cast<int32_t>(timeValue.Value() - currentTime) <= 0);
+    return !timeValue.IsNull() && (timeValue.Value() <= currentTime);
 }
 /**
  * @brief    Helper function to handle timer expiration when in enabled state
@@ -304,11 +304,11 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
         return Status::Failure; // Can't get time, skip scheduling
     }
 
-    int32_t delta = static_cast<int32_t>(enabledUntilTime.Value() - matterEpoch);
-    if (delta > 0)
+    if (enabledUntilTime.Value() > matterEpoch)
     {
         // Timer hasn't expired yet - schedule future check
-        ChipLogDetail(AppServer, "Setting EVSE Enable check timer for %ld seconds", static_cast<long int>(delta));
+        uint32_t delta = enabledUntilTime.Value() - matterEpoch;
+        ChipLogDetail(AppServer, "Setting EVSE Enable check timer for %lu seconds", static_cast<unsigned long >(delta));
         DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(delta), EvseCheckTimerExpiry, this);
         return Status::Success;
     }
