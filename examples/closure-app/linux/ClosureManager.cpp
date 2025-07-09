@@ -103,6 +103,7 @@ void ClosureManager::Init()
     ChipLogProgress(AppServer, "Initial state for Closure Panel Endpoint 2 set successfully");
     VerifyOrDie(SetClosurePanelInitialState(mClosurePanelEndpoint3) == CHIP_NO_ERROR);
     ChipLogProgress(AppServer, "Initial state for Closure Panel Endpoint 3 set successfully");
+
     TestEventTriggerDelegate * pTestEventDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
 
     if (pTestEventDelegate != nullptr)
@@ -116,6 +117,20 @@ void ClosureManager::Init()
     else
     {
         ChipLogError(AppServer, "TestEventTriggerDelegate is null, cannot add handler for delegate");
+    }
+}
+
+void ClosureManager::Shutdown()
+{
+    TestEventTriggerDelegate * pTestEventDelegate = Server::GetInstance().GetTestEventTriggerDelegate();
+
+    if (pTestEventDelegate != nullptr)
+    {
+        pTestEventDelegate->RemoveHandler(&mClosureEndpoint1.GetDelegate());
+    }
+    else
+    {
+        ChipLogError(AppServer, "TestEventTriggerDelegate is null, cannot remove handler for delegate");
     }
 }
 
