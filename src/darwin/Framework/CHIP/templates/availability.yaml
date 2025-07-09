@@ -11760,7 +11760,7 @@
       bitmap values:
           ElectricalEnergyMeasurement:
               Feature:
-                  # In-progress for Matter 1.6
+                  # In-progress for Matter 1.5
                   - ApparentEnergy
                   - ReactiveEnergy
       device types:
