@@ -75,7 +75,7 @@ the OpenThread integration with the Matter SDK.
       bool device_type        // ftd or mtd
       bool network_data       // full or stable
     -->
-    <property name="LinkMode" type="(bbb)" access="readwrite">
+    <property name="LinkMode" type="(bbb)" access="write">
       <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
     </property>
 
@@ -94,13 +94,6 @@ the OpenThread integration with the Matter SDK.
     </property>
 
     <!--
-    The 64-bit extended address.
-    -->
-    <property name="ExtendedAddress" type="t" access="read">
-      <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
-    </property>
-
-    <!--
     The list of current external route rules.
 
     The structure definition for a single route rule:
@@ -115,14 +108,14 @@ the OpenThread integration with the Matter SDK.
         bool next_hop_is_self
       }
     -->
-    <property name="ExternalRoutes" type="a((ayy)qybb)" access="read">
+    <property name="ExternalRoutes" type="a((ayy)qybb)" access="write">
       <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
     </property>
 
     <!--
     The Thread active dataset TLV in binary form.
     -->
-    <property name="ActiveDatasetTlvs" type="ay" access="readwrite">
+    <property name="ActiveDatasetTlvs" type="ay" access="write">
       <annotation name="org.gtk.GDBus.C.ForceGVariant" value="true"/>
       <annotation name="org.freedesktop.DBus.Property.EmitsChangedSignal" value="false"/>
     </property>
