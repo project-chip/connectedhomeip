@@ -29,7 +29,6 @@
 #include <DeviceInfoProviderImpl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/TestEventTriggerDelegate.h>
-#include <app/clusters/general-diagnostics-server/GenericFaultTestEventTriggerHandler.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-server.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
@@ -217,7 +216,6 @@ void AppTask::InitServer(intptr_t arg)
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
     initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
 
-    // Use GenericFaultTestEventTriggerHandler to inject faults
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate{};
     static OTATestEventTriggerHandler sOtaTestEventTriggerHandler{};
     VerifyOrDie(sTestEventTriggerDelegate.Init(ByteSpan(sTestEventTriggerEnableKey)) == CHIP_NO_ERROR);
@@ -287,6 +285,11 @@ void AppTask::ThermostatHandler(AppEvent * aEvent)
 void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnPressed)
 {
     if (btnIdx != APP_TEMPERATURE_BUTTON && btnIdx != APP_FUNCTION_BUTTON)
+    {
+        return;
+    }
+
+    if (!chip::DeviceManager::CHIPDeviceManager::GetInstance().IsInitDone())
     {
         return;
     }

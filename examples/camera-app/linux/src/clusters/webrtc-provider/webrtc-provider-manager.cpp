@@ -32,14 +32,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 
-using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
-using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
-using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandidateStruct::Type;
-using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
-using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
-
-using namespace Camera;
-
 namespace {
 
 // Constants
@@ -377,8 +369,14 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    mPeerConnection->setRemoteDescription(sdpAnswer);
+    if (mWebrtcTransportMap.find(sessionId) == mWebrtcTransportMap.end())
+    {
+        mWebrtcTransportMap[sessionId] =
+            std::unique_ptr<WebrtcTransport>(new WebrtcTransport(sessionId, mPeerId.GetNodeId(), mPeerConnection));
+    }
+    AcquireAudioVideoStreams();
 
+    mPeerConnection->setRemoteDescription(sdpAnswer);
     MoveToState(State::SendingICECandidates);
     ScheduleICECandidatesSend();
 
@@ -425,6 +423,10 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideICECandidates(uint16_t sessionId,
         }
     }
 
+    // Schedule sending Ice Candidates when remote candidates are received. This keeps the exchange simple
+    MoveToState(State::SendingICECandidates);
+    ScheduleICECandidatesSend();
+
     return CHIP_NO_ERROR;
 }
 
@@ -432,7 +434,8 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
                                                    DataModel::Nullable<uint16_t> videoStreamID,
                                                    DataModel::Nullable<uint16_t> audioStreamID)
 {
-    if (mWebrtcTransportMap.find(sessionId) != mWebrtcTransportMap.end())
+    auto it = mWebrtcTransportMap.find(sessionId);
+    if (it != mWebrtcTransportMap.end())
     {
         ChipLogProgress(Camera, "Delete Webrtc Transport for the session: %u", sessionId);
 
@@ -441,7 +444,15 @@ CHIP_ERROR WebRTCProviderManager::HandleEndSession(uint16_t sessionId, WebRTCEnd
         // TODO: Lookup the sessionID to get the Video/Audio StreamID
         ReleaseAudioVideoStreams();
 
-        mWebrtcTransportMap.erase(sessionId);
+        mMediaController->UnregisterTransport(it->second.get());
+        mWebrtcTransportMap.erase(it);
+    }
+
+    if (mPeerConnection)
+    {
+        ChipLogProgress(Camera, "Closing peer connection: %u", sessionId);
+        mPeerConnection->close();
+        mPeerConnection.reset();
     }
 
     if (mCurrentSessionId == sessionId)
@@ -460,8 +471,80 @@ WebRTCProviderManager::ValidateStreamUsage(StreamUsageEnum streamUsage,
                                            const Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                            const Optional<DataModel::Nullable<uint16_t>> & audioStreamId)
 {
-    // TODO: Validates the requested stream usage against the camera's resource management and stream priority policies.
-    return CHIP_NO_ERROR;
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+
+    return avsmController.ValidateStreamUsage(streamUsage, videoStreamId, audioStreamId);
+}
+
+CHIP_ERROR WebRTCProviderManager::ValidateVideoStreamID(uint16_t videoStreamId)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+
+    return avsmController.ValidateVideoStreamID(videoStreamId);
+}
+
+CHIP_ERROR WebRTCProviderManager::ValidateAudioStreamID(uint16_t audioStreamId)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+
+    return avsmController.ValidateAudioStreamID(audioStreamId);
+}
+
+CHIP_ERROR WebRTCProviderManager::IsPrivacyModeActive(bool & isActive)
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+
+    return avsmController.IsPrivacyModeActive(isActive);
+}
+
+bool WebRTCProviderManager::HasAllocatedVideoStreams()
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return false;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+
+    return avsmController.HasAllocatedVideoStreams();
+}
+
+bool WebRTCProviderManager::HasAllocatedAudioStreams()
+{
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return false;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+
+    return avsmController.HasAllocatedAudioStreams();
 }
 
 void WebRTCProviderManager::MoveToState(const State targetState)

@@ -1,0 +1,2 @@
+OwnershipContext.trustedIcacPublicKeyB max_size:65    // Maximum size of trustedIcacPublicKeyB
+ICACCSR.csr max_size:600                              // Maximum size of ICACCSR

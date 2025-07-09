@@ -17,86 +17,30 @@
  */
 #include "ClosureControlEndpoint.h"
 #include "ClosureDimensionEndpoint.h"
+#include "ClosureManager.h"
 #include <AppMain.h>
-
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/attribute-storage.h>
-#include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::ClosureControl;
 using namespace chip::app::Clusters::ClosureDimension;
 
-namespace {
-
-// Define the endpoint ID for the Closure
-constexpr chip::EndpointId kClosureEndpoint       = 1;
-constexpr chip::EndpointId kClosurePanel1Endpoint = 2;
-constexpr chip::EndpointId kClosurePanel2Endpoint = 3;
-
-// Closure Endpoints
-ClosureControlEndpoint ep1(kClosureEndpoint);
-ClosureDimensionEndpoint ep2(kClosurePanel1Endpoint);
-ClosureDimensionEndpoint ep3(kClosurePanel2Endpoint);
-
-// Define the Namespace and Tag for the endpoint
-// Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
-constexpr uint8_t kNamespaceClosure   = 0x44;
-constexpr uint8_t kTagClosureCovering = 0x00;
-// Derived from
-// https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure-Covering.adoc
-constexpr uint8_t kNamespaceCovering   = 0x46;
-constexpr uint8_t kTagCoveringVenetian = 0x03;
-// Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-ClosurePanel.adoc
-constexpr uint8_t kNamespaceClosurePanel = 0x45;
-constexpr uint8_t kTagClosurePanelLift   = 0x00;
-constexpr uint8_t kTagClosurePanelTilt   = 0x01;
-
-// Define the list of semantic tags for the endpoint
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp1TagList[] = {
-    { .namespaceID = kNamespaceClosure,
-      .tag         = kTagClosureCovering,
-      .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("Closure.Covering"_span)) },
-    { .namespaceID = kNamespaceCovering,
-      .tag         = kTagCoveringVenetian,
-      .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("Covering.Venetian"_span)) },
-};
-
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp2TagList[] = {
-    { .namespaceID = kNamespaceClosurePanel,
-      .tag         = kTagClosurePanelLift,
-      .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("ClosurePanel.Lift"_span)) },
-};
-
-const Clusters::Descriptor::Structs::SemanticTagStruct::Type gEp3TagList[] = {
-    { .namespaceID = kNamespaceClosurePanel,
-      .tag         = kTagClosurePanelTilt,
-      .label       = chip::MakeOptional(DataModel::Nullable<chip::CharSpan>("ClosurePanel.Tilt"_span)) },
-};
-
-} // namespace
-
 void ApplicationInit()
 {
     DeviceLayer::PlatformMgr().LockChipStack();
 
-    // Closure endpoints initilization
-    ep1.Init();
-    ep2.Init();
-    ep3.Init();
-
-    // Set Taglist for Closure endpoints
-    SetTagList(/* endpoint= */ 1, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp1TagList));
-    SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp2TagList));
-    SetTagList(/* endpoint= */ 3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(gEp3TagList));
-
+    ChipLogDetail(NotSpecified, "ApplicationInit Start()");
+    ClosureManager::GetInstance().Init();
+    ChipLogDetail(NotSpecified, "ApplicationInit Complete()");
     DeviceLayer::PlatformMgr().UnlockChipStack();
 }
 
 void ApplicationShutdown()
 {
     ChipLogDetail(NotSpecified, "ApplicationShutdown()");
+    DeviceLayer::PlatformMgr().LockChipStack();
+    ClosureManager::GetInstance().Shutdown();
+    DeviceLayer::PlatformMgr().UnlockChipStack();
 }
 
 int main(int argc, char * argv[])

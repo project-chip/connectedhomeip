@@ -137,6 +137,41 @@ void SetTestEventTrigger_EVSEDiagnosticsComplete()
     dg->HwDiagnosticsComplete();
 }
 
+void SetTestEventTrigger_EVSESetSoCLow()
+{
+    // Set SoC 20%, 70kWh BatterySize
+    EnergyEvseDelegate * dg = GetEvseDelegate();
+    dg->SetStateOfCharge(20);
+    dg->SetBatteryCapacity(70000000);
+}
+void SetTestEventTrigger_EVSESetSoCHigh()
+{
+    // Set SoC 95%, 70kWh BatterySize
+    EnergyEvseDelegate * dg = GetEvseDelegate();
+    dg->SetStateOfCharge(95);
+    dg->SetBatteryCapacity(70000000);
+}
+void SetTestEventTrigger_EVSESetSoCClear()
+{
+    // Set SoC null, BatterySize nu;;
+    EnergyEvseDelegate * dg = GetEvseDelegate();
+    DataModel::Nullable<uint8_t> noSoC;
+    DataModel::Nullable<int64_t> noBatteryCapacity;
+    dg->SetStateOfCharge(noSoC);
+    dg->SetBatteryCapacity(noBatteryCapacity);
+}
+void SetTestEventTrigger_EVSESetVehicleID()
+{
+    CharSpan vehicleIdSpan = "Test-Vehicle-ID-012345789-ABCDEF"_span;
+
+    EnergyEvseDelegate * dg = GetEvseDelegate();
+    dg->HwSetVehicleID(vehicleIdSpan);
+}
+void SetTestEventTrigger_EVSETriggerRFID()
+{
+    // TODO
+}
+
 bool HandleEnergyEvseTestEventTrigger(uint64_t eventTrigger)
 {
     EnergyEvseTrigger trigger = static_cast<EnergyEvseTrigger>(eventTrigger);
@@ -190,6 +225,26 @@ bool HandleEnergyEvseTestEventTrigger(uint64_t eventTrigger)
     case EnergyEvseTrigger::kEVTimeOfUseModeClear:
         ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EV TimeOfUse Mode clear");
         SetTestEventTrigger_EVTimeOfUseModeClear();
+        break;
+    case EnergyEvseTrigger::kEVSESetSoCLow:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EVSE Set SoC Low");
+        SetTestEventTrigger_EVSESetSoCLow();
+        break;
+    case EnergyEvseTrigger::kEVSESetSoCHigh:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EVSE Set SoC High");
+        SetTestEventTrigger_EVSESetSoCHigh();
+        break;
+    case EnergyEvseTrigger::kEVSESetSoCClear:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EVSE Set SoC Clear");
+        SetTestEventTrigger_EVSESetSoCClear();
+        break;
+    case EnergyEvseTrigger::kEVSESetVehicleID:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EVSE Set VehicleID");
+        SetTestEventTrigger_EVSESetVehicleID();
+        break;
+    case EnergyEvseTrigger::kEVSETriggerRFID:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EVSE Trigger RFID");
+        SetTestEventTrigger_EVSETriggerRFID();
         break;
     default:
         return false;

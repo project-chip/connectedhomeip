@@ -42,8 +42,8 @@ import time
 
 import chip.clusters as Clusters
 import test_plan_support
-from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
-                                         has_cluster, run_if_endpoint_matches)
+from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 
 
@@ -169,7 +169,8 @@ class TC_LVL_2_3(MatterBaseTest):
 
         self.step(13)
         if (lvl.Bitmaps.Feature.kLighting & feature_map) == 0:
-            self.skip_all_remaining_steps(15)
+            self.mark_all_remaining_steps_skipped(15)
+            return
 
         self.step(15)
         # reports are stored by the handler, so just reset so we get a clean look

@@ -26,8 +26,6 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::Chime::Structs;
 
-using namespace Camera;
-
 // Chime Cluster Methods
 CHIP_ERROR ChimeManager::GetChimeSoundByIndex(uint8_t chimeIndex, uint8_t & chimeID, MutableCharSpan & name)
 {

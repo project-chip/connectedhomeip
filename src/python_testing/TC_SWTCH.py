@@ -86,8 +86,8 @@ import chip.clusters as Clusters
 import test_plan_support
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult
-from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, EventChangeCallback, MatterBaseTest,
-                                         TestStep, await_sequence_of_reports, default_matter_test_main, has_feature,
+from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator, EventChangeCallback, await_sequence_of_reports
+from chip.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep, default_matter_test_main, has_feature,
                                          run_if_endpoint_matches)
 from chip.tlv import uint
 from mobly import asserts
@@ -523,7 +523,8 @@ class TC_SwitchTests(MatterBaseTest):
 
         if not has_ms_feature:
             logging.info("Skipping rest of test: SWTCH.S.F01(MS) feature not present")
-            self.skip_all_remaining_steps("2")
+            self.mark_all_remaining_steps_skipped("2")
+            return
 
         # Step 2: Set up subscription to all events and attributes of Switch cluster on the endpoint
         self.step(2)
@@ -738,7 +739,7 @@ class TC_SwitchTests(MatterBaseTest):
             test_multi_press_sequence("6b", count=3)
 
         if not has_msl_feature:
-            self.skip_all_remaining_steps(7)
+            self.mark_all_remaining_steps_skipped(7)
             return
 
         self.step(7)
@@ -904,7 +905,7 @@ class TC_SwitchTests(MatterBaseTest):
 
         self.step("7a")
         if not has_msl_feature:
-            self.skip_all_remaining_steps("7b")
+            self.mark_all_remaining_steps_skipped("7b")
             return
 
         # subscription is already established

@@ -63,23 +63,24 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServer::Init()
     // Make sure mandated Features are set
     //
     VerifyOrReturnError(HasFeature(Feature::kMechanicalPan) || HasFeature(Feature::kMechanicalTilt) ||
-                            HasFeature(Feature::kMechanicalZoom),
+                            HasFeature(Feature::kMechanicalZoom) || HasFeature(Feature::kDigitalPTZ),
                         CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(Zcl,
                                      "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. At least one of "
-                                     "Pan, Tilt, or Zoom must be supported",
+                                     "Mechanical Pan, Tilt, Zoom or Digital PTZ must be supported",
                                      mEndpointId));
 
     // All of the attributes are dependent on Feature Flags being set, ensure that this is the case
     //
-    // However MPTZPosition is dependent on one of Pan, Tilt, or Zoom, we wouldn't be at this point if one of those weren't set, so
-    // we explicitly check that it is present
-    //
-    if (!SupportsOptAttr(OptionalAttributes::kMptzPosition))
+    if (SupportsOptAttr(OptionalAttributes::kMptzPosition))
     {
-        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. MPTZPosition must be supported",
-                     mEndpointId);
-        return CHIP_ERROR_INVALID_ARGUMENT;
+        VerifyOrReturnError(
+            HasFeature(Feature::kMechanicalPan) || HasFeature(Feature::kMechanicalTilt) || HasFeature(Feature::kMechanicalZoom),
+            CHIP_ERROR_INVALID_ARGUMENT,
+            ChipLogError(Zcl,
+                         "CameraAVSettingsUserLevelMgmt[ep=%d]: Feature configuration error. If MPTZPosition is enabled "
+                         "then one of Pan, Tilt, or Zoom is required",
+                         mEndpointId));
     }
 
     if (SupportsOptAttr(OptionalAttributes::kMaxPresets))
@@ -373,7 +374,8 @@ void CameraAvSettingsUserLevelMgmtServer::SetZoom(Optional<uint8_t> aZoom)
 /**
  * Methods handling known video stream IDs, the addition and removal thereof.
  */
-void CameraAvSettingsUserLevelMgmtServer::AddMoveCapableVideoStream(uint16_t aVideoStreamID, ViewportStruct::Type aViewport)
+void CameraAvSettingsUserLevelMgmtServer::AddMoveCapableVideoStream(uint16_t aVideoStreamID,
+                                                                    Globals::Structs::ViewportStruct::Type aViewport)
 {
     DPTZStruct dptzEntry;
     dptzEntry.videoStreamID = aVideoStreamID;
@@ -382,7 +384,8 @@ void CameraAvSettingsUserLevelMgmtServer::AddMoveCapableVideoStream(uint16_t aVi
     MarkDirty(Attributes::DPTZStreams::Id);
 }
 
-void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStream(uint16_t aVideoStreamID, ViewportStruct::Type aViewport)
+void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStream(uint16_t aVideoStreamID,
+                                                                       Globals::Structs::ViewportStruct::Type aViewport)
 {
     auto it = std::find_if(mDptzStreams.begin(), mDptzStreams.end(),
                            [aVideoStreamID](const DPTZStruct & dptzs) { return dptzs.videoStreamID == aVideoStreamID; });
@@ -398,7 +401,7 @@ void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStream(uint16_t 
     MarkDirty(Attributes::DPTZStreams::Id);
 }
 
-void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStreams(ViewportStruct::Type aViewport)
+void CameraAvSettingsUserLevelMgmtServer::UpdateMoveCapableVideoStreams(Globals::Structs::ViewportStruct::Type aViewport)
 {
     for (auto & dptzStream : mDptzStreams)
     {
@@ -1219,8 +1222,8 @@ void CameraAvSettingsUserLevelMgmtServer::HandleMPTZRemovePreset(HandlerContext 
 void CameraAvSettingsUserLevelMgmtServer::HandleDPTZSetViewport(HandlerContext & ctx,
                                                                 const Commands::DPTZSetViewport::DecodableType & commandData)
 {
-    uint16_t videoStreamID                 = commandData.videoStreamID;
-    Structs::ViewportStruct::Type viewport = commandData.viewport;
+    uint16_t videoStreamID                          = commandData.videoStreamID;
+    Globals::Structs::ViewportStruct::Type viewport = commandData.viewport;
 
     // Is this a video stream ID of which we have already been informed?
     // If not, fail.
@@ -1280,7 +1283,7 @@ void CameraAvSettingsUserLevelMgmtServer::HandleDPTZRelativeMove(HandlerContext 
     }
 
     // Create a viewport and call the delegate; on success update our Stream Viewport with that which was set
-    ViewportStruct::Type viewport;
+    Globals::Structs::ViewportStruct::Type viewport;
     Status status = mDelegate.DPTZRelativeMove(videoStreamID, deltaX, deltaY, zoomDelta, viewport);
 
     if (status == Status::Success)

@@ -125,7 +125,6 @@ public:
         return Status::Success;
     }
     Status HandleCalibrateCommand() override { return Status::Success; }
-    CHIP_ERROR GetCurrentErrorAtIndex(size_t index, ClosureErrorEnum & closureError) override { return CHIP_NO_ERROR; }
 
     bool IsManualLatchingNeeded() override { return false; }
     bool IsReadyToMove() override { return true; }
@@ -206,6 +205,69 @@ TEST_F(TestClosureControlClusterLogic, Init_InvalidConformance)
 {
     conformance.FeatureMap().Set(Feature::kPositioning).Set(Feature::kSpeed).Set(Feature::kInstantaneous);
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
+}
+
+TEST_F(TestClosureControlClusterLogic, ReadFeatureMap_Init)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+}
+
+TEST_F(TestClosureControlClusterLogic, GetFeatureMap_WithoutInit)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning);
+
+    mockContext.ResetDirtyFlag();
+    mockContext.ResetReportedAttributeId();
+
+    BitFlags<Feature> featureMap;
+    EXPECT_EQ(logic->GetFeatureMap(featureMap), CHIP_ERROR_INCORRECT_STATE);
+
+    EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
+}
+
+TEST_F(TestClosureControlClusterLogic, GetFeatureMap_WithInit)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+
+    mockContext.ResetDirtyFlag();
+    mockContext.ResetReportedAttributeId();
+
+    BitFlags<Feature> featureMap;
+    EXPECT_EQ(logic->GetFeatureMap(featureMap), CHIP_NO_ERROR);
+
+    EXPECT_EQ(featureMap, conformance.FeatureMap());
+    EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
+}
+
+TEST_F(TestClosureControlClusterLogic, GetClusterRevision_WithoutInit)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning);
+
+    mockContext.ResetDirtyFlag();
+    mockContext.ResetReportedAttributeId();
+
+    Attributes::ClusterRevision::TypeInfo::Type clusterRevision;
+    EXPECT_EQ(logic->GetClusterRevision(clusterRevision), CHIP_ERROR_INCORRECT_STATE);
+
+    EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
+}
+
+TEST_F(TestClosureControlClusterLogic, GetClusterRevision_WithInit)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+
+    mockContext.ResetDirtyFlag();
+    mockContext.ResetReportedAttributeId();
+
+    uint16_t kExpectedClusterRevision = 1u;
+    Attributes::ClusterRevision::TypeInfo::Type clusterRevision;
+    EXPECT_EQ(logic->GetClusterRevision(clusterRevision), CHIP_NO_ERROR);
+
+    EXPECT_EQ(clusterRevision, kExpectedClusterRevision);
+    EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
 }
 
 TEST_F(TestClosureControlClusterLogic, SetMainState_Stopped)
@@ -621,20 +683,20 @@ TEST_F(TestClosureControlClusterLogic, SetOverallState_ValidPositioningOnly)
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
-    DataModel::Nullable<GenericOverallState> overallState(
-        GenericOverallState(Optional(DataModel::MakeNullable(PositioningEnum::kFullyOpened)), NullOptional, NullOptional));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(GenericOverallCurrentState(
+        Optional(DataModel::MakeNullable(CurrentPositionEnum::kFullyOpened)), NullOptional, NullOptional));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
-    DataModel::Nullable<GenericOverallState> readValue;
-    EXPECT_EQ(logic->GetOverallState(readValue), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> readValue;
+    EXPECT_EQ(logic->GetOverallCurrentState(readValue), CHIP_NO_ERROR);
 
     EXPECT_FALSE(readValue.IsNull());
-    EXPECT_EQ(readValue.Value().positioning.Value().Value(), PositioningEnum::kFullyOpened);
+    EXPECT_EQ(readValue.Value().position.Value().Value(), CurrentPositionEnum::kFullyOpened);
     EXPECT_FALSE(readValue.Value().latch.HasValue());
     EXPECT_FALSE(readValue.Value().speed.HasValue());
 
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
-    EXPECT_TRUE(mockContext.MatchesReportedAttributeId(Attributes::OverallState::Id));
+    EXPECT_TRUE(mockContext.MatchesReportedAttributeId(Attributes::OverallCurrentState::Id));
 }
 
 TEST_F(TestClosureControlClusterLogic, SetOverallState_InvalidSpeedPositioningOnly)
@@ -645,13 +707,13 @@ TEST_F(TestClosureControlClusterLogic, SetOverallState_InvalidSpeedPositioningOn
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
-    DataModel::Nullable<GenericOverallState> overallState(
-        GenericOverallState(Optional(DataModel::MakeNullable(PositioningEnum::kFullyOpened)), NullOptional,
-                            Optional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kLow))));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kFullyOpened)), NullOptional,
+                                   Optional(Globals::ThreeLevelAutoEnum::kLow)));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-    DataModel::Nullable<GenericOverallState> readValue;
-    EXPECT_EQ(logic->GetOverallState(readValue), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> readValue;
+    EXPECT_EQ(logic->GetOverallCurrentState(readValue), CHIP_NO_ERROR);
 
     EXPECT_TRUE(readValue.IsNull());
     EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
@@ -665,12 +727,12 @@ TEST_F(TestClosureControlClusterLogic, SetOverallState_InvalidLatchPositioningOn
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
-    DataModel::Nullable<GenericOverallState> overallState(
-        GenericOverallState(Optional(DataModel::MakeNullable(PositioningEnum::kFullyOpened)), Optional(true), NullOptional));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(GenericOverallCurrentState(
+        Optional(DataModel::MakeNullable(CurrentPositionEnum::kFullyOpened)), Optional(true), NullOptional));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-    DataModel::Nullable<GenericOverallState> readValue;
-    EXPECT_EQ(logic->GetOverallState(readValue), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> readValue;
+    EXPECT_EQ(logic->GetOverallCurrentState(readValue), CHIP_NO_ERROR);
 
     EXPECT_TRUE(readValue.IsNull());
     EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
@@ -684,20 +746,20 @@ TEST_F(TestClosureControlClusterLogic, SetOverallState_ValidPositioningAndMotion
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
-    DataModel::Nullable<GenericOverallState> overallState(
-        GenericOverallState(Optional(DataModel::MakeNullable(PositioningEnum::kPartiallyOpened)), Optional(true), NullOptional));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(GenericOverallCurrentState(
+        Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), Optional(true), NullOptional));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
-    DataModel::Nullable<GenericOverallState> readValue;
-    EXPECT_EQ(logic->GetOverallState(readValue), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> readValue;
+    EXPECT_EQ(logic->GetOverallCurrentState(readValue), CHIP_NO_ERROR);
 
     EXPECT_FALSE(readValue.IsNull());
-    EXPECT_EQ(readValue.Value().positioning.Value().Value(), PositioningEnum::kPartiallyOpened);
+    EXPECT_EQ(readValue.Value().position.Value().Value(), CurrentPositionEnum::kPartiallyOpened);
     EXPECT_EQ(readValue.Value().latch.Value().Value(), true);
     EXPECT_FALSE(readValue.Value().speed.HasValue());
 
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
-    EXPECT_TRUE(mockContext.MatchesReportedAttributeId(Attributes::OverallState::Id));
+    EXPECT_TRUE(mockContext.MatchesReportedAttributeId(Attributes::OverallCurrentState::Id));
 }
 
 TEST_F(TestClosureControlClusterLogic, SetOverallState_InvalidSpeedPositioningAndMotionLatching)
@@ -708,13 +770,13 @@ TEST_F(TestClosureControlClusterLogic, SetOverallState_InvalidSpeedPositioningAn
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
-    DataModel::Nullable<GenericOverallState> overallState(
-        GenericOverallState(Optional(DataModel::MakeNullable(PositioningEnum::kPartiallyOpened)), Optional(true),
-                            Optional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kLow))));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), Optional(true),
+                                   Optional(Globals::ThreeLevelAutoEnum::kLow)));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-    DataModel::Nullable<GenericOverallState> readValue;
-    EXPECT_EQ(logic->GetOverallState(readValue), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> readValue;
+    EXPECT_EQ(logic->GetOverallCurrentState(readValue), CHIP_NO_ERROR);
 
     EXPECT_TRUE(readValue.IsNull());
     EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
@@ -728,21 +790,21 @@ TEST_F(TestClosureControlClusterLogic, SetOverallState_ValidPositioningAndSpeed)
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
-    DataModel::Nullable<GenericOverallState> overallState(
-        GenericOverallState(Optional(DataModel::MakeNullable(PositioningEnum::kFullyClosed)), NullOptional,
-                            Optional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kLow))));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed)), NullOptional,
+                                   Optional(Globals::ThreeLevelAutoEnum::kLow)));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
-    DataModel::Nullable<GenericOverallState> readValue;
-    EXPECT_EQ(logic->GetOverallState(readValue), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> readValue;
+    EXPECT_EQ(logic->GetOverallCurrentState(readValue), CHIP_NO_ERROR);
 
     EXPECT_FALSE(readValue.IsNull());
-    EXPECT_EQ(readValue.Value().positioning.Value().Value(), PositioningEnum::kFullyClosed);
+    EXPECT_EQ(readValue.Value().position.Value().Value(), CurrentPositionEnum::kFullyClosed);
     EXPECT_FALSE(readValue.Value().latch.HasValue());
-    EXPECT_EQ(readValue.Value().speed.Value().Value(), Globals::ThreeLevelAutoEnum::kLow);
+    EXPECT_EQ(readValue.Value().speed.Value(), Globals::ThreeLevelAutoEnum::kLow);
 
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
-    EXPECT_TRUE(mockContext.MatchesReportedAttributeId(Attributes::OverallState::Id));
+    EXPECT_TRUE(mockContext.MatchesReportedAttributeId(Attributes::OverallCurrentState::Id));
 }
 
 TEST_F(TestClosureControlClusterLogic, SetOverallState_InvalidLatchPositioningAndSpeed)
@@ -753,13 +815,13 @@ TEST_F(TestClosureControlClusterLogic, SetOverallState_InvalidLatchPositioningAn
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
-    DataModel::Nullable<GenericOverallState> overallState(
-        GenericOverallState(Optional(DataModel::MakeNullable(PositioningEnum::kFullyClosed)), Optional(true),
-                            Optional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kLow))));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed)), Optional(true),
+                                   Optional(Globals::ThreeLevelAutoEnum::kLow)));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-    DataModel::Nullable<GenericOverallState> readValue;
-    EXPECT_EQ(logic->GetOverallState(readValue), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> readValue;
+    EXPECT_EQ(logic->GetOverallCurrentState(readValue), CHIP_NO_ERROR);
 
     EXPECT_TRUE(readValue.IsNull());
     EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
@@ -773,21 +835,21 @@ TEST_F(TestClosureControlClusterLogic, SetOverallState_ValidAllFeatures)
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
-    DataModel::Nullable<GenericOverallState> overallState(
-        GenericOverallState(Optional(DataModel::MakeNullable(PositioningEnum::kFullyOpened)), Optional(true),
-                            Optional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kHigh))));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kFullyOpened)), Optional(true),
+                                   Optional(Globals::ThreeLevelAutoEnum::kHigh)));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
-    DataModel::Nullable<GenericOverallState> readValue;
-    EXPECT_EQ(logic->GetOverallState(readValue), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> readValue;
+    EXPECT_EQ(logic->GetOverallCurrentState(readValue), CHIP_NO_ERROR);
 
     EXPECT_FALSE(readValue.IsNull());
-    EXPECT_EQ(readValue.Value().positioning.Value().Value(), PositioningEnum::kFullyOpened);
+    EXPECT_EQ(readValue.Value().position.Value().Value(), CurrentPositionEnum::kFullyOpened);
     EXPECT_EQ(readValue.Value().latch.Value().Value(), true);
-    EXPECT_EQ(readValue.Value().speed.Value().Value(), Globals::ThreeLevelAutoEnum::kHigh);
+    EXPECT_EQ(readValue.Value().speed.Value(), Globals::ThreeLevelAutoEnum::kHigh);
 
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
-    EXPECT_TRUE(mockContext.MatchesReportedAttributeId(Attributes::OverallState::Id));
+    EXPECT_TRUE(mockContext.MatchesReportedAttributeId(Attributes::OverallCurrentState::Id));
 }
 
 TEST_F(TestClosureControlClusterLogic, SetOverallState_ValidNullToNull)
@@ -799,11 +861,11 @@ TEST_F(TestClosureControlClusterLogic, SetOverallState_ValidNullToNull)
     mockContext.ResetReportedAttributeId();
 
     // Set the attribute to null
-    DataModel::Nullable<GenericOverallState> overallState;
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
-    DataModel::Nullable<GenericOverallState> readValue;
-    EXPECT_EQ(logic->GetOverallState(readValue), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> readValue;
+    EXPECT_EQ(logic->GetOverallCurrentState(readValue), CHIP_NO_ERROR);
 
     EXPECT_TRUE(readValue.IsNull());
     EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
@@ -818,30 +880,30 @@ TEST_F(TestClosureControlClusterLogic, SetOverallState_ValidValueThenNull)
     mockContext.ResetReportedAttributeId();
 
     // Set a valid value
-    DataModel::Nullable<GenericOverallState> overallState(
-        GenericOverallState(Optional(DataModel::MakeNullable(PositioningEnum::kFullyOpened)), NullOptional, NullOptional));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(GenericOverallCurrentState(
+        Optional(DataModel::MakeNullable(CurrentPositionEnum::kFullyOpened)), NullOptional, NullOptional));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
-    DataModel::Nullable<GenericOverallState> readValue;
-    EXPECT_EQ(logic->GetOverallState(readValue), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> readValue;
+    EXPECT_EQ(logic->GetOverallCurrentState(readValue), CHIP_NO_ERROR);
 
     EXPECT_FALSE(readValue.IsNull());
-    EXPECT_EQ(readValue.Value().positioning.Value().Value(), PositioningEnum::kFullyOpened);
+    EXPECT_EQ(readValue.Value().position.Value().Value(), CurrentPositionEnum::kFullyOpened);
 
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
-    EXPECT_TRUE(mockContext.MatchesReportedAttributeId(Attributes::OverallState::Id));
+    EXPECT_TRUE(mockContext.MatchesReportedAttributeId(Attributes::OverallCurrentState::Id));
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
     // Reset the value
-    overallState.SetNull();
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    overallCurrentState.SetNull();
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
-    EXPECT_EQ(logic->GetOverallState(readValue), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetOverallCurrentState(readValue), CHIP_NO_ERROR);
 
     EXPECT_TRUE(readValue.IsNull());
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
-    EXPECT_TRUE(mockContext.MatchesReportedAttributeId(Attributes::OverallState::Id));
+    EXPECT_TRUE(mockContext.MatchesReportedAttributeId(Attributes::OverallCurrentState::Id));
 }
 
 TEST_F(TestClosureControlClusterLogic, SetOverallState_AllFeaturesChangePositioning)
@@ -853,25 +915,25 @@ TEST_F(TestClosureControlClusterLogic, SetOverallState_AllFeaturesChangePosition
     mockContext.ResetReportedAttributeId();
 
     // Set initial state
-    DataModel::Nullable<GenericOverallState> overallState(
-        GenericOverallState(Optional(DataModel::MakeNullable(PositioningEnum::kPartiallyOpened)), Optional(true),
-                            Optional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kLow))));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), Optional(true),
+                                   Optional(Globals::ThreeLevelAutoEnum::kLow)));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
-    // Change positioning
-    overallState.Value().positioning.Value().SetNonNull(PositioningEnum::kFullyOpened);
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    // Change position
+    overallCurrentState.Value().position.Value().SetNonNull(CurrentPositionEnum::kFullyOpened);
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
-    DataModel::Nullable<GenericOverallState> readValue;
-    EXPECT_EQ(logic->GetOverallState(readValue), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> readValue;
+    EXPECT_EQ(logic->GetOverallCurrentState(readValue), CHIP_NO_ERROR);
 
     EXPECT_FALSE(readValue.IsNull());
-    EXPECT_EQ(readValue.Value().positioning.Value().Value(), PositioningEnum::kFullyOpened);
+    EXPECT_EQ(readValue.Value().position.Value().Value(), CurrentPositionEnum::kFullyOpened);
     EXPECT_EQ(readValue.Value().latch.Value().Value(), true);
-    EXPECT_EQ(readValue.Value().speed.Value().Value(), Globals::ThreeLevelAutoEnum::kLow);
+    EXPECT_EQ(readValue.Value().speed.Value(), Globals::ThreeLevelAutoEnum::kLow);
 
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
-    EXPECT_TRUE(mockContext.MatchesReportedAttributeId(Attributes::OverallState::Id));
+    EXPECT_TRUE(mockContext.MatchesReportedAttributeId(Attributes::OverallCurrentState::Id));
 }
 
 TEST_F(TestClosureControlClusterLogic, SetOverallState_AllFeaturesChangeLatching)
@@ -883,25 +945,25 @@ TEST_F(TestClosureControlClusterLogic, SetOverallState_AllFeaturesChangeLatching
     mockContext.ResetReportedAttributeId();
 
     // Set initial state
-    DataModel::Nullable<GenericOverallState> overallState(
-        GenericOverallState(Optional(DataModel::MakeNullable(PositioningEnum::kPartiallyOpened)), Optional(true),
-                            Optional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kLow))));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), Optional(true),
+                                   Optional(Globals::ThreeLevelAutoEnum::kLow)));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
     // Change latching
-    overallState.Value().latch.Value().SetNonNull(false);
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    overallCurrentState.Value().latch.Value().SetNonNull(false);
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
-    DataModel::Nullable<GenericOverallState> readValue;
-    EXPECT_EQ(logic->GetOverallState(readValue), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> readValue;
+    EXPECT_EQ(logic->GetOverallCurrentState(readValue), CHIP_NO_ERROR);
 
     EXPECT_FALSE(readValue.IsNull());
-    EXPECT_EQ(readValue.Value().positioning.Value().Value(), PositioningEnum::kPartiallyOpened);
+    EXPECT_EQ(readValue.Value().position.Value().Value(), CurrentPositionEnum::kPartiallyOpened);
     EXPECT_EQ(readValue.Value().latch.Value().Value(), false);
-    EXPECT_EQ(readValue.Value().speed.Value().Value(), Globals::ThreeLevelAutoEnum::kLow);
+    EXPECT_EQ(readValue.Value().speed.Value(), Globals::ThreeLevelAutoEnum::kLow);
 
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
-    EXPECT_TRUE(mockContext.MatchesReportedAttributeId(Attributes::OverallState::Id));
+    EXPECT_TRUE(mockContext.MatchesReportedAttributeId(Attributes::OverallCurrentState::Id));
 }
 
 TEST_F(TestClosureControlClusterLogic, SetOverallState_AllFeaturesChangeSpeed)
@@ -913,25 +975,25 @@ TEST_F(TestClosureControlClusterLogic, SetOverallState_AllFeaturesChangeSpeed)
     mockContext.ResetReportedAttributeId();
 
     // Set initial state
-    DataModel::Nullable<GenericOverallState> overallState(
-        GenericOverallState(Optional(DataModel::MakeNullable(PositioningEnum::kPartiallyOpened)), Optional(true),
-                            Optional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kLow))));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), Optional(true),
+                                   Optional(Globals::ThreeLevelAutoEnum::kLow)));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
     // Change speed
-    overallState.Value().speed.Value().SetNonNull(Globals::ThreeLevelAutoEnum::kHigh);
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    overallCurrentState.Value().speed.SetValue(Globals::ThreeLevelAutoEnum::kHigh);
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
-    DataModel::Nullable<GenericOverallState> readValue;
-    EXPECT_EQ(logic->GetOverallState(readValue), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> readValue;
+    EXPECT_EQ(logic->GetOverallCurrentState(readValue), CHIP_NO_ERROR);
 
     EXPECT_FALSE(readValue.IsNull());
-    EXPECT_EQ(readValue.Value().positioning.Value().Value(), PositioningEnum::kPartiallyOpened);
+    EXPECT_EQ(readValue.Value().position.Value().Value(), CurrentPositionEnum::kPartiallyOpened);
     EXPECT_EQ(readValue.Value().latch.Value().Value(), true);
-    EXPECT_EQ(readValue.Value().speed.Value().Value(), Globals::ThreeLevelAutoEnum::kHigh);
+    EXPECT_EQ(readValue.Value().speed.Value(), Globals::ThreeLevelAutoEnum::kHigh);
 
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
-    EXPECT_TRUE(mockContext.MatchesReportedAttributeId(Attributes::OverallState::Id));
+    EXPECT_TRUE(mockContext.MatchesReportedAttributeId(Attributes::OverallCurrentState::Id));
 }
 
 TEST_F(TestClosureControlClusterLogic, SetOverallState_AllFeaturesNoChange)
@@ -943,24 +1005,24 @@ TEST_F(TestClosureControlClusterLogic, SetOverallState_AllFeaturesNoChange)
     mockContext.ResetReportedAttributeId();
 
     // Set initial state
-    DataModel::Nullable<GenericOverallState> overallState(
-        GenericOverallState(Optional(DataModel::MakeNullable(PositioningEnum::kPartiallyOpened)), Optional(true),
-                            Optional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kLow))));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), Optional(true),
+                                   Optional(Globals::ThreeLevelAutoEnum::kLow)));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
     // Set the same value again
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
-    DataModel::Nullable<GenericOverallState> readValue;
-    EXPECT_EQ(logic->GetOverallState(readValue), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> readValue;
+    EXPECT_EQ(logic->GetOverallCurrentState(readValue), CHIP_NO_ERROR);
 
     EXPECT_FALSE(readValue.IsNull());
-    EXPECT_EQ(readValue.Value().positioning.Value().Value(), PositioningEnum::kPartiallyOpened);
+    EXPECT_EQ(readValue.Value().position.Value().Value(), CurrentPositionEnum::kPartiallyOpened);
     EXPECT_EQ(readValue.Value().latch.Value().Value(), true);
-    EXPECT_EQ(readValue.Value().speed.Value().Value(), Globals::ThreeLevelAutoEnum::kLow);
+    EXPECT_EQ(readValue.Value().speed.Value(), Globals::ThreeLevelAutoEnum::kLow);
 
     EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
 }
@@ -1131,10 +1193,10 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_NoArguments)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
     // Set initial state
-    DataModel::Nullable<GenericOverallState> overallState(
-        GenericOverallState(Optional(DataModel::MakeNullable(PositioningEnum::kPartiallyOpened)), Optional(true),
-                            Optional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kLow))));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), Optional(true),
+                                   Optional(Globals::ThreeLevelAutoEnum::kLow)));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
@@ -1153,16 +1215,16 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_InvalidState)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
     // Set initial state
-    DataModel::Nullable<GenericOverallState> overallState(
-        GenericOverallState(Optional(DataModel::MakeNullable(PositioningEnum::kPartiallyOpened)), Optional(true),
-                            Optional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kLow))));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), Optional(true),
+                                   Optional(Globals::ThreeLevelAutoEnum::kLow)));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
     EXPECT_EQ(logic->SetMainState(MainStateEnum::kError), CHIP_NO_ERROR);
 
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
-    EXPECT_EQ(logic->HandleMoveTo(Optional<TargetPositionEnum>(TargetPositionEnum::kOpenInFull), Optional<bool>(false),
+    EXPECT_EQ(logic->HandleMoveTo(Optional<TargetPositionEnum>(TargetPositionEnum::kMoveToFullyOpen), Optional<bool>(false),
                                   Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)),
               Status::InvalidInState);
     EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
@@ -1172,7 +1234,7 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_InvalidState)
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
-    EXPECT_EQ(logic->HandleMoveTo(Optional<TargetPositionEnum>(TargetPositionEnum::kOpenInFull), Optional<bool>(false),
+    EXPECT_EQ(logic->HandleMoveTo(Optional<TargetPositionEnum>(TargetPositionEnum::kMoveToFullyOpen), Optional<bool>(false),
                                   Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)),
               Status::InvalidInState);
     EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
@@ -1184,27 +1246,27 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_AllFeatures)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
     // Set initial state
-    DataModel::Nullable<GenericOverallState> overallState(
-        GenericOverallState(Optional(DataModel::MakeNullable(PositioningEnum::kPartiallyOpened)), Optional(true),
-                            Optional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kLow))));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), Optional(true),
+                                   Optional(Globals::ThreeLevelAutoEnum::kLow)));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
-    EXPECT_EQ(logic->HandleMoveTo(Optional<TargetPositionEnum>(TargetPositionEnum::kOpenInFull), Optional<bool>(false),
+    EXPECT_EQ(logic->HandleMoveTo(Optional<TargetPositionEnum>(TargetPositionEnum::kMoveToFullyOpen), Optional<bool>(false),
                                   Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)),
               Status::Success);
 
-    DataModel::Nullable<GenericOverallTarget> readValue;
+    DataModel::Nullable<GenericOverallTargetState> readValue;
     MainStateEnum state;
     DataModel::Nullable<ElapsedS> coundowntime;
-    EXPECT_EQ(logic->GetOverallTarget(readValue), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetOverallTargetState(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetMainState(state), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetCountdownTime(coundowntime), CHIP_NO_ERROR);
 
     EXPECT_FALSE(readValue.IsNull());
-    EXPECT_EQ(readValue.Value().position.Value(), TargetPositionEnum::kOpenInFull);
+    EXPECT_EQ(readValue.Value().position.Value(), TargetPositionEnum::kMoveToFullyOpen);
     EXPECT_EQ(readValue.Value().latch.Value(), false);
     EXPECT_EQ(readValue.Value().speed.Value(), Globals::ThreeLevelAutoEnum::kHigh);
 
@@ -1222,26 +1284,26 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_OnlyPositioningFeature)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
     // Set initial state
-    DataModel::Nullable<GenericOverallState> overallState(
-        GenericOverallState(Optional(DataModel::MakeNullable(PositioningEnum::kPartiallyOpened)), NullOptional, NullOptional));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(GenericOverallCurrentState(
+        Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), NullOptional, NullOptional));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
-    EXPECT_EQ(logic->HandleMoveTo(Optional<TargetPositionEnum>(TargetPositionEnum::kOpenInFull), Optional<bool>(false),
+    EXPECT_EQ(logic->HandleMoveTo(Optional<TargetPositionEnum>(TargetPositionEnum::kMoveToFullyOpen), Optional<bool>(false),
                                   Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)),
               Status::Success);
 
-    DataModel::Nullable<GenericOverallTarget> readValue;
+    DataModel::Nullable<GenericOverallTargetState> readValue;
     MainStateEnum state;
     DataModel::Nullable<ElapsedS> coundowntime;
-    EXPECT_EQ(logic->GetOverallTarget(readValue), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetOverallTargetState(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetMainState(state), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetCountdownTime(coundowntime), CHIP_NO_ERROR);
 
     EXPECT_FALSE(readValue.IsNull());
-    EXPECT_EQ(readValue.Value().position.Value(), TargetPositionEnum::kOpenInFull);
+    EXPECT_EQ(readValue.Value().position.Value(), TargetPositionEnum::kMoveToFullyOpen);
     EXPECT_FALSE(readValue.Value().latch.HasValue());
     EXPECT_FALSE(readValue.Value().speed.HasValue());
 
@@ -1259,20 +1321,21 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_OnlyMotionLatchingFeature)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
     // Set initial state
-    DataModel::Nullable<GenericOverallState> overallState(GenericOverallState(NullOptional, Optional(true), NullOptional));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(NullOptional, Optional(true), NullOptional));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
-    EXPECT_EQ(logic->HandleMoveTo(Optional<TargetPositionEnum>(TargetPositionEnum::kOpenInFull), Optional<bool>(false),
+    EXPECT_EQ(logic->HandleMoveTo(Optional<TargetPositionEnum>(TargetPositionEnum::kMoveToFullyOpen), Optional<bool>(false),
                                   Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)),
               Status::Success);
 
-    DataModel::Nullable<GenericOverallTarget> readValue;
+    DataModel::Nullable<GenericOverallTargetState> readValue;
     MainStateEnum state;
     DataModel::Nullable<ElapsedS> coundowntime;
-    EXPECT_EQ(logic->GetOverallTarget(readValue), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetOverallTargetState(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetMainState(state), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetCountdownTime(coundowntime), CHIP_NO_ERROR);
 
@@ -1295,27 +1358,27 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_PositioningAndSpeedFeature)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
     // Set initial state
-    DataModel::Nullable<GenericOverallState> overallState(
-        GenericOverallState(Optional(DataModel::MakeNullable(PositioningEnum::kPartiallyOpened)), NullOptional,
-                            Optional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kLow))));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), NullOptional,
+                                   Optional(Globals::ThreeLevelAutoEnum::kLow)));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
-    EXPECT_EQ(logic->HandleMoveTo(Optional<TargetPositionEnum>(TargetPositionEnum::kOpenInFull), Optional<bool>(false),
+    EXPECT_EQ(logic->HandleMoveTo(Optional<TargetPositionEnum>(TargetPositionEnum::kMoveToFullyOpen), Optional<bool>(false),
                                   Optional<Globals::ThreeLevelAutoEnum>(Globals::ThreeLevelAutoEnum::kHigh)),
               Status::Success);
 
-    DataModel::Nullable<GenericOverallTarget> readValue;
+    DataModel::Nullable<GenericOverallTargetState> readValue;
     MainStateEnum state;
     DataModel::Nullable<ElapsedS> coundowntime;
-    EXPECT_EQ(logic->GetOverallTarget(readValue), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetOverallTargetState(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetMainState(state), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetCountdownTime(coundowntime), CHIP_NO_ERROR);
 
     EXPECT_FALSE(readValue.IsNull());
-    EXPECT_EQ(readValue.Value().position.Value(), TargetPositionEnum::kOpenInFull);
+    EXPECT_EQ(readValue.Value().position.Value(), TargetPositionEnum::kMoveToFullyOpen);
     EXPECT_FALSE(readValue.Value().latch.HasValue());
     EXPECT_EQ(readValue.Value().speed.Value(), Globals::ThreeLevelAutoEnum::kHigh);
 
@@ -1333,26 +1396,26 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_OnlyPosiitonField)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
     // Set initial state
-    DataModel::Nullable<GenericOverallState> overallState(
-        GenericOverallState(Optional(DataModel::MakeNullable(PositioningEnum::kPartiallyOpened)), Optional(true),
-                            Optional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kLow))));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), Optional(true),
+                                   Optional(Globals::ThreeLevelAutoEnum::kLow)));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
-    EXPECT_EQ(logic->HandleMoveTo(Optional<TargetPositionEnum>(TargetPositionEnum::kOpenInFull), NullOptional, NullOptional),
+    EXPECT_EQ(logic->HandleMoveTo(Optional<TargetPositionEnum>(TargetPositionEnum::kMoveToFullyOpen), NullOptional, NullOptional),
               Status::Success);
 
-    DataModel::Nullable<GenericOverallTarget> readValue;
+    DataModel::Nullable<GenericOverallTargetState> readValue;
     MainStateEnum state;
     DataModel::Nullable<ElapsedS> coundowntime;
-    EXPECT_EQ(logic->GetOverallTarget(readValue), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetOverallTargetState(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetMainState(state), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetCountdownTime(coundowntime), CHIP_NO_ERROR);
 
     EXPECT_FALSE(readValue.IsNull());
-    EXPECT_EQ(readValue.Value().position.Value(), TargetPositionEnum::kOpenInFull);
+    EXPECT_EQ(readValue.Value().position.Value(), TargetPositionEnum::kMoveToFullyOpen);
     EXPECT_FALSE(readValue.Value().latch.HasValue());
     EXPECT_FALSE(readValue.Value().speed.HasValue());
 
@@ -1370,20 +1433,20 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_OnlyLatchField)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
     // Set initial state
-    DataModel::Nullable<GenericOverallState> overallState(
-        GenericOverallState(Optional(DataModel::MakeNullable(PositioningEnum::kPartiallyOpened)), Optional(true),
-                            Optional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kLow))));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), Optional(true),
+                                   Optional(Globals::ThreeLevelAutoEnum::kLow)));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
     EXPECT_EQ(logic->HandleMoveTo(NullOptional, Optional(true), NullOptional), Status::Success);
 
-    DataModel::Nullable<GenericOverallTarget> readValue;
+    DataModel::Nullable<GenericOverallTargetState> readValue;
     MainStateEnum state;
     DataModel::Nullable<ElapsedS> coundowntime;
-    EXPECT_EQ(logic->GetOverallTarget(readValue), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetOverallTargetState(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetMainState(state), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetCountdownTime(coundowntime), CHIP_NO_ERROR);
 
@@ -1406,20 +1469,20 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_OnlySpeedField)
     EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
 
     // Set initial state
-    DataModel::Nullable<GenericOverallState> overallState(
-        GenericOverallState(Optional(DataModel::MakeNullable(PositioningEnum::kPartiallyOpened)), Optional(true),
-                            Optional(DataModel::MakeNullable(Globals::ThreeLevelAutoEnum::kLow))));
-    EXPECT_EQ(logic->SetOverallState(overallState), CHIP_NO_ERROR);
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(
+        GenericOverallCurrentState(Optional(DataModel::MakeNullable(CurrentPositionEnum::kPartiallyOpened)), Optional(true),
+                                   Optional(Globals::ThreeLevelAutoEnum::kLow)));
+    EXPECT_EQ(logic->SetOverallCurrentState(overallCurrentState), CHIP_NO_ERROR);
 
     mockContext.ResetDirtyFlag();
     mockContext.ResetReportedAttributeId();
 
     EXPECT_EQ(logic->HandleMoveTo(NullOptional, NullOptional, Optional(Globals::ThreeLevelAutoEnum::kLow)), Status::Success);
 
-    DataModel::Nullable<GenericOverallTarget> readValue;
+    DataModel::Nullable<GenericOverallTargetState> readValue;
     MainStateEnum state;
     DataModel::Nullable<ElapsedS> coundowntime;
-    EXPECT_EQ(logic->GetOverallTarget(readValue), CHIP_NO_ERROR);
+    EXPECT_EQ(logic->GetOverallTargetState(readValue), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetMainState(state), CHIP_NO_ERROR);
     EXPECT_EQ(logic->GetCountdownTime(coundowntime), CHIP_NO_ERROR);
 
@@ -1434,4 +1497,123 @@ TEST_F(TestClosureControlClusterLogic, MoveToCommand_OnlySpeedField)
     EXPECT_EQ(coundowntime.Value(), static_cast<ElapsedS>(20));
 
     EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
+}
+
+TEST_F(TestClosureControlClusterLogic, ReadCurrentErrorList_WhenErrorListIsEmpty)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+
+    ClosureErrorEnum list[10] = {};
+    Span<ClosureErrorEnum> currentErrorListSpan(list);
+    EXPECT_EQ(logic->GetCurrentErrorList(currentErrorListSpan), CHIP_NO_ERROR);
+    EXPECT_TRUE(currentErrorListSpan.empty());
+}
+
+TEST_F(TestClosureControlClusterLogic, ReadCurrentErrorList_WhenErrorListIsNotEmpty)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+
+    EXPECT_EQ(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
+    mockContext.ResetDirtyFlag();
+    EXPECT_EQ(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kInternalInterference), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
+
+    ClosureErrorEnum list[10] = {};
+    Span<ClosureErrorEnum> currentErrorListSpan(list);
+    EXPECT_EQ(logic->GetCurrentErrorList(currentErrorListSpan), CHIP_NO_ERROR);
+    EXPECT_FALSE(currentErrorListSpan.empty());
+
+    EXPECT_EQ(static_cast<int>(currentErrorListSpan.size()), 2);
+    EXPECT_EQ(currentErrorListSpan[0], ClosureErrorEnum::kBlockedBySensor);
+    EXPECT_EQ(currentErrorListSpan[1], ClosureErrorEnum::kInternalInterference);
+}
+
+TEST_F(TestClosureControlClusterLogic, AddErrorToCurrentErrorList)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+
+    EXPECT_EQ(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
+    ClosureErrorEnum list[10] = {};
+    Span<ClosureErrorEnum> currentErrorListSpan(list);
+    EXPECT_EQ(logic->GetCurrentErrorList(currentErrorListSpan), CHIP_NO_ERROR);
+    EXPECT_FALSE(currentErrorListSpan.empty());
+
+    EXPECT_EQ(static_cast<int>(currentErrorListSpan.size()), 1);
+    EXPECT_EQ(currentErrorListSpan[0], ClosureErrorEnum::kBlockedBySensor);
+}
+
+TEST_F(TestClosureControlClusterLogic, AddDuplicateErrorToCurrentErrorList)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    logic->ClearCurrentErrorList();
+
+    EXPECT_EQ(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
+
+    mockContext.ResetDirtyFlag();
+    mockContext.ResetReportedAttributeId();
+
+    EXPECT_EQ(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor), CHIP_ERROR_DUPLICATE_MESSAGE_RECEIVED);
+    EXPECT_FALSE(mockContext.HasBeenMarkedDirty());
+    ClosureErrorEnum list[10] = {};
+    Span<ClosureErrorEnum> currentErrorListSpan(list);
+    EXPECT_EQ(logic->GetCurrentErrorList(currentErrorListSpan), CHIP_NO_ERROR);
+    EXPECT_FALSE(currentErrorListSpan.empty());
+
+    EXPECT_EQ(static_cast<int>(currentErrorListSpan.size()), 1);
+    EXPECT_EQ(currentErrorListSpan[0], ClosureErrorEnum::kBlockedBySensor);
+}
+
+TEST_F(TestClosureControlClusterLogic, ClearCurrentErrorList)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+    logic->ClearCurrentErrorList();
+
+    EXPECT_EQ(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
+
+    ClosureErrorEnum list[10] = {};
+    Span<ClosureErrorEnum> currentErrorListSpan(list);
+    EXPECT_EQ(logic->GetCurrentErrorList(currentErrorListSpan), CHIP_NO_ERROR);
+    EXPECT_FALSE(currentErrorListSpan.empty());
+
+    EXPECT_EQ(static_cast<int>(currentErrorListSpan.size()), 1);
+    EXPECT_EQ(currentErrorListSpan[0], ClosureErrorEnum::kBlockedBySensor);
+
+    mockContext.ResetDirtyFlag();
+    mockContext.ResetReportedAttributeId();
+
+    logic->ClearCurrentErrorList();
+    EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
+    Span<ClosureErrorEnum> emptyErrorListSpan(list);
+    EXPECT_EQ(logic->GetCurrentErrorList(emptyErrorListSpan), CHIP_NO_ERROR);
+    EXPECT_TRUE(emptyErrorListSpan.empty());
+}
+
+// This test is to ensure that the CurrentErrorList cannot be read when the span buffer is not equal to the expected size.
+// Span buffer should be equal to kCurrentErrorListMaxSize to read the current error list(since max-size of the current-error-list
+// is 10 as per the spec). If buffer is not equal to 10, it should return CHIP_ERROR_BUFFER_TOO_SMALL.
+TEST_F(TestClosureControlClusterLogic, ReadCurrentErrorList_InvalidBufferSize)
+{
+    conformance.FeatureMap().Set(Feature::kPositioning);
+    EXPECT_EQ(logic->Init(conformance, initParams), CHIP_NO_ERROR);
+
+    EXPECT_EQ(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kBlockedBySensor), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
+    mockContext.ResetDirtyFlag();
+    EXPECT_EQ(logic->AddErrorToCurrentErrorList(ClosureErrorEnum::kInternalInterference), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_TRUE(mockContext.HasBeenMarkedDirty());
+    ClosureErrorEnum list[1] = {};
+    Span<ClosureErrorEnum> currentErrorListSpan(list);
+    EXPECT_EQ(logic->GetCurrentErrorList(currentErrorListSpan), CHIP_ERROR_BUFFER_TOO_SMALL);
+    ClosureErrorEnum list2[11] = {};
+    Span<ClosureErrorEnum> currentErrorListSpan2(list2);
+    EXPECT_NE(logic->GetCurrentErrorList(currentErrorListSpan2), CHIP_NO_ERROR);
 }
