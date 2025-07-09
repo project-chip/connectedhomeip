@@ -187,7 +187,8 @@ public:
                                           RootCertificateListCallback loadedCallback) const = 0;
 
     /**
-     * @brief Finds the TLSCertStruct with the given id
+     * @brief Finds the TLSCertStruct with the given id. The certificates passed to loadedCallback has a
+     * guaranteed lifetime of the method call.
      *
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fabric The fabric the certificate is associated with
@@ -199,7 +200,8 @@ public:
                                     LoadedRootCertificateCallback loadedCallback) const = 0;
 
     /**
-     * @brief Finds the TLSCertStruct with the given fingerprint
+     * @brief Finds the TLSCertStruct with the given fingerprint. The certificates passed to loadedCallback has a
+     * guaranteed lifetime of the method call.
      *
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fabric The fabric the certificate is associated with
@@ -272,7 +274,8 @@ public:
                                             ClientCertificateListCallback loadedCallback) const = 0;
 
     /**
-     * @brief Finds the TLSClientCertificateDetailStruct with the given id
+     * @brief Finds the TLSClientCertificateDetailStruct with the given id. The certificates passed to loadedCallback has a
+     * guaranteed lifetime of the method call.
      *
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fabric The fabric the certificate is associated with
@@ -284,7 +287,8 @@ public:
                                       LoadedClientCertificateCallback loadedCallback) const = 0;
 
     /**
-     * @brief Finds the TLSClientCertificateDetailStruct with the given fingerprint
+     * @brief Finds the TLSClientCertificateDetailStruct with the given fingerprint. The certificates passed to loadedCallback has a
+     * guaranteed lifetime of the method call.
      *
      * @param[in] matterEndpoint The matter endpoint to query against
      * @param[in] fabric The fabric the certificate is associated with
