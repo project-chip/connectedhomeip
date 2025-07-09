@@ -72,6 +72,7 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_CONFIG_COMMAND_SENDER_BUILTIN_SUPPORT_FOR_BATCHED_COMMANDS=${chip_enable_sending_batch_commands}",
     "CHIP_CONFIG_TEST_GOOGLETEST=${chip_build_tests_googletest}",
     "CHIP_CONFIG_MRP_ANALYTICS_ENABLED=${chip_enable_mrp_analytics}",
+    "CHIP_CONFIG_ERROR_SOURCE_FULL=${chip_enable_error_source_full}",
   ]
 
   visibility = [ ":chip_config_header" ]
