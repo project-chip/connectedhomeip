@@ -1831,16 +1831,15 @@ class ChipDeviceControllerBase():
             # Wildcard
             return ClusterAttribute.EventPath()
         elif not isinstance(pathTuple, tuple):
-            # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
-            # Fixing these typing errors is a high risk to affect existing functionality.
-            # These mismatches are intentional and safe within the current logic.
-            # TODO:  Explore proper typing for dynamic attributes in ChipDeviceCtrl.py #618
+            # mypy refactor (PR https://github.com/project-chip/connectedhomeip/pull/39827):
+            # instantiate class types before passing to from_cluster/from_event
+            # because these expect instances, not classes.
             if isinstance(pathTuple, int):
                 return ClusterAttribute.EventPath(EndpointId=pathTuple)
-            elif issubclass(pathTuple, ClusterObjects.Cluster):  # type: ignore[arg-type]
-                return ClusterAttribute.EventPath.from_cluster(EndpointId=None, Cluster=pathTuple)  # type: ignore[arg-type]
-            elif issubclass(pathTuple, ClusterObjects.ClusterEvent):  # type: ignore[arg-type]
-                return ClusterAttribute.EventPath.from_event(EndpointId=None, Event=pathTuple)  # type: ignore[arg-type]
+            elif isinstance(pathTuple, type) and issubclass(pathTuple, ClusterObjects.Cluster):
+                return ClusterAttribute.EventPath.from_cluster(EndpointId=None, Cluster=pathTuple)
+            elif isinstance(pathTuple, type) and issubclass(pathTuple, ClusterObjects.ClusterEvent):
+                return ClusterAttribute.EventPath.from_event(EndpointId=None, Event=pathTuple)
             else:
                 raise ValueError("Unsupported Event Path")
         else:
@@ -1849,19 +1848,19 @@ class ChipDeviceControllerBase():
             else:
                 urgent = bool(pathTuple[-1]) if len(pathTuple) > 2 else False
                 # endpoint + (cluster) event / endpoint + cluster
-                # mypy errors ignored due to valid use of dynamic types (e.g., int, str, or class types).
-                # Fixing these typing errors is a high risk to affect existing functionality.
-                # These mismatches are intentional and safe within the current logic.
-                # TODO:  Explore proper typing for dynamic attributes in ChipDeviceCtrl.py #618
-                if issubclass(pathTuple[1], ClusterObjects.Cluster):  # type: ignore[arg-type]
+                # mypy refactor (PR https://github.com/project-chip/connectedhomeip/pull/39827):
+                # instantiate class types in pathTuple[1] before passing
+                # to from_cluster/from_event as these expect instances.
+                if isinstance(pathTuple[1], type) and issubclass(pathTuple[1], ClusterObjects.Cluster):
                     return ClusterAttribute.EventPath.from_cluster(
-                        EndpointId=pathTuple[0],    # type: ignore[arg-type]
-                        Cluster=pathTuple[1], Urgent=urgent  # type: ignore[arg-type]
+                        EndpointId=pathTuple[0],
+                        Cluster=pathTuple[1](),
+                        Urgent=urgent
                     )
-                elif issubclass(pathTuple[1], ClusterAttribute.ClusterEvent):  # type: ignore[arg-type]
+                elif isinstance(pathTuple[1], type) and issubclass(pathTuple[1], ClusterObjects.ClusterEvent):
                     return ClusterAttribute.EventPath.from_event(
-                        EndpointId=pathTuple[0],    # type: ignore[arg-type]
-                        Event=pathTuple[1],  # type: ignore[arg-type]
+                        EndpointId=pathTuple[0],
+                        Event=pathTuple[1](),
                         Urgent=urgent
                     )
                 else:
