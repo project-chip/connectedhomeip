@@ -58,6 +58,12 @@ jobs:
         run: out/venv/bin/python3 src/python_testing/matter_testing_infrastructure/generate_data_model_xmls_gni.py
       - name: Ensure git works in current working directory
         run: git config --global --add safe.directory `pwd`
-      - name: Check for uncommited changes
+      - name: Check for uncommitted changes
+        if: (!contains(github.event.pull_request.labels.*.name, 'data-model-file-structural-change-dm-tt-use-only')
         run: |
           git diff --exit-code HEAD -- src/python_testing/matter_testing_infrastructure/data_model_xmls.gni
+      - name: Skip check for uncommitted changes due to label
+        if: (contains(github.event.pull_request.labels.*.name, 'data-model-file-structural-change-dm-tt-use-only')
+        run: |
+          echo skipping data model checks due to label
+          exit 0
