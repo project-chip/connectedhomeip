@@ -172,8 +172,7 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
             CHIP_ERROR GetWiFiBssId(MutableByteSpan & value) override
             {
                 static constexpr uint8_t kBssId[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
-                value                             = MutableByteSpan(const_cast<uint8_t *>(kBssId), sizeof(kBssId));
-                return CHIP_NO_ERROR;
+                return CopySpanToMutableSpan(ByteSpan(kBssId), value);
             }
             CHIP_ERROR GetWiFiSecurityType(WiFiNetworkDiagnostics::SecurityTypeEnum & v) override
             {
@@ -279,7 +278,8 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
         ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 
         // Test that the provider methods are working correctly by directly accessing the provider
-        MutableByteSpan bssId;
+        uint8_t bssIdBuffer[6];
+        MutableByteSpan bssId(bssIdBuffer);
         EXPECT_EQ(allProvider.GetWiFiBssId(bssId), CHIP_NO_ERROR);
         EXPECT_EQ(bssId.size(), 6u);
         static constexpr uint8_t kExpectedBssId[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
