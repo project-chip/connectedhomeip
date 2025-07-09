@@ -557,7 +557,7 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
     VerifyOrReturnError(state == MainStateEnum::kMoving || state == MainStateEnum::kWaitingForMotion ||
                             state == MainStateEnum::kStopped,
                         Status::InvalidInState);
-    
+
     if (mConformance.HasFeature(Feature::kMotionLatching))
     {
         // If this command requests a position change while the Latch field of the OverallCurrentState is True (Latched), and the
