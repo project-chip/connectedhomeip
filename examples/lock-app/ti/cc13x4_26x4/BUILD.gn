@@ -102,6 +102,7 @@ ti_simplelink_executable("lock_app") {
     ":sysconfig",
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/examples/platform/ti/cc13x4_26x4:ti-attestation-credentials",
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/third_party/openthread:openthread",
