@@ -235,10 +235,6 @@ protected:
     ZoneMgmtServer * GetZoneMgmtServer() const { return mZoneMgmtServer; }
 };
 
-enum class OptionalAttribute : uint32_t
-{
-};
-
 class ZoneMgmtServer : public CommandHandlerInterface, public AttributeAccessInterface
 {
 public:
@@ -246,14 +242,12 @@ public:
      * @brief Creates a Zone Management cluster instance. The Init() function needs to be called for this instance
      * to be registered and called by the interaction model at the appropriate times.
      *
-     * @param aDelegate                         A pointer to the delegate to be used by this server.
+     * @param aDelegate                         A reference to the delegate to be used by this server.
      *                                          Note: the caller must ensure that the delegate lives throughout the instance's
      *                                          lifetime.
      *
      * @param aEndpointId                       The endpoint on which this cluster exists. This must match the zap configuration.
      * @param aFeatures                         The bitflags value that identifies which features are supported by this instance.
-     * @param aOptionalAttrs                    The bitflags value that identifies the optional attributes supported by this
-     *                                          instance.
      * @param aMaxUserDefinedZones              The maximum number of user-defined zones supported by the device.
      *                                          This value is specified by the device manufacturer.
      * @param aMaxZones                         The maximum number of zones that are allowed to exist on the device. This is the
@@ -263,9 +257,8 @@ public:
      * @param aTwoDCartesianMax                 The maximum X and Y points that are allowed for TwoD Cartesian Zones.
      *
      */
-    ZoneMgmtServer(Delegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
-                   const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxUserDefinedZones, uint8_t aMaxZones,
-                   uint8_t aSensitivityMax, const TwoDCartesianVertexStruct & aTwoDCartesianMax);
+    ZoneMgmtServer(Delegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures, uint8_t aMaxUserDefinedZones,
+                   uint8_t aMaxZones, uint8_t aSensitivityMax, const TwoDCartesianVertexStruct & aTwoDCartesianMax);
 
     ~ZoneMgmtServer() override;
 
@@ -278,8 +271,6 @@ public:
     CHIP_ERROR Init();
 
     bool HasFeature(Feature feature) const;
-
-    bool SupportsOptAttr(OptionalAttribute aOptionalAttr) const;
 
     // Attribute Setters
     CHIP_ERROR SetSensitivity(uint8_t aSensitivity);
@@ -310,7 +301,6 @@ private:
     Delegate & mDelegate;
     EndpointId mEndpointId;
     const BitFlags<Feature> mFeatures;
-    const BitFlags<OptionalAttribute> mOptionalAttrs;
 
     // Attributes
     const uint8_t mMaxUserDefinedZones;
@@ -353,6 +343,8 @@ private:
 
     // Utility function to check if a given ZoneUse and a TwoDVertex already
     // exists in mZones.
+    bool DoesZoneAlreadyExist(ZoneUseEnum zoneUse, const std::vector<TwoDCartesianVertexStruct> & vertices,
+                              const DataModel::Nullable<uint16_t> & excludeZoneId);
     bool DoesZoneAlreadyExist(ZoneUseEnum zoneUse, const std::vector<TwoDCartesianVertexStruct> & vertices);
 
     /**

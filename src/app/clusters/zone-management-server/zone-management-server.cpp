@@ -46,12 +46,12 @@ namespace Clusters {
 namespace ZoneManagement {
 
 ZoneMgmtServer::ZoneMgmtServer(Delegate & aDelegate, EndpointId aEndpointId, const BitFlags<Feature> aFeatures,
-                               const BitFlags<OptionalAttribute> aOptionalAttrs, uint8_t aMaxUserDefinedZones, uint8_t aMaxZones,
-                               uint8_t aSensitivityMax, const TwoDCartesianVertexStruct & aTwoDCartesianMax) :
+                               uint8_t aMaxUserDefinedZones, uint8_t aMaxZones, uint8_t aSensitivityMax,
+                               const TwoDCartesianVertexStruct & aTwoDCartesianMax) :
     CommandHandlerInterface(MakeOptional(aEndpointId), ZoneManagement::Id),
     AttributeAccessInterface(MakeOptional(aEndpointId), ZoneManagement::Id), mDelegate(aDelegate), mEndpointId(aEndpointId),
-    mFeatures(aFeatures), mOptionalAttrs(aOptionalAttrs), mMaxUserDefinedZones(aMaxUserDefinedZones), mMaxZones(aMaxZones),
-    mSensitivityMax(aSensitivityMax), mTwoDCartesianMax(aTwoDCartesianMax)
+    mFeatures(aFeatures), mMaxUserDefinedZones(aMaxUserDefinedZones), mMaxZones(aMaxZones), mSensitivityMax(aSensitivityMax),
+    mTwoDCartesianMax(aTwoDCartesianMax)
 {
     mDelegate.SetZoneMgmtServer(this);
 }
@@ -97,11 +97,6 @@ CHIP_ERROR ZoneMgmtServer::Init()
 bool ZoneMgmtServer::HasFeature(Feature feature) const
 {
     return mFeatures.Has(feature);
-}
-
-bool ZoneMgmtServer::SupportsOptAttr(OptionalAttribute aOptionalAttr) const
-{
-    return mOptionalAttrs.Has(aOptionalAttr);
 }
 
 void ZoneMgmtServer::LoadPersistentAttributes()
@@ -217,14 +212,14 @@ CHIP_ERROR ZoneMgmtServer::Read(const ConcreteReadAttributePath & aPath, Attribu
     case Sensitivity::Id:
         VerifyOrReturnError(!HasFeature(Feature::kPerZoneSensitivity), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl,
-                                         "ZoneManagement[ep=%d]: can not get Sensitivity, PerZoneSensitivity feature is supported",
+                                         "ZoneManagement[ep=%d]: cannot read Sensitivity, PerZoneSensitivity feature is supported",
                                          mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mSensitivity));
         break;
     case TwoDCartesianMax::Id:
         VerifyOrReturnError(
             HasFeature(Feature::kTwoDimensionalCartesianZone), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
-            ChipLogError(Zcl, "ZoneManagement[ep=%d]: can not get TwoDCartesianMax, feature is not supported", mEndpointId));
+            ChipLogError(Zcl, "ZoneManagement[ep=%d]: cannot read TwoDCartesianMax, feature is not supported", mEndpointId));
         ReturnErrorOnFailure(aEncoder.Encode(mTwoDCartesianMax));
         break;
     }
@@ -241,7 +236,7 @@ CHIP_ERROR ZoneMgmtServer::Write(const ConcreteDataAttributePath & aPath, Attrib
     case Sensitivity::Id: {
         VerifyOrReturnError(!HasFeature(Feature::kPerZoneSensitivity), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute),
                             ChipLogError(Zcl,
-                                         "ZoneManagement[ep=%d]: can not get Sensitivity, PerZoneSensitivity feature is supported",
+                                         "ZoneManagement[ep=%d]: cannot write Sensitivity, PerZoneSensitivity feature is supported",
                                          mEndpointId));
         uint8_t sensitivity;
         ReturnErrorOnFailure(aDecoder.Decode(sensitivity));
@@ -331,21 +326,33 @@ CHIP_ERROR ZoneMgmtServer::UpdateZone(uint16_t zoneId, const ZoneInformationStor
         auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
         mDelegate.OnAttributeChanged(Attributes::Zones::Id);
         MatterReportingAttributeChangeCallback(path);
-    }
 
-    return CHIP_NO_ERROR;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
 }
 
 CHIP_ERROR ZoneMgmtServer::RemoveZone(uint16_t zoneId)
 {
-    mZones.erase(
-        std::remove_if(mZones.begin(), mZones.end(), [&](const ZoneInformationStorage & zone) { return zone.zoneID == zoneId; }),
-        mZones.end());
-    auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
-    mDelegate.OnAttributeChanged(Attributes::Zones::Id);
-    MatterReportingAttributeChangeCallback(path);
+    auto it =
+        std::remove_if(mZones.begin(), mZones.end(), [&](const ZoneInformationStorage & zone) { return zone.zoneID == zoneId; });
 
-    return CHIP_NO_ERROR;
+    if (it != mZones.end())
+    {
+        mZones.erase(it, mZones.end());
+        auto path = ConcreteAttributePath(mEndpointId, ZoneManagement::Id, Attributes::Zones::Id);
+        mDelegate.OnAttributeChanged(Attributes::Zones::Id);
+        MatterReportingAttributeChangeCallback(path);
+
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_NOT_FOUND;
+    }
 }
 
 Status ZoneMgmtServer::AddOrUpdateTrigger(const ZoneTriggerControlStruct & trigger)
@@ -465,7 +472,7 @@ void ZoneMgmtServer::HandleCreateTwoDCartesianZone(HandlerContext & ctx,
         return;
     }
 
-    if (DoesZoneAlreadyExist(zoneToCreate.use, twoDCartVertices))
+    if (DoesZoneAlreadyExist(zoneToCreate.use, twoDCartVertices, DataModel::NullNullable))
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::AlreadyExists);
         return;
@@ -561,7 +568,7 @@ void ZoneMgmtServer::HandleUpdateTwoDCartesianZone(HandlerContext & ctx,
         return;
     }
 
-    if (DoesZoneAlreadyExist(zoneToUpdate.use, twoDCartVertices))
+    if (DoesZoneAlreadyExist(zoneToUpdate.use, twoDCartVertices, DataModel::MakeNullable<uint16_t>(zoneID)))
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::AlreadyExists);
         return;
@@ -681,17 +688,6 @@ void ZoneMgmtServer::HandleRemoveTrigger(HandlerContext & ctx, const Commands::R
     Status status = RemoveTrigger(zoneID);
 
     ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-    if (status == Status::Success)
-    {
-        RemoveTrigger(zoneID);
-    }
-    else
-    {
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, status);
-        return;
-    }
-
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::Success);
 }
 
 bool ZoneMgmtServer::DoZoneUseAndVerticesMatch(ZoneUseEnum use, const std::vector<TwoDCartesianVertexStruct> & vertices,
@@ -717,10 +713,16 @@ bool ZoneMgmtServer::DoZoneUseAndVerticesMatch(ZoneUseEnum use, const std::vecto
                       });
 }
 
-bool ZoneMgmtServer::DoesZoneAlreadyExist(ZoneUseEnum zoneUse, const std::vector<TwoDCartesianVertexStruct> & vertices)
+bool ZoneMgmtServer::DoesZoneAlreadyExist(ZoneUseEnum zoneUse, const std::vector<TwoDCartesianVertexStruct> & vertices,
+                                          const DataModel::Nullable<uint16_t> & excludeZoneId)
 {
     for (auto & zone : mZones)
     {
+        if (!excludeZoneId.IsNull() && zone.zoneID == excludeZoneId.Value())
+        {
+            continue;
+        }
+
         if (zone.twoDCartZoneStorage.HasValue() && DoZoneUseAndVerticesMatch(zoneUse, vertices, zone.twoDCartZoneStorage.Value()))
         {
             return true;
