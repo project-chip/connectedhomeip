@@ -336,7 +336,6 @@ struct CurrentTariffAttrsCtx
     std::map<uint32_t, const Structs::DayEntryStruct::Type *> DayEntriesMap;
     std::map<uint32_t, const Structs::TariffComponentStruct::Type *> TariffComponentsMap;
 
-    uint32_t dayEntriesUpdDelay;
     uint32_t forwardAlarmTriggerTime;
 };
 
@@ -376,11 +375,9 @@ public:
 
     bool HasFeature(Feature aFeature) const;
 
-    void ForceDaysAttrsUpdate();
-    void ForceDayEntriesAttrsUpdate();
-
     void TariffComponentUpd_AttrChangeCb(uint32_t aAttrId, void * CbCtx);
 
+    void SetupTestTimeShiftInterval(uint32_t time);
 private:
     enum class UpdateEventCode
     {
