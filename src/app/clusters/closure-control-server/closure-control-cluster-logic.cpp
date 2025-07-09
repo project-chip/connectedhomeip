@@ -272,6 +272,29 @@ CHIP_ERROR ClusterLogic::SetOverallCurrentState(const DataModel::Nullable<Generi
             // supported by the closure. If the Speed feature is not supported, return an error.
             VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) || mConformance.HasFeature(Feature::kMotionLatching),
                                 CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+            if (!incomingOverallCurrentState.secureState.Value().IsNull())
+            {
+                // SecureStateChanged event SHALL be generated when the SecureState field in the OverallCurrentState attribute
+                // changes
+                if (mState.mOverallCurrentState.IsNull() || !mState.mOverallCurrentState.Value().secureState.HasValue() ||
+                    mState.mOverallCurrentState.Value().secureState.Value().IsNull())
+                {
+                    // As secureState field is not set in present current state and incoming current state has value, we generate
+                    // the event
+                    GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value().Value());
+                }
+                else
+                {
+                    // If the secureState field is set in both present and incoming current state, we generate the event only if the
+                    // value has changed.
+                    if (mState.mOverallCurrentState.Value().secureState.Value().Value() !=
+                        incomingOverallCurrentState.secureState.Value().Value())
+                    {
+                        GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value().Value());
+                    }
+                }
+            }
         }
     }
 
