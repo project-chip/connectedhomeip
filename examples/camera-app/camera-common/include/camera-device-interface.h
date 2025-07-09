@@ -23,6 +23,7 @@
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/clusters/chime-server/chime-server.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
+#include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h>
 
 using chip::app::Clusters::CameraAvStreamManagement::AudioCapabilitiesStruct;
 using chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct;
@@ -118,6 +119,9 @@ public:
 
     // Getter for WebRTCProvider Delegate
     virtual chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate() = 0;
+
+    // Getter for WebRTCRequestor Delegate
+    virtual chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorDelegate & GetWebRTCRequestorDelegate() = 0;
 
     // Getter for CameraAVStreamManagement Delegate
     virtual chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() = 0;
@@ -343,4 +347,10 @@ public:
     };
 
     virtual CameraHALInterface & GetCameraHALInterface() = 0;
+
+    // Callback for Device event triggers. Platforms can ovveride and use this as and if needed
+    virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg) {}
+
+    // Platforms can use this to store the pointer to the WebRTCTransportRequestorServer
+    virtual void SetWebRTCRequestorServer(chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer * server) {}
 };

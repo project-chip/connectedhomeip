@@ -22,6 +22,7 @@
 #include "camera-device-interface.h"
 #include "chime-manager.h"
 #include "webrtc-provider-manager.h"
+#include "webrtc-requestor-manager.h"
 
 #include "default-media-controller.h"
 #include <protocols/interaction_model/StatusCode.h>
@@ -80,6 +81,7 @@ class CameraDevice : public CameraDeviceInterface, public CameraDeviceInterface:
 public:
     chip::app::Clusters::ChimeDelegate & GetChimeDelegate() override;
     chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate() override;
+    chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorDelegate & GetWebRTCRequestorDelegate() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() override;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
@@ -273,6 +275,13 @@ public:
 
     void SetVideoDevicePath(const std::string & path) { mVideoDevicePath = path; }
 
+    void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg) override;
+
+    void SetWebRTCRequestorServer(chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer * server) override
+    {
+        mWebRTCRequestorManager.SetWebRTCRequestorServer(server);
+    }
+
 private:
     int videoDeviceFd            = -1;
     std::string mVideoDevicePath = kDefaultVideoDevicePath;
@@ -293,6 +302,7 @@ private:
     // Various cluster server delegates
     chip::app::Clusters::ChimeManager mChimeManager;
     chip::app::Clusters::WebRTCTransportProvider::WebRTCProviderManager mWebRTCProviderManager;
+    chip::app::Clusters::WebRTCTransportRequestor::WebRTCRequestorManager mWebRTCRequestorManager;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager mCameraAVStreamManager;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAVSettingsUserLevelManager mCameraAVSettingsUserLevelManager;
 

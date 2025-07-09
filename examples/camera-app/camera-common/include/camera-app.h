@@ -37,12 +37,16 @@ public:
     // Initialize all the camera device clusters.
     void InitCameraDeviceClusters();
 
+    // Callback to listen for device events.
+    static void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
 private:
     chip::EndpointId mEndpoint;
     CameraDeviceInterface * mCameraDevice;
 
     // SDK cluster servers
     std::unique_ptr<chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderServer> mWebRTCTransportProviderPtr;
+    std::unique_ptr<chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer> mWebRTCTransportRequestorPtr;
     std::unique_ptr<chip::app::Clusters::ChimeServer> mChimeServerPtr;
     std::unique_ptr<chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtServer> mAVStreamMgmtServerPtr;
     std::unique_ptr<chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAvSettingsUserLevelMgmtServer>
