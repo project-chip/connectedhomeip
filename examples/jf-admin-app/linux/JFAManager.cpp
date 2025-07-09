@@ -281,12 +281,12 @@ void JFAManager::OnCommissioningCompleteFailure(void * context, CHIP_ERROR error
 
 CHIP_ERROR JFAManager::GetIcacCsr(MutableByteSpan & icacCsr)
 {
-	JFARpc * jfaRpc = GetJFARpc();
+    JFARpc * jfaRpc = GetJFARpc();
 
-	if (jfaRpc)
-	{
-	    return jfaRpc->GetICACCSRForJF(icacCsr);
-	}
+    if (jfaRpc)
+    {
+        return jfaRpc->GetICACCSRForJF(icacCsr);
+    }
 
-	return CHIP_ERROR_UNINITIALIZED;
+    return CHIP_ERROR_UNINITIALIZED;
 }

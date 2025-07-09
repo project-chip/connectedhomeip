@@ -18,6 +18,5 @@
 #include <app/server/JointFabricAdministrator.h>
 
 namespace chip {
-namespace app {
-} // namespace app
+namespace app {} // namespace app
 } // namespace chip

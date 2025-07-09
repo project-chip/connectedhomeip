@@ -85,8 +85,8 @@
 #endif                                                       // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-#include <app/server/JointFabricDatastore.h>     //nogncheck
 #include <app/server/JointFabricAdministrator.h> //nogncheck
+#include <app/server/JointFabricDatastore.h>     //nogncheck
 #endif                                           // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
 namespace chip {

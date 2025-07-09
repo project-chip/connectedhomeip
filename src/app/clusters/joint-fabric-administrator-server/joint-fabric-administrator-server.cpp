@@ -115,9 +115,9 @@ bool emberAfJointFabricAdministratorClusterICACCSRRequestCallback(
     MATTER_TRACE_SCOPE("ICACCSRRequest", "JointFabricAdministrator");
     ChipLogProgress(Zcl, "JointFabricAdministrator: Received an ICACCSRRequest command");
 
-    auto nonDefaultStatus = Status::Success;
-    const FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj);
-    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+    auto nonDefaultStatus           = Status::Success;
+    const FabricInfo * fabricInfo   = RetrieveCurrentFabric(commandObj);
+    auto & failSafeContext          = Server::GetInstance().GetFailSafeContext();
     auto & jointFabricAdministrator = Server::GetInstance().GetJointFabricAdministrator();
 
     uint8_t buf[Credentials::kMaxDERCertLength];
@@ -156,9 +156,9 @@ bool emberAfJointFabricAdministratorClusterAddICACCallback(
     MATTER_TRACE_SCOPE("AddICAC", "JointFabricAdministrator");
     ChipLogProgress(Zcl, "JointFabricAdministrator: Received an AddICAC command");
 
-    auto nonDefaultStatus = Status::Success;
+    auto nonDefaultStatus         = Status::Success;
     const FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj);
-    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+    auto & failSafeContext        = Server::GetInstance().GetFailSafeContext();
 
     // If current fabric is not available, command was invoked over PASE which is not legal
     VerifyOrExit(fabricInfo != nullptr, nonDefaultStatus = Status::InvalidCommand);

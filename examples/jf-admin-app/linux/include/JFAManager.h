@@ -19,8 +19,8 @@
 #pragma once
 
 #include <AppMain.h>
-#include <app/server/Server.h>
 #include <app/server/JointFabricAdministrator.h>
+#include <app/server/Server.h>
 
 #include <functional>
 #include <stdbool.h>
@@ -32,7 +32,7 @@
 
 namespace chip {
 
-class JFAManager: public app::JointFabricAdministrator::Delegate
+class JFAManager : public app::JointFabricAdministrator::Delegate
 {
 public:
     JFAManager() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}

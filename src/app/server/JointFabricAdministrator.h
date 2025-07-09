@@ -29,14 +29,14 @@ namespace app {
 class JointFabricAdministrator
 {
 public:
-	class Delegate
-	{
-	public:
-		Delegate() {}
-		virtual ~Delegate() {}
+    class Delegate
+    {
+    public:
+        Delegate() {}
+        virtual ~Delegate() {}
 
-		virtual CHIP_ERROR GetIcacCsr(MutableByteSpan & icacCsr) { return CHIP_NO_ERROR; }
-	};
+        virtual CHIP_ERROR GetIcacCsr(MutableByteSpan & icacCsr) { return CHIP_NO_ERROR; }
+    };
 
     static JointFabricAdministrator & GetInstance()
     {
@@ -49,22 +49,21 @@ public:
         mPeerJFAdminClusterEndpointId = peerJFAdminClusterEndpointId;
     }
 
-    CHIP_ERROR SetDelegate(JointFabricAdministrator::Delegate* delegate)
+    CHIP_ERROR SetDelegate(JointFabricAdministrator::Delegate * delegate)
     {
         VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    	mDelegate = delegate;
+        mDelegate = delegate;
 
-    	return CHIP_NO_ERROR;
+        return CHIP_NO_ERROR;
     }
 
     chip::EndpointId GetPeerJFAdminClusterEndpointId() const { return mPeerJFAdminClusterEndpointId; }
 
-    JointFabricAdministrator::Delegate* GetDelegate() { return mDelegate;}
+    JointFabricAdministrator::Delegate * GetDelegate() { return mDelegate; }
 
 private:
     chip::EndpointId mPeerJFAdminClusterEndpointId = chip::kInvalidEndpointId;
-    JointFabricAdministrator::Delegate* mDelegate = nullptr;
-
+    JointFabricAdministrator::Delegate * mDelegate = nullptr;
 };
 
 } // namespace app
