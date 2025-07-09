@@ -1,0 +1,122 @@
+/**
+ *
+ *    Copyright (c) 2025 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include "ThermostatSuggestionStructWithOwnedMembers.h"
+
+using namespace chip;
+using namespace chip::app;
+using namespace DataModel;
+using namespace chip::app::Clusters::Thermostat::Structs;
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace Thermostat {
+
+ThermostatSuggestionStructWithOwnedMembers::ThermostatSuggestionStructWithOwnedMembers(const ThermostatSuggestionStruct::Type & other)
+{
+    *this = other;
+}
+
+ThermostatSuggestionStructWithOwnedMembers::ThermostatSuggestionStructWithOwnedMembers(const ThermostatSuggestionStructWithOwnedMembers & other)
+{
+    *this = other;
+}
+
+ThermostatSuggestionStructWithOwnedMembers & ThermostatSuggestionStructWithOwnedMembers::operator=(const ThermostatSuggestionStruct::Type & other)
+{
+    SetUniqueID(other.uniqueID);
+    CHIP_ERROR err = SetPresetHandle(other.presetHandle);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to set Preset handle with err %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    SetEffectiveTime(other.effectiveTime);
+    SetExpirationTime(other.expirationTime);
+    return *this;
+}
+
+ThermostatSuggestionStructWithOwnedMembers & ThermostatSuggestionStructWithOwnedMembers::operator=(const ThermostatSuggestionStructWithOwnedMembers & other)
+{
+    if (this == &other)
+    {
+        return *this;
+    }
+    *this = static_cast<const ThermostatSuggestionStruct::Type &>(other);
+    return *this;
+}
+
+void ThermostatSuggestionStructWithOwnedMembers::SetUniqueID(uint8_t newUniqueID)
+{
+    uniqueID = newUniqueID;
+}
+
+CHIP_ERROR ThermostatSuggestionStructWithOwnedMembers::SetPresetHandle(const ByteSpan & newPresetHandle)
+{
+    size_t newPresetHandleSize = newPresetHandle.size();
+    if (newPresetHandleSize > kThermostatSuggestionPresetHandleSize)
+    {
+        ChipLogError(Zcl, "Failed to set Preset handle. New preset handle size (%u) > allowed preset handle size (%u)",
+                     static_cast<unsigned>(newPresetHandleSize), static_cast<unsigned>(kThermostatSuggestionPresetHandleSize));
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    MutableByteSpan targetSpan(presetHandleData);
+    ReturnErrorOnFailure(CopySpanToMutableSpan(newPresetHandle, targetSpan));
+    
+    presetHandle = ByteSpan(targetSpan.data(), targetSpan.size());
+    ChipLogError(Zcl, "ThermostatSuggestionStructWithOwnedMembers SetPresetHandle to");
+    ChipLogByteSpan(Zcl, presetHandle);
+
+    return CHIP_NO_ERROR;
+}
+
+void ThermostatSuggestionStructWithOwnedMembers::SetEffectiveTime(const uint32_t newEffectiveTime)
+{
+    effectiveTime = newEffectiveTime;
+}
+
+void ThermostatSuggestionStructWithOwnedMembers::SetExpirationTime(const uint32_t newExpirationTime)
+{
+    expirationTime = newExpirationTime;
+}
+
+uint8_t ThermostatSuggestionStructWithOwnedMembers::GetUniqueID() const
+{
+    return uniqueID;
+}
+
+const ByteSpan & ThermostatSuggestionStructWithOwnedMembers::GetPresetHandle() const
+{
+    ChipLogError(Zcl, "ThermostatSuggestionStructWithOwnedMembers GetPresetHandle:");
+    ChipLogByteSpan(Zcl, presetHandle);
+    return presetHandle;
+}
+
+uint32_t ThermostatSuggestionStructWithOwnedMembers::GetEffectiveTime() const
+{
+    return effectiveTime;
+}
+
+uint32_t ThermostatSuggestionStructWithOwnedMembers::GetExpirationTime() const
+{
+    return expirationTime;
+}
+
+} // namespace Thermostat
+} // namespace Clusters
+} // namespace app
+} // namespace chip

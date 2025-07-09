@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024 - 2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,6 +34,8 @@ namespace Thermostat {
  */
 
 static constexpr uint8_t kMaxNumberOfPresetTypes = 6;
+
+static constexpr uint8_t kMaxNumberOfThermostatSuggestions = 5;
 
 // TODO: #34556 Support multiple presets of each type.
 // We will support only one preset of each preset type.
@@ -70,6 +72,28 @@ public:
 
     void ClearPendingPresetList() override;
 
+    uint8_t GetMaxThermostatSuggestions() override;
+
+    uint8_t GetNumberOfThermostatSuggestions() override;
+
+    CHIP_ERROR GetThermostatSuggestionAtIndex(size_t index, ThermostatSuggestionStructWithOwnedMembers & thermostatSuggestion) override;
+
+    void GetCurrentThermostatSuggestion(DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> & currentThermostatSuggestion) override;
+
+    DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> & GetThermostatSuggestionNotFollowingReason() override;
+
+    void SetCurrentThermostatSuggestion(size_t index) override;
+
+    CHIP_ERROR AppendToThermostatSuggestionsList(const ThermostatSuggestionStructWithOwnedMembers & thermostatSuggestion) override;
+
+    CHIP_ERROR RemoveFromThermostatSuggestionsList(uint8_t uniqueID) override;
+
+    CHIP_ERROR SetThermostatSuggestionNotFollowingReason(const DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> & thermostatSuggestionNotFollowingReason) override;
+
+    uint8_t GetUniqueID() override;
+
+    CHIP_ERROR ReEvaluateCurrentSuggestion(uint32_t currentTimestamp) override;
+
 private:
     static ThermostatDelegate sInstance;
 
@@ -89,6 +113,21 @@ private:
      */
     void InitializePresets();
 
+    /**
+     * @brief return the index of the thermostat suggestion in the ThermostatSuggestions attribute with the earliest EffectiveTime field.
+     * If there are no entries or an error occurs, we will return the value in the MaxThermostatSuggestions attribute as an invalid index.
+     *
+     */
+    size_t GetThermostatSuggestionIndexWithEarliestEffectiveTime(uint32_t currentTimestamp);
+
+    CHIP_ERROR StartExpirationTimer(uint32_t timeoutInMSecs);
+
+    static void TimerExpiredCallback(chip::System::Layer * systemLayer, void * appState);
+
+    void CancelExpirationTimer();
+
+    CHIP_ERROR RemoveExpiredSuggestions(uint32_t currentTimestamp);
+
     uint8_t mNumberOfPresets;
 
     Structs::PresetTypeStruct::Type mPresetTypes[kMaxNumberOfPresetTypes];
@@ -100,6 +139,16 @@ private:
 
     uint8_t mActivePresetHandleData[kPresetHandleSize];
     size_t mActivePresetHandleDataSize;
+
+
+    uint8_t mMaxThermostatSuggestions;
+    ThermostatSuggestionStructWithOwnedMembers mThermostatSuggestions[kMaxNumberOfThermostatSuggestions];
+    uint8_t mNextFreeIndexInThermostatSuggestionsList;
+
+    size_t mIndexOfCurrentSuggestion;
+    uint8_t mUniqueID;
+
+    DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> mThermostatSuggestionNotFollowingReason;
 };
 
 } // namespace Thermostat
