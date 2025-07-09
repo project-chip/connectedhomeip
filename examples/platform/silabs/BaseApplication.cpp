@@ -27,7 +27,6 @@
 #include "OTAConfig.h"
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-#include <platform/silabs/MigrationManager.h>
 
 #define APP_ACTION_BUTTON 1
 
@@ -277,7 +276,6 @@ CHIP_ERROR BaseApplication::Init()
         return err;
     }
 
-    Silabs::MigrationManager::GetMigrationInstance().applyMigrations();
     return err;
 }
 
