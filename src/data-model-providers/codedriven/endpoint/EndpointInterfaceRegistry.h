@@ -108,6 +108,10 @@ public:
 
     /**
      * @brief Unregisters an endpoint with the given EndpointId.
+     *
+     * @note This method does not guarantee that iterators will remain valid after this call.
+     *       If you are iterating over the registry, you should NOT call this method.
+     *
      * @param endpointId The ID of the endpoint to unregister.
      * @return CHIP_NO_ERROR on success. It is not considered an error to
      *         unregister a provider that is not found.
