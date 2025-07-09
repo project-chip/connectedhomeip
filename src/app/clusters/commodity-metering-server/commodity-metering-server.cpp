@@ -208,7 +208,6 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
             for (size_t idx = 0; idx < len; idx++)
             {
                 // Deep copy each MeteredQuantityStruct in the newValue list
-
                 ReturnLogErrorOnFailure(CopyMeteredQuantityEntry(newValue.Value()[idx], buffer[idx]));
             }
 
