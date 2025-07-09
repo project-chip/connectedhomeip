@@ -108,7 +108,7 @@ void SetTestEventTrigger_TimeShift24h()
         const uint32_t delay = (now - secondsSinceMidnight) + (days_ctr++)*kSecondsPerDay;
 
         entries_ctr = 0;
-        instance->SetupTestTimeShiftInterval(delay);
+        instance->SetupTimeShiftOffset(delay);
    }
 }
 
@@ -143,7 +143,7 @@ void SetTestEventTrigger_TimeShift4h()
         } else {
             // Move to next 4-hour interval for next call
             delay += days_ctr*kSecondsPerDay;
-            instance->SetupTestTimeShiftInterval( delay);
+            instance->SetupTimeShiftOffset( delay);
         }
    }
 }
