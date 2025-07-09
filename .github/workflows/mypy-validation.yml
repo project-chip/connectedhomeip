@@ -18,9 +18,11 @@ on:
   push:
     branches: [ master ]
     paths:
+      - 'src/controller/python/chip/ChipDeviceCtrl.py'
       - 'src/python_testing/matter_testing_infrastructure/**/*.py'
   pull_request:
     paths:
+      - 'src/controller/python/chip/ChipDeviceCtrl.py'
       - 'src/python_testing/matter_testing_infrastructure/**/*.py'
 
 jobs:
@@ -54,6 +56,7 @@ jobs:
           # Eventually we should just check all files in the chip/testing directory
           
           ./scripts/run_in_python_env.sh out/venv "mypy --config-file=src/python_testing/matter_testing_infrastructure/mypy.ini \
+            src/controller/python/chip/ChipDeviceCtrl.py \
             src/python_testing/matter_testing_infrastructure/chip/testing/apps.py \
             src/python_testing/matter_testing_infrastructure/chip/testing/tasks.py \
             src/python_testing/matter_testing_infrastructure/chip/testing/taglist_and_topology_test.py \
