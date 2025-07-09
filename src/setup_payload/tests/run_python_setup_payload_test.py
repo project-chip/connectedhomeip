@@ -33,7 +33,8 @@ def payload_param_dict():
         'Discovery Bitmask': None,
         'Short discriminator': None,
         'Long discriminator': None,
-        'Passcode': None
+        'Passcode': None,
+        'Include Vid/Pid': None
     }
 
 
@@ -65,7 +66,8 @@ def chip_tool_parse_setup_payload(chip_tool, payload):
 def generate_payloads(in_params):
     payloads = SetupPayload(in_params['Long discriminator'], in_params['Passcode'],
                             in_params['Discovery Bitmask'], CommissioningFlow(in_params['Custom flow']),
-                            in_params['VendorID'], in_params['ProductID'])
+                            in_params['VendorID'], in_params['ProductID'],
+                            in_params['Include Vid/Pid'])
     manualcode = payloads.generate_manualcode()
     qrcode = payloads.generate_qrcode()
     return manualcode, qrcode
@@ -75,7 +77,7 @@ def verify_generated_payloads(in_params, manualcode_params, qrcode_params):
     assert in_params['Version'] == int(manualcode_params['Version'], 0)
     assert in_params['Passcode'] == int(manualcode_params['Passcode'], 0)
     assert in_params['Short discriminator'] == int(manualcode_params['Short discriminator'], 0)
-    if in_params['Custom flow'] != 0:
+    if in_params['Custom flow'] != 0 or in_params['Include Vid/Pid']:
         assert in_params['VendorID'] == int(manualcode_params['VendorID'], 0)
         assert in_params['ProductID'] == int(manualcode_params['ProductID'], 0)
 
@@ -88,7 +90,7 @@ def verify_generated_payloads(in_params, manualcode_params, qrcode_params):
     assert in_params['Long discriminator'] == int(qrcode_params['Long discriminator'], 0)
 
 
-def get_payload_params(discriminator, passcode, discovery=4, flow=0, vid=0, pid=0, version=0, short_discriminator=None):
+def get_payload_params(discriminator, passcode, discovery=4, flow=0, vid=0, pid=0, version=0, short_discriminator=None, include_vid_pid=False):
     p = payload_param_dict()
     p['Version'] = version
     p['VendorID'] = vid
@@ -98,6 +100,7 @@ def get_payload_params(discriminator, passcode, discovery=4, flow=0, vid=0, pid=
     p['Long discriminator'] = discriminator
     p['Short discriminator'] = short_discriminator if short_discriminator is not None else (discriminator >> 8)
     p['Passcode'] = passcode
+    p['Include Vid/Pid'] = include_vid_pid
     return p
 
 
@@ -109,6 +112,12 @@ def test_code_generation(chip_tool):
         get_payload_params(3091, 43338551, discovery=2, flow=2, vid=0x1123, pid=0x0012),
         get_payload_params(80, 54757432, discovery=6, flow=2, vid=0x2345, pid=0x1023),
         get_payload_params(174, 81235604, discovery=7, flow=1, vid=0x45, pid=0x10),
+        get_payload_params(3781, 12349876, flow=0, vid=1, pid=1, include_vid_pid=True),
+        get_payload_params(3840, 20202021, include_vid_pid=True),
+        get_payload_params(2310, 23005908, flow=0, vid=0xFFF3, pid=0x8098, include_vid_pid=True),
+        get_payload_params(3091, 43338551, discovery=2, flow=0, vid=0x1123, pid=0x0012, include_vid_pid=True),
+        get_payload_params(80, 54757432, discovery=6, flow=0, vid=0x2345, pid=0x1023, include_vid_pid=True),
+        get_payload_params(174, 81235604, discovery=7, flow=0, vid=0x45, pid=0x10, include_vid_pid=True),
     ]
 
     for test_params in test_data_set:
