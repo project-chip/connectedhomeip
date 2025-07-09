@@ -401,7 +401,7 @@ static CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewVal
         {
             if (!componentMap[tcId].insert(deId).second)
             {
-                ChipLogError(NotSpecified, "Current dayEntryID  already attached to the tariffComponentID");
+                ChipLogError(NotSpecified, "Current dayEntryID already attached to the tariffComponentID");
                 return CHIP_ERROR_DUPLICATE_KEY_ID;
             }
         }
