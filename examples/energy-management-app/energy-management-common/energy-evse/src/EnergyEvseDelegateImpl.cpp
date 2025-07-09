@@ -571,14 +571,6 @@ Status EnergyEvseDelegate::HwSetRFID(ByteSpan uid)
  */
 Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
 {
-    // If the input is empty, treat it as a request to clear the vehicle ID
-    if (newValue.empty())
-    {
-        mVehicleID.SetNull();
-        ChipLogDetail(AppServer, "VehicleID cleared");
-        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, VehicleID::Id);
-        return Status::Success;
-    }
 
     if (!mVehicleID.IsNull() && newValue.data_equal(mVehicleID.Value()))
     {
@@ -589,6 +581,15 @@ Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
     {
         ChipLogError(AppServer, "HwSetVehicleID - input too long. Max size = %d", kMaxVehicleIDBufSize);
         return Status::Failure;
+    }
+
+    // If the input is empty, treat it as a request to clear the vehicle ID
+    if (newValue.empty())
+    {
+        mVehicleID.SetNull();
+        ChipLogDetail(AppServer, "VehicleID cleared");
+        MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, VehicleID::Id);
+        return Status::Success;
     }
 
     memcpy(mVehicleIDBuf, newValue.data(), newValue.size());
