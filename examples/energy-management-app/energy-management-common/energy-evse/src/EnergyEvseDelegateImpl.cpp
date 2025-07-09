@@ -145,7 +145,6 @@ Status EnergyEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t>
     }
     else
     {
-        /* check dischargingEnabledUntil is in the future */
         ChipLogProgress(AppServer, "Discharging enabled until: %lu",
                         static_cast<long unsigned int>(dischargingEnabledUntil.Value()));
         SetDischargingEnabledUntil(dischargingEnabledUntil);
