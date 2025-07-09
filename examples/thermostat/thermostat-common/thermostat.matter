@@ -2949,7 +2949,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x123;
+    ram      attribute featureMap default = 0x323;
     ram      attribute clusterRevision default = 8;
 
     handle command SetpointRaiseLower;
