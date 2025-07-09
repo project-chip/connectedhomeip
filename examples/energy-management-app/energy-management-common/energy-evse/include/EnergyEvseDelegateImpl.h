@@ -122,7 +122,7 @@ class EnergyEvseDelegate : public EnergyEvse::Delegate
 {
 public:
     EnergyEvseDelegate(EvseTargetsDelegate & aDelegate) : EnergyEvse::Delegate() { mEvseTargetsDelegate = &aDelegate; }
-    ~EnergyEvseDelegate();
+    ~EnergyEvseDelegate() {}
 
     EvseTargetsDelegate * GetEvseTargetsDelegate() { return mEvseTargetsDelegate; }
 
@@ -228,6 +228,7 @@ public:
     Status HwSetFault(FaultStateEnum fault);
     Status HwSetRFID(ByteSpan uid);
     Status HwSetVehicleID(const CharSpan & vehID);
+    CHIP_ERROR HwGetVehicleID(DataModel::Nullable<MutableCharSpan> & outValue);
     Status HwDiagnosticsComplete();
     Status SendEVConnectedEvent();
     Status SendEVNotDetectedEvent();
@@ -379,6 +380,7 @@ private:
 
     /* PNC attributes*/
     DataModel::Nullable<CharSpan> mVehicleID;
+    char mVehicleIDBuf[kMaxVehicleIDBufSize];
 
     /* Session Object */
     EvseSession mSession = EvseSession();
