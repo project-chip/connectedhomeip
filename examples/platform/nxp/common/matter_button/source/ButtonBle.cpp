@@ -19,7 +19,9 @@
 #include "ButtonBle.h"
 #include "AppTaskBase.h"
 #include "BLEApplicationManager.h"
+#if (CONFIG_ENABLE_FEEDBACK == 1)
 #include "UserInterfaceFeedback.h"
+#endif
 
 extern "C" {
 #include "app.h"
