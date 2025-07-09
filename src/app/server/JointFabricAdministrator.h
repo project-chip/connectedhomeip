@@ -21,7 +21,6 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/core/NodeId.h>
-#include <vector>
 
 namespace chip {
 namespace app {
