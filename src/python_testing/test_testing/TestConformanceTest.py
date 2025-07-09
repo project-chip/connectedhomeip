@@ -27,6 +27,7 @@ from chip.testing.runner import default_matter_test_main
 from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types
 from fake_device_builder import create_minimal_cluster, create_minimal_dt
 from mobly import asserts
+
 from python_testing.TC_DeviceConformance import DeviceConformanceTests
 
 
