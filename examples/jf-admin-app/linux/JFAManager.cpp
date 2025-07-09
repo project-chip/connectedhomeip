@@ -278,3 +278,15 @@ void JFAManager::OnCommissioningCompleteFailure(void * context, CHIP_ERROR error
 
     ChipLogError(JointFabric, "Received failure response %s\n", chip::ErrorStr(error));
 }
+
+CHIP_ERROR JFAManager::GetIcacCsr(MutableByteSpan & icacCsr)
+{
+	JFARpc * jfaRpc = GetJFARpc();
+
+	if (jfaRpc)
+	{
+	    return jfaRpc->GetICACCSRForJF(icacCsr);
+	}
+
+	return CHIP_ERROR_UNINITIALIZED;
+}

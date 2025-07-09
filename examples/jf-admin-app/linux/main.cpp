@@ -36,16 +36,6 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
                                        uint8_t * value)
 {}
 
-bool emberAfJointFabricAdministratorClusterGetIcacCsr(MutableByteSpan & icacCsr)
-{
-    if (JFAMgr().GetJFARpc()->GetICACCSRForJF(icacCsr) == CHIP_NO_ERROR)
-    {
-        return true;
-    }
-
-    return false;
-}
-
 void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     (void) arg;
@@ -59,6 +49,8 @@ void EventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 void ApplicationInit()
 {
     JFAMgr().Init(Server::GetInstance());
+    Server::GetInstance().GetJointFabricAdministrator().SetDelegate(&JFAMgr());
+
     DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 }
 

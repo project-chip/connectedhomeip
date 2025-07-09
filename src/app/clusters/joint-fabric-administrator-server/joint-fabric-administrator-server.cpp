@@ -20,8 +20,6 @@
  * @brief Implementation for the Joint Fabric Administrator Cluster
  ***************************************************************************/
 
-#include "joint-fabric-administrator-server.h"
-
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -110,11 +108,6 @@ const FabricInfo * RetrieveCurrentFabric(CommandHandler * aCommandHandler)
     return Server::GetInstance().GetFabricTable().FindFabricWithIndex(index);
 }
 
-bool __attribute__((weak)) emberAfJointFabricAdministratorClusterGetIcacCsr(MutableByteSpan & icacCsr)
-{
-    return false;
-}
-
 bool emberAfJointFabricAdministratorClusterICACCSRRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::JointFabricAdministrator::Commands::ICACCSRRequest::DecodableType & commandData)
@@ -125,6 +118,7 @@ bool emberAfJointFabricAdministratorClusterICACCSRRequestCallback(
     auto nonDefaultStatus = Status::Success;
     const FabricInfo * fabricInfo = RetrieveCurrentFabric(commandObj);
     auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+    auto & jointFabricAdministrator = Server::GetInstance().GetJointFabricAdministrator();
 
     uint8_t buf[Credentials::kMaxDERCertLength];
     MutableByteSpan icacCsr(buf, Credentials::kMaxDERCertLength);
@@ -140,7 +134,9 @@ bool emberAfJointFabricAdministratorClusterICACCSRRequestCallback(
      * has not been executed against the initiator of this command, the command SHALL fail
      * with a <<ref_JFVidNotVerified, JfVidNotVerified>> status code SHALL be sent back to the initiator.*/
 
-    VerifyOrExit(emberAfJointFabricAdministratorClusterGetIcacCsr(icacCsr) == true, nonDefaultStatus = Status::Failure);
+    VerifyOrExit(jointFabricAdministrator.GetDelegate() != nullptr, nonDefaultStatus = Status::Failure);
+    VerifyOrExit(jointFabricAdministrator.GetDelegate()->GetIcacCsr(icacCsr) == CHIP_NO_ERROR, nonDefaultStatus = Status::Failure);
+
     response.icaccsr = icacCsr;
     commandObj->AddResponse(commandPath, response);
 
@@ -225,7 +221,7 @@ bool emberAfJointFabricAdministratorClusterAnnounceJointFabricAdministratorCallb
                  nonDefaultStatus = Status::FailsafeRequired);
     VerifyOrExit(commandData.endpointID != kInvalidEndpointId, nonDefaultStatus = Status::ConstraintError);
 
-    JointFabricAdministratorServer::GetInstance().SetPeerJFAdminClusterEndpointId(commandData.endpointID);
+    Server::GetInstance().GetJointFabricAdministrator().SetPeerJFAdminClusterEndpointId(commandData.endpointID);
 
     /* TODO: execute Fabric Table Vendor ID Verification */
 
@@ -276,10 +272,3 @@ bool emberAfJointFabricAdministratorClusterAnnounceJointFabricAdministratorCallb
     return false;
 }
 #endif
-
-JointFabricAdministratorServer JointFabricAdministratorServer::sJointFabricAdministratorServerInstance;
-
-JointFabricAdministratorServer & JointFabricAdministratorServer::GetInstance()
-{
-    return sJointFabricAdministratorServerInstance;
-}

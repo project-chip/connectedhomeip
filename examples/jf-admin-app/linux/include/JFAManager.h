@@ -20,6 +20,7 @@
 
 #include <AppMain.h>
 #include <app/server/Server.h>
+#include <app/server/JointFabricAdministrator.h>
 
 #include <functional>
 #include <stdbool.h>
@@ -31,7 +32,7 @@
 
 namespace chip {
 
-class JFAManager
+class JFAManager: public app::JointFabricAdministrator::Delegate
 {
 public:
     JFAManager() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
@@ -43,6 +44,9 @@ public:
 
     void SetJFARpc(JFARpc & aJFARpc);
     JFARpc * GetJFARpc();
+
+    /* app::JointFabricAdministrator::Delegate */
+    CHIP_ERROR GetIcacCsr(MutableByteSpan & icacCsr) override;
 
 private:
     // Various actions to take when OnConnected callback is called

@@ -13,5 +13,4 @@
 # limitations under the License.
 app_config_dependent_sources = [
   "joint-fabric-administrator-server.cpp",
-  "joint-fabric-administrator-server.h",
 ]
