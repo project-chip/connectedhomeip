@@ -11643,6 +11643,16 @@
           Descriptor:
               # In-progress for maybe Matter 1.5
               - EndpointUniqueID
+          GeneralCommissioning:
+              # In-progress for network recovery feature
+              - NetworkRecoveryReason
+              - RecoveryIdentifier
+          Thermostat:
+              # In-progress for Matter 1.5: Thermostat Suggestions feature
+              - CurrentThermostatSuggestion
+              - MaxThermostatSuggestions
+              - ThermostatSuggestionNotFollowingReason
+              - ThermostatSuggestions
           ThreadNetworkDiagnostics:
               # In-progress for maybe Matter 1.5
               - ExtAddress
@@ -11656,7 +11666,19 @@
               - SetVIDVerificationStatement
               - SignVIDVerificationRequest
               - SignVIDVerificationResponse
+          Thermostat:
+              # In-progress for Matter 1.5: Thermostat Suggestions feature
+              - AddThermostatSuggestion
+              - AddThermostatSuggestionResponse
+              - RemoveThermostatSuggestion
+          UnitTesting:
+              # Ideally none of UnitTesting would be exposed as public API, but
+              # for now just start doing that for new additions to it.
+              - TestCheckCommandFlags
       structs:
+          Thermostat:
+              # In-progress for Matter 1.5: Thermostat Suggestions feature
+              - ThermostatSuggestionStruct
           Globals:
               # In-progress for maybe Matter 1.5
               - CurrencyStruct
@@ -11664,7 +11686,17 @@
               - MeasurementAccuracyRangeStruct
               - PowerThresholdStruct
               - PriceStruct
+              # In-progress for cameras
+              - ICECandidateStruct
+              - ICEServerStruct
+              - ViewportStruct
+              - WebRTCSessionStruct
       struct fields:
+          ElectricalEnergyMeasurement:
+              EnergyMeasurementStruct:
+                  # In-progress for maybe Matter 1.5
+                  - apparentEnergy
+                  - reactiveEnergy
           OperationalCredentials:
               # In-progress for Matter 1.5: VID Verification feature
               FabricDescriptorStruct:
@@ -11677,14 +11709,19 @@
                   # In-progress for maybe Matter 1.5
                   - fabricIndex
       enums:
+          GeneralCommissioning:
+              # In-progress for network recovery feature
+              - NetworkRecoveryReasonEnum
           Globals:
               # In-progress for maybe Matter 1.5
               - LocationTag
               - MeasurementAccuracyStruct
               - MeasurementTypeEnum
               - PowerThresholdSourceEnum
+              - StreamUsageEnum
               - TariffPriceTypeEnum
               - TariffUnitEnum
+              - WebRTCEndReasonEnum
       enum values:
           ElectricalPowerMeasurement:
               # In-progress for maybe Matter 1.5
@@ -11716,18 +11753,36 @@
                   - CleaningMop
                   - FillingWaterTank
                   - UpdatingMaps
+      bitmaps:
+          Thermostat:
+              # In-progress for Matter 1.5: Thermostat Suggestions feature
+              - ThermostatSuggestionNotFollowingReasonBitmap
+      bitmap values:
+          ElectricalEnergyMeasurement:
+              Feature:
+                  # In-progress for Matter 1.6
+                  - ApparentEnergy
+                  - ReactiveEnergy
       device types:
           # In-progress for maybe Matter 1.5
+          - AudioDoorbell
           - Camera
+          - CameraController
+          - Chime
           - Closure
           - ClosureController
           - ClosurePanel
           - ElectricalEnergyTariff
           - ElectricalMeter
           - ElectricalUtilityMeter
+          - FloodlightCamera
+          - Intercom
           - MeterReferencePoint
           - MountedDimmableLoadControl
           - MountedOnOffControl
+          - SnapshotCamera
+          - SoilSensor
           - ThermostatController
+          - VideoDoorbell
           # In-progress for Joint Fabric feature
           - JointFabricAdministrator
