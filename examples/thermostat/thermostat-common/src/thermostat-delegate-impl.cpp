@@ -300,19 +300,19 @@ CHIP_ERROR ThermostatDelegate::RemoveFromThermostatSuggestionsList(uint8_t uniqu
         if (mThermostatSuggestions[index].GetUniqueID() == uniqueID)
         {
             uniqueIDMatchedIndex = index;
-            mThermostatSuggestions[index] = mThermostatSuggestions[index + 1];
-        }
-
-        if (uniqueIDMatchedIndex < index)
-        {
-            mThermostatSuggestions[index] = mThermostatSuggestions[index + 1];
+            break;
         }
     }
     if (uniqueIDMatchedIndex == mNextFreeIndexInThermostatSuggestionsList)
     {
         return CHIP_ERROR_NOT_FOUND;
     }
-    else if (uniqueIDMatchedIndex == mIndexOfCurrentSuggestion)
+    // Shift elements to the left to fill the gap.
+    for (size_t index = uniqueIDMatchedIndex; index < mNextFreeIndexInThermostatSuggestionsList - 1; index++)
+    {
+        mThermostatSuggestions[index] = mThermostatSuggestions[index + 1];
+    }
+    if (uniqueIDMatchedIndex == mIndexOfCurrentSuggestion)
     {
         CancelExpirationTimer();
         SetCurrentThermostatSuggestion(GetMaxThermostatSuggestions());
