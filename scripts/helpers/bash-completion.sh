@@ -27,16 +27,16 @@ _chip_build_example() {
     local i
     local command command_comp_cword
     # Get the first non-option argument taking into account the options with their arguments.
-    for (( i=1; i <= COMP_CWORD; i++ )); do
+    for ((i = 1; i <= COMP_CWORD; i++)); do
         case "${COMP_WORDS[i]}" in
             --log-level | --target | --repo | --out-prefix | --ninja-jobs | --pregen-dir | --dry-run-output | --pw-command-launcher)
-                (( i == COMP_CWORD )) && break
-                (( i == COMP_CWORD - 1 )) && [[ "${COMP_WORDS[i+1]}" = "=" ]] && break
-                [[ "${COMP_WORDS[i+1]}" = "=" ]] && (( i++ ))
-                [[ "${COMP_WORDS[i+1]}" ]] && (( i++ ))
+                ((i == COMP_CWORD)) && break
+                ((i == COMP_CWORD - 1)) && [[ "${COMP_WORDS[i + 1]}" = "=" ]] && break
+                [[ "${COMP_WORDS[i + 1]}" = "=" ]] && ((i++))
+                [[ "${COMP_WORDS[i + 1]}" ]] && ((i++))
                 continue
                 ;;
-            -*|=)
+            -* | =)
                 continue
                 ;;
         esac
