@@ -532,9 +532,16 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("7d")
 
             # Wait for the SecureStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
-
-            asserts.assert_false(data.secureValue, f"Unexpected event data: {data.secureValue}")
+            event_queue = event_sub_handler.event_queue
+            firstEvent = event_queue.get(block=True, timeout=timeout)
+            if firstEvent.Header.EventId == Clusters.ClosureControl.Events.SecureStateChanged.event_id:
+                logging.info(f"SecureStateChanged event received: {firstEvent}")
+                asserts.assert_false(firstEvent.Data.secureValue, "SecureStateChanged event secureValue is not False.")
+            else:
+                secondEvent = event_queue.get(block=True, timeout=timeout)
+                asserts.assert_equal(secondEvent.Header.EventId, Clusters.ClosureControl.Events.SecureStateChanged.event_id,
+                                     "Expected SecureStateChanged event not received.")
+                asserts.assert_false(secondEvent.Data.secureValue, "SecureStateChanged event secureValue is not False.")
 
             # STEP 7e: TH sends command MoveTo with Position = MoveToFullyClosed.
             self.step("7e")
@@ -553,9 +560,16 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("7f")
 
             # Wait for the SecureStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
-
-            asserts.assert_true(data.secureValue, f"Unexpected event data: {data.secureValue}")
+            event_queue = event_sub_handler.event_queue
+            firstEvent = event_queue.get(block=True, timeout=timeout)
+            if firstEvent.Header.EventId == Clusters.ClosureControl.Events.SecureStateChanged.event_id:
+                logging.info(f"SecureStateChanged event received: {firstEvent}")
+                asserts.assert_true(firstEvent.Data.secureValue, "SecureStateChanged event secureValue is not True.")
+            else:
+                secondEvent = event_queue.get(block=True, timeout=timeout)
+                asserts.assert_equal(secondEvent.Header.EventId, Clusters.ClosureControl.Events.SecureStateChanged.event_id,
+                                     "Expected SecureStateChanged event not received.")
+                asserts.assert_true(secondEvent.Data.secureValue, "SecureStateChanged event secureValue is not True.")
 
         # STEP 8a: If LT feature is not supported on the cluster or PS feature is supported on the cluster, skip steps 8b to 8l
         self.step("8a")
@@ -617,9 +631,16 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("8g")
 
             # Wait for the SecureStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
-
-            asserts.assert_true(data.secureValue, f"Unexpected event data: {data.secureValue}")
+            event_queue = event_sub_handler.event_queue
+            firstEvent = event_queue.get(block=True, timeout=timeout)
+            if firstEvent.Header.EventId == Clusters.ClosureControl.Events.SecureStateChanged.event_id:
+                logging.info(f"SecureStateChanged event received: {firstEvent}")
+                asserts.assert_true(firstEvent.Data.secureValue, "SecureStateChanged event secureValue is not True.")
+            else:
+                secondEvent = event_queue.get(block=True, timeout=timeout)
+                asserts.assert_equal(secondEvent.Header.EventId, Clusters.ClosureControl.Events.SecureStateChanged.event_id,
+                                     "Expected SecureStateChanged event not received.")
+                asserts.assert_true(secondEvent.Data.secureValue, "SecureStateChanged event secureValue is not True.")
 
             # STEP 8h: If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip step 8i
             self.step("8h")
@@ -663,9 +684,16 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("8l")
 
             # Wait for the SecureStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
-
-            asserts.assert_false(data.secureValue, f"Unexpected event data: {data.secureValue}")
+            event_queue = event_sub_handler.event_queue
+            firstEvent = event_queue.get(block=True, timeout=timeout)
+            if firstEvent.Header.EventId == Clusters.ClosureControl.Events.SecureStateChanged.event_id:
+                logging.info(f"SecureStateChanged event received: {firstEvent}")
+                asserts.assert_false(firstEvent.Data.secureValue, "SecureStateChanged event secureValue is not False.")
+            else:
+                secondEvent = event_queue.get(block=True, timeout=timeout)
+                asserts.assert_equal(secondEvent.Header.EventId, Clusters.ClosureControl.Events.SecureStateChanged.event_id,
+                                     "Expected SecureStateChanged event not received.")
+                asserts.assert_false(secondEvent.Data.secureValue, "SecureStateChanged event secureValue is not False.")
 
         # STEP 9a: If LT feature is not supported on the cluster or PS feature is not supported on the cluster, skip steps 9b to 9l
         self.step("9a")
@@ -718,9 +746,16 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("9f")
 
             # Wait for the SecureStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
-
-            asserts.assert_true(data.secureValue, f"Unexpected event data: {data.secureValue}")
+            event_queue = event_sub_handler.event_queue
+            firstEvent = event_queue.get(block=True, timeout=timeout)
+            if firstEvent.Header.EventId == Clusters.ClosureControl.Events.SecureStateChanged.event_id:
+                logging.info(f"SecureStateChanged event received: {firstEvent}")
+                asserts.assert_true(firstEvent.Data.secureValue, "SecureStateChanged event secureValue is not True.")
+            else:
+                secondEvent = event_queue.get(block=True, timeout=timeout)
+                asserts.assert_equal(secondEvent.Header.EventId, Clusters.ClosureControl.Events.SecureStateChanged.event_id,
+                                     "Expected SecureStateChanged event not received.")
+                asserts.assert_true(secondEvent.Data.secureValue, "SecureStateChanged event secureValue is not True.")
 
             # STEP 9g: If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip step 9h
             self.step("9g")
@@ -776,9 +811,16 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("9l")
 
             # Wait for the SecureStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
-
-            asserts.assert_false(data.secureValue, f"Unexpected event data: {data.secureValue}")
+            event_queue = event_sub_handler.event_queue
+            firstEvent = event_queue.get(block=True, timeout=timeout)
+            if firstEvent.Header.EventId == Clusters.ClosureControl.Events.SecureStateChanged.event_id:
+                logging.info(f"SecureStateChanged event received: {firstEvent}")
+                asserts.assert_false(firstEvent.Data.secureValue, "SecureStateChanged event secureValue is not False.")
+            else:
+                secondEvent = event_queue.get(block=True, timeout=timeout)
+                asserts.assert_equal(secondEvent.Header.EventId, Clusters.ClosureControl.Events.SecureStateChanged.event_id,
+                                     "Expected SecureStateChanged event not received.")
+                asserts.assert_false(secondEvent.Data.secureValue, "SecureStateChanged event secureValue is not False.")
 
 
 if __name__ == "__main__":
