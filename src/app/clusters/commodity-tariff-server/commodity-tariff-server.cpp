@@ -723,7 +723,7 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
             {
                 ChipLogError(NotSpecified, "Unable to update the NextTariffComponents attribute!");
             }
-            ChipLogDetail(NotSpecified, "ForceDayEntriesAttrsUpdate: current day entry: %u", tmpDayEntry.Value().dayEntryID);
+            ChipLogDetail(NotSpecified, "UpdateCurrentAttrs: next day entry: %u", tmpDayEntry.Value().dayEntryID);
         }
 
         SetNextDayEntry(tmpDayEntry);
