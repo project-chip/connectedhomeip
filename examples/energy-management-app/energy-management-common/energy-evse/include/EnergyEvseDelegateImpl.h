@@ -212,7 +212,7 @@ public:
      * @brief   Helper function to handle timer expiration when in enabled state
      * @param matterEpoch Current time in Matter epoch seconds
      */
-    void HandleEnabledStateExpiration(uint32_t matterEpoch);
+    void HandleEnabledStateExpiration(uint32_t matterEpochSeconds);
 
     /**
      * @brief   Helper function to get know if the EV is plugged in based on state
@@ -324,7 +324,7 @@ private:
     int64_t mActualChargingCurrentLimit                = 0;
     int64_t mMaximumDischargingCurrentLimitFromCommand = 0; /* Value of current maximum limit when discharging enabled */
     int64_t mActualDischargingCurrentLimit             = 0;
-    int64_t mNominalMainsVoltage                       = 230000; /* Assume a sensible default mains voltage */
+    int64_t mNominalMainsVoltage                       = 230000; /* Assume a sensible default mains voltage (mV) */
 
     StateEnum mHwState = StateEnum::kNotPluggedIn; /* Hardware state */
 
