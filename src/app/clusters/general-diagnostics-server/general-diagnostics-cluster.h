@@ -130,6 +130,17 @@ public:
         }
     }
 
+    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
+                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
+    {
+        return LOGIC::AcceptedCommands(builder);
+    }
+
+    CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override
+    {
+        return LOGIC::Attributes(builder);
+    }
+
     /**
      * @brief
      *   Called after the current device is rebooted.
