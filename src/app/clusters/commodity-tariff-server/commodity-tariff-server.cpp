@@ -369,7 +369,8 @@ std::pair<const T *, const T *> GetCurrNextItemsById(const std::map<uint32_t, co
 DayPatternDayOfWeekBitmap GetDayOfWeek(uint32_t timestamp)
 {
     time_t time         = static_cast<time_t>(timestamp);
-    struct tm * utcTime = gmtime(&time);
+    struct tm utcTimeStruct;
+    struct tm * utcTime = gmtime_r(&time, &utcTimeStruct);
     return static_cast<DayPatternDayOfWeekBitmap>(1 << utcTime->tm_wday);
 }
 
