@@ -95,8 +95,10 @@ def runConversion(zap_file):
     templates_file = getFilePath('src/app/zap-templates/app-templates.json')
     zcl_file = detectZclFile(zap_file)
     tool = ZapTool()
-    tool.run('convert', '-z', zcl_file, '-g',
-             templates_file, '-o', zap_file, zap_file)
+    zap_file_dir = str(os.path.dirname(zap_file))
+    results_yaml = os.path.join(zap_file_dir, "zap_upgrades.yaml")
+    tool.run('upgrade', '-d', zap_file_dir, '-z', zcl_file, '-g',
+             templates_file, '--results', results_yaml)
 
 
 def main():
@@ -110,6 +112,14 @@ def main():
     os.chdir(CHIP_ROOT_DIR)
 
     runConversion(zap_file)
+    # Delete results file if it is empty.
+    zap_file_dir = str(os.path.dirname(zap_file))
+    results_yaml = os.path.join(zap_file_dir, "zap_upgrades.yaml")
+    if os.path.isfile(results_yaml):
+        with open(results_yaml, 'r') as f:
+            content = f.read().strip()
+        if content == 'upgrade_results: []':
+            os.remove(results_yaml)
 
 
 if __name__ == '__main__':
