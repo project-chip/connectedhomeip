@@ -46,11 +46,12 @@ enum class CommodityTariffTrigger : uint64_t
     kTariffDataUpdated = 0x0700'0000'0000'0000,
     // Cleanup the tariff data
     kTariffDataClear = 0x0700'0000'0000'0001,
-    // Force jump to next day date (in epoch_s) to check of updating for time of day context-dependent attribute values.
-    kForcedOneDayForward = 0x0700'0000'0000'0002,
-    // Force jump to next intraday entry time (minutes) period to check of updating for time of day context-dependent attribute
-    // values.
-    kForcedOneDayEntryForward = 0x0700'0000'0000'0003
+    // Shifts current time on 24h to change day (The time shift mode will activated)
+    kTimeShift24h = 0x0700'0000'0000'0002,
+    // Shifts current time on 4h. (The time shift mode will activated)
+    kTimeShift4h = 0x0700'0000'0000'0003,
+    // Disable time shift mode (Clean up the time shift context)
+    kTimeShiftDisable= 0x0700'0000'0000'0004
 };
 
 class CommodityTariffTestEventTriggerHandler : public TestEventTriggerHandler

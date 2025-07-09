@@ -22,6 +22,7 @@
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
+#include <cstdint>
 #include "CommodityTariffConsts.h"
 
 using namespace chip;
@@ -717,7 +718,6 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
 
         if (nextUpdInterval > 0)
         {
-            mServerTariffAttrsCtx.dayEntriesUpdDelay = timestampNow + nextUpdInterval*60;
             if ( (nextUpdInterval >= (kDayEntryDurationLimit-minutesSinceMidnight) ) && !mNextDay.IsNull() )
             {
                 tmpDate.SetNonNull(mNextDay.Value().date);
@@ -799,46 +799,20 @@ void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEnt
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-void Instance::ForceDaysAttrsUpdate()
-{
-    uint32_t now                  = GetCurrentTimestamp();
-    uint32_t secondsSinceMidnight = static_cast<uint32_t>(now % kSecondsPerDay);
-    uint32_t delay                = (secondsSinceMidnight == 0) ? static_cast<uint32_t>(kSecondsPerDay)
-                                                                : static_cast<uint32_t>(kSecondsPerDay - secondsSinceMidnight);
+/* 
+ * Schedules an update after specified delay and determines event type
+ * (day change or entry update) based on whether it crosses midnight
+ */
+void Instance::SetupTestTimeShiftInterval(uint32_t delay)
+{   
+    mServerTariffAttrsCtx.forwardAlarmTriggerTime = delay;
 
-    mServerTariffAttrsCtx.forwardAlarmTriggerTime = now + delay;
+    // Determine if this update crosses day boundary
+    const bool crossesMidnight = (mServerTariffAttrsCtx.forwardAlarmTriggerTime)%kSecondsPerDay == 0;
+    const UpdateEventCode eventType = crossesMidnight ? UpdateEventCode::DaysUpdating 
+                                                   : UpdateEventCode::DayEntryUpdating;
 
-    UpdateCurrentAttrs(UpdateEventCode::DaysUpdating);
-}
-
-void Instance::ForceDayEntriesAttrsUpdate()
-{
-    if(mServerTariffAttrsCtx.dayEntriesUpdDelay)
-    {
-        mServerTariffAttrsCtx.forwardAlarmTriggerTime = mServerTariffAttrsCtx.dayEntriesUpdDelay;
-        mServerTariffAttrsCtx.dayEntriesUpdDelay = 0;        
-
-        ChipLogDetail(NotSpecified,
-            "ForceDayEntriesAttrsUpdate:\n \
-            current day entry: %u,\n \
-            current day entry date: %d,\n \
-            next day entry date: %d,\n \
-            now ts %d,\n \
-            since midnight: %d",
-            mCurrentDayEntry.Value().dayEntryID,
-            mCurrentDayEntryDate.Value(),
-            mNextDayEntryDate.Value(),
-            mServerTariffAttrsCtx.forwardAlarmTriggerTime,
-            static_cast<uint32_t>(mServerTariffAttrsCtx.forwardAlarmTriggerTime % kSecondsPerDay) );
-        if ( mServerTariffAttrsCtx.forwardAlarmTriggerTime - mCurrentDay.Value().date >= kSecondsPerDay)
-        {
-            UpdateCurrentAttrs(UpdateEventCode::DaysUpdating);                
-        }
-        else
-        {
-            UpdateCurrentAttrs(UpdateEventCode::DayEntryUpdating);   
-        }
-    }
+    UpdateCurrentAttrs(eventType);
 }
 
 } // namespace CommodityTariff
