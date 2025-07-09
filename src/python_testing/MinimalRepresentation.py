@@ -21,7 +21,7 @@ from chip.testing.conformance import ConformanceDecision
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from chip.tlv import uint
-from TC_DeviceConformance import DeviceConformanceTests
+from python_testing.TC_DeviceConformance import DeviceConformanceTests
 
 
 @dataclass
