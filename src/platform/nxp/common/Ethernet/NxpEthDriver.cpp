@@ -116,6 +116,7 @@ CHIP_ERROR NxpEthDriver::Init(NetworkStatusChangeCallback * networkStatusChangeC
 
 NetworkIterator * NxpEthDriver::GetNetworks()
 {
+    /* Caller is responsible for deleting this object to prevent a memory leak */
     EthernetNetworkIterator * iterator = new EthernetNetworkIterator();
 
     uint8_t interface_index = netif_get_index(&netif_app);

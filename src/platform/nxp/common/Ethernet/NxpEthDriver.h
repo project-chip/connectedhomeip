@@ -60,6 +60,7 @@ public:
     netif * GetEthInetIf() { return &netif_app; };
 
     // BaseDriver
+    /* current network ID is a concatenation of the prefix "eth_" and the ethernet interface number */
     NetworkIterator * GetNetworks() override;
     uint8_t GetMaxNetworks() { return 1; }
     CHIP_ERROR Init(NetworkStatusChangeCallback * networkStatusChangeCallback) override;
