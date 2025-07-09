@@ -322,15 +322,16 @@ CHIP_ERROR ThermostatDelegate::RemoveFromThermostatSuggestionsList(uint8_t uniqu
 }
 
 uint8_t ThermostatDelegate::GetUniqueID()
+uint8_t currentId = mUniqueID;
+if (mUniqueID == UINT8_MAX)
 {
-    if (mUniqueID == UINT8_MAX)
-    {
-        mUniqueID = 1;
-        return mUniqueID;
-    }
-    return mUniqueID++;
+    mUniqueID = 1;
 }
-
+else
+{
+    mUniqueID++;
+}
+return currentId;
 /**
  * @brief Starts a timer to wait for the expiration of the current thermostat suggestion.
  *
@@ -344,22 +345,18 @@ CHIP_ERROR ThermostatDelegate::StartExpirationTimer(uint32_t timeoutInMSecs)
 }
 
 CHIP_ERROR ThermostatDelegate::RemoveExpiredSuggestions(uint32_t currentTimestamp)
+for (int i = static_cast<int>(GetNumberOfThermostatSuggestions()) - 1; i >= 0; i--)
 {
-    for (size_t index = 0; index < GetNumberOfThermostatSuggestions(); index++)
+    ThermostatSuggestionStructWithOwnedMembers suggestion;
+    CHIP_ERROR err = GetThermostatSuggestionAtIndex(static_cast<size_t>(i), suggestion);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+
+    if (suggestion.GetExpirationTime() < currentTimestamp)
     {
-        ThermostatSuggestionStructWithOwnedMembers suggestion;
-        CHIP_ERROR err = GetThermostatSuggestionAtIndex(index, suggestion);
+        err = RemoveFromThermostatSuggestionsList(suggestion.GetUniqueID());
         VerifyOrReturnError(err == CHIP_NO_ERROR, err);
-
-        if (suggestion.GetExpirationTime() < currentTimestamp)
-        {
-            err = RemoveFromThermostatSuggestionsList(suggestion.GetUniqueID());
-            VerifyOrReturnError(err == CHIP_NO_ERROR, err);
-        }
     }
-    return CHIP_NO_ERROR;
 }
-
 void ThermostatDelegate::TimerExpiredCallback(chip::System::Layer * systemLayer, void * appState)
 {
     uint32_t currentTimestamp = 0;
@@ -403,8 +400,11 @@ CHIP_ERROR ThermostatDelegate::ReEvaluateCurrentSuggestion(uint32_t currentTimes
     {
 
         // Start a timer for the expiration time.
-        ThermostatSuggestionStructWithOwnedMembers & currentThermostatSuggestion = nullableCurrentThermostatSuggestion.Value();
-        StartExpirationTimer((currentThermostatSuggestion.GetExpirationTime() - currentThermostatSuggestion.GetEffectiveTime()) * 1000);
+ThermostatSuggestionStructWithOwnedMembers & currentThermostatSuggestion = nullableCurrentThermostatSuggestion.Value();
+if (currentThermostatSuggestion.GetExpirationTime() > currentTimestamp)
+{
+    StartExpirationTimer((currentThermostatSuggestion.GetExpirationTime() - currentTimestamp) * 1000);
+}
     }
 
     return CHIP_NO_ERROR;
