@@ -208,6 +208,10 @@ namespace GlobalStruct {
 inline constexpr AttributeId Id = 0x00000034;
 } // namespace GlobalStruct
 
+namespace UnsupportedAttributeRequiringAdminNotInZAP {
+inline constexpr AttributeId Id = 0x000000FE;
+} // namespace UnsupportedAttributeRequiringAdminNotInZAP
+
 namespace Unsupported {
 inline constexpr AttributeId Id = 0x000000FF;
 } // namespace Unsupported

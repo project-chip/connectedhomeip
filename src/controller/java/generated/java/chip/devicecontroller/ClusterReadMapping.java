@@ -19824,6 +19824,17 @@ public class ClusterReadMapping {
           readUnitTestingGlobalEnumCommandParams
         );
         result.put("readGlobalEnumAttribute", readUnitTestingGlobalEnumAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readUnitTestingUnsupportedAttributeRequiringAdminNotInZAPCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readUnitTestingUnsupportedAttributeRequiringAdminNotInZAPAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.UnitTestingCluster) cluster).readUnsupportedAttributeRequiringAdminNotInZAPAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readUnitTestingUnsupportedAttributeRequiringAdminNotInZAPCommandParams
+        );
+        result.put("readUnsupportedAttributeRequiringAdminNotInZAPAttribute", readUnitTestingUnsupportedAttributeRequiringAdminNotInZAPAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readUnitTestingUnsupportedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readUnitTestingUnsupportedAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

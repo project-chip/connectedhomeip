@@ -4525,6 +4525,28 @@ public class ClusterWriteMapping {
       writeUnitTestingGlobalEnumCommandParams
     );
     writeUnitTestingInteractionInfo.put("writeGlobalEnumAttribute", writeUnitTestingGlobalEnumAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeUnitTestingUnsupportedAttributeRequiringAdminNotInZAPCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo unitTestingunsupportedAttributeRequiringAdminNotInZAPCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Boolean.class, 
+            Boolean.class 
+        );
+    writeUnitTestingUnsupportedAttributeRequiringAdminNotInZAPCommandParams.put(
+        "value",
+        unitTestingunsupportedAttributeRequiringAdminNotInZAPCommandParameterInfo
+    );
+    InteractionInfo writeUnitTestingUnsupportedAttributeRequiringAdminNotInZAPAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.UnitTestingCluster) cluster).writeUnsupportedAttributeRequiringAdminNotInZAPAttribute(
+          (DefaultClusterCallback) callback,
+          (Boolean) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeUnitTestingUnsupportedAttributeRequiringAdminNotInZAPCommandParams
+    );
+    writeUnitTestingInteractionInfo.put("writeUnsupportedAttributeRequiringAdminNotInZAPAttribute", writeUnitTestingUnsupportedAttributeRequiringAdminNotInZAPAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeUnitTestingUnsupportedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo unitTestingunsupportedCommandParameterInfo =
         new CommandParameterInfo(

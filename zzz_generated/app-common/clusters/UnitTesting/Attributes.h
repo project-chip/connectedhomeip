@@ -641,6 +641,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GlobalStruct
+namespace UnsupportedAttributeRequiringAdminNotInZAP {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UnitTesting::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UnsupportedAttributeRequiringAdminNotInZAP::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace UnsupportedAttributeRequiringAdminNotInZAP
 namespace Unsupported {
 struct TypeInfo
 {
@@ -1221,6 +1233,8 @@ struct TypeInfo
         Attributes::ClusterErrorBoolean::TypeInfo::DecodableType clusterErrorBoolean = static_cast<bool>(0);
         Attributes::GlobalEnum::TypeInfo::DecodableType globalEnum = static_cast<chip::app::Clusters::Globals::TestGlobalEnum>(0);
         Attributes::GlobalStruct::TypeInfo::DecodableType globalStruct;
+        Attributes::UnsupportedAttributeRequiringAdminNotInZAP::TypeInfo::DecodableType unsupportedAttributeRequiringAdminNotInZAP =
+            static_cast<bool>(0);
         Attributes::Unsupported::TypeInfo::DecodableType unsupported         = static_cast<bool>(0);
         Attributes::ReadFailureCode::TypeInfo::DecodableType readFailureCode = static_cast<uint8_t>(0);
         Attributes::FailureInt32U::TypeInfo::DecodableType failureInt32U     = static_cast<uint32_t>(0);

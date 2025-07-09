@@ -4882,6 +4882,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "GlobalEnum";
         case chip::app::Clusters::UnitTesting::Attributes::GlobalStruct::Id:
             return "GlobalStruct";
+        case chip::app::Clusters::UnitTesting::Attributes::UnsupportedAttributeRequiringAdminNotInZAP::Id:
+            return "UnsupportedAttributeRequiringAdminNotInZAP";
         case chip::app::Clusters::UnitTesting::Attributes::Unsupported::Id:
             return "Unsupported";
         case chip::app::Clusters::UnitTesting::Attributes::ReadFailureCode::Id:

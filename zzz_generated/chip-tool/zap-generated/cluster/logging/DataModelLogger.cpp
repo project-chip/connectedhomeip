@@ -22036,6 +22036,11 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("global_struct", 1, value);
         }
+        case UnitTesting::Attributes::UnsupportedAttributeRequiringAdminNotInZAP::Id: {
+            bool value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("UnsupportedAttributeRequiringAdminNotInZAP", 1, value);
+        }
         case UnitTesting::Attributes::Unsupported::Id: {
             bool value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));

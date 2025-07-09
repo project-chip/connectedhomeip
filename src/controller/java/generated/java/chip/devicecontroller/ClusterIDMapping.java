@@ -20454,6 +20454,7 @@ public class ClusterIDMapping {
             ClusterErrorBoolean(50L),
             GlobalEnum(51L),
             GlobalStruct(52L),
+            UnsupportedAttributeRequiringAdminNotInZAP(254L),
             Unsupported(255L),
             ReadFailureCode(12288L),
             FailureInt32U(12289L),
