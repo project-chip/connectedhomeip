@@ -35251,34 +35251,6 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void groupedMoveTo(DefaultClusterCallback callback, Optional<Integer> position, Optional<Boolean> latch, Optional<Integer> speed) {
-      groupedMoveTo(callback, position, latch, speed, 0);
-    }
-
-    public void groupedMoveTo(DefaultClusterCallback callback, Optional<Integer> position, Optional<Boolean> latch, Optional<Integer> speed, int timedInvokeTimeoutMs) {
-      final long commandId = 3L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long positionFieldID = 0L;
-      BaseTLVType positiontlvValue = position.<BaseTLVType>map((nonOptionalposition) -> new UIntType(nonOptionalposition)).orElse(new EmptyType());
-      elements.add(new StructElement(positionFieldID, positiontlvValue));
-
-      final long latchFieldID = 1L;
-      BaseTLVType latchtlvValue = latch.<BaseTLVType>map((nonOptionallatch) -> new BooleanType(nonOptionallatch)).orElse(new EmptyType());
-      elements.add(new StructElement(latchFieldID, latchtlvValue));
-
-      final long speedFieldID = 2L;
-      BaseTLVType speedtlvValue = speed.<BaseTLVType>map((nonOptionalspeed) -> new UIntType(nonOptionalspeed)).orElse(new EmptyType());
-      elements.add(new StructElement(speedFieldID, speedtlvValue));
-
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
     public interface CountdownTimeAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Long value);
     }
@@ -35653,62 +35625,6 @@ public class ChipClusters {
 
     public void step(DefaultClusterCallback callback, Integer direction, Integer numberOfSteps, Optional<Integer> speed, int timedInvokeTimeoutMs) {
       final long commandId = 1L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long directionFieldID = 0L;
-      BaseTLVType directiontlvValue = new UIntType(direction);
-      elements.add(new StructElement(directionFieldID, directiontlvValue));
-
-      final long numberOfStepsFieldID = 1L;
-      BaseTLVType numberOfStepstlvValue = new UIntType(numberOfSteps);
-      elements.add(new StructElement(numberOfStepsFieldID, numberOfStepstlvValue));
-
-      final long speedFieldID = 2L;
-      BaseTLVType speedtlvValue = speed.<BaseTLVType>map((nonOptionalspeed) -> new UIntType(nonOptionalspeed)).orElse(new EmptyType());
-      elements.add(new StructElement(speedFieldID, speedtlvValue));
-
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void groupedSetTarget(DefaultClusterCallback callback, Optional<Integer> position, Optional<Boolean> latch, Optional<Integer> speed) {
-      groupedSetTarget(callback, position, latch, speed, 0);
-    }
-
-    public void groupedSetTarget(DefaultClusterCallback callback, Optional<Integer> position, Optional<Boolean> latch, Optional<Integer> speed, int timedInvokeTimeoutMs) {
-      final long commandId = 2L;
-
-      ArrayList<StructElement> elements = new ArrayList<>();
-      final long positionFieldID = 0L;
-      BaseTLVType positiontlvValue = position.<BaseTLVType>map((nonOptionalposition) -> new UIntType(nonOptionalposition)).orElse(new EmptyType());
-      elements.add(new StructElement(positionFieldID, positiontlvValue));
-
-      final long latchFieldID = 1L;
-      BaseTLVType latchtlvValue = latch.<BaseTLVType>map((nonOptionallatch) -> new BooleanType(nonOptionallatch)).orElse(new EmptyType());
-      elements.add(new StructElement(latchFieldID, latchtlvValue));
-
-      final long speedFieldID = 2L;
-      BaseTLVType speedtlvValue = speed.<BaseTLVType>map((nonOptionalspeed) -> new UIntType(nonOptionalspeed)).orElse(new EmptyType());
-      elements.add(new StructElement(speedFieldID, speedtlvValue));
-
-      StructType commandArgs = new StructType(elements);
-      invoke(new InvokeCallbackImpl(callback) {
-          @Override
-          public void onResponse(StructType invokeStructValue) {
-          callback.onSuccess();
-        }}, commandId, commandArgs, timedInvokeTimeoutMs);
-    }
-
-    public void groupedStep(DefaultClusterCallback callback, Integer direction, Integer numberOfSteps, Optional<Integer> speed) {
-      groupedStep(callback, direction, numberOfSteps, speed, 0);
-    }
-
-    public void groupedStep(DefaultClusterCallback callback, Integer direction, Integer numberOfSteps, Optional<Integer> speed, int timedInvokeTimeoutMs) {
-      final long commandId = 3L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
       final long directionFieldID = 0L;

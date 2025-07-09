@@ -29455,7 +29455,6 @@ class ClosureControl(Cluster):
             kCalibration = 0x40
             kProtection = 0x80
             kManuallyOperable = 0x100
-            kAccess = 0x200
 
         class LatchControlModesBitmap(IntFlag):
             kRemoteLatching = 0x1
@@ -29548,26 +29547,6 @@ class ClosureControl(Cluster):
             @ChipUtility.classproperty
             def must_use_timed_invoke(cls) -> bool:
                 return True
-
-        @dataclass
-        class GroupedMoveTo(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000104
-            command_id: typing.ClassVar[int] = 0x00000003
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[typing.Optional[str]] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Optional[ClosureControl.Enums.TargetPositionEnum]),
-                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Optional[bool]),
-                        ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
-                    ])
-
-            position: typing.Optional[ClosureControl.Enums.TargetPositionEnum] = None
-            latch: typing.Optional[bool] = None
-            speed: typing.Optional[Globals.Enums.ThreeLevelAutoEnum] = None
 
     class Attributes:
         @dataclass
@@ -29962,7 +29941,6 @@ class ClosureDimension(Cluster):
             kTranslation = 0x20
             kRotation = 0x40
             kModulation = 0x80
-            kAccess = 0x100
 
         class LatchControlModesBitmap(IntFlag):
             kRemoteLatching = 0x1
@@ -30054,46 +30032,6 @@ class ClosureDimension(Cluster):
             @ChipUtility.classproperty
             def must_use_timed_invoke(cls) -> bool:
                 return True
-
-            direction: ClosureDimension.Enums.StepDirectionEnum = 0
-            numberOfSteps: uint = 0
-            speed: typing.Optional[Globals.Enums.ThreeLevelAutoEnum] = None
-
-        @dataclass
-        class GroupedSetTarget(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000105
-            command_id: typing.ClassVar[int] = 0x00000002
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[typing.Optional[str]] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Optional[bool]),
-                        ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
-                    ])
-
-            position: typing.Optional[uint] = None
-            latch: typing.Optional[bool] = None
-            speed: typing.Optional[Globals.Enums.ThreeLevelAutoEnum] = None
-
-        @dataclass
-        class GroupedStep(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x00000105
-            command_id: typing.ClassVar[int] = 0x00000003
-            is_client: typing.ClassVar[bool] = True
-            response_type: typing.ClassVar[typing.Optional[str]] = None
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="direction", Tag=0, Type=ClosureDimension.Enums.StepDirectionEnum),
-                        ClusterObjectFieldDescriptor(Label="numberOfSteps", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
-                    ])
 
             direction: ClosureDimension.Enums.StepDirectionEnum = 0
             numberOfSteps: uint = 0

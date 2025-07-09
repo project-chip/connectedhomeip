@@ -57,16 +57,6 @@ struct Type;
 struct DecodableType;
 } // namespace Step
 
-namespace GroupedSetTarget {
-struct Type;
-struct DecodableType;
-} // namespace GroupedSetTarget
-
-namespace GroupedStep {
-struct Type;
-struct DecodableType;
-} // namespace GroupedStep
-
 } // namespace Commands
 
 namespace Commands {
@@ -150,86 +140,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Step
-namespace GroupedSetTarget {
-enum class Fields : uint8_t
-{
-    kPosition = 0,
-    kLatch    = 1,
-    kSpeed    = 2,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GroupedSetTarget::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
-
-    Optional<chip::Percent100ths> position;
-    Optional<bool> latch;
-    Optional<Globals::ThreeLevelAutoEnum> speed;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::GroupedSetTarget::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    Optional<chip::Percent100ths> position;
-    Optional<bool> latch;
-    Optional<Globals::ThreeLevelAutoEnum> speed;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace GroupedSetTarget
-namespace GroupedStep {
-enum class Fields : uint8_t
-{
-    kDirection     = 0,
-    kNumberOfSteps = 1,
-    kSpeed         = 2,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GroupedStep::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
-
-    StepDirectionEnum direction = static_cast<StepDirectionEnum>(0);
-    uint16_t numberOfSteps      = static_cast<uint16_t>(0);
-    Optional<Globals::ThreeLevelAutoEnum> speed;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::GroupedStep::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureDimension::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    StepDirectionEnum direction = static_cast<StepDirectionEnum>(0);
-    uint16_t numberOfSteps      = static_cast<uint16_t>(0);
-    Optional<Globals::ThreeLevelAutoEnum> speed;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace GroupedStep
 } // namespace Commands
 } // namespace ClosureDimension
 } // namespace Clusters

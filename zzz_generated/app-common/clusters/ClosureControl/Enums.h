@@ -104,7 +104,6 @@ enum class Feature : uint32_t
     kCalibration      = 0x40,
     kProtection       = 0x80,
     kManuallyOperable = 0x100,
-    kAccess           = 0x200,
 };
 
 // Bitmap for LatchControlModesBitmap

@@ -142,7 +142,6 @@ enum class Feature : uint32_t
     kTranslation    = 0x20,
     kRotation       = 0x40,
     kModulation     = 0x80,
-    kAccess         = 0x100,
 };
 
 // Bitmap for LatchControlModesBitmap

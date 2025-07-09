@@ -62,11 +62,6 @@ struct Type;
 struct DecodableType;
 } // namespace Calibrate
 
-namespace GroupedMoveTo {
-struct Type;
-struct DecodableType;
-} // namespace GroupedMoveTo
-
 } // namespace Commands
 
 namespace Commands {
@@ -168,46 +163,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Calibrate
-namespace GroupedMoveTo {
-enum class Fields : uint8_t
-{
-    kPosition = 0,
-    kLatch    = 1,
-    kSpeed    = 2,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GroupedMoveTo::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-
-    Optional<TargetPositionEnum> position;
-    Optional<bool> latch;
-    Optional<Globals::ThreeLevelAutoEnum> speed;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::GroupedMoveTo::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ClosureControl::Id; }
-    static constexpr bool kIsFabricScoped = false;
-
-    Optional<TargetPositionEnum> position;
-    Optional<bool> latch;
-    Optional<Globals::ThreeLevelAutoEnum> speed;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace GroupedMoveTo
 } // namespace Commands
 } // namespace ClosureControl
 } // namespace Clusters

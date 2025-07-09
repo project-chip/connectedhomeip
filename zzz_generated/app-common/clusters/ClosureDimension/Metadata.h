@@ -81,14 +81,6 @@ inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(Step::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
                    Access::Privilege::kOperate);
 } // namespace Step
-namespace GroupedSetTarget {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(GroupedSetTarget::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kOperate);
-} // namespace GroupedSetTarget
-namespace GroupedStep {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(GroupedStep::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kOperate);
-} // namespace GroupedStep
 
 } // namespace Commands
 } // namespace ClosureDimension
