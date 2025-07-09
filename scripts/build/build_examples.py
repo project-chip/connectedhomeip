@@ -169,13 +169,12 @@ before running this script.
     else:
         runner = ShellRunner(root=repo)
 
-    requested_targets = set([t.lower() for t in target])
-    logging.info('Building targets: %s', CommaSeparate(requested_targets))
-
     context.obj = build.Context(
         repository_path=repo, output_prefix=out_prefix, verbose=verbose,
         ninja_jobs=ninja_jobs, runner=runner
     )
+
+    requested_targets = set([t.lower() for t in target])
     context.obj.SetupBuilders(targets=requested_targets, options=BuilderOptions(
         enable_link_map_file=enable_link_map_file,
         enable_flashbundle=enable_flashbundle,
