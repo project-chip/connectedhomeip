@@ -8113,8 +8113,8 @@ endpoint 0 {
   }
 
   server cluster TimeFormatLocalization {
-    persist  attribute hourFormat default = 0;
-    persist  attribute activeCalendarType default = 0;
+    callback attribute hourFormat default = 0;
+    callback attribute activeCalendarType default = 0;
     callback attribute supportedCalendarTypes;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
