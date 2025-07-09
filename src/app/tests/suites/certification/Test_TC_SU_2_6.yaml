@@ -37,3 +37,17 @@ tests:
           [1673956344.449805][17737:17737] CHIP:ZCL:   Update Token: 32
           [1673956344.449833][17737:17737] CHIP:ZCL:   Software Version: 2
       disabled: true
+
+    - label:
+          "Step 2: TH reads BootReason in General Diagnostics cluster from the
+          DUT."
+      PICS: DGGEN.S.A0004
+      verification: |
+          ./chip-tool generaldiagnostics read boot-reason 321 0
+
+          Verify that BootReason value is 5 (SoftwareUpdateCompleted) On TH(chip-tool) log:
+
+          [1739338589.471] [17557:17559] [DMG] }
+          [1739338589.471] [17557:17559] [TOO] Endpoint: 0 Cluster: 0x0000_0033 Attribute 0x0000_0004 DataVersion: 3882201443
+          [1739338589.471] [17557:17559] [TOO]   BootReason: 5
+      disabled: true
