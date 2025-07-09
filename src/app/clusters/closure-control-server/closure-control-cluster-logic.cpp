@@ -527,7 +527,8 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
             VerifyOrReturnError(latch.HasValue() && !latch.Value(), Status::InvalidInState,
                                 ChipLogError(AppServer,
                                              "Latch is True in OverallCurrentState, but MoveTo command does not set latch to False "
-                                             "when position change is requested on endpoint : %d", mMatterContext.GetEndpointId()));
+                                             "when position change is requested on endpoint : %d",
+                                             mMatterContext.GetEndpointId()));
         }
     }
 
