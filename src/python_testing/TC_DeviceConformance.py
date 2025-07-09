@@ -38,7 +38,7 @@
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 
 # TODO: Enable 10.5 in CI once the door lock OTA requestor problem is sorted.
-from python_testing.TC_DeviceConformance import DeviceConformanceTests
+from test_testing.DeviceConformanceTests import DeviceConformanceTests
 
 
 class TC_DeviceConformance(MatterBaseTest, DeviceConformanceTests):
