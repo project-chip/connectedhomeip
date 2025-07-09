@@ -92,31 +92,32 @@ class TC_PAVST_2_9(MatterBaseTest):
                     await self.send_single_cmd(cmd=pvcluster.Commands.DeallocatePushTransport(ConnectionID=config.ConnectionID),
                                                endpoint=endpoint)
                 except InteractionModelError as e:
-                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                    assert e.status == Status.Success, "Unexpected error returned"
 
         self.step(2)
         aSupportedIngestMethods = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedIngestMethods
         )
-        logger.info("Supported Ingest Methods: {aSupportedIngestMethods}")
+        # Assign to _ to mark it as intentionally unused (avoids linter warnings)
+        _ = aSupportedIngestMethods
 
         self.step(3)
         aSupportedFormats = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedContainerFormats
         )
-        logger.info("Supported formats: {len(aSupportedFormats)}")
+        _ = aSupportedFormats
 
         self.step(4)
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=avcluster, attribute=avattr.AllocatedVideoStreams
         )
-        logger.info("Allocated video stream: {len(aAllocatedVideoStreams)}")
+        _ = aAllocatedVideoStreams
 
         self.step(5)
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=avcluster, attribute=avattr.AllocatedAudioStreams
         )
-        logger.info("Allocated audio stream: {len(aAllocatedAudioStreams)}")
+        _ = aAllocatedAudioStreams
 
         self.step(6)
         await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
@@ -145,7 +146,7 @@ class TC_PAVST_2_9(MatterBaseTest):
         transport_configs = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections
         )
-        #assert len(transport_configs) == 0, "TransportConfigurations must be empty"
+        assert len(transport_configs) == 0, "TransportConfigurations must be empty"
 
 
 if __name__ == "__main__":
