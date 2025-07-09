@@ -16,10 +16,10 @@
  *    limitations under the License.
  */
 
+#include "CommodityTariffConsts.h"
 #include "commodity-tariff-server.h"
 #include <cassert>
 #include <cstdint>
-#include "CommodityTariffConsts.h"
 
 using namespace chip;
 using namespace chip::app;

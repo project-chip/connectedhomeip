@@ -378,6 +378,7 @@ public:
     void TariffComponentUpd_AttrChangeCb(uint32_t aAttrId, void * CbCtx);
 
     void SetupTestTimeShiftInterval(uint32_t time);
+
 private:
     enum class UpdateEventCode
     {

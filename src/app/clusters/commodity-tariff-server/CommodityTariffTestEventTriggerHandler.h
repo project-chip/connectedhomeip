@@ -51,7 +51,7 @@ enum class CommodityTariffTrigger : uint64_t
     // Shifts current time on 4h. (The time shift mode will activated)
     kTimeShift4h = 0x0700'0000'0000'0003,
     // Disable time shift mode (Clean up the time shift context)
-    kTimeShiftDisable= 0x0700'0000'0000'0004
+    kTimeShiftDisable = 0x0700'0000'0000'0004
 };
 
 class CommodityTariffTestEventTriggerHandler : public TestEventTriggerHandler

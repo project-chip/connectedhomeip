@@ -682,8 +682,6 @@ public:
             err      = ValidateNewValue();
         }
 
-
-
         if (err == CHIP_NO_ERROR)
         {
             if (aUpdCb != nullptr)

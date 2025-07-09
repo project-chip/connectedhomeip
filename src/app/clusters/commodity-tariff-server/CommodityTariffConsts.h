@@ -21,26 +21,26 @@
 #include <stdint.h>
 
 namespace CommodityTariffConsts {
-    static constexpr size_t kDefaultStringValuesMaxBufLength = 128u;
-    static constexpr size_t kDefaultListAttrMaxLength        = 128u;
-    constexpr uint16_t kMaxCurrencyValue                     = 999; // From spec
+static constexpr size_t kDefaultStringValuesMaxBufLength = 128u;
+static constexpr size_t kDefaultListAttrMaxLength        = 128u;
+constexpr uint16_t kMaxCurrencyValue                     = 999; // From spec
 
-    static constexpr size_t kTariffInfoMaxLabelLength      = kDefaultStringValuesMaxBufLength;
-    static constexpr size_t kTariffInfoMaxProviderLength   = kDefaultStringValuesMaxBufLength;
-    static constexpr size_t kTariffComponentMaxLabelLength = kDefaultStringValuesMaxBufLength;
+static constexpr size_t kTariffInfoMaxLabelLength      = kDefaultStringValuesMaxBufLength;
+static constexpr size_t kTariffInfoMaxProviderLength   = kDefaultStringValuesMaxBufLength;
+static constexpr size_t kTariffComponentMaxLabelLength = kDefaultStringValuesMaxBufLength;
 
-    static constexpr size_t kDayEntriesAttrMaxLength       = kDefaultListAttrMaxLength;
-    static constexpr size_t kDayPatternsAttrMaxLength      = kDefaultListAttrMaxLength;
-    static constexpr size_t kTariffComponentsAttrMaxLength = kDefaultListAttrMaxLength;
-    static constexpr size_t kTariffPeriodsAttrMaxLength    = kDefaultListAttrMaxLength;
+static constexpr size_t kDayEntriesAttrMaxLength       = kDefaultListAttrMaxLength;
+static constexpr size_t kDayPatternsAttrMaxLength      = kDefaultListAttrMaxLength;
+static constexpr size_t kTariffComponentsAttrMaxLength = kDefaultListAttrMaxLength;
+static constexpr size_t kTariffPeriodsAttrMaxLength    = kDefaultListAttrMaxLength;
 
-    static constexpr size_t kCalendarPeriodsAttrMaxLength = 4;
-    static constexpr size_t kIndividualDaysAttrMaxLength  = 50;
+static constexpr size_t kCalendarPeriodsAttrMaxLength = 4;
+static constexpr size_t kIndividualDaysAttrMaxLength  = 50;
 
-    static constexpr size_t kCalendarPeriodItemMaxDayPatternIDs = 7;
-    static constexpr size_t kDayStructItemMaxDayEntryIDs        = 96;
-    static constexpr size_t kDayPatternItemMaxDayEntryIDs       = kDayStructItemMaxDayEntryIDs;
-    static constexpr size_t kTariffPeriodItemMaxIDs             = 20;
-    static constexpr uint16_t kDayEntryDurationLimit            = 1500;
-    static constexpr uint8_t kFullWeekMask                      = 0x7f;
-} // CommodityTariffConsts
+static constexpr size_t kCalendarPeriodItemMaxDayPatternIDs = 7;
+static constexpr size_t kDayStructItemMaxDayEntryIDs        = 96;
+static constexpr size_t kDayPatternItemMaxDayEntryIDs       = kDayStructItemMaxDayEntryIDs;
+static constexpr size_t kTariffPeriodItemMaxIDs             = 20;
+static constexpr uint16_t kDayEntryDurationLimit            = 1500;
+static constexpr uint8_t kFullWeekMask                      = 0x7f;
+} // namespace CommodityTariffConsts

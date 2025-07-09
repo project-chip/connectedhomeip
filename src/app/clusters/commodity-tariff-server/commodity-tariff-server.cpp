@@ -17,13 +17,13 @@
 #include "commodity-tariff-server.h"
 
 #include "CommodityTariffAttrsDataMgmt.h"
+#include "CommodityTariffConsts.h"
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandlerInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <cstdint>
-#include "CommodityTariffConsts.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -101,11 +101,13 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     // List attributes (using proper chunking)
     case DayEntries::Id: {
         const auto & entries = mDelegate.GetDayEntries();
-        if (entries.IsNull()) {
+        if (entries.IsNull())
+        {
             return aEncoder.EncodeNull();
         }
         return aEncoder.EncodeList([&entries](const auto & encoder) {
-            for (const auto & entry : entries.Value()) {
+            for (const auto & entry : entries.Value())
+            {
                 ReturnErrorOnFailure(encoder.Encode(entry));
             }
             return CHIP_NO_ERROR;
@@ -113,11 +115,13 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     }
     case DayPatterns::Id: {
         const auto & patterns = mDelegate.GetDayPatterns();
-        if (patterns.IsNull()) {
+        if (patterns.IsNull())
+        {
             return aEncoder.EncodeNull();
         }
         return aEncoder.EncodeList([&patterns](const auto & encoder) {
-            for (const auto & pattern : patterns.Value()) {
+            for (const auto & pattern : patterns.Value())
+            {
                 ReturnErrorOnFailure(encoder.Encode(pattern));
             }
             return CHIP_NO_ERROR;
@@ -125,11 +129,13 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     }
     case CalendarPeriods::Id: {
         const auto & periods = mDelegate.GetCalendarPeriods();
-        if (periods.IsNull()) {
+        if (periods.IsNull())
+        {
             return aEncoder.EncodeNull();
         }
         return aEncoder.EncodeList([&periods](const auto & encoder) {
-            for (const auto & period : periods.Value()) {
+            for (const auto & period : periods.Value())
+            {
                 ReturnErrorOnFailure(encoder.Encode(period));
             }
             return CHIP_NO_ERROR;
@@ -137,11 +143,13 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     }
     case IndividualDays::Id: {
         const auto & days = mDelegate.GetIndividualDays();
-        if (days.IsNull()) {
+        if (days.IsNull())
+        {
             return aEncoder.EncodeNull();
         }
         return aEncoder.EncodeList([&days](const auto & encoder) {
-            for (const auto & day : days.Value()) {
+            for (const auto & day : days.Value())
+            {
                 ReturnErrorOnFailure(encoder.Encode(day));
             }
             return CHIP_NO_ERROR;
@@ -149,11 +157,13 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     }
     case TariffComponents::Id: {
         const auto & components = mDelegate.GetTariffComponents();
-        if (components.IsNull()) {
+        if (components.IsNull())
+        {
             return aEncoder.EncodeNull();
         }
         return aEncoder.EncodeList([&components](const auto & encoder) {
-            for (const auto & component : components.Value()) {
+            for (const auto & component : components.Value())
+            {
                 ReturnErrorOnFailure(encoder.Encode(component));
             }
             return CHIP_NO_ERROR;
@@ -161,11 +171,13 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     }
     case TariffPeriods::Id: {
         const auto & periods = mDelegate.GetTariffPeriods();
-        if (periods.IsNull()) {
+        if (periods.IsNull())
+        {
             return aEncoder.EncodeNull();
         }
         return aEncoder.EncodeList([&periods](const auto & encoder) {
-            for (const auto & period : periods.Value()) {
+            for (const auto & period : periods.Value())
+            {
                 ReturnErrorOnFailure(encoder.Encode(period));
             }
             return CHIP_NO_ERROR;
@@ -173,11 +185,13 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     }
     case CurrentTariffComponents::Id: {
         const auto & components = GetCurrentTariffComponents();
-        if (components.IsNull()) {
+        if (components.IsNull())
+        {
             return aEncoder.EncodeNull();
         }
         return aEncoder.EncodeList([&components](const auto & encoder) {
-            for (const auto & component : components.Value()) {
+            for (const auto & component : components.Value())
+            {
                 ReturnErrorOnFailure(encoder.Encode(component));
             }
             return CHIP_NO_ERROR;
@@ -185,11 +199,13 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
     }
     case NextTariffComponents::Id: {
         const auto & components = GetNextTariffComponents();
-        if (components.IsNull()) {
+        if (components.IsNull())
+        {
             return aEncoder.EncodeNull();
         }
         return aEncoder.EncodeList([&components](const auto & encoder) {
-            for (const auto & component : components.Value()) {
+            for (const auto & component : components.Value())
+            {
                 ReturnErrorOnFailure(encoder.Encode(component));
             }
             return CHIP_NO_ERROR;
@@ -416,7 +432,7 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
 {
     const Structs::DayEntryStruct::Type * currentPtr = nullptr;
     const Structs::DayEntryStruct::Type * nextPtr    = nullptr;
-    *nextUpdInterval = 0;
+    *nextUpdInterval                                 = 0;
 
     for (const auto & entryID : dayEntryIDs)
     {
@@ -431,9 +447,9 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
 
         if (current->duration.HasValue())
         {
-            duration = current->duration.Value();  
+            duration = current->duration.Value();
         }
-        else if (next != nullptr && next->startTime < kDayEntryDurationLimit) 
+        else if (next != nullptr && next->startTime < kDayEntryDurationLimit)
         {
             if (next->startTime <= current->startTime)
             {
@@ -448,11 +464,10 @@ FindDayEntry(CurrentTariffAttrsCtx & aCtx, const DataModel::List<const uint32_t>
         }
 
         // Check if current entry matches the current time
-        if (current->startTime <= minutesSinceMidnight &&
-            (current->startTime + duration) > minutesSinceMidnight)
+        if (current->startTime <= minutesSinceMidnight && (current->startTime + duration) > minutesSinceMidnight)
         {
-            currentPtr = current;
-            nextPtr    = next;
+            currentPtr       = current;
+            nextPtr          = next;
             *nextUpdInterval = static_cast<uint16_t>(duration - (minutesSinceMidnight - current->startTime));
             break;
         }
@@ -689,9 +704,7 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
             {
                 ChipLogError(NotSpecified, "Unable to update the CurrentTariffComponents attribute!");
             }
-            ChipLogDetail(NotSpecified,
-                "ForceDayEntriesAttrsUpdate: current day entry: %u",
-                tmpDayEntry.Value().dayEntryID);
+            ChipLogDetail(NotSpecified, "ForceDayEntriesAttrsUpdate: current day entry: %u", tmpDayEntry.Value().dayEntryID);
         }
 
         SetCurrentDayEntry(tmpDayEntry);
@@ -709,16 +722,14 @@ void Instance::UpdateCurrentAttrs(UpdateEventCode aEvt)
             {
                 ChipLogError(NotSpecified, "Unable to update the NextTariffComponents attribute!");
             }
-            ChipLogDetail(NotSpecified,
-                "ForceDayEntriesAttrsUpdate: current day entry: %u",
-                tmpDayEntry.Value().dayEntryID);
+            ChipLogDetail(NotSpecified, "ForceDayEntriesAttrsUpdate: current day entry: %u", tmpDayEntry.Value().dayEntryID);
         }
 
         SetNextDayEntry(tmpDayEntry);
 
         if (nextUpdInterval > 0)
         {
-            if ( (nextUpdInterval >= (kDayEntryDurationLimit-minutesSinceMidnight) ) && !mNextDay.IsNull() )
+            if ((nextUpdInterval >= (kDayEntryDurationLimit - minutesSinceMidnight)) && !mNextDay.IsNull())
             {
                 tmpDate.SetNonNull(mNextDay.Value().date);
             }
@@ -744,9 +755,10 @@ void Instance::HandleGetTariffComponent(HandlerContext & ctx, const Commands::Ge
     }
     else
     {
-        status = Status::NotFound;
-        auto component = Utils::GetCurrNextItemsById<Structs::TariffComponentStruct::Type>(mServerTariffAttrsCtx.TariffComponentsMap,
-                                                                                           commandData.tariffComponentID).first;
+        status         = Status::NotFound;
+        auto component = Utils::GetCurrNextItemsById<Structs::TariffComponentStruct::Type>(
+                             mServerTariffAttrsCtx.TariffComponentsMap, commandData.tariffComponentID)
+                             .first;
         auto period = Utils::FindTariffPeriodByTariffComponentId(mServerTariffAttrsCtx, commandData.tariffComponentID);
 
         if (component != nullptr && period != nullptr)
@@ -787,7 +799,7 @@ void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEnt
         {
             response.dayEntry = *entry;
             status            = Status::Success;
-        }        
+        }
     }
 
     if (status != Status::Success)
@@ -799,18 +811,17 @@ void Instance::HandleGetDayEntry(HandlerContext & ctx, const Commands::GetDayEnt
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 }
 
-/* 
+/*
  * Schedules an update after specified delay and determines event type
  * (day change or entry update) based on whether it crosses midnight
  */
 void Instance::SetupTestTimeShiftInterval(uint32_t delay)
-{   
+{
     mServerTariffAttrsCtx.forwardAlarmTriggerTime = delay;
 
     // Determine if this update crosses day boundary
-    const bool crossesMidnight = (mServerTariffAttrsCtx.forwardAlarmTriggerTime)%kSecondsPerDay == 0;
-    const UpdateEventCode eventType = crossesMidnight ? UpdateEventCode::DaysUpdating 
-                                                   : UpdateEventCode::DayEntryUpdating;
+    const bool crossesMidnight      = (mServerTariffAttrsCtx.forwardAlarmTriggerTime) % kSecondsPerDay == 0;
+    const UpdateEventCode eventType = crossesMidnight ? UpdateEventCode::DaysUpdating : UpdateEventCode::DayEntryUpdating;
 
     UpdateCurrentAttrs(eventType);
 }
