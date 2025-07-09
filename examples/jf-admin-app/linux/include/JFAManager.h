@@ -42,6 +42,12 @@ public:
 
     void SetJFARpc(JFARpc & aJFARpc);
 
+    CHIP_ERROR GetJointFabricMode(uint8_t & jointFabricMode);
+
+    bool IsDeviceCommissioned() { return jfFabricIndex != kUndefinedFabricId; }
+    bool IsDeviceJFAdmin();
+    bool IsDeviceJFAnchor();
+
 private:
     // Various actions to take when OnConnected callback is called
     enum OnConnectedAction
