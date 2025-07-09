@@ -468,7 +468,10 @@ class MdnsDiscovery:
         try:
             await wait_for(self._event.wait(), timeout=discovery_timeout_sec)
         except TimeoutError:
-            logger.error("MDNS service discovery timed out after %d seconds.", discovery_timeout_sec)
+            if unlock_service:
+                logger.info("MDNS browse finished after %d seconds.", discovery_timeout_sec)
+            else:
+                logger.error("MDNS service discovery timed out after %d seconds.", discovery_timeout_sec)
         finally:
             self._event.set()
             await aiobrowser.async_cancel()

@@ -124,7 +124,7 @@ class TC_SC_4_3(MatterBaseTest):
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
         instance_name = f'{compressed_fabric_id:016X}-{node_id:016X}'
         if log_result:
-            logging.info(f"DUT Instance Name: {instance_name}")
+            logging.info(f"\n\n\tDUT Instance Name: {instance_name}\n")
         return instance_name
 
     def get_operational_subtype(self, log_result: bool = False) -> str:
@@ -273,7 +273,7 @@ class TC_SC_4_3(MatterBaseTest):
         # TH performs a query for the SRV record against the qname instance_qname.
         # Verify SRV record is returned
         self.step(6)
-        mdns = MdnsDiscovery(verbose_logging=True)
+        mdns = MdnsDiscovery()
         operational_record = await mdns.get_srv_record(
             service_name=instance_qname,
             service_type=MdnsServiceType.OPERATIONAL.value,
