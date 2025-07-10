@@ -11871,6 +11871,39 @@ public class ClusterReadMapping {
           readThermostatSetpointHoldExpiryTimestampCommandParams
         );
         result.put("readSetpointHoldExpiryTimestampAttribute", readThermostatSetpointHoldExpiryTimestampAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThermostatMaxThermostatSuggestionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThermostatMaxThermostatSuggestionsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThermostatCluster) cluster).readMaxThermostatSuggestionsAttribute(
+              (ChipClusters.IntegerAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+          readThermostatMaxThermostatSuggestionsCommandParams
+        );
+        result.put("readMaxThermostatSuggestionsAttribute", readThermostatMaxThermostatSuggestionsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThermostatThermostatSuggestionsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThermostatThermostatSuggestionsAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThermostatCluster) cluster).readThermostatSuggestionsAttribute(
+              (ChipClusters.ThermostatCluster.ThermostatSuggestionsAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThermostatClusterThermostatSuggestionsAttributeCallback(),
+          readThermostatThermostatSuggestionsCommandParams
+        );
+        result.put("readThermostatSuggestionsAttribute", readThermostatThermostatSuggestionsAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readThermostatThermostatSuggestionNotFollowingReasonCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readThermostatThermostatSuggestionNotFollowingReasonAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.ThermostatCluster) cluster).readThermostatSuggestionNotFollowingReasonAttribute(
+              (ChipClusters.ThermostatCluster.ThermostatSuggestionNotFollowingReasonAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedThermostatClusterThermostatSuggestionNotFollowingReasonAttributeCallback(),
+          readThermostatThermostatSuggestionNotFollowingReasonCommandParams
+        );
+        result.put("readThermostatSuggestionNotFollowingReasonAttribute", readThermostatThermostatSuggestionNotFollowingReasonAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readThermostatGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readThermostatGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -19204,17 +19237,17 @@ public class ClusterReadMapping {
           readCommodityMeteringMeteredQuantityTimestampCommandParams
         );
         result.put("readMeteredQuantityTimestampAttribute", readCommodityMeteringMeteredQuantityTimestampAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readCommodityMeteringMeasurementTypeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readCommodityMeteringMeasurementTypeAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readCommodityMeteringTariffUnitCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommodityMeteringTariffUnitAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.CommodityMeteringCluster) cluster).readMeasurementTypeAttribute(
-              (ChipClusters.CommodityMeteringCluster.MeasurementTypeAttributeCallback) callback
+            ((ChipClusters.CommodityMeteringCluster) cluster).readTariffUnitAttribute(
+              (ChipClusters.CommodityMeteringCluster.TariffUnitAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedCommodityMeteringClusterMeasurementTypeAttributeCallback(),
-          readCommodityMeteringMeasurementTypeCommandParams
+          () -> new ClusterInfoMapping.DelegatedCommodityMeteringClusterTariffUnitAttributeCallback(),
+          readCommodityMeteringTariffUnitCommandParams
         );
-        result.put("readMeasurementTypeAttribute", readCommodityMeteringMeasurementTypeAttributeInteractionInfo);
+        result.put("readTariffUnitAttribute", readCommodityMeteringTariffUnitAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readCommodityMeteringGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readCommodityMeteringGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -19791,6 +19824,17 @@ public class ClusterReadMapping {
           readUnitTestingGlobalEnumCommandParams
         );
         result.put("readGlobalEnumAttribute", readUnitTestingGlobalEnumAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readUnitTestingUnsupportedAttributeRequiringAdminPrivilegeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readUnitTestingUnsupportedAttributeRequiringAdminPrivilegeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.UnitTestingCluster) cluster).readUnsupportedAttributeRequiringAdminPrivilegeAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readUnitTestingUnsupportedAttributeRequiringAdminPrivilegeCommandParams
+        );
+        result.put("readUnsupportedAttributeRequiringAdminPrivilegeAttribute", readUnitTestingUnsupportedAttributeRequiringAdminPrivilegeAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readUnitTestingUnsupportedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readUnitTestingUnsupportedAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

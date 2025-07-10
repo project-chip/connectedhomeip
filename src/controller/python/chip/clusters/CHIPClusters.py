@@ -8312,6 +8312,22 @@ class ChipClusters:
                     "presetHandle": "bytes",
                 },
             },
+            0x00000007: {
+                "commandId": 0x00000007,
+                "commandName": "AddThermostatSuggestion",
+                "args": {
+                    "presetHandle": "bytes",
+                    "effectiveTime": "int",
+                    "expirationInMinutes": "int",
+                },
+            },
+            0x00000008: {
+                "commandId": 0x00000008,
+                "commandName": "RemoveThermostatSuggestion",
+                "args": {
+                    "uniqueID": "int",
+                },
+            },
             0x000000FE: {
                 "commandId": 0x000000FE,
                 "commandName": "AtomicRequest",
@@ -8709,6 +8725,30 @@ class ChipClusters:
             0x00000052: {
                 "attributeName": "SetpointHoldExpiryTimestamp",
                 "attributeId": 0x00000052,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000053: {
+                "attributeName": "MaxThermostatSuggestions",
+                "attributeId": 0x00000053,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000054: {
+                "attributeName": "ThermostatSuggestions",
+                "attributeId": 0x00000054,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000055: {
+                "attributeName": "CurrentThermostatSuggestion",
+                "attributeId": 0x00000055,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000056: {
+                "attributeName": "ThermostatSuggestionNotFollowingReason",
+                "attributeId": 0x00000056,
                 "type": "int",
                 "reportable": True,
             },
@@ -14510,7 +14550,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000002: {
-                "attributeName": "MeasurementType",
+                "attributeName": "TariffUnit",
                 "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
@@ -15108,6 +15148,13 @@ class ChipClusters:
                 "attributeName": "GlobalStruct",
                 "attributeId": 0x00000034,
                 "type": "",
+                "reportable": True,
+                "writable": True,
+            },
+            0x000000FE: {
+                "attributeName": "UnsupportedAttributeRequiringAdminPrivilege",
+                "attributeId": 0x000000FE,
+                "type": "bool",
                 "reportable": True,
                 "writable": True,
             },
