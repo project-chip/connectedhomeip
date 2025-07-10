@@ -15,12 +15,12 @@
  *    limitations under the License.
  */
 
-#include "thermostat-server.h"
-#include "thermostat-server-presets.h"
 #include "ThermostatSuggestionStructWithOwnedMembers.h"
+#include "thermostat-server-presets.h"
+#include "thermostat-server.h"
 
-#include <system/SystemClock.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <system/SystemClock.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -39,7 +39,7 @@ namespace Thermostat {
 extern ThermostatAttrAccess gThermostatAttrAccess;
 
 bool emberAfThermostatClusterAddThermostatSuggestionCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                            const Commands::AddThermostatSuggestion::DecodableType & commandData)
+                                                             const Commands::AddThermostatSuggestion::DecodableType & commandData)
 {
 
     // If time is not synced, return INVALID_IN_STATE in the AddThermostatSuggestionResponse.
@@ -79,7 +79,6 @@ bool emberAfThermostatClusterAddThermostatSuggestionCallback(CommandHandler * co
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
-    
 
     uint8_t uniqueID = delegate->GetUniqueID();
     ThermostatSuggestionStructWithOwnedMembers thermostatSuggestion;
@@ -105,15 +104,16 @@ bool emberAfThermostatClusterAddThermostatSuggestionCallback(CommandHandler * co
     {
         ChipLogError(Zcl, "Failed to ReEvaluateCurrentSuggestion with error: %" CHIP_ERROR_FORMAT, err.Format());
     }
-   
+
     Commands::AddThermostatSuggestionResponse::Type response;
     response.uniqueID = uniqueID;
-    commandObj->AddResponse(commandPath, response); 
+    commandObj->AddResponse(commandPath, response);
     return true;
 }
 
-bool emberAfThermostatClusterRemoveThermostatSuggestionCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                            const Commands::RemoveThermostatSuggestion::DecodableType & commandData)
+bool emberAfThermostatClusterRemoveThermostatSuggestionCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Commands::RemoveThermostatSuggestion::DecodableType & commandData)
 {
     auto delegate = GetDelegate(commandPath.mEndpointId);
     if (delegate == nullptr)
@@ -122,19 +122,20 @@ bool emberAfThermostatClusterRemoveThermostatSuggestionCallback(CommandHandler *
         commandObj->AddStatus(commandPath, Status::InvalidInState);
         return true;
     }
-    
+
     CHIP_ERROR err = delegate->RemoveFromThermostatSuggestionsList(commandData.uniqueID);
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to RemoveFromThermostatSuggestionsList with uniqueID: %d error: %" CHIP_ERROR_FORMAT, commandData.uniqueID, err.Format());
+        ChipLogError(Zcl, "Failed to RemoveFromThermostatSuggestionsList with uniqueID: %d error: %" CHIP_ERROR_FORMAT,
+                     commandData.uniqueID, err.Format());
         commandObj->AddStatus(commandPath, Status::NotFound);
         return true;
     }
     commandObj->AddStatus(commandPath, Status::Success);
 
     uint32_t currentTimestamp = 0;
-    err = System::Clock::GetClock_MatterEpochS(currentTimestamp);
+    err                       = System::Clock::GetClock_MatterEpochS(currentTimestamp);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to get the current time stamp with error: %" CHIP_ERROR_FORMAT, err.Format());
@@ -161,10 +162,9 @@ bool emberAfThermostatClusterAddThermostatSuggestionCallback(CommandHandler * co
     return Thermostat::emberAfThermostatClusterAddThermostatSuggestionCallback(commandObj, commandPath, commandData);
 }
 
-bool emberAfThermostatClusterRemoveThermostatSuggestionCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                                           const Clusters::Thermostat::Commands::RemoveThermostatSuggestion::DecodableType & commandData)
+bool emberAfThermostatClusterRemoveThermostatSuggestionCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Clusters::Thermostat::Commands::RemoveThermostatSuggestion::DecodableType & commandData)
 {
     return Thermostat::emberAfThermostatClusterRemoveThermostatSuggestionCallback(commandObj, commandPath, commandData);
 }
-
-    

@@ -32,11 +32,11 @@ ThermostatDelegate ThermostatDelegate::sInstance;
 
 ThermostatDelegate::ThermostatDelegate()
 {
-    mNumberOfPresets                   = kMaxNumberOfPresetsSupported;
-    mNextFreeIndexInPresetsList        = 0;
-    mNextFreeIndexInPendingPresetsList = 0;
-    mMaxThermostatSuggestions  = kMaxNumberOfThermostatSuggestions;
-    mIndexOfCurrentSuggestion = mMaxThermostatSuggestions;
+    mNumberOfPresets                          = kMaxNumberOfPresetsSupported;
+    mNextFreeIndexInPresetsList               = 0;
+    mNextFreeIndexInPendingPresetsList        = 0;
+    mMaxThermostatSuggestions                 = kMaxNumberOfThermostatSuggestions;
+    mIndexOfCurrentSuggestion                 = mMaxThermostatSuggestions;
     mNextFreeIndexInThermostatSuggestionsList = 0;
 
     // Start the unique ID from 1 and it increases montonically.
@@ -233,7 +233,6 @@ void ThermostatDelegate::ClearPendingPresetList()
     mNextFreeIndexInPendingPresetsList = 0;
 }
 
-
 uint8_t ThermostatDelegate::GetMaxThermostatSuggestions()
 {
     return mMaxThermostatSuggestions;
@@ -244,7 +243,8 @@ uint8_t ThermostatDelegate::GetNumberOfThermostatSuggestions()
     return mNextFreeIndexInThermostatSuggestionsList;
 }
 
-CHIP_ERROR ThermostatDelegate::GetThermostatSuggestionAtIndex(size_t index, ThermostatSuggestionStructWithOwnedMembers & thermostatSuggestion)
+CHIP_ERROR ThermostatDelegate::GetThermostatSuggestionAtIndex(size_t index,
+                                                              ThermostatSuggestionStructWithOwnedMembers & thermostatSuggestion)
 {
     if (index < mNextFreeIndexInThermostatSuggestionsList)
     {
@@ -254,10 +254,11 @@ CHIP_ERROR ThermostatDelegate::GetThermostatSuggestionAtIndex(size_t index, Ther
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-void ThermostatDelegate::GetCurrentThermostatSuggestion(DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> & currentThermostatSuggestion)
+void ThermostatDelegate::GetCurrentThermostatSuggestion(
+    DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> & currentThermostatSuggestion)
 {
     if (mIndexOfCurrentSuggestion < mNextFreeIndexInThermostatSuggestionsList)
-    {   
+    {
         currentThermostatSuggestion.SetNonNull(mThermostatSuggestions[mIndexOfCurrentSuggestion]);
     }
     else
@@ -271,7 +272,8 @@ DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> & ThermostatDe
     return mThermostatSuggestionNotFollowingReason;
 }
 
-CHIP_ERROR ThermostatDelegate::SetThermostatSuggestionNotFollowingReason(const DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> & thermostatSuggestionNotFollowingReason)
+CHIP_ERROR ThermostatDelegate::SetThermostatSuggestionNotFollowingReason(
+    const DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> & thermostatSuggestionNotFollowingReason)
 {
     mThermostatSuggestionNotFollowingReason = thermostatSuggestionNotFollowingReason;
     return CHIP_NO_ERROR;
@@ -282,7 +284,8 @@ void ThermostatDelegate::SetCurrentThermostatSuggestion(size_t index)
     mIndexOfCurrentSuggestion = index;
 }
 
-CHIP_ERROR ThermostatDelegate::AppendToThermostatSuggestionsList(const ThermostatSuggestionStructWithOwnedMembers & thermostatSuggestion)
+CHIP_ERROR
+ThermostatDelegate::AppendToThermostatSuggestionsList(const ThermostatSuggestionStructWithOwnedMembers & thermostatSuggestion)
 {
     if (mNextFreeIndexInThermostatSuggestionsList < MATTER_ARRAY_SIZE(mThermostatSuggestions))
     {
@@ -342,8 +345,10 @@ uint8_t ThermostatDelegate::GetUniqueID()
 CHIP_ERROR ThermostatDelegate::StartExpirationTimer(uint32_t timeoutInMSecs)
 {
 
-    ChipLogProgress(Zcl, "Starting timer to wait for %d milliseconds for the current thermostat suggestion to expire", timeoutInMSecs);
-    return chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds16(timeoutInMSecs), TimerExpiredCallback, static_cast<void *>(this));
+    ChipLogProgress(Zcl, "Starting timer to wait for %d milliseconds for the current thermostat suggestion to expire",
+                    timeoutInMSecs);
+    return chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds16(timeoutInMSecs), TimerExpiredCallback,
+                                                       static_cast<void *>(this));
 }
 
 CHIP_ERROR ThermostatDelegate::RemoveExpiredSuggestions(uint32_t currentTimestamp)
@@ -366,7 +371,7 @@ CHIP_ERROR ThermostatDelegate::RemoveExpiredSuggestions(uint32_t currentTimestam
 void ThermostatDelegate::TimerExpiredCallback(chip::System::Layer * systemLayer, void * appState)
 {
     uint32_t currentTimestamp = 0;
-    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(currentTimestamp);
+    CHIP_ERROR err            = System::Clock::GetClock_MatterEpochS(currentTimestamp);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to get the current time stamp with error: %" CHIP_ERROR_FORMAT, err.Format());
@@ -423,7 +428,7 @@ size_t ThermostatDelegate::GetThermostatSuggestionIndexWithEarliestEffectiveTime
     VerifyOrReturnValue(GetNumberOfThermostatSuggestions() > 0, maxThermostatSuggestions);
 
     uint32_t minEffectiveTimeValue = UINT32_MAX;
-    size_t minEffectiveTimeIndex = maxThermostatSuggestions;
+    size_t minEffectiveTimeIndex   = maxThermostatSuggestions;
 
     for (size_t index = 0; index < GetNumberOfThermostatSuggestions(); index++)
     {
@@ -432,7 +437,7 @@ size_t ThermostatDelegate::GetThermostatSuggestionIndexWithEarliestEffectiveTime
         VerifyOrReturnValue(err == CHIP_NO_ERROR, maxThermostatSuggestions);
 
         // Check for the least effective time that is less than the current timestamp.
-        uint32_t effectiveTime  = suggestion.GetEffectiveTime();
+        uint32_t effectiveTime = suggestion.GetEffectiveTime();
         if (effectiveTime < minEffectiveTimeValue && effectiveTime <= currentTimestamp)
         {
             minEffectiveTimeValue = effectiveTime;

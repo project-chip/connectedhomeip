@@ -38,7 +38,6 @@ static constexpr size_t kThermostatSuggestionPresetHandleSize = 16;
 struct ThermostatSuggestionStructWithOwnedMembers : protected Structs::ThermostatSuggestionStruct::Type
 {
 public:
-
     ThermostatSuggestionStructWithOwnedMembers() = default;
     ThermostatSuggestionStructWithOwnedMembers(const ThermostatSuggestionStructWithOwnedMembers & other);
     ThermostatSuggestionStructWithOwnedMembers(const Structs::ThermostatSuggestionStruct::Type & other);

@@ -27,17 +27,20 @@ namespace app {
 namespace Clusters {
 namespace Thermostat {
 
-ThermostatSuggestionStructWithOwnedMembers::ThermostatSuggestionStructWithOwnedMembers(const ThermostatSuggestionStruct::Type & other)
+ThermostatSuggestionStructWithOwnedMembers::ThermostatSuggestionStructWithOwnedMembers(
+    const ThermostatSuggestionStruct::Type & other)
 {
     *this = other;
 }
 
-ThermostatSuggestionStructWithOwnedMembers::ThermostatSuggestionStructWithOwnedMembers(const ThermostatSuggestionStructWithOwnedMembers & other)
+ThermostatSuggestionStructWithOwnedMembers::ThermostatSuggestionStructWithOwnedMembers(
+    const ThermostatSuggestionStructWithOwnedMembers & other)
 {
     *this = other;
 }
 
-ThermostatSuggestionStructWithOwnedMembers & ThermostatSuggestionStructWithOwnedMembers::operator=(const ThermostatSuggestionStruct::Type & other)
+ThermostatSuggestionStructWithOwnedMembers &
+ThermostatSuggestionStructWithOwnedMembers::operator=(const ThermostatSuggestionStruct::Type & other)
 {
     SetUniqueID(other.uniqueID);
     CHIP_ERROR err = SetPresetHandle(other.presetHandle);
@@ -50,7 +53,8 @@ ThermostatSuggestionStructWithOwnedMembers & ThermostatSuggestionStructWithOwned
     return *this;
 }
 
-ThermostatSuggestionStructWithOwnedMembers & ThermostatSuggestionStructWithOwnedMembers::operator=(const ThermostatSuggestionStructWithOwnedMembers & other)
+ThermostatSuggestionStructWithOwnedMembers &
+ThermostatSuggestionStructWithOwnedMembers::operator=(const ThermostatSuggestionStructWithOwnedMembers & other)
 {
     if (this == &other)
     {
@@ -76,7 +80,7 @@ CHIP_ERROR ThermostatSuggestionStructWithOwnedMembers::SetPresetHandle(const Byt
     }
     MutableByteSpan targetSpan(presetHandleData);
     ReturnErrorOnFailure(CopySpanToMutableSpan(newPresetHandle, targetSpan));
-    
+
     presetHandle = ByteSpan(targetSpan.data(), targetSpan.size());
 
     return CHIP_NO_ERROR;

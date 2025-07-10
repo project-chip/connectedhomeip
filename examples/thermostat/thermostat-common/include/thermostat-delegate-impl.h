@@ -76,9 +76,11 @@ public:
 
     uint8_t GetNumberOfThermostatSuggestions() override;
 
-    CHIP_ERROR GetThermostatSuggestionAtIndex(size_t index, ThermostatSuggestionStructWithOwnedMembers & thermostatSuggestion) override;
+    CHIP_ERROR GetThermostatSuggestionAtIndex(size_t index,
+                                              ThermostatSuggestionStructWithOwnedMembers & thermostatSuggestion) override;
 
-    void GetCurrentThermostatSuggestion(DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> & currentThermostatSuggestion) override;
+    void GetCurrentThermostatSuggestion(
+        DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> & currentThermostatSuggestion) override;
 
     DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> & GetThermostatSuggestionNotFollowingReason() override;
 
@@ -88,7 +90,8 @@ public:
 
     CHIP_ERROR RemoveFromThermostatSuggestionsList(uint8_t uniqueID) override;
 
-    CHIP_ERROR SetThermostatSuggestionNotFollowingReason(const DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> & thermostatSuggestionNotFollowingReason) override;
+    CHIP_ERROR SetThermostatSuggestionNotFollowingReason(
+        const DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> & thermostatSuggestionNotFollowingReason) override;
 
     uint8_t GetUniqueID() override;
 
@@ -114,8 +117,9 @@ private:
     void InitializePresets();
 
     /**
-     * @brief return the index of the thermostat suggestion in the ThermostatSuggestions attribute with the earliest EffectiveTime field.
-     * If there are no entries or an error occurs, we will return the value in the MaxThermostatSuggestions attribute as an invalid index.
+     * @brief return the index of the thermostat suggestion in the ThermostatSuggestions attribute with the earliest EffectiveTime
+     * field. If there are no entries or an error occurs, we will return the value in the MaxThermostatSuggestions attribute as an
+     * invalid index.
      *
      */
     size_t GetThermostatSuggestionIndexWithEarliestEffectiveTime(uint32_t currentTimestamp);
@@ -139,7 +143,6 @@ private:
 
     uint8_t mActivePresetHandleData[kPresetHandleSize];
     size_t mActivePresetHandleDataSize;
-
 
     uint8_t mMaxThermostatSuggestions;
     ThermostatSuggestionStructWithOwnedMembers mThermostatSuggestions[kMaxNumberOfThermostatSuggestions];
