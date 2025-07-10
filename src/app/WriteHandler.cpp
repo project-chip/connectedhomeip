@@ -764,14 +764,15 @@ void WriteHandler::MoveToState(const State aTargetState)
 DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::SubjectDescriptor & aSubject,
                                                               const ConcreteAttributePath & aPath)
 {
-    // TODO: ordering is to check writability/existence BEFORE ACL and this seems wrong, however
-    //       existing unit tests (TC_AcessChecker.py) validate that we get UnsupportedWrite instead of UnsupportedAccess
-    //
-    //       This should likely be fixed in spec (probably already fixed by
-    //       https://github.com/CHIP-Specifications/connectedhomeip-spec/pull/9024)
-    //       and tests and implementation
-    //
-    //       Open issue that needs fixing: https://github.com/project-chip/connectedhomeip/issues/33735
+
+    // Execute the ACL Access Granting Algorithm before existence checks, assuming the required_privilege for the element is
+    // View, to determine if the subject would have had at least some access against the concrete path. This is done so we don't
+    // leak information if we do fail existence checks.
+    // SPEC-DIVERGENCE: For non-concrete paths, the spec mandates only one ACL check AFTER the existence check.
+    // However, because this code is also used in the group path case, we end up performing an ADDITIONAL ACL check before the
+    // existence check. In practice, this divergence is not observable.
+    Status writeAccessStatus = CheckWriteAccess(aSubject, aPath, Access::Privilege::kView);
+    VerifyOrReturnValue(writeAccessStatus == Status::Success, writeAccessStatus);
 
     DataModel::AttributeFinder finder(mDataModelProvider);
 
@@ -789,6 +790,21 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
 
     // Allow writes on writable attributes only
     VerifyOrReturnValue(attributeEntry->GetWritePrivilege().has_value(), Status::UnsupportedWrite);
+
+    // Execute the ACL Access Granting Algorithm against the concrete path a second time, using the actual required_privilege
+    writeAccessStatus = CheckWriteAccess(aSubject, aPath, *attributeEntry->GetWritePrivilege());
+    VerifyOrReturnValue(writeAccessStatus == Status::Success, writeAccessStatus);
+
+    // validate that timed write is enforced
+    VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kTimed),
+                        Status::NeedsTimedInteraction);
+
+    return Status::Success;
+}
+
+Status WriteHandler::CheckWriteAccess(const Access::SubjectDescriptor & aSubject, const ConcreteAttributePath & aPath,
+                                      const Access::Privilege aRequiredPrivilege)
+{
 
     bool checkAcl = true;
     if (mLastSuccessfullyWrittenPath.has_value())
@@ -812,22 +828,25 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
                                          .requestType = Access::RequestType::kAttributeWriteRequest,
                                          .entityId    = aPath.mAttributeId };
 
-        // NOTE: we know that attributeEntry has a GetWriteProvilege based on the check above.
-        //       so we just directly reference it.
-        CHIP_ERROR err = Access::GetAccessControl().Check(aSubject, requestPath, *attributeEntry->GetWritePrivilege());
+        CHIP_ERROR err = Access::GetAccessControl().Check(aSubject, requestPath, aRequiredPrivilege);
 
-        if (err != CHIP_NO_ERROR)
+        if (err == CHIP_NO_ERROR)
         {
-            VerifyOrReturnValue(err != CHIP_ERROR_ACCESS_DENIED, Status::UnsupportedAccess);
-            VerifyOrReturnValue(err != CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL, Status::AccessRestricted);
-
-            return err;
+            return Status::Success;
         }
-    }
 
-    // validate that timed write is enforced
-    VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kTimed),
-                        Status::NeedsTimedInteraction);
+        if (err == CHIP_ERROR_ACCESS_DENIED)
+        {
+            return Status::UnsupportedAccess;
+        }
+
+        if (err == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL)
+        {
+            return Status::AccessRestricted;
+        }
+
+        return Status::Failure;
+    }
 
     return Status::Success;
 }
