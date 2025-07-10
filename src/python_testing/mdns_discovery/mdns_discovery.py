@@ -408,10 +408,10 @@ class MdnsDiscovery:
             return None
 
     async def get_ptr_records(self,
-                        discovery_timeout_sec: float,
-                        service_types: list[str],
-                        log_output: bool = False,
-                        ) -> list[PtrRecord]:
+                              discovery_timeout_sec: float,
+                              service_types: list[str],
+                              log_output: bool = False,
+                              ) -> list[PtrRecord]:
         """
         Asynchronously discovers mDNS PTR records for the given service types.
 
@@ -441,7 +441,7 @@ class MdnsDiscovery:
         try:
             await wait_for(self._event.wait(), timeout=discovery_timeout_sec)
         except TimeoutError:
-                logger.info("mDNS browse finished after %d seconds.", discovery_timeout_sec)
+            logger.info("mDNS browse finished after %d seconds.", discovery_timeout_sec)
         finally:
             self._event.set()
             await aiobrowser.async_cancel()
