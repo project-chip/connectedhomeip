@@ -263,7 +263,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         os.environ['CHIP_TEST_APP_PATH'] = app
         os.environ['CHIP_TEST_APP_ARGS'] = app_args
         os.environ['CHIP_TEST_APP_READY_PATTERN'] = app_ready_pattern.pattern.decode() if app_ready_pattern else ""
-        # Add a function reference for app restart
+# Signal that the app restart capability is available to the test script
         os.environ['CHIP_TEST_APP_RESTART_AVAILABLE'] = '1'
         os.environ['CHIP_TEST_RESTART_FLAG_FILE'] = restart_flag_file
         os.environ['CHIP_TEST_STOP_FLAG_FILE'] = stop_flag_file
