@@ -271,7 +271,6 @@ class TC_SC_4_3(MatterBaseTest):
 
         # *** STEP 6 ***
         # TH performs a query for the SRV record against the qname instance_qname.
-        # Verify SRV record is returned
         self.step(6)
         mdns = MdnsDiscovery()
         operational_record = await mdns.get_srv_record(
@@ -309,15 +308,14 @@ class TC_SC_4_3(MatterBaseTest):
 
         # *** STEP 8 ***
         # TH performs a query for the AAAA record against the target listed in the SRV record.
-        # Verify AAAA record is returned
         self.step(8)
-        quada_record = await mdns.get_quada_record(
+        quada_records = await mdns.get_quada_records(
             hostname=hostname,
             log_output=True
         )
 
         # Verify AAAA record is returned
-        asserts.assert_greater(len(quada_record.addresses), 0, f"No AAAA addresses were resolved for hostname '{hostname}'")
+        asserts.assert_greater(len(quada_records), 0, f"No AAAA addresses were resolved for hostname '{hostname}'")
 
         # # *** STEP 9 ***
         # TH verifies the following from the returned records: The hostname must be a fixed-length twelve-character (or sixteen-character)
@@ -403,9 +401,11 @@ class TC_SC_4_3(MatterBaseTest):
 
         # Verify the AAAA record contains an IPv6 address
         logging.info("Verify the AAAA record contains a valid IPv6 address")
-        ipv6_address = quada_record.addresses[0].address
-        is_valid_ipv6_addr = self.is_valid_ipv6_address(ipv6_address)
-        asserts.assert_true(is_valid_ipv6_addr, f"Address '{ipv6_address}' is not a valid IPv6 address.")
+        for r in quada_records:
+            asserts.assert_true(
+                self.is_valid_ipv6_address(r.address),
+                f"Invalid IPv6 address: '{r.address}'"
+            )
 
         # # *** STEP 10 ***
         # TH performs a DNS-SD browse for _I<hhhh>._sub._matter._tcp.local, where <hhhh> is the 64-bit compressed

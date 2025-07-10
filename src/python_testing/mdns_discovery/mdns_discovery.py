@@ -78,6 +78,11 @@ class MdnsDiscovery:
             - get_operational_service
             - get_border_router_service
             - get_all_services
+            - get_service_types
+            - get_srv_record
+            - get_txt_record
+            - get_quada_records
+            - get_ptr_records
         """
         # An instance of Zeroconf to manage mDNS operations.
         self._azc = AsyncZeroconf(ip_version=self.ip_version)
@@ -355,10 +360,10 @@ class MdnsDiscovery:
                 logger.error(f"TXT Record for service '{service_name}' of type '{service_type}' not found.")
                 return None
 
-    async def get_quada_record(self, hostname: str,
+    async def get_quada_records(self, hostname: str,
                                discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
                                log_output: bool = False
-                               ) -> Optional[QuadaRecord]:
+                               ) -> Optional[list[QuadaRecord]]:
         """
         Asynchronously retrieves the AAAA (IPv6) record of a device on the local network via mDNS.
 
@@ -389,23 +394,23 @@ class MdnsDiscovery:
                 return None
 
             # Get IPv6 addresses
-            ipv6_addresses = addr_resolver.ip_addresses_by_version(version=IPVersion.V6Only)
+            ipv6_addresses = addr_resolver.ip_addresses_by_version(version=self.ip_version)
             if ipv6_addresses:
-                quada_record = QuadaRecord.build(ipv6_addresses)
+                quada_records: list[QuadaRecord] = [
+                    QuadaRecord.build(ipv6)
+                    for ipv6 in ipv6_addresses
+                ]
 
             # Adds service to discovered services
-            if is_discovered:
-                self._discovered_services = {}
-                self._discovered_services[hostname] = []
-                for addr in quada_record.addresses:
-                    self._discovered_services[hostname].append(addr)
+            self._discovered_services = {}
+            self._discovered_services[hostname] = []
+            for ipv6 in quada_records:
+                self._discovered_services[hostname].append(ipv6)
 
-                if log_output:
-                    self._log_output()
+            if log_output:
+                self._log_output()
 
-                return quada_record
-
-            return None
+            return quada_records
 
     async def get_ptr_records(self,
                               discovery_timeout_sec: float,
@@ -566,7 +571,7 @@ class MdnsDiscovery:
         It handles the addition of new services by initiating a query for their detailed information.
 
         Args:
-            unlock_service (bool): If True, queries the service info for each of the discovered service names, defaluts to True.
+            unlock_service (bool): If True, queries the service info for each of the discovered service names.
             zeroconf (Zeroconf): The Zeroconf instance managing the network operations.
             service_type (str): The service type of the mDNS service that changed state.
             name (str): The service name of the mDNS service.
@@ -596,7 +601,7 @@ class MdnsDiscovery:
                 name)
             )
         else:
-            # Only gather PTR record information (service_type, service_name, instance_name)
+            # Only gather PTR record information
             if service_type not in self._discovered_services:
                 self._discovered_services[service_type] = []
             self._discovered_services[service_type].append(PtrRecord(service_type=service_type, service_name=name))

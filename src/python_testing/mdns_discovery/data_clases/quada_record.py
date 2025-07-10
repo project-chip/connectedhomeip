@@ -46,7 +46,7 @@ class AddressMeta:
 
 
 @dataclass
-class IPv6AddressInfo:
+class QuadaRecord:
     address: str
     version: int
     interface: Union[str, int]
@@ -55,40 +55,29 @@ class IPv6AddressInfo:
     special_types: SpecialAddressTypes
     meta: AddressMeta
 
-
-@dataclass
-class QuadaRecord:
-    addresses: list[IPv6AddressInfo]
-
     @classmethod
-    def build(cls, ipv6_addresses: list[ZeroconfIPv6Address]) -> "QuadaRecord":
-        address_info_list = []
-
-        for ipv6 in ipv6_addresses:
-            address_info = IPv6AddressInfo(
-                address=get_valid_compressed_ipv6(ipv6),
-                version=ipv6.version,
-                interface=get_interface(ipv6.scope_id),
-                type_info=AddressTypeInfo(
-                    is_global=ipv6.is_global,
-                    is_link_local=ipv6.is_link_local,
-                    is_loopback=ipv6.is_loopback,
-                    is_multicast=ipv6.is_multicast,
-                ),
-                special_types=SpecialAddressTypes(
-                    teredo=str(ipv6.teredo) if ipv6.teredo else None,
-                    sixtofour=str(ipv6.sixtofour) if ipv6.sixtofour else None,
-                    is_reserved=ipv6.is_reserved,
-                    ipv4_mapped=str(ipv6.ipv4_mapped) if ipv6.ipv4_mapped else None,
-                ),
-                meta=AddressMeta(
-                    max_prefixlen=ipv6.max_prefixlen,
-                    packed=ipv6.packed.hex(),
-                ),
-            )
-            address_info_list.append(address_info)
-
-        return cls(addresses=address_info_list)
+    def build(cls, ipv6: ZeroconfIPv6Address) -> "QuadaRecord":
+        return cls(
+            address=get_valid_compressed_ipv6(ipv6),
+            version=ipv6.version,
+            interface=get_interface(ipv6.scope_id),
+            type_info=AddressTypeInfo(
+                is_global=ipv6.is_global,
+                is_link_local=ipv6.is_link_local,
+                is_loopback=ipv6.is_loopback,
+                is_multicast=ipv6.is_multicast,
+            ),
+            special_types=SpecialAddressTypes(
+                teredo=str(ipv6.teredo) if ipv6.teredo else None,
+                sixtofour=str(ipv6.sixtofour) if ipv6.sixtofour else None,
+                is_reserved=ipv6.is_reserved,
+                ipv4_mapped=str(ipv6.ipv4_mapped) if ipv6.ipv4_mapped else None,
+            ),
+            meta=AddressMeta(
+                max_prefixlen=ipv6.max_prefixlen,
+                packed=ipv6.packed.hex(),
+            ),
+        )
 
 
 def get_valid_compressed_ipv6(ipv6: IPv6Address) -> str:
@@ -109,15 +98,15 @@ def get_interface(scope_id: str | int | None) -> str | int | None:
     Returns None for invalid/unspecified IDs, or original scope_id if not found.
     """
     if not scope_id:
-        return None  # None or falsy (like 0) means invalid or unspecified
+        return None
 
     try:
         scope_id = int(scope_id)
     except ValueError:
-        return scope_id  # Return original if not a valid integer
+        return scope_id
 
     for if_index, if_name in socket.if_nameindex():
         if if_index == scope_id:
             return if_name
 
-    return scope_id  # No match found
+    return scope_id
