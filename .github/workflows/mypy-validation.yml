@@ -49,10 +49,11 @@ jobs:
       
       - name: Run mypy validation (ChipDeviceCtrl.py)
         run: |
-          ERRORS=$(./scripts/run_in_python_env.sh out/venv "mypy --config-file=src/python_testing/matter_testing_infrastructure/mypy.ini src/controller/python/chip/ChipDeviceCtrl.py" | grep -c 'ChipDeviceCtrl.py:.*error:')
+          OUTPUT=$(./scripts/run_in_python_env.sh out/venv "mypy --config-file=src/python_testing/matter_testing_infrastructure/mypy.ini src/controller/python/chip/ChipDeviceCtrl.py" 2>&1 || true)
+          ERRORS=$(echo "$OUTPUT" | grep -c 'ChipDeviceCtrl.py:.*error:')
           if [ "$ERRORS" -ne 0 ]; then
-            echo "Mypy found $ERRORS errors in ChipDeviceCtrl.py"
-            ./scripts/run_in_python_env.sh out/venv "mypy --config-file=src/python_testing/matter_testing_infrastructure/mypy.ini src/controller/python/chip/ChipDeviceCtrl.py" | grep 'ChipDeviceCtrl.py'
+            echo "Mypy found $ERRORS error(s) in ChipDeviceCtrl.py"
+            echo "$OUTPUT" | grep 'ChipDeviceCtrl.py'
             exit 1
           else
             echo "No mypy errors found in ChipDeviceCtrl.py"
