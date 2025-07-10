@@ -230,11 +230,11 @@ class TC_ACL_2_10(MatterBaseTest):
             self.wait_for_user_input(prompt_msg="Reboot the DUT. Press Enter when ready.\n")
         else:
             # CI environment: restart the app process using the test runner functionality
-            restart_flag_file = os.environ.get("CHIP_TEST_RESTART_FLAG_FILE", "/tmp/chip_test_restart_app")
-            logging.info(f"Using restart flag file: {restart_flag_file}")
+            restart_flag_file = os.environ.get("CHIP_TEST_RESTART_FLAG_FILE")
+            if not restart_flag_file:
+                asserts.fail("CHIP_TEST_RESTART_FLAG_FILE environment variable not set. This test must be run via a runner that provides it.")
 
             try:
-                # Create the restart flag file to signal the test runner
                 with open(restart_flag_file, 'w') as f:
                     f.write("restart")
 
@@ -251,6 +251,13 @@ class TC_ACL_2_10(MatterBaseTest):
 
             except Exception as e:
                 logging.error(f"Failed to restart app: {e}")
+                # Clean up the flag file if we created it
+                if os.path.exists(restart_flag_file):
+                    try:
+                        os.unlink(restart_flag_file)
+                        logging.info(f"Cleaned up flag file after error: {restart_flag_file}")
+                    except Exception as cleanup_error:
+                        logging.warning(f"Failed to clean up flag file {restart_flag_file}: {cleanup_error}")
                 asserts.fail(f"App restart failed: {e}")
 
         # Wait for reboot to complete
@@ -289,21 +296,10 @@ class TC_ACL_2_10(MatterBaseTest):
         asserts.assert_equal(len(th1_extension_attr), 1, "Expected exactly one extension attribute")
 
         # Verify the actual values
-        asserts.assert_equal(th1_extension_attr[0].data,
-                             D_OK_EMPTY,
-                             "Data should be D_OK_EMPTY")
-        asserts.assert_equal(th1_extension_attr[0].fabricIndex,
-                             f1,
-                             "FabricIndex should be the current fabric index")
+        entry = th1_extension_attr[0]
+        asserts.assert_equal(entry.data, D_OK_EMPTY, "Data should be D_OK_EMPTY")
+        asserts.assert_equal(entry.fabricIndex, f1, "FabricIndex should be F1")
 
-        # Verify the attribute, should not contain an entry with FabricIndex F2 or Data D_OK_SINGLE
-        for attr in th1_extension_attr:
-            asserts.assert_not_equal(
-                attr.fabricIndex, f2, "Should not contain entry with FabricIndex F2")
-            asserts.assert_not_equal(
-                attr.data, D_OK_SINGLE, "Should not contain entry with Data D_OK_SINGLE")
-            asserts.assert_equal(
-                attr.fabricIndex, f1, "FabricIndex should be the current fabric index")
 
         self.step(12)
         # TH2 reads DUT Endpoint 0 AccessControl cluster ACL attribute
@@ -327,21 +323,9 @@ class TC_ACL_2_10(MatterBaseTest):
         asserts.assert_equal(len(th2_extension_attr), 1, "Expected exactly one extension attribute")
 
         # Verify the actual values
-        asserts.assert_equal(th2_extension_attr[0].data,
-                             D_OK_SINGLE,
-                             "Data should be D_OK_SINGLE")
-        asserts.assert_equal(th2_extension_attr[0].fabricIndex,
-                             f2,
-                             "FabricIndex should be the current fabric index")
-
-        # Verify the attribute, should not contain an entry with FabricIndex F1 or Data D_OK_EMPTY
-        for entry in th2_extension_attr:
-            asserts.assert_not_equal(
-                entry.fabricIndex, f1, "Should not contain entry with FabricIndex F1")
-            asserts.assert_not_equal(
-                entry.data, D_OK_EMPTY, "Should not contain entry with Data D_OK_EMPTY")
-            asserts.assert_equal(
-                entry.fabricIndex, f2, "FabricIndex should be the current fabric index")
+        entry2 = th2_extension_attr[0]
+        asserts.assert_equal(entry2.data, D_OK_SINGLE, "Data should be D_OK_SINGLE")
+        asserts.assert_equal(entry2.fabricIndex, f2, "FabricIndex should be F2")
 
         self.step(14)
         # TH1 removes fabric `F2` from DUT
@@ -373,13 +357,9 @@ class TC_ACL_2_10(MatterBaseTest):
         asserts.assert_equal(len(th1_extension_attr2), 1, "Expected exactly one extension attribute")
 
         # Verify the attribute, should not contain an entry with FabricIndex F2 or Data D_OK_SINGLE
-        for entry in th1_extension_attr2:
-            asserts.assert_not_equal(
-                entry.fabricIndex, f2, "Should not contain entry with FabricIndex F2")
-            asserts.assert_not_equal(
-                entry.data, D_OK_SINGLE, "Should not contain entry with Data D_OK_SINGLE")
-            asserts.assert_equal(
-                entry.fabricIndex, f1, "FabricIndex should be the current fabric index")
+        entry3 = th1_extension_attr2[0]
+        asserts.assert_equal(entry3.data, D_OK_EMPTY, "Data should be D_OK_EMPTY")
+        asserts.assert_equal(entry3.fabricIndex, f1, "FabricIndex should be F1")
 
 
 if __name__ == "__main__":

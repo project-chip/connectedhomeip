@@ -29,6 +29,7 @@ import sys
 import threading
 import time
 import typing
+import uuid
 
 import click
 import coloredlogs
@@ -209,7 +210,6 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
 
     # Generate unique test run ID to avoid conflicts in concurrent test runs
-    import uuid
     test_run_id = str(uuid.uuid4())[:8]  # Use first 8 characters for shorter paths
     restart_flag_file = f"/tmp/chip_test_restart_app_{test_run_id}"
     stop_flag_file = f"/tmp/chip_test_stop_monitor_{test_run_id}"
@@ -309,51 +309,58 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         )
         restart_monitor_thread.start()
 
-    test_script_exit_code = test_script_process.wait()
+    try:
+        test_script_exit_code = test_script_process.wait()
 
-    if test_script_exit_code != 0:
-        logging.error("Test script exited with returncode %d" % test_script_exit_code)
+        if test_script_exit_code != 0:
+            logging.error("Test script exited with returncode %d" % test_script_exit_code)
 
-    # Stop the restart monitor thread if it exists
-    if restart_monitor_thread and restart_monitor_thread.is_alive():
-        logging.info("Stopping app restart monitor thread")
-        # Signal the monitor thread to stop
-        with open(stop_flag_file, 'w') as f:
-            f.write("stop")
+        # Stop the restart monitor thread if it exists
+        if restart_monitor_thread and restart_monitor_thread.is_alive():
+            logging.info("Stopping app restart monitor thread")
+            # Signal the monitor thread to stop
+            with open(stop_flag_file, 'w') as f:
+                f.write("stop")
 
-        # Wait a bit for the monitor thread to stop
-        restart_monitor_thread.join(2.0)  # Wait up to 2 seconds for the thread to stop
+            # Wait a bit for the monitor thread to stop
+            restart_monitor_thread.join(2.0)  # Wait up to 2 seconds for the thread to stop
 
-    # Get the current app process (which might have been restarted)
-    current_app_process = app_process_ref[0] if app_process_ref else app_process
+        # Get the current app process (which might have been restarted)
+        current_app_process = app_process_ref[0] if app_process_ref else app_process
 
-    if current_app_process:
-        logging.info("Stopping app with SIGTERM")
-        if app_stdin_forwarding_thread:
-            app_stdin_forwarding_stop_event.set()
-            app_stdin_forwarding_thread.join()
-        current_app_process.terminate()
-        app_exit_code = current_app_process.returncode
+        if current_app_process:
+            logging.info("Stopping app with SIGTERM")
+            if app_stdin_forwarding_thread:
+                app_stdin_forwarding_stop_event.set()
+                app_stdin_forwarding_thread.join()
+            current_app_process.terminate()
+            app_exit_code = current_app_process.returncode
 
-    # Clean up any leftover flag files
-    for flag_file in [restart_flag_file, stop_flag_file]:
-        if os.path.exists(flag_file):
-            os.unlink(flag_file)
+        # We expect both app and test script should exit with 0
+        exit_code = test_script_exit_code or app_exit_code
 
-    # We expect both app and test script should exit with 0
-    exit_code = test_script_exit_code or app_exit_code
+        if quiet:
+            if exit_code:
+                sys.stdout.write(stream_output.getvalue().decode('utf-8'))
+            else:
+                logging.info("Test completed successfully")
 
-    if quiet:
-        if exit_code:
-            sys.stdout.write(stream_output.getvalue().decode('utf-8'))
-        else:
-            logging.info("Test completed successfully")
+        if exit_code != 0:
+            logging.error("SUBPROCESS failure: ")
+            logging.error("  TEST SCRIPT: %d (%r)", test_script_exit_code, final_script_command)
+            logging.error("  APP:         %d (%r)", app_exit_code, [app] + shlex.split(app_args))
+            sys.exit(exit_code)
 
-    if exit_code != 0:
-        logging.error("SUBPROCESS failure: ")
-        logging.error("  TEST SCRIPT: %d (%r)", test_script_exit_code, final_script_command)
-        logging.error("  APP:         %d (%r)", app_exit_code, [app] + shlex.split(app_args))
-        sys.exit(exit_code)
+    finally:
+        # Clean up any leftover flag files - ensure this always executes
+        logging.info("Cleaning up flag files")
+        for flag_file in [restart_flag_file, stop_flag_file]:
+            if os.path.exists(flag_file):
+                try:
+                    os.unlink(flag_file)
+                    logging.info(f"Cleaned up flag file: {flag_file}")
+                except Exception as e:
+                    logging.warning(f"Failed to clean up flag file {flag_file}: {e}")
 
 
 def monitor_app_restart_requests(app_process_ref, app, app_args, app_ready_pattern, stream_output, restart_flag_file, stop_flag_file):
