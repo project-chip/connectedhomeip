@@ -342,16 +342,16 @@ class TC_ACL_2_3(MatterBaseTest):
                      "Result is SUCCESS"),
             TestStep(20, "TH1 reads DUT Endpoint 0 AccessControl cluster Extension attribute",
                      "Result is Success, value is an empty list"),
-            TestStep(21, "Rerunning test with new list method",
-                     "Rerunning test with new list method"),
+            TestStep(21, "Re-run the test using the legacy list writing mechanism, where the client issues a series of AttributeDataIBs, with the first containing a path to the list itself and Data that is empty array, which signals clearing the list, and subsequent AttributeDataIBs containing updates.",
+                     "Test succeeds with legacy list encoding mechanism"),
         ]
         return steps
 
     @async_test_body
     async def test_TC_ACL_2_3(self):
-        await self.internal_test_TC_ACL_2_3(force_legacy_encoding=True)
-        self.current_step_index = 0
         await self.internal_test_TC_ACL_2_3(force_legacy_encoding=False)
+        self.current_step_index = 0
+        await self.internal_test_TC_ACL_2_3(force_legacy_encoding=True)
 
 
 if __name__ == "__main__":
