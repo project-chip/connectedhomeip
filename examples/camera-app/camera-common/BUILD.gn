@@ -52,5 +52,6 @@ source_set("camera-lib") {
   deps = [
     "${chip_root}/examples/camera-app/camera-common",
     "${chip_root}/src/lib",
+    "${chip_root}/src/app/clusters/push-av-stream-transport-server:push-av-stream-transport-server",
   ]
 }

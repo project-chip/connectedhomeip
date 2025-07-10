@@ -21,6 +21,7 @@
 #include "camera-avsettingsuserlevel-manager.h"
 #include "camera-device-interface.h"
 #include "chime-manager.h"
+#include "push-av-stream-transport-delegate-impl.h"
 #include "webrtc-provider-manager.h"
 #include "zone-manager.h"
 
@@ -86,6 +87,7 @@ public:
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamMgmtDelegate & GetCameraAVStreamMgmtDelegate() override;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamController & GetCameraAVStreamMgmtController() override;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::Delegate & GetCameraAVSettingsUserLevelMgmtDelegate() override;
+    chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportDelegate & GetPushAVDelegate() override;
     chip::app::Clusters::ZoneManagement::Delegate & GetZoneManagementDelegate() override;
 
     MediaController & GetMediaController() override;
@@ -100,7 +102,7 @@ public:
     // HAL interface impl
     CameraError InitializeCameraDevice() override;
 
-    CameraError InitializeStreams() override;
+    CameraError InitializeStreams(AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams) override;
 
     CameraError CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID, const VideoResolutionStruct & resolution,
                                 ImageSnapshot & outImageSnapshot) override;
@@ -304,8 +306,8 @@ private:
     std::vector<AudioStream> mAudioStreams;       // Vector to hold available audio streams
     std::vector<SnapshotStream> mSnapshotStreams; // Vector to hold available snapshot streams
 
-    void InitializeVideoStreams();
-    void InitializeAudioStreams();
+    VideoStreamStruct InitializeVideoStreams();
+    AudioStreamStruct InitializeAudioStreams();
     void InitializeSnapshotStreams();
 
     GstElement * CreateVideoPipeline(const std::string & device, int width, int height, int framerate, CameraError & error);
@@ -318,6 +320,7 @@ private:
     chip::app::Clusters::ChimeManager mChimeManager;
     chip::app::Clusters::WebRTCTransportProvider::WebRTCProviderManager mWebRTCProviderManager;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager mCameraAVStreamManager;
+    chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager mPushAVTransportManager;
     chip::app::Clusters::CameraAvSettingsUserLevelManagement::CameraAVSettingsUserLevelManager mCameraAVSettingsUserLevelManager;
     chip::app::Clusters::ZoneManagement::ZoneManager mZoneManager;
 
