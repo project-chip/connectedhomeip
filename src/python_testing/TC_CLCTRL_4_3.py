@@ -274,6 +274,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             self.step("4h")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(
                 Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyOpened)], timeout_sec=timeout)
+            sub_handler.reset()
 
         self.step("5a")
         if not is_latching_supported or is_position_supported:
@@ -378,6 +379,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                     logging.info(f"Exception caught for MoveTo with Position = MoveToFullyOpen and Latch = True: {e}")
                     asserts.assert_equal(e.status, Status.InvalidInState,
                                          f"Expected INVALID_IN_STATE for MoveTo with Position = MoveToFullyOpen and Latch = True but got: {e}")
+            sub_handler.reset()
 
         self.step("6a")
         if not is_speed_supported or is_latching_supported:
@@ -437,6 +439,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             self.step("6h")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_speed_matcher(
                 Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow)], timeout_sec=timeout)
+            sub_handler.reset()
 
         if is_position_supported:
             self.step("7a")
@@ -542,6 +545,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                     logging.error(f"MoveTo command with Latch = False failed: {e}")
                     asserts.assert_equal(e.status, Status.Success,
                                          f"Expected Success status for MoveTo with Latch = False, but got: {e}")
+            sub_handler.reset()
 
         else:
             logging.info("Skipping steps 8b to 8k as Latching feature is not supported")
