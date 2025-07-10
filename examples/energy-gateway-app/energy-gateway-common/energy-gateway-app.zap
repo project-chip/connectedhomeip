@@ -3311,6 +3311,33 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Commodity Metering",
+          "code": 2823,
+          "mfgCode": null,
+          "define": "COMMODITY_METERING_CLUSTER",
+          "side": "server",
+          "enabled": 1,
+          "apiMaturity": "provisional",
+          "attributes": [
+            {
+              "name": "MeteredQuantity",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "type": "array",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
               "defaultValue": null,
               "reportable": 1,
               "minInterval": 1,
@@ -3334,11 +3361,11 @@
               "reportableChange": 0
             },
             {
-              "name": "MeasurementType",
+              "name": "TariffUnit",
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "MeasurementTypeEnum",
+              "type": "TariffUnitEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,

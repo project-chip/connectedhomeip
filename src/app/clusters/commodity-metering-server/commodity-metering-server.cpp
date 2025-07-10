@@ -42,11 +42,15 @@ namespace app {
 namespace Clusters {
 namespace CommodityMetering {
 
+// Some constraints for lists limitation
+constexpr uint8_t kMaxMeteredQuantityEntries                    = 128;
+constexpr uint8_t kMaxTariffComponentIDsPerMeteredQuantityEntry = 128;
+
 namespace {
 
 inline bool operator==(const Span<const uint32_t> & a, const Span<const uint32_t> & b)
 {
-    return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin());
+    return std::equal(a.begin(), a.end(), b.begin());
 }
 
 inline bool operator==(const Structs::MeteredQuantityStruct::Type & lhs, const Structs::MeteredQuantityStruct::Type & rhs)
@@ -80,7 +84,7 @@ template <typename T>
 struct SpanCopier
 {
     static bool Copy(const chip::Span<const T> & source, DataModel::List<const T> & destination,
-                     Platform::ScopedMemoryBuffer<T> * bufferOut, size_t maxElements = std::numeric_limits<size_t>::max())
+                     size_t maxElements = std::numeric_limits<size_t>::max())
     {
         if (source.empty())
         {
@@ -89,21 +93,49 @@ struct SpanCopier
         }
 
         size_t elementsToCopy = std::min(source.size(), maxElements);
+        auto * buffer         = static_cast<T *>(chip::Platform::MemoryCalloc(elementsToCopy, sizeof(T)));
 
-        if (!bufferOut->Calloc(elementsToCopy))
+        if (!buffer)
         {
             return false;
         }
 
-        std::copy(source.begin(), source.begin() + elementsToCopy, bufferOut->Get());
-        destination = DataModel::List<const T>(chip::Span<const T>(bufferOut->Get(), elementsToCopy));
+        std::copy(source.begin(), source.begin() + elementsToCopy, buffer);
+        destination = DataModel::List<const T>(chip::Span<const T>(buffer, elementsToCopy));
         return true;
     }
 };
 } // namespace
 
+static void CleanUpIDs(DataModel::List<const uint32_t> & IDs)
+{
+    if (!IDs.empty() && IDs.data())
+    {
+        Platform::MemoryFree(const_cast<uint32_t *>(IDs.data()));
+        IDs = DataModel::List<const uint32_t>();
+    }
+}
+
+static void CleanupMeteredQuantityData(DataModel::List<Structs::MeteredQuantityStruct::Type> & aValue)
+{
+    if (aValue.data() != nullptr)
+    {
+        for (auto & item : aValue)
+        {
+            CleanUpIDs(item.tariffComponentIDs);
+        }
+
+        Platform::MemoryFree(aValue.data());
+        aValue = DataModel::List<Structs::MeteredQuantityStruct::Type>();
+    }
+}
+
 Instance::~Instance()
 {
+    if (!mMeteredQuantity.IsNull())
+    {
+        CleanupMeteredQuantityData(mMeteredQuantity.Value());
+    }
     Shutdown();
 }
 
@@ -111,6 +143,8 @@ CHIP_ERROR Instance::Init()
 {
     mMeteredQuantity.SetNull();
     mMeteredQuantityTimestamp.SetNull();
+    mMeasurementType.SetNull();
+    mMaximumMeteredQuantities.SetNull();
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
@@ -120,14 +154,12 @@ void Instance::Shutdown()
     AttributeAccessInterfaceRegistry::Instance().Unregister(this);
 }
 
-CHIP_ERROR CopyMeteredQuantityEntry(Structs::MeteredQuantityStruct::Type & dest,
-                                    Platform::ScopedMemoryBuffer<uint32_t> * destTariffComponentIDsBuffer,
-                                    const Structs::MeteredQuantityStruct::Type & src)
+static CHIP_ERROR CopyMeteredQuantityEntry(const Structs::MeteredQuantityStruct::Type & src,
+                                           Structs::MeteredQuantityStruct::Type & dest)
 {
     dest.quantity = src.quantity;
 
-    if (!SpanCopier<uint32_t>::Copy(src.tariffComponentIDs, dest.tariffComponentIDs, destTariffComponentIDsBuffer,
-                                    kMaxTariffComponentIDsPerMeteredQuantityEntry))
+    if (!SpanCopier<uint32_t>::Copy(src.tariffComponentIDs, dest.tariffComponentIDs, kMaxTariffComponentIDsPerMeteredQuantityEntry))
     {
         return CHIP_ERROR_NO_MEMORY;
     }
@@ -139,46 +171,52 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
 {
     assertChipStackLockedByCurrentThread();
 
-    if (NullableListEqual<Structs::MeteredQuantityStruct::Type>(newValue, mMeteredQuantity))
+    if (NullableListEqual(newValue, mMeteredQuantity))
     {
         return CHIP_NO_ERROR;
     }
 
-    if (mOwnedMeteredQuantityStructBuffer.Get() != nullptr)
+    if (newValue.IsNull())
     {
-        mOwnedMeteredQuantityStructBuffer.Free();
-    }
-
-    for (size_t idx = 0; idx < kMaxMeteredQuantityEntries; idx++)
-    {
-        if (mOwnedMeteredQuantityTariffComponentIDsBuffer[idx]->Get() != nullptr)
-        {
-            mOwnedMeteredQuantityTariffComponentIDsBuffer[idx]->Free();
-        }
-    }
-
-    const size_t len = newValue.IsNull() ? 0 : newValue.Value().size();
-
-    if (!newValue.IsNull() && len)
-    {
-        if (!mOwnedMeteredQuantityStructBuffer.Calloc(len))
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-
-        for (size_t idx = 0; idx < len; idx++)
-        {
-            // Deep copy each MeteredQuantityStruct in the newValue list
-            ReturnLogErrorOnFailure(CopyMeteredQuantityEntry(
-                mOwnedMeteredQuantityStructBuffer[idx], mOwnedMeteredQuantityTariffComponentIDsBuffer[idx], newValue.Value()[idx]));
-        }
-
-        mMeteredQuantity =
-            MakeNullable(DataModel::List<Structs::MeteredQuantityStruct::Type>(mOwnedMeteredQuantityStructBuffer.Get(), len));
+        mMeteredQuantity.SetNull();
     }
     else
     {
-        mMeteredQuantity.SetNull();
+        if (!mMeteredQuantity.IsNull())
+        {
+            CleanupMeteredQuantityData(mMeteredQuantity.Value());
+        }
+
+        const size_t len = newValue.Value().size();
+
+        if (len == 0)
+        {
+            mMeteredQuantity = MakeNullable(DataModel::List<Structs::MeteredQuantityStruct::Type>());
+        }
+        else if (len <= kMaxMeteredQuantityEntries)
+        {
+            Platform::ScopedMemoryBuffer<Structs::MeteredQuantityStruct::Type> buffer;
+
+            if (!buffer.Calloc(len))
+            {
+                return CHIP_ERROR_NO_MEMORY;
+            }
+
+            for (size_t idx = 0; idx < len; idx++)
+            {
+                // Deep copy each MeteredQuantityStruct in the newValue list
+                ReturnLogErrorOnFailure(CopyMeteredQuantityEntry(newValue.Value()[idx], buffer[idx]));
+            }
+
+            mMeteredQuantity = MakeNullable(DataModel::List<Structs::MeteredQuantityStruct::Type>(buffer.Get(), len));
+            (void) buffer.Release();
+        }
+        else
+        {
+            return CHIP_ERROR_INVALID_LIST_LENGTH;
+        }
+
+        SetMaximumMeteredQuantities(MakeNullable(static_cast<uint16_t>(len)));
     }
 
     MatterReportingAttributeChangeCallback(mEndpointId, CommodityMetering::Id, MeteredQuantity::Id);
@@ -189,7 +227,6 @@ CHIP_ERROR Instance::SetMeteredQuantityTimestamp(DataModel::Nullable<uint32_t> n
 {
     DataModel::Nullable<uint32_t> oldValue = mMeteredQuantityTimestamp;
 
-    mMeteredQuantityTimestamp = newValue;
     if (oldValue != newValue)
     {
         if (newValue.IsNull())
@@ -198,8 +235,7 @@ CHIP_ERROR Instance::SetMeteredQuantityTimestamp(DataModel::Nullable<uint32_t> n
         }
         else
         {
-            ChipLogDetail(AppServer, "MeteredQuantityTimestamp updated to %lu",
-                          static_cast<unsigned long int>(mMeteredQuantityTimestamp.Value()));
+            ChipLogDetail(AppServer, "MeteredQuantityTimestamp updated to %lu", static_cast<unsigned long int>(newValue.Value()));
         }
 
         mMeteredQuantityTimestamp = newValue;
@@ -210,20 +246,55 @@ CHIP_ERROR Instance::SetMeteredQuantityTimestamp(DataModel::Nullable<uint32_t> n
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::SetTariffUnit(TariffUnitEnum newValue)
+CHIP_ERROR Instance::SetMeasurementType(DataModel::Nullable<Globals::MeasurementTypeEnum> newValue)
 {
-    TariffUnitEnum oldValue = mTariffUnit;
+    DataModel::Nullable<Globals::MeasurementTypeEnum> oldValue = mMeasurementType;
 
-    if (EnsureKnownEnumValue(newValue) == TariffUnitEnum::kUnknownEnumValue)
-    {
-        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-    }
-
-    mTariffUnit = newValue;
     if (oldValue != newValue)
     {
-        ChipLogDetail(AppServer, "Endpoint: %d - mTariffUnit updated to %d", mEndpointId, to_underlying(mTariffUnit));
-        MatterReportingAttributeChangeCallback(mEndpointId, CommodityMetering::Id, TariffUnit::Id);
+        if (newValue.IsNull())
+        {
+            mMeasurementType.SetNull();
+        }
+        else if (EnsureKnownEnumValue(newValue.Value()) != Globals::MeasurementTypeEnum::kUnknownEnumValue)
+        {
+            mMeasurementType = newValue;
+            ChipLogDetail(AppServer, "Endpoint: %d - mMeasurementType updated to %d", mEndpointId,
+                          to_underlying(mMeasurementType.Value()));
+        }
+        else
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+
+        MatterReportingAttributeChangeCallback(mEndpointId, CommodityMetering::Id, MeasurementType::Id);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR Instance::SetMaximumMeteredQuantities(DataModel::Nullable<uint16_t> newValue)
+{
+    DataModel::Nullable<uint16_t> oldValue = mMaximumMeteredQuantities;
+
+    if (oldValue != newValue)
+    {
+        if (newValue.IsNull())
+        {
+            ChipLogDetail(AppServer, "MaximumMeteredQuantities updated to Null");
+        }
+        else if (kMaxMeteredQuantityEntries >= newValue.Value())
+        {
+            ChipLogDetail(AppServer, "MaximumMeteredQuantities updated to %lu", static_cast<unsigned long int>(newValue.Value()));
+        }
+        else
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        mMaximumMeteredQuantities = newValue;
+
+        MatterReportingAttributeChangeCallback(mEndpointId, CommodityMetering::Id, MaximumMeteredQuantities::Id);
     }
 
     return CHIP_NO_ERROR;
@@ -237,16 +308,39 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
 
     switch (aPath.mAttributeId)
     {
-    case MeteredQuantity::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(GetMeteredQuantity()));
+    case MeteredQuantity::Id: {
+        if (GetMeteredQuantity().IsNull())
+        {
+            return aEncoder.EncodeNull();
+        }
+        else
+        {
+            auto list = GetMeteredQuantity().Value();
+            ReturnErrorOnFailure(aEncoder.EncodeList([&list](const auto & encoder) {
+                for (const auto & item : list)
+                {
+                    CHIP_ERROR err = encoder.Encode(item);
+                    if (err != CHIP_NO_ERROR)
+                    {
+                        return err;
+                    }
+                }
+                return CHIP_NO_ERROR;
+            }));
+        }
         break;
+    }
 
     case MeteredQuantityTimestamp::Id:
         ReturnErrorOnFailure(aEncoder.Encode(GetMeteredQuantityTimestamp()));
         break;
 
-    case TariffUnit::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(GetTariffUnit()));
+    case MeasurementType::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(GetMeasurementType()));
+        break;
+
+    case MaximumMeteredQuantities::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(GetMaximumMeteredQuantities()));
         break;
 
     default:

@@ -33,10 +33,6 @@ namespace app {
 namespace Clusters {
 namespace CommodityMetering {
 
-// Some constraints for lists limitation ( does'nt defined in spec )
-constexpr uint8_t kMaxMeteredQuantityEntries                    = 128;
-constexpr uint8_t kMaxTariffComponentIDsPerMeteredQuantityEntry = 128;
-
 class Instance : public AttributeAccessInterface
 {
 public:
@@ -52,26 +48,20 @@ public:
         return mMeteredQuantity;
     }
     const DataModel::Nullable<uint32_t> & GetMeteredQuantityTimestamp() const { return mMeteredQuantityTimestamp; }
-    const Globals::TariffUnitEnum & GetTariffUnit() const { return mTariffUnit; }
-
+    const DataModel::Nullable<Globals::MeasurementTypeEnum> & GetMeasurementType() const { return mMeasurementType; }
+    const DataModel::Nullable<uint16_t> & GetMaximumMeteredQuantities() const { return mMaximumMeteredQuantities; }
     // Internal Application API to set attribute values
     CHIP_ERROR SetMeteredQuantity(const DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> & value);
     CHIP_ERROR SetMeteredQuantityTimestamp(DataModel::Nullable<uint32_t>);
-    CHIP_ERROR SetTariffUnit(Globals::TariffUnitEnum);
+    CHIP_ERROR SetMeasurementType(DataModel::Nullable<Globals::MeasurementTypeEnum>);
+    CHIP_ERROR SetMaximumMeteredQuantities(DataModel::Nullable<uint16_t>);
 
 private:
     // Attribute storage
     DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> mMeteredQuantity;
     DataModel::Nullable<uint32_t> mMeteredQuantityTimestamp;
-    Globals::TariffUnitEnum mTariffUnit;
-
-    CHIP_ERROR CopyMeteredQuantityEntry(Structs::MeteredQuantityStruct::Type & dest,
-                                        Platform::ScopedMemoryBuffer<uint32_t> * destTariffComponentIDsBuffer,
-                                        const Structs::MeteredQuantityStruct::Type & src);
-
-    Platform::ScopedMemoryBuffer<uint32_t>
-        mOwnedMeteredQuantityTariffComponentIDsBuffer[kMaxMeteredQuantityEntries][kMaxTariffComponentIDsPerMeteredQuantityEntry];
-    Platform::ScopedMemoryBuffer<Structs::MeteredQuantityStruct::Type> mOwnedMeteredQuantityStructBuffer;
+    DataModel::Nullable<Globals::MeasurementTypeEnum> mMeasurementType;
+    DataModel::Nullable<uint16_t> mMaximumMeteredQuantities;
 
     EndpointId mEndpointId = 0;
 
