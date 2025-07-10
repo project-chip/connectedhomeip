@@ -72,7 +72,7 @@ parser.add_argument(
 parser.add_argument(
     '--runner', type=str,
     help="path to the runner script which will be executed after boot; "
-          "it should be relative to the shared directory")
+    "it should be relative to the shared directory")
 parser.add_argument(
     '--output', metavar='FILE', default="/dev/null",
     help="store the QEMU output in a FILE")
