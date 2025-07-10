@@ -310,11 +310,18 @@ CHIP_ERROR EncodeTlvElement(const Json::Value & val, TLV::TLVWriter & writer, co
         size_t encodedLen             = valAsString.length();
         VerifyOrReturnError(CanCastTo<uint16_t>(encodedLen), CHIP_ERROR_INVALID_ARGUMENT);
 
+#if CONFIG_MALLOC_0_IS_NULL
+        // Skip PutBytes for 0-length strings.
+        if (encodedLen == 0)
+            break;
+#endif
+
         // Check if the length is a multiple of 4 as strict padding is required.
         VerifyOrReturnError(encodedLen % 4 == 0, CHIP_ERROR_INVALID_ARGUMENT);
 
         Platform::ScopedMemoryBuffer<uint8_t> byteString;
         byteString.Alloc(BASE64_MAX_DECODED_LEN(static_cast<uint16_t>(encodedLen)));
+
         VerifyOrReturnError(byteString.Get() != nullptr, CHIP_ERROR_NO_MEMORY);
 
         auto decodedLen = Base64Decode(valAsString.c_str(), static_cast<uint16_t>(encodedLen), byteString.Get());
