@@ -77,56 +77,54 @@ class TC_SETRF_2_3(MatterBaseTest, CommodityTariffTestBaseHelper):
             TestStep("1", "Commissioning, already done", test_plan_support.commission_if_required(), is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
                      "TestEventTriggersEnabled is True"),
-            TestStep("3", "TH sends TestEventTrigger command for Test Event Clear.",
+            TestStep("3", "TH reads TariffInfo attribute.", "TariffInfo is Null"),
+            TestStep("4", "TH sends TestEventTrigger command for Fake Tariff Test Event.",
                      "DUT replies with SUCCESS status code."),
-            TestStep("4", "TH reads TariffInfo attribute.", "TariffInfo is Null"),
-            TestStep("5", "TH sends TestEventTrigger command for Fake Tariff Test Event.",
-                     "DUT replies with SUCCESS status code."),
-            TestStep("6", "TH reads TariffInfo attribute.", """
+            TestStep("5", "TH reads TariffInfo attribute.", """
                           - DUT replies a value of TariffInformationStruct type;
                           - TariffLabel is equal to "Full Tariff One"."""),
-            TestStep("7", "TH reads DayEntries attribute.", """
+            TestStep("6", "TH reads DayEntries attribute.", """
                           - DUT replies a value that is a list of DayEntryStruct entries;
                           - Verify that the list length is equal to 5."""),
-            TestStep("8", "TH reads DayPatterns attribute.", """
+            TestStep("7", "TH reads DayPatterns attribute.", """
                           - DUT replies a value that is a list of DayPatternStruct entries;
                           - Verify that the list length is equal to 3."""),
-            TestStep("9", "TH reads CalendarPeriods attribute.", """
+            TestStep("8", "TH reads CalendarPeriods attribute.", """
                           - DUT replies a value that is a list of CalendarPeriodStruct entries;
                           - Verify that the list length is equal to 1."""),
-            TestStep("10", "TH reads IndividualDays attribute.", """
+            TestStep("9", "TH reads IndividualDays attribute.", """
                           - DUT replies a value that is a list of DayStruct entries;
                           - Verify that the list length is equal to 1."""),
-            TestStep("11", "TH reads TariffComponents attribute.", """
+            TestStep("10", "TH reads TariffComponents attribute.", """
                           - DUT replies a value that is a list of TariffComponentStruct entries;
                           - Verify that the list length is equal to 2."""),
-            TestStep("12", "TH reads TariffPeriods attribute.", """
+            TestStep("11", "TH reads TariffPeriods attribute.", """
                           - DUT replies a value that is a list of TariffPeriodStruct entries;
                           - Verify that the list length is equal to 4."""),
-            TestStep("13", "TH sends TestEventTrigger command for Fake Tariff Test Event.",
+            TestStep("12", "TH sends TestEventTrigger command for Fake Tariff Test Event.",
                      "DUT replies with SUCCESS status code."),
-            TestStep("14", "TH reads TariffInfo attribute.", """
+            TestStep("13", "TH reads TariffInfo attribute.", """
                           - DUT replies a value of TariffInformationStruct type;
                           - TariffLabel is equal to "Full Tariff Two"."""),
-            TestStep("15", "TH reads DayEntries attribute.", """
+            TestStep("14", "TH reads DayEntries attribute.", """
                           - DUT replies a value that is a list of DayEntryStruct entries;
                           - Verify that the list length is equal to 4."""),
-            TestStep("16", "TH reads DayPatterns attribute.", """
+            TestStep("15", "TH reads DayPatterns attribute.", """
                           - DUT replies a value that is a list of DayPatternStruct entries;
                           - Verify that the list length is equal to 2."""),
-            TestStep("17", "TH reads CalendarPeriods attribute.", """
+            TestStep("16", "TH reads CalendarPeriods attribute.", """
                           - DUT replies a value that is a list of CalendarPeriodStruct entries;
                           - Verify that the list length is equal to 1."""),
-            TestStep("18", "TH reads IndividualDays attribute.", """
+            TestStep("17", "TH reads IndividualDays attribute.", """
                           - DUT replies a value that is a list of DayStruct entries;
                           - Verify that the list length is equal to 1."""),
-            TestStep("19", "TH reads TariffComponents attribute.", """
+            TestStep("18", "TH reads TariffComponents attribute.", """
                           - DUT replies a value that is a list of TariffComponentStruct entries;
                           - Verify that the list length is equal to 3."""),
-            TestStep("20", "TH reads TariffPeriods attribute.", """
+            TestStep("19", "TH reads TariffPeriods attribute.", """
                           - DUT replies a value that is a list of TariffPeriodStruct entries;
                           - Verify that the list length is equal to 3."""),
-            TestStep("21", "TH sends TestEventTrigger command for Test Event Clear.", "DUT replies with SUCCESS status code."),
+            TestStep("20", "TH sends TestEventTrigger command for Test Event Clear.", "DUT replies with SUCCESS status code."),
         ]
 
         return steps
@@ -149,20 +147,17 @@ class TC_SETRF_2_3(MatterBaseTest, CommodityTariffTestBaseHelper):
         await self.check_test_event_triggers_enabled()
 
         self.step("3")
-        await self.send_test_event_trigger_clear()
-
-        self.step("4")
         # TH reads TariffInfo attribute, expects a Null
         val = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffInfo
         )
         asserts.assert_true(val is NullValue, "TariffInfo attribute must return a Null")
 
-        self.step("5")
+        self.step("4")
         # TH sends TestEventTrigger to propagate fake test data to the attributes
         await self.send_test_event_trigger_for_fake_data()
 
-        self.step("6")
+        self.step("5")
         # TH reads TariffInfo attribute, expects a TariffInformationStruct
         # TariffLabel is equal to "Full Tariff One"
         val: cluster.Structs.TariffInformationStruct = await self.read_single_attribute_check_success(
@@ -172,7 +167,7 @@ class TC_SETRF_2_3(MatterBaseTest, CommodityTariffTestBaseHelper):
             val, cluster.Structs.TariffInformationStruct), "val must be of type TariffInformationStruct")
         asserts.assert_equal(val.tariffLabel, "Full Tariff One", "TariffLabel field must be equal to 'Full Tariff One'")
 
-        self.step("7")
+        self.step("6")
         # TH reads DayEntries attribute, expects a list of DayEntryStruct
         # Verify that the list length is equal to 5
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayEntries)
@@ -183,7 +178,7 @@ class TC_SETRF_2_3(MatterBaseTest, CommodityTariffTestBaseHelper):
             for item in val:
                 await self.checkDayEntryStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
-        self.step("8")
+        self.step("7")
         # TH reads DayPatterns attribute, expects a list of DayPatternStruct
         # Verify that the list length is equal to 3
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayPatterns)
@@ -194,7 +189,7 @@ class TC_SETRF_2_3(MatterBaseTest, CommodityTariffTestBaseHelper):
             for item in val:
                 await self.checkDayPatternStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
-        self.step("9")
+        self.step("8")
         # TH reads CalendarPeriods attribute, expects a list of CalendarPeriodStruct
         # Verify that the list length is equal to 1
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CalendarPeriods)
@@ -205,7 +200,7 @@ class TC_SETRF_2_3(MatterBaseTest, CommodityTariffTestBaseHelper):
             for item in val:
                 await self.checkCalendarPeriodStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
-        self.step("10")
+        self.step("9")
         # TH reads IndividualDays attribute, expects a list of DayStruct
         # Verify that the list length is equal to 1
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.IndividualDays)
@@ -216,7 +211,7 @@ class TC_SETRF_2_3(MatterBaseTest, CommodityTariffTestBaseHelper):
             for item in val:
                 await self.checkDayStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
-        self.step("11")
+        self.step("10")
         # TH reads TariffComponents attribute, expects a list of TariffComponentStruct
         # Verify that the list length is equal to 2
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffComponents)
@@ -227,7 +222,7 @@ class TC_SETRF_2_3(MatterBaseTest, CommodityTariffTestBaseHelper):
             for item in val:
                 await self.checkTariffComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
-        self.step("12")
+        self.step("11")
         # TH reads TariffPeriods attribute, expects a list of TariffPeriodStruct
         # Verify that the list length is equal to 4
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffPeriods)
@@ -238,11 +233,11 @@ class TC_SETRF_2_3(MatterBaseTest, CommodityTariffTestBaseHelper):
             for item in val:
                 await self.checkTariffPeriodStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
-        self.step("13")
+        self.step("12")
         # TH sends TestEventTrigger to change fake test data sample
         await self.send_test_event_trigger_for_fake_data()
 
-        self.step("14")
+        self.step("13")
         # TH reads TariffInfo attribute, expects a TariffInformationStruct
         # TariffLabel is equal to "Full Tariff Two"
         val: cluster.Structs.TariffInformationStruct = await self.read_single_attribute_check_success(
@@ -252,7 +247,7 @@ class TC_SETRF_2_3(MatterBaseTest, CommodityTariffTestBaseHelper):
             val, cluster.Structs.TariffInformationStruct), "val must be of type TariffInformationStruct")
         asserts.assert_equal(val.tariffLabel, "Full Tariff Two", "TariffLabel field must be equal to 'Full Tariff Two'")
 
-        self.step("15")
+        self.step("14")
         # TH reads DayEntries attribute, expects a list of DayEntryStruct
         # Verify that the list length is equal to 4
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayEntries)
@@ -263,7 +258,7 @@ class TC_SETRF_2_3(MatterBaseTest, CommodityTariffTestBaseHelper):
             for item in val:
                 await self.checkDayEntryStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
-        self.step("16")
+        self.step("15")
         # TH reads DayPatterns attribute, expects a list of DayPatternStruct
         # Verify that the list length is equal to 2
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.DayPatterns)
@@ -274,7 +269,7 @@ class TC_SETRF_2_3(MatterBaseTest, CommodityTariffTestBaseHelper):
             for item in val:
                 await self.checkDayPatternStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
-        self.step("17")
+        self.step("16")
         # TH reads CalendarPeriods attribute, expects a list of CalendarPeriodStruct
         # Verify that the list length is equal to 1
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CalendarPeriods)
@@ -285,7 +280,7 @@ class TC_SETRF_2_3(MatterBaseTest, CommodityTariffTestBaseHelper):
             for item in val:
                 await self.checkCalendarPeriodStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
-        self.step("18")
+        self.step("17")
         # TH reads IndividualDays attribute, expects a list of DayStruct
         # Verify that the list length is equal to 1
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.IndividualDays)
@@ -296,7 +291,7 @@ class TC_SETRF_2_3(MatterBaseTest, CommodityTariffTestBaseHelper):
             for item in val:
                 await self.checkDayStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
-        self.step("19")
+        self.step("18")
         # TH reads TariffComponents attribute, expects a list of TariffComponentStruct
         # Verify that the list length is equal to 3
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffComponents)
@@ -307,7 +302,7 @@ class TC_SETRF_2_3(MatterBaseTest, CommodityTariffTestBaseHelper):
             for item in val:
                 await self.checkTariffComponentStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
-        self.step("20")
+        self.step("19")
         # TH reads TariffPeriods attribute, expects a list of TariffPeriodStruct
         # Verify that the list length is equal to 3
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffPeriods)
@@ -318,7 +313,7 @@ class TC_SETRF_2_3(MatterBaseTest, CommodityTariffTestBaseHelper):
             for item in val:
                 await self.checkTariffPeriodStruct(endpoint=endpoint, cluster=cluster, struct=item)
 
-        self.step("21")
+        self.step("20")
         # TH resets cluster state to defaults
         self.send_test_event_trigger_clear()
 

@@ -74,48 +74,46 @@ class TC_SETRF_2_4(MatterBaseTest, CommodityTariffTestBaseHelper):
             TestStep("1", "Commissioning, already done", test_plan_support.commission_if_required(), is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
                      "TestEventTriggersEnabled is True"),
-            TestStep("3", "TH sends TestEventTrigger command for Test Event Clear.",
+            TestStep("3", "TH sends TestEventTrigger command for Test Event Fake Tariff Set.",
                      "DUT replies with SUCCESS status code."),
-            TestStep("4", "TH sends TestEventTrigger command for Test Event Fake Tariff Set.",
-                     "DUT replies with SUCCESS status code."),
-            TestStep("5", "TH reads TariffInfo attribute.", "DUT replies a value of TariffInformationStruct type."),
-            TestStep("6", "TH reads CurrentDay attribute and save it as Current_day.", """
+            TestStep("4", "TH reads TariffInfo attribute.", "DUT replies a value of TariffInformationStruct type."),
+            TestStep("5", "TH reads CurrentDay attribute and save it as Current_day.", """
                      - DUT replies a value of DayStruct type;
                      - Values is saved in Current_day."""),
-            TestStep("7", "TH reads NextDay attribute and save it as Next_day.", """
+            TestStep("6", "TH reads NextDay attribute and save it as Next_day.", """
                      - DUT replies a value of DayStruct type;
                      - Values is saved in Next_day;
                      - Verify that the Current_day is not equal to Next_day."""),
-            TestStep("8", "TH sends TestEventTrigger command for Test Event Change Day.",
+            TestStep("7", "TH sends TestEventTrigger command for Test Event Change Day.",
                      "DUT replies with SUCCESS status code."),
-            TestStep("9", "TH reads CurrentDay attribute." """
+            TestStep("8", "TH reads CurrentDay attribute." """
                      - DUT replies a value of DayStruct type;
                      - Verify that Current_day is equal to Next_day."""),
-            TestStep("10", "TH reads CurrentDayEntry attribute and save it as Current_day_entry.", """
+            TestStep("9", "TH reads CurrentDayEntry attribute and save it as Current_day_entry.", """
                      - DUT replies a value of DayEntryStruct type;
                      - Values is saved in Current_day_entry."""),
-            TestStep("11", "TH reads NextDayEntry attribute and save it as Next_day_entry.", """
+            TestStep("10", "TH reads NextDayEntry attribute and save it as Next_day_entry.", """
                      - DUT replies a value of DayEntryStruct type;
                      - Values is saved in Next_day_entry;
                      - Verify that the Current_day_entry is not equal to Next_day_entry."""),
-            TestStep("12", "TH sends TestEventTrigger command for Test Event Change Time.",
+            TestStep("11", "TH sends TestEventTrigger command for Test Event Change Time.",
                      "DUT replies with SUCCESS status code."),
-            TestStep("13", "TH reads CurrentDayEntry attribute.", """
+            TestStep("12", "TH reads CurrentDayEntry attribute.", """
                      - DUT replies a value of DayEntryStruct type;
                      - Verify that Current_day_entry is equal to Next_day_entry."""),
-            TestStep("14", "TH reads CurrentTariffComponents attribute and save it as current_tariff_component.", """
+            TestStep("13", "TH reads CurrentTariffComponents attribute and save it as current_tariff_component.", """
                      - DUT replies a value that is a list of TariffComponentStruct entries;
                      - Values is saved in current_tariff_component."""),
-            TestStep("15", "TH reads NextTariffComponents attribute and save it as next_tariff_component.", """
+            TestStep("14", "TH reads NextTariffComponents attribute and save it as next_tariff_component.", """
                      - DUT replies a value that is a list of TariffComponentStruct entries;
                      - Values is saved in next_tariff_component;
                      - Verify that the current_tariff_component is not equal to next_tariff_component."""),
-            TestStep("16", "TH sends TestEventTrigger command for Test Event Change Time.", """
+            TestStep("15", "TH sends TestEventTrigger command for Test Event Change Time.", """
                      - DUT replies with SUCCESS status code;"""),
-            TestStep("17", "TH reads CurrentTariffComponents attribute.", """
+            TestStep("16", "TH reads CurrentTariffComponents attribute.", """
                      - DUT replies a value that is a list of TariffComponentStruct entries;
                      - Verify that current_tariff_component is equal to next_tariff_component."""),
-            TestStep("18", "TH sends TestEventTrigger command for Test Event Clear.", """
+            TestStep("17", "TH sends TestEventTrigger command for Test Event Clear.", """
                      - DUT replies with SUCCESS status code;"""),
         ]
 
@@ -139,14 +137,10 @@ class TC_SETRF_2_4(MatterBaseTest, CommodityTariffTestBaseHelper):
         await self.check_test_event_triggers_enabled()
 
         self.step("3")
-        # TH sends TestEventTrigger command for Test Event Clear
-        await self.send_test_event_trigger_clear()
-
-        self.step("4")
         # TH sends TestEventTrigger command for Test Event Fake Tariff Set
         await self.send_test_event_trigger_for_fake_data()
 
-        self.step("5")
+        self.step("4")
         # TH reads TariffInfo attribute, expects a TariffInformationStruct
         val: cluster.Structs.TariffInformationStruct = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.TariffInfo
@@ -154,61 +148,61 @@ class TC_SETRF_2_4(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_is_instance(val, cluster.Structs.TariffInformationStruct,
                                    "TariffInfo attribute must return a TariffInformationStruct")
 
-        self.step("6")
+        self.step("5")
         # TH reads CurrentDay attribute and save it as Current_day
         current_day = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDay
         )
 
-        self.step("7")
+        self.step("6")
         # TH reads NextDay attribute and save it as Next_day
         next_day = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDay
         )
         asserts.assert_not_equal(current_day, next_day, "CurrentDay and NextDay attributes must be different")
 
-        self.step("8")
+        self.step("7")
         # TH sends TestEventTrigger command for Test Event Change Day
         await self.send_test_event_trigger_change_day()
 
-        self.step("9")
+        self.step("8")
         # TH reads CurrentDay attribute, current_day must be equal to next_day
         current_day = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDay
         )
         asserts.assert_equal(current_day, next_day, "CurrentDay and NextDay attributes must be the same")
 
-        self.step("10")
+        self.step("9")
         # TH reads CurrentDayEntry attribute and save it as Current_day_entry
         current_day_entry = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDayEntry
         )
 
-        self.step("11")
+        self.step("10")
         # TH reads NextDayEntry attribute and save it as Next_day_entry
         next_day_entry = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDayEntry
         )
         asserts.assert_not_equal(current_day_entry, next_day_entry, "CurrentDayEntry and NextDayEntry attributes must be different")
 
-        self.step("12")
+        self.step("11")
         # TH sends TestEventTrigger command for Test Event Change Time
         await self.send_test_event_trigger_change_time()
 
-        self.step("13")
+        self.step("12")
         # TH reads CurrentDayEntry attribute, current_day_entry must be equal to next_day_entry
         current_day_entry = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentDayEntry
         )
         asserts.assert_equal(current_day_entry, next_day_entry, "CurrentDayEntry and NextDayEntry attributes must be the same")
 
-        self.step("14")
+        self.step("13")
         # TH reads CurrentTariffComponents attribute and save it as current_tariff_component
         current_tariff_component = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentTariffComponents
         )
 
-        self.step("15")
+        self.step("14")
         # TH reads NextTariffComponents attribute and save it as next_tariff_component
         next_tariff_component = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextTariffComponents
@@ -216,11 +210,11 @@ class TC_SETRF_2_4(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_not_equal(current_tariff_component, next_tariff_component,
                                  "CurrentTariffComponents and NextTariffComponents attributes must be different")
 
-        self.step("16")
+        self.step("15")
         # TH sends TestEventTrigger command for Test Event Change Time
         await self.send_test_event_trigger_change_time()
 
-        self.step("17")
+        self.step("16")
         # TH reads CurrentTariffComponents attribute, current_tariff_component must be equal to next_tariff_component
         current_tariff_component = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentTariffComponents
@@ -228,7 +222,7 @@ class TC_SETRF_2_4(MatterBaseTest, CommodityTariffTestBaseHelper):
         asserts.assert_equal(current_tariff_component, next_tariff_component,
                              "CurrentTariffComponents and NextTariffComponents attributes must be the same")
 
-        self.step("18")
+        self.step("17")
         # TH sends TestEventTrigger command for Test Event Clear
         await self.send_test_event_trigger_clear()
 

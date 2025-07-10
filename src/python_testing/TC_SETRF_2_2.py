@@ -77,15 +77,13 @@ class TC_SETRF_2_2(MatterBaseTest, CommodityTariffTestBaseHelper):
             TestStep("1", "Commissioning, already done", test_plan_support.commission_if_required(), is_commissioning=True),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "TestEventTriggersEnabled is True"),
-            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster for Test Event Clear",
+            TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster for Fake Tariff Set Test Event",
                      "DUT replies with SUCCESS status code."),
-            TestStep("4", "TH sends TestEventTrigger command to General Diagnostics Cluster for Fake Tariff Set Test Event",
-                     "DUT replies with SUCCESS status code."),
-            TestStep("5", "TH sends command GetTariffComponent command with TariffComponentID field set to 0."),
-            TestStep("6", "TH sends command GetTariffComponent command with TariffComponentID field set to 100."),
-            TestStep("7", "TH sends command GetDayEntry command with DayEntryID field set to 0."),
-            TestStep("8", "TH sends command GetDayEntry command with DayEntryID field set to 100."),
-            TestStep("9", "TH sends TestEventTrigger command to General Diagnostics Cluster for Test Event Clear",
+            TestStep("4", "TH sends command GetTariffComponent command with TariffComponentID field set to 0."),
+            TestStep("5", "TH sends command GetTariffComponent command with TariffComponentID field set to 100."),
+            TestStep("6", "TH sends command GetDayEntry command with DayEntryID field set to 0."),
+            TestStep("7", "TH sends command GetDayEntry command with DayEntryID field set to 100."),
+            TestStep("8", "TH sends TestEventTrigger command to General Diagnostics Cluster for Test Event Clear",
                      "DUT replies with SUCCESS status code."),
         ]
 
@@ -109,15 +107,11 @@ class TC_SETRF_2_2(MatterBaseTest, CommodityTariffTestBaseHelper):
         await self.check_test_event_triggers_enabled()
 
         self.step("3")
-        # TH sends TestEventTrigger command to General Diagnostics Cluster for Test Event Clear, expects a SUCCESS status code
-        await self.send_test_event_trigger_clear()
-
-        self.step("4")
         # TH sends TestEventTrigger command to General Diagnostics Cluster for Fake Tariff Set Test Event, expects a SUCCESS
         # status code
         await self.send_test_event_trigger_for_fake_data()
 
-        self.step("5")
+        self.step("4")
         # TH sends command GetTariffComponent command with TariffComponentID field set to 0
         # TH awaits a GetTariffComponentResponse
         # TH checks Label, DayEntryIDs and TariffComponent fields
@@ -135,7 +129,7 @@ class TC_SETRF_2_2(MatterBaseTest, CommodityTariffTestBaseHelper):
                                    "TariffComponent must be a TariffComponentStruct.")
         await self.checkTariffComponentStruct(endpoint=endpoint, cluster=cluster, struct=result.tariffComponent)
 
-        self.step("6")
+        self.step("5")
         # TH sends command GetTariffComponent command with TariffComponentID field set to 100, expects NOT_FOUND status code
         try:
             command = Clusters.CommodityTariff.Commands.GetTariffComponent(
@@ -147,7 +141,7 @@ class TC_SETRF_2_2(MatterBaseTest, CommodityTariffTestBaseHelper):
                 err.status, Status.NotFound, "Unexpected error returned"
             )
 
-        self.step("7")
+        self.step("6")
         # TH sends command GetDayEntry command with DayEntryID field set to 0, TH awaits a GetDayEntryResponse
         # TH checks DayEntry field
         command = Clusters.CommodityTariff.Commands.GetDayEntry(dayEntryID=10)
@@ -158,7 +152,7 @@ class TC_SETRF_2_2(MatterBaseTest, CommodityTariffTestBaseHelper):
                                    "DayEntry must be a DayEntryStruct.")
         await self.checkDayEntryStruct(endpoint=endpoint, cluster=cluster, struct=result.dayEntry)
 
-        self.step("8")
+        self.step("7")
         # TH sends command GetDayEntry command with DayEntryID field set to 100, expects NOT_FOUND status code
         try:
             command = Clusters.CommodityTariff.Commands.GetDayEntry(dayEntryID=100)
@@ -169,7 +163,7 @@ class TC_SETRF_2_2(MatterBaseTest, CommodityTariffTestBaseHelper):
                 err.status, Status.NotFound, "Unexpected error returned"
             )
 
-        self.step("9")
+        self.step("8")
         # TH sends TestEventTrigger command to General Diagnostics Cluster for Test Event Clear, expects a SUCCESS status code
         await self.send_test_event_trigger_clear()
 

@@ -217,10 +217,14 @@ class CommodityTariffTestBaseHelper:
         if struct.providerName is not NullValue:
             matter_asserts.assert_is_string(struct.providerName, "ProviderName must be a string")
             asserts.assert_less_equal(len(struct.providerName), 128, "ProviderName must have length at most 128!")
-        if struct.currency is not NullValue:
-            asserts.assert_true(isinstance(
-                struct.currency, Globals.Structs.CurrencyStruct), "struct.currency must be of type CurrencyStruct")
-            await self.checkCurrencyStruct(endpoint=endpoint, cluster=cluster, struct=struct.currency)
+        if self.check_pics("SETRF.S.F00"):
+            asserts.assert_true(struct.currency is not None, "Currency must have real value or can be Null")
+            if struct.currency is not NullValue:
+                asserts.assert_true(isinstance(
+                    struct.currency, Globals.Structs.CurrencyStruct), "struct.currency must be of type CurrencyStruct")
+                await self.checkCurrencyStruct(endpoint=endpoint, cluster=cluster, struct=struct.currency)
+        else:
+            asserts.assert_is_none(struct.currency, "Currency must be None")
         if struct.blockMode is not NullValue:
             matter_asserts.assert_valid_enum(
                 struct.blockMode, "BlockMode attribute must return a BlockModeEnum", cluster.Enums.BlockModeEnum)
