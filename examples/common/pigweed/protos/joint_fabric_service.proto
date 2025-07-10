@@ -24,7 +24,22 @@ message OwnershipContext {
   bytes trustedIcacPublicKeyB = 3; // see spec., JCM steps
 }
 
+message ICACCSROptions {
+  uint64 anchor_fabric_id = 1;
+}
+
+message ICACCSR {
+  bytes csr = 1;
+}
+
 service JointFabric {
   /* JFC executes the commissioner role and JFA the administrator steps */
   rpc TransferOwnership(OwnershipContext) returns (pw.protobuf.Empty) {}
+
+  // Server streaming: JFC initiates, JFA is RPC Server-Streaming
+  rpc GetICACCSR(pw.protobuf.Empty) returns (stream ICACCSROptions);
+
+  // JFC replies with the ICACCSR each time JFA requests it
+  // (JFA uses the above ICACCSROptions stream for requests)
+  rpc ReplyWithICACCSR(ICACCSR) returns (pw.protobuf.Empty);
 }

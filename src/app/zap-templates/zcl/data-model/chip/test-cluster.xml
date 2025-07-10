@@ -259,6 +259,12 @@ limitations under the License.
     <!-- This attribute should not be enabled on the server side -->
     <attribute side="server" code="0x00FF" define="UNSUPPORTED" type="boolean" writable="true" optional="true">unsupported</attribute>
 
+    <!-- WARNING: This attribute should not be enabled on the server side. It will return an UNSUPPORTED_ATTRIBUTE if we attempt to Access it while having Admin Privileges -->
+    <attribute side="server" code="0x00FE" name="UnsupportedAttributeRequiringAdminPrivilege" define="UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_PRIVILEGE" type="boolean" writable="true" optional="true">
+     <access op="read" privilege="administer"/>
+     <access op="write" privilege="administer"/>
+    </attribute>
+
     <!-- Test Commands -->
     <command source="client" code="0x00" name="Test" optional="false">
       <description>

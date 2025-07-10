@@ -6214,6 +6214,12 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters
                                         MarkAttributeDirty markDirty);
 } // namespace GlobalEnum
 
+namespace UnsupportedAttributeRequiringAdminPrivilege {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace UnsupportedAttributeRequiringAdminPrivilege
+
 namespace Unsupported {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
 Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);

@@ -15151,6 +15151,13 @@ class ChipClusters:
                 "reportable": True,
                 "writable": True,
             },
+            0x000000FE: {
+                "attributeName": "UnsupportedAttributeRequiringAdminPrivilege",
+                "attributeId": 0x000000FE,
+                "type": "bool",
+                "reportable": True,
+                "writable": True,
+            },
             0x000000FF: {
                 "attributeName": "Unsupported",
                 "attributeId": 0x000000FF,

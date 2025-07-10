@@ -299,6 +299,8 @@ def target_for_name(name: str):
     if (name.startswith("Test_TC_DEM_") or name.startswith("Test_TC_DEMM_") or
             name.startswith("Test_TC_EEVSE_") or name.startswith("Test_TC_EEVSEM_")):
         return TestTarget.ENERGY_MANAGEMENT
+    if name.startswith("Test_TC_CLCTRL_") or name.startswith("Test_TC_CLDIM_"):
+        return TestTarget.CLOSURE
     return TestTarget.ALL_CLUSTERS
 
 

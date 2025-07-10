@@ -13,6 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# py_matter_idl may not be installed in the pigweed venv.
+# Reference it directly from the source tree.
+from python_path import PythonPath
+
+with PythonPath('py_matter_idl', relative_to=__file__):
+    from matter.idl.generators.path_resolution import expand_path_for_idl
+    from matter.idl.generators.registry import GENERATORS, CodeGenerator
+    from matter.idl.generators.storage import FileSystemGeneratorStorage, GeneratorStorage
+    from matter.idl.matter_idl_parser import CreateParser
+
 import logging
 import sys
 
@@ -23,11 +33,6 @@ try:
     _has_coloredlogs = True
 except ImportError:
     _has_coloredlogs = False
-
-from matter.idl.generators.path_resolution import expand_path_for_idl
-from matter.idl.generators.registry import GENERATORS, CodeGenerator
-from matter.idl.generators.storage import FileSystemGeneratorStorage, GeneratorStorage
-from matter.idl.matter_idl_parser import CreateParser
 
 
 class ListGeneratedFilesStorage(GeneratorStorage):

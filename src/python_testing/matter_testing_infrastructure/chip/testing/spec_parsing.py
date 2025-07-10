@@ -33,8 +33,8 @@ from chip.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TA
                                       ConformanceException, ConformanceParseParameters, feature, is_disallowed, mandatory, optional,
                                       or_operation, parse_callable_from_xml, parse_device_type_callable_from_xml)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.matter_testing import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
-                                         EventPathLocation, FeaturePathLocation, ProblemLocation, ProblemNotice, ProblemSeverity)
+from chip.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
+                                          EventPathLocation, FeaturePathLocation, ProblemLocation, ProblemNotice, ProblemSeverity)
 from chip.tlv import uint
 
 _PRIVILEGE_STR = {

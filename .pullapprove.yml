@@ -284,7 +284,8 @@ groups:
     type: required
     conditions:
       - "files.include('src/darwin/*').exclude('src/darwin/Framework/CHIP/zap-generated/*') or \
-        files.include('src/platform/Darwin/*')"
+        files.include('src/platform/Darwin/*') or \
+        files.include('examples/darwin-framework-tool/*')"
     reviewers:
       teams: [reviewers-apple]
     reviews:
@@ -308,7 +309,8 @@ groups:
               .exclude('examples/chef/*')\
               .exclude('integrations/cloudbuild/*')\
               .exclude('src/darwin/*')\
-              .exclude('src/platform/Darwin/*') or \
+              .exclude('src/platform/Darwin/*')\
+              .exclude('examples/darwin-framework-tool/*') or \
         files.include('src/darwin/Framework/CHIP/zap-generated/*')"
     requirements:
       - len(groups.approved.include('shared-reviewers-*')) >= 2
