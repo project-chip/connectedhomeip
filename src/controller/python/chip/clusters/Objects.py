@@ -31591,6 +31591,10 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="presets", Tag=0x00000050, Type=typing.Optional[typing.List[Thermostat.Structs.PresetStruct]]),
                 ClusterObjectFieldDescriptor(Label="schedules", Tag=0x00000051, Type=typing.Optional[typing.List[Thermostat.Structs.ScheduleStruct]]),
                 ClusterObjectFieldDescriptor(Label="setpointHoldExpiryTimestamp", Tag=0x00000052, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="maxThermostatSuggestions", Tag=0x00000053, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="thermostatSuggestions", Tag=0x00000054, Type=typing.Optional[typing.List[Thermostat.Structs.ThermostatSuggestionStruct]]),
+                ClusterObjectFieldDescriptor(Label="currentThermostatSuggestion", Tag=0x00000055, Type=typing.Union[None, Nullable, Thermostat.Structs.ThermostatSuggestionStruct]),
+                ClusterObjectFieldDescriptor(Label="thermostatSuggestionNotFollowingReason", Tag=0x00000056, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -31658,6 +31662,10 @@ class Thermostat(Cluster):
     presets: typing.Optional[typing.List[Thermostat.Structs.PresetStruct]] = None
     schedules: typing.Optional[typing.List[Thermostat.Structs.ScheduleStruct]] = None
     setpointHoldExpiryTimestamp: typing.Union[None, Nullable, uint] = None
+    maxThermostatSuggestions: typing.Optional[uint] = None
+    thermostatSuggestions: typing.Optional[typing.List[Thermostat.Structs.ThermostatSuggestionStruct]] = None
+    currentThermostatSuggestion: typing.Union[None, Nullable, Thermostat.Structs.ThermostatSuggestionStruct] = None
+    thermostatSuggestionNotFollowingReason: typing.Union[None, Nullable, uint] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -31886,6 +31894,15 @@ class Thermostat(Cluster):
             kSupportsNames = 0x4
             kSupportsOff = 0x8
 
+        class ThermostatSuggestionNotFollowingReasonBitmap(IntFlag):
+            kDemandResponseEvent = 0x1
+            kOngoingHold = 0x2
+            kSchedule = 0x4
+            kOccupancy = 0x8
+            kVacationMode = 0x10
+            kTimeOfUseCostSavings = 0x20
+            kPreCoolingOrPreHeating = 0x40
+
     class Structs:
         @dataclass
         class ScheduleTransitionStruct(ClusterObject):
@@ -31979,6 +31996,23 @@ class Thermostat(Cluster):
             systemMode: 'Thermostat.Enums.SystemModeEnum' = 0
             numberOfSchedules: 'uint' = 0
             scheduleTypeFeatures: 'uint' = 0
+
+        @dataclass
+        class ThermostatSuggestionStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="uniqueID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="presetHandle", Tag=1, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="effectiveTime", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="expirationTime", Tag=3, Type=uint),
+                    ])
+
+            uniqueID: 'uint' = 0
+            presetHandle: 'bytes' = b""
+            effectiveTime: 'uint' = 0
+            expirationTime: 'uint' = 0
 
         @dataclass
         class WeeklyScheduleTransitionStruct(ClusterObject):
@@ -32077,6 +32111,22 @@ class Thermostat(Cluster):
             modeToReturn: uint = 0
 
         @dataclass
+        class AddThermostatSuggestionResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000201
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="uniqueID", Tag=0, Type=uint),
+                    ])
+
+            uniqueID: uint = 0
+
+        @dataclass
         class ClearWeeklySchedule(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000201
             command_id: typing.ClassVar[int] = 0x00000003
@@ -32120,6 +32170,42 @@ class Thermostat(Cluster):
                     ])
 
             presetHandle: typing.Union[Nullable, bytes] = NullValue
+
+        @dataclass
+        class AddThermostatSuggestion(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000201
+            command_id: typing.ClassVar[int] = 0x00000007
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'AddThermostatSuggestionResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="presetHandle", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="effectiveTime", Tag=1, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="expirationInMinutes", Tag=2, Type=uint),
+                    ])
+
+            presetHandle: bytes = b""
+            effectiveTime: typing.Union[Nullable, uint] = NullValue
+            expirationInMinutes: uint = 0
+
+        @dataclass
+        class RemoveThermostatSuggestion(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000201
+            command_id: typing.ClassVar[int] = 0x00000008
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="uniqueID", Tag=0, Type=uint),
+                    ])
+
+            uniqueID: uint = 0
 
         @dataclass
         class AtomicResponse(ClusterCommand):
@@ -33115,6 +33201,70 @@ class Thermostat(Cluster):
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
                 return 0x00000052
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: typing.Union[None, Nullable, uint] = None
+
+        @dataclass
+        class MaxThermostatSuggestions(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000053
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
+
+        @dataclass
+        class ThermostatSuggestions(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000054
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[Thermostat.Structs.ThermostatSuggestionStruct]])
+
+            value: typing.Optional[typing.List[Thermostat.Structs.ThermostatSuggestionStruct]] = None
+
+        @dataclass
+        class CurrentThermostatSuggestion(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000055
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, Thermostat.Structs.ThermostatSuggestionStruct])
+
+            value: typing.Union[None, Nullable, Thermostat.Structs.ThermostatSuggestionStruct] = None
+
+        @dataclass
+        class ThermostatSuggestionNotFollowingReason(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000056
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -52777,6 +52927,7 @@ class UnitTesting(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterErrorBoolean", Tag=0x00000032, Type=bool),
                 ClusterObjectFieldDescriptor(Label="globalEnum", Tag=0x00000033, Type=Globals.Enums.TestGlobalEnum),
                 ClusterObjectFieldDescriptor(Label="globalStruct", Tag=0x00000034, Type=Globals.Structs.TestGlobalStruct),
+                ClusterObjectFieldDescriptor(Label="unsupportedAttributeRequiringAdminPrivilege", Tag=0x000000FE, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="unsupported", Tag=0x000000FF, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="readFailureCode", Tag=0x00003000, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="failureInt32U", Tag=0x00003001, Type=typing.Optional[uint]),
@@ -52873,6 +53024,7 @@ class UnitTesting(Cluster):
     clusterErrorBoolean: bool = False
     globalEnum: Globals.Enums.TestGlobalEnum = 0
     globalStruct: Globals.Structs.TestGlobalStruct = field(default_factory=lambda: Globals.Structs.TestGlobalStruct())
+    unsupportedAttributeRequiringAdminPrivilege: typing.Optional[bool] = None
     unsupported: typing.Optional[bool] = None
     readFailureCode: typing.Optional[uint] = None
     failureInt32U: typing.Optional[uint] = None
@@ -54720,6 +54872,22 @@ class UnitTesting(Cluster):
                 return ClusterObjectFieldDescriptor(Type=Globals.Structs.TestGlobalStruct)
 
             value: Globals.Structs.TestGlobalStruct = field(default_factory=lambda: Globals.Structs.TestGlobalStruct())
+
+        @dataclass
+        class UnsupportedAttributeRequiringAdminPrivilege(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0xFFF1FC05
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x000000FE
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: typing.Optional[bool] = None
 
         @dataclass
         class Unsupported(ClusterAttributeDescriptor):

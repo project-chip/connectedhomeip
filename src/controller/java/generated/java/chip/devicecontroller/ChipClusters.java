@@ -37514,6 +37514,10 @@ public class ChipClusters {
     private static final long PRESETS_ATTRIBUTE_ID = 80L;
     private static final long SCHEDULES_ATTRIBUTE_ID = 81L;
     private static final long SETPOINT_HOLD_EXPIRY_TIMESTAMP_ATTRIBUTE_ID = 82L;
+    private static final long MAX_THERMOSTAT_SUGGESTIONS_ATTRIBUTE_ID = 83L;
+    private static final long THERMOSTAT_SUGGESTIONS_ATTRIBUTE_ID = 84L;
+    private static final long CURRENT_THERMOSTAT_SUGGESTION_ATTRIBUTE_ID = 85L;
+    private static final long THERMOSTAT_SUGGESTION_NOT_FOLLOWING_REASON_ATTRIBUTE_ID = 86L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -37697,6 +37701,64 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
+    public void addThermostatSuggestion(AddThermostatSuggestionResponseCallback callback, byte[] presetHandle, @Nullable Long effectiveTime, Integer expirationInMinutes) {
+      addThermostatSuggestion(callback, presetHandle, effectiveTime, expirationInMinutes, 0);
+    }
+
+    public void addThermostatSuggestion(AddThermostatSuggestionResponseCallback callback, byte[] presetHandle, @Nullable Long effectiveTime, Integer expirationInMinutes, int timedInvokeTimeoutMs) {
+      final long commandId = 7L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long presetHandleFieldID = 0L;
+      BaseTLVType presetHandletlvValue = new ByteArrayType(presetHandle);
+      elements.add(new StructElement(presetHandleFieldID, presetHandletlvValue));
+
+      final long effectiveTimeFieldID = 1L;
+      BaseTLVType effectiveTimetlvValue = effectiveTime != null ? new UIntType(effectiveTime) : new NullType();
+      elements.add(new StructElement(effectiveTimeFieldID, effectiveTimetlvValue));
+
+      final long expirationInMinutesFieldID = 2L;
+      BaseTLVType expirationInMinutestlvValue = new UIntType(expirationInMinutes);
+      elements.add(new StructElement(expirationInMinutesFieldID, expirationInMinutestlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          final long uniqueIDFieldID = 0L;
+          Integer uniqueID = null;
+          for (StructElement element: invokeStructValue.value()) {
+            if (element.contextTagNum() == uniqueIDFieldID) {
+              if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
+                UIntType castingValue = element.value(UIntType.class);
+                uniqueID = castingValue.value(Integer.class);
+              }
+            }
+          }
+          callback.onSuccess(uniqueID);
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
+    public void removeThermostatSuggestion(DefaultClusterCallback callback, Integer uniqueID) {
+      removeThermostatSuggestion(callback, uniqueID, 0);
+    }
+
+    public void removeThermostatSuggestion(DefaultClusterCallback callback, Integer uniqueID, int timedInvokeTimeoutMs) {
+      final long commandId = 8L;
+
+      ArrayList<StructElement> elements = new ArrayList<>();
+      final long uniqueIDFieldID = 0L;
+      BaseTLVType uniqueIDtlvValue = new UIntType(uniqueID);
+      elements.add(new StructElement(uniqueIDFieldID, uniqueIDtlvValue));
+
+      StructType commandArgs = new StructType(elements);
+      invoke(new InvokeCallbackImpl(callback) {
+          @Override
+          public void onResponse(StructType invokeStructValue) {
+          callback.onSuccess();
+        }}, commandId, commandArgs, timedInvokeTimeoutMs);
+    }
+
     public void atomicRequest(AtomicResponseCallback callback, Integer requestType, ArrayList<Long> attributeRequests, Optional<Integer> timeout) {
       atomicRequest(callback, requestType, attributeRequests, timeout, 0);
     }
@@ -37751,6 +37813,10 @@ public class ChipClusters {
 
     public interface GetWeeklyScheduleResponseCallback extends BaseClusterCallback {
       void onSuccess(Integer numberOfTransitionsForSequence, Integer dayOfWeekForSequence, Integer modeForSequence, ArrayList<ChipStructs.ThermostatClusterWeeklyScheduleTransitionStruct> transitions);
+    }
+
+    public interface AddThermostatSuggestionResponseCallback extends BaseClusterCallback {
+      void onSuccess(Integer uniqueID);
     }
 
     public interface AtomicResponseCallback extends BaseClusterCallback {
@@ -37831,6 +37897,18 @@ public class ChipClusters {
 
     public interface SetpointHoldExpiryTimestampAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Long value);
+    }
+
+    public interface ThermostatSuggestionsAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(List<ChipStructs.ThermostatClusterThermostatSuggestionStruct> value);
+    }
+
+    public interface CurrentThermostatSuggestionAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable ChipStructs.ThermostatClusterThermostatSuggestionStruct value);
+    }
+
+    public interface ThermostatSuggestionNotFollowingReasonAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable Integer value);
     }
 
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
@@ -39664,6 +39742,110 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, SETPOINT_HOLD_EXPIRY_TIMESTAMP_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMaxThermostatSuggestionsAttribute(
+        IntegerAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_THERMOSTAT_SUGGESTIONS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAX_THERMOSTAT_SUGGESTIONS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeMaxThermostatSuggestionsAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAX_THERMOSTAT_SUGGESTIONS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAX_THERMOSTAT_SUGGESTIONS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readThermostatSuggestionsAttribute(
+        ThermostatSuggestionsAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, THERMOSTAT_SUGGESTIONS_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.ThermostatClusterThermostatSuggestionStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, THERMOSTAT_SUGGESTIONS_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeThermostatSuggestionsAttribute(
+        ThermostatSuggestionsAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, THERMOSTAT_SUGGESTIONS_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            List<ChipStructs.ThermostatClusterThermostatSuggestionStruct> value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, THERMOSTAT_SUGGESTIONS_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readCurrentThermostatSuggestionAttribute(
+        CurrentThermostatSuggestionAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_THERMOSTAT_SUGGESTION_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable ChipStructs.ThermostatClusterThermostatSuggestionStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CURRENT_THERMOSTAT_SUGGESTION_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeCurrentThermostatSuggestionAttribute(
+        CurrentThermostatSuggestionAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, CURRENT_THERMOSTAT_SUGGESTION_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable ChipStructs.ThermostatClusterThermostatSuggestionStruct value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, CURRENT_THERMOSTAT_SUGGESTION_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readThermostatSuggestionNotFollowingReasonAttribute(
+        ThermostatSuggestionNotFollowingReasonAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, THERMOSTAT_SUGGESTION_NOT_FOLLOWING_REASON_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, THERMOSTAT_SUGGESTION_NOT_FOLLOWING_REASON_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeThermostatSuggestionNotFollowingReasonAttribute(
+        ThermostatSuggestionNotFollowingReasonAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, THERMOSTAT_SUGGESTION_NOT_FOLLOWING_REASON_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, THERMOSTAT_SUGGESTION_NOT_FOLLOWING_REASON_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
@@ -65527,6 +65709,7 @@ public class ChipClusters {
     private static final long CLUSTER_ERROR_BOOLEAN_ATTRIBUTE_ID = 50L;
     private static final long GLOBAL_ENUM_ATTRIBUTE_ID = 51L;
     private static final long GLOBAL_STRUCT_ATTRIBUTE_ID = 52L;
+    private static final long UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_PRIVILEGE_ATTRIBUTE_ID = 254L;
     private static final long UNSUPPORTED_ATTRIBUTE_ID = 255L;
     private static final long READ_FAILURE_CODE_ATTRIBUTE_ID = 12288L;
     private static final long FAILURE_INT32_U_ATTRIBUTE_ID = 12289L;
@@ -68661,6 +68844,41 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, GLOBAL_STRUCT_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readUnsupportedAttributeRequiringAdminPrivilegeAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_PRIVILEGE_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_PRIVILEGE_ATTRIBUTE_ID, true);
+    }
+
+    public void writeUnsupportedAttributeRequiringAdminPrivilegeAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeUnsupportedAttributeRequiringAdminPrivilegeAttribute(callback, value, 0);
+    }
+
+    public void writeUnsupportedAttributeRequiringAdminPrivilegeAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new BooleanType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_PRIVILEGE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeUnsupportedAttributeRequiringAdminPrivilegeAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_PRIVILEGE_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_PRIVILEGE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readUnsupportedAttribute(
