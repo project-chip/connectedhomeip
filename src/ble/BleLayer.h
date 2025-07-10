@@ -231,7 +231,7 @@ public:
         kState_NotInitialized = 0,
         kState_Initialized    = 1,
         kState_Disconnecting  = 2
-    } mState; ///< [READ-ONLY] external access is deprecated, use  () / IsBleClosing()
+    } mState; ///< [READ-ONLY] external access is deprecated, use  IsInitialized() / IsBleClosing()
 
     // This app state is not used by ble transport etc, it will be used by external ble implementation like Android
     void * mAppState                 = nullptr;
