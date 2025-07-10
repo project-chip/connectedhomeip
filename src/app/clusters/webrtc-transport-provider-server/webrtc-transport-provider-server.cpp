@@ -431,6 +431,9 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
 
     WebRTCSessionStruct outSession;
 
+    // Prepare delegate arguments for the session
+    Delegate::ProvideOfferRequestArgs args;
+
     // Validate the streamUsage field against the allowed enum values.
     if (req.streamUsage == StreamUsageEnum::kUnknownEnumValue)
     {
@@ -452,6 +455,9 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
 
         // Use the existing session for further processing (re-offer case).
         outSession = *existingSession;
+
+        // re-use the same session id for offer processing in delegate
+        args.sessionId = sessionId;
     }
     else
     {
@@ -540,57 +546,56 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
             return;
         }
 
-        // Prepare delegate arguments for new session
-        Delegate::ProvideOfferRequestArgs args;
-        args.sessionId             = GenerateSessionId();
-        args.streamUsage           = req.streamUsage;
-        args.videoStreamId         = videoStreamID;
-        args.audioStreamId         = audioStreamID;
-        args.peerNodeId            = peerNodeId;
-        args.fabricIndex           = peerFabricIndex;
-        args.sdp                   = std::string(req.sdp.data(), req.sdp.size());
-        args.originatingEndpointId = req.originatingEndpointID;
+        // Generate new sessiond id
+        args.sessionId = GenerateSessionId();
+    }
 
-        // Convert ICE servers list from DecodableList to vector.
-        if (req.ICEServers.HasValue())
+    args.streamUsage           = req.streamUsage;
+    args.videoStreamId         = videoStreamID;
+    args.audioStreamId         = audioStreamID;
+    args.peerNodeId            = peerNodeId;
+    args.fabricIndex           = peerFabricIndex;
+    args.sdp                   = std::string(req.sdp.data(), req.sdp.size());
+    args.originatingEndpointId = req.originatingEndpointID;
+
+    // Convert ICE servers list from DecodableList to vector.
+    if (req.ICEServers.HasValue())
+    {
+        std::vector<ICEServerDecodableStruct> localIceServers;
+
+        auto iter = req.ICEServers.Value().begin();
+        while (iter.Next())
         {
-            std::vector<ICEServerDecodableStruct> localIceServers;
-
-            auto iter = req.ICEServers.Value().begin();
-            while (iter.Next())
-            {
-                localIceServers.push_back(std::move(iter.GetValue()));
-            }
-
-            CHIP_ERROR listErr = iter.GetStatus();
-            if (listErr != CHIP_NO_ERROR)
-            {
-                ChipLogError(Zcl, "HandleProvideOffer: ICEServers list error: %" CHIP_ERROR_FORMAT, listErr.Format());
-                ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
-                return;
-            }
-
-            args.iceServers.SetValue(std::move(localIceServers));
+            localIceServers.push_back(std::move(iter.GetValue()));
         }
 
-        // Convert ICETransportPolicy from CharSpan to std::string.
-        if (req.ICETransportPolicy.HasValue())
+        CHIP_ERROR listErr = iter.GetStatus();
+        if (listErr != CHIP_NO_ERROR)
         {
-            args.iceTransportPolicy.SetValue(
-                std::string(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size()));
-        }
-
-        // Delegate processing: process the SDP offer, create session, increment reference counts.
-        auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleProvideOffer(args, outSession));
-        if (!delegateStatus.IsSuccess())
-        {
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);
+            ChipLogError(Zcl, "HandleProvideOffer: ICEServers list error: %" CHIP_ERROR_FORMAT, listErr.Format());
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
             return;
         }
 
-        // Store the new WebRTCSessionStruct in CurrentSessions.
-        UpsertSession(outSession);
+        args.iceServers.SetValue(std::move(localIceServers));
     }
+
+    // Convert ICETransportPolicy from CharSpan to std::string.
+    if (req.ICETransportPolicy.HasValue())
+    {
+        args.iceTransportPolicy.SetValue(std::string(req.ICETransportPolicy.Value().data(), req.ICETransportPolicy.Value().size()));
+    }
+
+    // Delegate processing: process the SDP offer, create session, increment reference counts.
+    auto delegateStatus = Protocols::InteractionModel::ClusterStatusCode(mDelegate.HandleProvideOffer(args, outSession));
+    if (!delegateStatus.IsSuccess())
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, delegateStatus);
+        return;
+    }
+
+    // Update/Insert the WebRTCSessionStruct in CurrentSessions.
+    UpsertSession(outSession);
 
     // Build and send the ProvideOfferResponse.
     Commands::ProvideOfferResponse::Type resp;
