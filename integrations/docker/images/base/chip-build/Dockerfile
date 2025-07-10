@@ -145,7 +145,7 @@ RUN set -x \
     && rm -rf bloaty \
     && : # last line
 
-# Code built with thread sanitizer can sometimes fail to run with an error messages
+# Code built with thread sanitizer can sometimes fail to run with an error message
 # similar to the following:
 # FATAL: ThreadSanitizer: unexpected memory mapping 0x7763c5472000-0x7763c5900000
 #
