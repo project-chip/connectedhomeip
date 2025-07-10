@@ -34,20 +34,12 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import copy
 import logging
 import random
 import asyncio
-from collections import namedtuple
-from datetime import datetime, timezone, timedelta
-# import typing
-# from controller.python.chip.clusters.Types import Nullable, NullValue
-# from controller.python.chip.tlv import float32, uint
+from datetime import datetime, timedelta
 
 import chip.clusters as Clusters
-from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
-from chip.clusters import Globals
-from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
@@ -61,14 +53,14 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
     # Command to send AddThermostatSuggestion command
     async def send_add_thermostat_suggestion_command(self,
-                                                    endpoint: int = None,
-                                                    preset_handle: bytes = None,
-                                                    effective_time: int = None,
-                                                    expiration_in_minutes: int = None,
-                                                    expected_status: Status = Status.Success):
+                                                     endpoint: int = None,
+                                                     preset_handle: bytes = None,
+                                                     effective_time: int = None,
+                                                     expiration_in_minutes: int = None,
+                                                     expected_status: Status = Status.Success):
         try:
             addThermostatSuggestionResponse = await self.send_single_cmd(cmd=cluster.Commands.AddThermostatSuggestion(preset_handle, effective_time, expiration_in_minutes),
-                                       endpoint=endpoint)
+                                                                         endpoint=endpoint)
             asserts.assert_equal(expected_status, Status.Success)
             return addThermostatSuggestionResponse
 
@@ -77,12 +69,12 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
     # Command to send RemoveThermostatSuggestion command
     async def send_remove_thermostat_suggestion_command(self,
-                                                    endpoint: int = None,
-                                                    uniqueID: int = None,
-                                                    expected_status: Status = Status.Success):
+                                                        endpoint: int = None,
+                                                        uniqueID: int = None,
+                                                        expected_status: Status = Status.Success):
         try:
             removeThermostatSuggestionResponse = await self.send_single_cmd(cmd=cluster.Commands.RemoveThermostatSuggestion(uniqueID),
-                                       endpoint=endpoint)
+                                                                            endpoint=endpoint)
             asserts.assert_equal(expected_status, Status.Success)
             return removeThermostatSuggestionResponse
 
@@ -155,34 +147,41 @@ class TC_TSTAT_4_3(MatterBaseTest):
             # Verify that the read returned a list of presets with count >=2.
             asserts.assert_greater_equal(len(supported_presets), 2)
 
-        self.step("3")
-        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
-            # TH reads the ActivePresetHandle attribute.
-            activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
-            logger.info(f"Active Preset Handlers: {activePresetHandle}")
+        # TODO Remove skipTimeSync once TimeSync details are ironed out in the test plan
+        skipTimeSync = True
+        if not skipTimeSync:
+            self.step("3")
+            if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
+                # TH reads the ActivePresetHandle attribute.
+                activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
+                logger.info(f"Active Preset Handlers: {activePresetHandle}")
 
-            # TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and the ExpirationInMinutes is set to 1 minute.
-            possiblePresetHandles = list(preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle)
-            if len(possiblePresetHandles) > 0:
-                preset_handle = possiblePresetHandles[0]
-                # Verify that the AddThermostatSuggestion command returns INVALID_IN_STATE.
-                currentUTC = datetime.now(datetime.timezone.utc)
-                await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
-                                                                            preset_handle=preset_handle,
-                                                                            effective_time=currentUTC,
-                                                                            expiration_in_minutes=1,
-                                                                            expected_status=Status.InvalidInState)
-            else:
-                logger.info(
-                    "Couldn't run test step 3 since all preset handles are also the ActivePresetHandle on this Thermostat")
+                # TH picks a preset handle from an entry in the SupportedPresets that does not match the ActivePresetHandle and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp and the ExpirationInMinutes is set to 1 minute.
+                possiblePresetHandles = list(preset.presetHandle for preset in supported_presets if preset.presetHandle != activePresetHandle)
+                if len(possiblePresetHandles) > 0:
+                    preset_handle = possiblePresetHandles[0]
+                    # Verify that the AddThermostatSuggestion command returns INVALID_IN_STATE.
+                    currentUTC = datetime.now(datetime.timezone.utc)
+                    await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
+                                                                                preset_handle=preset_handle,
+                                                                                effective_time=currentUTC,
+                                                                                expiration_in_minutes=1,
+                                                                                expected_status=Status.InvalidInState)
+                else:
+                    logger.info(
+                        "Couldn't run test step 3 since all preset handles are also the ActivePresetHandle on this Thermostat")
 
-        self.step("4")
-        # TH sends Time Synchronization command to DUT using a time source.
-        tts = Clusters.TimeSynchronization.Structs.FabricScopedTrustedTimeSourceStruct(nodeID=self.dut_node_id, endpoint=0)
-        await self.send_single_cmd(cmd=Clusters.TimeSynchronization.Commands.SetTrustedTimeSource(trustedTimeSource=tts), endpoint=endpoint)
-        # Verify that TH and DUT are now time synchronized.
-        # TODO Unsure how to validate this one. Read DUT through TimeSynchronization cluster and compare to datetime current time?
-
+            self.step("4")
+            if not skipTimeSync:
+                # TH sends Time Synchronization command to DUT using a time source.
+                tts = Clusters.TimeSynchronization.Structs.FabricScopedTrustedTimeSourceStruct(nodeID=self.dut_node_id, endpoint=0)
+                await self.send_single_cmd(cmd=Clusters.TimeSynchronization.Commands.SetTrustedTimeSource(trustedTimeSource=tts), endpoint=endpoint)
+                # Verify that TH and DUT are now time synchronized.
+                # TODO Unsure how to validate this one. Read DUT through TimeSynchronization cluster and compare to datetime current time?
+        else:
+            logger.info("TimeSync steps need to be ironed out, skipping for now.")
+            self.skip_step(3)
+            self.skip_step(4)
 
         self.step("5")
         if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
@@ -256,8 +255,8 @@ class TC_TSTAT_4_3(MatterBaseTest):
         self.step("7a")
         if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             # TH sets TemperatureSetpointHold to SetpointHoldOn and TemperatureSetpointHoldDuration to null. 
-            status_TemperatureSetpointHold = await self.write_single_attribute(attribute_value=cluster.Attributes.TemperatureSetpointHold(cluster.Thermostat.Enums.TemperatureSetpointHoldEnum.kSetpointHoldOn), endpoint_id=endpoint, expect_success=True)
-            status_TemperatureSetpointHoldDuration = await self.write_single_attribute(attribute_value=cluster.Attributes.TemperatureSetpointHoldDuration(None), endpoint_id=endpoint, expect_success=True)
+            await self.write_single_attribute(attribute_value=cluster.Attributes.TemperatureSetpointHold(cluster.Thermostat.Enums.TemperatureSetpointHoldEnum.kSetpointHoldOn), endpoint_id=endpoint, expect_success=True)
+            await self.write_single_attribute(attribute_value=cluster.Attributes.TemperatureSetpointHoldDuration(None), endpoint_id=endpoint, expect_success=True)
 
             # TH reads the ActivePresetHandle attribute.
             activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
@@ -397,7 +396,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
                 random_uniqueID = random.randint(0, 255)
             currentUTC = datetime.now(datetime.timezone.utc)
             # Verify that the RemoveThermostatSuggestion command returns NOT_FOUND.
-            response = await self.send_remove_thermostat_suggestion_command(endpoint=endpoint,
+            await self.send_remove_thermostat_suggestion_command(endpoint=endpoint,
                                                                             uniqueID=random_uniqueID,
                                                                             expected_status=Status.NotFound)
 
@@ -406,7 +405,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
         if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             print()
             # TH calls the RemoveThermostatSuggestion command with the UniqueID field set to the UniqueID field of then CurrentThermostatSuggestion attribute.
-            removeThermostatSuggestionResponse = await self.send_remove_thermostat_suggestion_command(endpoint=endpoint,
+            await self.send_remove_thermostat_suggestion_command(endpoint=endpoint,
                                                                             uniqueID=addThermostatSuggestionResponse_uniqueID,
                                                                             expected_status=Status.Success)
             # Verify that that RemoveThermostatSuggestion command returns SUCCESS, the entry with the relevant UniqueID is removed from the ThermostatSuggestions attribute and the CurrentThermostatSuggestion attribute is set to null.
@@ -465,7 +464,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
             try:
                 asserts.assert_equal(currentThermostatSuggestion.value.uniqueID, thermostatSuggestions[0].value.uniqueID, "UniqueID in the entry for CurrentThermostatSuggestion does not match the UniqueID entry from First AddThermostatSuggestionResponse.")
                 thermSuggestionIndex = 0
-            except InteractionModelError as e:
+            except AssertionError:
                 asserts.assert_equal(currentThermostatSuggestion.value.uniqueID, thermostatSuggestions[1].value.uniqueID, "UniqueID in the entry for CurrentThermostatSuggestion does not match the UniqueID entry from First or Second AddThermostatSuggestionResponse.")
                 thermSuggestionIndex = 1
 
