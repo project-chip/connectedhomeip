@@ -78,8 +78,6 @@ CHIP_ERROR ThermostatSuggestionStructWithOwnedMembers::SetPresetHandle(const Byt
     ReturnErrorOnFailure(CopySpanToMutableSpan(newPresetHandle, targetSpan));
     
     presetHandle = ByteSpan(targetSpan.data(), targetSpan.size());
-ChipLogProgress(Zcl, "ThermostatSuggestionStructWithOwnedMembers SetPresetHandle to");
-    ChipLogByteSpan(Zcl, presetHandle);
 
     return CHIP_NO_ERROR;
 }

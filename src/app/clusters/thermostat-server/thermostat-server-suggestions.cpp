@@ -73,10 +73,10 @@ bool emberAfThermostatClusterAddThermostatSuggestionCallback(CommandHandler * co
     }
 
     // If the effective time in UTC is greater than current time in UTC plus 24 hours, return INVALID_COMMAND.
-    if (!commandData.effectiveTime.IsNull() && (commandData.effectiveTime.Value() > currentTimestamp + 86400))
+    const uint32_t kSecondsInDay = 24 * 60 * 60;
+    if (!commandData.effectiveTime.IsNull() && (commandData.effectiveTime.Value() > currentTimestamp + kSecondsInDay))
     {
-const uint32_t kSecondsInDay = 24 * 60 * 60;
-if (!commandData.effectiveTime.IsNull() && (commandData.effectiveTime.Value() > currentTimestamp + kSecondsInDay))
+        commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
     }
     
@@ -88,10 +88,11 @@ if (!commandData.effectiveTime.IsNull() && (commandData.effectiveTime.Value() > 
 
     uint32_t effectiveTime = commandData.effectiveTime.ValueOr(currentTimestamp);
     thermostatSuggestion.SetEffectiveTime(effectiveTime);
-    thermostatSuggestion.SetExpirationTime(effectiveTime + (commandData.expirationInMinutes * 60));
 
-const uint32_t kSecondsInMinute = 60;
-thermostatSuggestion.SetExpirationTime(effectiveTime + (commandData.expirationInMinutes * kSecondsInMinute));
+    const uint32_t kSecondsInMinute = 60;
+    thermostatSuggestion.SetExpirationTime(effectiveTime + (commandData.expirationInMinutes * kSecondsInMinute));
+
+    CHIP_ERROR err = delegate->AppendToThermostatSuggestionsList(thermostatSuggestion);
 
     if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
     {
