@@ -11966,6 +11966,10 @@ public class ClusterIDMapping {
             Presets(80L),
             Schedules(81L),
             SetpointHoldExpiryTimestamp(82L),
+            MaxThermostatSuggestions(83L),
+            ThermostatSuggestions(84L),
+            CurrentThermostatSuggestion(85L),
+            ThermostatSuggestionNotFollowingReason(86L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -12017,6 +12021,8 @@ public class ClusterIDMapping {
             ClearWeeklySchedule(3L),
             SetActiveScheduleRequest(5L),
             SetActivePresetRequest(6L),
+            AddThermostatSuggestion(7L),
+            RemoveThermostatSuggestion(8L),
             AtomicRequest(254L),;
             private final long id;
             Command(long id) {
@@ -12114,6 +12120,40 @@ public class ClusterIDMapping {
                     }
                     public static SetActivePresetRequestCommandField value(int id) throws NoSuchFieldError {
                         for (SetActivePresetRequestCommandField field : SetActivePresetRequestCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum AddThermostatSuggestionCommandField {PresetHandle(0),EffectiveTime(1),ExpirationInMinutes(2),;
+                    private final int id;
+                    AddThermostatSuggestionCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static AddThermostatSuggestionCommandField value(int id) throws NoSuchFieldError {
+                        for (AddThermostatSuggestionCommandField field : AddThermostatSuggestionCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum RemoveThermostatSuggestionCommandField {UniqueID(0),;
+                    private final int id;
+                    RemoveThermostatSuggestionCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static RemoveThermostatSuggestionCommandField value(int id) throws NoSuchFieldError {
+                        for (RemoveThermostatSuggestionCommandField field : RemoveThermostatSuggestionCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -20265,7 +20305,8 @@ public class ClusterIDMapping {
         public enum Attribute {
             MeteredQuantity(0L),
             MeteredQuantityTimestamp(1L),
-            TariffUnit(2L),
+            MeasurementType(2L),
+            MaximumMeteredQuantities(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
