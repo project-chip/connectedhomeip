@@ -147,7 +147,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
         # Commission DUT - already done
         
         self.step("2")
-        if self.pics_guard(self.check_pics("TSTAT.S.F10")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             # TH reads the Presets attribute and saves it in a SupportedPresets variable.
             supported_presets = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets)
             logger.info(f"Supported Presets: {supported_presets}")
@@ -156,7 +156,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
             asserts.assert_greater_equal(len(supported_presets), 2)
 
         self.step("3")
-        if self.pics_guard(self.check_pics("TSTAT.S.F10")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             # TH reads the ActivePresetHandle attribute.
             activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
             logger.info(f"Active Preset Handlers: {activePresetHandle}")
@@ -185,7 +185,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
 
         self.step("5")
-        if self.pics_guard(self.check_pics("TSTAT.S.F10")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             # TH picks a random preset handle that does not match any entry in the Presets attribute and calls the AddThermostatSuggestion command with the preset handle, the EffectiveTime set to the current UTC timestamp the ExpirationInMinutes is set to 1 minute.
             random_preset_handle = random.randbytes(16)
             currentUTC = datetime.now(datetime.timezone.utc)
@@ -197,7 +197,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
                                                                 expected_status=Status.NotFound)
 
         self.step("6a")
-        if self.pics_guard(self.check_pics("TSTAT.S.F10")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             # TH reads the ActivePresetHandle attribute. 
             activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
             logger.info(f"Active Preset Handlers: {activePresetHandle}")
@@ -241,7 +241,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
 
         self.step("6b")
-        if self.pics_guard(self.check_pics("TSTAT.S.F10")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             # TH waits until the UTC timestamp specified in the ExpirationTime field in the CurrentThermostatSuggestion for the suggestion to expire.
             logger.info(f"Waiting until ExpirationTime field in CurrentThermostatSuggestion expires: {expirationInMinutes} minute/s")
             await asyncio.sleep(expirationInMinutes * 60)
@@ -254,7 +254,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
 
         self.step("7a")
-        if self.pics_guard(self.check_pics("TSTAT.S.F10")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             # TH sets TemperatureSetpointHold to SetpointHoldOn and TemperatureSetpointHoldDuration to null. 
             status_TemperatureSetpointHold = await self.write_single_attribute(attribute_value=cluster.Attributes.TemperatureSetpointHold(cluster.Thermostat.Enums.TemperatureSetpointHoldEnum.kSetpointHoldOn), endpoint_id=endpoint, expect_success=True)
             status_TemperatureSetpointHoldDuration = await self.write_single_attribute(attribute_value=cluster.Attributes.TemperatureSetpointHoldDuration(None), endpoint_id=endpoint, expect_success=True)
@@ -313,7 +313,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
 
         self.step("7b")
-        if self.pics_guard(self.check_pics("TSTAT.S.F10")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             # TH sets TemperatureSetpointHold to SetpointHoldOff after 10 seconds.
             await asyncio.sleep(10)
             status_TemperatureSetpointHold = await self.write_single_attribute(attribute_value=cluster.Attributes.TemperatureSetpointHold(cluster.Thermostat.Enums.TemperatureSetpointHoldEnum.kSetpointHoldOff), endpoint_id=endpoint, expect_success=True)
@@ -333,7 +333,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
 
         self.step("7c")
-        if self.pics_guard(self.check_pics("TSTAT.S.F10")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             # TH waits until the UTC timestamp specified in the ExpirationTime field in the CurrentThermostatSuggestion for the suggestion to expire.
             logger.info(f"Waiting until ExpirationTime field in CurrentThermostatSuggestion expires: {expirationInMinutes} minute/s")
             await asyncio.sleep(expirationInMinutes * 60)
@@ -345,7 +345,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
             asserts.assert_equal(currentThermostatSuggestion, None, "CurrentThermostatSuggestion should be Null after the ExpirationTime field in CurrentThermostatSuggestion expired.")   
 
         self.step("8a")
-        if self.pics_guard(self.check_pics("TSTAT.S.F10")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             # TH reads the ActivePresetHandle attribute. 
             activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
             logger.info(f"Active Preset Handlers: {activePresetHandle}")
@@ -389,7 +389,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
 
         self.step("8b")
-        if self.pics_guard(self.check_pics("TSTAT.S.F10")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             print()
             # TH calls the RemoveThermostatSuggestion command with the UniqueID field set to a value not matching the UniqueID field of the CurrentThermostatSuggestion attribute.
             random_uniqueID = addThermostatSuggestionResponse_uniqueID
@@ -403,7 +403,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
 
         self.step("8c")
-        if self.pics_guard(self.check_pics("TSTAT.S.F10")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             print()
             # TH calls the RemoveThermostatSuggestion command with the UniqueID field set to the UniqueID field of then CurrentThermostatSuggestion attribute.
             removeThermostatSuggestionResponse = await self.send_remove_thermostat_suggestion_command(endpoint=endpoint,
@@ -416,7 +416,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
             asserts.assert_equal(currentThermostatSuggestion, None, "CurrentThermostatSuggestion should be Null after the relevant entry was removed by UniqueID.")
 
         self.step("9a")
-        if self.pics_guard(self.check_pics("TSTAT.S.F10")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             # TH reads the ActivePresetHandle attribute and saves it. 
             activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
             logger.info(f"Active Preset Handlers: {activePresetHandle}")
@@ -479,7 +479,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
 
         self.step("9b")
-        if self.pics_guard(self.check_pics("TSTAT.S.F10")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             # TH waits until the timestamp value specified in the earliest ExpirationTime field in the two entries in the ThermostatSuggestions attribute.
             expirationInMinutes = firstExpirationInMinutes if firstExpirationInMinutes < secondExpirationInMinutes else secondExpirationInMinutes
             logger.info(f"Waiting until both ExpirationTime fields in ThermostatSuggestions expires: {expirationInMinutes} minute/s")
@@ -494,7 +494,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
             asserts.assert_equal(currentThermostatSuggestion, thermostatSuggestions[0], "CurrentThermostatSuggestion should be set to the ThermostatSuggestion with the longer ExpirationTime.")   
 
         self.step("9c")
-        if self.pics_guard(self.check_pics("TSTAT.S.F10")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             longerExpirationInMinutes = firstExpirationInMinutes if firstExpirationInMinutes > secondExpirationInMinutes else secondExpirationInMinutes
             shorterExpirationInMinutes = firstExpirationInMinutes if firstExpirationInMinutes < secondExpirationInMinutes else secondExpirationInMinutes
             expirationInMinutes = longerExpirationInMinutes - shorterExpirationInMinutes
@@ -510,7 +510,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
 
         self.step("10")
-        if self.pics_guard(self.check_pics("TSTAT.S.F10")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             # TH reads the ActivePresetHandle attribute. 
             activePresetHandle = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActivePresetHandle)
             logger.info(f"Active Preset Handlers: {activePresetHandle}")
@@ -531,7 +531,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
 
         self.step("11")
-        if self.pics_guard(self.check_pics("TSTAT.S.F10")):
+        if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             print()
             # TH reads the MaxThermostatSuggestions attribute. 
             maxThermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxThermostatSuggestions)

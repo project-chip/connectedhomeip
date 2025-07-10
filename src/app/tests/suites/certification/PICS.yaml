@@ -6614,7 +6614,7 @@ PICS:
     #   id: TSTAT.S.F09
 
     - label: "Supports thermostat suggestions"
-      id: TSTAT.S.F10
+      id: TSTAT.S.F0a
 
     #
     # server / manually
