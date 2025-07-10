@@ -89,7 +89,8 @@ static bool OptionalStructsAreEqual(const Optional<T> & lhs, const Optional<T> &
  * @brief The comparator for specific struct types wrapped to Optional<Nullable<Struct>>
  */
 template <typename T>
-static bool OptionalNullableStructsAreEqual(const Optional<DataModel::Nullable<T>> & lhs, const Optional<DataModel::Nullable<T>> & rhs)
+static bool OptionalNullableStructsAreEqual(const Optional<DataModel::Nullable<T>> & lhs,
+                                            const Optional<DataModel::Nullable<T>> & rhs)
 {
     // Both missing -> true
     if (!lhs.HasValue() && !rhs.HasValue())
