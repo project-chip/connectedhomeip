@@ -20,7 +20,8 @@
 
 PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID,
                                  AudioStreamStruct aAudioStreamParams, VideoStreamStruct aVideoStreamParams) :
-    audioStreamParams(aAudioStreamParams), videoStreamParams(aVideoStreamParams)
+    audioStreamParams(aAudioStreamParams),
+    videoStreamParams(aVideoStreamParams)
 {
     ConfigureRecorderSettings(transportOptions, audioStreamParams, videoStreamParams);
     mConnectionID    = connectionID;
