@@ -65407,7 +65407,8 @@ public class ChipClusters {
 
     private static final long METERED_QUANTITY_ATTRIBUTE_ID = 0L;
     private static final long METERED_QUANTITY_TIMESTAMP_ATTRIBUTE_ID = 1L;
-    private static final long TARIFF_UNIT_ATTRIBUTE_ID = 2L;
+    private static final long MEASUREMENT_TYPE_ATTRIBUTE_ID = 2L;
+    private static final long MAXIMUM_METERED_QUANTITIES_ATTRIBUTE_ID = 3L;
     private static final long GENERATED_COMMAND_LIST_ATTRIBUTE_ID = 65528L;
     private static final long ACCEPTED_COMMAND_LIST_ATTRIBUTE_ID = 65529L;
     private static final long ATTRIBUTE_LIST_ATTRIBUTE_ID = 65531L;
@@ -65432,7 +65433,11 @@ public class ChipClusters {
       void onSuccess(@Nullable Long value);
     }
 
-    public interface TariffUnitAttributeCallback extends BaseAttributeCallback {
+    public interface MeasurementTypeAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+    }
+
+    public interface MaximumMeteredQuantitiesAttributeCallback extends BaseAttributeCallback {
       void onSuccess(@Nullable Integer value);
     }
 
@@ -65500,9 +65505,9 @@ public class ChipClusters {
         }, METERED_QUANTITY_TIMESTAMP_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readTariffUnitAttribute(
-        TariffUnitAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TARIFF_UNIT_ATTRIBUTE_ID);
+    public void readMeasurementTypeAttribute(
+        MeasurementTypeAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASUREMENT_TYPE_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -65510,12 +65515,12 @@ public class ChipClusters {
             @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, TARIFF_UNIT_ATTRIBUTE_ID, true);
+        }, MEASUREMENT_TYPE_ATTRIBUTE_ID, true);
     }
 
-    public void subscribeTariffUnitAttribute(
-        TariffUnitAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, TARIFF_UNIT_ATTRIBUTE_ID);
+    public void subscribeMeasurementTypeAttribute(
+        MeasurementTypeAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MEASUREMENT_TYPE_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -65523,7 +65528,33 @@ public class ChipClusters {
             @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, TARIFF_UNIT_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, MEASUREMENT_TYPE_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readMaximumMeteredQuantitiesAttribute(
+        MaximumMeteredQuantitiesAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAXIMUM_METERED_QUANTITIES_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAXIMUM_METERED_QUANTITIES_ATTRIBUTE_ID, true);
+    }
+
+    public void subscribeMaximumMeteredQuantitiesAttribute(
+        MaximumMeteredQuantitiesAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, MAXIMUM_METERED_QUANTITIES_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            @Nullable Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, MAXIMUM_METERED_QUANTITIES_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readGeneratedCommandListAttribute(
