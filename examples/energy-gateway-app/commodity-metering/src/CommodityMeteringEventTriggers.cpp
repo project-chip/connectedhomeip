@@ -70,7 +70,8 @@ private:
         case 0:
             return { MeteredQuantitySamples::Sample1::Data[0], MeteredQuantitySamples::Sample1::Data[1] };
         case 1:
-            return { MeteredQuantitySamples::Sample2::Data[0], MeteredQuantitySamples::Sample2::Data[1], MeteredQuantitySamples::Sample1::Data[0] };
+            return { MeteredQuantitySamples::Sample2::Data[0], MeteredQuantitySamples::Sample2::Data[1],
+                     MeteredQuantitySamples::Sample1::Data[0] };
         default:
             return {}; // Return empty array
         }
@@ -155,7 +156,7 @@ private:
         mMaximumMeteredQuantities = mInstance->GetMaximumMeteredQuantities();
         SaveMeteredQuantity(mInstance->GetMeteredQuantity());
         mMeteredQuantityTimestamp = mInstance->GetMeteredQuantityTimestamp();
-        mMeasurementType               = mInstance->GetMeasurementType();
+        mMeasurementType          = mInstance->GetMeasurementType();
     }
 
     void ClearAttributes()
