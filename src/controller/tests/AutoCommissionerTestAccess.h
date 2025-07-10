@@ -30,19 +30,18 @@
 #include <lib/support/ScopedBuffer.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 
-using namespace chip;
-using namespace chip::Dnssd;
-using namespace chip::Controller;
-
 namespace chip {
 
 namespace Test {
+
+using namespace chip;
+using namespace chip::Controller;
 
 class AutoCommissionerTestAccess
 {
 public:
     AutoCommissionerTestAccess() = delete;
-    AutoCommissionerTestAccess(AutoCommissioner * Commissioner) : mCommissioner(Commissioner) {}
+    AutoCommissionerTestAccess(AutoCommissioner * commissioner) : mCommissioner(Commissioner) {}
 
     CommissioningStage AccessGetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr)
     {
