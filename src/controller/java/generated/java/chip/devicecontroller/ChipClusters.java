@@ -65740,6 +65740,7 @@ public class ChipClusters {
     private static final long CLUSTER_ERROR_BOOLEAN_ATTRIBUTE_ID = 50L;
     private static final long GLOBAL_ENUM_ATTRIBUTE_ID = 51L;
     private static final long GLOBAL_STRUCT_ATTRIBUTE_ID = 52L;
+    private static final long UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_PRIVILEGE_ATTRIBUTE_ID = 254L;
     private static final long UNSUPPORTED_ATTRIBUTE_ID = 255L;
     private static final long READ_FAILURE_CODE_ATTRIBUTE_ID = 12288L;
     private static final long FAILURE_INT32_U_ATTRIBUTE_ID = 12289L;
@@ -68874,6 +68875,41 @@ public class ChipClusters {
             callback.onSuccess(value);
           }
         }, GLOBAL_STRUCT_ATTRIBUTE_ID, minInterval, maxInterval);
+    }
+
+    public void readUnsupportedAttributeRequiringAdminPrivilegeAttribute(
+        BooleanAttributeCallback callback) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_PRIVILEGE_ATTRIBUTE_ID);
+
+      readAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_PRIVILEGE_ATTRIBUTE_ID, true);
+    }
+
+    public void writeUnsupportedAttributeRequiringAdminPrivilegeAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeUnsupportedAttributeRequiringAdminPrivilegeAttribute(callback, value, 0);
+    }
+
+    public void writeUnsupportedAttributeRequiringAdminPrivilegeAttribute(DefaultClusterCallback callback, Boolean value, int timedWriteTimeoutMs) {
+      BaseTLVType tlvValue = new BooleanType(value);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_PRIVILEGE_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+    }
+
+    public void subscribeUnsupportedAttributeRequiringAdminPrivilegeAttribute(
+        BooleanAttributeCallback callback, int minInterval, int maxInterval) {
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_PRIVILEGE_ATTRIBUTE_ID);
+
+      subscribeAttribute(new ReportCallbackImpl(callback, path) {
+          @Override
+          public void onSuccess(byte[] tlv) {
+            Boolean value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            callback.onSuccess(value);
+          }
+        }, UNSUPPORTED_ATTRIBUTE_REQUIRING_ADMIN_PRIVILEGE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readUnsupportedAttribute(

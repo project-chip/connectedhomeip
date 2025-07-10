@@ -6734,6 +6734,9 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
     case Attributes::GlobalStruct::Id: {
         return YES;
     }
+    case Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id: {
+        return YES;
+    }
     case Attributes::Unsupported::Id: {
         return YES;
     }
