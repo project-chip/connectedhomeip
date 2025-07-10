@@ -14550,7 +14550,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000002: {
-                "attributeName": "TariffUnit",
+                "attributeName": "MeasurementType",
                 "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,

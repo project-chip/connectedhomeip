@@ -39,7 +39,7 @@ Git: 1.4.2-dirty
     <globalAttribute code="0xFFFD" side="either" value="1"/>
     <attribute code="0x0000" side="server" name="MeteredQuantity" define="METERED_QUANTITY" type="array" entryType="MeteredQuantityStruct" isNullable="true"/>
     <attribute code="0x0001" side="server" name="MeteredQuantityTimestamp" define="METERED_QUANTITY_TIMESTAMP" type="epoch_s" isNullable="true"/>
-    <attribute code="0x0002" side="server" name="TariffUnit" define="TARIFF_UNIT" type="TariffUnitEnum" isNullable="true" max="0x01" min="0x00"/>
+    <attribute code="0x0002" side="server" name="MeasurementType" define="TARIFF_UNIT" type="MeasurementTypeEnum" isNullable="true" max="0x0011" min="0x00"/>
     <attribute code="0x0003" side="server" name="MaximumMeteredQuantities" define="MAXIMUM_METERED_QUANTITIES" type="int16u" isNullable="true"/>
   </cluster>
 </configurator>

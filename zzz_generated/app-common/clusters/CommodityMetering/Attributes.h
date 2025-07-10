@@ -70,18 +70,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeteredQuantityTimestamp
-namespace TariffUnit {
+namespace MeasurementType {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TariffUnitEnum>;
-    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TariffUnitEnum>;
-    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TariffUnitEnum> &;
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CommodityMetering::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::TariffUnit::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementType::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace TariffUnit
+} // namespace MeasurementType
 namespace MaximumMeteredQuantities {
 struct TypeInfo
 {
@@ -135,7 +135,7 @@ struct TypeInfo
 
         Attributes::MeteredQuantity::TypeInfo::DecodableType meteredQuantity;
         Attributes::MeteredQuantityTimestamp::TypeInfo::DecodableType meteredQuantityTimestamp;
-        Attributes::TariffUnit::TypeInfo::DecodableType tariffUnit;
+        Attributes::MeasurementType::TypeInfo::DecodableType measurementType;
         Attributes::MaximumMeteredQuantities::TypeInfo::DecodableType maximumMeteredQuantities;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;

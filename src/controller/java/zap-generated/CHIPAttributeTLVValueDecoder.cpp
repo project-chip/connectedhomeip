@@ -51039,8 +51039,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::TariffUnit::Id: {
-            using TypeInfo = Attributes::TariffUnit::TypeInfo;
+        case Attributes::MeasurementType::Id: {
+            using TypeInfo = Attributes::MeasurementType::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

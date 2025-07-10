@@ -6556,7 +6556,7 @@ static BOOL AttributeIsSpecifiedInCommodityMeteringCluster(AttributeId aAttribut
     case Attributes::MeteredQuantityTimestamp::Id: {
         return YES;
     }
-    case Attributes::TariffUnit::Id: {
+    case Attributes::MeasurementType::Id: {
         return YES;
     }
     case Attributes::MaximumMeteredQuantities::Id: {

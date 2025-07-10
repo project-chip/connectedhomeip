@@ -60,14 +60,14 @@ class CommodityMeteringCluster(
     object SubscriptionEstablished : MeteredQuantityTimestampAttributeSubscriptionState()
   }
 
-  class TariffUnitAttribute(val value: UByte?)
+  class MeasurementTypeAttribute(val value: UShort?)
 
-  sealed class TariffUnitAttributeSubscriptionState {
-    data class Success(val value: UByte?) : TariffUnitAttributeSubscriptionState()
+  sealed class MeasurementTypeAttributeSubscriptionState {
+    data class Success(val value: UShort?) : MeasurementTypeAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : TariffUnitAttributeSubscriptionState()
+    data class Error(val exception: Exception) : MeasurementTypeAttributeSubscriptionState()
 
-    object SubscriptionEstablished : TariffUnitAttributeSubscriptionState()
+    object SubscriptionEstablished : MeasurementTypeAttributeSubscriptionState()
   }
 
   class MaximumMeteredQuantitiesAttribute(val value: UShort?)
@@ -315,7 +315,7 @@ class CommodityMeteringCluster(
     }
   }
 
-  suspend fun readTariffUnitAttribute(): TariffUnitAttribute {
+  suspend fun readMeasurementTypeAttribute(): MeasurementTypeAttribute {
     val ATTRIBUTE_ID: UInt = 2u
 
     val attributePath =
@@ -337,25 +337,25 @@ class CommodityMeteringCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Tariffunit attribute not found in response" }
+    requireNotNull(attributeData) { "Measurementtype attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
+    val decodedValue: UShort? =
       if (!tlvReader.isNull()) {
-        tlvReader.getUByte(AnonymousTag)
+        tlvReader.getUShort(AnonymousTag)
       } else {
         tlvReader.getNull(AnonymousTag)
         null
       }
 
-    return TariffUnitAttribute(decodedValue)
+    return MeasurementTypeAttribute(decodedValue)
   }
 
-  suspend fun subscribeTariffUnitAttribute(
+  suspend fun subscribeMeasurementTypeAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<TariffUnitAttributeSubscriptionState> {
+  ): Flow<MeasurementTypeAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
       listOf(
@@ -374,7 +374,7 @@ class CommodityMeteringCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            TariffUnitAttributeSubscriptionState.Error(
+            MeasurementTypeAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -387,22 +387,24 @@ class CommodityMeteringCluster(
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Tariffunit attribute not found in Node State update" }
+          requireNotNull(attributeData) {
+            "Measurementtype attribute not found in Node State update"
+          }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
+          val decodedValue: UShort? =
             if (!tlvReader.isNull()) {
-              tlvReader.getUByte(AnonymousTag)
+              tlvReader.getUShort(AnonymousTag)
             } else {
               tlvReader.getNull(AnonymousTag)
               null
             }
 
-          decodedValue?.let { emit(TariffUnitAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(MeasurementTypeAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(TariffUnitAttributeSubscriptionState.SubscriptionEstablished)
+          emit(MeasurementTypeAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
