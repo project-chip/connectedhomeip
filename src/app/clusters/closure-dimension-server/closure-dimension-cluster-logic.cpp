@@ -673,7 +673,22 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     VerifyOrReturnError(currentState.Value().position.HasValue() && !currentState.Value().position.Value().IsNull(),
                         Status::InvalidInState);
 
-    // TargetState should only be set when delegate function returns status as Success. Return failure otherwise
+    // If this command requests a position change while the Latch field of the CurrentState is True (Latched), and the Latch field
+    // of this command is not set to False (Unlatched), a status code of INVALID_IN_STATE SHALL be returned.
+    if (mConformance.HasFeature(Feature::kMotionLatching))
+    {
+        if (position.HasValue() && currentState.Value().latch.HasValue() && !currentState.Value().latch.Value().IsNull() &&
+            currentState.Value().latch.Value().Value())
+        {
+            VerifyOrReturnError(latch.HasValue() && !latch.Value(), Status::InvalidInState,
+                                ChipLogError(AppServer,
+                                             "Latch is True in State, but SetTarget command does not set latch to False"
+                                             "when position change is requested on endpoint : %d",
+                                             mMatterContext.GetEndpointId()));
+        }
+    }
+
+    // Target should only be set when delegate function returns status as Success. Return failure otherwise
     VerifyOrReturnError(mDelegate.HandleSetTarget(position, latch, speed) == Status::Success, Status::Failure);
 
     VerifyOrReturnError(SetTargetState(targetState) == CHIP_NO_ERROR, Status::Failure);
@@ -719,6 +734,19 @@ Status ClusterLogic::HandleStepCommand(StepDirectionEnum direction, uint16_t num
     VerifyOrReturnError(!currentState.IsNull(), Status::InvalidInState);
     VerifyOrReturnError(currentState.Value().position.HasValue() && !currentState.Value().position.Value().IsNull(),
                         Status::InvalidInState);
+
+    if (mConformance.HasFeature(Feature::kMotionLatching))
+    {
+        if (currentState.Value().latch.HasValue() && !currentState.Value().latch.Value().IsNull())
+        {
+            VerifyOrReturnError(!currentState.Value().latch.Value().Value(), Status::InvalidInState,
+                                ChipLogError(AppServer,
+                                             "Step command cannot be processed when current latch is True"
+                                             "on endpoint : %d",
+                                             mMatterContext.GetEndpointId()));
+        }
+        // Return InvalidInState if currentState is latched
+    }
 
     // Derive TargetState Position from StepValue and NumberOfSteps.
     Percent100ths stepValue;

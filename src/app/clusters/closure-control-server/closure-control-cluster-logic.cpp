@@ -515,8 +515,12 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
 
     VerifyOrReturnError(position.HasValue() || latch.HasValue() || speed.HasValue(), Status::InvalidCommand);
 
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
     DataModel::Nullable<GenericOverallTargetState> overallTargetState;
     VerifyOrReturnError(GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR, Status::Failure);
+    VerifyOrReturnError(GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR, Status::Failure);
+    VerifyOrReturnError(!overallCurrentState.IsNull(), Status::InvalidInState,
+                        ChipLogError(AppServer, "OverallCurrentState is null on endpoint : %d", mMatterContext.GetEndpointId()));
 
     if (overallTargetState.IsNull())
     {
@@ -560,6 +564,21 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
     VerifyOrReturnError(state == MainStateEnum::kMoving || state == MainStateEnum::kWaitingForMotion ||
                             state == MainStateEnum::kStopped,
                         Status::InvalidInState);
+
+    if (mConformance.HasFeature(Feature::kMotionLatching))
+    {
+        // If this command requests a position change while the Latch field of the OverallCurrentState is True (Latched), and the
+        // Latch field of this command is not set to False (Unlatched), a status code of INVALID_IN_STATE SHALL be returned.
+        if (position.HasValue() && overallCurrentState.Value().latch.HasValue() &&
+            !overallCurrentState.Value().latch.Value().IsNull() && overallCurrentState.Value().latch.Value().Value())
+        {
+            VerifyOrReturnError(latch.HasValue() && !latch.Value(), Status::InvalidInState,
+                                ChipLogError(AppServer,
+                                             "Latch is True in OverallCurrentState, but MoveTo command does not set latch to False "
+                                             "when position change is requested on endpoint : %d",
+                                             mMatterContext.GetEndpointId()));
+        }
+    }
 
     // Set MainState and OverallTargetState only if the delegate call to HandleMoveToCommand is successful
     Status status = mDelegate.HandleMoveToCommand(position, latch, speed);
