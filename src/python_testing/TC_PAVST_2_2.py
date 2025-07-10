@@ -40,9 +40,7 @@ import logging
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-
-logger = logging.getLogger(__name__)
-
+from mobly import asserts
 
 class TC_PAVST_2_2(MatterBaseTest):
     def desc_TC_PAVST_2_2(self) -> str:
@@ -88,17 +86,19 @@ class TC_PAVST_2_2(MatterBaseTest):
                         await self.send_single_cmd(cmd=pvcluster.Commands.DeallocatePushTransport(ConnectionID=config.ConnectionID),
                                                    endpoint=endpoint)
                     except InteractionModelError as e:
-                        assert e.status == Status.Success, "Unexpected error returned"
+                        asserts.assert_true(e.status == Status.Success, "Unexpected error returned")
 
         self.step(2)
         if self.pics_guard(self.check_pics("PAVST.S")):
             supported_formats = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats
             )
-            assert len(supported_formats) != 0, "SupportedFormats must not be empty!"
+            asserts.assert_greater_equal(len(supported_formats, 1), "SupportedFormats must not be empty!")
             for format in supported_formats:
-                assert format.ContainerFormat != 0, "ContainerFormat must be a defined value!"
-                assert format.IngestMethod != 0, "IngestMethod must be a defined value!"
+                validContainerformat = format.ContainerFormat == pvcluster.ContainerFormatEnum.kCmaf
+                isValidIngestMethod = format.IngestMethod == pvcluster.IngestMethodEnum.kCMAFIngest
+                asserts.assert_true((validContainerformat & isValidIngestMethod),
+                                    "(ContainerFormat & IngestMethod) must be defined values!")
 
         self.step(3)
         if self.pics_guard(self.check_pics("AVSM.S")):
@@ -108,7 +108,7 @@ class TC_PAVST_2_2(MatterBaseTest):
                 minFrameRate=30,
                 maxFrameRate=120,
                 minResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=400, height=300),
-                maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=1920, height=1080),  # 16/9
+                maxResolution=Clusters.CameraAvStreamManagement.Structs.VideoResolutionStruct(width=1920, height=1080),
                 minBitRate=20000,
                 maxBitRate=150000,
                 minFragmentLen=2000,
@@ -119,7 +119,7 @@ class TC_PAVST_2_2(MatterBaseTest):
             aAllocatedVideoStreams = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=avcluster, attribute=avattr.AllocatedVideoStreams
             )
-            assert len(aAllocatedVideoStreams) != 0, "AllocatedVideoStreams must not be empty"
+            asserts.assert_greater_equal(len(aAllocatedVideoStreams), 1, "AllocatedVideoStreams must not be empty")
 
         self.step(4)
         if self.pics_guard(self.check_pics("AVSM.S")):
@@ -136,34 +136,35 @@ class TC_PAVST_2_2(MatterBaseTest):
             aAllocatedAudioStreams = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=avcluster, attribute=avattr.AllocatedAudioStreams
             )
-            assert len(aAllocatedAudioStreams) != 0, "AllocatedAudioStreams must not be empty"
+            asserts.assert_greater_equal(len(aAllocatedAudioStreams), 1, "AllocatedAudioStreams must not be empty")
 
         self.step(5)
         if self.pics_guard(self.check_pics("PAVST.S")):
             await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
-                 "videoStreamID": 1,
-                 "audioStreamID": 1,
-                 "endpointID": 1,
-                 "url": "https://localhost:1234/streams/1",
-                 "triggerOptions": {"triggerType": 2},
-                 "ingestMethod": 0,
-                 "containerFormat": 0,
-                 "containerOptions": {"containerType": 0},
-                 }), endpoint=endpoint)
+                "videoStreamID": 1,
+                "audioStreamID": 1,
+                "endpointID": 1,
+                "url": "https://localhost:1234/streams/1",
+                "triggerOptions": {"triggerType": 2},
+                "ingestMethod": 0,
+                "containerFormat": 0,
+                "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
+                "expiryTime": 5
+                }), endpoint=endpoint)
 
         self.step(6)
         if self.pics_guard(self.check_pics("PAVST.S")):
             current_connections = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=pvcluster, attribute=pvcluster.Attributes.CurrentConnections
             )
-            assert len(current_connections) == 1, "TransportConfigurations must be 1"
+            asserts.assert_equal(len(current_connections), 1, "TransportConfigurations must be 1")
         self.step(7)
         if self.pics_guard(self.check_pics("PAVST.S")):
             current_connections = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=pvcluster, attribute=pvcluster.Attributes.CurrentConnections
             )
-            assert len(current_connections) == 1, "TransportConfigurations must be 1"
+            asserts.assert_equal(len(current_connections), 1, "TransportConfigurations must be 1")
 
 
 if __name__ == "__main__":

@@ -41,9 +41,9 @@ import time
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from mobly import asserts
 
 logger = logging.getLogger(__name__)
-
 
 class TC_PAVST_2_9(MatterBaseTest):
     def desc_TC_PAVST_2_9(self) -> str:
@@ -92,61 +92,61 @@ class TC_PAVST_2_9(MatterBaseTest):
                     await self.send_single_cmd(cmd=pvcluster.Commands.DeallocatePushTransport(ConnectionID=config.ConnectionID),
                                                endpoint=endpoint)
                 except InteractionModelError as e:
-                    assert e.status == Status.Success, "Unexpected error returned"
+                    asserts.assert_true(e.status == Status.Success, "Unexpected error returned")
 
         self.step(2)
         aSupportedIngestMethods = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedIngestMethods
         )
-        # Assign to _ to mark it as intentionally unused (avoids linter warnings)
-        _ = aSupportedIngestMethods
+        logging.info(f"SupportedIngestMethods: {aSupportedIngestMethods}")
 
         self.step(3)
         aSupportedFormats = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedContainerFormats
         )
-        _ = aSupportedFormats
+        logging.info(f"SupportedContainerFormats: {aSupportedFormats}")
 
         self.step(4)
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=avcluster, attribute=avattr.AllocatedVideoStreams
         )
-        _ = aAllocatedVideoStreams
+        logging.info(f"AllocatedVideoStreams: {aAllocatedVideoStreams}")
 
         self.step(5)
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=avcluster, attribute=avattr.AllocatedAudioStreams
         )
-        _ = aAllocatedAudioStreams
+        logging.info(f"AllocatedAudioStreams: {aAllocatedAudioStreams}")
 
         self.step(6)
         await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
             {"streamUsage": 0,
-             "videoStreamID": 1,
-             "audioStreamID": 1,
-             "endpointID": 1,
-             "url": "https://localhost:1234/streams/1",
-             "triggerOptions": {"triggerType": 2},
-             "ingestMethod": 0,
-             "containerFormat": 0,
-             "containerOptions": {"containerType": 0},
-             "expiryTime": 5
-             }), endpoint=endpoint)
+            "videoStreamID": 1,
+            "audioStreamID": 1,
+            "endpointID": 1,
+            "url": "https://localhost:1234/streams/1",
+            "triggerOptions": {"triggerType": 2},
+            "ingestMethod": 0,
+            "containerFormat": 0,
+            "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
+            "expiryTime": 5
+            }), endpoint=endpoint)
 
         self.step(7)
         transport_configs = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections
         )
-        assert len(transport_configs) == 1, "TransportConfigurations must be 1"
-        assert transport_configs[0].transportStatus == pvcluster.Enums.TransportStatusEnum.kInactive, "Transport status should be Inactive"
+        asserts.assert_equal(len(transport_configs), 1, "TransportConfigurations must be 1")
+        asserts.assert_true(transport_configs[0].transportStatus == pvcluster.Enums.TransportStatusEnum.kInactive, "Transport status should be Inactive")
 
-        time.sleep(5)
+        logging.info("Wait for 6 secs to PushAVTransport expiry")
+        time.sleep(6)
 
         self.step(8)
         transport_configs = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections
         )
-        assert len(transport_configs) == 0, "TransportConfigurations must be empty"
+        asserts.assert_equal(len(transport_configs), 0, "TransportConfigurations must be empty")
 
 
 if __name__ == "__main__":
