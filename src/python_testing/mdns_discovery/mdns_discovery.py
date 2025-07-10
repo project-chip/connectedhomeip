@@ -471,7 +471,8 @@ class MdnsDiscovery:
             service_type (MdnsServiceType): The enum representing the type of mDNS service to discover.
             log_output (bool): Logs the discovered services to the console. Defaults to False.
             discovery_timeout_sec (float): Defaults to 15 seconds.
-            service_name (str): Defaults to none as currently only utilized to gather specific record in multiple discovery records if available
+            service_name (str): Defaults to none as currently only utilized to gather specific record in multiple discovery records if available.
+            unlock_service (bool): If True, queries the service info for each of the discovered service names, defaluts to True.
 
         Returns:
             Optional[MdnsServiceInfo]: An instance of MdnsServiceInfo representing the discovered service, if
@@ -502,8 +503,8 @@ class MdnsDiscovery:
     async def _discover(self,
                         discovery_timeout_sec: float,
                         log_output: bool,
-                        unlock_service: bool,
-                        all_services: bool = False
+                        all_services: bool = False,
+                        unlock_service: bool = True,
                         ) -> None:
         """
         Asynchronously discovers network services using multicast DNS (mDNS).
@@ -511,18 +512,18 @@ class MdnsDiscovery:
         Args:
             discovery_timeout_sec (float): The duration in seconds to wait for the discovery process, allowing for service
                                         announcements to be collected.
-            all_services (bool): If True, discovers all available mDNS services. If False, discovers services based on the
-                                predefined `_service_types` list. Defaults to False.
             log_output (bool): If True, logs the discovered services to the console in JSON format for debugging or informational
                             purposes. Defaults to False.
+            unlock_service (bool): If True, queries the service info for each of the discovered service names, defaluts to True.
+            all_services (bool): If True, discovers all available mDNS services. If False, discovers services based on the
+                                predefined `_service_types` list. Defaults to False.
 
         Returns:
             None: This method does not return any value.
 
         Note:
             The discovery duration may need to be adjusted based on network conditions and expected response times for service
-            announcements. The method leverages an asyncio event to manage asynchronous waiting and cancellation based on discovery
-            success or timeout.
+            announcements.
         """
         self._event.clear()
 
@@ -565,6 +566,7 @@ class MdnsDiscovery:
         It handles the addition of new services by initiating a query for their detailed information.
 
         Args:
+            unlock_service (bool): If True, queries the service info for each of the discovered service names, defaluts to True.
             zeroconf (Zeroconf): The Zeroconf instance managing the network operations.
             service_type (str): The service type of the mDNS service that changed state.
             name (str): The service name of the mDNS service.
