@@ -311,8 +311,8 @@ TEST_F(TestBtpEngine, EncodeStandAloneAckOnePacket)
     constexpr uint8_t packetData0[] = {
         to_underlying(BtpEngine::HeaderFlags::kStartMessage) | to_underlying(BtpEngine::HeaderFlags::kEndMessage), // Header flags
         0x01, // Sequence number
-        0x01, // Payload length
-        0x00, // Payload length
+        0x01, // Payload length, Least Significant Byte
+        0x00, // Payload length, Most Significant Byte
         0xff, // Payload
     };
     // Create a packet buffer with the data for the message and check that it is created successfully.
@@ -373,9 +373,23 @@ TEST_F(TestBtpEngine, EncodeStandAloneAckInsufficientBuffer)
 TEST_F(TestBtpEngine, EncodeStandAloneAckMultiFragmentMessage)
 {
     // Create packet buffers for a multi-fragment message.
-    constexpr uint8_t packetData0[] = { to_underlying(BtpEngine::HeaderFlags::kStartMessage), 0x01, 0x03, 0x00, 0xfd };
-    constexpr uint8_t packetData1[] = { to_underlying(BtpEngine::HeaderFlags::kContinueMessage), 0x02, 0xfe };
-    constexpr uint8_t packetData2[] = { to_underlying(BtpEngine::HeaderFlags::kEndMessage), 0x03, 0xff };
+    constexpr uint8_t packetData0[] = {
+        to_underlying(BtpEngine::HeaderFlags::kStartMessage), // Header flags
+        0x01,                                                 // Sequence number
+        0x03,                                                 // Payload length, Least Significant Byte
+        0x00,                                                 // Payload length, Most Significant Byte
+        0xfd,                                                 // Payload
+    };
+    constexpr uint8_t packetData1[] = {
+        to_underlying(BtpEngine::HeaderFlags::kContinueMessage), // Header flags
+        0x02,                                                    // Sequence number
+        0xfe,                                                    // Payload
+    };
+    constexpr uint8_t packetData2[] = {
+        to_underlying(BtpEngine::HeaderFlags::kEndMessage), // Header flags
+        0x03,                                               // Sequence number
+        0xff,                                               // Payload
+    };
 
     // Create the first packet and check its data length.
     auto packet0 = System::PacketBufferHandle::NewWithData(packetData0, sizeof(packetData0));
@@ -420,8 +434,8 @@ TEST_F(TestBtpEngine, HandleCharacteristicReceivedIncorrectSequence)
     uint8_t packetData0[] = {
         to_underlying(BtpEngine::HeaderFlags::kStartMessage) | to_underlying(BtpEngine::HeaderFlags::kEndMessage), // Header flags
         0x01, // Sequence number
-        0x01, // Payload length
-        0x00, // Payload length
+        0x01, // Payload length, Least Significant Byte
+        0x00, // Payload length, Most Significant Byte
         0xff, // Payload
     };
     auto packet0 = System::PacketBufferHandle::NewWithData(packetData0, sizeof(packetData0));
@@ -437,8 +451,8 @@ TEST_F(TestBtpEngine, HandleCharacteristicReceivedIncorrectSequence)
     uint8_t packetData1[] = {
         to_underlying(BtpEngine::HeaderFlags::kStartMessage) | to_underlying(BtpEngine::HeaderFlags::kEndMessage), // Header flags
         0x02, // Sequence number
-        0x01, // Payload length
-        0x00, // Payload length
+        0x01, // Payload length, Least Significant Byte
+        0x00, // Payload length, Most Significant Byte
         0xff, // Payload
     };
     auto packet1 = System::PacketBufferHandle::NewWithData(packetData1, sizeof(packetData1));
@@ -514,8 +528,8 @@ TEST_F(TestBtpEngine, HandleCharacteristicReceivedWithPadding)
     constexpr uint8_t packetData0[] = {
         to_underlying(BtpEngine::HeaderFlags::kStartMessage) | to_underlying(BtpEngine::HeaderFlags::kEndMessage), // Header flags
         0x01, // Sequence number
-        0x01, // Payload length (only 1 byte of actual payload)
-        0x00, // Payload length (high byte)
+        0x01, // Payload length, Least Significant Byte (only 1 byte of actual payload)
+        0x00, // Payload length, Most Significant Byte
         0xff, // Payload
         0x00, // Padding bytes (should be ignored by BTP engine)
         0x00,
