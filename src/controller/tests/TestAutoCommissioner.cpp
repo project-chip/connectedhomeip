@@ -228,7 +228,7 @@ struct StageTransition
     CommissioningStage nextStage;
 };
 
-const std::vector<StageTransition> KStagePairs = {
+const std::vector<StageTransition> kStagePairs = {
     // Only linear transitions are tested here;
     // Branching cases (like kReadCommissioningInfo, kConfigureTCAcknowledgments, etc.) are tested separately
     { kSecurePairing, kReadCommissioningInfo },
@@ -269,7 +269,7 @@ TEST_F(AutoCommissionerTest, NextCommissioningStage)
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    for (const auto & stagePair : KStagePairs)
+    for (const auto & stagePair : kStagePairs)
     {
         CommissioningStage nextStage =
             privateConfigCommissioner.AccessGetNextCommissioningStageInternal(stagePair.currentStage, err);
@@ -283,13 +283,12 @@ TEST_F(AutoCommissionerTest, NextStageStopCommissioning)
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
     mCommissioner.StopCommissioning();
 
-    // initialize error code for function call.
     CHIP_ERROR err           = CHIP_ERROR_INTERNAL;
     CommissioningStage stage = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kSecurePairing, err);
     EXPECT_EQ(stage, kCleanup);
 }
 
-// if commissioning failed, than the next stage should be cleanup
+// if commissioning failed, then the next stage should be cleanup
 TEST_F(AutoCommissionerTest, NextCommissioningStageAfterError)
 {
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
@@ -312,11 +311,11 @@ TEST_F(AutoCommissionerTest, NextStageReadCommissioningInfo)
     // if breadcrumb > 0, the stage changes to kSendNOC; subsequent stages progress accordingly.
     privateConfigCommissioner.SetBreadcrumb(1);
 
-    CommissioningStage nextStage_ReadCommissioningInfo =
+    CommissioningStage nextStageReadCommissioningInfo =
         privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kReadCommissioningInfo, err);
-    CommissioningStage nextStage_SendNOC = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kSendNOC, err);
+    CommissioningStage nextStageSendNOC = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kSendNOC, err);
 
-    EXPECT_EQ(nextStage_ReadCommissioningInfo, nextStage_SendNOC);
+    EXPECT_EQ(nextStageReadCommissioningInfo, nextStageSendNOC);
 }
 
 TEST_F(AutoCommissionerTest, NextStageConfigureTCAcknowledgments)

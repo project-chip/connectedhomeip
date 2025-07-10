@@ -33,7 +33,7 @@ namespace Test{
 
 class AutoCommissionerTestAccess;
 
-} /// nemespace Test
+} /// namespace Test
 
 namespace Controller {
 
