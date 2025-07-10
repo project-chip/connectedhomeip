@@ -35,6 +35,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import logging
 import time
 
 import chip.clusters as Clusters
