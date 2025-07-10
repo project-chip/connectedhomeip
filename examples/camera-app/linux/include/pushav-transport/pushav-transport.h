@@ -63,6 +63,7 @@ public:
     // Dummy implementation to indicate whether the transport is streaming or not
     bool IsStreaming();
 
+    bool GetBusyStatus();
     // Set Transport status
     void setTransportStatus(TransportStatusEnum status);
 
