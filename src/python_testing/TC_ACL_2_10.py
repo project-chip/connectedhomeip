@@ -300,7 +300,6 @@ class TC_ACL_2_10(MatterBaseTest):
         asserts.assert_equal(entry.data, D_OK_EMPTY, "Data should be D_OK_EMPTY")
         asserts.assert_equal(entry.fabricIndex, f1, "FabricIndex should be F1")
 
-
         self.step(12)
         # TH2 reads DUT Endpoint 0 AccessControl cluster ACL attribute
         # Result is SUCCESS, value is list of AccessControlExtensionStruct
