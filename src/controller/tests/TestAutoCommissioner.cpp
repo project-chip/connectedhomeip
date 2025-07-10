@@ -287,7 +287,11 @@ TEST_F(AutoCommissionerTest, NextStageStopCommissioning)
     EXPECT_EQ(stage, kCleanup);
 }
 
+<<<<<<< HEAD
 // if commissioning failed, then the next stage should be cleanup
+=======
+// if commissioning failed, than the next stage should be cleanup
+>>>>>>> af8316a128 (Fix typos; Improve comments)
 TEST_F(AutoCommissionerTest, NextCommissioningStageAfterError)
 {
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
