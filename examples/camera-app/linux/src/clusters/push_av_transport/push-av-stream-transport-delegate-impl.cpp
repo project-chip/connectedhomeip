@@ -99,7 +99,7 @@ PushAvStreamTransportManager::ModifyPushTransport(const uint16_t connectionID, c
     }
 
     mTransportOptionsMap[connectionID] = transportOptions;
-    mTransportMap[connectionID].ModifyPushTransport(transportOptions);
+    mTransportMap[connectionID].get()->ModifyPushTransport(transportOptions);
     ChipLogProgress(Camera, "PushAvStreamTransportManager, success to modify Connection :[%u]", connectionID);
 
     return Status::Success;
