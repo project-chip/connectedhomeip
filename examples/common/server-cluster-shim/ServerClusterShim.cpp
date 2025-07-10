@@ -528,9 +528,8 @@ CHIP_ERROR ServerClusterShim::AcceptedCommands(const ConcreteClusterPath & path,
 
 CHIP_ERROR ServerClusterShim::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
-    // Some CommandHandlerInterface instances are registered of ALL endpoints, so make sure first that
-    // the cluster actually exists on this endpoint before asking the CommandHandlerInterface what commands
-    // it claims to support.
+    // Make sure first that the cluster actually exists on this endpoint before asking the
+    // CommandHandlerInterface what commands it claims to support.
     const EmberAfCluster * serverCluster = emberAfFindServerCluster(path.mEndpointId, path.mClusterId);
     VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
 
