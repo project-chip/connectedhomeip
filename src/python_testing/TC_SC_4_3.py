@@ -227,7 +227,6 @@ class TC_SC_4_3(MatterBaseTest):
         supports_icd = None
         supports_lit = None
         active_mode_threshold_ms = None
-        instance_name = None
 
         # *** STEP 1 ***
         # DUT is commissioned on the same fabric as TH.
@@ -283,8 +282,7 @@ class TC_SC_4_3(MatterBaseTest):
         srv_record_returned = operational_record is not None and operational_record.service_name == instance_qname
         asserts.assert_true(srv_record_returned, "SRV record was not returned")
 
-        # Will be used in Step 8 and 11
-        # This is the hostname
+        # Will be used in Step 8
         hostname = operational_record.server
 
         # *** STEP 7 ***
@@ -399,7 +397,7 @@ class TC_SC_4_3(MatterBaseTest):
         result, message = self.verify_t_value(operational_record)
         asserts.assert_true(result, message)
 
-        # Verify the AAAA record contains an IPv6 address
+        # Verify the AAAA records contain a valid IPv6 address
         logging.info("Verify the AAAA record contains a valid IPv6 address")
         for r in quada_records:
             asserts.assert_true(
