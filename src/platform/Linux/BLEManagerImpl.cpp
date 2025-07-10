@@ -180,8 +180,7 @@ exit:
 
 uint16_t BLEManagerImpl::_NumConnections()
 {
-    uint16_t numCons = 0;
-    return numCons;
+    return mEndpoint.GetNumConnections();
 }
 
 CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
