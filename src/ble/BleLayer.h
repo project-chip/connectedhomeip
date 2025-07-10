@@ -361,7 +361,6 @@ private:
 
     static void OnConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj);
     static void OnConnectionError(void * appState, CHIP_ERROR err);
-
 };
 
 } /* namespace Ble */
