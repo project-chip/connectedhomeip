@@ -28,7 +28,9 @@ PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions
     mTransportStatus = TransportStatusEnum::kInactive;
     if (!prerollBuffer && clipInfo.mPreRollLength > 0)
     {
-        prerollBuffer = new PushAvPreRollBuffer(clipInfo.mPreRollLength, 1000000);
+        // TODO Fetch kMaxBufferContentSize from camera-device
+        int kMaxBufferContentSize = 4096;
+        prerollBuffer             = new PushAvPreRollBuffer(clipInfo.mPreRollLength, kMaxBufferContentSize);
     }
 }
 
@@ -36,7 +38,7 @@ const char * GetAudioCodecName(int codecId)
 {
     switch (codecId)
     {
-    case AV_CODEC_ID_OPUS:
+    case 8076 /*AV_CODEC_ID_OPUS*/:
         return "OPUS";
     default:
         return "Unknown";
@@ -47,7 +49,7 @@ const char * GetVideoCodecName(int codecId)
 {
     switch (codecId)
     {
-    case AV_CODEC_ID_H264:
+    case 27 /*AV_CODEC_ID_H264*/:
         return "H.264";
     default:
         return "Unknown";
@@ -120,7 +122,7 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
         clipInfo.mTriggerType          = 0;
         clipInfo.mUrl                  = "https://localhost:1234/streams/1/";
     }
-
+    mTransportTriggerType   = transportOptions.triggerOptions.triggerType;
     clipInfo.mClipId        = 0;
     clipInfo.mOutputPath    = "./clips/";
     clipInfo.mInputTimeBase = { 1, 1000000 };
@@ -130,7 +132,7 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
 
     if (audioCodec == 0)
     {
-        audioInfo.mAudioCodecId       = AV_CODEC_ID_OPUS;
+        audioInfo.mAudioCodecId       = 8076 /*AV_CODEC_ID_OPUS*/;
         audioInfo.mAudioTimeBase      = { 1, 48000 };
         audioInfo.mAudioFrameDuration = 19200;
     }
@@ -152,7 +154,7 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
     int8_t VideoCodec = static_cast<uint8_t>(mVideoStreamParams.videoCodec);
     if (VideoCodec == 0)
     {
-        videoInfo.mVideoCodecId  = AV_CODEC_ID_H264;
+        videoInfo.mVideoCodecId  = 27 /*AV_CODEC_ID_H264*/;
         videoInfo.mVideoTimeBase = { 1, 90000 };
     }
     else if (VideoCodec == 4)
@@ -268,7 +270,7 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
 {
     ChipLogProgress(Camera, "PushAVTransport trigger transport, activation reason: [%u]", (uint16_t) activationReason);
 
-    if (clipInfo.mTransportTriggerType == TransportTriggerTypeEnum::kCommand)
+    if (mTransportTriggerType == TransportTriggerTypeEnum::kCommand)
     {
         if (HandleTriggerDetected())
         {
@@ -284,7 +286,7 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
                 recorder->mClipInfo.mInitialDuration);
         }
     }
-    else if (clipInfo.mTransportTriggerType == TransportTriggerTypeEnum::kMotion)
+    else if (mTransportTriggerType == TransportTriggerTypeEnum::kMotion)
     {
         if (HandleTriggerDetected())
         {
@@ -301,7 +303,7 @@ void PushAVTransport::TriggerTransport(TriggerActivationReasonEnum activationRea
         }
     }
 
-    else if (clipInfo.mTransportTriggerType == TransportTriggerTypeEnum::kContinuous)
+    else if (mTransportTriggerType == TransportTriggerTypeEnum::kContinuous)
     {
         ChipLogProgress(Camera, "PushAVTransport continuous transport trigger received. No action needed");
         return;
@@ -322,7 +324,12 @@ void PushAVTransport::setTransportStatus(TransportStatusEnum status)
         ChipLogProgress(Camera, "PushAVTransport transport status changed to active");
         mCanSendVideo = true;
         mCanSendAudio = true;
-        uploader      = std::make_unique<PushAVUploader>();
+
+        // TODO Fetch these values from TLS Cluster
+        mCertPath.mRootCert = "/tmp/pavstest/certs/server/root.pem";
+        mCertPath.mDevCert  = "/tmp/pavstest/certs/device/dev.pem";
+        mCertPath.mDevKey   = "/tmp/pavstest/certs/device/dev.key";
+        uploader            = std::make_unique<PushAVUploader>(mCertPath);
         uploader->Start();
         InitializeRecorder();
 
@@ -334,7 +341,7 @@ void PushAVTransport::setTransportStatus(TransportStatusEnum status)
         if (mTransportTriggerType == TransportTriggerTypeEnum::kMotion)
         {
 
-            recorder->mClipInfo.mInitialDuration = std::chrono::duration_cast<std::chrono::seconds>(
+            recorder->mClipInfo.mInitialDuration = (uint16_t) std::chrono::duration_cast<std::chrono::seconds>(
                                                        std::chrono::steady_clock::now() - recorder->mClipInfo.activationTime)
                                                        .count();
         }
@@ -387,7 +394,7 @@ void PushAVTransport::SendPacketsToRecorder()
 
 void PushAVTransport::SendVideo(const char * data, size_t size, uint16_t videoStreamID)
 {
-    if (!CanSendVideo())
+    if (mTransportTriggerType == TransportTriggerTypeEnum::kContinuous && mTransportStatus == TransportStatusEnum::kInactive)
     {
         return;
     }
@@ -404,7 +411,7 @@ void PushAVTransport::SendVideo(const char * data, size_t size, uint16_t videoSt
 void PushAVTransport::SendAudio(const char * data, size_t size, uint16_t audioStreamID)
 {
 
-    if (!CanSendAudio())
+    if (mTransportTriggerType == TransportTriggerTypeEnum::kContinuous && mTransportStatus == TransportStatusEnum::kInactive)
     {
         return;
     }

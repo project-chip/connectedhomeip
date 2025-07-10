@@ -21,8 +21,8 @@
 #include "camera-device-interface.h"
 #include "pushav-clip-recorder.h"
 #include "pushav-prerollbuffer.h"
+#include "pushav-uploader.h"
 #include "transport.h"
-#include "uploader/pushav-uploader.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
@@ -39,7 +39,6 @@
 
 using namespace chip::app::Clusters::PushAvStreamTransport;
 
-// PushAV transport
 class PushAVTransport : public Transport
 {
 public:
@@ -77,8 +76,6 @@ public:
 
     void ModifyPushTransport(const TransportOptionsStorage transportOptions);
 
-    bool InBlindPeriod();
-
     bool HandleTriggerDetected();
 
     void StartTransport();
@@ -100,7 +97,7 @@ private:
     PushAVClipRecorder::AudioInfoStruct audioInfo;
     PushAVClipRecorder::VideoInfoStruct videoInfo;
     PushAvPreRollBuffer * prerollBuffer;
-
+    PushAVUploader::PushAVCertPath mCertPath;
     AudioStreamStruct audioStreamParams;
     VideoStreamStruct videoStreamParams;
     // Dummy implementation to indicate if video can be sent
@@ -113,6 +110,6 @@ private:
 
     // Enum indicating the type of trigger used to start the transport
     TransportStatusEnum mTransportStatus;
-
+    TransportTriggerTypeEnum mTransportTriggerType;
     uint16_t mConnectionID;
 };
