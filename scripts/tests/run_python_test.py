@@ -168,32 +168,32 @@ def restart_app_process(app_process, app, app_args, app_ready_pattern, stream_ou
     """Restart the app process during test execution."""
     if app_process:
         logging.info("Restarting app process...")
-        
+
         # Stop the existing app process
         if hasattr(app_process, 'terminate'):
             app_process.terminate()
             time.sleep(5)  # Give time for cleanup
-            
+
             # Force kill if still running
             if app_process.p.poll() is None:
                 logging.info("Force killing app process")
                 app_process.p.kill()
                 time.sleep(1)
-        
+
         # Start a new app process
         new_app_process = Subprocess(app, *shlex.split(app_args),
-                                   output_cb=process_chip_app_output,
-                                   f_stdout=stream_output,
-                                   f_stderr=stream_output)
-        
+                                     output_cb=process_chip_app_output,
+                                     f_stdout=stream_output,
+                                     f_stderr=stream_output)
+
         if app_ready_pattern:
             new_app_process.start(expected_output=app_ready_pattern, timeout=30)
         else:
             new_app_process.start()
-            
+
         logging.info("App process restarted successfully")
         return new_app_process
-    
+
     return None
 
 
@@ -256,7 +256,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         # Add a function reference for app restart
         os.environ['CHIP_TEST_APP_RESTART_AVAILABLE'] = '1'
         logging.info("App restart capability enabled")
-    
+
     script_command = [
         script,
         "--fail-on-skipped",
@@ -283,7 +283,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                                      f_stderr=stream_output)
     test_script_process.start()
     test_script_process.p.stdin.close()
-    
+
     # Monitor for app restart requests
     restart_monitor_thread = None
     app_process_ref = None
@@ -296,7 +296,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             daemon=True
         )
         restart_monitor_thread.start()
-    
+
     test_script_exit_code = test_script_process.wait()
 
     if test_script_exit_code != 0:
@@ -309,13 +309,13 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         stop_flag_file = "/tmp/chip_test_stop_monitor"
         with open(stop_flag_file, 'w') as f:
             f.write("stop")
-        
+
         # Wait a bit for the monitor thread to stop
         time.sleep(1)
 
     # Get the current app process (which might have been restarted)
     current_app_process = app_process_ref[0] if app_process_ref else app_process
-    
+
     if current_app_process:
         logging.info("Stopping app with SIGTERM")
         if app_stdin_forwarding_thread:
@@ -349,7 +349,7 @@ def monitor_app_restart_requests(app_process_ref, app, app_args, app_ready_patte
     """Monitor for app restart requests from the test script."""
     restart_flag_file = "/tmp/chip_test_restart_app"
     stop_flag_file = "/tmp/chip_test_stop_monitor"
-    
+
     while True:
         try:
             # Check if we should stop monitoring
@@ -357,19 +357,19 @@ def monitor_app_restart_requests(app_process_ref, app, app_args, app_ready_patte
                 logging.info("Stop signal received, ending app restart monitor")
                 os.unlink(stop_flag_file)
                 break
-                
+
             # Check if restart flag file exists
             if os.path.exists(restart_flag_file):
                 logging.info("App restart requested by test script")
-                
+
                 # Remove the flag file
                 os.unlink(restart_flag_file)
-                
+
                 # Restart the app
                 new_app_process = restart_app_process(app_process_ref[0], app, app_args, app_ready_pattern, stream_output)
                 if new_app_process:
                     app_process_ref[0] = new_app_process
-                
+
                 # Wait a bit before checking again
                 time.sleep(1)
             else:
