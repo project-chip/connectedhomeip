@@ -16,8 +16,6 @@
  *    limitations under the License.
  */
 
-#include "data-model-provider/MetadataTypes.h"
-#include "lib/core/DataModelTypes.h"
 #include <app/AppConfig.h>
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/AttributeValueDecoder.h>
@@ -35,7 +33,9 @@
 #include <app/reporting/Engine.h>
 #include <app/util/MatterCallbacks.h>
 #include <credentials/GroupDataProvider.h>
+#include <data-model-provider/MetadataTypes.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/TextOnlyLogging.h>
