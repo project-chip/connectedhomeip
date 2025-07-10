@@ -282,7 +282,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
                 // setting of these values, they may be subsequently modified. If the values have no value that
                 // is ok, the allocated stream will store as such and ignore.
                 stream.snapshotStreamParams.watermarkEnabled = allocateArgs.watermarkEnabled;
-                stream.snapshotStreamParams.OSDEnabled = allocateArgs.OSDEnabled;
+                stream.snapshotStreamParams.OSDEnabled       = allocateArgs.OSDEnabled;
 
                 // Start the snapshot stream for serving.
                 mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(outStreamID);
