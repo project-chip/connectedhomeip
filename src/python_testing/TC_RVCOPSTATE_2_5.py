@@ -33,13 +33,15 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-import enum
 import asyncio
+import enum
+import logging
+
 import chip.clusters as Clusters
 from chip.interaction_model import Status
 from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
-from chip.testing.matter_testing import AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
+from chip.testing.matter_testing import (AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main,
+                                         type_matches)
 from mobly import asserts
 
 
