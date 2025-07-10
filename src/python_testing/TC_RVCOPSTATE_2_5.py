@@ -270,12 +270,3 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
 
 if __name__ == "__main__":
     default_matter_test_main()
-
-
-
-
-
-
-
-
-
