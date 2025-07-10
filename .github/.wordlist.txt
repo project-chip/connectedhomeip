@@ -446,6 +446,7 @@ DL
 DM
 DMG
 DMM
+DMTT
 DNS
 Dnsmasq
 dnsmasqd
@@ -1138,6 +1139,7 @@ PowerProfile
 PowerSource
 PowerSourceConfiguration
 pre
+PrebuiltDataModelDirectory
 preprocessor
 Presetup
 PressureMeasurement

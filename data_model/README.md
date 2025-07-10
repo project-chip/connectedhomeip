@@ -103,7 +103,7 @@ To do this, perform the following steps:
         the zip file inclusion in this file that needs to be updated
     -   In
         src/python_testing/matter_testing_infrastructure/chip/testing/spec_parsing.py
-        update the PrebuiltDataModel enum to add the new directory and
+        update the PrebuiltDataModelDirectory enum to add the new directory and
         dm_from_spec_version
     -   Add unit tests for the new data model files to the data model file unit
         tests in src/python_testing:
