@@ -588,7 +588,7 @@ class MdnsDiscovery:
 
         if self._name_filter is not None and name.upper() != self._name_filter:
             if self._verbose_logging:
-                logger.info("   Name does NOT match %s", self._name_filter)
+                logger.info("   Name does NOT match \'%s\' vs \'%s\'", self._name_filter, name.upper())
             return
 
         if self._verbose_logging:
