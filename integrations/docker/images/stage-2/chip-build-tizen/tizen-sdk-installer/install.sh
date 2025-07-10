@@ -277,7 +277,7 @@ function install_tizen_sdk_arm() {
     done
 
     unrpm "$SYSROOT" *.armv7l.rpm
-    fixup_symlinks $SYSROOT/usr/{lib,lib64}
+    fixup_symlinks "$SYSROOT"/usr/{lib,lib64}
 
     ln -sf openssl3.pc "$SYSROOT/usr/lib/pkgconfig/openssl.pc"
 
@@ -373,7 +373,7 @@ function install_tizen_sdk_arm64() {
 
     unrpm "$SYSROOT" *.aarch64.rpm
 
-    fixup_symlinks $SYSROOT/usr/{lib,lib64}
+    fixup_symlinks "$SYSROOT"/usr/{lib,lib64}
 
     ln -sf openssl3.pc "$SYSROOT/usr/lib64/pkgconfig/openssl.pc"
 
