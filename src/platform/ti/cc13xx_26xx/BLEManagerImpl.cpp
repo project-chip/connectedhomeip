@@ -272,13 +272,11 @@ uint8_t BLEManagerImpl::getDeviceName(char * buf, size_t bufSize)
     if (bufSize <= GAP_DEVICE_NAME_LEN)
     {
         Platform::CopyString(buf, bufSize, mDeviceName);
-    }
-    else
-    {
         ret = SUCCESS;
     }
+
     return ret;
-}
+} 
 
 uint8_t BLEManagerImpl::setDeviceName(const char * deviceName)
 {
