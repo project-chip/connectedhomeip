@@ -21,7 +21,7 @@ source_set("thermostat-server") {
   ]
 
   public_deps = [
-    "${chip_root}/zzz_generated/app-common/clusters/Thermostat",
     "${chip_root}/src/lib/support:span",
+    "${chip_root}/zzz_generated/app-common/clusters/Thermostat",
   ]
 }

@@ -399,7 +399,7 @@ CHIP_ERROR ThermostatDelegate::ReEvaluateCurrentSuggestion()
 {
 
     uint32_t currentMatterEpochTimestampInSeconds = 0;
-    CHIP_ERROR err             = System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds);
+    CHIP_ERROR err                                = System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to get the current time stamp with error: %" CHIP_ERROR_FORMAT, err.Format());
@@ -435,11 +435,10 @@ CHIP_ERROR ThermostatDelegate::ReEvaluateCurrentSuggestion()
         if (currentThermostatSuggestion.GetExpirationTime() > currentMatterEpochTimestampInSeconds)
         {
             const uint32_t kMilliSecsInSeconds = 1000;
-            StartExpirationTimer((currentThermostatSuggestion.GetExpirationTime() - currentMatterEpochTimestampInSeconds) * kMilliSecsInSeconds);
+            StartExpirationTimer((currentThermostatSuggestion.GetExpirationTime() - currentMatterEpochTimestampInSeconds) *
+                                 kMilliSecsInSeconds);
         }
     }
-
-
 
     return CHIP_NO_ERROR;
 }

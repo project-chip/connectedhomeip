@@ -127,7 +127,8 @@ private:
 
     CHIP_ERROR RemoveExpiredSuggestions(uint32_t currentMatterEpochTimestampInSeconds);
 
-    CHIP_ERROR SetThermostatSuggestionNotFollowingReason(const DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> & thermostatSuggestionNotFollowingReason);
+    CHIP_ERROR SetThermostatSuggestionNotFollowingReason(
+        const DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> & thermostatSuggestionNotFollowingReason);
 
     void SetCurrentThermostatSuggestion(size_t index);
 

@@ -40,7 +40,7 @@ namespace Thermostat {
 extern ThermostatAttrAccess gThermostatAttrAccess;
 
 bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-                                                             const Commands::AddThermostatSuggestion::DecodableType & commandData)
+                             const Commands::AddThermostatSuggestion::DecodableType & commandData)
 {
 
     // If time is not synced, return INVALID_IN_STATE in the AddThermostatSuggestionResponse.
@@ -54,7 +54,7 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
     ChipLogError(Zcl, "current timestamp is %u", currentMatterEpochTimestampInSeconds);
 
     EndpointId endpoint = commandPath.mEndpointId;
-    auto delegate = GetDelegate(endpoint);
+    auto delegate       = GetDelegate(endpoint);
     if (delegate == nullptr)
     {
         ChipLogError(Zcl, "Delegate is null");
@@ -80,7 +80,8 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
 
     // If the effective time in UTC is greater than current time in UTC plus 24 hours, return INVALID_COMMAND.
     const uint32_t kSecondsInDay = 24 * 60 * 60;
-    if (!commandData.effectiveTime.IsNull() && (commandData.effectiveTime.Value() > currentMatterEpochTimestampInSeconds + kSecondsInDay))
+    if (!commandData.effectiveTime.IsNull() &&
+        (commandData.effectiveTime.Value() > currentMatterEpochTimestampInSeconds + kSecondsInDay))
     {
         commandObj->AddStatus(commandPath, Status::InvalidCommand);
         return true;
@@ -89,13 +90,13 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
     uint8_t uniqueID = delegate->GetUniqueID();
 
     Structs::ThermostatSuggestionStruct::Type thermostatSuggestion;
-    thermostatSuggestion.uniqueID = uniqueID;
+    thermostatSuggestion.uniqueID     = uniqueID;
     thermostatSuggestion.presetHandle = commandData.presetHandle;
 
-    uint32_t effectiveTime = commandData.effectiveTime.ValueOr(currentMatterEpochTimestampInSeconds);
+    uint32_t effectiveTime             = commandData.effectiveTime.ValueOr(currentMatterEpochTimestampInSeconds);
     thermostatSuggestion.effectiveTime = effectiveTime;
 
-    const uint32_t kSecondsInMinute = 60;
+    const uint32_t kSecondsInMinute     = 60;
     thermostatSuggestion.expirationTime = effectiveTime + (commandData.expirationInMinutes * kSecondsInMinute);
 
     CHIP_ERROR err = delegate->AppendToThermostatSuggestionsList(thermostatSuggestion);
@@ -123,10 +124,10 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
 }
 
 bool RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
-    const Commands::RemoveThermostatSuggestion::DecodableType & commandData)
+                                const Commands::RemoveThermostatSuggestion::DecodableType & commandData)
 {
     EndpointId endpoint = commandPath.mEndpointId;
-    auto delegate = GetDelegate(endpoint);
+    auto delegate       = GetDelegate(endpoint);
     if (delegate == nullptr)
     {
         ChipLogError(Zcl, "Delegate is null");
@@ -150,7 +151,7 @@ bool RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteComma
     commandObj->AddStatus(commandPath, Status::Success);
 
     uint32_t currentMatterEpochTimestampInSeconds = 0;
-    err                       = System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds);
+    err                                           = System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to get the current time stamp with error: %" CHIP_ERROR_FORMAT, err.Format());

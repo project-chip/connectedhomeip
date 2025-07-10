@@ -27,9 +27,9 @@
 #pragma once
 
 #include <clusters/Thermostat/Structs.h>
+#include <cstdint>
 #include <lib/support/Span.h>
 #include <stddef.h>
-#include <cstdint>
 
 namespace chip {
 namespace app {
