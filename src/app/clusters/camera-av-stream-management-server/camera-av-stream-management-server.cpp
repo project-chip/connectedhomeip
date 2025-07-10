@@ -2020,9 +2020,9 @@ void CameraAVStreamMgmtServer::HandleSnapshotStreamModify(HandlerContext & ctx,
         ChipLogError(Zcl, "CameraAVStreamMgmt[ep=%d]: One of WatermarkEnabled or OSDEnabled must be provided in SnapshotStreamModify", mEndpointId);
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::InvalidCommand);
     });
-    
+
     status = mDelegate.SnapshotStreamModify(snapshotStreamID, isWaterMarkEnabled, isOSDEnabled);
-    
+
 
     if (status == Status::Success)
     {
