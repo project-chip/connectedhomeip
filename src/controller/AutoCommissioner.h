@@ -25,13 +25,26 @@
 #include <lib/support/ScopedBuffer.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 
+
+
 namespace chip {
+
+namespace Test{
+
+class AutoCommissionerTestAccess;
+
+} /// nemespace Test
+
 namespace Controller {
 
 class DeviceCommissioner;
 
+
 class AutoCommissioner : public CommissioningDelegate
 {
+
+friend class chip::Test::AutoCommissionerTestAccess;
+
 public:
     AutoCommissioner();
     ~AutoCommissioner() override;
