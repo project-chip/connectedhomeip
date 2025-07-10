@@ -45,6 +45,7 @@ from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
+
 class TC_PAVST_2_9(MatterBaseTest):
     def desc_TC_PAVST_2_9(self) -> str:
         return "[TC-PAVST-2.9] Validate Transport allocation with an ExpiryTime with Server as DUT"
@@ -121,23 +122,24 @@ class TC_PAVST_2_9(MatterBaseTest):
         self.step(6)
         await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
             {"streamUsage": 0,
-            "videoStreamID": 1,
-            "audioStreamID": 1,
-            "endpointID": 1,
-            "url": "https://localhost:1234/streams/1",
-            "triggerOptions": {"triggerType": 2},
-            "ingestMethod": 0,
-            "containerFormat": 0,
-            "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
-            "expiryTime": 5
-            }), endpoint=endpoint)
+             "videoStreamID": 1,
+             "audioStreamID": 1,
+             "endpointID": 1,
+             "url": "https://localhost:1234/streams/1",
+             "triggerOptions": {"triggerType": 2},
+             "ingestMethod": 0,
+             "containerFormat": 0,
+             "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
+             "expiryTime": 5
+             }), endpoint=endpoint)
 
         self.step(7)
         transport_configs = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.CurrentConnections
         )
         asserts.assert_equal(len(transport_configs), 1, "TransportConfigurations must be 1")
-        asserts.assert_true(transport_configs[0].transportStatus == pvcluster.Enums.TransportStatusEnum.kInactive, "Transport status should be Inactive")
+        asserts.assert_true(transport_configs[0].transportStatus ==
+                            pvcluster.Enums.TransportStatusEnum.kInactive, "Transport status should be Inactive")
 
         logging.info("Wait for 6 secs to PushAVTransport expiry")
         time.sleep(6)
