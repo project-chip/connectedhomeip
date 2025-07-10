@@ -19,14 +19,13 @@
 
 #include <app/clusters/commodity-tariff-server/CommodityTariffConsts.h>
 #include <json/json.h>
-
+namespace JSON_Utilities {
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::CommodityTariffAttrsDataMgmt;
 using namespace CommodityTariffConsts;
 
-namespace JSON_Utilities {
 template <typename StructType, typename DataClass, bool IsList = true>
 class JsonParser
 {
