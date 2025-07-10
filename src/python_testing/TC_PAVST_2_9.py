@@ -35,7 +35,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
 import time
 
 import chip.clusters as Clusters
@@ -99,25 +98,25 @@ class TC_PAVST_2_9(MatterBaseTest):
         aSupportedIngestMethods = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedIngestMethods
         )
-        logging.info(f"SupportedIngestMethods: {aSupportedIngestMethods}")
+        logger.info(f"SupportedIngestMethods: {aSupportedIngestMethods}")
 
         self.step(3)
         aSupportedFormats = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedContainerFormats
         )
-        logging.info(f"SupportedContainerFormats: {aSupportedFormats}")
+        logger.info(f"SupportedContainerFormats: {aSupportedFormats}")
 
         self.step(4)
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=avcluster, attribute=avattr.AllocatedVideoStreams
         )
-        logging.info(f"AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        logger.info(f"AllocatedVideoStreams: {aAllocatedVideoStreams}")
 
         self.step(5)
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=avcluster, attribute=avattr.AllocatedAudioStreams
         )
-        logging.info(f"AllocatedAudioStreams: {aAllocatedAudioStreams}")
+        logger.info(f"AllocatedAudioStreams: {aAllocatedAudioStreams}")
 
         self.step(6)
         await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
@@ -141,7 +140,7 @@ class TC_PAVST_2_9(MatterBaseTest):
         asserts.assert_true(transport_configs[0].transportStatus ==
                             pvcluster.Enums.TransportStatusEnum.kInactive, "Transport status should be Inactive")
 
-        logging.info("Wait for 6 secs to PushAVTransport expiry")
+        logger.info("Wait for 6 secs to PushAVTransport expiry")
         time.sleep(6)
 
         self.step(8)

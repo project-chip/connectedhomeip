@@ -35,8 +35,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
@@ -45,7 +43,7 @@ from mobly import asserts
 
 class TC_PAVST_2_2(MatterBaseTest):
     def desc_TC_PAVST_2_2(self) -> str:
-        return "[TC-PAVST-2.1] Attributes with Server as DUT"
+        return "[TC-PAVST-2.2] Attributes with Server as DUT"
 
     def pics_TC_PAVST_2_2(self):
         return ["PAVST.S"]
