@@ -301,7 +301,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
             resp = await self.TH2.WriteAttribute(nodeid=self.dut_node_id, attributes=[(endpoint_id, attribute(val))])
             if spec_requires == Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue:
                 # not writeable - expect either an unsupported write response or an unsupported access response (since ACL privilege check happens before writable check)
-                if (resp[0].Status != Status.UnsupportedWrite and resp[0].Status != Status.UnsupportedAccess):
+                if resp[0].Status not in (Status.UnsupportedWrite, Status.UnsupportedAccess):
                     self.record_error(test_name=test_name, location=location,
                                       problem=f"Unexpected error writing non-writeable attribute - expected either Unsupported Access or UnsupportedWrite, got {resp[0].Status.name}")
                     self.success = False

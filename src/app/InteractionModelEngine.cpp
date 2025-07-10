@@ -1799,6 +1799,9 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
     // Execute the ACL Access Granting Algorithm before existence checks, assuming the required_privilege for the element is
     // Operate, to determine if the subject would have had at least some access against the concrete path. This is done so we don't
     // leak information if we do fail existence checks.
+    // SPEC-DIVERGENCE: For non-concrete paths (Group Commands), the spec mandates only one ACL check AFTER the existence check.
+    // However, because this code is also used in the group path case, we end up performing an ADDITIONAL ACL check before the
+    // existence check. In practice, this divergence is not observable if all commands require at least Operate privilege.
     Status status = CheckCommandAccess(request, Access::Privilege::kOperate);
     VerifyOrReturnValue(status == Status::Success, status);
 
@@ -1818,7 +1821,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::ValidateCommandCanBe
 }
 
 Protocols::InteractionModel::Status InteractionModelEngine::CheckCommandAccess(const DataModel::InvokeRequest & aRequest,
-                                                                               const Access::Privilege & aRequiredPrivilege)
+                                                                               const Access::Privilege aRequiredPrivilege)
 {
     if (aRequest.subjectDescriptor == nullptr)
     {
