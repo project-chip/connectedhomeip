@@ -43,6 +43,7 @@ namespace Clusters {
 namespace CommodityMetering {
 
 // Some constraints for lists limitation
+constexpr uint8_t kMaxMeteredQuantityEntries                    = 128;
 constexpr uint8_t kMaxTariffComponentIDsPerMeteredQuantityEntry = 128;
 
 namespace {
@@ -142,7 +143,7 @@ CHIP_ERROR Instance::Init()
 {
     mMeteredQuantity.SetNull();
     mMeteredQuantityTimestamp.SetNull();
-    mTariffUnit.SetNull();
+    mMeasurementType.SetNull();
     mMaximumMeteredQuantities.SetNull();
     VerifyOrReturnError(AttributeAccessInterfaceRegistry::Instance().Register(this), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
@@ -179,10 +180,6 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
     {
         mMeteredQuantity.SetNull();
     }
-    else if (mMaximumMeteredQuantities.IsNull())
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
     else
     {
         if (!mMeteredQuantity.IsNull())
@@ -196,7 +193,7 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
         {
             mMeteredQuantity = MakeNullable(DataModel::List<Structs::MeteredQuantityStruct::Type>());
         }
-        else if (len <= mMaximumMeteredQuantities.Value())
+        else if (len <= kMaxMeteredQuantityEntries)
         {
             Platform::ScopedMemoryBuffer<Structs::MeteredQuantityStruct::Type> buffer;
 
@@ -218,6 +215,8 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
         {
             return CHIP_ERROR_INVALID_LIST_LENGTH;
         }
+
+        SetMaximumMeteredQuantities(MakeNullable(static_cast<uint16_t>(len)));
     }
 
     MatterReportingAttributeChangeCallback(mEndpointId, CommodityMetering::Id, MeteredQuantity::Id);
@@ -247,27 +246,27 @@ CHIP_ERROR Instance::SetMeteredQuantityTimestamp(DataModel::Nullable<uint32_t> n
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Instance::SetTariffUnit(DataModel::Nullable<TariffUnitEnum> newValue)
+CHIP_ERROR Instance::SetMeasurementType(DataModel::Nullable<Globals::MeasurementTypeEnum> newValue)
 {
-    DataModel::Nullable<TariffUnitEnum> oldValue = mTariffUnit;
+    DataModel::Nullable<Globals::MeasurementTypeEnum> oldValue = mMeasurementType;
 
     if (oldValue != newValue)
     {
         if (newValue.IsNull())
         {
-            mTariffUnit.SetNull();
+            mMeasurementType.SetNull();
         }
-        else if (EnsureKnownEnumValue(newValue.Value()) != TariffUnitEnum::kUnknownEnumValue)
+        else if (EnsureKnownEnumValue(newValue.Value()) != Globals::MeasurementTypeEnum::kUnknownEnumValue)
         {
-            mTariffUnit = newValue;
-            ChipLogDetail(AppServer, "Endpoint: %d - mTariffUnit updated to %d", mEndpointId, to_underlying(mTariffUnit.Value()));
+            mMeasurementType = newValue;
+            ChipLogDetail(AppServer, "Endpoint: %d - mMeasurementType updated to %d", mEndpointId, to_underlying(mMeasurementType.Value()));
         }
         else
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
 
-        MatterReportingAttributeChangeCallback(mEndpointId, CommodityMetering::Id, TariffUnit::Id);
+        MatterReportingAttributeChangeCallback(mEndpointId, CommodityMetering::Id, MeasurementType::Id);
     }
 
     return CHIP_NO_ERROR;
@@ -283,7 +282,7 @@ CHIP_ERROR Instance::SetMaximumMeteredQuantities(DataModel::Nullable<uint16_t> n
         {
             ChipLogDetail(AppServer, "MaximumMeteredQuantities updated to Null");
         }
-        else if (newValue.Value() >= 1)
+        else if (kMaxMeteredQuantityEntries >= newValue.Value())
         {
             ChipLogDetail(AppServer, "MaximumMeteredQuantities updated to %lu", static_cast<unsigned long int>(newValue.Value()));
         }
@@ -335,8 +334,8 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         ReturnErrorOnFailure(aEncoder.Encode(GetMeteredQuantityTimestamp()));
         break;
 
-    case TariffUnit::Id:
-        ReturnErrorOnFailure(aEncoder.Encode(GetTariffUnit()));
+    case MeasurementType::Id:
+        ReturnErrorOnFailure(aEncoder.Encode(GetMeasurementType()));
         break;
 
     case MaximumMeteredQuantities::Id:
