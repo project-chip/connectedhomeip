@@ -207,13 +207,13 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
-    
+
     # Generate unique test run ID to avoid conflicts in concurrent test runs
     import uuid
     test_run_id = str(uuid.uuid4())[:8]  # Use first 8 characters for shorter paths
     restart_flag_file = f"/tmp/chip_test_restart_app_{test_run_id}"
     stop_flag_file = f"/tmp/chip_test_stop_monitor_{test_run_id}"
-    
+
     if factory_reset or factory_reset_app_only:
         # Remove native app config
         for path in glob.glob('/tmp/chip*') + glob.glob('/tmp/repl*'):
