@@ -69,47 +69,47 @@ class TC_PAVST_2_3(MatterBaseTest):
             TestStep(7, "TH Reads Zones attribute from Zones Management Cluster on DUT, if the zone management cluster is present on this endpoint",
                      "Store value as aZones."),
             TestStep(8, "TH Reads MaxZones attribute from Zones Management Cluster on DUT, if the zone management cluster is present on this endpoint",
-                    "Store value as aMaxZones."),
+                     "Store value as aMaxZones."),
             TestStep(9, "TH Reads ProvisionedEndpoints attribute from TLS Client Management Cluster on DUT",
-                    "Store value as aProvisionedEndpoints."),
+                     "Store value as aProvisionedEndpoints."),
             TestStep(10, "TH sends the AllocatePushTransport command with a TLSEndpointID not in aProvisionedEndpoints in the TransportOptions struct.",
-                    "DUT responds with Status Code InvalidTLSEndpoint."),
+                     "DUT responds with Status Code InvalidTLSEndpoint."),
             TestStep(11, "TH sends the AllocatePushTransport command with a combination of IngestMethod and ContainerFormat not in aSupportedFormats.",
                      "DUT responds with Status Code InvalidCombination."),
             TestStep(12, "DUT responds with Status Code InvalidURL.",
-                    "Store value as aMaxZones."),
+                     "Store value as aMaxZones."),
             TestStep(13, "TH sends the AllocatePushTransport command with an invalid TriggerType in the TransportTriggerOptions struct field.",
-                    "DUT responds with Status Code InvalidTriggerType."),
+                     "DUT responds with Status Code InvalidTriggerType."),
             TestStep(14, "If the zone management cluster is present on this endpoint, TH sends the AllocatePushTransport command with an invalid ZoneID that is not present in aZones.",
-                    "DUT responds with Status Code InvalidZone."),
+                     "DUT responds with Status Code InvalidZone."),
             TestStep(15, "TH sends the AllocatePushTransport command with a VideoStreamID not present in aAllocatedVideoStreams.",
                      "DUT responds with Status Code InvalidStream."),
             TestStep(16, "TH sends the AllocatePushTransport command with a AudioStreamID not present in aAllocatedAudioStreams.",
-                    "DUT responds with Status Code InvalidStream."),
+                     "DUT responds with Status Code InvalidStream."),
             TestStep(17, "TH sends the AllocatePushTransport command with both VideoStreamID and AudioStreamID absent.",
-                    "DUT responds with Status Code InvalidArgument."),
+                     "DUT responds with Status Code InvalidArgument."),
             TestStep(18, "TH sends the AllocatePushTransport command with both VideoStreamID and AudioStreamID set to None..",
-                    "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID."),
+                     "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID."),
             TestStep(19, "If the zone management cluster is present on this endpoint, TH sends the AllocatePushTransport command with the TriggerType = Motion and size of the MotionZones list to be greater than aMaxZones.",
                      "DUT responds with ConstraintError."),
             TestStep(20, "TH sends the AllocatePushTransport command with the TriggerType = Motion and valid value for MotionSensitivity if DUT supports PerZoneSensitivity.",
-                    "DUT responds with InvalidCommand."),
+                     "DUT responds with InvalidCommand."),
             TestStep(21, "TH sends the AllocatePushTransport command with the TriggerType = Motion and MotionSensitivity > 10 if DUT does not support PerZoneSensitivity.",
-                    "DUT responds with ConstraintError."),
+                     "DUT responds with ConstraintError."),
             TestStep(22, "TH sends the AllocatePushTransport command with the TriggerType = Motion and MotionTimeControl omitted.",
-                    "DUT responds with InvalidCommand."),
+                     "DUT responds with InvalidCommand."),
             TestStep(23, "TH sends the AllocatePushTransport command with the TriggerType = Motion and MotionTimeControl struct with InitialDuration = 0.",
-                    "DUT responds with ConstraintError."),
+                     "DUT responds with ConstraintError."),
             TestStep(24, "TH sends the AllocatePushTransport command with the TriggerType = Motion and MotionTimeControl struct with MaxDuration = 0.",
-                    "DUT responds with ConstraintError."),
+                     "DUT responds with ConstraintError."),
             TestStep(25, "TH deallocates transport allocated in step 5 using DeallocatePushTransport command successfully. TH sends the AllocatePushTransport command with all valid parameters. The TriggerType = Motion and MotionZones and MotionSensitivity fields are present and None.",
-                    "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID."),
+                     "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID."),
             TestStep(26, "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID.",
-                    "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID."),
+                     "DUT responds with AllocatePushTransportResponse containing the allocated ConnectionID."),
             TestStep(27, "TH sends the AllocatePushTransport command with an invalid value for StreamUsage in the TransportOptions struct.",
-                    "DUT responds with InvalidCommand."),
+                     "DUT responds with InvalidCommand."),
             TestStep(28, "TH sends the AllocatePushTransport command with ContainerType = CMAF and CMAFContainerOptions omitted.",
-                    "DUT responds with InvalidCommand."),
+                     "DUT responds with InvalidCommand."),
         ]
 
     @async_test_body
@@ -315,7 +315,7 @@ class TC_PAVST_2_3(MatterBaseTest):
 
         self.step(15)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
+            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
                  "videoStreamID": 11,
                  "audioStreamID": 1,
@@ -326,13 +326,13 @@ class TC_PAVST_2_3(MatterBaseTest):
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint = endpoint)
+                 }), endpoint=endpoint)
             asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidStream,
                                  "DUT must  responds with Status Code InvalidStream.")
 
         self.step(16)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
+            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
                  "videoStreamID": 1,
                  "audioStreamID": 11,
@@ -343,13 +343,13 @@ class TC_PAVST_2_3(MatterBaseTest):
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint = endpoint)
+                 }), endpoint=endpoint)
             asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidStream,
                                  "DUT must  responds with Status Code InvalidStream.")
 
         self.step(17)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
+            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
                  "endpointID": 1,
                  "url": "https://localhost:1234/streams/1",
@@ -358,15 +358,15 @@ class TC_PAVST_2_3(MatterBaseTest):
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint = endpoint)
+                 }), endpoint=endpoint)
             asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.ConstraintError,
                                  "DUT must  responds with Status Code ConstraintError.")
 
         self.step(18)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
+            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
-                "videoStreamID": None,
+                 "videoStreamID": None,
                  "audioStreamID": None,
                  "endpointID": 1,
                  "url": "https://localhost:1234/streams/1",
@@ -375,17 +375,17 @@ class TC_PAVST_2_3(MatterBaseTest):
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint = endpoint)
+                 }), endpoint=endpoint)
             asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.Success,
                                  "DUT must responds with Status code Success")
 
         self.step(19)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            zonesList={{"zoneID": 1}, {"zoneID": 2}, {"zoneID": 3}, {"zoneID": 4}, {"zoneID": 5}, {"zoneID": 6}, {"zoneID": 7}, {"zoneID": 8}, {
+            zonesList = {{"zoneID": 1}, {"zoneID": 2}, {"zoneID": 3}, {"zoneID": 4}, {"zoneID": 5}, {"zoneID": 6}, {"zoneID": 7}, {"zoneID": 8}, {
                 "zoneID": 9}, {"zoneID": 10}, {"zoneID": 11}, {"zoneID": 12}, {"zoneID": 13}, {"zoneID": 14}, {"zoneID": 15}, {"zoneID": 16}}
-            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
+            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
-                "videoStreamID": 1,
+                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
                  "url": "https://localhost:1234/streams/1",
@@ -394,15 +394,15 @@ class TC_PAVST_2_3(MatterBaseTest):
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint = endpoint)
+                 }), endpoint=endpoint)
             asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.ConstraintError,
                                  "DUT must  responds with Status code ConstraintError")
 
         self.step(20)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
+            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
-                "videoStreamID": 1,
+                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
                  "url": "https://localhost:1234/streams/1",
@@ -411,15 +411,15 @@ class TC_PAVST_2_3(MatterBaseTest):
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint = endpoint)
+                 }), endpoint=endpoint)
             asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidCommand,
                                  "DUT must  responds with Status code InvalidCommand")
 
         self.step(21)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
+            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
-                "videoStreamID": 1,
+                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
                  "url": "https://localhost:1234/streams/1",
@@ -428,15 +428,15 @@ class TC_PAVST_2_3(MatterBaseTest):
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint = endpoint)
+                 }), endpoint=endpoint)
             asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.ConstraintError,
                                  "DUT must  responds with Status code ConstraintError")
 
         self.step(22)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
+            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
-                "videoStreamID": 1,
+                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
                  "url": "https://localhost:1234/streams/1",
@@ -445,15 +445,15 @@ class TC_PAVST_2_3(MatterBaseTest):
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint = endpoint)
+                 }), endpoint=endpoint)
             asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidCommand,
                                  "DUT must  responds with Status code InvalidCommand")
 
         self.step(23)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
+            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
-                "videoStreamID": 1,
+                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
                  "url": "https://localhost:1234/streams/1",
@@ -462,15 +462,15 @@ class TC_PAVST_2_3(MatterBaseTest):
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint = endpoint)
+                 }), endpoint=endpoint)
             asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.ConstraintError,
                                  "DUT must  responds with Status code ConstraintError")
 
         self.step(23)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
+            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
-                "videoStreamID": 1,
+                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
                  "url": "https://localhost:1234/streams/1",
@@ -479,15 +479,15 @@ class TC_PAVST_2_3(MatterBaseTest):
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint = endpoint)
+                 }), endpoint=endpoint)
             asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.ConstraintError,
                                  "DUT must  responds with Status code ConstraintError")
 
         self.step(23)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
+            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
-                "videoStreamID": 1,
+                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
                  "url": "https://localhost:1234/streams/1",
@@ -496,15 +496,15 @@ class TC_PAVST_2_3(MatterBaseTest):
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint = endpoint)
+                 }), endpoint=endpoint)
             asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.ConstraintError,
                                  "DUT must  responds with Status code ConstraintError")
 
         self.step(24)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
+            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
-                "videoStreamID": 1,
+                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
                  "url": "https://localhost:1234/streams/1",
@@ -513,15 +513,15 @@ class TC_PAVST_2_3(MatterBaseTest):
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint = endpoint)
+                 }), endpoint=endpoint)
             asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.ConstraintError,
                                  "DUT must  responds with Status code ConstraintError")
 
         self.step(25)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
+            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
-                "videoStreamID": 1,
+                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
                  "url": "https://localhost:1234/streams/1",
@@ -530,15 +530,15 @@ class TC_PAVST_2_3(MatterBaseTest):
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint = endpoint)
+                 }), endpoint=endpoint)
             asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.Success,
                                  "DUT must responds with Status code Success")
 
         self.step(26)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
+            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
-                "videoStreamID": 1,
+                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
                  "url": "https://localhost:1234/streams/1",
@@ -547,15 +547,15 @@ class TC_PAVST_2_3(MatterBaseTest):
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint = endpoint)
+                 }), endpoint=endpoint)
             asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.Success,
                                  "DUT must  responds with Status code Success")
 
         self.step(27)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
+            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
-                "videoStreamID": 1,
+                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
                  "url": "https://localhost:1234/streams/1",
@@ -564,15 +564,15 @@ class TC_PAVST_2_3(MatterBaseTest):
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint = endpoint)
+                 }), endpoint=endpoint)
             asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidCommand,
                                  "DUT must  responds with Status code InvalidCommand")
 
         self.step(28)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
+            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 10,
-                "videoStreamID": 1,
+                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
                  "url": "https://localhost:1234/streams/1",
@@ -581,7 +581,7 @@ class TC_PAVST_2_3(MatterBaseTest):
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0},
                  "expiryTime": 5
-                 }), endpoint = endpoint)
+                 }), endpoint=endpoint)
             asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidCommand,
                                  "DUT must  responds with Status code InvalidCommand")
 
