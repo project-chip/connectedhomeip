@@ -79,14 +79,16 @@ public:
     CHIP_ERROR PersistentAttributesLoadedCallback();
 
     void SetMediaController(MediaController * mediaController);
-
-    void Init(AudioStreamStruct aAudioStreamParams, VideoStreamStruct aVideoStreamParams);
+    void SetCameraDevice(CameraDeviceInterface * cameraDevice);
+    void Init();
 
     ~PushAvStreamTransportManager();
 
 private:
     std::vector<PushAvStream> pushavStreams;
-    MediaController * mMediaController = nullptr;
+    MediaController * mMediaController    = nullptr;
+    CameraDeviceInterface * mCameraDevice = nullptr;
+
     AudioStreamStruct mAudioStreamParams;
     VideoStreamStruct mVideoStreamParams;
     std::unordered_map<uint16_t, std::unique_ptr<PushAVTransport>> mTransportMap; // map for the transport objects

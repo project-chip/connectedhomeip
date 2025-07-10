@@ -149,7 +149,7 @@ public:
         // Initialize the camera hardware
         virtual CameraError InitializeCameraDevice() = 0;
 
-        virtual CameraError InitializeStreams(AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams) = 0;
+        virtual CameraError InitializeStreams() = 0;
 
         // Configure camera settings (e.g., exposure, focus)
         // virtual CameraError Configure(const std::string & setting, const std::string & value) = 0;

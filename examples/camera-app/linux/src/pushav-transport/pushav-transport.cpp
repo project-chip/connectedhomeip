@@ -480,3 +480,8 @@ void PushAVTransport::ModifyPushTransport(const TransportOptionsStorage transpor
 {
     ConfigureRecorderSettings(transportOptions, audioStreamParams, videoStreamParams);
 }
+
+bool PushAVTransport::GetBusyStatus()
+{
+    return (uploader.get() != nullptr && uploader->GetUploadQueueSize() > 0);
+}

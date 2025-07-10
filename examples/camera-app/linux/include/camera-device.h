@@ -102,7 +102,7 @@ public:
     // HAL interface impl
     CameraError InitializeCameraDevice() override;
 
-    CameraError InitializeStreams(AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams) override;
+    CameraError InitializeStreams() override;
 
     CameraError CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID, const VideoResolutionStruct & resolution,
                                 ImageSnapshot & outImageSnapshot) override;
@@ -306,8 +306,8 @@ private:
     std::vector<AudioStream> mAudioStreams;       // Vector to hold available audio streams
     std::vector<SnapshotStream> mSnapshotStreams; // Vector to hold available snapshot streams
 
-    VideoStreamStruct InitializeVideoStreams();
-    AudioStreamStruct InitializeAudioStreams();
+    void InitializeVideoStreams();
+    void InitializeAudioStreams();
     void InitializeSnapshotStreams();
 
     GstElement * CreateVideoPipeline(const std::string & device, int width, int height, int framerate, CameraError & error);

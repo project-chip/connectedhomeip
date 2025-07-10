@@ -331,6 +331,7 @@ CameraDevice::CameraDevice()
 
     // Set the CameraDevice interface in ZoneManager
     mZoneManager.SetCameraDevice(this);
+    mPushAVTransportManager.SetCameraDevice(this);
 }
 
 CameraDevice::~CameraDevice()
@@ -343,13 +344,10 @@ CameraDevice::~CameraDevice()
 
 void CameraDevice::Init()
 {
-    VideoStreamStruct videoStreamParams;
-    AudioStreamStruct audioStreamParams;
-
     InitializeCameraDevice();
-    InitializeStreams(audioStreamParams, videoStreamParams);
+    InitializeStreams();
     mWebRTCProviderManager.Init();
-    mPushAVTransportManager.Init(audioStreamParams, videoStreamParams);
+    mPushAVTransportManager.Init();
 }
 
 CameraError CameraDevice::InitializeCameraDevice()
@@ -372,10 +370,10 @@ CameraError CameraDevice::InitializeCameraDevice()
     return CameraError::SUCCESS;
 }
 
-CameraError CameraDevice::InitializeStreams(AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams)
+CameraError CameraDevice::InitializeStreams()
 {
-    videoStreamParams = InitializeVideoStreams();
-    audioStreamParams = InitializeAudioStreams();
+    InitializeVideoStreams();
+    InitializeAudioStreams();
     InitializeSnapshotStreams();
 
     return CameraError::SUCCESS;
@@ -1175,6 +1173,7 @@ CameraError CameraDevice::SetZoom(uint8_t aZoom)
     return CameraError::SUCCESS;
 }
 
+<<<<<<< HEAD
 CameraError CameraDevice::SetDetectionSensitivity(uint8_t aSensitivity)
 {
     mDetectionSensitivity = aSensitivity;
@@ -1210,6 +1209,9 @@ void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneID)
 }
 
 VideoStreamStruct CameraDevice::InitializeVideoStreams()
+=======
+void CameraDevice::InitializeVideoStreams()
+>>>>>>> 41c4d9b54a (Implemented delegate API)
 {
     // Create single video stream with typical supported parameters
     VideoStream videoStream = { { 1 /* Id */,
@@ -1230,10 +1232,9 @@ VideoStreamStruct CameraDevice::InitializeVideoStreams()
                                 nullptr };
 
     mVideoStreams.push_back(videoStream);
-    return videoStream.videoStreamParams;
 }
 
-AudioStreamStruct CameraDevice::InitializeAudioStreams()
+void CameraDevice::InitializeAudioStreams()
 {
     // Create single audio stream with typical supported parameters
     AudioStream audioStream = { { 1 /* Id */, StreamUsageEnum::kLiveView /* StreamUsage */, AudioCodecEnum::kOpus,
@@ -1243,7 +1244,6 @@ AudioStreamStruct CameraDevice::InitializeAudioStreams()
                                 nullptr };
 
     mAudioStreams.push_back(audioStream);
-    return audioStream.audioStreamParams;
 }
 
 void CameraDevice::InitializeSnapshotStreams()
