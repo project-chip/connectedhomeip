@@ -422,6 +422,8 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDealloc
 void CameraAVStreamManager::OnStreamUsagePrioritiesChanged()
 {
     ChipLogProgress(Camera, "Stream usage priorities changed");
+    mCameraDeviceHAL->GetCameraHALInterface().SetStreamUsagePriorities(
+        GetCameraAVStreamMgmtServer()->GetStreamUsagePriorities());
 }
 
 void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)

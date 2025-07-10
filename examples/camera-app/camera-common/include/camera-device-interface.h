@@ -242,9 +242,9 @@ public:
         // This also sets the default priority of the stream usages.
         virtual std::vector<StreamUsageEnum> & GetSupportedStreamUsages() = 0;
 
-        // Get stream usage priorities as an ordered list. This is expected to
-        // be a subset of the SupportedStreamUsages.
-        virtual std::vector<StreamUsageEnum> & GetStreamUsagePriorities() = 0;
+        // Get/Set stream usage priorities as an ordered list. This is a subset of the SupportedStreamUsages.
+        virtual std::vector<StreamUsageEnum> & GetStreamUsagePriorities()          = 0;
+        virtual CameraError SetStreamUsagePriorities(std::vector<StreamUsageEnum>) = 0;
 
         // Get/Set soft recording privacy mode
         virtual CameraError SetSoftRecordingPrivacyModeEnabled(bool softRecordingPrivacyMode) = 0;

@@ -306,7 +306,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "HandleProvideOffer: Cannot meet resource management conditions");
-        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
         return;
     }
 
