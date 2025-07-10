@@ -52,14 +52,14 @@ private:
     RegisteredServerCluster<NetworkCommissioningCluster> mCluster;
 };
 
-// The InstanceAndDriver class encapsulates the creation and management of a transport driver instance (Wifi,Thread or Ethernet)
+// The InstanceAndDriver class encapsulates the creation and management of a transport driver instance (Wi-Fi, Thread, or Ethernet)
 // together with a NetworkCommissioningCluster instance.
 // It provides a unified interface to initialize, configure, and operate both components,
 // ensuring they are properly linked for network commissioning operations. This class simplifies the integration process by handling
 // the instantiation and lifecycle of both the transport driver and the cluster as a single unit.
 //
-// Until all platform driver instance is migrated to use this class, Instance constructors remain public to maintain both
-// instantiation methodes. Once the transition is completed, the construtors will be moved to the private section.
+// Until all platform driver instances are migrated to use this class, Instance constructors remain public to maintain both
+// instantiation methods. Once the transition is complete, the constructors will be moved to the private section.
 template <typename TransportDriver>
 class InstanceAndDriver : public Instance
 {
