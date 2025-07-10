@@ -152,14 +152,14 @@ class TC_JFADMIN_2_2(MatterBaseTest):
             TestStep("3", "TH sends ArmFailSafe command to DUT with ExpiryLengthSeconds set to 10 and Breadcrumb 1.",
                      "DUT respond with ArmFailSafeResponse Command."),
             TestStep("4", "TH sends ICACCSRRequest command to DUT.",
-                     "DUT response contains status code CONSTRAINT_ERROR."),
+                     "DUT response contains an ICACCSR."),
             TestStep("5", "Wait for ArmFailSafe to expire."),
             TestStep("6", "TH sends AddICAC command to DUT using icac1 as parameter.",
                      "DUT response contains status code FAILSAFE_REQUIRED."),
             TestStep("7", "TH sends ArmFailSafe command to DUT with ExpiryLengthSeconds set to 10 and Breadcrumb 1.",
                      "DUT respond with ArmFailSafeResponse Command."),
-            TestStep("8", "[SKIP Missing SDK Implementation] TH sends AddICAC command to DUT using icac1 as parameter.",
-                     "DUT ICACResponse contains status 2 (InvalidICAC).")
+            # TestStep("8", "[SKIP Missing SDK Implementation] TH sends AddICAC command to DUT using icac1 as parameter.",
+            #          "DUT ICACResponse contains status 2 (InvalidICAC).")
         ]
 
     @async_test_body
@@ -196,17 +196,12 @@ class TC_JFADMIN_2_2(MatterBaseTest):
             cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=10, breadcrumb=1))
 
         self.step("4")
-        try:
-            await self.send_single_cmd(
-                dev_ctrl=devCtrlEcoA,
-                node_id=1,
-                endpoint=1,
-                cmd=Clusters.JointFabricAdministrator.Commands.ICACCSRRequest())
-        except InteractionModelError as e:
-            asserts.assert_in('ConstraintError (0x87)',
-                              str(e), f'Expected ConstraintError (0x87) error, but got {str(e)}')
-        else:
-            asserts.assert_true(False, 'Expected InteractionModelError with ConstraintError (0x87), but no exception occurred.')
+        response = await self.send_single_cmd(
+            dev_ctrl=devCtrlEcoA,
+            node_id=1,
+            endpoint=1,
+            cmd=Clusters.JointFabricAdministrator.Commands.ICACCSRRequest())
+        asserts.assert_not_equal(response.icaccsr, b'', "No ICACSR was returned!")
 
         self.step("5")
         # Wait for ArmFailSafe timer to expire
@@ -234,7 +229,7 @@ class TC_JFADMIN_2_2(MatterBaseTest):
             cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=60, breadcrumb=1))
 
         # TODO SDK Functionality is not finished. Uncomment when implementation is ready
-        self.step("8")
+        # self.step("8")
         # cmd = Clusters.OperationalCredentials.Commands.CSRRequest(CSRNonce=random.randbytes(32), isForUpdateNOC=True)
         # csr_update = await self.send_single_cmd(dev_ctrl=devCtrlEcoA, node_id=1, cmd=cmd)
         # new_noc_chain = await devCtrlEcoA.IssueNOCChain(csr_update, 1)
