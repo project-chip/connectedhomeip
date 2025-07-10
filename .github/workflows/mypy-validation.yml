@@ -55,11 +55,11 @@ jobs:
 
           echo "$OUTPUT"
 
-          ERRORS=$(echo "$OUTPUT" | grep '^src/controller/python/chip/ChipDeviceCtrl.py:[0-9]\+: error:' | wc -l)
+          ERRORS=$(echo "$OUTPUT" | grep -E '^src/controller/python/chip/ChipDeviceCtrl.py:[0-9]+: error:' | wc -l)
 
           if [ "$ERRORS" -ne 0 ]; then
             echo "Mypy found $ERRORS error(s) in ChipDeviceCtrl.py"
-            echo "$OUTPUT" | grep '^src/controller/python/chip/ChipDeviceCtrl.py:[0-9]\+: error:'
+            echo "$OUTPUT" | grep -E '^src/controller/python/chip/ChipDeviceCtrl.py:[0-9]+: error:'
             exit 1
           else
             echo "No mypy errors found in ChipDeviceCtrl.py"
