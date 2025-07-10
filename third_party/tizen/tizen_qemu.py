@@ -71,8 +71,8 @@ parser.add_argument(
     help="host directory to share with the guest")
 parser.add_argument(
     '--runner', type=str,
-    help="path to the runner script which will be executed after boot; "
-    "it should be relative to the shared directory")
+    help=("path to the runner script which will be executed after boot; "
+    "it should be relative to the shared directory"))
 parser.add_argument(
     '--output', metavar='FILE', default="/dev/null",
     help="store the QEMU output in a FILE")
