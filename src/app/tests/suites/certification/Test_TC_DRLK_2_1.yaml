@@ -1638,6 +1638,7 @@ tests:
       attribute: "AliroReaderGroupIdentifier"
       response:
           value: aliroreadergrpidentifier
+
     - label:
           "Step 40a: TH reads AliroReaderGroupSubIdentifier attribute from DUT"
       PICS: DRLK.S.F0d && DRLK.S.A0082
@@ -1657,7 +1658,7 @@ tests:
       command: "writeAttribute"
       attribute: "AliroReaderGroupSubIdentifier"
       arguments:
-          value: "047a4c992d75368"
+          value: "047a4c992d753968"
       response:
           error: UNSUPPORTED_WRITE
 
@@ -1702,7 +1703,7 @@ tests:
           value: aliroprotocolversion
 
     - label: "Step 42a: TH reads AliroGroupResolvingKey attribute from DUT"
-      PICS: DRLK.S.F0d && DRLK.S.A0084
+      PICS: DRLK.S.F0e && DRLK.S.A0084
       command: "readAttribute"
       attribute: "AliroGroupResolvingKey"
       response:
@@ -1715,16 +1716,16 @@ tests:
     - label:
           "Step 42b: TH writes AliroGroupResolvingKey attribute as octstr value
           of length 16 which is different from alirogrpresolvingkey"
-      PICS: DRLK.S.F0d && DRLK.S.A0084
+      PICS: DRLK.S.F0e && DRLK.S.A0084
       command: "writeAttribute"
       attribute: "AliroGroupResolvingKey"
       arguments:
-          value: "047a4c992d75368"
+          value: "047a4c992d753968"
       response:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 42c: TH reads AliroGroupResolvingKey attribute from DUT"
-      PICS: DRLK.S.F0d && DRLK.S.A0084
+      PICS: DRLK.S.F0e && DRLK.S.A0084
       command: "readAttribute"
       attribute: "AliroGroupResolvingKey"
       response:
@@ -1733,7 +1734,7 @@ tests:
     - label:
           "Step 43a: TH reads AliroSupportedBLEUWBProtocolVersions attribute
           from DUT"
-      PICS: DRLK.S.F0d && DRLK.S.A0085
+      PICS: DRLK.S.F0e && DRLK.S.A0085
       command: "readAttribute"
       attribute: "AliroSupportedBLEUWBProtocolVersions"
       response:
@@ -1745,7 +1746,7 @@ tests:
     - label:
           "Step 43b: TH writes AliroSupportedBLEUWBProtocolVersions attribute as
           list which is different from alirobleuwbprotocolversion"
-      PICS: DRLK.S.F0d && DRLK.S.A0085
+      PICS: DRLK.S.F0e && DRLK.S.A0085
       command: "writeAttribute"
       attribute: "AliroSupportedBLEUWBProtocolVersions"
       arguments:
@@ -1754,14 +1755,14 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 43c: TH reads AliroGroupResolvingKey attribute from DUT"
-      PICS: DRLK.S.F0d && DRLK.S.A0085
+      PICS: DRLK.S.F0e && DRLK.S.A0085
       command: "readAttribute"
       attribute: "AliroSupportedBLEUWBProtocolVersions"
       response:
           value: alirobleuwbprotocolversion
 
     - label: "Step 44a: TH reads AliroBLEAdvertisingVersion attribute from DUT"
-      PICS: DRLK.S.F0d && DRLK.S.A0086
+      PICS: DRLK.S.F0e && DRLK.S.A0086
       command: "readAttribute"
       attribute: "AliroBLEAdvertisingVersion"
       response:
@@ -1774,7 +1775,7 @@ tests:
     - label:
           "Step 44b: TH writes AliroBLEAdvertisingVersion attribute as any value
           different from alirobleadvversion"
-      PICS: DRLK.S.F0d && DRLK.S.A0086
+      PICS: DRLK.S.F0e && DRLK.S.A0086
       command: "writeAttribute"
       attribute: "AliroBLEAdvertisingVersion"
       arguments:
@@ -1783,7 +1784,7 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Step 44c: TH reads AliroBLEAdvertisingVersion attribute from DUT"
-      PICS: DRLK.S.F0d && DRLK.S.A0086
+      PICS: DRLK.S.F0e && DRLK.S.A0086
       command: "readAttribute"
       attribute: "AliroBLEAdvertisingVersion"
       response:
