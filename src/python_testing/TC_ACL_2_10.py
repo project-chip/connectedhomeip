@@ -36,15 +36,12 @@
 import logging
 import os
 import random
-import shlex
-import subprocess
 import time
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from chip.clusters.Types import Nullable, NullValue
+from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
-from chip.storage import PersistentStorage
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
