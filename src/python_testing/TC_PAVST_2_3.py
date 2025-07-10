@@ -109,7 +109,7 @@ class TC_PAVST_2_3(MatterBaseTest):
             TestStep(27, "TH sends the AllocatePushTransport command with an invalid value for StreamUsage in the TransportOptions struct.",
                     "DUT responds with InvalidCommand."),
             TestStep(28, "TH sends the AllocatePushTransport command with ContainerType = CMAF and CMAFContainerOptions omitted.",
-                    "DUT responds with InvalidCommand."),              
+                    "DUT responds with InvalidCommand."),
         ]
 
     @async_test_body
@@ -209,14 +209,14 @@ class TC_PAVST_2_3(MatterBaseTest):
                 endpoint=endpoint, cluster=pvcluster, attribute=pvcluster.Attributes.CurrentConnections
             )
             asserts.assert_equal(len(current_connections), 1, "TransportConfigurations must be 1")
-            asserts.assert_equal(current_connections[0].TransportStatus, cluster.TransportStatusEnum.kInactive, "TransportStatus must be Inactive")
+            asserts.assert_equal(current_connections[0].TransportStatus,
+                                 cluster.TransportStatusEnum.kInactive, "TransportStatus must be Inactive")
 
         self.step(7)
         aZones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=zmcluster, attribute=zmcluster.Attributes.Zones
         )
         logger.info(f"aZones: {aZones}")
-
 
         self.step(8)
         aMaxZones = await self.read_single_attribute_check_success(
@@ -244,7 +244,8 @@ class TC_PAVST_2_3(MatterBaseTest):
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
                  }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidTLSEndpoint, "DUT must responds with Status Code InvalidTLSEndpoint.")
+            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidTLSEndpoint,
+                                 "DUT must responds with Status Code InvalidTLSEndpoint.")
 
         self.step(11)
         if self.pics_guard(self.check_pics("PAVST.S")):
@@ -260,7 +261,8 @@ class TC_PAVST_2_3(MatterBaseTest):
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
                  }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidCombination, "DUT must  responds with Status Code InvalidCombination.")
+            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidCombination,
+                                 "DUT must  responds with Status Code InvalidCombination.")
 
         self.step(12)
         if self.pics_guard(self.check_pics("PAVST.S")):
@@ -269,15 +271,15 @@ class TC_PAVST_2_3(MatterBaseTest):
                  "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
-                 "url": "https:/localhost:1234/streams/1",",
+                 "url": "https:/localhost:1234/streams/1", ",
                  "triggerOptions": {"triggerType": 2},
                  "ingestMethod": 0,
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
                  }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidURL, "DUT must  responds with Status Code InvalidURL.")
-
+            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidURL,
+                                 "DUT must  responds with Status Code InvalidURL.")
 
         self.step(13)
         if self.pics_guard(self.check_pics("PAVST.S")):
@@ -286,14 +288,15 @@ class TC_PAVST_2_3(MatterBaseTest):
                  "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
-                 "url": "https://localhost:1234/streams/1",",
+                 "url": "https://localhost:1234/streams/1", ",
                  "triggerOptions": {"triggerType": 10},
                  "ingestMethod": 0,
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
                  }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidTriggerType, "DUT must  responds with Status Code InvalidTriggerType.")
+            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidTriggerType,
+                                 "DUT must  responds with Status Code InvalidTriggerType.")
 
         self.step(14)
         if self.pics_guard(self.check_pics("PAVST.S")):
@@ -302,284 +305,302 @@ class TC_PAVST_2_3(MatterBaseTest):
                  "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
-                 "url": "https://localhost:1234/streams/1",",
-                 "triggerOptions": {"triggerType": 2, "motionZones": {"zoneID": 11}},},
+                 "url": "https://localhost:1234/streams/1", ",
+                 "triggerOptions": {"triggerType": 2, "motionZones": {"zoneID": 11}}, },
                  "ingestMethod": 0,
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
                  }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidZone, "DUT must  responds with Status Code InvalidZone.")
+            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidZone,
+                                 "DUT must  responds with Status Code InvalidZone.")
 
 
         self.step(15)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
+            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
                  "videoStreamID": 11,
                  "audioStreamID": 1,
                  "endpointID": 1,
-                 "url": "https://localhost:1234/streams/1",",
+                 "url": "https://localhost:1234/streams/1", ",
                  "triggerOptions": {"triggerType": 2},
                  "ingestMethod": 0,
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidStream, "DUT must  responds with Status Code InvalidStream.")
+                 }), endpoint = endpoint)
+            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidStream,
+                                 "DUT must  responds with Status Code InvalidStream.")
 
 
         self.step(16)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
+            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
                  "videoStreamID": 1,
                  "audioStreamID": 11,
                  "endpointID": 1,
-                 "url": "https://localhost:1234/streams/1",",
+                 "url": "https://localhost:1234/streams/1", ",
                  "triggerOptions": {"triggerType": 2},
                  "ingestMethod": 0,
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidStream, "DUT must  responds with Status Code InvalidStream.")
+                 }), endpoint = endpoint)
+            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidStream,
+                                 "DUT must  responds with Status Code InvalidStream.")
 
 
         self.step(17)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
+            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
                  "endpointID": 1,
-                 "url": "https://localhost:1234/streams/1",",
+                 "url": "https://localhost:1234/streams/1", ",
                  "triggerOptions": {"triggerType": 2},
                  "ingestMethod": 0,
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.ConstraintError, "DUT must  responds with Status Code ConstraintError.")
+                 }), endpoint = endpoint)
+            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.ConstraintError,
+                                 "DUT must  responds with Status Code ConstraintError.")
 
 
         self.step(18)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
+            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
                 "videoStreamID": Null,
                  "audioStreamID": Null,
                  "endpointID": 1,
-                 "url": "https://localhost:1234/streams/1",",
+                 "url": "https://localhost:1234/streams/1", ",
                  "triggerOptions": {"triggerType": 2},
                  "ingestMethod": 0,
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.Success, "DUT must responds with Status code Success")
+                 }), endpoint = endpoint)
+            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.Success,
+                                 "DUT must responds with Status code Success")
 
 
         self.step(19)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            zonesList = {{"zoneID": 1}, {"zoneID": 2},{"zoneID": 3}, {"zoneID": 4},{"zoneID": 5}, {"zoneID": 6},{"zoneID": 7}, {"zoneID": 8},{"zoneID": 9}, {"zoneID": 10},{"zoneID": 11}, {"zoneID": 12},{"zoneID": 13}, {"zoneID": 14},{"zoneID": 15}, {"zoneID": 16}}
-            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
+            zonesList={{"zoneID": 1}, {"zoneID": 2}, {"zoneID": 3}, {"zoneID": 4}, {"zoneID": 5}, {"zoneID": 6}, {"zoneID": 7}, {"zoneID": 8}, {
+                "zoneID": 9}, {"zoneID": 10}, {"zoneID": 11}, {"zoneID": 12}, {"zoneID": 13}, {"zoneID": 14}, {"zoneID": 15}, {"zoneID": 16}}
+            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
-                 "url": "https://localhost:1234/streams/1",",
+                 "url": "https://localhost:1234/streams/1", ",
                  "triggerOptions": {"triggerType": 1, "motionZones": zonesList},
                  "ingestMethod": 0,
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.ConstraintError, "DUT must  responds with Status code ConstraintError")
+                 }), endpoint = endpoint)
+            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.ConstraintError,
+                                 "DUT must  responds with Status code ConstraintError")
 
 
         self.step(20)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
+            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
-                 "url": "https://localhost:1234/streams/1",",
+                 "url": "https://localhost:1234/streams/1", ",
                  "triggerOptions": {"triggerType": 1, "MotionSensitivity ": 3},
                  "ingestMethod": 0,
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidCommand, "DUT must  responds with Status code InvalidCommand")
+                 }), endpoint = endpoint)
+            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidCommand,
+                                 "DUT must  responds with Status code InvalidCommand")
 
 
         self.step(21)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
+            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
-                 "url": "https://localhost:1234/streams/1",",
+                 "url": "https://localhost:1234/streams/1", ",
                  "triggerOptions": {"triggerType": 1, "MotionSensitivity ": 11},
                  "ingestMethod": 0,
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.ConstraintError, "DUT must  responds with Status code ConstraintError")
+                 }), endpoint = endpoint)
+            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.ConstraintError,
+                                 "DUT must  responds with Status code ConstraintError")
 
 
         self.step(22)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
+            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
-                 "url": "https://localhost:1234/streams/1",",
+                 "url": "https://localhost:1234/streams/1", ",
                  "triggerOptions": {"triggerType": 1},
                  "ingestMethod": 0,
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidCommand, "DUT must  responds with Status code InvalidCommand")
+                 }), endpoint = endpoint)
+            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidCommand,
+                                 "DUT must  responds with Status code InvalidCommand")
 
 
         self.step(23)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
+            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
-                 "url": "https://localhost:1234/streams/1",",
+                 "url": "https://localhost:1234/streams/1", ",
                  "triggerOptions": {"triggerType": 1, "motionTimeControl": {"initialDuration": 0}},
                  "ingestMethod": 0,
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.ConstraintError, "DUT must  responds with Status code ConstraintError")
+                 }), endpoint = endpoint)
+            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.ConstraintError,
+                                 "DUT must  responds with Status code ConstraintError")
 
 
         self.step(23)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
+            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
-                 "url": "https://localhost:1234/streams/1",",
+                 "url": "https://localhost:1234/streams/1", ",
                  "triggerOptions": {"triggerType": 1, "motionTimeControl": {"initialDuration": 0}},
                  "ingestMethod": 0,
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.ConstraintError, "DUT must  responds with Status code ConstraintError")
+                 }), endpoint = endpoint)
+            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.ConstraintError,
+                                 "DUT must  responds with Status code ConstraintError")
 
 
         self.step(23)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
+            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
-                 "url": "https://localhost:1234/streams/1",",
+                 "url": "https://localhost:1234/streams/1", ",
                  "triggerOptions": {"triggerType": 1, "motionTimeControl": {"initialDuration": 0}},
                  "ingestMethod": 0,
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.ConstraintError, "DUT must  responds with Status code ConstraintError")
+                 }), endpoint = endpoint)
+            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.ConstraintError,
+                                 "DUT must  responds with Status code ConstraintError")
 
 
         self.step(24)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
+            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
-                 "url": "https://localhost:1234/streams/1",",
+                 "url": "https://localhost:1234/streams/1", ",
                  "triggerOptions": {"triggerType": 1, "motionTimeControl": {"maxDuration": 0}},
                  "ingestMethod": 0,
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.ConstraintError, "DUT must  responds with Status code ConstraintError")
+                 }), endpoint = endpoint)
+            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.ConstraintError,
+                                 "DUT must  responds with Status code ConstraintError")
 
 
         self.step(25)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
+            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
-                 "url": "https://localhost:1234/streams/1",",
-                 "triggerOptions": {"triggerType": 1, "motionZones": Null, "motionSensitivity" : Null},
+                 "url": "https://localhost:1234/streams/1", ",
+                 "triggerOptions": {"triggerType": 1, "motionZones": Null, "motionSensitivity": Null},
                  "ingestMethod": 0,
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.Success, "DUT must responds with Status code Success")
+                 }), endpoint = endpoint)
+            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.Success,
+                                 "DUT must responds with Status code Success")
 
 
         self.step(26)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
+            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
-                 "url": "https://localhost:1234/streams/1",",
+                 "url": "https://localhost:1234/streams/1", ",
                  "triggerOptions": {"triggerType": 1, "motionZones": ""},
                  "ingestMethod": 0,
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.Success, "DUT must  responds with Status code Success")
+                 }), endpoint = endpoint)
+            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.Success,
+                                 "DUT must  responds with Status code Success")
 
 
         self.step(27)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
+            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 0,
                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
-                 "url": "https://localhost:1234/streams/1",",
+                 "url": "https://localhost:1234/streams/1", ",
                  "triggerOptions": {"triggerType": 1},
                  "ingestMethod": 0,
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
-                 }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidCommand, "DUT must  responds with Status code InvalidCommand")
+                 }), endpoint = endpoint)
+            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidCommand,
+                                 "DUT must  responds with Status code InvalidCommand")
 
         self.step(28)
         if self.pics_guard(self.check_pics("PAVST.S")):
-            status = await self.send_single_cmd(cmd=pvcluster.Commands.AllocatePushTransport(
+            status=await self.send_single_cmd(cmd = pvcluster.Commands.AllocatePushTransport(
                 {"streamUsage": 10,
                 "videoStreamID": 1,
                  "audioStreamID": 1,
                  "endpointID": 1,
-                 "url": "https://localhost:1234/streams/1",",
+                 "url": "https://localhost:1234/streams/1", ",
                  "triggerOptions": {"triggerType": 2},
                  "ingestMethod": 0,
                  "containerFormat": 0,
                  "containerOptions": {"containerType": 0},
                  "expiryTime": 5
-                 }), endpoint=endpoint)
-            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidCommand, "DUT must  responds with Status code InvalidCommand")
+                 }), endpoint = endpoint)
+            asserts.assert_equal(status, pvcluster.PushAvStreamTransport.StatusCodeEnum.InvalidCommand,
+                                 "DUT must  responds with Status code InvalidCommand")
 
 
 if __name__ == "__main__":
