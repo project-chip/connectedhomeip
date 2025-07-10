@@ -29,6 +29,7 @@ declare_args() {
   chip_bt_bluedroid_enabled = true
   chip_max_discovered_ip_addresses = 5
   chip_enable_route_hook = false
+  chip_enable_ble_controller = false
 }
 
 buildconfig_header("custom_buildconfig") {
@@ -61,6 +62,7 @@ buildconfig_header("custom_buildconfig") {
     "EXTERNAL_PLATFORMMANAGERIMPL_HEADER=<external_platform/ESP32_custom/PlatformManagerImpl.h>",
     "CHIP_CONFIG_SOFTWARE_VERSION_NUMBER=${chip_config_software_version_number}",
     "CHIP_DEVICE_CONFIG_MAX_DISCOVERED_IP_ADDRESSES=${chip_max_discovered_ip_addresses}",
+    "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}",
   ]
 
   if (chip_enable_ota_requestor) {
@@ -109,23 +111,35 @@ static_library("ESP32_custom") {
     "${chip_root}/src/platform:platform_base",
   ]
 
+  if (chip_enable_ble) {
+    sources += [ "BLEManagerImpl.h" ]
+    if (chip_enable_ble_controller) {
+      sources += [ "ChipDeviceScanner.h" ]
+    }
+
+    if (chip_bt_nimble_enabled) {
+      sources += [ "nimble/BLEManagerImpl.cpp" ]
+      if (chip_enable_ble_controller) {
+        sources += [
+          "nimble/ChipDeviceScanner.cpp",
+          "nimble/blecent.h",
+          "nimble/misc.c",
+          "nimble/peer.c",
+        ]
+      }
+    } else if (chip_bt_bluedroid_enabled) {
+      sources += [ "bluedroid/BLEManagerImpl.cpp" ]
+      if (chip_enable_ble_controller) {
+        sources += [ "bluedroid/ChipDeviceScanner.cpp" ]
+      }
+    }
+  }
+
   if (chip_enable_ota_requestor) {
     sources += [
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
     ]
-  }
-
-  if (chip_enable_chipoble) {
-    sources += [ "BLEManagerImpl.h" ]
-  }
-
-  if (chip_bt_nimble_enabled) {
-    sources += [ "nimble/BLEManagerImpl.cpp" ]
-  }
-
-  if (chip_bt_bluedroid_enabled) {
-    sources += [ "bluedroid/BLEManagerImpl.cpp" ]
   }
 
   if (chip_enable_wifi) {
