@@ -34,24 +34,29 @@ namespace chip {
 
 namespace Test {
 
-using namespace chip;
-using namespace chip::Controller;
-
 class AutoCommissionerTestAccess
 {
 public:
     AutoCommissionerTestAccess() = delete;
-    AutoCommissionerTestAccess(AutoCommissioner * commissioner) : mCommissioner(Commissioner) {}
+    AutoCommissionerTestAccess(chip::Controller::AutoCommissioner * commissioner) : mCommissioner(commissioner) {}
 
-    CommissioningStage AccessGetNextCommissioningStageInternal(CommissioningStage currentStage, CHIP_ERROR & lastErr)
+    chip::Controller::CommissioningStage AccessGetNextCommissioningStageInternal(chip::Controller::CommissioningStage currentStage,
+                                                                                 CHIP_ERROR & lastErr)
     {
         return mCommissioner->GetNextCommissioningStageInternal(currentStage, lastErr);
     }
     void SetBreadcrumb(uint64_t value) { mCommissioner->mDeviceCommissioningInfo.general.breadcrumb = value; }
     void SetUTCRequirements(bool requiresUTC) { mCommissioner->mDeviceCommissioningInfo.requiresUTC = requiresUTC; }
 
+    void AccessSetExecuteJCM(bool executeJCM)
+    {
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+        mCommissioner->mParams.SetExecuteJCM(executeJCM);
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    }
+
 private:
-    AutoCommissioner * mCommissioner = nullptr;
+    chip::Controller::AutoCommissioner * mCommissioner = nullptr;
 };
 
 } // namespace Test
