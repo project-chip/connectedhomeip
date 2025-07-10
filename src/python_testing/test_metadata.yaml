@@ -142,6 +142,10 @@ not_automated:
       reason:
           Depends on PushAV cluster. Will be enabled once local tests are fully
           verified.
+    - name: TC_PAVST_2_3.py
+      reason:
+          Depends on PushAV cluster. Will be enabled once local tests are fully
+          verified.
     - name: TC_PAVST_2_9.py
       reason:
           Depends on PushAV cluster. Will be enabled once local tests are fully
