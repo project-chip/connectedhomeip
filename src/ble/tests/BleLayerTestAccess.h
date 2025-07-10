@@ -23,7 +23,7 @@
 namespace chip {
 namespace Test {
 /**
- * @brief Class acts as an accessor to private methods of the ICDConfigurationData class without needing to give friend access to
+ * @brief Class acts as an accessor to private methods of the BleLayer class without needing to give friend access to
  *        each individual test.
  */
 class BleLayerTestAccess
