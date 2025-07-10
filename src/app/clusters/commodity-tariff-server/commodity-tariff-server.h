@@ -27,15 +27,14 @@
 
 #pragma once
 
+#include "CommodityTariffAttrsDataMgmt.h"
+
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
-#include <app/MessageDef/StatusIB.h>
 #include <app/reporting/reporting.h>
 #include <cstdint>
-
-#include "CommodityTariffAttrsDataMgmt.h"
 
 namespace chip {
 namespace app {

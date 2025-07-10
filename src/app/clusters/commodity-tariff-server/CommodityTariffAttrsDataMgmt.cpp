@@ -72,8 +72,24 @@ static bool HasDuplicateIDs(const DataModel::List<const uint32_t> & IDs, std::un
     return false;
 }
 
+/**
+ * @brief The comparator for specific struct types wrapped to Optional<Struct>
+ */
 template <typename T>
-static bool AreOptionalNullableEqual(const Optional<DataModel::Nullable<T>> & lhs, const Optional<DataModel::Nullable<T>> & rhs)
+static bool OptionalStructsAreEqual(const Optional<T> & lhs, const Optional<T> & rhs)
+{
+    if (lhs.HasValue() != rhs.HasValue())
+        return false;
+    if (!lhs.HasValue())
+        return true;
+    return (lhs.Value() == rhs.Value());
+}
+
+/**
+ * @brief The comparator for specific struct types wrapped to Optional<Nullable<Struct>>
+ */
+template <typename T>
+static bool OptionalNullableStructsAreEqual(const Optional<DataModel::Nullable<T>> & lhs, const Optional<DataModel::Nullable<T>> & rhs)
 {
     // Both missing -> true
     if (!lhs.HasValue() && !rhs.HasValue())
@@ -101,16 +117,6 @@ static bool AreOptionalNullableEqual(const Optional<DataModel::Nullable<T>> & lh
 
     // Both present and not null -> return false if equal
     return (lhs.Value().Value() == rhs.Value().Value());
-}
-
-template <typename T>
-static bool AreOptionalEqual(const Optional<T> & lhs, const Optional<T> & rhs)
-{
-    if (lhs.HasValue() != rhs.HasValue())
-        return false;
-    if (!lhs.HasValue())
-        return true;
-    return (lhs.Value() == rhs.Value());
 }
 
 }; // namespace CommonUtilities
@@ -181,7 +187,7 @@ CHIP_ERROR TariffInfoDataClass::Validate(const ValueType & aValue) const
 
 bool TariffInfoDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
-    if (!CommonUtilities::AreOptionalNullableEqual(source.currency, destination.currency))
+    if (!CommonUtilities::OptionalNullableStructsAreEqual(source.currency, destination.currency))
     {
         return true;
     }
@@ -607,40 +613,40 @@ CHIP_ERROR TariffComponentsDataClass::Validate(const ValueType & aValue) const
 bool TariffComponentsDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const
 {
 
-    if (!CommonUtilities::AreOptionalEqual(source.label, destination.label))
+    if (source.label != destination.label)
         return true;
 
     // If PRICE feature are supported
-    if (!CommonUtilities::AreOptionalNullableEqual(source.price, destination.price))
+    if (!CommonUtilities::OptionalNullableStructsAreEqual(source.price, destination.price))
     {
         return true;
     }
 
     // If FCRED feature are supported
-    if (!CommonUtilities::AreOptionalEqual(source.friendlyCredit, destination.friendlyCredit))
+    if (source.friendlyCredit != destination.friendlyCredit)
     {
         return true;
     }
 
     // If AUXLD feature are supported
-    if (!CommonUtilities::AreOptionalEqual(source.auxiliaryLoad, destination.auxiliaryLoad))
+    if (!CommonUtilities::OptionalStructsAreEqual(source.auxiliaryLoad, destination.auxiliaryLoad))
     {
         return true;
     }
 
     // If PEAKP feature are supported
-    if (!CommonUtilities::AreOptionalEqual(source.peakPeriod, destination.peakPeriod))
+    if (!CommonUtilities::OptionalStructsAreEqual<>(source.peakPeriod, destination.peakPeriod))
     {
         return true;
     }
 
     // If PWRTHLD feature are supported
-    if (!CommonUtilities::AreOptionalEqual(source.powerThreshold, destination.powerThreshold))
+    if (!CommonUtilities::OptionalStructsAreEqual(source.powerThreshold, destination.powerThreshold))
     {
         return true;
     }
 
-    if (!CommonUtilities::AreOptionalEqual(source.predicted, destination.predicted))
+    if (source.predicted != destination.predicted)
     {
         return true;
     }
