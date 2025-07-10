@@ -34,9 +34,9 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 import random
-import asyncio
 from datetime import datetime, timedelta
 
 import chip.clusters as Clusters
