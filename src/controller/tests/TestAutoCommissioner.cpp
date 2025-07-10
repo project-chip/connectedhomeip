@@ -19,7 +19,8 @@
 #include <pw_unit_test/framework.h>
 
 #include <controller/AutoCommissioner.h>
-
+#include <controller/CommissioningDelegate.h>
+#include <controller/tests/AutoCommissionerTestAccess.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMemString.h>
 
@@ -29,6 +30,7 @@
 using namespace chip;
 using namespace chip::Dnssd;
 using namespace chip::Controller;
+using namespace chip::Test;
 
 namespace {
 
@@ -217,6 +219,124 @@ TEST_F(AutoCommissionerTest, FeaturesPassedExtraReadPaths)
     ASSERT_EQ(pathParams[0].mEndpointId, endpointId);
     ASSERT_EQ(pathParams[0].mClusterId, clusterId);
     ASSERT_EQ(pathParams[0].mAttributeId, attributeId);
+}
+
+// kStages are enumerators from enum type name CommissioningStage
+struct StageTransition
+{
+    CommissioningStage currentStage;
+    CommissioningStage nextStage;
+};
+
+const std::vector<StageTransition> KStagePairs = {
+    // only linear transitions are tested here, no branching
+    // Branched cases (like kReadCommissioningInfo, kConfigureTCAcknowledgments, etc.) are tested separately
+    { kSecurePairing, kReadCommissioningInfo },
+    { kSecurePairing, kReadCommissioningInfo },
+    { kArmFailsafe, kConfigRegulatory },
+    { kConfigRegulatory, kConfigureTCAcknowledgments },
+    { kConfigureDefaultNTP, kSendPAICertificateRequest },
+    { kSendPAICertificateRequest, kSendDACCertificateRequest },
+    { kSendDACCertificateRequest, kSendAttestationRequest },
+    { kSendAttestationRequest, kAttestationVerification },
+    { kAttestationVerification, kAttestationRevocationCheck },
+    { kJFValidateNOC, kSendVIDVerificationRequest },
+    { kSendVIDVerificationRequest, kSendOpCertSigningRequest },
+    { kSendOpCertSigningRequest, kValidateCSR },
+    { kValidateCSR, kGenerateNOCChain },
+    { kGenerateNOCChain, kSendTrustedRootCert },
+    { kSendTrustedRootCert, kSendNOC },
+    { kICDGetRegistrationInfo, kICDRegistration },
+    { kScanNetworks, kNeedsNetworkCreds },
+    { kWiFiNetworkSetup, kFailsafeBeforeWiFiEnable },
+    { kThreadNetworkSetup, kFailsafeBeforeThreadEnable },
+    { kFailsafeBeforeWiFiEnable, kWiFiNetworkEnable },
+    { kFailsafeBeforeThreadEnable, kThreadNetworkEnable },
+    { kEvictPreviousCaseSessions, kFindOperationalForStayActive },
+    { kFindOperationalForStayActive, kICDSendStayActive },
+    { kICDSendStayActive, kFindOperationalForCommissioningComplete },
+    { kFindOperationalForCommissioningComplete, kSendComplete },
+    { kSendComplete, kCleanup },
+    { kCleanup, kError },
+    { kError, kError },
+    { static_cast<CommissioningStage>(250), kError }, // triggers default case in switch statement
+
+};
+
+// Test each case pair for the next commissioning stage
+TEST_F(AutoCommissionerTest, NextCommisioningStage)
+{
+    // Create an instance of AutoCommissionerTestAccess to access private methods
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    for (const auto & stagePair : KStagePairs)
+    {
+        CommissioningStage nextStage =
+            privateConfigCommissioner.AccessGetNextCommissioningStageInternal(stagePair.currentStage, err);
+        EXPECT_EQ(nextStage, stagePair.nextStage);
+    }
+}
+
+// if commisioning is manulaly stopped than , the next stage should be cleanup
+TEST_F(AutoCommissionerTest, NextStageStopCommissioning)
+{
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+    mCommissioner.StopCommissioning();
+
+    // only initilized for calling the function
+    CHIP_ERROR err           = CHIP_ERROR_INTERNAL;
+    CommissioningStage stage = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kSecurePairing, err);
+    EXPECT_EQ(stage, kCleanup);
+}
+
+// if commisioning failed, than the next stage should be cleanup
+TEST_F(AutoCommissionerTest, NextCommissioningStageAfterError)
+{
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+
+    CHIP_ERROR err           = CHIP_ERROR_INTERNAL;
+    CommissioningStage stage = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kSecurePairing, err);
+    EXPECT_EQ(stage, kCleanup);
+}
+
+TEST_F(AutoCommissionerTest, NextStageReadCommissioningInfo)
+{
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    privateConfigCommissioner.SetBreadcrumb(0);
+    CommissioningStage nextStage = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kReadCommissioningInfo, err);
+
+    EXPECT_EQ(nextStage, kArmFailsafe);
+
+    // if breadcrumb > 0 the stage changes to kSendNOC and the next stages progress equally
+    privateConfigCommissioner.SetBreadcrumb(1);
+
+    CommissioningStage nextStage_ReadCommissioningInfo =
+        privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kReadCommissioningInfo, err);
+    CommissioningStage nextStage_SendNOC = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kSendNOC, err);
+
+    EXPECT_EQ(nextStage_ReadCommissioningInfo, nextStage_SendNOC);
+}
+
+TEST_F(AutoCommissionerTest, NextStageConfigureTCAcknowledgments)
+{
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    privateConfigCommissioner.SetUTCRequirements(true);
+
+    CommissioningStage nextStage =
+        privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureTCAcknowledgments, err);
+
+    EXPECT_EQ(nextStage, kConfigureUTCTime);
+
+    privateConfigCommissioner.SetUTCRequirements(false);
+
+    nextStage = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureTCAcknowledgments, err);
+
+    EXPECT_EQ(nextStage, kSendPAICertificateRequest);
 }
 
 } // namespace
