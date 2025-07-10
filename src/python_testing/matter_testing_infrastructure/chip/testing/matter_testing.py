@@ -73,7 +73,6 @@ logger.setLevel(logging.INFO)
 
 DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
 
-
 def clear_queue(report_queue: queue.Queue):
     """Flush all contents of a report queue. Useful to get back to empty point."""
     while not report_queue.empty():
@@ -1081,8 +1080,9 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def user_verify_snap_shot(self,
                               prompt_msg: str,
-                              image: bytes) -> Optional[str]:
+                              image: bytes) -> None:
         """Show Image Verification Prompt and wait for user validation.
+           This method will be executed only when TC is running in TH.
 
         Args:
             prompt_msg (str): Message for TH UI prompt and input function.
@@ -1090,47 +1090,58 @@ class MatterBaseTest(base_test.BaseTestClass):
             image (bytes): Image data as bytes.
 
         Returns:
-            str: User input or none if input is closed.
-        """
+            Returns nothing indicating success so the test can go on.
 
-        # Convert bytes to comma separated hex string
-        hex_string = ', '.join(f'{byte:02x}' for byte in image)
-        if self.runner_hook:
+        Raises:
+            TestError: Indicating image validation step failed.
+        """
+        # Only run when TC is being executed in TH
+        if self.runner_hook and hasattr(self.runner_hook, 'show_image_prompt'):
+            # Convert bytes to comma separated hex string
+            hex_string = ', '.join(f'{byte:02x}' for byte in image)
             self.runner_hook.show_image_prompt(
                 msg=prompt_msg,
                 img_hex_str=hex_string
             )
 
-        logging.info("========= USER PROMPT for Image Verification =========")
-        logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
-        try:
-            return input()
-        except EOFError:
-            logging.info("========= EOF on STDIN =========")
-            return None
+            logging.info("========= USER PROMPT for Image Validation =========")
+
+            try:
+                result = input()
+                if result != '1':  # User did not select 'PASS'
+                    raise TestError("Image validation failed")
+            except EOFError:
+                logging.info("========= EOF on STDIN =========")
+                return None
 
     def user_verify_video_stream(self,
-                                 prompt_msg: str) -> Optional[str]:
+                                 prompt_msg: str) -> None:
         """Show Video Verification Prompt and wait for user validation.
+           This method will be executed only when TC is running in TH.
 
         Args:
             prompt_msg (str): Message for TH UI prompt and input function.
             Indicates what is expected from the user.
 
         Returns:
-            str: User input or none if input is closed.
-        """
+            Returns nothing indicating success so the test can go on.
 
-        if self.runner_hook:
+        Raises:
+            TestError: Indicating video validation step failed.
+        """
+        # Only run when TC is being executed in TH
+        if self.runner_hook and hasattr(self.runner_hook, 'show_video_prompt'):
             self.runner_hook.show_video_prompt(msg=prompt_msg)
 
-        logging.info("========= USER PROMPT for Video Stream Verification =========")
-        logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
-        try:
-            return input()
-        except EOFError:
-            logging.info("========= EOF on STDIN =========")
-            return None
+            logging.info("========= USER PROMPT for Video Stream Validation =========")
+
+            try:
+                result = input()
+                if result != '1':  # User did not select 'PASS'
+                    raise TestError("Video stream validation failed")
+            except EOFError:
+                logging.info("========= EOF on STDIN =========")
+                return None
 
 
 def _async_runner(body, self: MatterBaseTest, *args, **kwargs):

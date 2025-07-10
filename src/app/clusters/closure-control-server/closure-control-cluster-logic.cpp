@@ -272,6 +272,29 @@ CHIP_ERROR ClusterLogic::SetOverallCurrentState(const DataModel::Nullable<Generi
             // supported by the closure. If the Speed feature is not supported, return an error.
             VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) || mConformance.HasFeature(Feature::kMotionLatching),
                                 CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
+            if (!incomingOverallCurrentState.secureState.Value().IsNull())
+            {
+                // SecureStateChanged event SHALL be generated when the SecureState field in the OverallCurrentState attribute
+                // changes
+                if (mState.mOverallCurrentState.IsNull() || !mState.mOverallCurrentState.Value().secureState.HasValue() ||
+                    mState.mOverallCurrentState.Value().secureState.Value().IsNull())
+                {
+                    // As secureState field is not set in present current state and incoming current state has value, we generate
+                    // the event
+                    GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value().Value());
+                }
+                else
+                {
+                    // If the secureState field is set in both present and incoming current state, we generate the event only if the
+                    // value has changed.
+                    if (mState.mOverallCurrentState.Value().secureState.Value().Value() !=
+                        incomingOverallCurrentState.secureState.Value().Value())
+                    {
+                        GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value().Value());
+                    }
+                }
+            }
         }
     }
 
@@ -504,8 +527,12 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
 
     VerifyOrReturnError(position.HasValue() || latch.HasValue() || speed.HasValue(), Status::InvalidCommand);
 
+    DataModel::Nullable<GenericOverallCurrentState> overallCurrentState;
     DataModel::Nullable<GenericOverallTargetState> overallTargetState;
     VerifyOrReturnError(GetOverallTargetState(overallTargetState) == CHIP_NO_ERROR, Status::Failure);
+    VerifyOrReturnError(GetOverallCurrentState(overallCurrentState) == CHIP_NO_ERROR, Status::Failure);
+    VerifyOrReturnError(!overallCurrentState.IsNull(), Status::InvalidInState,
+                        ChipLogError(AppServer, "OverallCurrentState is null on endpoint : %d", mMatterContext.GetEndpointId()));
 
     if (overallTargetState.IsNull())
     {
@@ -553,6 +580,21 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
     VerifyOrReturnError(state == MainStateEnum::kMoving || state == MainStateEnum::kWaitingForMotion ||
                             state == MainStateEnum::kStopped,
                         Status::InvalidInState);
+
+    if (mConformance.HasFeature(Feature::kMotionLatching))
+    {
+        // If this command requests a position change while the Latch field of the OverallCurrentState is True (Latched), and the
+        // Latch field of this command is not set to False (Unlatched), a status code of INVALID_IN_STATE SHALL be returned.
+        if (position.HasValue() && overallCurrentState.Value().latch.HasValue() &&
+            !overallCurrentState.Value().latch.Value().IsNull() && overallCurrentState.Value().latch.Value().Value())
+        {
+            VerifyOrReturnError(latch.HasValue() && !latch.Value(), Status::InvalidInState,
+                                ChipLogError(AppServer,
+                                             "Latch is True in OverallCurrentState, but MoveTo command does not set latch to False "
+                                             "when position change is requested on endpoint : %d",
+                                             mMatterContext.GetEndpointId()));
+        }
+    }
 
     // Set MainState and OverallTargetState only if the delegate call to HandleMoveToCommand is successful
     Status status = mDelegate.HandleMoveToCommand(position, latch, speed);
