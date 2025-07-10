@@ -336,7 +336,7 @@ TEST_F(TestServerClusterShim, TestWriteAttributeOnlyProvidedPathsAreValid)
 
     chip::Test::SetEmberReadOutput(Protocols::InteractionModel::Status::Success);
     // Expect unsupported cluster because the ServerClusterShim instance was initialized with path 1,1 only
-    ASSERT_EQ(invalid_cluster.WriteAttribute(test.GetRequest(), decoder), Status::UnsupportedCluster);
+    ASSERT_EQ(invalid_cluster.WriteAttribute(test.GetRequest(), decoder), Status::UnsupportedEndpoint);
 
     // Create another cluster with the valid paths for the write command
     ServerClusterShim valid_cluster({ { kMockEndpoint1, MockClusterId(1) }, { kMockEndpoint3, MockClusterId(4) } });
@@ -417,7 +417,7 @@ TEST_F(TestServerClusterShim, EmberAttributeReadOctetString)
 
     // Read on invalid cluster, expect Status::UnsupportedCluster
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
-    ASSERT_EQ(invalid_cluster.ReadAttribute(testRequest.GetRequest(), *encoder), Status::UnsupportedCluster);
+    ASSERT_EQ(invalid_cluster.ReadAttribute(testRequest.GetRequest(), *encoder), Status::UnsupportedEndpoint);
 
     // Actual read via an encoder on the valid cluster
     ASSERT_EQ(valid_cluster.ReadAttribute(testRequest.GetRequest(), *encoder), CHIP_NO_ERROR);
@@ -508,7 +508,7 @@ TEST_F(TestServerClusterShim, EmberInvokeTest)
         const uint32_t kDispatchCountPre = chip::Test::DispatchCount();
 
         // Using a handler set to nullptr as it is not used by the impl
-        ASSERT_EQ(cluster_with_invalid_path.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr), std::nullopt);
+        ASSERT_EQ(cluster_with_invalid_path.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr), Status::UnsupportedEndpoint);
         EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre); // no dispatch expected
 
         ASSERT_EQ(cluster_with_valid_path.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr), std::nullopt);
@@ -523,8 +523,8 @@ TEST_F(TestServerClusterShim, EmberInvokeTest)
 
         const uint32_t kDispatchCountPre = chip::Test::DispatchCount();
 
-        // Using a handler set to nullpotr as it is not used by the impl
-        ASSERT_EQ(cluster_with_invalid_path.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr), std::nullopt);
+        // Using a handler set to nullptr as it is not used by the impl
+        ASSERT_EQ(cluster_with_invalid_path.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr), Status::UnsupportedEndpoint);
 
         EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre); // no dispatch expected
 

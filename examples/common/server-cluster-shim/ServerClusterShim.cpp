@@ -246,10 +246,10 @@ DataModel::ActionReturnStatus ServerClusterShim::ReadAttribute(const DataModel::
         return *status;
     }
 
-    // If path exists in ember storage but not added by the user to the ServerCluster instance
-    if (!ContainsClusterPath({ request.path.mEndpointId, request.path.mClusterId }))
+    // The path exists in ember storage but was not added by the user to the ServerClusterShim instance
+    if (!PathsContains({ request.path.mEndpointId, request.path.mClusterId }))
     {
-        return Status::UnsupportedCluster;
+        return Status::UnsupportedEndpoint;
     }
 
     // Read via AAI
@@ -284,12 +284,6 @@ DataModel::ActionReturnStatus ServerClusterShim::ReadAttribute(const DataModel::
 
 ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest & request, AttributeValueDecoder & decoder)
 {
-    // The path might exist in ember storage but not added by the user to the ServerCluster instance
-    if (!ContainsClusterPath({ request.path.mEndpointId, request.path.mClusterId }))
-    {
-        return Status::UnsupportedCluster;
-    }
-
     // Context not initialized. Need to call Startup(context) before writing.
     if (mContext == nullptr || mContext->interactionContext == nullptr ||
         mContext->interactionContext->dataModelChangeListener == nullptr)
@@ -318,6 +312,12 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
         }
 
         return *status;
+    }
+
+    // The path might exist in ember storage but was not added by the user to the ServerClusterShim instance
+    if (!PathsContains({ request.path.mEndpointId, request.path.mClusterId }))
+    {
+        return Status::UnsupportedEndpoint;
     }
 
     const EmberAfAttributeMetadata ** attributeMetadata = std::get_if<const EmberAfAttributeMetadata *>(&metadata);
@@ -404,20 +404,10 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
 std::optional<ActionReturnStatus> ServerClusterShim::InvokeCommand(const InvokeRequest & request,
                                                                    chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
-    // If path is not added by the user to the ServerCluster instance
-    if (!ContainsClusterPath({ request.path.mEndpointId, request.path.mClusterId }))
-    {
-        if (handler != nullptr)
-        {
-            handler->AddStatus(request.path, Status::UnsupportedCluster);
-        }
-        return std::nullopt;
-    }
-
     CommandHandlerInterface * handler_interface =
         CommandHandlerInterfaceRegistry::Instance().GetCommandHandler(request.path.mEndpointId, request.path.mClusterId);
 
-    if (handler_interface)
+    if (handler_interface && handler != nullptr)
     {
         CommandHandlerInterface::HandlerContext context(*handler, request.path, input_arguments);
         handler_interface->InvokeCommand(context);
@@ -427,6 +417,17 @@ std::optional<ActionReturnStatus> ServerClusterShim::InvokeCommand(const InvokeR
         {
             return std::nullopt;
         }
+    }
+
+    // If path was not added by the user to the ServerClusterShim instance, return UnsupportedEndpoint.
+    if (!PathsContains({ request.path.mEndpointId, request.path.mClusterId }))
+    {
+        ChipLogError(Zcl, "InvokeCommand: Cluster path not found in ServerClusterShim");
+        if( handler != nullptr)
+        {
+            handler->AddStatus(request.path, Status::UnsupportedEndpoint);
+        }
+        return Status::UnsupportedEndpoint;
     }
 
     // Ember always sets the return in the handler
@@ -444,8 +445,8 @@ CHIP_ERROR ServerClusterShim::AcceptedCommands(const ConcreteClusterPath & path,
     const EmberAfCluster * serverCluster = emberAfFindServerCluster(path.mEndpointId, path.mClusterId);
     VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
 
-    // If path exists in ember storage but not added by the user to the ServerCluster instance
-    if (!ContainsClusterPath({ path.mEndpointId, path.mClusterId }))
+    // If path exists in ember storage but not added by the user to the ServerClusterShim instance
+    if (!PathsContains({ path.mEndpointId, path.mClusterId }))
     {
         return CHIP_ERROR_NOT_FOUND;
     }
@@ -533,8 +534,8 @@ CHIP_ERROR ServerClusterShim::GeneratedCommands(const ConcreteClusterPath & path
     const EmberAfCluster * serverCluster = emberAfFindServerCluster(path.mEndpointId, path.mClusterId);
     VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
 
-    // If path exists in ember storage but not added by the user to the ServerCluster instance
-    if (!ContainsClusterPath({ path.mEndpointId, path.mClusterId }))
+    // If path exists in ember storage but not added by the user to the ServerClusterShim instance
+    if (!PathsContains({ path.mEndpointId, path.mClusterId }))
     {
         return CHIP_ERROR_NOT_FOUND;
     }
@@ -604,7 +605,7 @@ void ServerClusterShim::ListAttributeWriteNotification(const ConcreteAttributePa
 {
     AttributeAccessInterface * aai = AttributeAccessInterfaceRegistry::Instance().Get(aPath.mEndpointId, aPath.mClusterId);
 
-    if (aai != nullptr && ContainsClusterPath({ aPath.mEndpointId, aPath.mClusterId }))
+    if (aai != nullptr && PathsContains({ aPath.mEndpointId, aPath.mClusterId }))
     {
         switch (opType)
         {
@@ -619,15 +620,6 @@ void ServerClusterShim::ListAttributeWriteNotification(const ConcreteAttributePa
             break;
         }
     }
-}
-
-bool ServerClusterShim::ContainsClusterPath(const ConcreteClusterPath & path) const
-{
-    if (std::find(mPaths.begin(), mPaths.end(), path) == mPaths.end())
-    {
-        return false;
-    }
-    return true;
 }
 
 CHIP_ERROR ServerClusterShim::EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo)
