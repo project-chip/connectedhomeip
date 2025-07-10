@@ -1480,7 +1480,7 @@ class GeneralCommissioningCluster(
     }
   }
 
-  suspend fun readIsCommissioningWithoutPowerAttribute(): Boolean {
+  suspend fun readIsCommissioningWithoutPowerAttribute(): Boolean? {
     val ATTRIBUTE_ID: UInt = 12u
 
     val attributePath =
@@ -1502,11 +1502,16 @@ class GeneralCommissioningCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "IsCommissioningWithoutPower attribute not found in response" }
+    requireNotNull(attributeData) { "Iscommissioningwithoutpower attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
+    val decodedValue: Boolean? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getBoolean(AnonymousTag)
+      } else {
+        null
+      }
 
     return decodedValue
   }
@@ -1547,14 +1552,19 @@ class GeneralCommissioningCluster(
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "IsCommissioningWithoutPower attribute not found in Node State update"
+            "Iscommissioningwithoutpower attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: Boolean = tlvReader.getBoolean(AnonymousTag)
+          val decodedValue: Boolean? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getBoolean(AnonymousTag)
+            } else {
+              null
+            }
 
-          emit(BooleanSubscriptionState.Success(decodedValue))
+          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(BooleanSubscriptionState.SubscriptionEstablished)
