@@ -74,22 +74,22 @@ class TC_PAVST_2_1(MatterBaseTest):
             supported_formats = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SupportedFormats
             )
-            asserts.assert_greater_equal(len(supported_formats, 1, "SupportedFormats must not be empty!")
+            asserts.assert_greater_equal(len(supported_formats, 1), "SupportedFormats must not be empty!")
             for format in supported_formats:
-                validContainerformat=format.ContainerFormat == cluster.ContainerFormatEnum.kCmaf;
-                isValidIngestMethod=format.IngestMethod == cluster.IngestMethodEnum.kCMAFIngest;
+                validContainerformat=format.ContainerFormat == cluster.ContainerFormatEnum.kCmaf
+                isValidIngestMethod=format.IngestMethod == cluster.IngestMethodEnum.kCMAFIngest
                 asserts.assert_true((validContainerformat & isValidIngestMethod),
-                                    "(ContainerFormat & IngestMethod) must be defined values!");
+                                    "(ContainerFormat & IngestMethod) must be defined values!")
 
         self.step(3)
         if self.pics_guard(self.check_pics("PAVST.S.A0001")):
             transport_configs=await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.CurrentConnections
             )
-            asserts.assert_greater_equal(len(transport_configs, 1, "TransportConfigurations must not be empty!")
+            asserts.assert_greater_equal(len(transport_configs, 1), "TransportConfigurations must not be empty!")
             for config in transport_configs:
                 isValidTransportStatus=(config.TransportStatus == cluster.TransportStatusEnum.kActive |
-                                        config.TransportStatus == cluster.TransportStatusEnum.kInactive);
+                                        config.TransportStatus == cluster.TransportStatusEnum.kInactive)
                 asserts.assert_true(isValidTransportStatus, "TransportStatus must be a defined value!")
 
 if __name__ == "__main__":
