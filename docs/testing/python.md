@@ -321,7 +321,7 @@ callbacks are called on update.
 Example for setting callbacks:
 
 ```
-cb = EventSubscriptionHandler("cb", cluster, cluster_id, event_id)
+cb = EventSubscriptionHandler(cluster, cluster_id, event_id)
 
 urgent = 1
 subscription = await dev_ctrl.ReadEvent(nodeid=1, events=[(1, event, urgent)], reportInterval=[1, 3])

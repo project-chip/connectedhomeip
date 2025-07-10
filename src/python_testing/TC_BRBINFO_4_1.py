@@ -53,7 +53,7 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.apps import IcdAppServerSubprocess
-from chip.testing.event_attribute_reporting import EventCallback
+from chip.testing.event_attribute_reporting import EventSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -73,7 +73,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         """Returns a description of this test"""
         return "[TC_BRBINFO_4_1] Verification of KeepActive Command [DUT-Server]"
 
-    def _wait_for_active_changed_event(self, cb: EventCallback, event, timeout_s: int) -> int:
+    def _wait_for_active_changed_event(self, cb: EventSubscriptionHandler, event, timeout_s: int) -> int:
         """Waits for an ActiveChanged event and returns the promised active duration."""
         promised_active_duration_event_data = cb.wait_for_event_report(event, timeout_s)
         logging.info(f"PromisedActiveDurationEvent.Data: {promised_active_duration_event_data}")
@@ -269,7 +269,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
         self.step("2")
         event = brb_info_cluster.Events.ActiveChanged
         urgent = 1
-        cb = EventCallback(name="ActiveChanged", expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
+        cb = EventSubscriptionHandler(expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
         self._active_change_event_subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(dynamic_endpoint_id, event, urgent)], reportInterval=[1, 3])
         self._active_change_event_subscription.SetEventUpdateCallback(callback=cb)
 

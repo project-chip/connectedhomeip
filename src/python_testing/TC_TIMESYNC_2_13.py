@@ -101,8 +101,7 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
 
         self.print_step(5, "TH1 subscribeds to the MissingTrustedTimeSource event")
         event = Clusters.TimeSynchronization.Events.MissingTrustedTimeSource
-        cb = EventSubscriptionHandler(name="MissingTrustedTimeSource",
-                                      expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
+        cb = EventSubscriptionHandler(expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
         urgent = 1
         subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
         subscription.SetEventUpdateCallback(callback=cb)

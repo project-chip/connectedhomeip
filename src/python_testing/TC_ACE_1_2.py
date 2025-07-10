@@ -165,8 +165,7 @@ class TC_ACE_1_2(MatterBaseTest):
         urgent = 1
         subscription_ace = await self.TH2.ReadEvent(nodeid=self.dut_node_id, events=[(0, Clusters.AccessControl.Events.AccessControlEntryChanged, urgent)], reportInterval=(1, 5), fabricFiltered=False, keepSubscriptions=True, autoResubscribe=False)
         event = Clusters.AccessControl.Events.AccessControlEntryChanged
-        ace_cb = EventSubscriptionHandler(name="AccessControlEntryChanged",
-                                          expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
+        ace_cb = EventSubscriptionHandler(expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
         subscription_ace.SetEventUpdateCallback(ace_cb)
 
         self.print_step(6, "TH1 writes ACL attribute")

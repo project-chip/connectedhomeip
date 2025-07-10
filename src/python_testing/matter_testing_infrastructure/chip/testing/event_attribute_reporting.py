@@ -49,27 +49,25 @@ class EventSubscriptionHandler:
 
     It supports two usage modes:
         1. Cluster mode: Pass a 'ClusterObjects.Cluster' to subscribe to all events in a cluster.
-        2. Event ID mode: Pass 'expected_cluster_id', 'expected_event_id' and 'name' to subscribe to a specific event.
+        2. Event ID mode: Pass 'expected_cluster_id' and 'expected_event_id' to subscribe to a specific event.
 
     Attributes:
         _expected_cluster: The cluster object to match.
         _expected_cluster_id: The cluster ID to match against incoming event headers.
         _expected_event_id: The specific event ID to match.
-        _name: Name for identification in logs.
         _q: Internal queue that stores matching EventReadResult objects.
     """
 
-    def __init__(self, *, name: Optional[str] = None, expected_cluster: Optional[ClusterObjects.Cluster] = None, expected_cluster_id: Optional[int] = None, expected_event_id: Optional[int] = None):
+    def __init__(self, *, expected_cluster: Optional[ClusterObjects.Cluster] = None, expected_cluster_id: Optional[int] = None, expected_event_id: Optional[int] = None):
         is_cluster_mode = expected_cluster is not None
-        is_id_mode = all(x is not None for x in (expected_cluster_id, expected_event_id, name))
+        is_id_mode = all(x is not None for x in (expected_cluster_id, expected_event_id))
 
         if not (is_cluster_mode ^ is_id_mode):
-            raise ValueError("Failed argument inputs in EventSubscriptionHandler. You should use Cluster or ClusterId, EventId and name")
+            raise ValueError("Failed argument inputs in EventSubscriptionHandler. You should use Cluster or ClusterId and EventId")
 
         self._expected_cluster = expected_cluster
         self._expected_cluster_id = expected_cluster_id if expected_cluster_id is not None else expected_cluster.id
         self._expected_event_id = expected_event_id
-        self._name = name
         self._subscription = None
         self._q: queue.Queue = queue.Queue()
 
@@ -97,10 +95,6 @@ class EventSubscriptionHandler:
 
         logging.info(f"[EventSubscriptionHandler] Received event: {header}")
         self._q.put(event_result)
-
-    @property
-    def name(self) -> Optional[str]:
-        return self._name
 
     async def start(self, dev_ctrl, node_id: int, endpoint: int, fabric_filtered: bool = False, min_interval_sec: int = 0, max_interval_sec: int = 30) -> Any:
         """This starts a subscription for events on the specified node_id and endpoint. The cluster is specified when the class instance is created."""

@@ -48,7 +48,7 @@ from chip.clusters.Objects import AccessControl
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import arls_populated
-from chip.testing.event_attribute_reporting import EventCallback
+from chip.testing.event_attribute_reporting import EventSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -159,8 +159,7 @@ class TC_ACL_2_11(MatterBaseTest):
 
         # Belongs to step 6, but needs to be subscribed before executing step 5: begin
         event = Clusters.AccessControl.Events.FabricRestrictionReviewUpdate
-        arru_cb = EventCallback(name="FabricRestrictionReviewUpdate",
-                                expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
+        arru_cb = EventSubscriptionHandler(expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
 
         urgent = 1
         subscription_arru = await dev_ctrl.ReadEvent(dut_node_id, events=[(0, Clusters.AccessControl.Events.FabricRestrictionReviewUpdate, urgent)], reportInterval=(0, 30), keepSubscriptions=True, autoResubscribe=False)
