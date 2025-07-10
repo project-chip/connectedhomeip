@@ -48,13 +48,14 @@ jobs:
           scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
       
       - name: Run mypy validation (ChipDeviceCtrl.py)
-        shell: bash
         run: |
           OUTPUT=$(./scripts/run_in_python_env.sh out/venv "mypy --config-file=src/python_testing/matter_testing_infrastructure/mypy.ini src/controller/python/chip/ChipDeviceCtrl.py" 2>&1 || true)
-          ERRORS=$(echo "$OUTPUT" | grep -c 'ChipDeviceCtrl.py:.*error:')
+
+          ERRORS=$(echo "$OUTPUT" | grep -c '^src/controller/python/chip/ChipDeviceCtrl.py:[0-9]\+: error:')
+
           if [ "$ERRORS" -ne 0 ]; then
             echo "Mypy found $ERRORS error(s) in ChipDeviceCtrl.py"
-            echo "$OUTPUT" | grep 'ChipDeviceCtrl.py'
+            echo "$OUTPUT" | grep '^src/controller/python/chip/ChipDeviceCtrl.py:[0-9]\+: error:'
             exit 1
           else
             echo "No mypy errors found in ChipDeviceCtrl.py"
