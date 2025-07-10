@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 - 2025 Project CHIP Authors
+ *    Copyright (c) 2024-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -118,7 +118,7 @@ private:
 
     /**
      * @brief return the index of the thermostat suggestion in the ThermostatSuggestions attribute with the earliest EffectiveTime
-     * field. If there are no entries or an error occurs, we will return the value in the MaxThermostatSuggestions attribute as an
+     * field. If there are no entries or an error occurs, returns the value in the MaxThermostatSuggestions attribute as an
      * invalid index.
      *
      */
@@ -126,7 +126,7 @@ private:
 
     CHIP_ERROR StartExpirationTimer(uint32_t timeoutInMSecs);
 
-    static void TimerExpiredCallback(chip::System::Layer * systemLayer, void * appState);
+    static void TimerExpiredCallback(System::Layer * systemLayer, void * appState);
 
     void CancelExpirationTimer();
 

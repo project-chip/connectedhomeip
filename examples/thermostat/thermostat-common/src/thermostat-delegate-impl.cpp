@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 - 2025 Project CHIP Authors
+ *    Copyright (c) 2024-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -347,7 +347,7 @@ CHIP_ERROR ThermostatDelegate::StartExpirationTimer(uint32_t timeoutInMSecs)
 
     ChipLogProgress(Zcl, "Starting timer to wait for %u milliseconds for the current thermostat suggestion to expire",
                     timeoutInMSecs);
-    return chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds16(timeoutInMSecs), TimerExpiredCallback,
+    return DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds16(timeoutInMSecs), TimerExpiredCallback,
                                                        static_cast<void *>(this));
 }
 
@@ -368,7 +368,7 @@ CHIP_ERROR ThermostatDelegate::RemoveExpiredSuggestions(uint32_t currentTimestam
     return CHIP_NO_ERROR;
 }
 
-void ThermostatDelegate::TimerExpiredCallback(chip::System::Layer * systemLayer, void * appState)
+void ThermostatDelegate::TimerExpiredCallback(System::Layer * systemLayer, void * appState)
 {
     uint32_t currentTimestamp = 0;
     CHIP_ERROR err            = System::Clock::GetClock_MatterEpochS(currentTimestamp);
@@ -395,7 +395,6 @@ void ThermostatDelegate::CancelExpirationTimer()
 
 CHIP_ERROR ThermostatDelegate::ReEvaluateCurrentSuggestion(uint32_t currentTimestamp)
 {
-
     CancelExpirationTimer();
 
     // Remove all expired suggestions.

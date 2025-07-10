@@ -143,7 +143,7 @@ public:
     virtual uint8_t GetMaxThermostatSuggestions() = 0;
 
     /**
-     * @brief Get the number of suggestion in the ThermostatSuggestions attribute list.
+     * @brief Get the number of suggestions in the ThermostatSuggestions attribute list.
      *
      * @return The number of entries in the ThermostatSuggestions attribute list. Return 0 if not set.
      */
@@ -219,7 +219,7 @@ public:
     virtual CHIP_ERROR RemoveFromThermostatSuggestionsList(uint8_t uniqueID) = 0;
 
     /**
-     * @brief Returns a unique ID for a thermostat suggestion.
+     * @brief Returns an unused unique ID for a thermostat suggestion.
      *
      * @return a non-zero unique ID up to UINT8_MAX.
      */

@@ -81,7 +81,7 @@ CHIP_ERROR ThermostatSuggestionStructWithOwnedMembers::SetPresetHandle(const Byt
     MutableByteSpan targetSpan(presetHandleData);
     ReturnErrorOnFailure(CopySpanToMutableSpan(newPresetHandle, targetSpan));
 
-    presetHandle = ByteSpan(targetSpan.data(), targetSpan.size());
+    presetHandle = targetSpan;
 
     return CHIP_NO_ERROR;
 }
