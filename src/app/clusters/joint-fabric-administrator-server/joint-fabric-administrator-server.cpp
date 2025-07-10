@@ -230,6 +230,7 @@ void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext
     auto nonDefaultStatus           = Status::Success;
     auto & failSafeContext          = Server::GetInstance().GetFailSafeContext();
     auto & jointFabricAdministrator = Server::GetInstance().GetJointFabricAdministrator();
+    P256PublicKey pubKey;
 
     uint8_t buf[Credentials::kMaxDERCertLength];
     MutableByteSpan icacCsr(buf, Credentials::kMaxDERCertLength);
@@ -251,6 +252,10 @@ void JointFabricAdministratorGlobalInstance::HandleICACCSRRequest(HandlerContext
     VerifyOrExit(jointFabricAdministrator.GetDelegate() != nullptr, nonDefaultStatus = Status::Failure);
     VerifyOrExit(jointFabricAdministrator.GetDelegate()->GetIcacCsr(icacCsr) == CHIP_NO_ERROR, nonDefaultStatus = Status::Failure);
 
+    VerifyOrExit(VerifyCertificateSigningRequest(icacCsr.data(), icacCsr.size(), pubKey) == CHIP_NO_ERROR,
+                 nonDefaultStatus = Status::Failure);
+    Server::GetInstance().GetJointFabricAdministrator().SetIcacCsrPubKey(pubKey);
+
     response.icaccsr = icacCsr;
     ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
 
@@ -267,23 +272,95 @@ void JointFabricAdministratorGlobalInstance::HandleAddICAC(HandlerContext & ctx,
     MATTER_TRACE_SCOPE("AddICAC", "JointFabricAdministrator");
     ChipLogProgress(Zcl, "JointFabricAdministrator: Received an AddICAC command");
 
-    auto nonDefaultStatus  = Status::Success;
-    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+    CHIP_ERROR err                                         = CHIP_NO_ERROR;
+    auto nonDefaultStatus                                  = Status::Success;
+    auto & failSafeContext                                 = Server::GetInstance().GetFailSafeContext();
+    auto & fabricTable                                     = Server::GetInstance().GetFabricTable();
+    auto & jointFabricAdministrator                        = Server::GetInstance().GetJointFabricAdministrator();
+    CertificateChainValidationResult chainValidationResult = CertificateChainValidationResult::kSuccess;
+    Commands::ICACResponse::Type response;
+
+    // Heap-allocated buffers to minimize stack usage
+    chip::Platform::ScopedMemoryBuffer<uint8_t> anchorCAChipCertBuf;
+    VerifyOrReturn(anchorCAChipCertBuf.Alloc(kMaxCHIPCertLength));
+    MutableByteSpan anchorCAChipCert(anchorCAChipCertBuf.Get(), kMaxCHIPCertLength);
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> crossSignedICACX509Buf;
+    VerifyOrReturn(crossSignedICACX509Buf.Alloc(kMaxDERCertLength));
+    MutableByteSpan crossSignedICACX509(crossSignedICACX509Buf.Get(), kMaxDERCertLength);
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> crossSignedICACChipCertBuf;
+    VerifyOrReturn(crossSignedICACChipCertBuf.Alloc(kMaxCHIPCertLength));
+    MutableByteSpan crossSignedICACChipCert(crossSignedICACChipCertBuf.Get(), kMaxCHIPCertLength);
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> anchorCAX509Buf;
+    VerifyOrReturn(anchorCAX509Buf.Alloc(kMaxDERCertLength));
+    MutableByteSpan anchorCAX509(anchorCAX509Buf.Get(), kMaxDERCertLength);
+
+    Crypto::P256PublicKey crossSignedICACX509PubKey;
+    Crypto::P256PublicKey icacCsrPubKey;
+    FabricId anchorFabricId = kUndefinedFabricId;
 
     // command must be invoked over CASE
     VerifyOrExit(ctx.mCommandHandler.GetSubjectDescriptor().authMode == Access::AuthMode::kCase,
                  nonDefaultStatus = Status::InvalidCommand);
 
+    // fail-safe timer must be armed
     VerifyOrExit(failSafeContext.IsFailSafeArmed(ctx.mCommandHandler.GetAccessingFabricIndex()),
                  nonDefaultStatus = Status::FailsafeRequired);
 
+    // only one AddICAC command per fail-safe timer
     VerifyOrExit(!failSafeContext.AddICACCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
     failSafeContext.SetAddICACHasBeenInvoked();
 
-    /* TODO: implement rest of the AddICAC checks */
+    // Fetch and convert the root certificate
+    err = fabricTable.FetchRootCert(ctx.mCommandHandler.GetAccessingFabricIndex(), anchorCAChipCert);
+    VerifyOrExit(err == CHIP_NO_ERROR, nonDefaultStatus = Status::Failure);
+
+    err = ConvertChipCertToX509Cert(anchorCAChipCert, anchorCAX509);
+    VerifyOrExit(err == CHIP_NO_ERROR, nonDefaultStatus = Status::Failure);
+
+    // Convert the incoming ICAC to X.509
+    err = ConvertChipCertToX509Cert(commandData.ICACValue, crossSignedICACX509);
+    VerifyOrExit(err == CHIP_NO_ERROR, nonDefaultStatus = Status::Failure);
+
+    // Validate the certificate chain
+    err = ValidateCertificateChain(anchorCAX509.data(), anchorCAX509.size(), nullptr, 0, crossSignedICACX509.data(),
+                                   crossSignedICACX509.size(), chainValidationResult);
+    VerifyOrExit((err == CHIP_NO_ERROR) && (chainValidationResult == CertificateChainValidationResult::kSuccess),
+                 response.statusCode = ICACResponseStatusEnum::kInvalidICAC);
+
+    // Extract and compare public keys
+    err = ExtractPubkeyFromX509Cert(crossSignedICACX509, crossSignedICACX509PubKey);
+    VerifyOrExit(err == CHIP_NO_ERROR, nonDefaultStatus = Status::Failure);
+
+    icacCsrPubKey = jointFabricAdministrator.GetIcacCsrPubKey();
+    VerifyOrExit(icacCsrPubKey.Matches(crossSignedICACX509PubKey), response.statusCode = ICACResponseStatusEnum::kInvalidPublicKey);
+
+    // Convert back to CHIP cert and extract Fabric ID
+    err = ConvertX509CertToChipCert(crossSignedICACX509, crossSignedICACChipCert);
+    VerifyOrExit(err == CHIP_NO_ERROR, nonDefaultStatus = Status::Failure);
+
+    err = ExtractFabricIdFromCert(crossSignedICACChipCert, &anchorFabricId);
+    VerifyOrExit(err == CHIP_NO_ERROR, nonDefaultStatus = Status::ConstraintError);
+
+    VerifyOrExit(fabricTable.FindFabricWithIndex(ctx.mCommandHandler.GetAccessingFabricIndex())->GetFabricId() == anchorFabricId,
+                 response.statusCode = ICACResponseStatusEnum::kInvalidICAC);
+
+    // Notify delegate
+    VerifyOrExit(jointFabricAdministrator.GetDelegate() != nullptr, nonDefaultStatus = Status::Failure);
+    jointFabricAdministrator.GetDelegate()->OnAddICAC(crossSignedICACChipCert);
+    response.statusCode = ICACResponseStatusEnum::kOk;
 
 exit:
-    ctx.mCommandHandler.AddStatus(ctx.mRequestPath, nonDefaultStatus);
+    if (nonDefaultStatus != Status::Success)
+    {
+        ctx.mCommandHandler.AddStatus(ctx.mRequestPath, nonDefaultStatus);
+    }
+    else
+    {
+        ctx.mCommandHandler.AddResponse(ctx.mRequestPath, response);
+    }
 }
 
 void JointFabricAdministratorGlobalInstance::HandleTransferAnchorRequest(

@@ -12,8 +12,8 @@ constexpr uint32_t kRpcTimeoutMs = 1000;
 std::condition_variable responseCv;
 bool responseReceived = false;
 
-uint8_t icacCSRBuf[Crypto::kMIN_CSR_Buffer_Size] = { 0 };
-MutableByteSpan icacCSRSpan{ icacCSRBuf };
+uint8_t replyBuf[Credentials::kMaxDERCertLength] = { 0 };
+MutableByteSpan replySpan{ replyBuf };
 
 ::pw::Status JointFabric::TransferOwnership(const ::OwnershipContext & request, ::pw_protobuf_Empty & response)
 {
@@ -54,11 +54,11 @@ void JointFabric::GetStream(const ::pw_protobuf_Empty & request, ServerWriter<::
     return;
 }
 
-::pw::Status JointFabric::ResponseStream(const ::Response & ICACCSRBytes, ::pw_protobuf_Empty & response)
+::pw::Status JointFabric::ResponseStream(const ::Response & responseBytes, ::pw_protobuf_Empty & response)
 {
     ChipLogProgress(JointFabric, "RPC ReplyWithICACCSR");
 
-    CopySpanToMutableSpan(ByteSpan(ICACCSRBytes.response_bytes.bytes, ICACCSRBytes.response_bytes.size), icacCSRSpan);
+    CopySpanToMutableSpan(ByteSpan{ responseBytes.response_bytes.bytes, responseBytes.response_bytes.size }, replySpan);
 
     responseReceived = true;
     responseCv.notify_one();
@@ -68,12 +68,18 @@ void JointFabric::GetStream(const ::pw_protobuf_Empty & request, ServerWriter<::
 
 CHIP_ERROR JointFabric::GetICACCSRForJF(MutableByteSpan & icacCSR)
 {
+    // JFA requests an ICAC CSR from JFC
+    RequestOptions requestOptions{ TransactionType::TransactionType_ICAC_CSR };
+
+    return GetReplyInternal(icacCSR, requestOptions);
+}
+
+CHIP_ERROR JointFabric::GetReplyInternal(MutableByteSpan & icacCSR, RequestOptions & requestOptions)
+{
     std::mutex responseMutex;
     std::unique_lock<std::mutex> lock(responseMutex);
     ::pw::Status status;
 
-    // JFA requests an ICAC CSR from JFC
-    RequestOptions requestOptions{ TransactionType::TransactionType_ICAC_CSR };
     status = rpcGetStream.Write(requestOptions);
 
     if (pw::OkStatus() != status)
@@ -85,13 +91,31 @@ CHIP_ERROR JointFabric::GetICACCSRForJF(MutableByteSpan & icacCSR)
     // wait for the ICAC CSR from JFC
     if (responseCv.wait_for(lock, std::chrono::milliseconds(kRpcTimeoutMs), [] { return responseReceived; }))
     {
-        CopySpanToMutableSpan(ByteSpan(icacCSRSpan.data(), icacCSRSpan.size()), icacCSR);
+        CopySpanToMutableSpan(ByteSpan(replySpan.data(), replySpan.size()), icacCSR);
         responseReceived = false;
 
         return CHIP_NO_ERROR;
     }
 
     return CHIP_ERROR_TIMEOUT;
+}
+
+CHIP_ERROR JointFabric::GetCrossSignedIcacForJF(uint64_t anchorFabricId, ByteSpan & icacCSR, MutableByteSpan & crossSignedICAC)
+{
+
+    RequestOptions requestOptions;
+    requestOptions.transaction_type = TransactionType::TransactionType_CROSS_SIGNED_ICAC;
+    requestOptions.anchor_fabric_id = anchorFabricId;
+
+    if (sizeof(requestOptions.request_bytes.bytes) < icacCSR.size())
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    memcpy(requestOptions.request_bytes.bytes, icacCSR.data(), icacCSR.size());
+    requestOptions.request_bytes.size = icacCSR.size();
+
+    return GetReplyInternal(crossSignedICAC, requestOptions);
 }
 
 void JointFabric::CloseStreams()
