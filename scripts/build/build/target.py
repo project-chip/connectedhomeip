@@ -311,9 +311,9 @@ class BuildTarget:
                     #       full target name to be known, so in case of completions
                     #       we just assume that the target is acceptable.
                     completions.append(f"{prefix}-{target.name}")
-                # If we are not processing the last fixed target or we have
-                # some modifiers defined, append "-" to the generated completions.
-                if i < len(self.fixed_targets) - 1 or self.modifiers:
+                # If we are not processing the last fixed target,
+                # append "-" to the generated completions.
+                if i < len(self.fixed_targets) - 1:
                     completions = [f"{c}-" for c in completions]
                 # Return validated completions.
                 return [c for c in completions if c.startswith(value)]
