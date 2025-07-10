@@ -286,6 +286,8 @@ if [ -n "$install_virtual_env" ]; then
     "$ENVIRONMENT_ROOT"/bin/python -m ensurepip --upgrade
     "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade "${WHEEL[@]}"
 
+    "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/scripts/setup/requirements.build.txt"
+
     if [ "$install_pytest_requirements" = "yes" ]; then
         echo_blue "Installing python test dependencies ..."
         "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/scripts/tests/requirements.txt"
