@@ -39,6 +39,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
@@ -73,20 +74,21 @@ class TC_PAVST_2_1(MatterBaseTest):
             supported_formats = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.SupportedFormats
             )
-            assert len(supported_formats) != 0, "SupportedFormats must not be empty!"
+            asserts.assert_greater_equal(len(supported_formats, 1, "SupportedFormats must not be empty!")
             for format in supported_formats:
-                assert format.ContainerFormat != 0, "ContainerFormat must be a defined value!"
-                assert format.IngestMethod != 0, "IngestMethod must be a defined value!"
+                validContainerformat = format.ContainerFormat == cluster.ContainerFormatEnum.kCmaf;
+                isValidIngestMethod = format.IngestMethod == cluster.IngestMethodEnum.kCMAFIngest;
+                asserts.assert_true((validContainerformat & isValidIngestMethod), "(ContainerFormat & IngestMethod) must be defined values!");
 
         self.step(3)
         if self.pics_guard(self.check_pics("PAVST.S.A0001")):
             transport_configs = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.CurrentConnections
             )
-            assert len(transport_configs) != 0, "TransportConfigurations must not be empty!"
+            asserts.assert_greater_equal(len(transport_configs, 1, "TransportConfigurations must not be empty!")
             for config in transport_configs:
-                assert config.TransportStatus != 0, "TransportStatus must be a defined value!"
-
+                isValidTransportStatus = (config.TransportStatus == cluster.TransportStatusEnum.kActive | config.TransportStatus == cluster.TransportStatusEnum.kInactive);
+                asserts.assert_true(isValidTransportStatus, "TransportStatus must be a defined value!")
 
 if __name__ == "__main__":
     default_matter_test_main()
