@@ -46,7 +46,8 @@ from datetime import datetime, timedelta, timezone
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import EventChangeCallback, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.event_attribute_reporting import EventChangeCallback
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
 
@@ -206,18 +207,18 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         self.validate_ev_connected_event(event_data, session_id)
 
         self.step("5")
-        charging_duration = 5  # TODO test plan spec says 120s - reduced for now
+        charging_duration = 5
         min_charge_current = 6000
         max_charge_current = 60000
         expected_state = Clusters.EnergyEvse.Enums.StateEnum.kPluggedInCharging
-        # get epoch time for ChargeUntil variable (2 minutes from now)
+        # get epoch time for ChargeUntil variable
         utc_time_charging_end = datetime.now(
             tz=timezone.utc) + timedelta(seconds=charging_duration)
 
         # Matter epoch is 0 hours, 0 minutes, 0 seconds on Jan 1, 2000 UTC
         epoch_time = int((utc_time_charging_end - datetime(2000,
                          1, 1, 0, 0, 0, 0, timezone.utc)).total_seconds())
-        await self.send_enable_charge_command(endpoint=1, charge_until=epoch_time, min_charge=min_charge_current, max_charge=max_charge_current)
+        await self.send_enable_charge_command(charge_until=epoch_time, min_charge=min_charge_current, max_charge=max_charge_current)
 
         self.step("6")
         await self.send_test_event_trigger_charge_demand()

@@ -160,8 +160,6 @@ list(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/camera-av-settings-user-level-management-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/chime-instance.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp
-    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/device-energy-management-stub.cpp
-    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/energy-evse-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/energy-preference-delegate.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp
@@ -188,16 +186,6 @@ list(
     ${chip_dir}/examples/all-clusters-app/ameba/main/SmokeCOAlarmManager.cpp
 
     ${chip_dir}/examples/microwave-oven-app/microwave-oven-common/src/microwave-oven-device.cpp
-
-    ${chip_dir}/examples/energy-management-app/energy-management-common/common/src/EnergyTimeUtils.cpp
-    ${chip_dir}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementDelegateImpl.cpp
-    ${chip_dir}/examples/energy-management-app/energy-management-common/device-energy-management/src/DeviceEnergyManagementManager.cpp
-    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-evse/src/ChargingTargetsMemMgr.cpp
-    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-evse/src/EVSEManufacturerImpl.cpp
-    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseDelegateImpl.cpp
-    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseManager.cpp
-    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-evse/src/EnergyEvseTargetsStore.cpp
-    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-reporting/src/ElectricalPowerMeasurementDelegate.cpp
 
     ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_hook.c
     ${chip_dir}/examples/platform/ameba/route_hook/ameba_route_table.c
@@ -244,10 +232,6 @@ target_include_directories(
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/include
     ${chip_dir}/examples/microwave-oven-app/microwave-oven-common
     ${chip_dir}/examples/microwave-oven-app/microwave-oven-common/include
-    ${chip_dir}/examples/energy-management-app/energy-management-common/common/include
-    ${chip_dir}/examples/energy-management-app/energy-management-common/device-energy-management/include
-    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-evse/include
-    ${chip_dir}/examples/energy-management-app/energy-management-common/energy-reporting/include
     ${chip_dir}/examples/all-clusters-app/ameba/main/include
     ${chip_dir}/examples/platform/ameba
     ${chip_dir}/examples/platform/ameba/observer

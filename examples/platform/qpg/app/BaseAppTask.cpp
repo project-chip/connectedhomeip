@@ -27,9 +27,9 @@
 #include "combo-handler.h"
 #endif // GP_UPGRADE_DIVERSITY_DUAL_BOOT
 
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
-#include <app/util/persistence/DefaultAttributePersistenceProvider.h>
 #include <data-model-providers/codegen/Instance.h>
 
 #include <app/TestEventTriggerDelegate.h>
