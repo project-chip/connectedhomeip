@@ -33,15 +33,13 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
-import enum
 import logging
-
+import enum
+import asyncio
 import chip.clusters as Clusters
 from chip.interaction_model import Status
 from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
-from chip.testing.matter_testing import (AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main,
-                                         type_matches)
+from chip.testing.matter_testing import AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
 
@@ -52,21 +50,16 @@ class RvcStatusEnum(enum.IntEnum):
     GenericFailure = 0x2
     InvalidInMode = 0x3
 
-
 def error_enum_to_text(error_enum):
-    try:
-        return f'{Clusters.RvcRunMode.Enums.ModeTag(error_enum).name} 0x{error_enum:02x}'
-    except AttributeError:
-        if error_enum == RvcStatusEnum.Success:
-            return "Success(0x00)"
-        elif error_enum == RvcStatusEnum.UnsupportedMode:
-            return "UnsupportedMode(0x01)"
-        elif error_enum == RvcStatusEnum.GenericFailure:
-            return "GenericFailure(0x02)"
-        elif error_enum == RvcStatusEnum.InvalidInMode:
-            return "InvalidInMode(0x03)"
+    if error_enum == RvcStatusEnum.Success:
+        return "Success(0x00)"
+    elif error_enum == RvcStatusEnum.UnsupportedMode:
+        return "UnsupportedMode(0x01)"
+    elif error_enum == RvcStatusEnum.GenericFailure:
+        return "GenericFailure(0x02)"
+    elif error_enum == RvcStatusEnum.InvalidInMode:
+        return "InvalidInMode(0x03)"
     raise AttributeError("Unknown Enum value")
-
 
 def verify_mode_tag_in_supported_modes(supported_modes, mode_value, expected_tag):
     for entry in supported_modes:
@@ -120,18 +113,18 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
 
     async def read_supported_mode(self, endpoint):
         return await self.read_rvcrunm_attribute_expect_success(endpoint=endpoint,
-                                                                attribute=Clusters.RvcRunMode.Attributes.SupportedModes)
+                                                              attribute=Clusters.RvcRunMode.Attributes.SupportedModes)
 
     async def read_current_mode_with_check(self, expected_mode, endpoint):
         run_mode = await self.read_rvcrunm_attribute_expect_success(endpoint=endpoint,
-                                                                    attribute=Clusters.RvcRunMode.Attributes.CurrentMode)
+                                                              attribute=Clusters.RvcRunMode.Attributes.CurrentMode)
         asserts.assert_true(run_mode == expected_mode,
-                            "Expected the current mode to be %i, got %i" % (expected_mode, run_mode))
+                            f"Expected the current mode to be {expected_mode}, got {run_mode}")
         return run_mode
 
     async def read_operational_state(self, endpoint):
         return await self.read_rvcopstate_attribute_expect_success(endpoint=endpoint,
-                                                                   attribute=Clusters.RvcOperationalState.Attributes.OperationalState)
+                                                              attribute=Clusters.RvcOperationalState.Attributes.OperationalState)
 
     async def send_change_to_mode_cmd(self, new_mode) -> Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
@@ -141,8 +134,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
     async def send_change_to_mode_with_check(self, new_mode, expected_error):
         response = await self.send_change_to_mode_cmd(new_mode)
         asserts.assert_true(response.status == expected_error,
-                            "Expected a ChangeToMode response status of %s, got %s" %
-                            (error_enum_to_text(expected_error), error_enum_to_text(response.status)))
+                            f"Expected a ChangeToMode response status of {error_enum_to_text(expected_error)}, got {error_enum_to_text(response.status)}")
 
     async def send_go_home_cmd(self) -> Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcOperationalState.Commands.GoHome(),
@@ -154,8 +146,8 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
     async def send_go_home_cmd_with_check(self, expected_error):
         ret = await self.send_go_home_cmd()
         asserts.assert_equal(ret.commandResponseState.errorStateID, expected_error,
-                             "errorStateID(%s) should be %s" % (ret.commandResponseState.errorStateID,
-                                                                error_enum_to_text(expected_error)))
+                             f"errorStateID({ret.commandResponseState.errorStateID}) should be {error_enum_to_text(expected_error)}")
+
 
     @async_test_body
     async def test_TC_RVCOPSTATE_2_5(self):
@@ -244,10 +236,9 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
             current_operational_state = await self.read_operational_state(endpoint=self.endpoint)
             # Logging the OperationalState Attribute output responses from the DUT:
             logging.info(f"OperationalState: {current_operational_state}")
-            expected_value = Clusters.RvcOperationalState.Enums.OperationalStateEnum.kDocked
+            expected_value  = Clusters.RvcOperationalState.Enums.OperationalStateEnum.kDocked
             asserts.assert_equal(current_operational_state, expected_value,
-                                 "OperationalState(%s) should be %s" % (current_operational_state,
-                                                                        expected_value))
+                                 f"OperationalState({current_operational_state}) should be {expected_value}")
 
             # Wait for DUT to return to dock and complete docking-related activities
             self.step("11")
@@ -259,7 +250,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
 
             # TH reads CurrentMode attribute of the RVC Run Mode cluster
             self.step("12")
-            post_docking_run_mode_dut = await self.read_current_mode_with_check(expected_mode=idle_mode, endpoint=self.endpoint)
+            post_docking_run_mode_dut = await self.read_current_mode_with_check(expected_mode=idle_mode,endpoint=self.endpoint)
             # Logging the CurrentMode Attribute output responses from the DUT:
             logging.info(f"CurrentMode: {post_docking_run_mode_dut}")
             verify_mode_tag_in_supported_modes(supported_run_modes_dut, post_docking_run_mode_dut,
