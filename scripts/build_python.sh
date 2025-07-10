@@ -50,6 +50,7 @@ declare install_jupyterlab=no
 declare chip_device_config_enable_joint_fabric=""
 declare -a extra_packages
 declare -a extra_gn_args
+declare chip_build_controller_dynamic_server=false
 
 help() {
 
@@ -81,6 +82,8 @@ Input Options:
   -E, --extra_packages PACKAGE                              Install extra Python packages from PyPI.
                                                             May be specified multiple times.
   -z, --pregen_dir DIRECTORY                                Directory where generated zap files have been pre-generated.
+  -ds, --chip_build_controller_dynamic_server <true/false>  Enable dynamic server in controller.
+                                                            Defaults to $chip_build_controller_dynamic_server.
 "
 }
 
@@ -177,6 +180,10 @@ while (($#)); do
         --jupyter-lab | -j)
             install_jupyterlab=yes
             ;;
+        --chip_build_controller_dynamic_server | -ds)
+            chip_build_controller_dynamic_server=$2
+            shift
+            ;;
         -*)
             help
             echo "Unknown Option \"$1\""
@@ -200,6 +207,7 @@ echo "  enable_ipv4=\"$enable_ipv4\""
 if [[ -n $chip_device_config_enable_joint_fabric ]]; then
     echo "  $chip_device_config_enable_joint_fabric"
 fi
+echo "  chip_build_controller_dynamic_server=\"$chip_build_controller_dynamic_server\""
 if [[ ${#extra_gn_args[@]} -gt 0 ]]; then
     echo "In addition, the following extra args will added to gn command line: ${extra_gn_args[*]}"
 fi
@@ -233,7 +241,8 @@ gn_args=(
     "chip_config_network_layer_ble=$enable_ble"
     "chip_enable_ble=$enable_ble"
     "chip_inet_config_enable_ipv4=$enable_ipv4"
-    "chip_crypto=\"boringssl\""
+    "chip_crypto=\"openssl\""
+    "chip_build_controller_dynamic_server=$chip_build_controller_dynamic_server"
 )
 if [[ -n "$chip_mdns" ]]; then
     gn_args+=("chip_mdns=\"$chip_mdns\"")

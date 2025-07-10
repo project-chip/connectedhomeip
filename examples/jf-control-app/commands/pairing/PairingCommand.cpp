@@ -507,6 +507,13 @@ namespace {
 constexpr uint32_t kRpcTimeoutMs     = 1000;
 constexpr uint32_t kDefaultChannelId = 1;
 
+struct ICACCSRContext
+{
+    ICACCSRContext(uint64_t fabricId) : mAnchorFabricId(fabricId) {}
+
+    uint64_t mAnchorFabricId;
+};
+
 ::pw_rpc::nanopb::JointFabric::Client rpcClient(chip::rpc::client::GetDefaultRpcClient(), kDefaultChannelId);
 
 std::mutex responseMutex;
@@ -533,8 +540,7 @@ CHIP_ERROR WaitForResponse(CallType & call)
     }
 }
 
-// Callback function to be called when the RPC response is received
-void OnOwnershipTransferDone(const _pw_protobuf_Empty & response, ::pw::Status status)
+void OnRPCTransferDone(const _pw_protobuf_Empty & response, ::pw::Status status)
 {
     std::lock_guard<std::mutex> lock(responseMutex);
     responseReceived = true;
@@ -543,11 +549,58 @@ void OnOwnershipTransferDone(const _pw_protobuf_Empty & response, ::pw::Status s
 
     if (status.ok())
     {
-        ChipLogProgress(JointFabric, "OnOwnershipTransferDone RPC call succeeded!");
+        ChipLogProgress(JointFabric, "OnRPCTransferDone RPC call succeeded!");
     }
     else
     {
-        ChipLogProgress(JointFabric, "OnOwnershipTransferDone RPC call failed with status: %d\n", status.code());
+        ChipLogProgress(JointFabric, "OnRPCTransferDone RPC call failed with status: %d\n", status.code());
+    }
+}
+
+static void GenerateICACCSRWork(intptr_t arg)
+{
+    ICACCSRContext * data = reinterpret_cast<ICACCSRContext *>(arg);
+    ICACCSR reply;
+
+    // TODO: call the function that creates the ICAC CSR and populate reply
+
+    Platform::Delete(data);
+
+    // RPC call to JFA to reply with the ICAC CSR
+    auto call = rpcClient.ReplyWithICACCSR(reply, OnRPCTransferDone);
+    if (!call.active())
+    {
+        ChipLogError(JointFabric, "RPC, ReplyWithICACCSR Call Error");
+        return;
+    }
+
+    CHIP_ERROR err = WaitForResponse(call);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(JointFabric, "GenerateICACCSRWork, WaitForResponse Error");
+    }
+}
+
+void OnGetICACSROnNext(const ICACCSROptions & rpcIcacOptions)
+{
+    ChipLogProgress(JointFabric, "OnGetICACSROnNext, fabricId: %ld", rpcIcacOptions.anchor_fabric_id);
+
+    ICACCSRContext * options = Platform::New<ICACCSRContext>(rpcIcacOptions.anchor_fabric_id);
+    if (options)
+    {
+        DeviceLayer::PlatformMgr().ScheduleWork(GenerateICACCSRWork, reinterpret_cast<intptr_t>(options));
+    }
+}
+
+void OnGetICACSROnDone(::pw::Status status)
+{
+    if (status.ok())
+    {
+        ChipLogProgress(JointFabric, "GetICACCSR RPC Stream successfully closed!");
+    }
+    else
+    {
+        ChipLogProgress(JointFabric, "GetICACCSR RPC Stream closed with error: %d\n", status.code());
     }
 }
 
@@ -562,6 +615,21 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, const Optional<Crypt
         {
             ChipLogProgress(JointFabric, "Anchor Administrator commissioned with success");
             mAnchorNodeId = nodeId;
+
+            _pw_protobuf_Empty request;
+
+            ::pw::rpc::NanopbClientReader<::ICACCSROptions> localStream =
+                rpcClient.GetICACCSR(request, OnGetICACSROnNext, OnGetICACSROnDone);
+            if (!localStream.active())
+            {
+                ChipLogError(JointFabric, "RPC: Opening GetICACCSROptions Stream Error");
+                SetCommandExitStatus(CHIP_ERROR_SHUT_DOWN);
+                return;
+            }
+            else
+            {
+                rpcStreamGetICACCSR = std::move(localStream);
+            }
         }
         else
         {
@@ -595,17 +663,20 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, const Optional<Crypt
                 }
             }
 
-            auto call = rpcClient.TransferOwnership(request, OnOwnershipTransferDone);
+            auto call = rpcClient.TransferOwnership(request, OnRPCTransferDone);
             if (!call.active())
             {
                 ChipLogError(JointFabric, "RPC: OwnershipTransfer Call Error");
-                // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle if necessary.
+                SetCommandExitStatus(CHIP_ERROR_SHUT_DOWN);
+                return;
             }
 
             err = WaitForResponse(call);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(JointFabric, "RPC: OwnershipTransfer Timeout Error");
+                SetCommandExitStatus(err);
+                return;
             }
         }
     }
