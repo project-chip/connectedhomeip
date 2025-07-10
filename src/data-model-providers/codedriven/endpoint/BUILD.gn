@@ -1,5 +1,5 @@
 # Copyright (c) 2025 Project CHIP Authors
-#
+
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -12,22 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build_overrides/chip.gni")
-import("${chip_root}/build/chip/chip_test_suite.gni")
-
-chip_test_suite("tests") {
-  output_name = "libEndpointProviderTests"
-
-  test_sources = [
-    "TestEndpointProviderRegistry.cpp",
-    "TestSpanEndpointProvider.cpp",
+import("//build_overrides/pigweed.gni")
+source_set("endpoint") {
+  sources = [
+    "EndpointInterface.h",
+    "EndpointInterfaceRegistry.cpp",
+    "EndpointInterfaceRegistry.h",
+    "SpanEndpoint.cpp",
+    "SpanEndpoint.h",
   ]
 
-  cflags = [ "-Wconversion" ]
-
   public_deps = [
-    "${chip_root}/src/app/clusters/descriptor",
-    "${chip_root}/src/app/data-model-provider:string-builder-adapters",
-    "${chip_root}/src/app/server-cluster/testing",
-    "${chip_root}/src/data-model-providers/endpoint",
+    "${chip_root}/src/app:paths",
+    "${chip_root}/src/app/server-cluster",
+    "${chip_root}/src/lib/core:types",
+    "${chip_root}/src/lib/support",
   ]
 }
