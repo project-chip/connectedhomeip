@@ -87,7 +87,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
 
     def pics_TC_TSTAT_4_3(self):
         """ This function returns a list of PICS for this test case that must be True for the test to be run"""
-        return ["TSTAT.S"]
+        return ["TSTAT.S", "TSTAT.S.F0a"]
 
     def steps_TC_TSTAT_4_3(self) -> list[TestStep]:
         steps = [
@@ -180,8 +180,8 @@ class TC_TSTAT_4_3(MatterBaseTest):
                 # TODO Unsure how to validate this one. Read DUT through TimeSynchronization cluster and compare to datetime current time?
         else:
             logger.info("TimeSync steps need to be ironed out, skipping for now.")
-            self.skip_step(3)
-            self.skip_step(4)
+            self.skip_step("3")
+            self.skip_step("4")
 
         self.step("5")
         if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
