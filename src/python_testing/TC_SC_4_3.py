@@ -398,27 +398,35 @@ class TC_SC_4_3(MatterBaseTest):
         # # *** STEP 10 ***
         # TH performs a DNS-SD browse for _I<hhhh>._sub._matter._tcp.local, where <hhhh> is the 64-bit compressed
         # Fabric identifier, expressed as a fixed-length, sixteencharacter hexadecimal string, encoded as ASCII (UTF-8)
-        # text using capital letters. Verify DUT returns a PTR record with DNS-SD instance name set to instance_name
+        # text using capital letters.
         self.step(10)
-        service_types = await mdns.get_service_types(log_output=True)
         op_sub_type = self.get_operational_subtype(log_result=True)
-        asserts.assert_in(op_sub_type, service_types, f"No PTR record with DNS-SD instance name '{op_sub_type}' was found.")
+        ptr_records = await mdns.get_ptr_records(
+            service_types=[op_sub_type],
+            discovery_timeout_sec=3,
+            log_output=True,
+        )
+
+        # Verify DUT returns a PTR record with DNS-SD instance name set to instance_name
+        asserts.assert_true(
+            any(r.instance_name == instance_name for r in ptr_records),
+            f"No PTR record with DNS-SD instance name '{instance_name}' was found."
+        )
 
         # # *** STEP 11 ***
         # TH performs a DNS-SD browse for _matter._tcp.local
-        # Verify DUT returns a PTR record with DNS-SD instance name set to instance_name
         self.step(11)
-        op_service_info = await mdns._get_service(
-            service_name=instance_qname,
-            service_type=MdnsServiceType.OPERATIONAL,
+        ptr_records = await mdns.get_ptr_records(
+            service_types=[MdnsServiceType.OPERATIONAL.value],
+            discovery_timeout_sec=3,
             log_output=True,
-            discovery_timeout_sec=5,
-            unlock_service=False
         )
 
-        # Verify DUT returns a PTR record with DNS-SD instance name set instance_name
-        asserts.assert_equal(instance_name, op_service_info.instance_name,
-                             f"Instance name '{instance_name}' not present in PTR record ('{op_service_info.instance_name}')")
+        # Verify DUT returns a PTR record with DNS-SD instance name set to instance_name
+        asserts.assert_true(
+            any(r.instance_name == instance_name for r in ptr_records),
+            f"No PTR record with DNS-SD instance name '{instance_name}' was found."
+        )
 
 
 if __name__ == "__main__":
