@@ -6355,10 +6355,34 @@ CHIP_ERROR DataModelLogger::LogValue(
 {
     DataModelLogger::LogString(label, indent, "{");
     {
+        CHIP_ERROR err = LogValue("FragmentDuration", indent + 1, value.fragmentDuration);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'FragmentDuration'");
+            return err;
+        }
+    }
+    {
         CHIP_ERROR err = LogValue("ChunkDuration", indent + 1, value.chunkDuration);
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ChunkDuration'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("SegmentGroup", indent + 1, value.segmentGroup);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'SegmentGroup'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("TrackName", indent + 1, value.trackName);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'TrackName'");
             return err;
         }
     }
@@ -6371,18 +6395,18 @@ CHIP_ERROR DataModelLogger::LogValue(
         }
     }
     {
-        CHIP_ERROR err = LogValue("MetadataEnabled", indent + 1, value.metadataEnabled);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MetadataEnabled'");
-            return err;
-        }
-    }
-    {
         CHIP_ERROR err = LogValue("CENCKeyID", indent + 1, value.CENCKeyID);
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CENCKeyID'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("MetadataEnabled", indent + 1, value.metadataEnabled);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'MetadataEnabled'");
             return err;
         }
     }
