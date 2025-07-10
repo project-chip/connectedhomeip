@@ -3039,6 +3039,14 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "Schedules";
         case chip::app::Clusters::Thermostat::Attributes::SetpointHoldExpiryTimestamp::Id:
             return "SetpointHoldExpiryTimestamp";
+        case chip::app::Clusters::Thermostat::Attributes::MaxThermostatSuggestions::Id:
+            return "MaxThermostatSuggestions";
+        case chip::app::Clusters::Thermostat::Attributes::ThermostatSuggestions::Id:
+            return "ThermostatSuggestions";
+        case chip::app::Clusters::Thermostat::Attributes::CurrentThermostatSuggestion::Id:
+            return "CurrentThermostatSuggestion";
+        case chip::app::Clusters::Thermostat::Attributes::ThermostatSuggestionNotFollowingReason::Id:
+            return "ThermostatSuggestionNotFollowingReason";
         case chip::app::Clusters::Thermostat::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::Thermostat::Attributes::AcceptedCommandList::Id:
@@ -4757,8 +4765,8 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
             return "MeteredQuantity";
         case chip::app::Clusters::CommodityMetering::Attributes::MeteredQuantityTimestamp::Id:
             return "MeteredQuantityTimestamp";
-        case chip::app::Clusters::CommodityMetering::Attributes::MeasurementType::Id:
-            return "MeasurementType";
+        case chip::app::Clusters::CommodityMetering::Attributes::TariffUnit::Id:
+            return "TariffUnit";
         case chip::app::Clusters::CommodityMetering::Attributes::GeneratedCommandList::Id:
             return "GeneratedCommandList";
         case chip::app::Clusters::CommodityMetering::Attributes::AcceptedCommandList::Id:
@@ -5790,6 +5798,10 @@ char const * AcceptedCommandIdToText(chip::ClusterId cluster, chip::CommandId id
             return "SetActiveScheduleRequest";
         case chip::app::Clusters::Thermostat::Commands::SetActivePresetRequest::Id:
             return "SetActivePresetRequest";
+        case chip::app::Clusters::Thermostat::Commands::AddThermostatSuggestion::Id:
+            return "AddThermostatSuggestion";
+        case chip::app::Clusters::Thermostat::Commands::RemoveThermostatSuggestion::Id:
+            return "RemoveThermostatSuggestion";
         case chip::app::Clusters::Thermostat::Commands::AtomicRequest::Id:
             return "AtomicRequest";
         default:
@@ -6729,6 +6741,8 @@ char const * GeneratedCommandIdToText(chip::ClusterId cluster, chip::CommandId i
         {
         case chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::Id:
             return "GetWeeklyScheduleResponse";
+        case chip::app::Clusters::Thermostat::Commands::AddThermostatSuggestionResponse::Id:
+            return "AddThermostatSuggestionResponse";
         case chip::app::Clusters::Thermostat::Commands::AtomicResponse::Id:
             return "AtomicResponse";
         default:
@@ -7125,8 +7139,22 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Mounted Dimmable Load Control";
     case 0x00000130:
         return "Joint Fabric Administrator";
+    case 0x00000140:
+        return "Intercom";
+    case 0x00000141:
+        return "Audio Doorbell";
     case 0x00000142:
         return "Camera";
+    case 0x00000143:
+        return "Video Doorbell";
+    case 0x00000144:
+        return "Floodlight Camera";
+    case 0x00000145:
+        return "Snapshot Camera";
+    case 0x00000146:
+        return "Chime";
+    case 0x00000147:
+        return "Camera Controller";
     case 0x00000202:
         return "Window Covering";
     case 0x00000203:
@@ -7137,8 +7165,6 @@ char const * DeviceTypeIdToText(chip::DeviceTypeId id)
         return "Closure Panel";
     case 0x0000023E:
         return "Closure Controller";
-    case 0x00000300:
-        return "Heating/Cooling Unit";
     case 0x00000301:
         return "Thermostat";
     case 0x00000302:
