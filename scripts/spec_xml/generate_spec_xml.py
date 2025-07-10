@@ -20,7 +20,6 @@ import os
 import subprocess
 import sys
 import textwrap
-import xml.etree.ElementTree as ElementTree
 from pathlib import Path
 
 import click

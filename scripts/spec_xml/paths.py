@@ -16,8 +16,6 @@
 
 import os
 
-from chip.testing.spec_parsing import PrebuiltDataModelDirectory
-
 
 def get_chip_root():
     """
