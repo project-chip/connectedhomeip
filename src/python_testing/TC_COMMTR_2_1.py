@@ -47,7 +47,7 @@ import logging
 import chip.clusters as Clusters
 import test_plan_support
 from chip.clusters import Globals
-from chip.clusters.Types import Nullable, NullValue
+from chip.clusters.Types import NullValue
 from chip.testing import matter_asserts
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
@@ -84,7 +84,9 @@ class TC_COMMTR_2_1(MatterBaseTest, CommodityMeteringTestBaseHelper):
             TestStep("7", "TH sends TestEventTrigger command Fake Value Update Test Event", "Status code must be SUCCESS."),
             TestStep("8", "TH reads MeteredQuantityTimestamp attribute", "DUT replies an epoch-s value."),
             TestStep("9", "TH reads MeasurementType attribute", "DUT replies a MeasurementTypeEnum value."),
-            TestStep("10", "TH reads MaximumMeteredQuantities attribute", "DUT replies a uint16 value."),
+            TestStep("10", "TH reads MaximumMeteredQuantities attribute", """
+                     - DUT replies a uint16 value;
+                     - Value saved as MaxMeteredQuantities."""),
             TestStep("11", "TH reads MeteredQuantity attribute", """
                      - DUT replies a list of MeteredQuantityStruct entries.
                      - Verify that the list length less or equal MaximumMeteredQuantities attribute value;
