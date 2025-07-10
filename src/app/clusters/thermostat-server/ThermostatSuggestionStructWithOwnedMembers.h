@@ -26,7 +26,10 @@
 
 #pragma once
 
-#include <app/util/attribute-storage.h>
+#include <clusters/Thermostat/Structs.h>
+#include <lib/support/Span.h>
+#include <stddef.h>
+#include <cstdint>
 
 namespace chip {
 namespace app {

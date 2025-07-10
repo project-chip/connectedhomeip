@@ -82,26 +82,21 @@ public:
     void GetCurrentThermostatSuggestion(
         DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> & currentThermostatSuggestion) override;
 
-    DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> & GetThermostatSuggestionNotFollowingReason() override;
+    DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> GetThermostatSuggestionNotFollowingReason() override;
 
-    void SetCurrentThermostatSuggestion(size_t index) override;
-
-    CHIP_ERROR AppendToThermostatSuggestionsList(const ThermostatSuggestionStructWithOwnedMembers & thermostatSuggestion) override;
+    CHIP_ERROR AppendToThermostatSuggestionsList(const Structs::ThermostatSuggestionStruct::Type & thermostatSuggestion) override;
 
     CHIP_ERROR RemoveFromThermostatSuggestionsList(uint8_t uniqueID) override;
 
-    CHIP_ERROR SetThermostatSuggestionNotFollowingReason(
-        const DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> & thermostatSuggestionNotFollowingReason) override;
-
     uint8_t GetUniqueID() override;
 
-    CHIP_ERROR ReEvaluateCurrentSuggestion(uint32_t currentTimestamp) override;
+    CHIP_ERROR ReEvaluateCurrentSuggestion() override;
 
 private:
     static ThermostatDelegate sInstance;
 
     ThermostatDelegate();
-    ~ThermostatDelegate() = default;
+    ~ThermostatDelegate();
 
     ThermostatDelegate(const ThermostatDelegate &)             = delete;
     ThermostatDelegate & operator=(const ThermostatDelegate &) = delete;
@@ -122,7 +117,7 @@ private:
      * invalid index.
      *
      */
-    size_t GetThermostatSuggestionIndexWithEarliestEffectiveTime(uint32_t currentTimestamp);
+    size_t GetThermostatSuggestionIndexWithEarliestEffectiveTime(uint32_t currentMatterEpochTimestampInSeconds);
 
     CHIP_ERROR StartExpirationTimer(uint32_t timeoutInMSecs);
 
@@ -130,7 +125,11 @@ private:
 
     void CancelExpirationTimer();
 
-    CHIP_ERROR RemoveExpiredSuggestions(uint32_t currentTimestamp);
+    CHIP_ERROR RemoveExpiredSuggestions(uint32_t currentMatterEpochTimestampInSeconds);
+
+    CHIP_ERROR SetThermostatSuggestionNotFollowingReason(const DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> & thermostatSuggestionNotFollowingReason);
+
+    void SetCurrentThermostatSuggestion(size_t index);
 
     uint8_t mNumberOfPresets;
 
@@ -147,10 +146,10 @@ private:
     uint8_t mMaxThermostatSuggestions;
     ThermostatSuggestionStructWithOwnedMembers mThermostatSuggestions[kMaxNumberOfThermostatSuggestions];
     uint8_t mNextFreeIndexInThermostatSuggestionsList;
-
-    size_t mIndexOfCurrentSuggestion;
     uint8_t mUniqueID;
 
+    // TODO: #39949 - This information should be stored in the cluster instance.
+    size_t mIndexOfCurrentSuggestion;
     DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> mThermostatSuggestionNotFollowingReason;
 };
 

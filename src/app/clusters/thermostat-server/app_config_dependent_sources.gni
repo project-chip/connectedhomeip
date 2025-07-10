@@ -14,8 +14,6 @@
 app_config_dependent_sources = [
   "PresetStructWithOwnedMembers.cpp",
   "PresetStructWithOwnedMembers.h",
-  "ThermostatSuggestionStructWithOwnedMembers.cpp",
-  "ThermostatSuggestionStructWithOwnedMembers.h",
   "thermostat-delegate.h",
   "thermostat-server-atomic.cpp",
   "thermostat-server-presets.cpp",
