@@ -361,9 +361,9 @@ class MdnsDiscovery:
                 return None
 
     async def get_quada_records(self, hostname: str,
-                               discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
-                               log_output: bool = False
-                               ) -> Optional[list[QuadaRecord]]:
+                                discovery_timeout_sec: float = DISCOVERY_TIMEOUT_SEC,
+                                log_output: bool = False
+                                ) -> Optional[list[QuadaRecord]]:
         """
         Asynchronously retrieves the AAAA (IPv6) record of a device on the local network via mDNS.
 
