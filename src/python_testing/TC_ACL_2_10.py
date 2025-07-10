@@ -173,7 +173,7 @@ class TC_ACL_2_10(MatterBaseTest):
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
                 subjects=[self.th2.nodeId, 2222],
                 targets=NullValue,
-                fabricIndex=f1
+                fabricIndex=f2
             ),
             # Operate entry
             Clusters.AccessControl.Structs.AccessControlEntryStruct(
@@ -181,7 +181,7 @@ class TC_ACL_2_10(MatterBaseTest):
                 authMode=Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kGroup,
                 subjects=[4444],
                 targets=NullValue,
-                fabricIndex=f1
+                fabricIndex=f2
             )
         ]
 
@@ -233,7 +233,7 @@ class TC_ACL_2_10(MatterBaseTest):
             self.wait_for_user_input(prompt_msg="Reboot the DUT. Press Enter when ready.\n")
         else:
             # CI environment: restart the app process using the test runner functionality
-            restart_flag_file = "/tmp/chip_test_restart_app"
+            restart_flag_file = os.environ.get("CHIP_TEST_RESTART_FLAG_FILE", "/tmp/chip_test_restart_app")
 
             try:
                 # Create the restart flag file to signal the test runner

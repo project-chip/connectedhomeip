@@ -172,7 +172,11 @@ def restart_app_process(app_process, app, app_args, app_ready_pattern, stream_ou
         # Stop the existing app process
         if hasattr(app_process, 'terminate'):
             app_process.terminate()
-            time.sleep(5)  # Give time for cleanup
+            # Wait up to 5 seconds for the process to terminate gracefully.
+            for _ in range(50):
+                if app_process.p.poll() is not None:
+                    break
+                time.sleep(0.1)
 
             # Force kill if still running
             if app_process.p.poll() is None:
@@ -311,7 +315,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             f.write("stop")
 
         # Wait a bit for the monitor thread to stop
-        time.sleep(1)
+        restart_monitor_thread.join(2.0)  # Wait up to 2 seconds for the thread to stop
 
     # Get the current app process (which might have been restarted)
     current_app_process = app_process_ref[0] if app_process_ref else app_process
