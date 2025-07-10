@@ -33,7 +33,6 @@
 #include <app/reporting/Engine.h>
 #include <app/util/MatterCallbacks.h>
 #include <credentials/GroupDataProvider.h>
-#include <data-model-provider/MetadataTypes.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
