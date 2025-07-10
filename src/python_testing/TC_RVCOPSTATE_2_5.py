@@ -28,7 +28,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
-#       --PICS <your pics>
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
