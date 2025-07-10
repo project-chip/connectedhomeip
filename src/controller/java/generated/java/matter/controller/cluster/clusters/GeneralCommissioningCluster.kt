@@ -1502,7 +1502,7 @@ class GeneralCommissioningCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Iscommissioningwithoutpower attribute not found in response" }
+    requireNotNull(attributeData) { "IsCommissioningWithoutPower attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
