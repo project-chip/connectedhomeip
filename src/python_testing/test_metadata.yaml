@@ -8,6 +8,9 @@ not_automated:
     - name: TC_CLCTRL_6_1.py
       reason:
           Closure app on the master branch does not support this test script yet
+    - name: TC_CLCTRL_4_1.py
+      reason:
+          Closure app on the master branch does not support this test script yet
     - name: TC_CLCTRL_3_1.py
       reason:
           Closure app on the master branch does not support this test script yet
