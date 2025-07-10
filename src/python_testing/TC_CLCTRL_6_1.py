@@ -39,7 +39,7 @@ import logging
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator, EventChangeCallback
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
 from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
                                          default_matter_test_main)
 from mobly import asserts
@@ -186,10 +186,10 @@ class TC_CLCTRL_6_1(MatterBaseTest):
         # STEP 2d: TH establishes a wildcard subscription to all attributes and events on the Closure Control Cluster, with MinIntervalFloor = 0, MaxIntervalCeiling = 30 and KeepSubscriptions = false
         self.step("2d")
 
-        sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureControl)
+        sub_handler = AttributeSubscriptionHandler(expected_cluster=Clusters.ClosureControl)
         await sub_handler.start(dev_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
-        event_sub_handler = EventChangeCallback(Clusters.ClosureControl)
+        event_sub_handler = EventSubscriptionHandler(expected_cluster=Clusters.ClosureControl)
         await event_sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint)
 
         # STEP 3a: If the LT feature is not supported on the cluster, skip steps 3b to 3i.
