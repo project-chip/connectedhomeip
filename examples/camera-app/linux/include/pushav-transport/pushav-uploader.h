@@ -24,6 +24,7 @@
 #include <string>
 #include <thread>
 
+// TODO: This dummy file to be removed after merging #38998
 typedef struct UploadDataInfo
 {
     char * mData;
@@ -42,38 +43,53 @@ public:
     } PushAVCertPath;
 
     PushAVUploader(PushAVCertPath certPath) : mCertPath(certPath), mIsRunning(false) {}
-    ~PushAVUploader() {
-        if (mUploaderThread.joinable()) {
+    ~PushAVUploader()
+    {
+        if (mUploaderThread.joinable())
+        {
             mUploaderThread.join();
         }
     }
 
-    void Start() {
-        mIsRunning = true;
+    void Start()
+    {
+        mIsRunning      = true;
         mUploaderThread = std::thread(&PushAVUploader::ProcessQueue, this);
     }
 
-    void Stop() {
+    void Stop()
+    {
         mIsRunning = false;
-        if (mUploaderThread.joinable()) {
+        if (mUploaderThread.joinable())
+        {
             mUploaderThread.join();
         }
     }
 
-    void AddUploadData(std::string & filename, std::string & url) {
+    void AddUploadData(std::string & filename, std::string & url)
+    {
         std::lock_guard<std::mutex> lock(mQueueMutex);
-        mAvData.push({filename, url});
+        mAvData.push({ filename, url });
+    }
+
+    size_t GetUploadQueueSize()
+    {
+        std::lock_guard<std::mutex> lock(mQueueMutex);
+        return mAvData.size();
     }
 
 private:
-    void ProcessQueue() {
+    void ProcessQueue()
+    {
         // Dummy implementation
-        while (mIsRunning) {
+        while (mIsRunning)
+        {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     }
 
-    void UploadData(std::pair<std::string, std::string> data) {
+    void UploadData(std::pair<std::string, std::string> data)
+    {
         // Dummy implementation
     }
 

@@ -36,6 +36,11 @@ void PushAvStreamTransportManager::SetMediaController(MediaController * mediaCon
     mMediaController = mediaController;
 }
 
+void PushAvStreamTransportManager::SetCameraDevice(CameraDeviceInterface * aCameraDevice)
+{
+    mCameraDevice = aCameraDevice;
+}
+
 PushAvStreamTransportManager::~PushAvStreamTransportManager()
 {
     // Unregister all transports from Media Controller before deleting them. This will ensure that any ongoing streams are
@@ -188,56 +193,119 @@ bool PushAvStreamTransportManager::ValidateUrl(std::string url)
 Protocols::InteractionModel::Status PushAvStreamTransportManager::SelectVideoStream(StreamUsageEnum streamUsage,
                                                                                     uint16_t & videoStreamId)
 {
-    // TODO: Select and Assign videoStreamID from the allocated videoStreams
-    // Returning Status::Success to pass through checks in the Server Implementation.
-    return Status::Success;
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return Status::Failure;
+    }
+    auto & allocatedVideoStreams = mCameraDevice->GetCameraHALInterface().GetAvailableVideoStreams();
+
+    if (allocatedVideoStreams.empty())
+    {
+        return Status::Failure;
+    }
+    for (VideoStream & stream : allocatedVideoStreams)
+    {
+        VideoStreamStruct & videoStreamParams = stream.videoStreamParams;
+        if (videoStreamParams.streamUsage == streamUsage)
+        {
+            videoStreamId      = videoStreamParams.videoStreamID;
+            mVideoStreamParams = videoStreamParams;
+            return Status::Success;
+        }
+    }
+
+    return Status::Failure;
 }
 
 Protocols::InteractionModel::Status PushAvStreamTransportManager::SelectAudioStream(StreamUsageEnum streamUsage,
                                                                                     uint16_t & audioStreamId)
 {
-    // TODO: Select and Assign audioStreamID from the allocated audioStreams
-    // Returning Status::Success to pass through checks in the Server Implementation.
-    return Status::Success;
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return Status::Failure;
+    }
+
+    auto & allocatedAudioStreams = mCameraDevice->GetCameraHALInterface().GetAvailableAudioStreams();
+    if (allocatedAudioStreams.empty())
+    {
+        return Status::Failure;
+    }
+    for (AudioStream & stream : allocatedAudioStreams)
+    {
+        AudioStreamStruct & audioStreamParams = stream.audioStreamParams;
+        if (audioStreamParams.streamUsage == streamUsage)
+        {
+            audioStreamId      = audioStreamParams.audioStreamID;
+            mAudioStreamParams = audioStreamParams;
+            return Status::Success;
+        }
+    }
+
+    return Status::Failure;
 }
 
 Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateVideoStream(uint16_t videoStreamId)
 {
-    // TODO: Validate videoStreamID from the allocated videoStreams
-    // Returning Status::Success to pass through checks in the Server Implementation.
-    return Status::Success;
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return Status::Failure;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+    if (CHIP_NO_ERROR == avsmController.ValidateVideoStreamID(videoStreamId))
+    {
+        return Status::Success;
+    }
+    return Status::Failure;
 }
 
 Protocols::InteractionModel::Status PushAvStreamTransportManager::ValidateAudioStream(uint16_t audioStreamId)
 {
-    // TODO: Validate audioStreamID from the allocated audioStreams
-    // Returning Status::Success to pass through checks in the Server Implementation.
-    return Status::Success;
+    if (mCameraDevice == nullptr)
+    {
+        ChipLogError(Camera, "CameraDeviceInterface not initialized");
+        return Status::Failure;
+    }
+
+    auto & avsmController = mCameraDevice->GetCameraAVStreamMgmtController();
+
+    if (CHIP_NO_ERROR == avsmController.ValidateAudioStreamID(audioStreamId))
+    {
+        return Status::Success;
+    }
+    return Status::Failure;
 }
 
 PushAvStreamTransportStatusEnum PushAvStreamTransportManager::GetTransportBusyStatus(const uint16_t connectionID)
 {
-    for (PushAvStream & stream : pushavStreams)
+    if (mTransportMap.find(connectionID) == mTransportMap.end())
     {
-        if (stream.id == connectionID)
-        {
-            return stream.connectionStatus;
-        }
+        ChipLogError(Camera, "PushAvStreamTransportManager, failed to find Connection :[%u]", connectionID);
+        return PushAvStreamTransportStatusEnum::kUnknown;
     }
-    return PushAvStreamTransportStatusEnum::kUnknown;
+
+    if (mTransportMap[connectionID].get()->GetBusyStatus())
+    {
+        return PushAvStreamTransportStatusEnum::kBusy;
+    }
+    else
+    {
+        return PushAvStreamTransportStatusEnum::kIdle;
+    }
 }
 
+// Below API may not be needed
 void PushAvStreamTransportManager::OnAttributeChanged(AttributeId attributeId)
 {
     ChipLogProgress(Zcl, "Attribute changed for AttributeId = " ChipLogFormatMEI, ChipLogValueMEI(attributeId));
 }
 
-void PushAvStreamTransportManager::Init(AudioStreamStruct aAudioStreamParams, VideoStreamStruct aVideoStreamParams)
+void PushAvStreamTransportManager::Init()
 {
     ChipLogProgress(Zcl, "Push AV Stream Transport Initialized");
-    // mMediaController   = mediaController;
-    mVideoStreamParams = aVideoStreamParams;
-    mAudioStreamParams = aAudioStreamParams;
     return;
 }
 
