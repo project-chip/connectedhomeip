@@ -207,7 +207,13 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
-
+    
+    # Generate unique test run ID to avoid conflicts in concurrent test runs
+    import uuid
+    test_run_id = str(uuid.uuid4())[:8]  # Use first 8 characters for shorter paths
+    restart_flag_file = f"/tmp/chip_test_restart_app_{test_run_id}"
+    stop_flag_file = f"/tmp/chip_test_stop_monitor_{test_run_id}"
+    
     if factory_reset or factory_reset_app_only:
         # Remove native app config
         for path in glob.glob('/tmp/chip*') + glob.glob('/tmp/repl*'):
@@ -259,6 +265,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         os.environ['CHIP_TEST_APP_READY_PATTERN'] = app_ready_pattern.pattern.decode() if app_ready_pattern else ""
         # Add a function reference for app restart
         os.environ['CHIP_TEST_APP_RESTART_AVAILABLE'] = '1'
+        os.environ['CHIP_TEST_RESTART_FLAG_FILE'] = restart_flag_file
+        os.environ['CHIP_TEST_STOP_FLAG_FILE'] = stop_flag_file
         logging.info("App restart capability enabled")
 
     script_command = [
@@ -296,7 +304,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         app_process_ref = [app_process]
         restart_monitor_thread = threading.Thread(
             target=monitor_app_restart_requests,
-            args=(app_process_ref, app, app_args, app_ready_pattern, stream_output),
+            args=(app_process_ref, app, app_args, app_ready_pattern, stream_output, restart_flag_file, stop_flag_file),
             daemon=True
         )
         restart_monitor_thread.start()
@@ -310,7 +318,6 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     if restart_monitor_thread and restart_monitor_thread.is_alive():
         logging.info("Stopping app restart monitor thread")
         # Signal the monitor thread to stop
-        stop_flag_file = "/tmp/chip_test_stop_monitor"
         with open(stop_flag_file, 'w') as f:
             f.write("stop")
 
@@ -329,7 +336,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         app_exit_code = current_app_process.returncode
 
     # Clean up any leftover flag files
-    for flag_file in ["/tmp/chip_test_restart_app", "/tmp/chip_test_stop_monitor"]:
+    for flag_file in [restart_flag_file, stop_flag_file]:
         if os.path.exists(flag_file):
             os.unlink(flag_file)
 
@@ -349,11 +356,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         sys.exit(exit_code)
 
 
-def monitor_app_restart_requests(app_process_ref, app, app_args, app_ready_pattern, stream_output):
+def monitor_app_restart_requests(app_process_ref, app, app_args, app_ready_pattern, stream_output, restart_flag_file, stop_flag_file):
     """Monitor for app restart requests from the test script."""
-    restart_flag_file = "/tmp/chip_test_restart_app"
-    stop_flag_file = "/tmp/chip_test_stop_monitor"
-
     while True:
         try:
             # Check if we should stop monitoring

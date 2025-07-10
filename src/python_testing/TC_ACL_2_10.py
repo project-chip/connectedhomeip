@@ -234,6 +234,7 @@ class TC_ACL_2_10(MatterBaseTest):
         else:
             # CI environment: restart the app process using the test runner functionality
             restart_flag_file = os.environ.get("CHIP_TEST_RESTART_FLAG_FILE", "/tmp/chip_test_restart_app")
+            logging.info(f"Using restart flag file: {restart_flag_file}")
 
             try:
                 # Create the restart flag file to signal the test runner
