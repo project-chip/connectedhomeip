@@ -509,17 +509,23 @@ TEST_F(TestBtpEngine, HandleAckReceivedIncorrectSequence)
 // Test handling a packet that contains more data than the declared payload length (simulating BLE packet padding).
 TEST_F(TestBtpEngine, HandleCharacteristicReceivedWithPadding)
 {
-    // Create a packet buffer with a single message.
+    // Create a packet buffer with a single message and padding bytes.
+    // The payload length in the header is 1 byte, but the actual packet has padding.
     constexpr uint8_t packetData0[] = {
         to_underlying(BtpEngine::HeaderFlags::kStartMessage) | to_underlying(BtpEngine::HeaderFlags::kEndMessage), // Header flags
         0x01, // Sequence number
         0x01, // Payload length (only 1 byte of actual payload)
-        0x00, // Payload length
+        0x00, // Payload length (high byte)
         0xff, // Payload
+        0x00, // Padding bytes (should be ignored by BTP engine)
+        0x00,
+        0x00,
+        0x00,
+        0x00,
     };
 
-    // Create a packet with 10 bytes total, but only 1 byte is actual payload (the rest is padding).
-    auto packet0 = System::PacketBufferHandle::NewWithData(packetData0, 10);
+    // Create a packet with the full data including padding.
+    auto packet0 = System::PacketBufferHandle::NewWithData(packetData0, sizeof(packetData0));
 
     // Handle the received packet and check the state of the BTP engine.
     SequenceNumber_t receivedAck;
