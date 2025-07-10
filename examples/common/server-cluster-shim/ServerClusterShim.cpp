@@ -423,7 +423,7 @@ std::optional<ActionReturnStatus> ServerClusterShim::InvokeCommand(const InvokeR
     if (!PathsContains({ request.path.mEndpointId, request.path.mClusterId }))
     {
         ChipLogError(Zcl, "InvokeCommand: Cluster path not found in ServerClusterShim");
-        if( handler != nullptr)
+        if (handler != nullptr)
         {
             handler->AddStatus(request.path, Status::UnsupportedEndpoint);
         }
