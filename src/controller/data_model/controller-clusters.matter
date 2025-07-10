@@ -11299,7 +11299,8 @@ provisional cluster CommodityMetering = 2823 {
 
   readonly attribute nullable MeteredQuantityStruct meteredQuantity[] = 0;
   readonly attribute nullable epoch_s meteredQuantityTimestamp = 1;
-  readonly attribute nullable TariffUnitEnum tariffUnit = 2;
+  readonly attribute nullable MeasurementTypeEnum measurementType = 2;
+  readonly attribute nullable int16u maximumMeteredQuantities = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -11482,6 +11483,7 @@ internal cluster UnitTesting = 4294048773 {
   attribute boolean clusterErrorBoolean = 50;
   attribute TestGlobalEnum globalEnum = 51;
   attribute TestGlobalStruct globalStruct = 52;
+  attribute access(read: administer, write: administer) optional boolean unsupportedAttributeRequiringAdminPrivilege = 254;
   attribute optional boolean unsupported = 255;
   attribute optional int8u readFailureCode = 12288;
   attribute optional int32u failureInt32U = 12289;
