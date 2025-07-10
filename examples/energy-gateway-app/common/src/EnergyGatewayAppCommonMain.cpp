@@ -87,7 +87,6 @@ void ElectricalEnergyTariffInit()
     VerifyOrDie(CommodityTariffInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
     VerifyOrDie(ElectricalGridConditionsInit(kElectricalEnergyTariffEndpointId) == CHIP_NO_ERROR);
 
-
     // set the descriptor TagList to include "ElectricalEnergy" and "Current" (to indicate the ActiveTariff)
     SetTagList(kElectricalEnergyTariffEndpointId,
                Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(electricalEnergyTariffTagList));

@@ -132,7 +132,7 @@ JsonParser<TariffInformationStruct::Type, TariffInfoDataClass, false>::ParseFrom
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (json.isMember("TariffLabel"))
     {
-        if (CHIP_NO_ERROR != ( err = ParseLabelFromJson(json["TariffLabel"], output.tariffLabel)) )
+        if (CHIP_NO_ERROR != (err = ParseLabelFromJson(json["TariffLabel"], output.tariffLabel)))
         {
             return err;
         }
@@ -143,7 +143,7 @@ JsonParser<TariffInformationStruct::Type, TariffInfoDataClass, false>::ParseFrom
     }
     if (json.isMember("ProviderName"))
     {
-        if (CHIP_NO_ERROR != (err = ParseLabelFromJson(json["ProviderName"], output.providerName)) )
+        if (CHIP_NO_ERROR != (err = ParseLabelFromJson(json["ProviderName"], output.providerName)))
         {
             return err;
         }
@@ -282,7 +282,7 @@ CHIP_ERROR JsonParser<TariffComponentStructType, TariffComponentsDataClass>::Par
     {
         const Json::Value & priceJson = json["Price"];
         TariffPriceStruct::Type tmp_price;
-        
+
         if (priceJson.isMember("PriceType"))
         {
             tmp_price.priceType = static_cast<Globals::TariffPriceTypeEnum>(priceJson["PriceType"].asUInt());
@@ -298,7 +298,7 @@ CHIP_ERROR JsonParser<TariffComponentStructType, TariffComponentsDataClass>::Par
             if (priceJson["Price"].isDouble())
             {
                 double priceValue = priceJson["Price"].asDouble();
-                tmp_price.price = MakeOptional(static_cast<int64_t>(priceValue * 100));
+                tmp_price.price   = MakeOptional(static_cast<int64_t>(priceValue * 100));
             }
             else if (priceJson["Price"].isInt64())
             {
@@ -323,14 +323,14 @@ CHIP_ERROR JsonParser<TariffComponentStructType, TariffComponentsDataClass>::Par
             }
         }
 
-        output.price = MakeOptional(tmp_price);          
+        output.price = MakeOptional(tmp_price);
     }
 
     if (json.isMember("AuxiliaryLoad"))
     {
         const Json::Value & auxLoadJson = json["AuxiliaryLoad"];
         AuxiliaryLoadSwitchSettingsStruct::Type auxiliaryLoad;
-        
+
         if (auxLoadJson.isMember("Number"))
         {
             auxiliaryLoad.number = static_cast<uint8_t>(auxLoadJson["Number"].asUInt());
@@ -349,14 +349,14 @@ CHIP_ERROR JsonParser<TariffComponentStructType, TariffComponentsDataClass>::Par
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        output.auxiliaryLoad = MakeOptional(auxiliaryLoad);          
+        output.auxiliaryLoad = MakeOptional(auxiliaryLoad);
     }
 
     if (json.isMember("PeakPeriod"))
     {
         const Json::Value & PeakPeriodJson = json["PeakPeriod"];
         PeakPeriodStruct::Type peakPeriod;
-        
+
         if (PeakPeriodJson.isMember("Severity"))
         {
             peakPeriod.severity = static_cast<PeakPeriodSeverityEnum>(PeakPeriodJson["Severity"].asUInt());
@@ -375,14 +375,14 @@ CHIP_ERROR JsonParser<TariffComponentStructType, TariffComponentsDataClass>::Par
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        output.peakPeriod = MakeOptional(peakPeriod);          
+        output.peakPeriod = MakeOptional(peakPeriod);
     }
 
     if (json.isMember("PowerThreshold"))
     {
         const Json::Value & powerThresholdJson = json["PowerThreshold"];
         PowerThresholdStruct::Type powerThreshold;
-        
+
         if (powerThresholdJson.isMember("PowerThreshold"))
         {
             if (powerThresholdJson["PowerThreshold"].isUInt())
@@ -399,7 +399,8 @@ CHIP_ERROR JsonParser<TariffComponentStructType, TariffComponentsDataClass>::Par
         {
             if (powerThresholdJson["ApparentPowerThreshold"].isUInt())
             {
-                powerThreshold.apparentPowerThreshold = MakeOptional(static_cast<int64_t>(powerThresholdJson["ApparentPowerThreshold"].asUInt()));
+                powerThreshold.apparentPowerThreshold =
+                    MakeOptional(static_cast<int64_t>(powerThresholdJson["ApparentPowerThreshold"].asUInt()));
             }
             else
             {
@@ -411,7 +412,8 @@ CHIP_ERROR JsonParser<TariffComponentStructType, TariffComponentsDataClass>::Par
         {
             if (powerThresholdJson["PowerThresholdSource"].isUInt())
             {
-                powerThreshold.powerThresholdSource = MakeNullable(static_cast<PowerThresholdSourceEnum>(powerThresholdJson["PowerThresholdSource"].asUInt()));
+                powerThreshold.powerThresholdSource =
+                    MakeNullable(static_cast<PowerThresholdSourceEnum>(powerThresholdJson["PowerThresholdSource"].asUInt()));
             }
             else
             {
@@ -419,7 +421,7 @@ CHIP_ERROR JsonParser<TariffComponentStructType, TariffComponentsDataClass>::Par
             }
         }
 
-        output.powerThreshold = MakeOptional(powerThreshold);          
+        output.powerThreshold = MakeOptional(powerThreshold);
     }
 
     if (!tempLabel.IsNull())
@@ -445,8 +447,8 @@ CHIP_ERROR JsonParser<DayPatternStructType, DayPatternsDataClass>::ParseFromJson
 
     // Helper function to parse hex string
     auto parseHexString = [](const std::string & hexStr) -> std::optional<uint8_t> {
-        if (!hexStr.empty() && hexStr.size() >= 3 && 
-            hexStr[0] == '0' && (hexStr[1] != 'x' || hexStr[1] != 'X')) {
+        if (!hexStr.empty() && hexStr.size() >= 3 && hexStr[0] == '0' && (hexStr[1] != 'x' || hexStr[1] != 'X'))
+        {
             return static_cast<uint8_t>(std::stoul(hexStr.substr(2), nullptr, 16));
         }
 
@@ -455,26 +457,31 @@ CHIP_ERROR JsonParser<DayPatternStructType, DayPatternsDataClass>::ParseFromJson
 
     // Required fields check with hex string support
     auto checkRequired = [&](const std::string & key, auto & dest, auto converter) -> CHIP_ERROR {
-        if (!json.isMember(key)) {
+        if (!json.isMember(key))
+        {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        if (key == "DaysOfWeek" && json[key].isString()) {
+        if (key == "DaysOfWeek" && json[key].isString())
+        {
             // Special handling for hex string
             auto hexValue = parseHexString(json[key].asString());
-            if (!hexValue) {
+            if (!hexValue)
+            {
                 return CHIP_ERROR_INVALID_ARGUMENT;
             }
             dest = converter(*hexValue);
-        } 
-        else if (json[key].isUInt()) {
+        }
+        else if (json[key].isUInt())
+        {
             // Original numeric handling
             dest = converter(json[key].asUInt());
         }
-        else {
+        else
+        {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
-        
+
         return CHIP_NO_ERROR;
     };
 
@@ -499,8 +506,7 @@ CHIP_ERROR DayPatterns_LoadFromJson(const Json::Value & json, DayPatternsDataCla
 
 // IndividualDaysDataClass
 template <>
-CHIP_ERROR JsonParser<DayStructType, IndividualDaysDataClass>::ParseFromJson(const Json::Value & json,
-                                                                                 DayStructType & output)
+CHIP_ERROR JsonParser<DayStructType, IndividualDaysDataClass>::ParseFromJson(const Json::Value & json, DayStructType & output)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -512,12 +518,13 @@ CHIP_ERROR JsonParser<DayStructType, IndividualDaysDataClass>::ParseFromJson(con
         return CHIP_NO_ERROR;
     };
 
-    err = checkRequired("Date", output.date, [](auto v) { return static_cast<uint32_t>(v);; });
+    err = checkRequired("Date", output.date, [](auto v) {
+        return static_cast<uint32_t>(v);
+        ;
+    });
     SuccessOrExit(err);
 
-    err = checkRequired("DayType", output.dayType, [](auto v) {
-        return static_cast<DayTypeEnum>(v);
-    });
+    err = checkRequired("DayType", output.dayType, [](auto v) { return static_cast<DayTypeEnum>(v); });
     SuccessOrExit(err);
 
     err = ParseIDArray(json.get("DayEntryIDs", Json::Value()), output.dayEntryIDs, kDayEntriesAttrMaxLength);
@@ -534,9 +541,9 @@ CHIP_ERROR IndividualDays_LoadFromJson(const Json::Value & json, IndividualDaysD
 // CalendarPeriodsDataClass
 template <>
 CHIP_ERROR JsonParser<CalendarPeriodStructType, CalendarPeriodsDataClass>::ParseFromJson(const Json::Value & json,
-                                                                                 CalendarPeriodStructType & output)
+                                                                                         CalendarPeriodStructType & output)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err        = CHIP_NO_ERROR;
     uint32_t startDateVal = 0;
 
     if (json.isMember("StartDate"))
@@ -569,7 +576,8 @@ exit:
 
 CHIP_ERROR CalendarPeriods_LoadFromJson(const Json::Value & json, CalendarPeriodsDataClass & MgmtObj)
 {
-    return JsonParser<CalendarPeriodStructType, CalendarPeriodsDataClass>::LoadFromJson(json, MgmtObj, kCalendarPeriodsAttrMaxLength);
+    return JsonParser<CalendarPeriodStructType, CalendarPeriodsDataClass>::LoadFromJson(json, MgmtObj,
+                                                                                        kCalendarPeriodsAttrMaxLength);
 }
 } // namespace JSON_Utilities
 
@@ -730,9 +738,9 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
         }
     }
 
-    if ( GetIndividualDays_MgmtObj().IsValid() && (GetIndividualDays_MgmtObj().GetNewValueData() != nullptr) )
+    if (GetIndividualDays_MgmtObj().IsValid() && (GetIndividualDays_MgmtObj().GetNewValueData() != nullptr))
     {
-        
+
         assert(!UpdCtx.IndividualDaysDayEntryIDs.empty()); // Something went wrong if IndividualDays has no DE IDs
 
         // Checks that all ID_DE_IDs are in main DE list:
@@ -752,7 +760,7 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
         DayEntriesData_is_available = true;
     }
 
-    if ( GetCalendarPeriods_MgmtObj().IsValid() && ( GetCalendarPeriods_MgmtObj().GetNewValueData() != nullptr) )
+    if (GetCalendarPeriods_MgmtObj().IsValid() && (GetCalendarPeriods_MgmtObj().GetNewValueData() != nullptr))
     {
         assert(!UpdCtx.CalendarPeriodsDayPatternIDs.empty()); // Something went wrong if CP has no DP IDs
 
@@ -767,8 +775,8 @@ bool CommodityTariffDelegate::TariffDataUpd_CrossValidator(TariffUpdateCtx & Upd
 
         DayEntriesData_is_available = true;
     }
-    
-    if(!DayEntriesData_is_available)
+
+    if (!DayEntriesData_is_available)
     {
         ChipLogError(NotSpecified, "Both IndividualDays and CalendarPeriods are not present!");
         return false;

@@ -32,15 +32,15 @@ static constexpr uint32_t kSecondsPer4hr = 14400; // 4 hours in seconds
 
 uint8_t presetIndex = 0;
 
-static uint8_t days_ctr = 0;
+static uint8_t days_ctr    = 0;
 static uint8_t entries_ctr = 0;
-bool first_start = true;
+bool first_start           = true;
 namespace TariffPresets {
 static constexpr const char * kTariff1 = "./tariff_sample_1.json";
 static constexpr const char * kTariff2 = "./tariff_sample_2.json";
 
 // Array of all presets
-static constexpr std::array<const char *, 2> kAllPresets =  {kTariff1, kTariff2 };
+static constexpr std::array<const char *, 2> kAllPresets = { kTariff1, kTariff2 };
 
 // Number of presets (compile-time constant)
 static constexpr size_t kCount = kAllPresets.size();
@@ -52,13 +52,13 @@ static constexpr const char * GetPreset(size_t index)
     {
         index = presetIndex = 0;
     }
-    else{
+    else
+    {
         presetIndex++;
     }
     return kAllPresets[index];
 }
 } // namespace TariffPresets
-
 
 void SetTestEventTrigger_TariffDataUpdated()
 {
@@ -93,38 +93,38 @@ static uint32_t GetCurrentTimestamp(void)
     return static_cast<uint32_t>(chipEpochTime / chip::kMicrosecondsPerSecond);
 }
 
-/* 
+/*
  * Forces a day change event by scheduling update at the end of current day
  * Adds remaining time until midnight to trigger next day event
  */
 void SetTestEventTrigger_TimeShift24h()
 {
-   CommodityTariffInstance * instance = GetCommodityTariffInstance();
+    CommodityTariffInstance * instance = GetCommodityTariffInstance();
 
-   if (instance)
-   {
-        const uint32_t now = GetCurrentTimestamp();
+    if (instance)
+    {
+        const uint32_t now                  = GetCurrentTimestamp();
         const uint32_t secondsSinceMidnight = now % kSecondsPerDay;
-        const uint32_t delay = (now - secondsSinceMidnight) + (days_ctr++)*kSecondsPerDay;
+        const uint32_t delay                = (now - secondsSinceMidnight) + (days_ctr++) * kSecondsPerDay;
 
         entries_ctr = 0;
         instance->SetupTimeShiftOffset(delay);
-   }
+    }
 }
 
-/* 
+/*
  * Forces a day entry update by scheduling at next 4-hour interval
  * Handles midnight crossing and resets counter when day changes
  */
 void SetTestEventTrigger_TimeShift4h()
 {
-   CommodityTariffInstance * instance = GetCommodityTariffInstance();
+    CommodityTariffInstance * instance = GetCommodityTariffInstance();
 
-   if (instance)
-   {
-        const uint32_t now = GetCurrentTimestamp();
+    if (instance)
+    {
+        const uint32_t now                  = GetCurrentTimestamp();
         const uint32_t secondsSinceMidnight = now % kSecondsPerDay;
-        uint32_t delay = (now - secondsSinceMidnight);
+        uint32_t delay                      = (now - secondsSinceMidnight);
 
         if (first_start)
         {
@@ -134,23 +134,24 @@ void SetTestEventTrigger_TimeShift4h()
 
         delay += ++entries_ctr * kSecondsPer4hr;
 
-        ChipLogDetail(NotSpecified,
-                    "ForceDayEntriesAttrsUpdate: entry upd delay: %d",
-                    delay);
-        
-        if (delay % kSecondsPerDay == 0) {
+        ChipLogDetail(NotSpecified, "ForceDayEntriesAttrsUpdate: entry upd delay: %d", delay);
+
+        if (delay % kSecondsPerDay == 0)
+        {
             SetTestEventTrigger_TimeShift24h();
-        } else {
-            // Move to next 4-hour interval for next call
-            delay += days_ctr*kSecondsPerDay;
-            instance->SetupTimeShiftOffset( delay);
         }
-   }
+        else
+        {
+            // Move to next 4-hour interval for next call
+            delay += days_ctr * kSecondsPerDay;
+            instance->SetupTimeShiftOffset(delay);
+        }
+    }
 }
 
 void SetTestEventTrigger_TimeShiftDisable()
 {
-    days_ctr = 0;
+    days_ctr    = 0;
     entries_ctr = 0;
     first_start = true;
 }

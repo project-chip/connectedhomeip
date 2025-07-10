@@ -34,8 +34,7 @@ static bool EnergyGatewayAppOptionHandler(const char * aProgram, chip::ArgParser
 constexpr uint16_t kOptionTariffFile = 0xffd0;
 
 static chip::ArgParser::OptionDef sEnergyGatewayAppOptionDefs[] = {
-    { "tariff-file", chip::ArgParser::kArgumentRequired, kOptionTariffFile },
-    { nullptr }
+    { "tariff-file", chip::ArgParser::kArgumentRequired, kOptionTariffFile }, { nullptr }
 };
 
 static chip::ArgParser::OptionSet sCmdLineOptions = { EnergyGatewayAppOptionHandler, // handler function
@@ -43,7 +42,7 @@ static chip::ArgParser::OptionSet sCmdLineOptions = { EnergyGatewayAppOptionHand
                                                       "PROGRAM OPTIONS",             // help group
                                                       "--tariff-file <Path to JSON file>\n" };
 
-const char * spTariffFile        = nullptr;
+const char * spTariffFile = nullptr;
 
 void ApplicationInit()
 {
@@ -73,7 +72,7 @@ static bool EnergyGatewayAppOptionHandler(const char * aProgram, chip::ArgParser
     switch (aIdentifier)
     {
     case kOptionTariffFile:
-        if (strlen(aValue) > 0 )
+        if (strlen(aValue) > 0)
         {
             spTariffFile = aValue;
         }

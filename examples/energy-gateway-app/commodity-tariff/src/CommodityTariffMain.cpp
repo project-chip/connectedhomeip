@@ -93,7 +93,7 @@ void LoadTariffFromJSONFile(const char * aFname, CommodityTariffDelegate * dg)
     if (LoadJsonFile(aFname, json_root))
     {
         ChipLogProgress(NotSpecified, "The tariff file opened successfully");
-        if ( CHIP_NO_ERROR == dg->LoadTariffData(json_root) )
+        if (CHIP_NO_ERROR == dg->LoadTariffData(json_root))
         {
             dg->TariffDataUpdate();
         }
