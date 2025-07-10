@@ -89,9 +89,9 @@ class TestFrameworkArgParsing(MatterBaseTest):
         self.check_arg('lower.case.string_arg', string_val)
         self.check_arg('MiXed.case.string_arg', string_val)
 
-        self.check_arg('UPPER.CASE.INT_ARG', 15)
-        self.check_arg('lower.case.int_arg', 15)
-        self.check_arg('MiXed.case.int_arg', 15)
+        self.check_arg('UPPER.CASE.INT_ARG', int_val)
+        self.check_arg('lower.case.int_arg', int_val)
+        self.check_arg('MiXed.case.int_arg', int_val)
 
         self.check_arg('UPPER.CASE.BOOL_ARG_WITH_LOWER_CASE_VAL', True)
         self.check_arg('UPPER.CASE.BOOL_ARG_WITH_UPPER_CASE_VAL', True)
