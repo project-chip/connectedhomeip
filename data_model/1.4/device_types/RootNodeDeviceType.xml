@@ -167,8 +167,8 @@ Davis, CA 95616, USA
       <quality singleton="true"/>
       <mandatoryConform>
         <orTerm>
-          <condition name="SIT"/>
-          <condition name="LIT"/>
+          <feature name="SIT"/>
+          <feature name="LIT"/>
         </orTerm>
       </mandatoryConform>
       <features>
