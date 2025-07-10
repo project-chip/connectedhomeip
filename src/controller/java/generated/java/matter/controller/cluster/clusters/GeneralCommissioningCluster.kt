@@ -1547,7 +1547,7 @@ class GeneralCommissioningCluster(
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Iscommissioningwithoutpower attribute not found in Node State update"
+            "IsCommissioningWithoutPower attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
