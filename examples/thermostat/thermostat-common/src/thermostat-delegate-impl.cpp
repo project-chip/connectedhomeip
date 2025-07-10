@@ -345,7 +345,7 @@ uint8_t ThermostatDelegate::GetUniqueID()
 CHIP_ERROR ThermostatDelegate::StartExpirationTimer(uint32_t timeoutInMSecs)
 {
 
-    ChipLogProgress(Zcl, "Starting timer to wait for %d milliseconds for the current thermostat suggestion to expire",
+    ChipLogProgress(Zcl, "Starting timer to wait for %u milliseconds for the current thermostat suggestion to expire",
                     timeoutInMSecs);
     return chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds16(timeoutInMSecs), TimerExpiredCallback,
                                                        static_cast<void *>(this));
@@ -410,8 +410,14 @@ CHIP_ERROR ThermostatDelegate::ReEvaluateCurrentSuggestion(uint32_t currentTimes
     if (!nullableCurrentThermostatSuggestion.IsNull())
     {
 
-        // Start a timer for the expiration time.
         ThermostatSuggestionStructWithOwnedMembers & currentThermostatSuggestion = nullableCurrentThermostatSuggestion.Value();
+
+        // TODO: Check if a hold is set and set the ThermostatSuggestionNotFollowingReason to OngoingHold and do not update ActivePresetHandle.
+        // Otherwise set the ActivePresetHandle to the preset handle in the suggestion and set ThermostatSuggestionNotFollowingReason to null.
+        SetActivePresetHandle(currentThermostatSuggestion.GetPresetHandle());
+        SetThermostatSuggestionNotFollowingReason(DataModel::NullNullable);
+
+        // Start a timer for the expiration time.
         if (currentThermostatSuggestion.GetExpirationTime() > currentTimestamp)
         {
             const uint32_t kMilliSecsInSeconds = 1000;
