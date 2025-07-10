@@ -415,7 +415,7 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNotInitialized)
 
     // Create a list of discriminators
     SetupDiscriminator discriminators[] = { SetupDiscriminator(), SetupDiscriminator() };
-    Span<const SetupDiscriminator> discriminatorsSpan(discriminators, 2);
+    Span<const SetupDiscriminator> discriminatorsSpan(discriminators);
 
     // Define success and error callbacks
     auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {};
@@ -431,7 +431,7 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoConnectionDelegate)
     access.SetConnectionDelegate(nullptr);
 
     SetupDiscriminator discriminators[] = { SetupDiscriminator(), SetupDiscriminator() };
-    Span<const SetupDiscriminator> discriminatorsSpan(discriminators, 2);
+    Span<const SetupDiscriminator> discriminatorsSpan(discriminators);
 
     auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {};
     auto OnError   = [](void * appState, CHIP_ERROR err) {};
@@ -446,7 +446,7 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoBleTransportLayer)
     mBleTransport = nullptr;
 
     SetupDiscriminator discriminators[] = { SetupDiscriminator(), SetupDiscriminator() };
-    Span<const SetupDiscriminator> discriminatorsSpan(discriminators, 2);
+    Span<const SetupDiscriminator> discriminatorsSpan(discriminators);
 
     auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {};
     auto OnError   = [](void * appState, CHIP_ERROR err) {};
@@ -462,7 +462,7 @@ TEST_F(TestBleLayer, NewConnectionByDiscriminatorsSuccess)
     SetupDiscriminator discriminators[] = { SetupDiscriminator(), SetupDiscriminator() };
     discriminators[0].SetLongValue(1234);
     discriminators[1].SetLongValue(3333);
-    Span<const SetupDiscriminator> discriminatorsSpan(discriminators, 2);
+    Span<const SetupDiscriminator> discriminatorsSpan(discriminators);
 
     auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {
         BleLayer * testLayer = static_cast<BleLayer *>(appState);
@@ -493,7 +493,7 @@ TEST_F(TestBleLayer, NewConnectionByDiscriminatorsError)
     SetupDiscriminator discriminators[] = { SetupDiscriminator(), SetupDiscriminator() };
     discriminators[0].SetLongValue(1234);
     discriminators[1].SetLongValue(3333);
-    Span<const SetupDiscriminator> discriminatorsSpan(discriminators, 2);
+    Span<const SetupDiscriminator> discriminatorsSpan(discriminators);
 
     auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {
         FAIL() << "OnSuccess should not be called in this test";
