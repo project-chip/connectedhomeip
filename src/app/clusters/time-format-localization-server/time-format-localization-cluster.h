@@ -39,6 +39,8 @@ public:
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
 protected:
+    //TODO Set this to a specific type of "TimeFormatLocalizationLogic" (The DeviceLayer one) just to compile while UT are developed
+    // Will have to change this approach to avoid tying it to it.
     DeviceLayerTimeFormatLocalizationLogic mLogic;
 
 };

@@ -63,7 +63,8 @@ Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPre
     return Protocols::InteractionModel::Status::Success;
     
 }
-
+// TODO: This is not a proper initialization will probable need to move it to something like 
+// emberAfTimeFormatLocalizationClusterServerInitCallback to be able to get the information from the endpoint.
 void MatterTimeFormatLocalizationPluginServerInitCallback()
 {
     uint32_t rawFeatureMap = 0;

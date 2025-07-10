@@ -22,6 +22,7 @@
 namespace chip {
 namespace DeviceLayer {
 
+// TODO: Reduce this test case if possible since it is only used for the Calendars iterator
 class SampleDeviceProvider : public DeviceInfoProvider
 {
 public:

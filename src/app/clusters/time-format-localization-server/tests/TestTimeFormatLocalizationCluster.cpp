@@ -101,6 +101,7 @@ TEST_F(TestTimeFormatLocalizationCluster, AttributeTest)
 
 TEST_F(TestTimeFormatLocalizationCluster, ListCalendarTest)
 {
+    // TODO: This seems to work to test the ListCalendar using a Encoder/Decoder with TLV. Probably there is an easier way.
     uint8_t buf[1024];
     TLV::TLVWriter tlvWriter;
     tlvWriter.Init(buf);

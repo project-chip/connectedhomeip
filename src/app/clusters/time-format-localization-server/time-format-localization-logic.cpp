@@ -89,11 +89,9 @@ bool TimeFormatLocalizationLogic::IsCalendarSupported(TimeFormatLocalization::Ca
 
 TimeFormatLocalization::CalendarTypeEnum TimeFormatLocalizationLogic::GetActiveCalendarType() 
 {
-    {
-        return mCalendarType;
-    }
+    return mCalendarType;
 }
-
+// TODO: Missing persisten storage for Writable attributes, also should check here for a valid value for HourFormat and CalendarType?
 DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setHourFormat(TimeFormatLocalization::HourFormatEnum rHour)
 {
     mHourFormat = rHour;

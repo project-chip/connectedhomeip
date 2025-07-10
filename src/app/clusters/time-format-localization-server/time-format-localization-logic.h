@@ -28,6 +28,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+// TODO: These attributes are CALFMT conformance, not sure if handling them this way is the correct way.
 struct TimeFormatLocalizationEnabledAttributes
 {
     bool activeEnableCalendarType : 1;
@@ -86,6 +87,7 @@ protected:
     }
 };
 
+// TODO: This class seems to be used just to improve the UT by using a custom DeviceInfoProvider for the SupportedCalendarTypes
 class InjectedTimeFormatLocalizationLogic : public TimeFormatLocalizationLogic
 {
 public:

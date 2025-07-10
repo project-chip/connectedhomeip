@@ -21,12 +21,9 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libTestTimeFormatLocalizationCluster"
 
-  test_sources = [
-    "SampleDeviceProvider.cpp",
-    "TestTimeFormatLocalizationCluster.cpp",
-  ]
+  test_sources = [ "TestTimeFormatLocalizationCluster.cpp" ]
 
-  sources = []
+  sources = [ "SampleDeviceProvider.cpp" ]
 
   cflags = [ "-Wconversion" ]
 
