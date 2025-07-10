@@ -137,12 +137,6 @@ DataModel::AttributeEntry AttributeEntryFrom(const ConcreteClusterPath & cluster
         RequiredPrivilege::ForReadAttribute(attributePath),
         attribute.IsReadOnly() ? std::nullopt : std::make_optional(RequiredPrivilege::ForWriteAttribute(attributePath)));
 
-    // NOTE: we do NOT provide additional info for:
-    //    - IsExternal/IsSingleton/IsAutomaticallyPersisted is not used by IM handling
-    //    - IsSingleton spec defines it for CLUSTERS where as we have it for ATTRIBUTES
-    //    - Several specification flags are not available (reportable, quieter reporting,
-    //      fixed, source attribution)
-
     // TODO: Set additional flags:
     // entry.flags.Set(DataModel::AttributeQualityFlags::kFabricScoped)
     // entry.flags.Set(DataModel::AttributeQualityFlags::kFabricSensitive)
