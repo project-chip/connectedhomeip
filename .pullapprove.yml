@@ -284,7 +284,7 @@ groups:
     type: required
     conditions:
       - "files.include('src/darwin/*').exclude('src/darwin/Framework/CHIP/zap-generated/*') or \
-        files.include('src/platform/Darwin/*')" or \
+        files.include('src/platform/Darwin/*') or \
         files.include('examples/darwin-framework-tool/*')"
     reviewers:
       teams: [reviewers-apple]
