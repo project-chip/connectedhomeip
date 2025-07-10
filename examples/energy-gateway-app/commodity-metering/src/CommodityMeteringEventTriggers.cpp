@@ -34,7 +34,7 @@ static constexpr uint32_t TariffComponents1[] = { 0x5001, 0x5003 };
 static constexpr uint32_t TariffComponents2[] = { 0x5002, 0x5003, 0x5004 };
 
 // Non-constexpr storage for the actual data
-static const Structs::MeteredQuantityStruct::Type Data[] = {
+static Structs::MeteredQuantityStruct::Type Data[] = {
     { DataModel::List<const uint32_t>(TariffComponents1, sizeof(TariffComponents1) / sizeof(TariffComponents1[0])), 3500 },
     { DataModel::List<const uint32_t>(TariffComponents2, sizeof(TariffComponents2) / sizeof(TariffComponents2[0])), -2000 }
 };
@@ -44,7 +44,7 @@ namespace Sample2 {
 static constexpr uint32_t TariffComponents1[] = { 0x6001 };
 static constexpr uint32_t TariffComponents2[] = { 0x6002, 0x6003 };
 
-static const Structs::MeteredQuantityStruct::Type Data[] = {
+static Structs::MeteredQuantityStruct::Type Data[] = {
     { DataModel::List<const uint32_t>(TariffComponents1, sizeof(TariffComponents1) / sizeof(TariffComponents1[0])), 4200 },
     { DataModel::List<const uint32_t>(TariffComponents2, sizeof(TariffComponents2) / sizeof(TariffComponents2[0])), -1500 }
 };
@@ -60,17 +60,17 @@ private:
 
     DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> mMeteredQuantity;
     DataModel::Nullable<uint32_t> mMeteredQuantityTimestamp;
-    DataModel::Nullable<Globals::TariffUnitEnum> mTariffUnit;
+    DataModel::Nullable<Globals::MeasurementTypeEnum> mMeasurementType;
     DataModel::Nullable<uint16_t> mMaximumMeteredQuantities;
 
-    std::array<const Structs::MeteredQuantityStruct::Type, 2> GetMeteredQuantityDataSample(uint8_t presetIdx)
+    std::vector<Structs::MeteredQuantityStruct::Type> GetMeteredQuantityDataSample(uint8_t presetIdx)
     {
         switch (presetIdx)
         {
         case 0:
             return { MeteredQuantitySamples::Sample1::Data[0], MeteredQuantitySamples::Sample1::Data[1] };
         case 1:
-            return { MeteredQuantitySamples::Sample2::Data[0], MeteredQuantitySamples::Sample2::Data[1] };
+            return { MeteredQuantitySamples::Sample2::Data[0], MeteredQuantitySamples::Sample2::Data[1], MeteredQuantitySamples::Sample1::Data[0] };
         default:
             return {}; // Return empty array
         }
@@ -155,14 +155,14 @@ private:
         mMaximumMeteredQuantities = mInstance->GetMaximumMeteredQuantities();
         SaveMeteredQuantity(mInstance->GetMeteredQuantity());
         mMeteredQuantityTimestamp = mInstance->GetMeteredQuantityTimestamp();
-        mTariffUnit               = mInstance->GetTariffUnit();
+        mMeasurementType               = mInstance->GetMeasurementType();
     }
 
     void ClearAttributes()
     {
         ClearMeteredQuantity();
         mMeteredQuantityTimestamp.SetNull();
-        mTariffUnit.SetNull();
+        mMeasurementType.SetNull();
         mMaximumMeteredQuantities.SetNull();
     }
 
@@ -173,7 +173,7 @@ private:
             mInstance->SetMaximumMeteredQuantities(mMaximumMeteredQuantities);
             mInstance->SetMeteredQuantity(mMeteredQuantity);
             mInstance->SetMeteredQuantityTimestamp(mMeteredQuantityTimestamp);
-            mInstance->SetTariffUnit(mTariffUnit);
+            mInstance->SetMeasurementType(mMeasurementType);
         }
     }
 
@@ -189,19 +189,19 @@ private:
 
         mMeteredQuantityTimestamp.SetNonNull(matterEpoch);
 
-        if (mTariffUnit.IsNull() || (mTariffUnit.Value() == Globals::TariffUnitEnum::kKWh))
+        if (mMeasurementType.IsNull() || (mMeasurementType.Value() == Globals::MeasurementTypeEnum::kVoltage))
         {
-            mTariffUnit.SetNonNull(Globals::TariffUnitEnum::kKVAh);
+            mMeasurementType.SetNonNull(Globals::MeasurementTypeEnum::kFrequency);
             mMaximumMeteredQuantities.SetNonNull(3);
         }
         else
         {
-            mTariffUnit.SetNonNull(Globals::TariffUnitEnum::kKWh);
+            mMeasurementType.SetNonNull(Globals::MeasurementTypeEnum::kVoltage);
             mMaximumMeteredQuantities.SetNonNull(2);
         }
 
         auto MQSampleArray =
-            GetMeteredQuantityDataSample(static_cast<uint8_t>(mTariffUnit.Value() == Globals::TariffUnitEnum::kKWh));
+            GetMeteredQuantityDataSample(static_cast<uint8_t>(mMeasurementType.Value() == Globals::MeasurementTypeEnum::kVoltage));
 
         std::vector<Structs::MeteredQuantityStruct::Type> tempCopy(MQSampleArray.begin(), MQSampleArray.end());
 
@@ -209,10 +209,9 @@ private:
         DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> nullableList;
 
         nullableList.SetNonNull(std::move(tmpList));
-        mInstance->SetMaximumMeteredQuantities(mMaximumMeteredQuantities);
         mInstance->SetMeteredQuantity(nullableList);
         mInstance->SetMeteredQuantityTimestamp(mMeteredQuantityTimestamp);
-        mInstance->SetTariffUnit(mTariffUnit);
+        mInstance->SetMeasurementType(mMeasurementType);
 
         tempCopy.clear();
     }
