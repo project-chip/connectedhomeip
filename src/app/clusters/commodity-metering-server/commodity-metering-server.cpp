@@ -259,7 +259,8 @@ CHIP_ERROR Instance::SetMeasurementType(DataModel::Nullable<Globals::Measurement
         else if (EnsureKnownEnumValue(newValue.Value()) != Globals::MeasurementTypeEnum::kUnknownEnumValue)
         {
             mMeasurementType = newValue;
-            ChipLogDetail(AppServer, "Endpoint: %d - mMeasurementType updated to %d", mEndpointId, to_underlying(mMeasurementType.Value()));
+            ChipLogDetail(AppServer, "Endpoint: %d - mMeasurementType updated to %d", mEndpointId,
+                          to_underlying(mMeasurementType.Value()));
         }
         else
         {
