@@ -556,6 +556,10 @@ SDK_ARM64_TIZENSTUDIO_ZIPS=(
 if [ -n "$INSTALL_SDK_PKGS" ]; then
     mkdir -p "$TIZEN_SDK_ROOT"
 
+    if [ -e "$TIZEN_SDK_ROOT"/data ]; then
+        error "'$TIZEN_SDK_ROOT' is not empty, bailing out"
+        exit 1
+    fi
     # Trick unzip into junking the first path component:
     # Then unzip -o '*.zip' 'data/*' -d "$TIZEN_SDK_ROOT" creates:
     # $TIZEN_SDK_ROOT/platforms/*
