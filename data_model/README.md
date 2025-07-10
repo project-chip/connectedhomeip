@@ -89,7 +89,7 @@ To do this, perform the following steps:
 -   In the summary generated from spec_revision_diff_summary.py, be sure to
     double-check the following
     -   All expected provisional elements are still marked as provisional
-    -   There no unexpected provisional elements
+    -   There are no unexpected provisional elements
     -   Changes to clusters and device types are accompanied by a revision
         update
     -   All the changes between the two revisions are expected
