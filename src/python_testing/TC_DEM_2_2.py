@@ -52,7 +52,7 @@ import time
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.event_attribute_reporting import EventCallback
+from chip.testing.event_attribute_reporting import EventSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
@@ -179,7 +179,7 @@ class TC_DEM_2_2(MatterBaseTest, DEMTestBase):
 
         self.step("3")
         # Subscribe to Events and when they are sent push them to a queue for checking later
-        events_callback = EventCallback(expected_cluster=Clusters.DeviceEnergyManagement)
+        events_callback = EventSubscriptionHandler(expected_cluster=Clusters.DeviceEnergyManagement)
         await events_callback.start(self.default_controller,
                                     self.dut_node_id,
                                     self.get_endpoint(default=1))

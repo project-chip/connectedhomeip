@@ -36,7 +36,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.event_attribute_reporting import EventCallback
+from chip.testing.event_attribute_reporting import EventSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -104,7 +104,7 @@ class TC_ACL_2_5(MatterBaseTest):
 
         # Set up event subscription before making changes
         logging.info("Setting up event subscription...")
-        events_callback = EventCallback(expected_cluster=Clusters.AccessControl)
+        events_callback = EventSubscriptionHandler(expected_cluster=Clusters.AccessControl)
         await events_callback.start(self.default_controller, self.dut_node_id, 0)
 
         self.step(4)
