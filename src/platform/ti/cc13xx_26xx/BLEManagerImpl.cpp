@@ -276,7 +276,7 @@ uint8_t BLEManagerImpl::getDeviceName(char * buf, size_t bufSize)
     }
 
     return ret;
-} 
+}
 
 uint8_t BLEManagerImpl::setDeviceName(const char * deviceName)
 {
