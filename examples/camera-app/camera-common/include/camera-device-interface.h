@@ -22,6 +22,7 @@
 #include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/clusters/chime-server/chime-server.h>
+#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
 
 using chip::app::Clusters::CameraAvStreamManagement::AudioCapabilitiesStruct;
@@ -131,6 +132,9 @@ public:
     // Getter for the Media Controller
     virtual MediaController & GetMediaController() = 0;
 
+    // Getter for PushAVStreamTransport Delegate
+    virtual chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportDelegate & GetPushAVDelegate() = 0;
+
     // Class defining the Camera HAL interface
     class CameraHALInterface
     {
@@ -141,7 +145,7 @@ public:
         // Initialize the camera hardware
         virtual CameraError InitializeCameraDevice() = 0;
 
-        virtual CameraError InitializeStreams() = 0;
+        virtual CameraError InitializeStreams(AudioStreamStruct & audioStreamParams, VideoStreamStruct & videoStreamParams) = 0;
 
         // Configure camera settings (e.g., exposure, focus)
         // virtual CameraError Configure(const std::string & setting, const std::string & value) = 0;
@@ -340,6 +344,8 @@ public:
         virtual int16_t GetTiltMin() = 0;
         virtual int16_t GetTiltMax() = 0;
         virtual uint8_t GetZoomMax() = 0;
+
+        // virtual void RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID) = 0;
     };
 
     virtual CameraHALInterface & GetCameraHALInterface() = 0;
