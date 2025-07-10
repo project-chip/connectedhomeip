@@ -34,7 +34,7 @@
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.event_attribute_reporting import AttributeCallback
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing.matter_testing import AttributeValue, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -79,7 +79,7 @@ class TC_VALCC_3_1(MatterBaseTest):
         self.step(2)
         cluster = Clusters.ValveConfigurationAndControl
         attributes = cluster.Attributes
-        attribute_subscription = AttributeCallback(expected_cluster=cluster)
+        attribute_subscription = AttributeSubscriptionHandler(expected_cluster=cluster)
         await attribute_subscription.start(self.default_controller, self.dut_node_id, endpoint)
 
         self.step(3)

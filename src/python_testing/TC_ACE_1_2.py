@@ -38,7 +38,7 @@ import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
-from chip.testing.event_attribute_reporting import AttributeCallback, EventCallback
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -64,7 +64,7 @@ class TC_ACE_1_2(MatterBaseTest):
             print_steps (bool): If True, prints step descriptions.
 
         Returns:
-            AttributeCallback: The callback object associated with the subscription.
+            AttributeSubscriptionHandler: The callback object associated with the subscription.
         """
 
         if print_steps:
@@ -72,19 +72,19 @@ class TC_ACE_1_2(MatterBaseTest):
         subscription_breadcrumb = await self.TH2.ReadAttribute(
             nodeid=self.dut_node_id, attributes=[(0, Clusters.GeneralCommissioning.Attributes.Breadcrumb)],
             reportInterval=(1, 5), keepSubscriptions=False, autoResubscribe=False)
-        breadcrumb_cb = AttributeCallback(expected_cluster=Clusters.GeneralCommissioning,
-                                          expected_attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb)
+        breadcrumb_cb = AttributeSubscriptionHandler(expected_cluster=Clusters.GeneralCommissioning,
+                                                     expected_attribute=Clusters.GeneralCommissioning.Attributes.Breadcrumb)
         subscription_breadcrumb.SetAttributeUpdateCallback(breadcrumb_cb)
         return breadcrumb_cb
 
-    async def steps_receive_breadcrumb(self, breadcrumb_cb: AttributeCallback, print_steps: bool):
+    async def steps_receive_breadcrumb(self, breadcrumb_cb: AttributeSubscriptionHandler, print_steps: bool):
         """
         Step that triggers a change to the Breadcrumb attribute and waits for the subscription report.
 
-        This function writes a new valaue to the Breadcrumb attribute and waits for the AttributeCallback to receive and report the update.
+        This function writes a new valaue to the Breadcrumb attribute and waits for the AttributeSubscriptionHandler to receive and report the update.
 
         Parameters:
-            breadcrumb_cb (AttributeCallback): The callback previously set up to track Breadcrumb updates.
+            breadcrumb_cb (AttributeSubscriptionHandler): The callback previously set up to track Breadcrumb updates.
             print_steps (bool): If True, prints step descriptions.
         """
 
@@ -157,16 +157,16 @@ class TC_ACE_1_2(MatterBaseTest):
 
         self.print_step(4, "TH2 subscribes to ACL attribute")
         subscription_acl = await self.TH2.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.AccessControl.Attributes.Acl)], reportInterval=(1, 5), fabricFiltered=False, keepSubscriptions=True, autoResubscribe=False)
-        acl_cb = AttributeCallback(expected_cluster=Clusters.AccessControl,
-                                   expected_attribute=Clusters.AccessControl.Attributes.Acl)
+        acl_cb = AttributeSubscriptionHandler(expected_cluster=Clusters.AccessControl,
+                                              expected_attribute=Clusters.AccessControl.Attributes.Acl)
         subscription_acl.SetAttributeUpdateCallback(acl_cb)
 
         self.print_step(5, "TH2 subscribes to the AccessControlEntryChanged event")
         urgent = 1
         subscription_ace = await self.TH2.ReadEvent(nodeid=self.dut_node_id, events=[(0, Clusters.AccessControl.Events.AccessControlEntryChanged, urgent)], reportInterval=(1, 5), fabricFiltered=False, keepSubscriptions=True, autoResubscribe=False)
         event = Clusters.AccessControl.Events.AccessControlEntryChanged
-        ace_cb = EventCallback(name="AccessControlEntryChanged",
-                               expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
+        ace_cb = EventSubscriptionHandler(name="AccessControlEntryChanged",
+                                          expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
         subscription_ace.SetEventUpdateCallback(ace_cb)
 
         self.print_step(6, "TH1 writes ACL attribute")

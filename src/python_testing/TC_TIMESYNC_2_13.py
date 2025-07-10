@@ -41,7 +41,7 @@ import time
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters.Types import NullValue
-from chip.testing.event_attribute_reporting import EventCallback
+from chip.testing.event_attribute_reporting import EventSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
@@ -55,14 +55,14 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
 
         Parameters:
             timeout (float): Seconds to wait for the event.
-            cb (EventCallback): The event callback object from which the event is pulled.
+            cb (EventSubscriptionHandler): The event callback object from which the event is pulled.
 
         Raises:
             AssertionError: If no event is received before timeout or if the event type is incorrect.
         """
 
         try:
-            ret = cb.get_block(block=True, timeout=timeout)
+            ret = cb.get_event_from_queue(block=True, timeout=timeout)
             asserts.assert_true(type_matches(received_value=ret.Data,
                                 desired_type=Clusters.TimeSynchronization.Events.MissingTrustedTimeSource), "Incorrect type received for event")
         except queue.Empty:
@@ -101,7 +101,8 @@ class TC_TIMESYNC_2_13(MatterBaseTest):
 
         self.print_step(5, "TH1 subscribeds to the MissingTrustedTimeSource event")
         event = Clusters.TimeSynchronization.Events.MissingTrustedTimeSource
-        cb = EventCallback(name="MissingTrustedTimeSource", expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
+        cb = EventSubscriptionHandler(name="MissingTrustedTimeSource",
+                                      expected_cluster_id=event.cluster_id, expected_event_id=event.event_id)
         urgent = 1
         subscription = await self.default_controller.ReadEvent(nodeid=self.dut_node_id, events=[(self.endpoint, event, urgent)], reportInterval=[1, 3])
         subscription.SetEventUpdateCallback(callback=cb)

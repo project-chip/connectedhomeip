@@ -19,8 +19,8 @@
 This module provides classes to manage and validate subscription-based event and attribute reporting.
 
 Classes:
-    EventCallback: Handles subscription to events.
-    AttributeCallback: Manages subscriptions to specific attributes.
+    EventSubscriptionHandler: Handles subscription to events.
+    AttributeSubscriptionHandler: Manages subscriptions to specific attributes.
 
 Both classes allow tests to start and manage subscriptions, queue received updates asynchronously and 
 block until epected reports are received or fail on timeouts
@@ -42,7 +42,7 @@ from chip.testing.matter_testing import AttributeMatcher, AttributeValue
 from mobly import asserts
 
 
-class EventCallback:
+class EventSubscriptionHandler:
     """
     Handles subscription-based event reporting. It sets up and manages event subscriptions for a specific cluster or event ID,
     captures incoming event reports through a callback and stores them for validation and processing.
@@ -64,7 +64,7 @@ class EventCallback:
         is_id_mode = all(x is not None for x in (expected_cluster_id, expected_event_id, name))
 
         if not (is_cluster_mode ^ is_id_mode):
-            raise ValueError("Failed argument inputs in EventCallback. You should use Cluster or ClusterId, EventId and name")
+            raise ValueError("Failed argument inputs in EventSubscriptionHandler. You should use Cluster or ClusterId, EventId and name")
 
         self._expected_cluster = expected_cluster
         self._expected_cluster_id = expected_cluster_id if expected_cluster_id is not None else expected_cluster.id
@@ -95,7 +95,7 @@ class EventCallback:
         if self._expected_event_id is not None and header.EventId != self._expected_event_id:
             return
 
-        logging.info(f"[EventCallback] Received event: {header}")
+        logging.info(f"[EventSubscriptionHandler] Received event: {header}")
         self._q.put(event_result)
 
     @property
@@ -161,11 +161,11 @@ class EventCallback:
     def get_size(self) -> int:
         return self._q.qsize()
 
-    def get_block(self, block: bool, timeout: int):
+    def get_event_from_queue(self, block: bool, timeout: int):
         return self._q.get(block, timeout)
 
 
-class AttributeCallback:
+class AttributeSubscriptionHandler:
     """
     Callback class to handle attribute subscription reports. This class manages the reception. filtering and queuing of attribute update reports.
 
@@ -182,7 +182,7 @@ class AttributeCallback:
     def __init__(self, expected_cluster: ClusterObjects.Cluster = None, expected_attribute: ClusterObjects.ClusterAttributeDescriptor = None):
 
         if expected_cluster is None:
-            raise ValueError("Missing argument. Expected Cluster attribute is missing in AttributeCallback constructor")
+            raise ValueError("Missing argument. Expected Cluster attribute is missing in AttributeSubscriptionHandler constructor")
 
         self._expected_cluster = expected_cluster
         self._expected_attribute = expected_attribute
@@ -257,7 +257,7 @@ class AttributeCallback:
             data = transaction.GetAttribute(path)
             value = AttributeValue(endpoint_id=path.Path.EndpointId, attribute=path.AttributeType,
                                    value=data, timestamp_utc=datetime.now(timezone.utc))
-            logging.info(f"[AttributeCallback] Received attribute report: {path.AttributeType} = {data}")
+            logging.info(f"[AttributeSubscriptionHandler] Received attribute report: {path.AttributeType} = {data}")
             self._q.put(value)
             if self._lock:
                 with self._lock:
@@ -275,13 +275,13 @@ class AttributeCallback:
             item = self._q.get(block=True, timeout=10)
             attribute_value = item.value
             logging.info(
-                f"[AttributeCallback] Got attribute subscription report. Attribute {item.attribute}. Updated value: {attribute_value}. SubscriptionId: {item.value}")
+                f"[AttributeSubscriptionHandler] Got attribute subscription report. Attribute {item.attribute}. Updated value: {attribute_value}. SubscriptionId: {item.value}")
         except queue.Empty:
             asserts.fail(
-                f"[AttributeCallback] Failed to receive a report for the {self._expected_attribute} attribute change")
+                f"[AttributeSubscriptionHandler] Failed to receive a report for the {self._expected_attribute} attribute change")
 
         asserts.assert_equal(item.attribute, self._expected_attribute,
-                             f"[AttributeCallback] Received incorrect report. Expected: {self._expected_attribute}, received: {item.attribute}")
+                             f"[AttributeSubscriptionHandler] Received incorrect report. Expected: {self._expected_attribute}, received: {item.attribute}")
 
     def await_all_final_values_reported(self, expected_final_values: Iterable[AttributeValue], timeout_sec: float = 1.0):
         """Expect that every `expected_final_value` report is the last value reported for the given attribute, ignoring timestamps.

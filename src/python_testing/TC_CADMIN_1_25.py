@@ -35,7 +35,7 @@ import random
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
-from chip.testing.event_attribute_reporting import AttributeCallback
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing.matter_testing import AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -117,7 +117,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
         self.step(2)
         # TH_CR1 subscribes to WindowStatus attribute on DUT_CE
-        th1_window_status_accumulator = AttributeCallback(
+        th1_window_status_accumulator = AttributeSubscriptionHandler(
             Clusters.AdministratorCommissioning,
             Clusters.AdministratorCommissioning.Attributes.WindowStatus)
         await th1_window_status_accumulator.start(
@@ -127,7 +127,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
         self.step(3)
         # TH_CR1 subscribes to AdminFabricIndex attribute on DUT_CE
-        th1_admin_fabric_index_accumulator = AttributeCallback(
+        th1_admin_fabric_index_accumulator = AttributeSubscriptionHandler(
             Clusters.AdministratorCommissioning,
             Clusters.AdministratorCommissioning.Attributes.AdminFabricIndex)
         await th1_admin_fabric_index_accumulator.start(
@@ -137,7 +137,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
         self.step(4)
         # TH_CR1 subscribes to AdminVendorId attribute on DUT_CE
-        th1_admin_vendor_id_accumulator = AttributeCallback(
+        th1_admin_vendor_id_accumulator = AttributeSubscriptionHandler(
             Clusters.AdministratorCommissioning,
             Clusters.AdministratorCommissioning.Attributes.AdminVendorId)
         await th1_admin_vendor_id_accumulator.start(
@@ -222,7 +222,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
         self.step(10)
         # TH_CR2 subscribes to WindowStatus attribute on DUT_CE
-        th2_window_status_accumulator = AttributeCallback(
+        th2_window_status_accumulator = AttributeSubscriptionHandler(
             Clusters.AdministratorCommissioning,
             Clusters.AdministratorCommissioning.Attributes.WindowStatus)
         await th2_window_status_accumulator.start(
@@ -232,7 +232,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
         self.step(11)
         # TH_CR2 subscribes to AdminFabricIndex attribute on DUT_CE
-        th2_admin_fabric_index_accumulator = AttributeCallback(
+        th2_admin_fabric_index_accumulator = AttributeSubscriptionHandler(
             Clusters.AdministratorCommissioning,
             Clusters.AdministratorCommissioning.Attributes.AdminFabricIndex)
         await th2_admin_fabric_index_accumulator.start(
@@ -242,7 +242,7 @@ class TC_CADMIN_1_25(MatterBaseTest):
 
         self.step(12)
         # TH_CR2 subscribes to AdminVendorId attribute on DUT_CE
-        th2_admin_vendor_id_accumulator = AttributeCallback(
+        th2_admin_vendor_id_accumulator = AttributeSubscriptionHandler(
             Clusters.AdministratorCommissioning,
             Clusters.AdministratorCommissioning.Attributes.AdminVendorId)
         await th2_admin_vendor_id_accumulator.start(

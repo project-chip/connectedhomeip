@@ -39,7 +39,7 @@ from typing import List
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.interaction_model import Status
-from chip.testing.event_attribute_reporting import AttributeCallback
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -94,8 +94,8 @@ class TestGroupTableReports(MatterBaseTest):
 
         self.print_step(4, "TH subscribes to the GroupTable attribute from the Group Key Management Cluster")
         subscription_gcm = await self.TH1.ReadAttribute(nodeid=self.dut_node_id, attributes=[(0, Clusters.GroupKeyManagement.Attributes.GroupTable)], reportInterval=(1, 5), fabricFiltered=False, keepSubscriptions=True, autoResubscribe=False)
-        gcm_cb = AttributeCallback(expected_cluster=Clusters.GroupKeyManagement,
-                                   expected_attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
+        gcm_cb = AttributeSubscriptionHandler(expected_cluster=Clusters.GroupKeyManagement,
+                                              expected_attribute=Clusters.GroupKeyManagement.Attributes.GroupTable)
         subscription_gcm.SetAttributeUpdateCallback(gcm_cb)
 
         self.print_step(5, "TH Adds Group1 to the Group Cluster")

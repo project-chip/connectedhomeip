@@ -321,14 +321,14 @@ callbacks are called on update.
 Example for setting callbacks:
 
 ```
-cb = EventCallback("cb", cluster, cluster_id, event_id)
+cb = EventSubscriptionHandler("cb", cluster, cluster_id, event_id)
 
 urgent = 1
 subscription = await dev_ctrl.ReadEvent(nodeid=1, events=[(1, event, urgent)], reportInterval=[1, 3])
 subscription.SetEventUpdateCallback(callback=cb)
 
 try:
-    cb.get_block(block=True, timeout=timeout)
+    cb.get_event_from_queue(block=True, timeout=timeout)
 except queue.Empty:
     asserts.assert_fail("Timeout on event")
 ```

@@ -44,7 +44,7 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.event_attribute_reporting import AttributeCallback
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
@@ -114,7 +114,7 @@ class TC_OCC_3_2(MatterBaseTest):
         logging.info(f"--> Has PhysicalContactOccupiedToUnoccupiedDelay: {has_contact_timing_attrib}")
 
         # min interval = 0, and max interval = 30 seconds
-        attrib_listener = AttributeCallback(expected_cluster=Clusters.Objects.OccupancySensing)
+        attrib_listener = AttributeSubscriptionHandler(expected_cluster=Clusters.Objects.OccupancySensing)
         await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint_id, min_interval_sec=0, max_interval_sec=30)
 
         # add Namepiped to assimilate the manual sensor untrigger here

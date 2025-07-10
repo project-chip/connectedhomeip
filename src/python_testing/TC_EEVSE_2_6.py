@@ -45,7 +45,7 @@ import time
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.event_attribute_reporting import AttributeCallback, EventCallback
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
@@ -146,7 +146,7 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
 
         # Subscribe to Events and when they are sent push them to a queue for checking later
         self.step("3")
-        events_callback = EventCallback(expected_cluster=Clusters.EnergyEvse)
+        events_callback = EventSubscriptionHandler(expected_cluster=Clusters.EnergyEvse)
         await events_callback.start(self.default_controller,
                                     self.dut_node_id,
                                     self.get_endpoint())
@@ -155,7 +155,7 @@ class TC_EEVSE_2_6(MatterBaseTest, EEVSEBaseTestHelper):
         await self.check_test_event_triggers_enabled()
 
         self.step("5")
-        sub_handler = AttributeCallback(expected_cluster=Clusters.EnergyEvse)
+        sub_handler = AttributeSubscriptionHandler(expected_cluster=Clusters.EnergyEvse)
         await sub_handler.start(self.default_controller, self.dut_node_id,
                                 self.matter_test_config.endpoint,
                                 min_interval_sec=0,
