@@ -87,6 +87,7 @@ function warning() {
 function show_dependencies() {
     warning "Required dependencies for Tizen SDK installation: 7z cpio unzip wget"
     warning "Required dependencies for Tizen SDK: JAVA JRE >=8.0"
+    warning "To install them on Debian or Ubuntu run: sudo apt install ${DEPENDENCIES[*]}"
 }
 
 # ------------------------------------------------------------------------------
@@ -515,7 +516,8 @@ for PKG in '7z' 'cpio' 'java' 'unzip' 'wget'; do
     fi
 done
 if [[ $dep_lost ]]; then
-    info "[HINT]: sudo apt-get install ${DEPENDENCIES[*]}"
+    warning "Some dependencies are missing"
+    show_dependencies
     exit 1
 fi
 
