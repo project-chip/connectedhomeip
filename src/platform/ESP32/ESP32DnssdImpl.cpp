@@ -214,15 +214,15 @@ CHIP_ERROR EspDnssdRemoveServices()
     /* Calling ‘mdns_service_remove’ once may remove only a single matching service instance */
     while (mdns_service_exists("_matter", "_tcp", nullptr))
     {
-        mdns_service_remove("_matter", "_tcp");
+        ReturnMappedErrorOnFailure(mdns_service_remove("_matter", "_tcp"));
     }
     while (mdns_service_exists("_matterc", "_udp", nullptr))
     {
-        mdns_service_remove("_matterc", "_udp");
+        ReturnMappedErrorOnFailure(mdns_service_remove("_matterc", "_udp"));
     }
     while (mdns_service_exists("_matterd", "_udp", nullptr))
     {
-        mdns_service_remove("_matterd", "_udp");
+        ReturnMappedErrorOnFailure(mdns_service_remove("_matterd", "_udp"));
     }
     return CHIP_NO_ERROR;
 }
