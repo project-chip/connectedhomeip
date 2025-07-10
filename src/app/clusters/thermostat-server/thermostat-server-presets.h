@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include <app/clusters/thermostat-server/thermostat-delegate.h>
+
 namespace chip {
 namespace app {
 namespace Clusters {

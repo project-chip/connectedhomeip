@@ -298,7 +298,7 @@ ThermostatDelegate::AppendToThermostatSuggestionsList(const ThermostatSuggestion
 CHIP_ERROR ThermostatDelegate::RemoveFromThermostatSuggestionsList(uint8_t uniqueID)
 {
     size_t uniqueIDMatchedIndex = mNextFreeIndexInThermostatSuggestionsList;
-    for (size_t index = 0; index < mNextFreeIndexInThermostatSuggestionsList; index++)
+    for (size_t index = 0; index < static_cast<size_t>(mNextFreeIndexInThermostatSuggestionsList); index++)
     {
         if (mThermostatSuggestions[index].GetUniqueID() == uniqueID)
         {
@@ -311,7 +311,7 @@ CHIP_ERROR ThermostatDelegate::RemoveFromThermostatSuggestionsList(uint8_t uniqu
         return CHIP_ERROR_NOT_FOUND;
     }
     // Shift elements to the left to fill the gap.
-    for (size_t index = uniqueIDMatchedIndex; index < mNextFreeIndexInThermostatSuggestionsList - 1; index++)
+    for (size_t index = uniqueIDMatchedIndex; index < static_cast<size_t>(mNextFreeIndexInThermostatSuggestionsList - 1); index++)
     {
         mThermostatSuggestions[index] = mThermostatSuggestions[index + 1];
     }
@@ -430,7 +430,7 @@ size_t ThermostatDelegate::GetThermostatSuggestionIndexWithEarliestEffectiveTime
     uint32_t minEffectiveTimeValue = UINT32_MAX;
     size_t minEffectiveTimeIndex   = maxThermostatSuggestions;
 
-    for (size_t index = 0; index < GetNumberOfThermostatSuggestions(); index++)
+    for (size_t index = 0; index < static_cast<size_t>(GetNumberOfThermostatSuggestions()); index++)
     {
         ThermostatSuggestionStructWithOwnedMembers suggestion;
         CHIP_ERROR err = GetThermostatSuggestionAtIndex(index, suggestion);
