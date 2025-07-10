@@ -54,9 +54,18 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
 {
     // The server ensures that at least one stream Id has a value, and that there are streams allocated
     // If a stream id(s) are provided, ensure that the requested Stream Usage matches the allocation
-    // If they're Null, look for a stream ID that matches the usage
+    // If they're Null, look for a stream ID that matches the usage, or the supported usages if there isn't an exact match
     bool matchedVideoStream = false;
     bool matchedAudioStream = false;
+
+    // Is the requested stream usage supported by the camera?
+    auto myStreamUsages = GetCameraAVStreamMgmtServer()->GetSupportedStreamUsages();
+    auto it = std::find(myStreamUsages.begin(), myStreamUsages.end(), streamUsage);
+    if (it == myStreamUsages.end())
+    {
+        ChipLogError(Camera, "Requested stream usage not found in supported stream usages");
+        return CHIP_ERROR_NOT_FOUND;
+    }
 
     if (videoStreamId.HasValue()) 
     {
