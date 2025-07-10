@@ -163,13 +163,12 @@ class TC_TSTAT_4_3(MatterBaseTest):
                     # Verify that the AddThermostatSuggestion command returns INVALID_IN_STATE.
                     currentUTC = datetime.now(datetime.timezone.utc)
                     await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
-                                                                                preset_handle=preset_handle,
-                                                                                effective_time=currentUTC,
-                                                                                expiration_in_minutes=1,
-                                                                                expected_status=Status.InvalidInState)
+                                                                      preset_handle=preset_handle,
+                                                                      effective_time=currentUTC,
+                                                                      expiration_in_minutes=1,
+                                                                      expected_status=Status.InvalidInState)
                 else:
-                    logger.info(
-                        "Couldn't run test step 3 since all preset handles are also the ActivePresetHandle on this Thermostat")
+                    logger.info("Couldn't run test step 3 since all preset handles are also the ActivePresetHandle on this Thermostat")
 
             self.step("4")
             if not skipTimeSync:
@@ -190,10 +189,10 @@ class TC_TSTAT_4_3(MatterBaseTest):
             currentUTC = datetime.now(datetime.timezone.utc)
             # Verify that the AddThermostatSuggestion command returns NOT_FOUND.
             await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
-                                                                preset_handle=random_preset_handle,
-                                                                effective_time=currentUTC,
-                                                                expiration_in_minutes=1,
-                                                                expected_status=Status.NotFound)
+                                                              preset_handle=random_preset_handle,
+                                                              effective_time=currentUTC,
+                                                              expiration_in_minutes=1,
+                                                              expected_status=Status.NotFound)
 
         self.step("6a")
         if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
@@ -207,10 +206,10 @@ class TC_TSTAT_4_3(MatterBaseTest):
             currentUTC = datetime.now(datetime.timezone.utc)
             expirationInMinutes = 1
             addThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
-                                                                        preset_handle=presetHandle,
-                                                                        effective_time=currentUTC,
-                                                                        expiration_in_minutes=expirationInMinutes,
-                                                                        expected_status=Status.Success)
+                                                                                                preset_handle=presetHandle,
+                                                                                                effective_time=currentUTC,
+                                                                                                expiration_in_minutes=expirationInMinutes,
+                                                                                                expected_status=Status.Success)
         
             # TH reads the CurrentThermostatSuggestion, the ThermostatSuggestionNotFollowingReason and the ActivePresetHandle attributes.
             currentThermostatSuggestion = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentThermostatSuggestion)
@@ -268,11 +267,11 @@ class TC_TSTAT_4_3(MatterBaseTest):
             currentUTC = datetime.now(datetime.timezone.utc)
             expirationInMinutes = 1
             addThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
-                                                                        preset_handle=presetHandle,
-                                                                        effective_time=currentUTC,
-                                                                        expiration_in_minutes=expirationInMinutes,
-                                                                        expected_status=Status.Success)
-            
+                                                                                                preset_handle=presetHandle,
+                                                                                                effective_time=currentUTC,
+                                                                                                expiration_in_minutes=expirationInMinutes,
+                                                                                                expected_status=Status.Success)
+                                    
             # TH reads the CurrentThermostatSuggestion, the ThermostatSuggestionNotFollowingReason and the ActivePresetHandle attributes.
             currentThermostatSuggestion = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentThermostatSuggestion)
             thermostatSuggestionNotFollowingReason = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestionNotFollowingReason)
@@ -315,7 +314,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
         if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
             # TH sets TemperatureSetpointHold to SetpointHoldOff after 10 seconds.
             await asyncio.sleep(10)
-            status_TemperatureSetpointHold = await self.write_single_attribute(attribute_value=cluster.Attributes.TemperatureSetpointHold(cluster.Thermostat.Enums.TemperatureSetpointHoldEnum.kSetpointHoldOff), endpoint_id=endpoint, expect_success=True)
+            await self.write_single_attribute(attribute_value=cluster.Attributes.TemperatureSetpointHold(cluster.Thermostat.Enums.TemperatureSetpointHoldEnum.kSetpointHoldOff), endpoint_id=endpoint, expect_success=True)
             
             # TH reads the CurrentThermostatSuggestion, the ThermostatSuggestionNotFollowingReason and the ActivePresetHandle attributes.
             currentThermostatSuggestion = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentThermostatSuggestion)
@@ -355,10 +354,10 @@ class TC_TSTAT_4_3(MatterBaseTest):
             currentUTC = datetime.now(datetime.timezone.utc)
             expirationInMinutes = 1
             addThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
-                                                                        preset_handle=presetHandle,
-                                                                        effective_time=currentUTC,
-                                                                        expiration_in_minutes=expirationInMinutes,
-                                                                        expected_status=Status.Success)
+                                                                                                preset_handle=presetHandle,
+                                                                                                effective_time=currentUTC,
+                                                                                                expiration_in_minutes=expirationInMinutes,
+                                                                                                expected_status=Status.Success)
             
             # TH reads the CurrentThermostatSuggestion, the ThermostatSuggestionNotFollowingReason and the ActivePresetHandle attributes.
             currentThermostatSuggestion = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CurrentThermostatSuggestion)
@@ -397,8 +396,8 @@ class TC_TSTAT_4_3(MatterBaseTest):
             currentUTC = datetime.now(datetime.timezone.utc)
             # Verify that the RemoveThermostatSuggestion command returns NOT_FOUND.
             await self.send_remove_thermostat_suggestion_command(endpoint=endpoint,
-                                                                            uniqueID=random_uniqueID,
-                                                                            expected_status=Status.NotFound)
+                                                                 uniqueID=random_uniqueID,
+                                                                 expected_status=Status.NotFound)
 
 
         self.step("8c")
@@ -406,8 +405,8 @@ class TC_TSTAT_4_3(MatterBaseTest):
             print()
             # TH calls the RemoveThermostatSuggestion command with the UniqueID field set to the UniqueID field of then CurrentThermostatSuggestion attribute.
             await self.send_remove_thermostat_suggestion_command(endpoint=endpoint,
-                                                                            uniqueID=addThermostatSuggestionResponse_uniqueID,
-                                                                            expected_status=Status.Success)
+                                                                 uniqueID=addThermostatSuggestionResponse_uniqueID,
+                                                                 expected_status=Status.Success)
             # Verify that that RemoveThermostatSuggestion command returns SUCCESS, the entry with the relevant UniqueID is removed from the ThermostatSuggestions attribute and the CurrentThermostatSuggestion attribute is set to null.
             thermostatSuggestions = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ThermostatSuggestions)
             asserts.assert_equal(len(thermostatSuggestions), 0, "ThermostatSuggestions should not have any entries after the relevant entry was removed by UniqueID.")
@@ -426,20 +425,20 @@ class TC_TSTAT_4_3(MatterBaseTest):
             firstCurrentUTC = datetime.now(datetime.timezone.utc)
             firstExpirationInMinutes = 2
             firstAddThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
-                                                                        preset_handle=firstPresetHandle,
-                                                                        effective_time=firstCurrentUTC,
-                                                                        expiration_in_minutes=firstExpirationInMinutes,
-                                                                        expected_status=Status.Success)
+                                                                                                     preset_handle=firstPresetHandle,
+                                                                                                     effective_time=firstCurrentUTC,
+                                                                                                     expiration_in_minutes=firstExpirationInMinutes,
+                                                                                                     expected_status=Status.Success)
             
             # TH calls the AddThermostatSuggestion command again with the saved ActivePresetHandle attribute value, the EffectiveTime set to the current UTC timestamp and the ExpirationInMinutes is set to 1 minute.
             secondPresetHandle = activePresetHandle
             secondCurrentUTC = datetime.now(datetime.timezone.utc)
             secondExpirationInMinutes = 1
             secondAddThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
-                                                                        preset_handle=secondPresetHandle,
-                                                                        effective_time=secondCurrentUTC,
-                                                                        expiration_in_minutes=secondExpirationInMinutes,
-                                                                        expected_status=Status.Success)
+                                                                                                      preset_handle=secondPresetHandle,
+                                                                                                      effective_time=secondCurrentUTC,
+                                                                                                      expiration_in_minutes=secondExpirationInMinutes,
+                                                                                                      expected_status=Status.Success)
 
             # Verify that both the AddThermostatSuggestion command return a AddThermostatSuggestionResponse with distinct values in the UniqueID field.
             # TH saves both the UniqueID values.
@@ -521,13 +520,11 @@ class TC_TSTAT_4_3(MatterBaseTest):
             expirationInMinutes = 30
             # Verify that the AddThermostatSuggestion command returns INVALID_COMMAND.
             addThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
-                                                                        preset_handle=presetHandle,
-                                                                        effective_time=currentUTC,
-                                                                        expiration_in_minutes=expirationInMinutes,
-                                                                        expected_status=Status.InvalidCommand)
+                                                                                                preset_handle=presetHandle,
+                                                                                                effective_time=currentUTC,
+                                                                                                expiration_in_minutes=expirationInMinutes,
+                                                                                                expected_status=Status.InvalidCommand)
             
-
-
 
         self.step("11")
         if self.pics_guard(self.check_pics("TSTAT.S.F0a")):
