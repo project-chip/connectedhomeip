@@ -1970,7 +1970,6 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
   }
 
   server cluster CommodityMetering {
@@ -1985,3 +1984,5 @@ endpoint 1 {
     ram      attribute clusterRevision default = 1;
   }
 }
+
+
