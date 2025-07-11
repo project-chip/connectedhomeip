@@ -2800,7 +2800,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
         return self._fabricCheckNodeId
 
     async def CommissionOnNetwork(self, nodeId: int, setupPinCode: int,
-                                  filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None,
+                                  filterType: DiscoveryFilterType = DiscoveryFilterType.NONE, filter: typing.Any = None,  # type: ignore
                                   discoveryTimeoutMsec: int = 30000) -> int:
         '''
         Does the routine for OnNetworkCommissioning, with a filter for mDNS discovery.
@@ -2870,7 +2870,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
             return None
         return rcac_bytes
 
-    async def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> int:
+    async def CommissionWithCode(self, setupPayload: str, nodeid: int, discoveryType: DiscoveryType = DiscoveryType.DISCOVERY_ALL) -> int:  # type: ignore
         '''
         Commission with the given nodeid from the setupPayload.
         setupPayload may be a QR or manual code.
@@ -2892,7 +2892,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
             self._enablePairingCompleteCallback(True)
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ConnectWithCode(
-                    self.devCtrl, setupPayload.encode("utf-8"), nodeid, discoveryType.value)
+                    self.devCtrl, setupPayload.encode("utf-8"), nodeid, discoveryType.value)  # type: ignore
             )
 
             return await asyncio.futures.wrap_future(ctx.future)
