@@ -45,7 +45,7 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
         std::make_unique<WebRTCTransportProviderServer>(mCameraDevice->GetWebRTCProviderDelegate(), mEndpoint);
 
     /*
-        TODO: This code is commented out as #37787 is merged
+        TODO: This code is commented out as #37787 is not merged
         BitFlags<PushAvStreamTransport::Feature> pavFeatures;
         Clusters::PushAvStreamTransport::SetDelegate(mEndpoint, &(mCameraDevice->GetPushAVDelegate()));
     */
