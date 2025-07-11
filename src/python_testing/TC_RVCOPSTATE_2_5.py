@@ -29,6 +29,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
 #       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --int-arg runmode_cleanmode:1
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -191,9 +192,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
             # Dynamically extract Idle and Cleaning mode from SupportedModes
             idle_mode = next((m.mode for m in supported_run_modes_dut
                               if Clusters.RvcRunMode.Enums.ModeTag.kIdle.value in [t.value for t in m.modeTags]), None)
-            cleaning_mode = next((m.mode for m in supported_run_modes_dut
-                                  if Clusters.RvcRunMode.Enums.ModeTag.kCleaning.value in [t.value for t in m.modeTags]),
-                                 None)
+            cleaning_mode = self.user_params.get("runmode_cleanmode")
             asserts.assert_is_not_none(idle_mode, "Idle mode not found in SupportedModes!")
             asserts.assert_is_not_none(cleaning_mode, "Cleaning mode not found in SupportedModes!")
 
