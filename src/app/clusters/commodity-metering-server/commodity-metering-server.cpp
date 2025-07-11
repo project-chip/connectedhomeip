@@ -17,6 +17,7 @@
  */
 #include "commodity-metering-server.h"
 
+#include <cstdint>
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <app/AttributeAccessInterface.h>
@@ -43,14 +44,13 @@ namespace Clusters {
 namespace CommodityMetering {
 
 // Some constraints for lists limitation
-constexpr uint8_t kMaxMeteredQuantityEntries                    = 128;
 constexpr uint8_t kMaxTariffComponentIDsPerMeteredQuantityEntry = 128;
 
 namespace {
 
 inline bool operator==(const Span<const uint32_t> & a, const Span<const uint32_t> & b)
 {
-    return std::equal(a.begin(), a.end(), b.begin());
+    return std::equal(a.begin(), a.end(), b.begin(), b.end());
 }
 
 inline bool operator==(const Structs::MeteredQuantityStruct::Type & lhs, const Structs::MeteredQuantityStruct::Type & rhs)
@@ -59,25 +59,27 @@ inline bool operator==(const Structs::MeteredQuantityStruct::Type & lhs, const S
 }
 
 template <typename T>
-bool NullableListEqual(const DataModel::Nullable<DataModel::List<T>> & a, const DataModel::Nullable<DataModel::List<T>> & b)
+bool NullableListsEqual(const DataModel::Nullable<DataModel::List<T>> & a, const DataModel::Nullable<DataModel::List<T>> & b)
 {
     if (a.IsNull() || b.IsNull())
     {
         return a.IsNull() == b.IsNull();
     }
-    else if (a.Value().size() == b.Value().size())
+
+    if (a.Value().size() != b.Value().size())
     {
-        for (size_t i = 0; i < a.Value().size(); i++)
-        {
-            if (a.Value()[i] == b.Value()[i])
-            {
-                continue;
-            }
-            return false;
-        }
-        return true;
+        return false;
     }
-    return false;
+
+    for (size_t i = 0; i < a.Value().size(); i++)
+    {
+        if (a.Value()[i] == b.Value()[i])
+        {
+            continue;
+        }
+        return false;
+    }
+    return true;
 }
 
 template <typename T>
@@ -171,29 +173,38 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
 {
     assertChipStackLockedByCurrentThread();
 
-    if (NullableListEqual(newValue, mMeteredQuantity))
+    if (NullableListsEqual(newValue, mMeteredQuantity))
     {
         return CHIP_NO_ERROR;
+    }
+
+    if (!mMeteredQuantity.IsNull())
+    {
+        CleanupMeteredQuantityData(mMeteredQuantity.Value());
     }
 
     if (newValue.IsNull())
     {
         mMeteredQuantity.SetNull();
     }
+    else if (mMaximumMeteredQuantities.IsNull())
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
     else
     {
-        if (!mMeteredQuantity.IsNull())
-        {
-            CleanupMeteredQuantityData(mMeteredQuantity.Value());
-        }
+        uint16_t len = static_cast<uint16_t>(newValue.Value().size());
 
-        const size_t len = newValue.Value().size();
+        if (len > mMaximumMeteredQuantities.Value())
+        {
+            return CHIP_ERROR_INVALID_LIST_LENGTH;
+        }
 
         if (len == 0)
         {
             mMeteredQuantity = MakeNullable(DataModel::List<Structs::MeteredQuantityStruct::Type>());
         }
-        else if (len <= kMaxMeteredQuantityEntries)
+        else
         {
             Platform::ScopedMemoryBuffer<Structs::MeteredQuantityStruct::Type> buffer;
 
@@ -204,19 +215,21 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
 
             for (size_t idx = 0; idx < len; idx++)
             {
-                // Deep copy each MeteredQuantityStruct in the newValue list
-                ReturnLogErrorOnFailure(CopyMeteredQuantityEntry(newValue.Value()[idx], buffer[idx]));
+                CHIP_ERROR err = CopyMeteredQuantityEntry(newValue.Value()[idx], buffer[idx]);
+                if (err != CHIP_NO_ERROR)
+                {
+                    // Clean up any partially copied IDs
+                    for (size_t cleanupIdx = 0; cleanupIdx < idx; cleanupIdx++)
+                    {
+                        CleanUpIDs(buffer[cleanupIdx].tariffComponentIDs);
+                    }
+                    buffer.Free();
+                    return err;
+                }
             }
 
-            mMeteredQuantity = MakeNullable(DataModel::List<Structs::MeteredQuantityStruct::Type>(buffer.Get(), len));
-            (void) buffer.Release();
+            mMeteredQuantity = MakeNullable(DataModel::List(buffer.Release(), len));
         }
-        else
-        {
-            return CHIP_ERROR_INVALID_LIST_LENGTH;
-        }
-
-        SetMaximumMeteredQuantities(MakeNullable(static_cast<uint16_t>(len)));
     }
 
     MatterReportingAttributeChangeCallback(mEndpointId, CommodityMetering::Id, MeteredQuantity::Id);
@@ -283,7 +296,7 @@ CHIP_ERROR Instance::SetMaximumMeteredQuantities(DataModel::Nullable<uint16_t> n
         {
             ChipLogDetail(AppServer, "MaximumMeteredQuantities updated to Null");
         }
-        else if (kMaxMeteredQuantityEntries >= newValue.Value())
+        else if (newValue.Value() >= 1)
         {
             ChipLogDetail(AppServer, "MaximumMeteredQuantities updated to %lu", static_cast<unsigned long int>(newValue.Value()));
         }
@@ -315,7 +328,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         }
         else
         {
-            auto list = GetMeteredQuantity().Value();
+            auto & list = GetMeteredQuantity().Value();
             ReturnErrorOnFailure(aEncoder.EncodeList([&list](const auto & encoder) {
                 for (const auto & item : list)
                 {

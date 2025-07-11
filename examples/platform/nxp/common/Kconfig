@@ -326,4 +326,10 @@ config CHIP_APP_QUEUE_TICKS_TO_WAIT
     help
         Define app queue ticks to wait.
 
+config APP_TASK_STACK_SIZE
+    int "App Task Stack Size"
+    default 6144
+    help
+        Set the stack size for the application task in bytes.
+        The value is divided by the size of portSTACK_TYPE to get the actual stack size.
 endmenu
