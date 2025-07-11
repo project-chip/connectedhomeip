@@ -221,7 +221,7 @@ public:
 class DLL_EXPORT BleLayer
 {
     friend class BLEEndPoint;
-    friend class chip::Test::BleLayerTestAccess;
+    friend class Test::BleLayerTestAccess;
 
 public:
     // Public data members:
