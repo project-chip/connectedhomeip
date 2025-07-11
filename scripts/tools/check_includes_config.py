@@ -209,4 +209,9 @@ ALLOW: Dict[str, Set[str]] = {
     # Not intended for embedded clients
     'src/app/server/JointFabricDatastore.cpp': {'vector'},
     'src/app/server/JointFabricDatastore.h': {'vector'},
+
+    # For webrtc python bindings
+    'src/controller/webrtc/WebRTC.h': {'string'},
+    'src/controller/webrtc/WebRTCClient.h': {'map', 'string'},
+    'src/controller/webrtc/WebRTCTransportRequestorManager.cpp': {'string', 'vector'},
 }
