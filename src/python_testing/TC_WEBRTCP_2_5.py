@@ -151,7 +151,7 @@ class TC_WebRTCProvider_2_5(MatterBaseTest, WEBRTCPTestBase):
             if streamUsage != Globals.Enums.StreamUsageEnum.kLiveView:
                 myStreamUsage = streamUsage
                 break
-        
+
         # Only execute the following steps if we have an alternate supported stream usage to use
         if myStreamUsage is not None:
             # Send SolicitOffer with supported stream usage that doesn't match that allocated. Valid audio stream ID, valid video stream ID
@@ -160,20 +160,22 @@ class TC_WebRTCProvider_2_5(MatterBaseTest, WEBRTCPTestBase):
                 streamUsage=myStreamUsage, originatingEndpointID=endpoint, videoStreamID=videoStreamID, audioStreamID=audioStreamID)
             try:
                 await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-                asserts.fail("Unexpected success on SolicitOffer with stream usage different from that allocated, valid VideoStreamID and valid AudioStreamID")
+                asserts.fail(
+                    "Unexpected success on SolicitOffer with stream usage different from that allocated, valid VideoStreamID and valid AudioStreamID")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.DynamicConstraintError, "Expected DYNAMIC_CONSTRAINT_ERROR")
-            
+
             # Send SolicitOffer with supported stream usage that isn't supported. Valid audio stream ID, valid video stream ID
             self.step(9)
             notSupportedStreamUsage = next((e for e in Globals.Enums.StreamUsageEnum if e not in aStreamUsagePriorities),
-                Globals.Enums.StreamUsageEnum.kUnknownEnumValue,)
+                                           Globals.Enums.StreamUsageEnum.kUnknownEnumValue,)
 
             cmd = cluster.Commands.SolicitOffer(
                 streamUsage=notSupportedStreamUsage, originatingEndpointID=endpoint, videoStreamID=NullValue, audioStreamID=NullValue)
             try:
                 await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-                asserts.fail("Unexpected success on SolicitOffer with an unsupported stream usage, VideoStreamID and AudioStreamID are both valid")
+                asserts.fail(
+                    "Unexpected success on SolicitOffer with an unsupported stream usage, VideoStreamID and AudioStreamID are both valid")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.DynamicConstraintError, "Expected DYNAMIC_CONSTRAINT_ERROR")
 
@@ -183,7 +185,8 @@ class TC_WebRTCProvider_2_5(MatterBaseTest, WEBRTCPTestBase):
                 streamUsage=myStreamUsage, originatingEndpointID=endpoint, videoStreamID=NullValue, audioStreamID=NullValue)
             try:
                 await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
-                asserts.fail("Unexpected success on SolicitOffer with stream usage different from that allocated, VideoStreamID and AudioStreamID are both null")
+                asserts.fail(
+                    "Unexpected success on SolicitOffer with stream usage different from that allocated, VideoStreamID and AudioStreamID are both null")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.DynamicConstraintError, "Expected DYNAMIC_CONSTRAINT_ERROR")
         else:
