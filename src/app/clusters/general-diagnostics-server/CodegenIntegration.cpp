@@ -16,7 +16,7 @@
  */
 
 #include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
-#include <app/clusters/general-diagnostics-server/general-diagnostics-logic.h>
+#include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 #include <app/static-cluster-config/GeneralDiagnostics.h>
 #include <app/util/config.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
@@ -33,10 +33,10 @@ static_assert((GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.
               GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 0);
 
 namespace {
-#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
-LazyRegisteredServerCluster<GeneralDiagnosticsCluster<DeviceLayerGeneralDiagnosticsLogic, true>> gServer;
+#if defined(ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER) || defined(GENERAL_DIAGNOSTICS_ENABLE_PAYLOAD_TEST_REQUEST_CMD)
+LazyRegisteredServerCluster<GeneralDiagnosticsClusterTimeSnapshotPayloadTestRequest> gServer;
 #else
-LazyRegisteredServerCluster<GeneralDiagnosticsCluster<DeviceLayerGeneralDiagnosticsLogic, false>> gServer;
+LazyRegisteredServerCluster<GeneralDiagnosticsCluster> gServer;
 #endif
 
 // compile-time evaluated method if "is <EP>::GeneralDiagnostics::<ATTR>" enabled
