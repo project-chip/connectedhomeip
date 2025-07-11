@@ -297,9 +297,12 @@ class BuildTarget:
         prefix = self.name
         suffix = value[len(self.name) + 1:]
 
-        for i, targets in enumerate(self.fixed_targets):
+        for i, targets in enumerate(self.fixed_targets, 1):
+            # If we are not processing the last fixed target,
+            # append hyphen to the generated completions.
+            hyphen = '-' if i != len(self.fixed_targets) else ''
             for target in targets:
-                if suffix.startswith(target.name + "-"):
+                if suffix.startswith(target.name + hyphen):
                     # Strip the prefix and continue processing.
                     prefix += f"-{target.name}"
                     suffix = suffix[len(target.name) + 1:]
@@ -310,11 +313,7 @@ class BuildTarget:
                     #       for the given value. Some validation rules require the
                     #       full target name to be known, so in case of completions
                     #       we just assume that the target is acceptable.
-                    completions.append(f"{prefix}-{target.name}")
-                # If we are not processing the last fixed target,
-                # append "-" to the generated completions.
-                if i < len(self.fixed_targets) - 1:
-                    completions = [f"{c}-" for c in completions]
+                    completions.append(f"{prefix}-{target.name}{hyphen}")
                 # Return validated completions.
                 return [c for c in completions if c.startswith(value)]
 
