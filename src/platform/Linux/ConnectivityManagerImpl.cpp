@@ -261,8 +261,6 @@ bool ConnectivityManagerImpl::_IsWiFiStationConnected()
 
     if (g_strcmp0(wpa_supplicant_1_interface_get_state(mWpaSupplicant.iface.get()), "completed") == 0)
     {
-        mConnectivityFlag.Set(ConnectivityFlags::kHaveIPv4InternetConnectivity)
-            .Set(ConnectivityFlags::kHaveIPv6InternetConnectivity);
         return true;
     }
 
@@ -740,7 +738,6 @@ void ConnectivityManagerImpl::StartWiFiManagement()
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
-    mConnectivityFlag.ClearAll();
     mWpaSupplicant = GDBusWpaSupplicant{};
 
     CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
