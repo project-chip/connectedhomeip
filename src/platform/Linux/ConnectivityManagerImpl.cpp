@@ -607,12 +607,9 @@ void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaSupplicant1 * proxy, con
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     if (g_strcmp0(mWpaSupplicant.interfacePath.get(), path) == 0)
     {
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: WiFi interface removed: %s", StringOrNullMarker(path));
-
+        ChipLogProgress(DeviceLayer, "WPA supplicant: WiFi interface removed: %s", StringOrNullMarker(path));
         mWpaSupplicant.interfacePath.reset();
         mWpaSupplicant.iface.reset();
-
-        mWpaSupplicant.scanState = GDBusWpaSupplicant::WpaScanningState::IDLE;
     }
 }
 
