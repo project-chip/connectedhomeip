@@ -281,9 +281,10 @@ DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> ThermostatDele
 CHIP_ERROR ThermostatDelegate::SetThermostatSuggestionNotFollowingReason(
     const DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> & thermostatSuggestionNotFollowingReason)
 {
-    bool hasChanged = (mThermostatSuggestionNotFollowingReason.IsNull() && !thermostatSuggestionNotFollowingReason.IsNull())
-        || (!mThermostatSuggestionNotFollowingReason.IsNull() && thermostatSuggestionNotFollowingReason.IsNull())
-        || (!mThermostatSuggestionNotFollowingReason.IsNull() && !thermostatSuggestionNotFollowingReason.IsNull() && mThermostatSuggestionNotFollowingReason.Value() != thermostatSuggestionNotFollowingReason.Value());
+    bool hasChanged = (mThermostatSuggestionNotFollowingReason.IsNull() && !thermostatSuggestionNotFollowingReason.IsNull()) ||
+        (!mThermostatSuggestionNotFollowingReason.IsNull() && thermostatSuggestionNotFollowingReason.IsNull()) ||
+        (!mThermostatSuggestionNotFollowingReason.IsNull() && !thermostatSuggestionNotFollowingReason.IsNull() &&
+         mThermostatSuggestionNotFollowingReason.Value() != thermostatSuggestionNotFollowingReason.Value());
 
     if (hasChanged)
     {
@@ -296,7 +297,8 @@ CHIP_ERROR ThermostatDelegate::SetThermostatSuggestionNotFollowingReason(
 
 void ThermostatDelegate::SetCurrentThermostatSuggestion(size_t index)
 {
-    // The MaxThermostatSuggestions attribute value is used as an index to set the current thermostat suggestion to null. Hence the <= check below.
+    // The MaxThermostatSuggestions attribute value is used as an index to set the current thermostat suggestion to null. Hence the
+    // <= check below.
     if (index <= GetMaxThermostatSuggestions())
     {
         bool hasChanged = (mIndexOfCurrentSuggestion != index);
@@ -372,8 +374,8 @@ CHIP_ERROR ThermostatDelegate::StartExpirationTimer(uint32_t timeoutInSecs)
 {
     ChipLogProgress(Zcl, "Starting timer to wait for %" PRIu32 "seconds for the current thermostat suggestion to expire",
                     timeoutInSecs);
-    return DeviceLayer::SystemLayer().StartTimer(std::chrono::duration_cast<Milliseconds32>(Seconds32(timeoutInSecs)), TimerExpiredCallback,
-                                                 static_cast<void *>(this));
+    return DeviceLayer::SystemLayer().StartTimer(std::chrono::duration_cast<Milliseconds32>(Seconds32(timeoutInSecs)),
+                                                 TimerExpiredCallback, static_cast<void *>(this));
 }
 
 CHIP_ERROR ThermostatDelegate::RemoveExpiredSuggestions(uint32_t currentMatterEpochTimestampInSeconds)
@@ -459,8 +461,8 @@ size_t ThermostatDelegate::GetThermostatSuggestionIndexWithEarliestEffectiveTime
     uint8_t maxThermostatSuggestions = GetMaxThermostatSuggestions();
     VerifyOrReturnValue(GetNumberOfThermostatSuggestions() > 0, maxThermostatSuggestions);
 
-    uint32_t minEffectiveTimeValue = UINT32_MAX;
-    size_t minEffectiveTimeSuggestionIndex   = maxThermostatSuggestions;
+    uint32_t minEffectiveTimeValue         = UINT32_MAX;
+    size_t minEffectiveTimeSuggestionIndex = maxThermostatSuggestions;
 
     for (size_t index = 0; index < static_cast<size_t>(GetNumberOfThermostatSuggestions()); index++)
     {
@@ -472,7 +474,7 @@ size_t ThermostatDelegate::GetThermostatSuggestionIndexWithEarliestEffectiveTime
         uint32_t effectiveTime = suggestion.GetEffectiveTime();
         if (effectiveTime < minEffectiveTimeValue && effectiveTime <= currentMatterEpochTimestampInSeconds)
         {
-            minEffectiveTimeValue = effectiveTime;
+            minEffectiveTimeValue           = effectiveTime;
             minEffectiveTimeSuggestionIndex = index;
         }
     }
