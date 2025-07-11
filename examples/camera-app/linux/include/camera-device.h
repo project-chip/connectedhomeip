@@ -277,6 +277,8 @@ public:
 
     void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg) override;
 
+    void ShutDown() override;
+
     void SetWebRTCRequestorServer(chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer * server) override
     {
         mWebRTCRequestorManager.SetWebRTCRequestorServer(server);
@@ -298,6 +300,9 @@ private:
     GstElement * CreateSnapshotPipeline(const std::string & device, int width, int height, int quality, int frameRate,
                                         const std::string & filename, CameraError & error);
     CameraError SetV4l2Control(uint32_t controlId, int value);
+
+    static void ProvideOfferPollingCallback(chip::System::Layer * systemLayer, void * appState);
+    void StopPollForProvideOffer();
 
     // Various cluster server delegates
     chip::app::Clusters::ChimeManager mChimeManager;

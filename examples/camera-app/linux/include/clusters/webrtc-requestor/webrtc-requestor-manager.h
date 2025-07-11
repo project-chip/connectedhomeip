@@ -81,7 +81,6 @@ private:
 
     static void OnDeviceConnectionFailure(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 
-    void SendProvideOffer();
     CHIP_ERROR SendProvideOfferCommand(Messaging::ExchangeManager & exchangeMgr, const SessionHandle & sessionHandle);
     void HandleProvideOfferResponse(const WebRTCTransportProvider::Commands::ProvideOfferResponse::DecodableType & value);
 

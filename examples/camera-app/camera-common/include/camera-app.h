@@ -40,6 +40,9 @@ public:
     // Callback to listen for device events.
     static void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
 
+    // ShutDown call for clean up.
+    void ShutDown() { mCameraDevice->ShutDown(); }
+
 private:
     chip::EndpointId mEndpoint;
     CameraDeviceInterface * mCameraDevice;

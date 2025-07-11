@@ -463,7 +463,7 @@ const char * sDeviceOptionHelp =
     "       Indicates the delayed processing hint of the WebRTC Provider.\n"
     "\n"
     "  --camera-initiated-session\n"
-    "       Camera initiates WebRTC session with requestor role right after being commissioned.\n"
+    "       Camera initiates WebRTC session with requestor role within 5s of stream allocation.\n"
     "\n"
     "  --camera-video-device <path>\n"
     "       Path to a V4L2 video capture device (default: /dev/video0).\n"

@@ -353,4 +353,6 @@ public:
 
     // Platforms can use this to store the pointer to the WebRTCTransportRequestorServer
     virtual void SetWebRTCRequestorServer(chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer * server) {}
+
+    virtual void ShutDown() = 0;
 };
