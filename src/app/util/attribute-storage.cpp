@@ -123,7 +123,7 @@ constexpr const EventId generatedEvents[] = GENERATED_EVENTS;
 #define ZAP_GENERATED_EVENTS_INDEX(index) (&generatedEvents[index])
 #endif // GENERATED_EVENTS
 
-constexpr const EmberAfAttributeMetadata generatedAttributes[] = GENERATED_ATTRIBUTES;
+[[maybe_unused]] constexpr const EmberAfAttributeMetadata generatedAttributes[] = GENERATED_ATTRIBUTES;
 #define ZAP_ATTRIBUTE_INDEX(index) (&generatedAttributes[index])
 
 #ifdef GENERATED_CLUSTERS
