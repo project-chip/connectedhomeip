@@ -38,14 +38,12 @@ namespace Clusters {
 /// Translates between matter calls and Software Diagnostics logic
 ///
 /// This cluster is expected to only ever exist on endpoint 0 as it is a singleton cluster.
-class SoftwareDiagnosticsServerCluster : public DefaultServerCluster,
-                                         public SoftwareDiagnostics::SoftwareFaultListener,
-                                         private SoftwareDiagnosticsLogic
+class SoftwareDiagnosticsServerCluster : public DefaultServerCluster, public SoftwareDiagnostics::SoftwareFaultListener
 {
 public:
     template <typename... Args>
     SoftwareDiagnosticsServerCluster(Args &&... args) :
-        DefaultServerCluster({ kRootEndpointId, SoftwareDiagnostics::Id }), SoftwareDiagnosticsLogic(std::forward<Args>(args)...)
+        DefaultServerCluster({ kRootEndpointId, SoftwareDiagnostics::Id }), mLogic(std::forward<Args>(args)...)
     {}
 
     // software fault listener
@@ -84,23 +82,23 @@ public:
         {
         case SoftwareDiagnostics::Attributes::CurrentHeapFree::Id: {
             uint64_t value;
-            CHIP_ERROR err = GetCurrentHeapFree(value);
+            CHIP_ERROR err = mLogic.GetCurrentHeapFree(value);
             return EncodeValue(value, err, encoder);
         }
         case SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id: {
             uint64_t value;
-            CHIP_ERROR err = GetCurrentHeapUsed(value);
+            CHIP_ERROR err = mLogic.GetCurrentHeapUsed(value);
             return EncodeValue(value, err, encoder);
         }
         case SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id: {
             uint64_t value;
-            CHIP_ERROR err = GetCurrentHighWatermark(value);
+            CHIP_ERROR err = mLogic.GetCurrentHighWatermark(value);
             return EncodeValue(value, err, encoder);
         }
         case SoftwareDiagnostics::Attributes::ThreadMetrics::Id:
-            return ReadThreadMetrics(encoder);
+            return mLogic.ReadThreadMetrics(encoder);
         case Globals::Attributes::FeatureMap::Id:
-            return encoder.Encode(GetFeatureMap());
+            return encoder.Encode(mLogic.GetFeatureMap());
         case Globals::Attributes::ClusterRevision::Id:
             return encoder.Encode(SoftwareDiagnostics::kRevision);
         default:
@@ -114,7 +112,7 @@ public:
         switch (request.path.mCommandId)
         {
         case SoftwareDiagnostics::Commands::ResetWatermarks::Id:
-            return ResetWatermarks();
+            return mLogic.ResetWatermarks();
         default:
             return Protocols::InteractionModel::Status::UnsupportedCommand;
         }
@@ -123,12 +121,12 @@ public:
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
     {
-        return SoftwareDiagnosticsLogic::AcceptedCommands(builder);
+        return mLogic.AcceptedCommands(builder);
     }
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override
     {
-        return SoftwareDiagnosticsLogic::Attributes(builder);
+        return mLogic.Attributes(builder);
     }
 
 private:
@@ -148,6 +146,8 @@ private:
         }
         return encoder.Encode(value);
     }
+
+    SoftwareDiagnosticsLogic mLogic;
 };
 
 } // namespace Clusters

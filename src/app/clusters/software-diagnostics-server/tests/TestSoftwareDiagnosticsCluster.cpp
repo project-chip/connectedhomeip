@@ -37,9 +37,9 @@ using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 
 template <class T>
-struct ScopedDiagnosticsProvider
+class ScopedDiagnosticsProvider
 {
-public:
+  public:
     ScopedDiagnosticsProvider()
     {
         mOldProvider = &DeviceLayer::GetDiagnosticDataProvider();
@@ -47,10 +47,11 @@ public:
     }
     ~ScopedDiagnosticsProvider() { DeviceLayer::SetDiagnosticDataProvider(mOldProvider); }
 
-    ScopedDiagnosticsProvider(const ScopedDiagnosticsProvider &) = delete;
+    ScopedDiagnosticsProvider(const ScopedDiagnosticsProvider &)             = delete;
     ScopedDiagnosticsProvider & operator=(const ScopedDiagnosticsProvider &) = delete;
-    ScopedDiagnosticsProvider(ScopedDiagnosticsProvider &&) = delete;
-    ScopedDiagnosticsProvider & operator=(ScopedDiagnosticsProvider &&) = delete;
+    ScopedDiagnosticsProvider(ScopedDiagnosticsProvider &&)                  = delete;
+    ScopedDiagnosticsProvider & operator=(ScopedDiagnosticsProvider &&)      = delete;
+
 private:
     DeviceLayer::DiagnosticDataProvider * mOldProvider;
     T mProvider;
