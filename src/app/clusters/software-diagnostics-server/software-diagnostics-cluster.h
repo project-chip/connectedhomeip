@@ -42,8 +42,8 @@ class SoftwareDiagnosticsServerCluster : public DefaultServerCluster, public Sof
 {
 public:
     template <typename... Args>
-    SoftwareDiagnosticsServerCluster(Args &&... args) :
-        DefaultServerCluster({ kRootEndpointId, SoftwareDiagnostics::Id }), mLogic(std::forward<Args>(args)...)
+    SoftwareDiagnosticsServerCluster(const SoftwareDiagnosticsEnabledAttributes & enabledAttributes) :
+        DefaultServerCluster({ kRootEndpointId, SoftwareDiagnostics::Id }), mLogic(enabledAttributes)
     {}
 
     // software fault listener
