@@ -230,6 +230,10 @@ void BLWiFiDriver::OnScanWiFiNetworkDone()
 
         if (NULL == pScanList || 0 == wifi_mgmr_sta_scanlist_dump(pScanList, nums))
         {
+            if (pScanList)
+            {
+                MemoryFree(pScanList);
+            }
             mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
             mpScanCallback = nullptr;
         }
