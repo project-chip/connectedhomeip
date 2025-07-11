@@ -20,10 +20,19 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/IPAddressSorter.h>
 #include <lib/support/StringBuilder.h>
+#include <system/SystemLayerImpl.h>
 #include <transport/raw/PeerAddress.h>
+
+#include <functional>
+#include <optional>
 
 using namespace chip;
 using namespace chip::AddressResolve;
+using namespace chip::System::Clock::Literals;
+using chip::Dnssd::DiscoveryContext;
+using chip::Dnssd::DiscoveryFilter;
+using chip::Dnssd::DiscoveryType;
+using chip::Dnssd::OperationalResolveDelegate;
 
 namespace pw {
 
@@ -335,4 +344,564 @@ TEST(TestAddressResolveDefaultImpl, TestLookupResult)
     // Check that the results has been consumed properly.
     EXPECT_FALSE(handle.HasLookupResult());
 }
+
+TEST(TestAddressResolveDefaultImpl, TestNextActionKeepSearchingByReturingRemainingTimeouts)
+{
+    AddressResolve::NodeLookupHandle handle;
+
+    System::Clock::Internal::MockClock clock;
+    System::Clock::ClockBase * realClock = &System::SystemClock();
+    System::Clock::Internal::SetSystemClockForTesting(&clock);
+
+    /// now = 0
+    auto now     = System::SystemClock().GetMonotonicTimestamp();
+    auto request = NodeLookupRequest(chip::PeerId(1, 2));
+
+    request.SetMinLookupTime(100_ms32);
+    request.SetMaxLookupTime(200_ms32);
+
+    handle.ResetForLookup(now, request);
+
+    // let's wait 50ms to ensure that the min lookup time is not yet reached
+    clock.AdvanceMonotonic(50_ms64);
+
+    // now = 50ms
+    now = clock.GetMonotonicTimestamp();
+
+    // timeout should be 50ms, as we are still waiting for the min lookup time
+    EXPECT_EQ(handle.NextEventTimeout(now), request.GetMinLookupTime() - 50_ms64);
+
+    // advancing time by another 60ms we reach 110ms after request start
+    clock.AdvanceMonotonic(60_ms64);
+
+    // still no results, then timeout should be 90ms, since 110ms have gone by and max lookup time is 200ms
+    now = clock.GetMonotonicTimestamp();
+
+    EXPECT_EQ(handle.NextEventTimeout(now), request.GetMaxLookupTime() - 110_ms64);
+
+    System::Clock::Internal::SetSystemClockForTesting(realClock);
+}
+
+TEST(TestAddressResolveDefaultImpl, TestNextActionConsumesTimeoutWhenResultsAreFound)
+{
+    AddressResolve::NodeLookupHandle handle;
+
+    System::Clock::Internal::MockClock clock;
+    System::Clock::ClockBase * realClock = &System::SystemClock();
+    System::Clock::Internal::SetSystemClockForTesting(&clock);
+
+    ResolveResult lowResult;
+    lowResult.address = GetAddressWithLowScore(static_cast<uint16_t>(1));
+
+    /// now = 0
+    auto now     = System::SystemClock().GetMonotonicTimestamp();
+    auto request = NodeLookupRequest(chip::PeerId(1, 2));
+
+    request.SetMinLookupTime(100_ms32);
+    request.SetMaxLookupTime(200_ms32);
+
+    handle.ResetForLookup(now, request);
+
+    // fill in single result
+    handle.LookupResult(lowResult);
+
+    // let's move time to the middle of the range [minlookuptime, maxlookuptime]
+    clock.AdvanceMonotonic(150_ms64);
+
+    // now = 150ms
+    now = clock.GetMonotonicTimestamp();
+
+    // timeout should be consumed now, as we have a result
+    EXPECT_EQ(handle.NextEventTimeout(now), 0_ms64);
+
+    System::Clock::Internal::SetSystemClockForTesting(realClock);
+}
+
+TEST(TestAddressResolveDefaultImpl, TestTimeoutGetsClearedWhenResultsAreNotFoundAndMaxLookupTimeIsSurpassed)
+{
+    AddressResolve::NodeLookupHandle handle;
+
+    System::Clock::Internal::MockClock clock;
+    System::Clock::ClockBase * realClock = &System::SystemClock();
+    System::Clock::Internal::SetSystemClockForTesting(&clock);
+
+    /// now = 0
+    auto now     = System::SystemClock().GetMonotonicTimestamp();
+    auto request = NodeLookupRequest(chip::PeerId(1, 2));
+
+    request.SetMinLookupTime(100_ms32);
+    request.SetMaxLookupTime(200_ms32);
+
+    handle.ResetForLookup(now, request);
+
+    // let's move time passed the end of the range [minlookuptime, maxlookuptime]
+    clock.AdvanceMonotonic(250_ms64);
+
+    // now = 250ms
+    now = clock.GetMonotonicTimestamp();
+
+    // timeout should be cleared
+    EXPECT_EQ(handle.NextEventTimeout(now), 0_ms64);
+
+    System::Clock::Internal::SetSystemClockForTesting(realClock);
+}
+
+TEST(TestAddressResolveDefaultImpl, TestKeepsSearchingWhenConsumedTImeIsLessThanMinLookupTime)
+{
+    AddressResolve::NodeLookupHandle handle;
+
+    System::Clock::Internal::MockClock clock;
+    System::Clock::ClockBase * realClock = &System::SystemClock();
+    System::Clock::Internal::SetSystemClockForTesting(&clock);
+
+    /// now = 0
+    auto now     = System::SystemClock().GetMonotonicTimestamp();
+    auto request = NodeLookupRequest(chip::PeerId(1, 2));
+
+    request.SetMinLookupTime(100_ms32);
+    request.SetMaxLookupTime(200_ms32);
+
+    handle.ResetForLookup(now, request);
+
+    // let's move time to a point before the min lookup time
+    clock.AdvanceMonotonic(50_ms64);
+
+    // now = 50ms
+    now = clock.GetMonotonicTimestamp();
+
+    // should keep searching
+    EXPECT_EQ(handle.NextAction(now).Type(), chip::AddressResolve::Impl::NodeLookupResult::kKeepSearching);
+
+    System::Clock::Internal::SetSystemClockForTesting(realClock);
+}
+
+TEST(TestAddressResolveDefaultImpl, TestReturnsFoundResultAfterMinLookupTimeIsReached)
+{
+    AddressResolve::NodeLookupHandle handle;
+
+    System::Clock::Internal::MockClock clock;
+    System::Clock::ClockBase * realClock = &System::SystemClock();
+    System::Clock::Internal::SetSystemClockForTesting(&clock);
+
+    ResolveResult lowResult;
+    lowResult.address = GetAddressWithLowScore(static_cast<uint16_t>(1));
+
+    /// now = 0
+    auto now     = System::SystemClock().GetMonotonicTimestamp();
+    auto request = NodeLookupRequest(chip::PeerId(1, 2));
+
+    request.SetMinLookupTime(100_ms32);
+    request.SetMaxLookupTime(200_ms32);
+
+    handle.ResetForLookup(now, request);
+
+    handle.LookupResult(lowResult);
+
+    // let's move time to a point after the min lookup time
+    clock.AdvanceMonotonic(150_ms64);
+
+    // now = 150ms
+    now = clock.GetMonotonicTimestamp();
+
+    auto action = handle.NextAction(now);
+    // should inform success in searching
+    EXPECT_EQ(action.Type(), chip::AddressResolve::Impl::NodeLookupResult::kLookupSuccess);
+    // and return the result
+    EXPECT_EQ(action.ResolveResult().address, lowResult.address);
+
+    System::Clock::Internal::SetSystemClockForTesting(realClock);
+}
+
+TEST(TestAddressResolveDefaultImpl, TestGivesUpAfterMaxLookupTimeIsReachedWithoutResults)
+{
+    AddressResolve::NodeLookupHandle handle;
+
+    System::Clock::Internal::MockClock clock;
+    System::Clock::ClockBase * realClock = &System::SystemClock();
+    System::Clock::Internal::SetSystemClockForTesting(&clock);
+
+    /// now = 0
+    auto now     = System::SystemClock().GetMonotonicTimestamp();
+    auto request = NodeLookupRequest(chip::PeerId(1, 2));
+
+    request.SetMinLookupTime(100_ms32);
+    request.SetMaxLookupTime(200_ms32);
+
+    handle.ResetForLookup(now, request);
+
+    // let's move time to a point after the max lookup time
+    clock.AdvanceMonotonic(250_ms64);
+
+    // now = 250ms
+    now = clock.GetMonotonicTimestamp();
+
+    auto action = handle.NextAction(now);
+    // should inform error in searching
+    EXPECT_EQ(action.Type(), chip::AddressResolve::Impl::NodeLookupResult::kLookupError);
+    // and report timeout error
+    EXPECT_EQ(action.ErrorResult(), CHIP_ERROR_TIMEOUT);
+
+    System::Clock::Internal::SetSystemClockForTesting(realClock);
+}
+
+class MockResolver : public chip::Dnssd::Resolver
+{
+public:
+    CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) override { return InitStatus; }
+    bool IsInitialized() override { return true; }
+    void Shutdown() override {}
+    void SetOperationalDelegate(OperationalResolveDelegate * delegate) override {}
+    CHIP_ERROR ResolveNodeId(const PeerId & peerId) override { return ResolveNodeIdStatus; }
+    void NodeIdResolutionNoLongerNeeded(const PeerId & peerId) override {}
+    CHIP_ERROR StartDiscovery(DiscoveryType type, DiscoveryFilter filter, DiscoveryContext &) override
+    {
+        if (DiscoveryType::kCommissionerNode == type)
+            return DiscoverCommissionersStatus;
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+    CHIP_ERROR StopDiscovery(DiscoveryContext &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR ReconfirmRecord(const char * hostname, Inet::IPAddress address, Inet::InterfaceId interfaceId) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    CHIP_ERROR InitStatus                  = CHIP_NO_ERROR;
+    CHIP_ERROR ResolveNodeIdStatus         = CHIP_NO_ERROR;
+    CHIP_ERROR DiscoverCommissionersStatus = CHIP_NO_ERROR;
+};
+
+class TestAddressResolveDefaultImplWithSystemLayer : public ::testing::Test
+{
+public:
+    void SetUp() { mSystemLayer.Init(); }
+
+    void TearDown() { mSystemLayer.Shutdown(); }
+
+    class MockSystemLayer : public chip::System::LayerImpl
+    {
+    public:
+        CHIP_ERROR StartTimer(System::Clock::Timeout aDelay, System::TimerCompleteCallback aComplete, void * aAppState) override
+        {
+            return mStartTimerCallback ? mStartTimerCallback.value()(aDelay, aComplete, aAppState) : CHIP_NO_ERROR;
+        }
+        CHIP_ERROR ScheduleWork(System::TimerCompleteCallback aComplete, void * aAppState) override
+        {
+            return mScheduleWorkCallback ? mScheduleWorkCallback.value()(aComplete, aAppState) : CHIP_NO_ERROR;
+        }
+
+        std::optional<std::function<CHIP_ERROR(System::Clock::Timeout, System::TimerCompleteCallback, void *)>> mStartTimerCallback;
+        std::optional<std::function<CHIP_ERROR(System::TimerCompleteCallback, void *)>> mScheduleWorkCallback;
+    };
+
+    MockSystemLayer mSystemLayer;
+    MockResolver mockResolver;
+};
+
+class TestAddressResolveDefaultImplWithSystemLayerAndNodeListener : public TestAddressResolveDefaultImplWithSystemLayer
+{
+public:
+    void SetUp() override { TestAddressResolveDefaultImplWithSystemLayer::SetUp(); }
+
+    void TearDown() override { TestAddressResolveDefaultImplWithSystemLayer::TearDown(); }
+    /// @brief TestNodeListener is an inner class for fixture and also a mock implementation of the NodeListener interface
+    /// that allows for testing the address resolution process by providing
+    /// customizable callbacks for when a node address is resolved or when resolution fails.
+    class TestNodeListener : public chip::AddressResolve::NodeListener
+    {
+    public:
+        using OnNodeAddressResolvedCallback =
+            std::function<void(const chip::PeerId &, const chip::AddressResolve::ResolveResult &)>;
+        using OnNodeAddressResolutionFailedCallback = std::function<void(const chip::PeerId &, CHIP_ERROR)>;
+
+        /// @brief  Sets the callback to be called when a node address is resolved. Acts as a customization point for tests.
+        /// @param callback OnNodeAddressResolvedCallback
+        void SetOnNodeAddressResolved(OnNodeAddressResolvedCallback callback) { mOnNodeAddressResolved = std::move(callback); }
+
+        /// @brief Sets the callback to be called when a node address resolution fails. Acts as a customization point for tests.
+        /// @param callback OnNodeAddressResolutionFailedCallback
+        void SetOnNodeAddressResolutionFailed(OnNodeAddressResolutionFailedCallback callback)
+        {
+            mOnNodeAddressResolutionFailed = std::move(callback);
+        }
+
+        /// @brief  Called when a node address is resolved. Dispatches handling to the injected callback if set.
+        void OnNodeAddressResolved(const PeerId & peerId, const ResolveResult & result) override
+        {
+            if (mOnNodeAddressResolved)
+            {
+                mOnNodeAddressResolved.value()(peerId, result);
+            }
+        };
+
+        /// @brief Called when a node address resolution fails. Dispatches handling to the injected callback if set.
+        void OnNodeAddressResolutionFailed(const PeerId & peerId, CHIP_ERROR reason) override
+        {
+            if (mOnNodeAddressResolutionFailed)
+            {
+                mOnNodeAddressResolutionFailed.value()(peerId, reason);
+            }
+        };
+
+    private:
+        std::optional<OnNodeAddressResolvedCallback> mOnNodeAddressResolved{ std::nullopt };
+        std::optional<OnNodeAddressResolutionFailedCallback> mOnNodeAddressResolutionFailed{ std::nullopt };
+    };
+
+    TestNodeListener mNodeListener;
+    MockResolver mMockResolver;
+};
+
+TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, TriesNextResultAndCallsResolvedAddressListener)
+{
+    chip::AddressResolve::Impl::Resolver resolver;
+    auto r = resolver.Init(&mSystemLayer);
+
+    ASSERT_EQ(r, CHIP_NO_ERROR);
+
+    System::Clock::Internal::MockClock clock;
+    System::Clock::ClockBase * realClock = &System::SystemClock();
+    System::Clock::Internal::SetSystemClockForTesting(&clock);
+
+    AddressResolve::NodeLookupHandle handle;
+    auto request = NodeLookupRequest(chip::PeerId(1, 2));
+
+    ResolveResult lowResult;
+    lowResult.address = GetAddressWithLowScore(static_cast<uint16_t>(1));
+
+    /// now = 0
+    auto now = System::SystemClock().GetMonotonicTimestamp();
+
+    request.SetMinLookupTime(100_ms32);
+    request.SetMaxLookupTime(200_ms32);
+
+    handle.ResetForLookup(now, request);
+
+    // fill in single result
+    handle.LookupResult(lowResult);
+
+    // move time to a point after the min lookup time
+    clock.AdvanceMonotonic(150_ms64);
+
+    chip::PeerId expectedPeerId;
+    chip::AddressResolve::ResolveResult expectedResult;
+
+    // set up a success lookup listener
+    mNodeListener.SetOnNodeAddressResolved(
+        [&expectedPeerId, &expectedResult](const chip::PeerId & peerId, const chip::AddressResolve::ResolveResult & result) {
+            expectedPeerId = peerId;
+            expectedResult = result;
+        });
+
+    handle.SetListener(&mNodeListener);
+
+    r = resolver.TryNextResult(handle);
+
+    ASSERT_EQ(r, CHIP_NO_ERROR);
+    ASSERT_EQ(expectedPeerId.GetNodeId(), NodeId{ 2 });
+    ASSERT_EQ(expectedResult.address, GetAddressWithLowScore(static_cast<uint16_t>(1)));
+
+    System::Clock::Internal::SetSystemClockForTesting(realClock);
+}
+
+TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, CancellingLookupCallsOnNodeAddressResolutionFailed)
+{
+    chip::Dnssd::Resolver::SetInstance(mockResolver);
+
+    chip::AddressResolve::Impl::Resolver resolver;
+    auto r = resolver.Init(&mSystemLayer);
+
+    ASSERT_EQ(r, CHIP_NO_ERROR);
+
+    System::Clock::Internal::MockClock clock;
+    System::Clock::ClockBase * realClock = &System::SystemClock();
+    System::Clock::Internal::SetSystemClockForTesting(&clock);
+
+    AddressResolve::NodeLookupHandle handle;
+    auto request = NodeLookupRequest(chip::PeerId(1, 2));
+
+    ResolveResult lowResult;
+    lowResult.address = GetAddressWithLowScore(static_cast<uint16_t>(1));
+
+    /// now = 0
+    auto now = System::SystemClock().GetMonotonicTimestamp();
+
+    request.SetMinLookupTime(100_ms32);
+    request.SetMaxLookupTime(200_ms32);
+
+    handle.ResetForLookup(now, request);
+
+    for (auto i = 0; i < kNumberOfAvailableSlots; i++)
+    {
+        // Set up UNIQUE addresses
+        lowResult.address = GetAddressWithLowScore(static_cast<uint16_t>(i + 10));
+        handle.LookupResult(lowResult);
+    }
+
+    // push some NodeLookup handle into Resolver's internal list
+    resolver.LookupNode(request, handle);
+
+    // set up a failure listener
+    CHIP_ERROR expectedError = CHIP_NO_ERROR;
+    mNodeListener.SetOnNodeAddressResolutionFailed(
+        [&expectedError](const chip::PeerId & peerId, CHIP_ERROR reason) { expectedError = reason; });
+
+    handle.SetListener(&mNodeListener);
+
+    // cancel the lookup
+    r = resolver.CancelLookup(handle, Resolver::FailureCallback::Call);
+
+    EXPECT_EQ(r, CHIP_NO_ERROR);
+    EXPECT_EQ(expectedError, CHIP_ERROR_CANCELLED);
+
+    System::Clock::Internal::SetSystemClockForTesting(realClock);
+}
+
+TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, LooksUpFailsAndCallsFailureListenerWhenSystemStartTimerFails)
+{
+    chip::Dnssd::Resolver::SetInstance(mockResolver);
+
+    chip::AddressResolve::Impl::Resolver resolver;
+    auto r = resolver.Init(&mSystemLayer);
+
+    ASSERT_EQ(r, CHIP_NO_ERROR);
+
+    System::Clock::Internal::MockClock clock;
+    System::Clock::ClockBase * realClock = &System::SystemClock();
+    System::Clock::Internal::SetSystemClockForTesting(&clock);
+
+    AddressResolve::NodeLookupHandle handle;
+    auto request = NodeLookupRequest(chip::PeerId(1, 2));
+
+    CHIP_ERROR expectedError = CHIP_NO_ERROR;
+    mNodeListener.SetOnNodeAddressResolutionFailed(
+        [&expectedError](const chip::PeerId & peerId, CHIP_ERROR reason) { expectedError = reason; });
+
+    handle.SetListener(&mNodeListener);
+
+    CHIP_ERROR expectedTimerError    = CHIP_NO_ERROR;
+    mSystemLayer.mStartTimerCallback = [&expectedTimerError](auto, auto, auto *) {
+        // Simulate failure in starting the timer
+        expectedTimerError = CHIP_ERROR_CANCELLED;
+        return expectedTimerError;
+    };
+
+    r = resolver.LookupNode(request, handle);
+
+    EXPECT_EQ(r, CHIP_NO_ERROR);
+    EXPECT_EQ(expectedError, CHIP_ERROR_CANCELLED);
+    EXPECT_EQ(expectedTimerError, CHIP_ERROR_CANCELLED);
+
+    System::Clock::Internal::SetSystemClockForTesting(realClock);
+}
+
+TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener,
+       CallsSuccessAndFailureListenersWhenAppropriateLookupResultsAreFound)
+{
+    chip::Dnssd::Resolver::SetInstance(mockResolver);
+
+    chip::AddressResolve::Impl::Resolver resolver;
+    auto r = resolver.Init(&mSystemLayer);
+
+    ASSERT_EQ(r, CHIP_NO_ERROR);
+
+    System::Clock::Internal::MockClock clock;
+    System::Clock::ClockBase * realClock = &System::SystemClock();
+    System::Clock::Internal::SetSystemClockForTesting(&clock);
+
+    AddressResolve::NodeLookupHandle successfulHandle;
+    auto successfulRequest = NodeLookupRequest(chip::PeerId(1, 2));
+
+    successfulRequest.SetMinLookupTime(100_ms32);
+    successfulRequest.SetMaxLookupTime(200_ms32);
+
+    AddressResolve::NodeLookupHandle failedHandle;
+    auto failedRequest = NodeLookupRequest(chip::PeerId(1, 3));
+
+    failedRequest.SetMinLookupTime(50_ms32);
+    failedRequest.SetMaxLookupTime(100_ms32);
+
+    r = resolver.LookupNode(successfulRequest, successfulHandle);
+    EXPECT_EQ(r, CHIP_NO_ERROR);
+
+    r = resolver.LookupNode(failedRequest, failedHandle);
+    EXPECT_EQ(r, CHIP_NO_ERROR);
+
+    clock.AdvanceMonotonic(150_ms64);
+
+    chip::PeerId expectedPeerId;
+    chip::AddressResolve::ResolveResult expectedResult;
+    // set up a success lookup listener
+    mNodeListener.SetOnNodeAddressResolved(
+        [&expectedPeerId, &expectedResult](const chip::PeerId & peerId, const chip::AddressResolve::ResolveResult & result) {
+            expectedPeerId = peerId;
+            expectedResult = result;
+        });
+
+    CHIP_ERROR expectedError = CHIP_NO_ERROR;
+    chip::PeerId expectedFailedPeerId;
+    // set up a failed lookup listener
+    mNodeListener.SetOnNodeAddressResolutionFailed(
+        [&expectedFailedPeerId, &expectedError](const chip::PeerId & peerId, CHIP_ERROR reason) {
+            expectedFailedPeerId = peerId;
+            expectedError        = reason;
+        });
+
+    successfulHandle.SetListener(&mNodeListener);
+    failedHandle.SetListener(&mNodeListener);
+
+    ResolveResult lowResult;
+    lowResult.address = GetAddressWithLowScore();
+
+    Dnssd::ResolvedNodeData resolvedData;
+    resolvedData.resolutionData.numIPs       = 1;
+    resolvedData.resolutionData.ipAddress[0] = lowResult.address.GetIPAddress();
+    resolvedData.resolutionData.interfaceId  = lowResult.address.GetInterface();
+    resolvedData.resolutionData.port         = lowResult.address.GetPort();
+    resolvedData.operationalData.peerId      = successfulRequest.GetPeerId();
+
+    resolver.OnOperationalNodeResolved(resolvedData);                                          // successful resolution
+    resolver.OnOperationalNodeResolutionFailed(failedRequest.GetPeerId(), CHIP_ERROR_TIMEOUT); // failed resolution
+
+    EXPECT_EQ(expectedPeerId.GetNodeId(), NodeId{ 2 });
+    EXPECT_EQ(expectedResult.address, GetAddressWithLowScore());
+    EXPECT_EQ(expectedFailedPeerId.GetNodeId(), NodeId{ 3 });
+    EXPECT_EQ(expectedError, CHIP_ERROR_TIMEOUT);
+
+    System::Clock::Internal::SetSystemClockForTesting(realClock);
+}
+
+TEST_F(TestAddressResolveDefaultImplWithSystemLayerAndNodeListener, ResolverShutsDownAndClearsAllPendingLookups)
+{
+    chip::AddressResolve::Impl::Resolver resolver;
+    auto r = resolver.Init(&mSystemLayer);
+
+    ASSERT_EQ(r, CHIP_NO_ERROR);
+
+    System::Clock::Internal::MockClock clock;
+    System::Clock::ClockBase * realClock = &System::SystemClock();
+    System::Clock::Internal::SetSystemClockForTesting(&clock);
+
+    AddressResolve::NodeLookupHandle handle;
+    auto request = NodeLookupRequest(chip::PeerId(1, 2));
+
+    request.SetMinLookupTime(100_ms32);
+    request.SetMaxLookupTime(200_ms32);
+
+    r = resolver.LookupNode(request, handle);
+    EXPECT_EQ(r, CHIP_NO_ERROR);
+
+    CHIP_ERROR expectedError = CHIP_NO_ERROR;
+    mNodeListener.SetOnNodeAddressResolutionFailed(
+        [&expectedError](const chip::PeerId & peerId, CHIP_ERROR reason) { expectedError = reason; });
+
+    handle.SetListener(&mNodeListener);
+
+    // Shutdown the resolver
+    resolver.Shutdown();
+
+    EXPECT_EQ(expectedError, CHIP_ERROR_SHUT_DOWN);
+
+    System::Clock::Internal::SetSystemClockForTesting(realClock);
+}
+
 } // namespace

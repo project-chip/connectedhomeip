@@ -249,6 +249,7 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestAclAttribute.cpp",
+    "TestAclCommand.cpp",
     "TestAclEvent.cpp",
     "TestActionsCluster.cpp",
     "TestAttributeAccessInterfaceCache.cpp",

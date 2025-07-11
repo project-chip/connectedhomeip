@@ -50,6 +50,14 @@ public:
      */
     void Init();
 
+    /**
+     * @brief Shuts down the ClosureManager.
+     *
+     * This method clear up the necessary resources and configurations required
+     * for the Closure Application to shutdown properly.
+     */
+    void Shutdown();
+
     static ClosureManager & GetInstance() { return sInstance; }
 
     /**

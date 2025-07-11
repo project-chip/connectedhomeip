@@ -41,7 +41,7 @@ DataModel::ActionReturnStatus NetworkCommissioningCluster::ReadAttribute(const D
     switch (request.path.mAttributeId)
     {
     case FeatureMap::Id:
-        return encoder.Encode(mLogic.Features().Raw());
+        return encoder.Encode(mLogic.Features());
     case ClusterRevision::Id:
         return encoder.Encode(NetworkCommissioning::kRevision);
     case MaxNetworks::Id:

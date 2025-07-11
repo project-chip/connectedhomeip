@@ -18,7 +18,7 @@
 
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/ServerClusterInterface.h>
-#include <data-model-providers/endpoint/EndpointProviderInterface.h>
+#include <data-model-providers/codedriven/endpoint/EndpointInterface.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Span.h>
 
@@ -28,25 +28,25 @@ namespace chip {
 namespace app {
 
 /**
- * @brief An implementation of EndpointProviderInterface that uses `chip::Span` to refer to its data.
+ * @brief An implementation of EndpointInterface that uses `chip::Span` to refer to its data.
  *
  * This provider is constructed using its `Builder` class. It stores `chip::Span` members that
  * point to externally managed arrays for its configuration (device types, server/client clusters,
  * semantic tags, etc.).
  *
  * @warning Lifetime of Span-Referenced Data:
- * `SpanEndpointProvider` does NOT take ownership of the data arrays referenced by its
+ * `SpanEndpoint` does NOT take ownership of the data arrays referenced by its
  * internal `chip::Span` members. The caller who provides these Spans (usually via the
  * `Builder`) MUST ensure that the underlying data remains valid for the entire lifetime
- * of the `SpanEndpointProvider` instance.
+ * of the `SpanEndpoint` instance.
  *   - For `Span<T>` (e.g., `Span<const ClusterId>`, `Span<const DeviceTypeEntry>`), the
- *     array of `T` elements must outlive the `SpanEndpointProvider`.
+ *     array of `T` elements must outlive the `SpanEndpoint`.
  *   - For `Span<T*>` (e.g., `Span<ServerClusterInterface *>`), both the array of pointers
  *     (`T*`) and the objects (`T`) pointed to by those pointers must outlive the
- *     `SpanEndpointProvider`.
+ *     `SpanEndpoint`.
  * Failure to adhere to these lifetime requirements will lead to undefined behavior.
  */
-class SpanEndpointProvider : public EndpointProviderInterface
+class SpanEndpoint : public EndpointInterface
 {
 public:
     class Builder
@@ -61,11 +61,11 @@ public:
         Builder & SetSemanticTags(Span<const SemanticTag> semanticTags);
         Builder & SetDeviceTypes(Span<const DataModel::DeviceTypeEntry> deviceTypes);
 
-        // Builds the SpanEndpointProvider.
-        // Returns a std::variant containing either the successfully built SpanEndpointProvider
+        // Builds the SpanEndpoint.
+        // Returns a std::variant containing either the successfully built SpanEndpoint
         // or a CHIP_ERROR if the build failed (e.g., due to invalid arguments).
         // Callers should check the variant's active alternative before use.
-        std::variant<SpanEndpointProvider, CHIP_ERROR> build();
+        std::variant<SpanEndpoint, CHIP_ERROR> Build();
 
     private:
         EndpointId mEndpointId;
@@ -77,13 +77,16 @@ public:
         Span<const DataModel::DeviceTypeEntry> mDeviceTypes;
     };
 
-    ~SpanEndpointProvider() override = default;
+    ~SpanEndpoint() override = default;
 
-    // Delete copy and move constructors and assignment operators
-    SpanEndpointProvider(const SpanEndpointProvider &)             = delete;
-    SpanEndpointProvider & operator=(const SpanEndpointProvider &) = delete;
-    SpanEndpointProvider(SpanEndpointProvider &&)                  = default; // Allow move
-    SpanEndpointProvider & operator=(SpanEndpointProvider &&)      = default; // Allow move
+    // Delete copy constructor and assignment operator. SpanEndpoint holds non-owning data (Spans).
+    // This helps prevent accidental copies that could lead multiple objects pointing to the same external data.
+    SpanEndpoint(const SpanEndpoint &)             = delete;
+    SpanEndpoint & operator=(const SpanEndpoint &) = delete;
+
+    // Allow move semantics for SpanEndpoint.
+    SpanEndpoint(SpanEndpoint &&)             = default;
+    SpanEndpoint & operator=(SpanEndpoint &&) = default;
 
     const DataModel::EndpointEntry & GetEndpointEntry() const override { return mEndpointEntry; }
 
@@ -94,13 +97,13 @@ public:
 
     // Getter for ServerClusterInterface, returns nullptr if the cluster is not found.
     ServerClusterInterface * GetServerCluster(ClusterId clusterId) const override;
-    CHIP_ERROR ServerClusterInterfaces(ReadOnlyBufferBuilder<ServerClusterInterface *> & out) const override;
+    CHIP_ERROR ServerClusters(ReadOnlyBufferBuilder<ServerClusterInterface *> & out) const override;
 
 private:
     // Private constructor for Builder
-    SpanEndpointProvider(EndpointId id, DataModel::EndpointCompositionPattern composition, EndpointId parentId,
-                         Span<ServerClusterInterface *> serverClusters, Span<const ClusterId> clientClusters,
-                         Span<const SemanticTag> semanticTags, Span<const DataModel::DeviceTypeEntry> deviceTypes);
+    SpanEndpoint(EndpointId id, DataModel::EndpointCompositionPattern composition, EndpointId parentId,
+                 Span<ServerClusterInterface *> serverClusters, Span<const ClusterId> clientClusters,
+                 Span<const SemanticTag> semanticTags, Span<const DataModel::DeviceTypeEntry> deviceTypes);
 
     // Iteration methods
     // GetEndpointEntry is already public

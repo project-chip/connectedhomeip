@@ -52,7 +52,7 @@ public:
     Optional<DataModel::Nullable<CurrentPositionEnum>> position;
     Optional<DataModel::Nullable<bool>> latch;
     Optional<Globals::ThreeLevelAutoEnum> speed;
-    Optional<DataModel::Nullable<bool>> secureState;
+    DataModel::Nullable<bool> secureState;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

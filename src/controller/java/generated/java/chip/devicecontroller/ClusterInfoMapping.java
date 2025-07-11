@@ -20858,7 +20858,28 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedCommodityMeteringClusterTariffUnitAttributeCallback implements ChipClusters.CommodityMeteringCluster.TariffUnitAttributeCallback, DelegatedClusterCallback {
+  public static class DelegatedCommodityMeteringClusterMeasurementTypeAttributeCallback implements ChipClusters.CommodityMeteringCluster.MeasurementTypeAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(@Nullable Integer value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("value", "Integer");
+      responseValues.put(commandResponseInfo, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedCommodityMeteringClusterMaximumMeteredQuantitiesAttributeCallback implements ChipClusters.CommodityMeteringCluster.MaximumMeteredQuantitiesAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
     public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -27303,7 +27324,7 @@ public class ClusterInfoMapping {
         , (Optional<Boolean>)
         commandArguments.get("latch")
         , (Optional<Integer>)
-        commandArguments.get("speed")
+        commandArguments.get("speed"), 10000
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -27315,7 +27336,7 @@ public class ClusterInfoMapping {
     InteractionInfo closureControlcalibrateInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ClosureControlCluster) cluster)
-        .calibrate((DefaultClusterCallback) callback
+        .calibrate((DefaultClusterCallback) callback, 10000
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -27346,7 +27367,7 @@ public class ClusterInfoMapping {
         , (Optional<Boolean>)
         commandArguments.get("latch")
         , (Optional<Integer>)
-        commandArguments.get("speed")
+        commandArguments.get("speed"), 10000
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -27373,7 +27394,7 @@ public class ClusterInfoMapping {
         , (Integer)
         commandArguments.get("numberOfSteps")
         , (Optional<Integer>)
-        commandArguments.get("speed")
+        commandArguments.get("speed"), 10000
         );
       },
       () -> new DelegatedDefaultClusterCallback(),

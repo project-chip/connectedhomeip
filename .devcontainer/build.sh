@@ -36,8 +36,8 @@ Options:
 EOF
 }
 
-SHORT=t:,u:,h:,v
-LONG=tag:,uid:,help:,version:
+SHORT=t:,u:,h,v:
+LONG=tag:,uid:,help,version:
 OPTS=$(getopt -n build --options "$SHORT" --longoptions "$LONG" -- "$@")
 
 eval set -- "$OPTS"

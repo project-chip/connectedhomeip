@@ -159,6 +159,8 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             asserts.assert_greater(
                 captureSnapshotResponse.resolution.height, 0, "Image height returned by CaptureSnapshotResponse is <= 0"
             )
+            if not self.is_pics_sdk_ci_only:
+                self.user_verify_snap_shot("Validate the snapshot image", captureSnapshotResponse.data)
         except InteractionModelError as e:
             # TODO: Fail the test if this is reached, once the test infrastructure supports snapshot capture
             logger.error(f"Snapshot capture is not supported: {e}")
@@ -200,6 +202,8 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             asserts.assert_greater(
                 captureSnapshotResponse.resolution.height, 0, "Image height returned by CaptureSnapshotResponse is <= 0"
             )
+            if not self.is_pics_sdk_ci_only:
+                self.user_verify_snap_shot("Validate the snapshot image", captureSnapshotResponse.data)
         except InteractionModelError as e:
             # TODO: Fail the test if this is reached, once the test infrastructure supports snapshot capture
             logger.error(f"Snapshot capture is not supported: {e}")

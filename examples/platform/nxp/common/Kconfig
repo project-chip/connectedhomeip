@@ -314,16 +314,22 @@ config CHIP_APP_LED_MANAGER_LIGHT_LED_INDEX
 
 config CHIP_APP_LED_MANAGER_STATUS_LED
     int "App Led Status"
-    default 0 if (CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71) && CHIP_OTA_REQUESTOR
-    default 1
+    default 1 if !NXP_USE_LOW_POWER || CHIP_NXP_PLATFORM_RW61X
+    default 0
     help
         Enable status LED by setting value to 1, or disable with value 0.
 
 config CHIP_APP_QUEUE_TICKS_TO_WAIT
     string "App queue ticks to wait"
-    default "pdMS_TO_TICKS(10)" if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+    default "pdMS_TO_TICKS(10)" if (CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72) && !NXP_USE_LOW_POWER
     default "portMAX_DELAY"
     help
         Define app queue ticks to wait.
 
+config APP_TASK_STACK_SIZE
+    int "App Task Stack Size"
+    default 6144
+    help
+        Set the stack size for the application task in bytes.
+        The value is divided by the size of portSTACK_TYPE to get the actual stack size.
 endmenu

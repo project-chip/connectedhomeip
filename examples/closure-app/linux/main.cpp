@@ -38,6 +38,9 @@ void ApplicationInit()
 void ApplicationShutdown()
 {
     ChipLogDetail(NotSpecified, "ApplicationShutdown()");
+    DeviceLayer::PlatformMgr().LockChipStack();
+    ClosureManager::GetInstance().Shutdown();
+    DeviceLayer::PlatformMgr().UnlockChipStack();
 }
 
 int main(int argc, char * argv[])

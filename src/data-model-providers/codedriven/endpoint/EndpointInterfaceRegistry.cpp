@@ -14,18 +14,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <data-model-providers/endpoint/EndpointProviderRegistry.h>
+#include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
 #include <lib/support/CodeUtils.h>
 
 namespace chip {
 namespace app {
 
-CHIP_ERROR EndpointProviderRegistry::Register(EndpointProviderRegistration & entry)
+CHIP_ERROR EndpointInterfaceRegistry::Register(EndpointInterfaceRegistration & entry)
 {
-    VerifyOrReturnError(entry.next == nullptr, CHIP_ERROR_INVALID_ARGUMENT); // Should not be part of another list
-    VerifyOrReturnError(entry.endpointProviderInterface != nullptr, CHIP_ERROR_INVALID_ARGUMENT); // Should not be null
+    VerifyOrReturnError(entry.next == nullptr, CHIP_ERROR_INVALID_ARGUMENT);              // Should not be part of another list
+    VerifyOrReturnError(entry.endpointInterface != nullptr, CHIP_ERROR_INVALID_ARGUMENT); // Should not be null
 
-    auto newEndpointId = entry.endpointProviderInterface->GetEndpointEntry().id;
+    auto newEndpointId = entry.endpointInterface->GetEndpointEntry().id;
     VerifyOrReturnError(newEndpointId != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(Get(newEndpointId) == nullptr, CHIP_ERROR_DUPLICATE_KEY_ID); // Check for duplicates
 
@@ -35,16 +35,16 @@ CHIP_ERROR EndpointProviderRegistry::Register(EndpointProviderRegistration & ent
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EndpointProviderRegistry::Unregister(EndpointId endpointId)
+CHIP_ERROR EndpointInterfaceRegistry::Unregister(EndpointId endpointId)
 {
     VerifyOrReturnError(endpointId != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
 
-    EndpointProviderRegistration * prev    = nullptr;
-    EndpointProviderRegistration * current = mRegistrations;
+    EndpointInterfaceRegistration * prev    = nullptr;
+    EndpointInterfaceRegistration * current = mRegistrations;
 
     while (current != nullptr)
     {
-        if (current->endpointProviderInterface->GetEndpointEntry().id == endpointId)
+        if (current->endpointInterface->GetEndpointEntry().id == endpointId)
         {
             if (prev == nullptr) // Node to remove is the head
             {
@@ -69,7 +69,7 @@ CHIP_ERROR EndpointProviderRegistry::Unregister(EndpointId endpointId)
     return CHIP_NO_ERROR;
 }
 
-EndpointProviderInterface * EndpointProviderRegistry::Get(EndpointId endpointId)
+EndpointInterface * EndpointInterfaceRegistry::Get(EndpointId endpointId)
 {
     if (mCachedEndpointId == endpointId && mCachedInterface != nullptr)
     {
@@ -77,13 +77,13 @@ EndpointProviderInterface * EndpointProviderRegistry::Get(EndpointId endpointId)
     }
 
     // The endpoint searched for is not cached, do a linear search for it
-    EndpointProviderRegistration * current = mRegistrations;
+    EndpointInterfaceRegistration * current = mRegistrations;
 
     while (current != nullptr)
     {
-        if (current->endpointProviderInterface->GetEndpointEntry().id == endpointId)
+        if (current->endpointInterface->GetEndpointEntry().id == endpointId)
         {
-            mCachedInterface  = current->endpointProviderInterface;
+            mCachedInterface  = current->endpointInterface;
             mCachedEndpointId = endpointId;
             return mCachedInterface;
         }

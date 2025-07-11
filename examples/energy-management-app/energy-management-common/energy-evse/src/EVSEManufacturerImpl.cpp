@@ -670,6 +670,10 @@ void EVSEManufacturer::ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_
         pClass->ComputeChargingSchedule();
         pClass->UpdateEVFakeReadings(cb->ChargingCurrent.maximumChargeCurrent);
         break;
+    case EVSECallbackType::DischargeCurrentChanged:
+        ChipLogProgress(AppServer, "EVSE callback - maxDischargeCurrent changed to %ld",
+                        static_cast<long>(cb->DischargingCurrent.maximumDischargeCurrent));
+        break;
     case EVSECallbackType::EnergyMeterReadingRequested:
         ChipLogProgress(AppServer, "EVSE callback - EnergyMeterReadingRequested");
         if (cb->EnergyMeterReadingRequest.meterType == ChargingDischargingType::kCharging)

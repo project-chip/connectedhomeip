@@ -132,6 +132,12 @@ choice CHIP_CRYPTO
 			based on the PSA crypto API.
 endchoice
 
+config CHIP_TASK_STACK_SIZE
+	int "CHIP task stack size"
+	default 10240
+	help
+		Set the stack size for the CHIP task.
+
 config CHIP_USE_GENERATED_CONFIG
 	bool "Use generated config"
 	default y

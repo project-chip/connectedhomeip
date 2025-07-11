@@ -6556,7 +6556,10 @@ static BOOL AttributeIsSpecifiedInCommodityMeteringCluster(AttributeId aAttribut
     case Attributes::MeteredQuantityTimestamp::Id: {
         return YES;
     }
-    case Attributes::TariffUnit::Id: {
+    case Attributes::MeasurementType::Id: {
+        return YES;
+    }
+    case Attributes::MaximumMeteredQuantities::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6729,6 +6732,9 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::GlobalStruct::Id: {
+        return YES;
+    }
+    case Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id: {
         return YES;
     }
     case Attributes::Unsupported::Id: {

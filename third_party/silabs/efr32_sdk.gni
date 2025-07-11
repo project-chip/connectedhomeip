@@ -213,6 +213,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/hfxo_manager/src",
       "${efr32_sdk_root}/platform/service/interrupt_manager/inc/",
       "${efr32_sdk_root}/platform/service/interrupt_manager/inc/arm/",
+      "${efr32_sdk_root}/platform/service/interrupt_manager/src",
       "${efr32_sdk_root}/platform/service/iostream/inc",
       "${efr32_sdk_root}/platform/service/memory_manager/inc",
       "${efr32_sdk_root}/platform/service/memory_manager/src",
@@ -222,8 +223,9 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/power_manager/inc/",
       "${efr32_sdk_root}/platform/service/power_manager/src/common/",
       "${efr32_sdk_root}/platform/service/power_manager/src/sleep_loop/",
+      "${efr32_sdk_root}/platform/service/sl_main/inc",
+      "${efr32_sdk_root}/platform/service/sl_main/src",
       "${efr32_sdk_root}/platform/service/sleeptimer/inc",
-      "${efr32_sdk_root}/platform/service/system/inc",
       "${efr32_sdk_root}/platform/service/udelay/inc",
       "${efr32_sdk_root}/platform/service/legacy_hal/inc",
       "${efr32_sdk_root}/platform/middleware/glib",
@@ -247,6 +249,7 @@ template("efr32_sdk") {
       "${sl_ot_platform_abstraction}/rtos",
       "${efr32_sdk_root}/protocol/openthread/include",
       "${efr32_sdk_root}/util/third_party/openthread/include",
+      "${efr32_sdk_root}/util/third_party/openthread/src/include",
       "${efr32_sdk_root}/util/third_party/openthread/src/core",
       "${efr32_sdk_root}/util/third_party/openthread/examples/platforms/",
       "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}/config",
@@ -279,9 +282,12 @@ template("efr32_sdk") {
           "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/bgstack/release/libbondingdb_stub.a",
           "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi.a",
           "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_bgapi/release/libble_bgapi_stub_gatt_client.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/ble_system/release/libble_system.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/connection_subrating/release/libble_host_connection_subrating_stub.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/core/release/libble_host_core.a",
           "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/hal/release/libble_host_hal_series2.a",
           "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/hci/release/libble_host_hci.a",
-          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/system/release/libble_system.a",
+          "${matter_support_root}/sdk-copies/protocol/bluetooth/build/gcc/cortex-m33/ble_host/system/release/libble_host_system.a",
         ]
       }
     }
@@ -367,6 +373,7 @@ template("efr32_sdk") {
 
         # wifi component
         "${wifi_sdk_root}/components/protocol/wifi/inc",
+        "${wifi_sdk_root}/components/sli_wifi_command_engine/inc",
 
         # si91x_support component
         "${wifi_sdk_root}/components/si91x_support/inc",
@@ -494,6 +501,9 @@ template("efr32_sdk") {
       "SL_CSL_TIMEOUT=${sl_ot_csl_timeout_sec}",
       "CIRCULAR_QUEUE_USE_LOCAL_CONFIG_HEADER=1",
       "SILABS_LOG_OUT_UART=${sl_uart_log_output}",
+      "SL_RAIL_3_API=1",
+      "SL_CODE_COMPONENT_OPENTHREAD=openthread",
+      "SL_CODE_COMPONENT_INTERRUPT_MANAGER=interrupt_manager",
     ]
 
     if (silabs_log_enabled && chip_logging) {
@@ -589,6 +599,7 @@ template("efr32_sdk") {
           "SLI_SI917=1",
           "CHIP_9117",
           "SL_WIFI_COMPONENT_INCLUDED",
+          "SLI_SI91X_LWIP_HOSTED_NETWORK_STACK",
         ]
       } else if (use_wf200) {
         defines += [
@@ -724,7 +735,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_page.c",
       "${efr32_sdk_root}/platform/emdrv/nvm3/src/nvm3_utils.c",
       "${efr32_sdk_root}/platform/emlib/src/em_cmu.c",
-      "${efr32_sdk_root}/platform/emlib/src/em_core.c",
       "${efr32_sdk_root}/platform/emlib/src/em_crypto.c",
       "${efr32_sdk_root}/platform/emlib/src/em_emu.c",
       "${efr32_sdk_root}/platform/emlib/src/em_gpio.c",
@@ -774,16 +784,17 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_region.c",
       "${efr32_sdk_root}/platform/service/memory_manager/src/sl_memory_manager_retarget.c",
       "${efr32_sdk_root}/platform/service/memory_manager/src/sli_memory_manager_common.c",
-      "${efr32_sdk_root}/platform/service/mpu/src/sl_mpu.c",
       "${efr32_sdk_root}/platform/service/power_manager/src/common/sl_power_manager_common.c",
       "${efr32_sdk_root}/platform/service/power_manager/src/common/sl_power_manager_em4.c",
       "${efr32_sdk_root}/platform/service/power_manager/src/common/sl_power_manager_execution_modes.c",
       "${efr32_sdk_root}/platform/service/power_manager/src/sleep_loop/sl_power_manager.c",
       "${efr32_sdk_root}/platform/service/power_manager/src/sleep_loop/sl_power_manager_debug.c",
+      "${efr32_sdk_root}/platform/service/sl_main/src/rtos/main_retarget.c",
+      "${efr32_sdk_root}/platform/service/sl_main/src/sl_main_init.c",
+      "${efr32_sdk_root}/platform/service/sl_main/src/sl_main_init_memory.c",
+      "${efr32_sdk_root}/platform/service/sl_main/src/sl_main_kernel.c",
       "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
       "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_rtcc.c",
-      "${efr32_sdk_root}/platform/service/system/src/sl_system_init.c",
-      "${efr32_sdk_root}/platform/service/system/src/sl_system_kernel.c",
       "${efr32_sdk_root}/platform/service/udelay/src/sl_udelay.c",
       "${efr32_sdk_root}/platform/service/udelay/src/sl_udelay_armv6m_gcc.S",
       "${efr32_sdk_root}/util/plugin/security_manager/security_manager.c",
@@ -793,7 +804,7 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/util/third_party/freertos/kernel/event_groups.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/list.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/MemMang/heap_3.c",
-      "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/SiliconLabs/tick_power_manager.c",
+      "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/SiliconLabs/cortexm/tick_power_manager.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/queue.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/stream_buffer.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/tasks.c",
@@ -862,6 +873,7 @@ template("efr32_sdk") {
       "${silabs_gen_folder}/autogen/sl_board_default_init.c",
       "${silabs_gen_folder}/autogen/sl_event_handler.c",
       "${silabs_gen_folder}/autogen/sl_iostream_handles.c",
+      "${silabs_gen_folder}/main.c",
     ]
     if (enable_dic) {
       sources += [
@@ -912,6 +924,8 @@ template("efr32_sdk") {
       }
     } else {
       sources += [
+        "${efr32_sdk_root}/protocol/bluetooth/bgstack/ll/src/sl_btctrl_init.c",
+        "${efr32_sdk_root}/protocol/bluetooth/bgstack/ll/src/sl_btctrl_init_tasklets.c",
         "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_rtos_adaptation.c",
         "${efr32_sdk_root}/protocol/bluetooth/src/sl_bt_stack_init.c",
         "${efr32_sdk_root}/protocol/bluetooth/src/sli_bt_advertiser_config.c",
@@ -1079,8 +1093,10 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/service/clock_manager/src/sl_clock_manager_init_hal_s2.c",
         "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_dcdc_s2.c",
         "${efr32_sdk_root}/platform/service/hfxo_manager/src/sl_hfxo_manager_hal_s2.c",
+        "${efr32_sdk_root}/platform/service/mpu/src/sl_mpu_s2.c",
         "${efr32_sdk_root}/platform/service/power_manager/src/sleep_loop/sl_power_manager_hal_s2.c",
         "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_sysrtc.c",
+        "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/mpu_wrappers_v2_asm.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c",
         "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c",
       ]

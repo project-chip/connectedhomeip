@@ -47,6 +47,8 @@ public:
         return LogEvent(event, mEndpointId, eventNumber);
     }
 
+    EndpointId GetEndpointId() const { return mEndpointId; }
+
 private:
     EndpointId mEndpointId = kInvalidEndpointId;
 };

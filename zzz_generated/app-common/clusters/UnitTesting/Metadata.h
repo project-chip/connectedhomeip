@@ -227,6 +227,11 @@ namespace GlobalStruct {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(GlobalStruct::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace GlobalStruct
+namespace UnsupportedAttributeRequiringAdminPrivilege {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(UnsupportedAttributeRequiringAdminPrivilege::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(),
+                                                          Access::Privilege::kAdminister, Access::Privilege::kAdminister);
+} // namespace UnsupportedAttributeRequiringAdminPrivilege
 namespace Unsupported {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Unsupported::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);

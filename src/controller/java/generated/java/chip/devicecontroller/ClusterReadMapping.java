@@ -19237,17 +19237,28 @@ public class ClusterReadMapping {
           readCommodityMeteringMeteredQuantityTimestampCommandParams
         );
         result.put("readMeteredQuantityTimestampAttribute", readCommodityMeteringMeteredQuantityTimestampAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readCommodityMeteringTariffUnitCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readCommodityMeteringTariffUnitAttributeInteractionInfo = new InteractionInfo(
+     Map<String, CommandParameterInfo> readCommodityMeteringMeasurementTypeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommodityMeteringMeasurementTypeAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
-            ((ChipClusters.CommodityMeteringCluster) cluster).readTariffUnitAttribute(
-              (ChipClusters.CommodityMeteringCluster.TariffUnitAttributeCallback) callback
+            ((ChipClusters.CommodityMeteringCluster) cluster).readMeasurementTypeAttribute(
+              (ChipClusters.CommodityMeteringCluster.MeasurementTypeAttributeCallback) callback
             );
           },
-          () -> new ClusterInfoMapping.DelegatedCommodityMeteringClusterTariffUnitAttributeCallback(),
-          readCommodityMeteringTariffUnitCommandParams
+          () -> new ClusterInfoMapping.DelegatedCommodityMeteringClusterMeasurementTypeAttributeCallback(),
+          readCommodityMeteringMeasurementTypeCommandParams
         );
-        result.put("readTariffUnitAttribute", readCommodityMeteringTariffUnitAttributeInteractionInfo);
+        result.put("readMeasurementTypeAttribute", readCommodityMeteringMeasurementTypeAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readCommodityMeteringMaximumMeteredQuantitiesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readCommodityMeteringMaximumMeteredQuantitiesAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.CommodityMeteringCluster) cluster).readMaximumMeteredQuantitiesAttribute(
+              (ChipClusters.CommodityMeteringCluster.MaximumMeteredQuantitiesAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedCommodityMeteringClusterMaximumMeteredQuantitiesAttributeCallback(),
+          readCommodityMeteringMaximumMeteredQuantitiesCommandParams
+        );
+        result.put("readMaximumMeteredQuantitiesAttribute", readCommodityMeteringMaximumMeteredQuantitiesAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readCommodityMeteringGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readCommodityMeteringGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -19824,6 +19835,17 @@ public class ClusterReadMapping {
           readUnitTestingGlobalEnumCommandParams
         );
         result.put("readGlobalEnumAttribute", readUnitTestingGlobalEnumAttributeInteractionInfo);
+     Map<String, CommandParameterInfo> readUnitTestingUnsupportedAttributeRequiringAdminPrivilegeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+        InteractionInfo readUnitTestingUnsupportedAttributeRequiringAdminPrivilegeAttributeInteractionInfo = new InteractionInfo(
+          (cluster, callback, commandArguments) -> {
+            ((ChipClusters.UnitTestingCluster) cluster).readUnsupportedAttributeRequiringAdminPrivilegeAttribute(
+              (ChipClusters.BooleanAttributeCallback) callback
+            );
+          },
+          () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+          readUnitTestingUnsupportedAttributeRequiringAdminPrivilegeCommandParams
+        );
+        result.put("readUnsupportedAttributeRequiringAdminPrivilegeAttribute", readUnitTestingUnsupportedAttributeRequiringAdminPrivilegeAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readUnitTestingUnsupportedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readUnitTestingUnsupportedAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
