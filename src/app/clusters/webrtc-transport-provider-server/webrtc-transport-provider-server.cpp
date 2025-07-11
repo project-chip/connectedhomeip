@@ -338,7 +338,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
         }
     }
 
-    // Check resource management and stream priorities. If the IDs are Null the delegate will populate with 
+    // Check resource management and stream priorities. If the IDs are Null the delegate will populate with
     // a stream that matches the stream usage
     CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreamID, audioStreamID);
     if (err != CHIP_NO_ERROR)

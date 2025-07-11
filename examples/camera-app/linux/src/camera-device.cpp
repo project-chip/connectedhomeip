@@ -1000,7 +1000,7 @@ CameraError CameraDevice::SetHDRMode(bool hdrMode)
     return CameraError::SUCCESS;
 }
 
-CameraError CameraDevice::SetStreamUsagePriorities(std::vector<StreamUsageEnum> streamUsagePriorities) 
+CameraError CameraDevice::SetStreamUsagePriorities(std::vector<StreamUsageEnum> streamUsagePriorities)
 {
     mStreamUsagePriorities = streamUsagePriorities;
 

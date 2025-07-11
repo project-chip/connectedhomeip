@@ -67,7 +67,7 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
         return CHIP_ERROR_NOT_FOUND;
     }
 
-    if (videoStreamId.HasValue()) 
+    if (videoStreamId.HasValue())
     {
         const std::vector<VideoStreamStruct> & allocatedVideoStreams = GetCameraAVStreamMgmtServer()->GetAllocatedVideoStreams();
         if (videoStreamId.Value().IsNull())
@@ -82,7 +82,7 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
                 }
             }
         }
-        else 
+        else
         {
             for (const auto & stream : allocatedVideoStreams)
             {
@@ -95,7 +95,7 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
         }
     }
 
-    if (audioStreamId.HasValue()) 
+    if (audioStreamId.HasValue())
     {
         const std::vector<AudioStreamStruct> & allocatedAudioStreams = GetCameraAVStreamMgmtServer()->GetAllocatedAudioStreams();
         if (audioStreamId.Value().IsNull())
@@ -110,7 +110,7 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
                 }
             }
         }
-        else 
+        else
         {
             for (const auto & stream : allocatedAudioStreams)
             {
