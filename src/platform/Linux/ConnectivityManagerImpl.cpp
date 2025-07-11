@@ -1853,8 +1853,7 @@ CHIP_ERROR ConnectivityManagerImpl::GetConfiguredNetwork(NetworkCommissioning::N
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    const gchar * networkPath = wpa_supplicant_1_interface_get_current_network(mWpaSupplicant.iface.get());
-
+    const char * networkPath = wpa_supplicant_1_interface_get_current_network(mWpaSupplicant.iface.get());
     // wpa_supplicant DBus API: if network path of current network is "/", means no networks is currently selected.
     if ((networkPath == nullptr) || (strcmp(networkPath, "/") == 0))
     {
@@ -1863,13 +1862,13 @@ CHIP_ERROR ConnectivityManagerImpl::GetConfiguredNetwork(NetworkCommissioning::N
 
     GAutoPtr<WpaSupplicant1Network> networkInfo(wpa_supplicant_1_network_proxy_new_for_bus_sync(
         G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, networkPath, nullptr, &err.GetReceiver()));
-    if (networkInfo == nullptr)
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
+    VerifyOrReturnError(networkInfo, CHIP_ERROR_INTERNAL,
+                        ChipLogError(DeviceLayer, "WPA supplicant: Failed to create network proxy: %s", err->message));
 
     network.connected     = wpa_supplicant_1_network_get_enabled(networkInfo.get());
     GVariant * properties = wpa_supplicant_1_network_get_properties(networkInfo.get());
+    VerifyOrReturnError(properties != nullptr, CHIP_ERROR_KEY_NOT_FOUND);
+
     GAutoPtr<GVariant> ssid(g_variant_lookup_value(properties, "ssid", nullptr));
     gsize length;
     const gchar * ssidStr = g_variant_get_string(ssid.get(), &length);
