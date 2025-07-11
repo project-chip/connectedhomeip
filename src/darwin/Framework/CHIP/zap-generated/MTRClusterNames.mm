@@ -5641,6 +5641,22 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"SetpointHoldExpiryTimestamp";
             break;
 
+        case MTRAttributeIDTypeClusterThermostatAttributeMaxThermostatSuggestionsID:
+            result = @"MaxThermostatSuggestions";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeThermostatSuggestionsID:
+            result = @"ThermostatSuggestions";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeCurrentThermostatSuggestionID:
+            result = @"CurrentThermostatSuggestion";
+            break;
+
+        case MTRAttributeIDTypeClusterThermostatAttributeThermostatSuggestionNotFollowingReasonID:
+            result = @"ThermostatSuggestionNotFollowingReason";
+            break;
+
         case MTRAttributeIDTypeClusterThermostatAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -8969,8 +8985,12 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"MeteredQuantityTimestamp";
             break;
 
-        case MTRAttributeIDTypeClusterCommodityMeteringAttributeTariffUnitID:
-            result = @"TariffUnit";
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeMeasurementTypeID:
+            result = @"MeasurementType";
+            break;
+
+        case MTRAttributeIDTypeClusterCommodityMeteringAttributeMaximumMeteredQuantitiesID:
+            result = @"MaximumMeteredQuantities";
             break;
 
         case MTRAttributeIDTypeClusterCommodityMeteringAttributeGeneratedCommandListID:
@@ -9199,6 +9219,10 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
 
         case MTRAttributeIDTypeClusterUnitTestingAttributeGlobalStructID:
             result = @"GlobalStruct";
+            break;
+
+        case MTRAttributeIDTypeClusterUnitTestingAttributeUnsupportedAttributeRequiringAdminPrivilegeID:
+            result = @"UnsupportedAttributeRequiringAdminPrivilege";
             break;
 
         case MTRAttributeIDTypeClusterUnitTestingAttributeUnsupportedID:
@@ -10992,6 +11016,14 @@ NSString * MTRRequestCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDTy
 
         case MTRCommandIDTypeClusterThermostatCommandSetActivePresetRequestID:
             result = @"SetActivePresetRequest";
+            break;
+
+        case MTRCommandIDTypeClusterThermostatCommandAddThermostatSuggestionID:
+            result = @"AddThermostatSuggestion";
+            break;
+
+        case MTRCommandIDTypeClusterThermostatCommandRemoveThermostatSuggestionID:
+            result = @"RemoveThermostatSuggestion";
             break;
 
         case MTRCommandIDTypeClusterThermostatCommandAtomicRequestID:
@@ -13352,6 +13384,10 @@ NSString * MTRResponseCommandNameForID(MTRClusterIDType clusterID, MTRCommandIDT
             result = @"GetWeeklyScheduleResponse";
             break;
 
+        case MTRCommandIDTypeClusterThermostatCommandAddThermostatSuggestionResponseID:
+            result = @"AddThermostatSuggestionResponse";
+            break;
+
         case MTRCommandIDTypeClusterThermostatCommandAtomicResponseID:
             result = @"AtomicResponse";
             break;
@@ -15423,6 +15459,39 @@ NSString * MTREventNameForID(MTRClusterIDType clusterID, MTREventIDType eventID)
     case MTRClusterIDTypeThermostatID:
 
         switch (eventID) {
+
+            // Cluster Thermostat events
+        case MTREventIDTypeClusterThermostatEventSystemModeChangeID:
+            result = @"SystemModeChange";
+            break;
+
+        case MTREventIDTypeClusterThermostatEventLocalTemperatureChangeID:
+            result = @"LocalTemperatureChange";
+            break;
+
+        case MTREventIDTypeClusterThermostatEventOccupancyChangeID:
+            result = @"OccupancyChange";
+            break;
+
+        case MTREventIDTypeClusterThermostatEventSetpointChangeID:
+            result = @"SetpointChange";
+            break;
+
+        case MTREventIDTypeClusterThermostatEventRunningStateChangeID:
+            result = @"RunningStateChange";
+            break;
+
+        case MTREventIDTypeClusterThermostatEventRunningModeChangeID:
+            result = @"RunningModeChange";
+            break;
+
+        case MTREventIDTypeClusterThermostatEventActiveScheduleChangeID:
+            result = @"ActiveScheduleChange";
+            break;
+
+        case MTREventIDTypeClusterThermostatEventActivePresetChangeID:
+            result = @"ActivePresetChange";
+            break;
 
         default:
             result = [NSString stringWithFormat:@"<Unknown eventID %u>", eventID];

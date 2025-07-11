@@ -23,19 +23,12 @@
 #include "closure-dimension-cluster-objects.h"
 #include "closure-dimension-delegate.h"
 #include "closure-dimension-matter-context.h"
+#include <app/cluster-building-blocks/QuieterReporting.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ClosureDimension {
-
-/**
- * @brief Closure dimension feature optional attribute enum class
- */
-enum class OptionalAttributeEnum : uint32_t
-{
-    kOverflow = 0x1
-};
 
 /**
  * @brief Structure is used to configure and validate the Cluster configuration.
@@ -45,9 +38,6 @@ struct ClusterConformance
 {
     BitFlags<Feature> & FeatureMap() { return mFeatureMap; }
     const BitFlags<Feature> & FeatureMap() const { return mFeatureMap; }
-
-    BitFlags<OptionalAttributeEnum> & OptionalAttributes() { return mOptionalAttributes; }
-    const BitFlags<OptionalAttributeEnum> & OptionalAttributes() const { return mOptionalAttributes; }
 
     inline bool HasFeature(Feature aFeature) const { return mFeatureMap.Has(aFeature); }
 
@@ -96,33 +86,11 @@ struct ClusterConformance
             ChipLogError(AppServer, "Validation failed: Only one of Translation, Rotation or Modulation feature can be enabled.");
             return false;
         }
-
-        // If the Overflow Attribute is supported, at least one of Rotation or MotionLatching must be supported.
-        if (mOptionalAttributes.Has(OptionalAttributeEnum::kOverflow))
-        {
-            VerifyOrReturnValue(
-                HasFeature(Feature::kRotation) || HasFeature(Feature::kMotionLatching), false,
-                ChipLogError(NotSpecified,
-                             "Validation failed: If the Overflow attribute is supported, at least one of Rotation or "
-                             "MotionLatching must be supported."));
-        }
-
-        // If Rotation feature is supported, the Overflow attribute must be supported.
-        if (HasFeature(Feature::kRotation))
-        {
-            VerifyOrReturnValue(
-                mOptionalAttributes.Has(OptionalAttributeEnum::kOverflow), false,
-                ChipLogError(
-                    NotSpecified,
-                    "Validation failed: If the Rotation feature is supported, then Overflow Attribute must be supported."));
-        }
-
         return true;
     }
 
 private:
     BitFlags<Feature> mFeatureMap;
-    BitFlags<OptionalAttributeEnum> mOptionalAttributes;
 };
 
 /**
@@ -387,6 +355,11 @@ private:
     ClusterConformance mConformance;
     DelegateBase & mDelegate;
     MatterContext & mMatterContext;
+
+    // At Present, QuieterReportingAttribute doesnt support Structs.
+    // So, this variable will be used for Quietreporting of current state position.
+    // TODO: Refactor CurrentState Atrribute to use QuieterReportingAttribute once Issue#39801 is resolved
+    QuieterReportingAttribute<Percent100ths> quietReportableCurrentStatePosition{ DataModel::NullNullable };
 };
 
 } // namespace ClosureDimension
