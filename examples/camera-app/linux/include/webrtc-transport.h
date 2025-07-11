@@ -50,12 +50,34 @@ public:
     // Set audio track for the transport
     void SetAudioTrack(std::shared_ptr<WebRTCTrack> audioTrack);
 
+    void SetVideoStreamID(uint16_t videoStreamID);
+
+    void SetAudioStreamID(uint16_t audioStreamID);
+
+    uint16_t GetAudioStreamID() { return mAudioStreamID; }
+
+    uint16_t GetVideoStreamID() { return mVideoStreamID; }
+
+    std::shared_ptr<WebRTCPeerConnection> GetPeerConnection() { return mPeerConnection; }
+
+    std::string GetSdpAnswer() { return mSdpAnswer; }
+
+    void SetSdpAnswer(std::string sdpAnswer) { mSdpAnswer = sdpAnswer; }
+
+    std::vector<std::string> GetCandidates() { return mLocalCandidates; }
+
+    void SetCandidates(std::vector<std::string> candidates) { mLocalCandidates = candidates; }
+
 private:
     uint16_t mSessionID;
+    uint16_t mVideoStreamID;
+    uint16_t mAudioStreamID;
     uint64_t mNodeID;
     uint32_t mAudioSampleTimestamp;
     uint32_t mVideoSampleTimestamp;
     std::shared_ptr<WebRTCPeerConnection> mPeerConnection;
     std::shared_ptr<WebRTCTrack> mVideoTrack;
     std::shared_ptr<WebRTCTrack> mAudioTrack;
+    std::string mSdpAnswer;
+    std::vector<std::string> mLocalCandidates;
 };
