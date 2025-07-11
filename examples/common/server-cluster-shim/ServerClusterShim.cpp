@@ -159,6 +159,17 @@ DataModel::AcceptedCommandEntry AcceptedCommandEntryFor(const ConcreteCommandPat
     return entry;
 }
 
+bool PathsContainsOrLogError(const ConcreteClusterPath & path, ServerClusterInterface & serverCluster)
+{
+    if (!serverCluster.PathsContains({ path.mEndpointId, path.mClusterId }))
+    {
+        ChipLogError(DataManagement, "[Configuration Error] The cluster path has not been added to this "
+            "ServerClusterShim instance: Endpoint=0x%x Cluster " ChipLogFormatMEI, path.mEndpointId, ChipLogValueMEI(path.mClusterId));
+        return false;
+    }
+    return true;
+}
+
 } // namespace
 
 ServerClusterShim::~ServerClusterShim() {}
@@ -181,6 +192,7 @@ DataVersion ServerClusterShim::GetDataVersion(const ConcreteClusterPath & path) 
     {
         return *versionPtr;
     }
+    // Should not happen. We don't have a way to return error on this API.
     return 0;
 }
 
@@ -245,11 +257,10 @@ DataModel::ActionReturnStatus ServerClusterShim::ReadAttribute(const DataModel::
                     (*status == Status::UnsupportedAttribute));
         return *status;
     }
-
-    // The path exists in ember storage but was not added by the user to the ServerClusterShim instance
-    if (!PathsContains({ request.path.mEndpointId, request.path.mClusterId }))
+    
+    if (!PathsContainsOrLogError({ request.path.mEndpointId, request.path.mClusterId }, *this))
     {
-        return Status::UnsupportedEndpoint;
+        return Status::Failure;
     }
 
     // Read via AAI
@@ -314,10 +325,9 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
         return *status;
     }
 
-    // The path might exist in ember storage but was not added by the user to the ServerClusterShim instance
-    if (!PathsContains({ request.path.mEndpointId, request.path.mClusterId }))
+    if (!PathsContainsOrLogError({ request.path.mEndpointId, request.path.mClusterId }, *this))
     {
-        return Status::UnsupportedEndpoint;
+        return Status::Failure;
     }
 
     const EmberAfAttributeMetadata ** attributeMetadata = std::get_if<const EmberAfAttributeMetadata *>(&metadata);
@@ -419,15 +429,9 @@ std::optional<ActionReturnStatus> ServerClusterShim::InvokeCommand(const InvokeR
         }
     }
 
-    // If path was not added by the user to the ServerClusterShim instance, return UnsupportedEndpoint.
-    if (!PathsContains({ request.path.mEndpointId, request.path.mClusterId }))
+    if (!PathsContainsOrLogError({ request.path.mEndpointId, request.path.mClusterId }, *this))
     {
-        ChipLogError(Zcl, "InvokeCommand: Cluster path not found in ServerClusterShim");
-        if (handler != nullptr)
-        {
-            handler->AddStatus(request.path, Status::UnsupportedEndpoint);
-        }
-        return Status::UnsupportedEndpoint;
+        return Status::Failure;
     }
 
     // Ember always sets the return in the handler
@@ -445,7 +449,7 @@ CHIP_ERROR ServerClusterShim::AcceptedCommands(const ConcreteClusterPath & path,
     VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
 
     // If path exists in ember storage but not added by the user to the ServerClusterShim instance
-    if (!PathsContains({ path.mEndpointId, path.mClusterId }))
+    if (!PathsContainsOrLogError({ path.mEndpointId, path.mClusterId }, *this))
     {
         return CHIP_ERROR_NOT_FOUND;
     }
@@ -533,7 +537,7 @@ CHIP_ERROR ServerClusterShim::GeneratedCommands(const ConcreteClusterPath & path
     VerifyOrReturnError(serverCluster != nullptr, CHIP_ERROR_NOT_FOUND);
 
     // If path exists in ember storage but not added by the user to the ServerClusterShim instance
-    if (!PathsContains({ path.mEndpointId, path.mClusterId }))
+    if (!PathsContainsOrLogError({ path.mEndpointId, path.mClusterId }, *this))
     {
         return CHIP_ERROR_NOT_FOUND;
     }

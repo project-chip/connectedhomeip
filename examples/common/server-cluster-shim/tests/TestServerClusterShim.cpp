@@ -336,7 +336,7 @@ TEST_F(TestServerClusterShim, TestWriteAttributeOnlyProvidedPathsAreValid)
 
     chip::Test::SetEmberReadOutput(Protocols::InteractionModel::Status::Success);
     // Expect unsupported cluster because the ServerClusterShim instance was initialized with path 1,1 only
-    ASSERT_EQ(invalid_cluster.WriteAttribute(test.GetRequest(), decoder), Status::UnsupportedEndpoint);
+    ASSERT_EQ(invalid_cluster.WriteAttribute(test.GetRequest(), decoder), Status::Failure);
 
     // Create another cluster with the valid paths for the write command
     ServerClusterShim valid_cluster({ { kMockEndpoint1, MockClusterId(1) }, { kMockEndpoint3, MockClusterId(4) } });
@@ -415,9 +415,9 @@ TEST_F(TestServerClusterShim, EmberAttributeReadOctetString)
     chip::Encoding::LittleEndian::Write16(p, 4);
     chip::Test::SetEmberReadOutput(ByteSpan(reinterpret_cast<const uint8_t *>(data), sizeof(data)));
 
-    // Read on invalid cluster, expect Status::UnsupportedCluster
+    // Read on invalid cluster, expect Status::Failure
     std::unique_ptr<AttributeValueEncoder> encoder = testRequest.StartEncoding();
-    ASSERT_EQ(invalid_cluster.ReadAttribute(testRequest.GetRequest(), *encoder), Status::UnsupportedEndpoint);
+    ASSERT_EQ(invalid_cluster.ReadAttribute(testRequest.GetRequest(), *encoder), Status::Failure);
 
     // Actual read via an encoder on the valid cluster
     ASSERT_EQ(valid_cluster.ReadAttribute(testRequest.GetRequest(), *encoder), CHIP_NO_ERROR);
@@ -509,7 +509,7 @@ TEST_F(TestServerClusterShim, EmberInvokeTest)
 
         // Using a handler set to nullptr as it is not used by the impl
         ASSERT_EQ(cluster_with_invalid_path.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr),
-                  Status::UnsupportedEndpoint);
+                  Status::Failure);
         EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre); // no dispatch expected
 
         ASSERT_EQ(cluster_with_valid_path.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr), std::nullopt);
@@ -526,7 +526,7 @@ TEST_F(TestServerClusterShim, EmberInvokeTest)
 
         // Using a handler set to nullptr as it is not used by the impl
         ASSERT_EQ(cluster_with_invalid_path.InvokeCommand(kInvokeRequest, tlvReader, /* handler = */ nullptr),
-                  Status::UnsupportedEndpoint);
+                  Status::Failure);
 
         EXPECT_EQ(chip::Test::DispatchCount(), kDispatchCountPre); // no dispatch expected
 
