@@ -397,10 +397,12 @@ class TC_ACL_2_5(MatterBaseTest):
                              f1,
                              "FabricIndex should be the current fabric index")
 
-        self.step(14)
         # Rerunning test using the legacy list writing mechanism
         if not force_legacy_encoding:
+            self.step(14)
             logging.info("*** Rerunning test using the legacy list writing mechanism now ***")
+        else:
+            self.skip_step(14)
 
     async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlExtensionChanged) -> int:
         event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
