@@ -2142,8 +2142,6 @@ void CameraAVStreamMgmtServer::HandleCaptureSnapshot(HandlerContext & ctx,
         return;
     }
 
-    ChipLogProgress(Zcl, "CameraAvStreamManagement: Snapshot image size received %lu", image.data.size());
-
     if (image.data.size() > kMaxSnapshotImageSize)
     {
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
