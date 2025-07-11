@@ -525,27 +525,6 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, 
     });
 }
 
-void ConnectivityManagerImpl::_OnWpaBssProxyReady(GObject * sourceObject, GAsyncResult * res)
-{
-    // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
-    // all D-Bus signals will be delivered to the GLib global default main context.
-    VerifyOrDie(g_main_context_get_thread_default() != nullptr);
-
-    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-
-    GAutoPtr<GError> err;
-    mWpaSupplicant.bss.reset(wpa_supplicant_1_bss_proxy_new_for_bus_finish(res, &err.GetReceiver()));
-    if (mWpaSupplicant.bss && err.get() == nullptr)
-    {
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant bss proxy");
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to create wpa_supplicant bss proxy %s: %s",
-                        mWpaSupplicant.interfacePath.get(), err ? err->message : "unknown error");
-    }
-}
-
 void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * sourceObject, GAsyncResult * res)
 {
     // When creating D-Bus proxy object, the thread default context must be initialized. Otherwise,
@@ -566,14 +545,6 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * sourceObject, GAsyn
             reinterpret_cast<GAsyncReadyCallback>(
                 +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
                     return self->_OnWpaInterfaceProxyReady(sourceObject_, res_);
-                }),
-            this);
-
-        wpa_supplicant_1_bss_proxy_new_for_bus(
-            G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, mWpaSupplicant.interfacePath.get(), nullptr,
-            reinterpret_cast<GAsyncReadyCallback>(
-                +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
-                    return self->_OnWpaBssProxyReady(sourceObject_, res_);
                 }),
             this);
     }
@@ -605,14 +576,6 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * sourceObject, GAsyn
                 reinterpret_cast<GAsyncReadyCallback>(
                     +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
                         return self->_OnWpaInterfaceProxyReady(sourceObject_, res_);
-                    }),
-                this);
-
-            wpa_supplicant_1_bss_proxy_new_for_bus(
-                G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, mWpaSupplicant.interfacePath.get(), nullptr,
-                reinterpret_cast<GAsyncReadyCallback>(
-                    +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
-                        return self->_OnWpaBssProxyReady(sourceObject_, res_);
                     }),
                 this);
         }
@@ -652,14 +615,6 @@ void ConnectivityManagerImpl::_OnWpaInterfaceAdded(WpaSupplicant1 * proxy, const
                     return self->_OnWpaInterfaceProxyReady(sourceObject_, res_);
                 }),
             this);
-
-        wpa_supplicant_1_bss_proxy_new_for_bus(
-            G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, mWpaSupplicant.interfacePath.get(), nullptr,
-            reinterpret_cast<GAsyncReadyCallback>(
-                +[](GObject * sourceObject_, GAsyncResult * res_, ConnectivityManagerImpl * self) {
-                    return self->_OnWpaBssProxyReady(sourceObject_, res_);
-                }),
-            this);
     }
 }
 
@@ -674,7 +629,6 @@ void ConnectivityManagerImpl::_OnWpaInterfaceRemoved(WpaSupplicant1 * proxy, con
 
         mWpaSupplicant.interfacePath.reset();
         mWpaSupplicant.iface.reset();
-        mWpaSupplicant.bss.reset();
 
         mWpaSupplicant.scanState = GDBusWpaSupplicant::WpaScanningState::IDLE;
     }

@@ -115,7 +115,6 @@ struct GDBusWpaSupplicant
     WpaScanningState scanState = WpaScanningState::IDLE;
     GAutoPtr<WpaSupplicant1> proxy;
     GAutoPtr<WpaSupplicant1Interface> iface;
-    GAutoPtr<WpaSupplicant1BSS> bss;
     GAutoPtr<char> interfacePath;
     GAutoPtr<char> networkPath;
 };
@@ -256,7 +255,6 @@ private:
     void _OnWpaInterfaceScanDone(WpaSupplicant1Interface * iface, gboolean success);
     void _OnWpaInterfaceReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
-    void _OnWpaBssProxyReady(GObject * sourceObject, GAsyncResult * res);
     CHIP_ERROR StartWiFiManagementSync();
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     OnConnectionCompleteFunct mOnPafSubscribeComplete;
