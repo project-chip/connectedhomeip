@@ -314,7 +314,7 @@ CHIP_ERROR Instance::Read(const ConcreteReadAttributePath & aPath, AttributeValu
         }
         else
         {
-            auto list = GetMeteredQuantity().Value();
+            auto & list = GetMeteredQuantity().Value();
             ReturnErrorOnFailure(aEncoder.EncodeList([&list](const auto & encoder) {
                 for (const auto & item : list)
                 {
