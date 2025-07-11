@@ -613,7 +613,8 @@ Protocols::InteractionModel::Status ClusterLogic::HandleCalibrate()
     // the server SHALL respond with a status code of SUCCESS.
     VerifyOrReturnValue(state != MainStateEnum::kCalibrating, Status::Success);
 
-    // If the Calibrate command is invoked in any state other than 'Stopped', the server shall respond with INVALID_IN_STATE.
+    // If the Calibrate command is invoked in any state other than Stopped or SetupRequired,
+    // the server SHALL respond with INVALID_IN_STATE and there SHALL be no other effect.
     // This check excludes the 'Calibrating' MainState as it is already validated above
     VerifyOrReturnError(state == MainStateEnum::kStopped || state == MainStateEnum::kSetupRequired, Status::InvalidInState);
 

@@ -324,7 +324,7 @@ CHIP_ERROR ClusterLogic::SetUnitRange(const DataModel::Nullable<Structs::UnitRan
         VerifyOrReturnError(unitRange.Value().max >= 0 && unitRange.Value().max <= 32767, CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    // If Unit is Degrees ,The maximum span range is 360 degrees.
+    // If Unit is Degrees the maximum span range is 360 degrees.
     if (unit == ClosureUnitEnum::kDegree)
     {
         VerifyOrReturnError(unitRange.Value().min >= -360 && unitRange.Value().min <= 360, CHIP_ERROR_INVALID_ARGUMENT);
