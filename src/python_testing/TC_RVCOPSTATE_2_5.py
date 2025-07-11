@@ -128,13 +128,12 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
                                                                    attribute=Clusters.RvcOperationalState.Attributes.OperationalState)
 
     async def read_operational_state_with_check(self, expected_operational_state):
-       operational_state = await self.read_operational_state(endpoint=self.endpoint)
-       asserts.assert_true(operational_state == expected_operational_state,
-                           # TODO:  nice conversion of states to strings
-                           f"Expected OperationalState of {expected_operational_state}, got {operational_state}"
-       )
-       return operational_state
-
+        operational_state = await self.read_operational_state(endpoint=self.endpoint)
+        asserts.assert_true(operational_state == expected_operational_state,
+                            # TODO:  nice conversion of states to strings
+                            f"Expected OperationalState of {expected_operational_state}, got {operational_state}"
+                            )
+        return operational_state
 
     async def send_change_to_mode_cmd(self, new_mode) -> Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
@@ -235,7 +234,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
             self.step("8")
             await self.send_go_home_cmd_with_check(Clusters.OperationalState.Enums.ErrorStateEnum.kNoError)
             await self.read_operational_state_with_check(Clusters.RvcOperationalState.Enums.OperationalStateEnum.kSeekingCharger)
-            
+
             # Manually confirm DUT has returned to the dock and completed docking-related activities
             self.step("9")
             if not self.is_ci:
