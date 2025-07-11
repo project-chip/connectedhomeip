@@ -37,14 +37,11 @@ set -x
 # Activate Matter environment
 source "../scripts/activate.sh"
 
-# Activate Zephyr environment
-[[ -n $ZEPHYR_BASE ]] && source "$ZEPHYR_BASE/zephyr-env.sh"
-
-# Use Zephyr SDK toolchain
-export ZEPHYR_TOOLCHAIN_VARIANT=zephyr
-
-if [[ -z "$ZEPHYR_SDK_INSTALL_DIR" && -n "$NRF5_TOOLS_ROOT" ]]; then
-    export ZEPHYR_SDK_INSTALL_DIR="$NRF5_TOOLS_ROOT"/zephyr-sdk-0.16.1
+if [[ -n "$NRF5_TOOLS_ROOT" ]]; then
+    NCS_REVISION=$(cat ../config/nrfconnect/.nrfconnect-recommended-revision)
+    nrfutil install sdk-manager
+    eval "$(nrfutil sdk-manager toolchain env --as-script --ncs-version "$NCS_REVISION" --install-dir "$NRF5_TOOLS_ROOT"/zephyr-sdk | grep -v "PYTHONHOME\|PYTHONPATH")"
+    pip3 install -e ../scripts/py_matter_idl
 fi
 
 # Set ccache base directory to improve the cache hit ratio
