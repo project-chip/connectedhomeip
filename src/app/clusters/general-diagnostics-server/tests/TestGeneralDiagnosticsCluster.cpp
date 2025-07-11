@@ -52,7 +52,7 @@ TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
         .enableActiveNetworkFaults   = false,
     };
 
-    GeneralDiagnosticsCluster<DeviceLayerGeneralDiagnosticsLogic> cluster(enabledAttributes);
+    GeneralDiagnosticsCluster<DeviceLayerGeneralDiagnosticsLogic, false> cluster(enabledAttributes);
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
 }
 
