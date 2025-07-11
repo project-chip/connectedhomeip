@@ -281,10 +281,7 @@ DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> ThermostatDele
 CHIP_ERROR ThermostatDelegate::SetThermostatSuggestionNotFollowingReason(
     const DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> & thermostatSuggestionNotFollowingReason)
 {
-    bool hasChanged = (mThermostatSuggestionNotFollowingReason.IsNull() && !thermostatSuggestionNotFollowingReason.IsNull()) ||
-        (!mThermostatSuggestionNotFollowingReason.IsNull() && thermostatSuggestionNotFollowingReason.IsNull()) ||
-        (!mThermostatSuggestionNotFollowingReason.IsNull() && !thermostatSuggestionNotFollowingReason.IsNull() &&
-         mThermostatSuggestionNotFollowingReason.Value() != thermostatSuggestionNotFollowingReason.Value());
+    bool hasChanged = (mThermostatSuggestionNotFollowingReason != thermostatSuggestionNotFollowingReason);
 
     if (hasChanged)
     {
