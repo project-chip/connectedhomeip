@@ -49,10 +49,8 @@ jobs:
       
       - name: Run mypy validation (ChipDeviceCtrl.py)
         run: |
-          OUTPUT=$(./scripts/run_in_python_env.sh out/venv \
-            mypy --config-file=src/python_testing/matter_testing_infrastructure/mypy.ini \
-                --follow-imports=skip src/controller/python/chip/ChipDeviceCtrl.py 2>&1)
-
+          OUTPUT=$(./scripts/run_in_python_env.sh out/venv "mypy --config-file=src/python_testing/matter_testing_infrastructure/mypy.ini --follow-imports=skip src/controller/python/chip/ChipDeviceCtrl.py" 2>&1)
+          
           echo "$OUTPUT"
 
           ERRORS=$(echo "$OUTPUT" | grep -E '^[^:]+:[0-9]+: error:' | wc -l)
@@ -64,7 +62,7 @@ jobs:
           else
             echo "No mypy errors found in ChipDeviceCtrl.py"
           fi
-          
+
             
       - name: Run mypy validation
         run: |
