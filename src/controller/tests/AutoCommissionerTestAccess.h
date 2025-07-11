@@ -38,9 +38,9 @@ class AutoCommissionerTestAccess
 {
 public:
     AutoCommissionerTestAccess() = delete;
-    AutoCommissionerTestAccess(chip::Controller::AutoCommissioner * commissioner) : mCommissioner(commissioner) {}
+    AutoCommissionerTestAccess(Controller::AutoCommissioner * commissioner) : mCommissioner(commissioner) {}
 
-    chip::Controller::CommissioningStage AccessGetNextCommissioningStageInternal(chip::Controller::CommissioningStage currentStage,
+    Controller::CommissioningStage AccessGetNextCommissioningStageInternal(Controller::CommissioningStage currentStage,
                                                                                  CHIP_ERROR & lastErr)
     {
         return mCommissioner->GetNextCommissioningStageInternal(currentStage, lastErr);
@@ -48,15 +48,8 @@ public:
     void SetBreadcrumb(uint64_t value) { mCommissioner->mDeviceCommissioningInfo.general.breadcrumb = value; }
     void SetUTCRequirements(bool requiresUTC) { mCommissioner->mDeviceCommissioningInfo.requiresUTC = requiresUTC; }
 
-    void AccessSetExecuteJCM(bool executeJCM)
-    {
-#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-        mCommissioner->mParams.SetExecuteJCM(executeJCM);
-#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    }
-
 private:
-    chip::Controller::AutoCommissioner * mCommissioner = nullptr;
+    Controller::AutoCommissioner * mCommissioner = nullptr;
 };
 
 } // namespace Test
