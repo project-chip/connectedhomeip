@@ -1,4 +1,4 @@
-/**
+/*
  *
  *    Copyright (c) 2025 Project CHIP Authors
  *
@@ -15,19 +15,8 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include <app/server/JointFabricAdministrator.h>
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <lib/core/DataModelTypes.h>
-#include <lib/support/CHIPMem.h>
-
-class JointFabricAdministratorServer
-{
-public:
-    static JointFabricAdministratorServer & GetInstance(void);
-
-private:
-    JointFabricAdministratorServer() {}
-
-    static JointFabricAdministratorServer sJointFabricAdministratorServerInstance;
-};
+namespace chip {
+namespace app {} // namespace app
+} // namespace chip
