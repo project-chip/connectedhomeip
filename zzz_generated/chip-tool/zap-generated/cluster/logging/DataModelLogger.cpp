@@ -21752,10 +21752,15 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("MeteredQuantityTimestamp", 1, value);
         }
-        case CommodityMetering::Attributes::TariffUnit::Id: {
-            chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TariffUnitEnum> value;
+        case CommodityMetering::Attributes::MeasurementType::Id: {
+            chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("TariffUnit", 1, value);
+            return DataModelLogger::LogValue("MeasurementType", 1, value);
+        }
+        case CommodityMetering::Attributes::MaximumMeteredQuantities::Id: {
+            chip::app::DataModel::Nullable<uint16_t> value;
+            ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
+            return DataModelLogger::LogValue("MaximumMeteredQuantities", 1, value);
         }
         case CommodityMetering::Attributes::GeneratedCommandList::Id: {
             chip::app::DataModel::DecodableList<chip::CommandId> value;
