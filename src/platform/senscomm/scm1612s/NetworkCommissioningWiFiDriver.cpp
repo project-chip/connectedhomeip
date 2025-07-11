@@ -175,7 +175,7 @@ CHIP_ERROR WiseWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen
 
     memcpy(req.ssid, ssid, ssidLen);
     memcpy(req.key, key, keyLen);
-    switch (mSavedNetwork.auth_mode)
+    switch (mStagingNetwork.auth_mode)
     {
         case 3:
         req.auth = SCM_WIFI_SECURITY_SAE;
@@ -195,12 +195,12 @@ CHIP_ERROR WiseWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen
 #if 0
     ChipLogProgress(NetworkProvisioning, "ssid: %s %d", ssid, ssidLen);
     ChipLogProgress(NetworkProvisioning, "key: %s %d", key, keyLen);
-    ChipLogProgress(NetworkProvisioning, "auth: %d", mSavedNetwork.auth_mode);
+    ChipLogProgress(NetworkProvisioning, "auth: %d", mStagingNetwork.auth_mode);
 #endif
 
     if (ret != WISE_OK)
     {
-        ChipLogProgress(NetworkProvisioning, "WiseWiFiDriver::ConnectWiFiNetwork failed");
+        ChipLogProgress(NetworkProvisioning, "scm_wifi_sta_set_config failed");
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -209,7 +209,13 @@ CHIP_ERROR WiseWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen
     //ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
     //ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled));
 
-    scm_wifi_sta_connect();
+    ChipLogProgress(DeviceLayer, "Attempting to connect WiFi station interface");
+    ret = scm_wifi_sta_connect();
+    if (ret != WISE_OK)
+    {
+        ChipLogError(DeviceLayer, "scm_wifi_connect() failed");
+        return CHIP_ERROR_INTERNAL;
+    }
 
     return CHIP_NO_ERROR;
 }

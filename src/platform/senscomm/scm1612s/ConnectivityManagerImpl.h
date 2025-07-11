@@ -95,7 +95,7 @@ private:
     void OnInternetConnectivityChangeEvent(const ChipDeviceEvent * event);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    CHIP_ERROR WiFiInit(void);
+    CHIP_ERROR InitWiFi(void);
     void _OnWiFiPlatformEvent(const ChipDeviceEvent * event);
 #endif
 

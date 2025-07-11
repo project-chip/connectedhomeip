@@ -60,7 +60,7 @@ using namespace ::chip::DeviceLayer::Internal;
 namespace chip {
 namespace DeviceLayer {
 
-CHIP_ERROR ConnectivityManagerImpl::WiFiInit(void)
+CHIP_ERROR ConnectivityManagerImpl::InitWiFi(void)
 {
     CHIP_ERROR err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 
@@ -85,7 +85,6 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiInit(void)
     if (!IsWiFiStationProvisioned())
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-
         ConfigureWiFiAP();
         ChangeWiFiAPState(kWiFiAPState_Activating);
 
@@ -96,7 +95,9 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiInit(void)
         SuccessOrExit(err);
 #endif
     }
+#if 0 /* Temporary fix!! */
     else
+#endif
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
         mWiFiStationMode  = kWiFiStationMode_Enabled;
@@ -454,8 +455,8 @@ void ConnectivityManagerImpl::DriveAPState(void)
     // address, assign one now.
     if (mWiFiAPState == kWiFiAPState_Active && scm_wifi_interface_up() && !scm_wifi_get_ipv6(&addr))
     {
-        esp_err_t error = scm_wifi_set_ipv6_addr(addr);
-        if (error != ESP_OK)
+        scm_err_t error = scm_wifi_set_ipv6_addr(addr);
+        if (error != WISE_OK)
         {
             ChipLogError(DeviceLayer, "create_ip6_linklocal() failed for %s interface",
                          "wlan1");
@@ -695,11 +696,10 @@ void ConnectivityManagerImpl::DriveStationState()
                 ret = scm_wifi_sta_connect();
                 if (ret != WISE_OK)
                 {
-                    ChipLogError(DeviceLayer, "esp_wifi_connect() failed");
+                    ChipLogError(DeviceLayer, "scm_wifi_connect() failed");
                     return;
-                    }
-
-                    ChangeWiFiStationState(kWiFiStationState_Connecting);
+                }
+                ChangeWiFiStationState(kWiFiStationState_Connecting);
             }
             // Otherwise arrange another connection attempt at a suitable point in the future.
             else
