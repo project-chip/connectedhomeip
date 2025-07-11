@@ -521,6 +521,7 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     if (ep < MATTER_ARRAY_SIZE(gDelegateTable))
     {
         gDelegateTable[ep] = delegate;
+        delegate->SetEndpointId(endpoint);
     }
 }
 

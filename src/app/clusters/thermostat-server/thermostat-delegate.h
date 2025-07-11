@@ -179,6 +179,7 @@ public:
      *        The delegate must ensure it makes a copy of the provided thermostat suggestion and the data
      *        of its preset handle.  For example, it could create a ThermostatSuggestionStructWithOwnedMembers
      *        from the provided thermostat suggestion.
+     *        Note: The caller of this API has the responsibility to mark the relevant attributes dirty.
      *
      * @param[in] thermostatSuggestion The thermostat suggestion to add to the list.
      *
@@ -191,7 +192,8 @@ public:
     /**
      * @brief Removes a suggestion from the ThermostatSuggestions attribute list maintained by the delegate.
      *        If the index being removed is the current thermostat suggestion, the server should set the CurrentThermostatSuggestion
-     * attribute to null.
+     *        attribute to null.
+     *        Note: The caller of this API has the responsibility to mark the relevant attributes dirty.
      *
      * @param[in] uniqueID The UniqueID of the thermostat suggestion to remove from the list.
      *

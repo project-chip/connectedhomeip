@@ -19,7 +19,7 @@
 
 using namespace chip;
 using namespace chip::app;
-using namespace DataModel;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::Thermostat::Structs;
 
 namespace chip {
@@ -78,7 +78,7 @@ CHIP_ERROR ThermostatSuggestionStructWithOwnedMembers::SetPresetHandle(const Byt
                      static_cast<unsigned>(newPresetHandleSize), static_cast<unsigned>(kThermostatSuggestionPresetHandleSize));
         return CHIP_ERROR_NO_MEMORY;
     }
-    MutableByteSpan targetSpan(presetHandleData);
+    MutableByteSpan targetSpan(mPresetHandleData);
     ReturnErrorOnFailure(CopySpanToMutableSpan(newPresetHandle, targetSpan));
 
     presetHandle = targetSpan;

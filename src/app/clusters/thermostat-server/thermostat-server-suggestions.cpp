@@ -31,6 +31,7 @@ using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::Protocols::InteractionModel;
+using namespace System::Clock;
 
 namespace chip {
 namespace app {
@@ -50,8 +51,6 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
         return true;
     }
 
-    ChipLogError(Zcl, "current timestamp is %u", currentMatterEpochTimestampInSeconds);
-
     EndpointId endpoint = commandPath.mEndpointId;
     auto delegate       = GetDelegate(endpoint);
     if (delegate == nullptr)
@@ -61,7 +60,18 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
         return true;
     }
 
-    delegate->SetEndpointId(endpoint);
+    // Check constraints for PresetHandle and ExpirationInMinutes field.
+    if (commandData.presetHandle.size() >= kThermostatSuggestionPresetHandleSize)
+    {
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
+
+    if (commandData.expirationInMinutes < 30 || commandData.expirationInMinutes > 1440)
+    {
+        commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
 
     // If the preset hande doesn't exist in the Presets attribute, return NOT_FOUND.
     if (!IsPresetHandlePresentInPresets(delegate, commandData.presetHandle))
@@ -103,12 +113,17 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to AppendToThermostatSuggestionsList with error: %" CHIP_ERROR_FORMAT, err.Format());
-        commandObj->AddStatus(commandPath, Status::InvalidCommand);
+        commandObj->AddStatus(commandPath, Status::Failure);
         return true;
     }
 
     MatterReportingAttributeChangeCallback(endpoint, Thermostat::Id, ThermostatSuggestions::Id);
 
+    Commands::AddThermostatSuggestionResponse::Type response;
+    response.uniqueID = uniqueID;
+    commandObj->AddResponse(commandPath, response);
+
+    // The re-evalaution is done after sending a response since the result of the re-evaluation doesn't affect the response.
     err = delegate->ReEvaluateCurrentSuggestion();
 
     if (err != CHIP_NO_ERROR)
@@ -116,9 +131,6 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
         ChipLogError(Zcl, "Failed to ReEvaluateCurrentSuggestion with error: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
-    Commands::AddThermostatSuggestionResponse::Type response;
-    response.uniqueID = uniqueID;
-    commandObj->AddResponse(commandPath, response);
     return true;
 }
 
@@ -133,8 +145,6 @@ bool RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteComma
         commandObj->AddStatus(commandPath, Status::InvalidInState);
         return true;
     }
-
-    delegate->SetEndpointId(endpoint);
 
     CHIP_ERROR err = delegate->RemoveFromThermostatSuggestionsList(commandData.uniqueID);
 
@@ -157,6 +167,7 @@ bool RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteComma
         return true;
     }
 
+    // The re-evalaution is done after sending a response since the result of the re-evaluation doesn't affect the response status.
     err = delegate->ReEvaluateCurrentSuggestion();
 
     if (err != CHIP_NO_ERROR)

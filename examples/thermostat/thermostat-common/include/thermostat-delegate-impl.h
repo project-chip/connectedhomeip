@@ -119,7 +119,7 @@ private:
      */
     size_t GetThermostatSuggestionIndexWithEarliestEffectiveTime(uint32_t currentMatterEpochTimestampInSeconds);
 
-    CHIP_ERROR StartExpirationTimer(uint32_t timeoutInMSecs);
+    CHIP_ERROR StartExpirationTimer(uint32_t timeoutInSecs);
 
     static void TimerExpiredCallback(System::Layer * systemLayer, void * appState);
 
