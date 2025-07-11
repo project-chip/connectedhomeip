@@ -64,6 +64,7 @@ jobs:
           else
             echo "No mypy errors found in ChipDeviceCtrl.py"
           fi
+          
             
       - name: Run mypy validation
         run: |
