@@ -20,7 +20,6 @@
 
 #include "camera-device-interface.h"
 #include "pushav-clip-recorder.h"
-#include "pushav-prerollbuffer.h"
 #include "pushav-uploader.h"
 #include "transport.h"
 
@@ -32,7 +31,6 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandlerInterface.h>
 #include <memory>
-#include <mutex>
 #include <protocols/interaction_model/StatusCode.h>
 #include <thread>
 #include <vector>
@@ -79,28 +77,25 @@ public:
 
     bool HandleTriggerDetected();
 
-    void StartTransport();
     void InitializeRecorder();
-    void SendPacketsToRecorder();
+    bool CanSendPacketsToRecorder();
     void readFromFile(char * filename, uint8_t ** videoBuffer, size_t * videoBufferBytes);
-    std::mutex mtx;
-    bool isRecorderInitialized = false;
-    bool isUploaderInitialized = false;
-    bool hasAugmented          = false;
-    bool mStreaming            = false;
-    std::chrono::steady_clock::time_point blindStartTime;
-    int vid                                      = 1;
-    std::unique_ptr<PushAVClipRecorder> recorder = nullptr;
-    std::unique_ptr<PushAVUploader> uploader     = nullptr;
 
 private:
+    bool isRecorderInitialized                   = false;
+    bool isUploaderInitialized                   = false;
+    bool hasAugmented                            = false;
+    bool mStreaming                              = false;
+    std::unique_ptr<PushAVClipRecorder> recorder = nullptr;
+    std::unique_ptr<PushAVUploader> uploader     = nullptr;
+    std::chrono::steady_clock::time_point blindStartTime;
     PushAVClipRecorder::ClipInfoStruct clipInfo;
     PushAVClipRecorder::AudioInfoStruct audioInfo;
     PushAVClipRecorder::VideoInfoStruct videoInfo;
-    PushAvPreRollBuffer * prerollBuffer;
     PushAVUploader::PushAVCertPath mCertPath;
     AudioStreamStruct audioStreamParams;
     VideoStreamStruct videoStreamParams;
+
     // Dummy implementation to indicate if video can be sent
     bool mCanSendVideo = false;
 

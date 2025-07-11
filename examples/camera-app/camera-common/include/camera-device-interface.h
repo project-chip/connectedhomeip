@@ -22,8 +22,8 @@
 #include <app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h>
 #include <app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h>
 #include <app/clusters/chime-server/chime-server.h>
-#include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
+// #include <app/clusters/push-av-stream-transport-server/push-av-stream-transport-cluster.h>
 
 using chip::app::Clusters::CameraAvStreamManagement::AudioCapabilitiesStruct;
 using chip::app::Clusters::CameraAvStreamManagement::AudioStreamStruct;
@@ -344,8 +344,6 @@ public:
         virtual int16_t GetTiltMin() = 0;
         virtual int16_t GetTiltMax() = 0;
         virtual uint8_t GetZoomMax() = 0;
-
-        // virtual void RegisterTransport(Transport * transport, uint16_t videoStreamID, uint16_t audioStreamID) = 0;
     };
 
     virtual CameraHALInterface & GetCameraHALInterface() = 0;

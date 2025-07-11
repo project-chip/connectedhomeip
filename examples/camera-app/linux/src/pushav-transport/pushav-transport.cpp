@@ -26,19 +26,13 @@ PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions
     ConfigureRecorderSettings(transportOptions, audioStreamParams, videoStreamParams);
     mConnectionID    = connectionID;
     mTransportStatus = TransportStatusEnum::kInactive;
-    if (!prerollBuffer && clipInfo.mPreRollLength > 0)
-    {
-        // TODO Fetch kMaxBufferContentSize from camera-device
-        int kMaxBufferContentSize = 4096;
-        prerollBuffer             = new PushAvPreRollBuffer(clipInfo.mPreRollLength, kMaxBufferContentSize);
-    }
 }
 
 const char * GetAudioCodecName(int codecId)
 {
     switch (codecId)
     {
-    case 8076 /*AV_CODEC_ID_OPUS*/:
+    case AV_CODEC_ID_OPUS:
         return "OPUS";
     default:
         return "Unknown";
@@ -49,7 +43,7 @@ const char * GetVideoCodecName(int codecId)
 {
     switch (codecId)
     {
-    case 27 /*AV_CODEC_ID_H264*/:
+    case AV_CODEC_ID_H264:
         return "H.264";
     default:
         return "Unknown";
@@ -67,7 +61,7 @@ void PrintTransportSettings(PushAVClipRecorder::ClipInfoStruct clipInfo, PushAVC
     ChipLogProgress(Camera, "Max Clip Duration: %d sec", clipInfo.mMaxClipDuration);
     ChipLogProgress(Camera, "Chunk Duration: %d sec", clipInfo.mChunkDuration);
     ChipLogProgress(Camera, "Blind Duration: %d sec", clipInfo.mBlindDuration);
-    ChipLogProgress(Camera, "PreRoll Length: %d sec", clipInfo.mPreRollLength);
+    ChipLogProgress(Camera, "PreRoll Length: %d ", clipInfo.mPreRollLength);
     ChipLogProgress(Camera, "URL: %s", clipInfo.mUrl.c_str());
     ChipLogProgress(Camera, "Trigger Type: %d", clipInfo.mTriggerType);
     ChipLogProgress(Camera, "Recorder ID: %s", clipInfo.mRecorderId.c_str());
@@ -132,7 +126,7 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
 
     if (audioCodec == 0)
     {
-        audioInfo.mAudioCodecId       = 8076 /*AV_CODEC_ID_OPUS*/;
+        audioInfo.mAudioCodecId       = AV_CODEC_ID_OPUS;
         audioInfo.mAudioTimeBase      = { 1, 48000 };
         audioInfo.mAudioFrameDuration = 19200;
     }
@@ -154,7 +148,7 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
     int8_t VideoCodec = static_cast<uint8_t>(mVideoStreamParams.videoCodec);
     if (VideoCodec == 0)
     {
-        videoInfo.mVideoCodecId  = 27 /*AV_CODEC_ID_H264*/;
+        videoInfo.mVideoCodecId  = AV_CODEC_ID_H264;
         videoInfo.mVideoTimeBase = { 1, 90000 };
     }
     else if (VideoCodec == 4)
@@ -199,11 +193,6 @@ PushAVTransport::~PushAVTransport()
     mCanSendAudio = false;
     recorder.reset();
     uploader.reset();
-    if (prerollBuffer)
-    {
-        prerollBuffer->~PushAvPreRollBuffer();
-        delete prerollBuffer;
-    }
 }
 
 bool InBlindPeriod(std::chrono::steady_clock::time_point blindStartTime, uint16_t blindDuration)
@@ -345,7 +334,6 @@ void PushAVTransport::setTransportStatus(TransportStatusEnum status)
                                                        std::chrono::steady_clock::now() - recorder->mClipInfo.activationTime)
                                                        .count();
         }
-        ChipLogProgress(Camera, "PushAVTransport pre roll buffer length %d", clipInfo.mPreRollLength);
     }
     else if (status == TransportStatusEnum::kInactive)
     {
@@ -360,69 +348,41 @@ void PushAVTransport::setTransportStatus(TransportStatusEnum status)
 
 bool PushAVTransport::IsStreaming()
 {
-    return mStreaming && (mTransportStatus == TransportStatusEnum::kActive);
+    return (mStreaming && (mTransportStatus == TransportStatusEnum::kActive));
 }
 
-bool IsValid(RawBufferPacket rawPacket)
-{
-    return rawPacket.data != nullptr && rawPacket.size > 0;
-}
-
-void PushAVTransport::SendPacketsToRecorder()
+bool PushAVTransport::CanSendPacketsToRecorder()
 {
     if (!IsStreaming())
     {
-        ChipLogProgress(Camera, "PushAVTransport not streaming");
-        return;
+        return false;
     }
     if (recorder->mDeinitializeRecorder.load()) // Current clip is completed, Next clip will start on trigger
     {
         recorder.reset();
         InitializeRecorder();
         mStreaming = false;
-        return;
+        return false;
     }
-
-    RawBufferPacket rawPacket = prerollBuffer->FetchPacket();
-
-    while (IsValid(rawPacket))
-    {
-        recorder->PushPacket(rawPacket.data, rawPacket.size, rawPacket.isVideo);
-        rawPacket = prerollBuffer->FetchPacket();
-    }
+    return true;
 }
 
 void PushAVTransport::SendVideo(const char * data, size_t size, uint16_t videoStreamID)
 {
-    if (mTransportTriggerType == TransportTriggerTypeEnum::kContinuous && mTransportStatus == TransportStatusEnum::kInactive)
-    {
-        return;
-    }
 
-    if (prerollBuffer)
+    if (CanSendPacketsToRecorder())
     {
-        prerollBuffer->AddPacket(
-            RawBufferPacket(data, size, std::chrono::steady_clock::now(), true, "v" + std::to_string(videoStreamID)));
+        recorder->PushPacket(data, size, 1);
     }
-
-    SendPacketsToRecorder();
 }
 
 void PushAVTransport::SendAudio(const char * data, size_t size, uint16_t audioStreamID)
 {
 
-    if (mTransportTriggerType == TransportTriggerTypeEnum::kContinuous && mTransportStatus == TransportStatusEnum::kInactive)
+    if (CanSendPacketsToRecorder())
     {
-        return;
+        recorder->PushPacket(data, size, 0);
     }
-
-    if (prerollBuffer)
-    {
-        prerollBuffer->AddPacket(
-            RawBufferPacket(data, size, std::chrono::steady_clock::now(), false, "a" + std::to_string(audioStreamID)));
-    }
-
-    SendPacketsToRecorder();
 }
 
 void PushAVTransport::SendAudioVideo(const char * data, size_t size, uint16_t videoStreamID, uint16_t audioStreamID) {}
