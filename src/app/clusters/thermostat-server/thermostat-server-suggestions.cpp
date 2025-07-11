@@ -150,7 +150,7 @@ bool RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteComma
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to RemoveFromThermostatSuggestionsList with uniqueID: %" PRIu32 " error: %" CHIP_ERROR_FORMAT,
+        ChipLogError(Zcl, "Failed to RemoveFromThermostatSuggestionsList with uniqueID: %u error: %" CHIP_ERROR_FORMAT,
                      commandData.uniqueID, err.Format());
         commandObj->AddStatus(commandPath, Status::NotFound);
         return true;

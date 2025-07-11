@@ -2903,10 +2903,10 @@ endpoint 1 {
     ram      attribute activePresetHandle;
     callback attribute presets;
     ram      attribute setpointHoldExpiryTimestamp;
-    ram      attribute maxThermostatSuggestions;
+    callback attribute maxThermostatSuggestions;
     callback attribute thermostatSuggestions;
     callback attribute currentThermostatSuggestion;
-    ram      attribute thermostatSuggestionNotFollowingReason;
+    callback attribute thermostatSuggestionNotFollowingReason;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
