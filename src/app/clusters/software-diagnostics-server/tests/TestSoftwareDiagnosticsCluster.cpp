@@ -47,6 +47,10 @@ public:
     }
     ~ScopedDiagnosticsProvider() { DeviceLayer::SetDiagnosticDataProvider(mOldProvider); }
 
+    ScopedDiagnosticsProvider(const ScopedDiagnosticsProvider &) = delete;
+    ScopedDiagnosticsProvider & operator=(const ScopedDiagnosticsProvider &) = delete;
+    ScopedDiagnosticsProvider(ScopedDiagnosticsProvider &&) = delete;
+    ScopedDiagnosticsProvider & operator=(ScopedDiagnosticsProvider &&) = delete;
 private:
     DeviceLayer::DiagnosticDataProvider * mOldProvider;
     T mProvider;
