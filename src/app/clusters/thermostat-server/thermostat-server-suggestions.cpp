@@ -65,6 +65,14 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
         return true;
     }
 
+    // If time is not synced, return INVALID_IN_STATE in the AddThermostatSuggestionResponse.
+    uint32_t currentMatterEpochTimestampInSeconds = 0;
+    if (System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds) != CHIP_NO_ERROR)
+    {
+        commandObj->AddStatus(commandPath, Status::InvalidInState);
+        return true;
+    }
+
     // If the preset hande doesn't exist in the Presets attribute, return NOT_FOUND.
     if (!IsPresetHandlePresentInPresets(delegate, commandData.presetHandle))
     {
@@ -76,14 +84,6 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
     if (delegate->GetNumberOfThermostatSuggestions() >= delegate->GetMaxThermostatSuggestions())
     {
         commandObj->AddStatus(commandPath, Status::ResourceExhausted);
-        return true;
-    }
-
-    // If time is not synced, return INVALID_IN_STATE in the AddThermostatSuggestionResponse.
-    uint32_t currentMatterEpochTimestampInSeconds = 0;
-    if (System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds) != CHIP_NO_ERROR)
-    {
-        commandObj->AddStatus(commandPath, Status::InvalidInState);
         return true;
     }
 
