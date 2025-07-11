@@ -14,7 +14,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-from ctypes import CFUNCTYPE, POINTER, c_char_p, c_int, c_uint8, c_uint64, c_void_p
+from ctypes import CFUNCTYPE, POINTER, c_char_p, c_int, c_uint8, c_uint16, c_uint64, c_void_p
 from dataclasses import dataclass, field
 from enum import Enum, auto
 
@@ -29,6 +29,7 @@ OnOfferCallbackFunct = CFUNCTYPE(c_int, c_uint64, c_char_p)
 OnAnswerCallbackFunct = CFUNCTYPE(c_int, c_uint64, c_char_p)
 OnICECandidatesCallbackFunct = CFUNCTYPE(c_int, c_uint64, POINTER(c_char_p), c_int)
 OnEndCallbackFunct = CFUNCTYPE(c_int, c_uint64, c_uint8)
+SessionIdCreatedCallbackFunct = CFUNCTYPE(None, c_uint16, c_uint64)
 
 
 class PeerConnectionState(Enum):

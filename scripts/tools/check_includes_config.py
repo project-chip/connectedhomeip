@@ -210,4 +210,5 @@ ALLOW: Dict[str, Set[str]] = {
     'src/controller/webrtc/WebRTC.h': {'string'},
     'src/controller/webrtc/WebRTCClient.h': {'map', 'string'},
     'src/controller/webrtc/WebRTCTransportRequestorManager.cpp': {'string', 'vector'},
+    'src/controller/webrtc/WebRTCTransportProviderManager.cpp': {'string', 'vector'},
 }
