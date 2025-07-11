@@ -1206,7 +1206,6 @@ limitations under the License.
                     <feature code="TAGLIST" name="TagList"></feature>
                 </features>
             </include>
-            <include cluster="Groups" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Identify" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
     </deviceType>

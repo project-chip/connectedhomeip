@@ -41,6 +41,7 @@ executable("air-quality-sensor-app") {
   deps = [
     "${chip_root}/examples/air-quality-sensor-app/air-quality-sensor-common",
     "${chip_root}/examples/platform/linux:app-main",
+    "${chip_root}/src/app/clusters/software-diagnostics-server:software-fault-listener",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/jsoncpp",
   ]

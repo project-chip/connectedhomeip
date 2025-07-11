@@ -388,17 +388,6 @@ private:
     bool IsSupportedMainState(MainStateEnum mainState) const;
 
     /**
-     * @brief Function validates if the requested mainState is a valid transition from the current state.
-     *        TODO: Add functionnal description of the state machine
-     *
-     * @param mainState requested main state to be applied
-     *
-     * @return true, transition from current to requested is valid
-     *         false, otherwise
-     */
-    bool IsValidMainStateTransition(MainStateEnum mainState) const;
-
-    /**
      * @brief Function validates if the requested overallCurrentState positioning is supported by the closure.
      *        Function validates against the FeatureMap conformance to validate support.
      *

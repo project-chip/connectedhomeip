@@ -150,7 +150,7 @@ class TC_CLDIM_4_2(MatterBaseTest):
                 try:
                     await self.send_single_cmd(
                         cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=False),
-                        endpoint=endpoint
+                        endpoint=endpoint, timedRequestTimeoutMs=1000
                     )
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -178,7 +178,7 @@ class TC_CLDIM_4_2(MatterBaseTest):
                     direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kUnknownEnumValue,
                     numberOfSteps=1
                 ),
-                endpoint=endpoint
+                endpoint=endpoint, timedRequestTimeoutMs=1000
             )
 
             asserts.fail("Expected ConstraintError for invalid Direction")
@@ -196,7 +196,7 @@ class TC_CLDIM_4_2(MatterBaseTest):
                         numberOfSteps=1,
                         speed=Globals.Enums.ThreeLevelAutoEnum.kUnknownEnumValue,
                     ),
-                    endpoint=endpoint
+                    endpoint=endpoint, timedRequestTimeoutMs=1000
                 )
 
                 asserts.fail("Expected ConstraintError for invalid Speed")
@@ -212,7 +212,7 @@ class TC_CLDIM_4_2(MatterBaseTest):
                     direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease,
                     numberOfSteps=0
                 ),
-                endpoint=endpoint
+                endpoint=endpoint, timedRequestTimeoutMs=1000
             )
 
             asserts.fail("Expected ConstraintError for NumberOfSteps = 0")

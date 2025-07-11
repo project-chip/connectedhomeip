@@ -34,12 +34,12 @@ namespace app {
  * Implementations of this interface are responsible for providing instances of ServerClusterInterface
  * for each server cluster they expose.
  */
-class EndpointProviderInterface
+class EndpointInterface
 {
 public:
-    virtual ~EndpointProviderInterface() = default;
+    virtual ~EndpointInterface() = default;
 
-    using SemanticTag = chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type;
+    using SemanticTag = Clusters::Descriptor::Structs::SemanticTagStruct::Type;
 
     virtual const DataModel::EndpointEntry & GetEndpointEntry() const = 0;
 
@@ -51,7 +51,7 @@ public:
 
     /**
      * @brief Retrieves a pointer to the ServerClusterInterface for the given cluster ID.
-     * The returned pointer shall be valid as long as the EndpointProviderInterface instance is valid.
+     * The returned pointer shall be valid as long as the EndpointInterface instance is valid.
      *
      * @param clusterId The ID of the server cluster to retrieve.
      * @return A pointer to the ServerClusterInterface if found, otherwise nullptr.
@@ -61,12 +61,12 @@ public:
     /**
      * @brief Populates the provided buffer with pointers to all ServerClusterInterface instances
      *        hosted on this endpoint. The returned pointers shall be valid as long as the
-     *        EndpointProviderInterface instance is valid.
+     *        EndpointInterface instance is valid.
      *
      * @param[out] out The buffer to fill with ServerClusterInterface pointers.
      * @return CHIP_NO_ERROR on success or CHIP_ERROR_NO_MEMORY if the buffer is too small.
      */
-    virtual CHIP_ERROR ServerClusterInterfaces(ReadOnlyBufferBuilder<ServerClusterInterface *> & out) const = 0;
+    virtual CHIP_ERROR ServerClusters(ReadOnlyBufferBuilder<ServerClusterInterface *> & out) const = 0;
 };
 
 } // namespace app

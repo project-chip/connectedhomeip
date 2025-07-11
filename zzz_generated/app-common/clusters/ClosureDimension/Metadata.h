@@ -72,12 +72,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(LatchControlModes::Id,
 
 namespace Commands {
 namespace SetTarget {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(SetTarget::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kOperate);
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(SetTarget::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
+                   Access::Privilege::kOperate);
 } // namespace SetTarget
 namespace Step {
-inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(Step::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kOperate);
+inline constexpr DataModel::AcceptedCommandEntry
+    kMetadataEntry(Step::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
+                   Access::Privilege::kOperate);
 } // namespace Step
 
 } // namespace Commands
