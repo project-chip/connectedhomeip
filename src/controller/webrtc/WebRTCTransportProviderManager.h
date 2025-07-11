@@ -87,7 +87,7 @@ private:
     int webRTCProviderDynamicEndpointId = 1;
 #endif
 
-    WebRTCTransportProviderManager() : mWebRTCProviderServer(*this, webRTCProviderDynamicEndpointId) {};
+    WebRTCTransportProviderManager() : mWebRTCProviderServer(*this, webRTCProviderDynamicEndpointId){};
     ~WebRTCTransportProviderManager() = default;
 
     chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderServer mWebRTCProviderServer;
