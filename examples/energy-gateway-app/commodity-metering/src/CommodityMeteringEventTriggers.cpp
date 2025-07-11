@@ -34,7 +34,7 @@ static constexpr uint32_t TariffComponents1[] = { 0x5001, 0x5003 };
 static constexpr uint32_t TariffComponents2[] = { 0x5002, 0x5003, 0x5004 };
 
 // Non-constexpr storage for the actual data
-static Structs::MeteredQuantityStruct::Type Data[] = {
+static const Structs::MeteredQuantityStruct::Type Data[] = {
     { DataModel::List<const uint32_t>(TariffComponents1, sizeof(TariffComponents1) / sizeof(TariffComponents1[0])), 3500 },
     { DataModel::List<const uint32_t>(TariffComponents2, sizeof(TariffComponents2) / sizeof(TariffComponents2[0])), -2000 }
 };
@@ -44,7 +44,7 @@ namespace Sample2 {
 static constexpr uint32_t TariffComponents1[] = { 0x6001 };
 static constexpr uint32_t TariffComponents2[] = { 0x6002, 0x6003 };
 
-static Structs::MeteredQuantityStruct::Type Data[] = {
+static const Structs::MeteredQuantityStruct::Type Data[] = {
     { DataModel::List<const uint32_t>(TariffComponents1, sizeof(TariffComponents1) / sizeof(TariffComponents1[0])), 4200 },
     { DataModel::List<const uint32_t>(TariffComponents2, sizeof(TariffComponents2) / sizeof(TariffComponents2[0])), -1500 }
 };
@@ -63,15 +63,14 @@ private:
     DataModel::Nullable<Globals::MeasurementTypeEnum> mMeasurementType;
     DataModel::Nullable<uint16_t> mMaximumMeteredQuantities;
 
-    std::vector<Structs::MeteredQuantityStruct::Type> GetMeteredQuantityDataSample(uint8_t presetIdx)
+    std::array<const Structs::MeteredQuantityStruct::Type, 2> GetMeteredQuantityDataSample(uint8_t presetIdx)
     {
         switch (presetIdx)
         {
         case 0:
             return { MeteredQuantitySamples::Sample1::Data[0], MeteredQuantitySamples::Sample1::Data[1] };
         case 1:
-            return { MeteredQuantitySamples::Sample2::Data[0], MeteredQuantitySamples::Sample2::Data[1],
-                     MeteredQuantitySamples::Sample1::Data[0] };
+            return { MeteredQuantitySamples::Sample2::Data[0], MeteredQuantitySamples::Sample2::Data[1] };
         default:
             return {}; // Return empty array
         }
@@ -210,6 +209,7 @@ private:
         DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> nullableList;
 
         nullableList.SetNonNull(std::move(tmpList));
+        mInstance->SetMaximumMeteredQuantities(mMaximumMeteredQuantities);
         mInstance->SetMeteredQuantity(nullableList);
         mInstance->SetMeteredQuantityTimestamp(mMeteredQuantityTimestamp);
         mInstance->SetMeasurementType(mMeasurementType);
