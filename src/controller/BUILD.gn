@@ -70,6 +70,7 @@ static_library("controller") {
     "DevicePairingDelegate.h",
     "ExampleOperationalCredentialsIssuer.h",
     "SetUpCodePairer.h",
+    "jcm/JCMTrustVerification.h",
   ]
 
   deps = [ "${chip_root}/src/lib/address_resolve" ]
@@ -123,4 +124,15 @@ static_library("controller") {
   }
 
   public_configs = [ "${chip_root}/src:includes" ]
+}
+
+source_set("jcm") {
+  sources = [
+    "jcm/JCMCommissioner.cpp",
+    "jcm/JCMCommissioner.h",
+  ]
+  public_deps = [
+    "${chip_root}/src/app",
+    "${chip_root}/src/controller:controller",
+  ]
 }
