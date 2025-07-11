@@ -226,6 +226,7 @@ private:
     void _MaintainOnDemandWiFiAP();
     System::Clock::Timeout _GetWiFiAPIdleTimeout();
     void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
+    void NotifyWiFiConnectivityChange(ConnectivityChange change);
     void UpdateNetworkStatus();
     CHIP_ERROR StopAutoScan();
 

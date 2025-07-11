@@ -363,6 +363,12 @@ void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
     DeviceLayer::SystemLayer().ScheduleLambda([this] { DriveAPState(); });
 }
 
+void ConnectivityManagerImpl::NotifyWiFiConnectivityChange(ConnectivityChange change)
+{
+    ChipDeviceEvent event{ .Type = DeviceEventType::kWiFiConnectivityChange, .WiFiConnectivityChange = { .Result = change } };
+    PlatformMgr().PostEventOrDie(&event);
+}
+
 void ConnectivityManagerImpl::UpdateNetworkStatus()
 {
     Network configuredNetwork;
@@ -454,6 +460,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
         }
 
         DeviceLayer::SystemLayer().ScheduleLambda([]() { ConnectivityMgrImpl().UpdateNetworkStatus(); });
+        NotifyWiFiConnectivityChange(kConnectivity_Lost);
 
         mAssociationStarted = false;
     }
@@ -479,6 +486,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
                 ConnectivityMgrImpl().PostNetworkConnect();
             });
         }
+        NotifyWiFiConnectivityChange(kConnectivity_Established);
         mAssociationStarted = false;
     }
 }
@@ -1071,6 +1079,9 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
         return CHIP_ERROR_INTERNAL;
     }
 
+    // Network was provisioned successfully - emit a connectivity change event so the application can update its state.
+    NotifyWiFiConnectivityChange(kConnectivity_NoChange);
+
     mpConnectCallback = apCallback;
     return CHIP_NO_ERROR;
 }
@@ -1460,8 +1471,7 @@ void ConnectivityManagerImpl::OnNanSubscribeTerminated(guint subscribe_id, gchar
     /*
         Indicate the connection event
     */
-    ChipDeviceEvent event;
-    event.Type = DeviceEventType::kCHIPoWiFiPAFCancelConnect;
+    ChipDeviceEvent event{ .Type = DeviceEventType::kCHIPoWiFiPAFCancelConnect };
     PlatformMgr().PostEventOrDie(&event);
 }
 
@@ -1647,7 +1657,7 @@ void ConnectivityManagerImpl::PostNetworkConnect()
 {
     // Iterate on the network interface to see if we already have beed assigned addresses.
     // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
-    // This should be removed or find a better place once we depercate the rendezvous session.
+    // This should be removed or find a better place once we deprecate the rendezvous session.
     for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
     {
         char ifName[Inet::InterfaceId::kMaxIfNameLength];
