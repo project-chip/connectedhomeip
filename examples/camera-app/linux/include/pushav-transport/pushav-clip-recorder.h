@@ -26,18 +26,15 @@
 #include <queue>
 #include <string>
 
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#include <libavutil/avutil.h>
+#include <libavutil/error.h>
+#include <libavutil/opt.h>
+#include <libavutil/timestamp.h>
+}
 // TODO: This dummy file to be removed after merging #38998
-
-// Dummy AV types to replace FFmpeg dependencies
-typedef int AVCodecID;
-typedef int AVRational;
-typedef int AVMediaType;
-typedef int AVFormatContext;
-typedef int AVStream;
-typedef int AVCodecContext;
-typedef int AVPacket;
-#define AV_NOPTS_VALUE (-1)
-
 struct BufferData
 {
     uint8_t * mPtr;
@@ -76,7 +73,7 @@ public:
     {
         uint64_t mChannelLayout = 0;
         int mChannels           = 0;
-        AVCodecID mAudioCodecId = 0;
+        AVCodecID mAudioCodecId = AV_CODEC_ID_NONE;
         int mSampleRate         = 0;
         int mBitRate            = 0;
         int64_t mAudioPts       = 0;
@@ -92,7 +89,7 @@ public:
 
     struct VideoInfoStruct
     {
-        AVCodecID mVideoCodecId = 0;
+        AVCodecID mVideoCodecId = AV_CODEC_ID_NONE;
         int64_t mVideoPts       = 0;
         int64_t mVideoDts       = 0;
         int mWidth              = 0;
@@ -110,7 +107,8 @@ public:
 
     PushAVClipRecorder(ClipInfoStruct & aClipInfo, AudioInfoStruct & aAudioInfo, VideoInfoStruct & aVideoInfo,
                        PushAVUploader * aUploader) :
-        mClipInfo(aClipInfo), mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
+        mClipInfo(aClipInfo),
+	mAudioInfo(aAudioInfo), mVideoInfo(aVideoInfo), mUploader(aUploader)
     {}
 
     ~PushAVClipRecorder() = default;
