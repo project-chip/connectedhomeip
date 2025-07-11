@@ -3,8 +3,8 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/Descriptor/ClusterId.h>
-#include <data-model-providers/endpoint/EndpointProviderRegistry.h>
-#include <data-model-providers/endpoint/SpanEndpointProvider.h>
+#include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
+#include <data-model-providers/codedriven/endpoint/SpanEndpoint.h>
 
 #include <algorithm>
 #include <array>
@@ -50,23 +50,23 @@ std::array<ServerClusterInterface *, 1> serverClustersArrayWithDescriptor = { &d
 
 } // namespace
 
-TEST(TestEndpointProviderRegistry, CreateAndDestroy)
+TEST(TestEndpointInterfaceRegistry, CreateAndDestroy)
 {
-    EndpointProviderRegistry registry;
+    EndpointInterfaceRegistry registry;
 
     // Create a provider
-    auto build_result = SpanEndpointProvider::Builder(kTestEndpointId1)
+    auto build_result = SpanEndpoint::Builder(kTestEndpointId1)
                             .SetServerClusters(serverClustersArrayWithDescriptor)
                             .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
-                            .build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result));
-    auto provider = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result)));
+                            .Build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result));
+    auto provider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result)));
     ASSERT_NE(provider, nullptr);
 
-    EndpointProviderInterface * provider_ptr = provider.get(); // Save raw pointer for comparison
+    EndpointInterface * provider_ptr = provider.get(); // Save raw pointer for comparison
 
     // Register it
-    EndpointProviderRegistration registration(*provider);
+    EndpointInterfaceRegistration registration(*provider);
     ASSERT_EQ(registry.Register(registration), CHIP_NO_ERROR);
 
     // Check if it can be retrieved
@@ -83,28 +83,32 @@ TEST(TestEndpointProviderRegistry, CreateAndDestroy)
     ASSERT_EQ(registry.Get(kTestEndpointId1), nullptr);
 }
 
-TEST(TestEndpointProviderRegistry, RegisterMultipleProviders)
+TEST(TestEndpointInterfaceRegistry, RegisterMultipleProviders)
 {
-    EndpointProviderRegistry registry;
+    EndpointInterfaceRegistry registry;
 
-    auto build_result1 = SpanEndpointProvider::Builder(kTestEndpointId1)
+    auto build_result1 = SpanEndpoint::Builder(kTestEndpointId1)
                              .SetServerClusters(serverClustersArrayWithDescriptor)
                              .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
-                             .build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result1));
-    auto provider1     = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result1)));
-    auto build_result2 = SpanEndpointProvider::Builder(kTestEndpointId2)
-                             .SetServerClusters(serverClustersArrayWithDescriptor)
+                             .Build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result1));
+    auto provider1 = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result1)));
+
+    MinimalServerCluster descriptorCluster2(kTestEndpointId2, chip::app::Clusters::Descriptor::Id);
+    std::array<ServerClusterInterface *, 1> serverClustersArrayWithDescriptor2 = { &descriptorCluster2 };
+
+    auto build_result2 = SpanEndpoint::Builder(kTestEndpointId2)
+                             .SetServerClusters(serverClustersArrayWithDescriptor2)
                              .SetComposition(DataModel::EndpointCompositionPattern::kTree)
-                             .build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result2));
-    auto provider2 = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result2)));
+                             .Build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result2));
+    auto provider2 = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result2)));
 
     ASSERT_NE(provider1, nullptr);
     ASSERT_NE(provider2, nullptr);
 
-    EndpointProviderRegistration registration1(*provider1);
-    EndpointProviderRegistration registration2(*provider2);
+    EndpointInterfaceRegistration registration1(*provider1);
+    EndpointInterfaceRegistration registration2(*provider2);
 
     ASSERT_EQ(registry.Register(registration1), CHIP_NO_ERROR);
     ASSERT_EQ(registry.Register(registration2), CHIP_NO_ERROR);
@@ -120,29 +124,29 @@ TEST(TestEndpointProviderRegistry, RegisterMultipleProviders)
     ASSERT_EQ(registry.Get(kTestEndpointId2), nullptr);
 }
 
-TEST(TestEndpointProviderRegistry, RegisterDuplicateProviderId)
+TEST(TestEndpointInterfaceRegistry, RegisterDuplicateProviderId)
 {
-    EndpointProviderRegistry registry;
+    EndpointInterfaceRegistry registry;
 
-    auto build_result1a = SpanEndpointProvider::Builder(kTestEndpointId1)
+    auto build_result1a = SpanEndpoint::Builder(kTestEndpointId1)
                               .SetServerClusters(serverClustersArrayWithDescriptor)
                               .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
-                              .build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result1a));
-    auto provider1a = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result1a)));
+                              .Build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result1a));
+    auto provider1a = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result1a)));
 
-    auto build_result1b = SpanEndpointProvider::Builder(kTestEndpointId1)
+    auto build_result1b = SpanEndpoint::Builder(kTestEndpointId1)
                               .SetServerClusters(serverClustersArrayWithDescriptor)
                               .SetComposition(DataModel::EndpointCompositionPattern::kTree)
-                              .build(); // Same ID
-    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result1b));
-    auto provider1b = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result1b)));
+                              .Build(); // Same ID
+    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result1b));
+    auto provider1b = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result1b)));
 
     ASSERT_NE(provider1a, nullptr);
     ASSERT_NE(provider1b, nullptr);
 
-    EndpointProviderRegistration registration1a(*provider1a);
-    EndpointProviderRegistration registration1b(*provider1b);
+    EndpointInterfaceRegistration registration1a(*provider1a);
+    EndpointInterfaceRegistration registration1b(*provider1b);
 
     ASSERT_EQ(registry.Register(registration1a), CHIP_NO_ERROR);
     ASSERT_EQ(registry.Get(kTestEndpointId1), provider1a.get());
@@ -152,68 +156,71 @@ TEST(TestEndpointProviderRegistry, RegisterDuplicateProviderId)
     ASSERT_EQ(registry.Get(kTestEndpointId1), provider1a.get()); // Should still be the first one
 }
 
-TEST(TestEndpointProviderRegistry, RegisterSameRegistrationObject)
+TEST(TestEndpointInterfaceRegistry, RegisterSameRegistrationObject)
 {
-    EndpointProviderRegistry registry;
-    auto build_result = SpanEndpointProvider::Builder(kTestEndpointId1)
+    EndpointInterfaceRegistry registry;
+    auto build_result = SpanEndpoint::Builder(kTestEndpointId1)
                             .SetServerClusters(serverClustersArrayWithDescriptor)
                             .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
-                            .build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result));
-    auto provider = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result)));
+                            .Build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result));
+    auto provider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result)));
     ASSERT_NE(provider, nullptr);
 
-    EndpointProviderRegistration registration(*provider);
+    EndpointInterfaceRegistration registration(*provider);
     ASSERT_EQ(registry.Register(registration), CHIP_NO_ERROR);
 
     // Attempt to register the exact same registration object again
     ASSERT_EQ(registry.Register(registration), CHIP_ERROR_DUPLICATE_KEY_ID); // Because registration.next is no longer nullptr
 }
 
-TEST(TestEndpointProviderRegistry, UnregisterNonExistentProvider)
+TEST(TestEndpointInterfaceRegistry, UnregisterNonExistentProvider)
 {
-    EndpointProviderRegistry registry;
+    EndpointInterfaceRegistry registry;
     ASSERT_EQ(registry.Unregister(kTestEndpointId1), CHIP_NO_ERROR); // Should succeed, no error for non-existent ID
 
-    auto build_result = SpanEndpointProvider::Builder(kTestEndpointId1)
+    auto build_result = SpanEndpoint::Builder(kTestEndpointId1)
                             .SetServerClusters(serverClustersArrayWithDescriptor)
                             .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
-                            .build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result));
-    auto provider = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result)));
+                            .Build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result));
+    auto provider = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result)));
     ASSERT_NE(provider, nullptr);
-    EndpointProviderRegistration registration(*provider);
+    EndpointInterfaceRegistration registration(*provider);
     ASSERT_EQ(registry.Register(registration), CHIP_NO_ERROR);
 
     ASSERT_EQ(registry.Unregister(kTestEndpointId2), CHIP_NO_ERROR); // Different ID. Should still succeed
 }
 
-TEST(TestEndpointProviderRegistry, GetNonExistentProvider)
+TEST(TestEndpointInterfaceRegistry, GetNonExistentProvider)
 {
-    EndpointProviderRegistry registry;
+    EndpointInterfaceRegistry registry;
     ASSERT_EQ(registry.Get(kNonExistentId), nullptr);
 }
 
-TEST(TestEndpointProviderRegistry, IteratorTest)
+TEST(TestEndpointInterfaceRegistry, IteratorTest)
 {
-    EndpointProviderRegistry registry;
+    EndpointInterfaceRegistry registry;
 
-    auto build_result1 = SpanEndpointProvider::Builder(kTestEndpointId1)
+    auto build_result1 = SpanEndpoint::Builder(kTestEndpointId1)
                              .SetServerClusters(serverClustersArrayWithDescriptor)
                              .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
-                             .build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result1));
-    auto provider1 = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result1)));
+                             .Build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result1));
+    auto provider1 = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result1)));
 
-    auto build_result2 = SpanEndpointProvider::Builder(2)
-                             .SetServerClusters(serverClustersArrayWithDescriptor)
+    MinimalServerCluster descriptorCluster2(kTestEndpointId2, chip::app::Clusters::Descriptor::Id);
+    std::array<ServerClusterInterface *, 1> serverClustersArrayWithDescriptor2 = { &descriptorCluster2 };
+
+    auto build_result2 = SpanEndpoint::Builder(kTestEndpointId2)
+                             .SetServerClusters(serverClustersArrayWithDescriptor2)
                              .SetComposition(DataModel::EndpointCompositionPattern::kTree)
-                             .build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result2));
-    auto provider2 = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result2)));
+                             .Build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result2));
+    auto provider2 = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result2)));
 
-    EndpointProviderRegistration registration1(*provider1);
-    EndpointProviderRegistration registration2(*provider2);
+    EndpointInterfaceRegistration registration1(*provider1);
+    EndpointInterfaceRegistration registration2(*provider2);
 
     registry.Register(registration1);
     registry.Register(registration2); // Registry stores in LIFO order for simple list prepend
@@ -235,23 +242,23 @@ TEST(TestEndpointProviderRegistry, IteratorTest)
     ASSERT_TRUE(found2);
 
     // Test empty iteration
-    EndpointProviderRegistry emptyRegistry;
+    EndpointInterfaceRegistry emptyRegistry;
     ASSERT_EQ(emptyRegistry.begin(), emptyRegistry.end());
 }
 
-TEST(TestEndpointProviderRegistry, RegisterInvalidArgs)
+TEST(TestEndpointInterfaceRegistry, RegisterInvalidArgs)
 {
-    EndpointProviderRegistry registry;
-    auto build_result_valid = SpanEndpointProvider::Builder(kValidIdForArgsTest)
+    EndpointInterfaceRegistry registry;
+    auto build_result_valid = SpanEndpoint::Builder(kValidIdForArgsTest)
                                   .SetServerClusters(serverClustersArrayWithDescriptor)
                                   .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
-                                  .build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result_valid));
-    auto providerValid = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result_valid)));
+                                  .Build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result_valid));
+    auto providerValid = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result_valid)));
     ASSERT_NE(providerValid, nullptr);
 
-    // Case 2: EndpointProviderInterface returns kInvalidEndpointId
-    auto build_result_invalid = SpanEndpointProvider::Builder(kInvalidEndpointId).build();
+    // Case 2: EndpointInterface returns kInvalidEndpointId
+    auto build_result_invalid = SpanEndpoint::Builder(kInvalidEndpointId).Build();
     ASSERT_TRUE(std::holds_alternative<CHIP_ERROR>(build_result_invalid)); // Expecting an error for invalid ID
     ASSERT_EQ(std::get<CHIP_ERROR>(build_result_invalid), CHIP_ERROR_INVALID_ARGUMENT);
     // Cannot create a provider from an error, so this part of the test needs adjustment.
@@ -259,24 +266,29 @@ TEST(TestEndpointProviderRegistry, RegisterInvalidArgs)
     // is caught by the registry if we somehow bypassed the builder's check.
     // For now, the builder prevents this. If we want to test the registry's check directly,
     // we'd need a mock provider that returns kInvalidEndpointId.
-    // The current SpanEndpointProvider::Builder already prevents creation with kInvalidEndpointId.
+    // The current SpanEndpoint::Builder already prevents creation with kInvalidEndpointId.
 
-    // Case 3: EndpointProviderRegistration already part of a list (entry.next != nullptr)
+    // Case 3: EndpointInterfaceRegistration already part of a list (entry.next != nullptr)
     // To test this, we need two valid providers and registrations.
-    auto build_result_list1 = SpanEndpointProvider::Builder(kListId1ForArgsTest)
-                                  .SetServerClusters(serverClustersArrayWithDescriptor)
+    MinimalServerCluster descriptorForList1(kListId1ForArgsTest, chip::app::Clusters::Descriptor::Id);
+    std::array<ServerClusterInterface *, 1> serverClustersForList1 = { &descriptorForList1 };
+    auto build_result_list1                                        = SpanEndpoint::Builder(kListId1ForArgsTest)
+                                  .SetServerClusters(serverClustersForList1)
                                   .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
-                                  .build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result_list1));
-    auto providerForList1   = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result_list1)));
-    auto build_result_list2 = SpanEndpointProvider::Builder(kListId2ForArgsTest)
-                                  .SetServerClusters(serverClustersArrayWithDescriptor)
+                                  .Build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result_list1));
+    auto providerForList1 = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result_list1)));
+
+    MinimalServerCluster descriptorForList2(kListId2ForArgsTest, chip::app::Clusters::Descriptor::Id);
+    std::array<ServerClusterInterface *, 1> serverClustersForList2 = { &descriptorForList2 };
+    auto build_result_list2                                        = SpanEndpoint::Builder(kListId2ForArgsTest)
+                                  .SetServerClusters(serverClustersForList2)
                                   .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
-                                  .build();
-    ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result_list2));
-    auto providerForList2 = std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result_list2)));
-    EndpointProviderRegistration registrationInList1(*providerForList1);
-    EndpointProviderRegistration registrationInList2(*providerForList2);
+                                  .Build();
+    ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result_list2));
+    auto providerForList2 = std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result_list2)));
+    EndpointInterfaceRegistration registrationInList1(*providerForList1);
+    EndpointInterfaceRegistration registrationInList2(*providerForList2);
 
     // Manually link to simulate it being in another list
     // This simulates registrationInList2 being part of a list where registrationInList1 is its successor.
@@ -285,30 +297,33 @@ TEST(TestEndpointProviderRegistry, RegisterInvalidArgs)
     registrationInList2.next = nullptr; // Reset for other tests or cleanup
 
     // Test that registering a valid provider after these failures still works
-    EndpointProviderRegistration registrationValid(*providerValid);
+    EndpointInterfaceRegistration registrationValid(*providerValid);
     EXPECT_EQ(registry.Register(registrationValid), CHIP_NO_ERROR);
     EXPECT_EQ(registry.Get(kValidIdForArgsTest), providerValid.get());
 }
 
-TEST(TestEndpointProviderRegistry, StressTestRegistration)
+TEST(TestEndpointInterfaceRegistry, StressTestRegistration)
 {
     constexpr int kNumProviders = 100;
-    EndpointProviderRegistry registry;
-    std::vector<std::unique_ptr<SpanEndpointProvider>> providers_storage; // Owns the providers
-    std::list<EndpointProviderRegistration> registrations;                // Owns the registration objects, stable addresses
+    EndpointInterfaceRegistry registry;
+    std::vector<std::unique_ptr<SpanEndpoint>> providers_storage; // Owns the providers
+    std::list<EndpointInterfaceRegistration> registrations;       // Owns the registration objects, stable addresses
     std::vector<EndpointId> ids;
+    std::vector<std::unique_ptr<MinimalServerCluster>> cluster_storage; // Owns the descriptor clusters
 
     providers_storage.reserve(kNumProviders);
+    cluster_storage.reserve(kNumProviders);
     for (int i = 0; i < kNumProviders; ++i)
     {
-        EndpointId id     = static_cast<EndpointId>(i + 1);
-        auto build_result = SpanEndpointProvider::Builder(id)
-                                .SetServerClusters(serverClustersArrayWithDescriptor)
+        EndpointId id = static_cast<EndpointId>(i + 1);
+        cluster_storage.push_back(std::make_unique<MinimalServerCluster>(id, chip::app::Clusters::Descriptor::Id));
+        std::array<ServerClusterInterface *, 1> serverClusters = { cluster_storage.back().get() };
+        auto build_result                                      = SpanEndpoint::Builder(id)
+                                .SetServerClusters(serverClusters)
                                 .SetComposition(DataModel::EndpointCompositionPattern::kFullFamily)
-                                .build();
-        ASSERT_TRUE(std::holds_alternative<SpanEndpointProvider>(build_result));
-        providers_storage.push_back(
-            std::make_unique<SpanEndpointProvider>(std::move(std::get<SpanEndpointProvider>(build_result))));
+                                .Build();
+        ASSERT_TRUE(std::holds_alternative<SpanEndpoint>(build_result));
+        providers_storage.push_back(std::make_unique<SpanEndpoint>(std::move(std::get<SpanEndpoint>(build_result))));
         ids.push_back(id);
         registrations.emplace_back(*providers_storage.back()); // Create registration from the provider
     }
@@ -349,7 +364,7 @@ TEST(TestEndpointProviderRegistry, StressTestRegistration)
         bool found_and_registered = false;
         for (auto & reg : registrations)
         { // Iterate through the list of registrations
-            if (reg.endpointProviderInterface->GetEndpointEntry().id == id_to_register)
+            if (reg.endpointInterface->GetEndpointEntry().id == id_to_register)
             {
                 ASSERT_EQ(registry.Register(reg), CHIP_NO_ERROR) << "Failed to re-register provider with ID " << id_to_register;
                 found_and_registered = true;
