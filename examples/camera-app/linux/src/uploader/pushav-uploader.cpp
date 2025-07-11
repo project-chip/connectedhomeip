@@ -125,7 +125,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     unsigned long size = (unsigned long) file.tellg();
     file.seekg(0, std::ios::beg);
     std::vector<char> buffer(size);
-    if (!file.read(buffer.data(), size))
+    if (!file.read(buffer.data(), static_cast<std::streamsize>(size)))
     {
         ChipLogError(Camera, "Failed to read file into buffer");
         return;
@@ -134,7 +134,7 @@ void PushAVUploader::UploadData(std::pair<std::string, std::string> data)
     PushAvUploadInfo upload;
     upload.mData = (char *) std::malloc(size);
     memcpy(upload.mData, buffer.data(), size);
-    upload.mSize                = size;
+    upload.mSize                = static_cast<long>(size);
     upload.mBytesRead           = 0;
     struct curl_slist * headers = nullptr;
     headers                     = curl_slist_append(headers, "Content-Type: application/*");

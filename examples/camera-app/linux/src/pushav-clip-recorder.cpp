@@ -80,15 +80,18 @@ namespace {
 int ReadPacket(void * opaque, uint8_t * buf, int bufSize)
 {
     struct BufferData * bd = (struct BufferData *) opaque;
-    bufSize                = (int) (FFMIN(bufSize, bd->mSize));
+    if (static_cast<size_t>(bufSize) > bd->mSize)
+    {
+        bufSize = static_cast<int>(bd->mSize);
+    }
 
     if (!bufSize)
         return AVERROR_EOF;
 
     /* copy internal buffer data to buf */
-    memcpy(buf, bd->mPtr, bufSize);
+    memcpy(buf, bd->mPtr, static_cast<size_t>(bufSize));
     bd->mPtr += bufSize;
-    bd->mSize -= bufSize;
+    bd->mSize -= static_cast<size_t>(bufSize);
 
     return bufSize;
 }
@@ -157,20 +160,19 @@ AVPacket * PushAVClipRecorder::CreatePacket(const uint8_t * data, int size, bool
         ChipLogError(Camera, "ERROR: AVPacket allocation failed!");
         return nullptr;
     }
-    packet->data = (uint8_t *) av_malloc(size);
+    packet->data = static_cast<uint8_t *>(av_malloc(static_cast<size_t>(size)));
     if (!packet->data)
     {
         ChipLogError(Camera, "ERROR: AVPacket data allocation failed!");
         av_packet_free(&packet);
         return nullptr;
     }
-    memcpy(packet->data, data, size);
+    memcpy(packet->data, data, static_cast<size_t>(size));
     packet->size = size;
     if (isVideo)
     {
-        if (IsH264IFrame(data, size))
+        if (IsH264IFrame(data, static_cast<unsigned int>(size)))
         {
-
             mFoundFirstIFramePts = mVideoInfo.mVideoPts;
             packet->flags        = AV_PKT_FLAG_KEY;
             ChipLogProgress(Camera, "Found I-frame at PTS: %ld", mVideoInfo.mVideoPts);
@@ -251,7 +253,7 @@ void PushAVClipRecorder::PushPacket(const char * data, size_t size, bool isVideo
         return;
     }
 
-    AVPacket * packet = CreatePacket((const uint8_t *) data, (int) size, isVideo);
+    AVPacket * packet = CreatePacket((const uint8_t *) data, static_cast<int>(size), isVideo);
     if (!packet)
     {
         ChipLogError(Camera, "ERROR: PACKET DROPPED!");
@@ -391,7 +393,7 @@ int PushAVClipRecorder::AddStreamToOutput(AVMediaType type)
         }
         mAudioEncoderContext->sample_rate           = mAudioInfo.mSampleRate;
         mAudioEncoderContext->channels              = mAudioInfo.mChannels;
-        mAudioEncoderContext->channel_layout        = av_get_default_channel_layout(mAudioEncoderContext->channels);
+        mAudioEncoderContext->channel_layout        = static_cast<uint64_t>(av_get_default_channel_layout(mAudioEncoderContext->channels));
         mAudioEncoderContext->bit_rate              = mAudioInfo.mBitRate;
         mAudioEncoderContext->sample_fmt            = audioCodec->sample_fmts[0];
         mAudioEncoderContext->time_base             = (AVRational){ 1, mAudioInfo.mSampleRate };
@@ -478,10 +480,10 @@ int PushAVClipRecorder::ProcessBuffersAndWrite()
         std::string mediaSegName     = prefix + "_chunk-stream$RepresentationID$-$Number%05d$.cmfv";
         mInputFormatContext          = avformat_alloc_context();
         int avioCtxBufferSize        = 1048576; // 1MB
-        uint8_t * mAvioContextBuffer = (uint8_t *) av_malloc(avioCtxBufferSize);
+        uint8_t * mAvioContextBuffer = static_cast<uint8_t *>(av_malloc(static_cast<size_t>(avioCtxBufferSize)));
         struct BufferData data       = { 0 };
-        data.mPtr                    = (uint8_t *) pkt->data;
-        data.mSize                   = pkt->size;
+        data.mPtr                    = static_cast<uint8_t *>(pkt->data);
+        data.mSize                   = static_cast<size_t>(pkt->size);
         mInputFormatContext->pb =
             avio_alloc_context(mAvioContextBuffer, avioCtxBufferSize, 0, &data, &ReadPacket, nullptr, nullptr);
         mInputFormatContext->flags = AVFMT_FLAG_CUSTOM_IO;
@@ -647,7 +649,6 @@ void PushAVClipRecorder::FinalizeCurrentClip(int reason)
     std::string video_cmfv = make_path("%s_chunk-stream0-%05d.cmfv", mVideoFragment);
     while (FileExists(video_cmfv) && !FileExists(video_cmfv + ".tmp"))
     {
-
         if (mVideoFragment == 1)
         {
             mUploadedInitSegment = true;
