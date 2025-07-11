@@ -86,7 +86,8 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
     def steps_TC_RVCOPSTATE_2_5(self) -> list[TestStep]:
         steps = [
             TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("2", "Manually put the device in a RVC Run Mode cluster mode with the Idle mode tag and in a device state that allows changing to {PIXIT_RUNMODE_CLEANMODE}"),
+            TestStep(
+                "2", "Manually put the device in a RVC Run Mode cluster mode with the Idle mode tag and in a device state that allows changing to {PIXIT_RUNMODE_CLEANMODE}"),
             TestStep("3", "TH reads the SupportedModes attribute of the RVC Run Mode cluster"),
             TestStep("4", "TH establishes a subscription to the CurrentMode attribute of the RVC Run Mode cluster of the DUT"),
             TestStep("5", "TH sends a RVC Run Mode cluster ChangeToMode command to the DUT with NewMode set to PIXIT.CLEANMODE"),
@@ -178,7 +179,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
                 step_name_idle_mode = "Manually put the device in a RVC Run Mode cluster mode with the Idle mode tag and in a device state that allows changing to {PIXIT_RUNMODE_CLEANMODE}"
                 self.wait_for_user_input(prompt_msg=f"{step_name_idle_mode}, and press Enter when ready.")
             else:
-                self.write_to_app_pipe({"Name": "Reset"}) 
+                self.write_to_app_pipe({"Name": "Reset"})
             # TH reads the SupportedModes attribute of the RVC Run Mode cluster
             self.step("3")
             supported_run_modes_dut = await self.read_supported_mode(endpoint=self.endpoint)
@@ -242,7 +243,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
                 self.wait_for_user_input(prompt_msg=f"{step_name_idle_mode}, and press Enter when ready.")
             else:
                 self.write_to_app_pipe({"Name": "Docked"})
-            
+
             current_mode_match = AttributeMatcher.from_callable(
                 "CurrentMode is IDLE",
                 lambda report: report.value == idle_mode)
