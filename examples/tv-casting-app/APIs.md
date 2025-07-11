@@ -1302,7 +1302,7 @@ void InvokeContentLauncherLaunchURL(matter::casting::memory::Strong<matter::cast
         request, nullptr,
         [](void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type::ResponseType & response) {
             ChipLogProgress(AppServer, "LaunchURL Success with response.data: %s",
-                            chip::StringBuilder(response.data.Value()).c_str());
+                            chip::NullTerminated(response.data.Value()).c_str());
         },
         [](void * context, CHIP_ERROR error) {
             ChipLogError(AppServer, "LaunchURL Failure with err %" CHIP_ERROR_FORMAT, error.Format());

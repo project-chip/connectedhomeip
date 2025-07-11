@@ -667,7 +667,7 @@ std::optional<ActionReturnStatus> NetworkCommissioningLogic::HandleNonConcurrent
 {
     ByteSpan nonConcurrentNetworkID = ByteSpan(mConnectingNetworkID, mConnectingNetworkIDLen);
     ChipLogProgress(NetworkProvisioning, "Non-concurrent mode, Connect to Network SSID=%s",
-                    StringBuilder(Uint8::to_const_char(mConnectingNetworkID), mConnectingNetworkIDLen).c_str());
+                    NullTerminated(Uint8::to_const_char(mConnectingNetworkID), mConnectingNetworkIDLen).c_str());
     mpWirelessDriver->ConnectNetwork(nonConcurrentNetworkID, this);
     return std::nullopt;
 }

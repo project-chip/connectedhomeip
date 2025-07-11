@@ -228,7 +228,7 @@ void NXPWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callbac
     Status networkingStatus = Status::kSuccess;
 
     ChipLogProgress(NetworkProvisioning, "Connecting to WiFi network: SSID: %s",
-                    StringBuilder(Uint8::to_const_char(networkId.data()), networkId.size()).c_str());
+                    NullTerminated(Uint8::to_const_char(networkId.data()), networkId.size()).c_str());
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);

@@ -168,7 +168,7 @@ void TargetVideoPlayerInfo::PrintInfo()
                     ChipLogValueX64(mNodeId), mFabricIndex);
     if (mMACAddress.size() > 0)
     {
-        ChipLogProgress(NotSpecified, "  MACAddress=%s", StringBuilder(mMACAddress).c_str());
+        ChipLogProgress(NotSpecified, "  MACAddress=%s", NullTerminated(mMACAddress).c_str());
     }
 
     for (auto & endpointInfo : mEndpoints)

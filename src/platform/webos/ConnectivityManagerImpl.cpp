@@ -1457,7 +1457,7 @@ bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, NetworkCommissi
         ChipLogError(DeviceLayer, "Got a network with bssid not equals to 6");
     }
     ChipLogDetail(DeviceLayer, "Network Found: %s (%s) Signal:%d",
-                  StringBuilder(StringOrNullMarker((const gchar *) ssidStr), ssidLen).c_str(), bssidStr, signal);
+                  NullTerminated(StringOrNullMarker((const gchar *) ssidStr), ssidLen).c_str(), bssidStr, signal);
 
     // A flag for enterprise encryption option to avoid returning open for these networks by mistake
     // TODO: The following code will mistakenly recognize WEP encryption as OPEN network, this should be fixed by reading

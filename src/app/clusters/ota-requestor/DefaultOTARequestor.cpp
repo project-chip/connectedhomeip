@@ -61,7 +61,7 @@ static void LogQueryImageResponse(const QueryImageResponse::DecodableType & resp
     }
     if (response.imageURI.HasValue())
     {
-        ChipLogDetail(SoftwareUpdate, "  imageURI: %s", StringBuilder(response.imageURI.Value()).c_str());
+        ChipLogDetail(SoftwareUpdate, "  imageURI: %s", NullTerminated(response.imageURI.Value()).c_str());
     }
     if (response.softwareVersion.HasValue())
     {
@@ -69,7 +69,8 @@ static void LogQueryImageResponse(const QueryImageResponse::DecodableType & resp
     }
     if (response.softwareVersionString.HasValue())
     {
-        ChipLogDetail(SoftwareUpdate, "  softwareVersionString: %s", StringBuilder(response.softwareVersionString.Value()).c_str());
+        ChipLogDetail(SoftwareUpdate, "  softwareVersionString: %s",
+                      NullTerminated(response.softwareVersionString.Value()).c_str());
     }
     if (response.updateToken.HasValue())
     {

@@ -91,24 +91,33 @@ private:
 };
 
 /// A preallocated sized string builder
-/// According to the specification there are fields with size up to 256
-/// Default buffer size is 257 to have space for the terminating null character
-/// If the buffer size is not enough the value will be truncated
-template <size_t kSize = 257>
+template <size_t kSize>
 class StringBuilder : public StringBuilderBase
 {
 public:
-    /// Default constructor
     StringBuilder() : StringBuilderBase(mBuffer, kSize) {}
 
-    /// Constructor for char * and length
-    StringBuilder(const char * data, size_t length) : StringBuilder() { AddFormat("%.*s", static_cast<int>(length), data); }
+    StringBuilder(const char * data, size_t length, bool add_marker_if_overflow = true) : StringBuilder()
+    {
+        AddFormat("%.*s", static_cast<int>(length), data);
+        if (add_marker_if_overflow)
+        {
+            AddMarkerIfOverflow();
+        }
+    }
 
-    /// Constructor for CharSpan
-    StringBuilder(const CharSpan & span) : StringBuilder(span.data(), span.size()) {}
+    StringBuilder(const CharSpan & span, bool add_marker_if_overflow = true) :
+        StringBuilder(span.data(), span.size(), add_marker_if_overflow)
+    {}
 
 private:
     char mBuffer[kSize];
 };
+
+/// Default buffer size is 257 to accommodate values with size up to 256
+/// If the buffer size is not enough the value will be truncated and an overflow marker will be added
+/// TODO Note that this buffer size will be used always even for much smaller values
+/// TODO Preferably the buffer size should be the one appropriate for each value
+using NullTerminated = StringBuilder<257>;
 
 } // namespace chip

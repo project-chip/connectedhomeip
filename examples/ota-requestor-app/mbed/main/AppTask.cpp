@@ -470,7 +470,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 bool AppTask::OnUpdateAvailableHandler(void * context, uint32_t softwareVersion, chip::CharSpan softwareVersionString)
 {
     AppTask * appTask = reinterpret_cast<AppTask *>(context);
-    ChipLogProgress(NotSpecified, "\tNew update available: \t %s [%d]", StringBuilder(softwareVersionString).c_str(),
+    ChipLogProgress(NotSpecified, "\tNew update available: \t %s [%d]", NullTerminated(softwareVersionString).c_str(),
                     softwareVersion);
     ChipLogProgress(NotSpecified, "\tDo you want to download new update?");
     ChipLogProgress(NotSpecified, "\tRespond by pressing the button");

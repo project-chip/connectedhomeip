@@ -201,7 +201,7 @@ CHIP_ERROR WiFiManager::Scan(const ByteSpan & ssid, ScanResultCallback resultCal
                 memcpy(mWantedNetwork.ssid, ssid.data(), ssid.size());
                 mWantedNetwork.ssidLen = ssid.size();
                 ChipLogProgress(DeviceLayer, "Directed Scanning, looking for: %s",
-                                StringBuilder(Uint8::to_const_char(ssid.data()), ssid.size()).c_str());
+                                NullTerminated(Uint8::to_const_char(ssid.data()), ssid.size()).c_str());
             }
             else
             {
@@ -335,7 +335,7 @@ void WiFiManager::ScanResultHandler(Platform::UniquePtr<uint8_t> data, size_t le
     const wifi_scan_result * scanResult = reinterpret_cast<const wifi_scan_result *>(data.get());
 
     ChipLogDetail(DeviceLayer, "Found SSID: %s",
-                  StringBuilder(Uint8::to_const_char(scanResult->ssid), scanResult->ssid_length).c_str());
+                  NullTerminated(Uint8::to_const_char(scanResult->ssid), scanResult->ssid_length).c_str());
 
     if (Instance().mDirectedScanning)
     {

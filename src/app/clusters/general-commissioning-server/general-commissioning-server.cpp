@@ -515,7 +515,7 @@ void GeneralCommissioningGlobalInstance::HandleSetRegulatoryConfig(HandlerContex
 
     if (countryCode.size() != ConfigurationManager::kMaxLocationLength)
     {
-        ChipLogError(Zcl, "Invalid country code: '%s'", StringBuilder(countryCode).c_str());
+        ChipLogError(Zcl, "Invalid country code: '%s'", NullTerminated(countryCode).c_str());
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Protocols::InteractionModel::Status::ConstraintError);
         return;
     }

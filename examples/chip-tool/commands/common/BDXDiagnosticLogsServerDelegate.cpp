@@ -97,7 +97,7 @@ void LogFileDesignator(const char * prefix, const chip::CharSpan & fileDesignato
 #if CHIP_PROGRESS_LOGGING
     auto size = static_cast<uint16_t>(fileDesignator.size());
 
-    ChipLogProgress(chipTool, "%s (%u): %s", prefix, size, chip::StringBuilder(fileDesignator).c_str());
+    ChipLogProgress(chipTool, "%s (%u): %s", prefix, size, chip::NullTerminated(fileDesignator).c_str());
 #endif // CHIP_PROGRESS_LOGGING
 
     if (CHIP_NO_ERROR != error)
