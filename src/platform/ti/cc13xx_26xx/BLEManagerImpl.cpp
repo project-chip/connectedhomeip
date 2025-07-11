@@ -269,7 +269,7 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 uint8_t BLEManagerImpl::getDeviceName(char * buf, size_t bufSize)
 {
     uint8_t ret = FAILURE;
-    if (bufSize <= GAP_DEVICE_NAME_LEN)
+    if (bufSize >= GAP_DEVICE_NAME_LEN)
     {
         Platform::CopyString(buf, bufSize, mDeviceName);
         ret = SUCCESS;
@@ -344,15 +344,15 @@ BLE_CONNECTION_OBJECT BLEManagerImpl::GetConnection(uint8_t connIndex)
 ConnectivityManager::CHIPoBLEServiceMode BLEManagerImpl::getMatteroBLEServiceMode(BLE_CONNECTION_OBJECT conId)
 {
     ConnectivityManager::CHIPoBLEServiceMode mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_NotSupported;
-    uint8_t i;
-    for (i = 0; i < MAX_NUM_BLE_CONNS; i++)
+    uint8_t index;
+
+    index = GetBLEConnIndex(*((uint32_t *) conId));
+
+    if (index < MAX_NUM_BLE_CONNS)
     {
-        if (connList[i].mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_Enabled)
-        {
-            mServiceMode = connList[i].mServiceMode;
-            break;
-        }
+        mServiceMode = connList[index].mServiceMode;
     }
+
     return mServiceMode;
 }
 
