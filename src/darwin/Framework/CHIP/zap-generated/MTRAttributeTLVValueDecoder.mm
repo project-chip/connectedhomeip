@@ -10914,14 +10914,10 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
             } else {
                 value.speed = nil;
             }
-            if (cppValue.Value().secureState.HasValue()) {
-                if (cppValue.Value().secureState.Value().IsNull()) {
-                    value.secureState = nil;
-                } else {
-                    value.secureState = [NSNumber numberWithBool:cppValue.Value().secureState.Value().Value()];
-                }
-            } else {
+            if (cppValue.Value().secureState.IsNull()) {
                 value.secureState = nil;
+            } else {
+                value.secureState = [NSNumber numberWithBool:cppValue.Value().secureState.Value()];
             }
         }
         return value;

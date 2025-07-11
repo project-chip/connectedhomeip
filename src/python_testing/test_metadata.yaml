@@ -5,9 +5,6 @@ not_automated:
       reason: Code/Test not being used or not shared code for any other tests
     - name: TC_AVSMTestBase.py
       reason: Shared code for TC_AVSM, not a standalone test
-    - name: TC_CLCTRL_6_1.py
-      reason:
-          Closure app on the master branch does not support this test script yet
     - name: TC_CLCTRL_3_1.py
       reason:
           Closure app on the master branch does not support this test script yet
@@ -134,6 +131,13 @@ not_automated:
       reason: Helper methods for WebRTC TCs, not a standalone test.
     - name: TC_CHIMETestBase.py
       reason: Shared code for the Chime Cluster, not a standalone test.
+    - name: TC_WEBRTCPTestBase.py
+      reason:
+          Shared code for the WebRTC Provider Cluster, not a standalone test.
+    - name: TC_WEBRTCR_2_3.py
+      reason: Camera Controller App does not support stream allocation requests
+    - name: TC_WEBRTCR_2_4.py
+      reason: Camera Controller App does not support stream allocation requests
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
