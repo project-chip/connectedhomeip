@@ -26,6 +26,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 #include <lib/core/Optional.h>
+#include <platform/CHIPDeviceConfig.h>
 #include <setup_payload/SetupPayload.h>
 
 namespace chip {
@@ -100,7 +101,12 @@ public:
     CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, System::Clock::Seconds16 timeout, uint32_t iteration,
                                        uint16_t discriminator, Optional<uint32_t> setupPIN, Optional<ByteSpan> salt,
                                        Callback::Callback<OnOpenCommissioningWindow> * callback, SetupPayload & payload,
-                                       bool readVIDPIDAttributes = false);
+                                       bool readVIDPIDAttributes = false
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+                                       ,
+                                       bool jointCommissioning = false
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    );
 
     /**
      * @brief
@@ -119,7 +125,12 @@ public:
      *                          out parameter, will include the VID/PID bits if
      *                          readVIDPIDAttributes is true.
      */
-    CHIP_ERROR OpenCommissioningWindow(const CommissioningWindowPasscodeParams & params, SetupPayload & payload);
+    CHIP_ERROR OpenCommissioningWindow(const CommissioningWindowPasscodeParams & params, SetupPayload & payload
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+                                       ,
+                                       bool jointCommissioning = false
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    );
 
     /**
      * @brief
@@ -132,7 +143,12 @@ public:
      * @param[in] params    The parameters required to open an enhanced commissioning window
      *                      with the provided PAKE passcode verifier.
      */
-    CHIP_ERROR OpenCommissioningWindow(const CommissioningWindowVerifierParams & params);
+    CHIP_ERROR OpenCommissioningWindow(const CommissioningWindowVerifierParams & params
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+                                       ,
+                                       bool jointCommissioning = false
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    );
 
 private:
     enum class Step : uint8_t
@@ -174,6 +190,10 @@ private:
     uint32_t mPBKDFIterations = 0;
     uint8_t mPBKDFSaltBuffer[Crypto::kSpake2p_Max_PBKDF_Salt_Length];
     ByteSpan mPBKDFSalt;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    bool mJointCommissioning;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
 
     Callback::Callback<OnDeviceConnected> mDeviceConnected;
     Callback::Callback<OnDeviceConnectionFailure> mDeviceConnectionFailure;

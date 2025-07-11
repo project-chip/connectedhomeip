@@ -188,5 +188,133 @@ TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowPasscode_Failure_In
     EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+TEST_F(TestCommissioningWindowOpener, OpenJointCommissioningWindowVerifier_Success)
+{
+    Callback::Callback<Controller::OnOpenCommissioningWindowWithVerifier> callback(OCWVerifierCallback, this);
+
+    CHIP_ERROR err = opener.OpenCommissioningWindow(Controller::CommissioningWindowVerifierParams()
+                                                        .SetNodeId(0x1234)
+                                                        .SetTimeout(300)
+                                                        .SetIteration(sTestSpake2p01_IterationCount)
+                                                        .SetDiscriminator(3840)
+                                                        .SetSalt(ByteSpan(sTestSpake2p01_Salt))
+                                                        .SetVerifier(ByteSpan(sTestSpake2p01_SerializedVerifier))
+                                                        .SetCallback(&callback),
+                                                    true);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+}
+
+TEST_F(TestCommissioningWindowOpener, OpenJointCommissioningWindowVerifier_Failure_InvalidSalt)
+{
+    Callback::Callback<Controller::OnOpenCommissioningWindowWithVerifier> callback(OCWVerifierCallback, this);
+
+    CHIP_ERROR err = opener.OpenCommissioningWindow(Controller::CommissioningWindowVerifierParams()
+                                                        .SetNodeId(0x1234)
+                                                        .SetTimeout(300)
+                                                        .SetIteration(sTestSpake2p01_IterationCount)
+                                                        .SetDiscriminator(3840)
+                                                        .SetSalt(ByteSpan())
+                                                        .SetVerifier(ByteSpan(sTestSpake2p01_SerializedVerifier))
+                                                        .SetCallback(&callback),
+                                                    true);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST_F(TestCommissioningWindowOpener, OpenJointCommissioningWindowVerifier_Failure_InvalidVerifier)
+{
+    Callback::Callback<Controller::OnOpenCommissioningWindowWithVerifier> callback(OCWVerifierCallback, this);
+
+    CHIP_ERROR err = opener.OpenCommissioningWindow(Controller::CommissioningWindowVerifierParams()
+                                                        .SetNodeId(0x1234)
+                                                        .SetTimeout(300)
+                                                        .SetIteration(sTestSpake2p01_IterationCount)
+                                                        .SetDiscriminator(3840)
+                                                        .SetSalt(ByteSpan(sTestSpake2p01_Salt))
+                                                        .SetVerifier(ByteSpan())
+                                                        .SetCallback(&callback),
+                                                    true);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST_F(TestCommissioningWindowOpener, OpenJointCommissioningWindowVerifier_Failure_InvalidIteration)
+{
+    Callback::Callback<Controller::OnOpenCommissioningWindowWithVerifier> callback(OCWVerifierCallback, this);
+
+    CHIP_ERROR err = opener.OpenCommissioningWindow(Controller::CommissioningWindowVerifierParams()
+                                                        .SetNodeId(0x1234)
+                                                        .SetTimeout(300)
+                                                        .SetIteration(0)
+                                                        .SetDiscriminator(3840)
+                                                        .SetSalt(ByteSpan(sTestSpake2p01_Salt))
+                                                        .SetVerifier(ByteSpan(sTestSpake2p01_SerializedVerifier))
+                                                        .SetCallback(&callback),
+                                                    true);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+}
+
+TEST_F(TestCommissioningWindowOpener, OpenJointCommissioningWindowPasscode_Success)
+{
+    SetupPayload ignored;
+    Callback::Callback<Controller::OnOpenCommissioningWindow> callback(OCWPasscodeCallback, this);
+    CHIP_ERROR err = opener.OpenCommissioningWindow(Controller::CommissioningWindowPasscodeParams()
+                                                        .SetNodeId(0x1234)
+                                                        .SetTimeout(300)
+                                                        .SetIteration(sTestSpake2p01_IterationCount)
+                                                        .SetDiscriminator(3840)
+                                                        .SetSetupPIN(sTestSpake2p01_PinCode)
+                                                        .SetReadVIDPIDAttributes(true)
+                                                        .SetSalt(ByteSpan(sTestSpake2p01_Salt))
+                                                        .SetCallback(&callback),
+                                                    ignored, true);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+}
+
+TEST_F(TestCommissioningWindowOpener, OpenJointCommissioningWindowPasscode_Success_NoPin)
+{
+    SetupPayload ignored;
+    Callback::Callback<Controller::OnOpenCommissioningWindow> callback(OCWPasscodeCallback, this);
+    CHIP_ERROR err = opener.OpenCommissioningWindow(Controller::CommissioningWindowPasscodeParams()
+                                                        .SetNodeId(0x1234)
+                                                        .SetTimeout(300)
+                                                        .SetIteration(sTestSpake2p01_IterationCount)
+                                                        .SetDiscriminator(3840)
+                                                        .SetReadVIDPIDAttributes(true)
+                                                        .SetSalt(ByteSpan(sTestSpake2p01_Salt))
+                                                        .SetCallback(&callback),
+                                                    ignored, true);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+}
+
+TEST_F(TestCommissioningWindowOpener, OpenJointCommissioningWindowPasscode_Success_NoSalt)
+{
+    SetupPayload ignored;
+    Callback::Callback<Controller::OnOpenCommissioningWindow> callback(OCWPasscodeCallback, this);
+    CHIP_ERROR err = opener.OpenCommissioningWindow(Controller::CommissioningWindowPasscodeParams()
+                                                        .SetNodeId(0x1234)
+                                                        .SetTimeout(300)
+                                                        .SetIteration(sTestSpake2p01_IterationCount)
+                                                        .SetDiscriminator(3840)
+                                                        .SetSetupPIN(sTestSpake2p01_PinCode)
+                                                        .SetCallback(&callback),
+                                                    ignored, true);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+}
+
+TEST_F(TestCommissioningWindowOpener, OpenJointCommissioningWindowPasscode_Failure_InvalidIteration)
+{
+    SetupPayload ignored;
+    Callback::Callback<Controller::OnOpenCommissioningWindow> callback(OCWPasscodeCallback, this);
+    CHIP_ERROR err = opener.OpenCommissioningWindow(Controller::CommissioningWindowPasscodeParams()
+                                                        .SetNodeId(0x1234)
+                                                        .SetTimeout(300)
+                                                        .SetIteration(0)
+                                                        .SetDiscriminator(3840)
+                                                        .SetCallback(&callback),
+                                                    ignored, true);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_ARGUMENT);
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+
 // Add more test cases as needed to cover different scenarios
 } // namespace
