@@ -2892,7 +2892,7 @@ class ChipDeviceController(ChipDeviceControllerBase):
             self._enablePairingCompleteCallback(True)
             await self._ChipStack.CallAsync(
                 lambda: self._dmLib.pychip_DeviceController_ConnectWithCode(
-                    self.devCtrl, setupPayload.encode("utf-8"), nodeid, discoveryType.value)
+                    self.devCtrl, setupPayload.encode("utf-8"), nodeid, discoveryType.value)  # type: ignore
             )
 
             return await asyncio.futures.wrap_future(ctx.future)
