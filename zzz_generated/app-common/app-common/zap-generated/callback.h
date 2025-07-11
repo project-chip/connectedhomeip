@@ -8059,42 +8059,6 @@ bool emberAfJointFabricDatastoreClusterRemoveACLFromNodeCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::JointFabricDatastore::Commands::RemoveACLFromNode::DecodableType & commandData);
 /**
- * @brief Joint Fabric Administrator Cluster ICACCSRRequest Command callback (from client)
- */
-bool emberAfJointFabricAdministratorClusterICACCSRRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::JointFabricAdministrator::Commands::ICACCSRRequest::DecodableType & commandData);
-/**
- * @brief Joint Fabric Administrator Cluster AddICAC Command callback (from client)
- */
-bool emberAfJointFabricAdministratorClusterAddICACCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::JointFabricAdministrator::Commands::AddICAC::DecodableType & commandData);
-/**
- * @brief Joint Fabric Administrator Cluster OpenJointCommissioningWindow Command callback (from client)
- */
-bool emberAfJointFabricAdministratorClusterOpenJointCommissioningWindowCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::JointFabricAdministrator::Commands::OpenJointCommissioningWindow::DecodableType & commandData);
-/**
- * @brief Joint Fabric Administrator Cluster TransferAnchorRequest Command callback (from client)
- */
-bool emberAfJointFabricAdministratorClusterTransferAnchorRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::JointFabricAdministrator::Commands::TransferAnchorRequest::DecodableType & commandData);
-/**
- * @brief Joint Fabric Administrator Cluster TransferAnchorComplete Command callback (from client)
- */
-bool emberAfJointFabricAdministratorClusterTransferAnchorCompleteCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::JointFabricAdministrator::Commands::TransferAnchorComplete::DecodableType & commandData);
-/**
- * @brief Joint Fabric Administrator Cluster AnnounceJointFabricAdministrator Command callback (from client)
- */
-bool emberAfJointFabricAdministratorClusterAnnounceJointFabricAdministratorCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::JointFabricAdministrator::Commands::AnnounceJointFabricAdministrator::DecodableType & commandData);
-/**
  * @brief Unit Testing Cluster Test Command callback (from client)
  */
 bool emberAfUnitTestingClusterTestCallback(chip::app::CommandHandler * commandObj,
