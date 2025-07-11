@@ -43,23 +43,6 @@ extern ThermostatAttrAccess gThermostatAttrAccess;
 bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                              const Commands::AddThermostatSuggestion::DecodableType & commandData)
 {
-    // If time is not synced, return INVALID_IN_STATE in the AddThermostatSuggestionResponse.
-    uint32_t currentMatterEpochTimestampInSeconds = 0;
-    if (System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds) != CHIP_NO_ERROR)
-    {
-        commandObj->AddStatus(commandPath, Status::InvalidInState);
-        return true;
-    }
-
-    EndpointId endpoint = commandPath.mEndpointId;
-    auto delegate       = GetDelegate(endpoint);
-    if (delegate == nullptr)
-    {
-        ChipLogError(Zcl, "Delegate is null");
-        commandObj->AddStatus(commandPath, Status::InvalidInState);
-        return true;
-    }
-
     // Check constraints for PresetHandle and ExpirationInMinutes field.
     if (commandData.presetHandle.size() >= kThermostatSuggestionPresetHandleSize)
     {
@@ -70,6 +53,15 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
     if (commandData.expirationInMinutes < 30 || commandData.expirationInMinutes > 1440)
     {
         commandObj->AddStatus(commandPath, Status::ConstraintError);
+        return true;
+    }
+
+    EndpointId endpoint = commandPath.mEndpointId;
+    auto delegate       = GetDelegate(endpoint);
+    if (delegate == nullptr)
+    {
+        ChipLogError(Zcl, "Delegate is null");
+        commandObj->AddStatus(commandPath, Status::InvalidInState);
         return true;
     }
 
@@ -84,6 +76,14 @@ bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandP
     if (delegate->GetNumberOfThermostatSuggestions() >= delegate->GetMaxThermostatSuggestions())
     {
         commandObj->AddStatus(commandPath, Status::ResourceExhausted);
+        return true;
+    }
+
+    // If time is not synced, return INVALID_IN_STATE in the AddThermostatSuggestionResponse.
+    uint32_t currentMatterEpochTimestampInSeconds = 0;
+    if (System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds) != CHIP_NO_ERROR)
+    {
+        commandObj->AddStatus(commandPath, Status::InvalidInState);
         return true;
     }
 
@@ -158,14 +158,6 @@ bool RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteComma
 
     MatterReportingAttributeChangeCallback(endpoint, Thermostat::Id, ThermostatSuggestions::Id);
     commandObj->AddStatus(commandPath, Status::Success);
-
-    uint32_t currentMatterEpochTimestampInSeconds = 0;
-    err                                           = System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Failed to get the current time stamp with error: %" CHIP_ERROR_FORMAT, err.Format());
-        return true;
-    }
 
     // The re-evalaution is done after sending a response since the result of the re-evaluation doesn't affect the response status.
     err = delegate->ReEvaluateCurrentSuggestion();
