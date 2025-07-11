@@ -121,9 +121,9 @@ CHIP_ERROR WebRTCTransportProviderManager::HandleProvideICECandidates(uint16_t s
                                                                       const std::vector<ICECandidateStruct> & candidates)
 {
     std::vector<std::string> remoteCandidates;
-    remoteCandidates.clear();
+    remoteCandidates.reserve(candidates.size());
     std::vector<const char *> cStrings;
-    cStrings.clear();
+    cStrings.reserve(candidates.size());
 
     if (candidates.empty())
     {
