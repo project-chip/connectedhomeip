@@ -23,7 +23,7 @@ from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from mobly import asserts
 
 
-class DefaultChecker(MatterBaseTest):
+class TestDefaultChecker(MatterBaseTest):
     ''' This is a unit-style test of the defaults test. It runs the individual test functions against mocks.'''
 
     def setup_test(self):
