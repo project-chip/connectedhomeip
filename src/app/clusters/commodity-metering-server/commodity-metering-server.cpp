@@ -208,8 +208,7 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
                 ReturnLogErrorOnFailure(CopyMeteredQuantityEntry(newValue.Value()[idx], buffer[idx]));
             }
 
-            mMeteredQuantity = MakeNullable(DataModel::List<Structs::MeteredQuantityStruct::Type>(buffer.Get(), len));
-            (void) buffer.Release();
+            mMeteredQuantity = MakeNullable(DataModel::List(buffer.Release(), len));
         }
         else
         {
