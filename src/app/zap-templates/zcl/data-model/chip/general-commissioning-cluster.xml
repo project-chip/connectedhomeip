@@ -142,7 +142,6 @@ Git: 0.7-summer-2025-ncr-444-g89b9baa9b-dirty
       </otherwiseConform>
     </attribute>
     <attribute code="0x000C" side="server" name="IsCommissioningWithoutPower" define="IS_COMMISSIONING_WITHOUT_POWER" type="boolean" default="0" apiMaturity="provisional">
-      <access op="read" privilege="view"/>
       <otherwiseConform>
         <provisionalConform/>
         <optionalConform/>
