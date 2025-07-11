@@ -206,7 +206,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
 
         self.step(3)
         try:
-            await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo())
+            await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(), timedRequestTimeoutMs=1000)
             logging.error("MoveTo command with no fields should have failed but succeeded")
             asserts.assert_true(False, "MoveTo command with no fields should have failed but succeeded")
         except InteractionModelError as e:
@@ -243,7 +243,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             else:
                 self.step("4d")
                 try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed), timedRequestTimeoutMs=1000)
                     logging.info("MoveTo command with Position = MoveToFullyClosed sent successfully")
                 except InteractionModelError as e:
                     logging.error(f"MoveTo command with Position = MoveToFullyClosed failed: {e}")
@@ -256,7 +256,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
 
             self.step("4f")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=True))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=True), timedRequestTimeoutMs=1000)
                 logging.info("MoveTo command with Latch = True sent successfully")
             except InteractionModelError as e:
                 logging.error(f"MoveTo command with Latch = True failed: {e}")
@@ -265,7 +265,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
 
             self.step("4g")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=True, position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=True, position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen), timedRequestTimeoutMs=1000)
                 logging.info("MoveTo command with Latch = True and Position = MoveToFullyOpen sent successfully")
             except InteractionModelError as e:
                 logging.error(f"MoveTo command with Latch = True and Position = MoveToFullyOpen failed: {e}")
@@ -327,7 +327,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                     logging.info("LatchControlModes Bit 1 is 1, sending MoveTo command with Latch = False")
 
                     try:
-                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False))
+                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False), timedRequestTimeoutMs=1000)
                     except InteractionModelError as e:
                         asserts.assert_equal(e.status, Status.Success, f"MoveTo command with Latch = False failed: {e}")
 
@@ -340,7 +340,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
 
             self.step("5i")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen), timedRequestTimeoutMs=1000)
                 logging.info("MoveTo command with Position = MoveToFullyOpen sent successfully")
             except InteractionModelError as e:
                 logging.error(f"MoveTo command with Position = MoveToFullyOpen failed: {e}")
@@ -355,7 +355,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             else:
                 self.step("5k")
                 try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen, latch=True))
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen, latch=True), timedRequestTimeoutMs=1000)
                     logging.info("MoveTo command with Position = MoveToFullyOpen and Latch = True sent successfully")
                 except InteractionModelError as e:
                     logging.error(f"MoveTo command with Position = MoveToFullyOpen and Latch = True failed: {e}")
@@ -371,7 +371,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             else:
                 self.step("5n")
                 try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen, latch=True))
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen, latch=True), timedRequestTimeoutMs=1000)
                     logging.error("MoveTo command with Position = MoveToFullyOpen and Latch = True should have failed but succeeded")
                     asserts.assert_true(
                         False, "MoveTo command with Position = MoveToFullyOpen and Latch = True should have failed but succeeded")
@@ -409,7 +409,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             else:
                 self.step("6d")
                 try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh))
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh), timedRequestTimeoutMs=1000)
                     logging.info("MoveTo command with Speed = High sent successfully")
                 except InteractionModelError as e:
                     logging.error(f"MoveTo command with Speed = High failed: {e}")
@@ -422,7 +422,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
 
             self.step("6f")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=True))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=True), timedRequestTimeoutMs=1000)
                 logging.info("MoveTo command with Latch = True sent successfully")
             except InteractionModelError as e:
                 logging.error(f"MoveTo command with Latch = True failed: {e}")
@@ -430,7 +430,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                                      f"Expected Success status for MoveTo with Latch = True, but got: {e}")
             self.step("6g")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=True, speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=True, speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kLow), timedRequestTimeoutMs=1000)
                 logging.info("MoveTo command with Latch = True and Speed = Low sent successfully")
             except InteractionModelError as e:
                 logging.error(f"MoveTo command with Latch = True and Speed = Low failed: {e}")
@@ -444,7 +444,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         if is_position_supported:
             self.step("7a")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=6))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=6), timedRequestTimeoutMs=1000)
                 logging.error("MoveTo command with Position = 6 should have failed but succeeded")
                 asserts.assert_true(False, "MoveTo command with Position = 6 should have failed but succeeded")
             except InteractionModelError as e:
@@ -458,7 +458,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         if is_speed_supported:
             self.step("7b")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(speed=4))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(speed=4), timedRequestTimeoutMs=1000)
                 logging.error("MoveTo command with Speed = 4 should have failed but succeeded")
                 asserts.assert_true(False, "MoveTo command with Speed = 4 should have failed but succeeded")
             except InteractionModelError as e:
@@ -467,7 +467,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                                      f"Expected CONSTRAINT_ERROR for MoveTo with Speed = 4 but got: {e}")
             self.step("7c")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=6, speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=6, speed=Clusters.Globals.Enums.ThreeLevelAutoEnum.kHigh), timedRequestTimeoutMs=1000)
                 logging.error("MoveTo command with Position = 6 and Speed = High should have failed but succeeded")
                 asserts.assert_true(False, "MoveTo command with Position = 6 and Speed = High should have failed but succeeded")
             except InteractionModelError as e:
@@ -476,7 +476,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
                                      f"Expected CONSTRAINT_ERROR for MoveTo with Position = 6 and Speed = High but got: {e}")
             self.step("7d")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed, speed=4))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed, speed=4), timedRequestTimeoutMs=1000)
                 logging.error("MoveTo command with Position = MoveToFullyClosed and Speed = 4 should have failed but succeeded")
                 asserts.assert_true(
                     False, "MoveTo command with Position = MoveToFullyClosed and Speed = 4 should have failed but succeeded")
@@ -502,7 +502,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             else:
                 self.step("8d")
                 try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=True))
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=True), timedRequestTimeoutMs=1000)
                     logging.info("MoveTo command with Latch = True sent successfully")
                 except InteractionModelError as e:
                     logging.error(f"MoveTo command with Latch = True failed: {e}")
@@ -515,7 +515,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             else:
                 self.step("8f")
                 try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False))
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False), timedRequestTimeoutMs=1000)
                     logging.info("MoveTo command with Latch = False sent successfully")
                 except InteractionModelError as e:
                     logging.error(f"MoveTo command with Latch = False failed: {e}")
@@ -539,7 +539,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             else:
                 self.step("8k")
                 try:
-                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False))
+                    await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False), timedRequestTimeoutMs=1000)
                     logging.info("MoveTo command with Latch = False sent successfully")
                 except InteractionModelError as e:
                     logging.error(f"MoveTo command with Latch = False failed: {e}")
@@ -569,7 +569,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
 
             self.step("9c")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=current_position))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=current_position), timedRequestTimeoutMs=1000)
                 logging.info("MoveTo command with Position = CurrentPosition sent successfully")
             except InteractionModelError as e:
                 logging.error(f"MoveTo command with Position = CurrentPosition failed: {e}")
@@ -589,7 +589,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
 
             self.step("10c")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(speed=current_speed))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(speed=current_speed), timedRequestTimeoutMs=1000)
                 logging.info("MoveTo command with Speed = CurrentSpeed sent successfully")
             except InteractionModelError as e:
                 logging.error(f"MoveTo command with Speed = CurrentSpeed failed: {e}")
