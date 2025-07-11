@@ -22,8 +22,11 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestBdxMessages.cpp",
+    "TestBdxStatusCode.cpp",
     "TestBdxTransferSession.cpp",
     "TestBdxUri.cpp",
+    "TestTransferDiagnosticLog.cpp",
+    "TestTransferFacilitator.cpp",
   ]
 
   public_deps = [
