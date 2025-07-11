@@ -207,7 +207,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
                 try:
                     await self.send_single_cmd(
                         cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=False),
-                        endpoint=endpoint
+                        endpoint=endpoint, timedRequestTimeoutMs=1000
                     )
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -234,7 +234,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
                     direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease, numberOfSteps=65535),
-                endpoint=endpoint
+                endpoint=endpoint, timedRequestTimeoutMs=1000
             )
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -255,7 +255,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
                     direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease, numberOfSteps=2),
-                endpoint=endpoint
+                endpoint=endpoint, timedRequestTimeoutMs=1000
             )
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -279,7 +279,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.Step(
                     direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease, numberOfSteps=2),
-                endpoint=endpoint
+                endpoint=endpoint, timedRequestTimeoutMs=1000
             )
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -310,7 +310,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
                         numberOfSteps=1,
                         speed=Globals.Enums.ThreeLevelAutoEnum.kHigh
                     ),
-                    endpoint=endpoint
+                    endpoint=endpoint, timedRequestTimeoutMs=1000
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -345,7 +345,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
                         numberOfSteps=1,
                         speed=Globals.Enums.ThreeLevelAutoEnum.kAuto
                     ),
-                    endpoint=endpoint
+                    endpoint=endpoint, timedRequestTimeoutMs=1000
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -377,7 +377,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
                     direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kDecrease,
                     numberOfSteps=65535
                 ),
-                endpoint=endpoint
+                endpoint=endpoint, timedRequestTimeoutMs=1000
             )
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -405,7 +405,7 @@ class TC_CLDIM_4_1(MatterBaseTest):
                     direction=Clusters.ClosureDimension.Enums.StepDirectionEnum.kIncrease,
                     numberOfSteps=65535
                 ),
-                endpoint=endpoint
+                endpoint=endpoint, timedRequestTimeoutMs=1000
             )
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")

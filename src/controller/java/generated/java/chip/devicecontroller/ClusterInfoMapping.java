@@ -27324,7 +27324,7 @@ public class ClusterInfoMapping {
         , (Optional<Boolean>)
         commandArguments.get("latch")
         , (Optional<Integer>)
-        commandArguments.get("speed")
+        commandArguments.get("speed"), 10000
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -27336,7 +27336,7 @@ public class ClusterInfoMapping {
     InteractionInfo closureControlcalibrateInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.ClosureControlCluster) cluster)
-        .calibrate((DefaultClusterCallback) callback
+        .calibrate((DefaultClusterCallback) callback, 10000
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -27367,7 +27367,7 @@ public class ClusterInfoMapping {
         , (Optional<Boolean>)
         commandArguments.get("latch")
         , (Optional<Integer>)
-        commandArguments.get("speed")
+        commandArguments.get("speed"), 10000
         );
       },
       () -> new DelegatedDefaultClusterCallback(),
@@ -27394,7 +27394,7 @@ public class ClusterInfoMapping {
         , (Integer)
         commandArguments.get("numberOfSteps")
         , (Optional<Integer>)
-        commandArguments.get("speed")
+        commandArguments.get("speed"), 10000
         );
       },
       () -> new DelegatedDefaultClusterCallback(),

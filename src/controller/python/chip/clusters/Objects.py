@@ -29470,13 +29470,13 @@ class ClosureControl(Cluster):
                         ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Union[None, Nullable, ClosureControl.Enums.CurrentPositionEnum]),
                         ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Union[None, Nullable, bool]),
                         ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
-                        ClusterObjectFieldDescriptor(Label="secureState", Tag=3, Type=typing.Union[None, Nullable, bool]),
+                        ClusterObjectFieldDescriptor(Label="secureState", Tag=3, Type=typing.Union[Nullable, bool]),
                     ])
 
             position: 'typing.Union[None, Nullable, ClosureControl.Enums.CurrentPositionEnum]' = None
             latch: 'typing.Union[None, Nullable, bool]' = None
             speed: 'typing.Optional[Globals.Enums.ThreeLevelAutoEnum]' = None
-            secureState: 'typing.Union[None, Nullable, bool]' = None
+            secureState: 'typing.Union[Nullable, bool]' = NullValue
 
         @dataclass
         class OverallTargetStateStruct(ClusterObject):
@@ -29523,6 +29523,10 @@ class ClosureControl(Cluster):
                         ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
             position: typing.Optional[ClosureControl.Enums.TargetPositionEnum] = None
             latch: typing.Optional[bool] = None
             speed: typing.Optional[Globals.Enums.ThreeLevelAutoEnum] = None
@@ -29539,6 +29543,10 @@ class ClosureControl(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                     ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
 
     class Attributes:
         @dataclass
@@ -29997,6 +30005,10 @@ class ClosureDimension(Cluster):
                         ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
             position: typing.Optional[uint] = None
             latch: typing.Optional[bool] = None
             speed: typing.Optional[Globals.Enums.ThreeLevelAutoEnum] = None
@@ -30016,6 +30028,10 @@ class ClosureDimension(Cluster):
                         ClusterObjectFieldDescriptor(Label="numberOfSteps", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
                     ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
 
             direction: ClosureDimension.Enums.StepDirectionEnum = 0
             numberOfSteps: uint = 0
