@@ -318,8 +318,8 @@ class TC_ACL_2_3(MatterBaseTest):
 
         self.step(21)
         # Rerunning test using the legacy list writing mechanism
-        if force_legacy_encoding:
-            logging.info("Rerunning test using the legacy list writing mechanism")
+        if not force_legacy_encoding:
+            logging.info("*** Rerunning test using the legacy list writing mechanism now ***")
 
     def desc_TC_ACL_2_3(self) -> str:
         return "[TC-ACL-2.3] Multiple fabrics test"

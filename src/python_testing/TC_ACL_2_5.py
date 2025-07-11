@@ -398,9 +398,9 @@ class TC_ACL_2_5(MatterBaseTest):
                              "FabricIndex should be the current fabric index")
 
         self.step(14)
-        # Rerunning test with new list method
+        # Rerunning test using the legacy list writing mechanism
         if not force_legacy_encoding:
-            logging.info("Rerunning test with new list method now")
+            logging.info("*** Rerunning test using the legacy list writing mechanism now ***")
 
     async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlExtensionChanged) -> int:
         event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
@@ -435,7 +435,8 @@ class TC_ACL_2_5(MatterBaseTest):
             TestStep(12, "TH1 writes DUT Endpoint 0 AccessControl cluster Extension attribute, value is an empty list", "Result is SUCCESS"),
             TestStep(13, "TH1 reads DUT Endpoint 0 AccessControl cluster AccessControlExtensionChanged event",
                      "Result is SUCCESS, value is list of AccessControlExtensionChanged containing at least 1 new element if new write list method is used LatestValue Field should be D_OK_EMPTY, else then the legacy list method is used value should be D_OK_SINGLE."),
-            TestStep(14, "Rerunning test with new list method", "Rerunning test with new list method"),
+            TestStep(14, "Re-run the test using the legacy list writing mechanism, where the client issues a series of AttributeDataIBs, with the first containing a path to the list itself and Data that is empty array, which signals clearing the list, and subsequent AttributeDataIBs containing updates.",
+                     "Test succeeds with legacy list encoding mechanism"),
         ]
         return steps
 
