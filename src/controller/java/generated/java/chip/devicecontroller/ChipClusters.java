@@ -37490,7 +37490,7 @@ public class ChipClusters {
     private static final long AC_ERROR_CODE_ATTRIBUTE_ID = 68L;
     private static final long AC_LOUVER_POSITION_ATTRIBUTE_ID = 69L;
     private static final long AC_COIL_TEMPERATURE_ATTRIBUTE_ID = 70L;
-    private static final long AC_CAPACITYFORMAT_ATTRIBUTE_ID = 71L;
+    private static final long AC_CAPACITY_FORMAT_ATTRIBUTE_ID = 71L;
     private static final long PRESET_TYPES_ATTRIBUTE_ID = 72L;
     private static final long SCHEDULE_TYPES_ATTRIBUTE_ID = 73L;
     private static final long NUMBER_OF_PRESETS_ATTRIBUTE_ID = 74L;
@@ -39393,9 +39393,9 @@ public class ChipClusters {
         }, AC_COIL_TEMPERATURE_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
-    public void readACCapacityformatAttribute(
+    public void readACCapacityFormatAttribute(
         IntegerAttributeCallback callback) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_CAPACITYFORMAT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_CAPACITY_FORMAT_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -39403,21 +39403,21 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, AC_CAPACITYFORMAT_ATTRIBUTE_ID, true);
+        }, AC_CAPACITY_FORMAT_ATTRIBUTE_ID, true);
     }
 
-    public void writeACCapacityformatAttribute(DefaultClusterCallback callback, Integer value) {
-      writeACCapacityformatAttribute(callback, value, 0);
+    public void writeACCapacityFormatAttribute(DefaultClusterCallback callback, Integer value) {
+      writeACCapacityFormatAttribute(callback, value, 0);
     }
 
-    public void writeACCapacityformatAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+    public void writeACCapacityFormatAttribute(DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
       BaseTLVType tlvValue = new UIntType(value);
-      writeAttribute(new WriteAttributesCallbackImpl(callback), AC_CAPACITYFORMAT_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
+      writeAttribute(new WriteAttributesCallbackImpl(callback), AC_CAPACITY_FORMAT_ATTRIBUTE_ID, tlvValue, timedWriteTimeoutMs);
     }
 
-    public void subscribeACCapacityformatAttribute(
+    public void subscribeACCapacityFormatAttribute(
         IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_CAPACITYFORMAT_ATTRIBUTE_ID);
+      ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, AC_CAPACITY_FORMAT_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
@@ -39425,7 +39425,7 @@ public class ChipClusters {
             Integer value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
-        }, AC_CAPACITYFORMAT_ATTRIBUTE_ID, minInterval, maxInterval);
+        }, AC_CAPACITY_FORMAT_ATTRIBUTE_ID, minInterval, maxInterval);
     }
 
     public void readPresetTypesAttribute(

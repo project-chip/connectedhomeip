@@ -6352,7 +6352,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }
   }
 
-  suspend fun readACCapacityformatAttribute(): UByte? {
+  suspend fun readACCapacityFormatAttribute(): UByte? {
     val ATTRIBUTE_ID: UInt = 71u
 
     val attributePath =
@@ -6388,7 +6388,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun writeACCapacityformatAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
+  suspend fun writeACCapacityFormatAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 71u
 
     val tlvWriter = TlvWriter()
@@ -6428,7 +6428,7 @@ class ThermostatCluster(private val controller: MatterController, private val en
     }
   }
 
-  suspend fun subscribeACCapacityformatAttribute(
+  suspend fun subscribeACCapacityFormatAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {

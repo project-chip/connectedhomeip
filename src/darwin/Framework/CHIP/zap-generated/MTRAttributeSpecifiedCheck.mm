@@ -3958,7 +3958,7 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
     case Attributes::ACCoilTemperature::Id: {
         return YES;
     }
-    case Attributes::ACCapacityformat::Id: {
+    case Attributes::ACCapacityFormat::Id: {
         return YES;
     }
     case Attributes::PresetTypes::Id: {
