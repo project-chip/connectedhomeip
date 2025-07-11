@@ -18,6 +18,7 @@
 #include <app/clusters/general-diagnostics-server/CodegenIntegration.h>
 #include <app/clusters/general-diagnostics-server/general-diagnostics-logic.h>
 #include <app/static-cluster-config/GeneralDiagnostics.h>
+#include <app/util/config.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 using namespace chip;
@@ -32,7 +33,11 @@ static_assert((GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.
               GeneralDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 0);
 
 namespace {
-LazyRegisteredServerCluster<GeneralDiagnosticsCluster<DeviceLayerGeneralDiagnosticsLogic>> gServer;
+#ifdef ZCL_USING_TIME_SYNCHRONIZATION_CLUSTER_SERVER
+LazyRegisteredServerCluster<GeneralDiagnosticsCluster<DeviceLayerGeneralDiagnosticsLogic, true>> gServer;
+#else
+LazyRegisteredServerCluster<GeneralDiagnosticsCluster<DeviceLayerGeneralDiagnosticsLogic, false>> gServer;
+#endif
 
 // compile-time evaluated method if "is <EP>::GeneralDiagnostics::<ATTR>" enabled
 constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId)
@@ -57,7 +62,7 @@ constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId
 
 void emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
-    VerifyOrReturn(endpointId == kRootEndpointId);
+    VerifyOrDie(endpointId == kRootEndpointId);
     const GeneralDiagnosticsEnabledAttributes enabledAttributes{
         .enableTotalOperationalHours = IsAttributeEnabled(endpointId, Attributes::TotalOperationalHours::Id),
         .enableBootReason            = IsAttributeEnabled(endpointId, Attributes::BootReason::Id),
