@@ -35,6 +35,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import time
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
@@ -66,6 +67,11 @@ def current_latch_matcher(current_latch: bool) -> AttributeMatcher:
 
 
 class TC_CLCTRL_6_1(MatterBaseTest):
+    @property
+    def default_timeout(self) -> int:
+        # This test has potentially 45s waits, so set the timeout to 60
+        return 60
+
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -300,7 +306,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                     try:
                         await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                             latch=False
-                        ), endpoint=endpoint)
+                        ), endpoint=endpoint, timedRequestTimeoutMs=1000)
                     except InteractionModelError as e:
                         asserts.assert_equal(
                             e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -358,7 +364,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 try:
                     await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                         position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
-                    ), endpoint=endpoint)
+                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -427,7 +433,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -447,7 +453,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -554,7 +560,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -573,7 +579,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -626,7 +632,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 try:
                     await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                         latch=True
-                    ), endpoint=endpoint)
+                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -677,7 +683,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 try:
                     await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                         latch=False
-                    ), endpoint=endpoint)
+                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -730,7 +736,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 try:
                     await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                         latch=True
-                    ), endpoint=endpoint)
+                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -774,7 +780,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 try:
                     await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                         latch=False
-                    ), endpoint=endpoint)
+                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -785,10 +791,11 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             # STEP 9k: TH sends command MoveTo with Position = MoveToFullyOpen.
             self.step("9k")
 
+            time.sleep(2)  # Adding a small delay to ensure the previous command is processed
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
