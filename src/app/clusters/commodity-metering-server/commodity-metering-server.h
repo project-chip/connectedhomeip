@@ -46,14 +46,14 @@ public:
 
     /**
      * Gets the current metered quantity data.
-     * 
+     *
      * @warning Returned references are only valid until:
      *          - Next call to SetMeteredQuantity()
      *          - Call to Shutdown()
      *          - Instance destruction
-     *          
+     *
      * @warning Not thread-safe - caller must ensure external synchronization
-     * 
+     *
      * @return Reference to internal state. Do not store long-term.
      */
     const DataModel::Nullable<DataModel::List<Structs::MeteredQuantityStruct::Type>> & GetMeteredQuantity() const

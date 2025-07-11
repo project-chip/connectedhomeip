@@ -207,9 +207,11 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
             for (size_t idx = 0; idx < len; idx++)
             {
                 CHIP_ERROR err = CopyMeteredQuantityEntry(newValue.Value()[idx], buffer[idx]);
-                if (err != CHIP_NO_ERROR) {
+                if (err != CHIP_NO_ERROR)
+                {
                     // Clean up any partially copied IDs
-                    for (size_t cleanupIdx = 0; cleanupIdx < idx; cleanupIdx++) {
+                    for (size_t cleanupIdx = 0; cleanupIdx < idx; cleanupIdx++)
+                    {
                         CleanUpIDs(buffer[cleanupIdx].tariffComponentIDs);
                     }
                     buffer.Free();
