@@ -73,7 +73,18 @@ static bool HasDuplicateIDs(const DataModel::List<const uint32_t> & IDs, std::un
 }
 
 /**
- * @brief The comparator for specific struct types wrapped to Optional<Struct>
+ * @brief Custom comparator for Optional-wrapped struct types.
+ * 
+ * @tparam T The struct type being compared
+ * @param lhs Left-hand Optional<T> to compare
+ * @param rhs Right-hand Optional<T> to compare
+ * @return bool True if equal, false otherwise
+ * 
+ * @note This exists because:
+ *       1. Optional<T>::operator== requires T to implement operator==
+ *       2. Many Matter structs don't implement operator== by design
+ *       3. We need to compare structs field-by-field for accurate change detection
+ *       4. The default Optional comparison would fail to compile for non-comparable types
  */
 template <typename T>
 static bool OptionalStructsAreEqual(const Optional<T> & lhs, const Optional<T> & rhs)
@@ -86,8 +97,21 @@ static bool OptionalStructsAreEqual(const Optional<T> & lhs, const Optional<T> &
 }
 
 /**
- * @brief The comparator for specific struct types wrapped to Optional<Nullable<Struct>>
+ * @brief Custom comparator for Optional<Nullable<T>> wrapped struct types.
+ * 
+ * @tparam T The struct type being compared
+ * @param lhs Left-hand Optional<Nullable<T>> to compare
+ * @param rhs Right-hand Optional<Nullable<T>> to compare
+ * @return bool True if equal, false otherwise
+ * 
+ * @note This exists because:
+ *       1. Combines three levels of wrapping (Optional+Nullable+Struct)
+ *       2. Handles all null/missing combinations explicitly
+ *       3. Provides consistent behavior when T lacks operator==
+ *       4. Needed for attribute change detection in Matter's data model
+ *       5. The nested wrappers make default comparisons impractical
  */
+
 template <typename T>
 static bool OptionalNullableStructsAreEqual(const Optional<DataModel::Nullable<T>> & lhs,
                                             const Optional<DataModel::Nullable<T>> & rhs)
@@ -116,7 +140,7 @@ static bool OptionalNullableStructsAreEqual(const Optional<DataModel::Nullable<T
         return false;
     }
 
-    // Both present and not null -> return false if equal
+    // Both present and not null -> return true if equal
     return (lhs.Value().Value() == rhs.Value().Value());
 }
 
@@ -146,41 +170,47 @@ CHIP_ERROR DefaultRandomizationTypeDataClass::Validate(const ValueType & aValue)
 
 CHIP_ERROR TariffInfoDataClass::Validate(const ValueType & aValue) const
 {
-    if (!aValue.IsNull())
+    // The tariff info is always required (cannot be null)
+    if (aValue.IsNull())
     {
-        const PayloadType & newValue = aValue.Value();
-
-        if (!newValue.tariffLabel.IsNull() && newValue.tariffLabel.Value().size() > kTariffInfoMaxLabelLength)
-            return CHIP_ERROR_INVALID_ARGUMENT;
-
-        if (!newValue.providerName.IsNull() && newValue.providerName.Value().size() > kTariffInfoMaxProviderLength)
-            return CHIP_ERROR_INVALID_ARGUMENT;
-
-        if (!newValue.blockMode.IsNull())
-        {
-            VerifyOrReturnError(EnsureKnownEnumValue(newValue.blockMode.Value()) != BlockModeEnum::kUnknownEnumValue,
-                                CHIP_ERROR_INVALID_ARGUMENT);
-        }
-
-        if (CommonUtilities::HasFeatureInCtx(static_cast<TariffUpdateCtx *>(mAuxData), CommodityTariff::Feature::kPricing))
-        {
-            if (newValue.currency.HasValue() && !newValue.currency.Value().IsNull())
-            {
-                const auto & currency = newValue.currency.Value().Value();
-                if (currency.currency >= kMaxCurrencyValue)
-                    return CHIP_ERROR_INVALID_ARGUMENT;
-            }
-            else
-            {
-                // If the pricing feature is enabled, the currency field is required!
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            }
-        }
+        return CHIP_NO_ERROR;
     }
-    else
-    {
-        // The tariff info is required, but not present.
-        return CHIP_ERROR_INVALID_ARGUMENT;
+
+    const PayloadType& newValue = aValue.Value();
+    auto* ctx = static_cast<TariffUpdateCtx*>(mAuxData);
+
+    // Validate string lengths (if fields are provided)
+    VerifyOrReturnError(newValue.tariffLabel.IsNull() || 
+                       newValue.tariffLabel.Value().size() <= kTariffInfoMaxLabelLength,
+                       CHIP_ERROR_INVALID_ARGUMENT);
+
+    VerifyOrReturnError(newValue.providerName.IsNull() || 
+                       newValue.providerName.Value().size() <= kTariffInfoMaxProviderLength,
+                       CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Validate enum values
+    if (!newValue.blockMode.IsNull()) {
+        VerifyOrReturnError(EnsureKnownEnumValue(newValue.blockMode.Value()) != BlockModeEnum::kUnknownEnumValue,
+                           CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    // Handle currency validation based on pricing feature
+    const bool pricingEnabled = CommonUtilities::HasFeatureInCtx(ctx, CommodityTariff::Feature::kPricing);
+
+    if (pricingEnabled) {
+        // Pricing enabled - currency must be provided (null or non-null)
+        VerifyOrReturnError(newValue.currency.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+
+        // If non-null, validate contents
+        if (!newValue.currency.Value().IsNull()) {
+            const auto& currency = newValue.currency.Value().Value();
+            VerifyOrReturnError(currency.currency < kMaxCurrencyValue, 
+                              CHIP_ERROR_INVALID_ARGUMENT);
+        }
+        // Else: null is valid when pricing enabled
+    } else {
+        // Pricing disabled - currency must not be provided at all
+        VerifyOrReturnError(!newValue.currency.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     return CHIP_NO_ERROR;
@@ -486,89 +516,101 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
                             CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    // If PRICE feature are supported
-    if (CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kPricing))
+    // Handle price field validation based on feature support
+    if (entryNewValue.price.HasValue() && !entryNewValue.price.Value().IsNull())
     {
-        if (entryNewValue.price.HasValue() && !entryNewValue.price.Value().IsNull())
+        // If price is provided, the Pricing feature MUST be supported
+        VerifyOrReturnError(CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kPricing),
+                          CHIP_ERROR_INVALID_ARGUMENT);
+
+        const auto & price = entryNewValue.price.Value().Value();
+        VerifyOrReturnError(EnsureKnownEnumValue(price.priceType) != TariffPriceTypeEnum::kUnknownEnumValue,
+                          CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else if (CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kPricing))
+    {
+        // If Pricing feature is enabled but no price provided, that's only acceptable
+        // if the field is explicitly set to null (which we already checked above)
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    // Else: No price provided and feature not enabled - valid case
+
+    // Validate friendlyCredit field
+    if (entryNewValue.friendlyCredit.HasValue())
+    {
+        // If friendlyCredit is provided, the FCRED feature MUST be supported
+        VerifyOrReturnError(CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kFriendlyCredit),
+                          CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    
+    // Validate auxiliaryLoad field
+    if (entryNewValue.auxiliaryLoad.HasValue())
+    {
+        VerifyOrReturnError(CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kAuxiliaryLoad),
+                          CHIP_ERROR_INVALID_ARGUMENT);
+        
+        const auto & auxiliaryLoad = entryNewValue.auxiliaryLoad.Value();
+        VerifyOrReturnError(EnsureKnownEnumValue(auxiliaryLoad.requiredState) != AuxiliaryLoadSettingEnum::kUnknownEnumValue,
+                          CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else if (CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kAuxiliaryLoad))
+    {
+        // AUXLD feature enabled but no auxiliaryLoad provided (or explicitly null)
+        ChipLogError(NotSpecified, "The auxiliaryLoad field must be provided and non-null when AUXLD feature is enabled");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    
+    // Validate peakPeriod field
+    if (entryNewValue.peakPeriod.HasValue())
+    {
+        VerifyOrReturnError(CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kPeakPeriod),
+                          CHIP_ERROR_INVALID_ARGUMENT);
+        
+        const auto & peakPeriod = entryNewValue.peakPeriod.Value();
+        VerifyOrReturnError(EnsureKnownEnumValue(peakPeriod.severity) != PeakPeriodSeverityEnum::kUnknownEnumValue,
+                          CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(peakPeriod.peakPeriod > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    else if (CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kPeakPeriod))
+    {
+        // PEAKP feature enabled but no peakPeriod provided (or explicitly null)
+        ChipLogError(NotSpecified, "The peakPeriod field must be provided and non-null when PEAKP feature is enabled");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    
+    // Validate powerThreshold field
+    if (entryNewValue.powerThreshold.HasValue())
+    {
+        VerifyOrReturnError(CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kPowerThreshold),
+                          CHIP_ERROR_INVALID_ARGUMENT);
+        
+        const auto & powerThreshold = entryNewValue.powerThreshold.Value();
+        if (!powerThreshold.powerThresholdSource.IsNull())
         {
-            const auto & price = entryNewValue.price.Value().Value();
-            VerifyOrReturnError(EnsureKnownEnumValue(price.priceType) != TariffPriceTypeEnum::kUnknownEnumValue,
-                                CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(EnsureKnownEnumValue(powerThreshold.powerThresholdSource.Value()) !=
+                              PowerThresholdSourceEnum::kUnknownEnumValue,
+                              CHIP_ERROR_INVALID_ARGUMENT);
         }
-        else
+    
+        // Additional power threshold validations
+        if (powerThreshold.powerThreshold.HasValue())
         {
-            // If the pricing feature is enabled, the price field is required!
-            return CHIP_ERROR_INVALID_ARGUMENT;
+            VerifyOrReturnError(powerThreshold.powerThreshold.Value() > 0, 
+                              CHIP_ERROR_INVALID_ARGUMENT);
+        }
+        if (powerThreshold.apparentPowerThreshold.HasValue())
+        {
+            VerifyOrReturnError(powerThreshold.apparentPowerThreshold.Value() > 0,
+                              CHIP_ERROR_INVALID_ARGUMENT);
         }
     }
 
-    // If FCRED feature are supported
-    if (CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kFriendlyCredit))
+    if (entryNewValue.predicted.HasValue())
     {
-        if (!entryNewValue.friendlyCredit.HasValue())
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-    }
-
-    // If AUXLD feature are supported
-    if (CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kAuxiliaryLoad))
-    {
-        if (entryNewValue.auxiliaryLoad.HasValue())
-        {
-            const auto & auxiliaryLoad = entryNewValue.auxiliaryLoad.Value();
-
-            VerifyOrReturnError(EnsureKnownEnumValue(auxiliaryLoad.requiredState) != AuxiliaryLoadSettingEnum::kUnknownEnumValue,
-                                CHIP_ERROR_INVALID_ARGUMENT);
-        }
-        else
-        {
-            // If the AUXLD feature is enabled, the auxiliaryLoad field is required!
-            ChipLogError(NotSpecified, "The auxiliaryLoad field is required when AUXLD feature is enabled");
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-    }
-
-    // If PEAKP feature are supported
-    if (CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kPeakPeriod))
-    {
-        if (entryNewValue.peakPeriod.HasValue())
-        {
-            const auto & peakPeriod = entryNewValue.peakPeriod.Value();
-
-            VerifyOrReturnError(EnsureKnownEnumValue(peakPeriod.severity) != PeakPeriodSeverityEnum::kUnknownEnumValue,
-                                CHIP_ERROR_INVALID_ARGUMENT);
-
-            VerifyOrReturnError(peakPeriod.peakPeriod > 0, CHIP_ERROR_INVALID_ARGUMENT);
-        }
-        else
-        {
-            // If the PEAKP feature is enabled, the peakPeriod field is required!
-            ChipLogError(NotSpecified, "The peakPeriod field is required when PEAKP feature is enabled");
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-    }
-
-    // If PWRTHLD feature are supported
-    if (CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kPowerThreshold))
-    {
-        if (entryNewValue.powerThreshold.HasValue())
-        {
-            const auto & powerThreshold = entryNewValue.powerThreshold.Value();
-
-            if (!powerThreshold.powerThresholdSource.IsNull())
-            {
-                VerifyOrReturnError(EnsureKnownEnumValue(powerThreshold.powerThresholdSource.Value()) !=
-                                        PowerThresholdSourceEnum::kUnknownEnumValue,
-                                    CHIP_ERROR_INVALID_ARGUMENT);
-            }
-
-            // TODO - maybe we should implement deeper validation for these fields:
-            if (powerThreshold.powerThreshold.HasValue() && powerThreshold.powerThreshold.Value() == 0)
-                return CHIP_ERROR_INVALID_ARGUMENT;
-            if (powerThreshold.apparentPowerThreshold.HasValue() && powerThreshold.apparentPowerThreshold.Value() == 0)
-                return CHIP_ERROR_INVALID_ARGUMENT;
-        }
+        // No need to check the value itself since it's just a bool
+        // But we can add debug logging if needed:
+        ChipLogDetail(NotSpecified, "Predicted flag set to %s", 
+                     entryNewValue.predicted.Value() ? "true" : "false");
     }
 
     return CHIP_NO_ERROR;
@@ -720,58 +762,56 @@ void IndividualDaysDataClass::CleanupStructValue(PayloadType & aValue)
 
 CHIP_ERROR CalendarPeriodsDataClass::Validate(const ValueType & aValue) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // If calendar is unavailable, the attribute should be null
-    if (!aValue.IsNull())
-    {
-        auto & newList   = aValue.Value();
-        bool isFirstItem = true;
-        Nullable<uint32_t> previousStartDate;
-        std::unordered_set<uint32_t> & CalendarPeriodsDayPatternIDs = ((TariffUpdateCtx *) mAuxData)->CalendarPeriodsDayPatternIDs;
-
-        for (const auto & item : newList)
-        {
-            // Validate dayPatternIDs
-            VerifyOrReturnError_LogSend(!item.dayPatternIDs.empty() &&
-                                            item.dayPatternIDs.size() <= kCalendarPeriodItemMaxDayPatternIDs,
-                                        CHIP_ERROR_INVALID_ARGUMENT, "DayPatternIDs count must be between 1 and %" PRIuMAX "",
-                                        kCalendarPeriodItemMaxDayPatternIDs);
-
-            // Check for duplicate dayPatternIDs
-            VerifyOrReturnError_LogSend(!CommonUtilities::HasDuplicateIDs(item.dayPatternIDs, CalendarPeriodsDayPatternIDs),
-                                        CHIP_ERROR_DUPLICATE_KEY_ID, "Duplicate dayPatternID found in CalendarPeriods");
-
-            // Special handling for first item
-            if (isFirstItem)
-            {
-                isFirstItem = false;
-                // First item can have null StartDate
-                if (item.startDate.IsNull())
-                {
-                    previousStartDate = item.startDate;
-                    continue;
-                }
-            }
-            else
-            {
-                // Subsequent items must have non-null StartDate
-                VerifyOrReturnError_LogSend(!item.startDate.IsNull(), CHIP_ERROR_INVALID_ARGUMENT,
-                                            "Only first CalendarPeriodStruct can have null StartDate");
-            }
-
-            // Validate StartDate ordering
-            if (!previousStartDate.IsNull() && !item.startDate.IsNull())
-            {
-                VerifyOrReturnError_LogSend(item.startDate.Value() > previousStartDate.Value(), CHIP_ERROR_INVALID_ARGUMENT,
-                                            "CalendarPeriodStructs must be in increasing StartDate order");
-            }
-
-            previousStartDate = item.startDate;
-        }
+    // If calendar is null, it's always valid
+    if (aValue.IsNull()) {
+        return CHIP_NO_ERROR;
     }
 
-    return err;
+    auto & newList = aValue.Value();
+    bool isFirstItem = true;
+    Nullable<uint32_t> previousStartDate;
+    std::unordered_set<uint32_t> & CalendarPeriodsDayPatternIDs = 
+        static_cast<TariffUpdateCtx *>(mAuxData)->CalendarPeriodsDayPatternIDs;
+
+    for (const auto & item : newList)
+    {
+        // Validate dayPatternIDs count
+        if (item.dayPatternIDs.empty() || item.dayPatternIDs.size() > kCalendarPeriodItemMaxDayPatternIDs) {
+            ChipLogError(NotSpecified, "DayPatternIDs count must be between 1 and %" PRIuMAX, kCalendarPeriodItemMaxDayPatternIDs);
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        // Check for duplicate dayPatternIDs
+        if (CommonUtilities::HasDuplicateIDs(item.dayPatternIDs, CalendarPeriodsDayPatternIDs)) {
+            ChipLogError(NotSpecified, "Duplicate dayPatternID found in CalendarPeriods");
+            return CHIP_ERROR_DUPLICATE_KEY_ID;
+        }
+
+        // Special handling for first item
+        if (isFirstItem) {
+            isFirstItem = false;
+            // First item can have null StartDate
+            previousStartDate = item.startDate;
+            continue;
+        }
+
+        // Subsequent items must have non-null StartDate
+        if (item.startDate.IsNull()) {
+            ChipLogError(NotSpecified, "Only first CalendarPeriodStruct can have null StartDate");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        // Validate StartDate ordering
+        if (!previousStartDate.IsNull() && !item.startDate.IsNull() && 
+            item.startDate.Value() <= previousStartDate.Value()) {
+            ChipLogError(NotSpecified, "CalendarPeriodStructs must be in increasing StartDate order");
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        previousStartDate = item.startDate;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 bool CalendarPeriodsDataClass::CompareStructValue(const PayloadType & source, const PayloadType & destination) const

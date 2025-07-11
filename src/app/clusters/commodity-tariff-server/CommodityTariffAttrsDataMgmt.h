@@ -144,105 +144,105 @@ inline bool operator!=(const DayEntryStruct::Type & lhs, const DayEntryStruct::T
 } // namespace Clusters
 
 namespace CommodityTariffAttrsDataMgmt {
+
+/// @brief Helper for copying spans to Matter data model lists
+/// @tparam T Type of elements to copy
 template <typename T>
 struct SpanCopier
 {
-    static bool Copy(const chip::Span<const T> & source, DataModel::List<const T> & destination,
-                     size_t maxElements = std::numeric_limits<size_t>::max())
+    /// @brief Copies span data to a newly allocated list
+    /// @param source Input span to copy from
+    /// @param destination Output list to populate
+    /// @param maxCount Maximum number of elements to copy (default: unlimited)
+    /// @return true if copy succeeded, false on memory allocation failure
+    static bool Copy(const Span<const T>& source, 
+                    DataModel::List<const T>& destination,
+                    size_t maxCount = std::numeric_limits<size_t>::max())
     {
-        if (source.empty())
-        {
+        if (source.empty()) {
             destination = DataModel::List<const T>();
             return true;
         }
 
-        size_t elementsToCopy = std::min(source.size(), maxElements);
-        auto * buffer         = static_cast<T *>(chip::Platform::MemoryCalloc(elementsToCopy, sizeof(T)));
-
-        if (!buffer)
-        {
-            return false;
-        }
+        const size_t elementsToCopy = std::min(source.size(), maxCount);
+        auto* buffer = static_cast<T*>(Platform::MemoryCalloc(elementsToCopy, sizeof(T)));
+        
+        if (!buffer) return false;
 
         std::copy(source.begin(), source.begin() + elementsToCopy, buffer);
-        destination = DataModel::List<const T>(chip::Span<const T>(buffer, elementsToCopy));
+        destination = DataModel::List<const T>(Span<const T>(buffer, elementsToCopy));
         return true;
     }
 };
 
+/// @brief Specialization for character spans with consistent maxCount semantics
 template <>
 struct SpanCopier<char>
 {
-    static bool Copy(const chip::CharSpan & source, DataModel::Nullable<chip::CharSpan> & destination,
-                     size_t maxLength = std::numeric_limits<size_t>::max())
+    /// @brief Copies character span to a nullable CharSpan
+    /// @param source Input span to copy from
+    /// @param destination Output span to populate
+    /// @param maxCount Maximum number of characters to copy (default: unlimited)
+    /// @return true if copy succeeded, false on memory allocation or size limit failure
+    static bool Copy(const CharSpan& source,
+                    DataModel::Nullable<CharSpan>& destination,
+                    size_t maxCount = std::numeric_limits<size_t>::max())
     {
-        if (source.size() > maxLength)
-        {
+        if (source.size() > maxCount) {
             return false;
         }
 
-        if (source.empty())
-        {
+        if (source.empty()) {
             destination.SetNull();
             return true;
         }
 
-        size_t bytesToCopy = std::min(source.size(), maxLength);
-        char * buffer      = static_cast<char *>(chip::Platform::MemoryCalloc(1, bytesToCopy + 1)); // +1 for null terminator
+        char* buffer = static_cast<char*>(Platform::MemoryCalloc(1, source.size() + 1));
+        if (!buffer) return false;
 
-        if (!buffer)
-        {
-            return false;
-        }
-
-        std::copy(source.begin(), source.begin() + bytesToCopy, buffer);
-        buffer[bytesToCopy] = '\0';
-        destination.SetNonNull(chip::CharSpan(buffer, bytesToCopy));
+        std::copy(source.begin(), source.end(), buffer);
+        buffer[source.size()] = '\0';
+        destination.SetNonNull(CharSpan(buffer, source.size()));
         return true;
     }
 };
 
+/// @brief Helper for string to span conversions
 struct StrToSpan
 {
-    static CHIP_ERROR Copy(const std::string & source, chip::CharSpan & destination,
-                           size_t maxLength = std::numeric_limits<size_t>::max())
+    /// @brief Copies std::string to a CharSpan
+    /// @param source Input string to copy from
+    /// @param destination Output span to populate
+    /// @param maxCount Maximum number of characters to copy (default: unlimited)
+    /// @return CHIP_NO_ERROR on success, error code on failure
+    static CHIP_ERROR Copy(const std::string& source,
+                          CharSpan& destination,
+                          size_t maxCount = std::numeric_limits<size_t>::max())
     {
-        // Handle empty string case
-        if (source.empty())
-        {
-            destination = chip::CharSpan();
+        if (source.empty()) {
+            destination = CharSpan();
             return CHIP_NO_ERROR;
         }
 
-        // Check length limit
-        if (source.size() > maxLength)
-        {
+        if (source.size() > maxCount) {
             return CHIP_ERROR_INVALID_STRING_LENGTH;
         }
 
-        // Allocate memory (including null terminator)
-        char * buffer = static_cast<char *>(chip::Platform::MemoryAlloc(source.size() + 1));
-        if (buffer == nullptr)
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
+        char* buffer = static_cast<char*>(Platform::MemoryAlloc(source.size() + 1));
+        if (!buffer) return CHIP_ERROR_NO_MEMORY;
 
-        // Copy data and null-terminate
         memcpy(buffer, source.data(), source.size());
         buffer[source.size()] = '\0';
-
-        // Set output span
-        destination = chip::CharSpan(buffer, source.size());
+        destination = CharSpan(buffer, source.size());
         return CHIP_NO_ERROR;
     }
 
-    // Optional: Memory cleanup helper
-    static void Release(chip::CharSpan & span)
+    /// @brief Releases memory allocated by a CharSpan
+    static void Release(CharSpan& span)
     {
-        if (!span.empty())
-        {
-            chip::Platform::MemoryFree(const_cast<char *>(span.data()));
-            span = chip::CharSpan();
+        if (!span.empty()) {
+            Platform::MemoryFree(const_cast<char*>(span.data()));
+            span = CharSpan();
         }
     }
 };
@@ -558,7 +558,7 @@ public:
         {
             if (size >= 1)
             {
-                auto * buffer = static_cast<PayloadType *>(chip::Platform::MemoryCalloc(size, sizeof(PayloadType)));
+                auto * buffer = static_cast<PayloadType *>(Platform::MemoryCalloc(size, sizeof(PayloadType)));
 
                 if (!buffer)
                 {
@@ -841,7 +841,7 @@ private:
         }
         if (list.data())
         {
-            chip::Platform::MemoryFree(list.data());
+            Platform::MemoryFree(list.data());
             list = DataModel::List<PayloadType>();
         }
     }
