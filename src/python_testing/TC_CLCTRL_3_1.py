@@ -175,7 +175,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
 
         sub_handler.reset()
         try:
-            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Calibrate(), endpoint=endpoint)
+            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Calibrate(), endpoint=endpoint, timedRequestTimeoutsMs=1000)
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command Calibrate: {e.status}")
@@ -203,7 +203,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         self.step("4a")
 
         try:
-            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Calibrate(), endpoint=endpoint)
+            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Calibrate(), endpoint=endpoint, timedRequestTimeoutsMs=1000)
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command Calibrate: {e.status}")
@@ -223,7 +223,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
 
         sub_handler.reset()
         try:
-            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Calibrate(), endpoint=endpoint)
+            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Calibrate(), endpoint=endpoint, timedRequestTimeoutsMs=1000)
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command Calibrate: {e.status}")
@@ -304,7 +304,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
                     try:
                         await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                             latch=False
-                        ), endpoint=endpoint)
+                        ), endpoint=endpoint, timedRequestTimeoutsMs=1000)
                     except InteractionModelError as e:
                         asserts.assert_equal(
                             e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -356,7 +356,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutsMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -377,7 +377,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         try:
             await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                 position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen
-            ), endpoint=endpoint)
+            ), endpoint=endpoint, timedRequestTimeoutsMs=1000)
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -409,7 +409,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         try:
             await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                 position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed
-            ), endpoint=endpoint)
+            ), endpoint=endpoint, timedRequestTimeoutsMs=1000)
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -428,7 +428,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         self.step("6f")
 
         try:
-            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Calibrate(), endpoint=endpoint)
+            await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.Calibrate(), endpoint=endpoint, timedRequestTimeoutsMs=1000)
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.InvalidInState, f"The Calibrate command sent in an incorrect state: {e.status}")
