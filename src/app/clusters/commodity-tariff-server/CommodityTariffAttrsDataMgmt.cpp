@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-
 #include "CommodityTariffConsts.h"
 #include <cassert>
 
@@ -56,7 +55,7 @@ static bool HasFeatureInCtx(TariffUpdateCtx * aCtx, Feature aFeature)
  * @brief Releases memory allocated for a list of IDs and resets the list
  * @param IDs List containing allocated IDs buffer to free. After this call,
  *            the list will be empty and the buffer pointer nulled.
- * 
+ *
  * @note The const_cast is safe because:
  *       1. We own the memory allocation (allocated via MemoryAlloc in non-const context)
  *       2. MemoryFree doesn't modify the memory, just deallocates it
@@ -90,12 +89,12 @@ static bool HasDuplicateIDs(const DataModel::List<const uint32_t> & IDs, std::un
 
 /**
  * @brief Custom comparator for Optional-wrapped struct types.
- * 
+ *
  * @tparam T The struct type being compared
  * @param lhs Left-hand Optional<T> to compare
  * @param rhs Right-hand Optional<T> to compare
  * @return bool True if equal, false otherwise
- * 
+ *
  * @note This exists because:
  *       1. Optional<T>::operator== requires T to implement operator==
  *       2. Many Matter structs don't implement operator== by design
@@ -114,12 +113,12 @@ static bool OptionalStructsAreEqual(const Optional<T> & lhs, const Optional<T> &
 
 /**
  * @brief Custom comparator for Optional<Nullable<T>> wrapped struct types.
- * 
+ *
  * @tparam T The struct type being compared
  * @param lhs Left-hand Optional<Nullable<T>> to compare
  * @param rhs Right-hand Optional<Nullable<T>> to compare
  * @return bool True if equal, false otherwise
- * 
+ *
  * @note This exists because:
  *       1. Combines three levels of wrapping (Optional+Nullable+Struct)
  *       2. Handles all null/missing combinations explicitly
@@ -192,39 +191,41 @@ CHIP_ERROR TariffInfoDataClass::Validate(const ValueType & aValue) const
         return CHIP_NO_ERROR;
     }
 
-    const PayloadType& newValue = aValue.Value();
-    auto* ctx = static_cast<TariffUpdateCtx*>(mAuxData);
+    const PayloadType & newValue = aValue.Value();
+    auto * ctx                   = static_cast<TariffUpdateCtx *>(mAuxData);
 
     // Validate string lengths (if fields are provided)
-    VerifyOrReturnError(newValue.tariffLabel.IsNull() || 
-                       newValue.tariffLabel.Value().size() <= kTariffInfoMaxLabelLength,
-                       CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(newValue.tariffLabel.IsNull() || newValue.tariffLabel.Value().size() <= kTariffInfoMaxLabelLength,
+                        CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrReturnError(newValue.providerName.IsNull() || 
-                       newValue.providerName.Value().size() <= kTariffInfoMaxProviderLength,
-                       CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(newValue.providerName.IsNull() || newValue.providerName.Value().size() <= kTariffInfoMaxProviderLength,
+                        CHIP_ERROR_INVALID_ARGUMENT);
 
     // Validate enum values
-    if (!newValue.blockMode.IsNull()) {
+    if (!newValue.blockMode.IsNull())
+    {
         VerifyOrReturnError(EnsureKnownEnumValue(newValue.blockMode.Value()) != BlockModeEnum::kUnknownEnumValue,
-                           CHIP_ERROR_INVALID_ARGUMENT);
+                            CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // Handle currency validation based on pricing feature
     const bool pricingEnabled = CommonUtilities::HasFeatureInCtx(ctx, CommodityTariff::Feature::kPricing);
 
-    if (pricingEnabled) {
+    if (pricingEnabled)
+    {
         // Pricing enabled - currency must be provided (null or non-null)
         VerifyOrReturnError(newValue.currency.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
         // If non-null, validate contents
-        if (!newValue.currency.Value().IsNull()) {
-            const auto& currency = newValue.currency.Value().Value();
-            VerifyOrReturnError(currency.currency < kMaxCurrencyValue, 
-                              CHIP_ERROR_INVALID_ARGUMENT);
+        if (!newValue.currency.Value().IsNull())
+        {
+            const auto & currency = newValue.currency.Value().Value();
+            VerifyOrReturnError(currency.currency < kMaxCurrencyValue, CHIP_ERROR_INVALID_ARGUMENT);
         }
         // Else: null is valid when pricing enabled
-    } else {
+    }
+    else
+    {
         // Pricing disabled - currency must not be provided at all
         VerifyOrReturnError(!newValue.currency.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
     }
@@ -253,7 +254,7 @@ void TariffInfoDataClass::CleanupStructValue(PayloadType & aValue)
 
     if (!aValue.providerName.IsNull() && aValue.providerName.Value().data())
     {
-        MemoryFree(const_cast<char *>(aValue.providerName.Value().data()));  
+        MemoryFree(const_cast<char *>(aValue.providerName.Value().data()));
         aValue.providerName.SetNull();
     }
 
@@ -287,33 +288,38 @@ static CHIP_ERROR ValidateListEntry(const DayEntryStruct::Type & entryNewValue, 
 }
 } // namespace DayEntriesDataClass_Utils
 
-CHIP_ERROR DayEntriesDataClass::Validate(const ValueType& aValue) const
+CHIP_ERROR DayEntriesDataClass::Validate(const ValueType & aValue) const
 {
     // Required field check
-    if (aValue.IsNull()) {
+    if (aValue.IsNull())
+    {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    const auto& newList = aValue.Value();
-    auto* ctx = static_cast<TariffUpdateCtx*>(mAuxData);
+    const auto & newList = aValue.Value();
+    auto * ctx           = static_cast<TariffUpdateCtx *>(mAuxData);
 
     // Validate list length
-    if (newList.size() == 0 || newList.size() > kDayEntriesAttrMaxLength) {
+    if (newList.size() == 0 || newList.size() > kDayEntriesAttrMaxLength)
+    {
         ChipLogError(NotSpecified, "Incorrect DayEntries length");
         return CHIP_ERROR_INVALID_LIST_LENGTH;
     }
 
     // Validate each entry
-    for (const auto& item : newList) {
+    for (const auto & item : newList)
+    {
         // Check for duplicate IDs
-        if (!ctx->DayEntryKeyIDs.insert(item.dayEntryID).second) {
+        if (!ctx->DayEntryKeyIDs.insert(item.dayEntryID).second)
+        {
             ChipLogError(NotSpecified, "Duplicate dayEntryID found");
             return CHIP_ERROR_DUPLICATE_KEY_ID;
         }
 
         // Validate entry contents
         CHIP_ERROR entryErr = DayEntriesDataClass_Utils::ValidateListEntry(item, ctx);
-        if (entryErr != CHIP_NO_ERROR) {
+        if (entryErr != CHIP_NO_ERROR)
+        {
             return entryErr;
         }
     }
@@ -353,25 +359,29 @@ static CHIP_ERROR ValidateListEntry(const DayPatternStruct::Type & entryNewValue
 }
 } // namespace DayPatternsDataClass_Utils
 
-CHIP_ERROR DayPatternsDataClass::Validate(const ValueType& aValue) const
+CHIP_ERROR DayPatternsDataClass::Validate(const ValueType & aValue) const
 {
-    if (aValue.IsNull()) {
+    if (aValue.IsNull())
+    {
         return CHIP_NO_ERROR; // Assuming null is valid for day patterns
     }
 
-    const auto& newList = aValue.Value();
-    auto* ctx = static_cast<TariffUpdateCtx*>(mAuxData);
+    const auto & newList   = aValue.Value();
+    auto * ctx             = static_cast<TariffUpdateCtx *>(mAuxData);
     uint8_t daysOfWeekMask = 0;
 
     // Validate list length
-    if (newList.size() == 0 || newList.size() > kDayPatternsAttrMaxLength) {
+    if (newList.size() == 0 || newList.size() > kDayPatternsAttrMaxLength)
+    {
         ChipLogError(NotSpecified, "Incorrect dayPatterns length");
         return CHIP_ERROR_INVALID_LIST_LENGTH;
     }
 
     // Validate each pattern
-    for (const auto& item : newList) {
-        if (!ctx->DayPatternKeyIDs.insert(item.dayPatternID).second) {
+    for (const auto & item : newList)
+    {
+        if (!ctx->DayPatternKeyIDs.insert(item.dayPatternID).second)
+        {
             ChipLogError(NotSpecified, "Duplicate dayPatternID found");
             return CHIP_ERROR_DUPLICATE_KEY_ID;
         }
@@ -379,16 +389,18 @@ CHIP_ERROR DayPatternsDataClass::Validate(const ValueType& aValue) const
         daysOfWeekMask |= item.daysOfWeek.Raw();
 
         CHIP_ERROR entryErr = DayPatternsDataClass_Utils::ValidateListEntry(item, ctx->DayPatternsDayEntryIDs);
-        if (entryErr != CHIP_NO_ERROR) {
+        if (entryErr != CHIP_NO_ERROR)
+        {
             return entryErr;
         }
     }
 
     // Validate week coverage
     const bool isValidSingleRotatingDay = (!daysOfWeekMask && newList.size() == 1);
-    const bool isValidFullWeekCoverage = (daysOfWeekMask == kFullWeekMask);
-    
-    if (!(isValidSingleRotatingDay || isValidFullWeekCoverage)) {
+    const bool isValidFullWeekCoverage  = (daysOfWeekMask == kFullWeekMask);
+
+    if (!(isValidSingleRotatingDay || isValidFullWeekCoverage))
+    {
         ChipLogError(NotSpecified, "Invalid day pattern coverage");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -462,31 +474,33 @@ static CHIP_ERROR ValidateListEntry(const TariffPeriodStruct::Type & entryNewVal
 }
 } // namespace TariffPeriodsDataClass_Utils
 
-CHIP_ERROR TariffPeriodsDataClass::Validate(const ValueType& aValue) const
+CHIP_ERROR TariffPeriodsDataClass::Validate(const ValueType & aValue) const
 {
     // Required field check
-    if (aValue.IsNull()) {
+    if (aValue.IsNull())
+    {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    const auto& newList = aValue.Value();
-    auto* ctx = static_cast<TariffUpdateCtx*>(mAuxData);
+    const auto & newList = aValue.Value();
+    auto * ctx           = static_cast<TariffUpdateCtx *>(mAuxData);
     std::map<uint32_t, std::unordered_set<uint32_t>> tariffComponentsMap;
 
     // Validate list length
-    if (newList.size() == 0 || newList.size() > kTariffPeriodsAttrMaxLength) {
+    if (newList.size() == 0 || newList.size() > kTariffPeriodsAttrMaxLength)
+    {
         ChipLogError(NotSpecified, "Incorrect TariffPeriods length");
         return CHIP_ERROR_INVALID_LIST_LENGTH;
     }
 
     // Validate each period
-    for (const auto& item : newList) {
+    for (const auto & item : newList)
+    {
         CHIP_ERROR entryErr = TariffPeriodsDataClass_Utils::ValidateListEntry(
-            item, ctx->TariffPeriodsDayEntryIDs, 
-            ctx->TariffPeriodsTariffComponentIDs,
-            tariffComponentsMap);
-        
-        if (entryErr != CHIP_NO_ERROR) {
+            item, ctx->TariffPeriodsDayEntryIDs, ctx->TariffPeriodsTariffComponentIDs, tariffComponentsMap);
+
+        if (entryErr != CHIP_NO_ERROR)
+        {
             return entryErr;
         }
     }
@@ -530,11 +544,11 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
     {
         // If price is provided, the Pricing feature MUST be supported
         VerifyOrReturnError(CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kPricing),
-                          CHIP_ERROR_INVALID_ARGUMENT);
+                            CHIP_ERROR_INVALID_ARGUMENT);
 
         const auto & price = entryNewValue.price.Value().Value();
         VerifyOrReturnError(EnsureKnownEnumValue(price.priceType) != TariffPriceTypeEnum::kUnknownEnumValue,
-                          CHIP_ERROR_INVALID_ARGUMENT);
+                            CHIP_ERROR_INVALID_ARGUMENT);
     }
     else if (CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kPricing))
     {
@@ -549,18 +563,18 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
     {
         // If friendlyCredit is provided, the FCRED feature MUST be supported
         VerifyOrReturnError(CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kFriendlyCredit),
-                          CHIP_ERROR_INVALID_ARGUMENT);
+                            CHIP_ERROR_INVALID_ARGUMENT);
     }
-    
+
     // Validate auxiliaryLoad field
     if (entryNewValue.auxiliaryLoad.HasValue())
     {
         VerifyOrReturnError(CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kAuxiliaryLoad),
-                          CHIP_ERROR_INVALID_ARGUMENT);
-        
+                            CHIP_ERROR_INVALID_ARGUMENT);
+
         const auto & auxiliaryLoad = entryNewValue.auxiliaryLoad.Value();
         VerifyOrReturnError(EnsureKnownEnumValue(auxiliaryLoad.requiredState) != AuxiliaryLoadSettingEnum::kUnknownEnumValue,
-                          CHIP_ERROR_INVALID_ARGUMENT);
+                            CHIP_ERROR_INVALID_ARGUMENT);
     }
     else if (CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kAuxiliaryLoad))
     {
@@ -568,16 +582,16 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
         ChipLogError(NotSpecified, "The auxiliaryLoad field must be provided and non-null when AUXLD feature is enabled");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    
+
     // Validate peakPeriod field
     if (entryNewValue.peakPeriod.HasValue())
     {
         VerifyOrReturnError(CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kPeakPeriod),
-                          CHIP_ERROR_INVALID_ARGUMENT);
-        
+                            CHIP_ERROR_INVALID_ARGUMENT);
+
         const auto & peakPeriod = entryNewValue.peakPeriod.Value();
         VerifyOrReturnError(EnsureKnownEnumValue(peakPeriod.severity) != PeakPeriodSeverityEnum::kUnknownEnumValue,
-                          CHIP_ERROR_INVALID_ARGUMENT);
+                            CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrReturnError(peakPeriod.peakPeriod > 0, CHIP_ERROR_INVALID_ARGUMENT);
     }
     else if (CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kPeakPeriod))
@@ -586,31 +600,29 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
         ChipLogError(NotSpecified, "The peakPeriod field must be provided and non-null when PEAKP feature is enabled");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    
+
     // Validate powerThreshold field
     if (entryNewValue.powerThreshold.HasValue())
     {
         VerifyOrReturnError(CommonUtilities::HasFeatureInCtx(aCtx, CommodityTariff::Feature::kPowerThreshold),
-                          CHIP_ERROR_INVALID_ARGUMENT);
-        
+                            CHIP_ERROR_INVALID_ARGUMENT);
+
         const auto & powerThreshold = entryNewValue.powerThreshold.Value();
         if (!powerThreshold.powerThresholdSource.IsNull())
         {
             VerifyOrReturnError(EnsureKnownEnumValue(powerThreshold.powerThresholdSource.Value()) !=
-                              PowerThresholdSourceEnum::kUnknownEnumValue,
-                              CHIP_ERROR_INVALID_ARGUMENT);
+                                    PowerThresholdSourceEnum::kUnknownEnumValue,
+                                CHIP_ERROR_INVALID_ARGUMENT);
         }
-    
+
         // Additional power threshold validations
         if (powerThreshold.powerThreshold.HasValue())
         {
-            VerifyOrReturnError(powerThreshold.powerThreshold.Value() > 0, 
-                              CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(powerThreshold.powerThreshold.Value() > 0, CHIP_ERROR_INVALID_ARGUMENT);
         }
         if (powerThreshold.apparentPowerThreshold.HasValue())
         {
-            VerifyOrReturnError(powerThreshold.apparentPowerThreshold.Value() > 0,
-                              CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(powerThreshold.apparentPowerThreshold.Value() > 0, CHIP_ERROR_INVALID_ARGUMENT);
         }
     }
 
@@ -618,38 +630,42 @@ static CHIP_ERROR ValidateListEntry(const TariffComponentStruct::Type & entryNew
     {
         // No need to check the value itself since it's just a bool
         // But we can add debug logging if needed:
-        ChipLogDetail(NotSpecified, "Predicted flag set to %s", 
-                     entryNewValue.predicted.Value() ? "true" : "false");
+        ChipLogDetail(NotSpecified, "Predicted flag set to %s", entryNewValue.predicted.Value() ? "true" : "false");
     }
 
     return CHIP_NO_ERROR;
 }
 } // namespace TariffComponentsDataClass_Utils
 
-CHIP_ERROR TariffComponentsDataClass::Validate(const ValueType& aValue) const
+CHIP_ERROR TariffComponentsDataClass::Validate(const ValueType & aValue) const
 {
     // Required field check
-    if (aValue.IsNull()) {
+    if (aValue.IsNull())
+    {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    const auto& newList = aValue.Value();
-    auto* ctx = static_cast<TariffUpdateCtx*>(mAuxData);
+    const auto & newList = aValue.Value();
+    auto * ctx           = static_cast<TariffUpdateCtx *>(mAuxData);
 
     // Validate list length
-    if (newList.size() == 0 || newList.size() > kTariffComponentsAttrMaxLength) {
+    if (newList.size() == 0 || newList.size() > kTariffComponentsAttrMaxLength)
+    {
         return CHIP_ERROR_INVALID_LIST_LENGTH;
     }
 
     // Validate each component
-    for (const auto& item : newList) {
-        if (!ctx->TariffComponentKeyIDs.insert(item.tariffComponentID).second) {
+    for (const auto & item : newList)
+    {
+        if (!ctx->TariffComponentKeyIDs.insert(item.tariffComponentID).second)
+        {
             ChipLogError(NotSpecified, "Duplicate tariffComponentID found");
             return CHIP_ERROR_DUPLICATE_KEY_ID;
         }
 
         CHIP_ERROR entryErr = TariffComponentsDataClass_Utils::ValidateListEntry(item, ctx);
-        if (entryErr != CHIP_NO_ERROR) {
+        if (entryErr != CHIP_NO_ERROR)
+        {
             return entryErr;
         }
     }
@@ -718,43 +734,50 @@ void TariffComponentsDataClass::CleanupStructValue(PayloadType & aValue)
 }
 
 // IndividualDaysDataClass
-CHIP_ERROR IndividualDaysDataClass::Validate(const ValueType& aValue) const
+CHIP_ERROR IndividualDaysDataClass::Validate(const ValueType & aValue) const
 {
     // Early return for null case (valid)
-    if (aValue.IsNull()) {
+    if (aValue.IsNull())
+    {
         return CHIP_NO_ERROR;
     }
 
-    const auto& newList = aValue.Value();
-    auto* ctx = static_cast<TariffUpdateCtx*>(mAuxData);
+    const auto & newList  = aValue.Value();
+    auto * ctx            = static_cast<TariffUpdateCtx *>(mAuxData);
     uint32_t previousDate = 0;
 
     // Validate list length
-    if (newList.size() == 0 || newList.size() > kIndividualDaysAttrMaxLength) {
+    if (newList.size() == 0 || newList.size() > kIndividualDaysAttrMaxLength)
+    {
         ChipLogError(NotSpecified, "Incorrect IndividualDays length");
         return CHIP_ERROR_INVALID_LIST_LENGTH;
     }
 
     // Validate each item
-    for (const auto& item : newList) {
+    for (const auto & item : newList)
+    {
         // Check date ordering
-        if (item.date <= previousDate) {
+        if (item.date <= previousDate)
+        {
             ChipLogError(NotSpecified, "IndividualDays must be ordered by date");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
         // Validate day type enum
-        if (EnsureKnownEnumValue(item.dayType) == DayTypeEnum::kUnknownEnumValue) {
+        if (EnsureKnownEnumValue(item.dayType) == DayTypeEnum::kUnknownEnumValue)
+        {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
         // Validate dayEntryIDs
-        if (item.dayEntryIDs.empty() || item.dayEntryIDs.size() > kDayStructItemMaxDayEntryIDs) {
+        if (item.dayEntryIDs.empty() || item.dayEntryIDs.size() > kDayStructItemMaxDayEntryIDs)
+        {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
         // Check for duplicates
-        if (CommonUtilities::HasDuplicateIDs(item.dayEntryIDs, ctx->IndividualDaysDayEntryIDs)) {
+        if (CommonUtilities::HasDuplicateIDs(item.dayEntryIDs, ctx->IndividualDaysDayEntryIDs))
+        {
             ChipLogError(NotSpecified, "Duplicate dayEntryID found");
             return CHIP_ERROR_DUPLICATE_KEY_ID;
         }
@@ -781,32 +804,36 @@ void IndividualDaysDataClass::CleanupStructValue(PayloadType & aValue)
 CHIP_ERROR CalendarPeriodsDataClass::Validate(const ValueType & aValue) const
 {
     // If calendar is null, it's always valid
-    if (aValue.IsNull()) {
+    if (aValue.IsNull())
+    {
         return CHIP_NO_ERROR;
     }
 
-    auto & newList = aValue.Value();
+    auto & newList   = aValue.Value();
     bool isFirstItem = true;
     Nullable<uint32_t> previousStartDate;
-    std::unordered_set<uint32_t> & CalendarPeriodsDayPatternIDs = 
+    std::unordered_set<uint32_t> & CalendarPeriodsDayPatternIDs =
         static_cast<TariffUpdateCtx *>(mAuxData)->CalendarPeriodsDayPatternIDs;
 
     for (const auto & item : newList)
     {
         // Validate dayPatternIDs count
-        if (item.dayPatternIDs.empty() || item.dayPatternIDs.size() > kCalendarPeriodItemMaxDayPatternIDs) {
+        if (item.dayPatternIDs.empty() || item.dayPatternIDs.size() > kCalendarPeriodItemMaxDayPatternIDs)
+        {
             ChipLogError(NotSpecified, "DayPatternIDs count must be between 1 and %" PRIuMAX, kCalendarPeriodItemMaxDayPatternIDs);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
         // Check for duplicate dayPatternIDs
-        if (CommonUtilities::HasDuplicateIDs(item.dayPatternIDs, CalendarPeriodsDayPatternIDs)) {
+        if (CommonUtilities::HasDuplicateIDs(item.dayPatternIDs, CalendarPeriodsDayPatternIDs))
+        {
             ChipLogError(NotSpecified, "Duplicate dayPatternID found in CalendarPeriods");
             return CHIP_ERROR_DUPLICATE_KEY_ID;
         }
 
         // Special handling for first item
-        if (isFirstItem) {
+        if (isFirstItem)
+        {
             isFirstItem = false;
             // First item can have null StartDate
             previousStartDate = item.startDate;
@@ -814,14 +841,15 @@ CHIP_ERROR CalendarPeriodsDataClass::Validate(const ValueType & aValue) const
         }
 
         // Subsequent items must have non-null StartDate
-        if (item.startDate.IsNull()) {
+        if (item.startDate.IsNull())
+        {
             ChipLogError(NotSpecified, "Only first CalendarPeriodStruct can have null StartDate");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
         // Validate StartDate ordering
-        if (!previousStartDate.IsNull() && !item.startDate.IsNull() && 
-            item.startDate.Value() <= previousStartDate.Value()) {
+        if (!previousStartDate.IsNull() && !item.startDate.IsNull() && item.startDate.Value() <= previousStartDate.Value())
+        {
             ChipLogError(NotSpecified, "CalendarPeriodStructs must be in increasing StartDate order");
             return CHIP_ERROR_INVALID_ARGUMENT;
         }

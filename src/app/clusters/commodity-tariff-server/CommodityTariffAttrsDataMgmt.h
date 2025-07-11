@@ -155,19 +155,20 @@ struct SpanCopier
     /// @param destination Output list to populate
     /// @param maxCount Maximum number of elements to copy (default: unlimited)
     /// @return true if copy succeeded, false on memory allocation failure
-    static bool Copy(const Span<const T>& source, 
-                    DataModel::List<const T>& destination,
-                    size_t maxCount = std::numeric_limits<size_t>::max())
+    static bool Copy(const Span<const T> & source, DataModel::List<const T> & destination,
+                     size_t maxCount = std::numeric_limits<size_t>::max())
     {
-        if (source.empty()) {
+        if (source.empty())
+        {
             destination = DataModel::List<const T>();
             return true;
         }
 
         const size_t elementsToCopy = std::min(source.size(), maxCount);
-        auto* buffer = static_cast<T*>(Platform::MemoryCalloc(elementsToCopy, sizeof(T)));
-        
-        if (!buffer) return false;
+        auto * buffer               = static_cast<T *>(Platform::MemoryCalloc(elementsToCopy, sizeof(T)));
+
+        if (!buffer)
+            return false;
 
         std::copy(source.begin(), source.begin() + elementsToCopy, buffer);
         destination = DataModel::List<const T>(Span<const T>(buffer, elementsToCopy));
@@ -184,21 +185,23 @@ struct SpanCopier<char>
     /// @param destination Output span to populate
     /// @param maxCount Maximum number of characters to copy (default: unlimited)
     /// @return true if copy succeeded, false on memory allocation or size limit failure
-    static bool Copy(const CharSpan& source,
-                    DataModel::Nullable<CharSpan>& destination,
-                    size_t maxCount = std::numeric_limits<size_t>::max())
+    static bool Copy(const CharSpan & source, DataModel::Nullable<CharSpan> & destination,
+                     size_t maxCount = std::numeric_limits<size_t>::max())
     {
-        if (source.size() > maxCount) {
+        if (source.size() > maxCount)
+        {
             return false;
         }
 
-        if (source.empty()) {
+        if (source.empty())
+        {
             destination.SetNull();
             return true;
         }
 
-        char* buffer = static_cast<char*>(Platform::MemoryCalloc(1, source.size() + 1));
-        if (!buffer) return false;
+        char * buffer = static_cast<char *>(Platform::MemoryCalloc(1, source.size() + 1));
+        if (!buffer)
+            return false;
 
         std::copy(source.begin(), source.end(), buffer);
         buffer[source.size()] = '\0';
@@ -215,33 +218,35 @@ struct StrToSpan
     /// @param destination Output span to populate
     /// @param maxCount Maximum number of characters to copy (default: unlimited)
     /// @return CHIP_NO_ERROR on success, error code on failure
-    static CHIP_ERROR Copy(const std::string& source,
-                          CharSpan& destination,
-                          size_t maxCount = std::numeric_limits<size_t>::max())
+    static CHIP_ERROR Copy(const std::string & source, CharSpan & destination, size_t maxCount = std::numeric_limits<size_t>::max())
     {
-        if (source.empty()) {
+        if (source.empty())
+        {
             destination = CharSpan();
             return CHIP_NO_ERROR;
         }
 
-        if (source.size() > maxCount) {
+        if (source.size() > maxCount)
+        {
             return CHIP_ERROR_INVALID_STRING_LENGTH;
         }
 
-        char* buffer = static_cast<char*>(Platform::MemoryAlloc(source.size() + 1));
-        if (!buffer) return CHIP_ERROR_NO_MEMORY;
+        char * buffer = static_cast<char *>(Platform::MemoryAlloc(source.size() + 1));
+        if (!buffer)
+            return CHIP_ERROR_NO_MEMORY;
 
         memcpy(buffer, source.data(), source.size());
         buffer[source.size()] = '\0';
-        destination = CharSpan(buffer, source.size());
+        destination           = CharSpan(buffer, source.size());
         return CHIP_NO_ERROR;
     }
 
     /// @brief Releases memory allocated by a CharSpan
-    static void Release(CharSpan& span)
+    static void Release(CharSpan & span)
     {
-        if (!span.empty()) {
-            Platform::MemoryFree(const_cast<char*>(span.data()));
+        if (!span.empty())
+        {
+            Platform::MemoryFree(const_cast<char *>(span.data()));
             span = CharSpan();
         }
     }
