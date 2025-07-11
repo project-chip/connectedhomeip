@@ -25,14 +25,14 @@
 #       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
-#       --enable-key 00112233445566778899aabbccddeeff
+#       --enable-key 000102030405060708090a0b0c0d0e0f
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
 #       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --hex-arg enableKey:00112233445566778899aabbccddeeff
+#       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -40,7 +40,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-"""Define Matter test case TC_SETRF_2_3."""
 
 import logging
 
