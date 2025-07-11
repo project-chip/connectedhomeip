@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2023 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <!-- Dynamic Lighting Cluster Enums -->
+  <enum name="EffectMode" type="enum8">
+    <cluster code="0x0302"/>
+    <item name="LightBased" value="0x00"/>
+    <item name="SoundBased" value="0x01"/>
+  </enum>
+
+  <enum name="EffectColorMode" type="enum8">
+    <cluster code="0x0302"/>
+    <item name="XYAndLevel" value="0x00"/>
+    <item name="HSAndLevel" value="0x01"/>
+    <item name="Level" value="0x02"/>
+  </enum>
+
+  <!-- Dynamic Lighting Cluster Structs -->
+  <struct name="EffectStyleStruct">
+    <cluster code="0x0302"/>
+    <item name="ID" type="int16u"/>
+    <item name="Label" type="char_string" length="32"/>
+  </struct>
+
+  <struct name="ModeWithEffectStylesStruct">
+    <cluster code="0x0302"/>
+    <item name="Mode" type="EffectMode"/>
+    <item name="Styles" type="EffectStyleStruct" array="true"/>
+    <item name="MaxSpeed" type="int16u"/>
+    <item name="DefaultSpeed" type="int16u"/>
+  </struct>
+
+  <struct name="BuiltInEffectStruct">
+    <cluster code="0x0302"/>
+    <item name="ID" type="int16u"/>
+    <item name="Mode" type="EffectMode"/>
+    <item name="Label" type="char_string"/>
+    <item name="MaxSpeed" type="int16u"/>
+    <item name="DefaultSpeed" type="int16u"/>
+  </struct>
+
+  <struct name="EffectColorStruct">
+    <cluster code="0x0302"/>
+    <item name="Level" type="int8u" max="254"/>
+    <item name="X" type="int16u" max="65279" isNullable="true"/>
+    <item name="Y" type="int16u" max="65279" isNullable="true"/>
+    <item name="Hue" type="int16u" isNullable="true"/>
+    <item name="Saturation" type="int8u" isNullable="true"/>
+  </struct>
+
+  <!-- Dynamic Lighting Cluster -->
+  <cluster>
+    <name>Dynamic Lighting</name>
+    <domain>Lighting</domain>
+    <description>This cluster provides a means to activate dynamic lighting effects on a light. These effects MAY either be built in, or include a custom color palette using a pre-defined style.</description>
+    <code>0x0302</code>
+    <define>DYNAMIC_LIGHTING_CLUSTER</define>
+
+    <client tick="false" init="false">true</client>
+    <server tick="false" init="false">true</server>
+
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
+
+    <!-- Attributes -->
+    <attribute side="server" code="0x0000" define="DYNAMIC_LIGHTING_AVAILABLE_MODES_AND_STYLES" type="ModeWithEffectStylesStruct" array="true" writable="false">
+      <description>AvailableModesAndStyles</description>
+    </attribute>
+
+    <attribute side="server" code="0x0001" define="DYNAMIC_LIGHTING_BUILT_IN_EFFECTS" type="BuiltInEffectStruct" array="true" writable="false">
+      <description>BuiltInEffects</description>
+    </attribute>
+
+    <attribute side="server" code="0x0002" define="DYNAMIC_LIGHTING_CURRENT_SPEED" type="int16u" writable="true" isNullable="true" optional="true">
+      <description>CurrentSpeed</description>
+      <access op="read" role="view"/>
+      <access op="write" role="operate"/>
+    </attribute>
+
+    <attribute side="server" code="0x0003" define="DYNAMIC_LIGHTING_CURRENT_BUILT_IN_EFFECT" type="int16u" writable="false" isNullable="true" optional="true">
+      <description>CurrentBuiltInEffect</description>
+    </attribute>
+
+    <attribute side="server" code="0x0004" define="DYNAMIC_LIGHTING_CURRENT_EFFECT_STYLE" type="int16u" writable="false" isNullable="true" optional="true">
+      <description>CurrentEffectStyle</description>
+    </attribute>
+
+    <!-- Commands -->
+    <command source="client" code="0x00" name="StartBuiltInEffect" optional="true" cli="zcl dynamic-lighting startbuiltineffect">
+      <description>
+        Start a built-in effect
+      </description>
+      <arg name="ID" type="int16u"/>
+      <arg name="Speed" type="int16u"/>
+    </command>
+
+    <command source="client" code="0x01" name="StopBuiltInEffect" optional="true" cli="zcl dynamic-lighting stopbuiltineffect">
+      <description>
+        Stop the currently running built-in effect
+      </description>
+    </command>
+
+    <command source="client" code="0x02" name="StartEffect" optional="true" cli="zcl dynamic-lighting starteffect">
+      <description>
+        Start a style effect with custom colors
+      </description>
+      <arg name="Mode" type="EffectMode"/>
+      <arg name="StyleID" type="int16u"/>
+      <arg name="Speed" type="int16u"/>
+      <arg name="PointsMode" type="EffectColorMode"/>
+      <arg name="Points" type="EffectColorStruct" array="true" length="16"/>
+    </command>
+
+    <command source="client" code="0x03" name="StopEffect" optional="true" cli="zcl dynamic-lighting stopeffect">
+      <description>
+        Stop the currently running style effect
+      </description>
+    </command>
+  </cluster>
+</configurator>
