@@ -73,6 +73,11 @@ logger.setLevel(logging.INFO)
 
 DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
 
+
+class TestError(Exception):
+    pass
+
+
 def clear_queue(report_queue: queue.Queue):
     """Flush all contents of a report queue. Useful to get back to empty point."""
     while not report_queue.empty():
