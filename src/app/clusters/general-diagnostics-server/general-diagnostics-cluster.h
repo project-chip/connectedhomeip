@@ -28,7 +28,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-template <typename LOGIC>
+template <typename LOGIC, bool timeSynchronization>
 class GeneralDiagnosticsCluster : public DefaultServerCluster, private LOGIC
 {
 public:
@@ -36,6 +36,20 @@ public:
     GeneralDiagnosticsCluster(Args &&... args) :
         DefaultServerCluster({ kRootEndpointId, GeneralDiagnostics::Id }), LOGIC(std::forward<Args>(args)...)
     {}
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override
+    {
+        ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+
+        // Calling on device reboot here to maintain the event generation of the old implemenation of the 
+        // server init callback. We consider startup to be a boot event here.
+        GeneralDiagnostics::BootReasonEnum bootReason;
+        if (LOGIC::GetDiagnosticDataProvider().GetBootReason(bootReason) == CHIP_NO_ERROR)
+        {
+            OnDeviceReboot(bootReason);
+        }
+        return CHIP_NO_ERROR;
+    }
 
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override
@@ -118,7 +132,7 @@ public:
         case GeneralDiagnostics::Commands::TimeSnapshot::Id: {
             GeneralDiagnostics::Commands::TimeSnapshot::DecodableType request_data;
             ReturnErrorOnFailure(request_data.Decode(input_arguments));
-            return LOGIC::HandleTimeSnapshot(*handler, request.path, request_data);
+            return LOGIC::HandleTimeSnapshot(*handler, request.path, request_data, timeSynchronization);
         }
         case GeneralDiagnostics::Commands::PayloadTestRequest::Id: {
             GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType request_data;
