@@ -36,6 +36,7 @@
 
 using namespace ::chip;
 using namespace ::chip::Controller;
+using namespace chip::Credentials;
 
 CHIP_ERROR PairingCommand::RunCommand()
 {
@@ -507,19 +508,23 @@ namespace {
 constexpr uint32_t kRpcTimeoutMs     = 1000;
 constexpr uint32_t kDefaultChannelId = 1;
 
-struct ICACCSRContext
+struct RequestOptionsContext
 {
-    ICACCSRContext(uint64_t fabricId) : mAnchorFabricId(fabricId) {}
+    RequestOptionsContext(uint64_t fabricId, TransactionType transactionType) :
+        mAnchorFabricId(fabricId), mTransactionType(transactionType)
+    {}
 
     uint64_t mAnchorFabricId;
+    TransactionType mTransactionType;
 };
 
 ::pw_rpc::nanopb::JointFabric::Client rpcClient(chip::rpc::client::GetDefaultRpcClient(), kDefaultChannelId);
 
 std::mutex responseMutex;
 std::condition_variable responseCv;
-bool responseReceived    = false;
-CHIP_ERROR responseError = CHIP_NO_ERROR;
+bool responseReceived                                  = false;
+CHIP_ERROR responseError                               = CHIP_NO_ERROR;
+CredentialIssuerCommands * pkiProviderCredentialIssuer = nullptr;
 
 // By passing the `call` parameter into WaitForResponse we are explicitly trying to insure the caller takes into consideration that
 // the lifetime of the `call` object when calling WaitForResponse
@@ -557,57 +562,79 @@ void OnRPCTransferDone(const _pw_protobuf_Empty & response, ::pw::Status status)
     }
 }
 
-static void GenerateICACCSRWork(intptr_t arg)
+static void GenerateReplyWork(intptr_t arg)
 {
-    ICACCSRContext * data = reinterpret_cast<ICACCSRContext *>(arg);
-    ICACCSR reply;
+    CHIP_ERROR err = CHIP_ERROR_INTERNAL;
+    uint8_t buf[kMaxDERCertLength];
+    MutableByteSpan generatedCertificate(buf, kMaxDERCertLength);
+    Response rsp;
+    ::pw::rpc::NanopbUnaryReceiver<::pw_protobuf_Empty> call;
 
-    // TODO: call the function that creates the ICAC CSR and populate reply
+    RequestOptionsContext * request = reinterpret_cast<RequestOptionsContext *>(arg);
+    VerifyOrExit(request, ChipLogError(JointFabric, "GenerateReplyWork: invalid request"));
+    VerifyOrExit(pkiProviderCredentialIssuer, ChipLogError(JointFabric, "GenerateReplyWork: no PKI provider"));
 
-    Platform::Delete(data);
-
-    // RPC call to JFA to reply with the ICAC CSR
-    auto call = rpcClient.ReplyWithICACCSR(reply, OnRPCTransferDone);
-    if (!call.active())
+    switch (request->mTransactionType)
     {
-        ChipLogError(JointFabric, "RPC, ReplyWithICACCSR Call Error");
-        return;
+    case TransactionType::TransactionType_ICAC_CSR: {
+        err = (static_cast<ExampleCredentialIssuerCommands *>(pkiProviderCredentialIssuer))->GenerateIcacCsr(generatedCertificate);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(JointFabric, "GenerateIcacCsr failed");
+        }
+        break;
     }
+    default: {
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+        break;
+    }
+    }
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(JointFabric, "GenerateReplyWork: invalid request"));
 
-    CHIP_ERROR err = WaitForResponse(call);
-    if (err != CHIP_NO_ERROR)
+    memcpy(rsp.response_bytes.bytes, generatedCertificate.data(), generatedCertificate.size());
+    rsp.response_bytes.size = (short unsigned int) generatedCertificate.size();
+
+    call = rpcClient.ResponseStream(rsp, OnRPCTransferDone);
+    VerifyOrExit(rpcClient.ResponseStream(rsp, OnRPCTransferDone).active(),
+                 ChipLogError(JointFabric, "GenerateReplyWork: stream error"));
+    VerifyOrExit(CHIP_NO_ERROR == WaitForResponse(call), ChipLogError(JointFabric, "GenerateReplyWork: stream error"));
+
+exit:
+    if (request)
     {
-        ChipLogError(JointFabric, "GenerateICACCSRWork, WaitForResponse Error");
+        Platform::Delete(request);
     }
 }
 
-void OnGetICACSROnNext(const ICACCSROptions & rpcIcacOptions)
+void OnGetStreamOnNext(const RequestOptions & requestOptions)
 {
-    ChipLogProgress(JointFabric, "OnGetICACSROnNext, fabricId: %ld", rpcIcacOptions.anchor_fabric_id);
+    ChipLogProgress(JointFabric, "OnGetStreamOnNext, fabricId: %ld", requestOptions.anchor_fabric_id);
 
-    ICACCSRContext * options = Platform::New<ICACCSRContext>(rpcIcacOptions.anchor_fabric_id);
+    RequestOptionsContext * options =
+        Platform::New<RequestOptionsContext>(requestOptions.anchor_fabric_id, requestOptions.transaction_type);
+
     if (options)
     {
-        DeviceLayer::PlatformMgr().ScheduleWork(GenerateICACCSRWork, reinterpret_cast<intptr_t>(options));
+        DeviceLayer::PlatformMgr().ScheduleWork(GenerateReplyWork, reinterpret_cast<intptr_t>(options));
     }
 }
 
-void OnGetICACSROnDone(::pw::Status status)
+void OnGetStreamOnDone(::pw::Status status)
 {
     if (status.ok())
     {
-        ChipLogProgress(JointFabric, "GetICACCSR RPC Stream successfully closed!");
+        ChipLogProgress(JointFabric, "GetStream RPC successfully closed!");
     }
     else
     {
-        ChipLogProgress(JointFabric, "GetICACCSR RPC Stream closed with error: %d\n", status.code());
+        ChipLogProgress(JointFabric, "GetStream RPC closed with error: %d\n", status.code());
     }
 }
 
 } // namespace
 
 void PairingCommand::OnCommissioningComplete(NodeId nodeId, const Optional<Crypto::P256PublicKey> & trustedIcacPublicKeyB,
-                                             CHIP_ERROR err)
+                                             uint16_t peerAdminJFAdminClusterEndpointId, CHIP_ERROR err)
 {
     if (err == CHIP_NO_ERROR)
     {
@@ -618,17 +645,18 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, const Optional<Crypt
 
             _pw_protobuf_Empty request;
 
-            ::pw::rpc::NanopbClientReader<::ICACCSROptions> localStream =
-                rpcClient.GetICACCSR(request, OnGetICACSROnNext, OnGetICACSROnDone);
+            ::pw::rpc::NanopbClientReader<::RequestOptions> localStream =
+                rpcClient.GetStream(request, OnGetStreamOnNext, OnGetStreamOnDone);
             if (!localStream.active())
             {
-                ChipLogError(JointFabric, "RPC: Opening GetICACCSROptions Stream Error");
+                ChipLogError(JointFabric, "RPC: Opening GetStream Error");
                 SetCommandExitStatus(CHIP_ERROR_SHUT_DOWN);
                 return;
             }
             else
             {
-                rpcStreamGetICACCSR = std::move(localStream);
+                rpcGetStream                = std::move(localStream);
+                pkiProviderCredentialIssuer = mCredIssuerCmds;
             }
         }
         else
@@ -643,7 +671,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, const Optional<Crypt
             {
                 request.jcm = true;
 
-                if (trustedIcacPublicKeyB.HasValue())
+                if (trustedIcacPublicKeyB.HasValue() && (peerAdminJFAdminClusterEndpointId != kInvalidEndpointId))
                 {
                     memcpy(request.trustedIcacPublicKeyB.bytes, trustedIcacPublicKeyB.Value().ConstBytes(),
                            Crypto::kP256_PublicKey_Length);
@@ -654,11 +682,14 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, const Optional<Crypt
                         ChipLogProgress(JointFabric, "trustedIcacPublicKeyB[%li] = %02X", i,
                                         request.trustedIcacPublicKeyB.bytes[i]);
                     }
+
+                    request.peerAdminJFAdminClusterEndpointId = peerAdminJFAdminClusterEndpointId;
                 }
                 else
                 {
                     SetCommandExitStatus(CHIP_ERROR_INVALID_ARGUMENT);
-                    ChipLogError(chipTool, "JCM requested but peer Admin ICAC not found");
+                    ChipLogError(chipTool,
+                                 "JCM requested but trustedIcacPublicKeyB/peerAdminJFAdminClusterEndpointId are invalid!");
                     return;
                 }
             }

@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Project CHIP Authors
+# Copyright (c) 2024 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,23 +11,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import("//build_overrides/chip.gni")
-import("${chip_root}/build/chip/chip_test_suite.gni")
 
-chip_test_suite("tests") {
-  output_name = "libEndpointProviderTests"
+import("${chip_root}/src/crypto/crypto.gni")
 
-  test_sources = [
-    "TestEndpointProviderRegistry.cpp",
-    "TestSpanEndpointProvider.cpp",
-  ]
+chip_device_platform = "zephyr"
 
-  cflags = [ "-Wconversion" ]
+chip_build_tests = false
 
-  public_deps = [
-    "${chip_root}/src/app/clusters/descriptor",
-    "${chip_root}/src/app/data-model-provider:string-builder-adapters",
-    "${chip_root}/src/app/server-cluster/testing",
-    "${chip_root}/src/data-model-providers/endpoint",
-  ]
-}
+chip_project_config_include = ""
+chip_system_project_config_include = ""
+chip_ble_project_config_include = ""
+
+chip_crypto = "psa"
+chip_external_mbedtls =
+    true  # For Zephyr, we use the mbedtls provided by Zephyr
+custom_toolchain = "${chip_root}/config/silabs/chip-gn/toolchain:zephyr"
+
+pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/setup/constraints.txt" ]
