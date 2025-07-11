@@ -270,6 +270,7 @@ void CameraAppShutdown()
 {
     ChipLogDetail(Camera, "CameraAppShutdown: Shutting down Camera app");
     DeviceLayer::PlatformMgr().RemoveEventHandler(CameraApp::DeviceEventCallback, reinterpret_cast<intptr_t>(nullptr));
+    gCameraApp.get()->ShutDown();
     gCameraApp = nullptr;
 }
 

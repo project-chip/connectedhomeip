@@ -1252,6 +1252,11 @@ MediaController & CameraDevice::GetMediaController()
     return mMediaController;
 }
 
+void CameraDevice::ShutDown()
+{
+    StopPollForProvideOffer();
+}
+
 void CameraDevice::DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
     if (!LinuxDeviceOptions::GetInstance().cameraInitiatedSession)
@@ -1261,8 +1266,9 @@ void CameraDevice::DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent 
     switch (event->Type)
     {
     case DeviceEventType::kCommissioningComplete:
-        ChipLogProgress(DeviceLayer, "Commissioning complete triggering provide offer send");
-        mWebRTCRequestorManager.ScheduleProvideOfferSend();
+        ChipLogProgress(DeviceLayer, "Commissioning complete polling for provide offer send");
+        // Start polling to send provide offer
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(5000), ProvideOfferPollingCallback, this);
         break;
     case DeviceEventType::kSecureSessionEstablished:
         ChipLogProgress(DeviceLayer, "Secure session established Setting peerId and endpoint");
@@ -1271,4 +1277,28 @@ void CameraDevice::DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent 
         break;
     }
     return;
+}
+
+void CameraDevice::StopPollForProvideOffer()
+{
+    ChipLogProgress(Camera, "Stop polling for ProvideOffer Send");
+    chip::DeviceLayer::SystemLayer().CancelTimer(ProvideOfferPollingCallback, this);
+}
+
+void CameraDevice::ProvideOfferPollingCallback(chip::System::Layer * systemLayer, void * appState)
+{
+    auto * self = static_cast<CameraDevice *>(appState);
+    VerifyOrReturn(self != nullptr, ChipLogError(Camera, "Failed to send ProvideOffer"));
+    // Check if any stream is allocated
+    auto & avStreamManager = self->GetCameraAVStreamMgmtController();
+    if (avStreamManager.HasAllocatedVideoStreams() || avStreamManager.HasAllocatedAudioStreams())
+    {
+        self->mWebRTCRequestorManager.ScheduleProvideOfferSend();
+    }
+    else
+    {
+        ChipLogProgress(Camera, "No stream allocated yet to send ProvideOffer, checking after 5s");
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(5000), ProvideOfferPollingCallback,
+                                                    appState);
+    }
 }

@@ -92,8 +92,6 @@ void WebRTCRequestorManager::Init(ScopedNodeId peerId, EndpointId endpointId)
     rtc::InitLogger(rtc::LogLevel::Error);
 
     rtc::Configuration config;
-    // config.iceServers.emplace_back("stun.l.google.com:19302");
-
     mPeerConnection = std::make_shared<rtc::PeerConnection>(config);
 
     mPeerConnection->onLocalDescription([this](rtc::Description desc) {
@@ -251,17 +249,6 @@ void WebRTCRequestorManager::CloseConnection()
 void WebRTCRequestorManager::ScheduleProvideOfferSend()
 {
     ChipLogProgress(Camera, "ScheduleProvideOfferSend");
-    DeviceLayer::SystemLayer().StartTimer(
-        chip::System::Clock::Milliseconds32(5000),
-        [](chip::System::Layer * systemLayer, void * appState) {
-            auto * self = static_cast<WebRTCRequestorManager *>(appState);
-            self->SendProvideOffer();
-        },
-        this);
-}
-
-void WebRTCRequestorManager::SendProvideOffer()
-{
     rtc::Description::Video media("video", rtc::Description::Direction::SendOnly);
     media.addH264Codec(kVideoH264PayloadType);
     media.setBitrate(kVideoBitRate);
@@ -269,17 +256,18 @@ void WebRTCRequestorManager::SendProvideOffer()
 
     ChipLogProgress(Camera, "Generate and set the SDP");
     mPeerConnection->setLocalDescription();
-    ChipLogProgress(Camera, "Sending Offer command to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
 
-    mCommandType = CommandType::kProvideOffer;
+    DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+        ChipLogProgress(Camera, "Sending Offer command to node " ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
+        mCommandType = CommandType::kProvideOffer;
 
-    // Attempt to find or establish a CASE session to the target PeerId.
-    CASESessionManager * caseSessionMgr = Server::GetInstance().GetCASESessionManager();
-    VerifyOrDie(caseSessionMgr != nullptr);
-
-    // WebRTC ProvideOffer requires a large payload session establishment.
-    caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback,
-                                           TransportPayloadCapability::kLargePayload);
+        // Attempt to find or establish a CASE session to the target PeerId.
+        CASESessionManager * caseSessionMgr = Server::GetInstance().GetCASESessionManager();
+        VerifyOrDie(caseSessionMgr != nullptr);
+        // WebRTC ProvideOffer requires a large payload session establishment.
+        caseSessionMgr->FindOrEstablishSession(mPeerId, &mOnConnectedCallback, &mOnConnectionFailureCallback,
+                                               TransportPayloadCapability::kLargePayload);
+    });
 }
 
 void WebRTCRequestorManager::OnDeviceConnected(void * context, Messaging::ExchangeManager & exchangeMgr,
