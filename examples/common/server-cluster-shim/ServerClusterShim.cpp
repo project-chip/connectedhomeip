@@ -163,8 +163,10 @@ bool PathsContainsOrLogError(const ConcreteClusterPath & path, ServerClusterInte
 {
     if (!serverCluster.PathsContains({ path.mEndpointId, path.mClusterId }))
     {
-        ChipLogError(DataManagement, "[Configuration Error] The cluster path has not been added to this "
-            "ServerClusterShim instance: Endpoint=0x%x Cluster " ChipLogFormatMEI, path.mEndpointId, ChipLogValueMEI(path.mClusterId));
+        ChipLogError(DataManagement,
+                     "[Configuration Error] The cluster path has not been added to this "
+                     "ServerClusterShim instance: Endpoint=0x%x Cluster " ChipLogFormatMEI,
+                     path.mEndpointId, ChipLogValueMEI(path.mClusterId));
         return false;
     }
     return true;
