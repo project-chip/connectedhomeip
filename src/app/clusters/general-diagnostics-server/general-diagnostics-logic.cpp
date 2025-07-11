@@ -71,7 +71,8 @@ GeneralDiagnosticsLogic::HandleTestEventTrigger(const Commands::TestEventTrigger
 
 std::optional<DataModel::ActionReturnStatus>
 GeneralDiagnosticsLogic::HandleTimeSnapshot(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                                            const Commands::TimeSnapshot::DecodableType & commandData, bool usingTimeSynchClusterServer)
+                                            const Commands::TimeSnapshot::DecodableType & commandData,
+                                            bool usingTimeSynchClusterServer)
 {
     ChipLogError(Zcl, "Received TimeSnapshot command!");
 
@@ -81,7 +82,8 @@ GeneralDiagnosticsLogic::HandleTimeSnapshot(CommandHandler & handler, const Conc
 
     // Only consider real time if time sync cluster is actually enabled. Avoids
     // likelihood of frequently reporting unsynced time.
-    if (usingTimeSynchClusterServer){
+    if (usingTimeSynchClusterServer)
+    {
         CHIP_ERROR posix_time_err = System::SystemClock().GetClock_RealTime(posix_time_us);
         if (posix_time_err != CHIP_NO_ERROR)
         {
