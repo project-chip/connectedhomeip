@@ -66,8 +66,11 @@ class TC_ZONEMGMT_2_3(MatterBaseTest):
                      "Verify that the DUT responds with a ConstraintError status code"),
             TestStep("5", "TH sends UpdateTwoDCartesianZone command with any X or Y value of zone vertices set to TwoDCartesianMax + 1",
                      "Verify that the DUT responds with a DynamicConstraintError status code."),
-            TestStep("6", "TH sends the UpdateTwoDCartesianZone command with the same zoneID and zone information as step 2a(Zone1_Updated",
-                     "Verify that the first DUT response contains a new zoneId and the second command returns AlreadyExists status code."),
+            TestStep("6", "If DUT supports TwoDCartesianZone and User defined zones, TH sends CreateTwoDCartesianZone command with",
+                     " new valid parameters",
+                     "Verify that the DUT response contains a new zoneId and the corresponding zone information matches."),
+            TestStep("6a", "TH sends the UpdateTwoDCartesianZone command with the same zoneID  as step 2a(ZoneID1) and zone vertices as  in step 6",
+                     "Verify that the DUT responds with an AlreadyExists status code."),
             TestStep("7", "TH sends the UpdateTwoDCartesianZone command with the zone vertices forming a self-intersecting polygonal shape",
                      "Verify that the DUT responds with a DynamicConstraintError status code."),
             TestStep("8", "TH reads Zones attribute and sends RemoveZone command for all reviously created zones",
@@ -270,14 +273,55 @@ class TC_ZONEMGMT_2_3(MatterBaseTest):
                 pass
 
             self.step("6")
-            updatedZoneVertices = [
-                cluster.Structs.TwoDCartesianVertexStruct(20, 20),
-                cluster.Structs.TwoDCartesianVertexStruct(30, 20),
-                cluster.Structs.TwoDCartesianVertexStruct(30, 30),
-                cluster.Structs.TwoDCartesianVertexStruct(20, 30)
+            # Fetch the zones attribute before calling Create
+            zonesBeforeCreate = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.Zones
+            )
+
+            # Form the Create request and send
+            zone2Vertices = [
+                cluster.Structs.TwoDCartesianVertexStruct(100, 100),
+                cluster.Structs.TwoDCartesianVertexStruct(200, 100),
+                cluster.Structs.TwoDCartesianVertexStruct(200, 200),
+                cluster.Structs.TwoDCartesianVertexStruct(100, 200)
             ]
+            zoneToCreate = cluster.Structs.TwoDCartesianZoneStruct(
+                name="Zone2", use=enums.ZoneUseEnum.kMotion, vertices=zone2Vertices,
+                color="#00FFFF")
+            createTwoDCartesianCmd = commands.CreateTwoDCartesianZone(
+                zone=zoneToCreate
+            )
+            cmdResponse = await self.send_single_cmd(endpoint=endpoint, cmd=createTwoDCartesianCmd)
+            logger.info(f"Rx'd CreateTwoDCartesianZoneResponse : {cmdResponse}")
+            asserts.assert_equal(type(cmdResponse), commands.CreateTwoDCartesianZoneResponse,
+                                 "Incorrect response type")
+            asserts.assert_is_not_none(
+                cmdResponse.zoneID, "CreateTwoDCartesianCmdResponse does not contain ZoneID")
+            zoneID2 = cmdResponse.zoneID
+
+            # Check that zoneID2 did not exist before
+            matchingZone = next(
+                (z for z in zonesBeforeCreate if z.zoneID == zoneID2), None)
+            asserts.assert_is_none(matchingZone, "fZone with {zoneID2} already existed in Zones")
+
+            # Fetch the zones attribute after Create
+            zonesAfterCreate = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.Zones
+            )
+            logger.info(f"Rx'd Zones: {zonesAfterCreate}")
+
+            matchingZone = next(
+                (z for z in zonesAfterCreate if z.zoneID == zoneID2), None)
+            asserts.assert_is_not_none(matchingZone, "fZone with {zoneID2} not found")
+            asserts.assert_equal(matchingZone.zoneType, enums.ZoneTypeEnum.kTwoDCARTZone,
+                                 "ZoneType of created Zone is not of type TwoDCartZone")
+            asserts.assert_equal(matchingZone.zoneSource, enums.ZoneSourceEnum.kUser,
+                                 "ZoneSource of created Zone is not of type User")
+
+            self.step("6a")
+            # Attempt updating ZoneID1 with Zone2Vertices from ZoneID2
             zoneToUpdate = cluster.Structs.TwoDCartesianZoneStruct(
-                name="Zone1_Updated", use=enums.ZoneUseEnum.kMotion, vertices=updatedZoneVertices,
+                name="Zone1_Updated", use=enums.ZoneUseEnum.kMotion, vertices=zone2Vertices,
                 color="#00FFFF")
             try:
                 updateTwoDCartesianCmd = commands.UpdateTwoDCartesianZone(
@@ -286,7 +330,7 @@ class TC_ZONEMGMT_2_3(MatterBaseTest):
                 await self.send_single_cmd(endpoint=endpoint, cmd=updateTwoDCartesianCmd)
                 # TODO : Double check if this validation is for any zone other than
                 # the current one
-                #asserts.fail("Unexpected success when expecting ALREADY_EXISTS due to duplicate zone existing")
+                asserts.fail("Unexpected success when expecting ALREADY_EXISTS due to duplicate zone existing")
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.AlreadyExists, "Unexpected error returned when trying to update zone")
                 pass
