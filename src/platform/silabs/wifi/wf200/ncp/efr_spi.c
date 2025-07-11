@@ -58,8 +58,6 @@
 #define SL_SPIDRV_FRAME_LENGTH SL_SPIDRV_EXP_FRAME_LENGTH
 #define SL_SPIDRV_HANDLE sl_spidrv_exp_handle
 
-#define USART SL_WFX_HOST_PINOUT_SPI_PERIPHERAL
-
 #if SL_SPICTRL_MUX
 StaticSemaphore_t spi_sem_peripheral;
 static SemaphoreHandle_t spi_sem_sync_hdl;

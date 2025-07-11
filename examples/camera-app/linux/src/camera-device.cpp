@@ -1196,13 +1196,17 @@ void CameraDevice::InitializeAudioStreams()
 void CameraDevice::InitializeSnapshotStreams()
 {
     // Create single snapshot stream with typical supported parameters
-    SnapshotStream snapshotStream = { { 1 /* Id */,
-                                        ImageCodecEnum::kJpeg,
-                                        kSnapshotStreamFrameRate /* FrameRate */,
-                                        { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution*/,
-                                        { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
-                                        90 /* Quality */,
-                                        0 /* RefCount */ },
+    SnapshotStream snapshotStream = { {
+                                          1 /* Id */,
+                                          ImageCodecEnum::kJpeg,
+                                          kSnapshotStreamFrameRate /* FrameRate */,
+                                          { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution*/,
+                                          { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
+                                          90 /* Quality */,
+                                          0 /* RefCount */,
+                                          false /* EncodedPixels */,
+                                          false /* HardwareEncoder */
+                                      },
                                       false,
                                       nullptr };
 

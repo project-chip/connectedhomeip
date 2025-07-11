@@ -19,7 +19,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CLOSURE_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --enable-key 000102030405060708090a0b0c0d0e0f --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -35,6 +35,7 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
+import time
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
@@ -66,6 +67,11 @@ def current_latch_matcher(current_latch: bool) -> AttributeMatcher:
 
 
 class TC_CLCTRL_6_1(MatterBaseTest):
+    @property
+    def default_timeout(self) -> int:
+        # This test has potentially 45s waits, so set the timeout to 60
+        return 60
+
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -141,6 +147,38 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             TestStep("9l", "Verify that the DUT has emitted the SecureStateChanged event."),
         ]
         return steps
+
+    def wait_for_secure_state_changed_and_assert(self, event_sub_handler, expected_secure_value: bool, timeout: int):
+        """
+        Waits for a SecureStateChanged event, allowing for one other event to arrive first.
+        Asserts that the SecureStateChanged event is received and its secureValue matches the expected value.
+        """
+        event_queue = event_sub_handler.event_queue
+
+        try:
+            event1 = event_queue.get(block=True, timeout=timeout)
+        except event_queue.Empty:
+            asserts.fail("Timeout waiting for event.")
+
+        secure_event = None
+        if event1.Header.EventId == Clusters.ClosureControl.Events.SecureStateChanged.event_id:
+            secure_event = event1
+        else:
+            logging.info(f"Received other event first: {event1.Header.EventId}, waiting for SecureStateChanged.")
+            try:
+                event2 = event_queue.get(block=True, timeout=timeout)
+            except event_queue.Empty:
+                asserts.fail("Timeout waiting for SecureStateChanged event after receiving another event first.")
+
+            asserts.assert_equal(event2.Header.EventId, Clusters.ClosureControl.Events.SecureStateChanged.event_id,
+                                 "Expected SecureStateChanged event not received as the second event.")
+            secure_event = event2
+
+        logging.info(f"SecureStateChanged event received: {secure_event}")
+        if expected_secure_value:
+            asserts.assert_true(secure_event.Data.secureValue, "SecureStateChanged event secureValue is not True.")
+        else:
+            asserts.assert_false(secure_event.Data.secureValue, "SecureStateChanged event secureValue is not False.")
 
     def pics_TC_CLCTRL_6_1(self) -> list[str]:
         pics = [
@@ -268,7 +306,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                     try:
                         await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                             latch=False
-                        ), endpoint=endpoint)
+                        ), endpoint=endpoint, timedRequestTimeoutMs=1000)
                     except InteractionModelError as e:
                         asserts.assert_equal(
                             e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -326,7 +364,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 try:
                     await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                         position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
-                    ), endpoint=endpoint)
+                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -395,7 +433,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -415,7 +453,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -522,7 +560,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -532,9 +570,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("7d")
 
             # Wait for the SecureStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
-
-            asserts.assert_false(data.secureValue, f"Unexpected event data: {data.secureValue}")
+            self.wait_for_secure_state_changed_and_assert(event_sub_handler, expected_secure_value=False, timeout=timeout)
 
             # STEP 7e: TH sends command MoveTo with Position = MoveToFullyClosed.
             self.step("7e")
@@ -543,7 +579,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed,
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -553,9 +589,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("7f")
 
             # Wait for the SecureStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
-
-            asserts.assert_true(data.secureValue, f"Unexpected event data: {data.secureValue}")
+            self.wait_for_secure_state_changed_and_assert(event_sub_handler, expected_secure_value=True, timeout=timeout)
 
         # STEP 8a: If LT feature is not supported on the cluster or PS feature is supported on the cluster, skip steps 8b to 8l
         self.step("8a")
@@ -598,7 +632,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 try:
                     await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                         latch=True
-                    ), endpoint=endpoint)
+                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -617,9 +651,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("8g")
 
             # Wait for the SecureStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
-
-            asserts.assert_true(data.secureValue, f"Unexpected event data: {data.secureValue}")
+            self.wait_for_secure_state_changed_and_assert(event_sub_handler, expected_secure_value=True, timeout=timeout)
 
             # STEP 8h: If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip step 8i
             self.step("8h")
@@ -651,7 +683,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 try:
                     await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                         latch=False
-                    ), endpoint=endpoint)
+                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -663,9 +695,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("8l")
 
             # Wait for the SecureStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
-
-            asserts.assert_false(data.secureValue, f"Unexpected event data: {data.secureValue}")
+            self.wait_for_secure_state_changed_and_assert(event_sub_handler, expected_secure_value=False, timeout=timeout)
 
         # STEP 9a: If LT feature is not supported on the cluster or PS feature is not supported on the cluster, skip steps 9b to 9l
         self.step("9a")
@@ -706,7 +736,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 try:
                     await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                         latch=True
-                    ), endpoint=endpoint)
+                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -718,9 +748,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("9f")
 
             # Wait for the SecureStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
-
-            asserts.assert_true(data.secureValue, f"Unexpected event data: {data.secureValue}")
+            self.wait_for_secure_state_changed_and_assert(event_sub_handler, expected_secure_value=True, timeout=timeout)
 
             # STEP 9g: If LatchControlModes Bit 1 = 0 (RemoteUnlatching = False), skip step 9h
             self.step("9g")
@@ -752,7 +780,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 try:
                     await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                         latch=False
-                    ), endpoint=endpoint)
+                    ), endpoint=endpoint, timedRequestTimeoutMs=1000)
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -763,10 +791,11 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             # STEP 9k: TH sends command MoveTo with Position = MoveToFullyOpen.
             self.step("9k")
 
+            time.sleep(2)  # Adding a small delay to ensure the previous command is processed
             try:
                 await self.send_single_cmd(cmd=Clusters.ClosureControl.Commands.MoveTo(
                     position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen,
-                ), endpoint=endpoint)
+                ), endpoint=endpoint, timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
@@ -776,9 +805,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             self.step("9l")
 
             # Wait for the SecureStateChanged event to be emitted
-            data = event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.SecureStateChanged, timeout_sec=timeout)
-
-            asserts.assert_false(data.secureValue, f"Unexpected event data: {data.secureValue}")
+            self.wait_for_secure_state_changed_and_assert(event_sub_handler, expected_secure_value=False, timeout=timeout)
 
 
 if __name__ == "__main__":

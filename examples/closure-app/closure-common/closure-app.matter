@@ -2238,7 +2238,7 @@ provisional cluster ClosureControl = 260 {
     optional nullable CurrentPositionEnum position = 0;
     optional nullable boolean latch = 1;
     optional ThreeLevelAutoEnum speed = 2;
-    optional nullable boolean secureState = 3;
+    nullable boolean secureState = 3;
   }
 
   struct OverallTargetStateStruct {
@@ -2283,9 +2283,9 @@ provisional cluster ClosureControl = 260 {
   /** On receipt of this command, the closure SHALL stop its movement as fast as the closure is able too. */
   command Stop(): DefaultSuccess = 0;
   /** On receipt of this command, the closure SHALL operate to update its position, latch state and/or motion speed. */
-  command MoveTo(MoveToRequest): DefaultSuccess = 1;
+  timed command MoveTo(MoveToRequest): DefaultSuccess = 1;
   /** This command is used to trigger a calibration of the closure. */
-  command access(invoke: manage) Calibrate(): DefaultSuccess = 2;
+  timed command access(invoke: manage) Calibrate(): DefaultSuccess = 2;
 }
 
 /** This cluster provides an interface to reflect and control a closure's range of movement, usually involving a panel, by using 6-axis framework. */
@@ -2416,9 +2416,9 @@ provisional cluster ClosureDimension = 261 {
   }
 
   /** This command is used to move a dimension of the closure to a target position. */
-  command SetTarget(SetTargetRequest): DefaultSuccess = 0;
-  /** Upon receipt, this SHALL move a dimension of the closure to a target position by a number of steps. */
-  command Step(StepRequest): DefaultSuccess = 1;
+  timed command SetTarget(SetTargetRequest): DefaultSuccess = 0;
+  /** This command is used to move a dimension of the closure to a target position by a number of steps. */
+  timed command Step(StepRequest): DefaultSuccess = 1;
 }
 
 endpoint 0 {

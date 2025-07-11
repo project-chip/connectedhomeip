@@ -38,11 +38,11 @@ component:
 - {id: bluetooth_feature_connection}
 - {id: bluetooth_feature_system}
 - {id: bluetooth_stack}
+- {id: bluetooth_feature_connection_role_peripheral}
 # Platform support
 - {id: cpp_support}
-- {id: sl_system}
+- {id: sl_main}
 - {id: device_init}
-- {id: board_control}
 - {id: memory_manager}
 - {id: silabs_core_memory_manager}
 - {id: clock_manager}
@@ -116,17 +116,23 @@ configuration:
 - {name: SL_MBEDTLS_PSA_ASSUME_EXCLUSIVE_BUFFERS, value: 1}
 - {name: SL_OPENTHREAD_ENABLE_SERIAL_TASK, value: 0}
 
-template_contribution:
-  - name: mbedtls_ssl_content_len_in_requirement
-    value: 900
-  - name: mbedtls_ssl_content_len_out_requirement
-    value: 900
-
 requires:
 - condition: [device_series_2]
   name: uartdrv_eusart
 - condition: [device_series_2]
   name: device_init_dpll
+- condition: [device_series_2]
+  name: gpiointerrupt
+- condition: [device_series_2]
+  name: emlib
+- condition: [device_series_3]
+  name: hal_system
+- condition: [device_series_3]
+  name: hal_emu
+- condition: [device_series_2]
+  name: bootloader_interface_s2
+- condition: [device_series_3]
+  name: bootloader_interface_s3
 
 ui_hints:
   highlight:

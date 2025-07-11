@@ -9082,7 +9082,7 @@ public static class ClosureControlClusterOverallCurrentStateStruct {
   public @Nullable Optional<Integer> position;
   public @Nullable Optional<Boolean> latch;
   public Optional<Integer> speed;
-  public @Nullable Optional<Boolean> secureState;
+  public @Nullable Boolean secureState;
   private static final long POSITION_ID = 0L;
   private static final long LATCH_ID = 1L;
   private static final long SPEED_ID = 2L;
@@ -9092,7 +9092,7 @@ public static class ClosureControlClusterOverallCurrentStateStruct {
     @Nullable Optional<Integer> position,
     @Nullable Optional<Boolean> latch,
     Optional<Integer> speed,
-    @Nullable Optional<Boolean> secureState
+    @Nullable Boolean secureState
   ) {
     this.position = position;
     this.latch = latch;
@@ -9105,7 +9105,7 @@ public static class ClosureControlClusterOverallCurrentStateStruct {
     values.add(new StructElement(POSITION_ID, position != null ? position.<BaseTLVType>map((nonOptionalposition) -> new UIntType(nonOptionalposition)).orElse(new EmptyType()) : new NullType()));
     values.add(new StructElement(LATCH_ID, latch != null ? latch.<BaseTLVType>map((nonOptionallatch) -> new BooleanType(nonOptionallatch)).orElse(new EmptyType()) : new NullType()));
     values.add(new StructElement(SPEED_ID, speed.<BaseTLVType>map((nonOptionalspeed) -> new UIntType(nonOptionalspeed)).orElse(new EmptyType())));
-    values.add(new StructElement(SECURE_STATE_ID, secureState != null ? secureState.<BaseTLVType>map((nonOptionalsecureState) -> new BooleanType(nonOptionalsecureState)).orElse(new EmptyType()) : new NullType()));
+    values.add(new StructElement(SECURE_STATE_ID, secureState != null ? new BooleanType(secureState) : new NullType()));
 
     return new StructType(values);
   }
@@ -9117,7 +9117,7 @@ public static class ClosureControlClusterOverallCurrentStateStruct {
     @Nullable Optional<Integer> position = null;
     @Nullable Optional<Boolean> latch = null;
     Optional<Integer> speed = Optional.empty();
-    @Nullable Optional<Boolean> secureState = null;
+    @Nullable Boolean secureState = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == POSITION_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -9137,7 +9137,7 @@ public static class ClosureControlClusterOverallCurrentStateStruct {
       } else if (element.contextTagNum() == SECURE_STATE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Boolean) {
           BooleanType castingValue = element.value(BooleanType.class);
-          secureState = Optional.of(castingValue.value(Boolean.class));
+          secureState = castingValue.value(Boolean.class);
         }
       }
     }

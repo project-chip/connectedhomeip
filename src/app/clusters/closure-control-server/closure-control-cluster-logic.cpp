@@ -82,12 +82,6 @@ bool ClusterLogic::IsSupportedMainState(MainStateEnum mainState) const
     return isSupported;
 }
 
-bool ClusterLogic::IsValidMainStateTransition(MainStateEnum mainState) const
-{
-    // TODO: Implement the MainState state machine to validate transitions
-    return true;
-}
-
 bool ClusterLogic::IsSupportedOverallCurrentStatePositioning(CurrentPositionEnum positioning) const
 {
     bool isSupported = false;
@@ -152,6 +146,8 @@ CHIP_ERROR ClusterLogic::SetCountdownTime(const DataModel::Nullable<ElapsedS> & 
     assertChipStackLockedByCurrentThread();
 
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous),
+                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     auto now       = System::SystemClock().GetMonotonicTimestamp();
     bool markDirty = false;
@@ -176,7 +172,6 @@ CHIP_ERROR ClusterLogic::SetMainState(MainStateEnum mainState)
 
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(IsSupportedMainState(mainState), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-    VerifyOrReturnError(IsValidMainStateTransition(mainState), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mainState != mState.mMainState, CHIP_NO_ERROR);
 
     // EngageStateChanged event SHALL be generated when the MainStateEnum attribute changes state to and from disengaged state
@@ -265,34 +260,25 @@ CHIP_ERROR ClusterLogic::SetOverallCurrentState(const DataModel::Nullable<Generi
                                 CHIP_ERROR_INVALID_ARGUMENT);
         }
 
-        // Validate the incoming SecureState FeatureMap conformance.
-        if (incomingOverallCurrentState.secureState.HasValue())
-        {
-            // If the secureState member is present in the OverallCurrentState, we need to check if the Speed feature is
-            // supported by the closure. If the Speed feature is not supported, return an error.
-            VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) || mConformance.HasFeature(Feature::kMotionLatching),
-                                CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        // TODO: SecureState field Value based on conditions validation will be done after the specification issue #11805
+        // resolution.
 
-            if (!incomingOverallCurrentState.secureState.Value().IsNull())
+        // SecureStateChanged event SHALL be generated when the SecureState field in the OverallCurrentState attribute changes
+        if (!incomingOverallCurrentState.secureState.IsNull())
+        {
+            if (mState.mOverallCurrentState.IsNull() || mState.mOverallCurrentState.Value().secureState.IsNull())
             {
-                // SecureStateChanged event SHALL be generated when the SecureState field in the OverallCurrentState attribute
-                // changes
-                if (mState.mOverallCurrentState.IsNull() || !mState.mOverallCurrentState.Value().secureState.HasValue() ||
-                    mState.mOverallCurrentState.Value().secureState.Value().IsNull())
+                // As secureState field is not set in present current state and incoming current state has value, we generate the
+                // event
+                GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value());
+            }
+            else
+            {
+                // If the secureState field is set in both present and incoming current state, we generate the event only if the
+                // value has changed.
+                if (mState.mOverallCurrentState.Value().secureState.Value() != incomingOverallCurrentState.secureState.Value())
                 {
-                    // As secureState field is not set in present current state and incoming current state has value, we generate
-                    // the event
-                    GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value().Value());
-                }
-                else
-                {
-                    // If the secureState field is set in both present and incoming current state, we generate the event only if the
-                    // value has changed.
-                    if (mState.mOverallCurrentState.Value().secureState.Value().Value() !=
-                        incomingOverallCurrentState.secureState.Value().Value())
-                    {
-                        GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value().Value());
-                    }
+                    GenerateSecureStateChangedEvent(incomingOverallCurrentState.secureState.Value());
                 }
             }
         }
@@ -410,6 +396,8 @@ CHIP_ERROR ClusterLogic::GetCountdownTime(DataModel::Nullable<ElapsedS> & countd
 {
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous),
+                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     countdownTime = mState.mCountdownTime.value();
 
@@ -541,20 +529,19 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
         overallTargetState.SetNonNull(GenericOverallTargetState{});
     }
 
-    if (position.HasValue())
+    if (position.HasValue() && mConformance.HasFeature(Feature::kPositioning))
     {
         VerifyOrReturnError(position.Value() != TargetPositionEnum::kUnknownEnumValue, Status::ConstraintError);
 
-        if (mConformance.HasFeature(Feature::kPositioning))
-        {
-            overallTargetState.Value().position.SetValue(DataModel::MakeNullable(position.Value()));
-        }
+        overallTargetState.Value().position.SetValue(DataModel::MakeNullable(position.Value()));
     }
 
     if (latch.HasValue() && mConformance.HasFeature(Feature::kMotionLatching))
     {
-        // If manual intervention is required to latch, respond with INVALID_IN_STATE
-        if (mDelegate.IsManualLatchingNeeded())
+        // If latch value is true and the Remote Latching feature is not supported, or
+        // if latch value is false and the Remote Unlatching feature is not supported, return InvalidInState.
+        if ((latch.Value() && !mState.mLatchControlModes.Has(LatchControlModesBitmap::kRemoteLatching)) ||
+            (!latch.Value() && !mState.mLatchControlModes.Has(LatchControlModesBitmap::kRemoteUnlatching)))
         {
             return Status::InvalidInState;
         }
@@ -562,14 +549,11 @@ Protocols::InteractionModel::Status ClusterLogic::HandleMoveTo(Optional<TargetPo
         overallTargetState.Value().latch.SetValue(DataModel::MakeNullable(latch.Value()));
     }
 
-    if (speed.HasValue())
+    if (speed.HasValue() && mConformance.HasFeature(Feature::kSpeed))
     {
         VerifyOrReturnError(speed.Value() != Globals::ThreeLevelAutoEnum::kUnknownEnumValue, Status::ConstraintError);
 
-        if (mConformance.HasFeature(Feature::kSpeed))
-        {
-            overallTargetState.Value().speed.SetValue(speed.Value());
-        }
+        overallTargetState.Value().speed.SetValue(speed.Value());
     }
 
     MainStateEnum state;
@@ -629,9 +613,10 @@ Protocols::InteractionModel::Status ClusterLogic::HandleCalibrate()
     // the server SHALL respond with a status code of SUCCESS.
     VerifyOrReturnValue(state != MainStateEnum::kCalibrating, Status::Success);
 
-    // If the Calibrate command is invoked in any state other than 'Stopped', the server shall respond with INVALID_IN_STATE.
+    // If the Calibrate command is invoked in any state other than Stopped or SetupRequired,
+    // the server SHALL respond with INVALID_IN_STATE and there SHALL be no other effect.
     // This check excludes the 'Calibrating' MainState as it is already validated above
-    VerifyOrReturnError(state == MainStateEnum::kStopped, Status::InvalidInState);
+    VerifyOrReturnError(state == MainStateEnum::kStopped || state == MainStateEnum::kSetupRequired, Status::InvalidInState);
 
     // Set the MainState to 'Calibrating' only if the delegate call to HandleCalibrateCommand is successful
     Status status = mDelegate.HandleCalibrateCommand();
@@ -655,8 +640,7 @@ CHIP_ERROR ClusterLogic::GenerateOperationalErrorEvent(const DataModel::List<con
 
 CHIP_ERROR ClusterLogic::GenerateMovementCompletedEvent()
 {
-    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous),
-                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(!mConformance.HasFeature(Feature::kInstantaneous), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
     Events::MovementCompleted::Type event{};
     ReturnErrorOnFailure(mMatterContext.GenerateEvent(event));
@@ -676,9 +660,6 @@ CHIP_ERROR ClusterLogic::GenerateEngageStateChangedEvent(const bool engageValue)
 
 CHIP_ERROR ClusterLogic::GenerateSecureStateChangedEvent(const bool secureValue)
 {
-    VerifyOrReturnError(mConformance.HasFeature(Feature::kPositioning) && !mConformance.HasFeature(Feature::kInstantaneous),
-                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
-
     Events::SecureStateChanged::Type event{ .secureValue = secureValue };
     ReturnErrorOnFailure(mMatterContext.GenerateEvent(event));
 
