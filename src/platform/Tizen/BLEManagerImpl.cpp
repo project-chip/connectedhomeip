@@ -1065,7 +1065,8 @@ exit:
 
 uint16_t BLEManagerImpl::_NumConnections()
 {
-    return 0;
+    VerifyOrReturnValue(mConnectionMap != nullptr, 0);
+    return g_hash_table_size(mConnectionMap);
 }
 
 CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
