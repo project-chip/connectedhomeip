@@ -257,7 +257,7 @@ DataModel::ActionReturnStatus ServerClusterShim::ReadAttribute(const DataModel::
                     (*status == Status::UnsupportedAttribute));
         return *status;
     }
-    
+
     if (!PathsContainsOrLogError({ request.path.mEndpointId, request.path.mClusterId }, *this))
     {
         return Status::Failure;
