@@ -49,7 +49,7 @@ CHIP_ERROR StartupServerClusters(EndpointInterface * endpointProvider, ServerClu
             had_failure = true;
             VerifyOrDie(!serverCluster->GetPaths().empty()); // API says it must have at least one path
 
-            const ConcreteClusterPath path = serverCluster->GetPaths().front();
+            [[maybe_unused]] const ConcreteClusterPath path = serverCluster->GetPaths().front();
             ChipLogError(DataManagement, "Cluster " ChipLogFormatMEI " on Endpoint %u startup failed: %" CHIP_ERROR_FORMAT,
                          ChipLogValueMEI(path.mClusterId), path.mEndpointId, err.Format());
         }
