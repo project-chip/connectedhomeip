@@ -539,26 +539,6 @@ const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpo
     return metadata;
 }
 
-static uint8_t * singletonAttributeLocation(const EmberAfAttributeMetadata * am)
-{
-
-    uint16_t index = 0;
-    // NOLINTNEXTLINE(bugprone-sizeof-expression)
-    if constexpr (sizeof(generatedAttributes) > 0)
-    {
-        const EmberAfAttributeMetadata * m = &(generatedAttributes[0]);
-        while (m < am)
-        {
-            if (m->IsSingleton() && !m->IsExternal())
-            {
-                index = static_cast<uint16_t>(index + m->size);
-            }
-            m++;
-        }
-    }
-    return (uint8_t *) (singletonAttributeData + index);
-}
-
 // This function does mem copy, but smartly, which means that if the type is a
 // string, it will copy as much as it can.
 // If src == NULL, then this method will set memory to zeroes
@@ -696,9 +676,7 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
                             }
 
                             {
-                                uint8_t * attributeLocation =
-                                    (am->mask & MATTER_ATTRIBUTE_FLAG_SINGLETON ? singletonAttributeLocation(am)
-                                                                                : attributeData + attributeOffsetIndex);
+                                uint8_t * attributeLocation = attributeData + attributeOffsetIndex);
                                 uint8_t *src, *dst;
                                 if (write)
                                 {

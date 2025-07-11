@@ -118,8 +118,7 @@ union EmberAfDefaultOrMinMaxAttributeValue
 #define MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE (0x08)
 // Attribute deferred to external storage
 #define MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE (0x10)
-// Attribute is singleton
-#define MATTER_ATTRIBUTE_FLAG_SINGLETON (0x20)
+// UNUSED, used to be "SINGLETON": 0x20
 // Attribute is nullable
 #define MATTER_ATTRIBUTE_FLAG_NULLABLE (0x40)
 
