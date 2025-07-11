@@ -68,11 +68,16 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
             ),
             TestStep(
                 3,
+                "TH sends the SnapshotStreamModify command with SnapshotStreamID set to aStreamID. No WaterMarkEnabled or OSDEnabled provided.",
+                "DUT responds with an INVALID_COMMAND status code.",
+            ),
+            TestStep(
+                4,
                 "TH sends the SnapshotStreamModify command with SnapshotStreamID set to aStreamID. If WMARK is supported, set WaterMarkEnabled to !aWmark`and if OSD is supported, set OSDEnabled to `!aOSD in the command.",
                 "DUT responds with a SUCCESS status code.",
             ),
             TestStep(
-                4,
+                5,
                 "TH reads AllocatedSnapshotStreams attribute from CameraAVStreamManagement Cluster on DUT",
                 "Verify the following: If WMARK is supported, verify WaterMarkEnabled == !aWmark. If OSD is supported, verify OSDEnabled == !aOSD.",
             ),
@@ -104,7 +109,7 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
         logger.info(f"Rx'd snpSupport: {snpSupport}, wmarkSupport: {wmarkSupport}, osdSupport: {osdSupport}")
         asserts.assert_true(
             (snpSupport and (wmarkSupport or osdSupport)),
-            "SNP & (WMARK|OSD) is supported is not supported.",
+            "SNP & (WMARK|OSD) is not supported.",
         )
 
         self.step(2)
@@ -121,6 +126,19 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
         try:
             cmd = commands.SnapshotStreamModify(
                 snapshotStreamID=aStreamID,
+                watermarkEnabled=None,
+                OSDEnabled=None,
+            )
+            await self.send_single_cmd(endpoint=endpoint, cmd=cmd)
+            asserts.fail("Unexpected success when expecting INVALID_COMMAND due to absence of WatermarkEnabled and OSDEnabled)")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.InvalidCommand, "Unexpected error when expecting INVALID_COMMAND")
+            pass
+
+        self.step(4)
+        try:
+            cmd = commands.SnapshotStreamModify(
+                snapshotStreamID=aStreamID,
                 watermarkEnabled=None if aWmark is None else not aWmark,
                 OSDEnabled=None if aOSD is None else not aOSD,
             )
@@ -129,7 +147,7 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
             pass
 
-        self.step(4)
+        self.step(5)
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedSnapshotStreams
         )
