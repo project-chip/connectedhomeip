@@ -70,7 +70,16 @@ bool NullableListsEqual(const DataModel::Nullable<DataModel::List<T>> & a, const
     {
         return false;
     }
-    return std::equal(a.Value().begin(), a.Value().end(), b.Value().begin());
+
+    for (size_t i = 0; i < a.Value().size(); i++)
+    {
+        if (a.Value()[i] == b.Value()[i])
+        {
+            continue;
+        }
+        return false;
+    }
+    return true;
 }
 
 template <typename T>
