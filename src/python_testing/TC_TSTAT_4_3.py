@@ -37,7 +37,7 @@
 import asyncio
 import logging
 import random
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
@@ -162,7 +162,8 @@ class TC_TSTAT_4_3(MatterBaseTest):
                 if len(possiblePresetHandles) > 0:
                     preset_handle = possiblePresetHandles[0]
                     # Verify that the AddThermostatSuggestion command returns INVALID_IN_STATE.
-                    currentUTC = int(int((datetime.now(timezone.utc) - datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)).total_seconds()))
+                    currentUTC = int(int((datetime.now(timezone.utc) - datetime(2000,
+                                     1, 1, 0, 0, 0, 0, timezone.utc)).total_seconds()))
                     await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
                                                                       preset_handle=preset_handle,
                                                                       effective_time=currentUTC,
@@ -562,7 +563,8 @@ class TC_TSTAT_4_3(MatterBaseTest):
             asserts.assert_greater_equal(
                 len(possiblePresetHandles), 1, "Couldn't run test step 10 since all preset handles are also the ActivePresetHandle on this Thermostat")
             presetHandle = possiblePresetHandles[0]
-            currentUTC = int((datetime.now(timezone.utc) - datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)).total_seconds()) + int(timedelta(hours=25).total_seconds())
+            currentUTC = int((datetime.now(timezone.utc) - datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc)
+                              ).total_seconds()) + int(timedelta(hours=25).total_seconds())
             expirationInMinutes = 30
             # Verify that the AddThermostatSuggestion command returns INVALID_COMMAND.
             addThermostatSuggestionResponse = await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
