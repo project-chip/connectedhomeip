@@ -39,7 +39,7 @@ struct SoftwareDiagnosticsEnabledAttributes
 class SoftwareDiagnosticsLogic
 {
 public:
-    SoftwareDiagnosticsLogic(const SoftwareDiagnosticsEnabledAttributes enabledAttributes) : mEnabledAttributes(enabledAttributes)
+    SoftwareDiagnosticsLogic(const SoftwareDiagnosticsEnabledAttributes &enabledAttributes) : mEnabledAttributes(enabledAttributes)
     {}
     virtual ~SoftwareDiagnosticsLogic() = default;
 
