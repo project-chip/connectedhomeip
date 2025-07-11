@@ -175,7 +175,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
             # Manually put the device in a RVC Run Mode cluster mode with the Idle mode tag and in a device state that allows changing to {PIXIT_RUNMODE_CLEANMODE}
             self.step("2")
             if not self.is_ci:
-                step_name_idle_mode = "Manually put the device in the Idle mode"
+                step_name_idle_mode = "Manually put the device in a RVC Run Mode cluster mode with the Idle mode tag and in a device state that allows changing to {PIXIT_RUNMODE_CLEANMODE}"
                 self.wait_for_user_input(prompt_msg=f"{step_name_idle_mode}, and press Enter when ready.")
 
             # TH reads the SupportedModes attribute of the RVC Run Mode cluster
