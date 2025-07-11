@@ -27,7 +27,7 @@ from chip.tlv import uint
 from fake_device_builder import create_minimal_dt
 from jinja2 import Template
 from mobly import asserts
-from TC_DeviceConformance import DeviceConformanceTests, get_supersets
+from DeviceConformanceTests import DeviceConformanceTests, get_supersets
 
 
 class TestSpecParsingDeviceType(MatterBaseTest):

@@ -21,7 +21,7 @@ from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, dm_from_spec_version
 from chip.tlv import uint
 from mobly import asserts, signals
-from TC_DeviceConformance import DeviceConformanceTests
+from DeviceConformanceTests import DeviceConformanceTests
 
 
 class TestSpecParsingSelection(MatterBaseTest, DeviceConformanceTests):
