@@ -676,7 +676,7 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
                             }
 
                             {
-                                uint8_t * attributeLocation = attributeData + attributeOffsetIndex);
+                                uint8_t * attributeLocation = attributeData + attributeOffsetIndex;
                                 uint8_t *src, *dst;
                                 if (write)
                                 {
