@@ -57,7 +57,6 @@ CHIP_ERROR ClosureDimensionEndpoint::Init()
         .Set(Feature::kLimitation)
         .Set(Feature::kSpeed)
         .Set(Feature::kRotation);
-    conformance.OptionalAttributes().Set(OptionalAttributeEnum::kOverflow);
 
     ClusterInitParameters clusterInitParameters;
     clusterInitParameters.translationDirection = TranslationDirectionEnum::kDownward;

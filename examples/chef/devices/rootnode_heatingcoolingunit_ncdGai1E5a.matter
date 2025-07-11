@@ -2572,7 +2572,6 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_heatcool = 768, version 1;
 
   binding cluster Binding;
   binding cluster Thermostat;

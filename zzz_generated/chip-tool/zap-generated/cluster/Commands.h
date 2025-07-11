@@ -17420,7 +17420,8 @@ private:
 | Attributes:                                                         |        |
 | * MeteredQuantity                                                   | 0x0000 |
 | * MeteredQuantityTimestamp                                          | 0x0001 |
-| * TariffUnit                                                        | 0x0002 |
+| * MeasurementType                                                   | 0x0002 |
+| * MaximumMeteredQuantities                                          | 0x0003 |
 | * GeneratedCommandList                                              | 0xFFF8 |
 | * AcceptedCommandList                                               | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -17513,6 +17514,7 @@ private:
 | * ClusterErrorBoolean                                               | 0x0032 |
 | * GlobalEnum                                                        | 0x0033 |
 | * GlobalStruct                                                      | 0x0034 |
+| * UnsupportedAttributeRequiringAdminPrivilege                       | 0x00FE |
 | * Unsupported                                                       | 0x00FF |
 | * ReadFailureCode                                                   | 0x3000 |
 | * FailureInt32U                                                     | 0x3001 |
@@ -31073,8 +31075,10 @@ void registerClusterCommodityMetering(Commands & commands, CredentialIssuerComma
         make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                      //
         make_unique<ReadAttribute>(Id, "metered-quantity", Attributes::MeteredQuantity::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "metered-quantity-timestamp", Attributes::MeteredQuantityTimestamp::Id,
+                                   credsIssuerConfig),                                                          //
+        make_unique<ReadAttribute>(Id, "measurement-type", Attributes::MeasurementType::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "maximum-metered-quantities", Attributes::MaximumMeteredQuantities::Id,
                                    credsIssuerConfig),                                                                     //
-        make_unique<ReadAttribute>(Id, "tariff-unit", Attributes::TariffUnit::Id, credsIssuerConfig),                      //
         make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -31087,8 +31091,12 @@ void registerClusterCommodityMetering(Commands & commands, CredentialIssuerComma
         make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint32_t>>>(Id, "metered-quantity-timestamp", 0, UINT32_MAX,
                                                                               Attributes::MeteredQuantityTimestamp::Id,
                                                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TariffUnitEnum>>>(
-            Id, "tariff-unit", 0, UINT8_MAX, Attributes::TariffUnit::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum>>>(
+            Id, "measurement-type", 0, UINT16_MAX, Attributes::MeasurementType::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::DataModel::Nullable<uint16_t>>>(Id, "maximum-metered-quantities", 0, UINT16_MAX,
+                                                                              Attributes::MaximumMeteredQuantities::Id,
+                                                                              WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::CommandId>>>(
             Id, "generated-command-list", Attributes::GeneratedCommandList::Id, WriteCommandType::kForceWrite,
             credsIssuerConfig), //
@@ -31103,8 +31111,10 @@ void registerClusterCommodityMetering(Commands & commands, CredentialIssuerComma
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                      //
         make_unique<SubscribeAttribute>(Id, "metered-quantity", Attributes::MeteredQuantity::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "metered-quantity-timestamp", Attributes::MeteredQuantityTimestamp::Id,
+                                        credsIssuerConfig),                                                          //
+        make_unique<SubscribeAttribute>(Id, "measurement-type", Attributes::MeasurementType::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "maximum-metered-quantities", Attributes::MaximumMeteredQuantities::Id,
                                         credsIssuerConfig),                                                                     //
-        make_unique<SubscribeAttribute>(Id, "tariff-unit", Attributes::TariffUnit::Id, credsIssuerConfig),                      //
         make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
         make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
@@ -31212,38 +31222,40 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
         make_unique<ReadAttribute>(Id, "cluster-error-boolean", Attributes::ClusterErrorBoolean::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "global-enum", Attributes::GlobalEnum::Id, credsIssuerConfig),                        //
         make_unique<ReadAttribute>(Id, "global-struct", Attributes::GlobalStruct::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "unsupported", Attributes::Unsupported::Id, credsIssuerConfig),                       //
-        make_unique<ReadAttribute>(Id, "read-failure-code", Attributes::ReadFailureCode::Id, credsIssuerConfig),             //
-        make_unique<ReadAttribute>(Id, "failure-int32u", Attributes::FailureInt32U::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "nullable-boolean", Attributes::NullableBoolean::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "nullable-bitmap8", Attributes::NullableBitmap8::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "nullable-bitmap16", Attributes::NullableBitmap16::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "nullable-bitmap32", Attributes::NullableBitmap32::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "nullable-bitmap64", Attributes::NullableBitmap64::Id, credsIssuerConfig),            //
-        make_unique<ReadAttribute>(Id, "nullable-int8u", Attributes::NullableInt8u::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "nullable-int16u", Attributes::NullableInt16u::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int24u", Attributes::NullableInt24u::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int32u", Attributes::NullableInt32u::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int40u", Attributes::NullableInt40u::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int48u", Attributes::NullableInt48u::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int56u", Attributes::NullableInt56u::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int64u", Attributes::NullableInt64u::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int8s", Attributes::NullableInt8s::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "nullable-int16s", Attributes::NullableInt16s::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int24s", Attributes::NullableInt24s::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int32s", Attributes::NullableInt32s::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int40s", Attributes::NullableInt40s::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int48s", Attributes::NullableInt48s::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int56s", Attributes::NullableInt56s::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-int64s", Attributes::NullableInt64s::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-enum8", Attributes::NullableEnum8::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "nullable-enum16", Attributes::NullableEnum16::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "nullable-float-single", Attributes::NullableFloatSingle::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "nullable-float-double", Attributes::NullableFloatDouble::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "nullable-octet-string", Attributes::NullableOctetString::Id, credsIssuerConfig),     //
-        make_unique<ReadAttribute>(Id, "nullable-char-string", Attributes::NullableCharString::Id, credsIssuerConfig),       //
-        make_unique<ReadAttribute>(Id, "nullable-enum-attr", Attributes::NullableEnumAttr::Id, credsIssuerConfig),           //
-        make_unique<ReadAttribute>(Id, "nullable-struct", Attributes::NullableStruct::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "unsupported-attribute-requiring-admin-privilege",
+                                   Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id, credsIssuerConfig),      //
+        make_unique<ReadAttribute>(Id, "unsupported", Attributes::Unsupported::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "read-failure-code", Attributes::ReadFailureCode::Id, credsIssuerConfig),         //
+        make_unique<ReadAttribute>(Id, "failure-int32u", Attributes::FailureInt32U::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "nullable-boolean", Attributes::NullableBoolean::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "nullable-bitmap8", Attributes::NullableBitmap8::Id, credsIssuerConfig),          //
+        make_unique<ReadAttribute>(Id, "nullable-bitmap16", Attributes::NullableBitmap16::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "nullable-bitmap32", Attributes::NullableBitmap32::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "nullable-bitmap64", Attributes::NullableBitmap64::Id, credsIssuerConfig),        //
+        make_unique<ReadAttribute>(Id, "nullable-int8u", Attributes::NullableInt8u::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "nullable-int16u", Attributes::NullableInt16u::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int24u", Attributes::NullableInt24u::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int32u", Attributes::NullableInt32u::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int40u", Attributes::NullableInt40u::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int48u", Attributes::NullableInt48u::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int56u", Attributes::NullableInt56u::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int64u", Attributes::NullableInt64u::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int8s", Attributes::NullableInt8s::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "nullable-int16s", Attributes::NullableInt16s::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int24s", Attributes::NullableInt24s::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int32s", Attributes::NullableInt32s::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int40s", Attributes::NullableInt40s::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int48s", Attributes::NullableInt48s::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int56s", Attributes::NullableInt56s::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-int64s", Attributes::NullableInt64s::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-enum8", Attributes::NullableEnum8::Id, credsIssuerConfig),              //
+        make_unique<ReadAttribute>(Id, "nullable-enum16", Attributes::NullableEnum16::Id, credsIssuerConfig),            //
+        make_unique<ReadAttribute>(Id, "nullable-float-single", Attributes::NullableFloatSingle::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "nullable-float-double", Attributes::NullableFloatDouble::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "nullable-octet-string", Attributes::NullableOctetString::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "nullable-char-string", Attributes::NullableCharString::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "nullable-enum-attr", Attributes::NullableEnumAttr::Id, credsIssuerConfig),       //
+        make_unique<ReadAttribute>(Id, "nullable-struct", Attributes::NullableStruct::Id, credsIssuerConfig),            //
         make_unique<ReadAttribute>(Id, "nullable-range-restricted-int8u", Attributes::NullableRangeRestrictedInt8u::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "nullable-range-restricted-int8s", Attributes::NullableRangeRestrictedInt8s::Id,
@@ -31366,6 +31378,9 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
             Id, "global-enum", 0, UINT8_MAX, Attributes::GlobalEnum::Id, WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttributeAsComplex<chip::app::Clusters::Globals::Structs::TestGlobalStruct::Type>>(
             Id, "global-struct", Attributes::GlobalStruct::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<bool>>(Id, "unsupported-attribute-requiring-admin-privilege", 0, 1,
+                                          Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id, WriteCommandType::kWrite,
+                                          credsIssuerConfig), //
         make_unique<WriteAttribute<bool>>(Id, "unsupported", 0, 1, Attributes::Unsupported::Id, WriteCommandType::kWrite,
                                           credsIssuerConfig), //
         make_unique<WriteAttribute<uint8_t>>(Id, "read-failure-code", 0, UINT8_MAX, Attributes::ReadFailureCode::Id,
@@ -31534,38 +31549,40 @@ void registerClusterUnitTesting(Commands & commands, CredentialIssuerCommands * 
         make_unique<SubscribeAttribute>(Id, "cluster-error-boolean", Attributes::ClusterErrorBoolean::Id, credsIssuerConfig),     //
         make_unique<SubscribeAttribute>(Id, "global-enum", Attributes::GlobalEnum::Id, credsIssuerConfig),                        //
         make_unique<SubscribeAttribute>(Id, "global-struct", Attributes::GlobalStruct::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "unsupported", Attributes::Unsupported::Id, credsIssuerConfig),                       //
-        make_unique<SubscribeAttribute>(Id, "read-failure-code", Attributes::ReadFailureCode::Id, credsIssuerConfig),             //
-        make_unique<SubscribeAttribute>(Id, "failure-int32u", Attributes::FailureInt32U::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "nullable-boolean", Attributes::NullableBoolean::Id, credsIssuerConfig),              //
-        make_unique<SubscribeAttribute>(Id, "nullable-bitmap8", Attributes::NullableBitmap8::Id, credsIssuerConfig),              //
-        make_unique<SubscribeAttribute>(Id, "nullable-bitmap16", Attributes::NullableBitmap16::Id, credsIssuerConfig),            //
-        make_unique<SubscribeAttribute>(Id, "nullable-bitmap32", Attributes::NullableBitmap32::Id, credsIssuerConfig),            //
-        make_unique<SubscribeAttribute>(Id, "nullable-bitmap64", Attributes::NullableBitmap64::Id, credsIssuerConfig),            //
-        make_unique<SubscribeAttribute>(Id, "nullable-int8u", Attributes::NullableInt8u::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "nullable-int16u", Attributes::NullableInt16u::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int24u", Attributes::NullableInt24u::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int32u", Attributes::NullableInt32u::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int40u", Attributes::NullableInt40u::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int48u", Attributes::NullableInt48u::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int56u", Attributes::NullableInt56u::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int64u", Attributes::NullableInt64u::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int8s", Attributes::NullableInt8s::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "nullable-int16s", Attributes::NullableInt16s::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int24s", Attributes::NullableInt24s::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int32s", Attributes::NullableInt32s::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int40s", Attributes::NullableInt40s::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int48s", Attributes::NullableInt48s::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int56s", Attributes::NullableInt56s::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-int64s", Attributes::NullableInt64s::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-enum8", Attributes::NullableEnum8::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "nullable-enum16", Attributes::NullableEnum16::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "nullable-float-single", Attributes::NullableFloatSingle::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "nullable-float-double", Attributes::NullableFloatDouble::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "nullable-octet-string", Attributes::NullableOctetString::Id, credsIssuerConfig),     //
-        make_unique<SubscribeAttribute>(Id, "nullable-char-string", Attributes::NullableCharString::Id, credsIssuerConfig),       //
-        make_unique<SubscribeAttribute>(Id, "nullable-enum-attr", Attributes::NullableEnumAttr::Id, credsIssuerConfig),           //
-        make_unique<SubscribeAttribute>(Id, "nullable-struct", Attributes::NullableStruct::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "unsupported-attribute-requiring-admin-privilege",
+                                        Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id, credsIssuerConfig),      //
+        make_unique<SubscribeAttribute>(Id, "unsupported", Attributes::Unsupported::Id, credsIssuerConfig),                   //
+        make_unique<SubscribeAttribute>(Id, "read-failure-code", Attributes::ReadFailureCode::Id, credsIssuerConfig),         //
+        make_unique<SubscribeAttribute>(Id, "failure-int32u", Attributes::FailureInt32U::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "nullable-boolean", Attributes::NullableBoolean::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "nullable-bitmap8", Attributes::NullableBitmap8::Id, credsIssuerConfig),          //
+        make_unique<SubscribeAttribute>(Id, "nullable-bitmap16", Attributes::NullableBitmap16::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "nullable-bitmap32", Attributes::NullableBitmap32::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "nullable-bitmap64", Attributes::NullableBitmap64::Id, credsIssuerConfig),        //
+        make_unique<SubscribeAttribute>(Id, "nullable-int8u", Attributes::NullableInt8u::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "nullable-int16u", Attributes::NullableInt16u::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int24u", Attributes::NullableInt24u::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int32u", Attributes::NullableInt32u::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int40u", Attributes::NullableInt40u::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int48u", Attributes::NullableInt48u::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int56u", Attributes::NullableInt56u::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int64u", Attributes::NullableInt64u::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int8s", Attributes::NullableInt8s::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "nullable-int16s", Attributes::NullableInt16s::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int24s", Attributes::NullableInt24s::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int32s", Attributes::NullableInt32s::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int40s", Attributes::NullableInt40s::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int48s", Attributes::NullableInt48s::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int56s", Attributes::NullableInt56s::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-int64s", Attributes::NullableInt64s::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-enum8", Attributes::NullableEnum8::Id, credsIssuerConfig),              //
+        make_unique<SubscribeAttribute>(Id, "nullable-enum16", Attributes::NullableEnum16::Id, credsIssuerConfig),            //
+        make_unique<SubscribeAttribute>(Id, "nullable-float-single", Attributes::NullableFloatSingle::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "nullable-float-double", Attributes::NullableFloatDouble::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "nullable-octet-string", Attributes::NullableOctetString::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "nullable-char-string", Attributes::NullableCharString::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "nullable-enum-attr", Attributes::NullableEnumAttr::Id, credsIssuerConfig),       //
+        make_unique<SubscribeAttribute>(Id, "nullable-struct", Attributes::NullableStruct::Id, credsIssuerConfig),            //
         make_unique<SubscribeAttribute>(Id, "nullable-range-restricted-int8u", Attributes::NullableRangeRestrictedInt8u::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "nullable-range-restricted-int8s", Attributes::NullableRangeRestrictedInt8s::Id,

@@ -49,6 +49,7 @@ declare install_pytest_requirements=yes
 declare install_jupyterlab=no
 declare -a extra_packages
 declare -a extra_gn_args
+declare chip_build_controller_dynamic_server=false
 
 help() {
 
@@ -79,6 +80,8 @@ Input Options:
   -E, --extra_packages PACKAGE                              Install extra Python packages from PyPI.
                                                             May be specified multiple times.
   -z, --pregen_dir DIRECTORY                                Directory where generated zap files have been pre-generated.
+  -ds, --chip_build_controller_dynamic_server <true/false>  Enable dynamic server in controller.
+                                                            Defaults to $chip_build_controller_dynamic_server.
 "
 }
 
@@ -166,6 +169,10 @@ while (($#)); do
         --jupyter-lab | -j)
             install_jupyterlab=yes
             ;;
+        --chip_build_controller_dynamic_server | -ds)
+            chip_build_controller_dynamic_server=$2
+            shift
+            ;;
         -*)
             help
             echo "Unknown Option \"$1\""
@@ -186,6 +193,7 @@ if [[ -n $wifi_paf_config ]]; then
     echo "  $wifi_paf_config"
 fi
 echo "  enable_ipv4=\"$enable_ipv4\""
+echo "  chip_build_controller_dynamic_server=\"$chip_build_controller_dynamic_server\""
 
 if [[ ${#extra_gn_args[@]} -gt 0 ]]; then
     echo "In addition, the following extra args will added to gn command line: ${extra_gn_args[*]}"
@@ -220,7 +228,8 @@ gn_args=(
     "chip_config_network_layer_ble=$enable_ble"
     "chip_enable_ble=$enable_ble"
     "chip_inet_config_enable_ipv4=$enable_ipv4"
-    "chip_crypto=\"boringssl\""
+    "chip_crypto=\"openssl\""
+    "chip_build_controller_dynamic_server=$chip_build_controller_dynamic_server"
 )
 if [[ -n "$chip_mdns" ]]; then
     gn_args+=("chip_mdns=\"$chip_mdns\"")
@@ -276,6 +285,8 @@ if [ -n "$install_virtual_env" ]; then
     source "$ENVIRONMENT_ROOT"/bin/activate
     "$ENVIRONMENT_ROOT"/bin/python -m ensurepip --upgrade
     "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade "${WHEEL[@]}"
+
+    "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/scripts/setup/requirements.build.txt"
 
     if [ "$install_pytest_requirements" = "yes" ]; then
         echo_blue "Installing python test dependencies ..."

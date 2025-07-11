@@ -6911,6 +6911,7 @@ internal cluster UnitTesting = 4294048773 {
   attribute boolean clusterErrorBoolean = 50;
   attribute TestGlobalEnum globalEnum = 51;
   attribute TestGlobalStruct globalStruct = 52;
+  attribute access(read: administer, write: administer) optional boolean unsupportedAttributeRequiringAdminPrivilege = 254;
   attribute optional boolean unsupported = 255;
   attribute optional int8u readFailureCode = 12288;
   attribute optional int32u failureInt32U = 12289;

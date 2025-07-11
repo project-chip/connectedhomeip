@@ -638,6 +638,26 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
+    case Clusters::ClosureControl::Id: {
+        switch (aCommand)
+        {
+        case Clusters::ClosureControl::Commands::MoveTo::Id:
+        case Clusters::ClosureControl::Commands::Calibrate::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
+    case Clusters::ClosureDimension::Id: {
+        switch (aCommand)
+        {
+        case Clusters::ClosureDimension::Commands::SetTarget::Id:
+        case Clusters::ClosureDimension::Commands::Step::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
     case Clusters::ThreadBorderRouterManagement::Id: {
         switch (aCommand)
         {
