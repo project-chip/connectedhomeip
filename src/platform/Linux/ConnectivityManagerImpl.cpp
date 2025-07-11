@@ -269,9 +269,21 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned()
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
     VerifyOrReturnValue(mWpaSupplicant.iface, false);
-    GAutoPtr<char> bss(wpa_supplicant_1_interface_dup_current_bss(mWpaSupplicant.iface.get()));
-    // Check if the current BSS is not empty (NULL or "/") which indicates that the station is provisioned.
-    return bss && g_strcmp0(bss.get(), "/") != 0;
+
+    GAutoPtr<GError> err;
+    // WPA supplicant does not emit PropertiesChanged signal for the Networks property, so we can not use our
+    // proxy observer to get the property value. Instead, we need to get it directly using the D-Bus call.
+    const char * ifaceName = g_dbus_proxy_get_interface_name(reinterpret_cast<GDBusProxy *>(mWpaSupplicant.iface.get()));
+    GAutoPtr<GVariant> response(g_dbus_proxy_call_sync(
+        reinterpret_cast<GDBusProxy *>(mWpaSupplicant.iface.get()), "org.freedesktop.DBus.Properties.Get",
+        g_variant_new("(ss)", ifaceName, "Networks"), G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &err.GetReceiver()));
+    VerifyOrReturnValue(response, false,
+                        ChipLogError(DeviceLayer, "WPA supplicant: Failed to get Networks property: %s", err->message));
+
+    // Check whether we have at least one network provisioned.
+    GAutoPtr<GVariant> responseValue(g_variant_get_child_value(response.get(), 0));
+    GAutoPtr<GVariant> networks(g_variant_get_child_value(responseValue.get(), 0));
+    return g_variant_n_children(networks.get()) > 0;
 }
 
 void ConnectivityManagerImpl::_ClearWiFiStationProvision()
@@ -590,8 +602,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceAdded(WpaSupplicant1 * proxy, const
     mWpaSupplicant.interfacePath.reset(g_strdup(path));
     if (mWpaSupplicant.interfacePath)
     {
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: WiFi interface added: %s", mWpaSupplicant.interfacePath.get());
-
+        ChipLogProgress(DeviceLayer, "WPA supplicant: WiFi interface added: %s", mWpaSupplicant.interfacePath.get());
         wpa_supplicant_1_interface_proxy_new_for_bus(
             G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, mWpaSupplicant.interfacePath.get(), nullptr,
             reinterpret_cast<GAsyncReadyCallback>(
