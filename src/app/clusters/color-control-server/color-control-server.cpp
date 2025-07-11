@@ -2407,8 +2407,8 @@ void ColorControlServer::updateXYCommand(EndpointId endpoint)
     Color16uTransitionState * colorXTransitionState = getXTransitionStateByIndex(epIndex);
     Color16uTransitionState * colorYTransitionState = getYTransitionStateByIndex(epIndex);
 
-    VerifyOrReturnValue(colorXTransitionState != nullptr, Status::UnsupportedEndpoint);
-    VerifyOrReturnValue(colorYTransitionState != nullptr, Status::UnsupportedEndpoint);
+    VerifyOrReturn(colorXTransitionState != nullptr);
+    VerifyOrReturn(colorYTransitionState != nullptr);
 
     // compute new values for X and Y.
     bool isXTransitionDone = computeNewColor16uValue(colorXTransitionState);
