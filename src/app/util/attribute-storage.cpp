@@ -84,13 +84,6 @@ static bool emberAfEndpointIsEnabled(EndpointId endpoint);
 
 namespace {
 
-#if (!defined(ATTRIBUTE_SINGLETONS_SIZE)) || (ATTRIBUTE_SINGLETONS_SIZE == 0)
-#define ACTUAL_SINGLETONS_SIZE 1
-#else
-#define ACTUAL_SINGLETONS_SIZE ATTRIBUTE_SINGLETONS_SIZE
-#endif
-uint8_t singletonAttributeData[ACTUAL_SINGLETONS_SIZE];
-
 uint16_t emberEndpointCount = 0;
 
 /// Determines a incremental unique index for ember
