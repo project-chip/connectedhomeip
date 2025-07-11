@@ -25,7 +25,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --timeout 30
+#       --timeout 120
 #       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
