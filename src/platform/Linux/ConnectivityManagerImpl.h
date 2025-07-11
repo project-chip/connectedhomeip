@@ -94,24 +94,12 @@ namespace DeviceLayer {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 struct GDBusWpaSupplicant
 {
-    enum class WpaState
-    {
-        INIT,
-        CONNECTING,
-        CONNECTED,
-        NOT_CONNECTED,
-        NO_INTERFACE_PATH,
-        GOT_INTERFACE_PATH,
-        INTERFACE_CONNECTED,
-    };
-
     enum class WpaScanningState
     {
         IDLE,
         SCANNING,
     };
 
-    WpaState state             = WpaState::INIT;
     WpaScanningState scanState = WpaScanningState::IDLE;
     GAutoPtr<WpaSupplicant1> proxy;
     GAutoPtr<WpaSupplicant1Interface> iface;
