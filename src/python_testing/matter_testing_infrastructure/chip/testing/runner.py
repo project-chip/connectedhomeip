@@ -331,7 +331,7 @@ def run_tests_no_exit(
     # If the test class is not CommissionDeviceTest, retrieve its information.
     # CommissionDeviceTest does not implement the methods expected by get_test_info
     # and this information is not required for its execution.
-    if test_class != CommissionDeviceTest:
+    if test_class is not CommissionDeviceTest:
         get_test_info(test_class, matter_test_config)
 
     # Load test config file.
