@@ -434,6 +434,27 @@ class MatterBaseTest(base_test.BaseTestClass):
             self.runner_hook.test_stop(exception=exception, duration=test_duration)
 
             def extract_error_text() -> tuple[str, str]:
+                """Extract meaningful error information from test failure stack traces.
+
+                This function parses stack trace information to identify the most relevant
+                error line and associated file location for test failure reporting.
+
+                Returns:
+                    tuple[str, str]: A tuple containing:
+                        - probable_error (str): The most likely line containing the actual error.
+                          For Mobly framework exceptions (TestError/TestFailure), this finds
+                          the last assertion line. For other exceptions, uses the last line
+                          of the stack trace.
+                        - probable_file (str): The file path where the error occurred,
+                          extracted from the stack trace "File" markers.
+
+                Note:
+                    - Returns ("Stack Trace Unavailable", "") if no stack trace is available
+                    - Returns ("Unknown error, please see stack trace above", "") if no
+                      assertion candidates are found for Mobly exceptions
+                    - Returns (probable_error, "Unknown file") if no file information
+                      can be extracted from the stack trace
+                """
                 no_stack_trace = ("Stack Trace Unavailable", "")
                 if not record.termination_signal.stacktrace:
                     return no_stack_trace
