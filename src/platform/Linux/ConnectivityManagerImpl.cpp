@@ -503,7 +503,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * sourceObject, 
     mWpaSupplicant.iface.reset(wpa_supplicant_1_interface_proxy_new_for_bus_finish(res, &err.GetReceiver()));
     if (mWpaSupplicant.iface && err == nullptr)
     {
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant interface proxy");
+        ChipLogProgress(DeviceLayer, "WPA supplicant: connected to wpa_supplicant interface proxy");
 
         g_signal_connect(
             mWpaSupplicant.iface.get(), "g-properties-changed",
