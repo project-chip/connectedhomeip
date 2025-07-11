@@ -98,9 +98,11 @@ class TC_ACL_2_3(MatterBaseTest):
         extension1 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=D_OK_EMPTY)
         extensions_list1 = [extension1]
-        result1 = await self.th1.WriteAttribute(
+        result1 = await self.write_attribute_with_encoding_option(
+            self.th1,
             self.dut_node_id,
-            [(0, ac_extension_attr(value=extensions_list1))]
+            [(0, ac_extension_attr(value=extensions_list1))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         logging.info(f"Write result: {str(result1)}")
         asserts.assert_equal(
@@ -117,9 +119,11 @@ class TC_ACL_2_3(MatterBaseTest):
         extension2 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=D_OK_SINGLE)
         extensions_list2 = [extension2]
-        result2 = await self.th1.WriteAttribute(
+        result2 = await self.write_attribute_with_encoding_option(
+            self.th1,
             self.dut_node_id,
-            [(0, ac_extension_attr(value=extensions_list2))]
+            [(0, ac_extension_attr(value=extensions_list2))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         logging.info(f"Write result: {str(result2)}")
         asserts.assert_equal(
@@ -136,9 +140,11 @@ class TC_ACL_2_3(MatterBaseTest):
         extension3 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=D_OK_FULL)
         extensions_list3 = [extension3]
-        result3 = await self.th1.WriteAttribute(
+        result3 = await self.write_attribute_with_encoding_option(
+            self.th1,
             self.dut_node_id,
-            [(0, ac_extension_attr(value=extensions_list3))]
+            [(0, ac_extension_attr(value=extensions_list3))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         logging.info(f"Write result: {str(result3)}")
         asserts.assert_equal(
@@ -155,9 +161,11 @@ class TC_ACL_2_3(MatterBaseTest):
         extension4 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=D_BAD_LENGTH)
         extensions_list4 = [extension4]
-        result4 = await self.th1.WriteAttribute(
+        result4 = await self.write_attribute_with_encoding_option(
+            self.th1,
             self.dut_node_id,
-            [(0, ac_extension_attr(value=extensions_list4))]
+            [(0, ac_extension_attr(value=extensions_list4))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         logging.info(f"Write result: {str(result4)}")
         asserts.assert_equal(
@@ -168,9 +176,11 @@ class TC_ACL_2_3(MatterBaseTest):
         extension5 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=D_BAD_STRUCT)
         extensions_list5 = [extension5]
-        result5 = await self.th1.WriteAttribute(
+        result5 = await self.write_attribute_with_encoding_option(
+            self.th1,
             self.dut_node_id,
-            [(0, ac_extension_attr(value=extensions_list5))]
+            [(0, ac_extension_attr(value=extensions_list5))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         logging.info(f"Write result: {str(result5)}")
         asserts.assert_equal(
@@ -181,9 +191,11 @@ class TC_ACL_2_3(MatterBaseTest):
         extension6 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=D_BAD_LIST)
         extensions_list6 = [extension6]
-        result6 = await self.th1.WriteAttribute(
+        result6 = await self.write_attribute_with_encoding_option(
+            self.th1,
             self.dut_node_id,
-            [(0, ac_extension_attr(value=extensions_list6))]
+            [(0, ac_extension_attr(value=extensions_list6))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         logging.info(f"Write result: {str(result6)}")
         asserts.assert_equal(
@@ -194,9 +206,11 @@ class TC_ACL_2_3(MatterBaseTest):
         extension7 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=D_BAD_ELEM)
         extensions_list7 = [extension7]
-        result7 = await self.th1.WriteAttribute(
+        result7 = await self.write_attribute_with_encoding_option(
+            self.th1,
             self.dut_node_id,
-            [(0, ac_extension_attr(value=extensions_list7))]
+            [(0, ac_extension_attr(value=extensions_list7))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         logging.info(f"Write result: {str(result7)}")
         asserts.assert_equal(
@@ -207,9 +221,11 @@ class TC_ACL_2_3(MatterBaseTest):
         extension8 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=D_BAD_OVERFLOW)
         extensions_list8 = [extension8]
-        result8 = await self.th1.WriteAttribute(
+        result8 = await self.write_attribute_with_encoding_option(
+            self.th1,
             self.dut_node_id,
-            [(0, ac_extension_attr(value=extensions_list8))]
+            [(0, ac_extension_attr(value=extensions_list8))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         logging.info(f"Write result: {str(result8)}")
         asserts.assert_equal(
@@ -220,9 +236,11 @@ class TC_ACL_2_3(MatterBaseTest):
         extension9 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=D_BAD_UNDERFLOW)
         extensions_list9 = [extension9]
-        result9 = await self.th1.WriteAttribute(
+        result9 = await self.write_attribute_with_encoding_option(
+            self.th1,
             self.dut_node_id,
-            [(0, ac_extension_attr(value=extensions_list9))]
+            [(0, ac_extension_attr(value=extensions_list9))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         logging.info(f"Write result: {str(result9)}")
         asserts.assert_equal(
@@ -233,9 +251,11 @@ class TC_ACL_2_3(MatterBaseTest):
         extension10 = Clusters.AccessControl.Structs.AccessControlExtensionStruct(
             data=D_BAD_NONE)
         extensions_list10 = [extension10]
-        result10 = await self.th1.WriteAttribute(
+        result10 = await self.write_attribute_with_encoding_option(
+            self.th1,
             self.dut_node_id,
-            [(0, ac_extension_attr(value=extensions_list10))]
+            [(0, ac_extension_attr(value=extensions_list10))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         logging.info(f"Write result: {str(result10)}")
         asserts.assert_equal(
@@ -249,10 +269,12 @@ class TC_ACL_2_3(MatterBaseTest):
             data=D_OK_SINGLE)
         extensions_list11 = [extension11, extension12]
 
-        result11 = await self.write_attribute_with_encoding_option(self.th1,
-                                                                   self.dut_node_id,
-                                                                   [(0, ac_extension_attr(value=extensions_list11))],
-                                                                   forceLegacyListEncoding=force_legacy_encoding)
+        result11 = await self.write_attribute_with_encoding_option(
+            self.th1,
+            self.dut_node_id,
+            [(0, ac_extension_attr(value=extensions_list11))],
+            forceLegacyListEncoding=force_legacy_encoding
+        )
 
         logging.info(f"Write result: {str(result11)}")
         asserts.assert_equal(
@@ -278,9 +300,11 @@ class TC_ACL_2_3(MatterBaseTest):
         self.step(19)
         # Write AccessControlExtension attribute for TH1 value is an empty list
         extensions_list12 = []
-        result12 = await self.th1.WriteAttribute(
+        result12 = await self.write_attribute_with_encoding_option(
+            self.th1,
             self.dut_node_id,
-            [(0, ac_extension_attr(value=extensions_list12))]
+            [(0, ac_extension_attr(value=extensions_list12))],
+            forceLegacyListEncoding=force_legacy_encoding
         )
         logging.info(f"Write result: {str(result12)}")
         asserts.assert_equal(
@@ -293,9 +317,9 @@ class TC_ACL_2_3(MatterBaseTest):
         asserts.assert_equal(ac_extension_value5, [], "AccessControlExtension is empty list")
 
         self.step(21)
-        # Rerunning test with new list method
+        # Rerunning test using the legacy list writing mechanism
         if force_legacy_encoding:
-            logging.info("Rerunning test with new list method")
+            logging.info("Rerunning test using the legacy list writing mechanism")
 
     def desc_TC_ACL_2_3(self) -> str:
         return "[TC-ACL-2.3] Multiple fabrics test"
