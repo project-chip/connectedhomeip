@@ -19,8 +19,8 @@
 #include "webrtc-provider-manager.h"
 
 #include <Options.h>
-#include <controller/InvokeInteraction.h>
 #include <app/server/Server.h>
+#include <controller/InvokeInteraction.h>
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <webrtc-transport.h>
