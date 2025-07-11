@@ -134,6 +134,8 @@ bool emberAfJointFabricAdministratorClusterICACCSRRequestCallback(
      * has not been executed against the initiator of this command, the command SHALL fail
      * with a <<ref_JFVidNotVerified, JfVidNotVerified>> status code SHALL be sent back to the initiator.*/
 
+    VerifyOrExit(!failSafeContext.AddICACCommandHasBeenInvoked(), nonDefaultStatus = Status::ConstraintError);
+
     VerifyOrExit(jointFabricAdministrator.GetDelegate() != nullptr, nonDefaultStatus = Status::Failure);
     VerifyOrExit(jointFabricAdministrator.GetDelegate()->GetIcacCsr(icacCsr) == CHIP_NO_ERROR, nonDefaultStatus = Status::Failure);
 
@@ -215,10 +217,6 @@ bool emberAfJointFabricAdministratorClusterAnnounceJointFabricAdministratorCallb
                     commandData.endpointID);
 
     auto nonDefaultStatus = Status::Success;
-
-    auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
-    VerifyOrExit(failSafeContext.IsFailSafeArmed(commandObj->GetAccessingFabricIndex()),
-                 nonDefaultStatus = Status::FailsafeRequired);
     VerifyOrExit(commandData.endpointID != kInvalidEndpointId, nonDefaultStatus = Status::ConstraintError);
 
     Server::GetInstance().GetJointFabricAdministrator().SetPeerJFAdminClusterEndpointId(commandData.endpointID);
