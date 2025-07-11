@@ -118,9 +118,9 @@ private:
 
     CHIP_ERROR SendICECandidatesCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle);
 
-    CHIP_ERROR AcquireAudioVideoStreams();
+    CHIP_ERROR AcquireAudioVideoStreams(uint16_t sessionId);
 
-    CHIP_ERROR ReleaseAudioVideoStreams();
+    CHIP_ERROR ReleaseAudioVideoStreams(uint16_t sessionId);
 
     static void OnDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
                                   const chip::SessionHandle & sessionHandle);
@@ -134,8 +134,6 @@ private:
     void OnTrack(std::shared_ptr<WebRTCTrack> track);
 
     std::shared_ptr<WebRTCPeerConnection> mPeerConnection;
-    std::shared_ptr<WebRTCTrack> mVideoTrack;
-    std::shared_ptr<WebRTCTrack> mAudioTrack;
 
     chip::ScopedNodeId mPeerId;
     chip::EndpointId mOriginatingEndpointId;
@@ -155,9 +153,6 @@ private:
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 
     std::unordered_map<uint16_t, std::unique_ptr<WebrtcTransport>> mWebrtcTransportMap;
-
-    uint16_t mVideoStreamID;
-    uint16_t mAudioStreamID;
 
     MediaController * mMediaController = nullptr;
 
