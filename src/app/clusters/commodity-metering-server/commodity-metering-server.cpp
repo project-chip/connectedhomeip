@@ -70,16 +70,7 @@ bool NullableListsEqual(const DataModel::Nullable<DataModel::List<T>> & a, const
     {
         return false;
     }
-    
-    for (size_t i = 0; i < a.Value().size(); i++)
-    {
-        if (a.Value()[i] == b.Value()[i])
-        {
-            continue;
-        }
-        return false;
-    }
-    return true;
+    return std::equal(a.Value().begin(), a.Value().end(), b.Value().begin());
 }
 
 template <typename T>
@@ -197,7 +188,7 @@ CHIP_ERROR Instance::SetMeteredQuantity(const DataModel::Nullable<DataModel::Lis
 
         if (len > mMaximumMeteredQuantities.Value())
         {
-            len = mMaximumMeteredQuantities.Value();
+            return CHIP_ERROR_INVALID_LIST_LENGTH;
         }
 
         if (len == 0)
