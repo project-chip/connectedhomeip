@@ -305,7 +305,7 @@ void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, con
     CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreamID, audioStreamID);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "HandleProvideOffer: Cannot meet resource management conditions");
+        ChipLogError(Zcl, "HandleSolicitOffer: Cannot provide the stream usage requested");
         ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
         return;
     }
@@ -506,8 +506,8 @@ void WebRTCTransportProviderServer::HandleProvideOffer(HandlerContext & ctx, con
         CHIP_ERROR err = mDelegate.ValidateStreamUsage(req.streamUsage, videoStreamID, audioStreamID);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(Zcl, "HandleProvideOffer: Cannot meet resource management conditions");
-            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::ResourceExhausted);
+            ChipLogError(Zcl, "HandleProvideOffer: Cannot provide stream usage requested");
+            ctx.mCommandHandler.AddStatus(ctx.mRequestPath, Status::DynamicConstraintError);
             return;
         }
 
