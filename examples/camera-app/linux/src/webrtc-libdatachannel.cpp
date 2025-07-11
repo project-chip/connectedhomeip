@@ -154,11 +154,6 @@ public:
             {
                 onConnectionState(true);
             }
-            else if (state == rtc::PeerConnection::State::Failed || state == rtc::PeerConnection::State::Closed ||
-                     state == rtc::PeerConnection::State::Disconnected)
-            {
-                onConnectionState(false);
-            }
         });
 
         mPeerConnection->onGatheringStateChange([](rtc::PeerConnection::GatheringState state) {
@@ -211,6 +206,7 @@ public:
         }
 
         // TODO: Add audio track support
+        ChipLogProgress(Camera, "Audio track support is not yet implemented");
         return nullptr;
     }
 
