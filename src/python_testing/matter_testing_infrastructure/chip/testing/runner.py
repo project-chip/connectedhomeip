@@ -328,7 +328,11 @@ def run_tests_no_exit(
     CommissionDeviceTest.event_loop = event_loop
     test_class.event_loop = event_loop
 
-    get_test_info(test_class, matter_test_config)
+    # If the test class is not CommissionDeviceTest, retrieve its information.
+    # CommissionDeviceTest does not implement the methods expected by get_test_info
+    # and this information is not required for its execution.
+    if test_class != CommissionDeviceTest:
+        get_test_info(test_class, matter_test_config)
 
     # Load test config file.
     test_config = generate_mobly_test_config(matter_test_config)
