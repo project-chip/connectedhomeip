@@ -193,13 +193,6 @@ struct EmberAfAttributeMetadata
     bool IsExternal() const { return mask & MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE; }
 
     /**
-     * Check whether this is a "singleton" attribute, in the sense that it has a
-     * single value across multiple instances of the cluster.  This is not
-     * mutually exclusive with the attribute being external.
-     */
-    bool IsSingleton() const { return mask & MATTER_ATTRIBUTE_FLAG_SINGLETON; }
-
-    /**
      * Check whether this attribute is automatically stored in non-volatile
      * memory.
      */
