@@ -342,7 +342,7 @@ CHIP_ERROR WiFiPAFLayer::HandleTransportConnectionInitiated(WiFiPAF::WiFiPAFSess
 
     ChipLogProgress(WiFiPAF, "Creating WiFiPAFEndPoint");
     err                                  = NewEndPoint(&newEndPoint, SessionInfo, SessionInfo.role);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(err);
     newEndPoint->mOnPafSubscribeComplete = OnSubscribeDoneFunc;
     newEndPoint->mOnPafSubscribeError    = OnSubscribeErrFunc;
     newEndPoint->mAppState               = appState;
