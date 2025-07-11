@@ -1,0 +1,116 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/scm1612s.gni")
+import("${build_root}/toolchain/flashable_executable.gni")
+
+import("scm1612s_board.gni")
+
+template("scm1612s_postbuild") {
+  forward_variables_from(invoker,
+                         [
+                           "input_name",
+                           "map_name",
+                           "deps",
+                         ])
+
+  output_base_name = get_path_info(input_name, "name")
+  original_image_name = output_base_name + ".bin"
+  mcuboot_image_name = output_base_name + ".mcuboot.bin"
+  disas_name = output_base_name + ".dis"
+
+  # Generate System.map
+  action(target_name + "_map") {
+    inputs = [ "${root_out_dir}/${input_name}" ]
+    outputs = [ "${root_out_dir}/${map_name}" ]
+
+    args = [
+      rebase_path("${root_out_dir}/${input_name}", root_build_dir),
+      rebase_path("${root_out_dir}/${map_name}", root_build_dir),
+    ]
+    script = "${scm1612s_sdk_build_root}/build-system-map.py"
+  }
+
+  # Generate xxx.mcuboot.bin
+  action(target_name + "_sign") {
+    inputs = [ "${root_out_dir}/${original_image_name}" ]
+    outputs = [ "${root_out_dir}/${mcuboot_image_name}" ]
+
+    args = [
+      "sign",
+      "--align", "4",
+      "--version", "0.1",
+      "--header-size", "0x20",
+      "--slot-size", "0x180000",
+      "--pad-header",
+      rebase_path("${root_out_dir}/${original_image_name}", root_build_dir),
+      rebase_path("${root_out_dir}/${mcuboot_image_name}", root_build_dir),
+    ]
+    script = "${scm1612s_sdk_root}/lib/scm_mcuboot/mcuboot/scripts/imgtool.py"
+  }
+
+  # Generate xxx.dis (disassembly)
+  action(target_name + "_dis") {
+    inputs = [ "${root_out_dir}/${input_name}" ]
+    outputs = [ "${root_out_dir}/${disas_name}" ]
+
+    args = [
+      rebase_path("${root_out_dir}/${input_name}", root_build_dir),
+      rebase_path("${root_out_dir}/${disas_name}", root_build_dir),
+    ]
+    script = "${scm1612s_sdk_build_root}/disassemble.py"
+  }
+
+}
+
+template("scm1612s_executable") {
+  output_name = invoker.output_name
+  output_base_name = get_path_info(output_name, "name")
+
+  objcopy_image_name = output_base_name + ".bin"
+  objcopy_image_format = "binary"
+  objcopy = "riscv32-elf-objcopy"
+
+  #Copy flashing dependencies to the output directory so that the output
+  #is collectively self-contained; this allows flashing to work reliably
+  #even if the build and flashing steps take place on different machines
+  #or in different containers.
+
+#  flashing_runtime_target = target_name + ".flashing_runtime"
+#  flashing_script_inputs = [
+#    "${chip_root}/scripts/flashing/firmware_utils.py",
+#    "${chip_root}/scripts/flashing/psoc6_firmware_utils.py",
+#  ]
+
+#  copy(flashing_runtime_target) {
+#    sources = flashing_script_inputs
+#    outputs = [ "${root_out_dir}/{{source_file_part}}" ]
+#  }
+
+#  flashing_script_generator =
+#      "${chip_root}/scripts/flashing/gen_flashing_script.py"
+#  flashing_script_name = output_base_name + ".flash.py"
+#  flashing_options = [
+#    "psoc6",
+#    "--device",
+#    "${psoc6_board}",
+#  ]
+
+  flashable_executable(target_name) {
+    forward_variables_from(invoker, "*")
+#    data_deps = [ ":${flashing_runtime_target}" ]
+  }
+}

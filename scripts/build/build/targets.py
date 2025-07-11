@@ -24,6 +24,7 @@ from builders.genio import GenioApp, GenioBuilder
 from builders.host import HostApp, HostBoard, HostBuilder, HostCryptoLibrary, HostFuzzingType
 from builders.imx import IMXApp, IMXBuilder
 from builders.infineon import InfineonApp, InfineonBoard, InfineonBuilder
+from builders.senscomm import SenscommApp, SenscommBoard, SenscommBuilder
 from builders.k32w import K32WApp, K32WBoard, K32WBuilder
 from builders.mbed import MbedApp, MbedBoard, MbedBuilder, MbedProfile
 from builders.mw320 import MW320App, MW320Builder
@@ -410,6 +411,26 @@ def BuildInfineonTarget():
     target.AppendModifier('ota', enable_ota_requestor=True)
     target.AppendModifier('updateimage', update_image=True)
     target.AppendModifier('trustm', enable_trustm=True)
+
+    return target
+
+
+def BuildSenscommTarget():
+    target = BuildTarget('senscomm', SenscommBuilder)
+
+    # board
+    target.AppendFixedTargets([
+        TargetPart('scm1612s', board=SenscommBoard.EVBQFN40),
+    ])
+
+    # apps
+    target.AppendFixedTargets([
+        TargetPart('lock', app=SenscommApp.LOCK),
+        TargetPart('light', app=SenscommApp.LIGHT),
+        TargetPart('all-clusters', app=SenscommApp.ALL_CLUSTERS),
+        TargetPart('all-clusters-minimal',
+                   app=SenscommApp.ALL_CLUSTERS_MINIMAL),
+    ])
 
     return target
 
@@ -804,6 +825,7 @@ BUILD_TARGETS = [
     BuildHostTestRunnerTarget(),
     BuildIMXTarget(),
     BuildInfineonTarget(),
+    BuildSenscommTarget(),
     BuildRW61XTarget(),
     BuildK32WTarget(),
     BuildMbedTarget(),
