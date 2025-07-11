@@ -42,7 +42,6 @@ extern ThermostatAttrAccess gThermostatAttrAccess;
 bool AddThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                              const Commands::AddThermostatSuggestion::DecodableType & commandData)
 {
-
     // If time is not synced, return INVALID_IN_STATE in the AddThermostatSuggestionResponse.
     uint32_t currentMatterEpochTimestampInSeconds = 0;
     if (System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds) != CHIP_NO_ERROR)
@@ -141,7 +140,7 @@ bool RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteComma
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "Failed to RemoveFromThermostatSuggestionsList with uniqueID: %d error: %" CHIP_ERROR_FORMAT,
+        ChipLogError(Zcl, "Failed to RemoveFromThermostatSuggestionsList with uniqueID: %" PRIu32 " error: %" CHIP_ERROR_FORMAT,
                      commandData.uniqueID, err.Format());
         commandObj->AddStatus(commandPath, Status::NotFound);
         return true;

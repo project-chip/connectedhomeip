@@ -299,7 +299,7 @@ ThermostatDelegate::AppendToThermostatSuggestionsList(const Structs::ThermostatS
 
     if (mNextFreeIndexInThermostatSuggestionsList < MATTER_ARRAY_SIZE(mThermostatSuggestions))
     {
-        mThermostatSuggestions[mNextFreeIndexInThermostatSuggestionsList++] = newThermostatSuggestion;
+        mThermostatSuggestions[mNextFreeIndexInThermostatSuggestionsList++] = thermostatSuggestion;
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -397,7 +397,6 @@ void ThermostatDelegate::CancelExpirationTimer()
 
 CHIP_ERROR ThermostatDelegate::ReEvaluateCurrentSuggestion()
 {
-
     uint32_t currentMatterEpochTimestampInSeconds = 0;
     CHIP_ERROR err                                = System::Clock::GetClock_MatterEpochS(currentMatterEpochTimestampInSeconds);
     if (err != CHIP_NO_ERROR)
@@ -449,7 +448,7 @@ size_t ThermostatDelegate::GetThermostatSuggestionIndexWithEarliestEffectiveTime
     VerifyOrReturnValue(GetNumberOfThermostatSuggestions() > 0, maxThermostatSuggestions);
 
     uint32_t minEffectiveTimeValue = UINT32_MAX;
-    size_t minEffectiveTimeIndex   = maxThermostatSuggestions;
+    size_t minEffectiveTimeSuggestionIndex   = maxThermostatSuggestions;
 
     for (size_t index = 0; index < static_cast<size_t>(GetNumberOfThermostatSuggestions()); index++)
     {

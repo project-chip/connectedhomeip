@@ -61,7 +61,7 @@ public:
     using Structs::ThermostatSuggestionStruct::Type::kIsFabricScoped;
 
 private:
-    uint8_t presetHandleData[kThermostatSuggestionPresetHandleSize] = { 0 };
+    uint8_t mPresetHandleData[kThermostatSuggestionPresetHandleSize] = { 0 };
 };
 
 } // namespace Thermostat
