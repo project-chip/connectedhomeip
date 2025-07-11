@@ -102,7 +102,8 @@ class MockServerCluster : public DefaultServerCluster
 public:
     MockServerCluster(std::initializer_list<ConcreteClusterPath> paths, DataVersion dataVersion,
                       BitFlags<DataModel::ClusterQualityFlags> flags) :
-        DefaultServerCluster({ 0, 0 }), mPaths(paths), mDataVersion(dataVersion), mFlags(flags),
+        DefaultServerCluster({ 0, 0 }),
+        mPaths(paths), mDataVersion(dataVersion), mFlags(flags),
         mAttributeEntry(1, BitMask<DataModel::AttributeQualityFlags>(), std::nullopt, std::nullopt)
     {}
 
@@ -1147,7 +1148,6 @@ TEST_F(TestCodeDrivenDataModelProvider, RemoveNonExistentEndpoint)
 {
     EXPECT_EQ(mProvider.RemoveEndpoint(999), CHIP_ERROR_NOT_FOUND);
 }
-
 
 TEST_F(TestCodeDrivenDataModelProvider, InvokeCommandOnInvalidEndpoint)
 {

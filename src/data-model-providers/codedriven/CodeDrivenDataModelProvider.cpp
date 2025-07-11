@@ -164,7 +164,7 @@ std::optional<DataModel::ActionReturnStatus> CodeDrivenDataModelProvider::Invoke
 
 CHIP_ERROR CodeDrivenDataModelProvider::Endpoints(ReadOnlyBufferBuilder<DataModel::EndpointEntry> & out)
 {
-    //TODO: Add a size() method to EndpointInterfaceRegistry to avoid iterating twice.
+    // TODO: Add a size() method to EndpointInterfaceRegistry to avoid iterating twice.
     size_t count = 0;
     for (const auto * endpointProvider : mEndpointInterfaceRegistry)
     {
