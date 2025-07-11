@@ -126,7 +126,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
     async def read_operational_state(self, endpoint):
         return await self.read_rvcopstate_attribute_expect_success(endpoint=endpoint,
                                                                    attribute=Clusters.RvcOperationalState.Attributes.OperationalState)
-   	
+
        async def read_operational_state_with_check(self, expected_operational_state):
        operational_state = await self.read_operational_state(endpoint=self.endpoint)
        asserts.assert_true(operational_state == expected_operational_state,
