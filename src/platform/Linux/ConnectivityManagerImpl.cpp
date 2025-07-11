@@ -253,18 +253,10 @@ bool ConnectivityManagerImpl::_IsWiFiStationConnected()
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
-    if (mWpaSupplicant.state != GDBusWpaSupplicant::WpaState::INTERFACE_CONNECTED)
-    {
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: _IsWiFiStationConnected: interface not connected");
-        return false;
-    }
-
-    if (g_strcmp0(wpa_supplicant_1_interface_get_state(mWpaSupplicant.iface.get()), "completed") == 0)
-    {
-        return true;
-    }
-
-    return false;
+    VerifyOrReturnValue(mWpaSupplicant.iface, false);
+    GAutoPtr<char> state(wpa_supplicant_1_interface_dup_state(mWpaSupplicant.iface.get()));
+    // The "completed" state indicates that we are associated with the access point.
+    return g_strcmp0(state.get(), "completed") == 0;
 }
 
 bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled()
@@ -276,14 +268,10 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned()
 {
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
 
-    if (mWpaSupplicant.state != GDBusWpaSupplicant::WpaState::INTERFACE_CONNECTED)
-    {
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: _IsWiFiStationProvisioned: interface not connected");
-        return false;
-    }
-
-    const char * bss = wpa_supplicant_1_interface_get_current_bss(mWpaSupplicant.iface.get());
-    return g_str_match_string("BSSs", bss, true);
+    VerifyOrReturnValue(mWpaSupplicant.iface, false);
+    GAutoPtr<char> bss(wpa_supplicant_1_interface_dup_current_bss(mWpaSupplicant.iface.get()));
+    // Check if the current BSS is not empty (NULL or "/") which indicates that the station is provisioned.
+    return bss && g_strcmp0(bss.get(), "/") != 0;
 }
 
 void ConnectivityManagerImpl::_ClearWiFiStationProvision()
