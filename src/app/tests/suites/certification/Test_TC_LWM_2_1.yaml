@@ -185,7 +185,7 @@ tests:
                             0xBC,
                             0xBD,
                             0xBE,
-                            0xBF
+                            0xBF,
                         ]
               - name: "StatusText"
                 constraints:
