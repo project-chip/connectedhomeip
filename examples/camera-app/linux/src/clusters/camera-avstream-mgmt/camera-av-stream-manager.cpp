@@ -60,7 +60,7 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
 
     // Is the requested stream usage supported by the camera?
     auto myStreamUsages = GetCameraAVStreamMgmtServer()->GetSupportedStreamUsages();
-    auto it = std::find(myStreamUsages.begin(), myStreamUsages.end(), streamUsage);
+    auto it             = std::find(myStreamUsages.begin(), myStreamUsages.end(), streamUsage);
     if (it == myStreamUsages.end())
     {
         ChipLogError(Camera, "Requested stream usage not found in supported stream usages");
@@ -430,8 +430,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamDealloc
 void CameraAVStreamManager::OnStreamUsagePrioritiesChanged()
 {
     ChipLogProgress(Camera, "Stream usage priorities changed");
-    mCameraDeviceHAL->GetCameraHALInterface().SetStreamUsagePriorities(
-        GetCameraAVStreamMgmtServer()->GetStreamUsagePriorities());
+    mCameraDeviceHAL->GetCameraHALInterface().SetStreamUsagePriorities(GetCameraAVStreamMgmtServer()->GetStreamUsagePriorities());
 }
 
 void CameraAVStreamManager::OnAttributeChanged(AttributeId attributeId)

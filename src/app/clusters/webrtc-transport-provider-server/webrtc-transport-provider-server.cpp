@@ -248,8 +248,8 @@ uint16_t WebRTCTransportProviderServer::GenerateSessionId()
 // Command Handlers
 void WebRTCTransportProviderServer::HandleSolicitOffer(HandlerContext & ctx, const Commands::SolicitOffer::DecodableType & req)
 {
-    auto videoStreamID   = req.videoStreamID;
-    auto audioStreamID   = req.audioStreamID;
+    auto videoStreamID = req.videoStreamID;
+    auto audioStreamID = req.audioStreamID;
 
     // Validate the streamUsage field against the allowed enum values.
     if (req.streamUsage == StreamUsageEnum::kUnknownEnumValue)

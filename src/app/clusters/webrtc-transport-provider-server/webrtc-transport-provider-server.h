@@ -206,8 +206,7 @@ public:
      *
      * @return CHIP_ERROR CHIP_NO_ERROR if the stream usage is valid; an appropriate error code otherwise.
      */
-    virtual CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage,
-                                           Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
+    virtual CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, Optional<DataModel::Nullable<uint16_t>> & videoStreamId,
                                            Optional<DataModel::Nullable<uint16_t>> & audioStreamId) = 0;
 
     /**
