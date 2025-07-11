@@ -167,7 +167,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
                     await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
                                                                       preset_handle=preset_handle,
                                                                       effective_time=currentUTC,
-                                                                      expiration_in_minutes=1,
+                                                                      expiration_in_minutes=30,
                                                                       expected_status=Status.InvalidInState)
                 else:
                     logger.info("Couldn't run test step 3 since all preset handles are also the ActivePresetHandle on this Thermostat")
@@ -193,7 +193,7 @@ class TC_TSTAT_4_3(MatterBaseTest):
             await self.send_add_thermostat_suggestion_command(endpoint=endpoint,
                                                               preset_handle=random_preset_handle,
                                                               effective_time=currentUTC,
-                                                              expiration_in_minutes=1,
+                                                              expiration_in_minutes=30,
                                                               expected_status=Status.NotFound)
 
         self.step("6a")
