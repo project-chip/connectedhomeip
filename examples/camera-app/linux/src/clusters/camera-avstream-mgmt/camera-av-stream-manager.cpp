@@ -54,7 +54,7 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
 {
     // The server ensures that at least one stream Id has a value, and that there are streams allocated
     // If a stream id(s) are provided, ensure that the requested Stream Usage matches the allocation
-    // If they're Null, look for a stream ID that matches the usage, or the supported usages if there isn't an exact match
+    // If they're Null, look for a stream ID that matches the usage
     bool matchedVideoStream = false;
     bool matchedAudioStream = false;
 
@@ -80,10 +80,6 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
                     matchedVideoStream = true;
                     break;
                 }
-            }
-            if (!matchedVideoStream) 
-            {
-                return CHIP_ERROR_NOT_FOUND;
             }
         }
         else 
@@ -113,10 +109,6 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
                     break;
                 }
             }
-            if (!matchedAudioStream)
-            {
-                return CHIP_ERROR_NOT_FOUND;
-            }
         }
         else 
         {
@@ -131,7 +123,8 @@ CHIP_ERROR CameraAVStreamManager::ValidateStreamUsage(StreamUsageEnum streamUsag
         }
     }
 
-    if (!matchedAudioStream && !matchedVideoStream)
+    // Failure if a stream has value (actual or Null) and there's no match for either stream type
+    if (!(audioStreamId.HasValue() && matchedAudioStream) || !(videoStreamId.HasValue() && matchedVideoStream))
     {
         return CHIP_ERROR_NOT_FOUND;
     }

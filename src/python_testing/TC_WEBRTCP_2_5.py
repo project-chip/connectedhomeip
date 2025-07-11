@@ -193,7 +193,7 @@ class TC_WebRTCProvider_2_5(MatterBaseTest, WEBRTCPTestBase):
 
         self.step(11)
         cmd = cluster.Commands.SolicitOffer(
-            streamUsage=3, originatingEndpointID=endpoint, videoStreamID=videoStreamID, audioStreamID=audioStreamID)
+            streamUsage=Globals.Enums.StreamUsageEnum.kLiveView, originatingEndpointID=endpoint, videoStreamID=videoStreamID, audioStreamID=audioStreamID)
         resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse,
                              "Incorrect response type")
