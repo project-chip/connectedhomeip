@@ -45,40 +45,40 @@ from mobly import asserts
 from TC_WEBRTCPTestBase import WEBRTCPTestBase
 
 
-class TC_WebRTCProvider_2_2(MatterBaseTest, WEBRTCPTestBase):
+class TC_WebRTCProvider_2_5(MatterBaseTest, WEBRTCPTestBase):
 
-    def desc_TC_WebRTCProvider_2_2(self) -> str:
+    def desc_TC_WebRTCProvider_2_5(self) -> str:
         """Returns a description of this test"""
-        return "[TC-{picsCode}-2.2] Validate immediate processing of SolicitOffer with {DUT_Server}"
+        return "[TC-{picsCode}-2.5] Validate interaction of SolicitOffer and stream allocation with {DUT_Server}"
 
-    def steps_TC_WebRTCProvider_2_2(self) -> list[TestStep]:
+    def steps_TC_WebRTCProvider_2_5(self) -> list[TestStep]:
         """
         Define the step-by-step sequence for the test.
         """
         steps = [
-            TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
+            TestStep("precondition", "DUT commissioned ", is_commissioning=True),
             TestStep(1, "Read CurrentSessions attribute => expect 0"),
             TestStep(2, "Send SolicitOffer with no audio or video id => expect INVALID_COMMAND"),
-            TestStep(3, "Send SolicitOffer with valid parameters => expect DeferredOffer=FALSE"),
-            TestStep(4, "Read CurrentSessions attribute => expect 1"),
-            TestStep(5, "Send EndSession with invalid WebRTCSessionID => expect NOT_FOUND"),
-            TestStep(6, "Send EndSession with valid WebRTCSessionID => expect SUCCESS"),
+            TestStep(3, "Send SolicitOffer with valid parameters, audio and video stream IDs are Null => expect INVALID_IN_STATE"),
+            TestStep(4, "Allocate Video Stream"),
+            TestStep(5, "Send SolicitOffer with valid parameters, audio stream ID is Null, video stream ID is for the allocated stream => expect INVALID_IN_STATE"),
+            TestStep(6, "Allocate Audio Stream"),
+            TestStep(7, "Send SolicitOffer with valid parameters, audio stream ID is the allocated stream ID, video stream ID is invalid => expect DYNAMIC_CONSTRAINT_ERROR"),
+            TestStep(8, "Send SolicitOffer with valid parameters and stream IDs => expect SolicitOfferResponse"),
+            TestStep(9, "Read CurrentSessions attribute => expect 1"),
+            TestStep(10, "Send EndSession with invalid WebRTCSessionID => expect NOT_FOUND"),
+            TestStep(11, "Send EndSession with valid WebRTCSessionID => expect SUCCESS"),
         ]
         return steps
 
     @async_test_body
-    async def test_TC_WebRTCProvider_2_2(self):
+    async def test_TC_WebRTCProvider_2_5(self):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.
         """
 
         self.step("precondition")
         # Commission DUT - already done
-        audioStreamID = await self.allocate_one_audio_stream()
-        videoStreamID = await self.allocate_one_video_stream()
-
-        await self.validate_allocated_audio_stream(audioStreamID)
-        await self.validate_allocated_video_stream(videoStreamID)
 
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.WebRTCTransportProvider
@@ -102,8 +102,46 @@ class TC_WebRTCProvider_2_2(MatterBaseTest, WEBRTCPTestBase):
             asserts.assert_equal(e.status, Status.InvalidCommand, "Expected INVALID_COMMAND")
 
         self.step(3)
+        # Send SolicitOffer with null stream IDs
         cmd = cluster.Commands.SolicitOffer(
             streamUsage=3, originatingEndpointID=endpoint, videoStreamID=NullValue, audioStreamID=NullValue)
+        try:
+            await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+            asserts.fail("Unexpected success on SolicitOffer with Null VideoStreamID and AudioStreamID")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.InvalidInState, "Expected INVALID_IN_STATE")
+
+        self.step(4)
+        videoStreamID = await self.allocate_one_video_stream()
+        await self.validate_allocated_video_stream(videoStreamID)
+
+        self.step(5)
+        # Send SolicitOffer with null audio stream ID, valid video stream ID
+        cmd = cluster.Commands.SolicitOffer(
+            streamUsage=3, originatingEndpointID=endpoint, videoStreamID=videoStreamID, audioStreamID=NullValue)
+        try:
+            await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+            asserts.fail("Unexpected success on SolicitOffer with valid VideoStreamID and Null AudioStreamID")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.InvalidInState, "Expected INVALID_IN_STATE")
+
+        self.step(6)
+        audioStreamID = await self.allocate_one_audio_stream()
+        await self.validate_allocated_audio_stream(audioStreamID)
+
+        self.step(7)
+        # Send SolicitOffer with valid audio stream ID, invalid video stream ID
+        cmd = cluster.Commands.SolicitOffer(
+            streamUsage=3, originatingEndpointID=endpoint, videoStreamID=videoStreamID+1, audioStreamID=audioStreamID)
+        try:
+            await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
+            asserts.fail("Unexpected success on SolicitOffer with invalid VideoStreamID and valid AudioStreamID")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.DynamicConstraintError, "Expected DYNAMIC_CONSTRAINT_ERROR")
+
+        self.step(8)
+        cmd = cluster.Commands.SolicitOffer(
+            streamUsage=3, originatingEndpointID=endpoint, videoStreamID=videoStreamID, audioStreamID=audioStreamID)
         resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
         asserts.assert_equal(type(resp), Clusters.WebRTCTransportProvider.Commands.SolicitOfferResponse,
                              "Incorrect response type")
@@ -125,7 +163,7 @@ class TC_WebRTCProvider_2_2(MatterBaseTest, WEBRTCPTestBase):
         # Save the session ID for later steps
         current_session_id = resp.webRTCSessionID
 
-        self.step(4)
+        self.step(9)
         current_sessions = await self.read_single_attribute_check_success(
             endpoint=endpoint,
             cluster=cluster,
@@ -136,7 +174,7 @@ class TC_WebRTCProvider_2_2(MatterBaseTest, WEBRTCPTestBase):
         # Verify the session contains the correct WebRTCSessionID
         asserts.assert_equal(current_sessions[0].id, current_session_id, "Session ID should match")
 
-        self.step(5)
+        self.step(10)
         # Send EndSession with invalid WebRTCSessionID (current + 1)
         invalid_session_id = current_session_id + 1
         cmd = cluster.Commands.EndSession(webRTCSessionID=invalid_session_id)
@@ -146,7 +184,7 @@ class TC_WebRTCProvider_2_2(MatterBaseTest, WEBRTCPTestBase):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.NotFound, "Expected NOT_FOUND status code")
 
-        self.step(6)
+        self.step(11)
         # Send EndSession with valid WebRTCSessionID
         cmd = cluster.Commands.EndSession(webRTCSessionID=current_session_id)
         resp = await self.send_single_cmd(cmd=cmd, endpoint=endpoint)
