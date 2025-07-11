@@ -8985,7 +8985,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command Step
  *
- * Upon receipt, this SHALL move a dimension of the closure to a target position by a number of steps.
+ * This command is used to move a dimension of the closure to a target position by a number of steps.
  */
 - (void)stepWithParams:(MTRClosureDimensionClusterStepParams *)params completion:(MTRStatusCompletion)completion MTR_PROVISIONALLY_AVAILABLE;
 

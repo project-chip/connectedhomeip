@@ -42,19 +42,20 @@ CHIP_ERROR JFAManager::Init(Server & server)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR JFAManager::FinalizeCommissioning(NodeId nodeId, bool isJCM, P256PublicKey & trustedIcacPublicKeyB)
+CHIP_ERROR JFAManager::FinalizeCommissioning(NodeId nodeId, bool isJCM, P256PublicKey & trustedIcacPublicKeyB, uint16_t endpointId)
 {
     if (jfFabricIndex == kUndefinedFabricId)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    ChipLogProgress(JointFabric, "FinalizeCommissioning for NodeID: 0x" ChipLogFormatX64 ", isJCM = %d", ChipLogValueX64(nodeId),
-                    isJCM);
+    ChipLogProgress(JointFabric, "FinalizeCommissioning for NodeID: 0x" ChipLogFormatX64 ", isJCM = %d, peerEndpointId = %d",
+                    ChipLogValueX64(nodeId), isJCM, endpointId);
 
-    ScopedNodeId scopedNodeId = ScopedNodeId(nodeId, jfFabricIndex);
-
-    ConnectToNode(scopedNodeId, kStandardCommissioningComplete);
+    peerAdminJFAdminClusterEndpointId = endpointId;
+    peerAdminICACPubKey               = trustedIcacPublicKeyB;
+    ScopedNodeId scopedNodeId         = ScopedNodeId(nodeId, jfFabricIndex);
+    ConnectToNode(scopedNodeId, isJCM ? kJCMCommissioning : kStandardCommissioningComplete);
 
     return CHIP_NO_ERROR;
 }
@@ -62,6 +63,11 @@ CHIP_ERROR JFAManager::FinalizeCommissioning(NodeId nodeId, bool isJCM, P256Publ
 void JFAManager::SetJFARpc(JFARpc & aJFARpc)
 {
     mJFARpc = &aJFARpc;
+}
+
+JFARpc * JFAManager::GetJFARpc()
+{
+    return mJFARpc;
 }
 
 void JFAManager::HandleCommissioningCompleteEvent()
@@ -133,6 +139,10 @@ void JFAManager::OnConnected(void * context, Messaging::ExchangeManager & exchan
         jfaManager->SendCommissioningComplete();
         break;
     }
+    case kJCMCommissioning: {
+        jfaManager->AnnounceJointFabricAdministrator();
+        break;
+    }
 
     default:
         break;
@@ -148,6 +158,81 @@ void JFAManager::OnConnectionFailure(void * context, const ScopedNodeId & peerId
                  ChipLogValueX64(peerId.GetNodeId()), peerId.GetFabricIndex());
 
     jfaManager->ReleaseSession();
+}
+
+CHIP_ERROR JFAManager::AnnounceJointFabricAdministrator()
+{
+    JointFabricAdministrator::Commands::AnnounceJointFabricAdministrator::Type request;
+
+    if (!mExchangeMgr)
+    {
+        return CHIP_ERROR_UNINITIALIZED;
+    }
+
+    ChipLogProgress(JointFabric, "AnnounceJointFabricAdministrator: invoke cluster command.");
+    Controller::ClusterBase cluster(*mExchangeMgr, mSessionHolder.Get().Value(), peerAdminJFAdminClusterEndpointId);
+    return cluster.InvokeCommand(request, this, OnAnnounceJointFabricAdministratorResponse,
+                                 OnAnnounceJointFabricAdministratorFailure);
+}
+
+void JFAManager::OnAnnounceJointFabricAdministratorResponse(void * context, const chip::app::DataModel::NullObjectType & data)
+{
+    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
+    VerifyOrDie(jfaManagerCore != nullptr);
+
+    ChipLogProgress(JointFabric, "OnAnnounceJointFabricAdministratorResponse");
+
+    /* TODO: https://github.com/project-chip/connectedhomeip/issues/38202 */
+    jfaManagerCore->SendICACSRRequest();
+}
+
+void JFAManager::OnAnnounceJointFabricAdministratorFailure(void * context, CHIP_ERROR error)
+{
+    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
+    VerifyOrDie(jfaManagerCore != nullptr);
+    jfaManagerCore->ReleaseSession();
+
+    ChipLogError(JointFabric, "OnAnnounceJointFabricAdministratorFailure: %s\n", chip::ErrorStr(error));
+}
+
+CHIP_ERROR JFAManager::SendICACSRRequest()
+{
+    JointFabricAdministrator::Commands::ICACCSRRequest::Type request;
+
+    if (!mExchangeMgr)
+    {
+        return CHIP_ERROR_UNINITIALIZED;
+    }
+
+    ChipLogProgress(JointFabric, "SendICACSRRequest: invoke cluster command.");
+
+    Controller::ClusterBase cluster(*mExchangeMgr, mSessionHolder.Get().Value(), peerAdminJFAdminClusterEndpointId);
+    return cluster.InvokeCommand(request, this, OnSendICACSRRequestResponse, OnSendICACSRRequestFailure);
+}
+
+void JFAManager::OnSendICACSRRequestResponse(void * context,
+                                             const JointFabricAdministrator::Commands::ICACCSRResponse::DecodableType & icaccsr)
+{
+    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
+    VerifyOrDie(jfaManagerCore != nullptr);
+    P256PublicKey pubKey;
+
+    ChipLogProgress(JointFabric, "OnSendICACSRRequestResponse");
+
+    if ((CHIP_NO_ERROR == VerifyCertificateSigningRequest(icaccsr.icaccsr.data(), icaccsr.icaccsr.size(), pubKey)) &&
+        jfaManagerCore->peerAdminICACPubKey.Matches(pubKey))
+    {
+        ChipLogProgress(JointFabric, "OnSendICACSRRequestResponse: validated ICAC CSR");
+    }
+}
+
+void JFAManager::OnSendICACSRRequestFailure(void * context, CHIP_ERROR error)
+{
+    JFAManager * jfaManagerCore = static_cast<JFAManager *>(context);
+    VerifyOrDie(jfaManagerCore != nullptr);
+    jfaManagerCore->ReleaseSession();
+
+    ChipLogError(JointFabric, "OnSendICACSRRequestFailure: %s\n", chip::ErrorStr(error));
 }
 
 CHIP_ERROR JFAManager::SendCommissioningComplete()
@@ -192,4 +277,16 @@ void JFAManager::OnCommissioningCompleteFailure(void * context, CHIP_ERROR error
     jfaManagerCore->ReleaseSession();
 
     ChipLogError(JointFabric, "Received failure response %s\n", chip::ErrorStr(error));
+}
+
+CHIP_ERROR JFAManager::GetIcacCsr(MutableByteSpan & icacCsr)
+{
+    JFARpc * jfaRpc = GetJFARpc();
+
+    if (jfaRpc)
+    {
+        return jfaRpc->GetICACCSRForJF(icacCsr);
+    }
+
+    return CHIP_ERROR_UNINITIALIZED;
 }
