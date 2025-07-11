@@ -30,7 +30,7 @@ if (CONFIG_CHIP)
 include(ExternalProject)
 include(../zephyr/ota-image.cmake)
 include(../zephyr/zephyr-util.cmake)
-include(generate_factory_data.cmake)
+#include(generate_factory_data.cmake)
 
 # ==============================================================================
 # Prepare CHIP configuration based on the project Kconfig configuration
