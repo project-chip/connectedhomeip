@@ -18,6 +18,7 @@
 import logging
 
 import chip.clusters as Clusters
+from chip.clusters import Globals
 from chip.interaction_model import InteractionModelError, Status
 from mobly import asserts
 
@@ -56,9 +57,12 @@ class WEBRTCPTestBase:
         logger.info(f"Rx'd StreamUsagePriorities : {aStreamUsagePriorities}")
         asserts.assert_greater(len(aStreamUsagePriorities), 0, "StreamUsagePriorities is empty")
 
+        if (Globals.Enums.StreamUsageEnum.kLiveView not in aStreamUsagePriorities):
+            asserts.fail("Camera doesn't support live view")
+
         try:
             adoStreamAllocateCmd = commands.AudioStreamAllocate(
-                streamUsage=aStreamUsagePriorities[0],
+                streamUsage=Globals.Enums.StreamUsageEnum.kLiveView,
                 audioCodec=aMicrophoneCapabilities.supportedCodecs[0],
                 channelCount=aMicrophoneCapabilities.maxNumberOfChannels,
                 sampleRate=aMicrophoneCapabilities.supportedSampleRates[0],
