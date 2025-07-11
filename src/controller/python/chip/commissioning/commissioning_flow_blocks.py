@@ -26,6 +26,7 @@ from .. import clusters as Clusters
 from .. import commissioning
 from ..credentials.cert import convert_chip_cert_to_x509_cert
 from ..crypto.fabric import generate_compressed_fabric_id
+from ..tlv import uint
 
 
 class CommissioningFlowBlocks:
@@ -36,7 +37,7 @@ class CommissioningFlowBlocks:
 
     async def arm_failsafe(self, node_id: int, duration_seconds: int = 180):
         response = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Commands.ArmFailSafe(
-            expiryLengthSeconds=duration_seconds
+            expiryLengthSeconds=uint(duration_seconds)
         ))
         if response.errorCode != 0:
             raise commissioning.CommissionFailure(repr(response))
@@ -48,10 +49,12 @@ class CommissioningFlowBlocks:
             (commissioning.ROOT_ENDPOINT_ID, Clusters.BasicInformation.Attributes.ProductID)], returnClusterObject=True))[commissioning.ROOT_ENDPOINT_ID][Clusters.BasicInformation]
 
         self._logger.info("Getting AttestationNonce")
-        attestation_nonce = await self._credential_provider.get_attestation_nonce()
+        if hasattr(self._credential_provider, "get_attestation_nonce") and callable(self._credential_provider.get_attestation_nonce()):
+            attestation_nonce = await self._credential_provider.get_attestation_nonce()
 
         self._logger.info("Getting CSR Nonce")
-        csr_nonce = await self._credential_provider.get_csr_nonce()
+        if hasattr(self._credential_provider, "get_csr_nonce") and callable(self._credential_provider.get_csr_nonce()):
+            csr_nonce = await self._credential_provider.get_csr_nonce()
 
         self._logger.info("Sending AttestationRequest")
         try:
@@ -65,7 +68,7 @@ class CommissioningFlowBlocks:
         # Failures are exceptions
         try:
             dac = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.OperationalCredentials.Commands.CertificateChainRequest(
-                certificateType=1
+                certificateType=Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum.kDACCertificate
             ))
         except Exception as ex:
             raise commissioning.CommissionFailure(f"Failed to get DAC: {ex}")
@@ -73,7 +76,7 @@ class CommissioningFlowBlocks:
         self._logger.info("Getting CertificateChain - PAI")
         try:
             pai = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.OperationalCredentials.Commands.CertificateChainRequest(
-                certificateType=2
+                certificateType=Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum.kPAICertificate
             ))
         except Exception as ex:
             raise commissioning.CommissionFailure(f"Failed to get PAI: {ex}")
@@ -147,8 +150,8 @@ class CommissioningFlowBlocks:
             NOCValue=commissionee_credentials.noc,
             ICACValue=commissionee_credentials.icac,
             IPKValue=commissionee_credentials.ipk,
-            caseAdminSubject=commissionee_credentials.case_admin_node,
-            adminVendorId=commissionee_credentials.admin_vendor_id
+            caseAdminSubject=uint(commissionee_credentials.case_admin_node),
+            adminVendorId=uint(commissionee_credentials.admin_vendor_id)
         ))
         if response.statusCode != 0:
             raise commissioning.CommissionFailure(repr(response))
@@ -245,7 +248,7 @@ class CommissioningFlowBlocks:
         self._logger.info("Settings Terms and Conditions")
         if parameter.tc_acknowledgements:
             response = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.GeneralCommissioning.Commands.SetTCAcknowledgements(
-                TCVersion=parameter.tc_acknowledgements.version, TCUserResponse=parameter.tc_acknowledgements.user_response
+                TCVersion=uint(parameter.tc_acknowledgements.version), TCUserResponse=uint(parameter.tc_acknowledgements.user_response)
             ))
         if response.errorCode != 0:
             raise commissioning.CommissionFailure(repr(response))
