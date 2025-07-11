@@ -357,7 +357,7 @@ CHIP_ERROR WebRTCRequestorManager::SendProvideOfferCommand(Messaging::ExchangeMa
     VerifyOrReturnError(mCameraDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     // update stream ids with the first alllocated streams if available.
-    for (VideoStream stream : mCameraDevice->GetCameraHALInterface().GetAvailableVideoStreams())
+    for (const VideoStream & stream : mCameraDevice->GetCameraHALInterface().GetAvailableVideoStreams())
     {
         if (stream.isAllocated)
         {
@@ -366,7 +366,7 @@ CHIP_ERROR WebRTCRequestorManager::SendProvideOfferCommand(Messaging::ExchangeMa
         }
     }
 
-    for (AudioStream stream : mCameraDevice->GetCameraHALInterface().GetAvailableAudioStreams())
+    for (const AudioStream & stream : mCameraDevice->GetCameraHALInterface().GetAvailableAudioStreams())
     {
         if (stream.isAllocated)
         {
@@ -496,7 +496,8 @@ CHIP_ERROR WebRTCRequestorManager::ReleaseAudioVideoStreams()
 
 void WebRTCRequestorManager::RegisterWebrtcTransport(uint16_t sessionId)
 {
-    if (mWebrtcTransportMap.find(sessionId) == mWebrtcTransportMap.end())
+    auto it = mWebrtcTransportMap.find(sessionId);
+    if (it == mWebrtcTransportMap.end())
     {
         return;
     }
@@ -507,17 +508,19 @@ void WebRTCRequestorManager::RegisterWebrtcTransport(uint16_t sessionId)
         return;
     }
 
+    auto & transport = it->second;
+
     // Set the Video track on the transport
-    if (mVideoTrack && mWebrtcTransportMap[sessionId])
+    if (mVideoTrack)
     {
-        mWebrtcTransportMap[sessionId]->SetVideoTrack(mVideoTrack);
+        transport->SetVideoTrack(mVideoTrack);
     }
 
     // Set the Audio track on the transport
-    if (mAudioTrack && mWebrtcTransportMap[sessionId])
+    if (mAudioTrack)
     {
-        mWebrtcTransportMap[sessionId]->SetAudioTrack(mAudioTrack);
+        transport->SetAudioTrack(mAudioTrack);
     }
 
-    mMediaController->RegisterTransport(mWebrtcTransportMap[sessionId].get(), mVideoStreamID, mAudioStreamID);
+    mMediaController->RegisterTransport(transport.get(), mVideoStreamID, mAudioStreamID);
 }
