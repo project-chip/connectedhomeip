@@ -3377,11 +3377,11 @@
               "reportableChange": 0
             },
             {
-              "name": "TariffUnit",
+              "name": "MeasurementType",
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "TariffUnitEnum",
+              "type": "MeasurementTypeEnum",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,

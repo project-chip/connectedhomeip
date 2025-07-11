@@ -1686,7 +1686,7 @@ provisional cluster CommodityMetering = 2823 {
 
   readonly attribute nullable MeteredQuantityStruct meteredQuantity[] = 0;
   readonly attribute nullable epoch_s meteredQuantityTimestamp = 1;
-  readonly attribute nullable TariffUnitEnum tariffUnit = 2;
+  readonly attribute nullable MeasurementTypeEnum measurementType = 2;
   readonly attribute nullable int16u maximumMeteredQuantities = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -1976,7 +1976,7 @@ endpoint 1 {
   server cluster CommodityMetering {
     callback attribute meteredQuantity;
     callback attribute meteredQuantityTimestamp;
-    callback attribute tariffUnit;
+    callback attribute measurementType;
     callback attribute maximumMeteredQuantities;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
