@@ -41,7 +41,13 @@ _DEVICE_LIST = [file[:-4]
 _CICD_CONFIG_FILE_NAME = os.path.join(_CHEF_SCRIPT_PATH, "cicd_config.json")
 _CD_STAGING_DIR = os.path.join(_CHEF_SCRIPT_PATH, "staging")
 _EXCLUDE_DEVICE_FROM_LINUX_CI = [  # These do not compile / deprecated.
+                                   # Other devices are not actively developed, so need not be compied in CI.
     "noip_rootnode_dimmablelight_bCwGYSDpoe",
+    "rootnode_genericswitch_2dfff6e516",
+    "rootnode_mounteddimmableloadcontrol_a9a1a87f2d",
+    "rootnode_mountedonoffcontrol_ec30c757a6",
+    "rootnode_onofflight_samplemei",
+    "rootnode_watervalve_6bb39f1f67",
 ]
 # Pattern to filter (based on device-name) devices that need ICD support.
 _ICD_DEVICE_PATTERN = "^icd_"
