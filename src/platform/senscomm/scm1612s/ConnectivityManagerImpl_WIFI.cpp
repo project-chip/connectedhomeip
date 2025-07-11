@@ -25,22 +25,31 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/BLEManager.h>
 #include <platform/senscomm/scm1612s/NetworkCommissioningWiFiDriver.h>
+#include <platform/senscomm/scm1612s/CHIPDevicePlatformConfig.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/logging/CHIPLogging.h>
 
-#ifdef __no_stub__
 #include <lwip/dns.h>
 #include <lwip/ip_addr.h>
 #include <lwip/nd6.h>
 #include <lwip/netif.h>
-#endif /* __no_stub__ */
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
 #endif
 
-#ifdef __no_stub__
-#include "mt7933_pos.h"
-#include "wifi_api_ex.h"
-#endif /* __no_stub__ */
+#include "wise_event_loop.h"
+#include "wise_wifi_types.h"
+#include "wise_err.h"
+#include "scm_wifi.h"
+#include "wise_event.h"
+
+#define IP2STR(ipaddr) ip4_addr1_16(ipaddr), \
+	ip4_addr2_16(ipaddr), \
+	ip4_addr3_16(ipaddr), \
+	ip4_addr4_16(ipaddr)
+
+#define IPSTR "%d.%d.%d.%d"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -73,18 +82,16 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiInit(void)
 #endif
     mFlags.ClearAll();
 
-#ifdef __no_stub__
-    mFilogicCtx = PlatformMgrImpl().mFilogicCtx;
-#endif
-
     if (!IsWiFiStationProvisioned())
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
+
+        ConfigureWiFiAP();
+        ChangeWiFiAPState(kWiFiAPState_Activating);
+
         mWiFiAPMode  = kWiFiAPMode_Enabled;
         mWiFiAPState = kWiFiAPState_NotActive;
-#ifdef __no_stub__
-        filogic_wifi_init_async(mFilogicCtx, FILOGIC_WIFI_OPMODE_AP);
-#endif /* __no_stub__ */
+
         err = CHIP_NO_ERROR;
         SuccessOrExit(err);
 #endif
@@ -94,9 +101,16 @@ CHIP_ERROR ConnectivityManagerImpl::WiFiInit(void)
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
         mWiFiStationMode  = kWiFiStationMode_Enabled;
         mWiFiStationState = kWiFiStationState_NotConnected;
-#ifdef __no_stub__
-        filogic_wifi_init_async(mFilogicCtx, FILOGIC_WIFI_OPMODE_STA);
-#endif /* __no_stub__ */
+        char ifname[WIFI_IFNAME_MAX_SIZE + 1] = {0};
+        int len = sizeof(ifname);
+        int ret = WISE_OK;
+        ChipLogProgress(DeviceLayer, "WiFi station start");
+        // set station mode, if sta already started, it will return OK and do nothing
+        ret = scm_wifi_sta_start(ifname, &len);
+        if (ret != WISE_OK)
+        {
+            ChipLogProgress(DeviceLayer, "WiFi start fail");
+        }
         err = CHIP_NO_ERROR;
         SuccessOrExit(err);
 #endif
@@ -108,6 +122,7 @@ exit:
     return err;
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 void ConnectivityManagerImpl::ChangeWiFiAPState(WiFiAPState newState)
 {
     if (mWiFiAPState != newState)
@@ -116,21 +131,57 @@ void ConnectivityManagerImpl::ChangeWiFiAPState(WiFiAPState newState)
         mWiFiAPState = newState;
     }
 }
+#endif
+
+void ConnectivityManagerImpl::OnStationIPv4AddressAvailable(const system_event_sta_got_ip_t & got_ip)
+{
+    bool hadIPv4Conn = mFlags.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
+    bool hadIPv6Conn = mFlags.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
+
+#if CHIP_PROGRESS_LOGGING
+    {
+        ChipLogProgress(DeviceLayer, "IPv4 address %s on WiFi station interface: " IPSTR "/" IPSTR " gateway " IPSTR,
+                        (got_ip.ip_changed) ? "changed" : "ready", IP2STR(&got_ip.ip_info.ip), IP2STR(&got_ip.ip_info.netmask),
+                        IP2STR(&got_ip.ip_info.gw));
+    }
+#endif // CHIP_PROGRESS_LOGGING
+    char addrStr[INET_ADDRSTRLEN];
+    ip4addr_ntoa_r(&got_ip.ip_info.ip, addrStr, sizeof(addrStr));
+
+    UpdateInternetConnectivityState(true, hadIPv6Conn, reinterpret_cast<const uint8_t *>(addrStr));
+
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
+    event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV4_Assigned;
+    PlatformMgr().PostEventOrDie(&event);
+}
+
+void ConnectivityManagerImpl::OnStationIPv4AddressLost(void)
+{
+    ChipLogProgress(DeviceLayer, "IPv4 address lost on WiFi station interface");
+
+    UpdateInternetConnectivityState(false, false, nullptr);
+
+    ChipDeviceEvent event;
+    event.Type                           = DeviceEventType::kInterfaceIpAddressChanged;
+    event.InterfaceIpAddressChanged.Type = InterfaceIpChangeType::kIpV4_Lost;
+    PlatformMgr().PostEventOrDie(&event);
+}
 
 void ConnectivityManagerImpl::_OnWiFiPlatformEvent(const ChipDeviceEvent * event)
 {
     if (event->Type != DeviceEventType::kSCMSystemEvent)
         return;
 
+    bool hadIPv4Conn = mFlags.Has(ConnectivityFlags::kHaveIPv4InternetConnectivity);
+    bool hadIPv6Conn = mFlags.Has(ConnectivityFlags::kHaveIPv6InternetConnectivity);
     ChipLogProgress(DeviceLayer, "%s WiFi event %d", __func__, event->Platform.SCMSystemEvent.event.event_id);
 
     switch (event->Platform.SCMSystemEvent.event.event_id)
     {
     case SYSTEM_EVENT_SCAN_DONE:
         ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_SCAN_DONE");
-#ifdef __no_stub__
         NetworkCommissioning::WiseWiFiDriver::GetInstance().OnScanWiFiNetworkDone();
-#endif /* __no_stub__*/
         break;
     case SYSTEM_EVENT_STA_START:
         ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_STA_START");
@@ -141,14 +192,13 @@ void ConnectivityManagerImpl::_OnWiFiPlatformEvent(const ChipDeviceEvent * event
         if (mWiFiStationState == kWiFiStationState_Connecting)
         {
             ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
+            scm_wifi_dhcp_start();
         }
         DriveStationState();
         break;
     case SYSTEM_EVENT_STA_DISCONNECTED:
         ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_STA_DISCONNECTED");
-#ifdef __no_stub__
         NetworkCommissioning::WiseWiFiDriver::GetInstance().SetLastDisconnectReason(event);
-#endif /* __no_stub__ */
         if (mWiFiStationState == kWiFiStationState_Connecting)
         {
             ChangeWiFiStationState(kWiFiStationState_Connecting_Failed);
@@ -177,116 +227,41 @@ void ConnectivityManagerImpl::_OnWiFiPlatformEvent(const ChipDeviceEvent * event
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
     case SYSTEM_EVENT_STA_GOT_IP:
         ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_STA_GOT_IP");
-#ifdef __no_stub__
-        OnStationIPv4AddressAvailable(event->Platform.SCMSystemEvent.Data.IpGotIp);
-#endif /* __no_stub__ */
+        OnStationIPv4AddressAvailable(event->Platform.SCMSystemEvent.event.event_info.got_ip);
         break;
     case SYSTEM_EVENT_STA_LOST_IP:
         ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_STA_LOST_IP");
-#ifdef __no_stub__
         OnStationIPv4AddressLost();
-#endif /* __no_stub__ */
         break;
     case SYSTEM_EVENT_GOT_IP6:
+    {
+        char addrStr[INET_ADDRSTRLEN];
+        system_event_got_ip6_t got_ip = event->Platform.SCMSystemEvent.event.event_info.got_ip6;
         ChipLogProgress(DeviceLayer, "SYSTEM_EVENT_GOT_IP6");
-#ifdef __no_stub__
-        if (strcmp(esp_netif_get_ifkey(event->Platform.ESPSystemEvent.Data.IpGotIp6.esp_netif),
-                   ESP32Utils::kDefaultWiFiStationNetifKey) == 0)
-        {
-            OnStationIPv6AddressAvailable(event->Platform.ESPSystemEvent.Data.IpGotIp6);
-        }
-#endif /* __no_stub__ */
+        DriveStationState();
+        
+        ip6addr_ntoa_r(&got_ip.ip6_info.ip, addrStr, sizeof(addrStr));
+
+        UpdateInternetConnectivityState(hadIPv4Conn, true, reinterpret_cast<const uint8_t *>(addrStr));
+    }
         break;
     default:
         break;
     }
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#ifdef __no_stub__
-ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::GetFilogicStationMode(void)
-{
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-    filogic_wifi_opmode_t opmode;
-    int32_t ret;
-
-    filogic_wifi_opmode_get_sync(mFilogicCtx, &opmode);
-
-    if (opmode == FILOGIC_WIFI_OPMODE_STA || opmode == FILOGIC_WIFI_OPMODE_DUAL)
-        return kWiFiStationMode_Enabled;
-#endif
-    return kWiFiStationMode_Disabled;
-}
-#endif /* __no_stub__ */
-
-#ifdef __no_stub__
-ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::GetFilogicAPMode(void)
-{
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
-    filogic_wifi_opmode_t opmode;
-    int32_t ret;
-
-    filogic_wifi_opmode_get_sync(mFilogicCtx, &opmode);
-
-    if (opmode == FILOGIC_WIFI_OPMODE_AP || opmode == FILOGIC_WIFI_OPMODE_DUAL)
-        return kWiFiAPMode_Enabled;
-#endif
-    return kWiFiAPMode_Disabled;
-}
-#endif /* __no_stub__ */
-
-#ifdef __no_stub__
-filogic_wifi_opmode_t ConnectivityManagerImpl::GetFilogicNextOpMode(WiFiStationMode staMode, WiFiAPMode apMode)
-{
-    bool sta, ap;
-    filogic_wifi_opmode_t opmode;
-
-    ChipLogProgress(DeviceLayer, "%s %d %d", __func__, staMode, apMode);
-
-    sta = staMode == kWiFiStationMode_Enabled;
-    ap  = apMode == kWiFiAPMode_Enabled;
-
-    if (sta && ap)
-        opmode = FILOGIC_WIFI_OPMODE_DUAL;
-    else if (ap)
-        opmode = FILOGIC_WIFI_OPMODE_AP;
-    else if (sta)
-        opmode = FILOGIC_WIFI_OPMODE_STA;
-    else
-        opmode = FILOGIC_WIFI_OPMODE_NONE;
-
-    return opmode;
-}
-#endif /* __no_stub__ */
-
-#ifdef __no_stub__
-void ConnectivityManagerImpl::SetFlogicNextMode(filogic_wifi_opmode_t nextMode)
-{
-    ChipLogProgress(DeviceLayer, "WiFi driver mode set %s", filogic_opmode_to_name(nextMode));
-    filogic_wifi_opmode_set_async(mFilogicCtx, nextMode);
-}
-#endif /* __no_stub__ */
-#endif
-
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode(void)
 {
-#ifdef __no_stub__
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
-        filogic_wifi_opmode_t opmode;
-
-        filogic_wifi_opmode_get_sync(mFilogicCtx, &opmode);
-
-        if (opmode == FILOGIC_WIFI_OPMODE_AP)
-            mWiFiStationMode = kWiFiStationMode_Disabled;
-        else
-            mWiFiStationMode = kWiFiStationMode_Enabled;
+        wifi_mode_t curWiFiMode;
+        mWiFiStationMode =
+            (scm_wifi_get_mode(&curWiFiMode, WIFI_IF_STA) == WISE_OK && (curWiFiMode == WIFI_MODE_APSTA || curWiFiMode == WIFI_MODE_STA))
+            ? kWiFiStationMode_Enabled
+            : kWiFiStationMode_Disabled;
     }
     return mWiFiStationMode;
-#else /* __no_stub__ */
-    return kWiFiStationMode_Disabled;
-#endif /* __no_stub__ */
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(ConnectivityManager::WiFiStationMode val)
@@ -326,17 +301,13 @@ bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)
 
 bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
 {
-#ifdef __no_stub__
-    filogic_wifi_sta_prov_t prov = {};
+    char ssid[32];
+    size_t ssid_len = 0;
 
-    /* See if we have SSID */
-    if (filogic_wifi_sta_prov_get_sync(mFilogicCtx, &prov))
-    {
-        return prov.ssid[0] != '\0';
-    }
-#endif /* __no_stub__ */
+    SCM1612SConfig::ReadConfigValueStr(SCM1612SConfig::kConfigKey_WiFiSSID, ssid, sizeof(ssid),
+                                           ssid_len);
 
-    return false;
+    return !!(ssid_len);
 }
 
 void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
@@ -345,12 +316,7 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
 
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
-#ifdef __no_stub__
-#ifdef MT793X_PORTING
-        wfx_clear_wifi_provision();
-#endif /* MT793X_PORTING */
-#endif /* __no_stub__ */
-
+        scm_wifi_clear_config(WIFI_IF_STA);
         DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
     }
 }
@@ -373,49 +339,182 @@ void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP
 void ConnectivityManagerImpl::DriveAPState(void)
 {
-#ifdef __no_stub__
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    WiFiAPMode driverAPMode = GetFilogicAPMode();
-    filogic_wifi_opmode_t nextMode;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    WiFiAPState targetState;
+    bool IsAPModeEnabled;
 
-    ChipLogProgress(DeviceLayer, "%s", __func__);
+    // Determine if AP mode is currently enabled in the ESP WiFi layer.
+    scm_wifi_sap_get_state(&IsAPModeEnabled, NULL, NULL);
 
-    if (mWiFiAPMode != driverAPMode)
+
+    // Adjust the Connectivity Manager's AP state to match the state in the WiFi layer.
+    if (IsAPModeEnabled && (mWiFiAPState == kWiFiAPState_NotActive || mWiFiAPState == kWiFiAPState_Deactivating))
     {
-        nextMode = GetFilogicNextOpMode(mWiFiStationMode, driverAPMode);
-        ChipLogProgress(DeviceLayer, "WiFi Driver AP mode set: %d", nextMode);
-        SetFlogicNextMode(nextMode);
-        if (driverAPMode == kWiFiAPMode_Enabled)
-        {
-        }
-        // TODO wait driver event
+        ChangeWiFiAPState(kWiFiAPState_Activating);
     }
-#endif /* __no_stub__ */
+    if (!IsAPModeEnabled && (mWiFiAPState == kWiFiAPState_Active || mWiFiAPState == kWiFiAPState_Activating))
+    {
+        ChangeWiFiAPState(kWiFiAPState_Deactivating);
+    }
+
+    // If the AP interface is not under application control...
+    if (mWiFiAPMode != kWiFiAPMode_ApplicationControlled)
+    {
+        // Ensure the WiFi layer is started.
+        //StartWiFiLayer();
+        //SuccessOrExit(err);
+
+        // Determine the target (desired) state for AP interface...
+
+        // The target state is 'NotActive' if the application has expressly disabled the AP interface.
+        if (mWiFiAPMode == kWiFiAPMode_Disabled)
+        {
+            targetState = kWiFiAPState_NotActive;
+        }
+
+        // The target state is 'Active' if the application has expressly enabled the AP interface.
+        else if (mWiFiAPMode == kWiFiAPMode_Enabled)
+        {
+            targetState = kWiFiAPState_Active;
+        }
+
+        // The target state is 'Active' if the AP mode is 'On demand, when no station is available'
+        // and the station interface is not provisioned or the application has disabled the station
+        // interface.
+        else if (mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision &&
+                 (!IsWiFiStationProvisioned() || GetWiFiStationMode() == kWiFiStationMode_Disabled))
+        {
+            targetState = kWiFiAPState_Active;
+        }
+
+        // The target state is 'Active' if the AP mode is one of the 'On demand' modes and there
+        // has been demand for the AP within the idle timeout period.
+        else if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
+        {
+            System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
+
+            if (mLastAPDemandTime != System::Clock::kZero && now < (mLastAPDemandTime + mWiFiAPIdleTimeout))
+            {
+                targetState = kWiFiAPState_Active;
+
+                // Compute the amount of idle time before the AP should be deactivated and
+                // arm a timer to fire at that time.
+                System::Clock::Timeout apTimeout = (mLastAPDemandTime + mWiFiAPIdleTimeout) - now;
+                err                              = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, NULL);
+                SuccessOrExit(err);
+                ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " ms",
+                                System::Clock::Milliseconds32(apTimeout).count());
+            }
+            else
+            {
+                targetState = kWiFiAPState_NotActive;
+            }
+        }
+
+        // Otherwise the target state is 'NotActive'.
+        else
+        {
+            targetState = kWiFiAPState_NotActive;
+        }
+
+        // If the current AP state does not match the target state...
+        if (mWiFiAPState != targetState)
+        {
+            // If the target state is 'Active' and the current state is NOT 'Activating', enable
+            // and configure the AP interface, and then enter the 'Activating' state.  Eventually
+            // a SYSTEM_EVENT_AP_START event will be received from the ESP WiFi layer which will
+            // cause the state to transition to 'Active'.
+            if (targetState == kWiFiAPState_Active)
+            {
+                if (mWiFiAPState != kWiFiAPState_Activating)
+                {
+                    err = ConfigureWiFiAP();
+                    SuccessOrExit(err);
+
+                    ChangeWiFiAPState(kWiFiAPState_Activating);
+                }
+            }
+
+            // Otherwise, if the target state is 'NotActive' and the current state is not 'Deactivating',
+            // disable the AP interface and enter the 'Deactivating' state.  Later a SYSTEM_EVENT_AP_STOP
+            // event will move the AP state to 'NotActive'.
+            else
+            {
+                if (mWiFiAPState != kWiFiAPState_Deactivating)
+                {
+                    scm_wifi_sap_stop();
+                    ChangeWiFiAPState(kWiFiAPState_Deactivating);
+                }
+            }
+        }
+    }
+
+#if 0 //TODO
+    // If AP is active, but the interface doesn't have an IPv6 link-local
+    // address, assign one now.
+    if (mWiFiAPState == kWiFiAPState_Active && scm_wifi_interface_up() && !scm_wifi_get_ipv6(&addr))
+    {
+        esp_err_t error = scm_wifi_set_ipv6_addr(addr);
+        if (error != ESP_OK)
+        {
+            ChipLogError(DeviceLayer, "create_ip6_linklocal() failed for %s interface",
+                         "wlan1");
+            goto exit;
+        }
+    }
+#endif
+
+exit:
+    if (err != CHIP_NO_ERROR && mWiFiAPMode != kWiFiAPMode_ApplicationControlled)
+    {
+        SetWiFiAPMode(kWiFiAPMode_Disabled);
+        scm_wifi_sap_stop();
+    }
 }
 
 CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP(void)
 {
-#ifdef __no_stub__
+    int ret = WISE_FAIL;
+    char ifname[WIFI_IFNAME_MAX_SIZE + 1] = {0};
+    int len = sizeof(ifname);
+
     char ssid[32];
     int ssid_len;
+    char key[] = "12345678";
 
     ChipLogProgress(DeviceLayer, "%s", __func__);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // TODO, generate
-    uint16_t discriminator = 0x8888;
+    scm_wifi_softap_config sap = {0};
+
+    //srand(time(NULL));
+    //only support 12bit
+    //uint16_t discriminator = (uint16_t)(rand() & 0x0FFF);
+    uint16_t discriminator = 0x0F00;
 
     ssid_len       = snprintf(ssid, sizeof(ssid), "%s%03X-%04X-%04X", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX, discriminator,
                               CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
-    int8_t channel = CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL;
 
-    filogic_wifi_ap_config_async(mFilogicCtx, channel, ssid, ssid_len);
+    memcpy(sap.ssid, ssid, ssid_len);
+
+    sap.channel_num = CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL;
+    sap.authmode = SCM_WIFI_SECURITY_WPA2PSK;
+    sap.pairwise = SCM_WIFI_PAIRWISE_AES;
+    /* Encrypt&Valid: memcpy */
+    memcpy(sap.key, key, strlen(key));
+
+    scm_wifi_sap_set_config(&sap);
+
+    ret = scm_wifi_sap_start(ifname, &len);
+
+    if (ret == WISE_OK) {
+        printf("ifname: %s\n", ifname);
+        scm_wifi_set_ip("wlan1", "192.168.200.1", NULL, NULL);
+        scm_wifi_dhcps_start();
+    }
 
     return err;
-#else /* __no_stub__ */
-    return CHIP_NO_ERROR;
-#endif /* __no_stub__ */
 }
 
 void ConnectivityManagerImpl::DriveAPState(::chip::System::Layer * aLayer, void * aAppState)
@@ -429,7 +528,6 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-#ifdef __no_stub__
     VerifyOrExit(val != kWiFiAPMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     if (mWiFiAPMode != val)
@@ -440,7 +538,6 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
     mWiFiAPMode = val;
 
 exit:
-#endif /* __no_stub__ */
     return err;
 }
 
@@ -496,11 +593,11 @@ void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
 void ConnectivityManagerImpl::DriveStationState()
 {
     ChipLogProgress(DeviceLayer, "%s", __func__);
-#ifdef __no_stub__
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    int32_t status;
     bool stationConnected;
+    int ret = WISE_OK;
+    scm_wifi_status connect_status = {0};
 
     // Refresh the current station mode.
     GetWiFiStationMode();
@@ -510,14 +607,25 @@ void ConnectivityManagerImpl::DriveStationState()
     {
         if (mWiFiStationMode != kWiFiStationMode_Enabled)
         {
+	        char ifname[WIFI_IFNAME_MAX_SIZE + 1] = {0};
+	        int len = sizeof(ifname);
             ChipLogProgress(DeviceLayer, "WiFi station mode set");
             mWiFiStationState = kWiFiStationState_NotConnected;
-            SetFlogicNextMode(FILOGIC_WIFI_OPMODE_STA);
+            // set station mode, if sta already started, it will return OK and do nothing
+            ret = scm_wifi_sta_start(ifname, &len);
+            if (ret != WISE_OK) {
+                ChipLogProgress(DeviceLayer, "WiFi station mode set failed");
+            }
             return;
         }
     }
 
-    stationConnected = filogic_wifi_sta_get_link_status_sync(mFilogicCtx);
+    ret = scm_wifi_get_options(SCM_WIFI_STA_GET_CONNECT, &connect_status);
+    if (ret != WISE_OK) {
+        ChipLogProgress(DeviceLayer, "WiFi station mode get failed");
+        return;
+    }
+    stationConnected = (connect_status.status == SCM_WIFI_CONNECTED);
 
     // If the station interface is currently connected ...
     if (stationConnected)
@@ -540,10 +648,10 @@ void ConnectivityManagerImpl::DriveStationState()
         {
             ChipLogProgress(DeviceLayer, "Disconnecting WiFi station interface");
 
-            status = wifi_connection_disconnect_ap();
-            if (status < 0)
+            ret = scm_wifi_sta_disconnect();
+            if (ret != WISE_OK)
             {
-                ChipLogError(DeviceLayer, "WiFi disconnect : FAIL: %ld", status);
+                ChipLogError(DeviceLayer, "WiFi disconnect : FAIL");
             }
 
             ChangeWiFiStationState(kWiFiStationState_Disconnecting);
@@ -583,20 +691,15 @@ void ConnectivityManagerImpl::DriveStationState()
             if (mLastStationConnectFailTime == System::Clock::kZero ||
                 now >= mLastStationConnectFailTime + mWiFiStationReconnectInterval)
             {
-                if (mWiFiStationState != kWiFiStationState_Connecting)
+                ChipLogProgress(DeviceLayer, "Attempting to connect WiFi station interface");
+                ret = scm_wifi_sta_connect();
+                if (ret != WISE_OK)
                 {
-                    ChipLogProgress(DeviceLayer, "Attempting to connect WiFi");
-
-                    status = wifi_config_reload_setting();
-
-                    if (status < 0)
-                    {
-                        ChipLogError(DeviceLayer, "WiFi start connect : FAIL %ld", status);
-                        goto exit;
+                    ChipLogError(DeviceLayer, "esp_wifi_connect() failed");
+                    return;
                     }
 
                     ChangeWiFiStationState(kWiFiStationState_Connecting);
-                }
             }
             // Otherwise arrange another connection attempt at a suitable point in the future.
             else
@@ -613,13 +716,11 @@ void ConnectivityManagerImpl::DriveStationState()
 
 exit:
 
-#endif /* __no_stub__ */
     ChipLogProgress(DeviceLayer, "Done driving station state, nothing else to do...");
 }
 
 void ConnectivityManagerImpl::OnStationConnected()
 {
-#ifdef __no_stub__
     ChipLogProgress(DeviceLayer, "%s", __func__);
 
     ChipDeviceEvent event;
@@ -631,13 +732,11 @@ void ConnectivityManagerImpl::OnStationConnected()
     event.WiFiConnectivityChange.Result = kConnectivity_Established;
     (void) PlatformMgr().PostEvent(&event);
 
-    UpdateInternetConnectivityState(FALSE, FALSE, NULL);
-#endif /* __no_stub__ */
+    UpdateInternetConnectivityState(false, false, NULL);
 }
 
 void ConnectivityManagerImpl::OnStationDisconnected()
 {
-#ifdef __no_stub__
     ChipLogProgress(DeviceLayer, "%s", __func__);
 
     // TODO Invoke WARM to perform actions that occur when the WiFi station interface goes down.
@@ -648,8 +747,7 @@ void ConnectivityManagerImpl::OnStationDisconnected()
     event.WiFiConnectivityChange.Result = kConnectivity_Lost;
     (void) PlatformMgr().PostEvent(&event);
 
-    UpdateInternetConnectivityState(FALSE, FALSE, NULL);
-#endif /* __no_stub__ */
+    UpdateInternetConnectivityState(false, false, NULL);
 }
 
 void ConnectivityManagerImpl::DriveStationState(::chip::System::Layer * aLayer, void * aAppState)

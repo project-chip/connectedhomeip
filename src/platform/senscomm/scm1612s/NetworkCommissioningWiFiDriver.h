@@ -17,9 +17,10 @@
 
 #pragma once
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-#ifdef __no_stub__
-#include <filogic.h>
-#endif /* __no_stub__ */
+#include "wise_event_loop.h"
+#include "wise_wifi_types.h"
+#include "wise_err.h"
+#include "scm_wifi.h"
 #include <platform/NetworkCommissioning.h>
 
 namespace chip {
@@ -33,46 +34,39 @@ inline constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
 inline constexpr uint8_t kMaxWiFiScanAPs                   = 30;
 } // namespace
 
-template <typename T>
-class WiseScanResponseIterator : public Iterator<T>
+BitFlags<WiFiSecurityBitmap> ConvertSecurityType(scm_wifi_auth_mode authMode);
+
+class WiseScanResponseIterator : public Iterator<WiFiScanResponse>
 {
 public:
-    WiseScanResponseIterator(T * apScanResponse) : mpScanResponse(apScanResponse) {}
-    size_t Count() override { return itemCount; }
-    bool Next(T & item) override
+    WiseScanResponseIterator(const size_t size, const scm_wifi_ap_info * scanResults) : mSize(size), mpScanResults(scanResults) {}
+    size_t Count() override { return mSize; }
+    bool Next(WiFiScanResponse & item) override
     {
-        if (mpScanResponse == nullptr || currentIterating >= itemCount)
+        if (mIternum >= mSize)
         {
             return false;
         }
-        item = mpScanResponse[currentIterating];
-        currentIterating++;
+
+        item.security = ConvertSecurityType(mpScanResults[mIternum].auth);
+        static_assert(chip::DeviceLayer::Internal::kMaxWiFiSSIDLength <= UINT8_MAX, "SSID length might not fit in item.ssidLen");
+        item.ssidLen = static_cast<uint8_t>(
+            strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength));
+        item.channel  = mpScanResults[mIternum].channel;
+        item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
+        item.rssi     = mpScanResults[mIternum].rssi;
+        memcpy(item.ssid, mpScanResults[mIternum].ssid, item.ssidLen);
+        memcpy(item.bssid, mpScanResults[mIternum].bssid, 6);
+
+        mIternum++;
         return true;
     }
-    void Release() override
-    {
-        itemCount = currentIterating = 0;
-        Platform::MemoryFree(mpScanResponse);
-        mpScanResponse = nullptr;
-    }
-
-    void Add(T * pResponse)
-    {
-        size_t tempCount = itemCount + 1;
-        mpScanResponse   = static_cast<T *>(Platform::MemoryRealloc(mpScanResponse, kItemSize * tempCount));
-        if (mpScanResponse)
-        {
-            // first item at index. update after the copy.
-            memcpy(&(mpScanResponse[itemCount]), pResponse, kItemSize);
-            itemCount = tempCount;
-        }
-    }
+    void Release() override {}
 
 private:
-    size_t currentIterating           = 0;
-    size_t itemCount                  = 0;
-    static constexpr size_t kItemSize = sizeof(T);
-    T * mpScanResponse;
+    const size_t mSize;
+    const scm_wifi_ap_info * mpScanResults;
+    size_t mIternum = 0;
 };
 
 class WiseWiFiDriver final : public WiFiDriver
@@ -124,11 +118,9 @@ public:
 
     CHIP_ERROR ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen);
 
-#ifdef __no_stub__
-    chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> ConvertSecuritytype(wifi_auth_mode_t auth_mode);
-#endif /* __no_stub__ */
-
     void OnConnectWiFiNetwork();
+    void OnScanWiFiNetworkDone();
+    CHIP_ERROR SetLastDisconnectReason(const ChipDeviceEvent * event);
     static WiseWiFiDriver & GetInstance()
     {
         static WiseWiFiDriver instance;
@@ -138,9 +130,6 @@ public:
 private:
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
     bool StartScanWiFiNetworks(ByteSpan ssid);
-#ifdef __no_stub__
-    static void OnScanWiFiNetworkDone(wifi_scan_list_item_t * aScanResult);
-#endif /* __no_stub__ */
 
     WiFiNetwork mSavedNetwork   = {};
     WiFiNetwork mStagingNetwork = {};

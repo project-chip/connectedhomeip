@@ -42,9 +42,7 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
 #endif
 
-#ifdef __no_stub__
-#include "filogic.h"
-#endif /* __no_stub__ */
+#include "wise_event.h"
 
 namespace Inet {
 class IPAddress;
@@ -98,12 +96,6 @@ private:
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     CHIP_ERROR WiFiInit(void);
-#ifdef __no_stub__
-    WiFiStationMode GetFilogicStationMode(void);
-    WiFiAPMode GetFilogicAPMode(void);
-    filogic_wifi_opmode_t GetFilogicNextOpMode(WiFiStationMode wifiStationMode, WiFiAPMode wifiAPMode);
-    void SetFlogicNextMode(filogic_wifi_opmode_t nextMode);
-#endif /* __no_stub__ */
     void _OnWiFiPlatformEvent(const ChipDeviceEvent * event);
 #endif
 
@@ -121,6 +113,8 @@ private:
     bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
+    void OnStationIPv4AddressAvailable(const system_event_sta_got_ip_t & got_ip);
+    void OnStationIPv4AddressLost(void);
     System::Clock::Timeout _GetWiFiStationReconnectInterval(void);
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP

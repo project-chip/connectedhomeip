@@ -23,6 +23,12 @@
 
 #include <platform/KeyValueStoreManager.h>
 
+#include "wise_event_loop.h"
+#include "wise_event.h"
+#include "scm_fs.h"
+#include "scm_wifi.h"
+#include "wise_wifi_types.h"
+
 /* ignore GCC Wconversion warnings for pigweed */
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
@@ -47,108 +53,53 @@ KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,
                                           size_t offset_bytes) const
 {
-#ifdef __no_stub__
-    CHIP_ERROR err;
-    nvdm_status_t nvdm_status;
+    if (key == nullptr || value == nullptr)
+        return CHIP_ERROR_INVALID_ARGUMENT;
 
-    nvdm_status = nvdm_read_data_item(kNamespace, key, (uint8_t *) value, (uint32_t *) &value_size);
-    if (read_bytes_size)
-    {
-        *read_bytes_size = value_size;
-    }
-    err = MapNvdmStatus(nvdm_status);
+    int ret = scm_fs_read_config_value(kNamespace, key, static_cast<char *>(value), value_size);
+    if (ret < 0)
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
 
-    return err;
-#else /* __no_stub__ */
+    if (read_bytes_size != nullptr)
+        *read_bytes_size = static_cast<size_t>(ret);
+
     return CHIP_NO_ERROR;
-#endif /* __no_stub__ */
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Put(const char * key, const void * value, size_t value_size)
 {
-#ifdef __no_stub__
-    CHIP_ERROR err;
-    nvdm_status_t nvdm_status;
+    if (key == nullptr || value == nullptr || value_size == 0)
+        return CHIP_ERROR_INVALID_ARGUMENT;
 
-    nvdm_status = nvdm_write_data_item(kNamespace, key, NVDM_DATA_ITEM_TYPE_RAW_DATA, (uint8_t *) value, value_size);
-    err         = MapNvdmStatus(nvdm_status);
+    int ret = scm_fs_write_config_value(kNamespace, key, static_cast<const char *>(value), value_size);
+    if (ret < 0)
+        return CHIP_ERROR_WRITE_FAILED;
 
-    return err;
-#else /* __no_stub__ */
     return CHIP_NO_ERROR;
-#endif /* __no_stub__ */
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Delete(const char * key)
 {
-#ifdef __no_stub__
-    CHIP_ERROR err;
-    nvdm_status_t nvdm_status;
+    if (key == nullptr)
+        return CHIP_ERROR_INVALID_ARGUMENT;
 
-    nvdm_status = nvdm_delete_data_item(kNamespace, key);
-    err         = MapNvdmStatus(nvdm_status);
+    int ret = scm_fs_remove_config_value(kNamespace, key);
+    if (ret < 0)
+        return CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
 
-    return err;
-#else /* __no_stub__ */
     return CHIP_NO_ERROR;
-#endif /* __no_stub__ */
 }
+
+#define CONFIG_DIR "/config"
 
 CHIP_ERROR KeyValueStoreManagerImpl::ErasePartition()
 {
-#ifdef __no_stub__
-    CHIP_ERROR err;
-    nvdm_status_t nvdm_status;
+    int ret = scm_fs_format(CONFIG_DIR);
+    if (ret < 0)
+        return CHIP_ERROR_INTERNAL;
 
-    nvdm_status = nvdm_delete_group(kNamespace);
-    err         = MapNvdmStatus(nvdm_status);
-
-    return err;
-#else /* __no_stub__ */
     return CHIP_NO_ERROR;
-#endif /* __no_stub__ */
 }
-
-#ifdef __no_stub__
-CHIP_ERROR KeyValueStoreManagerImpl::MapNvdmStatus(nvdm_status_t nvdm_status)
-{
-    CHIP_ERROR err;
-
-    //    NVDM_STATUS_INVALID_PARAMETER = -5,  /**< The user parameter is invalid. */
-    //    NVDM_STATUS_ITEM_NOT_FOUND = -4,     /**< The data item wasn't found by the NVDM. */
-    //    NVDM_STATUS_INSUFFICIENT_SPACE = -3, /**< No space is available in the flash. */
-    //    NVDM_STATUS_INCORRECT_CHECKSUM = -2, /**< The NVDM found a checksum error when reading the data item. */
-    //    NVDM_STATUS_ERROR = -1,              /**< An unknown error occurred. */
-    //    NVDM_STATUS_OK = 0,                  /**< The operation was successful. */
-
-    switch (nvdm_status)
-    {
-    case NVDM_STATUS_OK:
-        err = CHIP_NO_ERROR;
-        break;
-    case NVDM_STATUS_ITEM_NOT_FOUND:
-        err = CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND;
-        break;
-    case NVDM_STATUS_INCORRECT_CHECKSUM:
-        err = CHIP_ERROR_INTEGRITY_CHECK_FAILED;
-        break;
-    case NVDM_STATUS_INSUFFICIENT_SPACE:
-        err = CHIP_ERROR_BUFFER_TOO_SMALL;
-        break;
-    case NVDM_STATUS_INVALID_PARAMETER:
-        err = CHIP_ERROR_INVALID_ARGUMENT;
-        break;
-    case NVDM_STATUS_ERROR:
-        err = CHIP_ERROR_INTERNAL;
-        break;
-    default:
-        err = CHIP_ERROR_INTERNAL;
-        break;
-    }
-
-    return err;
-}
-#endif /* __no_stub__ */
 
 } // namespace PersistedStorage
 } // namespace DeviceLayer

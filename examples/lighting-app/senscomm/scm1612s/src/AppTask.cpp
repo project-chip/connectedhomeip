@@ -314,12 +314,16 @@ CHIP_ERROR AppTask::Init()
 
     // Wait for the WiFi to be initialized
     SCM1612S_LOG("APP: Wait WiFi Init");
-    vTaskDelay(1000); // TODO
-    SCM1612S_LOG("APP: Done WiFi Init");
+
+    PlatformMgr().LockChipStack();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
     sWiFiNetworkCommissioningInstance.Init();
 #endif
+
+    vTaskDelay(10000); // TODO
+    SCM1612S_LOG("APP: Done WiFi Init");
+
 
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
@@ -328,6 +332,8 @@ CHIP_ERROR AppTask::Init()
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+
+    PlatformMgr().UnlockChipStack();
 
     // Create FreeRTOS sw timer for Function Selection.
     sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel

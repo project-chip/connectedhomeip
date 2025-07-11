@@ -23,6 +23,11 @@
 
 #include <limits>
 
+#include "wise_event_loop.h"
+#include "wise_wifi_types.h"
+#include "wise_err.h"
+#include "scm_wifi.h"
+
 using namespace ::chip;
 using namespace ::chip::DeviceLayer::Internal;
 
@@ -31,10 +36,9 @@ namespace DeviceLayer {
 namespace NetworkCommissioning {
 
 namespace {
-NetworkCommissioning::WiFiScanResponse * sScanResult;
-WiseScanResponseIterator<NetworkCommissioning::WiFiScanResponse> mScanResponseIter(sScanResult);
-
-using chip::app::Clusters::NetworkCommissioning::WiFiSecurityBitmap;
+constexpr char kWiFiSSIDKeyName[]        = "wifi-ssid";
+constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
+static uint8_t WiFiSSIDStr[DeviceLayer::Internal::kMaxWiFiSSIDLength];
 } // namespace
 
 CHIP_ERROR WiseWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChangeCallback)
@@ -47,6 +51,16 @@ CHIP_ERROR WiseWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChang
     mpConnectCallback     = nullptr;
 
     ChipLogProgress(NetworkProvisioning, "WiseWiFiDriver::Init");
+
+
+#if 0
+    err = SCM1612SConfig::WriteConfigValueStr(SCM1612SConfig::kConfigKey_WiFiSSID, "ax3");
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_NO_ERROR);
+    err = SCM1612SConfig::WriteConfigValueStr(SCM1612SConfig::kConfigKey_WiFiPSK, "12345678");
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_NO_ERROR);
+    uint8_t auth = 2;
+    err = SCM1612SConfig::WriteConfigValueBin(SCM1612SConfig::kConfigKey_WiFiSEC, &auth, sizeof(auth));
+#endif
 
     // If reading fails, wifi is not provisioned, no need to go further.
     err = SCM1612SConfig::ReadConfigValueStr(SCM1612SConfig::kConfigKey_WiFiSSID, mSavedNetwork.ssid, sizeof(mSavedNetwork.ssid),
@@ -120,9 +134,8 @@ Status WiseWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, M
     memcpy(mStagingNetwork.ssid, ssid.data(), ssid.size());
     mStagingNetwork.ssidLen = static_cast<decltype(mStagingNetwork.ssidLen)>(ssid.size());
 
-#ifdef __no_stub__
-    mStagingNetwork.auth_mode = WIFI_AUTH_MODE_WPA2_PSK;
-#endif /* __no_stub__ */
+    // TODO: Get the auth mode from the user
+    mStagingNetwork.auth_mode = SCM_WIFI_SECURITY_WPA2PSK;
 
     return Status::kSuccess;
 }
@@ -154,28 +167,49 @@ Status WiseWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, Mutable
 
 CHIP_ERROR WiseWiFiDriver::ConnectWiFiNetwork(const char * ssid, uint8_t ssidLen, const char * key, uint8_t keyLen)
 {
+    scm_wifi_assoc_request req = {0};
+    int ret;
     ChipLogProgress(NetworkProvisioning, "WiseWiFiDriver::ConnectWiFiNetwork");
 
     ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled));
 
-#ifdef __no_stub__
-    // Set the wifi configuration
-    filogic_wifi_sta_prov_t wifi_prov = {};
-    memcpy(wifi_prov.ssid, ssid, ssidLen);
-    memcpy(wifi_prov.psk, key, keyLen);
-    wifi_prov.ssid_len  = ssidLen;
-    wifi_prov.psk_len   = keyLen;
-    wifi_prov.auth_mode = WIFI_AUTH_MODE_WPA2_PSK;
+    memcpy(req.ssid, ssid, ssidLen);
+    memcpy(req.key, key, keyLen);
+    switch (mSavedNetwork.auth_mode)
+    {
+        case 3:
+        req.auth = SCM_WIFI_SECURITY_SAE;
+        break;
+        case 2:
+        req.auth = SCM_WIFI_SECURITY_WPA2PSK;
+        break;
+        case 0:
+        default:
+        req.auth = SCM_WIFI_SECURITY_OPEN;
+        break;
+    }
+    req.pairwise = SCM_WIFI_PAIRWISE_AES;
+
+    ret = scm_wifi_sta_set_config(&req, NULL);
+
+#if 0
+    ChipLogProgress(NetworkProvisioning, "ssid: %s %d", ssid, ssidLen);
+    ChipLogProgress(NetworkProvisioning, "key: %s %d", key, keyLen);
+    ChipLogProgress(NetworkProvisioning, "auth: %d", mSavedNetwork.auth_mode);
+#endif
+
+    if (ret != WISE_OK)
+    {
+        ChipLogProgress(NetworkProvisioning, "WiseWiFiDriver::ConnectWiFiNetwork failed");
+        return CHIP_ERROR_INTERNAL;
+    }
 
     ChipLogProgress(NetworkProvisioning, "Setting up connection for WiFi SSID: %.*s", static_cast<int>(ssidLen), ssid);
 
-    void * filogicCtx = PlatformMgrImpl().mFilogicCtx;
+    //ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
+    //ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled));
 
-    // Configure the FILOGIC WiFi interface.
-    filogic_wifi_sta_prov_set_sync(filogicCtx, &wifi_prov);
-#endif /* __no_stub__ */
-    ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled));
-    ReturnErrorOnFailure(ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled));
+    scm_wifi_sta_connect();
 
     return CHIP_NO_ERROR;
 }
@@ -190,6 +224,11 @@ void WiseWiFiDriver::OnConnectWiFiNetwork()
         mpConnectCallback->OnResult(Status::kSuccess, CharSpan(), 0);
         mpConnectCallback = nullptr;
     }
+}
+
+CHIP_ERROR WiseWiFiDriver::SetLastDisconnectReason(const ChipDeviceEvent * event)
+{
+    return CHIP_NO_ERROR;
 }
 
 void WiseWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
@@ -219,23 +258,22 @@ exit:
     }
 }
 
-#ifdef __no_stub__
-chip::BitFlags<WiFiSecurityBitmap> WiseWiFiDriver::ConvertSecuritytype(wifi_auth_mode_t auth_mode)
+chip::BitFlags<WiFiSecurityBitmap> ConvertSecurityType(scm_wifi_auth_mode auth_mode)
 {
     chip::BitFlags<WiFiSecurityBitmap> securityType;
-    if (auth_mode == WIFI_AUTH_MODE_OPEN)
+    if (auth_mode == SCM_WIFI_SECURITY_OPEN)
     {
         securityType = WiFiSecurity::kUnencrypted;
     }
-    else if (auth_mode == WIFI_AUTH_MODE_WPA_PSK)
+    else if (auth_mode == SCM_WIFI_SECURITY_WPAPSK)
     {
         securityType = WiFiSecurity::kWpaPersonal;
     }
-    else if (auth_mode == WIFI_AUTH_MODE_WPA2_PSK)
+    else if (auth_mode == SCM_WIFI_SECURITY_WPA2PSK)
     {
         securityType = WiFiSecurity::kWpa2Personal;
     }
-    else if (auth_mode == WIFI_AUTH_MODE_WPA3_PSK)
+    else if (auth_mode == SCM_WIFI_SECURITY_SAE)
     {
         securityType = WiFiSecurity::kWpa3Personal;
     }
@@ -246,7 +284,6 @@ chip::BitFlags<WiFiSecurityBitmap> WiseWiFiDriver::ConvertSecuritytype(wifi_auth
 
     return securityType;
 }
-#endif /* __no_stub__ */
 
 bool WiseWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 {
@@ -254,62 +291,75 @@ bool WiseWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 
     ChipLogProgress(DeviceLayer, "Start Scan WiFi Networks");
 
-#ifdef __no_stub__
-    void * filogicCtx = PlatformMgrImpl().mFilogicCtx;
-
     if (!ssid.empty()) // ssid is given, only scan this network
     {
-        char cSsid[DeviceLayer::Internal::kMaxWiFiSSIDLength] = {};
-        memcpy(cSsid, ssid.data(), ssid.size());
-        filogic_wifi_scan(filogicCtx, (uint8_t *) cSsid, ssid.size(), kMaxWiFiScanAPs, OnScanWiFiNetworkDone);
+        scm_wifi_scan_params sp = {0};
+        sp.scan_type = SCM_WIFI_SSID_SCAN;
+        sp.ssid_len = ssid.size();
+        memcpy(sp.ssid, ssid.data(), ssid.size());
+        scm_wifi_sta_advance_scan(&sp);
     }
     else // scan all networks
     {
-        filogic_wifi_scan(filogicCtx, nullptr, 0, kMaxWiFiScanAPs, OnScanWiFiNetworkDone);
+        scm_wifi_sta_scan();
     }
-#endif /* __no_stub__ */
+
     return true;
 }
 
-#ifdef __no_stub__
-void WiseWiFiDriver::OnScanWiFiNetworkDone(wifi_scan_list_item_t * aScanResult)
+void WiseWiFiDriver::OnScanWiFiNetworkDone()
 {
-    ChipLogProgress(NetworkProvisioning, "WiseWiFiDriver::OnScanWiFiNetworkDone");
-
-    ChipLogProgress(DeviceLayer, "OnScanWiFiNetworkDone");
-    if (!aScanResult)
+    if (!GetInstance().mpScanCallback)
     {
-        if (GetInstance().mpScanCallback != nullptr)
+        ChipLogProgress(DeviceLayer, "No scan callback");
+        return;
+    }
+    uint16_t ap_number = 32, num;
+
+    // Since this is the dynamic memory allocation, restrict it to a configured limit
+    ap_number = std::min(static_cast<uint16_t>(CHIP_DEVICE_CONFIG_MAX_SCAN_NETWORKS_RESULTS), ap_number);
+
+    std::unique_ptr<scm_wifi_ap_info[]> ap_buffer_ptr(new scm_wifi_ap_info[ap_number]);
+    if (ap_buffer_ptr == NULL)
+    {
+        ChipLogError(DeviceLayer, "can't malloc memory for ap_list_buffer");
+        GetInstance().mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
+        GetInstance().mpScanCallback = nullptr;
+        return;
+    }
+    scm_wifi_ap_info * ap_list_buffer = ap_buffer_ptr.get();
+    if (scm_wifi_sta_scan_results(ap_list_buffer, &num, ap_number) == WISE_OK)
+    {
+        if (CHIP_NO_ERROR == DeviceLayer::SystemLayer().ScheduleLambda([ap_number, ap_list_buffer]() {
+                std::unique_ptr<scm_wifi_ap_info[]> auto_free(ap_list_buffer);
+                WiseScanResponseIterator iter(ap_number, ap_list_buffer);
+                if (GetInstance().mpScanCallback)
+                {
+                    GetInstance().mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
+                    GetInstance().mpScanCallback = nullptr;
+                }
+                else
+                {
+                    ChipLogError(DeviceLayer, "can't find the ScanCallback function");
+                }
+            }))
         {
-            DeviceLayer::SystemLayer().ScheduleLambda([]() {
-                GetInstance().mpScanCallback->OnFinished(NetworkCommissioning::Status::kSuccess, CharSpan(), &mScanResponseIter);
-                GetInstance().mpScanCallback = nullptr;
-            });
+            ap_buffer_ptr.release();
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "can't schedule the scan result processing");
+            GetInstance().mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
+            GetInstance().mpScanCallback = nullptr;
         }
     }
     else
     {
-        while (aScanResult->is_valid)
-        {
-            NetworkCommissioning::WiFiScanResponse scanResponse = {};
-            chip::BitFlags<WiFiSecurityBitmap> security;
-
-            security = GetInstance().ConvertSecuritytype(aScanResult->auth_mode);
-
-            scanResponse.security.Set(security);
-            scanResponse.channel = aScanResult->channel;
-            scanResponse.rssi    = aScanResult->rssi;
-            scanResponse.ssidLen = strnlen((char *) aScanResult->ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
-            memcpy(scanResponse.ssid, aScanResult->ssid, scanResponse.ssidLen);
-            memcpy(scanResponse.bssid, aScanResult->bssid, sizeof(scanResponse.bssid));
-
-            mScanResponseIter.Add(&scanResponse);
-
-            aScanResult++; // process next result
-        }
+        ChipLogError(DeviceLayer, "can't get ap_records ");
+        GetInstance().mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
+        GetInstance().mpScanCallback = nullptr;
     }
 }
-#endif /* __no_stub__ */
 
 void WiseWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
 {
@@ -331,26 +381,17 @@ CHIP_ERROR GetConnectedNetwork(Network & network)
 {
     ChipLogProgress(NetworkProvisioning, "GetConnectedNetwork");
 
-#ifdef __no_stub__
-    void * filogicCtx = PlatformMgrImpl().mFilogicCtx;
-
-    filogic_wifi_sta_prov_t wifi_prov;
-
-    if (!filogic_wifi_sta_get_link_status_sync(filogicCtx) || !filogic_wifi_sta_prov_get_sync(filogicCtx, &wifi_prov))
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    uint8_t length = strnlen(wifi_prov.ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
+    wifi_config_t stationConfig;
+    scm_wifi_get_config(WIFI_IF_STA, &stationConfig);
+    uint8_t length = strnlen(reinterpret_cast<const char*>(stationConfig.sta.ssid), DeviceLayer::Internal::kMaxWiFiSSIDLength);
     if (length > sizeof(network.networkID))
     {
         ChipLogError(DeviceLayer, "SSID too long");
         return CHIP_ERROR_INTERNAL;
     }
 
-    memcpy(network.networkID, wifi_prov.ssid, length);
+    memcpy(network.networkID, stationConfig.sta.ssid, length);
     network.networkIDLen = length;
-#endif /* __no_stub__ */
 
     return CHIP_NO_ERROR;
 }
