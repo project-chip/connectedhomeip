@@ -171,11 +171,12 @@ class TC_WEBRTC_1_2(MatterBaseTest, WebRTCTestHelper):
         webrtc_peer.set_remote_ice_candidates(remote_candidates)
 
         self.step(7)
-        if not self.is_pics_sdk_ci_only:
-            self.wait_for_user_input("Verify WebRTC session is established")
-        elif not webrtc_peer.is_session_connected():
+        if not webrtc_peer.is_session_connected():
             logging.error("Failed to establish webrtc session")
             raise Exception("Failed to establish webrtc session")
+
+        if not self.is_pics_sdk_ci_only:
+            self.user_verify_video_stream("Verify WebRTC session by validating if video is received")
 
         self.step(8)
         await self.send_single_cmd(
