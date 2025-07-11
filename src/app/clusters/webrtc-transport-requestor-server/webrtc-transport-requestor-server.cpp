@@ -43,7 +43,6 @@ using namespace chip::app::Clusters::WebRTCTransportRequestor::Attributes;
 using chip::Protocols::InteractionModel::ClusterStatusCode;
 using chip::Protocols::InteractionModel::Status;
 
-
 namespace {
 
 static constexpr uint16_t kMaxSessionId = 65534;
