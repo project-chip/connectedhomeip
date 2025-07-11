@@ -264,7 +264,7 @@ Protocols::InteractionModel::Status CameraAVStreamManager::AudioStreamDeallocate
     return Status::NotFound;
 }
 
-Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocate(const SnapshotStreamStruct & allocateArgs,
+Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocate(const SnapshotStreamAllocateArgs & allocateArgs,
                                                                                   uint16_t & outStreamID)
 {
     outStreamID = kInvalidStreamID;
@@ -280,8 +280,6 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
 
                 // Start the snapshot stream for serving.
                 mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(outStreamID);
-
-                return Status::Success;
             }
             else
             {
@@ -289,6 +287,13 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
             }
             return Status::Success;
         }
+    }
+
+    // If no pre-allocated stream matches, try allocating a new one.
+    if (mCameraDeviceHAL->GetCameraHALInterface().AllocateSnapshotStream(allocateArgs, outStreamID) == CameraError::SUCCESS)
+    {
+        mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(outStreamID);
+        return Status::Success;
     }
 
     return Status::DynamicConstraintError;
