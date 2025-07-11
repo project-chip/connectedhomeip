@@ -27,7 +27,11 @@
 #include "sl_se_manager_types.h"
 #include <sl_se_manager_extmem.h>
 #endif // _SILICON_LABS_32B_SERIES_2
+
+// Use sl_system for projects upgraded to 2025.6, identified by the presence of SL_CATALOG_CUSTOM_MAIN_PRESENT
+#if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
 #include "sl_system_kernel.h"
+#endif
 
 #ifdef ENABLE_WSTK_LEDS
 extern "C" {
@@ -223,10 +227,13 @@ CHIP_ERROR SilabsPlatform::ToggleLed(uint8_t led)
 }
 #endif // ENABLE_WSTK_LEDS
 
+#if defined(SL_CATALOG_CUSTOM_MAIN_PRESENT)
+// Use sl_system for projects upgraded to 2025.6, identified by the presence of SL_CATALOG_CUSTOM_MAIN_PRESENT
 void SilabsPlatform::StartScheduler()
 {
     sl_system_kernel_start();
 }
+#endif
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
 extern "C" void sl_button_on_change(const sl_button_t * handle)

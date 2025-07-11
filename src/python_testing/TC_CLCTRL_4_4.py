@@ -219,7 +219,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
                     logging.info("LatchControlModes Bit 1 is 1, sending MoveTo command with Latch = False")
 
                     try:
-                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False))
+                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False), timedRequestTimeoutMs=1000)
                     except InteractionModelError as e:
                         asserts.assert_equal(e.status, Status.Success, f"MoveTo command with Latch = False failed: {e}")
 
@@ -229,6 +229,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
                 self.step("2m")
                 sub_handler.await_all_expected_report_matches(expected_matchers=[current_latch_matcher(False)], timeout_sec=timeout)
                 logging.info("Latch is now False, proceeding with CountdownTime checks")
+                sub_handler.reset()
 
         # STEP 3: Verify the CountdownTime when no operation is in progress
         self.step(3)
@@ -257,7 +258,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
             self.step("4c")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed), timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, f"MoveTo command to FullyClosed position failed: {e}")
 
@@ -267,7 +268,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
         self.step("4e")
         try:
-            await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen))
+            await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen), timedRequestTimeoutMs=1000)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, f"MoveTo command to FullyOpened position failed: {e}")
 
@@ -295,6 +296,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             asserts.assert_equal(countdown_time_after_operation, 0,
                                  f"CountdownTime should be 0 after operation completes, got: {countdown_time_after_operation}.")
             logging.info(f"CountdownTime after operation: {countdown_time_after_operation}")
+        sub_handler.reset()
 
         # STEP 5: Verify the CountdownTime behavior when an operation is interrupted
         self.step("5a")
@@ -308,7 +310,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         else:
             self.step("5b")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed), timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, f"MoveTo command to FullyClosed position failed: {e}")
 
@@ -334,6 +336,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             asserts.assert_true(countdown_time_after_interruption == 0,
                                 f"CountdownTime after interruption not 0, but: {countdown_time_after_interruption}.")
             logging.info(f"CountdownTime after interruption not 0, but: {countdown_time_after_interruption}")
+            sub_handler.reset()
 
 
 if __name__ == "__main__":
