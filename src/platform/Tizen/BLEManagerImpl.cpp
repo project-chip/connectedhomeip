@@ -1040,7 +1040,7 @@ exit:
 
 uint16_t BLEManagerImpl::_NumConnections()
 {
-    return 0;
+    return static_cast<uint16_t>(mConnectionMap.size());
 }
 
 CHIP_ERROR BLEManagerImpl::ConfigureBle(uint32_t aAdapterId, bool aIsCentral)
