@@ -39,7 +39,7 @@ using namespace chip::app::DataModel;
 template <class T>
 class ScopedDiagnosticsProvider
 {
-  public:
+public:
     ScopedDiagnosticsProvider()
     {
         mOldProvider = &DeviceLayer::GetDiagnosticDataProvider();
