@@ -69,7 +69,8 @@ public:
     HandleTestEventTrigger(const GeneralDiagnostics::Commands::TestEventTrigger::DecodableType & commandData);
     std::optional<DataModel::ActionReturnStatus>
     HandleTimeSnapshot(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                       const GeneralDiagnostics::Commands::TimeSnapshot::DecodableType & commandData, bool usingTimeSynchClusterServer);
+                       const GeneralDiagnostics::Commands::TimeSnapshot::DecodableType & commandData,
+                       bool usingTimeSynchClusterServer);
     std::optional<DataModel::ActionReturnStatus>
     HandlePayloadTestRequest(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                              const GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType & commandData);
