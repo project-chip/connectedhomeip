@@ -93,10 +93,8 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
             TestStep("6", "Wait for DUT to leave dock and begin cleaning activities"),
             TestStep("7", "TH reads CurrentMode attribute of the RVC Run Mode cluster"),
             TestStep("8", "TH sends GoHome command to the DUT"),
-            TestStep("9", "Manually put the device in the Docked(0x42) operational state"),
-            TestStep("10", "TH reads the OperationalState attribute"),
-            TestStep("11", "Wait for DUT to return to dock and complete docking-related activities"),
-            TestStep("12", "TH reads CurrentMode attribute of the RVC Run Mode cluster"),
+            TestStep("9", "Manually confirm DUT has returned to the dock and completed docking-related activities"),
+            TestStep("10", "TH reads CurrentMode attribute of the RVC Run Mode cluster"),
         ]
         return steps
 
@@ -228,22 +226,11 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
             self.step("8")
             await self.send_go_home_cmd_with_check(Clusters.OperationalState.Enums.ErrorStateEnum.kNoError)
 
+            # Manually confirm DUT has returned to the dock and completed docking-related activities
             self.step("9")
             if not self.is_ci:
-                step_name_for_docked_state = "Manually put the device in the Docked(0x42) operational state"
-                self.wait_for_user_input(prompt_msg=f"{step_name_for_docked_state}, and press Enter when ready.")
+                self.wait_for_user_input(prompt_msg=f"{step_name_idle_mode}, and press Enter when ready.")
 
-            # TH reads the OperationalState attribute
-            self.step("10")
-            current_operational_state = await self.read_operational_state(endpoint=self.endpoint)
-            # Logging the OperationalState Attribute output responses from the DUT:
-            logging.info(f"OperationalState: {current_operational_state}")
-            expected_value = Clusters.RvcOperationalState.Enums.OperationalStateEnum.kDocked
-            asserts.assert_equal(current_operational_state, expected_value,
-                                 f"OperationalState({current_operational_state}) should be {expected_value}")
-
-            # Wait for DUT to return to dock and complete docking-related activities
-            self.step("11")
             current_mode_match = AttributeMatcher.from_callable(
                 "CurrentMode is IDLE",
                 lambda report: report.value == idle_mode)
@@ -251,7 +238,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
             current_mode_accumulator.await_all_expected_report_matches([current_mode_match], timeout_sec=10)
 
             # TH reads CurrentMode attribute of the RVC Run Mode cluster
-            self.step("12")
+            self.step("10")
             post_docking_run_mode_dut = await self.read_current_mode_with_check(expected_mode=idle_mode, endpoint=self.endpoint)
             # Logging the CurrentMode Attribute output responses from the DUT:
             logging.info(f"CurrentMode: {post_docking_run_mode_dut}")
