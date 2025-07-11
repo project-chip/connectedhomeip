@@ -245,7 +245,7 @@ void WebRTCClient::OnStateChange(std::function<void(int)> callback)
     mStateChangeCallback = callback;
 }
 
-void WebRTCClient::WebRTCProviderClientInit(uint32_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
+void WebRTCClient::WebRTCProviderClientInit(uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
 {
     mTransportProviderClient->Init(nodeId, fabricIndex, endpoint);
 }

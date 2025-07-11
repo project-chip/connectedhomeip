@@ -25,10 +25,10 @@ GatheringCompleteCallbackType = CFUNCTYPE(None)
 StateChangeCallback = CFUNCTYPE(None, c_int)
 
 # Callback types for WebRTCRequestor server
-OnOfferCallbackFunct = CFUNCTYPE(c_int, c_uint64, c_char_p)
-OnAnswerCallbackFunct = CFUNCTYPE(c_int, c_uint64, c_char_p)
-OnICECandidatesCallbackFunct = CFUNCTYPE(c_int, c_uint64, POINTER(c_char_p), c_int)
-OnEndCallbackFunct = CFUNCTYPE(c_int, c_uint64, c_uint8)
+OnOfferCallbackFunct = CFUNCTYPE(c_int, c_uint16, c_char_p)
+OnAnswerCallbackFunct = CFUNCTYPE(c_int, c_uint16, c_char_p)
+OnICECandidatesCallbackFunct = CFUNCTYPE(c_int, c_uint16, POINTER(c_char_p), c_int)
+OnEndCallbackFunct = CFUNCTYPE(c_int, c_uint16, c_uint8)
 SessionIdCreatedCallbackFunct = CFUNCTYPE(None, c_uint16, c_uint64)
 
 

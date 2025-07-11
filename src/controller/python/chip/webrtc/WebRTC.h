@@ -176,7 +176,7 @@ void webrtc_client_set_state_change_callback(WebRTCClientHandle handle, OnStateC
  *
  * @note This function assumes that the handle is valid and exists in the global clients map.
  */
-void webrtc_provider_client_init(WebRTCClientHandle handle, uint32_t nodeId, uint8_t fabricIndex, uint16_t endpoint);
+void webrtc_provider_client_init(WebRTCClientHandle handle, uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint);
 
 /**
  * @brief Initializes the WebRTC client handle with webrtc provider client command sender callbacks.
