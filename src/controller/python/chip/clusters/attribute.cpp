@@ -263,8 +263,8 @@ struct __attribute__((packed)) PyReadAttributeParams
 
 PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
                                                size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
-                                               chip::python::PyWriteAttributeData * writeAttributesData,
-                                               size_t attributeDataLength);
+                                               chip::python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength,
+                                               bool forceLegacyListEncoding);
 PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::Controller::DeviceCommissioner * devCtrl,
                                                     size_t busyWaitMsSizeT,
                                                     chip::python::PyWriteAttributeData * writeAttributesData,
@@ -344,7 +344,8 @@ void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttribute
 
 PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t timedWriteTimeoutMsSizeT,
                                                size_t interactionTimeoutMsSizeT, size_t busyWaitMsSizeT,
-                                               python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength)
+                                               python::PyWriteAttributeData * writeAttributesData, size_t attributeDataLength,
+                                               bool forceLegacyListEncoding)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -377,9 +378,13 @@ PyChipError pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * 
         {
             dataVersion.SetValue(path.dataVersion);
         }
-        SuccessOrExit(
-            err = client->PutPreencodedAttribute(
-                chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion), reader));
+
+        auto listEncodingOverride = forceLegacyListEncoding ? WriteClient::TestListEncodingOverride::kForceLegacyEncoding
+                                                            : WriteClient::TestListEncodingOverride::kNoOverride;
+
+        SuccessOrExit(err = client->PutPreencodedAttribute(
+                          chip::app::ConcreteDataAttributePath(path.endpointId, path.clusterId, path.attributeId, dataVersion),
+                          reader, listEncodingOverride));
     }
 
     SuccessOrExit(err = client->SendWriteRequest(device->GetSecureSession().Value(),
