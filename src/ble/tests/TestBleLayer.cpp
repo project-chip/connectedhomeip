@@ -26,6 +26,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/SetupDiscriminator.h>
 #include <lib/support/Span.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -35,9 +36,12 @@
 
 #define _CHIP_BLE_BLE_H
 #include <ble/BleApplicationDelegate.h>
+#include <ble/BleConnectionDelegate.h>
 #include <ble/BleLayer.h>
 #include <ble/BleLayerDelegate.h>
 #include <ble/BlePlatformDelegate.h>
+
+#include <ble/tests/BleLayerTestAccess.h>
 
 namespace chip {
 namespace Ble {
@@ -52,9 +56,12 @@ class TestBleLayer : public BleLayer,
                      private BleApplicationDelegate,
                      private BleLayerDelegate,
                      private BlePlatformDelegate,
+                     public BleConnectionDelegate,
                      public ::testing::Test
 {
 public:
+    int mOnConnectionCompleteCount = 0;
+    int mOnConnectionErrorCount    = 0;
     static void SetUpTestSuite()
     {
         ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR);
@@ -69,6 +76,8 @@ public:
 
     void SetUp() override
     {
+        mOnConnectionCompleteCount = 0;
+        mOnConnectionErrorCount    = 0;
         ASSERT_EQ(Init(this, this, &DeviceLayer::SystemLayer()), CHIP_NO_ERROR);
         mBleTransport = this;
     }
@@ -122,8 +131,8 @@ public:
     ///
     // Implementation of BleLayerDelegate
 
-    void OnBleConnectionComplete(BLEEndPoint * endpoint) override {}
-    void OnBleConnectionError(CHIP_ERROR err) override {}
+    void OnBleConnectionComplete(BLEEndPoint * endpoint) override { mOnConnectionCompleteCount++; }
+    void OnBleConnectionError(CHIP_ERROR err) override { mOnConnectionErrorCount++; }
     void OnEndPointConnectComplete(BLEEndPoint * endPoint, CHIP_ERROR err) override {}
     void OnEndPointMessageReceived(BLEEndPoint * endPoint, System::PacketBufferHandle && msg) override {}
     void OnEndPointConnectionClosed(BLEEndPoint * endPoint, CHIP_ERROR err) override {}
@@ -148,6 +157,22 @@ public:
     }
     CHIP_ERROR SendWriteRequest(BLE_CONNECTION_OBJECT, const ChipBleUUID *, const ChipBleUUID *, PacketBufferHandle) override
     {
+        return CHIP_NO_ERROR;
+    }
+
+    ///
+    // Implementation of BleConnectionDelegate
+    void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override {}
+    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override {}
+    CHIP_ERROR CancelConnection() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR NewConnection(BleLayer * bleLayer, void * appState, const Span<const SetupDiscriminator> & discriminators,
+                             OnConnectionByDiscriminatorsCompleteFunct onConnectionComplete,
+                             OnConnectionErrorFunct onConnectionError) override
+    {
+        if (discriminators.empty())
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
         return CHIP_NO_ERROR;
     }
 
@@ -381,6 +406,128 @@ TEST_F(TestBleLayer, ExceedBleConnectionEndPointLimit)
 
     auto connObj = GetConnectionObject();
     EXPECT_FALSE(HandleWriteReceivedCapabilitiesRequest(connObj));
+}
+
+TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNotInitialized)
+{
+    // Simulate BleLayer not being initialized by calling Shutdown
+    Shutdown();
+
+    // Create a list of discriminators
+    SetupDiscriminator discriminators[] = { SetupDiscriminator(), SetupDiscriminator() };
+    Span<const SetupDiscriminator> discriminatorsSpan(discriminators);
+
+    // Define success and error callbacks
+    auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {};
+    auto OnError   = [](void * appState, CHIP_ERROR err) {};
+
+    EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_ERROR_INCORRECT_STATE);
+}
+
+TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoConnectionDelegate)
+{
+    // Set up the BleLayerTestAccess accessor class to manipulate the BleConnectionDelegate of BleLayer
+    chip::Test::BleLayerTestAccess access(this);
+    access.SetConnectionDelegate(nullptr);
+
+    SetupDiscriminator discriminators[] = { SetupDiscriminator(), SetupDiscriminator() };
+    Span<const SetupDiscriminator> discriminatorsSpan(discriminators);
+
+    auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {};
+    auto OnError   = [](void * appState, CHIP_ERROR err) {};
+
+    EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_ERROR_INCORRECT_STATE);
+}
+
+TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoBleTransportLayer)
+{
+    chip::Test::BleLayerTestAccess access(this);
+    access.SetConnectionDelegate(this);
+    mBleTransport = nullptr;
+
+    SetupDiscriminator discriminators[] = { SetupDiscriminator(), SetupDiscriminator() };
+    Span<const SetupDiscriminator> discriminatorsSpan(discriminators);
+
+    auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {};
+    auto OnError   = [](void * appState, CHIP_ERROR err) {};
+
+    EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_ERROR_INCORRECT_STATE);
+}
+
+TEST_F(TestBleLayer, NewConnectionByDiscriminatorsSuccess)
+{
+    chip::Test::BleLayerTestAccess access(this);
+    access.SetConnectionDelegate(this);
+
+    SetupDiscriminator discriminators[] = { SetupDiscriminator(), SetupDiscriminator() };
+    discriminators[0].SetLongValue(1234);
+    discriminators[1].SetLongValue(3333);
+    Span<const SetupDiscriminator> discriminatorsSpan(discriminators);
+
+    auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {
+        BleLayer * testLayer = static_cast<BleLayer *>(appState);
+        chip::Test::BleLayerTestAccess tempAccess(testLayer);
+
+        tempAccess.CallOnConnectionComplete(appState, connObj);
+    };
+    auto OnError             = [](void * appState, CHIP_ERROR err) { FAIL() << "OnError should not be called in this test"; };
+    BleLayer * bleLayerState = this;
+
+    EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_NO_ERROR);
+
+    // Simulate a successful connection by calling the success callback directly
+    OnSuccess(bleLayerState, discriminatorsSpan[0].GetLongValue(), GetConnectionObject());
+
+    // Verify that the success callback was called
+    EXPECT_EQ(mOnConnectionCompleteCount, 1);
+    EXPECT_EQ(mOnConnectionErrorCount, 0);
+}
+
+// Checks that the connection could not be established due to an error
+TEST_F(TestBleLayer, NewConnectionByDiscriminatorsError)
+{
+    chip::Test::BleLayerTestAccess access(this);
+
+    access.SetConnectionDelegate(this);
+
+    SetupDiscriminator discriminators[] = { SetupDiscriminator(), SetupDiscriminator() };
+    discriminators[0].SetLongValue(1234);
+    discriminators[1].SetLongValue(3333);
+    Span<const SetupDiscriminator> discriminatorsSpan(discriminators);
+
+    auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {
+        FAIL() << "OnSuccess should not be called in this test";
+    };
+
+    auto OnError = [](void * appState, CHIP_ERROR err) {
+        BleLayer * testLayer = static_cast<BleLayer *>(appState);
+        chip::Test::BleLayerTestAccess tempAccess(testLayer);
+
+        tempAccess.CallOnConnectionError(appState, err);
+    };
+    BleLayer * bleLayerState = this;
+
+    EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_NO_ERROR);
+
+    // Call the error callback directly to simulate an error
+    OnError(bleLayerState, CHIP_ERROR_CONNECTION_ABORTED);
+
+    // Verify that the error callback was called
+    EXPECT_EQ(mOnConnectionCompleteCount, 0);
+    EXPECT_EQ(mOnConnectionErrorCount, 1);
+}
+
+TEST_F(TestBleLayer, NewConnectionByDiscriminatorsEmptySpan)
+{
+    chip::Test::BleLayerTestAccess access(this);
+    access.SetConnectionDelegate(this);
+
+    Span<const SetupDiscriminator> discriminatorsSpan;
+
+    auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {};
+    auto OnError   = [](void * appState, CHIP_ERROR err) {};
+
+    EXPECT_NE(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_NO_ERROR);
 }
 
 }; // namespace Ble

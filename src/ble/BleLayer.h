@@ -70,6 +70,11 @@
 #include "BleUUID.h"
 
 namespace chip {
+
+namespace Test {
+// Forward declaration of BleLayerTestAccess class tests to allow it to be friends with BleLayer
+class BleLayerTestAccess;
+} // namespace Test
 namespace Ble {
 
 /**
@@ -216,6 +221,7 @@ public:
 class DLL_EXPORT BleLayer
 {
     friend class BLEEndPoint;
+    friend class Test::BleLayerTestAccess;
 
 public:
     // Public data members:
@@ -224,7 +230,7 @@ public:
         kState_NotInitialized = 0,
         kState_Initialized    = 1,
         kState_Disconnecting  = 2
-    } mState; ///< [READ-ONLY] external access is deprecated, use IsInitialized() / IsBleClosing()
+    } mState; ///< [READ-ONLY] external access is deprecated, use  IsInitialized() / IsBleClosing()
 
     // This app state is not used by ble transport etc, it will be used by external ble implementation like Android
     void * mAppState                 = nullptr;
@@ -355,6 +361,5 @@ private:
     static void OnConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj);
     static void OnConnectionError(void * appState, CHIP_ERROR err);
 };
-
 } /* namespace Ble */
 } /* namespace chip */
