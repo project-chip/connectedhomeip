@@ -62,7 +62,7 @@ DataModel::ActionReturnStatus AdministratorCommissioningCluster::ReadAttribute(c
     case WindowStatus::Id:
         return encoder.Encode(mLogic.GetWindowStatus());
     case AdminFabricIndex::Id:
-        return encoder.Encode(mLogic.GetOpenerFabricIndex());
+        return encoder.Encode(mLogic.GetAdminFabricIndex());
     case AdminVendorId::Id:
         return encoder.Encode(mLogic.GetAdminVendorId());
     default:
