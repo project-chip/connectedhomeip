@@ -3,11 +3,11 @@ import logging
 import threading
 from collections import defaultdict
 
-from .library_handle import WebRTCRequestorNativeBindings
+from .library_handle import WebRTCTransportNativeBindings
 from .peer_connection import PeerConnection
 
 
-class WebRTCManager(WebRTCRequestorNativeBindings):
+class WebRTCManager(WebRTCTransportNativeBindings):
     """Manages WebRTC peer connections and handles various WebRTC-related events and operations.
     Maintains mappings between session IDs <-> node IDs <-> peer connections.
 
@@ -23,8 +23,15 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
 
     def __init__(self, event_loop: asyncio.AbstractEventLoop | None = None):
         super().__init__()
+
+        # Initialize WebRTC requestor server and set up delegate callbacks.
         self.init_webrtc_requestor_server()
         self.set_webrtc_requestor_delegate_callbacks()
+
+        # Initialize WebRTC provider server and set up delegate callbacks.
+        self.init_webrtc_provider_server()
+        self.set_webrtc_provider_delegate_callbacks()
+
         self.event_loop = event_loop or asyncio.get_running_loop()
 
     def create_peer(self, node_id: int, fabric_index: int, endpoint: int) -> PeerConnection:

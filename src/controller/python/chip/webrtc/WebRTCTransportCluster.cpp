@@ -15,7 +15,9 @@
  *    limitations under the License.
  */
 
+#include <controller/webrtc/WebRTCTransportProviderManager.h>
 #include <controller/webrtc/WebRTCTransportRequestorManager.h>
+
 // These methods are expected to be called from Python.
 extern "C" {
 // WebRTC Requestor functions
@@ -31,5 +33,19 @@ void pychip_WebRTCTransportRequestor_InitCallbacks(OnOfferCallback onOnOfferCall
                                                               onEndCallback);
 }
 
-// WebRTC Provider client functions
+// WebRTC Provider functions
+void pychip_WebRTCTransportProvider_Init()
+{
+    WebRTCTransportProviderManager::Instance().Init();
+}
+
+void pychip_WebRTCTransportProvider_InitCallbacks(ProvideOfferCallback provideOfferCallback,
+                                                  ProvideAnswerCallback provideAnswerCallback,
+                                                  ProvideICECandidatesCallback provideICECandidatesCallback,
+                                                  ProvideEndCallback provideEndCallback,
+                                                  SessionIdCreatedCallback sessionIdCreatedCallback)
+{
+    WebRTCTransportProviderManager::Instance().InitCallbacks(
+        provideOfferCallback, provideAnswerCallback, provideICECandidatesCallback, provideEndCallback, sessionIdCreatedCallback);
+}
 }
