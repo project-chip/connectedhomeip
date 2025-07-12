@@ -293,7 +293,9 @@
             "PacketTxCount",
             "TxErrCount",
             "CollisionCount",
-            "OverrunCount"
+            "OverrunCount",
+            "FeatureMap",
+            "ClusterRevision"
         ],
         "General Commissioning": [
             "RegulatoryConfig",
