@@ -293,6 +293,8 @@ private:
         return StorageKeyName::Formatted("g/e/%x/lh/%x", endpoint, scheduleIndex);
     }
 
+    bool MigrateConfig(const SilabsDoorLock::LockInitParams::LockParam & params);
+
     // Pointer to the PeristentStorage
     PersistentStorageDelegate * mStorage = nullptr;
 };
