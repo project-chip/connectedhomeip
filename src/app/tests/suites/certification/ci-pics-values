@@ -3022,3 +3022,13 @@ THNETDIR.S=1
 
 # Wi-Fi Network Management Cluster
 WIFINM.S=1
+
+# Commodity Metering
+
+#Server
+COMMTR.S=1
+
+#Attributes
+COMMTR.S.A0000=1
+COMMTR.S.A0001=1
+COMMTR.S.A0002=1
