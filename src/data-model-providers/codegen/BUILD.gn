@@ -26,8 +26,6 @@ import("//build_overrides/chip.gni")
 #   CodegenDataModelProvider_Write.cpp
 #   EmberAttributeDataBuffer.cpp
 #   EmberAttributeDataBuffer.h
-#   EmberMetadata.cpp
-#   EmberMetadata.h
 #   Instance.cpp
 #
 # The above list of files exists to satisfy the "dependency linter"

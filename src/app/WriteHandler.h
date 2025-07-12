@@ -192,7 +192,7 @@ private:
     ///
     /// Returns a success status if all is ok, failure otherwise.
     DataModel::ActionReturnStatus CheckWriteAllowed(const Access::SubjectDescriptor & aSubject,
-                                                    const ConcreteAttributePath & aPath);
+                                                    const ConcreteDataAttributePath & aPath);
 
     /// Validate that a write on the given path has aRequiredPrivilege.
     ///
