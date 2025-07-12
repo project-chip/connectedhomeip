@@ -41,7 +41,6 @@ namespace Clusters {
 class SoftwareDiagnosticsServerCluster : public DefaultServerCluster, public SoftwareDiagnostics::SoftwareFaultListener
 {
 public:
-    template <typename... Args>
     SoftwareDiagnosticsServerCluster(const SoftwareDiagnosticsEnabledAttributes & enabledAttributes) :
         DefaultServerCluster({ kRootEndpointId, SoftwareDiagnostics::Id }), mLogic(enabledAttributes)
     {}
