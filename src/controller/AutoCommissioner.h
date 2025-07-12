@@ -26,12 +26,22 @@
 #include <protocols/secure_channel/RendezvousParameters.h>
 
 namespace chip {
+
+namespace Test {
+
+class AutoCommissionerTestAccess;
+
+} // namespace Test
+
 namespace Controller {
 
 class DeviceCommissioner;
 
 class AutoCommissioner : public CommissioningDelegate
 {
+
+    friend class chip::Test::AutoCommissionerTestAccess;
+
 public:
     AutoCommissioner();
     ~AutoCommissioner() override;
@@ -137,6 +147,7 @@ private:
     app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type mDstOffsetsBuf[kMaxSupportedDstStructs];
 
     static constexpr size_t kMaxDefaultNtpSize = 128;
+
     char mDefaultNtp[kMaxDefaultNtpSize];
 
     uint8_t mICDSymmetricKey[Crypto::kAES_CCM128_Key_Length];
