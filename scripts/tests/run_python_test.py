@@ -29,6 +29,7 @@ import sys
 import threading
 import time
 import typing
+import uuid
 
 import click
 import coloredlogs
@@ -164,12 +165,54 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
                   run.script_args or "", run.script_gdb, run.quiet)
 
 
+def restart_app_process(app_process, app, app_args, app_ready_pattern, stream_output):
+    """Restart the app process during test execution."""
+    if app_process:
+        logging.info("Restarting app process...")
+
+        # Stop the existing app process
+        if hasattr(app_process, 'terminate'):
+            app_process.terminate()
+            # Wait up to 5 seconds for the process to terminate gracefully.
+            for _ in range(50):
+                if app_process.p.poll() is not None:
+                    break
+                time.sleep(0.1)
+
+            # Force kill if still running
+            if app_process.p.poll() is None:
+                logging.info("Force killing app process")
+                app_process.p.kill()
+                time.sleep(1)
+
+        # Start a new app process
+        new_app_process = Subprocess(app, *shlex.split(app_args),
+                                     output_cb=process_chip_app_output,
+                                     f_stdout=stream_output,
+                                     f_stderr=stream_output)
+
+        if app_ready_pattern:
+            new_app_process.start(expected_output=app_ready_pattern, timeout=30)
+        else:
+            new_app_process.start()
+
+        logging.info("App process restarted successfully")
+        return new_app_process
+
+    return None
+
+
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
               app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
               script_gdb: bool, quiet: bool):
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
+
+    # Generate unique test run ID to avoid conflicts in concurrent test runs
+    test_run_id = str(uuid.uuid4())[:8]  # Use first 8 characters for shorter paths
+    restart_flag_file = f"/tmp/chip_test_restart_app_{test_run_id}"
+    stop_flag_file = f"/tmp/chip_test_stop_monitor_{test_run_id}"
 
     if factory_reset or factory_reset_app_only:
         # Remove native app config
@@ -215,6 +258,17 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         else:
             app_process.p.stdin.close()
 
+    # Set environment variables for app restart capability
+    if app:
+        os.environ['CHIP_TEST_APP_PATH'] = app
+        os.environ['CHIP_TEST_APP_ARGS'] = app_args
+        os.environ['CHIP_TEST_APP_READY_PATTERN'] = app_ready_pattern.pattern.decode() if app_ready_pattern else ""
+# Signal that the app restart capability is available to the test script
+        os.environ['CHIP_TEST_APP_RESTART_AVAILABLE'] = '1'
+        os.environ['CHIP_TEST_RESTART_FLAG_FILE'] = restart_flag_file
+        os.environ['CHIP_TEST_STOP_FLAG_FILE'] = stop_flag_file
+        logging.info("App restart capability enabled")
+
     script_command = [
         script,
         "--fail-on-skipped",
@@ -241,33 +295,103 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                                      f_stderr=stream_output)
     test_script_process.start()
     test_script_process.p.stdin.close()
-    test_script_exit_code = test_script_process.wait()
 
-    if test_script_exit_code != 0:
-        logging.error("Test script exited with returncode %d" % test_script_exit_code)
+    # Monitor for app restart requests
+    restart_monitor_thread = None
+    app_process_ref = None
+    if app:
+        # Create a reference to app_process so it can be updated by the monitor thread
+        app_process_ref = [app_process]
+        restart_monitor_thread = threading.Thread(
+            target=monitor_app_restart_requests,
+            args=(app_process_ref, app, app_args, app_ready_pattern, stream_output, restart_flag_file, stop_flag_file),
+            daemon=True
+        )
+        restart_monitor_thread.start()
 
-    if app_process:
-        logging.info("Stopping app with SIGTERM")
-        if app_stdin_forwarding_thread:
-            app_stdin_forwarding_stop_event.set()
-            app_stdin_forwarding_thread.join()
-        app_process.terminate()
-        app_exit_code = app_process.returncode
+    try:
+        test_script_exit_code = test_script_process.wait()
 
-    # We expect both app and test script should exit with 0
-    exit_code = test_script_exit_code or app_exit_code
+        if test_script_exit_code != 0:
+            logging.error("Test script exited with returncode %d" % test_script_exit_code)
 
-    if quiet:
-        if exit_code:
-            sys.stdout.write(stream_output.getvalue().decode('utf-8'))
-        else:
-            logging.info("Test completed successfully")
+        # Stop the restart monitor thread if it exists
+        if restart_monitor_thread and restart_monitor_thread.is_alive():
+            logging.info("Stopping app restart monitor thread")
+            # Signal the monitor thread to stop
+            with open(stop_flag_file, 'w') as f:
+                f.write("stop")
 
-    if exit_code != 0:
-        logging.error("SUBPROCESS failure: ")
-        logging.error("  TEST SCRIPT: %d (%r)", test_script_exit_code, final_script_command)
-        logging.error("  APP:         %d (%r)", app_exit_code, [app] + shlex.split(app_args))
-        sys.exit(exit_code)
+            # Wait a bit for the monitor thread to stop
+            restart_monitor_thread.join(2.0)  # Wait up to 2 seconds for the thread to stop
+
+        # Get the current app process (which might have been restarted)
+        current_app_process = app_process_ref[0] if app_process_ref else app_process
+
+        if current_app_process:
+            logging.info("Stopping app with SIGTERM")
+            if app_stdin_forwarding_thread:
+                app_stdin_forwarding_stop_event.set()
+                app_stdin_forwarding_thread.join()
+            current_app_process.terminate()
+            app_exit_code = current_app_process.returncode
+
+        # We expect both app and test script should exit with 0
+        exit_code = test_script_exit_code or app_exit_code
+
+        if quiet:
+            if exit_code:
+                sys.stdout.write(stream_output.getvalue().decode('utf-8'))
+            else:
+                logging.info("Test completed successfully")
+
+        if exit_code != 0:
+            logging.error("SUBPROCESS failure: ")
+            logging.error("  TEST SCRIPT: %d (%r)", test_script_exit_code, final_script_command)
+            logging.error("  APP:         %d (%r)", app_exit_code, [app] + shlex.split(app_args))
+            sys.exit(exit_code)
+
+    finally:
+        # Clean up any leftover flag files - ensure this always executes
+        logging.info("Cleaning up flag files")
+        for flag_file in [restart_flag_file, stop_flag_file]:
+            if os.path.exists(flag_file):
+                try:
+                    os.unlink(flag_file)
+                    logging.info(f"Cleaned up flag file: {flag_file}")
+                except Exception as e:
+                    logging.warning(f"Failed to clean up flag file {flag_file}: {e}")
+
+
+def monitor_app_restart_requests(app_process_ref, app, app_args, app_ready_pattern, stream_output, restart_flag_file, stop_flag_file):
+    """Monitor for app restart requests from the test script."""
+    while True:
+        try:
+            # Check if we should stop monitoring
+            if os.path.exists(stop_flag_file):
+                logging.info("Stop signal received, ending app restart monitor")
+                os.unlink(stop_flag_file)
+                break
+
+            # Check if restart flag file exists
+            if os.path.exists(restart_flag_file):
+                logging.info("App restart requested by test script")
+
+                # Remove the flag file
+                os.unlink(restart_flag_file)
+
+                # Restart the app
+                new_app_process = restart_app_process(app_process_ref[0], app, app_args, app_ready_pattern, stream_output)
+                if new_app_process:
+                    app_process_ref[0] = new_app_process
+
+                # Wait a bit before checking again
+                time.sleep(1)
+            else:
+                time.sleep(0.5)  # Check every 500ms
+        except Exception as e:
+            logging.error(f"Error in app restart monitor: {e}")
+            time.sleep(1)
 
 
 if __name__ == '__main__':
