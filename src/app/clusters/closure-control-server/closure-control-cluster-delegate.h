@@ -72,14 +72,6 @@ public:
     virtual bool IsReadyToMove() = 0;
 
     /**
-     * @brief Checks whether this closure needs manual latching.
-     *
-     * @return true if manual latching is needed
-     *         false if manual latching not needed
-     */
-    virtual bool IsManualLatchingNeeded() = 0;
-
-    /**
      * @brief Get the countdown time required by the closure for calibration.
      *
      * @return Time required for calibration action.

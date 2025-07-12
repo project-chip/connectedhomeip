@@ -219,7 +219,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
                     logging.info("LatchControlModes Bit 1 is 1, sending MoveTo command with Latch = False")
 
                     try:
-                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False))
+                        await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(latch=False), timedRequestTimeoutMs=1000)
                     except InteractionModelError as e:
                         asserts.assert_equal(e.status, Status.Success, f"MoveTo command with Latch = False failed: {e}")
 
@@ -258,7 +258,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
             self.step("4c")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed), timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, f"MoveTo command to FullyClosed position failed: {e}")
 
@@ -268,7 +268,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
         self.step("4e")
         try:
-            await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen))
+            await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyOpen), timedRequestTimeoutMs=1000)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, f"MoveTo command to FullyOpened position failed: {e}")
 
@@ -310,7 +310,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
         else:
             self.step("5b")
             try:
-                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed))
+                await self.send_single_cmd(endpoint=endpoint, cmd=Clusters.ClosureControl.Commands.MoveTo(position=Clusters.ClosureControl.Enums.TargetPositionEnum.kMoveToFullyClosed), timedRequestTimeoutMs=1000)
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, f"MoveTo command to FullyClosed position failed: {e}")
 

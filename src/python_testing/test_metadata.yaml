@@ -104,21 +104,6 @@ not_automated:
     - name: TC_AVSUMTestBase.py
       reason:
           Shared code for Camera AV Settings (TC_AVSUM*), not a standalone test.
-    - name: TC_CLDIM_3_1.py
-      reason:
-          Closure app on master branch does not support this test script yet.
-    - name: TC_CLDIM_3_2.py
-      reason:
-          Closure app on master branch does not support this test script yet.
-    - name: TC_CLDIM_3_3.py
-      reason:
-          Closure app on master branch does not support this test script yet.
-    - name: TC_CLDIM_4_1.py
-      reason:
-          Closure app on master branch does not support this test script yet.
-    - name: TC_CLDIM_4_2.py
-      reason:
-          Closure app on master branch does not support this test script yet.
     - name: TC_WEBRTC_1_1.py
       reason:
           Depends on Python WebRTC bindings. Will be enabled once local tests
@@ -143,21 +128,29 @@ not_automated:
       reason: Helper methods for WebRTC TCs, not a standalone test.
     - name: TC_CHIMETestBase.py
       reason: Shared code for the Chime Cluster, not a standalone test.
-    - name: TC_CLCTRL_2_1.py
+    - name: TC_WEBRTCPTestBase.py
       reason:
-          Closure app on master branch does not support this test script yet.
-    - name: TC_CLCTRL_4_2.py
+          Shared code for the WebRTC Provider Cluster, not a standalone test.
+    - name: TC_WEBRTCR_2_3.py
+      reason: Camera Controller App does not support stream allocation requests
+    - name: TC_WEBRTCR_2_4.py
+      reason: Camera Controller App does not support stream allocation requests
+    - name: TC_PAVST_2_1.py
       reason:
-          Closure app on master branch does not support this test script yet.
-    - name: TC_CLCTRL_4_3.py
+          Depends on PushAV cluster. Will be enabled once local tests are fully
+          verified.
+    - name: TC_PAVST_2_2.py
       reason:
-          Closure app on master branch does not support this test script yet.
-    - name: TC_CLCTRL_4_4.py
+          Depends on PushAV cluster. Will be enabled once local tests are fully
+          verified.
+    - name: TC_PAVST_2_3.py
       reason:
-          Closure app on master branch does not support this test script yet.
-    - name: TC_CLDIM_2_1.py
+          Depends on PushAV cluster. Will be enabled once local tests are fully
+          verified.
+    - name: TC_PAVST_2_9.py
       reason:
-          Closure app on master branch does not support this test script yet.
+          Depends on PushAV cluster. Will be enabled once local tests are fully
+          verified.
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
@@ -188,3 +181,4 @@ slow_tests:
     - { name: TC_TIMESYNC_2_12.py, duration: 20 seconds }
     - { name: TC_TIMESYNC_2_7.py, duration: 20 seconds }
     - { name: TC_TIMESYNC_2_8.py, duration: 1.5 minutes }
+    - { name: TC_CLCTRL_3_1.py, duration: 45 seconds }
