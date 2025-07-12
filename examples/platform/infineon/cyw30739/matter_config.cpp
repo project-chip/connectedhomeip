@@ -36,6 +36,7 @@
 #ifdef BOARD_ENABLE_I2C
 #include "wiced_hal_i2c.h"
 #endif
+#include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
 #include <app/server/Server.h>
@@ -237,6 +238,9 @@ void CYW30739MatterConfig::InitApp(void)
 #endif
 
     // Init Matter Server
+    const Clusters::GeneralDiagnosticsEnabledAttributes enabledAttributes = Clusters::GeneralDiagnosticsEnabledAttributes();
+    static Clusters::GeneralDiagnosticsCluster<Clusters::DeviceLayerGeneralDiagnosticsLogic> cluster(enabledAttributes);
+    sEventManagementTestEventTriggerHandler.SetGeneralDiagnosticsClusterInstance(&cluster);
     chip::Server::GetInstance().Init(initParams);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR

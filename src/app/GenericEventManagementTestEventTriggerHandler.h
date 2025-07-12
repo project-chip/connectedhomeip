@@ -19,18 +19,37 @@
 #pragma once
 
 #include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 
 namespace chip {
 namespace app {
 
 class GenericEventManagementTestEventTriggerHandler : public TestEventTriggerHandler
 {
+public:
+    GenericEventManagementTestEventTriggerHandler(
+        Clusters::GeneralDiagnosticsCluster<Clusters::DeviceLayerGeneralDiagnosticsLogic> * generalDiagnosticsClusterInstance) :
+        mGeneralDiagnosticsCluster(generalDiagnosticsClusterInstance)
+    {}
+
+    Clusters::GeneralDiagnosticsCluster<Clusters::DeviceLayerGeneralDiagnosticsLogic> * GetGeneralDiagnosticsClusterInstance()
+    {
+        return mGeneralDiagnosticsCluster;
+    }
+
+    void SetGeneralDiagnosticsClusterInstance(
+        Clusters::GeneralDiagnosticsCluster<Clusters::DeviceLayerGeneralDiagnosticsLogic> * generalDiagnosticsClusterInstance)
+    {
+        mGeneralDiagnosticsCluster = generalDiagnosticsClusterInstance;
+    }
+
 protected:
     CHIP_ERROR HandleFillUpEventLoggingBufferEventTriger();
 
 private:
     void FillUpEventLoggingBufferWithFakeSoftwareFault(size_t bufferSize);
-    virtual void TriggerSoftwareFaultEvent(const char * faultRecordString) = 0;
+    virtual void TriggerSoftwareFaultEvent(const char * faultRecordString)                                         = 0;
+    Clusters::GeneralDiagnosticsCluster<Clusters::DeviceLayerGeneralDiagnosticsLogic> * mGeneralDiagnosticsCluster = nullptr;
 };
 
 } // namespace app
