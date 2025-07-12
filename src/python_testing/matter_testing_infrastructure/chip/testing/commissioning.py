@@ -320,3 +320,37 @@ class CommissionDeviceTest(base_test.BaseTestClass):
     @default_controller.setter
     def default_controller(self, tmp_default_controller):
         self._default_controller = tmp_default_controller
+
+
+@dataclass
+class SetupParameters:
+    """
+    Specifies configuration parameters for commissioning.
+
+    Args:
+        passcode (int): The setup passcode of the device.
+        vendor_id (Optional[int]): Identification number specific tothe vendor.
+        product_id (Optional[int]): Identification number specific to the product.
+        discriminator (Optional[int]): The long discriminator for the DNS-SD advertisement. Valid range: 0-4095.
+        custom_flow (Optional[int]): The custom flow type.
+        capabilities (Optional[int]): Device capabilities.
+        version (Optional[int]): Version number.
+
+    """
+    passcode: int
+    vendor_id: int = 0xFFF1
+    product_id: int = 0x8001
+    discriminator: int = 3840
+    custom_flow: int = 0
+    capabilities: int = 0b0100
+    version: int = 0
+
+    @property
+    def qr_code(self):
+        return SetupPayload().GenerateQrCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
+                                             self.custom_flow, self.capabilities, self.version)
+
+    @property
+    def manual_code(self):
+        return SetupPayload().GenerateManualPairingCode(self.passcode, self.vendor_id, self.product_id, self.discriminator,
+                                                        self.custom_flow, self.capabilities, self.version)
