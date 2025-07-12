@@ -46,7 +46,7 @@ from datetime import datetime, timedelta, timezone
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.event_attribute_reporting import EventChangeCallback
+from chip.testing.event_attribute_reporting import EventSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
@@ -173,7 +173,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("1a")
         # Set up a subscription to all EnergyEVSE cluster events
-        events_callback = EventChangeCallback(cluster)
+        events_callback = EventSubscriptionHandler(expected_cluster=cluster)
         await events_callback.start(self.default_controller,
                                     self.dut_node_id,
                                     endpoint=endpoint)

@@ -35,7 +35,7 @@
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
-from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing.matter_testing import AttributeValue, MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from support_modules.cadmin_support import CADMINSupport
@@ -166,7 +166,7 @@ class TC_CADMIN_1_19(MatterBaseTest):
         asserts.assert_equal(current_fabrics, initial_number_of_fabrics, "Expected number of fabrics not correct")
 
         self.step(11)
-        attribute_reports = ClusterAttributeChangeAccumulator(
+        attribute_reports = AttributeSubscriptionHandler(
             expected_cluster=Clusters.AdministratorCommissioning, expected_attribute=Clusters.AdministratorCommissioning.Attributes.WindowStatus)
         await attribute_reports.start(dev_ctrl=self.th1, node_id=self.dut_node_id, endpoint=0)
 

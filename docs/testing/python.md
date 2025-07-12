@@ -321,17 +321,16 @@ callbacks are called on update.
 Example for setting callbacks:
 
 ```
-q = queue.Queue()
-cb = SimpleEventCallback("cb", cluster_id, event_id, q)
+cb = EventSubscriptionHandler(cluster, cluster_id, event_id)
 
 urgent = 1
 subscription = await dev_ctrl.ReadEvent(nodeid=1, events=[(1, event, urgent)], reportInterval=[1, 3])
 subscription.SetEventUpdateCallback(callback=cb)
 
 try:
-    q.get(block=True, timeout=timeout)
+    cb.get_event_from_queue(block=True, timeout=timeout)
 except queue.Empty:
-    asserts.assert_fail(“Timeout on event”)
+    asserts.assert_fail("Timeout on event")
 ```
 
 ### [WriteAttribute](./ChipDeviceCtrlAPI.md#writeattribute)
