@@ -19,12 +19,12 @@
 #pragma once
 
 #include "camera-device-interface.h"
+#include "webrtc-abstract.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/CASESessionManager.h>
 #include <app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h>
 #include <app/dynamic_server/AccessControl.h>
 #include <media-controller.h>
-#include <rtc/rtc.hpp>
 #include <webrtc-transport.h>
 
 #include <unordered_map>
@@ -92,12 +92,18 @@ private:
 
     void RegisterWebrtcTransport(uint16_t sessionId);
 
+    // WebRTC Callbacks
+    void OnLocalDescription(const std::string & sdp, SDPType type);
+    void OnICECandidate(const std::string & candidate);
+    void OnConnectionStateChanged(bool connected);
+    void OnTrack(std::shared_ptr<WebRTCTrack> track);
+
     WebRTCTransportRequestorServer * mWebRTCRequestorServer;
     MediaController * mMediaController = nullptr;
 
-    std::shared_ptr<rtc::PeerConnection> mPeerConnection;
-    std::shared_ptr<rtc::Track> mVideoTrack;
-    std::shared_ptr<rtc::Track> mAudioTrack;
+    std::shared_ptr<WebRTCPeerConnection> mPeerConnection;
+    std::shared_ptr<WebRTCTrack> mVideoTrack;
+    std::shared_ptr<WebRTCTrack> mAudioTrack;
     uint16_t mVideoStreamID;
     uint16_t mAudioStreamID;
     uint16_t mCurrentSessionId;
