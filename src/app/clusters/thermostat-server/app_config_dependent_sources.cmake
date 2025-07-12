@@ -20,6 +20,7 @@ TARGET_SOURCES(
     "${CLUSTER_DIR}/PresetStructWithOwnedMembers.h"
     "${CLUSTER_DIR}/thermostat-delegate.h"
     "${CLUSTER_DIR}/thermostat-server-atomic.cpp"
+    "${CLUSTER_DIR}/thermostat-server-events.cpp"
     "${CLUSTER_DIR}/thermostat-server-presets.cpp"
     "${CLUSTER_DIR}/thermostat-server.cpp"
     "${CLUSTER_DIR}/thermostat-server.h"
