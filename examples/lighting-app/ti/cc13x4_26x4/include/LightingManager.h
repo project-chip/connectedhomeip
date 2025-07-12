@@ -21,7 +21,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "AppEvent.h"
+#include <AppEvent.h>
 
 #include "FreeRTOS.h"
 #include "timers.h" // provides FreeRTOS timer support
