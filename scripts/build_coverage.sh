@@ -38,18 +38,21 @@ _install_lcov() {
 
 _install_lcov
 
-_normpath() {
-    python3 -c "import os.path; print(os.path.normpath('$@'))"
+# Get absolute path from a relative and normalize (e.g "foo/bar/../baz" -> "/path/to/foo/baz")
+_abspath() {
+    python3 -c "import os.path; print(os.path.abspath('$@'))"
 }
 
-CHIP_ROOT=$(_normpath "$(dirname "$0")/..")
+CHIP_ROOT=$(_abspath "$(dirname "$0")/..")
 OUTPUT_ROOT="$CHIP_ROOT/out/coverage"
 COVERAGE_ROOT="$OUTPUT_ROOT/coverage"
 SUPPORTED_CODE=(core clusters all)
 CODE="core"
+QUIET_FLAG=()
+ACCUMULATE=false
 
 skip_gn=false
-TEST_TARGET=check
+TEST_TARGET=(check)
 
 # By default, do not run YAML or Python tests
 ENABLE_YAML=false
@@ -60,6 +63,8 @@ help() {
     echo
     echo "Misc:"
     echo "    -h, --help              Print this help, then exit."
+    echo "    -q, --quiet             Decrease verbosity level."
+    echo "    -a, --accumulate        Accumulate coverage data from previous runs."
     echo
     echo "Build/Output options:"
     echo "    -o, --output_root=DIR   Set the build output directory."
@@ -76,7 +81,7 @@ help() {
     echo "    --python                In addition to unit tests, run Python-based tests."
     echo "                            Both can be combined if needed."
     echo
-    echo "    --target=TARGET         Specific test target to run for unit tests (e.g. 'TestEmberAttributeBuffer.run')."
+    echo "    --target=TARGET         Specify one or more test targets to run for unit tests (e.g. 'TestEmberAttributeBuffer.run' or 'TestBleLayer.run TestBtpEngine.run')."
     echo
 }
 
@@ -97,6 +102,7 @@ for i in "$@"; do
             ;;
         --target=*)
             TEST_TARGET="${i#*=}"
+            IFS=' ' read -ra TEST_TARGET <<<"$TEST_TARGET"
             shift
             ;;
         -o=* | --output_root=*)
@@ -113,6 +119,14 @@ for i in "$@"; do
             ENABLE_PYTHON=true
             shift
             ;;
+        -q | --quiet)
+            QUIET_FLAG=("--quiet")
+            shift
+            ;;
+        -a | --accumulate)
+            ACCUMULATE=true
+            shift
+            ;;
         *)
             echo "Unknown Option \"$1\""
             echo
@@ -126,6 +140,16 @@ done
 if [[ ! " ${SUPPORTED_CODE[@]} " =~ " ${CODE} " ]]; then
     echo "ERROR: Code $CODE not supported"
     exit 1
+fi
+
+# Set coverage data to zero if not accumulating
+if [[ -d "$OUTPUT_ROOT/obj/src" && "$ACCUMULATE" == false ]]; then
+    lcov --zerocounters --directory "$OUTPUT_ROOT/obj/src" \
+        --ignore-errors format,unsupported,inconsistent,unused \
+        --exclude="$CHIP_ROOT"/zzz_generated/* \
+        --exclude="$CHIP_ROOT"/third_party/* \
+        --exclude=/usr/include/* \
+        "${QUIET_FLAG[@]}"
 fi
 
 # ------------------------------------------------------------------------------
@@ -151,7 +175,7 @@ if [ "$skip_gn" == false ]; then
     #
     # 1) Always run unit tests
     #
-    ninja -C "$OUTPUT_ROOT" "$TEST_TARGET"
+    ninja -C "$OUTPUT_ROOT" "${TEST_TARGET[@]}"
 
     #
     # 2) Run YAML tests if requested
@@ -217,37 +241,40 @@ fi
 # ------------------------------------------------------------------------------
 mkdir -p "$COVERAGE_ROOT"
 
-lcov --initial --capture --directory "$OUTPUT_ROOT/obj/src" \
-    --ignore-errors inconsistent \
-    --exclude="$PWD"/zzz_generated/* \
-    --exclude="$PWD"/third_party/* \
+lcov --capture --initial --directory "$OUTPUT_ROOT/obj/src" \
+    --ignore-errors format,unsupported,inconsistent,unused \
+    --exclude="$CHIP_ROOT"/zzz_generated/* \
+    --exclude="$CHIP_ROOT"/third_party/* \
     --exclude=/usr/include/* \
-    --ignore-errors format,unsupported,inconsistent \
-    --output-file "$COVERAGE_ROOT/lcov_base.info"
+    --output-file "$COVERAGE_ROOT/lcov_base.info" \
+    "${QUIET_FLAG[@]}"
 
 lcov --capture --directory "$OUTPUT_ROOT/obj/src" \
-    --ignore-errors format,unsupported,inconsistent \
-    --exclude="$PWD"/zzz_generated/* \
-    --exclude="$PWD"/third_party/* \
+    --ignore-errors format,unsupported,inconsistent,unused \
+    --exclude="$CHIP_ROOT"/zzz_generated/* \
+    --exclude="$CHIP_ROOT"/third_party/* \
     --exclude=/usr/include/* \
-    --output-file "$COVERAGE_ROOT/lcov_test.info"
+    --output-file "$COVERAGE_ROOT/lcov_test.info" \
+    "${QUIET_FLAG[@]}"
 
-lcov --ignore-errors format,unsupported,inconsistent \
+lcov --ignore-errors format,unsupported,inconsistent,unused \
     --add-tracefile "$COVERAGE_ROOT/lcov_base.info" \
     --add-tracefile "$COVERAGE_ROOT/lcov_test.info" \
-    --output-file "$COVERAGE_ROOT/lcov_final.info"
+    --output-file "$COVERAGE_ROOT/lcov_final.info" \
+    "${QUIET_FLAG[@]}"
 
 genhtml "$COVERAGE_ROOT/lcov_final.info" \
     --ignore-errors inconsistent,category,count \
     --rc max_message_count=1000 \
     --output-directory "$COVERAGE_ROOT/html" \
     --title "SHA:$(git rev-parse HEAD)" \
-    --header-title "Matter SDK Coverage Report"
+    --header-title "Matter SDK Coverage Report" \
+    "${QUIET_FLAG[@]}"
 
 cp "$CHIP_ROOT/integrations/appengine/webapp_config.yaml" \
     "$COVERAGE_ROOT/webapp_config.yaml"
 
-HTML_INDEX=$(_normpath "$COVERAGE_ROOT/html/index.html")
+HTML_INDEX=$(_abspath "$COVERAGE_ROOT/html/index.html")
 if [ -f "$HTML_INDEX" ]; then
     echo
     echo "============================================================"
