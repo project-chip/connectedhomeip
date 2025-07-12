@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <cctype>
 #include <nlassert.h>
 
 #include "BufferWriter.h"
@@ -89,15 +90,34 @@ private:
     }
 };
 
-/// a preallocated sized string builder
+/// A preallocated sized string builder
 template <size_t kSize>
 class StringBuilder : public StringBuilderBase
 {
 public:
     StringBuilder() : StringBuilderBase(mBuffer, kSize) {}
 
+    StringBuilder(const char * data, size_t length, bool add_marker_if_overflow = true) : StringBuilder()
+    {
+        AddFormat("%.*s", static_cast<int>(length), data);
+        if (add_marker_if_overflow)
+        {
+            AddMarkerIfOverflow();
+        }
+    }
+
+    StringBuilder(const CharSpan & span, bool add_marker_if_overflow = true) :
+        StringBuilder(span.data(), span.size(), add_marker_if_overflow)
+    {}
+
 private:
     char mBuffer[kSize];
 };
+
+/// Default buffer size is 257 to accommodate values with size up to 256
+/// If the buffer size is not enough the value will be truncated and an overflow marker will be added
+/// TODO Note that this buffer size will be used always even for much smaller values
+/// TODO Preferably the buffer size should be the one appropriate for each value
+using NullTerminated = StringBuilder<257>;
 
 } // namespace chip

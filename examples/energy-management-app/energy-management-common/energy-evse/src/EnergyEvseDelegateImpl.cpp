@@ -753,7 +753,7 @@ Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
     memcpy(mVehicleIDBuf, newValue.data(), newValue.size());
     mVehicleID = MakeNullable(CharSpan(mVehicleIDBuf, newValue.size()));
 
-    ChipLogDetail(AppServer, "VehicleID updated %.*s", static_cast<int>(mVehicleID.Value().size()), mVehicleID.Value().data());
+    ChipLogDetail(AppServer, "VehicleID updated %s", NullTerminated(mVehicleID.Value()).c_str());
     MatterReportingAttributeChangeCallback(mEndpointId, EnergyEvse::Id, VehicleID::Id);
 
     return Status::Success;

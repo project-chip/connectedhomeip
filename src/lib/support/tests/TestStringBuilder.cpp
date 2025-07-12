@@ -108,6 +108,20 @@ TEST(TestStringBuilder, TestFormat)
         EXPECT_TRUE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "Multi: 1234, then 0x00AB");
     }
+
+    {
+        char str[] = "1234567890";
+        StringBuilder<11> builder(str, strlen(str));
+        EXPECT_TRUE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "1234567890");
+    }
+
+    {
+        char str[] = "1234567890";
+        StringBuilder<11> builder(CharSpan::fromCharString(str));
+        EXPECT_TRUE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "1234567890");
+    }
 }
 
 TEST(TestStringBuilder, TestFormatOverflow)
@@ -153,6 +167,20 @@ TEST(TestStringBuilder, TestFormatOverflow)
 
         builder.AddMarkerIfOverflow();
         EXPECT_STREQ(builder.c_str(), "1234abc...");
+    }
+
+    {
+        char str[] = "1234567890a";
+        StringBuilder<11> builder(str, strlen(str), false);
+        EXPECT_FALSE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "1234567890");
+    }
+
+    {
+        char str[] = "1234567890a";
+        StringBuilder<11> builder(CharSpan::fromCharString(str), false);
+        EXPECT_FALSE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "1234567890");
     }
 }
 
@@ -216,6 +244,20 @@ TEST(TestStringBuilder, TestOverflowMarker)
 
         builder.AddMarkerIfOverflow();
         EXPECT_STREQ(builder.c_str(), "a...");
+    }
+
+    {
+        char str[] = "1234567890a";
+        StringBuilder<11> builder(str, strlen(str));
+        EXPECT_FALSE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "1234567...");
+    }
+
+    {
+        char str[] = "1234567890a";
+        StringBuilder<11> builder(CharSpan::fromCharString(str));
+        EXPECT_FALSE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "1234567...");
     }
 }
 
