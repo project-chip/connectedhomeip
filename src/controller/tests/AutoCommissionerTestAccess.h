@@ -33,7 +33,7 @@
 namespace chip {
 
 namespace Test {
-
+// Provides access to private/protected members of AutoCommissioner class for testing
 class AutoCommissionerTestAccess
 {
 public:
