@@ -298,6 +298,7 @@ TEST_F(AutoCommissionerTest, NextCommissioningStageAfterError)
     EXPECT_EQ(stage, kCleanup);
 }
 
+// Verifies that the commissioner proceeds to ConfigureTCAcknowledgments under the correct conditions.
 TEST_F(AutoCommissionerTest, NextStageReadCommissioningInfo)
 {
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
@@ -318,6 +319,7 @@ TEST_F(AutoCommissionerTest, NextStageReadCommissioningInfo)
     EXPECT_EQ(nextStageReadCommissioningInfo, nextStageSendNOC);
 }
 
+// Ensures TCAcknowledgment stage is triggered only under expected commissioning conditions.
 TEST_F(AutoCommissionerTest, NextStageConfigureTCAcknowledgments)
 {
     AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
