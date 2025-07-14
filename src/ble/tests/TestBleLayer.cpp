@@ -408,6 +408,7 @@ TEST_F(TestBleLayer, ExceedBleConnectionEndPointLimit)
     EXPECT_FALSE(HandleWriteReceivedCapabilitiesRequest(connObj));
 }
 
+// Verify connection attempt fails when BleLayer is unitialized
 TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNotInitialized)
 {
     // Simulate BleLayer not being initialized by calling Shutdown
@@ -424,6 +425,7 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNotInitialized)
     EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_ERROR_INCORRECT_STATE);
 }
 
+// Verify connection attempt fails when there is no BleConnectionDelegate
 TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoConnectionDelegate)
 {
     // Set up the BleLayerTestAccess accessor class to manipulate the BleConnectionDelegate of BleLayer
@@ -439,6 +441,7 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoConnectionDelegate)
     EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_ERROR_INCORRECT_STATE);
 }
 
+// Verify connection fails when Ble Transport Layer is missing
 TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoBleTransportLayer)
 {
     chip::Test::BleLayerTestAccess access(this);
@@ -454,6 +457,7 @@ TEST_F(TestBleLayer, NewBleConnectionByDiscriminatorsNoBleTransportLayer)
     EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_ERROR_INCORRECT_STATE);
 }
 
+// Simulate successfull connection callback from delegate
 TEST_F(TestBleLayer, NewConnectionByDiscriminatorsSuccess)
 {
     chip::Test::BleLayerTestAccess access(this);
@@ -517,6 +521,7 @@ TEST_F(TestBleLayer, NewConnectionByDiscriminatorsError)
     EXPECT_EQ(mOnConnectionErrorCount, 1);
 }
 
+// Connection attempt with empty list of discriminators
 TEST_F(TestBleLayer, NewConnectionByDiscriminatorsEmptySpan)
 {
     chip::Test::BleLayerTestAccess access(this);
