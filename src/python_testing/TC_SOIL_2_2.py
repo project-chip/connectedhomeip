@@ -117,7 +117,7 @@ class TC_SOIL_2_2(MatterBaseTest):
         asserts.assert_less_equal(measurement_after_action, max_bound, "SoilMoistureMeasuredValue is out of range")
 
         self.step(7)
-        count = sub_handler.attribute_report_counts[attributes.SoilMoistureMeasuredValue]
+        count = sub_handler.attribute_report_counts.get(attributes.SoilMoistureMeasuredValue, 0)
         asserts.assert_greater_equal(count, 1, "Unexpected number of SoilMoistureMeasuredValue reports")
 
 
