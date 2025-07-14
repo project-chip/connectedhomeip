@@ -222,7 +222,7 @@ class TC_ZONEMGMT_2_3(MatterBaseTest):
             logger.info(f"Rx'd Zones: {zones}")
             matchingZone = next(
                 (z for z in zones if z.zoneSource == enums.ZoneSourceEnum.kMfg), None)
-            if matchingZone != None:
+            if matchingZone is not None:
                 self.step("4")
                 logger.info(f"Found Mfg Zone with Id : {matchingZone.zoneID}")
 
