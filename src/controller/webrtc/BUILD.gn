@@ -1,0 +1,55 @@
+# Copyright (c) 2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/nlassert.gni")
+
+import("${chip_root}/build/chip/tools.gni")
+import("${chip_root}/src/app/common_flags.gni")
+
+import("${chip_root}/build/chip/buildconfig_header.gni")
+
+static_library("chip_webrtc") {
+  sources = [
+    "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.cpp",
+    "${chip_root}/src/app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h",
+    "${chip_root}/src/controller/python/chip/native/PyChipError.h",
+    "WebRTCClient.cpp",
+    "WebRTCClient.h",
+    "WebRTCTransportProviderClient.cpp",
+    "WebRTCTransportProviderClient.h",
+    "WebRTCTransportRequestorManager.cpp",
+    "WebRTCTransportRequestorManager.h",
+  ]
+
+  include_dirs = [
+    "${chip_root}/src/controller/webrtc/",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/third_party/libdatachannel/repo/include",
+  ]
+
+  deps = [
+    "${chip_root}/src/app:interaction-model",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+    "${chip_root}/third_party/libdatachannel:libdatachannel",
+  ]
+
+  libs = [
+    "ssl",
+    "crypto",
+  ]
+}

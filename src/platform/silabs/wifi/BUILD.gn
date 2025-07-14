@@ -147,6 +147,7 @@ source_set("wifi-platform") {
       "${silabs_platform_dir}/wifi/wiseconnect-interface/WiseconnectWifiInterface.cpp",
       "${silabs_platform_dir}/wifi/wiseconnect-interface/WiseconnectWifiInterface.h",
       "${wifi_sdk_root}/components/service/network_manager/src/sl_net_for_lwip.c",
+      "${wifi_sdk_root}/components/service/network_manager/src/sli_net_common_utility.c",
     ]
 
     public_deps += [ "${lwip_root}:lwip" ]

@@ -3619,7 +3619,7 @@ static BOOL AttributeIsSpecifiedInClosureDimensionCluster(AttributeId aAttribute
     case Attributes::CurrentState::Id: {
         return YES;
     }
-    case Attributes::Target::Id: {
+    case Attributes::TargetState::Id: {
         return YES;
     }
     case Attributes::Resolution::Id: {
@@ -3647,6 +3647,9 @@ static BOOL AttributeIsSpecifiedInClosureDimensionCluster(AttributeId aAttribute
         return YES;
     }
     case Attributes::ModulationType::Id: {
+        return YES;
+    }
+    case Attributes::LatchControlModes::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -3989,6 +3992,18 @@ static BOOL AttributeIsSpecifiedInThermostatCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::SetpointHoldExpiryTimestamp::Id: {
+        return YES;
+    }
+    case Attributes::MaxThermostatSuggestions::Id: {
+        return YES;
+    }
+    case Attributes::ThermostatSuggestions::Id: {
+        return YES;
+    }
+    case Attributes::CurrentThermostatSuggestion::Id: {
+        return YES;
+    }
+    case Attributes::ThermostatSuggestionNotFollowingReason::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
@@ -6544,6 +6559,9 @@ static BOOL AttributeIsSpecifiedInCommodityMeteringCluster(AttributeId aAttribut
     case Attributes::MeasurementType::Id: {
         return YES;
     }
+    case Attributes::MaximumMeteredQuantities::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -6714,6 +6732,9 @@ static BOOL AttributeIsSpecifiedInUnitTestingCluster(AttributeId aAttributeId)
         return YES;
     }
     case Attributes::GlobalStruct::Id: {
+        return YES;
+    }
+    case Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id: {
         return YES;
     }
     case Attributes::Unsupported::Id: {

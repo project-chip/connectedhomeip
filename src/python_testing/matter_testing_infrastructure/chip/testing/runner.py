@@ -55,7 +55,7 @@ except ImportError:
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from chip.testing.matter_testing import MatterTestConfig
+    from chip.testing.matter_test_config import MatterTestConfig
 
 
 class InternalTestRunnerHooks(TestRunnerHooks):
@@ -481,7 +481,8 @@ class MockTestRunner():
     def __init__(self, abs_filename: str, classname: str, test: str, endpoint: int = None,
                  pics: dict[str, bool] = None, paa_trust_store_path=None):
 
-        from chip.testing.matter_testing import MatterStackState, MatterTestConfig
+        from chip.testing.matter_test_config import MatterTestConfig
+        from chip.testing.matter_testing import MatterStackState
 
         self.kvs_storage = 'kvs_admin.json'
         self.config = MatterTestConfig(endpoint=endpoint, paa_trust_store_path=paa_trust_store_path,
@@ -511,7 +512,7 @@ class MockTestRunner():
         self.test_class = getattr(module, classname)
 
     def set_test_config(self, test_config: 'MatterTestConfig' = None):
-        from chip.testing.matter_testing import MatterTestConfig
+        from chip.testing.matter_test_config import MatterTestConfig
         if test_config is None:
             test_config = MatterTestConfig()
 

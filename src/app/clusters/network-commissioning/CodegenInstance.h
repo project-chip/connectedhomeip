@@ -26,12 +26,11 @@ namespace app {
 namespace Clusters {
 namespace NetworkCommissioning {
 
-/// Automates integration of a NetworkCommissioningCluster
-/// with the CodegenDataModelInterface.
+/// Automates integration of a NetworkCommissioningCluster with CodegenDataModelProvider.
 ///
-/// This class exists as a compatibility layer with the original
-/// network-commissioning class, however it only exposes Init/Shutdown and
-/// relevant constructors
+/// This class provides a very thin wrapper around the NetworkCommissioningCluster and its
+/// registration within the CodegenDataModelProvider.
+///
 class Instance
 {
 public:
@@ -39,7 +38,10 @@ public:
     using ThreadDriver   = DeviceLayer::NetworkCommissioning::ThreadDriver;
     using EthernetDriver = DeviceLayer::NetworkCommissioning::EthernetDriver;
 
+    /// Calls Init on the cluster and registers the cluster within the CodegenDataModelProvider Registry
     CHIP_ERROR Init();
+
+    /// Calls Shutdown on the cluster and unregisters the cluster from the CodegenDataModelProvider Registry
     void Shutdown();
 
     Instance(EndpointId aEndpointId, WiFiDriver * apDelegate) : mCluster(aEndpointId, apDelegate) {}
@@ -50,14 +52,14 @@ private:
     RegisteredServerCluster<NetworkCommissioningCluster> mCluster;
 };
 
-// The InstanceAndDriver class encapsulates the creation and management of a transport driver instance (Wifi,Thread or Ethernet)
+// The InstanceAndDriver class encapsulates the creation and management of a transport driver instance (Wi-Fi, Thread, or Ethernet)
 // together with a NetworkCommissioningCluster instance.
 // It provides a unified interface to initialize, configure, and operate both components,
 // ensuring they are properly linked for network commissioning operations. This class simplifies the integration process by handling
 // the instantiation and lifecycle of both the transport driver and the cluster as a single unit.
 //
-// Until all platform driver instance is migrated to use this class, Instance constructors remain public to maintain both
-// instantiation methodes. Once the transition is completed, the construtors will be moved to the private section.
+// Until all platform driver instances are migrated to use this class, Instance constructors remain public to maintain both
+// instantiation methods. Once the transition is complete, the constructors will be moved to the private section.
 template <typename TransportDriver>
 class InstanceAndDriver : public Instance
 {
