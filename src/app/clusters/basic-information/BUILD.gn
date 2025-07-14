@@ -25,7 +25,6 @@ source_set("basic-information") {
     "${chip_root}/src/app:constants",
     "${chip_root}/src/app:interaction-model",
     "${chip_root}/src/app/server-cluster",
-    "${chip_root}/src/app/storage:attribute-storage",
     "${chip_root}/src/platform",
     "${chip_root}/zzz_generated/app-common/clusters/BasicInformation",
   ]

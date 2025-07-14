@@ -19,6 +19,7 @@
 #include <app/data-model-provider/ActionContext.h>
 #include <app/data-model-provider/Context.h>
 #include <app/data-model-provider/Provider.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server-cluster/ServerClusterContext.h>
 #include <app/server-cluster/testing/EmptyProvider.h>
 #include <app/server-cluster/testing/TestEventGenerator.h>
@@ -36,16 +37,6 @@ public:
     Messaging::ExchangeContext * CurrentExchange() override { return nullptr; }
 };
 
-/// TODO: this is a useless class. For testing purposes we should
-///       extend this to something sensible
-class ErrorAttributeStorage : public app::Storage::AttributeStorage
-{
-public:
-    CHIP_ERROR Write(const app::ConcreteAttributePath & path, const Value & value) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-
-    CHIP_ERROR Read(const app::ConcreteAttributePath & path, Buffer buffer) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-};
-
 /// This is a ServerClusterContext that is initialized with VALID
 /// entries that can then be used during testing
 ///
@@ -60,7 +51,6 @@ public:
         mContext{
             .provider           = &mTestProvider,
             .storage            = &mTestStorage,
-            .attributeStorage   = &mAttributeStorage,
             .interactionContext = &mTestContext,
         }
     {
@@ -75,9 +65,12 @@ public:
     /// Create a new context bound to this test context
     app::ServerClusterContext Create()
     {
+        mDefaultAttributePersistenceProvider.Init(&mTestStorage);
+
         return {
             .provider           = &mTestProvider,
             .storage            = &mTestStorage,
+            .attributeStorage   = &mDefaultAttributePersistenceProvider,
             .interactionContext = &mTestContext,
 
         };
@@ -86,6 +79,7 @@ public:
     LogOnlyEvents & EventsGenerator() { return mTestEventsGenerator; }
     TestProviderChangeListener & ChangeListener() { return mTestDataModelChangeListener; }
     TestPersistentStorageDelegate & StorageDelegate() { return mTestStorage; }
+    app::DefaultAttributePersistenceProvider & AttributePersistenceProvider() { return mDefaultAttributePersistenceProvider; }
     app::DataModel::InteractionModelContext & ImContext() { return mTestContext; }
 
 private:
@@ -94,7 +88,7 @@ private:
     TestProviderChangeListener mTestDataModelChangeListener;
     EmptyProvider mTestProvider;
     TestPersistentStorageDelegate mTestStorage;
-    ErrorAttributeStorage mAttributeStorage;
+    app::DefaultAttributePersistenceProvider mDefaultAttributePersistenceProvider;
 
     app::DataModel::InteractionModelContext mTestContext;
 

@@ -127,6 +127,7 @@ BallastConfiguration
 BarrierControl
 BasicCHIPRegression
 BasicInformation
+Batcher
 baudrate
 BCM
 BD
@@ -309,6 +310,7 @@ ContentLauncher
 contrib
 controllee
 conv
+Cooktop
 CopperConcentrationMeasurement
 Corstone
 cortexa
@@ -571,6 +573,7 @@ FFF
 FFFFFFFFFFFF0102
 fffe
 fffff
+FFmpeg
 Fi
 filepath
 fini
@@ -1159,6 +1162,7 @@ PRs
 PSA
 PSCAN
 PSECT
+Pseudocode
 PSK
 PSoC
 PTR

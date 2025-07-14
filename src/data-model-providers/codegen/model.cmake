@@ -31,10 +31,6 @@ SET(CODEGEN_DATA_MODEL_SOURCES
   "${BASE_DIR}/ServerClusterInterfaceRegistry.cpp"
   "${BASE_DIR}/ServerClusterInterfaceRegistry.h"
 
-  # "${chip_root}/src/data-model-providers/codegen:attribute-storage",
-  "${BASE_DIR}/EmberAttributeStorageImpl.cpp"
-  "${BASE_DIR}/EmberAttributeStorageImpl.h"
-
   # "${chip_root}/src/app/server-cluster",
   "${BASE_DIR}/../../app/server-cluster/DefaultServerCluster.cpp"
   "${BASE_DIR}/../../app/server-cluster/DefaultServerCluster.h"
@@ -42,4 +38,3 @@ SET(CODEGEN_DATA_MODEL_SOURCES
   "${BASE_DIR}/../../app/server-cluster/ServerClusterInterface.cpp"
   "${BASE_DIR}/../../app/server-cluster/ServerClusterInterface.h"
 )
-

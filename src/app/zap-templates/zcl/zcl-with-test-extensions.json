@@ -211,14 +211,14 @@
         "Chime": ["SelectedChime", "Enabled"],
         "Closure Control": [
             "CountdownTime",
-            "OverallState",
-            "OverallTarget",
+            "OverallCurrentState",
+            "OverallTargetState",
             "FeatureMap",
             "ClusterRevision"
         ],
         "Closure Dimension": [
             "CurrentState",
-            "Target",
+            "TargetState",
             "UnitRange",
             "LimitRange",
             "FeatureMap",
@@ -799,7 +799,9 @@
             "ClusterRevision"
         ],
         "Unit Localization": ["TemperatureUnit"],
-        "Zone Management": ["TwoDCartesianMax"]
+        "Zone Management": ["TwoDCartesianMax"],
+        "TLS Client Management": ["ClusterRevision", "MaxProvisioned"],
+        "Thermostat": ["CurrentThermostatSuggestion"]
     },
     "mandatoryDeviceTypes": "0x0016",
     "defaultReportingPolicy": "mandatory",

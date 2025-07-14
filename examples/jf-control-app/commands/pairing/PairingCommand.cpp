@@ -36,12 +36,22 @@
 
 using namespace ::chip;
 using namespace ::chip::Controller;
+using namespace chip::Credentials;
 
 CHIP_ERROR PairingCommand::RunCommand()
 {
     CurrentCommissioner().RegisterPairingDelegate(this);
+    /* TODO: if JFA is onboarded get the administrator CAT initial version from JF_DS@GroupList (through RPC)
+     * https://github.com/project-chip/connectedhomeip/issues/39443
+     */
     chip::CASEAuthTag administratorCAT   = GetAdminCATWithVersion(CHIP_CONFIG_ADMINISTRATOR_CAT_INITIAL_VERSION);
     NodeId administratorCaseAdminSubject = NodeIdFromCASEAuthTag(administratorCAT);
+
+    /* TODO: if JFA is onboarded get the Anchor CAT initial version from JF_DS@GroupList (through RPC)
+     * https://github.com/project-chip/connectedhomeip/issues/39443
+     */
+    chip::CASEAuthTag anchorCAT   = GetAnchorCATWithVersion(CHIP_CONFIG_ANCHOR_CAT_INITIAL_VERSION);
+    NodeId anchorCaseAdminSubject = NodeIdFromCASEAuthTag(anchorCAT);
 
     if (mAnchorNodeId == chip::kUndefinedNodeId)
     {
@@ -52,8 +62,6 @@ CHIP_ERROR PairingCommand::RunCommand()
         }
         else
         {
-            chip::CASEAuthTag anchorCAT = GetAnchorCATWithVersion(CHIP_CONFIG_ANCHOR_CAT_INITIAL_VERSION);
-
             if (mExecuteJCM.ValueOr(false))
             {
                 ChipLogError(JointFabric, "--anchor and --execute-jcm options are not allowed simultaneously!");
@@ -75,15 +83,26 @@ CHIP_ERROR PairingCommand::RunCommand()
         mSkipCommissioningComplete = MakeOptional(true);
     }
 
+    mDeviceIsICD = false;
+
     // Clear the CATs in OperationalCredentialsIssuer
     mCredIssuerCmds->SetCredentialIssuerCATValues(kUndefinedCATs);
 
     // All the AddNOC commands invoked by JFC will have
     // the value below for the CaseAdminSubject field
-    (static_cast<ExampleCredentialIssuerCommands *>(mCredIssuerCmds))
-        ->SetCredentialIssuerCaseAdminSubject(administratorCaseAdminSubject);
+    if (mExecuteJCM.ValueOr(false))
+    {
+        // JFA-B will be issued a NOC with Administrator CAT
+        mCASEAuthTags = MakeOptional(std::vector<uint32_t>{ administratorCAT });
 
-    mDeviceIsICD = false;
+        (static_cast<ExampleCredentialIssuerCommands *>(mCredIssuerCmds))
+            ->SetCredentialIssuerCaseAdminSubject(anchorCaseAdminSubject);
+    }
+    else
+    {
+        (static_cast<ExampleCredentialIssuerCommands *>(mCredIssuerCmds))
+            ->SetCredentialIssuerCaseAdminSubject(administratorCaseAdminSubject);
+    }
 
     if (mCASEAuthTags.HasValue() && mCASEAuthTags.Value().size() <= kMaxSubjectCATAttributeCount)
     {
@@ -121,6 +140,17 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
         break;
     case PairingMode::Ble:
         err = Pair(remoteId, PeerAddress::BLE());
+        break;
+    case PairingMode::Nfc:
+        if (mDiscriminator.has_value())
+        {
+            err = Pair(remoteId, PeerAddress::NFC(mDiscriminator.value()));
+        }
+        else
+        {
+            // Discriminator is mandatory
+            err = CHIP_ERROR_MESSAGE_INCOMPLETE;
+        }
         break;
     case PairingMode::OnNetwork:
         err = PairWithMdns(remoteId);
@@ -478,12 +508,23 @@ namespace {
 constexpr uint32_t kRpcTimeoutMs     = 1000;
 constexpr uint32_t kDefaultChannelId = 1;
 
+struct RequestOptionsContext
+{
+    RequestOptionsContext(uint64_t fabricId, TransactionType transactionType) :
+        mAnchorFabricId(fabricId), mTransactionType(transactionType)
+    {}
+
+    uint64_t mAnchorFabricId;
+    TransactionType mTransactionType;
+};
+
 ::pw_rpc::nanopb::JointFabric::Client rpcClient(chip::rpc::client::GetDefaultRpcClient(), kDefaultChannelId);
 
 std::mutex responseMutex;
 std::condition_variable responseCv;
-bool responseReceived    = false;
-CHIP_ERROR responseError = CHIP_NO_ERROR;
+bool responseReceived                                  = false;
+CHIP_ERROR responseError                               = CHIP_NO_ERROR;
+CredentialIssuerCommands * pkiProviderCredentialIssuer = nullptr;
 
 // By passing the `call` parameter into WaitForResponse we are explicitly trying to insure the caller takes into consideration that
 // the lifetime of the `call` object when calling WaitForResponse
@@ -504,8 +545,7 @@ CHIP_ERROR WaitForResponse(CallType & call)
     }
 }
 
-// Callback function to be called when the RPC response is received
-void OnOwnershipTransferDone(const _pw_protobuf_Empty & response, ::pw::Status status)
+void OnRPCTransferDone(const _pw_protobuf_Empty & response, ::pw::Status status)
 {
     std::lock_guard<std::mutex> lock(responseMutex);
     responseReceived = true;
@@ -514,18 +554,87 @@ void OnOwnershipTransferDone(const _pw_protobuf_Empty & response, ::pw::Status s
 
     if (status.ok())
     {
-        ChipLogProgress(JointFabric, "OnOwnershipTransferDone RPC call succeeded!");
+        ChipLogProgress(JointFabric, "OnRPCTransferDone RPC call succeeded!");
     }
     else
     {
-        ChipLogProgress(JointFabric, "OnOwnershipTransferDone RPC call failed with status: %d\n", status.code());
+        ChipLogProgress(JointFabric, "OnRPCTransferDone RPC call failed with status: %d\n", status.code());
+    }
+}
+
+static void GenerateReplyWork(intptr_t arg)
+{
+    CHIP_ERROR err = CHIP_ERROR_INTERNAL;
+    uint8_t buf[kMaxDERCertLength];
+    MutableByteSpan generatedCertificate(buf, kMaxDERCertLength);
+    Response rsp;
+    ::pw::rpc::NanopbUnaryReceiver<::pw_protobuf_Empty> call;
+
+    RequestOptionsContext * request = reinterpret_cast<RequestOptionsContext *>(arg);
+    VerifyOrExit(request, ChipLogError(JointFabric, "GenerateReplyWork: invalid request"));
+    VerifyOrExit(pkiProviderCredentialIssuer, ChipLogError(JointFabric, "GenerateReplyWork: no PKI provider"));
+
+    switch (request->mTransactionType)
+    {
+    case TransactionType::TransactionType_ICAC_CSR: {
+        err = (static_cast<ExampleCredentialIssuerCommands *>(pkiProviderCredentialIssuer))->GenerateIcacCsr(generatedCertificate);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(JointFabric, "GenerateIcacCsr failed");
+        }
+        break;
+    }
+    default: {
+        err = CHIP_ERROR_INVALID_ARGUMENT;
+        break;
+    }
+    }
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(JointFabric, "GenerateReplyWork: invalid request"));
+
+    memcpy(rsp.response_bytes.bytes, generatedCertificate.data(), generatedCertificate.size());
+    rsp.response_bytes.size = (short unsigned int) generatedCertificate.size();
+
+    call = rpcClient.ResponseStream(rsp, OnRPCTransferDone);
+    VerifyOrExit(rpcClient.ResponseStream(rsp, OnRPCTransferDone).active(),
+                 ChipLogError(JointFabric, "GenerateReplyWork: stream error"));
+    VerifyOrExit(CHIP_NO_ERROR == WaitForResponse(call), ChipLogError(JointFabric, "GenerateReplyWork: stream error"));
+
+exit:
+    if (request)
+    {
+        Platform::Delete(request);
+    }
+}
+
+void OnGetStreamOnNext(const RequestOptions & requestOptions)
+{
+    ChipLogProgress(JointFabric, "OnGetStreamOnNext, fabricId: %ld", requestOptions.anchor_fabric_id);
+
+    RequestOptionsContext * options =
+        Platform::New<RequestOptionsContext>(requestOptions.anchor_fabric_id, requestOptions.transaction_type);
+
+    if (options)
+    {
+        DeviceLayer::PlatformMgr().ScheduleWork(GenerateReplyWork, reinterpret_cast<intptr_t>(options));
+    }
+}
+
+void OnGetStreamOnDone(::pw::Status status)
+{
+    if (status.ok())
+    {
+        ChipLogProgress(JointFabric, "GetStream RPC successfully closed!");
+    }
+    else
+    {
+        ChipLogProgress(JointFabric, "GetStream RPC closed with error: %d\n", status.code());
     }
 }
 
 } // namespace
 
 void PairingCommand::OnCommissioningComplete(NodeId nodeId, const Optional<Crypto::P256PublicKey> & trustedIcacPublicKeyB,
-                                             CHIP_ERROR err)
+                                             uint16_t peerAdminJFAdminClusterEndpointId, CHIP_ERROR err)
 {
     if (err == CHIP_NO_ERROR)
     {
@@ -533,6 +642,22 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, const Optional<Crypt
         {
             ChipLogProgress(JointFabric, "Anchor Administrator commissioned with sucess");
             mAnchorNodeId = nodeId;
+
+            _pw_protobuf_Empty request;
+
+            ::pw::rpc::NanopbClientReader<::RequestOptions> localStream =
+                rpcClient.GetStream(request, OnGetStreamOnNext, OnGetStreamOnDone);
+            if (!localStream.active())
+            {
+                ChipLogError(JointFabric, "RPC: Opening GetStream Error");
+                SetCommandExitStatus(CHIP_ERROR_SHUT_DOWN);
+                return;
+            }
+            else
+            {
+                rpcGetStream                = std::move(localStream);
+                pkiProviderCredentialIssuer = mCredIssuerCmds;
+            }
         }
         else
         {
@@ -546,7 +671,7 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, const Optional<Crypt
             {
                 request.jcm = true;
 
-                if (trustedIcacPublicKeyB.HasValue())
+                if (trustedIcacPublicKeyB.HasValue() && (peerAdminJFAdminClusterEndpointId != kInvalidEndpointId))
                 {
                     memcpy(request.trustedIcacPublicKeyB.bytes, trustedIcacPublicKeyB.Value().ConstBytes(),
                            Crypto::kP256_PublicKey_Length);
@@ -557,26 +682,32 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, const Optional<Crypt
                         ChipLogProgress(JointFabric, "trustedIcacPublicKeyB[%li] = %02X", i,
                                         request.trustedIcacPublicKeyB.bytes[i]);
                     }
+
+                    request.peerAdminJFAdminClusterEndpointId = peerAdminJFAdminClusterEndpointId;
                 }
                 else
                 {
                     SetCommandExitStatus(CHIP_ERROR_INVALID_ARGUMENT);
-                    ChipLogError(chipTool, "JCM requested but peer Admin ICAC not found");
+                    ChipLogError(chipTool,
+                                 "JCM requested but trustedIcacPublicKeyB/peerAdminJFAdminClusterEndpointId are invalid!");
                     return;
                 }
             }
 
-            auto call = rpcClient.TransferOwnership(request, OnOwnershipTransferDone);
+            auto call = rpcClient.TransferOwnership(request, OnRPCTransferDone);
             if (!call.active())
             {
                 ChipLogError(JointFabric, "RPC: OwnershipTransfer Call Error");
-                // The RPC call was not sent. This could occur due to, for example, an invalid channel ID. Handle if necessary.
+                SetCommandExitStatus(CHIP_ERROR_SHUT_DOWN);
+                return;
             }
 
             err = WaitForResponse(call);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(JointFabric, "RPC: OwnershipTransfer Timeout Error");
+                SetCommandExitStatus(err);
+                return;
             }
         }
     }
