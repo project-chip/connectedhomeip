@@ -42,7 +42,7 @@ struct ThermostatSuggestionStructWithOwnedMembers : protected Structs::Thermosta
 {
 public:
     ThermostatSuggestionStructWithOwnedMembers() = default;
-    ThermostatSuggestionStructWithOwnedMembers(const ThermostatSuggestionStructWithOwnedMembers & other);
+    ThermostatSuggestionStructWithOwnedMembers(const ThermostatSuggestionStructWithOwnedMembers & other) = default;
     ThermostatSuggestionStructWithOwnedMembers(const Structs::ThermostatSuggestionStruct::Type & other);
     ThermostatSuggestionStructWithOwnedMembers & operator=(const Structs::ThermostatSuggestionStruct::Type & other);
     ThermostatSuggestionStructWithOwnedMembers & operator=(const ThermostatSuggestionStructWithOwnedMembers & other);
