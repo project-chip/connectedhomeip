@@ -83,7 +83,8 @@ public:
     ~BLEConnection() = default;
 
     std::string peerAddr;
-    unsigned int mtu           = 0;
+    unsigned int mtu = 0;
+    // These are handle copies managed by BLEManagerImpl.
     bt_gatt_h gattCharC1Handle = nullptr;
     bt_gatt_h gattCharC2Handle = nullptr;
 };
@@ -145,7 +146,7 @@ private:
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 
     void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
-    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override{};
+    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override {};
     CHIP_ERROR CancelConnection() override;
 
     //  ===== Members that implement virtual methods on ChipDeviceScannerDelegate
@@ -235,15 +236,17 @@ private:
     CHIP_ERROR StopBLEAdvertising();
     void CleanScanConfig();
 
-    CHIPoBLEServiceMode mServiceMode;
+    CHIPoBLEServiceMode mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     BitFlags<Flags> mFlags;
-    bool mIsCentral          = false;
-    void * mGattCharC1Handle = nullptr;
-    void * mGattCharC2Handle = nullptr;
-    uint32_t mAdapterId;
+
+    uint32_t mAdapterId = 0;
+    bool mIsCentral     = false;
+
     bt_advertiser_h mAdvertiser = nullptr;
     bool mAdvReqInProgress      = false;
 
+    bt_gatt_h mGattCharC1Handle = nullptr;
+    bt_gatt_h mGattCharC2Handle = nullptr;
     std::unordered_map<std::string, BLEConnection *> mConnectionMap;
 
     ChipDeviceScanner mDeviceScanner;
