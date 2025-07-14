@@ -299,7 +299,7 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
             self.skip_step("6")
             self.skip_step("6a")
 
-        if zoneID1 != None:
+        if zoneID1 is not None:
             self.step("7")
             try:
                 await self.send_single_cmd(endpoint=endpoint, cmd=commands.RemoveZone(zoneID=zoneID1))
@@ -341,7 +341,7 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
         logger.info(f"Rx'd Zones: {zones}")
         matchingZone = next(
             (z for z in zones if z.zoneSource == enums.ZoneSourceEnum.kMfg), None)
-        if matchingZone != None:
+        if matchingZone is not None:
             self.step("8")
             logger.info(f"Found Mfg Zone with Id : {matchingZone.zoneID}")
 
