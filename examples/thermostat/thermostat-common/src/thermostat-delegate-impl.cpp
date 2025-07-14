@@ -360,7 +360,7 @@ uint8_t ThermostatDelegate::GetUniqueID()
         }
     }
 
-    // TODO: Fix this to return an id that does not truly exist in the list. e.g. If the list has uinqueID 0 and 255 this will
+    // TODO: Fix this to return an id that does not truly exist in the list. e.g. If the list has uniqueID 0 and 255 this will
     // incorrectly return 0 which exists in the list and is not unique.
     return maxUniqueId + 1;
 }
