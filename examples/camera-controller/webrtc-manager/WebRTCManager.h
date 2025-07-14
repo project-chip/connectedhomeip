@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <functional>
 #include <platform/CHIPDeviceLayer.h>
 #include <rtc/rtc.hpp>
@@ -75,7 +76,8 @@ private:
     WebRTCManager();
     ~WebRTCManager();
 
-    chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer mWebRTCRequestorServer;
+    chip::app::LazyRegisteredServerCluster<chip::app::Clusters::WebRTCTransportRequestor::WebRTCTransportRequestorServer>
+        mWebRTCRegisteredServerCluster;
 
     WebRTCProviderClient mWebRTCProviderClient;
     WebRTCRequestorDelegate mWebRTCRequestorDelegate;

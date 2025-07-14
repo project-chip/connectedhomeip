@@ -1,5 +1,5 @@
 /**
- *    Copyright (c) 2022-2023 Project CHIP Authors
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -41,26 +41,23 @@ public:
     {}
 };
 
-// TODO: Make the policy more configurable by consumers.
 class AccessControlDelegate : public Access::AccessControl::Delegate
 {
     CHIP_ERROR Check(const SubjectDescriptor & subjectDescriptor, const RequestPath & requestPath,
                      Privilege requestPrivilege) override
     {
-        // Check for OTA Software Update Provider endpoint
-        bool isOtaEndpoint =
-            (requestPath.endpoint == kOtaProviderDynamicEndpointId && requestPath.cluster == OtaSoftwareUpdateProvider::Id);
+        // Check for WebRTC Transport Requestor endpoint
+        bool isWebRtcEndpoint =
+            (requestPath.endpoint == kWebRTCRequesterDynamicEndpointId && requestPath.cluster == WebRTCTransportRequestor::Id);
 
         // Only allow these specific endpoints
-        if (!isOtaEndpoint)
+        if (!isWebRtcEndpoint)
         {
             return CHIP_ERROR_ACCESS_DENIED;
         }
 
         if (requestPrivilege != Privilege::kOperate)
         {
-            // The commands on OtaSoftwareUpdateProvider all require
-            // Operate; we should not be asked for anything else.
             return CHIP_ERROR_ACCESS_DENIED;
         }
 
@@ -70,8 +67,6 @@ class AccessControlDelegate : public Access::AccessControl::Delegate
             // No idea who is asking; deny for now.
             return CHIP_ERROR_ACCESS_DENIED;
         }
-
-        // TODO do we care about the fabric index here?  Probably not.
 
         return CHIP_NO_ERROR;
     }
@@ -90,11 +85,11 @@ Global<ControllerAccessControl> gControllerAccessControl;
 
 namespace chip {
 namespace app {
-namespace dynamic_server {
+namespace AccessControl {
 void InitAccessControl()
 {
     gControllerAccessControl.get(); // force initialization
 }
-} // namespace dynamic_server
+} // namespace AccessControl
 } // namespace app
 } // namespace chip

@@ -18,7 +18,7 @@
 
 #include "WebRTCManager.h"
 
-#include <app/dynamic_server/AccessControl.h>
+#include <access-control/AccessControl.h>
 #include <commands/interactive/InteractiveCommands.h>
 #include <crypto/RandUtils.h>
 #include <lib/support/StringBuilder.h>
@@ -85,7 +85,7 @@ const char * GetGatheringStateStr(rtc::PeerConnection::GatheringState state)
 
 } // namespace
 
-WebRTCManager::WebRTCManager() : mWebRTCRequestorServer(kWebRTCRequesterDynamicEndpointId, mWebRTCRequestorDelegate) {}
+WebRTCManager::WebRTCManager() {}
 
 WebRTCManager::~WebRTCManager()
 {
@@ -94,8 +94,15 @@ WebRTCManager::~WebRTCManager()
 
 void WebRTCManager::Init()
 {
-    dynamic_server::InitAccessControl();
-    mWebRTCRequestorServer.Init();
+    AccessControl::InitAccessControl();
+
+    mWebRTCRegisteredServerCluster.Create(kWebRTCRequesterDynamicEndpointId, mWebRTCRequestorDelegate);
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(mWebRTCRegisteredServerCluster.Registration());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to register WebRTCTransportRequestor on endpoint %u: %" CHIP_ERROR_FORMAT,
+                     kWebRTCRequesterDynamicEndpointId, err.Format());
+    }
 }
 
 CHIP_ERROR WebRTCManager::HandleOffer(uint16_t sessionId, const WebRTCRequestorDelegate::OfferArgs & args)
@@ -250,7 +257,7 @@ CHIP_ERROR WebRTCManager::Connnect(Controller::DeviceCommissioner & commissioner
 
     chip::ScopedNodeId peerId(nodeId, fabricIndex);
 
-    mWebRTCProviderClient.Init(peerId, endpointId, &mWebRTCRequestorServer);
+    mWebRTCProviderClient.Init(peerId, endpointId, &mWebRTCRegisteredServerCluster.Cluster());
 
     rtc::InitLogger(rtc::LogLevel::Warning);
 
