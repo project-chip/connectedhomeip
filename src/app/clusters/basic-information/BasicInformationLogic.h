@@ -42,7 +42,7 @@ public:
     /// BasicInformationLogic is a SINGLETON according to the matter specification.
     static BasicInformationLogic & Instance();
 
-    CHIP_ERROR Init(AttributePersistenceProvider& storage);
+    CHIP_ERROR Init(AttributePersistenceProvider & storage);
 
     bool GetReachable() const { return mReachable; }
     bool GetLocalConfigDisabled() const { return mLocalConfigDisabled; }
@@ -50,7 +50,7 @@ public:
 
     // NOTE: these methods do NOT notify the cluster implementation of
     //       changes. Callers are responsible for that.
-    DataModel::ActionReturnStatus SetLocalConfigDisabled(bool value,AttributePersistenceProvider & storage);
+    DataModel::ActionReturnStatus SetLocalConfigDisabled(bool value, AttributePersistenceProvider & storage);
     DataModel::ActionReturnStatus SetNodeLabel(CharSpan label, AttributePersistenceProvider & storage);
     DataModel::ActionReturnStatus SetLocation(CharSpan location);
 
