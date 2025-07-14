@@ -47,6 +47,14 @@ void ApplicationInit()
     {
         ChipLogDetail(Camera, "Using default video device path: %s", Camera::kDefaultVideoDevicePath);
     }
+
+    std::string appPipePath = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
+    if ((!appPipePath.empty()) and (sChipNamedPipeCommands.Start(appPipePath, &sCameraAppCommandDelegate) != CHIP_NO_ERROR))
+    {
+        ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
+        sChipNamedPipeCommands.Stop();
+    }
+
     gCameraDevice.Init();
     CameraAppInit(&gCameraDevice);
 
@@ -56,6 +64,8 @@ void ApplicationInit()
 void ApplicationShutdown()
 {
     CameraAppShutdown();
+
+    sChipNamedPipeCommands.Stop();
 }
 
 int main(int argc, char * argv[])
