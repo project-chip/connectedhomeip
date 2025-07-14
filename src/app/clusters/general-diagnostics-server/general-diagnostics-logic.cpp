@@ -193,7 +193,8 @@ CHIP_ERROR GeneralDiagnosticsLogic::AcceptedCommands(ReadOnlyBufferBuilder<DataM
     return builder.ReferenceExisting(kAcceptedCommands);
 }
 
-CHIP_ERROR GeneralDiagnosticsLogic::GeneratedCommands(ReadOnlyBufferBuilder<CommandId> & builder) {
+CHIP_ERROR GeneralDiagnosticsLogic::GeneratedCommands(ReadOnlyBufferBuilder<CommandId> & builder)
+{
     static constexpr chip::CommandId kAcceptedCommands[] = {
         GeneralDiagnostics::Commands::TimeSnapshotResponse::Id,
 #if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1

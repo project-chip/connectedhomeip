@@ -150,7 +150,8 @@ public:
         return LOGIC::AcceptedCommands(builder);
     }
 
-    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override {
+    CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override
+    {
         return LOGIC::GeneratedCommands(builder);
     }
 
