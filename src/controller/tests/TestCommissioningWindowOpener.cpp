@@ -67,6 +67,9 @@ protected:
     Controller::CommissioningWindowOpener opener = Controller::CommissioningWindowOpener(&mockController);
 };
 
+/*
+ * This validates the OpenBasicCommissioningWindow constructor with only deviceId and timeout
+ */
 TEST_F(TestCommissioningWindowOpener, OpenBasicCommissioningWindow_Success)
 {
     constexpr chip::NodeId kTestNodeId = 0x1234;
@@ -75,6 +78,9 @@ TEST_F(TestCommissioningWindowOpener, OpenBasicCommissioningWindow_Success)
     EXPECT_EQ(opener.OpenBasicCommissioningWindow(kTestNodeId, kTimeout, &callback), CHIP_NO_ERROR);
 }
 
+/*
+ * This validates the OpenBasicCommissioningWindow constructor with all the parameter setters
+ */
 TEST_F(TestCommissioningWindowOpener, OpenCommissioningWindowWithPasscode_Success)
 {
     constexpr chip::NodeId kTestNodeId = 0x1234;
