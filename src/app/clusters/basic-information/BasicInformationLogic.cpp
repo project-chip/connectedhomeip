@@ -65,7 +65,7 @@ CHIP_ERROR BasicInformationLogic::Init(AttributePersistenceProvider & storage)
     {
         MutableByteSpan localConfigBytes(reinterpret_cast<uint8_t *>(&mLocalConfigDisabled), sizeof(mLocalConfigDisabled));
         LogIfReadError(Attributes::LocalConfigDisabled::Id,
-                       storage.ReadValue({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, localConfigBytes));
+                       storage.ReadValue({ kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id }, localConfigBytes));
 
         if (localConfigBytes.size() == 0)
         {
