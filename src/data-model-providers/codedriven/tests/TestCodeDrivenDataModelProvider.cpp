@@ -594,7 +594,8 @@ TEST_F(TestCodeDrivenDataModelProvider, AddAndRemoveEndpoints)
 
 TEST_F(TestCodeDrivenDataModelProvider, EndpointWithStaticData)
 {
-    CodeDrivenDataModelProvider localProvider(&mServerClusterTestContext.StorageDelegate()); // Use a local provider for focused testing
+    CodeDrivenDataModelProvider localProvider(
+        &mServerClusterTestContext.StorageDelegate()); // Use a local provider for focused testing
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
 
     // Define static data directly in arrays. MockServerCluster instances need to be static
@@ -1052,8 +1053,6 @@ TEST_F(TestCodeDrivenDataModelProvider, Temporary_ReportAttributeChanged)
     EXPECT_EQ(mChangeListener.mDirtyList[0].mClusterId, path.mClusterId);
     EXPECT_EQ(mChangeListener.mDirtyList[0].mAttributeId, path.mAttributeId);
 }
-
-
 
 TEST_F(TestCodeDrivenDataModelProvider, Shutdown)
 {
