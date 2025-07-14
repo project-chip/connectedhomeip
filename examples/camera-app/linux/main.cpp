@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include "CameraAppCommandDelegate.h"
 #include "camera-app.h"
 #include "camera-device.h"
 
@@ -25,6 +26,11 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace Camera;
+
+namespace {
+NamedPipeCommands sChipNamedPipeCommands;
+CameraAppCommandDelegate sCameraAppCommandDelegate;
+} // namespace
 
 CameraDevice gCameraDevice;
 
@@ -43,6 +49,8 @@ void ApplicationInit()
     }
     gCameraDevice.Init();
     CameraAppInit(&gCameraDevice);
+
+    sCameraAppCommandDelegate.SetCameraDevice(&gCameraDevice);
 }
 
 void ApplicationShutdown()
