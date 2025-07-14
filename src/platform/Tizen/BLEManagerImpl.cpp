@@ -797,7 +797,7 @@ void BLEManagerImpl::AddConnection(const char * remoteAddr)
     VerifyOrReturn(conn != nullptr, NotifyHandleConnectFailed(CHIP_ERROR_NO_MEMORY));
 
     int ret;
-    if ((ret = bt_gatt_server_get_device_mtu(remoteAddr, &conn->mtu) != BT_ERROR_NONE))
+    if ((ret = bt_gatt_server_get_device_mtu(remoteAddr, &conn->mtu)) != BT_ERROR_NONE)
     {
         ChipLogError(DeviceLayer, "Failed to get MTU for [%s]. ret: %s", StringOrNullMarker(remoteAddr), get_error_message(ret));
     }
