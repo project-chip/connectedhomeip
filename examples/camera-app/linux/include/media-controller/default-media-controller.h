@@ -41,6 +41,6 @@ public:
     void DistributeAudio(const char * data, size_t size, uint16_t audioStreamID) override;
 
 private:
-    std::vector<Connection> connections;
-    std::mutex connectionsMutex;
+    std::vector<Connection> mConnections;
+    std::mutex mConnectionsMutex;
 };

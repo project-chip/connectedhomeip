@@ -6,7 +6,10 @@ Linux.
 
 ---
 
--   [Building the Example Application](#building-the-example-application)
+- [CHIP Linux Camera Example App](#chip-linux-camera-example-app)
+  - [Building the Example Application](#building-the-example-application)
+    - [1. Prerequisites](#1-prerequisites)
+    - [2. Building](#2-building)
 
 ---
 
@@ -14,8 +17,9 @@ Linux.
 
 ### 1. Prerequisites
 
-Before building, you must install the necessary GStreamer libraries and
-development packages, which are used for video processing and streaming.
+Before building, you must install the necessary GStreamer, FFmpeg, curl
+libraries and development packages, which are used for video processing,
+streaming, recording and uploading.
 
 ```
 sudo apt update
@@ -25,7 +29,11 @@ sudo apt install \
   gstreamer1.0-plugins-bad \
   gstreamer1.0-libav \
   libgstreamer1.0-dev \
-  libgstreamer-plugins-base1.0-dev
+  libgstreamer-plugins-base1.0-dev \
+  libavcodec-dev \
+  libavformat-dev \
+  libavutil-dev \
+  libcurl4-openssl-dev
 ```
 
 ### 2. Building
@@ -72,7 +80,7 @@ environment to ensure all dependencies are correct.
 1. Pull the Cross-Compilation Docker Image
 
 ```
-docker pull ghcr.io/project-chip/chip-build-crosscompile:146
+docker pull ghcr.io/project-chip/chip-build-crosscompile:148
 ```
 
 2. Run the Docker Container This command starts an interactive shell inside the
@@ -80,7 +88,7 @@ docker pull ghcr.io/project-chip/chip-build-crosscompile:146
    container's /var/connectedhomeip directory.
 
 ```
-docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:146 /bin/bash
+docker run -it -v ~/connectedhomeip:/var/connectedhomeip ghcr.io/project-chip/chip-build-crosscompile:148 /bin/bash
 ```
 
 3. Build Inside the Container From within the Docker container's shell, execute
