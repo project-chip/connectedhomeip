@@ -997,45 +997,31 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
 
 CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    int ret;
-    char * deviceName = nullptr;
+    VerifyOrReturnError(buf != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(buf != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    GAutoPtr<char> deviceName;
+    int ret = bt_adapter_get_name(&deviceName.GetReceiver());
+    VerifyOrReturnError(ret == BT_ERROR_NONE, TizenToChipError(ret),
+                        ChipLogError(DeviceLayer, "bt_adapter_get_name() failed: %s", get_error_message(ret)));
 
-    ret = bt_adapter_get_name(&deviceName);
-    if (ret != BT_ERROR_NONE)
-    {
-        ChipLogError(DeviceLayer, "bt_adapter_get_name() failed: %s", get_error_message(ret));
-        return CHIP_ERROR_INTERNAL;
-    }
+    VerifyOrReturnError(deviceName, CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(strlen(deviceName.get()) >= bufSize, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    VerifyOrExit(deviceName != nullptr, err = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(strlen(deviceName) >= bufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    g_strlcpy(buf, deviceName.get(), bufSize);
+    ChipLogProgress(DeviceLayer, "BLE device name: %s", buf);
 
-    g_strlcpy(buf, deviceName, bufSize);
-    ChipLogProgress(DeviceLayer, "DeviceName: %s", buf);
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    int ret;
+    VerifyOrReturnError(deviceName != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(deviceName != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    int ret = bt_adapter_set_name(deviceName);
+    VerifyOrReturnError(ret == BT_ERROR_NONE, TizenToChipError(ret),
+                        ChipLogError(DeviceLayer, "bt_adapter_set_name() failed: %s", get_error_message(ret)));
 
-    ret = bt_adapter_set_name(deviceName);
-    if (ret != BT_ERROR_NONE)
-    {
-        ChipLogError(DeviceLayer, "bt_adapter_set_name() failed: %s", get_error_message(ret));
-        return CHIP_ERROR_INTERNAL;
-    }
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 uint16_t BLEManagerImpl::_NumConnections()
