@@ -129,6 +129,8 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/sleeptimer/inc",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/unified_api/inc",
       "${efr32_sdk_root}/hardware/driver/memlcd/src/ls013b7dh03",
+      "${efr32_sdk_root}/platform/service/sl_main/inc",
+      "${efr32_sdk_root}/platform/service/sl_main/src",
       "${efr32_sdk_root}/platform/service/sleeptimer/inc",
       "${efr32_sdk_root}/platform/service/sleeptimer/config",
       "${efr32_sdk_root}/platform/service/sleeptimer/src",
@@ -152,6 +154,7 @@ template("siwx917_sdk") {
 
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/power_manager/inc",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/clock_manager/inc",
+      "${wifi_sdk_root}/components/sli_wifi_command_engine/inc",
     ]
 
     if (sl_enable_rgb_led) {
@@ -258,6 +261,8 @@ template("siwx917_sdk") {
       "SILABS_LOG_OUT_UART=${sl_uart_log_output}",
       "SUPPORT_CPLUSPLUS=1",
       "SLI_SI91X_LWIP_HOSTED_NETWORK_STACK=1",
+      "__FREERTOS_OS_WISECONNECT=1",
+      "SL_SI91X_SOC_MODE=1",
 
       # TODO: This is a workaround for the init issue with the SiWx917
       "SL_WLAN_EVENT_THREAD_PRIORITY=osPriorityRealtime6",
@@ -280,7 +285,7 @@ template("siwx917_sdk") {
     if (chip_enable_icd_server || !disable_lcd) {
       defines += [
         "SL_SLEEP_TIMER=1",
-        "SI91X_SYSRTC_COUNT=1",
+        "SI91X_SYSRTC_COUNT=2",
       ]
     }
 
@@ -665,6 +670,7 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/rsi_ps_ram_func.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/rsi_system_config.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/system_si91x.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/common/src/malloc_thread_safety.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/common/src/rsi_debug.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/common/src/sl_si91x_stack_object_declare.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/config/src/rsi_nvic_priorities_config.c",
@@ -707,21 +713,20 @@ template("siwx917_sdk") {
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_callback_framework.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sl_si91x_net_credentials.c",
+      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/sl_net/src/sli_net_si91x_utility.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_rsi_utility.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/wireless/src/sl_si91x_driver.c",
-      "${wifi_sdk_root}/components/device/silabs/si91x/wireless/threading/sli_si91x_multithreaded.c",
+      "${wifi_sdk_root}/components/sli_si91x_wifi_event_handler/src/sli_si91x_wifi_event_handler.c",
+      "${wifi_sdk_root}/components/sli_wifi_command_engine/src/sli_wifi_command_engine.c",
 
       # modified hal
-      "${efr32_sdk_root}/platform/emlib/src/em_core.c",
-      "${efr32_sdk_root}/platform/service/device_init/src/sl_device_init_nvic.c",
       "${efr32_sdk_root}/platform/service/system/src/sl_system_init.c",
       "${efr32_sdk_root}/platform/service/system/src/sl_system_kernel.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/croutine.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/event_groups.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/list.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/GCC/ARM_CM4F/port.c",
-      "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/MemMang/heap_3.c",
+      "${efr32_sdk_root}/util/third_party/freertos/kernel/portable/MemMang/heap_4.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/queue.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/stream_buffer.c",
       "${efr32_sdk_root}/util/third_party/freertos/kernel/tasks.c",
@@ -730,6 +735,7 @@ template("siwx917_sdk") {
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_iostream_handles.c",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_si91x_button_instances.c",
       "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/autogen/sl_ulp_timer_init.c",
+      "${matter_support_root}/board-support/si91x/siwx917/${silabs_board}/main.c",
       "${matter_support_root}/board-support/si91x/support/hal/rsi_hal_mcu_m4.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/hardware_drivers/button/src/sl_si91x_button.c",
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/drivers/service/clock_manager/src/sl_si91x_clock_manager.c",
@@ -750,6 +756,12 @@ template("siwx917_sdk") {
       # iostream
       "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream.c",
       "${efr32_sdk_root}/platform/service/iostream/src/sl_iostream_rtt.c",
+
+      # sl_main
+      "${efr32_sdk_root}/platform/service/sl_main/src/rtos/main_retarget.c",
+      "${efr32_sdk_root}/platform/service/sl_main/src/sl_main_init.c",
+      "${efr32_sdk_root}/platform/service/sl_main/src/sl_main_init_memory.c",
+      "${efr32_sdk_root}/platform/service/sl_main/src/sl_main_kernel.c",
 
       # STARTUP FILES.
       "${wifi_sdk_root}/components/device/silabs/si91x/mcu/core/chip/src/startup_si91x.c",

@@ -42,6 +42,12 @@ enum class EVSECallbackType : uint8_t
      */
     ChargeCurrentChanged,
     /*
+     * DischargeCurrent has changed (e.g. maxDischargingCurrent so requires an
+       update to EVSE application logic about a new discharging current )
+     */
+    DischargeCurrentChanged,
+
+    /*
      * Charging Preferences have changed
      * The daily charging target time, SoC / Added Energy schedules have changed
      * and may require the local optimiser to re-run.
@@ -83,6 +89,12 @@ struct EVSECbInfo
         {
             int64_t maximumChargeCurrent;
         } ChargingCurrent;
+
+        /* for type = DischargeCurrentChanged */
+        struct
+        {
+            int64_t maximumDischargeCurrent;
+        } DischargingCurrent;
 
         /* for type = EnergyMeterReadingRequested */
         struct
