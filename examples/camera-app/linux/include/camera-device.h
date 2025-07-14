@@ -294,6 +294,10 @@ public:
 
     void SetVideoDevicePath(const std::string & path) { mVideoDevicePath = path; }
 
+    void HandleSimulatedZoneTriggeredEvent(uint16_t zoneID);
+
+    void HandleSimulatedZoneStoppedEvent(uint16_t zoneID);
+
 private:
     int videoDeviceFd            = -1;
     std::string mVideoDevicePath = kDefaultVideoDevicePath;
