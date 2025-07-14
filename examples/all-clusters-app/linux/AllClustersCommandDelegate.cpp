@@ -956,9 +956,10 @@ void AllClustersAppCommandHandler::OnSoilMoistureChange(EndpointId endpointId, D
 {
     SoilMeasurement::Instance * soilMeasurementInstance = SoilMeasurement::GetInstance();
 
-    if (soilMeasurementInstance->SetSoilMeasuredValue(soilMoisture) != CHIP_NO_ERROR)
+    CHIP_ERROR err = soilMeasurementInstance->SetSoilMeasuredValue(soilMoisture);
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogDetail(NotSpecified, "Invalid SoilMoisture value");
+        ChipLogDetail(NotSpecified, "Failed to set SoilMoisture value: %" CHIP_ERROR_FORMAT, err.Format());
         return;
     }
 
