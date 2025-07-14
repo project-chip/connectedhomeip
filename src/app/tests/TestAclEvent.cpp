@@ -320,7 +320,7 @@ TEST_F(TestAclEvent, TestReadRoundtripWithEventStatusIBInEventReport)
 
         ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
         readPrepareParams.mpEventPathParamsList    = eventPathParams;
-        readPrepareParams.mEventPathParamsListSize = 1;
+        readPrepareParams.mEventPathParamsListSize = 2;
         readPrepareParams.mEventNumber.SetValue(1);
 
         MockInteractionModelApp delegate;
