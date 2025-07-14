@@ -47,6 +47,36 @@ public:
     }
     void SetBreadcrumb(uint64_t value) { mCommissioner->mDeviceCommissioningInfo.general.breadcrumb = value; }
     void SetUTCRequirements(bool requiresUTC) { mCommissioner->mDeviceCommissioningInfo.requiresUTC = requiresUTC; }
+    void SetTimeSourceRequirements(bool requiresTrustedTimeSource)
+    {
+        mCommissioner->mDeviceCommissioningInfo.requiresTrustedTimeSource = requiresTrustedTimeSource;
+    }
+    void SetTimeZoneRequirements(bool requiresTimeZone)
+    {
+        mCommissioner->mDeviceCommissioningInfo.requiresTimeZone = requiresTimeZone;
+    }
+
+    void AccessSetTrustedTimeSource(
+        app::DataModel::Nullable<app::Clusters::TimeSynchronization::Structs::FabricScopedTrustedTimeSourceStruct::Type>
+            trustedTimeSource)
+    {
+        mCommissioner->mParams.SetTrustedTimeSource(trustedTimeSource);
+    }
+    void AccessSetTimeZone(app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> timeZone)
+    {
+        mCommissioner->mParams.SetTimeZone(timeZone);
+    }
+    void SetNeedIcdRegistration(bool NeedIcdRegistration) { mCommissioner->mNeedIcdRegistration = NeedIcdRegistration; }
+    void SetNeedsDST(bool NeedsDST) { mCommissioner->mNeedsDST = NeedsDST; }
+    void AccessSetDSTOffsets(app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type> dstOffset)
+    {
+        mCommissioner->mParams.SetDSTOffsets(dstOffset);
+    }
+    void SetRequiresDefaultNTP(bool requiresDefaultNTP)
+    {
+        mCommissioner->mDeviceCommissioningInfo.requiresDefaultNTP = requiresDefaultNTP;
+    }
+    void AccessSetDefaultNTP(app::DataModel::Nullable<CharSpan> defaultNTP) { mCommissioner->mParams.SetDefaultNTP(defaultNTP); }
 
 private:
     Controller::AutoCommissioner * mCommissioner = nullptr;
