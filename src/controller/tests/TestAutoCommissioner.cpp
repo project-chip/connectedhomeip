@@ -342,4 +342,118 @@ TEST_F(AutoCommissionerTest, NextStageConfigureTCAcknowledgments)
     EXPECT_EQ(nextStage, kSendPAICertificateRequest);
 }
 
+// all branches that include conditional if statments are tested with alternating conditions
+TEST_F(AutoCommissionerTest, NextStageConfigureUTCTime)
+{
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    CommissioningStage nextStage_ConfigureUTCTime =
+        privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureUTCTime, err);
+    CommissioningStage nextStage_ConfigureTimeZone =
+        privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureTimeZone, err);
+
+    EXPECT_EQ(nextStage_ConfigureUTCTime, nextStage_ConfigureTimeZone);
+
+    privateConfigCommissioner.SetTimeZoneRequirements(true);
+
+    nextStage_ConfigureUTCTime  = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureUTCTime, err);
+    nextStage_ConfigureTimeZone = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureTimeZone, err);
+
+    EXPECT_EQ(nextStage_ConfigureUTCTime, nextStage_ConfigureTimeZone);
+
+    privateConfigCommissioner.SetTimeZoneRequirements(false);
+    // setting up correct structs for condition evaluation
+    app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type timeZoneStruct;
+    timeZoneStruct.name.Emplace(chip::CharSpan::fromCharString("")); // evaluates HasValue() to true
+    app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> timeZone(&timeZoneStruct,
+                                                                                                     1); // size of list = 1
+    privateConfigCommissioner.AccessSetTimeZone(timeZone);
+
+    // subsequent stages progress accordingly.
+    nextStage_ConfigureUTCTime  = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureUTCTime, err);
+    nextStage_ConfigureTimeZone = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureTimeZone, err);
+
+    EXPECT_EQ(nextStage_ConfigureUTCTime, nextStage_ConfigureTimeZone);
+
+    privateConfigCommissioner.SetTimeZoneRequirements(true);
+
+    CommissioningStage nextStage = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureUTCTime, err);
+
+    EXPECT_EQ(nextStage, kConfigureTimeZone);
+}
+
+TEST_F(AutoCommissionerTest, NextStageConfigureTimeZone)
+{
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    CommissioningStage nextStage_ConfigureTimeZone =
+        privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureTimeZone, err);
+    CommissioningStage nextStage_ConfigureDSTOffset =
+        privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureDSTOffset, err);
+
+    EXPECT_EQ(nextStage_ConfigureTimeZone, nextStage_ConfigureDSTOffset);
+
+    privateConfigCommissioner.SetNeedsDST(true);
+
+    nextStage_ConfigureTimeZone  = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureTimeZone, err);
+    nextStage_ConfigureDSTOffset = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureDSTOffset, err);
+
+    EXPECT_EQ(nextStage_ConfigureTimeZone, nextStage_ConfigureDSTOffset);
+
+    // setting up correct structs for condition evaluation
+    app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type dstOffsetStruct;
+    dstOffsetStruct.offset        = 10;
+    dstOffsetStruct.validStarting = epochJanFirst2000;
+    dstOffsetStruct.validUntil    = epochJanFirst2001;
+    app::DataModel::List<app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type> dstOffsets(&dstOffsetStruct,
+                                                                                                        1); // size of list = 1
+
+    privateConfigCommissioner.AccessSetDSTOffsets(dstOffsets);
+
+    CommissioningStage nextStage = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureTimeZone, err);
+
+    EXPECT_EQ(nextStage, kConfigureDSTOffset);
+
+    privateConfigCommissioner.SetNeedsDST(false);
+
+    nextStage_ConfigureTimeZone  = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureTimeZone, err);
+    nextStage_ConfigureDSTOffset = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureDSTOffset, err);
+
+    EXPECT_EQ(nextStage_ConfigureTimeZone, nextStage_ConfigureDSTOffset);
+}
+
+TEST_F(AutoCommissionerTest, NextStageConfigureDSTOffset)
+{
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    CommissioningStage nextStage_ConfigureDSTOffset =
+        privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureDSTOffset, err);
+    CommissioningStage nextStage_ConfigureDefaultNTP =
+        privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureDefaultNTP, err);
+
+    EXPECT_EQ(nextStage_ConfigureDSTOffset, nextStage_ConfigureDefaultNTP);
+
+    privateConfigCommissioner.SetRequiresDefaultNTP(true);
+
+    EXPECT_EQ(nextStage_ConfigureDSTOffset, nextStage_ConfigureDefaultNTP);
+
+    // setting up correct variables for condition evaluation
+    app::DataModel::Nullable<CharSpan> defaultNTP = chip::CharSpan("ntp", strlen("ntp"));
+    privateConfigCommissioner.AccessSetDefaultNTP(defaultNTP);
+
+    CommissioningStage nextStage = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureDSTOffset, err);
+
+    EXPECT_EQ(nextStage, kConfigureDefaultNTP);
+
+    privateConfigCommissioner.SetRequiresDefaultNTP(false);
+
+    nextStage_ConfigureDSTOffset  = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureDSTOffset, err);
+    nextStage_ConfigureDefaultNTP = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureDefaultNTP, err);
+
+    EXPECT_EQ(nextStage_ConfigureDSTOffset, nextStage_ConfigureDefaultNTP);
+}
+
 } // namespace
