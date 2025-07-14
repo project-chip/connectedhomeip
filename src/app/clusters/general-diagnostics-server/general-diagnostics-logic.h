@@ -79,6 +79,8 @@ public:
 
     CHIP_ERROR AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder);
 
+    CHIP_ERROR GeneratedCommands(ReadOnlyBufferBuilder<CommandId> & builder);
+
 private:
     TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(ByteSpan enableKey);
     bool IsByteSpanAllZeros(const ByteSpan & byteSpan);

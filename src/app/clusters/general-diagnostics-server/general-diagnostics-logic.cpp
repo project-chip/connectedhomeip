@@ -193,6 +193,16 @@ CHIP_ERROR GeneralDiagnosticsLogic::AcceptedCommands(ReadOnlyBufferBuilder<DataM
     return builder.ReferenceExisting(kAcceptedCommands);
 }
 
+CHIP_ERROR GeneralDiagnosticsLogic::GeneratedCommands(ReadOnlyBufferBuilder<CommandId> & builder) {
+    static constexpr chip::CommandId kAcceptedCommands[] = {
+        GeneralDiagnostics::Commands::TimeSnapshotResponse::Id,
+#if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
+        GeneralDiagnostics::Commands::PayloadTestResponse::Id,
+#endif
+    };
+    return builder.ReferenceExisting(kAcceptedCommands);
+}
+
 TestEventTriggerDelegate * GeneralDiagnosticsLogic::GetTriggerDelegateOnMatchingKey(ByteSpan enableKey)
 {
     if (enableKey.size() != TestEventTriggerDelegate::kEnableKeyLength)
