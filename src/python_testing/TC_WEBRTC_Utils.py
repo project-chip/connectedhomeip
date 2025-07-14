@@ -17,7 +17,6 @@
 import logging
 
 from chip.clusters import CameraAvStreamManagement
-from chip.clusters.Types import NullValue
 
 
 class WebRTCTestHelper:
@@ -27,6 +26,7 @@ class WebRTCTestHelper:
         )
 
     async def allocate_video_stream(self, endpoint):
+        """Try to allocate a video stream from the camera device. Returns the stream ID if successful, otherwise None."""
         attrs = CameraAvStreamManagement.Attributes
         try:
             # Check for watermark and OSD features
@@ -65,4 +65,4 @@ class WebRTCTestHelper:
 
         except Exception as e:
             logging.error(f"Failed to allocate video stream. {e}")
-            return NullValue
+            return None
