@@ -18,11 +18,8 @@ import pathlib
 import typing
 from dataclasses import dataclass, field
 from datetime import timedelta
+from matter_testing_defaults import DEFAULT_ADMIN_VENDOR_ID, DEFAULT_CONTROLLER_NODE_ID, DEFAULT_TRUST_ROOT_INDEX
 from typing import List, Optional
-
-_DEFAULT_ADMIN_VENDOR_ID = 0xFFF1
-_DEFAULT_CONTROLLER_NODE_ID = 112233
-_DEFAULT_TRUST_ROOT_INDEX = 1
 
 
 @dataclass
@@ -33,7 +30,7 @@ class MatterTestConfig:
     ble_controller: Optional[int] = None
     commission_only: bool = False
 
-    admin_vendor_id: int = _DEFAULT_ADMIN_VENDOR_ID
+    admin_vendor_id: int = DEFAULT_ADMIN_VENDOR_ID
     case_admin_subject: Optional[int] = None
     global_test_params: dict = field(default_factory=dict)
     # List of explicit tests to run by name. If empty, all tests will run
@@ -68,7 +65,7 @@ class MatterTestConfig:
     # Node ID for basic DUT
     dut_node_ids: List[int] = field(default_factory=list)
     # Node ID to use for controller/commissioner
-    controller_node_id: int = _DEFAULT_CONTROLLER_NODE_ID
+    controller_node_id: int = DEFAULT_CONTROLLER_NODE_ID
     # CAT Tags for default controller/commissioner
     # By default, we commission with CAT tags specified for RR-1.1
     # so the cert tests can be run without re-commissioning the device
@@ -79,7 +76,7 @@ class MatterTestConfig:
     fabric_id: int = 1
 
     # "Alpha" by default
-    root_of_trust_index: int = _DEFAULT_TRUST_ROOT_INDEX
+    root_of_trust_index: int = DEFAULT_TRUST_ROOT_INDEX
 
     # If this is set, we will reuse root of trust keys at that location
     chip_tool_credentials_path: Optional[pathlib.Path] = None
