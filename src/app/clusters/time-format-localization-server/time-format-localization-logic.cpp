@@ -50,7 +50,7 @@ private:
 }
 CHIP_ERROR TimeFormatLocalizationLogic::GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder) const 
 {
-    DeviceLayer::DeviceInfoProvider * provider = GetDeviceInfoProvider();
+    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
     VerifyOrReturnValue(provider != nullptr, aEncoder.EncodeEmptyList());
 
     AutoReleaseIterator it(provider->IterateSupportedCalendarTypes());
@@ -69,7 +69,7 @@ CHIP_ERROR TimeFormatLocalizationLogic::GetSupportedCalendarTypes(AttributeValue
 
 bool TimeFormatLocalizationLogic::IsCalendarSupported(TimeFormatLocalization::CalendarTypeEnum calendar)
 {
-    DeviceLayer::DeviceInfoProvider * provider = GetDeviceInfoProvider();
+    DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
     VerifyOrReturnValue(provider != nullptr, false);
 
     AutoReleaseIterator it(provider->IterateSupportedCalendarTypes());
@@ -100,10 +100,6 @@ DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setHourFormat(TimeFor
 
 DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum rCalendar)
 {
-    if(!mEnabledAttributes.activeEnableCalendarType)
-    {
-        return Protocols::InteractionModel::Status::UnsupportedAttribute;
-    }
 
     if(IsCalendarSupported(rCalendar))
     {
@@ -125,23 +121,13 @@ CHIP_ERROR TimeFormatLocalizationLogic::Attributes(ReadOnlyBufferBuilder<DataMod
     // Mandatory attributes
     ReturnErrorOnFailure(builder.Append(TimeFormatLocalization::Attributes::HourFormat::kMetadataEntry));
     // Optional, missing better handling
-    if(mEnabledAttributes.activeEnableCalendarType)
-    {
-        ReturnErrorOnFailure(builder.Append(TimeFormatLocalization::Attributes::ActiveCalendarType::kMetadataEntry));
-    }
+
+    ReturnErrorOnFailure(builder.Append(TimeFormatLocalization::Attributes::ActiveCalendarType::kMetadataEntry));
     
-    if(mEnabledAttributes.activeSupportedCalendarTypes)
-    {
-        ReturnErrorOnFailure(builder.Append(TimeFormatLocalization::Attributes::SupportedCalendarTypes::kMetadataEntry));
-    }
+    ReturnErrorOnFailure(builder.Append(TimeFormatLocalization::Attributes::SupportedCalendarTypes::kMetadataEntry));
 
     // Finally, the global attributes
     return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
-}
-
-CHIP_ERROR TimeFormatLocalizationLogic::AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
-{
-    return CHIP_NO_ERROR;
 }
 
 BitFlags<TimeFormatLocalization::Feature> TimeFormatLocalizationLogic::GetFeatureMap() const

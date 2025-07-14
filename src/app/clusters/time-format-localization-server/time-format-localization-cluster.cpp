@@ -21,8 +21,8 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-TimeFormatLocalizationCluster::TimeFormatLocalizationCluster(EndpointId endpointId, BitFlags<TimeFormatLocalization::Feature> _unused_features, TimeFormatLocalizationEnabledAttributes attr) :
-DefaultServerCluster ({endpointId, TimeFormatLocalization::Id}), mLogic(attr) { }
+TimeFormatLocalizationCluster::TimeFormatLocalizationCluster(EndpointId endpointId, BitFlags<TimeFormatLocalization::Feature> features) :
+DefaultServerCluster ({endpointId, TimeFormatLocalization::Id}), mFeatures(features) { }
 
 DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder)
 {
@@ -65,7 +65,7 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::ReadAttribute(const
     }
     case TimeFormatLocalization::Attributes::FeatureMap::Id:
     {
-        return encoder.Encode(BitFlags<TimeFormatLocalization::Feature>{ 0 }.Raw());
+        return encoder.Encode(mFeatures.Raw());
     }
     case TimeFormatLocalization::Attributes::ClusterRevision::Id:
     {
@@ -74,18 +74,6 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::ReadAttribute(const
     default:
         return Protocols::InteractionModel::Status::UnreportableAttribute;
     }
-}
-
-std::optional<DataModel::ActionReturnStatus> TimeFormatLocalizationCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & input_arguments, CommandHandler * handler) 
-{
-    // No commands are supported by this cluster
-    return Protocols::InteractionModel::Status::UnsupportedCommand;
-}
-
-CHIP_ERROR TimeFormatLocalizationCluster::AcceptedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) 
-{
-    // No commands are supported by this cluster
-    return mLogic.AcceptedCommands(builder);
 }
 
 CHIP_ERROR TimeFormatLocalizationCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) 

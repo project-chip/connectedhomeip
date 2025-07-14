@@ -28,17 +28,10 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
-// TODO: These attributes are CALFMT conformance, not sure if handling them this way is the correct way.
-struct TimeFormatLocalizationEnabledAttributes
-{
-    bool activeEnableCalendarType : 1;
-    bool activeSupportedCalendarTypes : 1;
-};
-
 class TimeFormatLocalizationLogic
 {
 public:
-    TimeFormatLocalizationLogic(const TimeFormatLocalizationEnabledAttributes enabledAttributes) : mEnabledAttributes(enabledAttributes)
+    TimeFormatLocalizationLogic()
     {
         mHourFormat = TimeFormatLocalization::HourFormatEnum::k12hr;
         mCalendarType = TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
@@ -60,49 +53,13 @@ public:
 
     CHIP_ERROR Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
 
-    CHIP_ERROR AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder);
-
-protected:
-    [[nodiscard]] virtual DeviceLayer::DeviceInfoProvider * GetDeviceInfoProvider() const = 0;
-
 private:
-    const TimeFormatLocalizationEnabledAttributes mEnabledAttributes;
 
     TimeFormatLocalization::HourFormatEnum mHourFormat;
     TimeFormatLocalization::CalendarTypeEnum mCalendarType;
 
     bool IsCalendarSupported(TimeFormatLocalization::CalendarTypeEnum calendarType);
 
-};
-
-class DeviceLayerTimeFormatLocalizationLogic : public TimeFormatLocalizationLogic
-{
-public:
-    DeviceLayerTimeFormatLocalizationLogic(const TimeFormatLocalizationEnabledAttributes enabledAttributes) :
-                                        TimeFormatLocalizationLogic(enabledAttributes) {}
-protected:
-    [[nodiscard]] DeviceLayer::DeviceInfoProvider * GetDeviceInfoProvider() const override
-    {
-        return DeviceLayer::GetDeviceInfoProvider();
-    }
-};
-
-// TODO: This class seems to be used just to improve the UT by using a custom DeviceInfoProvider for the SupportedCalendarTypes
-class InjectedTimeFormatLocalizationLogic : public TimeFormatLocalizationLogic
-{
-public:
-    InjectedTimeFormatLocalizationLogic(DeviceLayer::DeviceInfoProvider & provider,
-                                        const TimeFormatLocalizationEnabledAttributes enabledAttributes) :
-                TimeFormatLocalizationLogic(enabledAttributes), mProvider(provider) {}
-
-protected:
-    [[nodiscard]] DeviceLayer::DeviceInfoProvider * GetDeviceInfoProvider() const override
-    {
-        return &mProvider;
-    }
-
-private:
-    DeviceLayer::DeviceInfoProvider & mProvider;
 };
 
 } // namespace Clusters

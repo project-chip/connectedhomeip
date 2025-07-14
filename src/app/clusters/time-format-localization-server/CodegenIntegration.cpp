@@ -26,29 +26,11 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace Protocols::InteractionModel;
 
+using namespace chip::app::Clusters::TimeFormatLocalization::Attributes;
+
 namespace {
 
 LazyRegisteredServerCluster<TimeFormatLocalizationCluster> gServer;
-
-#if 0
-constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId) {
-    for(auto & config : TimeFormatLocalization::StaticApplicationConfig::kFixedClusterConfig)
-    {
-        if(config.endpointNumber != endpointId)
-        {
-            continue;
-        }
-        for(auto & attr : config.enabledAttributes)
-        {
-            if(attr == attributeId)
-            {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-#endif
 
 }
 
@@ -57,19 +39,17 @@ void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
 
 }
 
-Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPreAttributeChangedCallback(
-    const ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value) {
-
-    return Protocols::InteractionModel::Status::Success;
-    
-}
-// TODO: This is not a proper initialization will probable need to move it to something like 
-// emberAfTimeFormatLocalizationClusterServerInitCallback to be able to get the information from the endpoint.
-void MatterTimeFormatLocalizationPluginServerInitCallback()
+void emberAfTimeFormatLocalizationClusterInitCallback(EndpointId endpoint) 
 {
-    uint32_t rawFeatureMap = 0;
-    TimeFormatLocalizationEnabledAttributes attr {1, 1};
-    gServer.Create(kRootEndpointId, BitFlags<TimeFormatLocalization::Feature>(rawFeatureMap), attr);
+    VerifyOrReturn(endpoint == kRootEndpointId);
+
+    uint32_t rawFeatureMap;
+    if (FeatureMap::Get(endpoint, &rawFeatureMap) != Status::Success)
+    {
+        ChipLogError(AppServer, "Failed to get feature map for endpoint %u", endpoint);
+        rawFeatureMap = 0;
+    }
+    gServer.Create(endpoint, BitFlags<TimeFormatLocalization::Feature>(rawFeatureMap));
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
     if (err != CHIP_NO_ERROR)
@@ -78,12 +58,30 @@ void MatterTimeFormatLocalizationPluginServerInitCallback()
     }
 }
 
-void MatterTimeFormatLocalizationPluginServerShutdownCallback()
+void emberAfTimeFormatLocalizationClusterShutdownCallback(EndpointId endpoint) 
 {
+    VerifyOrReturn(endpoint == kRootEndpointId);
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "TimeFormatLocalization unregister error");
     }
     gServer.Destroy();
+}
+
+Protocols::InteractionModel::Status MatterTimeFormatLocalizationClusterServerPreAttributeChangedCallback(
+    const ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value) {
+
+    return Protocols::InteractionModel::Status::Success;
+    
+}
+
+void MatterTimeFormatLocalizationPluginServerInitCallback()
+{
+
+}
+
+void MatterTimeFormatLocalizationPluginServerShutdownCallback()
+{
+
 }
