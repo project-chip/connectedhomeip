@@ -762,6 +762,12 @@ static BOOL CommandNeedsTimedInvokeInClosureControlCluster(AttributeId aAttribut
 {
     using namespace Clusters::ClosureControl;
     switch (aAttributeId) {
+    case Commands::MoveTo::Id: {
+        return YES;
+    }
+    case Commands::Calibrate::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }
@@ -771,6 +777,12 @@ static BOOL CommandNeedsTimedInvokeInClosureDimensionCluster(AttributeId aAttrib
 {
     using namespace Clusters::ClosureDimension;
     switch (aAttributeId) {
+    case Commands::SetTarget::Id: {
+        return YES;
+    }
+    case Commands::Step::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }

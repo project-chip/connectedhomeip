@@ -29,15 +29,17 @@
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters::ClosureControl;
 using namespace chip::app::Clusters::ClosureDimension;
 
 namespace {
-constexpr uint32_t kDefaultCountdownTimeSeconds = 10;    // 10 seconds
-constexpr uint32_t kCalibrateTimerMs            = 10000; // 10 seconds
-constexpr uint32_t kMotionCountdownTimeMs       = 1000;  // 1 second
+constexpr uint32_t kDefaultCountdownTimeSeconds   = 10;    // 10 seconds
+constexpr uint32_t kCalibrateTimerMs              = 10000; // 10 seconds
+constexpr uint32_t kMotionCountdownTimeMs         = 1000;  // 1 second for each motion.
+constexpr chip::Percent100ths kMotionPositionStep = 1000;  // 10% of the total range per motion interval.
 
 // Define the Namespace and Tag for the endpoint
 // Derived from https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/namespaces/Namespace-Closure.adoc
@@ -104,7 +106,67 @@ void ClosureManager::Init()
     SetTagList(/* endpoint= */ 2, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEndpoint2TagList));
     SetTagList(/* endpoint= */ 3, Span<const Clusters::Descriptor::Structs::SemanticTagStruct::Type>(kEndpoint3TagList));
 
+    // Set Initial state for Closure endpoints
+    VerifyOrDie(SetClosureControlInitialState(mClosureEndpoint1) == CHIP_NO_ERROR);
+    ChipLogProgress(AppServer, "Initial state for Closure Control Endpoint set successfully");
+    VerifyOrDie(SetClosurePanelInitialState(mClosurePanelEndpoint2) == CHIP_NO_ERROR);
+    ChipLogProgress(AppServer, "Initial state for Closure Panel Endpoint 2 set successfully");
+    VerifyOrDie(SetClosurePanelInitialState(mClosurePanelEndpoint3) == CHIP_NO_ERROR);
+    ChipLogProgress(AppServer, "Initial state for Closure Panel Endpoint 3 set successfully");
+
     DeviceLayer::PlatformMgr().UnlockChipStack();
+}
+
+CHIP_ERROR ClosureManager::SetClosureControlInitialState(ClosureControlEndpoint & closureControlEndpoint)
+{
+    ChipLogProgress(AppServer, "ClosureControlEndpoint SetInitialState");
+    ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetCountdownTimeFromDelegate(NullNullable));
+    ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetMainState(MainStateEnum::kStopped));
+
+    DataModel::Nullable<GenericOverallCurrentState> overallState(GenericOverallCurrentState(
+        MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed)), MakeOptional(DataModel::MakeNullable(true)),
+        MakeOptional(Globals::ThreeLevelAutoEnum::kAuto), DataModel::MakeNullable(true)));
+    ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetOverallCurrentState(overallState));
+    DataModel::Nullable<GenericOverallTargetState> overallTarget(
+        GenericOverallTargetState(MakeOptional(DataModel::NullNullable), MakeOptional(DataModel::NullNullable),
+                                  MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
+    ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetOverallTargetState(overallTarget));
+    BitFlags<ClosureControl::LatchControlModesBitmap> latchControlModes;
+    latchControlModes.Set(ClosureControl::LatchControlModesBitmap::kRemoteLatching)
+        .Set(ClosureControl::LatchControlModesBitmap::kRemoteUnlatching);
+    ReturnErrorOnFailure(closureControlEndpoint.GetLogic().SetLatchControlModes(latchControlModes));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClosureManager::SetClosurePanelInitialState(ClosureDimensionEndpoint & closurePanelEndpoint)
+{
+    ChipLogProgress(AppServer, "ClosurePanelEndpoint SetInitialState");
+    DataModel::Nullable<GenericDimensionStateStruct> currentState(
+        GenericDimensionStateStruct(MakeOptional(DataModel::MakeNullable<Percent100ths>(10000)),
+                                    MakeOptional(DataModel::MakeNullable(true)), MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
+    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetCurrentState(currentState));
+
+    DataModel::Nullable<GenericDimensionStateStruct> targetState(
+        GenericDimensionStateStruct(MakeOptional(DataModel::NullNullable), MakeOptional(DataModel::NullNullable),
+                                    MakeOptional(Globals::ThreeLevelAutoEnum::kAuto)));
+    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetTargetState(targetState));
+
+    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetResolution(Percent100ths(100)));
+    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetStepValue(1000));
+    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetUnit(ClosureUnitEnum::kMillimeter));
+    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetUnitRange(
+        ClosureDimension::Structs::UnitRangeStruct::Type{ .min = static_cast<int16_t>(0), .max = static_cast<int16_t>(10000) }));
+    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetOverflow(OverflowEnum::kTopInside));
+
+    ClosureDimension::Structs::RangePercent100thsStruct::Type limitRange{ .min = static_cast<Percent100ths>(0),
+                                                                          .max = static_cast<Percent100ths>(10000) };
+    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetLimitRange(limitRange));
+    BitFlags<ClosureDimension::LatchControlModesBitmap> latchControlModes;
+    latchControlModes.Set(ClosureDimension::LatchControlModesBitmap::kRemoteLatching)
+        .Set(ClosureDimension::LatchControlModesBitmap::kRemoteUnlatching);
+    ReturnErrorOnFailure(closurePanelEndpoint.GetLogic().SetLatchControlModes(latchControlModes));
+
+    return CHIP_NO_ERROR;
 }
 
 void ClosureManager::StartTimer(uint32_t aTimeoutMs)
@@ -153,6 +215,16 @@ void ClosureManager::InitiateAction(AppEvent * event)
         break;
     case Action_t::MOVE_TO_ACTION:
         ChipLogDetail(AppServer, "Initiating move to action");
+        // For Closure sample app, Motion action is simulated with a timer with rate
+        // of 10% change of position per second.
+        // In a real application, this would be replaced with actual move to logic.
+        instance.StartTimer(kMotionCountdownTimeMs);
+        break;
+    case Action_t::UNLATCH_ACTION:
+        ChipLogDetail(AppServer, "Initiating unlatch action");
+        // Unlatch action check is a prerequisite for the move to action.
+        // In a real application, this would be replaced with actual unlatch logic.
+        PlatformMgr().ScheduleWork([](intptr_t) { ClosureManager::GetInstance().HandleClosureUnlatchAction(); });
         break;
     case Action_t::SET_TARGET_ACTION:
         ChipLogDetail(AppServer, "Initiating set target action");
@@ -220,10 +292,7 @@ void ClosureManager::HandleClosureActionCompleteEvent(AppEvent * event)
         });
         break;
     case Action_t::MOVE_TO_ACTION:
-        PlatformMgr().ScheduleWork([](intptr_t) {
-            ClosureManager & instance = ClosureManager::GetInstance();
-            instance.HandleClosureActionComplete(instance.GetCurrentAction());
-        });
+        PlatformMgr().ScheduleWork([](intptr_t) { ClosureManager::GetInstance().HandleClosureMotionAction(); });
         break;
     case Action_t::SET_TARGET_ACTION:
         PlatformMgr().ScheduleWork([](intptr_t) {
@@ -295,7 +364,14 @@ void ClosureManager::HandleClosureActionComplete(Action_t action)
         break;
     }
     case Action_t::MOVE_TO_ACTION:
-        // This should handle the completion of a move-to action.
+        instance.mClosureEndpoint1.OnMoveToActionComplete();
+        instance.mClosurePanelEndpoint2.OnMoveToActionComplete();
+        instance.mClosurePanelEndpoint3.OnMoveToActionComplete();
+
+        DeviceLayer::PlatformMgr().LockChipStack();
+        instance.isMoveToInProgress = false;
+        DeviceLayer::PlatformMgr().UnlockChipStack();
+
         break;
     case Action_t::SET_TARGET_ACTION:
         instance.mClosureEndpoint1.OnPanelMotionActionComplete();
@@ -382,13 +458,247 @@ chip::Protocols::InteractionModel::Status ClosureManager::OnStopCommand()
     return Status::Success;
 }
 
-chip::Protocols::InteractionModel::Status
-ClosureManager::OnMoveToCommand(const chip::Optional<chip::app::Clusters::ClosureControl::TargetPositionEnum> position,
-                                const chip::Optional<bool> latch,
-                                const chip::Optional<chip::app::Clusters::Globals::ThreeLevelAutoEnum> speed)
+chip::Protocols::InteractionModel::Status ClosureManager::OnMoveToCommand(const Optional<TargetPositionEnum> position,
+                                                                          const Optional<bool> latch,
+                                                                          const Optional<Globals::ThreeLevelAutoEnum> speed)
 {
-    // this function will contain the code for MoveTo command handling and initiate the motion action.
+
+    // Update the target state for the closure panels based on the MoveTo command.
+    // This closure sample app assumes that the closure panels are represented by two endpoints:
+    // - Endpoint 2: Represents the Closure Dimension Cluster for the first panel.
+    // - Endpoint 3: Represents the Closure Dimension Cluster for the second panel.
+
+    // For sample app, MoveTo command to Fullopen , will set target position of both panels to 0
+    //  MoveTo command to Fullclose will set target position of both panels to 10000
+    //  We simulate harware action by using timer for 1 sec and updating the current state of the panels after the timer expires.
+    //  till we reach the target position.
+
+    DataModel::Nullable<GenericDimensionStateStruct> mClosurePanelEndpoint2CurrentState;
+    VerifyOrReturnError(mClosurePanelEndpoint2.GetLogic().GetCurrentState(mClosurePanelEndpoint2CurrentState) == CHIP_NO_ERROR,
+                        Status::Failure, ChipLogError(AppServer, "Failed to get current state for Endpoint 2"));
+    DataModel::Nullable<GenericDimensionStateStruct> mClosurePanelEndpoint3CurrentState;
+    VerifyOrReturnError(mClosurePanelEndpoint3.GetLogic().GetCurrentState(mClosurePanelEndpoint3CurrentState) == CHIP_NO_ERROR,
+                        Status::Failure, ChipLogError(AppServer, "Failed to get current state for Endpoint 3"));
+
+    DataModel::Nullable<GenericDimensionStateStruct> mClosurePanelEndpoint2TargetState;
+    VerifyOrReturnError(mClosurePanelEndpoint2.GetLogic().GetTargetState(mClosurePanelEndpoint2TargetState) == CHIP_NO_ERROR,
+                        Status::Failure, ChipLogError(AppServer, "Failed to get target state for Endpoint 2"));
+    DataModel::Nullable<GenericDimensionStateStruct> mClosurePanelEndpoint3TargetState;
+    VerifyOrReturnError(mClosurePanelEndpoint3.GetLogic().GetTargetState(mClosurePanelEndpoint3TargetState) == CHIP_NO_ERROR,
+                        Status::Failure, ChipLogError(AppServer, "Failed to get target state for Endpoint 3"));
+
+    VerifyOrReturnError(!mClosurePanelEndpoint2CurrentState.IsNull(), Status::Failure,
+                        ChipLogError(AppServer, "MoveToCommand failed due to Null value Current state on Endpoint 2"));
+    VerifyOrReturnError(!mClosurePanelEndpoint3CurrentState.IsNull(), Status::Failure,
+                        ChipLogError(AppServer, "MoveToCommand failed due to Null value Current state on Endpoint 3"));
+
+    // Create target struct for the panels if the target state is not set.
+    GenericDimensionStateStruct mClosurePanelEndpoint2Target =
+        mClosurePanelEndpoint2TargetState.IsNull() ? GenericDimensionStateStruct() : mClosurePanelEndpoint2TargetState.Value();
+    GenericDimensionStateStruct mClosurePanelEndpoint3Target =
+        mClosurePanelEndpoint3TargetState.IsNull() ? GenericDimensionStateStruct() : mClosurePanelEndpoint3TargetState.Value();
+
+    if (position.HasValue())
+    {
+        // Set the Closure panel target position for the panels based on the MoveTo Command position.
+        // For Sample App,TargetPositionEnum is mapped to specific positions for the panels.
+        Percent100ths mClosurePanelEndpoint2Position;
+        Percent100ths mClosurePanelEndpoint3Position;
+
+        switch (position.Value())
+        {
+        case TargetPositionEnum::kMoveToFullyClosed:
+            mClosurePanelEndpoint2Position = static_cast<Percent100ths>(10000);
+            mClosurePanelEndpoint3Position = static_cast<Percent100ths>(10000);
+            break;
+        case TargetPositionEnum::kMoveToFullyOpen:
+            mClosurePanelEndpoint2Position = static_cast<Percent100ths>(0);
+            mClosurePanelEndpoint3Position = static_cast<Percent100ths>(0);
+            break;
+        case TargetPositionEnum::kMoveToPedestrianPosition:
+            mClosurePanelEndpoint2Position = static_cast<Percent100ths>(3000);
+            mClosurePanelEndpoint3Position = static_cast<Percent100ths>(3000);
+            break;
+        case TargetPositionEnum::kMoveToSignaturePosition:
+            mClosurePanelEndpoint2Position = static_cast<Percent100ths>(2000);
+            mClosurePanelEndpoint3Position = static_cast<Percent100ths>(2000);
+            break;
+        case TargetPositionEnum::kMoveToVentilationPosition:
+            mClosurePanelEndpoint2Position = static_cast<Percent100ths>(1000);
+            mClosurePanelEndpoint3Position = static_cast<Percent100ths>(1000);
+            break;
+        default:
+            ChipLogError(AppServer, "Invalid target position received in OnMoveToCommand");
+            return Status::Failure;
+        }
+
+        mClosurePanelEndpoint2Target.position.SetValue(DataModel::MakeNullable(mClosurePanelEndpoint2Position));
+        mClosurePanelEndpoint3Target.position.SetValue(DataModel::MakeNullable(mClosurePanelEndpoint3Position));
+    }
+
+    if (latch.HasValue())
+    {
+        mClosurePanelEndpoint2Target.latch.SetValue(DataModel::MakeNullable(latch.Value()));
+        mClosurePanelEndpoint3Target.latch.SetValue(DataModel::MakeNullable(latch.Value()));
+    }
+
+    if (speed.HasValue())
+    {
+        mClosurePanelEndpoint2Target.speed.SetValue(speed.Value());
+        mClosurePanelEndpoint3Target.speed.SetValue(speed.Value());
+    }
+
+    VerifyOrReturnError(mClosurePanelEndpoint2.GetLogic().SetTargetState(DataModel::MakeNullable(mClosurePanelEndpoint2Target)) ==
+                            CHIP_NO_ERROR,
+                        Status::Failure, ChipLogError(AppServer, "Failed to set target for Endpoint 2"));
+    VerifyOrReturnError(mClosurePanelEndpoint3.GetLogic().SetTargetState(DataModel::MakeNullable(mClosurePanelEndpoint3Target)) ==
+                            CHIP_NO_ERROR,
+                        Status::Failure, ChipLogError(AppServer, "Failed to set target for Endpoint 3"));
+
+    VerifyOrReturnError(mClosureEndpoint1.GetLogic().SetCountdownTimeFromDelegate(kDefaultCountdownTimeSeconds) == CHIP_NO_ERROR,
+                        Status::Failure, ChipLogError(AppServer, "Failed to set countdown time for move to command on Endpoint 1"));
+
+    // Set the current action to UNLATCH_ACTION.
+    // This is to ensure that the closure is unlatched before starting the motion action.
+    // The Closure Control Cluster will handle the unlatch action before proceeding with the motion action.
+    DeviceLayer::PlatformMgr().LockChipStack();
+    SetCurrentAction(UNLATCH_ACTION);
+    isMoveToInProgress = true;
+    DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    // Post an event to initiate the move to action asynchronously.
+    // MoveTo Command can only be initiated from Closure Control Endpoint (Endpoint 1).
+    AppEvent event;
+    event.Type                = AppEvent::kEventType_Closure;
+    event.ClosureEvent.Action = mCurrentAction;
+    event.Handler             = InitiateAction;
+    AppTask::GetAppTask().PostEvent(&event);
+
     return Status::Success;
+}
+
+void ClosureManager::HandleClosureMotionAction()
+{
+    ClosureManager & instance = ClosureManager::GetInstance();
+
+    DataModel::Nullable<GenericDimensionStateStruct> mClosurePanelEndpoint2CurrentState;
+    DataModel::Nullable<GenericDimensionStateStruct> mClosurePanelEndpoint3CurrentState;
+
+    DataModel::Nullable<GenericDimensionStateStruct> mClosurePanelEndpoint2TargetState;
+    DataModel::Nullable<GenericDimensionStateStruct> mClosurePanelEndpoint3TargetState;
+
+    VerifyOrReturn(mClosurePanelEndpoint2.GetLogic().GetCurrentState(mClosurePanelEndpoint2CurrentState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get current state for Endpoint 2"));
+    VerifyOrReturn(mClosurePanelEndpoint3.GetLogic().GetCurrentState(mClosurePanelEndpoint3CurrentState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get current state for Endpoint 3"));
+    VerifyOrReturn(mClosurePanelEndpoint2.GetLogic().GetTargetState(mClosurePanelEndpoint2TargetState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get target state for Endpoint 2"));
+    VerifyOrReturn(mClosurePanelEndpoint3.GetLogic().GetTargetState(mClosurePanelEndpoint3TargetState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get target state for Endpoint 3"));
+
+    VerifyOrReturn(!mClosurePanelEndpoint2CurrentState.IsNull(),
+                   ChipLogError(AppServer, "MoveToCommand failed due to Null value Current state on Endpoint 2"));
+    VerifyOrReturn(!mClosurePanelEndpoint3CurrentState.IsNull(),
+                   ChipLogError(AppServer, "MoveToCommand failed due to Null value Current state on Endpoint 3"));
+
+    VerifyOrReturn(!mClosurePanelEndpoint2TargetState.IsNull(),
+                   ChipLogError(AppServer, "MoveToCommand failed due to Null value Target state on Endpoint 2"));
+    VerifyOrReturn(!mClosurePanelEndpoint3TargetState.IsNull(),
+                   ChipLogError(AppServer, "MoveToCommand failed due to Null value Target state on Endpoint 3"));
+
+    // Once Closure is unlatched, we can proceed with the motion action for endpoints 2 and 3.
+    DataModel::Nullable<Percent100ths> mClosurePanelEndpoint2NextPosition = DataModel::NullNullable;
+    DataModel::Nullable<Percent100ths> mClosurePanelEndpoint3NextPosition = DataModel::NullNullable;
+
+    bool isEndPoint2ProgressPossible = false;
+    bool isEndPoint3ProgressPossible = false;
+
+    // Get the Next Current State to be set for the endpoint 2, if target postion is not reached.
+    if (GetPanelNextPosition(mClosurePanelEndpoint2CurrentState.Value(), mClosurePanelEndpoint2TargetState.Value(),
+                             mClosurePanelEndpoint2NextPosition))
+    {
+        VerifyOrReturn(!mClosurePanelEndpoint2NextPosition.IsNull(),
+                       ChipLogError(AppServer, "Failed to get next position for Endpoint 2"));
+        mClosurePanelEndpoint2CurrentState.Value().position.SetValue(
+            DataModel::MakeNullable(mClosurePanelEndpoint2NextPosition.Value()));
+        instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(mClosurePanelEndpoint2CurrentState);
+        isEndPoint2ProgressPossible =
+            (mClosurePanelEndpoint2NextPosition.Value() != mClosurePanelEndpoint2TargetState.Value().position.Value().Value());
+        ChipLogProgress(AppServer, "EndPoint 2 Current Position: %d, Target Position: %d",
+                        mClosurePanelEndpoint2NextPosition.Value(),
+                        mClosurePanelEndpoint2TargetState.Value().position.Value().Value());
+    }
+
+    // Get the Next Current State to be set for the endpoint 3, if target postion is not reached.
+    if (GetPanelNextPosition(mClosurePanelEndpoint3CurrentState.Value(), mClosurePanelEndpoint3TargetState.Value(),
+                             mClosurePanelEndpoint3NextPosition))
+    {
+        VerifyOrReturn(!mClosurePanelEndpoint3NextPosition.IsNull(),
+                       ChipLogError(AppServer, "Failed to get next position for Endpoint 3"));
+        mClosurePanelEndpoint3CurrentState.Value().position.SetValue(
+            DataModel::MakeNullable(mClosurePanelEndpoint3NextPosition.Value()));
+        instance.mClosurePanelEndpoint3.GetLogic().SetCurrentState(mClosurePanelEndpoint3CurrentState);
+        isEndPoint3ProgressPossible =
+            (mClosurePanelEndpoint3NextPosition.Value() != mClosurePanelEndpoint3TargetState.Value().position.Value().Value());
+        ChipLogProgress(AppServer, "EndPoint 3 Current Position: %d, Target Position: %d",
+                        mClosurePanelEndpoint3NextPosition.Value(),
+                        mClosurePanelEndpoint3TargetState.Value().position.Value().Value());
+    }
+
+    // Check if both endpoints have reached their target positions
+    // If both endpoints have reached their target positions, we can consider the closure motion action as complete.
+    // If either endpoint has not reached its target position, we will continue the motion action
+    // and set the closureTargetReached flag to false.
+    // This will ensure that the closure motion action continues until both endpoints have reached their target positions.
+    bool isProgressPossible = isEndPoint2ProgressPossible || isEndPoint3ProgressPossible;
+
+    ChipLogProgress(AppServer, "Motion progress possible: %s", isProgressPossible ? "true" : "false");
+
+    // If the closure target is not reached, we will reschedule the timer for motion action
+    if (isProgressPossible)
+    {
+        instance.CancelTimer(); // Cancel any existing timer before starting a new action
+        instance.SetCurrentAction(MOVE_TO_ACTION);
+        instance.StartTimer(kMotionCountdownTimeMs);
+        return;
+    }
+
+    DataModel::Nullable<GenericOverallCurrentState> mClosureEndpoint1CurrentState;
+    DataModel::Nullable<GenericOverallTargetState> mClosureEndpoint1TargetState;
+
+    VerifyOrReturn(mClosureEndpoint1.GetLogic().GetOverallCurrentState(mClosureEndpoint1CurrentState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get current state for Endpoint 1"));
+    VerifyOrReturn(mClosureEndpoint1.GetLogic().GetOverallTargetState(mClosureEndpoint1TargetState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get target state for Endpoint 1"));
+
+    VerifyOrReturn(!mClosureEndpoint1CurrentState.IsNull(),
+                   ChipLogError(AppServer, "MoveToCommand failed due to Null value Current state on Endpoint 1"));
+    VerifyOrReturn(!mClosureEndpoint1TargetState.IsNull(),
+                   ChipLogError(AppServer, "MoveToCommand failed due to Null value Target state on Endpoint 1"));
+
+    // If both endpoints have reached their target positions, we can consider the closure motion action as complete.
+    // Before calling HandleClosureActionComplete, we need to check if a latch action is needed.
+    if (mClosureEndpoint1CurrentState.Value().latch.HasValue() && !mClosureEndpoint1CurrentState.Value().latch.Value().IsNull() &&
+        mClosureEndpoint1TargetState.Value().latch.HasValue() && !mClosureEndpoint1TargetState.Value().latch.Value().IsNull())
+    {
+        // If currently unlatched (false) and target is latched (true), latch after moving to target position.
+        if (!mClosureEndpoint1CurrentState.Value().latch.Value().Value() &&
+            mClosureEndpoint1TargetState.Value().latch.Value().Value())
+        {
+            // In Real application, this would be replaced with actual unlatch logic.
+            ChipLogProgress(AppServer, "Performing latch action");
+            mClosureEndpoint1CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
+            instance.mClosureEndpoint1.GetLogic().SetOverallCurrentState(mClosureEndpoint1CurrentState);
+            mClosurePanelEndpoint2CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
+            instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(mClosurePanelEndpoint2CurrentState);
+            mClosurePanelEndpoint3CurrentState.Value().latch.SetValue(DataModel::MakeNullable(true));
+            instance.mClosurePanelEndpoint3.GetLogic().SetCurrentState(mClosurePanelEndpoint3CurrentState);
+            ChipLogProgress(AppServer, "latched action complete");
+        }
+    }
+
+    // Target reached and no latch action needed, call HandleClosureAction
+    instance.HandleClosureActionComplete(ClosureManager::Action_t::MOVE_TO_ACTION);
 }
 
 chip::Protocols::InteractionModel::Status ClosureManager::OnSetTargetCommand(const Optional<Percent100ths> & position,
@@ -548,6 +858,70 @@ void ClosureManager::HandlePanelSetTargetAction(EndpointId endpointId)
     }
 
     instance.HandleClosureActionComplete(Action_t::SET_TARGET_ACTION);
+}
+
+void ClosureManager::HandleClosureUnlatchAction()
+{
+    ClosureManager & instance = ClosureManager::GetInstance();
+
+    DataModel::Nullable<GenericOverallCurrentState> mClosureEndpoint1CurrentState;
+    DataModel::Nullable<GenericOverallTargetState> mClosureEndpoint1TargetState;
+    DataModel::Nullable<GenericDimensionStateStruct> mClosurePanelEndpoint2CurrentState;
+    DataModel::Nullable<GenericDimensionStateStruct> mClosurePanelEndpoint3CurrentState;
+
+    VerifyOrReturn(mClosureEndpoint1.GetLogic().GetOverallCurrentState(mClosureEndpoint1CurrentState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get current state for Endpoint 1"));
+    VerifyOrReturn(mClosureEndpoint1.GetLogic().GetOverallTargetState(mClosureEndpoint1TargetState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get target state for Endpoint 1"));
+
+    VerifyOrReturn(mClosurePanelEndpoint2.GetLogic().GetCurrentState(mClosurePanelEndpoint2CurrentState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get current state for Endpoint 2"));
+    VerifyOrReturn(mClosurePanelEndpoint3.GetLogic().GetCurrentState(mClosurePanelEndpoint3CurrentState) == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "Failed to get current state for Endpoint 3"));
+
+    VerifyOrReturn(!mClosureEndpoint1CurrentState.IsNull(),
+                   ChipLogError(AppServer, "UnlatchAction failed due to Null value Current state on Endpoint 1"));
+    VerifyOrReturn(!mClosureEndpoint1TargetState.IsNull(),
+                   ChipLogError(AppServer, "UnlatchAction failed due to Null value Target state on Endpoint 1"));
+
+    VerifyOrReturn(!mClosurePanelEndpoint2CurrentState.IsNull(),
+                   ChipLogError(AppServer, "UnlatchAction failed due to Null value Current state on Endpoint 2"));
+    VerifyOrReturn(!mClosurePanelEndpoint3CurrentState.IsNull(),
+                   ChipLogError(AppServer, "UnlatchAction failed due to Null value Current state on Endpoint 3"));
+
+    // check if closure (endpoint 1) need unlatch before starting the motion action.
+    if (mClosureEndpoint1CurrentState.Value().latch.HasValue() && !mClosureEndpoint1CurrentState.Value().latch.Value().IsNull() &&
+        mClosureEndpoint1TargetState.Value().latch.HasValue() && !mClosureEndpoint1TargetState.Value().latch.Value().IsNull())
+    {
+        bool mClosureEndpoint1CurrentLatchValue      = mClosureEndpoint1CurrentState.Value().latch.Value().Value();
+        bool mClosurePanelEndpoint2CurrentLatchValue = mClosurePanelEndpoint2CurrentState.Value().latch.HasValue() &&
+            !mClosurePanelEndpoint2CurrentState.Value().latch.Value().IsNull() &&
+            mClosurePanelEndpoint2CurrentState.Value().latch.Value().Value();
+        bool mClosurePanelEndpoint3CurrentLatchValue = mClosurePanelEndpoint3CurrentState.Value().latch.HasValue() &&
+            !mClosurePanelEndpoint3CurrentState.Value().latch.Value().IsNull() &&
+            mClosurePanelEndpoint3CurrentState.Value().latch.Value().Value();
+
+        // If currently Closure or any panel is latched (true) and target is unlatched (false), unlatch first before moving
+        if ((mClosureEndpoint1CurrentLatchValue || mClosurePanelEndpoint2CurrentLatchValue ||
+             mClosurePanelEndpoint3CurrentLatchValue) &&
+            !mClosureEndpoint1TargetState.Value().latch.Value().Value())
+        {
+            // In Real application, this would be replaced with actual unlatch logic.
+            ChipLogProgress(AppServer, "Performing unlatch action");
+            mClosureEndpoint1CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
+            instance.mClosureEndpoint1.GetLogic().SetOverallCurrentState(mClosureEndpoint1CurrentState);
+            mClosurePanelEndpoint2CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
+            instance.mClosurePanelEndpoint2.GetLogic().SetCurrentState(mClosurePanelEndpoint2CurrentState);
+            mClosurePanelEndpoint3CurrentState.Value().latch.SetValue(DataModel::MakeNullable(false));
+            instance.mClosurePanelEndpoint3.GetLogic().SetCurrentState(mClosurePanelEndpoint3CurrentState);
+            ChipLogProgress(AppServer, "Unlatched action completed");
+        }
+    }
+
+    CancelTimer(); // Cancel any existing timer before proceeding with the motion action
+
+    // After unlatching, we can proceed with the motion action
+    instance.HandleClosureMotionAction();
 }
 
 void ClosureManager::HandlePanelUnlatchAction(EndpointId endpointId)
@@ -747,4 +1121,37 @@ ClosureDimension::ClosureDimensionEndpoint * ClosureManager::GetPanelEndpointByI
         ChipLogError(AppServer, "GetPanelEndpointById called with invalid endpointId: %u", endpointId);
         return nullptr;
     }
+}
+
+bool ClosureManager::GetPanelNextPosition(const GenericDimensionStateStruct & currentState,
+                                          const GenericDimensionStateStruct & targetState,
+                                          DataModel::Nullable<Percent100ths> & nextPosition)
+{
+    VerifyOrReturnValue(targetState.position.HasValue() && !targetState.position.Value().IsNull(), false,
+                        ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to Target position is not set"));
+
+    VerifyOrReturnValue(currentState.position.HasValue() && !currentState.position.Value().IsNull(), false,
+                        ChipLogError(AppServer, "Updating CurrentState to NextPosition failed due to Current position is not set"));
+
+    chip::Percent100ths currentPosition = currentState.position.Value().Value();
+    chip::Percent100ths targetPosition  = targetState.position.Value().Value();
+
+    if (currentPosition < targetPosition)
+    {
+        // Increment position by 1000 units, capped at target.
+        nextPosition.SetNonNull(std::min(static_cast<chip::Percent100ths>(currentPosition + kMotionPositionStep), targetPosition));
+    }
+    else if (currentPosition > targetPosition)
+    {
+        // Moving down: Decreasing the current position by a step of 1000 units,
+        // ensuring it does not go below the target position.
+        nextPosition.SetNonNull(std::max(static_cast<chip::Percent100ths>(currentPosition - kMotionPositionStep), targetPosition));
+    }
+    else
+    {
+        // Already at target: No further action is needed as the current position matches the target position.
+        nextPosition.SetNonNull(currentPosition);
+        return false; // No update needed
+    }
+    return true;
 }

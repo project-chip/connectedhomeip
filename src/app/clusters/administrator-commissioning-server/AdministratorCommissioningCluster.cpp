@@ -56,7 +56,7 @@ DataModel::ActionReturnStatus AdministratorCommissioningCluster::ReadAttribute(c
     switch (request.path.mAttributeId)
     {
     case FeatureMap::Id:
-        return encoder.Encode(BitFlags<AdministratorCommissioning::Feature>{ 0 }.Raw());
+        return encoder.Encode(BitFlags<AdministratorCommissioning::Feature>{ 0 });
     case ClusterRevision::Id:
         return encoder.Encode(AdministratorCommissioning::kRevision);
     case WindowStatus::Id:
@@ -144,7 +144,7 @@ AdministratorCommissioningWithBasicCommissioningWindowCluster::ReadAttribute(con
 
     if (request.path.mAttributeId == FeatureMap::Id)
     {
-        return encoder.Encode(mFeatures.Raw());
+        return encoder.Encode(mFeatures);
     }
 
     return AdministratorCommissioningCluster::ReadAttribute(request, encoder);
