@@ -152,13 +152,15 @@ public:
     template <size_t N>
     static Span<const T> ContentOf(const T (&data)[N])
     {
-        if (!IsValid({ data, N }))
+        LengthType len = PascalPrefixOperations<PREFIX_LEN>::GetLength(data);
+
+        if ((len == kInvalidLength) || (len + PREFIX_LEN > N))
         {
-            return Span<const T>(); // empty span on invalid data
+            return Span<const T>();
         }
 
         // we know data length is valid, return it
-        return { data + PREFIX_LEN, PascalPrefixOperations<PREFIX_LEN>::GetLength(data) };
+        return { data + PREFIX_LEN, len };
     }
 
 private:
