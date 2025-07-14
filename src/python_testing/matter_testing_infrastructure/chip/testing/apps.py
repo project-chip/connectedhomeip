@@ -102,3 +102,90 @@ class JFControllerSubprocess(Subprocess):
         # Start the server application
         super().__init__(*command,  # Pass the constructed command list
                          output_cb=lambda line, is_stderr: self.PREFIX + line)
+
+
+class OTAProviderSubprocess(AppServerSubprocess):
+    """Wrapper class for starting an OTA Provider application server in a subprocess."""
+
+    # Prefix for log messages from the OTA provider application.
+    PREFIX = b"[OTA-PROVIDER]"
+
+    def __init__(self, app: str, storage_dir: str, discriminator: int,
+                 passcode: int, port: int = 5540, ota_image_path: str = None,
+                 image_list_path: str = None, extra_args: list[str] = []):
+        """Initialize the OTA Provider subprocess.
+
+        Args:
+            app: Path to the chip-ota-provider-app executable
+            storage_dir: Directory for persistent storage
+            discriminator: Discriminator for commissioning
+            passcode: Passcode for commissioning
+            port: UDP port for secure connections
+            ota_image_path: Path to OTA image file (cannot be used with image_list_path)
+            image_list_path: Path to JSON image list file (cannot be used with ota_image_path)
+            extra_args: Additional command line arguments
+        """
+        # Initialize kvs_fd to None to avoid __del__ issues if constructor fails
+        self.kvs_fd = None
+
+        if ota_image_path and image_list_path:
+            raise ValueError("Cannot specify both ota_image_path and image_list_path")
+
+        if not ota_image_path and not image_list_path:
+            raise ValueError("Must specify either ota_image_path or image_list_path")
+
+        # Build OTA-specific arguments
+        ota_args = []
+        if ota_image_path:
+            ota_args.extend(["--filepath", ota_image_path])
+        elif image_list_path:
+            ota_args.extend(["--otaImageList", image_list_path])
+
+        # Combine with any additional extra args
+        combined_extra_args = ota_args + extra_args
+
+        # Initialize with the combined arguments
+        super().__init__(app=app, storage_dir=storage_dir, discriminator=discriminator,
+                         passcode=passcode, port=port, extra_args=combined_extra_args)
+
+    def create_acl_entry(self, dev_ctrl, provider_node_id: int, requestor_node_id: int = None):
+        """Create ACL entries to allow OTA requestors to access the provider.
+
+        Args:
+            dev_ctrl: Device controller for sending commands
+            provider_node_id: Node ID of the OTA provider
+            requestor_node_id: Optional specific requestor node ID for targeted access
+
+        Returns:
+            Result of the ACL write operation
+        """
+        # Standard ACL entry for OTA Provider cluster (0x0029)
+        acl_entries = [
+            {
+                "fabricIndex": 1,
+                "privilege": 5,  # Administer
+                "authMode": 2,   # CASE
+                "subjects": [dev_ctrl.nodeId] if hasattr(dev_ctrl, 'nodeId') else [112233],
+                "targets": None
+            },
+            {
+                "fabricIndex": 1,
+                "privilege": 3,  # Operate
+                "authMode": 2,   # CASE
+                "subjects": [requestor_node_id] if requestor_node_id else None,
+                "targets": [{"cluster": 41, "endpoint": None, "deviceType": None}]  # OTA Provider cluster 0x0029 = 41
+            }
+        ]
+
+        return dev_ctrl.WriteAttribute(
+            nodeid=provider_node_id,
+            attributes=[(0, 0x001F, 0x0000, acl_entries)]  # AccessControl cluster 0x001F, ACL attribute 0x0000
+        )
+
+    def __del__(self):
+        # Override to safely handle kvs_fd that might not exist if constructor failed
+        if hasattr(self, 'kvs_fd') and self.kvs_fd is not None:
+            try:
+                os.close(self.kvs_fd)
+            except (OSError, AttributeError):
+                pass  # Ignore errors during cleanup
