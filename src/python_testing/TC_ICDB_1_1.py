@@ -36,16 +36,16 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-from time import sleep
-from datetime import timedelta
 import random
-from mobly import asserts
+from datetime import timedelta
+from time import sleep
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
+from chip.ChipDeviceCtrl import ScopedNodeId, WaitForCheckIn
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.ChipDeviceCtrl import ScopedNodeId, WaitForCheckIn
+from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
