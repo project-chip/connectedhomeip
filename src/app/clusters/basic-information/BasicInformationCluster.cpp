@@ -63,7 +63,7 @@ constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
 
 };
 
-/// a storage buffer that is provideded by callers to store string data.
+/// a storage buffer that is provided by callers to store string data.
 /// It is sized to support reading any of the underlying data items in the
 /// logic class.
 struct StringReadBuffer

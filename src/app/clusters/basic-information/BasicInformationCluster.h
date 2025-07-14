@@ -47,7 +47,7 @@ enum class OptionalBasicInformationAttributes : uint16_t
 /// The BasicInformationCluster is a SINGLETON that only applies to
 /// the root endpoint id.
 ///
-/// If registered, it auto-registers itself as a PlatforMmanagerDelegate
+/// If registered, it auto-registers itself as a PlatformManagerDelegate
 /// and will emit startup/shtdown events
 class BasicInformationCluster : public DefaultServerCluster, public DeviceLayer::PlatformManagerDelegate
 {
