@@ -204,7 +204,7 @@ DataModel::ActionReturnStatus WiFiDiagnosticsServer::ReadAttribute(const DataMod
     switch (request.path.mAttributeId)
     {
     case FeatureMap::Id: {
-        return encoder.Encode(mLogic.GetFeatureFlags().Raw());
+        return encoder.Encode(mLogic.GetFeatureFlags());
     }
     case ClusterRevision::Id: {
         return encoder.Encode(WiFiNetworkDiagnostics::kRevision);
@@ -225,7 +225,7 @@ DataModel::ActionReturnStatus WiFiDiagnosticsServer::ReadAttribute(const DataMod
         return mLogic.ReadWiFiRssi(encoder);
     }
     case BeaconLostCount::Id: {
-        if (mLogic.GetFeatureFlags().Has(Feature::kErrorCounts) && mLogic.GetEnabledAttributes().enableBeaconLostCount)
+        if (mLogic.GetFeatureFlags().Has(Feature::kErrorCounts))
         {
             Attributes::BeaconLostCount::TypeInfo::Type count;
             return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiBeaconLostCount, count, encoder);
@@ -233,7 +233,7 @@ DataModel::ActionReturnStatus WiFiDiagnosticsServer::ReadAttribute(const DataMod
         break;
     }
     case BeaconRxCount::Id: {
-        if (mLogic.GetFeatureFlags().Has(Feature::kPacketCounts) && mLogic.GetEnabledAttributes().enableBeaconRxCount)
+        if (mLogic.GetFeatureFlags().Has(Feature::kPacketCounts))
         {
             Attributes::BeaconRxCount::TypeInfo::Type count;
             return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiBeaconRxCount, count, encoder);
@@ -241,7 +241,7 @@ DataModel::ActionReturnStatus WiFiDiagnosticsServer::ReadAttribute(const DataMod
         break;
     }
     case PacketMulticastRxCount::Id: {
-        if (mLogic.GetFeatureFlags().Has(Feature::kPacketCounts) && mLogic.GetEnabledAttributes().enablePacketMulticastRxCount)
+        if (mLogic.GetFeatureFlags().Has(Feature::kPacketCounts))
         {
             Attributes::PacketMulticastRxCount::TypeInfo::Type count;
             return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiPacketMulticastRxCount, count, encoder);
@@ -249,7 +249,7 @@ DataModel::ActionReturnStatus WiFiDiagnosticsServer::ReadAttribute(const DataMod
         break;
     }
     case PacketMulticastTxCount::Id: {
-        if (mLogic.GetFeatureFlags().Has(Feature::kPacketCounts) && mLogic.GetEnabledAttributes().enablePacketMulticastTxCount)
+        if (mLogic.GetFeatureFlags().Has(Feature::kPacketCounts))
         {
             Attributes::PacketMulticastTxCount::TypeInfo::Type count;
             return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiPacketMulticastTxCount, count, encoder);
@@ -257,7 +257,7 @@ DataModel::ActionReturnStatus WiFiDiagnosticsServer::ReadAttribute(const DataMod
         break;
     }
     case PacketUnicastRxCount::Id: {
-        if (mLogic.GetFeatureFlags().Has(Feature::kPacketCounts) && mLogic.GetEnabledAttributes().enablePacketUnicastRxCount)
+        if (mLogic.GetFeatureFlags().Has(Feature::kPacketCounts))
         {
             Attributes::PacketUnicastRxCount::TypeInfo::Type count;
             return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiPacketUnicastRxCount, count, encoder);
@@ -265,7 +265,7 @@ DataModel::ActionReturnStatus WiFiDiagnosticsServer::ReadAttribute(const DataMod
         break;
     }
     case PacketUnicastTxCount::Id: {
-        if (mLogic.GetFeatureFlags().Has(Feature::kPacketCounts) && mLogic.GetEnabledAttributes().enablePacketUnicastTxCount)
+        if (mLogic.GetFeatureFlags().Has(Feature::kPacketCounts))
         {
             Attributes::PacketUnicastTxCount::TypeInfo::Type count;
             return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiPacketUnicastTxCount, count, encoder);
@@ -281,7 +281,7 @@ DataModel::ActionReturnStatus WiFiDiagnosticsServer::ReadAttribute(const DataMod
         break;
     }
     case OverrunCount::Id: {
-        if (mLogic.GetFeatureFlags().Has(Feature::kErrorCounts) && mLogic.GetEnabledAttributes().enableOverrunCount)
+        if (mLogic.GetFeatureFlags().Has(Feature::kErrorCounts))
         {
             Attributes::OverrunCount::TypeInfo::Type count;
             return mLogic.ReadIfSupported(&DiagnosticDataProvider::GetWiFiOverrunCount, count, encoder);
@@ -352,13 +352,11 @@ std::optional<DataModel::ActionReturnStatus> WiFiDiagnosticsServer::InvokeComman
     switch (request.path.mCommandId)
     {
     case Commands::ResetCounts::Id: {
-#ifdef WI_FI_NETWORK_DIAGNOSTICS_ENABLE_RESET_COUNTS_CMD
         if (mLogic.GetFeatureFlags().Has(Feature::kErrorCounts))
         {
             mLogic.HandleResetCounts();
             return Protocols::InteractionModel::Status::Success;
         }
-#endif
         break;
     }
     default:
