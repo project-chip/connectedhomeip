@@ -102,8 +102,7 @@ class MockServerCluster : public DefaultServerCluster
 public:
     MockServerCluster(std::initializer_list<ConcreteClusterPath> paths, DataVersion dataVersion,
                       BitFlags<DataModel::ClusterQualityFlags> flags) :
-        DefaultServerCluster({ 0, 0 }),
-        mPaths(paths), mDataVersion(dataVersion), mFlags(flags),
+        DefaultServerCluster({ 0, 0 }), mPaths(paths), mDataVersion(dataVersion), mFlags(flags),
         mAttributeEntry(1, BitMask<DataModel::AttributeQualityFlags>(), std::nullopt, std::nullopt)
     {}
 
@@ -945,7 +944,7 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommand)
     reader.Init(buffer->Start(), buffer->DataLength());
     DataModel::InvokeRequest request = { .path = ConcreteCommandPath(1, 10, 1) };
     auto result                      = mProvider.InvokeCommand(request, reader, nullptr);
-    EXPECT_TRUE(result.has_value());
+    ASSERT_TRUE(result.has_value());
     EXPECT_EQ(result.value().GetUnderlyingError(), CHIP_NO_ERROR);
     EXPECT_EQ(testCluster.mLastInvokeRequest.path, request.path);
 }
