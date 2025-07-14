@@ -38,6 +38,7 @@ public:
     {
         CALIBRATE_ACTION = 0,
         MOVE_TO_ACTION,
+        UNLATCH_ACTION,
         STOP_ACTION,
         SET_TARGET_ACTION,
         PANEL_UNLATCH_ACTION,
@@ -155,6 +156,28 @@ public:
      */
     const Action_t & GetCurrentAction() const { return mCurrentAction; }
 
+    /**
+     * @brief Sets the initial state for the ClosureControlEndpoint.
+     *
+     * This method initializes the closure control instance with default values and configurations.
+     *
+     * @param closureControlEndpoint The ClosureControlEndpoint to be initialized.
+     *
+     * @return CHIP_ERROR Returns CHIP_NO_ERROR on success, or an error code if initialization fails.
+     */
+    CHIP_ERROR SetClosureControlInitialState(chip::app::Clusters::ClosureControl::ClosureControlEndpoint & closureControlEndpoint);
+
+    /**
+     * @brief Sets the initial state for the ClosureDimensionEndpoint.
+     *
+     * This method initializes the closure panel instance with default values and configurations.
+     *
+     * @param closurePanelEndpoint The ClosureDimensionEndpoint to be initialized.
+     *
+     * @return CHIP_ERROR Returns CHIP_NO_ERROR on success, or an error code if initialization fails.
+     */
+    CHIP_ERROR SetClosurePanelInitialState(chip::app::Clusters::ClosureDimension::ClosureDimensionEndpoint & closurePanelEndpoint);
+
 private:
     static ClosureManager sClosureMgr;
 
@@ -242,6 +265,40 @@ private:
      * @param timerCbArg Pointer to the callback argument (unused).
      */
     static void TimerEventHandler(void * timerCbArg);
+
+    /**
+     * @brief Handles the motion action for closure endpoint.
+     *
+     * This method performs the latch action for closure endpoint and updates the current positions of endpoints 2 and 3
+     * to the next position towards their target positions and calls HandleClosureActionComplete if both endpoints
+     * have reached their target positions.
+     */
+    void HandleClosureMotionAction();
+
+    /**
+     * @brief Handles the unlatch action for closure endpoint.
+     *
+     * This method performs the unlatch action for closure endpoint if needed and updates the latch of endpoints 2 and 3
+     * and calls HandleClosureMotionAction to continue the motion action.
+     */
+    void HandleClosureUnlatchAction();
+
+    /**
+     * @brief Calculates the next position for a panel based on the closure panel state.
+     *
+     * This function determines the next position by incrementing or decrementing current position of the panel
+     * by a fixed step (1000 units) towards the target position, ensuring it does not overshoot the target.
+     *
+     * @param[in]  currentState   The current state of the panel, containing the current position.
+     * @param[in]  targetState    The target state of the panel, containing the desired position.
+     * @param[out] nextPosition   A reference to a Nullable object that will be updated with the next current position.
+     *
+     * @return true if the next position was updated and movement is required; false if no update is needed
+     *         or if either the current or target position is not set.
+     */
+    bool GetPanelNextPosition(const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & currentState,
+                              const chip::app::Clusters::ClosureDimension::GenericDimensionStateStruct & targetState,
+                              chip::app::DataModel::Nullable<chip::Percent100ths> & nextPosition);
 
     /**
      * @brief Handles the SetTarget motion action for a panel endpoint.
