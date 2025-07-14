@@ -1185,6 +1185,16 @@ CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneID)
     return CameraError::SUCCESS;
 }
 
+void CameraDevice::HandleSimulatedZoneTriggeredEvent(uint16_t zoneID)
+{
+    mZoneManager.OnZoneTriggeredEvent(zoneID, ZoneEventTriggeredReasonEnum::kMotion);
+}
+
+void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneID)
+{
+    mZoneManager.OnZoneStoppedEvent(zoneID, ZoneEventStoppedReasonEnum::kActionStopped);
+}
+
 void CameraDevice::InitializeVideoStreams()
 {
     // Create single video stream with typical supported parameters
