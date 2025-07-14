@@ -16,6 +16,7 @@ import os
 import signal
 import tempfile
 
+import chip.clusters as Clusters
 from chip.testing.tasks import Subprocess
 
 
@@ -159,27 +160,27 @@ class OTAProviderSubprocess(AppServerSubprocess):
         Returns:
             Result of the ACL write operation
         """
-        # Standard ACL entry for OTA Provider cluster (0x0029)
+        # Standard ACL entry for OTA Provider cluster
         acl_entries = [
             {
                 "fabricIndex": 1,
-                "privilege": 5,  # Administer
-                "authMode": 2,   # CASE
+                "privilege": Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kAdminister,
+                "authMode": Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
                 "subjects": [dev_ctrl.nodeId] if hasattr(dev_ctrl, 'nodeId') else [112233],
                 "targets": None
             },
             {
                 "fabricIndex": 1,
-                "privilege": 3,  # Operate
-                "authMode": 2,   # CASE
+                "privilege": Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kOperate,
+                "authMode": Clusters.AccessControl.Enums.AccessControlEntryAuthModeEnum.kCase,
                 "subjects": [requestor_node_id] if requestor_node_id else None,
-                "targets": [{"cluster": 41, "endpoint": None, "deviceType": None}]  # OTA Provider cluster 0x0029 = 41
+                "targets": [{"cluster": Clusters.OtaSoftwareUpdateProvider.id, "endpoint": None, "deviceType": None}]
             }
         ]
 
         return dev_ctrl.WriteAttribute(
             nodeid=provider_node_id,
-            attributes=[(0, 0x001F, 0x0000, acl_entries)]  # AccessControl cluster 0x001F, ACL attribute 0x0000
+            attributes=[(0, Clusters.AccessControl.id, Clusters.AccessControl.Attributes.Acl.attribute_id, acl_entries)]
         )
 
     def __del__(self):
