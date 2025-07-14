@@ -248,6 +248,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     struct netif * netif = deviceInterface_getNetif();
     if (netif == nullptr)
     {
+        delete ifp;
+        *netifpp = nullptr;
         return CHIP_ERROR_NOT_FOUND;
     }
 
