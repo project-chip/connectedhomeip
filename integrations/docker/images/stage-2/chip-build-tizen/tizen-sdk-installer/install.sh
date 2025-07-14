@@ -149,8 +149,8 @@ function install_dependencies() {
 # unzip_globs function below wrt. globs matching multiple RPMs.
 function unrpm_globs() {
     local destdir="$1"
-    shift
-    for fn_glob in "${@}"; do
+    declare -n globs="$2"
+    for fn_glob in "${globs[@]}"; do
         info "Processing filenames matching '$fn_glob' ..."
 
         most_recent_filename=$(find "$PKG_CACHE_PATH" -name "$fn_glob" -printf '%T@ %p\n' |
@@ -173,17 +173,23 @@ function unrpm_globs() {
 # The function assumes that every glob matches at lease one filename.
 function unzip_globs() {
     local destdir="$1"
-    shift
-    for fn_glob in "${@}"; do
+    declare -n globs="$2"
+    for fn_glob in "${globs[@]}"; do
         info "Processing filenames matching '$fn_glob' ..."
 
         most_recent_filename=$(find "$PKG_CACHE_PATH" -name "$fn_glob" -printf '%T@ %p\n' |
             sort -nr | head -n 1 | cut -d ' ' -f 2)
 
         info "Unpacking '$most_recent_filename' into '$destdir'"
-        verbose_flag="-q"
-        [ -n "$VERBOSE" ] && unset verbose_flag
-        unzip "$verbose_flag" "$most_recent_filename" 'data/*' -d "$destdir"
+
+        # Shellharden puts quotes around ${VERBOSE:+-v} which causes an empty
+        # argv item to be passed to unzip when verbose is not specified.
+        # unzip does not like that and bails out.
+        if [ -n "$VERBOSE" ]; then
+            unzip "$most_recent_filename" 'data/*' -d "$destdir"
+        else
+            unzip -q "$most_recent_filename" 'data/*' -d "$destdir"
+        fi
     done
 }
 
@@ -229,19 +235,19 @@ function install_tizen_sdk_common() {
 
     info "Installing Tizen Studio CLI..."
 
-    unzip_globs "$TIZEN_SDK_ROOT" "${COMMON_TIZENSTUDIO_ZIPS[@]}"
+    unzip_globs "$TIZEN_SDK_ROOT" COMMON_TIZENSTUDIO_ZIPS
 
     info "Installing common toolchain files ..."
-    unzip_globs "${COMMON_TOOLCHAIN_ZIPS[@]}"
+    unzip_globs "$TIZEN_SDK_ROOT" COMMON_TOOLCHAIN_ZIPS
 
     info "Installing common IoT files ..."
-    unzip_globs "${IOT_ZIPS[@]}"
+    unzip_globs "$TIZEN_SDK_ROOT" IOT_ZIPS
 }
 
 function add_suffix() {
     local suffix="$1"
-    shift
-    for p in "$@"; do echo "$p$suffix"; done
+    local -n items="$2"
+    for p in "${items[@]}"; do echo "$p$suffix"; done
 }
 
 # Take care to provide separate globs for binary and devel RPMs
@@ -272,8 +278,8 @@ TIZEN_SDK_BASE_RPMS=(
     'xdgmime-devel-*'
 )
 
-TIZEN_SDK_ARM_BASE_RPMS=("$(add_suffix .armv7l.rpm "${TIZEN_SDK_BASE_RPMS[@]}")")
-TIZEN_SDK_ARM64_BASE_RPMS=("$(add_suffix .aarch64.rpm "${TIZEN_SDK_BASE_RPMS[@]}")")
+TIZEN_SDK_ARM_BASE_RPMS=($(add_suffix .armv7l.rpm TIZEN_SDK_BASE_RPMS))
+TIZEN_SDK_ARM64_BASE_RPMS=($(add_suffix .aarch64.rpm TIZEN_SDK_BASE_RPMS))
 
 TIZEN_SDK_UNIFIED_RPMS=(
     'app-core-common-[0-9]*'
@@ -328,8 +334,8 @@ TIZEN_SDK_UNIFIED_RPMS=(
     'vconf-internal-keys-devel-*'
 )
 
-TIZEN_SDK_ARM_UNIFIED_RPMS=("$(add_suffix .armv7l.rpm "${TIZEN_SDK_UNIFIED_RPMS[@]}")")
-TIZEN_SDK_ARM64_UNIFIED_RPMS=("$(add_suffix .aarch64.rpm "${TIZEN_SDK_UNIFIED_RPMS[@]}")")
+TIZEN_SDK_ARM_UNIFIED_RPMS=($(add_suffix .armv7l.rpm TIZEN_SDK_UNIFIED_RPMS))
+TIZEN_SDK_ARM64_UNIFIED_RPMS=($(add_suffix .aarch64.rpm TIZEN_SDK_UNIFIED_RPMS))
 
 function download_tizen_sdk_arm() {
     # Get toolchain
@@ -355,11 +361,12 @@ function install_tizen_sdk_arm() {
 
     info "Installing Tizen ARM SDK..."
 
-    unzip_globs "$TIZEN_SDK_ROOT" "${SDK_ARM_TIZENSTUDIO_ZIPS[@]}"
+    unzip_globs "$TIZEN_SDK_ROOT" SDK_ARM_TIZENSTUDIO_ZIPS
 
     info "Installing Tizen ARM sysroot..."
 
-    unrpm_globs "$SYSROOT" "${TIZEN_SDK_ARM_BASE_RPMS[@]}" "${TIZEN_SDK_ARM_UNIFIED_RPMS[@]}"
+    unrpm_globs "$SYSROOT" TIZEN_SDK_ARM_BASE_RPMS 
+    unrpm_globs "$SYSROOT" TIZEN_SDK_ARM_UNIFIED_RPMS
 
     fixup_symlinks "$SYSROOT"/usr/{lib,lib64}
 
@@ -390,11 +397,12 @@ function install_tizen_sdk_arm64() {
 
     info "Installing Tizen ARM64 SDK..."
 
-    unzip_globs "$TIZEN_SDK_ROOT" "${SDK_ARM64_TIZENSTUDIO_ZIPS[@]}"
+    unzip_globs "$TIZEN_SDK_ROOT" SDK_ARM64_TIZENSTUDIO_ZIPS
 
     info "Installing Tizen ARM64 sysroot..."
 
-    unrpm_globs "$SYSROOT" "${TIZEN_SDK_ARM64_BASE_RPMS[@]}" "${TIZEN_SDK_ARM64_UNIFIED_RPMS[@]}"
+    unrpm_globs "$SYSROOT" TIZEN_SDK_ARM64_BASE_RPMS
+    unrpm_globs "$SYSROOT" TIZEN_SDK_ARM64_UNIFIED_RPMS
 
     fixup_symlinks "$SYSROOT"/usr/{lib,lib64}
 
