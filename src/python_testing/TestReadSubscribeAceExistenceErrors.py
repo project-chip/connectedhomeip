@@ -371,11 +371,11 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
             attributes=TestPaths,
         )
         asserts.assert_equal(Status.UnsupportedEndpoint,
-                             read_step4b[UNIT_TESTING_ENDPOINT_ID + 80][Clusters.UnitTesting][AttrNeedsAdminDoesNotExist].Reason.status, "Expected Attribute StatusIB with UnsupportedAccess")
+                             read_step4b[UNIT_TESTING_ENDPOINT_ID + 80][Clusters.UnitTesting][AttrNeedsAdminDoesNotExist].Reason.status, "Expected Attribute StatusIB with UnsupportedEndpoint")
         asserts.assert_equal(Status.UnsupportedCluster,
-                             read_step4b[UNIT_TESTING_ENDPOINT_ID + 1][Clusters.UnitTesting][AttrNeedsAdminDoesNotExist].Reason.status, "Expected Attribute StatusIB with UnsupportedAccess")
+                             read_step4b[UNIT_TESTING_ENDPOINT_ID + 1][Clusters.UnitTesting][AttrNeedsAdminDoesNotExist].Reason.status, "Expected Attribute StatusIB with UnsupportedCluster")
         asserts.assert_equal(Status.UnsupportedAttribute,
-                             read_step4b[UNIT_TESTING_ENDPOINT_ID][Clusters.UnitTesting][AttrNeedsAdminDoesNotExist].Reason.status, "Expected Attribute StatusIB with UnsupportedAccess")
+                             read_step4b[UNIT_TESTING_ENDPOINT_ID][Clusters.UnitTesting][AttrNeedsAdminDoesNotExist].Reason.status, "Expected Attribute StatusIB with UnsupportedAttribute")
 
         self.print_step(
             "4c",
