@@ -240,6 +240,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
             # Manually confirm DUT has returned to the dock and completed docking-related activities
             self.step("9")
             if not self.is_ci:
+                confirm_docking_complete = "Manually confirm DUT has returned to the dock and completed docking-related activities"
                 self.wait_for_user_input(prompt_msg=f"{step_name_idle_mode}, and press Enter when ready.")
             else:
                 self.write_to_app_pipe({"Name": "Docked"})
