@@ -1187,12 +1187,10 @@ CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 
     ChipLogProgress(DeviceLayer, "Send GATT disconnect to [%s]", conId->peerAddr.c_str());
     int ret = bt_gatt_disconnect(conId->peerAddr.c_str());
-    VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_disconnect() failed: %s", get_error_message(ret)));
+    VerifyOrReturnError(ret == BT_ERROR_NONE, TizenToChipError(ret),
+                        ChipLogError(DeviceLayer, "bt_gatt_disconnect() failed: %s", get_error_message(ret)));
 
-    RemoveConnection(conId->peerAddr.c_str());
-
-exit:
-    return TizenToChipError(ret);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
