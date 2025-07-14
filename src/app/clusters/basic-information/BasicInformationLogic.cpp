@@ -27,7 +27,16 @@ namespace app {
 namespace Clusters {
 namespace {
 
-void LogIfReadError(AttributeId attributeId, CHIP_ERROR err) {}
+static_assert(sizeof(bool) == 1, "I/O assumption for backwards compatibility");
+
+void LogIfReadError(AttributeId attributeId, CHIP_ERROR err)
+{
+    VerifyOrReturn(err != CHIP_NO_ERROR);
+    VerifyOrReturn(err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+
+    ChipLogError(Zcl, "BasicInformation: failed to load attribute " ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
+                 ChipLogValueMEI(attributeId), err.Format());
+}
 
 } // namespace
 
@@ -37,31 +46,49 @@ BasicInformationLogic & BasicInformationLogic::Instance()
     return sInstance;
 }
 
-CHIP_ERROR BasicInformationLogic::Init(Storage::AttributeStorage & storage)
+CHIP_ERROR BasicInformationLogic::Init(AttributePersistenceProvider & storage)
 {
-    Storage::ShortPascalString labelBuffer(mNodeLabelBuffer);
-    LogIfReadError(Attributes::NodeLabel::Id,
-                   storage.Read({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, labelBuffer));
+    {
+        Storage::ShortPascalString labelBuffer(mNodeLabelBuffer);
+        MutableByteSpan labelSpan = labelBuffer.RawBuffer();
 
-    LogIfReadError(Attributes::LocalConfigDisabled::Id,
-                   storage.Read({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id },
-                                Storage::AttributeStorage::Buffer::Primitive(mLocalConfigDisabled)));
+        LogIfReadError(Attributes::NodeLabel::Id,
+                       storage.ReadValue({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, labelSpan));
+
+        if (!Storage::ShortPascalString::IsValid({ mNodeLabelBuffer, labelSpan.size() }))
+        {
+            // invalid value
+            labelBuffer.SetValue(""_span);
+        }
+    }
+
+    {
+        MutableByteSpan localConfigBytes(reinterpret_cast<uint8_t *>(&mLocalConfigDisabled), sizeof(mLocalConfigDisabled));
+        LogIfReadError(Attributes::LocalConfigDisabled::Id,
+                       storage.ReadValue({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, localConfigBytes));
+
+        if (localConfigBytes.size() == 0)
+        {
+            // invalid value
+            mLocalConfigDisabled = false;
+        }
+    }
 
     return CHIP_NO_ERROR;
 }
 
-DataModel::ActionReturnStatus BasicInformationLogic::SetLocalConfigDisabled(bool value, Storage::AttributeStorage & storage)
+DataModel::ActionReturnStatus BasicInformationLogic::SetLocalConfigDisabled(bool value, AttributePersistenceProvider & storage)
 {
     mLocalConfigDisabled = value;
-    return storage.Write({ kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
-                         Storage::AttributeStorage::Value::Primitive(value));
+    return storage.WriteValue({ kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
+                              { reinterpret_cast<const uint8_t *>(&value), sizeof(value) });
 }
 
-DataModel::ActionReturnStatus BasicInformationLogic::SetNodeLabel(CharSpan label, Storage::AttributeStorage & storage)
+DataModel::ActionReturnStatus BasicInformationLogic::SetNodeLabel(CharSpan label, AttributePersistenceProvider & storage)
 {
     Storage::ShortPascalString labelBuffer(mNodeLabelBuffer);
     VerifyOrReturnError(labelBuffer.SetValue(label), Protocols::InteractionModel::Status::ConstraintError);
-    return storage.Write({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, labelBuffer);
+    return storage.WriteValue({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, labelBuffer.RawValidData());
 }
 
 DataModel::ActionReturnStatus BasicInformationLogic::SetLocation(CharSpan location)
