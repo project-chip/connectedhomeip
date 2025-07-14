@@ -33,7 +33,7 @@ find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 #
 # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
 target_compile_options(app PRIVATE -Werror -Wno-error=maybe-uninitialized)
-target_compile_options(app PRIVATE -Werror PRIVATE -Wno-error=format)
+target_compile_options(app PRIVATE -Werror -Wno-error=format)
 
 project(matter-zephyr-light)
 

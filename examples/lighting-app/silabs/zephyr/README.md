@@ -147,38 +147,38 @@ tool standalone, Android or iOS app.
 
 Here is an example with the chip-tool:
 
-**Commission the device over BLE-WiFi:**
+#### Commission the device over BLE-WiFi:
 
 ```bash
-./out/linux-x64-chip-tool/chip-tool pairing ble-wifi 1 ${SSID} ${PASSWORD} 20202021 3840
+./out/linux-x64-chip-tool/chip-tool pairing ble-wifi ${NODE_ID} ${SSID} ${PASSWORD} 20202021 3840
 ```
 
-**Control the device (turn on/off):**
+#### Control the device (turn on/off):
 
 ```bash
 # Turn on the light
-./out/linux-x64-chip-tool/chip-tool onoff on 1 1
+./out/linux-x64-chip-tool/chip-tool onoff on ${NODE_ID} 1
 
 # Turn off the light
-./out/linux-x64-chip-tool/chip-tool onoff off 1 1
+./out/linux-x64-chip-tool/chip-tool onoff off ${NODE_ID} 1
 
 # Read the on/off state
-./out/linux-x64-chip-tool/chip-tool onoff read on-off 1 1
+./out/linux-x64-chip-tool/chip-tool onoff read on-off ${NODE_ID} 1
 ```
 
-**Level control (if supported):**
+#### Level control (if supported):
 
 ```bash
 # Set brightness to 50%
-./out/linux-x64-chip-tool/chip-tool levelcontrol move-to-level 128 1 1 1
+./out/linux-x64-chip-tool/chip-tool levelcontrol move-to-level 128 1 0 0 ${NODE_ID} 1
 
 # Read current level
-./out/linux-x64-chip-tool/chip-tool levelcontrol read current-level 1 1
+./out/linux-x64-chip-tool/chip-tool levelcontrol read current-level ${NODE_ID} 1
 ```
 
 Where:
 
--   `1` is the node ID assigned to the device
+-   `${NODE_ID}` is the node ID assigned to the device
 -   `20202021` is the setup PIN code
 -   `3840` is the discriminator
 -   `${SSID}` and `${PASSWORD}` are your WiFi network credentials
@@ -255,7 +255,7 @@ platform with the standard Silicon Labs lighting example.
 
 ---
 
-**Additional Resources:**
+### Additional Resources:
 
 -   [Silicon Labs Matter Documentation](https://github.com/SiliconLabs/matter)
 -   [SiWx917 Development Kit User Guide](https://www.silabs.com/development-tools/wireless/wi-fi/siwx917-development-kit)
