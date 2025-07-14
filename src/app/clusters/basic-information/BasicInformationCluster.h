@@ -73,8 +73,6 @@ private:
     const BitFlags<OptionalBasicInformationAttributes> mEnabledOptionalAttributes;
 };
 
-// TODO: define the cluster
-
 } // namespace Clusters
 } // namespace app
 } // namespace chip
