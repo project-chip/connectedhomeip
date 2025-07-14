@@ -32,14 +32,7 @@ namespace Clusters {
 
 struct WiFiNetworkDiagnosticsEnabledAttributes
 {
-    bool enableBeaconLostCount : 1;
-    bool enableBeaconRxCount : 1;
-    bool enablePacketMulticastRxCount : 1;
-    bool enablePacketMulticastTxCount : 1;
-    bool enablePacketUnicastRxCount : 1;
-    bool enablePacketUnicastTxCount : 1;
     bool enableCurrentMaxRate : 1;
-    bool enableOverrunCount : 1;
 };
 
 class WiFiDiagnosticsServerLogic : public DeviceLayer::WiFiDiagnosticsDelegate
@@ -48,27 +41,26 @@ public:
     WiFiDiagnosticsServerLogic(DeviceLayer::DiagnosticDataProvider & diagnosticProvider,
                                const WiFiNetworkDiagnosticsEnabledAttributes & enabledAttributes,
                                BitFlags<WiFiNetworkDiagnostics::Feature> featureFlags) :
-        mDiagnosticProvider(diagnosticProvider),
-        mEnabledAttributes(enabledAttributes), mFeatureFlags(featureFlags)
+        mDiagnosticProvider(diagnosticProvider), mEnabledAttributes(enabledAttributes), mFeatureFlags(featureFlags)
     {}
 
     template <typename T, typename Type>
     CHIP_ERROR ReadIfSupported(CHIP_ERROR (DeviceLayer::DiagnosticDataProvider::*getter)(T &), Type & data,
                                AttributeValueEncoder & aEncoder);
 
+    // These attributes use custom implementations instead of ReadIfSupported because they
+    // provide more detailed logging messages and, in some cases, additional metrics.
     CHIP_ERROR ReadWiFiBssId(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadSecurityType(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadWiFiVersion(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadChannelNumber(AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadWiFiRssi(AttributeValueEncoder & aEncoder);
 
-#ifdef WI_FI_NETWORK_DIAGNOSTICS_ENABLE_RESET_COUNTS_CMD
     CHIP_ERROR HandleResetCounts()
     {
         mDiagnosticProvider.ResetWiFiNetworkDiagnosticsCounts();
         return CHIP_NO_ERROR;
     }
-#endif
 
     // Gets called when the Node detects Node's Wi-Fi connection has been disconnected.
     void OnDisconnectionDetected(uint16_t reasonCode) override;

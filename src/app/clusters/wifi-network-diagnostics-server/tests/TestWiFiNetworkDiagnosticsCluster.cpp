@@ -48,12 +48,7 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, CompileTest)
     };
 
     const WiFiNetworkDiagnosticsEnabledAttributes enabledAttributes{
-        .enableBeaconLostCount        = false,
-        .enableBeaconRxCount          = false,
-        .enablePacketMulticastRxCount = false,
-        .enablePacketMulticastTxCount = false,
-        .enablePacketUnicastRxCount   = false,
-        .enablePacketUnicastTxCount   = false,
+        .enableCurrentMaxRate = false,
     };
 
     NullProvider nullProvider;
@@ -71,12 +66,7 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
         {
         };
         const WiFiNetworkDiagnosticsEnabledAttributes enabledAttributes{
-            .enableBeaconLostCount        = false,
-            .enableBeaconRxCount          = false,
-            .enablePacketMulticastRxCount = false,
-            .enablePacketMulticastTxCount = false,
-            .enablePacketUnicastRxCount   = false,
-            .enablePacketUnicastTxCount   = false,
+            .enableCurrentMaxRate = false,
         };
 
         NullProvider nullProvider;
@@ -123,13 +113,7 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
         };
 
         const WiFiNetworkDiagnosticsEnabledAttributes enabledAttributes{
-            .enableBeaconLostCount        = true,
-            .enableBeaconRxCount          = false,
-            .enablePacketMulticastRxCount = false,
-            .enablePacketMulticastTxCount = false,
-            .enablePacketUnicastRxCount   = false,
-            .enablePacketUnicastTxCount   = false,
-            .enableOverrunCount           = true,
+            .enableCurrentMaxRate = false,
         };
 
         ResetCountsProvider resetCountsProvider;
@@ -219,21 +203,20 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
                 v = 678;
                 return CHIP_NO_ERROR;
             }
-            CHIP_ERROR GetWiFiOverrunCount(uint64_t & v) override
+            CHIP_ERROR GetWiFiCurrentMaxRate(uint64_t & v) override
             {
                 v = 789;
+                return CHIP_NO_ERROR;
+            }
+            CHIP_ERROR GetWiFiOverrunCount(uint64_t & v) override
+            {
+                v = 890;
                 return CHIP_NO_ERROR;
             }
         };
 
         const WiFiNetworkDiagnosticsEnabledAttributes enabledAttributes{
-            .enableBeaconLostCount        = true,
-            .enableBeaconRxCount          = true,
-            .enablePacketMulticastRxCount = true,
-            .enablePacketMulticastTxCount = true,
-            .enablePacketUnicastRxCount   = true,
-            .enablePacketUnicastTxCount   = true,
-            .enableOverrunCount           = true,
+            .enableCurrentMaxRate = true,
         };
 
         AllProvider allProvider;
@@ -271,6 +254,7 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
                       WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::kMetadataEntry,
                       WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::kMetadataEntry,
                       WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::kMetadataEntry,
+                      WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::kMetadataEntry,
                       WiFiNetworkDiagnostics::Attributes::OverrunCount::kMetadataEntry,
                   }),
                   CHIP_NO_ERROR);
@@ -321,9 +305,13 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)
         EXPECT_EQ(allProvider.GetWiFiPacketUnicastTxCount(packetUnicastTxCount), CHIP_NO_ERROR);
         EXPECT_EQ(packetUnicastTxCount, 678u);
 
+        uint64_t currentMaxRate;
+        EXPECT_EQ(allProvider.GetWiFiCurrentMaxRate(currentMaxRate), CHIP_NO_ERROR);
+        EXPECT_EQ(currentMaxRate, 789u);
+
         uint64_t overrunCount;
         EXPECT_EQ(allProvider.GetWiFiOverrunCount(overrunCount), CHIP_NO_ERROR);
-        EXPECT_EQ(overrunCount, 789u);
+        EXPECT_EQ(overrunCount, 890u);
     }
 }
 
