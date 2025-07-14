@@ -14,6 +14,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+/**
+ * @file CodegenIntegration.cpp
+ *
+ * This file contains the WiFi Network Diagnostics cluster integration code for
+ * STATIC/FIXED endpoints only.
+ */
 #include "wifi-network-diagnostics-cluster.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/static-cluster-config/WiFiNetworkDiagnostics.h>
@@ -59,18 +66,12 @@ constexpr bool IsAttributeEnabled(EndpointId endpointId, AttributeId attributeId
 
 } // namespace
 
+// This callback is only called for fixed endpoints.
 void emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
     const WiFiNetworkDiagnosticsEnabledAttributes enabledAttributes{
-        .enableBeaconLostCount        = IsAttributeEnabled(kRootEndpointId, Attributes::BeaconLostCount::Id),
-        .enableBeaconRxCount          = IsAttributeEnabled(kRootEndpointId, Attributes::BeaconRxCount::Id),
-        .enablePacketMulticastRxCount = IsAttributeEnabled(kRootEndpointId, Attributes::PacketMulticastRxCount::Id),
-        .enablePacketMulticastTxCount = IsAttributeEnabled(kRootEndpointId, Attributes::PacketMulticastTxCount::Id),
-        .enablePacketUnicastRxCount   = IsAttributeEnabled(kRootEndpointId, Attributes::PacketUnicastRxCount::Id),
-        .enablePacketUnicastTxCount   = IsAttributeEnabled(kRootEndpointId, Attributes::PacketUnicastTxCount::Id),
-        .enableCurrentMaxRate         = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentMaxRate::Id),
-        .enableOverrunCount           = IsAttributeEnabled(kRootEndpointId, Attributes::OverrunCount::Id),
+        .enableCurrentMaxRate = IsAttributeEnabled(kRootEndpointId, Attributes::CurrentMaxRate::Id),
     };
 
     uint32_t rawFeatureMap;
@@ -91,6 +92,7 @@ void emberAfWiFiNetworkDiagnosticsClusterInitCallback(EndpointId endpointId)
     }
 }
 
+// This callback is only called for fixed endpoints.
 void emberAfWiFiNetworkDiagnosticsClusterShutdownCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
