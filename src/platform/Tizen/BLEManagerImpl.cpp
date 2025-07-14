@@ -87,21 +87,6 @@ constexpr System::Clock::Timeout kFastAdvertiseTimeout =
 
 BLEManagerImpl BLEManagerImpl::sInstance;
 
-struct BLEConnection
-{
-    char * peerAddr;
-    unsigned int mtu;
-    bt_gatt_h gattCharC1Handle;
-    bt_gatt_h gattCharC2Handle;
-};
-
-static void __BLEConnectionFree(BLEConnection * conn)
-{
-    VerifyOrReturn(conn != nullptr);
-    g_free(conn->peerAddr);
-    g_free(conn);
-}
-
 void BLEManagerImpl::AdapterStateChangedCb(int result, bt_adapter_state_e adapterState)
 {
     ChipLogProgress(DeviceLayer, "Adapter State Changed: %s", adapterState == BT_ADAPTER_ENABLED ? "Enabled" : "Disabled");
@@ -226,7 +211,7 @@ void BLEManagerImpl::WriteValueRequestedCb(const char * remoteAddress, int reque
     BLEConnection * conn;
     bt_gatt_type_e type;
 
-    conn = static_cast<BLEConnection *>(g_hash_table_lookup(mConnectionMap, remoteAddress));
+    conn = GetConnection(remoteAddress);
     VerifyOrReturn(conn != nullptr, ChipLogError(DeviceLayer, "Failed to find connection info"));
 
     VerifyOrReturn(__GetAttInfo(gattHandle, &uuid.GetReceiver(), &type) == BT_ERROR_NONE,
@@ -250,15 +235,12 @@ void BLEManagerImpl::IndicationStateChangedCb(bool notify, bt_gatt_server_h serv
     GAutoPtr<char> uuid;
     BLEConnection * conn = nullptr;
     bt_gatt_type_e type;
-    GHashTableIter iter;
-    gpointer key, value;
 
-    g_hash_table_iter_init(&iter, mConnectionMap);
-    while (g_hash_table_iter_next(&iter, &key, &value))
+    for (auto & pair : mConnectionMap)
     {
         /* NOTE: Currently Tizen Platform API does not return remote device address, which enables/disables
          * notification/indication. Therefore, returning first connection. */
-        conn = static_cast<BLEConnection *>(value);
+        conn = static_cast<BLEConnection *>(pair.second);
         break;
     }
 
@@ -281,7 +263,7 @@ void BLEManagerImpl::WriteCompletedCb(int result, bt_gatt_h gattHandle, void * u
     VerifyOrReturn(conn != nullptr, ChipLogError(DeviceLayer, "Connection object is invalid"));
     VerifyOrReturn(conn->gattCharC1Handle == gattHandle, ChipLogError(DeviceLayer, "Gatt characteristic handle did not match"));
 
-    ChipLogProgress(DeviceLayer, "Write Completed to CHIP peripheral [%s]", conn->peerAddr);
+    ChipLogProgress(DeviceLayer, "Write Completed to CHIP peripheral [%s]", conn->peerAddr.c_str());
     sInstance.NotifyHandleWriteComplete(conn);
 }
 
@@ -293,7 +275,7 @@ void BLEManagerImpl::CharacteristicIndicationCb(bt_gatt_h characteristic, char *
     VerifyOrReturn(conn != nullptr, ChipLogError(DeviceLayer, "Connection object is invalid"));
     VerifyOrReturn(conn->gattCharC2Handle == characteristic, ChipLogError(DeviceLayer, "Gatt characteristic handle did not match"));
 
-    ChipLogProgress(DeviceLayer, "Indication received from CHIP peripheral [%s]", conn->peerAddr);
+    ChipLogProgress(DeviceLayer, "Indication received from CHIP peripheral [%s]", conn->peerAddr.c_str());
     sInstance.HandleC2CharChanged(conn, Uint8::from_const_char(value), len);
 }
 
@@ -303,8 +285,7 @@ void BLEManagerImpl::IndicationConfirmationCb(int result, const char * remoteAdd
     BLEConnection * conn = nullptr;
     VerifyOrReturn(result == BT_ERROR_NONE, ChipLogError(DeviceLayer, "Failed to Get Indication Confirmation"));
 
-    conn = static_cast<BLEConnection *>(g_hash_table_lookup(mConnectionMap, remoteAddress));
-
+    conn = GetConnection(remoteAddress);
     VerifyOrReturn(conn != nullptr,
                    ChipLogError(DeviceLayer, "Could not find connection for [%s]", StringOrNullMarker(remoteAddress)));
     VerifyOrReturn(mGattCharC2Handle == characteristic, ChipLogError(DeviceLayer, "Gatt characteristic handle did not match"));
@@ -557,8 +538,8 @@ CHIP_ERROR BLEManagerImpl::RegisterGATTServer()
     ret = bt_gatt_characteristic_create(
         Ble::CHIP_BLE_CHAR_1_UUID_STR, BT_GATT_PERMISSION_WRITE,
         BT_GATT_PROPERTY_WRITE, // Write Request is not coming if we use WITHOUT_RESPONSE property. Let's use WRITE property and
-                                // consider to use WITHOUT_RESPONSE property in the future according to the CHIP Spec 4.16.3.2. BTP
-                                // GATT Service
+                                // consider to use WITHOUT_RESPONSE property in the future according to the CHIP Spec 4.16.3.2.
+                                // BTP GATT Service
         nullptr, 0, &char1);
     VerifyOrExit(ret == BT_ERROR_NONE,
                  ChipLogError(DeviceLayer, "bt_gatt_characteristic_create() failed: %s", get_error_message(ret)));
@@ -800,66 +781,65 @@ bool BLEManagerImpl::IsDeviceChipPeripheral(BLE_CONNECTION_OBJECT conId)
     return conId->gattCharC1Handle != nullptr && conId->gattCharC2Handle != nullptr;
 }
 
-void BLEManagerImpl::AddConnectionData(const char * remoteAddr)
+BLEConnection * BLEManagerImpl::GetConnection(const char * remoteAddr)
 {
-    BLEConnection * conn;
-    ChipLogProgress(DeviceLayer, "AddConnectionData for [%s]", StringOrNullMarker(remoteAddr));
+    auto it = mConnectionMap.find(remoteAddr);
+    return (it != mConnectionMap.end()) ? it->second : nullptr;
+}
 
-    if (!g_hash_table_lookup(mConnectionMap, remoteAddr))
+void BLEManagerImpl::AddConnection(const char * remoteAddr)
+{
+    ChipLogProgress(DeviceLayer, "AddConnection for [%s]", StringOrNullMarker(remoteAddr));
+    VerifyOrReturn(GetConnection(remoteAddr) == nullptr,
+                   ChipLogError(DeviceLayer, "Connection already tracked [%s]", StringOrNullMarker(remoteAddr)));
+
+    BLEConnection * conn = chip::Platform::New<BLEConnection>(remoteAddr);
+    VerifyOrReturn(conn != nullptr, NotifyHandleConnectFailed(CHIP_ERROR_NO_MEMORY));
+
+    int ret;
+    if ((ret = bt_gatt_server_get_device_mtu(remoteAddr, &conn->mtu) != BT_ERROR_NONE))
     {
-        ChipLogProgress(DeviceLayer, "Connection not found in map [%s]", StringOrNullMarker(remoteAddr));
-        conn           = static_cast<BLEConnection *>(g_malloc0(sizeof(BLEConnection)));
-        conn->peerAddr = g_strdup(remoteAddr);
+        ChipLogError(DeviceLayer, "Failed to get MTU for [%s]. ret: %s", StringOrNullMarker(remoteAddr), get_error_message(ret));
+    }
 
-        int ret;
-        if ((ret = bt_gatt_server_get_device_mtu(remoteAddr, &conn->mtu) != BT_ERROR_NONE))
+    if (mIsCentral)
+    {
+        /* Local Device is BLE Central Role */
+        if (IsDeviceChipPeripheral(conn))
         {
-            ChipLogError(DeviceLayer, "Failed to get MTU for [%s]. ret: %s", StringOrNullMarker(remoteAddr),
-                         get_error_message(ret));
-        }
-
-        if (mIsCentral)
-        {
-            /* Local Device is BLE Central Role */
-            if (IsDeviceChipPeripheral(conn))
-            {
-                g_hash_table_insert(mConnectionMap, conn->peerAddr, conn);
-                ChipLogProgress(DeviceLayer, "New Connection Added for [%s]", StringOrNullMarker(remoteAddr));
-                NotifyHandleNewConnection(conn);
-            }
-            else
-            {
-                __BLEConnectionFree(conn);
-            }
+            mConnectionMap[remoteAddr] = conn;
+            ChipLogProgress(DeviceLayer, "New Connection Added for [%s]", StringOrNullMarker(remoteAddr));
+            NotifyHandleNewConnection(conn);
         }
         else
         {
-
-            /* Save own gatt handles */
-            conn->gattCharC1Handle = mGattCharC1Handle;
-            conn->gattCharC2Handle = mGattCharC2Handle;
-
-            g_hash_table_insert(mConnectionMap, conn->peerAddr, conn);
-            ChipLogProgress(DeviceLayer, "New Connection Added for [%s]", StringOrNullMarker(remoteAddr));
+            chip::Platform::Delete(conn);
         }
+    }
+    else
+    {
+
+        /* Save own gatt handles */
+        conn->gattCharC1Handle = mGattCharC1Handle;
+        conn->gattCharC2Handle = mGattCharC2Handle;
+
+        mConnectionMap[remoteAddr] = conn;
+        ChipLogProgress(DeviceLayer, "New Connection Added for [%s]", StringOrNullMarker(remoteAddr));
     }
 }
 
-void BLEManagerImpl::RemoveConnectionData(const char * remoteAddr)
+void BLEManagerImpl::RemoveConnection(const char * remoteAddr)
 {
-    BLEConnection * conn = nullptr;
-    ChipLogProgress(DeviceLayer, "Connection Remove Request for [%s]", StringOrNullMarker(remoteAddr));
+    ChipLogProgress(DeviceLayer, "Connection remove request for [%s]", StringOrNullMarker(remoteAddr));
 
-    VerifyOrReturn(mConnectionMap != nullptr, ChipLogError(DeviceLayer, "Connection map does not exist"));
-
-    conn = static_cast<BLEConnection *>(g_hash_table_lookup(mConnectionMap, remoteAddr));
+    BLEConnection * conn = GetConnection(remoteAddr);
     VerifyOrReturn(conn != nullptr,
                    ChipLogError(DeviceLayer, "Connection does not exist for [%s]", StringOrNullMarker(remoteAddr)));
 
     NotifyBLEDisconnection(conn);
-    g_hash_table_remove(mConnectionMap, remoteAddr);
 
-    ChipLogProgress(DeviceLayer, "Connection Removed");
+    mConnectionMap.erase(remoteAddr);
+    chip::Platform::Delete(conn);
 }
 
 void BLEManagerImpl::HandleC1CharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
@@ -894,12 +874,12 @@ void BLEManagerImpl::HandleConnectionEvent(bool connected, const char * remoteAd
     if (connected)
     {
         ChipLogProgress(DeviceLayer, "Device Connected [%s]", StringOrNullMarker(remoteAddress));
-        AddConnectionData(remoteAddress);
+        AddConnection(remoteAddress);
     }
     else
     {
         ChipLogProgress(DeviceLayer, "Device Disconnected [%s]", StringOrNullMarker(remoteAddress));
-        RemoveConnectionData(remoteAddress);
+        RemoveConnection(remoteAddress);
     }
 }
 
@@ -970,13 +950,8 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     ChipLogProgress(DeviceLayer, "Initialize Tizen BLE Layer");
 
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](BLEManagerImpl * self) { return self->_InitImpl(); }, this);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BLEManagerImpl * self) { return self->_InitImpl(); }, this);
     SuccessOrExit(err);
-
-    // The hash table key is stored in the BLEConnection structure
-    // and is freed by the __BLEConnectionFree() function.
-    mConnectionMap = g_hash_table_new_full(g_str_hash, g_str_equal, nullptr, reinterpret_cast<GDestroyNotify>(__BLEConnectionFree));
 
     mFlags.Set(Flags::kTizenBLELayerInitialized);
 
@@ -1181,7 +1156,7 @@ CHIP_ERROR BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, 
                         ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid characteristic ID"));
     VerifyOrReturnError(conId->gattCharC2Handle != nullptr, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "Char C2 is null"));
 
-    ChipLogProgress(DeviceLayer, "Sending Notification Enable Request to CHIP Peripheral: %s", conId->peerAddr);
+    ChipLogProgress(DeviceLayer, "Sending Notification Enable Request to CHIP Peripheral: %s", conId->peerAddr.c_str());
     int ret = bt_gatt_client_set_characteristic_value_changed_cb(conId->gattCharC2Handle, CharacteristicIndicationCb, conId);
     VerifyOrExit(
         ret == BT_ERROR_NONE,
@@ -1205,7 +1180,7 @@ CHIP_ERROR BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId
                         ChipLogError(DeviceLayer, "UnSubscribeCharacteristic() called with invalid characteristic ID"));
     VerifyOrReturnError(conId->gattCharC2Handle != nullptr, CHIP_ERROR_INTERNAL, ChipLogError(DeviceLayer, "Char C2 is null"));
 
-    ChipLogProgress(DeviceLayer, "Disable Notification Request to CHIP Peripheral: %s", conId->peerAddr);
+    ChipLogProgress(DeviceLayer, "Disable Notification Request to CHIP Peripheral: %s", conId->peerAddr.c_str());
     int ret = bt_gatt_client_unset_characteristic_value_changed_cb(conId->gattCharC2Handle);
     VerifyOrExit(
         ret == BT_ERROR_NONE,
@@ -1223,11 +1198,11 @@ CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
     VerifyOrReturnError(conId != BLE_CONNECTION_UNINITIALIZED, CHIP_ERROR_INVALID_ARGUMENT,
                         ChipLogError(DeviceLayer, "Invalid BLE connection"));
 
-    ChipLogProgress(DeviceLayer, "Send GATT disconnect to [%s]", conId->peerAddr);
-    int ret = bt_gatt_disconnect(conId->peerAddr);
+    ChipLogProgress(DeviceLayer, "Send GATT disconnect to [%s]", conId->peerAddr.c_str());
+    int ret = bt_gatt_disconnect(conId->peerAddr.c_str());
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_disconnect() failed: %s", get_error_message(ret)));
 
-    RemoveConnectionData(conId->peerAddr);
+    RemoveConnection(conId->peerAddr.c_str());
 
 exit:
     return TizenToChipError(ret);
@@ -1243,7 +1218,7 @@ CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Ble
     int ret = bt_gatt_set_value(mGattCharC2Handle, Uint8::to_const_char(pBuf->Start()), static_cast<int>(pBuf->DataLength()));
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_set_value() failed: %s", get_error_message(ret)));
 
-    ChipLogProgress(DeviceLayer, "Sending indication for CHIPoBLE RX characteristic (con %s, len %u)", conId->peerAddr,
+    ChipLogProgress(DeviceLayer, "Sending indication for CHIPoBLE RX characteristic (con %s, len %u)", conId->peerAddr.c_str(),
                     static_cast<int>(pBuf->DataLength()));
 
     ret = bt_gatt_server_notify_characteristic_changed_value(
@@ -1253,7 +1228,7 @@ CHIP_ERROR BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const Ble
             return reinterpret_cast<BLEManagerImpl *>(self)->IndicationConfirmationCb(result, remoteAddress, server, characteristic,
                                                                                       completed);
         },
-        conId->peerAddr, this);
+        conId->peerAddr.c_str(), this);
     VerifyOrExit(
         ret == BT_ERROR_NONE,
         ChipLogError(DeviceLayer, "bt_gatt_server_notify_characteristic_changed_value() failed: %s", get_error_message(ret)));
@@ -1277,7 +1252,7 @@ CHIP_ERROR BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const B
     int ret = bt_gatt_set_value(conId->gattCharC1Handle, Uint8::to_const_char(pBuf->Start()), static_cast<int>(pBuf->DataLength()));
     VerifyOrExit(ret == BT_ERROR_NONE, ChipLogError(DeviceLayer, "bt_gatt_set_value() failed: %s", get_error_message(ret)));
 
-    ChipLogProgress(DeviceLayer, "Sending Write Request for CHIPoBLE TX characteristic (con %s, len %u)", conId->peerAddr,
+    ChipLogProgress(DeviceLayer, "Sending Write Request for CHIPoBLE TX characteristic (con %s, len %u)", conId->peerAddr.c_str(),
                     static_cast<int>(pBuf->DataLength()));
 
     ret = bt_gatt_client_write_value(conId->gattCharC1Handle, WriteCompletedCb, conId);
