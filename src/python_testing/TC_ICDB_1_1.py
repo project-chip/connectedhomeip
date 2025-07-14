@@ -35,11 +35,20 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from mobly import asserts
+import logging
 from time import sleep
-from chip.ChipDeviceCtrl import ScopedNodeId
+from datetime import timedelta
+import random
+
+
+import chip.clusters as Clusters
+from chip import ChipDeviceCtrl
+from chip.interaction_model import InteractionModelError, Status
+from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.ChipDeviceCtrl import ScopedNodeId, WaitForCheckIn
+from mobly import asserts
+
+logger = logging.getLogger(__name__)
 
 
 class TC_ICDB_1_1(MatterBaseTest):
@@ -87,6 +96,7 @@ class TC_ICDB_1_1(MatterBaseTest):
 
         # Commissioning Step
         self.step(1)
+        self.th1 = self.default_controller
 
         try:
             self.step("1a")
@@ -96,44 +106,67 @@ class TC_ICDB_1_1(MatterBaseTest):
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
             for client in registered_clients:
-                try:
-                    await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
-                except InteractionModelError as e:
-                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                if self.nodeId not in client.checkInNodeID:
+                    try:
+                        await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
+                    except InteractionModelError as e:
+                        asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
             self.step("1b")
             try:
                 icd_configs = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, cluster, attributes.IdleModeDuration),
                                                                                              (0, cluster, attributes.ActiveModeDuration),
                                                                                              (0, cluster, attributes.ActiveModeThreshold)])
+
+                idle_mode_duration_s = icd_configs[0][cluster][attributes.IdleModeDuration]
+                active_mode_duration_ms = icd_configs[0][cluster][attributes.ActiveModeDuration]
+                active_mode_threshold_ms = icd_configs[0][cluster][attributes.ActiveModeThreshold]
+
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
 
             self.step(2)
-            registration_info = self.default_controller.GenerateICDRegistrationParameters()
             try:
-                await self._send_single_icdm_command(commands.RegisterClient(checkInNodeID=registration_info.checkInNodeID,
-                                                                             monitoredSubject=registration_info.monitoredSubject,
-                                                                             key=registration_info.key,
-                                                                             clientType=registration_info.clientType))
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                discriminator = random.randint(0, 4095)
 
+                th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
+                th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
+                self.th2 = th2_fabric_admin.NewController(nodeId=self.th1.nodeId, useTestCommissioner=True)
+
+                registration_info = self.th2.GenerateICDRegistrationParameters()
+                self.th2.EnableICDRegistration(registration_info)
+
+                params = await self.th1.OpenCommissioningWindow(nodeid=self.dut_node_id, timeout=900, iteration=10000,
+                                                                discriminator=discriminator, option=self.th1.CommissioningWindowPasscode.kTokenWithRandomPin)
+                await self.th2.CommissionOnNetwork(
+                    nodeId=self.dut_node_id, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator, setupPinCode=params.setupPinCode)
+
+                require_unregister: bool = True
+
+            except:
+                require_unregister = False
+                asserts.fail("Failed to commission TH2 on the DUT")
+
+            # Wait for DUT transition to Idle Mode
             self.step(3)
-            # Wait for DUT transition to Idle Mode - ActiveModeThreshold + ActiveModeDuration
-            sleep(icd_configs.ActiveModeThreshold + icd_configs.ActiveModeDuration)
+            sleep(timedelta(milliseconds=(active_mode_threshold_ms + active_mode_duration_ms)).total_seconds())
 
             self.step(4)
-            # Wait for 1 or more cycle of IdleModeDuration to receinve a Check-In message
+            # Wait for 1 or more cycle of IdleModeDuration to receive a Check-In message
             try:
-                self.default_controller.WaitForCheckIn(ScopedNodeId(self.dut_node_id, self.default_controller.GetFabricIndexInternal()),
-                                                       timeout=icd_configs.IdleModeDuration)
+                await WaitForCheckIn(ScopedNodeId(self.dut_node_id, self.th2.GetFabricIndexInternal()),
+                                     timeoutSeconds=idle_mode_duration_s + 5)  # +5 second as margin of error
             except TimeoutError:
                 asserts.fail("Check-In message not received within IdleModeDuration")
 
         finally:
             # Post Condition processing
-            try:
-                await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=registration_info.checkInNodeID))
-            except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+            if require_unregister:
+                try:
+                    await self.send_single_cmd(dev_ctrl=self.th2, cmd=commands.UnregisterClient(checkInNodeID=registration_info.checkInNodeId), endpoint=0)
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+
+
+if __name__ == "__main__":
+    default_matter_test_main()
