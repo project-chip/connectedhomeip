@@ -152,6 +152,8 @@ private:
     // TODO: #39949 - This information should be stored in the cluster instance.
     size_t mIndexOfCurrentSuggestion;
     DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> mThermostatSuggestionNotFollowingReason;
+
+    bool IsExpirationTimerRunning = false;
 };
 
 } // namespace Thermostat

@@ -373,6 +373,7 @@ CHIP_ERROR ThermostatDelegate::StartExpirationTimer(uint32_t timeoutInSecs)
 {
     ChipLogProgress(Zcl, "Starting timer to wait for %" PRIu32 "seconds for the current thermostat suggestion to expire",
                     timeoutInSecs);
+    IsExpirationTimerRunning = true;
     return DeviceLayer::SystemLayer().StartTimer(std::chrono::duration_cast<Milliseconds32>(Seconds32(timeoutInSecs)),
                                                  TimerExpiredCallback, static_cast<void *>(this));
 }
@@ -407,8 +408,12 @@ void ThermostatDelegate::TimerExpiredCallback(System::Layer * systemLayer, void 
 
 void ThermostatDelegate::CancelExpirationTimer()
 {
-    ChipLogProgress(Zcl, "Cancelling expiration timer for the current thermostat suggestion");
-    DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, static_cast<void *>(this));
+    if (IsExpirationTimerRunning)
+    {
+        ChipLogProgress(Zcl, "Cancelling expiration timer for the current thermostat suggestion");
+        DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, static_cast<void *>(this));
+        IsExpirationTimerRunning = false;
+    }
 }
 
 CHIP_ERROR ThermostatDelegate::ReEvaluateCurrentSuggestion()
