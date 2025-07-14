@@ -36,6 +36,8 @@ chip_config_memory_management = "platform"
 #
 chip_system_config_event_loop = "FreeRTOS"
 
+#chip_stack_lock_tracking = "none"
+
 custom_toolchain = "${chip_root}/config/senscomm/toolchain:senscomm"
 
 is_debug = false

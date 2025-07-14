@@ -38,6 +38,7 @@
 #include "wise_err.h"
 #include "wise_system.h"
 #include "scm_wifi.h"
+#include "scm_fs.h"
 
 namespace chip {
 namespace DeviceLayer {
