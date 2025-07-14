@@ -336,7 +336,8 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
     case LocalConfigDisabled::Id:
         return encoder.Encode(logic.GetLocalConfigDisabled());
     case Reachable::Id:
-        return encoder.Encode(logic.GetReachable());
+        // NOTE: we are always reachable (this is the same node)
+        return encoder.Encode(true);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }

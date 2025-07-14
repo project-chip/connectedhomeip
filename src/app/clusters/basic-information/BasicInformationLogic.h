@@ -44,7 +44,6 @@ public:
 
     CHIP_ERROR Init(AttributePersistenceProvider & storage);
 
-    bool GetReachable() const { return mReachable; }
     bool GetLocalConfigDisabled() const { return mLocalConfigDisabled; }
     CharSpan GetNodeLabel() const { return Storage::ShortPascalString::ContentOf(mNodeLabelBuffer); }
 
@@ -56,7 +55,6 @@ public:
 
 private:
     char mNodeLabelBuffer[32 + 1];
-    bool mReachable           = true;
     bool mLocalConfigDisabled = false;
 };
 
