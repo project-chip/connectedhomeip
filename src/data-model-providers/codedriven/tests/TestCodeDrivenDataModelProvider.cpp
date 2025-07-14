@@ -77,14 +77,13 @@ protected:
         .dataModelChangeListener = &mChangeListener,
         .actionContext           = &mActionContext,
     };
+    chip::Test::TestServerClusterContext mServerClusterTestContext;
     CodeDrivenDataModelProvider mProvider;
     std::vector<std::unique_ptr<SpanEndpoint>> mEndpointStorage;                     // To keep providers alive
     std::vector<std::unique_ptr<EndpointInterfaceRegistration>> mOwnedRegistrations; // To keep registration objects alive
-    chip::Test::TestServerClusterContext mServerClusterTestContext;
 
-    TestCodeDrivenDataModelProvider()
+    TestCodeDrivenDataModelProvider() : mProvider(&mServerClusterTestContext.StorageDelegate())
     {
-        mProvider.SetPersistentStorageDelegate(&mServerClusterTestContext.StorageDelegate());
         EXPECT_EQ(mProvider.Startup(mContext), CHIP_NO_ERROR);
     }
 
@@ -595,8 +594,7 @@ TEST_F(TestCodeDrivenDataModelProvider, AddAndRemoveEndpoints)
 
 TEST_F(TestCodeDrivenDataModelProvider, EndpointWithStaticData)
 {
-    CodeDrivenDataModelProvider localProvider; // Use a local provider for focused testing
-    localProvider.SetPersistentStorageDelegate(&mServerClusterTestContext.StorageDelegate());
+    CodeDrivenDataModelProvider localProvider(&mServerClusterTestContext.StorageDelegate()); // Use a local provider for focused testing
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
 
     // Define static data directly in arrays. MockServerCluster instances need to be static
@@ -722,8 +720,7 @@ TEST_F(TestCodeDrivenDataModelProvider, ClusterStartupIsCalledWhenAddingToStarte
     // Use a local provider, started up, to test adding an endpoint to an already started provider.
     // This ensures its lifecycle (including Shutdown) is fully contained within this test,
     // happening before local stack objects like testCluster are destroyed.
-    CodeDrivenDataModelProvider localProvider;
-    localProvider.SetPersistentStorageDelegate(&mServerClusterTestContext.StorageDelegate());
+    CodeDrivenDataModelProvider localProvider(&mServerClusterTestContext.StorageDelegate());
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR); // Provider is now "already started"
 
     MockServerCluster testCluster(ConcreteClusterPath(endpointEntry1.id, 100), 1, BitFlags<DataModel::ClusterQualityFlags>());
@@ -753,8 +750,7 @@ TEST_F(TestCodeDrivenDataModelProvider, ClusterStartupIsCalledWhenAddingToStarte
 
 TEST_F(TestCodeDrivenDataModelProvider, ClusterStartupNotCalledWhenAddingToNonStartedProviderThenCalledOnProviderStartup)
 {
-    CodeDrivenDataModelProvider localProvider; // Not started yet
-    localProvider.SetPersistentStorageDelegate(&mServerClusterTestContext.StorageDelegate());
+    CodeDrivenDataModelProvider localProvider(&mServerClusterTestContext.StorageDelegate()); // Not started yet
 
     MockServerCluster testCluster(ConcreteClusterPath(endpointEntry1.id, 101), 1, BitFlags<DataModel::ClusterQualityFlags>());
     ASSERT_FALSE(testCluster.startupCalled);
@@ -789,8 +785,7 @@ TEST_F(TestCodeDrivenDataModelProvider, ClusterShutdownIsCalledWhenRemovingFromS
     // Use a local provider to ensure its lifecycle is fully contained within this test,
     // avoiding potential issues with the fixture's provider shutdown timing relative to
     // local stack objects like testCluster.
-    CodeDrivenDataModelProvider localProvider;
-    localProvider.SetPersistentStorageDelegate(&mServerClusterTestContext.StorageDelegate());
+    CodeDrivenDataModelProvider localProvider(&mServerClusterTestContext.StorageDelegate());
     ASSERT_EQ(localProvider.Startup(mContext), CHIP_NO_ERROR);
 
     MockServerCluster testCluster(ConcreteClusterPath(endpointEntry1.id, 102), 1, BitFlags<DataModel::ClusterQualityFlags>());
@@ -824,8 +819,7 @@ TEST_F(TestCodeDrivenDataModelProvider, ClusterShutdownIsCalledWhenRemovingFromS
 
 TEST_F(TestCodeDrivenDataModelProvider, ClusterShutdownNotCalledWhenRemovingFromNonStartedProvider)
 {
-    CodeDrivenDataModelProvider localProvider; // Not started
-    localProvider.SetPersistentStorageDelegate(&mServerClusterTestContext.StorageDelegate());
+    CodeDrivenDataModelProvider localProvider(&mServerClusterTestContext.StorageDelegate()); // Not started
 
     MockServerCluster testCluster(ConcreteClusterPath(endpointEntry1.id, 103), 1, BitFlags<DataModel::ClusterQualityFlags>());
     ServerClusterInterface * serverClustersArray[] = { &descriptorClusterEP1, &testCluster };
@@ -1059,18 +1053,7 @@ TEST_F(TestCodeDrivenDataModelProvider, Temporary_ReportAttributeChanged)
     EXPECT_EQ(mChangeListener.mDirtyList[0].mAttributeId, path.mAttributeId);
 }
 
-TEST_F(TestCodeDrivenDataModelProvider, GetAndSetPersistentStorageDelegate)
-{
-    chip::Test::TestServerClusterContext otherTestContext;
-    mProvider.SetPersistentStorageDelegate(&otherTestContext.StorageDelegate());
-    EXPECT_EQ(mProvider.GetPersistentStorageDelegate(), &otherTestContext.StorageDelegate());
-    // TODO: Add more checks to ensure the delegate is used correctly in operations.
-    // For example, you could check if the delegate is used in a read/write operation.
-    // This would require implementing a mock or a spy for the persistent storage delegate.
-    // For now, we just check that the delegate can be set and retrieved without error.
-    mProvider.SetPersistentStorageDelegate(nullptr); // Reset to default
-    EXPECT_EQ(mProvider.GetPersistentStorageDelegate(), nullptr);
-}
+
 
 TEST_F(TestCodeDrivenDataModelProvider, Shutdown)
 {

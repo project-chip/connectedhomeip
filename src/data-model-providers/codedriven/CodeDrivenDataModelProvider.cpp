@@ -92,7 +92,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::Startup(DataModel::InteractionModelConte
 
     mServerClusterContext.emplace(ServerClusterContext({
         .provider           = this,
-        .storage            = GetPersistentStorageDelegate(),
+        .storage            = mPersistentStorageDelegate,
         .interactionContext = &mContext,
     }));
 
@@ -351,32 +351,6 @@ ServerClusterInterface * CodeDrivenDataModelProvider::GetServerCluster(EndpointI
         return nullptr;
     }
     return serverCluster;
-}
-
-void CodeDrivenDataModelProvider::SetPersistentStorageDelegate(PersistentStorageDelegate * delegate)
-{
-    // This function should be called before Startup. If called after, it will
-    // replace the server cluster context, which may have unintended side effects
-    // on clusters that are already started.
-    if (mContext.dataModelChangeListener != nullptr)
-    {
-        ChipLogError(DataManagement,
-                     "SetPersistentStorageDelegate called after provider has been started. This is not recommended.");
-    }
-    mServerClusterContext.emplace(ServerClusterContext({
-        .provider           = this,
-        .storage            = delegate,
-        .interactionContext = &mContext,
-    }));
-}
-
-PersistentStorageDelegate * CodeDrivenDataModelProvider::GetPersistentStorageDelegate() const
-{
-    if (!mServerClusterContext.has_value())
-    {
-        return nullptr;
-    }
-    return mServerClusterContext->storage;
 }
 
 } // namespace app

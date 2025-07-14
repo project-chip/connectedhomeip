@@ -50,6 +50,8 @@ namespace app {
 class CodeDrivenDataModelProvider : public DataModel::Provider
 {
 public:
+    CodeDrivenDataModelProvider(PersistentStorageDelegate * delegate = nullptr) : mPersistentStorageDelegate(delegate) {}
+
     CHIP_ERROR Startup(DataModel::InteractionModelContext context) override;
     CHIP_ERROR Shutdown() override;
 
@@ -76,15 +78,6 @@ public:
     CHIP_ERROR EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo) override;
     void Temporary_ReportAttributeChanged(const AttributePathParams & path) override;
 
-    /**
-     * @brief Sets the persistent storage delegate for the provider.
-     *
-     * This function MUST be called before Startup(). Calling it after Startup() is not recommended
-     * as it may lead to unintended side effects on clusters that are already started.
-     */
-    void SetPersistentStorageDelegate(PersistentStorageDelegate * delegate);
-    PersistentStorageDelegate * GetPersistentStorageDelegate() const;
-
     /* Lifecycle Management:
      * The CodeDrivenDataModelProvider stores pointers to EndpointInterface, but does NOT take ownership.
      * Any EndpointInterface instance MUST outlive the CodeDrivenDataModelProvider it is registered with.
@@ -99,6 +92,7 @@ private:
                                               DataModel::ActionReturnStatus * outStatus);
     EndpointInterfaceRegistry mEndpointInterfaceRegistry;
     std::optional<ServerClusterContext> mServerClusterContext;
+    PersistentStorageDelegate * mPersistentStorageDelegate;
 };
 
 } // namespace app
