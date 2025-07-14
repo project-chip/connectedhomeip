@@ -17,7 +17,7 @@ limitations under the License.
 <configurator>
     <domain name="CHIP"/>
 
-    <cluster apiMaturity="provisional">
+    <cluster>
         <domain>Network Infrastructure</domain>
         <name>Wi-Fi Network Management</name>
         <code>0x0451</code>
