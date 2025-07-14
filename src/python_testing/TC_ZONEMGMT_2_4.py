@@ -39,6 +39,7 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
+from chip.testing.event_attribute_reporting import EventChangeCallback
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 
@@ -64,6 +65,9 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
             TestStep("2b", "TH reads the Triggers attribute from DUT",
                      "Verify that the response contains a list of ZoneTriggerControlStruct entries",
                      "Verify that the Trigger list contains the Trigger created in step 2a"),
+            TestStep("3", "Trigger the DUT to generate ZoneTriggered event",
+                     "Verify that the TH receives the ZoneTriggered event and the ZoneID matches one created in step 2",
+                     "Verify that the reason is 0(Motion) and the event has priority set as INFO"),
             TestStep("5", "TH sends CreateOrUpdateTrigger command with a ZoneID that does not exist in the Zones attribute",
                      "Verify that the DUT responds with a NotFound status code."),
             TestStep("6", "If DUT supports TwoDCartesianZone and User defined zones, TH sends CreateTwoDCartesianZone command with",
@@ -208,7 +212,24 @@ class TC_ZONEMGMT_2_4(MatterBaseTest):
         asserts.assert_equal(matchingTrigger.blindDuration, 5,
                              "BlindDuration of created Trigger does not match")
 
+        self.step("3")
+
+        node_id = self.dut_node_id
+        dev_ctrl = self.default_controller
+        event_listener = EventChangeCallback(cluster)
+        await event_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
+        event_delay_seconds = 10.0
+        # TODO: Check for self.is_ci
+        # CI call to trigger zone event.
+        self.write_to_app_pipe({"Name": "ZoneTriggered", "ZoneId": zoneID1})
+        event = event_listener.wait_for_event_report(
+            cluster.Events.ZoneTriggered, timeout_sec=event_delay_seconds)
+        asserts.assert_equal(event.zone, zoneID1, "Unexpected zoneID on ZoneTriggered")
+        asserts.assert_equal(event.reason, enums.ZoneEventTriggeredReasonEnum.kMotion, "Unexpected zoneID on ZoneTriggered")
+
+        self.step("3a")
         # TODO: Event-based tests 3-4
+
         self.step("5")
 
         # Fetch the zones attribute

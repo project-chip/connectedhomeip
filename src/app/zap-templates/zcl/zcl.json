@@ -803,7 +803,7 @@
             "MaxThermostatSuggestions",
             "CurrentThermostatSuggestion",
             "ThermostatSuggestionNotFollowingReason"
-		],
+        ],
         "Zone Management": [
             "MaxUserDefinedZones",
             "MaxZones",
