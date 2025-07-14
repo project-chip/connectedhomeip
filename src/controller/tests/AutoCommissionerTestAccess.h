@@ -78,6 +78,11 @@ public:
     }
     void AccessSetDefaultNTP(app::DataModel::Nullable<CharSpan> defaultNTP) { mCommissioner->mParams.SetDefaultNTP(defaultNTP); }
 
+    void SetRequiresTrustedTimeSource(bool requiresTrustedTimeSource)
+    {
+        mCommissioner->mDeviceCommissioningInfo.requiresTrustedTimeSource = requiresTrustedTimeSource;
+    }
+
 private:
     Controller::AutoCommissioner * mCommissioner = nullptr;
 };
