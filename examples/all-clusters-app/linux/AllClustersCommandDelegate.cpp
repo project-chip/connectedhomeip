@@ -956,21 +956,20 @@ void AllClustersAppCommandHandler::OnSoilMoistureChange(EndpointId endpointId, D
 {
     SoilMeasurement::Instance * soilMeasurementInstance = SoilMeasurement::GetInstance();
 
-    if (soilMoisture.IsNull())
-    {
-        ChipLogDetail(NotSpecified, "Set SoilMoisture value to null");
-    }
-    else if (soilMoisture.Value() > 100)
+    if (soilMeasurementInstance->SetSoilMeasuredValue(soilMoisture) != CHIP_NO_ERROR)
     {
         ChipLogDetail(NotSpecified, "Invalid SoilMoisture value");
         return;
+    }
+
+    if (soilMoisture.IsNull())
+    {
+        ChipLogDetail(NotSpecified, "Set SoilMoisture value to null");
     }
     else
     {
         ChipLogDetail(NotSpecified, "Set SoilMoisture value to %u", soilMoisture.Value());
     }
-
-    soilMeasurementInstance->SetSoilMeasuredValue(soilMoisture);
 }
 
 void AllClustersAppCommandHandler::HandleSetOccupancyChange(EndpointId endpointId, uint8_t newOccupancyValue)

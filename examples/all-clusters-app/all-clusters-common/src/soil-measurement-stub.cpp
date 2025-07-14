@@ -61,5 +61,6 @@ void emberAfSoilMeasurementClusterInitCallback(EndpointId endpointId)
     if (gSoilMeasurementInstance)
     {
         gSoilMeasurementInstance->Init(kDefaultSoilMoistureMeasurementLimits);
+        gSoilMeasurementInstance->SetSoilMeasuredValue(kDefaultSoilMoistureMeasurementLimits.minMeasuredValue);
     }
 }
