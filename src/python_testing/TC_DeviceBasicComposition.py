@@ -191,7 +191,7 @@ from chip.testing.taglist_and_topology_test import (create_device_type_list_for_
                                                     find_tag_list_problems, find_tree_roots, flat_list_ok,
                                                     get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
 from chip.tlv import uint
-from TC_DeviceConformance import get_supersets
+from test_testing.DeviceConformanceTests import get_supersets
 
 
 def get_vendor_id(mei: int) -> int:
