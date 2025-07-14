@@ -367,9 +367,9 @@ config CHIP_USE_OPENTHREAD_ENDPOINT
 	  This option is not supported when using WiFi.
 
 config CHIP_SYSTEM_PACKETBUFFER_POOL_SIZE
-  int "Packet buffer pool size"
-  default 11
-  help
-    Total number of packet buffers allocated by the stack for internal pool.
+	int "Packet buffer pool size"
+	default 11
+	help
+	  Total number of packet buffers allocated by the stack for internal pool.
 
 endif # CHIP
