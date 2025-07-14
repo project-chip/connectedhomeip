@@ -195,7 +195,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
                               if Clusters.RvcRunMode.Enums.ModeTag.kIdle.value in [t.value for t in m.modeTags]), None)
             cleaning_mode = self.user_params.get("runmode_cleanmode")
             asserts.assert_is_not_none(idle_mode, "Idle mode not found in SupportedModes!")
-            asserts.assert_is_not_none(cleaning_mode, "Cleaning mode not found in SupportedModes!")
+            asserts.assert_is_not_none(cleaning_mode, "Cleaning mode not provided via --int-arg runmode_cleanmode")
 
             # TH establishes a subscription to the CurrentMode attribute of the RVC Run Mode cluster of the DUT
             self.step("4")
