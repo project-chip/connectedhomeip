@@ -441,7 +441,7 @@ TEST_F(AutoCommissionerTest, NextStageConfigureDSTOffset)
     EXPECT_EQ(nextStage_ConfigureDSTOffset, nextStage_ConfigureDefaultNTP);
 
     // setting up correct variables for condition evaluation
-    app::DataModel::Nullable<CharSpan> defaultNTP = chip::CharSpan("ntp", strlen("ntp"));
+    app::DataModel::Nullable<CharSpan> defaultNTP = CharSpan("ntp", strlen("ntp"));
     privateConfigCommissioner.AccessSetDefaultNTP(defaultNTP);
 
     CommissioningStage nextStage = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureDSTOffset, err);
@@ -454,6 +454,43 @@ TEST_F(AutoCommissionerTest, NextStageConfigureDSTOffset)
     nextStage_ConfigureDefaultNTP = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureDefaultNTP, err);
 
     EXPECT_EQ(nextStage_ConfigureDSTOffset, nextStage_ConfigureDefaultNTP);
+}
+
+TEST_F(AutoCommissionerTest, NextStageSendNOC)
+{
+    AutoCommissionerTestAccess privateConfigCommissioner(&mCommissioner);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    CommissioningStage nextStage_SendNOC = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kSendNOC, err);
+    CommissioningStage nextStage_ConfigureTrustedTimeSource =
+        privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureTrustedTimeSource, err);
+
+    EXPECT_EQ(nextStage_SendNOC, nextStage_ConfigureTrustedTimeSource);
+
+    privateConfigCommissioner.SetRequiresTrustedTimeSource(true);
+
+    EXPECT_EQ(nextStage_SendNOC, nextStage_ConfigureTrustedTimeSource);
+
+    // setting up correct variables for condition evaluation
+    app::Clusters::TimeSynchronization::Structs::FabricScopedTrustedTimeSourceStruct::Type trustedTimeSourceStruct;
+    trustedTimeSourceStruct.nodeID   = 1;
+    trustedTimeSourceStruct.endpoint = 0;
+
+    app::DataModel::Nullable<app::Clusters::TimeSynchronization::Structs::FabricScopedTrustedTimeSourceStruct::Type>
+        trustedTimeSource(trustedTimeSourceStruct);
+    privateConfigCommissioner.AccessSetTrustedTimeSource(trustedTimeSource);
+
+    CommissioningStage nextStage = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kSendNOC, err);
+
+    EXPECT_EQ(nextStage, kConfigureTrustedTimeSource);
+
+    privateConfigCommissioner.SetRequiresTrustedTimeSource(false);
+
+    nextStage_SendNOC = privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kSendNOC, err);
+    nextStage_ConfigureTrustedTimeSource =
+        privateConfigCommissioner.AccessGetNextCommissioningStageInternal(kConfigureTrustedTimeSource, err);
+
+    EXPECT_EQ(nextStage_SendNOC, nextStage_ConfigureTrustedTimeSource);
 }
 
 } // namespace
