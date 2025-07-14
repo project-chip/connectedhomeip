@@ -39,28 +39,18 @@ import logging
 from time import sleep
 from datetime import timedelta
 import random
-
+from mobly import asserts
 
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from chip.ChipDeviceCtrl import ScopedNodeId, WaitForCheckIn
-from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
 
 class TC_ICDB_1_1(MatterBaseTest):
-
-    #
-    # Class Helper functions
-    #
-    async def _read_icdm_attribute_expect_success(self, attribute):
-        return await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.IcdManagement, attribute=attribute)
-
-    async def _send_single_icdm_command(self, command):
-        return await self.send_single_cmd(command, endpoint=0)
 
     def desc_TC_ICDB_1_1(self) -> str:
         """Returns the description of the test case."""
@@ -94,6 +84,12 @@ class TC_ICDB_1_1(MatterBaseTest):
         commands = cluster.Commands
         attributes = cluster.Attributes
 
+        # Initialize variables
+        require_unregister = False
+        registration_info = None
+        th2_certificate_authority = None
+        th2_fabric_admin = None
+
         # Commissioning Step
         self.step(1)
         self.th1 = self.default_controller
@@ -101,16 +97,15 @@ class TC_ICDB_1_1(MatterBaseTest):
         try:
             self.step("1a")
             try:
-                registered_clients = await self._read_icdm_attribute_expect_success(attribute=attributes.RegisteredClients)
+                registered_clients = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Objects.IcdManagement, attribute=attributes.RegisteredClients)
             except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                asserts.assert_equal(e.status, Status.Success, "Failed to read RegisteredClients attribute")
 
             for client in registered_clients:
-                if self.nodeId not in client.checkInNodeID:
-                    try:
-                        await self._send_single_icdm_command(commands.UnregisterClient(checkInNodeID=client.checkInNodeID))
-                    except InteractionModelError as e:
-                        asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                try:
+                    await self.send_single_cmd(cmd=commands.UnregisterClient(checkInNodeID=client.checkInNodeID), endpoint=0)
+                except InteractionModelError as e:
+                    asserts.assert_equal(e.status, Status.Success, f"Failed to unregister client {client.checkInNodeID}: {e}")
 
             self.step("1b")
             try:
@@ -122,50 +117,67 @@ class TC_ICDB_1_1(MatterBaseTest):
                 active_mode_duration_ms = icd_configs[0][cluster][attributes.ActiveModeDuration]
                 active_mode_threshold_ms = icd_configs[0][cluster][attributes.ActiveModeThreshold]
 
+                logger.info(f"ICD Config - IdleModeDuration: {idle_mode_duration_s}s, "
+                            f"ActiveModeDuration: {active_mode_duration_ms}ms, "
+                            f"ActiveModeThreshold: {active_mode_threshold_ms}ms")
+
             except InteractionModelError as e:
-                asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                asserts.assert_equal(e.status, Status.Success, "Failed to read ICD configuration attributes")
 
             self.step(2)
             try:
                 discriminator = random.randint(0, 4095)
-
                 th2_certificate_authority = self.certificate_authority_manager.NewCertificateAuthority()
                 th2_fabric_admin = th2_certificate_authority.NewFabricAdmin(vendorId=0xFFF1, fabricId=self.th1.fabricId + 1)
-                self.th2 = th2_fabric_admin.NewController(nodeId=self.th1.nodeId, useTestCommissioner=True)
+                self.th2 = th2_fabric_admin.NewController(nodeId=self.th1.nodeId + 1, useTestCommissioner=True)
 
                 registration_info = self.th2.GenerateICDRegistrationParameters()
+                registration_info.stayActiveMs = 0  # We do not need to keep the client active
                 self.th2.EnableICDRegistration(registration_info)
 
                 params = await self.th1.OpenCommissioningWindow(nodeid=self.dut_node_id, timeout=900, iteration=10000,
                                                                 discriminator=discriminator, option=self.th1.CommissioningWindowPasscode.kTokenWithRandomPin)
+
+                logger.info("Commissioning TH2 on DUT...")
                 await self.th2.CommissionOnNetwork(
-                    nodeId=self.dut_node_id, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR, filter=discriminator, setupPinCode=params.setupPinCode)
+                    nodeId=self.dut_node_id, filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+                    filter=discriminator, setupPinCode=params.setupPinCode)
 
-                require_unregister: bool = True
+                require_unregister = True
+                logger.info("TH2 successfully commissioned")
 
-            except:
-                require_unregister = False
-                asserts.fail("Failed to commission TH2 on the DUT")
+            except Exception as e:
+                asserts.fail(f"Failed to commission TH2 on the DUT: {e}")
 
             # Wait for DUT transition to Idle Mode
             self.step(3)
-            sleep(timedelta(milliseconds=(active_mode_threshold_ms + active_mode_duration_ms)).total_seconds())
+            transition_wait_time = timedelta(milliseconds=(active_mode_threshold_ms + active_mode_duration_ms)).total_seconds()
+            logger.info(f"Waiting {transition_wait_time:.2f}s for DUT transition to Idle Mode")
+            sleep(transition_wait_time)
 
             self.step(4)
             # Wait for 1 or more cycle of IdleModeDuration to receive a Check-In message
+            timeout_seconds = idle_mode_duration_s + 5  # Increased margin for reliability
+            logger.info(f"Waiting up to {timeout_seconds}s for Check-In message")
             try:
+                logger.info(
+                    f"Waiting for Check-In message with ScopedNodeId: {ScopedNodeId(self.dut_node_id, self.th2.GetFabricIndexInternal())}")
+
                 await WaitForCheckIn(ScopedNodeId(self.dut_node_id, self.th2.GetFabricIndexInternal()),
-                                     timeoutSeconds=idle_mode_duration_s + 5)  # +5 second as margin of error
+                                     timeoutSeconds=timeout_seconds)
+                logger.info("Check-In message received successfully")
             except TimeoutError:
-                asserts.fail("Check-In message not received within IdleModeDuration")
+                asserts.fail(f"Check-In message not received within {timeout_seconds}s (IdleModeDuration: {idle_mode_duration_s}s)")
 
         finally:
             # Post Condition processing
             if require_unregister:
                 try:
-                    await self.send_single_cmd(dev_ctrl=self.th2, cmd=commands.UnregisterClient(checkInNodeID=registration_info.checkInNodeId), endpoint=0)
-                except InteractionModelError as e:
-                    asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
+                    if registration_info:
+                        await self.th2.UnpairDevice(self.dut_node_id)
+                except Exception as e:
+                    asserts.fail(f"Failed to unregister client: {e}")
+                    pass
 
 
 if __name__ == "__main__":
