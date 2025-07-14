@@ -365,7 +365,7 @@ function install_tizen_sdk_arm() {
 
     info "Installing Tizen ARM sysroot..."
 
-    unrpm_globs "$SYSROOT" TIZEN_SDK_ARM_BASE_RPMS 
+    unrpm_globs "$SYSROOT" TIZEN_SDK_ARM_BASE_RPMS
     unrpm_globs "$SYSROOT" TIZEN_SDK_ARM_UNIFIED_RPMS
 
     fixup_symlinks "$SYSROOT"/usr/{lib,lib64}
