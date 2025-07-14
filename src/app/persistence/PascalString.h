@@ -154,7 +154,7 @@ public:
     {
         LengthType len = PascalPrefixOperations<PREFIX_LEN>::GetLength(data);
 
-        if ((len == kInvalidLength) || (len + PREFIX_LEN > N))
+        if ((len == kInvalidLength) || (static_cast<size_t>(len + PREFIX_LEN) > N))
         {
             return Span<const T>();
         }

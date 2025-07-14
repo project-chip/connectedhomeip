@@ -304,7 +304,7 @@ void DefaultOTARequestor::OnApplyUpdateFailure(void * context, CHIP_ERROR error)
     requestorCore->RecordErrorUpdateState(error);
 }
 
-void DefaultOTARequestor::OnNotifyUpdateAppliedResponse(void * context, const app::DataModel::NullObjectType & response) {}
+void DefaultOTARequestor::OnNotifyUpdateAppliedResponse(void * context, const DataModel::NullObjectType & response) {}
 
 void DefaultOTARequestor::OnNotifyUpdateAppliedFailure(void * context, CHIP_ERROR error)
 {
@@ -326,7 +326,7 @@ void DefaultOTARequestor::Reset()
     StoreCurrentUpdateInfo();
 }
 
-void DefaultOTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+void DefaultOTARequestor::HandleAnnounceOTAProvider(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                     const AnnounceOTAProvider::DecodableType & commandData)
 {
     VerifyOrReturn(commandObj != nullptr, ChipLogError(SoftwareUpdate, "Invalid commandObj, cannot handle AnnounceOTAProvider"));
@@ -408,7 +408,7 @@ void DefaultOTARequestor::CancelImageUpdate()
     Reset();
 }
 
-CHIP_ERROR DefaultOTARequestor::GetUpdateStateProgressAttribute(EndpointId endpointId, app::DataModel::Nullable<uint8_t> & progress)
+CHIP_ERROR DefaultOTARequestor::GetUpdateStateProgressAttribute(EndpointId endpointId, DataModel::Nullable<uint8_t> & progress)
 {
     VerifyOrReturnError(OtaRequestorServerGetUpdateStateProgress(endpointId, progress) == Status::Success, CHIP_ERROR_BAD_REQUEST);
     return CHIP_NO_ERROR;
@@ -667,7 +667,7 @@ void DefaultOTARequestor::RecordNewUpdateState(OTAUpdateStateEnum newState, OTAC
     // The UpdateStateProgress attribute only applies to the downloading state
     if (newState != OTAUpdateStateEnum::kDownloading)
     {
-        app::DataModel::Nullable<uint8_t> percent;
+        DataModel::Nullable<uint8_t> percent;
         percent.SetNull();
         OtaRequestorServerSetUpdateStateProgress(percent);
     }
