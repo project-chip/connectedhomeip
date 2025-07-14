@@ -100,13 +100,20 @@ DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setHourFormat(TimeFor
 
 DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum rCalendar)
 {
+    // TODO: Confirm error values for this operation.
+    if(!mFeatures.Has(TimeFormatLocalization::Feature::kCalendarFormat))
+    {
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    }
 
     if(IsCalendarSupported(rCalendar))
     {
         mCalendarType = rCalendar;
+        return Protocols::InteractionModel::Status::Success;
     }
 
-    return Protocols::InteractionModel::Status::Success;
+    return Protocols::InteractionModel::Status::ConstraintError;
+    
 }
 
 TimeFormatLocalization::HourFormatEnum TimeFormatLocalizationLogic::GetHourFormat()
@@ -120,11 +127,13 @@ CHIP_ERROR TimeFormatLocalizationLogic::Attributes(ReadOnlyBufferBuilder<DataMod
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(3 + DefaultServerCluster::GlobalAttributes().size()));
     // Mandatory attributes
     ReturnErrorOnFailure(builder.Append(TimeFormatLocalization::Attributes::HourFormat::kMetadataEntry));
-    // Optional, missing better handling
-
-    ReturnErrorOnFailure(builder.Append(TimeFormatLocalization::Attributes::ActiveCalendarType::kMetadataEntry));
     
-    ReturnErrorOnFailure(builder.Append(TimeFormatLocalization::Attributes::SupportedCalendarTypes::kMetadataEntry));
+    // These attributes depend on the Feature CalendarFormat (CALFMT)
+    if(mFeatures.Has(TimeFormatLocalization::Feature::kCalendarFormat))
+    {
+        ReturnErrorOnFailure(builder.Append(TimeFormatLocalization::Attributes::ActiveCalendarType::kMetadataEntry));
+        ReturnErrorOnFailure(builder.Append(TimeFormatLocalization::Attributes::SupportedCalendarTypes::kMetadataEntry));
+    }
 
     // Finally, the global attributes
     return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
@@ -132,7 +141,7 @@ CHIP_ERROR TimeFormatLocalizationLogic::Attributes(ReadOnlyBufferBuilder<DataMod
 
 BitFlags<TimeFormatLocalization::Feature> TimeFormatLocalizationLogic::GetFeatureMap() const
 {
-    return BitFlags<TimeFormatLocalization::Feature>();
+    return mFeatures;
 }
 
 } // namespace Clusters

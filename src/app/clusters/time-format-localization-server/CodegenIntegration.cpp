@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/time-format-localization-server/time-format-localization-cluster.h>
 #include <app/static-cluster-config/TimeFormatLocalization.h>
 #include <platform/DeviceInfoProvider.h>

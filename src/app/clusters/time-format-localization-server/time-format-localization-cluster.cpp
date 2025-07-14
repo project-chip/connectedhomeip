@@ -22,7 +22,7 @@ namespace app {
 namespace Clusters {
 
 TimeFormatLocalizationCluster::TimeFormatLocalizationCluster(EndpointId endpointId, BitFlags<TimeFormatLocalization::Feature> features) :
-DefaultServerCluster ({endpointId, TimeFormatLocalization::Id}), mFeatures(features) { }
+DefaultServerCluster ({endpointId, TimeFormatLocalization::Id}), mLogic(features) { }
 
 DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder)
 {
@@ -65,7 +65,7 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::ReadAttribute(const
     }
     case TimeFormatLocalization::Attributes::FeatureMap::Id:
     {
-        return encoder.Encode(mFeatures.Raw());
+        return encoder.Encode(mLogic.GetFeatureMap().Raw());
     }
     case TimeFormatLocalization::Attributes::ClusterRevision::Id:
     {

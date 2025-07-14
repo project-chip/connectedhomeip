@@ -31,7 +31,7 @@ namespace Clusters {
 class TimeFormatLocalizationLogic
 {
 public:
-    TimeFormatLocalizationLogic()
+    TimeFormatLocalizationLogic(BitFlags<TimeFormatLocalization::Feature> features): mFeatures(features)
     {
         mHourFormat = TimeFormatLocalization::HourFormatEnum::k12hr;
         mCalendarType = TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
@@ -54,6 +54,8 @@ public:
     CHIP_ERROR Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
 
 private:
+
+    BitFlags<TimeFormatLocalization::Feature> mFeatures;
 
     TimeFormatLocalization::HourFormatEnum mHourFormat;
     TimeFormatLocalization::CalendarTypeEnum mCalendarType;

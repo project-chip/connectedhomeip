@@ -39,9 +39,6 @@ public:
 protected:
     TimeFormatLocalizationLogic mLogic;
 
-private:
-    BitFlags<TimeFormatLocalization::Feature> mFeatures;
-
 };
 
 } // namespace Clusters
