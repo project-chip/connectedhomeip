@@ -278,8 +278,8 @@ TIZEN_SDK_BASE_RPMS=(
     'xdgmime-devel-*'
 )
 
-TIZEN_SDK_ARM_BASE_RPMS=($(add_suffix .armv7l.rpm TIZEN_SDK_BASE_RPMS))
-TIZEN_SDK_ARM64_BASE_RPMS=($(add_suffix .aarch64.rpm TIZEN_SDK_BASE_RPMS))
+TIZEN_SDK_ARM_BASE_RPMS=("$(add_suffix .armv7l.rpm TIZEN_SDK_BASE_RPMS)")
+TIZEN_SDK_ARM64_BASE_RPMS=("$(add_suffix .aarch64.rpm TIZEN_SDK_BASE_RPMS)")
 
 TIZEN_SDK_UNIFIED_RPMS=(
     'app-core-common-[0-9]*'
@@ -334,8 +334,8 @@ TIZEN_SDK_UNIFIED_RPMS=(
     'vconf-internal-keys-devel-*'
 )
 
-TIZEN_SDK_ARM_UNIFIED_RPMS=($(add_suffix .armv7l.rpm TIZEN_SDK_UNIFIED_RPMS))
-TIZEN_SDK_ARM64_UNIFIED_RPMS=($(add_suffix .aarch64.rpm TIZEN_SDK_UNIFIED_RPMS))
+TIZEN_SDK_ARM_UNIFIED_RPMS=("$(add_suffix .armv7l.rpm TIZEN_SDK_UNIFIED_RPMS)")
+TIZEN_SDK_ARM64_UNIFIED_RPMS=("$(add_suffix .aarch64.rpm TIZEN_SDK_UNIFIED_RPMS)")
 
 function download_tizen_sdk_arm() {
     # Get toolchain
