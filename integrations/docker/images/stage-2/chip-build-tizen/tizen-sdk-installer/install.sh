@@ -275,8 +275,8 @@ TIZEN_SDK_BASE_RPMS=(
 # this could have been a function but shellharden does not allow us to
 declare -a TIZEN_SDK_ARM_BASE_RPMS TIZEN_SDK_ARM64_BASE_RPMS
 for rpm in "${TIZEN_SDK_BASE_RPMS[@]}"; do
-    TIZEN_SDK_ARM_BASE_RPMS+=( "$rpm.armv7l.rpm" )
-    TIZEN_SDK_ARM64_BASE_RPMS+=( "$rpm.aarch64.rpm" )
+    TIZEN_SDK_ARM_BASE_RPMS+=("$rpm.armv7l.rpm")
+    TIZEN_SDK_ARM64_BASE_RPMS+=("$rpm.aarch64.rpm")
 done
 
 TIZEN_SDK_UNIFIED_RPMS=(
@@ -333,8 +333,8 @@ TIZEN_SDK_UNIFIED_RPMS=(
 )
 
 for rpm in "${TIZEN_SDK_UNIFIED_RPMS[@]}"; do
-    TIZEN_SDK_ARM_UNIFIED_RPMS+=( "$rpm.armv7l.rpm" )
-    TIZEN_SDK_ARM64_UNIFIED_RPMS+=( "$rpm.aarch64.rpm" )
+    TIZEN_SDK_ARM_UNIFIED_RPMS+=("$rpm.armv7l.rpm")
+    TIZEN_SDK_ARM64_UNIFIED_RPMS+=("$rpm.aarch64.rpm")
 done
 
 function download_tizen_sdk_arm() {
