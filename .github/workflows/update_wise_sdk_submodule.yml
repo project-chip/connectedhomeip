@@ -32,4 +32,5 @@ jobs:
           git config user.email github-actions@github.com
           git add third_party/senscomm/scm1612s/wise-sdk
           git commit -m "Update wise-sdk"
+          git pull
           git push origin senscomm
