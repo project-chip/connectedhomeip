@@ -635,7 +635,9 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        // do not propagate if an error occurs here because it is not the user relevant error
+        // Restore our state to the last known-good one.
+        //
+        // Do not propagate failure from LoadTimeZone if an error occurs here because it is not the user relevant error
         LoadTimeZone();
     }
     else
