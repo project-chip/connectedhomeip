@@ -365,6 +365,8 @@ TEST_F(AutoCommissionerTest, NextStageConfigureUTCTime)
     privateConfigCommissioner.SetTimeZoneRequirements(false);
     // setting up correct structs for condition evaluation
     app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type timeZoneStruct;
+
+    // for Optional<T> and Nullable<T> default-constructd HasValue() return false
     timeZoneStruct.name.Emplace(chip::CharSpan::fromCharString("")); // evaluates HasValue() to true
     app::DataModel::List<app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type> timeZone(&timeZoneStruct,
                                                                                                      1); // size of list = 1
