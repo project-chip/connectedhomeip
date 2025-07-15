@@ -96,7 +96,13 @@ public:
 
     /// Accesses the "PASCAL" string (i.e. valid data including the string prefix)
     ///
-    /// Use this to serialize the data
+    /// Use this to serialize the data. Specifically to recover the original string from
+    /// persistent storage one can:
+    ///   - persist pascalString.RawValidData (will include the data WITH the size prefix)
+    ///     - read via pascalString.RawFullBuffer
+    ///   - persist pascalString.Content (will NOT include data size)
+    ///     - read in a temporary buffer and set value via pascalString.SetValue()
+    ///     - OR read into (RawFullBuffer().data() + PREFIX_LEN) and call SetLength()
     ByteSpan RawValidData() const
     {
         return { reinterpret_cast<const uint8_t *>(mData), static_cast<size_t>(GetLength() + PREFIX_LEN) };
