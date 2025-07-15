@@ -254,9 +254,16 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         app_manager_ref = [app_manager]
         restart_monitor_thread = threading.Thread(
             target=monitor_app_restart_requests,
-            args=(app_manager_ref, app_manager_lock, app, app_args, app_ready_pattern, sys.stdout.buffer, app_stdin_pipe, restart_flag_file),
-            daemon=True
-        )
+            args=(
+                app_manager_ref,
+                app_manager_lock,
+                app,
+                app_args,
+                app_ready_pattern,
+                sys.stdout.buffer,
+                app_stdin_pipe,
+                restart_flag_file),
+            daemon=True)
         restart_monitor_thread.start()
 
     script_args += f" --restart-flag-file {restart_flag_file}"
@@ -342,27 +349,35 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                 logging.warning(f"Failed to clean up flag file {restart_flag_file}: {e}")
 
 
-def monitor_app_restart_requests(app_manager_ref, app_manager_lock, app, app_args, app_ready_pattern, stream_output, app_stdin_pipe, restart_flag_file):
+def monitor_app_restart_requests(
+        app_manager_ref,
+        app_manager_lock,
+        app,
+        app_args,
+        app_ready_pattern,
+        stream_output,
+        app_stdin_pipe,
+        restart_flag_file):
     while True:
         try:
             if os.path.exists(restart_flag_file):
                 logging.info("App restart requested by test script")
                 # Remove the flag file immediately to prevent multiple restarts
                 os.unlink(restart_flag_file)
-                
+
                 new_app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
                 new_app_manager.start()
                 with app_manager_lock:
                     app_manager_ref[0].stop()
                     app_manager_ref[0] = new_app_manager
-                
+
                 # After restart is complete, we can exit the monitor thread
                 logging.info("App restart completed, monitor thread exiting")
                 break
             else:
                 time.sleep(0.5)
         except Exception as e:
-            logging.error(f"Error in app restart monitor: {e}") 
+            logging.error(f"Error in app restart monitor: {e}")
 
 
 if __name__ == '__main__':
