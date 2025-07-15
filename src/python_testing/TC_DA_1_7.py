@@ -41,7 +41,7 @@ from pathlib import Path
 from typing import List, Optional
 
 import chip.clusters as Clusters
-from chip.testing.conversions import bytes_from_hex, hex_from_bytes
+from chip.testing import conversions
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes
@@ -52,8 +52,8 @@ from mobly import asserts
 
 # Those are SDK samples that are known to be non-production.
 FORBIDDEN_AKID = [
-    bytes_from_hex("78:5C:E7:05:B8:6B:8F:4E:6F:C7:93:AA:60:CB:43:EA:69:68:82:D5"),
-    bytes_from_hex("6A:FD:22:77:1F:51:1F:EC:BF:16:41:97:67:10:DC:DC:31:A1:71:7E")
+    conversions.bytes_from_hex("78:5C:E7:05:B8:6B:8F:4E:6F:C7:93:AA:60:CB:43:EA:69:68:82:D5"),
+    conversions.bytes_from_hex("6A:FD:22:77:1F:51:1F:EC:BF:16:41:97:67:10:DC:DC:31:A1:71:7E")
 ]
 
 # List of certificate names that are known to have some issues, but not yet
@@ -209,7 +209,7 @@ class TC_DA_1_7(MatterBaseTest):
         pai = result.certificate
         asserts.assert_less_equal(len(pai), 600, "PAI cert must be at most 600 bytes")
         key = 'pai_{}'.format(dut_index)
-        self.record_data({key: hex_from_bytes(pai)})
+        self.record_data({key: conversions.hex_from_bytes(pai)})
 
         self.step(f'{dut_index}.2')
         result = await dev_ctrl.SendCommand(dut_node_id, 0,
@@ -217,14 +217,14 @@ class TC_DA_1_7(MatterBaseTest):
         dac = result.certificate
         asserts.assert_less_equal(len(dac), 600, "DAC cert must be at most 600 bytes")
         key = 'dac_{}'.format(dut_index)
-        self.record_data({key: hex_from_bytes(dac)})
+        self.record_data({key: conversions.hex_from_bytes(dac)})
 
         self.step(f'{dut_index}.3')
         logging.info("DUT {} Step 3 check 1: Ensure PAI's AKID matches a PAA and signature is valid".format(dut_index))
         pai_cert = load_der_x509_certificate(pai)
         pai_akid = extract_akid(pai_cert)
         if pai_akid not in paa_by_skid:
-            asserts.fail("DUT %d PAI (%s) not matched in PAA trust store" % (dut_index, hex_from_bytes(pai_akid)))
+            asserts.fail("DUT %d PAI (%s) not matched in PAA trust store" % (dut_index, conversions.hex_from_bytes(pai_akid)))
 
         filename, paa_cert = paa_by_skid[pai_akid]
         logging.info("Matched PAA file %s, subject: %s" % (filename, paa_cert.subject))
@@ -242,7 +242,8 @@ class TC_DA_1_7(MatterBaseTest):
             logging.warning("===> TEST STEP SKIPPED: Allowing SDK DACs!")
         else:
             for candidate in FORBIDDEN_AKID:
-                asserts.assert_not_equal(hex_from_bytes(pai_akid), hex_from_bytes(candidate), "PAI AKID must not be in denylist")
+                asserts.assert_not_equal(conversions.hex_from_bytes(
+                    pai_akid), conversions.hex_from_bytes(candidate), "PAI AKID must not be in denylist")
 
         self.step(f'{dut_index}.4')
         # dac issuer == pai subject
@@ -255,9 +256,9 @@ class TC_DA_1_7(MatterBaseTest):
 
         self.step(f'{dut_index}.6')
         pk = dac_cert.public_key().public_bytes(encoding=Encoding.X962, format=PublicFormat.UncompressedPoint)
-        logging.info("Subject public key pk: %s" % hex_from_bytes(pk))
+        logging.info("Subject public key pk: %s" % conversions.hex_from_bytes(pk))
         key = 'pk_{}'.format(dut_index)
-        self.record_data({key: hex_from_bytes(pk)})
+        self.record_data({key: conversions.hex_from_bytes(pk)})
         return pk
 
 

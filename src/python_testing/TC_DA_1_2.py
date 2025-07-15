@@ -43,7 +43,7 @@ import re
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.conversions import hex_from_bytes
+from chip.testing import conversions
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
 from chip.tlv import TLVReader
 from cryptography import x509
@@ -434,8 +434,8 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
         # signature is a struct of r and s - see 3.5.3
         # Actual curve is secp256r1 / NIST P-256 per 2.7
         baselen = curve_by_name("NIST256p").baselen
-        signature_attestation_raw_r = int(hex_from_bytes(signature_attestation_raw[:baselen]), 16)
-        signature_attestation_raw_s = int(hex_from_bytes(signature_attestation_raw[baselen:]), 16)
+        signature_attestation_raw_r = int(conversions.hex_from_bytes(signature_attestation_raw[:baselen]), 16)
+        signature_attestation_raw_s = int(conversions.hex_from_bytes(signature_attestation_raw[baselen:]), 16)
 
         signature_attestation = utils.encode_dss_signature(signature_attestation_raw_r, signature_attestation_raw_s)
 
