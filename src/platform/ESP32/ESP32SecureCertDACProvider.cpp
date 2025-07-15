@@ -23,9 +23,9 @@
 #include <platform/ESP32/ESP32Config.h>
 #include <platform/ESP32/ESP32SecureCertDACProvider.h>
 
-#ifdef CONFIG_USE_ESP32_ECDSA_PERIPHERAL
+#if defined(CONFIG_USE_ESP32_ECDSA_PERIPHERAL) || defined(CONFIG_USE_ESP32_TEE_SECURE_STORAGE)
 #include <platform/ESP32/ESP32CHIPCryptoPAL.h>
-#endif // CONFIG_USE_ESP32_ECDSA_PERIPHERAL
+#endif // CONFIG_USE_ESP32_ECDSA_PERIPHERAL || CONFIG_USE_ESP32_TEE_SECURE_STORAGE
 
 #define TAG "dac_provider"
 
@@ -150,6 +150,20 @@ CHIP_ERROR ESP32SecureCertDACProvider ::SignWithDeviceAttestationKey(const ByteS
         ESP_LOGD(TAG, "efuse block id:%u", efuseBlockId);
 
         chipError = keypair.Initialize(chip::Crypto::ECPKeyTarget::ECDSA, efuseBlockId);
+        VerifyOrReturnError(chipError == CHIP_NO_ERROR, chipError,
+                            ESP_LOGE(TAG, "Failed to initialize the keypair err:%" CHIP_ERROR_FORMAT, chipError.Format()));
+
+        chipError = keypair.ECDSA_sign_msg(messageToSign.data(), messageToSign.size(), signature);
+        VerifyOrReturnError(
+            chipError == CHIP_NO_ERROR, chipError,
+            ESP_LOGE(TAG, "Failed to sign with device attestation key, err:%" CHIP_ERROR_FORMAT, chipError.Format()));
+#elif defined(CONFIG_USE_ESP32_TEE_SECURE_STORAGE)
+        Crypto::ESP32P256Keypair keypair;
+        const char *key_id = chip::DeviceLayer::Internal::ESP32Config::kConfigKey_DACPrivateKey.Name;
+
+        ESP_LOGD(TAG, "TEE secure storage key id: %s", key_id);
+
+        chipError = keypair.InitializeFromTEE(chip::Crypto::ECPKeyTarget::ECDSA, key_id);
         VerifyOrReturnError(chipError == CHIP_NO_ERROR, chipError,
                             ESP_LOGE(TAG, "Failed to initialize the keypair err:%" CHIP_ERROR_FORMAT, chipError.Format()));
 
