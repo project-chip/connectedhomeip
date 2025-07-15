@@ -248,7 +248,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
                              read_step2_granted[UNIT_TESTING_ENDPOINT_ID + 80][Clusters.UnitTesting][AttrViewDoesNotExist].Reason.status, "Expected Attribute StatusIB with UnsupportedEndpoint")
 
         asserts.assert_equal(Status.UnsupportedCluster,
-                             read_step2_granted[UNIT_TESTING_ENDPOINT_ID+1][Clusters.UnitTesting][AttrViewDoesNotExist].Reason.status, "Expected Attribute StatusIB with UnsupportedCluster")
+                             read_step2_granted[UNIT_TESTING_ENDPOINT_ID + 1][Clusters.UnitTesting][AttrViewDoesNotExist].Reason.status, "Expected Attribute StatusIB with UnsupportedCluster")
 
         asserts.assert_equal(Status.UnsupportedAttribute,
                              read_step2_granted[UNIT_TESTING_ENDPOINT_ID][Clusters.UnitTesting][AttrViewDoesNotExist].Reason.status, "Expected Attribute StatusIB with UnsupportedAttribute")
@@ -327,7 +327,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         #
         self.print_step(
             "4a",
-            "Attribute does NOT exist; higher-than-view privilege required to read."
+            "Attribute does NOT exist; higher-than-view privilege required to read. "
             "No privileges granted to cluster under test. Non-Existence should NOT be leaked"
         )
 
@@ -355,7 +355,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
 
         self.print_step(
             "4b",
-            "Attribute does NOT exist; higher-than-view privilege required to read."
+            "Attribute does NOT exist; higher-than-view privilege required to read. "
             "Only View privilege granted to cluster under test. It's acceptable for Existence to be leaked"
         )
 
@@ -379,7 +379,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
 
         self.print_step(
             "4c",
-            "Attribute does NOT exist; higher-than-view privilege required to read."
+            "Attribute does NOT exist; higher-than-view privilege required to read. "
             "Admin privileges granted to cluster under test."
         )
 
@@ -399,7 +399,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
                              read_step4c[UNIT_TESTING_ENDPOINT_ID + 80][Clusters.UnitTesting][AttrNeedsAdminDoesNotExist].Reason.status, "Expected Attribute StatusIB with UnsupportedEndpoint")
 
         asserts.assert_equal(Status.UnsupportedCluster,
-                             read_step4c[UNIT_TESTING_ENDPOINT_ID+1][Clusters.UnitTesting][AttrNeedsAdminDoesNotExist].Reason.status, "Expected Attribute StatusIB with UnsupportedCluster")
+                             read_step4c[UNIT_TESTING_ENDPOINT_ID + 1][Clusters.UnitTesting][AttrNeedsAdminDoesNotExist].Reason.status, "Expected Attribute StatusIB with UnsupportedCluster")
 
         asserts.assert_equal(Status.UnsupportedAttribute,
                              read_step4c[UNIT_TESTING_ENDPOINT_ID][Clusters.UnitTesting][AttrNeedsAdminDoesNotExist].Reason.status, "Expected Attribute StatusIB with UnsupportedAttribute")
@@ -409,7 +409,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         #
         self.print_step(
             "5a",
-            "Attribute exists; Attribute is Write-Only"
+            "Attribute exists; Attribute is Write-Only. "
             "No privileges granted to cluster under test. Non-Existence should NOT be leaked"
         )
 
@@ -427,7 +427,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
 
         self.print_step(
             "5b",
-            "Attribute exists; Attribute is Write-Only"
+            "Attribute exists; Attribute is Write-Only. "
             "View Privilege granted to cluster under test. UnsupportedRead will be Returned"
         )
 
@@ -634,7 +634,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         #
         self.print_step(
             "4a",
-            "Event does NOT exist; higher-than-view privilege required to read."
+            "Event does NOT exist; higher-than-view privilege required to read. "
             "No privileges granted to cluster under test. Non-Existence should NOT be leaked"
         )
 
@@ -657,7 +657,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
 
         self.print_step(
             "4b",
-            "Event does NOT exist; higher-than-view privilege required to read."
+            "Event does NOT exist; higher-than-view privilege required to read. "
             "Only View privilege granted to cluster under test. It's acceptable for Existence to be leaked"
         )
 
@@ -685,7 +685,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
 
         self.print_step(
             "4c",
-            "Event does NOT exist; higher-than-view privilege required to read."
+            "Event does NOT exist; higher-than-view privilege required to read. "
             "Admin privileges granted to cluster under test."
         )
 
