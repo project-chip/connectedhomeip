@@ -793,7 +793,7 @@ DataModel::ActionReturnStatus WriteHandler::CheckWriteAllowed(const Access::Subj
     VerifyOrReturnValue(writeAccessStatus == Status::Success, writeAccessStatus);
 
     // SPEC:
-    //   Else if the path indicates specific attribute data that requires a Timed Write
+    //   If the path indicates specific attribute data that requires a Timed Write
     //   transaction to write and this action is not part of a Timed Write transaction,
     //   an AttributeStatusIB SHALL be generated with the NEEDS_TIMED_INTERACTION Status Code.
     VerifyOrReturnValue(IsTimedWrite() || !attributeEntry->HasFlags(DataModel::AttributeQualityFlags::kTimed),

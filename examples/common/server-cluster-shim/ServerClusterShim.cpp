@@ -297,7 +297,7 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
     }
 
     const EmberAfAttributeMetadata * attributeMetadata =
-       emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
+        emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
 
     // WriteAttribute requirement is that request.path is a VALID path inside the provider
     // metadata tree. Clients are supposed to validate this (and data version and other flags)
@@ -356,14 +356,14 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
         ReturnErrorOnFailure(decoder.Decode(emberData));
     }
 
-    if (dataBuffer.size() > (*attributeMetadata)->size)
+    if (dataBuffer.size() > attributeMetadata->size)
     {
         ChipLogDetail(Zcl, "Data to write exceeds the attribute size claimed.");
         return Status::InvalidValue;
     }
 
     Protocols::InteractionModel::Status status;
-    EmberAfWriteDataInput dataInput(dataBuffer.data(), (*attributeMetadata)->attributeType);
+    EmberAfWriteDataInput dataInput(dataBuffer.data(), attributeMetadata->attributeType);
     dataInput.SetChangeListener(&changeListener);
     // TODO: dataInput.SetMarkDirty() should be according to `ChangesOmmited`
 
