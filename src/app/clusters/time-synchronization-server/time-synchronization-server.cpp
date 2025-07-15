@@ -550,7 +550,7 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
     {
         const TimeSyncDataProvider::TimeZoneStore & tzStore = GetTimeZone()[0];
         lastTz.offset                                       = tzStore.timeZone.offset;
-        chip::MutableCharSpan tempSpan(name, sizeof(name));
+        MutableCharSpan tempSpan(name);
         if (tzStore.timeZone.name.HasValue() &&
             CHIP_NO_ERROR == CopyCharSpanToMutableCharSpan(tzStore.timeZone.name.Value(), tempSpan))
         {
