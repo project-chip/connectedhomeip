@@ -38,7 +38,6 @@
 import time
 import typing
 from datetime import datetime, timedelta, timezone
-
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -78,7 +77,7 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
         # It doesn't actually matter if this succeeds. The DUT is free to reject this command and use its own time.
         # If the DUT fails to get the time completely, all other tests will fail.
         try:
-            await self.send_set_utc_cmd(utc_time_in_matter_epoch())
+            await self.send_set_utc_cmd(timeoperations.utc_time_in_matter_epoch())
         except InteractionModelError:
             pass
 
@@ -107,8 +106,8 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
         cb.wait_for_event_report(event, 5)
 
         self.print_step(7, "Set DSTOffset to expire in 10 seconds")
-        th_utc = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc))
-        expiry = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
+        th_utc = timeoperations.utc_time_in_matter_epoch(datetime.now(tz=timezone.utc))
+        expiry = timeoperations.utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
         dst = [dst_struct(offset=3600, validStarting=0, validUntil=expiry)]
         await self.send_set_dst_cmd(dst)
 
