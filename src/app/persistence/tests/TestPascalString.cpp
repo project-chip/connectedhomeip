@@ -252,7 +252,7 @@ TEST(TestPascalString, SupportConstAccess)
 {
     // a const buffer should be viewable as a pascal string
     const char buffer[8] = { 4, 't', 'e', 's', 't', 'a', 'b', 'c' };
-    ASSERT_TRUE(ShortPascalConstString(buffer).Content().data_equal("test"_span));
+    ASSERT_TRUE(ShortConstPascalString(buffer).Content().data_equal("test"_span));
 }
 
 } // namespace

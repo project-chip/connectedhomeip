@@ -166,10 +166,10 @@ using LongPascalBytes   = PascalBuffer<uint8_t, 2>;
 
 // same as the pascal strings, except the data is const and cannot
 // be changed. Useful to get the content of data
-using ShortPascalConstString = PascalBuffer<const char, 1>;
-using ShortPascalConstBytes  = PascalBuffer<const uint8_t, 1>;
-using LongPascalConstString  = PascalBuffer<const char, 2>;
-using LongPascalConstBytes   = PascalBuffer<const uint8_t, 2>;
+using ShortConstPascalString = PascalBuffer<const char, 1>;
+using ShortConstPascalBytes  = PascalBuffer<const uint8_t, 1>;
+using LongConstPascalString  = PascalBuffer<const char, 2>;
+using LongConstPascalBytes   = PascalBuffer<const uint8_t, 2>;
 
 } // namespace Storage
 } // namespace app
