@@ -297,7 +297,7 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
     }
 
     const EmberAfAttributeMetadata * attributeMetadata =
-       emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
+        emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
 
     // WriteAttribute requirement is that request.path is a VALID path inside the provider
     // metadata tree. Clients are supposed to validate this (and data version and other flags)
