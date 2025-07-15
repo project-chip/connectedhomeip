@@ -16,6 +16,7 @@
 
 #include "time-format-localization-cluster.h"
 #include <clusters/TimeFormatLocalization/Metadata.h>
+#include <tracing/macros.h>
 
 namespace chip {
 namespace app {
@@ -23,6 +24,36 @@ namespace Clusters {
 
 TimeFormatLocalizationCluster::TimeFormatLocalizationCluster(EndpointId endpointId, BitFlags<TimeFormatLocalization::Feature> features) :
 DefaultServerCluster ({endpointId, TimeFormatLocalization::Id}), mLogic(features) { }
+
+CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context) 
+{
+    ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
+
+    TimeFormatLocalization::CalendarTypeEnum calendarType;
+
+    MutableByteSpan calendarBytes(reinterpret_cast<uint8_t *>(&calendarType), sizeof(calendarType));
+
+    CHIP_ERROR error = context.attributeStorage->ReadValue({kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id},
+                                                            calendarBytes);
+    ChipLogError(Zcl, "Got this message: %" CHIP_ERROR_FORMAT, error.Format());
+    mLogic.setActiveCalendarType(calendarType);
+
+    TimeFormatLocalization::HourFormatEnum hourFormat;
+
+    MutableByteSpan hourBytes(reinterpret_cast<uint8_t *>(&hourFormat), sizeof(hourFormat));
+
+    error = context.attributeStorage->ReadValue({kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id},
+                                                            hourBytes);
+    ChipLogError(Zcl, "Got this message: %" CHIP_ERROR_FORMAT, error.Format());
+    mLogic.setHourFormat(hourFormat);
+
+    if(error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    return error;
+}
 
 DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder)
 {
@@ -32,13 +63,30 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteAttribute(cons
     {
         TimeFormatLocalization::CalendarTypeEnum tCalendar;
         ReturnErrorOnFailure(decoder.Decode(tCalendar));
-        return mLogic.setActiveCalendarType(tCalendar);
+        CHIP_ERROR result = mContext->attributeStorage->WriteValue({kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id},
+        {reinterpret_cast<const uint8_t *>(&tCalendar), sizeof(tCalendar)});
+        if(result == CHIP_NO_ERROR)
+        {
+            NotifyAttributeChanged(TimeFormatLocalization::Attributes::ActiveCalendarType::Id);
+            mLogic.setActiveCalendarType(tCalendar);
+            return Protocols::InteractionModel::Status::Success;
+        }
+        return Protocols::InteractionModel::Status::Failure;
+        //return mLogic.setActiveCalendarType(tCalendar);
     }
     case TimeFormatLocalization::Attributes::HourFormat::Id:
     {
         TimeFormatLocalization::HourFormatEnum tHour;
         ReturnErrorOnFailure(decoder.Decode(tHour));
-        return mLogic.setHourFormat(tHour);
+        CHIP_ERROR result = mContext->attributeStorage->WriteValue({kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id},
+        {reinterpret_cast<const uint8_t *>(&tHour), sizeof(tHour)});
+        if(result == CHIP_NO_ERROR)
+        {
+            NotifyAttributeChanged(TimeFormatLocalization::Attributes::HourFormat::Id);
+            mLogic.setHourFormat(tHour);
+            return Protocols::InteractionModel::Status::Success;
+        }
+        return Protocols::InteractionModel::Status::Failure;
     }
     default:
     {

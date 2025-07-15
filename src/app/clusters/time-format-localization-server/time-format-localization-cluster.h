@@ -30,6 +30,7 @@ class TimeFormatLocalizationCluster : public DefaultServerCluster
 public:
     TimeFormatLocalizationCluster(EndpointId endpointId, BitFlags<TimeFormatLocalization::Feature> features);
 
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
     
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request, AttributeValueEncoder & encoder) override;
