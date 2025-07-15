@@ -603,7 +603,7 @@ jobs:
             - name: Run Tests
               run: |
                   mkdir -p out/trace_data
-                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --script "src/python_testing/TC_ICDB_1_1.py'
+                  scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --script "src/python_testing/TC_ICDB_1_1.py"'
 
             - name: Execute Jupyter Notebooks
               run: |
