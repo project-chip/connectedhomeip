@@ -94,11 +94,16 @@ public:
     Span<const T> Content() const { return { mData + PREFIX_LEN, GetLength() }; }
 
     /// Accesses the "PASCAL" string (i.e. valid data including the string prefix)
-    Span<const T> PascalContent() const { return { mData, static_cast<size_t>(GetLength() + PREFIX_LEN) }; }
+    ///
+    /// Use this to serialize the data
+    ByteSpan RawValidData() const
+    {
+        return { reinterpret_cast<const uint8_t *>(mData), static_cast<size_t>(GetLength() + PREFIX_LEN) };
+    }
 
     /// Access to the full buffer. does NOT take into account current size
     /// and includes the "size prefix"
-    Span<T> Buffer() { return { mData, static_cast<size_t>(mMaxSize + PREFIX_LEN) }; }
+    MutableByteSpan RawBuffer() { return { reinterpret_cast<uint8_t *>(mData), static_cast<size_t>(mMaxSize + PREFIX_LEN) }; }
 
     LengthType GetLength() const
     {
@@ -140,6 +145,22 @@ public:
         VerifyOrReturnValue(span.size() >= PREFIX_LEN, false);
         LengthType len = PascalPrefixOperations<PREFIX_LEN>::GetLength(span.data());
         return len == kInvalidLength || (static_cast<size_t>(len + PREFIX_LEN) <= span.size());
+    }
+
+    /// Convenience function: it is very common to require the content of a buffer
+    /// represented as a pascal buffer. This provides that.
+    template <size_t N>
+    static Span<const T> ContentOf(const T (&data)[N])
+    {
+        LengthType len = PascalPrefixOperations<PREFIX_LEN>::GetLength(data);
+
+        if ((len == kInvalidLength) || (static_cast<size_t>(len + PREFIX_LEN) > N))
+        {
+            return Span<const T>();
+        }
+
+        // we know data length is valid, return it
+        return { data + PREFIX_LEN, len };
     }
 
 private:
