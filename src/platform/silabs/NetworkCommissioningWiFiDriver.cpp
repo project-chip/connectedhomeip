@@ -79,8 +79,10 @@ CHIP_ERROR SlWiFiDriver::CommitConfiguration()
 {
     uint8_t securityType = WFX_SEC_WPA2;
 
-    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_WiFiSSID, mStagingNetwork.ssid));
-    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_WiFiPSK, mStagingNetwork.credentials));
+    ReturnErrorOnFailure(
+        SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_WiFiSSID, mStagingNetwork.ssid, mStagingNetwork.ssidLen));
+    ReturnErrorOnFailure(SilabsConfig::WriteConfigValueStr(SilabsConfig::kConfigKey_WiFiPSK, mStagingNetwork.credentials,
+                                                           mStagingNetwork.credentialsLen));
     ReturnErrorOnFailure(SilabsConfig::WriteConfigValueBin(SilabsConfig::kConfigKey_WiFiSEC, &securityType, sizeof(securityType)));
 
     mSavedNetwork = mStagingNetwork;

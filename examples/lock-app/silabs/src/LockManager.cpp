@@ -48,6 +48,8 @@ LockManager & LockMgr()
 CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> state, LockParam lockParam,
                              PersistentStorageDelegate * storage)
 {
+    VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    mStorage = storage;
 
     LockParams = lockParam;
 
@@ -90,6 +92,9 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
         return APP_ERROR_ALLOCATION_FAILED;
     }
 
+    // Migrate legacy configuration, if needed
+    MigrateConfig(lockParam);
+
     // Create cmsis os sw timer for lock timer.
     mLockTimer = osTimerNew(TimerEventHandler, // timer callback handler
                             osTimerOnce,       // no timer reload (one-shot timer)
@@ -102,10 +107,6 @@ CHIP_ERROR LockManager::Init(chip::app::DataModel::Nullable<chip::app::Clusters:
         SILABS_LOG("mLockTimer timer create failed");
         return APP_ERROR_CREATE_TIMER_FAILED;
     }
-
-    VerifyOrReturnError(storage != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-
-    mStorage = storage;
 
     if (state.Value() == DlLockState::kUnlocked)
         mState = kState_UnlockCompleted;

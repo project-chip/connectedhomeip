@@ -10914,14 +10914,10 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
             } else {
                 value.speed = nil;
             }
-            if (cppValue.Value().secureState.HasValue()) {
-                if (cppValue.Value().secureState.Value().IsNull()) {
-                    value.secureState = nil;
-                } else {
-                    value.secureState = [NSNumber numberWithBool:cppValue.Value().secureState.Value().Value()];
-                }
-            } else {
+            if (cppValue.Value().secureState.IsNull()) {
                 value.secureState = nil;
+            } else {
+                value.secureState = [NSNumber numberWithBool:cppValue.Value().secureState.Value()];
             }
         }
         return value;
@@ -20857,8 +20853,8 @@ static id _Nullable DecodeAttributeValueForCommodityMeteringCluster(AttributeId 
         }
         return value;
     }
-    case Attributes::TariffUnit::Id: {
-        using TypeInfo = Attributes::TariffUnit::TypeInfo;
+    case Attributes::MeasurementType::Id: {
+        using TypeInfo = Attributes::MeasurementType::TypeInfo;
         TypeInfo::DecodableType cppValue;
         *aError = DataModel::Decode(aReader, cppValue);
         if (*aError != CHIP_NO_ERROR) {
@@ -20868,7 +20864,22 @@ static id _Nullable DecodeAttributeValueForCommodityMeteringCluster(AttributeId 
         if (cppValue.IsNull()) {
             value = nil;
         } else {
-            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.Value())];
+            value = [NSNumber numberWithUnsignedShort:chip::to_underlying(cppValue.Value())];
+        }
+        return value;
+    }
+    case Attributes::MaximumMeteredQuantities::Id: {
+        using TypeInfo = Attributes::MaximumMeteredQuantities::TypeInfo;
+        TypeInfo::DecodableType cppValue;
+        *aError = DataModel::Decode(aReader, cppValue);
+        if (*aError != CHIP_NO_ERROR) {
+            return nil;
+        }
+        NSNumber * _Nullable value;
+        if (cppValue.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedShort:cppValue.Value()];
         }
         return value;
     }
