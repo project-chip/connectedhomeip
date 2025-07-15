@@ -79,6 +79,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
         NullProvider nullProvider;
         InjectedDiagnosticsSoftwareDiagnosticsLogic diag(nullProvider, enabledAttributes);
 
+        using chip::Protocols::InteractionModel::Status;
         uint64_t testOutHeapNum = 0;
         AttributeReportIBs::Builder testBuilder;
         Access::SubjectDescriptor testAccessDescriptor;
