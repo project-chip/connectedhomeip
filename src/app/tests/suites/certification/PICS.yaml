@@ -10323,10 +10323,6 @@ PICS:
     #
     # Camera AV Stream Management Cluster
     #
-    - label:
-          "Does the device implement the Camera AV Stream Management Cluster as
-          a server?"
-      id: AVSM.S
     - label: " Does the device implement the MaxConcurrentEncoders attribute?"
       id: AVSM.S.A0000
     - label: " Does the device implement the MaxEncodedPixelRate attribute?"
