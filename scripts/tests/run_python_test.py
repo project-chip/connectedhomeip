@@ -212,42 +212,6 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
                   run.script_args or "", run.script_gdb, run.quiet)
 
 
-def restart_app_process(app_process, app, app_args, app_ready_pattern, stream_output):
-    """Restart the app process during test execution."""
-    if app_process:
-        logging.info("Restarting app process...")
-
-        # Stop the existing app process
-        app_process.terminate()
-        # Wait up to 5 seconds for the process to terminate gracefully.
-        for _ in range(50):
-            if app_process.p.poll() is not None:
-                break
-            time.sleep(0.1)
-
-        # Force kill if still running
-        if app_process.p.poll() is None:
-            logging.info("Force killing app process")
-            app_process.p.kill()
-            time.sleep(1)
-
-        # Start a new app process
-        new_app_process = Subprocess(app, *shlex.split(app_args),
-                                     output_cb=process_chip_app_output,
-                                     f_stdout=stream_output,
-                                     f_stderr=stream_output)
-
-        if app_ready_pattern:
-            new_app_process.start(expected_output=app_ready_pattern, timeout=30)
-        else:
-            new_app_process.start()
-
-        logging.info("App process restarted successfully")
-        return new_app_process
-
-    return None
-
-
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
               app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
               script_gdb: bool, quiet: bool):
