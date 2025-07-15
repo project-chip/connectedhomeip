@@ -38,6 +38,21 @@ using namespace chip::app::Clusters;
 
 namespace {
 
+template<class T>
+class ScopedDeviceProvider
+{
+public:
+    ScopedDeviceProvider()
+    {
+        mOldProvider = DeviceLayer::GetDeviceInfoProvider();
+        DeviceLayer::SetDeviceInfoProvider(&mProvider);
+    }
+
+private:
+    DeviceLayer::DeviceInfoProvider * mOldProvider;
+    T mProvider;
+};
+
 struct TestTimeFormatLocalizationCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -47,19 +62,14 @@ struct TestTimeFormatLocalizationCluster : public ::testing::Test
 TEST_F(TestTimeFormatLocalizationCluster, AttributeTest)
 {
     {
-        // No attributes enabled
-        TimeFormatLocalizationEnabledAttributes mandatoryAttributes {
-            .activeEnableCalendarType = false,
-            .activeSupportedCalendarTypes = false
-        };
+        BitFlags<TimeFormatLocalization::Feature> features {0};
 
-        DeviceLayerTimeFormatLocalizationLogic onlyMandatory(mandatoryAttributes);
+        TimeFormatLocalizationLogic onlyMandatory(features);
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        ASSERT_EQ(onlyMandatory.AcceptedCommands(commandsBuilder), CHIP_NO_ERROR);
-        ASSERT_EQ(commandsBuilder.TakeBuffer().size(), 0u);
 
-        ASSERT_EQ(onlyMandatory.GetFeatureMap(), BitFlags<TimeFormatLocalization::Feature>{});
+        // No features enabled
+        ASSERT_EQ(onlyMandatory.GetFeatureMap(), BitFlags<TimeFormatLocalization::Feature>{0});
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
         ASSERT_EQ(onlyMandatory.Attributes(attributesBuilder), CHIP_NO_ERROR);
@@ -73,18 +83,13 @@ TEST_F(TestTimeFormatLocalizationCluster, AttributeTest)
 
     {
         // No attributes enabled
-        TimeFormatLocalizationEnabledAttributes mandatoryAttributes {
-            .activeEnableCalendarType = true,
-            .activeSupportedCalendarTypes = true
-        };
+         BitFlags<TimeFormatLocalization::Feature> features {0};
+         features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
 
-        DeviceLayerTimeFormatLocalizationLogic onlyMandatory(mandatoryAttributes);
+        TimeFormatLocalizationLogic onlyMandatory(features);
 
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
-        ASSERT_EQ(onlyMandatory.AcceptedCommands(commandsBuilder), CHIP_NO_ERROR);
-        ASSERT_EQ(commandsBuilder.TakeBuffer().size(), 0u);
-
-        ASSERT_EQ(onlyMandatory.GetFeatureMap(), BitFlags<TimeFormatLocalization::Feature>{});
+        // CalendarFormat feature enabled.
+        ASSERT_EQ(onlyMandatory.GetFeatureMap(), BitFlags<TimeFormatLocalization::Feature>{TimeFormatLocalization::Feature::kCalendarFormat});
 
         ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributesBuilder;
         ASSERT_EQ(onlyMandatory.Attributes(attributesBuilder), CHIP_NO_ERROR);
@@ -115,14 +120,11 @@ TEST_F(TestTimeFormatLocalizationCluster, ListCalendarTest)
     Access::SubjectDescriptor descriptor;
     AttributeValueEncoder encoder(builder, descriptor, path, version);
 
-    TimeFormatLocalizationEnabledAttributes noAttributes {
-        .activeEnableCalendarType = true,
-        .activeSupportedCalendarTypes = true
-    };
+    BitFlags<TimeFormatLocalization::Feature> features {0};
+    features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
 
-    DeviceLayer::SampleDeviceProvider sampleProvider;
-
-    InjectedTimeFormatLocalizationLogic clusterSim(sampleProvider, noAttributes);
+    ScopedDeviceProvider<DeviceLayer::SampleDeviceProvider> sampleProvider;
+    TimeFormatLocalizationLogic clusterSim(features);
 
     EXPECT_EQ(clusterSim.GetSupportedCalendarTypes(encoder), CHIP_NO_ERROR);
 
