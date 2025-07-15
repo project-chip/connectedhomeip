@@ -77,13 +77,6 @@ bool ClosureControlDelegate::IsReadyToMove()
     return true;
 }
 
-bool ClosureControlDelegate::IsManualLatchingNeeded()
-{
-    // This function should return true if manual latching is needed.
-    // For now, we will return false.
-    return false;
-}
-
 ElapsedS ClosureControlDelegate::GetCalibrationCountdownTime()
 {
     // This function should return the calibration countdown time.
@@ -224,7 +217,7 @@ void ClosureControlEndpoint::OnCalibrateActionComplete()
 {
     DataModel::Nullable<GenericOverallCurrentState> overallCurrentState(GenericOverallCurrentState(
         MakeOptional(DataModel::MakeNullable(CurrentPositionEnum::kFullyClosed)), MakeOptional(DataModel::MakeNullable(true)),
-        MakeOptional(Globals::ThreeLevelAutoEnum::kAuto), MakeOptional(DataModel::MakeNullable(true))));
+        MakeOptional(Globals::ThreeLevelAutoEnum::kAuto), DataModel::MakeNullable(true)));
     DataModel::Nullable<GenericOverallTargetState> overallTargetState = DataModel::NullNullable;
 
     mLogic.SetMainState(MainStateEnum::kStopped);
@@ -290,7 +283,7 @@ void ClosureControlEndpoint::UpdateCurrentStateFromTargetState()
             !overallCurrentState.Value().latch.Value().IsNull() && overallCurrentState.Value().latch.Value().Value() == true;
     }
 
-    overallCurrentState.Value().secureState.SetValue(MakeNullable(isClosureInSecureState));
+    overallCurrentState.Value().secureState.SetNonNull(isClosureInSecureState);
 
     mLogic.SetOverallCurrentState(overallCurrentState);
 }

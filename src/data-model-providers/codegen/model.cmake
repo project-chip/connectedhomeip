@@ -33,4 +33,3 @@ SET(CODEGEN_DATA_MODEL_SOURCES
   "${BASE_DIR}/../../app/server-cluster/ServerClusterInterface.cpp"
   "${BASE_DIR}/../../app/server-cluster/ServerClusterInterface.h"
 )
-

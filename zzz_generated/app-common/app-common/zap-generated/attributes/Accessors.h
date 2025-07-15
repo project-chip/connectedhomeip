@@ -868,6 +868,12 @@ Set(EndpointId endpoint,
     MarkAttributeDirty markDirty);
 } // namespace NetworkRecoveryReason
 
+namespace IsCommissioningWithoutPower {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, bool * value); // boolean
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, bool value, MarkAttributeDirty markDirty);
+} // namespace IsCommissioningWithoutPower
+
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
@@ -3698,35 +3704,6 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
                                         MarkAttributeDirty markDirty);
 } // namespace SetpointHoldExpiryTimestamp
 
-namespace MaxThermostatSuggestions {
-Protocols::InteractionModel::Status Get(EndpointId endpoint, uint8_t * value); // int8u
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, uint8_t value, MarkAttributeDirty markDirty);
-} // namespace MaxThermostatSuggestions
-
-namespace ThermostatSuggestionNotFollowingReason {
-Protocols::InteractionModel::Status
-Get(EndpointId endpoint,
-    DataModel::Nullable<chip::BitMask<chip::app::Clusters::Thermostat::ThermostatSuggestionNotFollowingReasonBitmap>> &
-        value); // ThermostatSuggestionNotFollowingReasonBitmap
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::ThermostatSuggestionNotFollowingReasonBitmap> value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint, chip::BitMask<chip::app::Clusters::Thermostat::ThermostatSuggestionNotFollowingReasonBitmap> value,
-    MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
-Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<
-        chip::BitMask<chip::app::Clusters::Thermostat::ThermostatSuggestionNotFollowingReasonBitmap>> & value);
-Protocols::InteractionModel::Status
-Set(EndpointId endpoint,
-    const chip::app::DataModel::Nullable<
-        chip::BitMask<chip::app::Clusters::Thermostat::ThermostatSuggestionNotFollowingReasonBitmap>> & value,
-    MarkAttributeDirty markDirty);
-} // namespace ThermostatSuggestionNotFollowingReason
-
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32
 Protocols::InteractionModel::Status Set(EndpointId endpoint, uint32_t value);
@@ -5933,20 +5910,32 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::Da
                                         MarkAttributeDirty markDirty);
 } // namespace MeteredQuantityTimestamp
 
-namespace TariffUnit {
+namespace MeasurementType {
 Protocols::InteractionModel::Status
-Get(EndpointId endpoint, DataModel::Nullable<chip::app::Clusters::Globals::TariffUnitEnum> & value); // TariffUnitEnum
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Globals::TariffUnitEnum value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::Globals::TariffUnitEnum value,
+Get(EndpointId endpoint,
+    DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> & value); // MeasurementTypeEnum
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CommodityMetering::MeasurementTypeEnum value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::app::Clusters::CommodityMetering::MeasurementTypeEnum value,
                                         MarkAttributeDirty markDirty);
 Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
 Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TariffUnitEnum> & value);
-Protocols::InteractionModel::Status Set(EndpointId endpoint,
-                                        const chip::app::DataModel::Nullable<chip::app::Clusters::Globals::TariffUnitEnum> & value,
+Protocols::InteractionModel::Status
+Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> & value);
+Protocols::InteractionModel::Status
+Set(EndpointId endpoint, const chip::app::DataModel::Nullable<chip::app::Clusters::CommodityMetering::MeasurementTypeEnum> & value,
+    MarkAttributeDirty markDirty);
+} // namespace MeasurementType
+
+namespace MaximumMeteredQuantities {
+Protocols::InteractionModel::Status Get(EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // int16u
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, uint16_t value, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint);
+Protocols::InteractionModel::Status SetNull(EndpointId endpoint, MarkAttributeDirty markDirty);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value);
+Protocols::InteractionModel::Status Set(EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value,
                                         MarkAttributeDirty markDirty);
-} // namespace TariffUnit
+} // namespace MaximumMeteredQuantities
 
 namespace FeatureMap {
 Protocols::InteractionModel::Status Get(EndpointId endpoint, uint32_t * value); // bitmap32

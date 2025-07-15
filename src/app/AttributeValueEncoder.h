@@ -23,6 +23,8 @@
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/data-model/FabricScoped.h>
 #include <app/data-model/List.h>
+#include <lib/support/BitFlags.h>
+#include <lib/support/BitMask.h>
 
 #include <type_traits>
 
@@ -39,13 +41,56 @@ namespace app {
  */
 class AttributeValueEncoder
 {
+private:
+    // Attempt to save flash by reducing the number of instantiations of the
+    // Encode methods for AttributeValueEncoder and ListEncodeHelper.  The idea
+    // here is that some types actually end up encoded as other types anyway
+    // (e.g. all integers are encoded are uint64_t or int64_t), so we might as
+    // well avoid generating template instantiations of our methods (which have
+    // extra logic) for all the different types that end up encoded the same in
+    // the end.
+    //
+    // A type is a "base" type if it can't be treated as any other type for
+    // encoding purposes.  Overloads of BaseEncodableValue can be added for
+    // "non-base" types to return values of a base type.
+    //
+    // It's important here to not collapse together types for which
+    // DataModel::Encode in fact has different behavior (e.g. enum types).
+    template <typename T>
+    static constexpr const T & BaseEncodableValue(const T & aArg)
+    {
+        return aArg;
+    }
+    template <typename T>
+    static constexpr auto BaseEncodableValue(const BitFlags<T> & aArg)
+    {
+        return BaseEncodableValue(aArg.Raw());
+    }
+    template <typename T>
+    static constexpr auto BaseEncodableValue(const BitMask<T> & aArg)
+    {
+        return BaseEncodableValue(aArg.Raw());
+    }
+    static constexpr uint64_t BaseEncodableValue(uint32_t aArg) { return aArg; }
+    static constexpr uint64_t BaseEncodableValue(uint16_t aArg) { return aArg; }
+    static constexpr uint64_t BaseEncodableValue(uint8_t aArg) { return aArg; }
+    static constexpr int64_t BaseEncodableValue(int32_t aArg) { return aArg; }
+    static constexpr int64_t BaseEncodableValue(int16_t aArg) { return aArg; }
+    static constexpr int64_t BaseEncodableValue(int8_t aArg) { return aArg; }
+
+    // Determines whether a type should be encoded as-is (if IsBaseType<T> is
+    // true) or transformed to a different type by calling BaseEncodableValue()
+    // on it.
+    template <typename T>
+    static constexpr bool IsBaseType = std::is_same_v<const T &, decltype(BaseEncodableValue(std::declval<const T &>()))>;
+
 public:
     class ListEncodeHelper
     {
     public:
         ListEncodeHelper(AttributeValueEncoder & encoder) : mAttributeValueEncoder(encoder) {}
 
-        template <typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
+        template <typename T, std::enable_if_t<IsBaseType<T> && DataModel::IsFabricScoped<T>::value, bool> = true>
         CHIP_ERROR Encode(const T & aArg) const
         {
             VerifyOrReturnError(aArg.GetFabricIndex() != kUndefinedFabricIndex, CHIP_ERROR_INVALID_FABRIC_INDEX);
@@ -58,39 +103,17 @@ public:
             return mAttributeValueEncoder.EncodeListItem(mCheckpoint, aArg, mAttributeValueEncoder.AccessingFabricIndex());
         }
 
-        template <typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
+        template <typename T, std::enable_if_t<IsBaseType<T> && !DataModel::IsFabricScoped<T>::value, bool> = true>
         CHIP_ERROR Encode(const T & aArg) const
         {
             return mAttributeValueEncoder.EncodeListItem(mCheckpoint, aArg);
         }
 
-        // overrides that save flash: no need to care about the extra const
-        // Without this, we have a usage of:
-        //   chip::ChipError chip::app::AttributeValueEncoder::EncodeListItem<unsigned long const&>
-        // Overall we tend to have very similar code expand (from nm):
-        //    chip::ChipError chip::app::AttributeValueEncoder::Encode<unsigned char>(unsigned char&&)
-        //    chip::ChipError chip::app::AttributeValueEncoder::Encode<unsigned char&>(unsigned char&)
-        //    chip::ChipError chip::app::AttributeValueEncoder::Encode<unsigned char const&>(unsigned char const&)
-        //    chip::ChipError chip::app::AttributeValueEncoder::Encode<unsigned short const&>(unsigned short const&)
-        //    chip::ChipError chip::app::AttributeValueEncoder::Encode<unsigned long&>(unsigned long&)
-        //    chip::ChipError chip::app::AttributeValueEncoder::Encode<unsigned short&>(unsigned short&)
-        //    chip::ChipError chip::app::AttributeValueEncoder::Encode<unsigned long long&>(unsigned long long&)
-        //    chip::ChipError chip::app::AttributeValueEncoder::Encode<unsigned short>(unsigned short&&)
-        //    chip::ChipError chip::app::AttributeValueEncoder::Encode<unsigned long long>(unsigned long long&&)
-        // that we try to reduce
-        //
-        // TODO:
-        //   - we should figure where the extra const override is used
-        //   - we should try to avoid having such footguns. This list template-explosion seems
-        //     dangerous for flash.
-        //
-        // This relies on TLV numbers always being encoded as 64-bit value
-        inline CHIP_ERROR Encode(uint32_t const & aArg) const { return Encode<uint64_t>(aArg); }
-        inline CHIP_ERROR Encode(uint32_t & aArg) const { return Encode<uint64_t>(aArg); }
-        inline CHIP_ERROR Encode(uint16_t const & aArg) const { return Encode<uint64_t>(aArg); }
-        inline CHIP_ERROR Encode(uint16_t & aArg) const { return Encode<uint64_t>(aArg); }
-        inline CHIP_ERROR Encode(uint8_t const & aArg) const { return Encode<uint64_t>(aArg); }
-        inline CHIP_ERROR Encode(uint8_t & aArg) const { return Encode<uint64_t>(aArg); }
+        template <typename T, std::enable_if_t<!IsBaseType<T>, bool> = true>
+        CHIP_ERROR Encode(const T & aArg) const
+        {
+            return Encode(BaseEncodableValue(aArg));
+        }
 
     private:
         AttributeValueEncoder & mAttributeValueEncoder;
@@ -114,11 +137,17 @@ public:
      * entirely encoded or fail to be encoded.  Consumers are allowed to make
      * either one call to Encode or one call to EncodeList to handle a read.
      */
-    template <typename... Ts>
-    CHIP_ERROR Encode(Ts &&... aArgs)
+    template <typename T, std::enable_if_t<IsBaseType<T>, bool> = true>
+    CHIP_ERROR Encode(const T & aArg)
     {
         mTriedEncode = true;
-        return EncodeAttributeReportIB(std::forward<Ts>(aArgs)...);
+        return EncodeAttributeReportIB(aArg);
+    }
+
+    template <typename T, std::enable_if_t<!IsBaseType<T>, bool> = true>
+    CHIP_ERROR Encode(const T & aArg)
+    {
+        return Encode(BaseEncodableValue(aArg));
     }
 
     /**
