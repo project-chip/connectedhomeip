@@ -87,7 +87,7 @@ class TC_TIMESYNC_2_9(MatterBaseTest):
         # It doesn't actually matter if this succeeds. The DUT is free to reject this command and use its own time.
         # If the DUT fails to get the time completely, all other tests will fail.
         try:
-            await self.send_set_utc_cmd(utc_time_in_matter_epoch())
+            await self.send_set_utc_cmd(timeoperations.utc_time_in_matter_epoch())
         except InteractionModelError:
             pass
 

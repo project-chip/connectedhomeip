@@ -101,7 +101,7 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
         # It doesn't actually matter if this succeeds. The DUT is free to reject this command and use its own time.
         # If the DUT fails to get the time completely, all other tests will fail.
         try:
-            await self.send_set_utc_cmd(utc_time_in_matter_epoch())
+            await self.send_set_utc_cmd(timeoperations.utc_time_in_matter_epoch())
         except InteractionModelError:
             pass
 
@@ -114,7 +114,7 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
         compare_time(received=local, offset=timedelta(), tolerance=timedelta(seconds=5))
 
         self.print_step(6, "Send SetDSTOffset command")
-        th_utc = utc_time_in_matter_epoch()
+        th_utc = timeoperations.utc_time_in_matter_epoch()
         dst = [dst_struct(offset=3600, validStarting=0, validUntil=th_utc+1e+7)]
         await self.send_set_dst_cmd(dst)
 
@@ -157,7 +157,7 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
 
         self.print_step(17, "Send multiple DST offsets")
         if dst_list_size > 1:
-            th_utc = utc_time_in_matter_epoch()
+            th_utc = timeoperations.utc_time_in_matter_epoch()
             dst = [dst_struct(offset=3600, validStarting=0, validUntil=th_utc+1e+7),
                    dst_struct(offset=7200, validStarting=th_utc+2.5e+7, validUntil=th_utc+4e+7)]
             await self.send_set_dst_cmd(dst)
@@ -203,7 +203,7 @@ class TC_TIMESYNC_2_8(MatterBaseTest):
         compare_time(received=local, offset=timedelta(seconds=-3600), tolerance=timedelta(seconds=5))
 
         self.print_step(27, "Send SetDSTOffset command with DST starting in the future")
-        valid = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
+        valid = timeoperations.utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
         dst = [dst_struct(offset=3600, validStarting=valid, validUntil=NullValue)]
         await self.send_set_dst_cmd(dst)
 
