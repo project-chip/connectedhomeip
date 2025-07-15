@@ -22,7 +22,6 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <protocols/interaction_model/StatusCode.h>
 
 namespace chip {
 namespace app {
@@ -44,28 +43,10 @@ public:
     {}
     virtual ~SoftwareDiagnosticsLogic() = default;
 
-    CHIP_ERROR GetCurrentHeapFree(uint64_t & out) const
-    {
-        if (!mEnabledAttributes.enableCurrentHeapFree)
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
-        return GetDiagnosticDataProvider().GetCurrentHeapFree(out);
-    }
-    CHIP_ERROR GetCurrentHeapUsed(uint64_t & out) const
-    {
-        if (!mEnabledAttributes.enableCurrentHeapUsed)
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
-        return GetDiagnosticDataProvider().GetCurrentHeapUsed(out);
-    }
+    CHIP_ERROR GetCurrentHeapFree(uint64_t & out) const { return GetDiagnosticDataProvider().GetCurrentHeapFree(out); }
+    CHIP_ERROR GetCurrentHeapUsed(uint64_t & out) const { return GetDiagnosticDataProvider().GetCurrentHeapUsed(out); }
     CHIP_ERROR GetCurrentHighWatermark(uint64_t & out) const
     {
-        if (!mEnabledAttributes.enableCurrentWatermarks)
-        {
-            return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-        }
         return GetDiagnosticDataProvider().GetCurrentHeapHighWatermark(out);
     }
 
@@ -123,7 +104,8 @@ class InjectedDiagnosticsSoftwareDiagnosticsLogic : public SoftwareDiagnosticsLo
 public:
     InjectedDiagnosticsSoftwareDiagnosticsLogic(DeviceLayer::DiagnosticDataProvider & provider,
                                                 const SoftwareDiagnosticsEnabledAttributes enabledAttributes) :
-        SoftwareDiagnosticsLogic(enabledAttributes), mProvider(provider)
+        SoftwareDiagnosticsLogic(enabledAttributes),
+        mProvider(provider)
     {}
 
 protected:

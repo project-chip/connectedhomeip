@@ -66,10 +66,6 @@ using namespace chip::app::Clusters::SoftwareDiagnostics;
 
 CHIP_ERROR SoftwareDiagnosticsLogic::ReadThreadMetrics(AttributeValueEncoder & encoder) const
 {
-    if (!mEnabledAttributes.enableThreadMetrics)
-    {
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-    }
     AutoFreeThreadMetrics metrics(GetDiagnosticDataProvider());
 
     if (metrics.ReadThreadMetrics() != CHIP_NO_ERROR)

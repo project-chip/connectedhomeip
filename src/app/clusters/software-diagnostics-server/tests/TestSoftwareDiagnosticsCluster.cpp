@@ -15,19 +15,14 @@
  */
 #include <pw_unit_test/framework.h>
 
-#include <access/SubjectDescriptor.h>
-#include <app/AttributeValueEncoder.h>
-#include <app/MessageDef/AttributeReportIBs.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-cluster.h>
 #include <app/clusters/software-diagnostics-server/software-diagnostics-logic.h>
 #include <app/clusters/testing/AttributeTesting.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/DefaultServerCluster.h>
-#include <clusters/SoftwareDiagnostics/ClusterId.h>
 #include <clusters/SoftwareDiagnostics/Enums.h>
 #include <clusters/SoftwareDiagnostics/Metadata.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/DataModelTypes.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -78,20 +73,6 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
         };
         NullProvider nullProvider;
         InjectedDiagnosticsSoftwareDiagnosticsLogic diag(nullProvider, enabledAttributes);
-
-        using chip::Protocols::InteractionModel::Status;
-        uint64_t testOutHeapNum = 0;
-        AttributeReportIBs::Builder testBuilder;
-        Access::SubjectDescriptor testAccessDescriptor;
-        DataVersion testDataVersion = 0x99;
-        AttributeValueEncoder testEncoder(
-            testBuilder, testAccessDescriptor,
-            ConcreteAttributePath(kRootEndpointId, SoftwareDiagnostics::Id, SoftwareDiagnostics::Attributes::ThreadMetrics::Id),
-            testDataVersion);
-        ASSERT_EQ(diag.GetCurrentHighWatermark(testOutHeapNum), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-        ASSERT_EQ(diag.GetCurrentHeapFree(testOutHeapNum), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-        ASSERT_EQ(diag.GetCurrentHeapUsed(testOutHeapNum), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-        ASSERT_EQ(diag.ReadThreadMetrics(testEncoder), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
 
         // without watermarks, no commands are accepted
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
