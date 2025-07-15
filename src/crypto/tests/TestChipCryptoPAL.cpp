@@ -486,7 +486,7 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128InPlaceEncryption)
     EXPECT_GT(numOfTestsRan, 0);
 }
 
-// Testing in-place encryption: same buffer for ciphertext input and plaintext output
+// Testing in-place decryption: same buffer for ciphertext input and plaintext output
 // This pattern is more widely used in the Matter Stack
 TEST_F(TestChipCryptoPAL, TestAES_CCM_128InPlaceDecryption)
 {
@@ -521,7 +521,7 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128InPlaceDecryption)
         EXPECT_EQ(err, vector->result);
         if (vector->result == CHIP_NO_ERROR)
         {
-            bool arePTsEqual = memcmp(vector->pt, inplace_buffer.Get(), vector->pt_len) == 0;
+            bool arePTsEqual = memcmp(vector->pt, inplace_buffer_ptr, vector->pt_len) == 0;
             EXPECT_TRUE(arePTsEqual);
             if (!arePTsEqual)
             {
