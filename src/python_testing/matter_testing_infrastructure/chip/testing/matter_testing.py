@@ -1175,7 +1175,7 @@ def str_from_manual_code(s: str) -> str:
 
 
 def int_named_arg(s: str) -> Tuple[str, int]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<hex_value>0x[0-9a-fA-F_]+)|(?P<decimal_value>-?\d+))$"
+    regex = r"^(?P<name>[a-zA-Z_0-9_.-]+):((?P<hex_value>0x[0-9a-fA-F_]+)|(?P<decimal_value>-?\d+))$"
     match = re.match(regex, s)
     if not match:
         raise ValueError("Invalid int argument format, does not match %s" % regex)
@@ -1189,7 +1189,7 @@ def int_named_arg(s: str) -> Tuple[str, int]:
 
 
 def str_named_arg(s: str) -> Tuple[str, str]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
+    regex = r"^(?P<name>[a-zA-Z_0-9_.-]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
         raise ValueError("Invalid string argument format, does not match %s" % regex)
@@ -1198,7 +1198,7 @@ def str_named_arg(s: str) -> Tuple[str, str]:
 
 
 def float_named_arg(s: str) -> Tuple[str, float]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
+    regex = r"^(?P<name>[a-zA-Z_0-9_.-]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
         raise ValueError("Invalid float argument format, does not match %s" % regex)
@@ -1210,7 +1210,7 @@ def float_named_arg(s: str) -> Tuple[str, float]:
 
 
 def json_named_arg(s: str) -> Tuple[str, object]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
+    regex = r"^(?P<name>[a-zA-Z_0-9_.-]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
         raise ValueError("Invalid JSON argument format, does not match %s" % regex)
@@ -1222,7 +1222,7 @@ def json_named_arg(s: str) -> Tuple[str, object]:
 
 
 def bool_named_arg(s: str) -> Tuple[str, bool]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
+    regex = r"^(?P<name>[a-zA-Z_0-9_.-]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
     match = re.match(regex, s, re.IGNORECASE)
     if not match:
         raise ValueError("Invalid bool argument format, does not match %s" % regex)
@@ -1237,7 +1237,7 @@ def bool_named_arg(s: str) -> Tuple[str, bool]:
 
 
 def bytes_as_hex_named_arg(s: str) -> Tuple[str, bytes]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>[0-9a-fA-F:]+)$"
+    regex = r"^(?P<name>[a-zA-Z_0-9_.-]+):(?P<value>[0-9a-fA-F:]+)$"
     match = re.match(regex, s)
     if not match:
         raise ValueError("Invalid bytes as hex argument format, does not match %s" % regex)
