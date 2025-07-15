@@ -243,11 +243,9 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
 
     // Add to the collection only if it does not exist as yet or pick latest value for instant event
     if (![_metricsDataCollection valueForKey:metricsKey] || event.type() == MetricEvent::Type::kInstantEvent) {
-        static const size_t kStagingStringLength(strlen(chip::Tracing::kMetricDeviceCommissionerCommissionStage));
-
         // If this is the commissioning staging event, skip the cleanup to track the last stage completed in case of error
         // For all other events, just capture the value
-        if (strncmp(event.key(), chip::Tracing::kMetricDeviceCommissionerCommissionStage, kStagingStringLength) != 0 || event.ValueUInt32() != chip::Controller::CommissioningStage::kCleanup) {
+        if (strcmp(event.key(), chip::Tracing::kMetricDeviceCommissionerCommissionStage) != 0 || event.ValueUInt32() != chip::Controller::CommissioningStage::kCleanup) {
             [_metricsDataCollection setValue:data forKey:metricsKey];
         }
     }
