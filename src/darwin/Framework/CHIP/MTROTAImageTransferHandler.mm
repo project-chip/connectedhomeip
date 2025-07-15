@@ -22,7 +22,7 @@
 #import "MTRMetricKeys.h"
 #import "MTROTAUnsolicitedBDXMessageHandler.h"
 #import "NSStringSpanConversion.h"
-#include "darwin/Framework/CHIP/MTRMetricsCollector.h"
+#import "MTRMetricsCollector.h"
 
 #include <chrono>
 #include <platform/Darwin/UserDefaults.h>
@@ -301,7 +301,7 @@ void MTROTAImageTransferHandler::InvokeTransferSessionEndCallback(CHIP_ERROR err
     MATTER_LOG_METRIC_END(kMetricOTATransfer, error);
 
     // Always collect the metrics to avoid unbounded growth of the stats in the collector
-    MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshotForCategory:@("ota") removeMetrics:TRUE];
+    MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshotForCategory:@("ota") removeMetrics:YES];
     [device otaTransferEnded:metrics];
 
     auto nsError = [MTRError errorForCHIPErrorCode:error];
@@ -351,7 +351,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
 
     auto respondWithBlock = ^(NSData * _Nullable data, BOOL isEOF) {
         if (data) {
-            mNumBytesProcessed += [data length];
+            mNumBytesProcessed += data.length;
         }
         [controller
             asyncDispatchToMatterQueue:^() {
