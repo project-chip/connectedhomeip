@@ -68,7 +68,7 @@ class CommissioningFlowBlocks:
         # Failures are exceptions
         try:
             dac = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.OperationalCredentials.Commands.CertificateChainRequest(
-                certificateType=Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum.kDACCertificate
+                certificateType=Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum(1)
             ))
         except Exception as ex:
             raise commissioning.CommissionFailure(f"Failed to get DAC: {ex}")
@@ -76,7 +76,7 @@ class CommissioningFlowBlocks:
         self._logger.info("Getting CertificateChain - PAI")
         try:
             pai = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, Clusters.OperationalCredentials.Commands.CertificateChainRequest(
-                certificateType=Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum.kPAICertificate
+                certificateType=Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum(2)
             ))
         except Exception as ex:
             raise commissioning.CommissionFailure(f"Failed to get PAI: {ex}")
