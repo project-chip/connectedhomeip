@@ -42,7 +42,7 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches,
-                                           type_matches)
+                                           matchers)
 from matter.tlv import uint
 
 
@@ -64,7 +64,7 @@ class TC_TLSCLIENT_1_1(MatterBaseTest):
             result = await self.send_single_cmd(cmd=Clusters.TlsClientManagement.Commands.ProvisionEndpoint(hostname=hostname, port=port, caid=caid, ccdid=ccdid),
                                                 endpoint=endpoint, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
 
-            asserts.assert_true(type_matches(result, Clusters.TlsClientManagement.Commands.ProvisionEndpointResponse),
+            asserts.assert_true(matchers.is_type(result, Clusters.TlsClientManagement.Commands.ProvisionEndpointResponse),
                                 "Unexpected return type for ProvisionEndpoint")
             return result
         except InteractionModelError as e:

@@ -39,6 +39,7 @@ import logging
 import random
 from dataclasses import dataclass
 
+
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -46,7 +47,7 @@ import matter.discovery as Discovery
 from matter import ChipUtility
 from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
+from matter.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
 
 
 def get_all_cmds_for_cluster_id(cid: int) -> list[Clusters.ClusterObjects.ClusterCommand]:
@@ -246,7 +247,7 @@ class TC_IDM_1_2(MatterBaseTest):
         # ArmFailSafe sends a data response
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=1)
         ret = await self.default_controller.SendCommand(nodeid=self.dut_node_id, endpoint=0, payload=cmd)
-        asserts.assert_true(type_matches(ret, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
+        asserts.assert_true(matchers.is_type(ret, Clusters.GeneralCommissioning.Commands.ArmFailSafeResponse),
                             "Unexpected response type from ArmFailSafe")
 
         self.print_step(7, "Send a command with suppress Response")
