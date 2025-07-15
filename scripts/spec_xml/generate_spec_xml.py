@@ -20,6 +20,7 @@ import os
 import subprocess
 import sys
 import textwrap
+from lxml import etree
 from pathlib import Path
 
 import click
@@ -106,7 +107,13 @@ def make_asciidoc(target: str, include_in_progress: str, spec_dir: str, dry_run:
 @click.option(
     '--include-in-progress',
     type=click.Choice(['All', 'None', 'Current']), default='All')
-def main(scraper, spec_root, output_dir, dry_run, include_in_progress):
+@click.option(
+    '--skip-scrape',
+    help='Runs only the updates that happen after the scrape from the spec repo',
+    is_flag=True,
+    default=False,
+)
+def main(scraper, spec_root, output_dir, dry_run, include_in_progress, skip_scrape):
     '''
     This script is used to generate the data model XML files found in the SDK
     data_model directory.
@@ -137,11 +144,13 @@ def main(scraper, spec_root, output_dir, dry_run, include_in_progress):
     Information on structuring PRs for data model files and adding new files
     to the supporting test script can be found in the README.md file in
     the data_model folder.
-
     '''
-    scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress)
+    if not skip_scrape:
+        scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress)
+        if not dry_run:
+            dump_versions(scraper, spec_root, output_dir)
     if not dry_run:
-        dump_versions(scraper, spec_root, output_dir)
+        cleanup_old_spec_dms(output_dir)
         dump_json_ids(output_dir)
         dump_ids_from_data_model_dirs()
         # Update all the files in the python wheels
@@ -199,6 +208,111 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress):
         if adoc not in namespace_files:
             print(f'Removing {adoc} as it was not in the generated spec document')
             os.remove(os.path.join(namespaces_output_dir, filename))
+
+
+def cleanup_old_spec_dms(output_dir):
+    ''' There are a few old spec versions that have the same longstanding problems.
+        Unfortunately, we don't have specific branches for all these spec versions
+        since some were only tagged, and some were re-used for dot releases.
+        Applying the fixes here. Alchemy will continue to provide a faithful
+        representation of the spec, and going forward, we should correct these
+        types of problems in the spec where possible.
+    '''
+    def _fix_door_lock_device_type_features():
+        '''Door lock device type has a typo in the required features
+           for the user feature in the door lock cluster element requirements.
+           - FPG should be FGP (fingerprint)
+        '''
+        changed = False
+        filename = os.path.join(output_dir, 'device_types', 'DoorLock.xml')
+        with open(filename, 'rt+') as file:
+            tree = etree.parse(file)
+            root = tree.getroot()
+            for feature_tag in root.iter('feature'):
+                print(feature_tag.attrib.get('name', ''))
+                if feature_tag.attrib.get('name', '') == 'FPG':
+                    feature_tag.attrib['name'] = 'FGP'
+                    changed = True
+            for condition_tag in root.iter('condition'):
+                if condition_tag.attrib.get('name', '') == 'FPG':
+                    condition_tag.attrib['name'] = 'FGP'
+                    condition_tag.tag = 'feature'
+                    changed = True
+        if changed:
+            tree.write(filename, pretty_print=True, xml_declaration=True, encoding='utf-8')
+
+    def _fix_pre_1_3_base_device_type():
+        ''' The 1.2 spec tables in the base device type are all weird because they
+            include separate tables for matter and zigbee still. Given that those
+            specs are frozen, add in the information from the missing table.
+            This is taken directly from the 1.3 base device type specification.
+            There were no changes between 1.0 and 1.3 to this device type.
+        '''
+        missing_pre_1_3_base_device_type_clusters = '''
+            <clusters>
+            <cluster id="0x001D" name="Descriptor" side="server">
+            <mandatoryConform/>
+            <features>
+                <feature code="" name="TagList">
+                <mandatoryConform>
+                    <condition name="Duplicate"/>
+                </mandatoryConform>
+                </feature>
+            </features>
+            </cluster>
+            <cluster id="0x001E" name="Binding" side="server">
+            <mandatoryConform>
+                <andTerm>
+                <condition name="Simple"/>
+                <condition name="Client"/>
+                </andTerm>
+            </mandatoryConform>
+            </cluster>
+            <cluster id="0x0040" name="Fixed Label" side="server">
+            <optionalConform/>
+            </cluster>
+            <cluster id="0x0041" name="User Label" side="server">
+            <optionalConform/>
+            </cluster>
+        </clusters>
+        '''
+        changed = False
+        filename = os.path.join(output_dir, 'device_types', 'BaseDeviceType.xml')
+        with open(filename, 'rt+') as file:
+            tree = etree.parse(file)
+            root = tree.getroot()
+            if root.find('clusters') is None:
+                # Cluster info is missing and we need to add it
+                new_xml = etree.fromstring(missing_pre_1_3_base_device_type_clusters)
+                device_type = root.find('deviceType')
+                if device_type is None:
+                    print("Unable to locate device type tag in BaseDeviceType")
+                    return
+                device_type.append(new_xml)
+                changed = True
+        if changed:
+            tree.write(filename, pretty_print=True, xml_declaration=True, encoding='utf-8')
+
+    def _fix_sit_lit_type():
+        # In some spec revisions, the SIT and LIT conditions are listed as features.
+        # This is probably fixable in alchemy, but let's just fix here until that
+        # gets pushed through.
+        changed = False
+        filename = os.path.join(output_dir, 'device_types', 'RootNodeDeviceType.xml')
+        with open(filename, 'rt+') as file:
+            tree = etree.parse(file)
+            root = tree.getroot()
+            for tag in root.iter('feature'):
+                if tag.attrib.get('name', '') in ['SIT', 'LIT']:
+                    # These should be conditions
+                    tag.tag = 'condition'
+                    changed = True
+        if changed:
+            tree.write(filename, pretty_print=True, xml_declaration=True, encoding='utf-8')
+
+    _fix_door_lock_device_type_features()
+    _fix_pre_1_3_base_device_type()
+    _fix_sit_lit_type()
 
 
 def dump_versions(scraper, spec_root, output_dir):
@@ -342,6 +456,7 @@ def dump_ids_from_data_model_dirs():
             fout.write(header)
             fout.write(table_header)
             fout.write("\n".join(lines))
+            fout.write("\n")
 
     print_out_ids(paths.get_cluster_documentation_file_path(), "clusters",  all_clusters, version_clusters)
     print_out_ids(paths.get_device_types_documentation_file_path(), "device types", all_device_types, version_device_types)
