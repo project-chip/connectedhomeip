@@ -514,6 +514,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         except AttributeError:
             return None
 
+    def get_restart_flag_file(self) -> str:
+        return self.matter_test_config.restart_flag_file
+
     def get_test_pics(self, test: str) -> list[str]:
         ''' Retrieves a list of top-level PICS that should be checked before running this test
 
@@ -1574,6 +1577,7 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
     config.app_pipe = args.app_pipe
+    config.restart_flag_file = args.restart_flag_file
     if config.app_pipe is not None and not os.path.exists(config.app_pipe):
         # Named pipes are unique, so we MUST have consistent paths
         # Verify from start the named pipe exists.
@@ -1639,6 +1643,7 @@ def parse_matter_test_args(argv: Optional[List[str]] = None) -> MatterTestConfig
                              'and NodeID to assign if commissioning (default: %d)' % _DEFAULT_DUT_NODE_ID, nargs="+")
     basic_group.add_argument('--endpoint', type=int, default=None, help="Endpoint under test")
     basic_group.add_argument('--app-pipe', type=str, default=None, help="The full path of the app to send an out-of-band command")
+    basic_group.add_argument('--restart-flag-file', type=str, default=None, help="The full path of the file to use to signal a restart to the app")
     basic_group.add_argument('--timeout', type=int, help="Test timeout in seconds")
     basic_group.add_argument("--PICS", help="PICS file path", type=str)
 

@@ -230,15 +230,15 @@ class TC_ACL_2_10(MatterBaseTest):
             self.wait_for_user_input(prompt_msg="Reboot the DUT. Press Enter when ready.\n")
         else:
             # CI environment: restart the app process using the test runner functionality
-            restart_flag_file = os.environ.get("CHIP_TEST_RESTART_FLAG_FILE")
+            restart_flag_file = self.get_restart_flag_file()
             if not restart_flag_file:
-                asserts.fail("CHIP_TEST_RESTART_FLAG_FILE environment variable not set. This test must be run via a runner that provides it.")
+                asserts.fail("Restart flag file not set. This test must be run via a runner that provides it.")
 
             try:
-                with open(restart_flag_file, 'w') as f:
+                # Create the restart flag file to signal the test runner
+                with open(restart_flag_file, "w") as f:
                     f.write("restart")
-
-                logging.info("Signaled app restart to test runner")
+                logging.info("Created restart flag file to signal app restart")
 
                 # Wait for app to restart (give it some time)
                 time.sleep(5)
@@ -251,13 +251,6 @@ class TC_ACL_2_10(MatterBaseTest):
 
             except Exception as e:
                 logging.error(f"Failed to restart app: {e}")
-                # Clean up the flag file if we created it
-                if os.path.exists(restart_flag_file):
-                    try:
-                        os.unlink(restart_flag_file)
-                        logging.info(f"Cleaned up flag file after error: {restart_flag_file}")
-                    except Exception as cleanup_error:
-                        logging.warning(f"Failed to clean up flag file {restart_flag_file}: {cleanup_error}")
                 asserts.fail(f"App restart failed: {e}")
 
         # Wait for reboot to complete
