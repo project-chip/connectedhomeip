@@ -99,18 +99,22 @@ gboolean BluezEndpoint::BluezCharacteristicAcquireWrite(BluezGattCharacteristic1
 {
     int fds[2]             = { -1, -1 };
     BluezConnection * conn = nullptr;
+    const char * deviceObjectPath;
     uint16_t mtu;
 
-    conn = GetBluezConnectionViaDevice();
     VerifyOrReturnValue(
-        conn != nullptr, FALSE,
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No CHIPoBLE connection"));
-
-    ChipLogDetail(DeviceLayer, "BluezCharacteristicAcquireWrite is called, conn: %p", conn);
-
+        g_variant_lookup(aOptions, "device", "&o", &deviceObjectPath), FALSE,
+        ChipLogError(DeviceLayer, "FAIL: No device in options in %s", __func__);
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "No device object path"));
     VerifyOrReturnValue(
         g_variant_lookup(aOptions, "mtu", "q", &mtu), FALSE, ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed"));
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "No MTU value"));
+
+    conn = GetBluezConnection(deviceObjectPath);
+    VerifyOrReturnValue(
+        conn != nullptr, FALSE,
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No CHIPoBLE connection for the device"));
+
     conn->SetMTU(mtu);
 
     if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, fds) < 0)
@@ -145,26 +149,29 @@ gboolean BluezEndpoint::BluezCharacteristicAcquireNotify(BluezGattCharacteristic
     int fds[2]                   = { -1, -1 };
     BluezConnection * conn       = nullptr;
     bool isAdditionalAdvertising = false;
+    const char * deviceObjectPath;
     uint16_t mtu;
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     isAdditionalAdvertising = (aChar == mC3.get());
 #endif
 
-    if (bluez_gatt_characteristic1_get_notifying(aChar))
-    {
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.NotPermitted", "Already notifying");
-        return FALSE;
-    }
-
-    conn = GetBluezConnectionViaDevice();
     VerifyOrReturnValue(
-        conn != nullptr, FALSE,
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No CHIPoBLE connection"));
-
+        !bluez_gatt_characteristic1_get_notifying(aChar), FALSE,
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.NotPermitted", "Already notifying"));
+    VerifyOrReturnValue(
+        g_variant_lookup(aOptions, "device", "&o", &deviceObjectPath), FALSE,
+        ChipLogError(DeviceLayer, "FAIL: No device in options in %s", __func__);
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "No device object path"));
     VerifyOrReturnValue(
         g_variant_lookup(aOptions, "mtu", "q", &mtu), FALSE, ChipLogError(DeviceLayer, "FAIL: No MTU in options in %s", __func__);
-        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "MTU negotiation failed"););
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.InvalidArguments", "No MTU value"));
+
+    conn = GetBluezConnection(deviceObjectPath);
+    VerifyOrReturnValue(
+        conn != nullptr, FALSE,
+        g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "No CHIPoBLE connection for the device"));
+
     conn->SetMTU(mtu);
 
     if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, fds) < 0)
