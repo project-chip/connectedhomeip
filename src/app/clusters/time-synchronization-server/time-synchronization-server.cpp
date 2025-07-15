@@ -554,7 +554,7 @@ CHIP_ERROR TimeSynchronizationServer::SetTimeZone(const DataModel::DecodableList
         if (tzStore.timeZone.name.HasValue() &&
             CHIP_NO_ERROR == CopyCharSpanToMutableCharSpan(tzStore.timeZone.name.Value(), tempSpan))
         {
-            lastTz.name.SetValue(CharSpan(tempSpan.data(), tempSpan.size()));
+            lastTz.name.SetValue(tempSpan);
         }
     }
 
