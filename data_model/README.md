@@ -32,7 +32,19 @@ Perform the following steps
     includes or all in-progress includes). If you are generating files using
     "Current", be sure to double-check the include list inside the script
     against the ballot email.
--   Run the script and check in all the file changes
+-   Run the script and check in all the file changes.
+
+    -   Example script invocation (adjust environment variables to reflect your
+        proper paths and spec revisions)
+
+        ```
+        ALCHEMY=/path/to/alchemy
+        SPEC_ROOT=/path/to/spec/repo
+        DM_DIR=1.3
+        IN_PROGRESS=None
+        ./scripts/spec_xml/generate_spec_xml.py --scraper $ALCHEMY --spec-root $SPEC_ROOT --include-in-progress $IN_PROGRESS --output-dir data_model/$DM_DIR
+        ```
+
 -   You can use the scripts/spec_xml/spec_revision_diff_summary.py script to
     create a summary with the differences between the data model files for two
     different directories
@@ -44,6 +56,19 @@ Perform the following steps
 -   Before pushing the PR, run build_python.sh, activate the venv and run all
     the TestSpec\* tests in src/python_testing. These are unit tests of the data
     model files.
+
+    -   To do this (set VENV to your desired path), paths set as if you're
+        running from the chip root
+
+        ```
+        . scripts/activate.sh
+        VENV=out/py
+        ./scripts/build_python.sh -i $VENV
+        source $VENV/bin/activate
+        python3 src/python_testing/TestSpecParsingSupport.py
+        python3 src/python_testing/TestSpecParsingSelection.py
+        python3 src/python_testing/TestSpecParsingDeviceType.py
+        ```
 
 ### Adding data model files for a new revision
 
@@ -77,6 +102,18 @@ To do this, perform the following steps:
 -   Create the new data model files using scripts/spec_xml/generate_spec_xml.py.
     More information on the use of the script can be found by using the --help
     flag for that script.
+
+    -   Example script invocation (adjust environment variables to reflect your
+        proper paths and spec revisions)
+
+        ```
+        ALCHEMY=/path/to/alchemy
+        SPEC_ROOT=/path/to/spec/repo
+        DM_DIR=1.5
+        IN_PROGRESS=Current
+        ./scripts/spec_xml/generate_spec_xml.py --scraper $ALCHEMY --spec-root $SPEC_ROOT --include-in-progress $IN_PROGRESS --output-dir data_model/$DM_DIR
+        ```
+
 -   Run build_python.sh, activate the venv and run all the TestSpec\* tests in
     src/python_testing. These are unit tests of the data model files.
 -   If there are errors, prefer to correct them in the spec, or by updating the
