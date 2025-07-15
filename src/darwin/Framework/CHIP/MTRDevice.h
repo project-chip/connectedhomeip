@@ -405,8 +405,6 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                                               queue:(dispatch_queue_t)queue
                                          completion:(void (^)(NSError * _Nullable error))completion MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 
-- (void)otaTransferEnded:(MTRMetrics *)metrics;
-
 @end
 
 MTR_EXTERN NSString * const MTRPreviousDataKey MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
@@ -480,7 +478,7 @@ MTR_EXTERN NSString * const MTRDataVersionKey MTR_AVAILABLE(ios(17.6), macos(14.
  */
 - (void)deviceConfigurationChanged:(MTRDevice *)device MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6));
 
-- (void)otaTransferEnded:(MTRDevice *)device metrics:(MTRMetrics *)metrics MTR_NEWLY_AVAILABLE;
+- (void)otaTransferComplete:(MTRDevice *)device metrics:(MTRMetrics *)metrics MTR_NEWLY_AVAILABLE;
 
 @end
 

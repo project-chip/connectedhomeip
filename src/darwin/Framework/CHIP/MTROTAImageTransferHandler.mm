@@ -20,9 +20,9 @@
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRMetricKeys.h"
+#import "MTRMetricsCollector.h"
 #import "MTROTAUnsolicitedBDXMessageHandler.h"
 #import "NSStringSpanConversion.h"
-#import "MTRMetricsCollector.h"
 
 #include <chrono>
 #include <platform/Darwin/UserDefaults.h>
@@ -294,15 +294,15 @@ void MTROTAImageTransferHandler::InvokeTransferSessionEndCallback(CHIP_ERROR err
 
     auto * device = [MTRDevice deviceWithNodeID:nodeId controller:controller];
 
-    MATTER_LOG_METRIC(kMetricOTADeviceVendorID, [device vendorID].unsignedIntValue);
-    MATTER_LOG_METRIC(kMetricOTADeviceProductID, [device productID].unsignedIntValue);
+    MATTER_LOG_METRIC(kMetricOTADeviceVendorID, device.vendorID.unsignedIntValue);
+    MATTER_LOG_METRIC(kMetricOTADeviceProductID, device.productID.unsignedIntValue);
     MATTER_LOG_METRIC(kMetricOTADeviceUsesThread, mIsPeerNodeAKnownThreadDevice);
     MATTER_LOG_METRIC(kMetricOTATNumBytesProcessed, uint32_t(mNumBytesProcessed));
     MATTER_LOG_METRIC_END(kMetricOTATransfer, error);
 
     // Always collect the metrics to avoid unbounded growth of the stats in the collector
     MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshotForCategory:@("ota") removeMetrics:YES];
-    [device otaTransferEnded:metrics];
+    [device otaTransferComplete:metrics];
 
     auto nsError = [MTRError errorForCHIPErrorCode:error];
     if ([strongDelegate respondsToSelector:@selector(handleBDXTransferSessionEndForNodeID:controller:error:)]) {

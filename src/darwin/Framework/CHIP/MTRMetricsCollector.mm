@@ -252,14 +252,16 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
     }
 }
 
-- (MTRMetrics *)metricSnapshot:(BOOL)resetCollection
+- (MTRMetrics *)metricSnapshotForCommissioning:(BOOL)resetCollection
 {
     std::lock_guard lock(_lock);
 
     NSMutableArray * keysToDelete = [NSMutableArray array];
     MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:[_metricsDataCollection count]];
     [_metricsDataCollection enumerateKeysAndObjectsUsingBlock:^(NSString * key, MTRMetricData * obj, BOOL * stop) {
-        if (![key hasPrefix:@NOT_COMMISSIONING_METRICS_PREFIX]) {
+        // Commissioning metric keys predate the encoding of a category, so we need to filter out
+        // all keys that use the encoding scheme here.
+        if (![key hasPrefix:@METRICS_KEY_PREFIX]) {
             [keysToDelete addObject:key];
             [metrics setMetricData:obj forKey:key];
         }
@@ -276,7 +278,7 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
 {
     std::lock_guard lock(_lock);
 
-    NSString * keyPrefix = [NSString stringWithFormat:@NOT_COMMISSIONING_METRICS_PREFIX "%@__", category];
+    NSString * keyPrefix = [NSString stringWithFormat:@METRICS_KEY_PREFIX "%@__", category];
     NSMutableArray * keysToDelete = [NSMutableArray array];
     MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:[_metricsDataCollection count]];
     [_metricsDataCollection enumerateKeysAndObjectsUsingBlock:^(NSString * key, MTRMetricData * obj, BOOL * stop) {

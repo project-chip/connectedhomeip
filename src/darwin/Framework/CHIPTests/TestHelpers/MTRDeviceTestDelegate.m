@@ -15,7 +15,7 @@
  */
 
 #import "MTRDeviceTestDelegate.h"
-#include <Foundation/Foundation.h>
+#import <Foundation/Foundation.h>
 #include <Matter/Matter.h>
 
 @implementation MTRDeviceTestDelegate
@@ -163,7 +163,7 @@
     return self.forceTimeSynchronizationLossDetectionCadenceToZero;
 }
 
-- (void)otaTransferEnded:(MTRDevice *)device metrics:(MTRMetrics *)metrics
+- (void)otaTransferComplete:(MTRDevice *)device metrics:(MTRMetrics *)metrics
 {
     if (self.onOTATransferEnd != nil) {
         NSArray<NSString *> * keys = [metrics allKeys];

@@ -883,11 +883,11 @@ MTR_DIRECT_MEMBERS
 
 #pragma mark - Metrics
 
-- (void)otaTransferEnded:(MTRMetrics *)metrics
+- (void)otaTransferComplete:(MTRMetrics *)metrics
 {
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
-        if ([delegate respondsToSelector:@selector(otaTransferEnded:metrics:)]) {
-            [delegate otaTransferEnded:self metrics:metrics];
+        if ([delegate respondsToSelector:@selector(otaTransferComplete:metrics:)]) {
+            [delegate otaTransferComplete:self metrics:metrics];
         }
     }];
 }

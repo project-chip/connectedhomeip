@@ -29,8 +29,9 @@ namespace DarwinFramework {
 // opted to use a special prefix (dwnfw__CATEGORY__) for the keys that are in a category. Any keys that do not contain this special
 // prefix are assumed to be used for commissioning events (because we don't want to rename the existing keys).
 
-#define NOT_COMMISSIONING_METRICS_PREFIX "dwnfw__"
-#define NOT_COMMISSIONING_METRICS_KEY(category, key) NOT_COMMISSIONING_METRICS_PREFIX #category "__" #key
+// Note that these are not used for commissioning metrics, because those predate the encoding of a category.
+#define METRICS_KEY_PREFIX "dwnfw__"
+#define METRICS_KEY(category, key) METRICS_KEY_PREFIX #category "__" #key
 
 // Tracks overall commissioning via one of the setup APIs
 constexpr Tracing::MetricKey kMetricDeviceCommissioning = "dwnfw_device_commissioning";
@@ -104,22 +105,22 @@ constexpr Tracing::MetricKey kMetricUnexpectedCQualityUpdate = "dwnpm_bad_c_attr
 // Setup from darwin MTRDevice for initial subscription to a device
 constexpr Tracing::MetricKey kMetricMTRDeviceInitialSubscriptionSetup = "dwnpm_dev_initial_subscription_setup";
 
-constexpr Tracing::MetricKey kMetricOTATransfer = NOT_COMMISSIONING_METRICS_KEY(ota, transfer);
+constexpr Tracing::MetricKey kMetricOTATransfer = METRICS_KEY(ota, transfer);
 
 // Device Vendor ID
-constexpr Tracing::MetricKey kMetricOTADeviceVendorID = NOT_COMMISSIONING_METRICS_KEY(ota, device_vendor_id);
+constexpr Tracing::MetricKey kMetricOTADeviceVendorID = METRICS_KEY(ota, device_vendor_id);
 
 // Device Product ID
-constexpr Tracing::MetricKey kMetricOTADeviceProductID = NOT_COMMISSIONING_METRICS_KEY(ota, device_product_id);
+constexpr Tracing::MetricKey kMetricOTADeviceProductID = METRICS_KEY(ota, device_product_id);
 
 // Device Uses Thread
-constexpr Tracing::MetricKey kMetricOTADeviceUsesThread = NOT_COMMISSIONING_METRICS_KEY(ota, device_uses_thread_bool);
+constexpr Tracing::MetricKey kMetricOTADeviceUsesThread = METRICS_KEY(ota, device_uses_thread_bool);
 
-constexpr Tracing::MetricKey kMetricOTATransferLength = NOT_COMMISSIONING_METRICS_KEY(ota, transfer_length);
+constexpr Tracing::MetricKey kMetricOTATransferLength = METRICS_KEY(ota, transfer_length);
 
-constexpr Tracing::MetricKey kMetricOTATransferOffset = NOT_COMMISSIONING_METRICS_KEY(ota, transfer_offset);
+constexpr Tracing::MetricKey kMetricOTATransferOffset = METRICS_KEY(ota, transfer_offset);
 
-constexpr Tracing::MetricKey kMetricOTATNumBytesProcessed = NOT_COMMISSIONING_METRICS_KEY(ota, num_bytes_processed);
+constexpr Tracing::MetricKey kMetricOTATNumBytesProcessed = METRICS_KEY(ota, num_bytes_processed);
 
 } // namespace DarwinFramework
 } // namespace Tracing

@@ -1589,10 +1589,6 @@ static BOOL sStackInitRan = NO;
     // Check whether the ota raw image exists at otaRawImagePath
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:otaRawImagePath]);
 
-    NSError * error = nil;
-    NSDictionary * fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:otaImagePath error:&error];
-    XCTAssertNil(error);
-
     __auto_type * runner = [[MTROTARequestorAppRunner alloc] initWithPayload:kOnboardingPayload1 testcase:self];
     __auto_type * device = [runner commissionWithNodeID:@(kDeviceId1)];
 
@@ -1603,6 +1599,10 @@ static BOOL sStackInitRan = NO;
     XCTestExpectation * gotMetricsExpectation
         = [self expectationWithDescription:@"Received metrics after OTA update"];
     delegate.onOTATransferEnd = ^(NSArray<NSDictionary<NSString *, id> *> * metrics) {
+        NSError * error = nil;
+        NSDictionary * fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:otaImagePath error:&error];
+        XCTAssertNil(error);
+
         XCTAssertEqual([metrics count], 1);
         NSDictionary<NSString *, id> * metricDict = metrics[0];
         uint32_t (^getValue)(NSString *, NSString *) = ^uint32_t(NSString * dataKey, NSString * valueKey) {
