@@ -27,6 +27,7 @@
 
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/senscomm/scm1612s/SystemTimeSupport.h>
+#include <time.h>
 
 namespace chip {
 namespace System {
@@ -49,7 +50,7 @@ Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & aCurTime)
 {
     struct timeval tv;
-#ifdef __no_stub__
+
     if (gettimeofday(&tv, nullptr) != 0)
     {
         return CHIP_ERROR_POSIX(errno);
@@ -64,17 +65,14 @@ CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & aCurTime)
     }
     static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
     aCurTime = Clock::Microseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000000)) + static_cast<uint64_t>(tv.tv_usec));
-#else /* __no_stub__ */
-    tv.tv_sec = tv.tv_usec = 0;
-    aCurTime = Clock::Microseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000000)) + static_cast<uint64_t>(tv.tv_usec));
-#endif /* __no_stub__ */
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & aCurTime)
 {
     struct timeval tv;
-#ifdef __no_stub__
+
     if (gettimeofday(&tv, nullptr) != 0)
     {
         return CHIP_ERROR_POSIX(errno);
@@ -90,11 +88,7 @@ CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & aCurTime)
     static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
     aCurTime =
         Clock::Milliseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000)) + (static_cast<uint64_t>(tv.tv_usec) / 1000));
-#else /* __no_stub__ */
-    tv.tv_sec = tv.tv_usec = 0;
-    aCurTime =
-        Clock::Milliseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000)) + (static_cast<uint64_t>(tv.tv_usec) / 1000));
-#endif /* __no_stub__ */
+
     return CHIP_NO_ERROR;
 }
 
