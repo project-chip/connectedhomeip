@@ -67,7 +67,7 @@ public:
     /// When this is invoked, caller is expected to have already done some validations:
     ///    - `request.path` is a valid path inside the ProviderMetadataTree (an AttributeEntry exists)
     ///    - Attribute is readable according to the ProviderMetadataTree/AttributeEntry data
-    ///    - Appropriate ACL checks done according to the attribute AttributeEntry
+    ///    - Appropriate ACL checks done according to the attribute's AttributeEntry
     ///
     /// Return value notes:
     ///   ActionReturnStatus::IsOutOfSpaceEncodingResponse
