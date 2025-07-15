@@ -50,7 +50,7 @@ enum class OptionalBasicInformationAttributes : uint16_t
 class BasicInformationCluster : public DefaultServerCluster, public DeviceLayer::PlatformManagerDelegate
 {
 public:
-    static BasicInformationCluster &Instance();
+    static BasicInformationCluster & Instance();
 
     const BitFlags<OptionalBasicInformationAttributes> & OptionalAttributes() const { return mEnabledOptionalAttributes; }
     BitFlags<OptionalBasicInformationAttributes> OptionalAttributes() { return mEnabledOptionalAttributes; }

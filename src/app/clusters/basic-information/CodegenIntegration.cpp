@@ -52,19 +52,19 @@ void emberAfBasicInformationClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
-    BasicInformationCluster::Instance().OptionalAttributes()
-            .Set(OptionalBasicInformationAttributes::kManufacturingDate, IsAttributeEnabledOnSomeEndpoint(ManufacturingDate::Id))
-            .Set(OptionalBasicInformationAttributes::kPartNumber, IsAttributeEnabledOnSomeEndpoint(PartNumber::Id))
-            .Set(OptionalBasicInformationAttributes::kProductURL, IsAttributeEnabledOnSomeEndpoint(ProductURL::Id))
-            .Set(OptionalBasicInformationAttributes::kProductLabel, IsAttributeEnabledOnSomeEndpoint(ProductLabel::Id))
-            .Set(OptionalBasicInformationAttributes::kSerialNumber, IsAttributeEnabledOnSomeEndpoint(SerialNumber::Id))
-            .Set(OptionalBasicInformationAttributes::kLocalConfigDisabled,
-                 IsAttributeEnabledOnSomeEndpoint(LocalConfigDisabled::Id))
-            .Set(OptionalBasicInformationAttributes::kReachable, IsAttributeEnabledOnSomeEndpoint(Reachable::Id))
-            .Set(OptionalBasicInformationAttributes::kProductAppearance, IsAttributeEnabledOnSomeEndpoint(ProductAppearance::Id))
-            // This is NOT typical, however we try to respect ZAP here. MCORE_FS tests require this
-            .Set(OptionalBasicInformationAttributes::kDisableMandatoryUniqueIDOnPurpose,
-                 !IsAttributeEnabledOnSomeEndpoint(UniqueID::Id));
+    BasicInformationCluster::Instance()
+        .OptionalAttributes()
+        .Set(OptionalBasicInformationAttributes::kManufacturingDate, IsAttributeEnabledOnSomeEndpoint(ManufacturingDate::Id))
+        .Set(OptionalBasicInformationAttributes::kPartNumber, IsAttributeEnabledOnSomeEndpoint(PartNumber::Id))
+        .Set(OptionalBasicInformationAttributes::kProductURL, IsAttributeEnabledOnSomeEndpoint(ProductURL::Id))
+        .Set(OptionalBasicInformationAttributes::kProductLabel, IsAttributeEnabledOnSomeEndpoint(ProductLabel::Id))
+        .Set(OptionalBasicInformationAttributes::kSerialNumber, IsAttributeEnabledOnSomeEndpoint(SerialNumber::Id))
+        .Set(OptionalBasicInformationAttributes::kLocalConfigDisabled, IsAttributeEnabledOnSomeEndpoint(LocalConfigDisabled::Id))
+        .Set(OptionalBasicInformationAttributes::kReachable, IsAttributeEnabledOnSomeEndpoint(Reachable::Id))
+        .Set(OptionalBasicInformationAttributes::kProductAppearance, IsAttributeEnabledOnSomeEndpoint(ProductAppearance::Id))
+        // This is NOT typical, however we try to respect ZAP here. MCORE_FS tests require this
+        .Set(OptionalBasicInformationAttributes::kDisableMandatoryUniqueIDOnPurpose,
+             !IsAttributeEnabledOnSomeEndpoint(UniqueID::Id));
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gRegistration);
     if (err != CHIP_NO_ERROR)
