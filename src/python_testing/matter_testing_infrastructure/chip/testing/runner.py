@@ -916,7 +916,7 @@ def str_from_manual_code(s: str) -> str:
 
 
 def int_named_arg(s: str) -> Tuple[str, int]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<hex_value>0x[0-9a-fA-F_]+)|(?P<decimal_value>-?\d+))$"
+    regex = r"^(?P<name>[a-zA-Z_0-9_.-]+):((?P<hex_value>0x[0-9a-fA-F_]+)|(?P<decimal_value>-?\d+))$"
     match = re.match(regex, s)
     if not match:
         raise ValueError("Invalid int argument format, does not match %s" % regex)
