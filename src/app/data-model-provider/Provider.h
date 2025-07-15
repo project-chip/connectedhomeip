@@ -62,7 +62,7 @@ public:
     ///
     ///       Users of DataModel::Provider are expected to get these lists
     ///       from ProviderMetadataTree (in particular IM Reads of these
-    ///       attributes will the automatically filled from metadata).
+    ///       attributes will be automatically filled from metadata).
     ///
     /// When this is invoked, caller is expected to have already done some validations:
     ///    - `request.path` is a valid path inside the ProviderMetadataTree (an AttributeEntry exists)
