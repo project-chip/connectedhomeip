@@ -248,34 +248,11 @@ TEST(TestPascalString, TestIsValid)
     }
 }
 
-TEST(TestPascalString, TestContentOf)
+TEST(TestPascalString, SupportConstAccess)
 {
-    {
-        uint8_t buffer[8] = { 0 };
-        ShortPascalBytes s(buffer);
-
-        ASSERT_TRUE(ShortPascalBytes::ContentOf(buffer).empty());
-
-        const uint8_t foo[] = { 1, 2, 3 };
-        ASSERT_TRUE(s.SetValue(ByteSpan(foo)));
-        ASSERT_TRUE(ShortPascalBytes::ContentOf(buffer).data_equal(ByteSpan(foo)));
-
-        s.SetNull();
-        ASSERT_TRUE(ShortPascalBytes::ContentOf(buffer).empty());
-    }
-
-    {
-        char buffer[8] = { 0 };
-        LongPascalString s(buffer);
-
-        ASSERT_TRUE(LongPascalString::ContentOf(buffer).data_equal(""_span));
-
-        ASSERT_TRUE(s.SetValue("test"_span));
-        ASSERT_TRUE(LongPascalString::ContentOf(buffer).data_equal("test"_span));
-
-        s.SetNull();
-        ASSERT_TRUE(LongPascalString::ContentOf(buffer).data_equal(""_span));
-    }
+    // a const buffer should be viewable as a pascal string
+    const char buffer[8] = { 4, 't', 'e', 's', 't', 'a', 'b', 'c' };
+    ASSERT_TRUE(ShortPascalConstString(buffer).Content().data_equal("test"_span));
 }
 
 } // namespace

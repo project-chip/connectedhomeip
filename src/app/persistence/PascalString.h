@@ -147,22 +147,6 @@ public:
         return len == kInvalidLength || (static_cast<size_t>(len + PREFIX_LEN) <= span.size());
     }
 
-    /// Convenience function: it is very common to require the content of a buffer
-    /// represented as a pascal buffer. This provides that.
-    template <size_t N>
-    static Span<const T> ContentOf(const T (&data)[N])
-    {
-        LengthType len = PascalPrefixOperations<PREFIX_LEN>::GetLength(data);
-
-        if ((len == kInvalidLength) || (static_cast<size_t>(len + PREFIX_LEN) > N))
-        {
-            return Span<const T>();
-        }
-
-        // we know data length is valid, return it
-        return { data + PREFIX_LEN, len };
-    }
-
 private:
     T * mData;
     const LengthType mMaxSize;
@@ -172,6 +156,13 @@ using ShortPascalString = PascalBuffer<char, 1>;
 using ShortPascalBytes  = PascalBuffer<uint8_t, 1>;
 using LongPascalString  = PascalBuffer<char, 2>;
 using LongPascalBytes   = PascalBuffer<uint8_t, 2>;
+
+// same as the pascal strings, except the data is const and cannot
+// be changed. Useful to get the content of data
+using ShortPascalConstString = PascalBuffer<const char, 1>;
+using ShortPascalConstBytes  = PascalBuffer<const uint8_t, 1>;
+using LongPascalConstString  = PascalBuffer<const char, 2>;
+using LongPascalConstBytes   = PascalBuffer<const uint8_t, 2>;
 
 } // namespace Storage
 } // namespace app
