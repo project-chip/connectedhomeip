@@ -39,7 +39,7 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.conversions import hex_from_bytes
-from matter.testing.matter_testing import type_matches
+from matter.testing.matter_testing import matchers
 from matter.testing.tasks import Subprocess
 from matter.tlv import uint
 
@@ -206,7 +206,7 @@ class PAVSTIUtils:
             )
 
             asserts.assert_true(
-                type_matches(
+                matchers.is_type(
                     result,
                     Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificateResponse,
                 ),
@@ -249,7 +249,7 @@ class PAVSTIUtils:
             )
 
             asserts.assert_true(
-                type_matches(
+                matchers.is_type(
                     result,
                     Clusters.TlsCertificateManagement.Commands.ClientCSRResponse,
                 ),
@@ -294,7 +294,7 @@ class PAVSTIUtils:
             )
 
             asserts.assert_true(
-                type_matches(
+                matchers.is_type(
                     result,
                     Clusters.TlsClientManagement.Commands.ProvisionEndpointResponse,
                 ),

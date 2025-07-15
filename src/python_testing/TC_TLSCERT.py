@@ -57,7 +57,7 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
 from matter.testing.conversions import hex_from_bytes
 from matter.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches,
-                                           type_matches)
+                                           matchers)
 from matter.utils import CommissioningBuildingBlocks
 
 
@@ -205,7 +205,7 @@ class TC_TLSCERT(MatterBaseTest):
                 result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificate(certificate=certificate, caid=caid),
                                                          endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
 
-                asserts.assert_true(type_matches(result, Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificateResponse),
+                asserts.assert_true(matchers.is_type(result, Clusters.TlsCertificateManagement.Commands.ProvisionRootCertificateResponse),
                                     "Unexpected return type for ProvisionRootCertificate")
                 return result
             except InteractionModelError as e:
@@ -219,7 +219,7 @@ class TC_TLSCERT(MatterBaseTest):
                 result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.FindRootCertificate(caid=caid),
                                                          endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
 
-                asserts.assert_true(type_matches(result, Clusters.TlsCertificateManagement.Commands.FindRootCertificateResponse),
+                asserts.assert_true(matchers.is_type(result, Clusters.TlsCertificateManagement.Commands.FindRootCertificateResponse),
                                     "Unexpected return type for FindRootCertificate")
                 return result
             except InteractionModelError as e:
@@ -244,7 +244,7 @@ class TC_TLSCERT(MatterBaseTest):
                 result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.ClientCSR(ccdid=ccdid, nonce=nonce),
                                                          endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
 
-                asserts.assert_true(type_matches(result, Clusters.TlsCertificateManagement.Commands.ClientCSRResponse),
+                asserts.assert_true(matchers.is_type(result, Clusters.TlsCertificateManagement.Commands.ClientCSRResponse),
                                     "Unexpected return type for ClientCSR")
                 return result
             except InteractionModelError as e:
@@ -270,7 +270,7 @@ class TC_TLSCERT(MatterBaseTest):
                 result = await self.test.send_single_cmd(cmd=Clusters.TlsCertificateManagement.Commands.FindClientCertificate(ccdid=ccdid),
                                                          endpoint=self.endpoint, dev_ctrl=self.dev_ctrl, node_id=self.node_id, payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
 
-                asserts.assert_true(type_matches(result, Clusters.TlsCertificateManagement.Commands.FindClientCertificateResponse),
+                asserts.assert_true(matchers.is_type(result, Clusters.TlsCertificateManagement.Commands.FindClientCertificateResponse),
                                     "Unexpected return type for FindClientCertificate")
                 return result
             except InteractionModelError as e:
