@@ -23,6 +23,7 @@
 
 using namespace chip::DeviceLayer;
 using namespace chip::app::Clusters::GeneralDiagnostics;
+using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
 namespace app {
@@ -66,7 +67,8 @@ GeneralDiagnosticsLogic::HandleTestEventTrigger(const Commands::TestEventTrigger
         return chip::Protocols::InteractionModel::Status::ConstraintError;
     }
 
-    return triggerDelegate->HandleEventTriggers(commandData.eventTrigger);
+    CHIP_ERROR handleEventTriggerResult = triggerDelegate->HandleEventTriggers(commandData.eventTrigger);
+    return (handleEventTriggerResult != CHIP_NO_ERROR) ? Status::InvalidCommand : Status::Success;
 }
 
 std::optional<DataModel::ActionReturnStatus>
