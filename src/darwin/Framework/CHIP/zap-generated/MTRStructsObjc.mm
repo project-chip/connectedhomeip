@@ -7902,6 +7902,42 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@implementation MTRThermostatClusterThermostatSuggestionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _uniqueID = @(0);
+
+        _presetHandle = [NSData data];
+
+        _effectiveTime = @(0);
+
+        _expirationTime = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterThermostatSuggestionStruct alloc] init];
+
+    other.uniqueID = self.uniqueID;
+    other.presetHandle = self.presetHandle;
+    other.effectiveTime = self.effectiveTime;
+    other.expirationTime = self.expirationTime;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: uniqueID:%@; presetHandle:%@; effectiveTime:%@; expirationTime:%@; >", NSStringFromClass([self class]), _uniqueID, [_presetHandle base64EncodedStringWithOptions:0], _effectiveTime, _expirationTime];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTRThermostatClusterWeeklyScheduleTransitionStruct
 - (instancetype)init
 {
@@ -7939,6 +7975,249 @@ NS_ASSUME_NONNULL_BEGIN
 @dynamic transitionTime;
 @dynamic heatSetpoint;
 @dynamic coolSetpoint;
+@end
+
+@implementation MTRThermostatClusterSystemModeChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _previousSystemMode = nil;
+
+        _currentSystemMode = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterSystemModeChangeEvent alloc] init];
+
+    other.previousSystemMode = self.previousSystemMode;
+    other.currentSystemMode = self.currentSystemMode;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: previousSystemMode:%@; currentSystemMode:%@; >", NSStringFromClass([self class]), _previousSystemMode, _currentSystemMode];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterLocalTemperatureChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _currentLocalTemperature = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterLocalTemperatureChangeEvent alloc] init];
+
+    other.currentLocalTemperature = self.currentLocalTemperature;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: currentLocalTemperature:%@; >", NSStringFromClass([self class]), _currentLocalTemperature];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterOccupancyChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _previousOccupancy = nil;
+
+        _currentOccupancy = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterOccupancyChangeEvent alloc] init];
+
+    other.previousOccupancy = self.previousOccupancy;
+    other.currentOccupancy = self.currentOccupancy;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: previousOccupancy:%@; currentOccupancy:%@; >", NSStringFromClass([self class]), _previousOccupancy, _currentOccupancy];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterSetpointChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _systemMode = @(0);
+
+        _occupancy = nil;
+
+        _previousSetpoint = nil;
+
+        _currentSetpoint = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterSetpointChangeEvent alloc] init];
+
+    other.systemMode = self.systemMode;
+    other.occupancy = self.occupancy;
+    other.previousSetpoint = self.previousSetpoint;
+    other.currentSetpoint = self.currentSetpoint;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: systemMode:%@; occupancy:%@; previousSetpoint:%@; currentSetpoint:%@; >", NSStringFromClass([self class]), _systemMode, _occupancy, _previousSetpoint, _currentSetpoint];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterRunningStateChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _previousRunningState = nil;
+
+        _currentRunningState = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterRunningStateChangeEvent alloc] init];
+
+    other.previousRunningState = self.previousRunningState;
+    other.currentRunningState = self.currentRunningState;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: previousRunningState:%@; currentRunningState:%@; >", NSStringFromClass([self class]), _previousRunningState, _currentRunningState];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterRunningModeChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _previousRunningMode = nil;
+
+        _currentRunningMode = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterRunningModeChangeEvent alloc] init];
+
+    other.previousRunningMode = self.previousRunningMode;
+    other.currentRunningMode = self.currentRunningMode;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: previousRunningMode:%@; currentRunningMode:%@; >", NSStringFromClass([self class]), _previousRunningMode, _currentRunningMode];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterActiveScheduleChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _previousScheduleHandle = nil;
+
+        _currentScheduleHandle = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterActiveScheduleChangeEvent alloc] init];
+
+    other.previousScheduleHandle = self.previousScheduleHandle;
+    other.currentScheduleHandle = self.currentScheduleHandle;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: previousScheduleHandle:%@; currentScheduleHandle:%@; >", NSStringFromClass([self class]), [_previousScheduleHandle base64EncodedStringWithOptions:0], [_currentScheduleHandle base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatClusterActivePresetChangeEvent
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _previousPresetHandle = nil;
+
+        _currentPresetHandle = nil;
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatClusterActivePresetChangeEvent alloc] init];
+
+    other.previousPresetHandle = self.previousPresetHandle;
+    other.currentPresetHandle = self.currentPresetHandle;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: previousPresetHandle:%@; currentPresetHandle:%@; >", NSStringFromClass([self class]), [_previousPresetHandle base64EncodedStringWithOptions:0], [_currentPresetHandle base64EncodedStringWithOptions:0]];
+    return descriptionString;
+}
+
 @end
 
 @implementation MTROccupancySensingClusterHoldTimeLimitsStruct

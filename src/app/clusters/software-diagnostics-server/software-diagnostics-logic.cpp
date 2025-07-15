@@ -66,7 +66,7 @@ using namespace chip::app::Clusters::SoftwareDiagnostics;
 
 CHIP_ERROR SoftwareDiagnosticsLogic::ReadThreadMetrics(AttributeValueEncoder & encoder) const
 {
-    AutoFreeThreadMetrics metrics(GetDiagnosticDataProvider());
+    AutoFreeThreadMetrics metrics(DeviceLayer::GetDiagnosticDataProvider());
 
     if (metrics.ReadThreadMetrics() != CHIP_NO_ERROR)
     {
@@ -85,7 +85,7 @@ CHIP_ERROR SoftwareDiagnosticsLogic::ReadThreadMetrics(AttributeValueEncoder & e
 
 CHIP_ERROR SoftwareDiagnosticsLogic::AcceptedCommands(ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
-    if (mEnabledAttributes.enableCurrentWatermarks && GetDiagnosticDataProvider().SupportsWatermarks())
+    if (mEnabledAttributes.enableCurrentWatermarks && DeviceLayer::GetDiagnosticDataProvider().SupportsWatermarks())
     {
         static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = { Commands::ResetWatermarks::kMetadataEntry };
         return builder.ReferenceExisting(kAcceptedCommands);

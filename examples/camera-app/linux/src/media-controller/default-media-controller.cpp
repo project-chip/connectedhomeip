@@ -23,24 +23,24 @@ void DefaultMediaController::RegisterTransport(Transport * transport, uint16_t v
 {
     ChipLogProgress(Camera, "Registering transport: videoStreamID=%u, audioStreamID=%u", videoStreamID, audioStreamID);
 
-    std::lock_guard<std::mutex> lock(connectionsMutex);
-    connections.push_back({ transport, videoStreamID, audioStreamID });
+    std::lock_guard<std::mutex> lock(mConnectionsMutex);
+    mConnections.push_back({ transport, videoStreamID, audioStreamID });
 
-    ChipLogProgress(Camera, "Transport registered successfully. Total connections: %u", (unsigned) connections.size());
+    ChipLogProgress(Camera, "Transport registered successfully. Total connections: %u", (unsigned) mConnections.size());
 }
 
 void DefaultMediaController::UnregisterTransport(Transport * transport)
 {
-    std::lock_guard<std::mutex> lock(connectionsMutex);
-    connections.erase(std::remove_if(connections.begin(), connections.end(),
-                                     [transport](const Connection & c) { return c.transport == transport; }),
-                      connections.end());
+    std::lock_guard<std::mutex> lock(mConnectionsMutex);
+    mConnections.erase(std::remove_if(mConnections.begin(), mConnections.end(),
+                                      [transport](const Connection & c) { return c.transport == transport; }),
+                       mConnections.end());
 }
 
 void DefaultMediaController::DistributeVideo(const char * data, size_t size, uint16_t videoStreamID)
 {
-    std::lock_guard<std::mutex> lock(connectionsMutex);
-    for (const Connection & connection : connections)
+    std::lock_guard<std::mutex> lock(mConnectionsMutex);
+    for (const Connection & connection : mConnections)
     {
         if (connection.videoStreamID == videoStreamID && connection.transport && connection.transport->CanSendVideo())
         {
@@ -51,8 +51,8 @@ void DefaultMediaController::DistributeVideo(const char * data, size_t size, uin
 
 void DefaultMediaController::DistributeAudio(const char * data, size_t size, uint16_t audioStreamID)
 {
-    std::lock_guard<std::mutex> lock(connectionsMutex);
-    for (const Connection & connection : connections)
+    std::lock_guard<std::mutex> lock(mConnectionsMutex);
+    for (const Connection & connection : mConnections)
     {
         if (connection.audioStreamID == audioStreamID && connection.transport && connection.transport->CanSendAudio())
         {

@@ -69,6 +69,11 @@ namespace NetworkRecoveryReason {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(NetworkRecoveryReason::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kManage, std::nullopt);
 } // namespace NetworkRecoveryReason
+namespace IsCommissioningWithoutPower {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(IsCommissioningWithoutPower::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace IsCommissioningWithoutPower
 
 } // namespace Attributes
 
