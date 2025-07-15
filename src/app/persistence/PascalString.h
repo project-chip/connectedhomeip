@@ -24,6 +24,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <type_traits>
 
 namespace chip {
 namespace app {
@@ -103,7 +104,11 @@ public:
 
     /// Access to the full buffer. does NOT take into account current size
     /// and includes the "size prefix"
-    MutableByteSpan RawBuffer() { return { reinterpret_cast<uint8_t *>(mData), static_cast<size_t>(mMaxSize + PREFIX_LEN) }; }
+    MutableByteSpan RawBuffer()
+    {
+        static_assert(!std::is_const<T>::value, "Cannot mutate a const pascal string");
+        return { reinterpret_cast<uint8_t *>(mData), static_cast<size_t>(mMaxSize + PREFIX_LEN) };
+    }
 
     LengthType GetLength() const
     {
@@ -118,6 +123,7 @@ public:
     // Returns true if the length was valid and could be set
     bool SetLength(LengthType len)
     {
+        static_assert(!std::is_const<T>::value, "Cannot mutate a const pascal string");
         if (len != kInvalidLength)
         {
             VerifyOrReturnError(len <= mMaxSize, false);
@@ -132,6 +138,7 @@ public:
     // pascal buffer (and could be set)
     bool SetValue(Span<const T> value)
     {
+        static_assert(!std::is_const<T>::value, "Cannot mutate a const pascal string");
         VerifyOrReturnValue(value.size() < kInvalidLength, false);
         VerifyOrReturnValue(SetLength(static_cast<LengthType>(value.size())), false);
         memcpy(mData + PREFIX_LEN, value.data(), value.size());
