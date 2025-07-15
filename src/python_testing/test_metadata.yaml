@@ -13,10 +13,14 @@ not_automated:
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_9.py
       reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_10.py
+      reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_12.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_15.py
       reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_16.py
+      reason: Can not run thread CNET tests in CI
     - name: TC_CNET_4_22.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_DGGEN_3_2.py
