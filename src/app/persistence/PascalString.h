@@ -97,7 +97,7 @@ public:
     /// Accesses the "PASCAL" string (i.e. valid data including the string prefix)
     ///
     /// Use this to serialize the data. Specifically to recover the original string from
-    /// persistent storage one can:
+    /// persistent storage one can do one of two things:
     ///   - persist pascalString.ContentWithLenPrefix (will include the data WITH the size prefix)
     ///     - read via pascalString.RawFullBuffer
     ///   - persist pascalString.Content (will NOT include data size)
