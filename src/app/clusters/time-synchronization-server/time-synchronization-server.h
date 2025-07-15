@@ -90,6 +90,7 @@ public:
     CHIP_ERROR GetLocalTime(chip::EndpointId ep, DataModel::Nullable<uint64_t> & localTime);
     GranularityEnum & GetGranularity() { return mGranularity; }
     TimeSourceEnum & GetTimeSource() { return mTimeSource; }
+    CHIP_ERROR SetTimeSource(TimeSourceEnum timeSource);
 
     void ScheduleDelayedAction(System::Clock::Seconds32 delay, System::TimerCompleteCallback action, void * aAppState);
 

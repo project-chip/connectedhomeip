@@ -27,6 +27,7 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/CommandHandler.h>
 #include <app/EventLogging.h>
+#include <app/reporting/reporting.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
@@ -382,7 +383,7 @@ void TimeSynchronizationServer::OnTimeSyncCompletionFn(TimeSourceEnum timeSource
         return;
     }
     mGranularity = granularity;
-    mTimeSource  = timeSource;
+    SetTimeSource(timeSource);
 }
 
 void TimeSynchronizationServer::OnFallbackNTPCompletionFn(bool timeSyncSuccessful)
@@ -391,7 +392,7 @@ void TimeSynchronizationServer::OnFallbackNTPCompletionFn(bool timeSyncSuccessfu
     {
         mGranularity = GranularityEnum::kMillisecondsGranularity;
         // Non-matter SNTP because we know it's external and there's only one source
-        mTimeSource = TimeSourceEnum::kNonMatterSNTP;
+        SetTimeSource(TimeSourceEnum::kNonMatterSNTP);
     }
     else
     {
@@ -791,7 +792,7 @@ CHIP_ERROR TimeSynchronizationServer::SetUTCTime(EndpointId ep, uint64_t utcTime
     }
     GetDelegate()->UTCTimeAvailabilityChanged(utcTime);
     mGranularity = static_cast<GranularityEnum>(to_underlying(granularity) - 1);
-    mTimeSource  = source;
+    SetTimeSource(source);
     return CHIP_NO_ERROR;
 }
 
@@ -825,6 +826,21 @@ CHIP_ERROR TimeSynchronizationServer::GetLocalTime(EndpointId ep, DataModel::Nul
     uint64_t localTimeSec = static_cast<uint64_t>(static_cast<int64_t>(chipEpochTime) + timeZoneOffset + dstOffset);
     localTime.SetNonNull((localTimeSec * chip::kMicrosecondsPerSecond) + usRemainder);
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TimeSynchronizationServer::SetTimeSource(TimeSourceEnum timeSource)
+{
+    if (timeSource == TimeSourceEnum::kUnknownEnumValue)
+    {
+        return CHIP_IM_GLOBAL_STATUS(Failure);
+    }
+    if (mTimeSource == timeSource)
+    {
+        return CHIP_NO_ERROR;
+    }
+    mTimeSource = timeSource;
+    MatterReportingAttributeChangeCallback(kRootEndpointId, TimeSynchronization::Id, TimeSource::Id);
     return CHIP_NO_ERROR;
 }
 
