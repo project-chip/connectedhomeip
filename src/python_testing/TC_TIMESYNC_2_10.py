@@ -112,14 +112,14 @@ class TC_TIMESYNC_2_10(MatterBaseTest):
         await self.send_set_dst_cmd(dst)
 
         self.print_step(8, "Wait until th_utc + 15s")
-        time.sleep(get_wait_seconds_from_set_time(th_utc, 15))
+        time.sleep(timeoperations.get_wait_seconds_from_set_time(th_utc, 15))
 
         self.print_step(9, "Read LocalTime from the DUT")
         await self.read_single_attribute_check_success(cluster=Clusters.TimeSynchronization,
                                                        attribute=Clusters.TimeSynchronization.Attributes.LocalTime)
 
         self.print_step(10, "Wait for DSTTableEmpty event")
-        timeout = get_wait_seconds_from_set_time(th_utc, 20)
+        timeout = timeoperations.get_wait_seconds_from_set_time(th_utc, 20)
         cb.wait_for_event_report(event, timeout)
 
         self.print_step(11, "Set time zone back to 0")

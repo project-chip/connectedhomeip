@@ -77,7 +77,7 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
             AssertionError: If no event is received in time, the type is incorrect or the value does not match.
         """
 
-        timeout = get_wait_seconds_from_set_time(th_utc, wait_s)
+        timeout = timeoperations.get_wait_seconds_from_set_time(th_utc, wait_s)
         try:
             ret = cb.get_event_from_queue(block=True, timeout=timeout)
             asserts.assert_true(matchers.is_type(received_value=ret.Data,
@@ -148,7 +148,7 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
 
         self.print_step(9, "If dst_list_size > 1, TH waits until th_utc + 15s")
         if dst_list_size > 1:
-            time.sleep(get_wait_seconds_from_set_time(th_utc, 15))
+            time.sleep(timeoperations.get_wait_seconds_from_set_time(th_utc, 15))
 
         self.print_step(10, "If dst_list_size > 1, TH reads LocalTime")
         if dst_list_size > 1:
@@ -160,7 +160,7 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
 
         self.print_step(12, "If dst_list_size > 1, TH waits until th_utc + 30s")
         if dst_list_size > 1:
-            time.sleep(get_wait_seconds_from_set_time(th_utc, 30))
+            time.sleep(timeoperations.get_wait_seconds_from_set_time(th_utc, 30))
 
         self.print_step(13, "If dst_list_size > 1, TH reads LocalTime")
         if dst_list_size > 1:

@@ -143,8 +143,8 @@ class TC_DGGEN_2_4(MatterBaseTest):
             asserts.assert_greater_equal(response.systemTimeMs // 1000, testvar_UpTime1,
                                          "System time in milliseconds must be >= UpTime1")
 
-            utc_from_posix = utc_datetime_from_posix_time_ms(posix_time_ms=response.posixTimeMs)
-            utc_from_utctime1 = utc_datetime_from_matter_epoch_us(testvar_UTCTime1)
+            utc_from_posix = timeoperations.utc_datetime_from_posix_time_ms(posix_time_ms=response.posixTimeMs)
+            utc_from_utctime1 = timeoperations.utc_datetime_from_matter_epoch_us(testvar_UTCTime1)
 
             asserts.assert_greater_equal(
                 utc_from_posix, utc_from_utctime1, "PosixTimeMs field converted to a UTC timestamp must be >= than UTCTime1 converted to a UTC timestamp")

@@ -41,7 +41,7 @@ import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from chip.testing.timeoperations import compare_time, utc_time_in_matter_epoch
+from chip.testing import timeoperations
 from mobly import asserts
 
 
@@ -99,7 +99,7 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
             tolerance = timedelta(minutes=10)
         else:
             tolerance = timedelta(minutes=1)
-        compare_time(received=utc_dut, utc=th_utc, tolerance=tolerance)
+        timeoperations.compare_time(received=utc_dut, utc=th_utc, tolerance=tolerance)
 
         self.print_step(5, "Read time source")
         if timesource_attr_id in attribute_list:
