@@ -929,7 +929,7 @@ TimeState TimeSynchronizationServer::UpdateDSTOffsetState()
     {
         if (activeDstIndex + 1 >= mDstOffsetObj.validSize)
         {
-            // this is the last item in the list that has already expired
+            // This is the last item in the list, and it has already expired.
             ClearDSTOffset();
             // no DST available
             return TimeState::kInvalid;
