@@ -102,7 +102,6 @@ gboolean BluezEndpoint::BluezCharacteristicAcquireWrite(BluezGattCharacteristic1
     char * errStr;
 #endif // CHIP_ERROR_LOGGING
     BluezConnection * conn = nullptr;
-    GAutoPtr<GVariant> option_mtu;
     uint16_t mtu;
 
     conn = GetBluezConnectionViaDevice();
@@ -155,7 +154,6 @@ gboolean BluezEndpoint::BluezCharacteristicAcquireNotify(BluezGattCharacteristic
 #endif // CHIP_ERROR_LOGGING
     BluezConnection * conn       = nullptr;
     bool isAdditionalAdvertising = false;
-    GAutoPtr<GVariant> option_mtu;
     uint16_t mtu;
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
