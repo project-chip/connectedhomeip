@@ -27,6 +27,7 @@
 #include <app/util/attribute-storage.h>
 #include <controller/InvokeInteraction.h>
 #include <controller/ReadInteraction.h>
+#include <controller/tests/DispatchDataModel.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/core/CHIPError.h>
@@ -39,6 +40,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::TestDataModel;
 
 namespace {
 constexpr EndpointId kTestEndpointId = 1;
@@ -125,33 +127,6 @@ CHIP_ERROR TestClusterCommandHandler::EnumerateAcceptedCommands(const ConcreteCl
 } // namespace
 
 namespace {
-
-// TODO:(#36837) implementing its own provider instead of using "CodegenDataModelProvider"
-// TestServerCommandDispatch should provide its own dedicated data model provider rather than using CodegenDataModelProvider
-// provider. This class exists solely for one specific test scenario, on a temporary basis.
-class DispatchTestDataModel : public CodegenDataModelProvider
-{
-public:
-    static DispatchTestDataModel & Instance()
-    {
-        static DispatchTestDataModel instance;
-        return instance;
-    }
-
-    // The Startup method initializes the data model provider with a given context.
-    // This approach ensures that the test relies on a more controlled and explicit data model provider
-    // rather than depending on the code-generated one with undefined modifications.
-    CHIP_ERROR Startup(DataModel::InteractionModelContext context) override
-    {
-        ReturnErrorOnFailure(CodegenDataModelProvider::Startup(context));
-        return CHIP_NO_ERROR;
-    }
-
-protected:
-    // Since the current unit tests do not involve any cluster implementations, we override InitDataModelForTesting
-    // to do nothing, thereby preventing calls to the Ember-specific InitDataModelHandler.
-    void InitDataModelForTesting() override {}
-};
 
 class TestServerCommandDispatch : public chip::Test::AppContext
 {
