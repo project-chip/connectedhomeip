@@ -104,7 +104,7 @@ public:
 
     /// Access to the full buffer. does NOT take into account current size
     /// and includes the "size prefix"
-    MutableByteSpan RawBuffer()
+    MutableByteSpan RawFullBuffer()
     {
         static_assert(!std::is_const_v<T>, "Cannot mutate a const pascal string");
         return { reinterpret_cast<uint8_t *>(mData), static_cast<size_t>(mMaxSize + PREFIX_LEN) };
