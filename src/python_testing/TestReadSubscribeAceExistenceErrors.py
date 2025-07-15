@@ -994,7 +994,6 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
 
         sub_step8 = await self.TH2.ReadEvent(
             nodeid=self.dut_node_id,
-            # Attribute from a cluster controller 2 has no access to
             events=[validBasicInfoEventPath,
                     unsupportedEndpointAclEventPath,
                     unsupportedClusterAclEventPath],
@@ -1031,7 +1030,8 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         #
 
         self.print_step(
-            9, "Subscribe Request from Controller 1 to Mixed Events Path (Valid Event + Unsupported Endpoint + Unsupported Cluster) - Controller 1 has Access to all paths")
+            9, "Subscribe Request to Mixed Valid and Invalid Concrete Event Paths (Valid Concrete Path + Unsupported Endpoint + Unsupported Cluster)"
+            "Admin privileges granted to all Paths")
 
         # Grant TH2 Admin Privileges to AccessControl Cluster
         await self.grant_privilege_to_cluster(
@@ -1042,7 +1042,6 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
 
         sub_step9 = await self.TH2.ReadEvent(
             nodeid=self.dut_node_id,
-            # Attribute from a cluster controller 2 has no access to
             events=[validAclEventPath,
                     unsupportedEndpointAclEventPath,
                     unsupportedClusterAclEventPath],
