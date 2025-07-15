@@ -16,7 +16,10 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/common_flags.gni")
 
 config("includes") {
-  include_dirs = [ "${chip_app_zap_dir}" ]
+  include_dirs = [
+    "${chip_app_zap_dir}",
+    "${chip_root}/zzz_generated/app-common/",
+  ]
 }
 
 source_set("attribute-type") {
@@ -40,11 +43,7 @@ source_set("ids") {
     "${chip_app_zap_dir}/app-common/zap-generated/ids/Events.h",
   ]
 
-  public_deps = [
-    "${chip_root}/zzz_generated/app-common/clusters:all-ids",
-    "${chip_root}/zzz_generated/app-common/clusters:all-metadata",
-    "${chip_root}/zzz_generated/app-common/clusters:metadata-query",
-  ]
+  public_deps = [ "${chip_root}/zzz_generated/app-common/clusters:all-ids" ]
 
   public_configs = [ ":includes" ]
 }
@@ -88,16 +87,10 @@ source_set("enums") {
   public_configs = [ ":includes" ]
 }
 
-source_set("enums") {
-  sources = [
-    "${chip_app_zap_dir}/app-common/zap-generated/cluster-enums-check.h",
-    "${chip_app_zap_dir}/app-common/zap-generated/cluster-enums.h",
-    "CompatEnumNames.h",
-  ]
-
+source_set("ids") {
   deps = [
-    "${chip_root}/zzz_generated/app-common/clusters:all-enums",
-    "${chip_root}/zzz_generated/app-common/clusters/shared:enums",
+    "${chip_root}/zzz_generated/app-common/clusters:all-metadata",
+    "${chip_root}/zzz_generated/app-common/clusters:metadata-query",
   ]
   public_configs = [ ":includes" ]
 }
