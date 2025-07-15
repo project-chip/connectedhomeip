@@ -324,12 +324,12 @@ CHIP_ERROR ClusterLogic::SetUnitRange(const DataModel::Nullable<Structs::UnitRan
         VerifyOrReturnError(unitRange.Value().max >= 0 && unitRange.Value().max <= 32767, CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    // If Unit is Degrees , 0° value orientation is the value corresponding to the perpendicular axis to the Closure panel.
-    // Range of values SHALL contain -90 to 90 only
+    // If Unit is Degrees the maximum span range is 360 degrees.
     if (unit == ClosureUnitEnum::kDegree)
     {
-        VerifyOrReturnError(unitRange.Value().min >= -90 && unitRange.Value().min <= 90, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(unitRange.Value().max >= -90 && unitRange.Value().max <= 90, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(unitRange.Value().min >= -360 && unitRange.Value().min <= 360, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(unitRange.Value().max >= -360 && unitRange.Value().max <= 360, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError((unitRange.Value().max - unitRange.Value().min) <= 360, CHIP_ERROR_INVALID_ARGUMENT);
     }
 
     // If the mState unitRange is null, we need to set it to the new value
@@ -421,9 +421,7 @@ CHIP_ERROR ClusterLogic::SetOverflow(const OverflowEnum overflow)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
 
-    // No need to check for feature conformance, as feature conformance is validated during Initilization.
-    VerifyOrReturnError(mConformance.OptionalAttributes().Has(OptionalAttributeEnum::kOverflow),
-                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(mConformance.HasFeature(Feature::kRotation), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     VerifyOrReturnError(EnsureKnownEnumValue(overflow) != OverflowEnum::kUnknownEnumValue, CHIP_ERROR_INVALID_ARGUMENT);
 
     RotationAxisEnum rotationAxis;
@@ -552,8 +550,7 @@ CHIP_ERROR ClusterLogic::GetRotationAxis(RotationAxisEnum & rotationAxis)
 CHIP_ERROR ClusterLogic::GetOverflow(OverflowEnum & overflow)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError((mConformance.OptionalAttributes().Has(OptionalAttributeEnum::kOverflow)),
-                        CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError((mConformance.HasFeature(Feature::kRotation)), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
     overflow = mState.overflow;
     return CHIP_NO_ERROR;
 }
@@ -651,7 +648,13 @@ Status ClusterLogic::HandleSetTargetCommand(Optional<Percent100ths> position, Op
     // If latch field is present and MotionLatching feature is not supported, we should not set targetState.latch value.
     if (latch.HasValue() && mConformance.HasFeature(Feature::kMotionLatching))
     {
-        VerifyOrReturnError(!mDelegate.IsManualLatchingNeeded(), Status::InvalidAction);
+        // If latch value is true and the Remote Latching feature is not supported, or
+        // if latch value is false and the Remote Unlatching feature is not supported, return InvalidInState.
+        if ((latch.Value() && !mState.latchControlModes.Has(LatchControlModesBitmap::kRemoteLatching)) ||
+            (!latch.Value() && !mState.latchControlModes.Has(LatchControlModesBitmap::kRemoteUnlatching)))
+        {
+            return Status::InvalidInState;
+        }
 
         targetState.Value().latch.SetValue(DataModel::MakeNullable(latch.Value()));
     }

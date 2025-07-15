@@ -54,6 +54,7 @@ config("chip_examples_project_config") {
     "-Wl,--wrap=_realloc_r",
     "-Wl,--wrap=_free_r",
     "-Wl,--wrap=_calloc_r",
+    "-Wl,--wrap=main",
   ]
 }
 
