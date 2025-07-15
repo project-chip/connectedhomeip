@@ -126,7 +126,8 @@ class TC_JCM_1_2(MatterBaseTest):
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork 1 {self.jfadmin_fabric_a_passcode} --anchor true",
-            expected_output="[JF] Anchor Administrator commissioned with sucess")
+            expected_output="[JF] Anchor Administrator commissioned with sucess",
+            timeout=10)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
@@ -186,7 +187,8 @@ class TC_JCM_1_2(MatterBaseTest):
         # Commission JF-ADMIN app with JF-Controller on Fabric B
         self.fabric_b_ctrl.send(
             message=f"pairing onnetwork 11 {self.jfadmin_fabric_b_passcode} --anchor true",
-            expected_output="[JF] Anchor Administrator commissioned with sucess")
+            expected_output="[JF] Anchor Administrator commissioned with sucess",
+            timeout=10)
 
         # Extract the Ecosystem B certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
@@ -293,7 +295,8 @@ class TC_JCM_1_2(MatterBaseTest):
 
             devCtrl.send(
                 message=f"pairing onnetwork {nodeid} {passcode} --execute-jcm true",
-                expected_output="")
+                expected_output="[JF] OnOwnershipTransferDone RPC call succeeded!",
+                timeout=10)
 
             logging.info(f"Joint Commissioning completed successfully for node {nodeid}")
 
