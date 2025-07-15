@@ -157,7 +157,7 @@ class TC_ICDB_1_1(MatterBaseTest):
 
             self.step(4)
             # Wait for 1 or more cycle of IdleModeDuration to receive a Check-In message
-            timeout_seconds = idle_mode_duration_s + 5  # Increased margin for reliability
+            timeout_seconds = idle_mode_duration_s  # Increased margin for reliability
             logger.info(f"Waiting up to {timeout_seconds}s for Check-In message")
             try:
                 logger.info(
