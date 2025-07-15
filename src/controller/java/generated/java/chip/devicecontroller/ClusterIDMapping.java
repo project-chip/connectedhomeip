@@ -11994,7 +11994,15 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            SystemModeChange(0L),
+            LocalTemperatureChange(1L),
+            OccupancyChange(2L),
+            SetpointChange(3L),
+            RunningStateChange(4L),
+            RunningModeChange(5L),
+            ActiveScheduleChange(6L),
+            ActivePresetChange(7L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -20305,7 +20313,8 @@ public class ClusterIDMapping {
         public enum Attribute {
             MeteredQuantity(0L),
             MeteredQuantityTimestamp(1L),
-            TariffUnit(2L),
+            MeasurementType(2L),
+            MaximumMeteredQuantities(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -20454,6 +20463,7 @@ public class ClusterIDMapping {
             ClusterErrorBoolean(50L),
             GlobalEnum(51L),
             GlobalStruct(52L),
+            UnsupportedAttributeRequiringAdminPrivilege(254L),
             Unsupported(255L),
             ReadFailureCode(12288L),
             FailureInt32U(12289L),

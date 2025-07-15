@@ -84,13 +84,6 @@ static bool emberAfEndpointIsEnabled(EndpointId endpoint);
 
 namespace {
 
-#if (!defined(ATTRIBUTE_SINGLETONS_SIZE)) || (ATTRIBUTE_SINGLETONS_SIZE == 0)
-#define ACTUAL_SINGLETONS_SIZE 1
-#else
-#define ACTUAL_SINGLETONS_SIZE ATTRIBUTE_SINGLETONS_SIZE
-#endif
-uint8_t singletonAttributeData[ACTUAL_SINGLETONS_SIZE];
-
 uint16_t emberEndpointCount = 0;
 
 /// Determines a incremental unique index for ember
@@ -130,7 +123,7 @@ constexpr const EventId generatedEvents[] = GENERATED_EVENTS;
 #define ZAP_GENERATED_EVENTS_INDEX(index) (&generatedEvents[index])
 #endif // GENERATED_EVENTS
 
-constexpr const EmberAfAttributeMetadata generatedAttributes[] = GENERATED_ATTRIBUTES;
+[[maybe_unused]] constexpr const EmberAfAttributeMetadata generatedAttributes[] = GENERATED_ATTRIBUTES;
 #define ZAP_ATTRIBUTE_INDEX(index) (&generatedAttributes[index])
 
 #ifdef GENERATED_CLUSTERS
@@ -539,26 +532,6 @@ const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpo
     return metadata;
 }
 
-static uint8_t * singletonAttributeLocation(const EmberAfAttributeMetadata * am)
-{
-
-    uint16_t index = 0;
-    // NOLINTNEXTLINE(bugprone-sizeof-expression)
-    if constexpr (sizeof(generatedAttributes) > 0)
-    {
-        const EmberAfAttributeMetadata * m = &(generatedAttributes[0]);
-        while (m < am)
-        {
-            if (m->IsSingleton() && !m->IsExternal())
-            {
-                index = static_cast<uint16_t>(index + m->size);
-            }
-            m++;
-        }
-    }
-    return (uint8_t *) (singletonAttributeData + index);
-}
-
 // This function does mem copy, but smartly, which means that if the type is a
 // string, it will copy as much as it can.
 // If src == NULL, then this method will set memory to zeroes
@@ -696,9 +669,7 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
                             }
 
                             {
-                                uint8_t * attributeLocation =
-                                    (am->mask & MATTER_ATTRIBUTE_FLAG_SINGLETON ? singletonAttributeLocation(am)
-                                                                                : attributeData + attributeOffsetIndex);
+                                uint8_t * attributeLocation = attributeData + attributeOffsetIndex;
                                 uint8_t *src, *dst;
                                 if (write)
                                 {
@@ -757,8 +728,7 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
                         else
                         { // Not the attribute we are looking for
                             // Increase the index if attribute is not externally stored
-                            if (!(am->mask & MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE) &&
-                                !(am->mask & MATTER_ATTRIBUTE_FLAG_SINGLETON))
+                            if (!(am->mask & MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE))
                             {
                                 attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emberAfAttributeSize(am));
                             }
