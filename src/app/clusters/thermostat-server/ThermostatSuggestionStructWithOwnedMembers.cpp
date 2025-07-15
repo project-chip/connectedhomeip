@@ -35,9 +35,8 @@ ThermostatSuggestionStructWithOwnedMembers::ThermostatSuggestionStructWithOwnedM
 
 ThermostatSuggestionStructWithOwnedMembers::ThermostatSuggestionStructWithOwnedMembers(
     const ThermostatSuggestionStructWithOwnedMembers & other)
-{
-    *this = other;
-}
+    : ThermostatSuggestionStructWithOwnedMembers(static_cast<const Structs::ThermostatSuggestionStruct::Type &>(other))
+{}
 
 ThermostatSuggestionStructWithOwnedMembers &
 ThermostatSuggestionStructWithOwnedMembers::operator=(const ThermostatSuggestionStruct::Type & other)
