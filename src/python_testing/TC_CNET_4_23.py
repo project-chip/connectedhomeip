@@ -75,26 +75,25 @@ class TC_CNET_4_23(MatterBaseTest):
 
     async def SendConnectNetworkWithFailure(
             self, networkID: int, endpoint: int):
-        try:
+        with asserts.assert_raises(ChipStackError) as cm:
             cmd = Clusters.NetworkCommissioning.Commands.ConnectNetwork(networkID=networkID)
             await self.send_single_cmd(endpoint=endpoint, cmd=cmd)
-        except ChipStackError as e:
-            asserts.assert_equal(e.err, kChipErrorTimeout, "Unexpected error while trying to send ConnectNetwork command")
-            logging.exception(e)
+        asserts.assert_equal(cm.exception.err, kChipErrorTimeout, "Unexpected error while trying to send ConnectNetwork command")
+        logging.info("ConnectNetwork command timed out, not assert here as it is expected during network switching")
 
     async def SendCommissioningCompleteWithRetry(self):
         commissioning_complete_cmd = Clusters.GeneralCommissioning.Commands.CommissioningComplete()
-        # After switching networks, it may resolve to an incorrect address. Implement a retry mechanism for failure recovery.
+        # Implement a retry mechanism for timeout failure.
         for i in range(kMaxCommissioningCompleteRetryTimes):
             try:
                 commissioning_complete_results = await self.send_single_cmd(cmd=commissioning_complete_cmd)
                 asserts.assert_true(commissioning_complete_results.errorCode ==
                                     Clusters.GeneralCommissioning.Enums.CommissioningErrorEnum.kOk, "CommissioningComplete command failed")
                 break
-            except ChipStackError as e:
+            except ChipStackError as e:  # chipstack-ok: After switching networks, it may resolve to an incorrect address
                 asserts.assert_equal(e.err, kChipErrorTimeout, "Unexpected error while trying to send CommissioningComplete")
+                logging.info(f"Will retry CommissioningComplete command in 10 seconds, attempt: {i + 1}")
                 time.sleep(10)
-                logging.exception(e)
         else:
             asserts.assert_true(False, "CommissioningComplete command failed")
 
