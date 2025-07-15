@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include "data-model-providers/codegen/ServerClusterInterfaceRegistry.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 #include <app/static-cluster-config/BasicInformation.h>
@@ -43,7 +44,7 @@ static_assert((kBasicInformationFixedClusterCount == 0) ||
                    BasicInformation::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId),
               "Basic Information cluster MUST be on endpoint 0");
 
-LazyRegisteredServerCluster<BasicInformationCluster> gServer;
+ServerClusterRegistration gRegistration(BasicInformationCluster::Instance());
 
 } // namespace
 
@@ -51,8 +52,7 @@ void emberAfBasicInformationClusterInitCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
-    constexpr auto enabledOptionalAttributes =
-        BitFlags<OptionalBasicInformationAttributes>()
+    BasicInformationCluster::Instance().OptionalAttributes()
             .Set(OptionalBasicInformationAttributes::kManufacturingDate, IsAttributeEnabledOnSomeEndpoint(ManufacturingDate::Id))
             .Set(OptionalBasicInformationAttributes::kPartNumber, IsAttributeEnabledOnSomeEndpoint(PartNumber::Id))
             .Set(OptionalBasicInformationAttributes::kProductURL, IsAttributeEnabledOnSomeEndpoint(ProductURL::Id))
@@ -66,8 +66,7 @@ void emberAfBasicInformationClusterInitCallback(EndpointId endpointId)
             .Set(OptionalBasicInformationAttributes::kDisableMandatoryUniqueIDOnPurpose,
                  !IsAttributeEnabledOnSomeEndpoint(UniqueID::Id));
 
-    gServer.Create(enabledOptionalAttributes);
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gRegistration);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Basic Information register error: endpoint %u, %" CHIP_ERROR_FORMAT, endpointId, err.Format());
@@ -78,12 +77,11 @@ void emberAfBasicInformationClusterShutdownCallback(EndpointId endpointId)
 {
     VerifyOrReturn(endpointId == kRootEndpointId);
 
-    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&BasicInformationCluster::Instance());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Basic Information unregister error: endpoint %u, %" CHIP_ERROR_FORMAT, endpointId, err.Format());
     }
-    gServer.Destroy();
 }
 
 void MatterBasicInformationPluginServerInitCallback() {}

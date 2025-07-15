@@ -25,6 +25,4 @@ TARGET_SOURCES(
   PRIVATE
     "${CLUSTER_DIR}/BasicInformationCluster.cpp"
     "${CLUSTER_DIR}/BasicInformationCluster.h"
-    "${CLUSTER_DIR}/BasicInformationLogic.cpp"
-    "${CLUSTER_DIR}/BasicInformationLogic.h"
 )

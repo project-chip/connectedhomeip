@@ -16,8 +16,6 @@
  */
 #pragma once
 
-#include <app/clusters/basic-information/BasicInformationLogic.h>
-
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/BasicInformation/ClusterId.h>
 #include <lib/core/DataModelTypes.h>
@@ -52,9 +50,12 @@ enum class OptionalBasicInformationAttributes : uint16_t
 class BasicInformationCluster : public DefaultServerCluster, public DeviceLayer::PlatformManagerDelegate
 {
 public:
-    BasicInformationCluster(BitFlags<OptionalBasicInformationAttributes> enabledOptional) :
-        DefaultServerCluster({ kRootEndpointId, BasicInformation::Id }), mEnabledOptionalAttributes(enabledOptional)
-    {}
+    static BasicInformationCluster &Instance();
+
+    const BitFlags<OptionalBasicInformationAttributes> & OptionalAttributes() const { return mEnabledOptionalAttributes; }
+    BitFlags<OptionalBasicInformationAttributes> OptionalAttributes() { return mEnabledOptionalAttributes; }
+
+    bool GetLocalConfigDisabled() { return mLocalConfigDisabled; }
 
     // Server cluster implementation
     CHIP_ERROR Startup(ServerClusterContext & context) override;
@@ -70,7 +71,12 @@ public:
     void OnShutDown() override;
 
 private:
-    const BitFlags<OptionalBasicInformationAttributes> mEnabledOptionalAttributes;
+    BasicInformationCluster() : DefaultServerCluster({ kRootEndpointId, BasicInformation::Id }) {}
+
+    BitFlags<OptionalBasicInformationAttributes> mEnabledOptionalAttributes;
+
+    char mNodeLabelBuffer[32 + 1];
+    bool mLocalConfigDisabled = false;
 };
 
 } // namespace Clusters

@@ -17,7 +17,8 @@
 #include <app/clusters/basic-information/BasicInformationCluster.h>
 
 #include <app/InteractionModelEngine.h>
-#include <app/clusters/basic-information/BasicInformationLogic.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/PascalString.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/BasicInformation/Attributes.h>
 #include <clusters/BasicInformation/Enums.h>
@@ -40,6 +41,9 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace {
+
+// fixed size for location strings
+static constexpr size_t kFixedLocationLength = 2;
 
 constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
     DataModelRevision::kMetadataEntry,
@@ -69,7 +73,7 @@ constexpr DataModel::AttributeEntry kMandatoryAttributes[] = {
 struct StringReadBuffer
 {
     static constexpr size_t kMaxStringLength = std::max<size_t>({
-        BasicInformationLogic::kFixedLocationLength,                        //
+        kFixedLocationLength,                                               //
         DeviceLayer::ConfigurationManager::kMaxHardwareVersionStringLength, //
         DeviceLayer::ConfigurationManager::kMaxManufacturingDateLength,     //
         DeviceLayer::ConfigurationManager::kMaxPartNumberLength,            //
@@ -85,6 +89,17 @@ struct StringReadBuffer
     char buffer[kMaxStringLength + 1];
 };
 
+static_assert(sizeof(bool) == 1, "I/O assumption for backwards compatibility");
+
+void LogIfReadError(AttributeId attributeId, CHIP_ERROR err)
+{
+    VerifyOrReturn(err != CHIP_NO_ERROR);
+    VerifyOrReturn(err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+
+    ChipLogError(Zcl, "BasicInformation: failed to load attribute " ChipLogFormatMEI ": %" CHIP_ERROR_FORMAT,
+                 ChipLogValueMEI(attributeId), err.Format());
+}
+
 CHIP_ERROR ClearNullTerminatedStringWhenUnimplemented(CHIP_ERROR status, char * strBuf)
 {
     if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
@@ -98,15 +113,15 @@ CHIP_ERROR ClearNullTerminatedStringWhenUnimplemented(CHIP_ERROR status, char * 
 
 DataModel::ActionReturnStatus ReadLocation(AttributeValueEncoder & encoder, StringReadBuffer & buffer)
 {
-    static_assert(sizeof(buffer.buffer) >= BasicInformationLogic::kFixedLocationLength + 1);
+    static_assert(sizeof(buffer.buffer) >= kFixedLocationLength + 1);
 
     size_t codeLen = 0;
     CHIP_ERROR err = ConfigurationMgr().GetCountryCode(buffer.buffer, sizeof(buffer.buffer), codeLen);
-    if ((err != CHIP_NO_ERROR) || (codeLen != BasicInformationLogic::kFixedLocationLength))
+    if ((err != CHIP_NO_ERROR) || (codeLen != kFixedLocationLength))
     {
-        static_assert(BasicInformationLogic::kFixedLocationLength == 2); // we write a string of size 2
+        static_assert(kFixedLocationLength == 2); // we write a string of size 2
         strcpy(buffer.buffer, "XX");
-        codeLen = BasicInformationLogic::kFixedLocationLength;
+        codeLen = kFixedLocationLength;
     }
     return encoder.Encode(CharSpan(buffer.buffer, codeLen));
 }
@@ -247,14 +262,18 @@ DataModel::ActionReturnStatus ReadProductAppearance(AttributeValueEncoder & enco
 
 } // namespace
 
+BasicInformationCluster & BasicInformationCluster::Instance()
+{
+    static BasicInformationCluster instance;
+    return instance;
+}
+
 DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                                      AttributeValueEncoder & encoder)
 {
     using namespace BasicInformation::Attributes;
 
     StringReadBuffer readBuffer;
-
-    auto & logic = BasicInformationLogic::Instance();
 
     switch (request.path.mAttributeId)
     {
@@ -332,9 +351,9 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
         return encoder.Encode(configVersion);
     }
     case NodeLabel::Id:
-        return encoder.Encode(logic.GetNodeLabel());
+        return encoder.Encode(Storage::ShortPascalString::ContentOf(mNodeLabelBuffer));
     case LocalConfigDisabled::Id:
-        return encoder.Encode(logic.GetLocalConfigDisabled());
+        return encoder.Encode(mLocalConfigDisabled);
     case Reachable::Id:
         // NOTE: we are always reachable (this is the same node)
         return encoder.Encode<bool>(true);
@@ -353,19 +372,29 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteAttribute(const Data
     case Location::Id: {
         CharSpan location;
         ReturnErrorOnFailure(decoder.Decode(location));
-        return NotifyAttributeChangedIfSuccess(Location::Id, BasicInformationLogic::Instance().SetLocation(location));
+        VerifyOrReturnError(location.size() == kFixedLocationLength, Protocols::InteractionModel::Status::ConstraintError);
+        return NotifyAttributeChangedIfSuccess(Location::Id,
+                                               DeviceLayer::ConfigurationMgr().StoreCountryCode(location.data(), location.size()));
     }
     case NodeLabel::Id: {
         CharSpan label;
         ReturnErrorOnFailure(decoder.Decode(label));
-        return NotifyAttributeChangedIfSuccess(NodeLabel::Id,
-                                               BasicInformationLogic::Instance().SetNodeLabel(label, *mContext->attributeStorage));
+
+        Storage::ShortPascalString labelBuffer(mNodeLabelBuffer);
+        VerifyOrReturnError(labelBuffer.SetValue(label), Protocols::InteractionModel::Status::ConstraintError);
+
+        return NotifyAttributeChangedIfSuccess(
+            NodeLabel::Id,
+            mContext->attributeStorage->WriteValue({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id },
+                                                   labelBuffer.RawValidData()));
     }
     case LocalConfigDisabled::Id: {
-        bool value;
-        ReturnErrorOnFailure(decoder.Decode(value));
+        ReturnErrorOnFailure(decoder.Decode(mLocalConfigDisabled));
         return NotifyAttributeChangedIfSuccess(
-            LocalConfigDisabled::Id, BasicInformationLogic::Instance().SetLocalConfigDisabled(value, *mContext->attributeStorage));
+            LocalConfigDisabled::Id,
+            mContext->attributeStorage->WriteValue(
+                { kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id },
+                { reinterpret_cast<const uint8_t *>(&mLocalConfigDisabled), sizeof(mLocalConfigDisabled) }));
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
@@ -412,7 +441,34 @@ CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
     {
         PlatformMgr().SetDelegate(this);
     }
-    return BasicInformationLogic::Instance().Init(*context.attributeStorage);
+    {
+        Storage::ShortPascalString labelBuffer(mNodeLabelBuffer);
+        MutableByteSpan labelSpan = labelBuffer.RawBuffer();
+
+        LogIfReadError(
+            Attributes::NodeLabel::Id,
+            context.attributeStorage->ReadValue({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id }, labelSpan));
+
+        if (!Storage::ShortPascalString::IsValid({ mNodeLabelBuffer, labelSpan.size() }))
+        {
+            // invalid value
+            labelBuffer.SetValue(""_span);
+        }
+    }
+
+    {
+        MutableByteSpan localConfigBytes(reinterpret_cast<uint8_t *>(&mLocalConfigDisabled), sizeof(mLocalConfigDisabled));
+        LogIfReadError(Attributes::LocalConfigDisabled::Id,
+                       context.attributeStorage->ReadValue(
+                           { kRootEndpointId, BasicInformation::Id, Attributes::LocalConfigDisabled::Id }, localConfigBytes));
+
+        if (localConfigBytes.size() == 0)
+        {
+            // invalid value
+            mLocalConfigDisabled = false;
+        }
+    }
+    return CHIP_NO_ERROR;
 }
 
 void BasicInformationCluster::Shutdown()
