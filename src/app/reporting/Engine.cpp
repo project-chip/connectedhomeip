@@ -178,7 +178,24 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     }
     else
     {
-        status = dataModel->ReadAttribute(readRequest, attributeValueEncoder);
+        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
+        const ConcreteClusterPath clusterPath(readRequest.path.mEndpointId, readRequest.path.mClusterId);
+        status = dataModel->Attributes(clusterPath, attributes);
+        if (status.IsSuccess()) {
+            ReadOnlyBuffer<DataModel::AttributeEntry> attributesBuffer = attributes.TakeBuffer();
+            bool attributeExist = false;
+            for (size_t idx = 0; idx < attributesBuffer.size(); idx++) {
+                if (attributesBuffer[idx].attributeId == readRequest.path.mAttributeId) {
+                    attributeExist = true;
+                    break;
+                }
+            }
+            if (attributeExist) {
+                status = dataModel->ReadAttribute(readRequest, attributeValueEncoder);
+            } else {
+                status = Protocols::InteractionModel::Status::UnsupportedAttribute;
+            }
+        }
     }
 
     if (status.IsSuccess())
