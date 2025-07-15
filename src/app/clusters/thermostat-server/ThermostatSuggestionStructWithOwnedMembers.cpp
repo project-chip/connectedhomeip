@@ -34,8 +34,8 @@ ThermostatSuggestionStructWithOwnedMembers::ThermostatSuggestionStructWithOwnedM
 }
 
 ThermostatSuggestionStructWithOwnedMembers::ThermostatSuggestionStructWithOwnedMembers(
-    const ThermostatSuggestionStructWithOwnedMembers & other)
-    : ThermostatSuggestionStructWithOwnedMembers(static_cast<const Structs::ThermostatSuggestionStruct::Type &>(other))
+    const ThermostatSuggestionStructWithOwnedMembers & other) :
+    ThermostatSuggestionStructWithOwnedMembers(static_cast<const Structs::ThermostatSuggestionStruct::Type &>(other))
 {}
 
 ThermostatSuggestionStructWithOwnedMembers &
