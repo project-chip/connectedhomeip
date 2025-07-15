@@ -38,8 +38,9 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +61,7 @@ class TC_PAVST_2_1(MatterBaseTest):
                      "Verify that the DUT response contains a list of TransportConfigurationStruct entries. For each entry in the list, verify that the TransportStatus is a defined TransportStatusEnum value."),
         ]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_PAVST_2_1(self):
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.PushAvStreamTransport

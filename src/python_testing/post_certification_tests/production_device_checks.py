@@ -62,13 +62,13 @@ DEFAULT_CHIP_ROOT = os.path.abspath(
 try:
     from chip.testing.basic_composition import BasicCompositionTests
     from chip.testing.matter_test_config import MatterTestConfig
-    from chip.testing.matter_testing import MatterBaseTest, MatterStackState, TestStep, async_test_body, run_tests_no_exit
+    from chip.testing.matter_testing import MatterBaseTest, MatterStackState, TestStep, run_tests_no_exit
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
     from chip.testing.basic_composition import BasicCompositionTests
     from chip.testing.matter_test_config import MatterTestConfig
-    from chip.testing.matter_testing import MatterBaseTest, MatterStackState, TestStep, async_test_body, run_tests_no_exit
+    from chip.testing.matter_testing import MatterBaseTest, MatterStackState, TestStep, run_tests_no_exit
 
 try:
     import fetch_paa_certs_from_dcl
@@ -76,6 +76,7 @@ except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(DEFAULT_CHIP_ROOT, 'credentials')))
     import fetch_paa_certs_from_dcl
+from chip.testing import decorators
 
 sys.path.append(os.path.abspath(os.path.join(DEFAULT_CHIP_ROOT, 'src', 'python_testing')))
 
@@ -127,7 +128,7 @@ class Hooks():
 
 
 class TestEventTriggersCheck(MatterBaseTest, BasicCompositionTests):
-    @async_test_body
+    @decorators.async_test_body
     async def test_TestEventTriggersCheck(self):
         setupCode = self.matter_test_config.qr_code_content or self.matter_test_config.manual_code
         await self.default_controller.FindOrEstablishPASESession(setupCode[0], self.dut_node_id)
@@ -137,7 +138,7 @@ class TestEventTriggersCheck(MatterBaseTest, BasicCompositionTests):
 
 
 class DclCheck(MatterBaseTest, BasicCompositionTests):
-    @async_test_body
+    @decorators.async_test_body
     async def setup_class(self):
         setupCode = self.matter_test_config.qr_code_content or self.matter_test_config.manual_code
         await self.default_controller.FindOrEstablishPASESession(setupCode[0], self.dut_node_id)

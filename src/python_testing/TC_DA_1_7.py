@@ -42,7 +42,8 @@ from typing import List, Optional
 
 import chip.clusters as Clusters
 from chip.testing import conversions
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing import decorators
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec
@@ -164,7 +165,7 @@ class TC_DA_1_7(MatterBaseTest):
                            "Public keys do not match")]
         return steps
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_DA_1_7(self):
         num = 0
         if self.matter_test_config.discriminators:

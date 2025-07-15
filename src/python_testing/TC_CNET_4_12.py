@@ -1,3 +1,9 @@
+import asyncio
+import logging
+import chip.clusters as Clusters
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from mobly import asserts
+from chip.testing import decorators
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -19,12 +25,7 @@
 # for details about the block below.
 # N/A - Test will not run on CI
 
-import asyncio
-import logging
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
-from mobly import asserts
 
 logger = logging.getLogger(__name__)
 

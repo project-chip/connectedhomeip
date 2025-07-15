@@ -35,8 +35,9 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from drlk_2_x_common import DRLK_COMMON
+from chip.testing import decorators
 
 # Configurable parameters:
 # - userIndex: userIndex to use when creating a user on the DUT for testing purposes
@@ -53,7 +54,7 @@ from drlk_2_x_common import DRLK_COMMON
 
 class TC_DRLK_2_2(MatterBaseTest, DRLK_COMMON):
 
-    @async_test_body
+    @decorators.async_test_body
     async def teardown_test(self):
         await self.teardown()
         return super().teardown_test()
@@ -64,7 +65,7 @@ class TC_DRLK_2_2(MatterBaseTest, DRLK_COMMON):
     def pics_TC_DRLK_2_2(self) -> list[str]:
         return ["DRLK.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_DRLK_2_2(self):
         await self.run_drlk_test_2_2()
 

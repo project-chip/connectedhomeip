@@ -39,11 +39,12 @@ import logging
 
 from chip.ChipDeviceCtrl import TransportPayloadCapability
 from chip.clusters import Objects, WebRTCTransportProvider
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from chip.webrtc import PeerConnection, WebRTCManager
 from mobly import asserts
 from TC_WEBRTC_Utils import WebRTCTestHelper
 from test_plan_support import commission_if_required
+from chip.testing import decorators
 
 
 class TC_WEBRTC_1_3(MatterBaseTest, WebRTCTestHelper):
@@ -99,7 +100,7 @@ class TC_WEBRTC_1_3(MatterBaseTest, WebRTCTestHelper):
     def default_timeout(self) -> int:
         return 4 * 60  # 4 minutes
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_WEBRTC_1_3(self):
         self.step("precondition-1")
 

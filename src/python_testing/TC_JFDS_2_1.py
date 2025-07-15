@@ -43,13 +43,14 @@ import chip.clusters as Clusters
 from chip import CertificateAuthority
 from chip.storage import PersistentStorage
 from chip.testing.apps import AppServerSubprocess, JFControllerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 
 class TC_JFDS_2_1(MatterBaseTest):
 
-    @async_test_body
+    @decorators.async_test_body
     async def setup_class(self):
         super().setup_class()
 
@@ -157,7 +158,7 @@ class TC_JFDS_2_1(MatterBaseTest):
             #          "Verify that the a valid string is returned")
         ]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_JFDS_2_1(self):
         # Creating a Controller for Ecosystem A
         _fabric_a_persistent_storage = PersistentStorage(jsonData=self.ecoACtrlStorage)

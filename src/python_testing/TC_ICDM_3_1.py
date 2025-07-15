@@ -41,8 +41,9 @@ import os
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 logger = logging.getLogger(__name__)
 
@@ -111,7 +112,7 @@ class TC_ICDM_3_1(MatterBaseTest):
     # ICDM 3.1 Test Body
     #
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_ICDM_3_1(self):
 
         cluster = Clusters.Objects.IcdManagement

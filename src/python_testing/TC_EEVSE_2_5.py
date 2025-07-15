@@ -46,8 +46,9 @@ import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
+from chip.testing import decorators
 
 logger = logging.getLogger(__name__)
 
@@ -111,7 +112,7 @@ class TC_EEVSE_2_5(MatterBaseTest, EEVSEBaseTestHelper):
 
         return steps
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_EEVSE_2_5(self):
         self.step("1")
         # Commission DUT - already done

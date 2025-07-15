@@ -44,10 +44,11 @@ import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main, matchers
 from chip.testing import timeoperations
 from chip.tlv import uint
 from mobly import asserts
+from chip.testing import decorators
 
 
 class TC_TIMESYNC_2_12(MatterBaseTest):
@@ -91,7 +92,7 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
     def pics_TC_TIMESYNC_2_12(self) -> list[str]:
         return ["TIMESYNC.S.F00"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_TIMESYNC_2_12(self):
 
         self.endpoint = 0

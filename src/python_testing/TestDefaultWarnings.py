@@ -1,3 +1,9 @@
+from typing import Callable
+import chip.clusters as Clusters
+import TC_DefaultWarnings
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from mobly import asserts
+from chip.testing import decorators
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -15,12 +21,7 @@
 #    limitations under the License.
 #
 
-from typing import Callable
 
-import chip.clusters as Clusters
-import TC_DefaultWarnings
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from mobly import asserts
 
 
 class TestDefaultChecker(MatterBaseTest):

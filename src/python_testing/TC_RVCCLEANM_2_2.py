@@ -40,8 +40,9 @@
 import enum
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main, matchers
 from mobly import asserts
+from chip.testing import decorators
 
 
 class RvcStatusEnum(enum.IntEnum):
@@ -102,7 +103,7 @@ class TC_RVCCLEANM_2_2(MatterBaseTest):
     def pics_TC_RVCCLEANM_2_2(self) -> list[str]:
         return ["RVCCLEANM.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_RVCCLEANM_2_2(self):
         self.directmodech_bit_mask = Clusters.RvcCleanMode.Bitmaps.Feature.kDirectModeChange
         self.endpoint = self.get_endpoint()

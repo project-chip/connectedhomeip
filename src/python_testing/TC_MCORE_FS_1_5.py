@@ -69,11 +69,12 @@ import time
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import (MatterBaseTest, SetupParameters, TestStep, async_test_body, default_matter_test_main,
+from chip.testing.matter_testing import (MatterBaseTest, SetupParameters, TestStep, default_matter_test_main,
                                          matchers)
 from ecdsa.curves import NIST256p
 from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator
+from chip.testing import decorators
 
 # Length of `w0s` and `w1s` elements
 WS_LENGTH = NIST256p.baselen + 8
@@ -89,7 +90,7 @@ def _generate_verifier(passcode: int, salt: bytes, iterations: int) -> bytes:
 
 
 class TC_MCORE_FS_1_5(MatterBaseTest):
-    @async_test_body
+    @decorators.async_test_body
     async def setup_class(self):
         super().setup_class()
 
@@ -176,7 +177,7 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
     def default_timeout(self) -> int:
         return 3*60
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_MCORE_FS_1_5(self):
 
         # Commissioning - done

@@ -41,9 +41,9 @@ import logging
 
 import chip.clusters as Clusters
 from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
-from chip.testing.matter_testing import (AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main,
-                                         matchers)
+from chip.testing.matter_testing import (AttributeMatcher, MatterBaseTest, TestStep, default_matter_test_main, matchers)
 from mobly import asserts
+from chip.testing import decorators
 
 
 class RvcStatusEnum(enum.IntEnum):
@@ -160,7 +160,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
         asserts.assert_equal(ret.commandResponseState.errorStateID, expected_error,
                              f"errorStateID({ret.commandResponseState.errorStateID}) should be {error_enum_to_text(expected_error)}")
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_RVCOPSTATE_2_5(self):
 
         self.endpoint = self.get_endpoint(default=1)

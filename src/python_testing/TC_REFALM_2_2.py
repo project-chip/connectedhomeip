@@ -48,9 +48,10 @@ from chip.clusters.ClusterObjects import ClusterCommand, ClusterObjectDescriptor
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing import matter_asserts
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from chip.tlv import uint
 from mobly import asserts
+from chip.testing import decorators
 
 logger = logging.getLogger(__name__)
 
@@ -181,7 +182,7 @@ class TC_REFALM_2_2(MatterBaseTest):
         command_dict = {"Name": "SetRefrigeratorDoorStatus", "EndpointId": self.endpoint, "DoorOpen": 0}
         self.write_to_app_pipe(command_dict)
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_REFALM_2_2(self):
         """Run the test steps."""
         self.endpoint = self.get_endpoint(default=1)

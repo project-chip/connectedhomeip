@@ -60,10 +60,11 @@ from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
                                                is_standard_command_id)
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from chip.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation
 from chip.testing.spec_parsing import XmlCluster
 from chip.tlv import uint
+from chip.testing import decorators
 
 
 class AccessTestType(Enum):
@@ -110,7 +111,7 @@ def checkable_commands(cluster_id, cluster, xml_cluster) -> list[uint]:
 
 
 class AccessChecker(MatterBaseTest, BasicCompositionTests):
-    @async_test_body
+    @decorators.async_test_body
     async def setup_class(self):
         # TODO: Make this into a proper default in the class so we're not overriding the command lines
         self.user_params["use_pase_only"] = False
@@ -132,12 +133,12 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
     def default_timeout(self) -> int:
         return 180
 
-    @async_test_body
+    @decorators.async_test_body
     async def setup_test(self):
         super().setup_test()
         self.success = True
 
-    @async_test_body
+    @decorators.async_test_body
     async def teardown_test(self):
         await self.default_controller.WriteAttribute(self.dut_node_id, attributes=[
             (0, Clusters.AccessControl.Attributes.Acl(self.default_acl))])
@@ -385,7 +386,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
     def desc_TC_ACE_2_1(self):
         return "[TC-ACE-2.1] Attribute read privilege enforcement - [DUT as Server]"
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_ACE_2_1(self):
         await self.run_access_test(AccessTestType.READ)
 
@@ -408,7 +409,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
     def desc_TC_ACE_2_2(self):
         return "[TC-ACE-2.2] Attribute write privilege enforcement - [DUT as Server]"
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_ACE_2_2(self):
         await self.run_access_test(AccessTestType.WRITE)
 
@@ -435,7 +436,7 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
     def desc_TC_ACE_2_3(self):
         return "[TC-ACE-2.3] Command Privilege Enforcement - [DUT as Server]"
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_ACE_2_3(self):
         await self.run_access_test(AccessTestType.INVOKE)
 

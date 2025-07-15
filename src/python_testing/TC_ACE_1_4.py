@@ -42,7 +42,8 @@ import sys
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from chip.testing import decorators
 from mobly import asserts
 
 # This test requires several additional command line arguments
@@ -99,7 +100,7 @@ class TC_ACE_1_4(MatterBaseTest):
         asserts.assert_true(attr_ret is not None, err_msg)
         asserts.assert_false(isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure), err_msg)
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_ACE_1_4(self):
         # TODO: Guard these on the PICS
         asserts.assert_true('PIXIT.ACE.APPENDPOINT' in self.matter_test_config.global_test_params,

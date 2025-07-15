@@ -32,10 +32,10 @@ from typing import Optional
 import chip.clusters as Clusters
 from chip.clusters import Attribute
 from chip.testing.matter_test_config import MatterTestConfig
-from chip.testing.matter_testing import (MatterBaseTest, async_test_body, has_attribute, has_cluster, has_feature,
-                                         run_if_endpoint_matches, run_on_singleton_matching_endpoint, should_run_test_on_endpoint)
+from chip.testing.matter_testing import (MatterBaseTest, has_attribute, has_cluster, has_feature, run_if_endpoint_matches, run_on_singleton_matching_endpoint, should_run_test_on_endpoint)
 from chip.testing.runner import MockTestRunner
 from mobly import asserts
+from chip.testing import decorators
 
 
 def get_clusters(endpoints: list[int]) -> Attribute.AsyncReadTransaction.ReadResponse:
@@ -118,7 +118,7 @@ class TestDecorators(MatterBaseTest):
         check_endpoints(has_timesync, False, "TimeSynchronization Cluster")
         check_endpoints(has_timesync_utc, False, "UTC attribute")
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_endpoints(self):
         has_onoff = has_cluster(Clusters.OnOff)
         has_onoff_onoff = has_attribute(Clusters.OnOff.Attributes.OnOff)

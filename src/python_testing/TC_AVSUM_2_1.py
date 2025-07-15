@@ -1,3 +1,9 @@
+import logging
+import chip.clusters as Clusters
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from mobly import asserts
+from TC_AVSUMTestBase import AVSUMTestBase
+from chip.testing import decorators
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -35,12 +41,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
-from mobly import asserts
-from TC_AVSUMTestBase import AVSUMTestBase
 
 
 class TC_AVSUM_2_1(MatterBaseTest, AVSUMTestBase):

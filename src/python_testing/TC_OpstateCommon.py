@@ -1,3 +1,18 @@
+import logging
+import queue
+import time
+from dataclasses import dataclass
+from typing import Any
+import chip.clusters as Clusters
+import psutil
+from chip.clusters import ClusterObjects as ClusterObjects
+from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
+from chip.clusters.Types import NullValue
+from chip.interaction_model import InteractionModelError, Status
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
+from chip.testing.matter_testing import TestStep
+from mobly import asserts
+from chip.testing import decorators
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
@@ -15,21 +30,7 @@
 #    limitations under the License.
 #
 
-import logging
-import queue
-import time
-from dataclasses import dataclass
-from typing import Any
 
-import chip.clusters as Clusters
-import psutil
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.clusters.Attribute import EventReadResult, SubscriptionTransaction
-from chip.clusters.Types import NullValue
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from chip.testing.matter_testing import TestStep
-from mobly import asserts
 
 
 def get_pid(name):

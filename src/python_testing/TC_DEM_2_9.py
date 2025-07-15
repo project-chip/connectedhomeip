@@ -48,9 +48,10 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
+from chip.testing import decorators
 
 logger = logging.getLogger(__name__)
 
@@ -91,7 +92,7 @@ class TC_DEM_2_9(MatterBaseTest, DEMTestBase):
 
         return steps
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_DEM_2_9(self):
         # pylint: disable=too-many-locals, too-many-statements
         """Run the test steps."""

@@ -41,7 +41,8 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing import conversions
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main, matchers
+from chip.testing import decorators
 from chip.tlv import TLVReader
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes
@@ -54,7 +55,7 @@ from pyasn1_modules import rfc2986, rfc3279, rfc5480
 
 
 class TC_DA_1_5(MatterBaseTest):
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_DA_1_5(self):
 
         opcreds = Clusters.Objects.OperationalCredentials

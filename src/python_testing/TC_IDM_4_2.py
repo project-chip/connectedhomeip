@@ -45,8 +45,9 @@ from chip.clusters.Attribute import AttributePath, TypedAttributePath
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 '''
 Category:
@@ -172,7 +173,7 @@ class TC_IDM_4_2(MatterBaseTest):
     def is_valid_uint16_value(var):
         return isinstance(var, int) and 0 <= var <= 0xFFFF
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_IDM_4_2(self):
         # commissioning step - done prior to test start
         self.step('precondition')

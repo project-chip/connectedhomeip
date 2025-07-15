@@ -45,8 +45,9 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackException
 from chip.interaction_model import InteractionModelError
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 logger = logging.getLogger(__name__)
 
@@ -292,7 +293,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         ]
         return steps
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_CGEN_2_2(self):
 
         self.step(0)

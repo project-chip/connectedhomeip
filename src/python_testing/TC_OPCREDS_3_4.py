@@ -39,9 +39,10 @@ import random
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
 from test_plan_support import commission_if_required, read_attribute, send_command
+from chip.testing import decorators
 
 
 def verify_noc() -> str:
@@ -133,7 +134,7 @@ class TC_OPCREDS_3_4(MatterBaseTest):
                 TestStep(25, "TH1 generates a new NOC chain with ICAC with the following properties: new NOC and ICAC using icac_pase"),
                 TestStep(26, f"TH1 {send_command('UpdateNOC')} to the Node Operational Credentials cluster over PASE", None, verify_unsupported_access())]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_OPCREDS_3_4(self):
         self.step(1)
         opcreds = Clusters.OperationalCredentials

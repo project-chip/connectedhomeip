@@ -38,8 +38,9 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main, matchers
 from mobly import asserts
+from chip.testing import decorators
 
 ''' Integration test of batch commands using UnitTesting Cluster
 
@@ -50,7 +51,7 @@ how DUT processes commands.
 
 class TestBatchInvoke(MatterBaseTest):
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_batch_invoke(self):
         dev_ctrl = self.default_controller
         dut_node_id = self.dut_node_id

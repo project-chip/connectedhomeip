@@ -43,8 +43,9 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 # Assumes `--enable-key 000102030405060708090a0b0c0d0e0f` on Linux app command line, or a DUT
 # that has that Enable Key
@@ -60,7 +61,7 @@ kInvalidEventTrigger = 0  # Per TC-DGEN-2.3
 
 
 class TestEventTrigger(MatterBaseTest):
-    @async_test_body
+    @decorators.async_test_body
     async def test_all_zeros_key(self):
         dev_ctrl = self.default_controller
         with asserts.assert_raises_regex(InteractionModelError,
@@ -72,7 +73,7 @@ class TestEventTrigger(MatterBaseTest):
                                                                               eventTrigger=kValidEventTrigger)
             )
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_incorrect_key(self):
         dev_ctrl = self.default_controller
         test_event_triggers_enabled = await self.read_single_attribute(
@@ -92,7 +93,7 @@ class TestEventTrigger(MatterBaseTest):
                                                                               eventTrigger=kValidEventTrigger)
             )
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_correct_key_valid_code(self):
         dev_ctrl = self.default_controller
         test_event_triggers_enabled = await self.read_single_attribute(
@@ -113,7 +114,7 @@ class TestEventTrigger(MatterBaseTest):
             )
         )
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_correct_key_invalid_code(self):
         dev_ctrl = self.default_controller
         test_event_triggers_enabled = await self.read_single_attribute(
@@ -136,7 +137,7 @@ class TestEventTrigger(MatterBaseTest):
                 )
             )
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_multiple_command_request_feature_present_if_needed(self):
         dev_ctrl = self.default_controller
         test_event_triggers_enabled = await self.read_single_attribute(

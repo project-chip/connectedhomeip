@@ -40,8 +40,8 @@ from datetime import timedelta
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from chip.testing import timeoperations
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from chip.testing import timeoperations, decorators
 from mobly import asserts
 
 
@@ -53,7 +53,7 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
     def pics_TC_TIMESYNC_2_2(self) -> list[str]:
         return ["TIMESYNC.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_TIMESYNC_2_2(self):
 
         # Time sync is required to be on endpoint 0 if it is present

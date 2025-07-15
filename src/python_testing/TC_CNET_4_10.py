@@ -23,6 +23,7 @@ from chip.clusters.Types import NullValue
 from chip.testing.decorators import has_feature, run_if_endpoint_matches
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 # Thread TLV Type mapping for operational dataset parsing
 THREAD_TLV_TYPE_MAP = {

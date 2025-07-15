@@ -1,3 +1,9 @@
+import chip.clusters as Clusters
+from chip import ChipDeviceCtrl
+from chip.interaction_model import Status
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_attribute, has_cluster, run_if_endpoint_matches)
+from mobly import asserts
+from chip.testing import decorators
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -32,12 +38,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.interaction_model import Status
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_attribute, has_cluster,
-                                         run_if_endpoint_matches)
-from mobly import asserts
 
 
 class TC_LUNIT_3_1(MatterBaseTest):

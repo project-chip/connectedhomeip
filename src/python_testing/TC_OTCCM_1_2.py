@@ -37,8 +37,9 @@
 
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from modebase_cluster_check import ModeBaseClusterChecks
+from chip.testing import decorators
 
 cluster_otccm_mode = Clusters.OvenMode
 
@@ -67,7 +68,7 @@ class TC_OTCCM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         ]
         return pics
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_OTCCM_1_2(self):
 
         # Setup common mode check

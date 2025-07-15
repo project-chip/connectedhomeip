@@ -1,3 +1,33 @@
+import asyncio
+import importlib
+import logging
+import os
+import sys
+import typing
+from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from typing import Optional
+from unittest.mock import MagicMock
+import chip.testing.global_stash as global_stash
+from chip.clusters import Attribute
+from mobly import signals
+from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
+from mobly.test_runner import TestRunner
+    from matter_yamltests.hooks import TestRunnerHooks
+    from chip.tracing import TracingContext
+from typing import TYPE_CHECKING
+    from chip.testing.matter_test_config import MatterTestConfig
+      from chip.testing.matter_testing import default_matter_test_main
+    from chip.testing.matter_testing import _find_test_class, parse_matter_test_args
+    from typing import TYPE_CHECKING
+    from chip.testing.matter_testing import MatterStackState
+        from chip.testing.commissioning import CommissionDeviceTest
+        from chip.testing.commissioning import CommissionDeviceTest
+        from chip.testing.matter_test_config import MatterTestConfig
+        from chip.testing.matter_testing import MatterStackState
+        from chip.testing.matter_test_config import MatterTestConfig
+from chip.testing import decorators
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
@@ -15,31 +45,13 @@
 #    limitations under the License.
 #
 
-import asyncio
-import importlib
-import logging
-import os
-import sys
-import typing
-from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
-from pathlib import Path
-from typing import Optional
-from unittest.mock import MagicMock
 
-import chip.testing.global_stash as global_stash
-from chip.clusters import Attribute
-from mobly import signals
-from mobly.config_parser import ENV_MOBLY_LOGPATH, TestRunConfig
-from mobly.test_runner import TestRunner
 
 try:
-    from matter_yamltests.hooks import TestRunnerHooks
 except ImportError:
     class TestRunnerHooks:
         pass
 try:
-    from chip.tracing import TracingContext
 except ImportError:
     class TracingContext:
         def __enter__(self):
@@ -51,10 +63,8 @@ except ImportError:
         def StartFromString(self, destination):
             pass
 
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from chip.testing.matter_test_config import MatterTestConfig
 
 _DEFAULT_LOG_PATH = "/tmp/matter_testing/logs"
 
@@ -249,13 +259,11 @@ def default_matter_test_main():
     In this case, only one test class in a test script is allowed.
     To make your test script executable, add the following to your file:
     .. code-block:: python
-      from chip.testing.matter_testing import default_matter_test_main
       ...
       if __name__ == '__main__':
         default_matter_test_main()
     """
 
-    from chip.testing.matter_testing import _find_test_class, parse_matter_test_args
 
     matter_test_config = parse_matter_test_args()
 
@@ -310,17 +318,13 @@ def run_tests_no_exit(
     """
 
     # Lazy import to avoid circular dependency
-    from typing import TYPE_CHECKING
 
-    from chip.testing.matter_testing import MatterStackState
     if TYPE_CHECKING:
-        from chip.testing.commissioning import CommissionDeviceTest
     else:
         CommissionDeviceTest = None  # Initial placeholder
 
     # Actual runtime import
     if CommissionDeviceTest is None:
-        from chip.testing.commissioning import CommissionDeviceTest
 
     # NOTE: It's not possible to pass event loop via Mobly TestRunConfig user params, because the
     #       Mobly deep copies the user params before passing them to the test class and the event
@@ -480,8 +484,6 @@ class MockTestRunner():
     def __init__(self, abs_filename: str, classname: str, test: str, endpoint: int = None,
                  pics: dict[str, bool] = None, paa_trust_store_path=None):
 
-        from chip.testing.matter_test_config import MatterTestConfig
-        from chip.testing.matter_testing import MatterStackState
 
         self.kvs_storage = 'kvs_admin.json'
         self.config = MatterTestConfig(endpoint=endpoint, paa_trust_store_path=paa_trust_store_path,
@@ -511,7 +513,6 @@ class MockTestRunner():
         self.test_class = getattr(module, classname)
 
     def set_test_config(self, test_config: 'MatterTestConfig' = None):
-        from chip.testing.matter_test_config import MatterTestConfig
         if test_config is None:
             test_config = MatterTestConfig()
 

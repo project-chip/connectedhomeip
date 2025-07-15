@@ -38,7 +38,8 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing import decorators
 from mobly import asserts
 
 
@@ -131,7 +132,7 @@ class TC_ACE_1_3(MatterBaseTest):
         ]
         return steps
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_ACE_1_3(self):
         cat1_id = 0x11110000
         cat2_id = 0x22220000

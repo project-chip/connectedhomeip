@@ -66,15 +66,16 @@ import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import Status
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import (MatterBaseTest, SetupParameters, TestStep, async_test_body, default_matter_test_main,
+from chip.testing.matter_testing import (MatterBaseTest, SetupParameters, TestStep, default_matter_test_main,
                                          matchers)
 from chip.tlv import uint
 from mobly import asserts
+from chip.testing import decorators
 
 
 class TC_ECOINFO_2_1(MatterBaseTest):
 
-    @async_test_body
+    @decorators.async_test_body
     async def setup_class(self):
         super().setup_class()
 
@@ -240,7 +241,7 @@ class TC_ECOINFO_2_1(MatterBaseTest):
             TestStep(6, "Repeating steps 2 to 5 for each endpoint identified in step 1"),
         ]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_ECOINFO_2_1(self):
         dev_ctrl = self.default_controller
         dut_node_id = self.dut_node_id

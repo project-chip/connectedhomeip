@@ -1,3 +1,12 @@
+import logging
+import time
+import chip.clusters as Clusters
+import test_plan_support
+from chip.interaction_model import InteractionModelError, Status
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from mobly import asserts
+from chip.testing import decorators
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
@@ -37,15 +46,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-import time
 
-import chip.clusters as Clusters
-import test_plan_support
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
-from mobly import asserts
 
 
 class TC_I_2_4(MatterBaseTest):

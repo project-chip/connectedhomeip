@@ -41,9 +41,9 @@ import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
+from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, default_matter_test_main)
 from mobly import asserts
+from chip.testing import decorators
 
 triggerProtected = 0x0104000000000001
 triggerDisengaged = 0x0104000000000002
@@ -182,7 +182,7 @@ class TC_CLCTRL_4_1(MatterBaseTest):
         ]
         return pics
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_CLCTRL_4_1(self):
         endpoint = self.get_endpoint(default=1)
         dev_controller = self.default_controller

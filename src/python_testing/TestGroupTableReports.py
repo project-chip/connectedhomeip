@@ -40,13 +40,14 @@ import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.interaction_model import Status
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 
 class TestGroupTableReports(MatterBaseTest):
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_group_table_reports(self):
         self.print_step(1, "Commissioning, already done")
 

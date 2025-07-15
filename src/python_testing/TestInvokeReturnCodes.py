@@ -36,8 +36,9 @@
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 
 class TestInvokeReturnCodes(MatterBaseTest):
@@ -46,7 +47,7 @@ class TestInvokeReturnCodes(MatterBaseTest):
     on invalid endpoints.
     """
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_invalid_endpoint_command(self):
         self.print_step(0, "Commissioning - already done")
 

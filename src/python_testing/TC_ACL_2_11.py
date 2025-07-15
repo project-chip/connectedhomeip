@@ -49,8 +49,9 @@ from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import arls_populated
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 
 class TC_ACL_2_11(MatterBaseTest):
@@ -78,7 +79,7 @@ class TC_ACL_2_11(MatterBaseTest):
         ]
         return steps
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_ACL_2_11(self):
         dev_ctrl = self.default_controller
         dut_node_id = self.dut_node_id

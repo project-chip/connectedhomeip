@@ -1,3 +1,11 @@
+import ipaddress
+from datetime import timedelta
+import chip.clusters as Clusters
+from chip.clusters.Types import NullValue
+from chip.testing.matter_testing import (MatterBaseTest, default_matter_test_main, has_attribute, has_cluster, run_if_endpoint_matches)
+from chip.testing import timeoperations
+from mobly import asserts
+from chip.testing import decorators
 #
 #    Copyright (c) 2023 Project CHIP Authors
 #    All rights reserved.
@@ -36,15 +44,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import ipaddress
-from datetime import timedelta
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import (MatterBaseTest, default_matter_test_main, has_attribute, has_cluster,
-                                         run_if_endpoint_matches)
-from chip.testing import timeoperations
-from mobly import asserts
 
 
 class TC_TIMESYNC_2_1(MatterBaseTest):

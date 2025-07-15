@@ -1,3 +1,12 @@
+import logging
+import time
+import chip.clusters as Clusters
+from chip.clusters import ClusterObjects as ClusterObjects
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from mobly import asserts
+from test_plan_support import commission_if_required, read_attribute, verify_success
+from chip.testing import decorators
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
@@ -36,15 +45,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-import time
 
-import chip.clusters as Clusters
-from chip.clusters import ClusterObjects as ClusterObjects
-from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
-from mobly import asserts
-from test_plan_support import commission_if_required, read_attribute, verify_success
 
 
 class TC_CC_2_3(MatterBaseTest):

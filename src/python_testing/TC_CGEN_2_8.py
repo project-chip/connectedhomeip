@@ -39,8 +39,9 @@
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.commissioning import ROOT_ENDPOINT_ID
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 
 class TC_CGEN_2_8(MatterBaseTest):
@@ -66,7 +67,7 @@ class TC_CGEN_2_8(MatterBaseTest):
             TestStep(11, "TH sends CommissioningComplete to DUT."),
         ]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_CGEN_2_8(self):
         commissioner: ChipDeviceCtrl.ChipDeviceController = self.default_controller
         failsafe_expiry_length_seconds = self.matter_test_config.global_test_params['PIXIT.CGEN.FailsafeExpiryLengthSeconds']

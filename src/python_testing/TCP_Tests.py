@@ -33,8 +33,9 @@
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 
 class TCP_Tests(MatterBaseTest):
@@ -42,7 +43,7 @@ class TCP_Tests(MatterBaseTest):
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=1)
         await self.send_single_cmd(cmd=cmd, endpoint=0, payloadCapability=payloadCapability)
 
-    @async_test_body
+    @decorators.async_test_body
     async def teardown_test(self):
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=0, breadcrumb=0)
         await self.send_single_cmd(cmd=cmd, endpoint=0,
@@ -60,7 +61,7 @@ class TCP_Tests(MatterBaseTest):
         return steps
 
     # TCP Connection Establishment
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_SC_8_1(self):
 
         self.step(1)
@@ -87,7 +88,7 @@ class TCP_Tests(MatterBaseTest):
         return steps
 
     # Large Payload Session Establishment
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_SC_8_2(self):
 
         self.step(1)
@@ -115,7 +116,7 @@ class TCP_Tests(MatterBaseTest):
         return steps
 
     # Session Inactive After TCP Disconnect
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_SC_8_3(self):
 
         self.step(1)
@@ -153,7 +154,7 @@ class TCP_Tests(MatterBaseTest):
         return steps
 
     # TCP Connect, Disconnect, Then Connect Again
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_SC_8_4(self):
 
         self.step(1)
@@ -202,7 +203,7 @@ class TCP_Tests(MatterBaseTest):
         ]
         return steps
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_SC_8_5(self):
 
         self.step(1)
@@ -242,7 +243,7 @@ class TCP_Tests(MatterBaseTest):
         return steps
 
     # WildCard Read Over TCP Session
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_SC_8_6(self):
 
         self.step(1)
@@ -282,7 +283,7 @@ class TCP_Tests(MatterBaseTest):
         return steps
 
     # Use TCP Session If Available For MRP Interaction
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_SC_8_7(self):
 
         self.step(1)

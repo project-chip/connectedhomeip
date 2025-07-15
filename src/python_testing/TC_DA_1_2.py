@@ -44,7 +44,8 @@ import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing import conversions
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, matchers
+from chip.testing import decorators
 from chip.tlv import TLVReader
 from cryptography import x509
 from cryptography.exceptions import InvalidSignature
@@ -183,7 +184,7 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
                          "Verify that the DUT reports an INVALID_COMMAND error"),
                 ]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_DA_1_2(self):
         cd_cert_dir = self.user_params.get("cd_cert_dir", 'credentials/development/cd-certs')
         post_cert_test = self.user_params.get("post_cert_test", False)

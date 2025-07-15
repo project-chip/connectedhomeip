@@ -45,13 +45,14 @@ import chip.tlv
 from chip import CertificateAuthority
 from chip.storage import PersistentStorage
 from chip.testing.apps import AppServerSubprocess, JFControllerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 
 class TC_JCM_1_1(MatterBaseTest):
 
-    @async_test_body
+    @decorators.async_test_body
     async def setup_class(self):
         super().setup_class()
 
@@ -237,7 +238,7 @@ class TC_JCM_1_1(MatterBaseTest):
                      "Check the correct Vendor ID and Administrator CATs have been installed on the server app")
         ]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_JCM_1_1(self):
 
         # Creating a Controller for Ecosystem A

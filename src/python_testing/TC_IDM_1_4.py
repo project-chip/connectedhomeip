@@ -44,7 +44,8 @@ import logging
 import chip.clusters as Clusters
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, matchers
+from chip.testing import decorators
 from mobly import asserts
 
 # If DUT supports `MaxPathsPerInvoke > 1`, additional command line argument
@@ -68,7 +69,7 @@ class TC_IDM_1_4(MatterBaseTest):
                  TestStep(11, "Verify DUT capable of responding to request with multiple InvokeResponseMessages")]
         return steps
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_IDM_1_4(self):
         dev_ctrl = self.default_controller
         dut_node_id = self.dut_node_id

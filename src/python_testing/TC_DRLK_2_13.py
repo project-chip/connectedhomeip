@@ -43,7 +43,8 @@ import chip.clusters as Clusters
 from chip.clusters.Attribute import EventPriority
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, matchers
+from chip.testing import decorators
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -358,7 +359,7 @@ class TC_DRLK_2_13(MatterBaseTest):
     def generate_unique_octbytes(self, length=65) -> bytes:
         return ''.join(random.choices('01234567', k=length)).encode()
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_DRLK_2_13(self):
         self.max_aliro_keys_supported = None
         self.numberofcredentialsupportedperuser = None

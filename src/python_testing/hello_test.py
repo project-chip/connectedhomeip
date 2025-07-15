@@ -38,7 +38,8 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing import decorators
 from mobly import asserts
 
 
@@ -48,7 +49,7 @@ class HelloTest(MatterBaseTest):
     # based on the test name
     # To work in the Test harness, all tests should be named as
     # TC_PICSCODE_#_#, (substituting the appropriate pics codes and numbers for the test)
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_NAMES_2_1(self):
         dev_ctrl = self.default_controller
         vendor_name = await self.read_single_attribute(
@@ -76,7 +77,7 @@ class HelloTest(MatterBaseTest):
     def desc_TC_ENDPOINT_2_1(self) -> str:
         return '#.#.#. [TC-HELLO-x.x] Test Failure On Wrong Endpoint'
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_ENDPOINT_2_1(self):
         self.step(1)  # Commissioning
 
@@ -102,7 +103,7 @@ class HelloTest(MatterBaseTest):
     def desc_TC_PICSTEST_2_1(self) -> str:
         return "#.#.#. [TC-HELLO-x.x] Test pics"
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_PICSTEST_2_1(self):
         self.step(1)  # commissioning
         print('This should be run')

@@ -42,8 +42,9 @@
 
 from chip.exceptions import ChipStackError
 from chip.fault_injection import CHIPFaultId, FailAtFault, GetFaultCounter, ResetFaultCounters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 CHIP_ERROR_CODES = {
     "CHIP_ERROR_INVALID_CASE_PARAMETER": 0x54,
@@ -113,7 +114,7 @@ class TC_SC_3_4(MatterBaseTest):
         asserts.assert_equal(GetFaultCounter(faultID), 1)
         ResetFaultCounters()
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_SC_3_4(self):
 
         self.th = self.default_controller

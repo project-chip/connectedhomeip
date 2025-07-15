@@ -45,9 +45,10 @@ from typing import List
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClustersObjects
 from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from chip.utils import CommissioningBuildingBlocks
 from mobly import asserts
+from chip.testing import decorators
 
 # TODO: Overall, we need to add validation that session IDs have not changed throughout to be agnostic
 #       to some internal behavior assumptions of the SDK we are making relative to the write to
@@ -106,7 +107,7 @@ class TC_SC_3_6(MatterBaseTest):
         for subscription in self._subscriptions:
             subscription.Shutdown()
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_SC_3_6(self):
         dev_ctrl = self.default_controller
 

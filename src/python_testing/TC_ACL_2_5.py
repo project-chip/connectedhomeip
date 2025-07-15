@@ -37,8 +37,9 @@ import logging
 import chip.clusters as Clusters
 from chip.interaction_model import Status
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 
 class TC_ACL_2_5(MatterBaseTest):
@@ -443,7 +444,7 @@ class TC_ACL_2_5(MatterBaseTest):
         ]
         return steps
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_ACL_2_5(self):
         await self.internal_test_TC_ACL_2_5(force_legacy_encoding=False)
         self.current_step_index = 0

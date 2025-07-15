@@ -46,9 +46,10 @@ import logging
 
 import chip.clusters as Clusters
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
 from TC_EWATERHTRBase import EWATERHTRBase
+from chip.testing import decorators
 
 logger = logging.getLogger(__name__)
 
@@ -156,7 +157,7 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
 
         return steps
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_EWATERHTR_2_3(self):
 
         self.step("1")

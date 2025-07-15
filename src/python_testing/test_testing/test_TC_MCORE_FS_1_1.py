@@ -1,3 +1,20 @@
+import asyncio
+import base64
+import os
+import sys
+import typing
+from pathlib import Path
+import chip.clusters as Clusters
+import click
+from chip import ChipDeviceCtrl
+from chip.clusters import Attribute
+from chip.interaction_model import InteractionModelError, Status
+from chip.testing.runner import AsyncMock, MockTestRunner
+    from chip.testing.matter_test_config import MatterTestConfig
+    from chip.testing.matter_testing import get_default_paa_trust_store, run_tests_no_exit
+    from chip.testing.matter_test_config import MatterTestConfig
+    from chip.testing.matter_testing import get_default_paa_trust_store, run_tests_no_exit
+from chip.testing import decorators
 #!/usr/bin/env -S python3 -B
 #
 #    Copyright (c) 2024 Project CHIP Authors
@@ -16,28 +33,12 @@
 #    limitations under the License.
 #
 
-import asyncio
-import base64
-import os
-import sys
-import typing
-from pathlib import Path
 
-import chip.clusters as Clusters
-import click
-from chip import ChipDeviceCtrl
-from chip.clusters import Attribute
-from chip.interaction_model import InteractionModelError, Status
-from chip.testing.runner import AsyncMock, MockTestRunner
 
 try:
-    from chip.testing.matter_test_config import MatterTestConfig
-    from chip.testing.matter_testing import get_default_paa_trust_store, run_tests_no_exit
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
-    from chip.testing.matter_test_config import MatterTestConfig
-    from chip.testing.matter_testing import get_default_paa_trust_store, run_tests_no_exit
 
 invoke_call_count = 0
 event_call_count = 0

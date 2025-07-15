@@ -51,10 +51,11 @@ import logging
 import re
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mdns_discovery.mdns_discovery import DNSRecordType, MdnsDiscovery, MdnsServiceType
 from mobly import asserts
 from zeroconf.const import _TYPE_AAAA, _TYPES
+from chip.testing import decorators
 
 '''
 Purpose
@@ -224,7 +225,7 @@ class TC_SC_4_3(MatterBaseTest):
         pattern = re.compile(r'^[0-9A-F]{12}$|^[0-9A-F]{16}$')
         return bool(pattern.match(hostname))
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_SC_4_3(self):
         supports_icd = None
         supports_lit = None

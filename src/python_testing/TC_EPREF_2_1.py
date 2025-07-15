@@ -36,8 +36,9 @@ import logging
 import chip.clusters as Clusters
 from chip.interaction_model import Status
 from chip.testing.matter_asserts import assert_valid_uint8
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 
 class TC_EPREF_2_1(MatterBaseTest):
@@ -104,7 +105,7 @@ class TC_EPREF_2_1(MatterBaseTest):
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(endpoint, Clusters.EnergyPreference.Attributes.CurrentLowPowerModeSensitivity(current_low_power_mode_sensitivity))])
         return result[0].Status
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_EPREF_2_1(self):
 
         endpoint = self.user_params.get("endpoint", 1)

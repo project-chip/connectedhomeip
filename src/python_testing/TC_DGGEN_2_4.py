@@ -40,7 +40,8 @@ import logging
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from chip.testing import decorators
 from chip.testing import timeoperations
 from mobly import asserts
 
@@ -83,7 +84,7 @@ class TC_DGGEN_2_4(MatterBaseTest):
         asserts.assert_equal(code, 0, "Expected success of TimeSnapshot.")
         return response
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_DGGEN_2_4(self):
         self.print_step("1a", "Detect Time Synchronization UTCTime attribute presence")
         root_descriptor = await self.default_controller.ReadAttribute(self.dut_node_id, [(0, Clusters.Descriptor)])

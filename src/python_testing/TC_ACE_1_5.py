@@ -40,7 +40,8 @@ import logging
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from chip.testing import decorators
 from mobly import asserts
 
 
@@ -56,7 +57,7 @@ class TC_ACE_1_5(MatterBaseTest):
         result = await th.WriteAttribute(self.dut_node_id, [(0, Clusters.AccessControl.Attributes.Acl(acl))])
         asserts.assert_equal(result[0].Status, Status.Success, "ACL write failed")
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_ACE_1_5(self):
         self.print_step(1, "Comissioning, already done")
         self.th1 = self.default_controller

@@ -40,8 +40,9 @@ import random
 
 import chip.clusters as Clusters
 from chip.bdx import BdxProtocol, BdxTransfer
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 
 class TestBdxTransfer(MatterBaseTest):
@@ -61,7 +62,7 @@ class TestBdxTransfer(MatterBaseTest):
         ]
         return steps
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_bdx_transfer(self):
         self.step(1)
         expected_data = random.randbytes(9240)

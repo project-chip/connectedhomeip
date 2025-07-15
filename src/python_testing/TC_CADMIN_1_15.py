@@ -39,9 +39,10 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mdns_discovery.mdns_discovery import MdnsDiscovery
 from mobly import asserts
+from chip.testing import decorators
 
 
 class TC_CADMIN_1_15(MatterBaseTest):
@@ -120,7 +121,7 @@ class TC_CADMIN_1_15(MatterBaseTest):
     def pics_TC_CADMIN_1_15(self) -> list[str]:
         return ["CADMIN.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_CADMIN_1_15(self):
         self.step(1)
         # Establishing TH1 controller

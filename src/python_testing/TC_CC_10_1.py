@@ -41,8 +41,9 @@ from typing import List
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 kCCAttributeValueIDs = [0x0001, 0x0003, 0x0004, 0x0007, 0x4000, 0x4001, 0x4002, 0x4003, 0x4004]
 
@@ -138,7 +139,7 @@ class TC_CC_10_1(MatterBaseTest):
         ]
         return steps
 
-    @async_test_body
+    @decorators.async_test_body
     async def setup_test(self):
         super().setup_test()
         # Pre-Condition: Commissioning
@@ -189,7 +190,7 @@ class TC_CC_10_1(MatterBaseTest):
         asserts.assert_equal(result.groupID, self.kGroup1, "Get Scene Membership failed on groupID")
         asserts.assert_equal(result.sceneList, [], "Get Scene Membership failed on sceneList")
 
-    @async_test_body
+    @decorators.async_test_body
     async def teardown_test(self):
         result = await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.ScenesManagement.Commands.RemoveAllScenes(self.kGroup1))
         asserts.assert_equal(result.status, Status.Success, "Remove All Scenes failed on status")
@@ -197,7 +198,7 @@ class TC_CC_10_1(MatterBaseTest):
         await self.TH1.SendCommand(self.dut_node_id, self.matter_test_config.endpoint, Clusters.Groups.Commands.RemoveAllGroups())
         super().teardown_test()
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_CC_10_1(self):
         cluster = Clusters.Objects.ColorControl
         attributes = cluster.Attributes

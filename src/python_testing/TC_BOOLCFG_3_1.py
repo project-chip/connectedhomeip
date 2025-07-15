@@ -36,8 +36,9 @@ from random import choice
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 
 class TC_BOOLCFG_3_1(MatterBaseTest):
@@ -72,7 +73,7 @@ class TC_BOOLCFG_3_1(MatterBaseTest):
         ]
         return pics
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_BOOLCFG_3_1(self):
 
         endpoint = self.get_endpoint(default=1)

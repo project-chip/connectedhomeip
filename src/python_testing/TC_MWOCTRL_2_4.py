@@ -39,8 +39,9 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 # This test requires several additional command line arguments
 # run with
@@ -72,7 +73,7 @@ class TC_MWOCTRL_2_4(MatterBaseTest):
         ]
         return pics
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_MWOCTRL_2_4(self):
 
         endpoint = self.get_endpoint(default=1)

@@ -1,3 +1,24 @@
+import asyncio
+import base64
+import copy
+import json
+import logging
+import pathlib
+import sys
+import typing
+from dataclasses import dataclass
+from pprint import pformat, pprint
+from typing import Any, Optional
+import chip.clusters as Clusters
+import chip.clusters.ClusterObjects
+import chip.tlv
+from chip.ChipDeviceCtrl import ChipDeviceController
+from chip.clusters.Attribute import ValueDecodeFailure
+from chip.testing.conformance import ConformanceException
+from chip.testing.matter_testing import MatterTestConfig, ProblemNotice
+from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
+from mobly import asserts
+from chip.testing import decorators
 #
 #    Copyright (c) 2023 Project CHIP Authors
 #    All rights reserved.
@@ -15,27 +36,7 @@
 #    limitations under the License.
 #
 
-import asyncio
-import base64
-import copy
-import json
-import logging
-import pathlib
-import sys
-import typing
-from dataclasses import dataclass
-from pprint import pformat, pprint
-from typing import Any, Optional
 
-import chip.clusters as Clusters
-import chip.clusters.ClusterObjects
-import chip.tlv
-from chip.ChipDeviceCtrl import ChipDeviceController
-from chip.clusters.Attribute import ValueDecodeFailure
-from chip.testing.conformance import ConformanceException
-from chip.testing.matter_testing import MatterTestConfig, ProblemNotice
-from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
-from mobly import asserts
 
 
 @dataclass

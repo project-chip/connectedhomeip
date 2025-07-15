@@ -38,8 +38,9 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 
 def _trusted_root_test_step(dut_num: int) -> TestStep:
@@ -78,7 +79,7 @@ class TC_SC_7_1(MatterBaseTest):
 
     # TODO: Need a pics or something to limit this to devices that have a factory-provided matter setup code (as opposed to a field upgradable device / device with a custom commissioning where this test won't apply)
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_SC_7_1(self):
         # For now, this test is WAY easier if we just ask for the setup code instead of discriminator / passcode
         asserts.assert_false(self.matter_test_config.discriminators,

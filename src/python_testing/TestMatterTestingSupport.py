@@ -22,8 +22,7 @@ from datetime import datetime, timedelta, timezone
 
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
-from chip.testing.matter_testing import (MatterBaseTest, async_test_body, default_matter_test_main, parse_matter_test_args,
-                                         matchers)
+from chip.testing.matter_testing import (MatterBaseTest, default_matter_test_main, parse_matter_test_args, matchers)
 from chip.testing.pics import parse_pics, parse_pics_xml
 from chip.testing.taglist_and_topology_test import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
                                                     find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
@@ -31,6 +30,7 @@ from chip.testing.taglist_and_topology_test import (TagProblem, create_device_ty
 from chip.testing import timeoperations
 from chip.tlv import uint
 from mobly import asserts, signals
+from chip.testing import decorators
 
 
 def get_raw_type_list():
@@ -105,7 +105,7 @@ def run_all_match_tests_for_type(test_type):
 
 
 class TestMatterTestingSupport(MatterBaseTest):
-    @async_test_body
+    @decorators.async_test_body
     async def test_matter_epoch_time(self):
         # Matter epoch should return zero
         ret = timeoperations.utc_time_in_matter_epoch(datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc))
@@ -129,13 +129,13 @@ class TestMatterTestingSupport(MatterBaseTest):
         current_date = timeoperations.utc_time_in_matter_epoch()
         asserts.assert_greater(current_date, last_date, "Time does not appear to be incrementing")
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_type_checking(self):
         vals = get_raw_type_list()
         for k in vals.keys():
             run_all_match_tests_for_type(k)
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_pics_support(self):
         pics_list = ['TEST.S.A0000=1',
                      'TEST.S.A0001=0',

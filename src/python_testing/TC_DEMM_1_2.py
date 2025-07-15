@@ -38,8 +38,9 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from modebase_cluster_check import ModeBaseClusterChecks
+from chip.testing import decorators
 
 logger = logging.getLogger(__name__)
 
@@ -110,7 +111,7 @@ class TC_DEMM_1_2(MatterBaseTest, ModeBaseClusterChecks):
         else:
             logger.info('Extra Check: One or more modes failed No Optimization validation.')
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_DEMM_1_2(self):
 
         # Setup common mode check

@@ -1,3 +1,12 @@
+import xml.etree.ElementTree as ElementTree
+import chip.clusters as Clusters
+import jinja2
+from chip.testing.global_attribute_ids import GlobalAttributeIds
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from chip.testing.problem_notices import ProblemNotice
+from chip.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, XmlCluster,
+from mobly import asserts
+from chip.testing import decorators
 #
 #    Copyright (c) 2023 Project CHIP Authors
 #    All rights reserved.
@@ -15,17 +24,9 @@
 #    limitations under the License.
 #
 
-import xml.etree.ElementTree as ElementTree
 
-import chip.clusters as Clusters
-import jinja2
-from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing.problem_notices import ProblemNotice
-from chip.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, XmlCluster,
                                        add_cluster_data_from_xml, build_xml_clusters, check_clusters_for_unknown_commands,
                                        combine_derived_clusters_with_base, get_data_model_directory)
-from mobly import asserts
 
 # TODO: improve the test coverage here
 # https://github.com/project-chip/connectedhomeip/issues/30958

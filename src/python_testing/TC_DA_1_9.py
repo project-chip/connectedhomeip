@@ -49,8 +49,9 @@ import signal
 import subprocess
 
 from chip import ChipDeviceCtrl
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 
 class TC_DA_1_9(MatterBaseTest):
@@ -121,7 +122,7 @@ class TC_DA_1_9(MatterBaseTest):
                      "Commissioning succeeds without any attestation errors"),
         ]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_DA_1_9(self):
         test_vectors = [
             {

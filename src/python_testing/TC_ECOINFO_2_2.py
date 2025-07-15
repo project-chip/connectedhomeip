@@ -65,8 +65,9 @@ import tempfile
 import chip.clusters as Clusters
 from chip.interaction_model import Status
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, SetupParameters, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, SetupParameters, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 _DEVICE_TYPE_AGGREGATOR = 0x000E
 
@@ -149,7 +150,7 @@ class TC_ECOINFO_2_2(MatterBaseTest):
     def default_timeout(self) -> int:
         return 3*60
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_ECOINFO_2_2(self):
         dev_ctrl = self.default_controller
         dut_node_id = self.dut_node_id

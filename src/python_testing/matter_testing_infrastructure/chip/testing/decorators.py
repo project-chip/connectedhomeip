@@ -295,6 +295,7 @@ def run_on_singleton_matching_endpoint(accept_function: EndpointCheckFunction):
         def matching_runner(self: "MatterBaseTest", *args, **kwargs):
             # Import locally to avoid circular dependency
             from chip.testing.matter_testing import MatterBaseTest
+from chip.testing import decorators
             assert isinstance(self, MatterBaseTest)
 
             runner_with_timeout = asyncio.wait_for(

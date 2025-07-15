@@ -43,8 +43,9 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, matchers
 from mobly import asserts
+from chip.testing import decorators
 
 
 class TC_WHM_2_1(MatterBaseTest):
@@ -85,7 +86,7 @@ class TC_WHM_2_1(MatterBaseTest):
     def pics_TC_WHM_2_1(self) -> list[str]:
         return ["WHM.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_WHM_2_1(self):
 
         # Valid modes. Only ModeManual referred to in this test

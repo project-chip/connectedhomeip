@@ -39,7 +39,8 @@ from chip.clusters import ClusterObjects as ClusterObjects
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from chip.testing import decorators
 from mobly import asserts
 
 
@@ -132,7 +133,7 @@ class TC_ACE_1_2(MatterBaseTest):
                                      autoResubscribe=False)
         asserts.assert_equal(cm.exception.err, 0x580, "Incorrectly subscribed to attribute with invalid permissions")
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_ACE_1_2(self):
         self.print_step(1, "Commissioning, already done")
 

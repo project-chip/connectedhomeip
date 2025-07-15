@@ -40,8 +40,9 @@ from time import sleep
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 
 class TC_WebRTCRequestor_2_2(MatterBaseTest):
@@ -109,7 +110,7 @@ class TC_WebRTCRequestor_2_2(MatterBaseTest):
     def default_timeout(self) -> int:
         return 3 * 60
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_WebRTCRequestor_2_2(self):
         """
         Executes the test steps for the WebRTC Provider cluster scenario.

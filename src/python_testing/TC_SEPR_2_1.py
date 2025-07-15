@@ -1,3 +1,11 @@
+import chip.clusters as Clusters
+from chip.clusters import Globals
+from chip.clusters.Types import NullValue
+from chip.testing import matter_asserts
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from mobly import asserts
+from TC_SEPRTestBase import CommodityPriceTestBaseHelper
+from chip.testing import decorators
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -43,13 +51,6 @@
 """Define Matter test case TC_SEPR_2_1."""
 
 
-import chip.clusters as Clusters
-from chip.clusters import Globals
-from chip.clusters.Types import NullValue
-from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
-from mobly import asserts
-from TC_SEPRTestBase import CommodityPriceTestBaseHelper
 
 cluster = Clusters.CommodityPrice
 

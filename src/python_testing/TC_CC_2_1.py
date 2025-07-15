@@ -44,8 +44,9 @@ from chip.clusters import Attribute
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Types import NullValue
 from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, has_attribute
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_attribute
 from mobly import asserts
+from chip.testing import decorators
 
 logger = logging.getLogger(__name__)
 
@@ -240,7 +241,7 @@ class TC_CC_2_1(MatterBaseTest):
         logger.info(f"Num b : {bin(tmp_b)}")
         asserts.assert_equal(tmp_a, tmp_b, "Lower 4 bits of values are not equal")
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_CC_2_1(self):
         self.cluster = Clusters.ColorControl
         self.endpoint = self.get_endpoint(1)

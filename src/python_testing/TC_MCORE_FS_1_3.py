@@ -69,7 +69,8 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, matchers
+from chip.testing import decorators
 from mobly import asserts
 
 _DEVICE_TYPE_AGGREGATOR = 0x000E
@@ -136,7 +137,7 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
                      "TH verifies a value is visible for the UniqueID from the DUT_FSA's Bridged Device Basic Information Cluster."),
         ]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_MCORE_FS_1_3(self):
 
         # Commissioning - done

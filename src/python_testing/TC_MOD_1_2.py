@@ -39,8 +39,9 @@ import logging
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 logger = logging.getLogger(__name__)
 
@@ -99,7 +100,7 @@ class MOD_1_2(MatterBaseTest):
     def _log_attribute(self, name, value):
         logger.info(f"{name} attribute with value: {value} with type: {type(value)}")
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_MOD_1_2(self):
         self.cluster = Clusters.ModeSelect
         self.endpoint = self.get_endpoint(1)

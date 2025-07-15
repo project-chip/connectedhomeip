@@ -22,8 +22,9 @@ from typing import Optional
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, matchers
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, matchers
 from mobly import asserts
+from chip.testing import decorators
 
 
 class TC_CNET_4_4(MatterBaseTest):
@@ -44,7 +45,7 @@ class TC_CNET_4_4(MatterBaseTest):
     def pics_TC_CNET_4_4(self):
         return ['CNET.S']
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_CNET_4_4(self):
         # Commissioning is already done
         self.step("precondition")

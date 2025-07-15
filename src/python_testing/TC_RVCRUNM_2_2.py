@@ -42,8 +42,9 @@
 import enum
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 # This test requires several additional command line arguments.
 # Run the test with
@@ -123,7 +124,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
     def pics_TC_RVCRUNM_2_2(self) -> list[str]:
         return ["RVCRUNM.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_RVCRUNM_2_2(self):
 
         if 'PIXIT.RVCRUNM.MODE_A' not in self.matter_test_config.global_test_params or \

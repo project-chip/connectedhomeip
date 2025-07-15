@@ -42,7 +42,7 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main, matchers
 from mobly import asserts
 
 # This test requires several additional command line arguments
@@ -73,7 +73,7 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
     def pics_TC_RVCRUNM_2_1(self) -> list[str]:
         return ["RVCRUNM.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_RVCRUNM_2_1(self):
 
         asserts.assert_true('PIXIT.RVCRUNM.MODE_CHANGE_OK' in self.matter_test_config.global_test_params,
@@ -120,6 +120,7 @@ class TC_RVCRUNM_2_1(MatterBaseTest):
         invalid_mode = max(modes) + 1
 
         from enum import Enum
+from chip.testing import decorators
 
         class CommonCodes(Enum):
             SUCCESS = 0x00

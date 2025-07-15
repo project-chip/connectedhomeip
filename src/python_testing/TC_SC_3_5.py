@@ -37,8 +37,9 @@ from chip import ChipDeviceCtrl
 from chip.fault_injection import CHIPFaultId
 from chip.interaction_model import InteractionModelError
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 
 class TC_SC_3_5(MatterBaseTest):
@@ -189,7 +190,7 @@ class TC_SC_3_5(MatterBaseTest):
         except InteractionModelError:
             asserts.fail("Fault Injection Command Failed, is the TH_SERVER app built with the FaultInjection Cluster?")
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_SC_3_5(self):
 
         self.step("precondition")

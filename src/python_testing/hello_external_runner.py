@@ -1,3 +1,14 @@
+import os
+import signal
+import subprocess
+import sys
+from multiprocessing import Process
+from multiprocessing.managers import BaseManager
+from chip.testing.matter_test_config import MatterTestConfig
+from chip.testing.matter_testing import get_test_info, run_tests
+from hello_test import HelloTest
+    from matter.yamltests.hooks import TestRunnerHooks
+from chip.testing import decorators
 #!/usr/bin/env -S python3 -B
 #
 #    Copyright (c) 2023 Project CHIP Authors
@@ -16,19 +27,9 @@
 #    limitations under the License.
 #
 
-import os
-import signal
-import subprocess
-import sys
-from multiprocessing import Process
-from multiprocessing.managers import BaseManager
 
-from chip.testing.matter_test_config import MatterTestConfig
-from chip.testing.matter_testing import get_test_info, run_tests
-from hello_test import HelloTest
 
 try:
-    from matter.yamltests.hooks import TestRunnerHooks
 except ImportError:
     class TestRunnerHooks:
         pass

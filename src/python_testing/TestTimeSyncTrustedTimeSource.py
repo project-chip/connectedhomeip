@@ -18,8 +18,9 @@ import time
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 # We don't have a good pipe between the c++ enums in CommissioningDelegate and python
 # so this is hardcoded.
@@ -37,19 +38,19 @@ class TestTestTimeSyncTrustedTimeSource(MatterBaseTest):
     # This test needs to be run against an app that has previously been commissioned, has been reset
     # but not factory reset, and which has been started with the --simulate-no-internal-time flag.
     # This test should be run using the provided "TestTimeSyncTrustedTimeSourceRunner.py" script
-    @async_test_body
+    @decorators.async_test_body
     async def test_SimulateNoInternalTime(self):
         ret = await self.read_single_attribute_check_success(
             cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
         asserts.assert_equal(ret, NullValue, "Non-null value returned for time")
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_HaveInternalTime(self):
         ret = await self.read_single_attribute_check_success(
             cluster=Clusters.TimeSynchronization, attribute=Clusters.TimeSynchronization.Attributes.UTCTime)
         asserts.assert_not_equal(ret, NullValue, "Null value returned for time")
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_SetupTimeSourceACL(self):
         # We just want to append to this list
         ac = Clusters.AccessControl
@@ -76,7 +77,7 @@ class TestTestTimeSyncTrustedTimeSource(MatterBaseTest):
         asserts.assert_equal(ret, Clusters.TimeSynchronization.Enums.TimeSourceEnum.kNodeTimeCluster,
                              "Returned time source is incorrect")
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_SetAndReadFromTrustedTimeSource(self):
         asserts.assert_true('trusted_time_source' in self.matter_test_config.global_test_params,
                             "trusted_time_source must be included on the command line in "
@@ -88,7 +89,7 @@ class TestTestTimeSyncTrustedTimeSource(MatterBaseTest):
 
         await self.ReadFromTrustedTimeSource()
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_ReadFromTrustedTimeSource(self):
         await self.ReadFromTrustedTimeSource()
 

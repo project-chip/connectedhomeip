@@ -39,8 +39,9 @@ import time
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +81,7 @@ class TC_FAN_3_5(MatterBaseTest):
     def pics_TC_FAN_3_5(self) -> list[str]:
         return ["FAN.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_FAN_3_5(self):
         if not self.check_pics("FAN.S.F04"):
             logger.info("Test skipped because PICS FAN.S.F04 is not set")

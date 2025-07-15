@@ -38,8 +38,9 @@
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from TC_OpstateCommon import TC_OPSTATE_BASE, TestInfo
+from chip.testing import decorators
 
 
 class TC_OPSTATE_2_1(MatterBaseTest, TC_OPSTATE_BASE):
@@ -59,7 +60,7 @@ class TC_OPSTATE_2_1(MatterBaseTest, TC_OPSTATE_BASE):
     def pics_TC_OPSTATE_2_1(self) -> list[str]:
         return ["OPSTATE.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_OPSTATE_2_1(self):
         endpoint = self.get_endpoint(default=1)
         await self.TEST_TC_OPSTATE_BASE_2_1(endpoint)

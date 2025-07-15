@@ -39,8 +39,9 @@ import time
 
 import chip.clusters as Clusters
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 
 class TC_PS_2_3(MatterBaseTest):
@@ -54,7 +55,7 @@ class TC_PS_2_3(MatterBaseTest):
                 TestStep(3, "Accumulate all attribute reports on the endpoint under test for 30 seconds",
                             "For each of the attributes in the set of BatTimeToFullCharge, BatPercentRemaining and BatTimeRemaining, verify that there are not more than 4 reports per attribute where the value is non-null over the period of accumulation.")]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_PS_2_3(self):
         # Commissioning, already done.
         self.step(1)

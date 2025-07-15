@@ -40,8 +40,9 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main, matchers
 from mobly import asserts
+from chip.testing import decorators
 
 
 # Takes an OpState or RvcOpState state enum and returns a string representation
@@ -101,7 +102,7 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
     def pics_TC_RVCOPSTATE_2_4(self) -> list[str]:
         return ["RVCOPSTATE.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_RVCOPSTATE_2_4(self):
         self.endpoint = self.get_endpoint()
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")

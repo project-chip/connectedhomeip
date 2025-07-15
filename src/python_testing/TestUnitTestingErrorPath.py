@@ -38,8 +38,9 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from mobly import asserts
+from chip.testing import decorators
 
 """ Integration test for error path returns via the UnitTesting cluster.
 """
@@ -47,7 +48,7 @@ from mobly import asserts
 
 class TestUnitTestingErrorPath(MatterBaseTest):
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_unit_test_error_read(self):
         endpoint_id = 1
         attributes = Clusters.UnitTesting.Attributes
