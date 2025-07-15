@@ -188,7 +188,7 @@ void BLWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
     ChipLogProgress(NetworkProvisioning, "BL NetworkCommissioningDelegate: SSID: %s",
-                    NullTerminated(Uint8::to_const_char(networkId.data()), networkId.size()).c_str());
+                    NullTerminated(Uint8::to_const_char(networkId.data()), networkId.size()).AddMarkerIfNonPrintable().c_str());
 
     err               = ConnectWiFiNetwork(reinterpret_cast<const char *>(mStagingNetwork.ssid), mStagingNetwork.ssidLen,
                                            reinterpret_cast<const char *>(mStagingNetwork.credentials), mStagingNetwork.credentialsLen);

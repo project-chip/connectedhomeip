@@ -167,8 +167,9 @@ bool BoltLockManager::ValidatePIN(const Optional<ByteSpan> & pinCode, OperationE
     {
         return true;
     }
-    ChipLogProgress(Zcl, "ValidatePIN %s",
-                    NullTerminated(Uint8::to_const_char(pinCode.Value().data()), pinCode.Value().size()).c_str());
+    ChipLogProgress(
+        Zcl, "ValidatePIN %s",
+        NullTerminated(Uint8::to_const_char(pinCode.Value().data()), pinCode.Value().size()).AddMarkerIfNonPrintable().c_str());
 
     // Check the PIN code
     for (const auto & credential : mCredentials)

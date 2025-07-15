@@ -122,6 +122,17 @@ TEST(TestStringBuilder, TestFormat)
         EXPECT_TRUE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "1234567890");
     }
+
+    {
+        uint8_t str[] = "12\x01"
+                        "34\x02"
+                        "56\x03"
+                        "7890";
+        StringBuilder<14> builder(reinterpret_cast<char *>(str), strlen(reinterpret_cast<char *>(str)));
+        builder.AddMarkerIfNonPrintable();
+        EXPECT_TRUE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "12.34.56.7890");
+    }
 }
 
 TEST(TestStringBuilder, TestFormatOverflow)
@@ -181,6 +192,17 @@ TEST(TestStringBuilder, TestFormatOverflow)
         StringBuilder<11> builder(CharSpan::fromCharString(str), false);
         EXPECT_FALSE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "1234567890");
+    }
+
+    {
+        uint8_t str[] = "12\x01"
+                        "34\x02"
+                        "56\x03"
+                        "7890a";
+        StringBuilder<14> builder(reinterpret_cast<char *>(str), strlen(reinterpret_cast<char *>(str)), false);
+        builder.AddMarkerIfNonPrintable();
+        EXPECT_FALSE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "12.34.56.7890");
     }
 }
 
@@ -258,6 +280,17 @@ TEST(TestStringBuilder, TestOverflowMarker)
         StringBuilder<11> builder(CharSpan::fromCharString(str));
         EXPECT_FALSE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "1234567...");
+    }
+
+    {
+        uint8_t str[] = "12\x01"
+                        "34\x02"
+                        "56\x03"
+                        "7890a";
+        StringBuilder<14> builder(reinterpret_cast<char *>(str), strlen(reinterpret_cast<char *>(str)));
+        builder.AddMarkerIfNonPrintable();
+        EXPECT_FALSE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "12.34.56.7...");
     }
 }
 

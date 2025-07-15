@@ -110,6 +110,18 @@ public:
         StringBuilder(span.data(), span.size(), add_marker_if_overflow)
     {}
 
+    const StringBuilder<kSize> & AddMarkerIfNonPrintable()
+    {
+        for (size_t i = 0; mBuffer[i] != '\0'; ++i)
+        {
+            if (!std::isprint((unsigned char) mBuffer[i]))
+            {
+                mBuffer[i] = '.';
+            }
+        }
+        return *this;
+    }
+
 private:
     char mBuffer[kSize];
 };
