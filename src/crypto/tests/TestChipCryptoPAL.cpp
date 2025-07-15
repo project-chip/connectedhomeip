@@ -431,6 +431,107 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128DecryptTestVectors)
     EXPECT_GT(numOfTestsRan, 0);
 }
 
+// Testing in-place encryption: same buffer for plaintext input and ciphertext output
+// This pattern is more widely used in the Matter Stack
+TEST_F(TestChipCryptoPAL, TestAES_CCM_128InPlaceEncryption)
+{
+    HeapChecker heapChecker;
+    int numOfTestVectors = MATTER_ARRAY_SIZE(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+
+    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[vectorIndex];
+        numOfTestsRan++;
+
+        ASSERT_EQ(vector->ct_len, vector->pt_len);
+
+        chip::Platform::ScopedMemoryBuffer<uint8_t> inplace_buffer;
+        uint8_t * inplace_buffer_ptr = nullptr;
+
+        if (vector->ct_len > 0)
+        {
+            inplace_buffer.Alloc(vector->ct_len);
+            inplace_buffer_ptr = inplace_buffer.Get();
+
+            // Copy the PlainText Buffer so we can do inplace encryption
+            memcpy(inplace_buffer_ptr, vector->pt, vector->pt_len);
+        }
+        chip::Platform::ScopedMemoryBuffer<uint8_t> out_tag;
+        out_tag.Alloc(vector->tag_len);
+        EXPECT_TRUE(out_tag);
+
+        TestAesKey key(vector->key, vector->key_len);
+
+        CHIP_ERROR err = AES_CCM_encrypt(inplace_buffer_ptr, vector->pt_len, vector->aad, vector->aad_len, key.key, vector->nonce,
+                                         vector->nonce_len, inplace_buffer_ptr, out_tag.Get(), vector->tag_len);
+
+        EXPECT_EQ(err, vector->result);
+        if (vector->result == CHIP_NO_ERROR)
+        {
+            bool areCTsEqual  = memcmp(inplace_buffer_ptr, vector->ct, vector->ct_len) == 0;
+            bool areTagsEqual = memcmp(out_tag.Get(), vector->tag, vector->tag_len) == 0;
+            EXPECT_TRUE(areCTsEqual);
+            EXPECT_TRUE(areTagsEqual);
+            if (!areCTsEqual)
+            {
+                printf("\n Test %d failed due to mismatching ciphertext\n", vector->tcId);
+            }
+            if (!areTagsEqual)
+            {
+                printf("\n Test %d failed due to mismatching tags\n", vector->tcId);
+            }
+        }
+    }
+    EXPECT_GT(numOfTestsRan, 0);
+}
+
+// Testing in-place encryption: same buffer for ciphertext input and plaintext output
+// This pattern is more widely used in the Matter Stack
+TEST_F(TestChipCryptoPAL, TestAES_CCM_128InPlaceDecryption)
+{
+    HeapChecker heapChecker;
+    int numOfTestVectors = MATTER_ARRAY_SIZE(ccm_128_test_vectors);
+    int numOfTestsRan    = 0;
+
+    for (int vectorIndex = 0; vectorIndex < numOfTestVectors; vectorIndex++)
+    {
+        const ccm_128_test_vector * vector = ccm_128_test_vectors[vectorIndex];
+        numOfTestsRan++;
+
+        ASSERT_EQ(vector->ct_len, vector->pt_len);
+
+        chip::Platform::ScopedMemoryBuffer<uint8_t> inplace_buffer;
+        uint8_t * inplace_buffer_ptr = nullptr;
+
+        if (vector->pt_len > 0)
+        {
+            inplace_buffer.Alloc(vector->pt_len);
+            inplace_buffer_ptr = inplace_buffer.Get();
+
+            // Copy the Ciphertext Buffer so we can do inplace decryption
+            memcpy(inplace_buffer_ptr, vector->ct, vector->ct_len);
+        }
+
+        TestAesKey key(vector->key, vector->key_len);
+
+        CHIP_ERROR err = AES_CCM_decrypt(inplace_buffer_ptr, vector->ct_len, vector->aad, vector->aad_len, vector->tag,
+                                         vector->tag_len, key.key, vector->nonce, vector->nonce_len, inplace_buffer_ptr);
+
+        EXPECT_EQ(err, vector->result);
+        if (vector->result == CHIP_NO_ERROR)
+        {
+            bool arePTsEqual = memcmp(vector->pt, inplace_buffer.Get(), vector->pt_len) == 0;
+            EXPECT_TRUE(arePTsEqual);
+            if (!arePTsEqual)
+            {
+                printf("\n Test %d failed due to mismatching plaintext\n", vector->tcId);
+            }
+        }
+    }
+    EXPECT_GT(numOfTestsRan, 0);
+}
+
 TEST_F(TestChipCryptoPAL, TestAES_CCM_128EncryptInvalidNonceLen)
 {
     HeapChecker heapChecker;
