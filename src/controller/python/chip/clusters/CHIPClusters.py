@@ -1789,6 +1789,12 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x0000000C: {
+                "attributeName": "IsCommissioningWithoutPower",
+                "attributeId": 0x0000000C,
+                "type": "bool",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -7817,15 +7823,21 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000003: {
-                "attributeName": "OverallState",
+                "attributeName": "OverallCurrentState",
                 "attributeId": 0x00000003,
                 "type": "",
                 "reportable": True,
             },
             0x00000004: {
-                "attributeName": "OverallTarget",
+                "attributeName": "OverallTargetState",
                 "attributeId": 0x00000004,
                 "type": "",
+                "reportable": True,
+            },
+            0x00000005: {
+                "attributeName": "LatchControlModes",
+                "attributeId": 0x00000005,
+                "type": "int",
                 "reportable": True,
             },
             0x0000FFF8: {
@@ -7891,7 +7903,7 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "Target",
+                "attributeName": "TargetState",
                 "attributeId": 0x00000001,
                 "type": "",
                 "reportable": True,
@@ -7947,6 +7959,12 @@ class ChipClusters:
             0x0000000A: {
                 "attributeName": "ModulationType",
                 "attributeId": 0x0000000A,
+                "type": "int",
+                "reportable": True,
+            },
+            0x0000000B: {
+                "attributeName": "LatchControlModes",
+                "attributeId": 0x0000000B,
                 "type": "int",
                 "reportable": True,
             },
@@ -8298,6 +8316,22 @@ class ChipClusters:
                 "commandName": "SetActivePresetRequest",
                 "args": {
                     "presetHandle": "bytes",
+                },
+            },
+            0x00000007: {
+                "commandId": 0x00000007,
+                "commandName": "AddThermostatSuggestion",
+                "args": {
+                    "presetHandle": "bytes",
+                    "effectiveTime": "int",
+                    "expirationInMinutes": "int",
+                },
+            },
+            0x00000008: {
+                "commandId": 0x00000008,
+                "commandName": "RemoveThermostatSuggestion",
+                "args": {
+                    "uniqueID": "int",
                 },
             },
             0x000000FE: {
@@ -8697,6 +8731,30 @@ class ChipClusters:
             0x00000052: {
                 "attributeName": "SetpointHoldExpiryTimestamp",
                 "attributeId": 0x00000052,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000053: {
+                "attributeName": "MaxThermostatSuggestions",
+                "attributeId": 0x00000053,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000054: {
+                "attributeName": "ThermostatSuggestions",
+                "attributeId": 0x00000054,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000055: {
+                "attributeName": "CurrentThermostatSuggestion",
+                "attributeId": 0x00000055,
+                "type": "",
+                "reportable": True,
+            },
+            0x00000056: {
+                "attributeName": "ThermostatSuggestionNotFollowingReason",
+                "attributeId": 0x00000056,
                 "type": "int",
                 "reportable": True,
             },
@@ -14503,6 +14561,12 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x00000003: {
+                "attributeName": "MaximumMeteredQuantities",
+                "attributeId": 0x00000003,
+                "type": "int",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -15096,6 +15160,13 @@ class ChipClusters:
                 "attributeName": "GlobalStruct",
                 "attributeId": 0x00000034,
                 "type": "",
+                "reportable": True,
+                "writable": True,
+            },
+            0x000000FE: {
+                "attributeName": "UnsupportedAttributeRequiringAdminPrivilege",
+                "attributeId": 0x000000FE,
+                "type": "bool",
                 "reportable": True,
                 "writable": True,
             },

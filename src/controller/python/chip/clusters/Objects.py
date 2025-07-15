@@ -6531,6 +6531,7 @@ class GeneralCommissioning(Cluster):
                 ClusterObjectFieldDescriptor(Label="TCUpdateDeadline", Tag=0x00000009, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="recoveryIdentifier", Tag=0x0000000A, Type=typing.Optional[bytes]),
                 ClusterObjectFieldDescriptor(Label="networkRecoveryReason", Tag=0x0000000B, Type=typing.Union[None, Nullable, GeneralCommissioning.Enums.NetworkRecoveryReasonEnum]),
+                ClusterObjectFieldDescriptor(Label="isCommissioningWithoutPower", Tag=0x0000000C, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -6550,6 +6551,7 @@ class GeneralCommissioning(Cluster):
     TCUpdateDeadline: typing.Union[None, Nullable, uint] = None
     recoveryIdentifier: typing.Optional[bytes] = None
     networkRecoveryReason: typing.Union[None, Nullable, GeneralCommissioning.Enums.NetworkRecoveryReasonEnum] = None
+    isCommissioningWithoutPower: typing.Optional[bool] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -6943,6 +6945,22 @@ class GeneralCommissioning(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, GeneralCommissioning.Enums.NetworkRecoveryReasonEnum])
 
             value: typing.Union[None, Nullable, GeneralCommissioning.Enums.NetworkRecoveryReasonEnum] = None
+
+        @dataclass
+        class IsCommissioningWithoutPower(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000030
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000C
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: typing.Optional[bool] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -29369,8 +29387,9 @@ class ClosureControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="countdownTime", Tag=0x00000000, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="mainState", Tag=0x00000001, Type=ClosureControl.Enums.MainStateEnum),
                 ClusterObjectFieldDescriptor(Label="currentErrorList", Tag=0x00000002, Type=typing.List[ClosureControl.Enums.ClosureErrorEnum]),
-                ClusterObjectFieldDescriptor(Label="overallState", Tag=0x00000003, Type=typing.Union[Nullable, ClosureControl.Structs.OverallStateStruct]),
-                ClusterObjectFieldDescriptor(Label="overallTarget", Tag=0x00000004, Type=typing.Union[Nullable, ClosureControl.Structs.OverallTargetStruct]),
+                ClusterObjectFieldDescriptor(Label="overallCurrentState", Tag=0x00000003, Type=typing.Union[Nullable, ClosureControl.Structs.OverallCurrentStateStruct]),
+                ClusterObjectFieldDescriptor(Label="overallTargetState", Tag=0x00000004, Type=typing.Union[Nullable, ClosureControl.Structs.OverallTargetStateStruct]),
+                ClusterObjectFieldDescriptor(Label="latchControlModes", Tag=0x00000005, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -29381,8 +29400,9 @@ class ClosureControl(Cluster):
     countdownTime: typing.Union[None, Nullable, uint] = None
     mainState: ClosureControl.Enums.MainStateEnum = 0
     currentErrorList: typing.List[ClosureControl.Enums.ClosureErrorEnum] = field(default_factory=lambda: [])
-    overallState: typing.Union[Nullable, ClosureControl.Structs.OverallStateStruct] = NullValue
-    overallTarget: typing.Union[Nullable, ClosureControl.Structs.OverallTargetStruct] = NullValue
+    overallCurrentState: typing.Union[Nullable, ClosureControl.Structs.OverallCurrentStateStruct] = NullValue
+    overallTargetState: typing.Union[Nullable, ClosureControl.Structs.OverallTargetStateStruct] = NullValue
+    latchControlModes: typing.Optional[uint] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -29402,6 +29422,19 @@ class ClosureControl(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 5
 
+        class CurrentPositionEnum(MatterIntEnum):
+            kFullyClosed = 0x00
+            kFullyOpened = 0x01
+            kPartiallyOpened = 0x02
+            kOpenedForPedestrian = 0x03
+            kOpenedForVentilation = 0x04
+            kOpenedAtSignature = 0x05
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 6
+
         class MainStateEnum(MatterIntEnum):
             kStopped = 0x00
             kMoving = 0x01
@@ -29417,25 +29450,12 @@ class ClosureControl(Cluster):
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 8
 
-        class PositioningEnum(MatterIntEnum):
-            kFullyClosed = 0x00
-            kFullyOpened = 0x01
-            kPartiallyOpened = 0x02
-            kOpenedForPedestrian = 0x03
-            kOpenedForVentilation = 0x04
-            kOpenedAtSignature = 0x05
-            # All received enum values that are not listed above will be mapped
-            # to kUnknownEnumValue. This is a helper enum value that should only
-            # be used by code to process how it handles receiving an unknown
-            # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 6
-
         class TargetPositionEnum(MatterIntEnum):
-            kCloseInFull = 0x00
-            kOpenInFull = 0x01
-            kPedestrian = 0x02
-            kVentilation = 0x03
-            kSignature = 0x04
+            kMoveToFullyClosed = 0x00
+            kMoveToFullyOpen = 0x01
+            kMoveToPedestrianPosition = 0x02
+            kMoveToVentilationPosition = 0x03
+            kMoveToSignaturePosition = 0x04
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
@@ -29454,37 +29474,41 @@ class ClosureControl(Cluster):
             kProtection = 0x80
             kManuallyOperable = 0x100
 
+        class LatchControlModesBitmap(IntFlag):
+            kRemoteLatching = 0x1
+            kRemoteUnlatching = 0x2
+
     class Structs:
         @dataclass
-        class OverallStateStruct(ClusterObject):
+        class OverallCurrentStateStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="positioning", Tag=0, Type=typing.Union[None, Nullable, ClosureControl.Enums.PositioningEnum]),
+                        ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Union[None, Nullable, ClosureControl.Enums.CurrentPositionEnum]),
                         ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Union[None, Nullable, bool]),
-                        ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Union[None, Nullable, Globals.Enums.ThreeLevelAutoEnum]),
-                        ClusterObjectFieldDescriptor(Label="secureState", Tag=3, Type=typing.Union[None, Nullable, bool]),
+                        ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
+                        ClusterObjectFieldDescriptor(Label="secureState", Tag=3, Type=typing.Union[Nullable, bool]),
                     ])
 
-            positioning: 'typing.Union[None, Nullable, ClosureControl.Enums.PositioningEnum]' = None
+            position: 'typing.Union[None, Nullable, ClosureControl.Enums.CurrentPositionEnum]' = None
             latch: 'typing.Union[None, Nullable, bool]' = None
-            speed: 'typing.Union[None, Nullable, Globals.Enums.ThreeLevelAutoEnum]' = None
-            secureState: 'typing.Union[None, Nullable, bool]' = None
+            speed: 'typing.Optional[Globals.Enums.ThreeLevelAutoEnum]' = None
+            secureState: 'typing.Union[Nullable, bool]' = NullValue
 
         @dataclass
-        class OverallTargetStruct(ClusterObject):
+        class OverallTargetStateStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Optional[ClosureControl.Enums.TargetPositionEnum]),
-                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Union[None, Nullable, ClosureControl.Enums.TargetPositionEnum]),
+                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Union[None, Nullable, bool]),
                         ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
                     ])
 
-            position: 'typing.Optional[ClosureControl.Enums.TargetPositionEnum]' = None
-            latch: 'typing.Optional[bool]' = None
+            position: 'typing.Union[None, Nullable, ClosureControl.Enums.TargetPositionEnum]' = None
+            latch: 'typing.Union[None, Nullable, bool]' = None
             speed: 'typing.Optional[Globals.Enums.ThreeLevelAutoEnum]' = None
 
     class Commands:
@@ -29517,6 +29541,10 @@ class ClosureControl(Cluster):
                         ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
             position: typing.Optional[ClosureControl.Enums.TargetPositionEnum] = None
             latch: typing.Optional[bool] = None
             speed: typing.Optional[Globals.Enums.ThreeLevelAutoEnum] = None
@@ -29533,6 +29561,10 @@ class ClosureControl(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                     ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
 
     class Attributes:
         @dataclass
@@ -29584,7 +29616,7 @@ class ClosureControl(Cluster):
             value: typing.List[ClosureControl.Enums.ClosureErrorEnum] = field(default_factory=lambda: [])
 
         @dataclass
-        class OverallState(ClusterAttributeDescriptor):
+        class OverallCurrentState(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000104
@@ -29595,12 +29627,12 @@ class ClosureControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ClosureControl.Structs.OverallStateStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ClosureControl.Structs.OverallCurrentStateStruct])
 
-            value: typing.Union[Nullable, ClosureControl.Structs.OverallStateStruct] = NullValue
+            value: typing.Union[Nullable, ClosureControl.Structs.OverallCurrentStateStruct] = NullValue
 
         @dataclass
-        class OverallTarget(ClusterAttributeDescriptor):
+        class OverallTargetState(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000104
@@ -29611,9 +29643,25 @@ class ClosureControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ClosureControl.Structs.OverallTargetStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ClosureControl.Structs.OverallTargetStateStruct])
 
-            value: typing.Union[Nullable, ClosureControl.Structs.OverallTargetStruct] = NullValue
+            value: typing.Union[Nullable, ClosureControl.Structs.OverallTargetStateStruct] = NullValue
+
+        @dataclass
+        class LatchControlModes(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000104
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -29778,8 +29826,8 @@ class ClosureDimension(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields=[
-                ClusterObjectFieldDescriptor(Label="currentState", Tag=0x00000000, Type=typing.Union[Nullable, ClosureDimension.Structs.CurrentStateStruct]),
-                ClusterObjectFieldDescriptor(Label="target", Tag=0x00000001, Type=typing.Union[Nullable, ClosureDimension.Structs.TargetStruct]),
+                ClusterObjectFieldDescriptor(Label="currentState", Tag=0x00000000, Type=typing.Union[Nullable, ClosureDimension.Structs.DimensionStateStruct]),
+                ClusterObjectFieldDescriptor(Label="targetState", Tag=0x00000001, Type=typing.Union[Nullable, ClosureDimension.Structs.DimensionStateStruct]),
                 ClusterObjectFieldDescriptor(Label="resolution", Tag=0x00000002, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="stepValue", Tag=0x00000003, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="unit", Tag=0x00000004, Type=typing.Optional[ClosureDimension.Enums.ClosureUnitEnum]),
@@ -29789,6 +29837,7 @@ class ClosureDimension(Cluster):
                 ClusterObjectFieldDescriptor(Label="rotationAxis", Tag=0x00000008, Type=typing.Optional[ClosureDimension.Enums.RotationAxisEnum]),
                 ClusterObjectFieldDescriptor(Label="overflow", Tag=0x00000009, Type=typing.Optional[ClosureDimension.Enums.OverflowEnum]),
                 ClusterObjectFieldDescriptor(Label="modulationType", Tag=0x0000000A, Type=typing.Optional[ClosureDimension.Enums.ModulationTypeEnum]),
+                ClusterObjectFieldDescriptor(Label="latchControlModes", Tag=0x0000000B, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -29796,8 +29845,8 @@ class ClosureDimension(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    currentState: typing.Union[Nullable, ClosureDimension.Structs.CurrentStateStruct] = NullValue
-    target: typing.Union[Nullable, ClosureDimension.Structs.TargetStruct] = NullValue
+    currentState: typing.Union[Nullable, ClosureDimension.Structs.DimensionStateStruct] = NullValue
+    targetState: typing.Union[Nullable, ClosureDimension.Structs.DimensionStateStruct] = NullValue
     resolution: typing.Optional[uint] = None
     stepValue: typing.Optional[uint] = None
     unit: typing.Optional[ClosureDimension.Enums.ClosureUnitEnum] = None
@@ -29807,6 +29856,7 @@ class ClosureDimension(Cluster):
     rotationAxis: typing.Optional[ClosureDimension.Enums.RotationAxisEnum] = None
     overflow: typing.Optional[ClosureDimension.Enums.OverflowEnum] = None
     modulationType: typing.Optional[ClosureDimension.Enums.ModulationTypeEnum] = None
+    latchControlModes: typing.Optional[uint] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -29893,15 +29943,11 @@ class ClosureDimension(Cluster):
             kBackward = 0x09
             kDepthMask = 0x0A
             kDepthSymmetry = 0x0B
-            kCeilingSimple = 0x0C
-            kCeilingMask = 0x0D
-            kCeilingSidedSymmetry = 0x0E
-            kCeilingCenteredSymmetry = 0x0F
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
-            kUnknownEnumValue = 16
+            kUnknownEnumValue = 12
 
     class Bitmaps:
         class Feature(IntFlag):
@@ -29914,20 +29960,24 @@ class ClosureDimension(Cluster):
             kRotation = 0x40
             kModulation = 0x80
 
+        class LatchControlModesBitmap(IntFlag):
+            kRemoteLatching = 0x1
+            kRemoteUnlatching = 0x2
+
     class Structs:
         @dataclass
-        class CurrentStateStruct(ClusterObject):
+        class DimensionStateStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields=[
-                        ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Optional[bool]),
+                        ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Union[None, Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Union[None, Nullable, bool]),
                         ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
                     ])
 
-            position: 'typing.Optional[uint]' = None
-            latch: 'typing.Optional[bool]' = None
+            position: 'typing.Union[None, Nullable, uint]' = None
+            latch: 'typing.Union[None, Nullable, bool]' = None
             speed: 'typing.Optional[Globals.Enums.ThreeLevelAutoEnum]' = None
 
         @dataclass
@@ -29942,21 +29992,6 @@ class ClosureDimension(Cluster):
 
             min: 'uint' = 0
             max: 'uint' = 0
-
-        @dataclass
-        class TargetStruct(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(Label="position", Tag=0, Type=typing.Optional[uint]),
-                        ClusterObjectFieldDescriptor(Label="latch", Tag=1, Type=typing.Optional[bool]),
-                        ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
-                    ])
-
-            position: 'typing.Optional[uint]' = None
-            latch: 'typing.Optional[bool]' = None
-            speed: 'typing.Optional[Globals.Enums.ThreeLevelAutoEnum]' = None
 
         @dataclass
         class UnitRangeStruct(ClusterObject):
@@ -29988,6 +30023,10 @@ class ClosureDimension(Cluster):
                         ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
             position: typing.Optional[uint] = None
             latch: typing.Optional[bool] = None
             speed: typing.Optional[Globals.Enums.ThreeLevelAutoEnum] = None
@@ -30008,6 +30047,10 @@ class ClosureDimension(Cluster):
                         ClusterObjectFieldDescriptor(Label="speed", Tag=2, Type=typing.Optional[Globals.Enums.ThreeLevelAutoEnum]),
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
             direction: ClosureDimension.Enums.StepDirectionEnum = 0
             numberOfSteps: uint = 0
             speed: typing.Optional[Globals.Enums.ThreeLevelAutoEnum] = None
@@ -30025,12 +30068,12 @@ class ClosureDimension(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ClosureDimension.Structs.CurrentStateStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ClosureDimension.Structs.DimensionStateStruct])
 
-            value: typing.Union[Nullable, ClosureDimension.Structs.CurrentStateStruct] = NullValue
+            value: typing.Union[Nullable, ClosureDimension.Structs.DimensionStateStruct] = NullValue
 
         @dataclass
-        class Target(ClusterAttributeDescriptor):
+        class TargetState(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x00000105
@@ -30041,9 +30084,9 @@ class ClosureDimension(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ClosureDimension.Structs.TargetStruct])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, ClosureDimension.Structs.DimensionStateStruct])
 
-            value: typing.Union[Nullable, ClosureDimension.Structs.TargetStruct] = NullValue
+            value: typing.Union[Nullable, ClosureDimension.Structs.DimensionStateStruct] = NullValue
 
         @dataclass
         class Resolution(ClusterAttributeDescriptor):
@@ -30188,6 +30231,22 @@ class ClosureDimension(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Optional[ClosureDimension.Enums.ModulationTypeEnum])
 
             value: typing.Optional[ClosureDimension.Enums.ModulationTypeEnum] = None
+
+        @dataclass
+        class LatchControlModes(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000105
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000000B
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -31566,6 +31625,10 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="presets", Tag=0x00000050, Type=typing.Optional[typing.List[Thermostat.Structs.PresetStruct]]),
                 ClusterObjectFieldDescriptor(Label="schedules", Tag=0x00000051, Type=typing.Optional[typing.List[Thermostat.Structs.ScheduleStruct]]),
                 ClusterObjectFieldDescriptor(Label="setpointHoldExpiryTimestamp", Tag=0x00000052, Type=typing.Union[None, Nullable, uint]),
+                ClusterObjectFieldDescriptor(Label="maxThermostatSuggestions", Tag=0x00000053, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="thermostatSuggestions", Tag=0x00000054, Type=typing.Optional[typing.List[Thermostat.Structs.ThermostatSuggestionStruct]]),
+                ClusterObjectFieldDescriptor(Label="currentThermostatSuggestion", Tag=0x00000055, Type=typing.Union[None, Nullable, Thermostat.Structs.ThermostatSuggestionStruct]),
+                ClusterObjectFieldDescriptor(Label="thermostatSuggestionNotFollowingReason", Tag=0x00000056, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -31633,6 +31696,10 @@ class Thermostat(Cluster):
     presets: typing.Optional[typing.List[Thermostat.Structs.PresetStruct]] = None
     schedules: typing.Optional[typing.List[Thermostat.Structs.ScheduleStruct]] = None
     setpointHoldExpiryTimestamp: typing.Union[None, Nullable, uint] = None
+    maxThermostatSuggestions: typing.Optional[uint] = None
+    thermostatSuggestions: typing.Optional[typing.List[Thermostat.Structs.ThermostatSuggestionStruct]] = None
+    currentThermostatSuggestion: typing.Union[None, Nullable, Thermostat.Structs.ThermostatSuggestionStruct] = None
+    thermostatSuggestionNotFollowingReason: typing.Union[None, Nullable, uint] = None
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -31808,6 +31875,7 @@ class Thermostat(Cluster):
             kLocalTemperatureNotExposed = 0x40
             kMatterScheduleConfiguration = 0x80
             kPresets = 0x100
+            kEvents = 0x200
 
         class HVACSystemTypeBitmap(IntFlag):
             kCoolingStage = 0x3
@@ -31860,6 +31928,15 @@ class Thermostat(Cluster):
             kSupportsSetpoints = 0x2
             kSupportsNames = 0x4
             kSupportsOff = 0x8
+
+        class ThermostatSuggestionNotFollowingReasonBitmap(IntFlag):
+            kDemandResponseEvent = 0x1
+            kOngoingHold = 0x2
+            kSchedule = 0x4
+            kOccupancy = 0x8
+            kVacationMode = 0x10
+            kTimeOfUseCostSavings = 0x20
+            kPreCoolingOrPreHeating = 0x40
 
     class Structs:
         @dataclass
@@ -31954,6 +32031,23 @@ class Thermostat(Cluster):
             systemMode: 'Thermostat.Enums.SystemModeEnum' = 0
             numberOfSchedules: 'uint' = 0
             scheduleTypeFeatures: 'uint' = 0
+
+        @dataclass
+        class ThermostatSuggestionStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="uniqueID", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="presetHandle", Tag=1, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="effectiveTime", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(Label="expirationTime", Tag=3, Type=uint),
+                    ])
+
+            uniqueID: 'uint' = 0
+            presetHandle: 'bytes' = b""
+            effectiveTime: 'uint' = 0
+            expirationTime: 'uint' = 0
 
         @dataclass
         class WeeklyScheduleTransitionStruct(ClusterObject):
@@ -32052,6 +32146,22 @@ class Thermostat(Cluster):
             modeToReturn: uint = 0
 
         @dataclass
+        class AddThermostatSuggestionResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000201
+            command_id: typing.ClassVar[int] = 0x00000002
+            is_client: typing.ClassVar[bool] = False
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="uniqueID", Tag=0, Type=uint),
+                    ])
+
+            uniqueID: uint = 0
+
+        @dataclass
         class ClearWeeklySchedule(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x00000201
             command_id: typing.ClassVar[int] = 0x00000003
@@ -32095,6 +32205,42 @@ class Thermostat(Cluster):
                     ])
 
             presetHandle: typing.Union[Nullable, bytes] = NullValue
+
+        @dataclass
+        class AddThermostatSuggestion(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000201
+            command_id: typing.ClassVar[int] = 0x00000007
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[str] = 'AddThermostatSuggestionResponse'
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="presetHandle", Tag=0, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="effectiveTime", Tag=1, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(Label="expirationInMinutes", Tag=2, Type=uint),
+                    ])
+
+            presetHandle: bytes = b""
+            effectiveTime: typing.Union[Nullable, uint] = NullValue
+            expirationInMinutes: uint = 0
+
+        @dataclass
+        class RemoveThermostatSuggestion(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x00000201
+            command_id: typing.ClassVar[int] = 0x00000008
+            is_client: typing.ClassVar[bool] = True
+            response_type: typing.ClassVar[typing.Optional[str]] = None
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="uniqueID", Tag=0, Type=uint),
+                    ])
+
+            uniqueID: uint = 0
 
         @dataclass
         class AtomicResponse(ClusterCommand):
@@ -33098,6 +33244,70 @@ class Thermostat(Cluster):
             value: typing.Union[None, Nullable, uint] = None
 
         @dataclass
+        class MaxThermostatSuggestions(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000053
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: typing.Optional[uint] = None
+
+        @dataclass
+        class ThermostatSuggestions(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000054
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[Thermostat.Structs.ThermostatSuggestionStruct]])
+
+            value: typing.Optional[typing.List[Thermostat.Structs.ThermostatSuggestionStruct]] = None
+
+        @dataclass
+        class CurrentThermostatSuggestion(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000055
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, Thermostat.Structs.ThermostatSuggestionStruct])
+
+            value: typing.Union[None, Nullable, Thermostat.Structs.ThermostatSuggestionStruct] = None
+
+        @dataclass
+        class ThermostatSuggestionNotFollowingReason(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000056
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
+
+            value: typing.Union[None, Nullable, uint] = None
+
+        @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -33176,6 +33386,177 @@ class Thermostat(Cluster):
                 return ClusterObjectFieldDescriptor(Type=uint)
 
             value: uint = 0
+
+    class Events:
+        @dataclass
+        class SystemModeChange(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="previousSystemMode", Tag=0, Type=typing.Optional[Thermostat.Enums.SystemModeEnum]),
+                        ClusterObjectFieldDescriptor(Label="currentSystemMode", Tag=1, Type=Thermostat.Enums.SystemModeEnum),
+                    ])
+
+            previousSystemMode: typing.Optional[Thermostat.Enums.SystemModeEnum] = None
+            currentSystemMode: Thermostat.Enums.SystemModeEnum = 0
+
+        @dataclass
+        class LocalTemperatureChange(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="currentLocalTemperature", Tag=0, Type=typing.Union[Nullable, int]),
+                    ])
+
+            currentLocalTemperature: typing.Union[Nullable, int] = NullValue
+
+        @dataclass
+        class OccupancyChange(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="previousOccupancy", Tag=0, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="currentOccupancy", Tag=1, Type=uint),
+                    ])
+
+            previousOccupancy: typing.Optional[uint] = None
+            currentOccupancy: uint = 0
+
+        @dataclass
+        class SetpointChange(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="systemMode", Tag=0, Type=Thermostat.Enums.SystemModeEnum),
+                        ClusterObjectFieldDescriptor(Label="occupancy", Tag=1, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="previousSetpoint", Tag=2, Type=typing.Optional[int]),
+                        ClusterObjectFieldDescriptor(Label="currentSetpoint", Tag=3, Type=int),
+                    ])
+
+            systemMode: Thermostat.Enums.SystemModeEnum = 0
+            occupancy: typing.Optional[uint] = None
+            previousSetpoint: typing.Optional[int] = None
+            currentSetpoint: int = 0
+
+        @dataclass
+        class RunningStateChange(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="previousRunningState", Tag=0, Type=typing.Optional[uint]),
+                        ClusterObjectFieldDescriptor(Label="currentRunningState", Tag=1, Type=uint),
+                    ])
+
+            previousRunningState: typing.Optional[uint] = None
+            currentRunningState: uint = 0
+
+        @dataclass
+        class RunningModeChange(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="previousRunningMode", Tag=0, Type=typing.Optional[Thermostat.Enums.ThermostatRunningModeEnum]),
+                        ClusterObjectFieldDescriptor(Label="currentRunningMode", Tag=1, Type=Thermostat.Enums.ThermostatRunningModeEnum),
+                    ])
+
+            previousRunningMode: typing.Optional[Thermostat.Enums.ThermostatRunningModeEnum] = None
+            currentRunningMode: Thermostat.Enums.ThermostatRunningModeEnum = 0
+
+        @dataclass
+        class ActiveScheduleChange(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000006
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="previousScheduleHandle", Tag=0, Type=typing.Union[None, Nullable, bytes]),
+                        ClusterObjectFieldDescriptor(Label="currentScheduleHandle", Tag=1, Type=typing.Union[Nullable, bytes]),
+                    ])
+
+            previousScheduleHandle: typing.Union[None, Nullable, bytes] = None
+            currentScheduleHandle: typing.Union[Nullable, bytes] = NullValue
+
+        @dataclass
+        class ActivePresetChange(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000201
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000007
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="previousPresetHandle", Tag=0, Type=typing.Union[None, Nullable, bytes]),
+                        ClusterObjectFieldDescriptor(Label="currentPresetHandle", Tag=1, Type=typing.Union[Nullable, bytes]),
+                    ])
+
+            previousPresetHandle: typing.Union[None, Nullable, bytes] = None
+            currentPresetHandle: typing.Union[Nullable, bytes] = NullValue
 
 
 @dataclass
@@ -52510,6 +52891,7 @@ class CommodityMetering(Cluster):
                 ClusterObjectFieldDescriptor(Label="meteredQuantity", Tag=0x00000000, Type=typing.Union[Nullable, typing.List[CommodityMetering.Structs.MeteredQuantityStruct]]),
                 ClusterObjectFieldDescriptor(Label="meteredQuantityTimestamp", Tag=0x00000001, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="measurementType", Tag=0x00000002, Type=typing.Union[Nullable, CommodityMetering.Enums.MeasurementTypeEnum]),
+                ClusterObjectFieldDescriptor(Label="maximumMeteredQuantities", Tag=0x00000003, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="generatedCommandList", Tag=0x0000FFF8, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="acceptedCommandList", Tag=0x0000FFF9, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
@@ -52520,6 +52902,7 @@ class CommodityMetering(Cluster):
     meteredQuantity: typing.Union[Nullable, typing.List[CommodityMetering.Structs.MeteredQuantityStruct]] = NullValue
     meteredQuantityTimestamp: typing.Union[Nullable, uint] = NullValue
     measurementType: typing.Union[Nullable, CommodityMetering.Enums.MeasurementTypeEnum] = NullValue
+    maximumMeteredQuantities: typing.Union[Nullable, uint] = NullValue
     generatedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     acceptedCommandList: typing.List[uint] = field(default_factory=lambda: [])
     attributeList: typing.List[uint] = field(default_factory=lambda: [])
@@ -52613,6 +52996,22 @@ class CommodityMetering(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, CommodityMetering.Enums.MeasurementTypeEnum])
 
             value: typing.Union[Nullable, CommodityMetering.Enums.MeasurementTypeEnum] = NullValue
+
+        @dataclass
+        class MaximumMeteredQuantities(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x00000B07
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
+
+            value: typing.Union[Nullable, uint] = NullValue
 
         @dataclass
         class GeneratedCommandList(ClusterAttributeDescriptor):
@@ -52752,6 +53151,7 @@ class UnitTesting(Cluster):
                 ClusterObjectFieldDescriptor(Label="clusterErrorBoolean", Tag=0x00000032, Type=bool),
                 ClusterObjectFieldDescriptor(Label="globalEnum", Tag=0x00000033, Type=Globals.Enums.TestGlobalEnum),
                 ClusterObjectFieldDescriptor(Label="globalStruct", Tag=0x00000034, Type=Globals.Structs.TestGlobalStruct),
+                ClusterObjectFieldDescriptor(Label="unsupportedAttributeRequiringAdminPrivilege", Tag=0x000000FE, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="unsupported", Tag=0x000000FF, Type=typing.Optional[bool]),
                 ClusterObjectFieldDescriptor(Label="readFailureCode", Tag=0x00003000, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="failureInt32U", Tag=0x00003001, Type=typing.Optional[uint]),
@@ -52848,6 +53248,7 @@ class UnitTesting(Cluster):
     clusterErrorBoolean: bool = False
     globalEnum: Globals.Enums.TestGlobalEnum = 0
     globalStruct: Globals.Structs.TestGlobalStruct = field(default_factory=lambda: Globals.Structs.TestGlobalStruct())
+    unsupportedAttributeRequiringAdminPrivilege: typing.Optional[bool] = None
     unsupported: typing.Optional[bool] = None
     readFailureCode: typing.Optional[uint] = None
     failureInt32U: typing.Optional[uint] = None
@@ -54695,6 +55096,22 @@ class UnitTesting(Cluster):
                 return ClusterObjectFieldDescriptor(Type=Globals.Structs.TestGlobalStruct)
 
             value: Globals.Structs.TestGlobalStruct = field(default_factory=lambda: Globals.Structs.TestGlobalStruct())
+
+        @dataclass
+        class UnsupportedAttributeRequiringAdminPrivilege(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0xFFF1FC05
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x000000FE
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[bool])
+
+            value: typing.Optional[bool] = None
 
         @dataclass
         class Unsupported(ClusterAttributeDescriptor):

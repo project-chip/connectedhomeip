@@ -155,6 +155,13 @@ def _get_targets(coverage: Optional[bool]) -> list[ApplicationTarget]:
     )
     targets.append(
         ApplicationTarget(
+            key="CLOSURE_APP",
+            target=f"{target_prefix}-closure-{suffix}",
+            binary="closure-app",
+        )
+    )
+    targets.append(
+        ApplicationTarget(
             key="LIT_ICD_APP",
             target=f"{target_prefix}-lit-icd-{suffix}",
             binary="lit-icd-app",
@@ -1203,6 +1210,9 @@ def chip_tool_tests(
         ("--lit-icd-app", "LIT_ICD_APP"),
         ("--microwave-oven-app", "CHIP_MICROWAVE_OVEN_APP"),
         ("--rvc-app", "CHIP_RVC_APP"),
+        ("--energy-gateway-app", "ENERGY_GATEWAY_APP"),
+        ("--energy-management-app", "ENERGY_MANAGEMENT_APP"),
+        ("--closure-app", "CLOSURE_APP"),
     ]
 
     for flag, path_key in target_flags:
