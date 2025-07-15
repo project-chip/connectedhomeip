@@ -41,12 +41,12 @@ struct PascalPrefixOperations<1>
     using LengthType                           = uint8_t;
     static constexpr LengthType kInvalidLength = 0xFF;
 
-    static LengthType GetLength(const uint8_t * buffer) { return *buffer; }
-    static void SetLength(uint8_t * buffer, LengthType size) { *buffer = static_cast<uint8_t>(size); }
+    static LengthType GetContentLength(const uint8_t * buffer) { return *buffer; }
+    static void SetContentLength(uint8_t * buffer, LengthType size) { *buffer = static_cast<uint8_t>(size); }
 
     // Casts for chars as well
-    static LengthType GetLength(const char * buffer) { return GetLength(Uint8::from_const_char(buffer)); }
-    static void SetLength(char * buffer, LengthType size) { SetLength(Uint8::from_char(buffer), size); }
+    static LengthType GetContentLength(const char * buffer) { return GetContentLength(Uint8::from_const_char(buffer)); }
+    static void SetContentLength(char * buffer, LengthType size) { SetContentLength(Uint8::from_char(buffer), size); }
 };
 
 template <>
@@ -55,12 +55,12 @@ struct PascalPrefixOperations<2>
     using LengthType                           = uint16_t;
     static constexpr LengthType kInvalidLength = 0xFFFF;
 
-    static LengthType GetLength(const uint8_t * buffer) { return Encoding::LittleEndian::Get16(buffer); }
-    static void SetLength(uint8_t * buffer, LengthType size) { Encoding::LittleEndian::Put16(buffer, size); }
+    static LengthType GetContentLength(const uint8_t * buffer) { return Encoding::LittleEndian::Get16(buffer); }
+    static void SetContentLength(uint8_t * buffer, LengthType size) { Encoding::LittleEndian::Put16(buffer, size); }
 
     // Casts for chars as well
-    static LengthType GetLength(const char * buffer) { return GetLength(Uint8::from_const_char(buffer)); }
-    static void SetLength(char * buffer, LengthType size) { SetLength(Uint8::from_char(buffer), size); }
+    static LengthType GetContentLength(const char * buffer) { return GetContentLength(Uint8::from_const_char(buffer)); }
+    static void SetContentLength(char * buffer, LengthType size) { SetContentLength(Uint8::from_char(buffer), size); }
 };
 
 /// Interprets a byte buffer as a pascal buffer:
@@ -91,8 +91,8 @@ public:
 
     /// Returns the content of the pascal string.
     /// Uses the prefix size information
-    Span<T> Content() { return { mData + PREFIX_LEN, GetLength() }; }
-    Span<const T> Content() const { return { mData + PREFIX_LEN, GetLength() }; }
+    Span<T> Content() { return { mData + PREFIX_LEN, GetContentLength() }; }
+    Span<const T> Content() const { return { mData + PREFIX_LEN, GetContentLength() }; }
 
     /// Accesses the "PASCAL" string (i.e. valid data including the string prefix)
     ///
@@ -102,10 +102,10 @@ public:
     ///     - read via pascalString.RawFullBuffer
     ///   - persist pascalString.Content (will NOT include data size)
     ///     - read in a temporary buffer and set value via pascalString.SetValue()
-    ///     - OR read into (RawFullBuffer().data() + PREFIX_LEN) and call SetLength()
+    ///     - OR read into (RawFullBuffer().data() + PREFIX_LEN) and call SetContentLength()
     ByteSpan ContentWithLenPrefix() const
     {
-        return { reinterpret_cast<const uint8_t *>(mData), static_cast<size_t>(GetLength() + PREFIX_LEN) };
+        return { reinterpret_cast<const uint8_t *>(mData), static_cast<size_t>(GetContentLength() + PREFIX_LEN) };
     }
 
     /// Access to the full buffer. does NOT take into account current size
@@ -116,9 +116,9 @@ public:
         return { reinterpret_cast<uint8_t *>(mData), static_cast<size_t>(mMaxSize + PREFIX_LEN) };
     }
 
-    LengthType GetLength() const
+    LengthType GetContentLength() const
     {
-        const LengthType length = PascalPrefixOperations<PREFIX_LEN>::GetLength(mData);
+        const LengthType length = PascalPrefixOperations<PREFIX_LEN>::GetContentLength(mData);
         if (length == kInvalidLength)
         {
             return 0;
@@ -127,18 +127,18 @@ public:
     }
 
     // Returns true if the length was valid and could be set
-    bool SetLength(LengthType len)
+    bool SetContentLength(LengthType len)
     {
         static_assert(!std::is_const_v<T>, "Cannot mutate a const pascal string");
         if (len != kInvalidLength)
         {
             VerifyOrReturnError(len <= mMaxSize, false);
         }
-        PascalPrefixOperations<PREFIX_LEN>::SetLength(mData, len);
+        PascalPrefixOperations<PREFIX_LEN>::SetContentLength(mData, len);
         return true;
     }
-    void SetNull() { (void) SetLength(kInvalidLength); }
-    bool IsNull() const { return PascalPrefixOperations<PREFIX_LEN>::GetLength(mData) == kInvalidLength; }
+    void SetNull() { (void) SetContentLength(kInvalidLength); }
+    bool IsNull() const { return PascalPrefixOperations<PREFIX_LEN>::GetContentLength(mData) == kInvalidLength; }
 
     // Returns true if the length of the input buffer fit in the
     // pascal buffer (and could be set)
@@ -146,7 +146,7 @@ public:
     {
         static_assert(!std::is_const_v<T>, "Cannot mutate a const pascal string");
         VerifyOrReturnValue(value.size() < kInvalidLength, false);
-        VerifyOrReturnValue(SetLength(static_cast<LengthType>(value.size())), false);
+        VerifyOrReturnValue(SetContentLength(static_cast<LengthType>(value.size())), false);
         memcpy(mData + PREFIX_LEN, value.data(), value.size());
         return true;
     }
@@ -156,7 +156,7 @@ public:
     static bool IsValid(Span<const T> span)
     {
         VerifyOrReturnValue(span.size() >= PREFIX_LEN, false);
-        LengthType len = PascalPrefixOperations<PREFIX_LEN>::GetLength(span.data());
+        LengthType len = PascalPrefixOperations<PREFIX_LEN>::GetContentLength(span.data());
         return len == kInvalidLength || (static_cast<size_t>(len + PREFIX_LEN) <= span.size());
     }
 
