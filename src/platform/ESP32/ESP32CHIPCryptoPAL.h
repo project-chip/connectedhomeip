@@ -36,6 +36,12 @@ public:
      **/
     CHIP_ERROR Initialize(ECPKeyTarget keyTarget, int efuseBlock);
 
+    /**
+     * @brief Initialize the keypair from the TEE secure storage
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR InitializeFromTEE(ECPKeyTarget keyTarget, const char * key_id);
+
     CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) const override;
 };
 

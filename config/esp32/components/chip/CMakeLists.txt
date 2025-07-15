@@ -315,6 +315,10 @@ if (CONFIG_USE_ESP32_ECDSA_PERIPHERAL)
     chip_gn_arg_append("chip_use_esp32_ecdsa_peripheral" "true")
 endif()
 
+if (CONFIG_USE_ESP32_TEE_SECURE_STORAGE)
+    chip_gn_arg_append("chip_use_esp32_tee_secure_storage" "true")
+endif()
+
 if (CONFIG_ENABLE_ESP_INSIGHTS_TRACE)
    target_include_directories(${COMPONENT_LIB} INTERFACE "${CHIP_ROOT}/src/tracing/esp32_trace/include")
 endif()
