@@ -605,6 +605,77 @@ jobs:
                   mkdir -p out/trace_data
                   scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDB_1_1.py'
 
+            - name: Run Tests
+              run: |
+                  mkdir -p out/trace_data
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDB_1_1.py'
+
+            - name: Run Tests
+              run: |
+                  mkdir -p out/trace_data
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDB_1_1.py'
+
+            - name: Run Tests
+              run: |
+                  mkdir -p out/trace_data
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDB_1_1.py'
+            - name: Run Tests
+              run: |
+                  mkdir -p out/trace_data
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDB_1_1.py'
+
+            - name: Run Tests
+              run: |
+                  mkdir -p out/trace_data
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDB_1_1.py'
+
+            - name: Run Tests
+              run: |
+                  mkdir -p out/trace_data
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDB_1_1.py'
+
+            - name: Run Tests
+              run: |
+                  mkdir -p out/trace_data
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDB_1_1.py'
+            - name: Run Tests
+              run: |
+                  mkdir -p out/trace_data
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDB_1_1.py'
+
+            - name: Run Tests
+              run: |
+                  mkdir -p out/trace_data
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDB_1_1.py'
+
+            - name: Run Tests
+              run: |
+                  mkdir -p out/trace_data
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDB_1_1.py'
+
+            - name: Run Tests
+              run: |
+                  mkdir -p out/trace_data
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDB_1_1.py'
+            - name: Run Tests
+              run: |
+                  mkdir -p out/trace_data
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDB_1_1.py'
+
+            - name: Run Tests
+              run: |
+                  mkdir -p out/trace_data
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDB_1_1.py'
+
+            - name: Run Tests
+              run: |
+                  mkdir -p out/trace_data
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDB_1_1.py'
+
+            - name: Run Tests
+              run: |
+                  mkdir -p out/trace_data
+                  scripts/run_in_python_env.sh out/venv './scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ICDB_1_1.py'
             - name: Execute Jupyter Notebooks
               run: |
                   scripts/run_in_build_env.sh './scripts/build_python.sh --jupyter-lab --install_virtual_env out/venv'
