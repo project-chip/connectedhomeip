@@ -70,7 +70,6 @@ class TC_FAN_3_5(MatterBaseTest):
                 TestStep(7, "[FC] Initialize the PercentSetting attribute to 100.",
                          "- Verify that the SpeedSetting attribute value is set to SpeedMax. - Verify that the FanMode attribute value is set to High."),
                 TestStep(8, "[FC] Subscribe to PercentSetting, SpeedSetting, and FanMode attributes.",
-                         "Listen for attribute report updates."),
                 TestStep(9, "[FC] TH sends Step commands iteratively.",
                          "- Verify that the PercentSetting attribute value reaches 0. - When the PercentSetting attribute value reaches 0, send an additional Step command to veiryf that the PercentSetting attribute value stays at 0."),
                 TestStep(10, "[FC] Read the resulting attribute reports from each subscription after the Step commands.",
