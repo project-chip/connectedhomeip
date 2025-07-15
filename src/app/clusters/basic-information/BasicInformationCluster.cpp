@@ -351,7 +351,7 @@ DataModel::ActionReturnStatus BasicInformationCluster::ReadAttribute(const DataM
         return encoder.Encode(configVersion);
     }
     case NodeLabel::Id:
-        return encoder.Encode(Storage::ShortPascalString::ContentOf(mNodeLabelBuffer));
+        return encoder.Encode(Storage::ShortPascalString(mNodeLabelBuffer).Content());
     case LocalConfigDisabled::Id:
         return encoder.Encode(mLocalConfigDisabled);
     case Reachable::Id:
@@ -443,7 +443,7 @@ CHIP_ERROR BasicInformationCluster::Startup(ServerClusterContext & context)
     }
     {
         Storage::ShortPascalString labelBuffer(mNodeLabelBuffer);
-        MutableByteSpan labelSpan = labelBuffer.RawBuffer();
+        MutableByteSpan labelSpan = labelBuffer.RawFullBuffer();
 
         LogIfReadError(
             Attributes::NodeLabel::Id,
