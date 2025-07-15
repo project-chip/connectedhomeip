@@ -37,6 +37,7 @@
 
 from datetime import timedelta
 
+
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -100,7 +101,7 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
             tolerance = timedelta(minutes=10)
         else:
             tolerance = timedelta(minutes=1)
-        compare_time(received=utc_dut, utc=th_utc, tolerance=tolerance)
+        timeoperations.compare_time(received=utc_dut, utc=th_utc, tolerance=tolerance)
 
         self.print_step(5, "Read time source")
         if timesource_attr_id in attribute_list:
