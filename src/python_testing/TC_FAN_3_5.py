@@ -65,7 +65,7 @@ class TC_FAN_3_5(MatterBaseTest):
                          "- Set PercentSetting to 0. - Send Step command with direction=Increase, lowestOff=True, and wrap=False. - Read the resulting PercentSetting attribute report value. - Calculate the PercentSetting range per Step command. - Store value for future reference."),
 
                 # LowestOff tests
-                TestStep(6, "[FC] TH tests Step command behavior of the LowestOff field.",
+                TestStep(6, """[FC] Step 6 is used to verify the Step command behavior of the LowestOff field. The following step command fields are used in step 6 substeps:
                          "- Setup a Step command with: -- Direction=Decrease -- Wrap=False -- LowestOff=True."),
                 TestStep(7, "[FC] Initialize the PercentSetting attribute to 100.",
                          "- Verify that the SpeedSetting attribute value is set to SpeedMax. - Verify that the FanMode attribute value is set to High."),
