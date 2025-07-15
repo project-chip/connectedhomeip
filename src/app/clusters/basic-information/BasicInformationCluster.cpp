@@ -386,7 +386,7 @@ DataModel::ActionReturnStatus BasicInformationCluster::WriteAttribute(const Data
         return NotifyAttributeChangedIfSuccess(
             NodeLabel::Id,
             mContext->attributeStorage->WriteValue({ kRootEndpointId, BasicInformation::Id, Attributes::NodeLabel::Id },
-                                                   labelBuffer.RawValidData()));
+                                                   labelBuffer.ContentWithLenPrefix()));
     }
     case LocalConfigDisabled::Id: {
         ReturnErrorOnFailure(decoder.Decode(mLocalConfigDisabled));
