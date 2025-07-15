@@ -356,14 +356,14 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
         ReturnErrorOnFailure(decoder.Decode(emberData));
     }
 
-    if (dataBuffer.size() > (*attributeMetadata)->size)
+    if (dataBuffer.size() > attributeMetadata->size)
     {
         ChipLogDetail(Zcl, "Data to write exceeds the attribute size claimed.");
         return Status::InvalidValue;
     }
 
     Protocols::InteractionModel::Status status;
-    EmberAfWriteDataInput dataInput(dataBuffer.data(), (*attributeMetadata)->attributeType);
+    EmberAfWriteDataInput dataInput(dataBuffer.data(), attributeMetadata->attributeType);
     dataInput.SetChangeListener(&changeListener);
     // TODO: dataInput.SetMarkDirty() should be according to `ChangesOmmited`
 
