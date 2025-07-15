@@ -44,7 +44,7 @@ import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, type_matches
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
 from chip.testing.timeoperations import get_wait_seconds_from_set_time, utc_time_in_matter_epoch
 from chip.tlv import uint
 from mobly import asserts
@@ -81,7 +81,7 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
         timeout = get_wait_seconds_from_set_time(th_utc, wait_s)
         try:
             ret = cb.get_event_from_queue(block=True, timeout=timeout)
-            asserts.assert_true(type_matches(received_value=ret.Data,
+            asserts.assert_true(matchers.is_type(received_value=ret.Data,
                                 desired_type=Clusters.TimeSynchronization.Events.TimeZoneStatus), "Incorrect type received for event")
             asserts.assert_equal(ret.Data.offset, expected_offset, "Unexpected offset returned")
             asserts.assert_equal(ret.Data.name, expected_name, "Unexpected name returned")

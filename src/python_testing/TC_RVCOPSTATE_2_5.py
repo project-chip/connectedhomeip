@@ -42,7 +42,7 @@ import logging
 import chip.clusters as Clusters
 from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
 from chip.testing.matter_testing import (AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main,
-                                         type_matches)
+                                         matchers)
 from mobly import asserts
 
 
@@ -151,7 +151,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
     async def send_go_home_cmd(self) -> Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcOperationalState.Commands.GoHome(),
                                          endpoint=self.endpoint)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse),
+        asserts.assert_true(matchers.is_type(ret, Clusters.Objects.RvcOperationalState.Commands.OperationalCommandResponse),
                             "Unexpected return type for GoHome")
         return ret
 

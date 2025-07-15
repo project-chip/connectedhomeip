@@ -605,7 +605,7 @@ class MatterBaseTest(base_test.BaseTestClass):
         desired_type = attribute.attribute_type.Type
         type_err_msg = f'Returned attribute {attribute} is wrong type expected {desired_type}, got {type(attr_ret)}'
         read_ok = attr_ret is not None and not isinstance(attr_ret, Clusters.Attribute.ValueDecodeFailure)
-        type_ok = type_matches(attr_ret, desired_type)
+        type_ok = matchers.is_type(attr_ret, desired_type)
         if assert_on_error:
             asserts.assert_true(read_ok, read_err_msg)
             asserts.assert_true(type_ok, type_err_msg)
@@ -1585,34 +1585,3 @@ async def _get_all_matching_endpoints(self: MatterBaseTest, accept_function: End
     matching = [e for e in wildcard.attributes.keys()
                 if accept_function(wildcard, e)]
     return matching
-
-
-# TODO(#37537): Remove these temporary aliases after transition period
-type_matches = matchers.is_type
-utc_time_in_matter_epoch = timeoperations.utc_time_in_matter_epoch
-utc_datetime_from_matter_epoch_us = timeoperations.utc_datetime_from_matter_epoch_us
-utc_datetime_from_posix_time_ms = timeoperations.utc_datetime_from_posix_time_ms
-compare_time = timeoperations.compare_time
-get_wait_seconds_from_set_time = timeoperations.get_wait_seconds_from_set_time
-bytes_from_hex = conversions.bytes_from_hex
-hex_from_bytes = conversions.hex_from_bytes
-id_str = conversions.format_decimal_and_hex
-cluster_id_str = conversions.cluster_id_with_name
-
-async_test_body = decorators.async_test_body
-run_if_endpoint_matches = decorators.run_if_endpoint_matches
-run_on_singleton_matching_endpoint = decorators.run_on_singleton_matching_endpoint
-has_cluster = decorators.has_cluster
-has_attribute = decorators.has_attribute
-has_command = decorators.has_command
-has_feature = decorators.has_feature
-should_run_test_on_endpoint = decorators.should_run_test_on_endpoint
-_get_all_matching_endpoints = decorators._get_all_matching_endpoints
-_has_feature = decorators._has_feature
-_has_command = decorators._has_command
-_has_attribute = decorators._has_attribute
-
-default_matter_test_main = runner.default_matter_test_main
-get_test_info = runner.get_test_info
-run_tests = runner.run_tests
-run_tests_no_exit = runner.run_tests_no_exit

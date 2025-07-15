@@ -23,7 +23,7 @@ from datetime import datetime, timedelta, timezone
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.testing.matter_testing import (MatterBaseTest, async_test_body, default_matter_test_main, parse_matter_test_args,
-                                         type_matches)
+                                         matchers)
 from chip.testing.pics import parse_pics, parse_pics_xml
 from chip.testing.taglist_and_topology_test import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
                                                     find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
@@ -82,19 +82,19 @@ def test_type_matching_for_type(test_type, test_nullable: bool = False, test_opt
 
     # true_list is all the values that should match with the test type
     for i in true_list:
-        asserts.assert_true(type_matches(i, match_type), "{} type checking failure".format(test_type))
+        asserts.assert_true(matchers.is_type(i, match_type), "{} type checking failure".format(test_type))
 
     # try every value in every type in the remaining dict - they should all fail
     for v in vals.values():
         for i in v:
-            asserts.assert_false(type_matches(i, match_type), "{} falsely matched to type {}".format(i, match_type))
+            asserts.assert_false(matchers.is_type(i, match_type), "{} falsely matched to type {}".format(i, match_type))
 
     # Test the nullables or optionals that aren't supposed to work
     if not test_nullable:
-        asserts.assert_false(type_matches(NullValue, match_type), "NullValue falsely matched to {}".format(match_type))
+        asserts.assert_false(matchers.is_type(NullValue, match_type), "NullValue falsely matched to {}".format(match_type))
 
     if not test_optional:
-        asserts.assert_false(type_matches(None, match_type), "None falsely matched to {}".format(match_type))
+        asserts.assert_false(matchers.is_type(None, match_type), "None falsely matched to {}".format(match_type))
 
 
 def run_all_match_tests_for_type(test_type):
