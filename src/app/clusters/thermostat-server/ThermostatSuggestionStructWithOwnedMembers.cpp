@@ -33,6 +33,12 @@ ThermostatSuggestionStructWithOwnedMembers::ThermostatSuggestionStructWithOwnedM
     *this = other;
 }
 
+ThermostatSuggestionStructWithOwnedMembers::ThermostatSuggestionStructWithOwnedMembers(
+    const ThermostatSuggestionStructWithOwnedMembers & other)
+{
+    *this = other;
+}
+
 ThermostatSuggestionStructWithOwnedMembers &
 ThermostatSuggestionStructWithOwnedMembers::operator=(const ThermostatSuggestionStruct::Type & other)
 {
