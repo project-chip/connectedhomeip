@@ -18,8 +18,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${CHIP_RVC_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvcopstate_2_5_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -28,6 +28,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
+#       --app-pipe /tmp/rvcopstate_2_5_fifo
 #       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
 #       --int-arg runmode_cleanmode:1
 #     factory-reset: true
@@ -194,7 +195,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
                               if Clusters.RvcRunMode.Enums.ModeTag.kIdle.value in [t.value for t in m.modeTags]), None)
             cleaning_mode = self.user_params.get("runmode_cleanmode")
             asserts.assert_is_not_none(idle_mode, "Idle mode not found in SupportedModes!")
-            asserts.assert_is_not_none(cleaning_mode, "Cleaning mode not found in SupportedModes!")
+            asserts.assert_is_not_none(cleaning_mode, "Cleaning mode not provided via --int-arg runmode_cleanmode")
 
             # TH establishes a subscription to the CurrentMode attribute of the RVC Run Mode cluster of the DUT
             self.step("4")
@@ -233,13 +234,18 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
 
             # TH sends GoHome command to the DUT
             self.step("8")
+
+            # TODO:  add this idle mode set to test plan, as RVC must be idle for GoHome to be performed successfully
+            await self.send_change_to_mode_with_check(idle_mode, RvcStatusEnum.Success)
+
             await self.send_go_home_cmd_with_check(Clusters.OperationalState.Enums.ErrorStateEnum.kNoError)
             await self.read_operational_state_with_check(Clusters.RvcOperationalState.Enums.OperationalStateEnum.kSeekingCharger)
 
             # Manually confirm DUT has returned to the dock and completed docking-related activities
             self.step("9")
             if not self.is_ci:
-                self.wait_for_user_input(prompt_msg=f"{step_name_idle_mode}, and press Enter when ready.")
+                confirm_docking_complete = "Manually confirm DUT has returned to the dock and completed docking-related activities"
+                self.wait_for_user_input(prompt_msg=f"{confirm_docking_complete}, and press Enter when ready.")
             else:
                 self.write_to_app_pipe({"Name": "Docked"})
 
