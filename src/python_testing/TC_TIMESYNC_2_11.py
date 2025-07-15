@@ -40,6 +40,15 @@ import time
 import typing
 from datetime import datetime, timedelta, timezone
 
+<<<<<<< HEAD
+=======
+import chip.clusters as Clusters
+from chip.clusters.Types import NullValue
+from chip.interaction_model import InteractionModelError
+from chip.testing.event_attribute_reporting import EventSubscriptionHandler
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from chip.testing import timeoperations
+>>>>>>> c22181942f (Commit to refactor utc_time_in_matter_epoch to timeoperations.utc_time_in_matter_epoch.)
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -106,7 +115,7 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
         # It doesn't actually matter if this succeeds. The DUT is free to reject this command and use its own time.
         # If the DUT fails to get the time completely, all other tests will fail.
         try:
-            await self.send_set_utc_cmd(utc_time_in_matter_epoch())
+            await self.send_set_utc_cmd(timeoperations.utc_time_in_matter_epoch())
         except InteractionModelError:
             pass
 
@@ -127,12 +136,12 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
         asserts.assert_greater_equal(dst_list_size, 1, "Invalid dst list size")
 
         self.print_step(5, "TH sets two DST items if dst_list_size > 1")
-        th_utc = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc))
-        expiry_first = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
+        th_utc = timeoperations.utc_time_in_matter_epoch(datetime.now(tz=timezone.utc))
+        expiry_first = timeoperations.utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
         dst_first = dst_struct(offset=3600, validStarting=0, validUntil=expiry_first)
         if dst_list_size > 1:
-            start_second = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=25))
-            expiry_second = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=40))
+            start_second = timeoperations.utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=25))
+            expiry_second = timeoperations.utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=40))
             dst_second = dst_struct(offset=3600, validStarting=start_second, validUntil=expiry_second)
             dst = [dst_first, dst_second]
             await self.send_set_dst_cmd(dst)

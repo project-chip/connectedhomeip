@@ -105,7 +105,7 @@ class TC_DGGEN_2_4(MatterBaseTest):
 
             self.print_step("1b", "Write current time to DUT")
             # Get current time in the correct format to set via command.
-            th_utc = utc_time_in_matter_epoch(desired_datetime=None)
+            th_utc = timeoperations.utc_time_in_matter_epoch(desired_datetime=None)
 
             await self.set_time_in_timesync(th_utc)
 

@@ -40,6 +40,16 @@ import time
 import typing
 from datetime import datetime, timedelta, timezone
 
+<<<<<<< HEAD
+=======
+import chip.clusters as Clusters
+from chip.clusters.Types import NullValue
+from chip.interaction_model import InteractionModelError
+from chip.testing.event_attribute_reporting import EventSubscriptionHandler
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from chip.testing import timeoperations
+from chip.tlv import uint
+>>>>>>> c22181942f (Commit to refactor utc_time_in_matter_epoch to timeoperations.utc_time_in_matter_epoch.)
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -106,7 +116,7 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
         # It doesn't actually matter if this succeeds. The DUT is free to reject this command and use its own time.
         # If the DUT fails to get the time completely, all other tests will fail.
         try:
-            await self.send_set_utc_cmd(utc_time_in_matter_epoch())
+            await self.send_set_utc_cmd(timeoperations.utc_time_in_matter_epoch())
         except InteractionModelError:
             pass
 
@@ -127,10 +137,10 @@ class TC_TIMESYNC_2_12(MatterBaseTest):
         asserts.assert_greater_equal(tz_list_size, 1, "Invalid tz list size")
 
         self.print_step(5, "TH sets two TZ items if dst_list_size > 1")
-        th_utc = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc))
+        th_utc = timeoperations.utc_time_in_matter_epoch(datetime.now(tz=timezone.utc))
         tz_first = tz_struct(offset=3600, validAt=0, name="Not/Real")
         if tz_list_size > 1:
-            valid_second = utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
+            valid_second = timeoperations.utc_time_in_matter_epoch(datetime.now(tz=timezone.utc) + timedelta(seconds=10))
             tz_second = tz_struct(offset=7200, validAt=valid_second, name="Un/Real")
             tz = [tz_first, tz_second]
             await self.send_set_time_zone_cmd(tz)

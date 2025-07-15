@@ -38,6 +38,13 @@
 import typing
 from datetime import timedelta
 
+<<<<<<< HEAD
+=======
+import chip.clusters as Clusters
+from chip.interaction_model import InteractionModelError, Status
+from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main, matchers
+from chip.testing import timeoperations
+>>>>>>> c22181942f (Commit to refactor utc_time_in_matter_epoch to timeoperations.utc_time_in_matter_epoch.)
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -120,11 +127,11 @@ class TC_TIMESYNC_2_4(MatterBaseTest):
         self.print_step(9, "Send SetTimeZone command")
         if tz_max_size_dut == 2:
             tz = [tz_struct(offset=3600, validAt=0, name="Europe/Dublin"),
-                  tz_struct(offset=7200, validAt=utc_time_in_matter_epoch() + timedelta(minutes=2).microseconds, name="Europe/Athens")]
+                  tz_struct(offset=7200, validAt=timeoperations.utc_time_in_matter_epoch() + timedelta(minutes=2).microseconds, name="Europe/Athens")]
             ret = await self.send_set_time_zone_cmd(tz=tz)
 
         self.print_step(10, "Send SetTimeZone command - bad validAt time")
-        tz = [tz_struct(offset=3600, validAt=utc_time_in_matter_epoch(), name="Europe/Dublin")]
+        tz = [tz_struct(offset=3600, validAt=timeoperations.utc_time_in_matter_epoch(), name="Europe/Dublin")]
         await self.send_set_time_zone_cmd_expect_error(tz=tz, error=Status.ConstraintError)
 
         self.print_step(11, "Send SetTimeZone command - bad second entry")
@@ -152,9 +159,9 @@ class TC_TIMESYNC_2_4(MatterBaseTest):
         self.print_step(16, "Send SetTimeZone command - too many entries")
         if tz_max_size_dut == 2:
             tz = [tz_struct(offset=3600, validAt=0, name="Europe/Dublin"),
-                  tz_struct(offset=7200, validAt=utc_time_in_matter_epoch() +
+                  tz_struct(offset=7200, validAt=timeoperations.utc_time_in_matter_epoch() +
                             timedelta(minutes=2).microseconds, name="Europe/Athens"),
-                  tz_struct(offset=10800, validAt=utc_time_in_matter_epoch() +
+                  tz_struct(offset=10800, validAt=timeoperations.utc_time_in_matter_epoch() +
                             timedelta(minutes=4).microseconds, name="Europe/Istanbul")
                   ]
             await self.send_set_time_zone_cmd_expect_error(tz=tz, error=Status.ResourceExhausted)
@@ -162,7 +169,7 @@ class TC_TIMESYNC_2_4(MatterBaseTest):
         self.print_step(17, "Send SetTimeZone command - too many entries")
         if tz_max_size_dut == 1:
             tz = [tz_struct(offset=3600, validAt=0, name="Europe/Dublin"),
-                  tz_struct(offset=7200, validAt=utc_time_in_matter_epoch() +
+                  tz_struct(offset=7200, validAt=timeoperations.utc_time_in_matter_epoch() +
                             timedelta(minutes=2).microseconds, name="Europe/Athens")
                   ]
             await self.send_set_time_zone_cmd_expect_error(tz=tz,  error=Status.ResourceExhausted)
