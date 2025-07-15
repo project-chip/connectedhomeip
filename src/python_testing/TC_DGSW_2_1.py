@@ -79,8 +79,6 @@ class TC_DGSW_2_1(MatterBaseTest):
         if self.pics_guard(attributes.ThreadMetrics.attribute_id in attribute_list):
             thread_metrics_list = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.ThreadMetrics)
 
-            print(f"------------ thread_metrics_list ------------\n{thread_metrics_list}")
-
             # Validate each element in the thread_metrics_list
             for metric in thread_metrics_list:
                 # The Id field is mandatory
@@ -106,21 +104,18 @@ class TC_DGSW_2_1(MatterBaseTest):
         self.step(3)
         if self.pics_guard(attributes.CurrentHeapFree.attribute_id in attribute_list):
             current_heap_free_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapFree)
-            print(f"------------ current_heap_free_attr ------------\n{current_heap_free_attr}")
             matter_asserts.assert_valid_uint64(current_heap_free_attr, "CurrentHeapFree")
 
         # STEP 4: TH reads from the DUT the CurrentHeapUsed attribute
         self.step(4)
         if self.pics_guard(attributes.CurrentHeapUsed.attribute_id in attribute_list):
             current_heap_used_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
-            print(f"------------ current_heap_used_attr ------------\n{current_heap_used_attr}")
             matter_asserts.assert_valid_uint64(current_heap_used_attr, "CurrentHeapUsed")
 
         # STEP 5: TH reads from the DUT the CurrentHeapHighWatermark attribute
         self.step(5)
         if self.pics_guard(attributes.CurrentHeapHighWatermark.attribute_id in attribute_list):
             current_heap_high_watermark_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
-            print(f"------------ current_heap_high_watermark_attr ------------\n{current_heap_high_watermark_attr}")
             matter_asserts.assert_valid_uint64(current_heap_high_watermark_attr, "CurrentHeapHighWatermark")
 
 
