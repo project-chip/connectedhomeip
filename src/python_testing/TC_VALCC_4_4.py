@@ -33,7 +33,6 @@
 # === END CI TEST ARGUMENTS ===
 
 import logging
-
 from mobly import asserts
 
 import matter.clusters as Clusters
@@ -111,7 +110,7 @@ class TC_VALCC_4_4(MatterBaseTest):
 
         self.step("3b")
         if utcTime is NullValue:
-            th_utc = utc_time_in_matter_epoch()
+            th_utc = timeoperations.utc_time_in_matter_epoch()
 
             try:
                 await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetUTCTime(UTCTime=th_utc, granularity=Clusters.Objects.TimeSynchronization.Enums.GranularityEnum.kMillisecondsGranularity), endpoint=0)
