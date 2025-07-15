@@ -203,10 +203,13 @@ static gboolean BluezCharacteristicAcquireNotifyError(BluezGattCharacteristic1 *
     return TRUE;
 }
 
+// TODO: When using with BlueZ >= 5.80, this method can be removed. Also, the GetBluezConnectionViaDevice
+//       method will no longer be needed, since every callback will have the device object path available
+//       in the options parameter.
 gboolean BluezEndpoint::BluezCharacteristicConfirm(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation)
 {
     BluezConnection * conn = GetBluezConnectionViaDevice();
-    ChipLogDetail(Ble, "Indication confirmation, %p", conn);
+    ChipLogDetail(DeviceLayer, "Indication confirmation: conn=%p", conn);
     bluez_gatt_characteristic1_complete_confirm(aChar, aInvocation);
     BLEManagerImpl::HandleTXComplete(conn);
     return TRUE;
