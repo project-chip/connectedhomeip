@@ -399,6 +399,10 @@ class TC_JCM_1_1(MatterBaseTest):
             response[0][Clusters.AccessControl].acl[0].subjects[0],
             "EcoA Server App Subjects field has wrong value")
 
+        # Shutdown the Python Controllers start at the begining
+        devCtrlEcoA.Shutdown()
+        devCtrlEcoB.Shutdown()
+
 
 if __name__ == "__main__":
     default_matter_test_main()

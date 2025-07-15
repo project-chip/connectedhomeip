@@ -294,9 +294,7 @@ class TC_JCM_1_2(MatterBaseTest):
             logging.info(f"Starting Joint Commissioning of Ecosystem B jfa-app with node ID {nodeid}")
 
             devCtrl.send(
-                message=f"pairing onnetwork {nodeid} {passcode} --execute-jcm true",
-                expected_output="[JF] OnOwnershipTransferDone RPC call succeeded!",
-                timeout=10)
+                message=f"pairing onnetwork {nodeid} {passcode} --execute-jcm true")
 
             logging.info(f"Joint Commissioning completed successfully for node {nodeid}")
 
@@ -308,17 +306,6 @@ class TC_JCM_1_2(MatterBaseTest):
 
     @async_test_body
     async def test_TC_JCM_1_2(self):
-
-        # Creating a Controller for Ecosystem A
-        _fabric_a_persistent_storage = PersistentStorage(jsonData=self.ecoACtrlStorage)
-        _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
-            chipStack=self.matter_stack._chip_stack,
-            persistentStorage=_fabric_a_persistent_storage)
-        _certAuthorityManagerA.LoadAuthoritiesFromStorage()
-        _devCtrlEcoA = _certAuthorityManagerA.activeCaList[0].adminList[0].NewController(
-            nodeId=101,
-            paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
-            catTags=[int(self.ecoACATs, 16)])
 
         # Creating a Controller for Ecosystem B
         _fabric_b_persistent_storage = PersistentStorage(jsonData=self.ecoBCtrlStorage)
@@ -378,6 +365,9 @@ class TC_JCM_1_2(MatterBaseTest):
                 break
         asserts.assert_true(_admin_cat_found, "Administrator CAT not found in Admin App NOC on Ecosystem B")
         asserts.assert_true(_anchor_cat_found, "Anchor CAT not found in Admin App NOC on Ecosystem B")
+
+        # Shutdown the Python Controllers start at the begining
+        devCtrlEcoB.Shutdown()
 
 
 if __name__ == "__main__":

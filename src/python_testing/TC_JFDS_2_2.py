@@ -282,6 +282,9 @@ class TC_JFDS_2_2(MatterBaseTest):
         # else:
         #     asserts.assert_true(False, 'Expected InteractionModelError with CONSTRANT_ERROR, but no exception occurred!')
 
+        # Shutdown the Python Controllers start at the begining
+        devCtrlEcoA.Shutdown()
+
 
 if __name__ == "__main__":
     default_matter_test_main()
