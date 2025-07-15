@@ -2049,10 +2049,12 @@ void DeviceCommissioner::SendCommissioningCompleteCallbacks(NodeId nodeId, const
     }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    mPairingDelegate->OnCommissioningComplete(nodeId, mTrustedIcacPublicKeyB, completionStatus.err);
+    mPairingDelegate->OnCommissioningComplete(nodeId, mTrustedIcacPublicKeyB, mPeerAdminJFAdminClusterEndpointId,
+                                              completionStatus.err);
     mTrustedIcacPublicKeyB.ClearValue();
+    mPeerAdminJFAdminClusterEndpointId = kInvalidEndpointId;
 #else
-    mPairingDelegate->OnCommissioningComplete(nodeId, NullOptional, completionStatus.err);
+    mPairingDelegate->OnCommissioningComplete(nodeId, completionStatus.err);
 #endif
 
     PeerId peerId(GetCompressedFabricId(), nodeId);
@@ -3591,7 +3593,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     {
         if (!params.GetJFAdministratorFabricIndex().HasValue() || !params.GetJFAdminNOC().HasValue() ||
-            params.GetJFAdministratorFabricIndex().Value() == kUndefinedFabricIndex)
+            params.GetJFAdministratorFabricIndex().Value() == kUndefinedFabricIndex || !params.GetJFAdminEndpointId().HasValue() ||
+            params.GetJFAdminEndpointId().Value() == kInvalidEndpointId)
         {
             ChipLogError(Controller, "JCM: No JF Admin Values found");
             CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
@@ -3620,6 +3623,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             return;
         }
         mTrustedIcacPublicKeyB.Emplace(jfAdminICACPKSpan);
+        mPeerAdminJFAdminClusterEndpointId = params.GetJFAdminEndpointId().Value();
 
         CommissioningStageComplete(err);
     }

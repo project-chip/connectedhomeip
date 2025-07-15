@@ -381,7 +381,11 @@ bool BLEManagerImpl::gattMonitorCharateristicsCb(LSHandle * sh, LSMessage * mess
             pbnjson::JValue value = jvalue["changed"]["value"];
 
             uint8_t * values = (uint8_t *) malloc(sizeof(uint8_t) * value["bytes"].arraySize());
-
+            if (values == nullptr)
+            {
+                ChipLogError(DeviceLayer, "Failed to allocate memory for values");
+                return false;
+            }
             for (int i = 0; i < value["bytes"].arraySize(); i++)
             {
                 values[i] = value["bytes"][i].asNumber<int32_t>();

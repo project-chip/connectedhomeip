@@ -1129,7 +1129,8 @@ private:
     Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier = nullptr;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-    chip::Optional<chip::Crypto::P256PublicKey> mTrustedIcacPublicKeyB;
+    Optional<Crypto::P256PublicKey> mTrustedIcacPublicKeyB;
+    EndpointId mPeerAdminJFAdminClusterEndpointId = kInvalidEndpointId;
 #endif
 };
 
