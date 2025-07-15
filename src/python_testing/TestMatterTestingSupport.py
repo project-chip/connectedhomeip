@@ -28,7 +28,7 @@ from chip.testing.pics import parse_pics, parse_pics_xml
 from chip.testing.taglist_and_topology_test import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
                                                     find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
                                                     get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
-from chip.testing.timeoperations import compare_time, get_wait_seconds_from_set_time, utc_time_in_matter_epoch
+from chip.testing import timeoperations
 from chip.tlv import uint
 from mobly import asserts, signals
 
@@ -108,11 +108,11 @@ class TestMatterTestingSupport(MatterBaseTest):
     @async_test_body
     async def test_matter_epoch_time(self):
         # Matter epoch should return zero
-        ret = utc_time_in_matter_epoch(datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc))
+        ret = timeoperations.utc_time_in_matter_epoch(datetime(2000, 1, 1, 0, 0, 0, 0, timezone.utc))
         asserts.assert_equal(ret, 0, "UTC epoch returned non-zero value")
 
         # Jan 2 is exactly 1 day after Jan 1
-        ret = utc_time_in_matter_epoch(datetime(2000, 1, 2, 0, 0, 0, 0, timezone.utc))
+        ret = timeoperations.utc_time_in_matter_epoch(datetime(2000, 1, 2, 0, 0, 0, 0, timezone.utc))
         expected_delay = timedelta(days=1)
         actual_delay = timedelta(microseconds=ret)
         asserts.assert_equal(expected_delay, actual_delay, "Calculation for Jan 2 date is incorrect")
@@ -120,13 +120,13 @@ class TestMatterTestingSupport(MatterBaseTest):
         # There's a catch 22 for knowing the current time, but we can check that it's
         # going up, and that it's larger than when I wrote the test
         # Check that the returned value is larger than the test writing date
-        writing_date = utc_time_in_matter_epoch(datetime(2023, 5, 5, 0, 0, 0, 0, timezone.utc))
-        current_date = utc_time_in_matter_epoch()
+        writing_date = timeoperations.utc_time_in_matter_epoch(datetime(2023, 5, 5, 0, 0, 0, 0, timezone.utc))
+        current_date = timeoperations.utc_time_in_matter_epoch()
         asserts.assert_greater(current_date, writing_date, "Calculation for current date is smaller than writing date")
 
         # Check that the time is going up
         last_date = current_date
-        current_date = utc_time_in_matter_epoch()
+        current_date = timeoperations.utc_time_in_matter_epoch()
         asserts.assert_greater(current_date, last_date, "Time does not appear to be incrementing")
 
     @async_test_body
@@ -191,7 +191,7 @@ class TestMatterTestingSupport(MatterBaseTest):
                      offset=timedelta(seconds=3605), utc=0, tolerance=timedelta(seconds=5))
 
     def test_get_wait_time_function(self):
-        th_utc = utc_time_in_matter_epoch()
+        th_utc = timeoperations.utc_time_in_matter_epoch()
         secs = get_wait_seconds_from_set_time(th_utc, 5)
         asserts.assert_equal(secs, 5)
         # If we've pass less than a second, we still want to wait 5
