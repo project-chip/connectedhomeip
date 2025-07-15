@@ -249,7 +249,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         if not os.path.exists(app):
             if app is None:
                 raise FileNotFoundError(f"{app} not found")
-        app_manager = AppProcessManager(app, app_args, app_ready_pattern, sys.stdout.buffer, app_stdin_pipe)
+        app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
         app_manager.start()
         app_manager_ref = [app_manager]
         restart_monitor_thread = threading.Thread(
@@ -260,7 +260,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                 app,
                 app_args,
                 app_ready_pattern,
-                sys.stdout.buffer,
+                stream_output,
                 app_stdin_pipe,
                 restart_flag_file),
             daemon=True)
@@ -290,8 +290,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
     test_script_process = Subprocess(final_script_command[0], *final_script_command[1:],
                                      output_cb=process_test_script_output,
-                                     f_stdout=sys.stdout.buffer,
-                                     f_stderr=sys.stderr.buffer)
+                                     f_stdout=stream_output,
+                                     f_stderr=stream_output)
     test_script_process.start()
     test_script_process.p.stdin.close()
 
