@@ -21,13 +21,12 @@ import inspect
 import json
 import logging
 import os
-import pathlib
 import queue
 import random
 import shlex
 import textwrap
 import typing
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from enum import IntFlag
 from typing import Any, Callable, List, Optional
@@ -37,7 +36,6 @@ import chip.testing.decorators as decorators
 import chip.testing.matchers as matchers
 import chip.testing.runner as runner
 import chip.testing.timeoperations as timeoperations
-from chip.testing.runner import _DEFAULT_ADMIN_VENDOR_ID, _DEFAULT_CONTROLLER_NODE_ID, _DEFAULT_TRUST_ROOT_INDEX
 from chip.testing.matter_test_config import MatterTestConfig
 
 # isort: off
@@ -64,7 +62,7 @@ from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.problem_notices import AttributePathLocation, ClusterMapper, ProblemLocation, ProblemNotice, ProblemSeverity
 from chip.testing.runner import TestRunnerHooks, TestStep
 from chip.tlv import uint
-from mobly import asserts, base_test, signals, utils
+from mobly import asserts, base_test, signals
 
 # TODO: Add utility to commission a device if needed
 # TODO: Add utilities to keep track of controllers/fabrics
