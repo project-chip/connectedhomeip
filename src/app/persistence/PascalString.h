@@ -101,7 +101,7 @@ public:
     ///   - persist pascalString.ContentWithLenPrefix (will include the data WITH the size prefix)
     ///     - read via pascalString.RawFullBuffer
     ///   - persist pascalString.Content (will NOT include data size)
-    ///     - read in a temporary buffer and set value via pascalString.SetValue()
+    ///     - read into a temporary buffer and set value via pascalString.SetValue()
     ///     - OR read into (RawFullBuffer().data() + PREFIX_LEN) and call SetContentLength()
     ByteSpan ContentWithLenPrefix() const
     {
