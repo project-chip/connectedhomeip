@@ -97,10 +97,7 @@ gboolean BluezEndpoint::BluezCharacteristicReadValue(BluezGattCharacteristic1 * 
 gboolean BluezEndpoint::BluezCharacteristicAcquireWrite(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
                                                         GUnixFDList * aFDList, GVariant * aOptions)
 {
-    int fds[2] = { -1, -1 };
-#if CHIP_ERROR_LOGGING
-    char * errStr;
-#endif // CHIP_ERROR_LOGGING
+    int fds[2]             = { -1, -1 };
     BluezConnection * conn = nullptr;
     uint16_t mtu;
 
@@ -118,10 +115,7 @@ gboolean BluezEndpoint::BluezCharacteristicAcquireWrite(BluezGattCharacteristic1
 
     if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, fds) < 0)
     {
-#if CHIP_ERROR_LOGGING
-        errStr = strerror(errno);
-#endif // CHIP_ERROR_LOGGING
-        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", StringOrNullMarker(errStr), __func__);
+        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", StringOrNullMarker(strerror(errno)), __func__);
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "FD creation failed");
         return FALSE;
     }
@@ -148,10 +142,7 @@ static gboolean BluezCharacteristicAcquireWriteError(BluezGattCharacteristic1 * 
 gboolean BluezEndpoint::BluezCharacteristicAcquireNotify(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
                                                          GUnixFDList * aFDList, GVariant * aOptions)
 {
-    int fds[2] = { -1, -1 };
-#if CHIP_ERROR_LOGGING
-    char * errStr;
-#endif // CHIP_ERROR_LOGGING
+    int fds[2]                   = { -1, -1 };
     BluezConnection * conn       = nullptr;
     bool isAdditionalAdvertising = false;
     uint16_t mtu;
@@ -178,10 +169,7 @@ gboolean BluezEndpoint::BluezCharacteristicAcquireNotify(BluezGattCharacteristic
 
     if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, fds) < 0)
     {
-#if CHIP_ERROR_LOGGING
-        errStr = strerror(errno);
-#endif // CHIP_ERROR_LOGGING
-        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", StringOrNullMarker(errStr), __func__);
+        ChipLogError(DeviceLayer, "FAIL: socketpair: %s in %s", StringOrNullMarker(strerror(errno)), __func__);
         g_dbus_method_invocation_return_dbus_error(aInvocation, "org.bluez.Error.Failed", "FD creation failed");
         return FALSE;
     }
@@ -557,8 +545,7 @@ CHIP_ERROR BluezEndpoint::Init(BluezAdapter1 * apAdapter, bool aIsCentral)
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                         ChipLogError(DeviceLayer, "Failed to subscribe for notifications: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](BluezEndpoint * self) { return self->SetupEndpointBindings(); }, this);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BluezEndpoint * self) { return self->SetupEndpointBindings(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                         ChipLogError(DeviceLayer, "Failed to schedule endpoint initialization: %" CHIP_ERROR_FORMAT, err.Format()));
 
