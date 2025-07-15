@@ -352,7 +352,7 @@ ActionReturnStatus ServerClusterShim::WriteAttribute(const WriteAttributeRequest
 
     MutableByteSpan dataBuffer = gEmberAttributeIOBufferSpan;
     {
-        Ember::EmberAttributeDataBuffer emberData(*attributeMetadata, dataBuffer);
+        Ember::EmberAttributeDataBuffer emberData(attributeMetadata, dataBuffer);
         ReturnErrorOnFailure(decoder.Decode(emberData));
     }
 
