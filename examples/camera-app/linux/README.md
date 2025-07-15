@@ -6,7 +6,7 @@ Linux.
 
 ---
 
-- [Building the Example Application](#building-the-example-application)
+-   [Building the Example Application](#building-the-example-application)
 
 ---
 
