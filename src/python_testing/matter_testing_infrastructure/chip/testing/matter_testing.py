@@ -32,9 +32,9 @@ import textwrap
 import typing
 from binascii import unhexlify
 from dataclasses import asdict as dataclass_asdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from enum import Enum, IntFlag
+from enum import IntFlag
 from itertools import chain
 from typing import Any, Callable, List, Optional, Tuple
 
@@ -43,6 +43,7 @@ import chip.testing.decorators as decorators
 import chip.testing.matchers as matchers
 import chip.testing.runner as runner
 import chip.testing.timeoperations as timeoperations
+from chip.testing.matter_test_config import MatterTestConfig
 
 # isort: off
 
@@ -66,6 +67,7 @@ from chip.testing.commissioning import (CommissioningInfo, CustomCommissioningPa
                                         get_setup_payload_info_config)
 from chip.testing.global_attribute_ids import GlobalAttributeIds
 from chip.testing.pics import read_pics_from_file
+from chip.testing.problem_notices import AttributePathLocation, ClusterMapper, ProblemLocation, ProblemNotice, ProblemSeverity
 from chip.testing.runner import TestRunnerHooks, TestStep
 from chip.tlv import uint
 from mobly import asserts, base_test, signals, utils
@@ -84,6 +86,10 @@ _DEFAULT_LOG_PATH = "/tmp/matter_testing/logs"
 _DEFAULT_CONTROLLER_NODE_ID = 112233
 _DEFAULT_DUT_NODE_ID = 0x12344321
 _DEFAULT_TRUST_ROOT_INDEX = 1
+
+
+class TestError(Exception):
+    pass
 
 
 def default_paa_rootstore_from_root(root_path: pathlib.Path) -> Optional[pathlib.Path]:
@@ -176,213 +182,6 @@ class AttributeMatcher:
                 return self._matcher(report)
 
         return AttributeMatcherFromCallable(description, matcher)
-
-
-@dataclass
-class MatterTestConfig:
-    storage_path: pathlib.Path = pathlib.Path(".")
-    logs_path: pathlib.Path = pathlib.Path(".")
-    paa_trust_store_path: Optional[pathlib.Path] = None
-    ble_controller: Optional[int] = None
-    commission_only: bool = False
-
-    admin_vendor_id: int = _DEFAULT_ADMIN_VENDOR_ID
-    case_admin_subject: Optional[int] = None
-    global_test_params: dict = field(default_factory=dict)
-    # List of explicit tests to run by name. If empty, all tests will run
-    tests: List[str] = field(default_factory=list)
-    timeout: typing.Union[int, None] = None
-    endpoint: typing.Union[int, None] = 0
-    app_pid: int = 0
-    pipe_name: typing.Union[str, None] = None
-    fail_on_skipped_tests: bool = False
-
-    commissioning_method: Optional[str] = None
-    in_test_commissioning_method: Optional[str] = None
-    discriminators: List[int] = field(default_factory=list)
-    setup_passcodes: List[int] = field(default_factory=list)
-    commissionee_ip_address_just_for_testing: Optional[str] = None
-    # By default, we start with maximized cert chains, as required for RR-1.1.
-    # This allows cert tests to be run without re-commissioning for RR-1.1.
-    maximize_cert_chains: bool = True
-
-    # By default, let's set validity to 10 years
-    certificate_validity_period = int(timedelta(days=10*365).total_seconds())
-
-    qr_code_content: List[str] = field(default_factory=list)
-    manual_code: List[str] = field(default_factory=list)
-
-    wifi_ssid: Optional[str] = None
-    wifi_passphrase: Optional[str] = None
-    thread_operational_dataset: Optional[bytes] = None
-
-    pics: dict[bool, str] = field(default_factory=dict)
-
-    # Node ID for basic DUT
-    dut_node_ids: List[int] = field(default_factory=list)
-    # Node ID to use for controller/commissioner
-    controller_node_id: int = _DEFAULT_CONTROLLER_NODE_ID
-    # CAT Tags for default controller/commissioner
-    # By default, we commission with CAT tags specified for RR-1.1
-    # so the cert tests can be run without re-commissioning the device
-    # for this one test. This can be overwritten from the command line
-    controller_cat_tags: List[int] = field(default_factory=lambda: [0x0001_0001])
-
-    # Fabric ID which to use
-    fabric_id: int = 1
-
-    # "Alpha" by default
-    root_of_trust_index: int = _DEFAULT_TRUST_ROOT_INDEX
-
-    # If this is set, we will reuse root of trust keys at that location
-    chip_tool_credentials_path: Optional[pathlib.Path] = None
-
-    trace_to: List[str] = field(default_factory=list)
-
-    # Accepted Terms and Conditions if used
-    tc_version_to_simulate: int = None
-    tc_user_response_to_simulate: int = None
-    # path to device attestation revocation set json file
-    dac_revocation_set_path: Optional[pathlib.Path] = None
-
-    legacy: bool = False
-
-
-class ClusterMapper:
-    """Describe clusters/attributes using schema names."""
-
-    def __init__(self, legacy_cluster_mapping) -> None:
-        self._mapping = legacy_cluster_mapping
-
-    def get_cluster_string(self, cluster_id: int) -> str:
-        mapping = self._mapping._CLUSTER_ID_DICT.get(cluster_id, None)
-        if not mapping:
-            return f"Cluster Unknown ({cluster_id}, 0x{cluster_id:08X})"
-        else:
-            name = mapping["clusterName"]
-            return f"Cluster {name} ({cluster_id}, 0x{cluster_id:04X})"
-
-    def get_attribute_string(self, cluster_id: int, attribute_id) -> str:
-        global_attrs = [item.value for item in GlobalAttributeIds]
-        if attribute_id in global_attrs:
-            return f"Attribute {GlobalAttributeIds(attribute_id).to_name()} {attribute_id}, 0x{attribute_id:04X}"
-        mapping = self._mapping._CLUSTER_ID_DICT.get(cluster_id, None)
-        if not mapping:
-            return f"Attribute Unknown ({attribute_id}, 0x{attribute_id:08X})"
-        else:
-            attribute_mapping = mapping["attributes"].get(attribute_id, None)
-
-            if not attribute_mapping:
-                return f"Attribute Unknown ({attribute_id}, 0x{attribute_id:08X})"
-            else:
-                attribute_name = attribute_mapping["attributeName"]
-                return f"Attribute {attribute_name} ({attribute_id}, 0x{attribute_id:04X})"
-
-
-@dataclass
-class ClusterPathLocation:
-    endpoint_id: int
-    cluster_id: int
-
-    def __str__(self):
-        return (f'\n       Endpoint: {self.endpoint_id},'
-                f'\n       Cluster:  {cluster_id_str(self.cluster_id)}')
-
-
-@dataclass
-class AttributePathLocation(ClusterPathLocation):
-    cluster_id: Optional[int] = None
-    attribute_id: Optional[int] = None
-
-    def as_cluster_string(self, mapper: ClusterMapper):
-        desc = f"Endpoint {self.endpoint_id}"
-        if self.cluster_id is not None:
-            desc += f", {mapper.get_cluster_string(self.cluster_id)}"
-        return desc
-
-    def as_string(self, mapper: ClusterMapper):
-        desc = self.as_cluster_string(mapper)
-        if self.cluster_id is not None and self.attribute_id is not None:
-            desc += f", {mapper.get_attribute_string(self.cluster_id, self.attribute_id)}"
-
-        return desc
-
-    def __str__(self):
-        return (f'{super().__str__()}'
-                f'\n      Attribute:{id_str(self.attribute_id)}')
-
-
-@dataclass
-class EventPathLocation(ClusterPathLocation):
-    event_id: int
-
-    def __str__(self):
-        return (f'{super().__str__()}'
-                f'\n       Event:    {id_str(self.event_id)}')
-
-
-@dataclass
-class CommandPathLocation(ClusterPathLocation):
-    command_id: int
-
-    def __str__(self):
-        return (f'{super().__str__()}'
-                f'\n       Command:  {id_str(self.command_id)}')
-
-
-@dataclass
-class FeaturePathLocation(ClusterPathLocation):
-    feature_code: str
-
-    def __str__(self):
-        return (f'{super().__str__()}'
-                f'\n       Feature:  {self.feature_code}')
-
-
-@dataclass
-class DeviceTypePathLocation:
-    device_type_id: int
-    cluster_id: Optional[int] = None
-
-    def __str__(self):
-        msg = f'\n       DeviceType: {self.device_type_id}'
-        if self.cluster_id:
-            msg += f'\n       ClusterID: {self.cluster_id}'
-        return msg
-
-
-class UnknownProblemLocation:
-    def __str__(self):
-        return '\n      Unknown Locations - see message for more details'
-
-
-ProblemLocation = typing.Union[ClusterPathLocation, DeviceTypePathLocation, UnknownProblemLocation]
-
-# ProblemSeverity is not using StrEnum, but rather Enum, since StrEnum only
-# appeared in 3.11. To make it JSON serializable easily, multiple inheritance
-# from `str` is used. See https://stackoverflow.com/a/51976841.
-
-
-class ProblemSeverity(str, Enum):
-    NOTE = "NOTE"
-    WARNING = "WARNING"
-    ERROR = "ERROR"
-
-
-@dataclass
-class ProblemNotice:
-    test_name: str
-    location: ProblemLocation
-    severity: ProblemSeverity
-    problem: str
-    spec_location: str = ""
-
-    def __str__(self):
-        return (f'\nProblem: {str(self.severity)}'
-                f'\n    test_name: {self.test_name}'
-                f'\n    location: {str(self.location)}'
-                f'\n    problem: {self.problem}'
-                f'\n    spec_location: {self.spec_location}\n')
 
 
 @dataclass
@@ -1269,8 +1068,9 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def user_verify_snap_shot(self,
                               prompt_msg: str,
-                              image: bytes) -> Optional[str]:
+                              image: bytes) -> None:
         """Show Image Verification Prompt and wait for user validation.
+           This method will be executed only when TC is running in TH.
 
         Args:
             prompt_msg (str): Message for TH UI prompt and input function.
@@ -1278,47 +1078,58 @@ class MatterBaseTest(base_test.BaseTestClass):
             image (bytes): Image data as bytes.
 
         Returns:
-            str: User input or none if input is closed.
-        """
+            Returns nothing indicating success so the test can go on.
 
-        # Convert bytes to comma separated hex string
-        hex_string = ', '.join(f'{byte:02x}' for byte in image)
-        if self.runner_hook:
+        Raises:
+            TestError: Indicating image validation step failed.
+        """
+        # Only run when TC is being executed in TH
+        if self.runner_hook and hasattr(self.runner_hook, 'show_image_prompt'):
+            # Convert bytes to comma separated hex string
+            hex_string = ', '.join(f'{byte:02x}' for byte in image)
             self.runner_hook.show_image_prompt(
                 msg=prompt_msg,
                 img_hex_str=hex_string
             )
 
-        logging.info("========= USER PROMPT for Image Verification =========")
-        logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
-        try:
-            return input()
-        except EOFError:
-            logging.info("========= EOF on STDIN =========")
-            return None
+            logging.info("========= USER PROMPT for Image Validation =========")
+
+            try:
+                result = input()
+                if result != '1':  # User did not select 'PASS'
+                    raise TestError("Image validation failed")
+            except EOFError:
+                logging.info("========= EOF on STDIN =========")
+                return None
 
     def user_verify_video_stream(self,
-                                 prompt_msg: str) -> Optional[str]:
+                                 prompt_msg: str) -> None:
         """Show Video Verification Prompt and wait for user validation.
+           This method will be executed only when TC is running in TH.
 
         Args:
             prompt_msg (str): Message for TH UI prompt and input function.
             Indicates what is expected from the user.
 
         Returns:
-            str: User input or none if input is closed.
-        """
+            Returns nothing indicating success so the test can go on.
 
-        if self.runner_hook:
+        Raises:
+            TestError: Indicating video validation step failed.
+        """
+        # Only run when TC is being executed in TH
+        if self.runner_hook and hasattr(self.runner_hook, 'show_video_prompt'):
             self.runner_hook.show_video_prompt(msg=prompt_msg)
 
-        logging.info("========= USER PROMPT for Video Stream Verification =========")
-        logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
-        try:
-            return input()
-        except EOFError:
-            logging.info("========= EOF on STDIN =========")
-            return None
+            logging.info("========= USER PROMPT for Video Stream Validation =========")
+
+            try:
+                result = input()
+                if result != '1':  # User did not select 'PASS'
+                    raise TestError("Video stream validation failed")
+            except EOFError:
+                logging.info("========= EOF on STDIN =========")
+                return None
 
 
 def _find_test_class():
@@ -1412,13 +1223,13 @@ def json_named_arg(s: str) -> Tuple[str, object]:
 
 def bool_named_arg(s: str) -> Tuple[str, bool]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
-    match = re.match(regex, s.lower())
+    match = re.match(regex, s, re.IGNORECASE)
     if not match:
         raise ValueError("Invalid bool argument format, does not match %s" % regex)
 
     name = match.group("name")
     if match.group("truth_value"):
-        value = True if match.group("truth_value") == "true" else False
+        value = True if match.group("truth_value").lower() == "true" else False
     else:
         value = int(match.group("decimal_value")) != 0
 

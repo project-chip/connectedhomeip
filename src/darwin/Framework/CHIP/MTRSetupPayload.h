@@ -27,6 +27,7 @@ typedef NS_OPTIONS(NSUInteger, MTRDiscoveryCapabilities) {
     MTRDiscoveryCapabilitiesSoftAP = 1 << 0, // Device supports WiFi softAP
     MTRDiscoveryCapabilitiesBLE = 1 << 1, // Device supports BLE
     MTRDiscoveryCapabilitiesOnNetwork = 1 << 2, // Device supports On Network setup
+    MTRDiscoveryCapabilitiesNFC MTR_NEWLY_AVAILABLE = 1 << 4, // Device supports NFC-based commissioning
 
     // Note: New values added here need to be included in MTRDiscoveryCapabilitiesAsString()
 
