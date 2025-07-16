@@ -16,25 +16,21 @@ namespace {
 class TestTransferDiagnosticLog : public ::testing::Test
 {
 public:
-static void SetUpTestSuite()
-    {
-        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
-    }
+    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
 
-    static void TearDownTestSuite()
-    {
-        Platform::MemoryShutdown();
-    }
+    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+
 protected:
     TransferSession mTransferSession{};
 };
 
-TEST_F(TestTransferDiagnosticLog, InitsDiagnosticLog) {
+TEST_F(TestTransferDiagnosticLog, InitsDiagnosticLog)
+{
     System::Clock::Internal::MockClock clock;
     System::Clock::ClockBase * realClock = &System::SystemClock();
     System::Clock::Internal::SetSystemClockForTesting(&clock);
 
-    mTransferSession.WaitForTransfer(TransferRole::kReceiver, TransferControlFlags::kSenderDrive, uint16_t{512}, 1000_ms);
+    mTransferSession.WaitForTransfer(TransferRole::kReceiver, TransferControlFlags::kSenderDrive, uint16_t{ 512 }, 1000_ms);
 
     auto transferInit = TransferInit();
 
@@ -46,11 +42,11 @@ TEST_F(TestTransferDiagnosticLog, InitsDiagnosticLog) {
     transferInit.StartOffset  = 42;
     transferInit.MaxBlockSize = 256;
 
-    char testFileDes[9]    = { "test.txt" };
+    char testFileDes[9]         = { "test.txt" };
     transferInit.FileDesLength  = 9;
     transferInit.FileDesignator = reinterpret_cast<uint8_t *>(testFileDes);
 
-    uint8_t fakeData[5]    = { 7, 6, 5, 4, 3 };
+    uint8_t fakeData[5]         = { 7, 6, 5, 4, 3 };
     transferInit.MetadataLength = 5;
     transferInit.Metadata       = reinterpret_cast<uint8_t *>(fakeData);
 
@@ -65,7 +61,7 @@ TEST_F(TestTransferDiagnosticLog, InitsDiagnosticLog) {
     ASSERT_FALSE(rcvBuf.IsNull());
 
     PayloadHeader payloadHeader;
-    payloadHeader.SetMessageType(Protocols::BDX::Id , to_underlying(MessageType::SendInit));
+    payloadHeader.SetMessageType(Protocols::BDX::Id, to_underlying(MessageType::SendInit));
 
     auto r = mTransferSession.HandleMessageReceived(payloadHeader, std::move(rcvBuf), System::Clock::kZero);
 
@@ -80,22 +76,23 @@ TEST_F(TestTransferDiagnosticLog, InitsDiagnosticLog) {
     System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 
-TEST_F(TestTransferDiagnosticLog, AccpetsTransferActingAsReceiverWhileInititatorDrivesTransfer) {
+TEST_F(TestTransferDiagnosticLog, AccpetsTransferActingAsReceiverWhileInititatorDrivesTransfer)
+{
 
     auto proxyDiagnosticLog = BDXTransferProxyDiagnosticLog();
 
     TransferSession initiator;
     TransferSession::TransferInitData transferInitData;
-    transferInitData.TransferCtlFlags =TransferControlFlags::kSenderDrive;
-    transferInitData.MaxBlockSize = 512;
-    transferInitData.StartOffset  = 0;
-    transferInitData.Length       = 1024;
-    char testFileDes[9]    = { "test.txt" };
-    transferInitData.FileDesLength  = 9;
-    transferInitData.FileDesignator = reinterpret_cast<uint8_t *>(testFileDes);
-    uint8_t fakeData[5]    = { 7, 6, 5, 4, 3 };
-    transferInitData.MetadataLength = 5;
-    transferInitData.Metadata       = reinterpret_cast<uint8_t *>(fakeData);
+    transferInitData.TransferCtlFlags = TransferControlFlags::kSenderDrive;
+    transferInitData.MaxBlockSize     = 512;
+    transferInitData.StartOffset      = 0;
+    transferInitData.Length           = 1024;
+    char testFileDes[9]               = { "test.txt" };
+    transferInitData.FileDesLength    = 9;
+    transferInitData.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
+    uint8_t fakeData[5]               = { 7, 6, 5, 4, 3 };
+    transferInitData.MetadataLength   = 5;
+    transferInitData.Metadata         = reinterpret_cast<uint8_t *>(fakeData);
 
     /// Init initiator (and sender) transfer session
     auto r = initiator.StartTransfer(TransferRole::kSender, transferInitData, System::Clock::Seconds16(10));
@@ -107,7 +104,8 @@ TEST_F(TestTransferDiagnosticLog, AccpetsTransferActingAsReceiverWhileInititator
     EXPECT_EQ(initiatorEvent.EventType, TransferSession::OutputEventType::kMsgToSend);
 
     /// Init responder (and receiver) transfer session
-    r = mTransferSession.WaitForTransfer(TransferRole::kReceiver, TransferControlFlags::kSenderDrive, 512, System::Clock::Seconds16(20));
+    r = mTransferSession.WaitForTransfer(TransferRole::kReceiver, TransferControlFlags::kSenderDrive, 512,
+                                         System::Clock::Seconds16(20));
     EXPECT_EQ(r, CHIP_NO_ERROR);
 
     TransferSession::OutputEvent responderEvent;
@@ -138,26 +136,25 @@ TEST_F(TestTransferDiagnosticLog, AccpetsTransferActingAsReceiverWhileInititator
     mTransferSession.PollOutput(responderEvent, System::Clock::kZero);
 
     EXPECT_EQ(responderEvent.EventType, TransferSession::OutputEventType::kMsgToSend); // responder sends Accept message
-
 }
 
-
-TEST_F(TestTransferDiagnosticLog, RejectsInTheMiddleOfTransfer) {
+TEST_F(TestTransferDiagnosticLog, RejectsInTheMiddleOfTransfer)
+{
 
     auto proxyDiagnosticLog = BDXTransferProxyDiagnosticLog();
 
     TransferSession initiator;
     TransferSession::TransferInitData transferInitData;
-    transferInitData.TransferCtlFlags =TransferControlFlags::kSenderDrive;
-    transferInitData.MaxBlockSize = 512;
-    transferInitData.StartOffset  = 0;
-    transferInitData.Length       = 1024;
-    char testFileDes[9]    = { "test.txt" };
-    transferInitData.FileDesLength  = 9;
-    transferInitData.FileDesignator = reinterpret_cast<uint8_t *>(testFileDes);
-    uint8_t fakeData[5]    = { 7, 6, 5, 4, 3 };
-    transferInitData.MetadataLength = 5;
-    transferInitData.Metadata       = reinterpret_cast<uint8_t *>(fakeData);
+    transferInitData.TransferCtlFlags = TransferControlFlags::kSenderDrive;
+    transferInitData.MaxBlockSize     = 512;
+    transferInitData.StartOffset      = 0;
+    transferInitData.Length           = 1024;
+    char testFileDes[9]               = { "test.txt" };
+    transferInitData.FileDesLength    = 9;
+    transferInitData.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
+    uint8_t fakeData[5]               = { 7, 6, 5, 4, 3 };
+    transferInitData.MetadataLength   = 5;
+    transferInitData.Metadata         = reinterpret_cast<uint8_t *>(fakeData);
 
     /// Init initiator (and sender) transfer session
     auto r = initiator.StartTransfer(TransferRole::kSender, transferInitData, System::Clock::Seconds16(10));
@@ -169,7 +166,8 @@ TEST_F(TestTransferDiagnosticLog, RejectsInTheMiddleOfTransfer) {
     EXPECT_EQ(initiatorEvent.EventType, TransferSession::OutputEventType::kMsgToSend);
 
     /// Init responder (and receiver) transfer session
-    r = mTransferSession.WaitForTransfer(TransferRole::kReceiver, TransferControlFlags::kSenderDrive, 512, System::Clock::Seconds16(20));
+    r = mTransferSession.WaitForTransfer(TransferRole::kReceiver, TransferControlFlags::kSenderDrive, 512,
+                                         System::Clock::Seconds16(20));
     EXPECT_EQ(r, CHIP_NO_ERROR);
 
     TransferSession::OutputEvent responderEvent;
@@ -300,12 +298,12 @@ TEST_F(TestTransferDiagnosticLog, RejectsInTheMiddleOfTransfer) {
 
     initiator.PollOutput(initiatorEvent, System::Clock::kZero);
 
-    EXPECT_EQ(initiatorEvent.EventType, TransferSession::OutputEventType::kStatusReceived); /// this implies transfer rejection got received
+    EXPECT_EQ(initiatorEvent.EventType,
+              TransferSession::OutputEventType::kStatusReceived); /// this implies transfer rejection got received
 
     initiator.Reset();
     mTransferSession.Reset();
     proxyDiagnosticLog.Reset();
 }
-
 
 } // namespace
