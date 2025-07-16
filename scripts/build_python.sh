@@ -47,10 +47,9 @@ declare install_virtual_env
 declare clean_virtual_env=yes
 declare install_pytest_requirements=yes
 declare install_jupyterlab=no
-declare chip_device_config_enable_joint_fabric=""
 declare -a extra_packages
 declare -a extra_gn_args
-declare chip_build_controller_dynamic_server=false
+declare chip_build_controller_dynamic_server=true
 
 help() {
 
@@ -64,7 +63,6 @@ Input Options:
   -b, --enable_ble          <true/false>                    Enable BLE in the controller (default=$enable_ble)
   -p, --enable_wifi_paf     <true/false>                    Enable Wi-Fi PAF discovery in the controller (default=SDK default behavior)
   -4, --enable_ipv4         <true/false>                    Enable IPv4 in the controller (default=$enable_ipv4)
-  -J, --enable_jf           <true/false>                    Enable JointFabrics in the controller (default=$chip_device_config_enable_joint_fabric)
   -d, --chip_detail_logging <true/false>                    Specify ChipDetailLoggingValue as true or false.
                                                             By default it is $chip_detail_logging.
   -m, --chip_mdns           ChipMDNSValue                   Specify ChipMDNSValue as platform or minimal.
@@ -110,15 +108,6 @@ while (($#)); do
                 exit
             fi
             wifi_paf_config="chip_device_config_enable_wifipaf=$wifi_paf_arg"
-            shift
-            ;;
-        --enable_jf | -J)
-            declare jf_arg="$2"
-            if [[ "$jf_arg" != "true" && "$jf_arg" != "false" ]]; then
-                echo "enable_jf should have a true/false value, not '$jf_arg'"
-                exit
-            fi
-            chip_device_config_enable_joint_fabric="chip_device_config_enable_joint_fabric=$jf_arg"
             shift
             ;;
         --enable_ipv4 | -4)
@@ -204,10 +193,9 @@ if [[ -n $wifi_paf_config ]]; then
     echo "  $wifi_paf_config"
 fi
 echo "  enable_ipv4=\"$enable_ipv4\""
-if [[ -n $chip_device_config_enable_joint_fabric ]]; then
-    echo "  $chip_device_config_enable_joint_fabric"
-fi
 echo "  chip_build_controller_dynamic_server=\"$chip_build_controller_dynamic_server\""
+echo "  chip_support_webrtc_python_bindings=true"
+
 if [[ ${#extra_gn_args[@]} -gt 0 ]]; then
     echo "In addition, the following extra args will added to gn command line: ${extra_gn_args[*]}"
 fi
@@ -243,6 +231,7 @@ gn_args=(
     "chip_inet_config_enable_ipv4=$enable_ipv4"
     "chip_crypto=\"openssl\""
     "chip_build_controller_dynamic_server=$chip_build_controller_dynamic_server"
+    "chip_support_webrtc_python_bindings=true"
 )
 if [[ -n "$chip_mdns" ]]; then
     gn_args+=("chip_mdns=\"$chip_mdns\"")
@@ -255,9 +244,6 @@ if [[ -n "$pregen_dir" ]]; then
 fi
 if [[ -n $wifi_paf_config ]]; then
     args+=("$wifi_paf_config")
-fi
-if [[ -n $chip_device_config_enable_joint_fabric ]]; then
-    args+=("$chip_device_config_enable_joint_fabric")
 fi
 # Append extra arguments provided by the user.
 gn_args+=("${extra_gn_args[@]}")
@@ -301,6 +287,8 @@ if [ -n "$install_virtual_env" ]; then
     source "$ENVIRONMENT_ROOT"/bin/activate
     "$ENVIRONMENT_ROOT"/bin/python -m ensurepip --upgrade
     "$ENVIRONMENT_ROOT"/bin/python -m pip install --upgrade "${WHEEL[@]}"
+
+    "$ENVIRONMENT_ROOT"/bin/pip install -r "$CHIP_ROOT/scripts/setup/requirements.build.txt"
 
     if [ "$install_pytest_requirements" = "yes" ]; then
         echo_blue "Installing python test dependencies ..."
