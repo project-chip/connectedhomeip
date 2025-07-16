@@ -16,23 +16,21 @@
 # limitations under the License.
 #
 
-function trim_whitespace()
-{
+function trim_whitespace() {
     local OLD_SHOPT_EXTGLOB="$(shopt -p extglob)"
     shopt -s extglob
 
-    while IFS= read -r line; do # For every line in stdin
-        local trimmed_line="${line##+([[:space:]])}" # Remove leading whitespace
+    while IFS= read -r line; do                        # For every line in stdin
+        local trimmed_line="${line##+([[:space:]])}"   # Remove leading whitespace
         trimmed_line="${trimmed_line%%+([[:space:]])}" # Remove trailing whitespace
-        echo "$trimmed_line" # Output to stdout
+        echo "$trimmed_line"                           # Output to stdout
     done
 
     eval "$OLD_SHOPT_EXTGLOB"
 }
 
 # This function parses the input from `ninja -t query` and extracts the input targets.
-function parse_input_targets()
-{
+function parse_input_targets() {
     while IFS= read -r line; do
         if [[ "$line" == "input: "* ]]; then
             rule="${line#input: }"
@@ -52,8 +50,7 @@ function parse_input_targets()
 }
 
 # This function executes a command with lastpipe enabled, allowing the last command in a pipeline to run in the current shell.
-function dowithlastpipe()
-{
+function dowithlastpipe() {
     # Save the current lastpipe and monitor settings
     local original_lastpipe_setting="$(shopt -p lastpipe)"
     local original_monitor_setting
@@ -83,8 +80,7 @@ function dowithlastpipe()
 
 # This function returns the rules that should be cleaned based on the targets provided.
 # Based on this, ninja -t clean -r <rules> will clean the exact targets that need to be reexecuted.
-function get_rules_to_clean()
-{
+function get_rules_to_clean() {
     declare -A RULES
 
     # Read the rules that execute (not build) targets from the toolchain.ninja file
