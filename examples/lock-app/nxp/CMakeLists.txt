@@ -42,13 +42,13 @@ get_filename_component(NXP_MATTER_SUPPORT_DIR ${CHIP_ROOT}/third_party/nxp/nxp_m
 # Add the CHIP stack & NXP port libs as an external module
 list(APPEND EXTRA_MCUX_MODULES ${CHIP_ROOT}/config/nxp/chip-cmake-freertos)
 
-# If CONF_FILE_NAME is provided, append its full path to CONF_FILE
+# If CONF_FILE_NAME is provided, add the full path in front of CONF_FILE
 if (DEFINED CONF_FILE_NAME)
-    set(CONF_FILE ${CONF_FILE} ${CHIP_ROOT}/examples/platform/nxp/config/${CONF_FILE_NAME})
+    set(CONF_FILE ${CHIP_ROOT}/examples/platform/nxp/config/${CONF_FILE_NAME} ${CONF_FILE})
 endif()
 
-# Add application prj.conf & Kconfig
-set(CONF_FILE ${CONF_FILE} ${CMAKE_CURRENT_SOURCE_DIR}/prj.conf)
+# Add application prj.conf in front of CONF_FILE
+set(CONF_FILE ${CMAKE_CURRENT_SOURCE_DIR}/prj.conf ${CONF_FILE})
 
 set(KCONFIG_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/Kconfig)
 
