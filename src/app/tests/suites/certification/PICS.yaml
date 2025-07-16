@@ -6610,6 +6610,12 @@ PICS:
     - label: "Supports setpoint presets"
       id: TSTAT.S.F08
 
+    # - label: "Supports events"
+    #   id: TSTAT.S.F09
+
+    - label: "Supports thermostat suggestions"
+      id: TSTAT.S.F0a
+
     #
     # server / manually
     #
