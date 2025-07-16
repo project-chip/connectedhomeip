@@ -25,7 +25,6 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EthernetNetworkDiagnostics;
 
-// for fixed endpoint, this file is ever only included IF ethernet diagnostics is enabled and that MUST happen only on endpoint 0
 // the static assert is skipped in case of dynamic endpoints.
 static_assert((EthernetNetworkDiagnostics::StaticApplicationConfig::kFixedClusterConfig.size() == 1 &&
                EthernetNetworkDiagnostics::StaticApplicationConfig::kFixedClusterConfig[0].endpointNumber == kRootEndpointId) ||
