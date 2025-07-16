@@ -10321,6 +10321,102 @@ PICS:
       id: WIFINM.S
 
     #
+    # Camera AV Stream Management Cluster
+    #
+    - label: " Does the device implement the MaxConcurrentEncoders attribute?"
+      id: AVSM.S.A0000
+    - label: " Does the device implement the MaxEncodedPixelRate attribute?"
+      id: AVSM.S.A0001
+    - label: " Does the device implement the VideoSensorParams attribute?"
+      id: AVSM.S.A0002
+    - label: " Does the device implement the NightVisionUsesInfrared attribute?"
+      id: AVSM.S.A0003
+    - label: " Does the device implement the MinViewport attribute?"
+      id: AVSM.S.A0004
+    - label:
+          " Does the device implement the RateDistortionTradeOffPoints
+          attribute?"
+      id: AVSM.S.A0005
+    - label: " Does the device implement the MaxContentBufferSize attribute?"
+      id: AVSM.S.A0006
+    - label: " Does the device implement the MicrophoneCapabilities attribute?"
+      id: AVSM.S.A0007
+    - label: " Does the device implement the SpeakerCapabilities attribute?"
+      id: AVSM.S.A0008
+    - label: " Does the device implement the TwoWayTalkSupport attribute?"
+      id: AVSM.S.A0009
+    - label: " Does the device implement the SnapshotCapabilities attribute?"
+      id: AVSM.S.A000A
+    - label: " Does the device implement the MaxNetworkBandwidth attribute?"
+      id: AVSM.S.A000B
+    - label: " Does the device implement the CurrentFrameRate attribute?"
+      id: AVSM.S.A000C
+    - label: " Does the device implement the HDRModeEnabled attribute?"
+      id: AVSM.S.A000D
+    - label: " Does the device implement the SupportedStreamUsages attribute?"
+      id: AVSM.S.A000E
+    - label: " Does the device implement the AllocatedVideoStreams attribute?"
+      id: AVSM.S.A000F
+    - label: " Does the device implement the AllocatedAudioStreams attribute?"
+      id: AVSM.S.A0010
+    - label:
+          " Does the device implement the AllocatedSnapshotStreams attribute?"
+      id: AVSM.S.A0011
+    - label: " Does the device implement the StreamUsagePriorities attribute?"
+      id: AVSM.S.A0012
+    - label:
+          " Does the device implement the SoftRecordingPrivacyModeEnabled
+          attribute?"
+      id: AVSM.S.A0013
+    - label:
+          " Does the device implement the SoftLivestreamPrivacyModeEnabled
+          attribute?"
+      id: AVSM.S.A0014
+    - label: " Does the device implement the HardPrivacyModeOn attribute?"
+      id: AVSM.S.A0015
+    - label: " Does the device implement the NightVision attribute?"
+      id: AVSM.S.A0016
+    - label: " Does the device implement the NightVisionIllum attribute?"
+      id: AVSM.S.A0017
+    - label: " Does the device implement the Viewport attribute?"
+      id: AVSM.S.A0018
+    - label: " Does the device implement the SpeakerMuted attribute?"
+      id: AVSM.S.A0019
+    - label: " Does the device implement the SpeakerVolumeLevel attribute?"
+      id: AVSM.S.A001A
+    - label: " Does the device implement the SpeakerMaxLevel attribute?"
+      id: AVSM.S.A001B
+    - label: " Does the device implement the SpeakerMinLevel attribute?"
+      id: AVSM.S.A001C
+    - label: " Does the device implement the MicrophoneMuted attribute?"
+      id: AVSM.S.A001D
+    - label: " Does the device implement the MicrophoneVolumeLevel attribute?"
+      id: AVSM.S.A001E
+    - label: " Does the device implement the MicrophoneMaxLevel attribute?"
+      id: AVSM.S.A001F
+    - label: " Does the device implement the MicrophoneMinLevel attribute?"
+      id: AVSM.S.A0020
+    - label: " Does the device implement the MicrophoneAGCEnabled attribute?"
+      id: AVSM.S.A0021
+    - label: " Does the device implement the ImageRotation attribute?"
+      id: AVSM.S.A0022
+    - label: " Does the device implement the ImageFlipHorizontal attribute?"
+      id: AVSM.S.A0023
+    - label: " Does the device implement the ImageFlipVertical attribute?"
+      id: AVSM.S.A0024
+    - label:
+          " Does the device implement the LocalVideoRecordingEnabled attribute?"
+      id: AVSM.S.A0025
+    - label:
+          " Does the device implement the LocalSnapshotRecordingEnabled
+          attribute?"
+      id: AVSM.S.A0026
+    - label: " Does the device implement the StatusLightEnabled attribute?"
+      id: AVSM.S.A0027
+    - label: " Does the device implement the StatusLightBrightnesss attribute?"
+      id: AVSM.S.A0028
+
+    #
     # Commodity Tariff Cluster
     #
     - label:
