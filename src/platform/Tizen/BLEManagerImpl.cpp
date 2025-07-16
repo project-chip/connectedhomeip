@@ -839,7 +839,12 @@ void BLEManagerImpl::RemoveConnection(const char * remoteAddr)
     NotifyBLEDisconnection(conn);
 
     mConnectionMap.erase(remoteAddr);
-    chip::Platform::Delete(conn);
+    // The BLE layer notification above is done asynchronously (it will be processed
+    // in the next event loop iteration). So, we can not delete the connection object
+    // immediately, because the BLE layer might still use it. Instead, we will also
+    // schedule the deletion of the connection object, so it will happen after the
+    // BLE layer has processed the disconnection event.
+    DeviceLayer::SystemLayer().ScheduleLambda([conn] { chip::Platform::Delete(conn); });
 }
 
 void BLEManagerImpl::HandleC1CharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
