@@ -121,6 +121,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::UnitTesting:
             return GlobalEnum::kMetadataEntry;
         case GlobalStruct::Id:
             return GlobalStruct::kMetadataEntry;
+        case UnsupportedAttributeRequiringAdminPrivilege::Id:
+            return UnsupportedAttributeRequiringAdminPrivilege::kMetadataEntry;
         case Unsupported::Id:
             return Unsupported::kMetadataEntry;
         case ReadFailureCode::Id:

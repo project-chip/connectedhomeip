@@ -47,6 +47,8 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::GeneralCommi
             return RecoveryIdentifier::kMetadataEntry;
         case NetworkRecoveryReason::Id:
             return NetworkRecoveryReason::kMetadataEntry;
+        case IsCommissioningWithoutPower::Id:
+            return IsCommissioningWithoutPower::kMetadataEntry;
         default:
             return std::nullopt;
         }
