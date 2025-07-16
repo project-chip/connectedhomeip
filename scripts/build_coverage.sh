@@ -18,7 +18,7 @@
 
 function trim_whitespace()
 {
-    local OLD_SHOPT_EXTGLOB=$(shopt -p extglob)
+    local OLD_SHOPT_EXTGLOB="$(shopt -p extglob)"
     shopt -s extglob
 
     while IFS= read -r line; do # For every line in stdin
@@ -55,7 +55,7 @@ function parse_input_targets()
 function dowithlastpipe()
 {
     # Save the current lastpipe and monitor settings
-    local original_lastpipe_setting=$(shopt -p lastpipe)
+    local original_lastpipe_setting="$(shopt -p lastpipe)"
     local original_monitor_setting
     if [[ "$-" == *m* ]]; then
         original_monitor_setting="set -m"
