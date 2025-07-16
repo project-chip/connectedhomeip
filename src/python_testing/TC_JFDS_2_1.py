@@ -189,7 +189,7 @@ class TC_JFDS_2_1(MatterBaseTest):
             returnClusterObject=True)
         asserts.assert_greater_equal(response[1][Clusters.JointFabricDatastore].anchorVendorID, 0)
 
-        # Shutdown the Python Controllers start at the begining
+        # Shutdown the Python Controllers started at the beginning of this script
         devCtrlEcoA.Shutdown()
 
 

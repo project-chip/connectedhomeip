@@ -366,7 +366,7 @@ class TC_JCM_1_2(MatterBaseTest):
         asserts.assert_true(_admin_cat_found, "Administrator CAT not found in Admin App NOC on Ecosystem B")
         asserts.assert_true(_anchor_cat_found, "Anchor CAT not found in Admin App NOC on Ecosystem B")
 
-        # Shutdown the Python Controllers start at the begining
+        # Shutdown the Python Controllers started at the beginning of this script
         devCtrlEcoB.Shutdown()
 
 

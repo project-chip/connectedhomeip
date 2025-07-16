@@ -184,7 +184,7 @@ class TC_JFADMIN_2_1(MatterBaseTest):
         asserts.assert_equal(attributeAdminFabricIndex,
                              response[0][Clusters.OperationalCredentials].fabrics[0].fabricIndex, "AdministratorFabricIndex != fabricIndex")
 
-        # Shutdown the Python Controllers start at the begining
+        # Shutdown the Python Controllers started at the beginning of this script
         devCtrlEcoA.Shutdown()
 
 
