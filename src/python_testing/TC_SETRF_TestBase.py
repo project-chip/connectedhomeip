@@ -174,6 +174,7 @@ class CommodityTariffTestBaseHelper:
                 await self.checkTariffPriceStruct(endpoint=endpoint, cluster=cluster, struct=struct.price)
         else:
             asserts.assert_is_none(struct.price, "Price must be None")
+
         if self.check_pics("SETRF.S.F01"):
             matter_asserts.assert_valid_bool(struct.friendlyCredit, 'FriendlyCredit')
         else:
