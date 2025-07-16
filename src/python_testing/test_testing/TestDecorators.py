@@ -33,7 +33,7 @@ import chip.clusters as Clusters
 from chip.clusters import Attribute
 from chip.testing.matter_test_config import MatterTestConfig
 from chip.testing.matter_testing import (MatterBaseTest, has_attribute, has_cluster,
-                                         has_feature, should_run_test_on_endpoint)
+                                         has_feature)
 from chip.testing.runner import MockTestRunner
 from mobly import asserts
 from chip.testing import decorators
@@ -133,19 +133,19 @@ class TestDecorators(MatterBaseTest):
         msg = "Unexpected evaluation of should_run_test_on_endpoint"
         for e in all_endpoints:
             self.matter_test_config.endpoint = e
-            should_run = await should_run_test_on_endpoint(self, has_onoff)
+            should_run = await decorators.should_run_test_on_endpoint(self, has_onoff)
             asserts.assert_true(should_run, msg)
 
-            should_run = await should_run_test_on_endpoint(self, has_onoff_onoff)
+            should_run = await decorators.should_run_test_on_endpoint(self, has_onoff_onoff)
             asserts.assert_true(should_run, msg)
 
-            should_run = await should_run_test_on_endpoint(self, has_onoff_ontime)
+            should_run = await decorators.should_run_test_on_endpoint(self, has_onoff_ontime)
             asserts.assert_false(should_run, msg)
 
-            should_run = await should_run_test_on_endpoint(self, has_timesync)
+            should_run = await decorators.should_run_test_on_endpoint(self, has_timesync)
             asserts.assert_false(should_run, msg)
 
-            should_run = await should_run_test_on_endpoint(self, has_timesync_utc)
+            should_run = await decorators.should_run_test_on_endpoint(self, has_timesync_utc)
             asserts.assert_false(should_run, msg)
 
     # This test should be run once per endpoint
