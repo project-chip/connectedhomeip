@@ -84,8 +84,10 @@ CHIP_ERROR TlsCertificateManagementServer::Finish()
 }
 
 // AttributeAccessInterface
-CHIP_ERROR TlsCertificateManagementServer::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR TlsCertificateManagementServer::Read(const DataModel::ReadAttributeRequest & aRequest, AttributeValueEncoder & aEncoder)
 {
+    const auto & aPath = aRequest.path;
+    bool largePayload  = aRequest.readFlags.Has(DataModel::ReadFlags::kAllowsLargePayload);
     VerifyOrDie(aPath.mClusterId == TlsCertificateManagement::Id);
 
     switch (aPath.mAttributeId)
@@ -95,8 +97,8 @@ CHIP_ERROR TlsCertificateManagementServer::Read(const ConcreteReadAttributePath 
     case ProvisionedRootCertificates::Id: {
         auto matterEndpoint = aPath.mEndpointId;
         auto fabric         = aEncoder.AccessingFabricIndex();
-        return aEncoder.EncodeList([this, matterEndpoint, fabric](const auto & encoder) -> CHIP_ERROR {
-            return EncodeProvisionedRootCertificates(matterEndpoint, fabric, encoder);
+        return aEncoder.EncodeList([this, matterEndpoint, fabric, largePayload](const auto & encoder) -> CHIP_ERROR {
+            return EncodeProvisionedRootCertificates(matterEndpoint, fabric, largePayload, encoder);
         });
     }
     case MaxClientCertificates::Id:
@@ -104,8 +106,8 @@ CHIP_ERROR TlsCertificateManagementServer::Read(const ConcreteReadAttributePath 
     case ProvisionedClientCertificates::Id: {
         auto matterEndpoint = aPath.mEndpointId;
         auto fabric         = aEncoder.AccessingFabricIndex();
-        return aEncoder.EncodeList([this, matterEndpoint, fabric](const auto & encoder) -> CHIP_ERROR {
-            return EncodeProvisionedClientCertificates(matterEndpoint, fabric, encoder);
+        return aEncoder.EncodeList([this, matterEndpoint, fabric, largePayload](const auto & encoder) -> CHIP_ERROR {
+            return EncodeProvisionedClientCertificates(matterEndpoint, fabric, largePayload, encoder);
         });
     }
     case ClusterRevision::Id:
@@ -116,10 +118,16 @@ CHIP_ERROR TlsCertificateManagementServer::Read(const ConcreteReadAttributePath 
 }
 
 CHIP_ERROR
-TlsCertificateManagementServer::EncodeProvisionedRootCertificates(EndpointId matterEndpoint, FabricIndex fabric,
+TlsCertificateManagementServer::EncodeProvisionedRootCertificates(EndpointId matterEndpoint, FabricIndex fabric, bool largePayload,
                                                                   const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
-    return mDelegate.LoadedRootCerts(matterEndpoint, fabric, [&encoder](auto & cert) -> CHIP_ERROR {
+    return mDelegate.LoadedRootCerts(matterEndpoint, fabric, [&](auto & cert) -> CHIP_ERROR {
+        if (largePayload)
+        {
+            return encoder.Encode(cert);
+        }
+
+        // Drop the certificate payload if transport doesn't support large payload
         TLSCertStruct::Type idOnlyCert;
         idOnlyCert.fabricIndex = cert.fabricIndex;
         idOnlyCert.caid        = cert.caid;
@@ -129,9 +137,16 @@ TlsCertificateManagementServer::EncodeProvisionedRootCertificates(EndpointId mat
 
 CHIP_ERROR
 TlsCertificateManagementServer::EncodeProvisionedClientCertificates(EndpointId matterEndpoint, FabricIndex fabric,
+                                                                    bool largePayload,
                                                                     const AttributeValueEncoder::ListEncodeHelper & encoder)
 {
     return mDelegate.LoadedClientCerts(matterEndpoint, fabric, [&](auto & cert) -> CHIP_ERROR {
+        if (largePayload)
+        {
+            return encoder.Encode(cert);
+        }
+
+        // Drop the certificate payload if transport doesn't support large payload
         TLSClientCertificateDetailStruct::Type idOnlyCert;
         idOnlyCert.fabricIndex = cert.fabricIndex;
         idOnlyCert.ccdid       = cert.ccdid;

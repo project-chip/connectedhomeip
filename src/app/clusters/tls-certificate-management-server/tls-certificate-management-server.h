@@ -90,7 +90,13 @@ private:
     uint8_t mMaxClientCertificates;
 
     // AttributeAccessInterface
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override
+    {
+        ChipLogError(NotSpecified, "DataModel::ReadAttributeRequest overload should be called");
+        chipAbort();
+    }
+
+    CHIP_ERROR Read(const DataModel::ReadAttributeRequest & aRequest, AttributeValueEncoder & aEncoder) override;
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
@@ -115,10 +121,10 @@ private:
                                        const TlsCertificateManagement::Commands::RemoveClientCertificate::DecodableType & req);
 
     // Encodes all provisioned root certificates
-    CHIP_ERROR EncodeProvisionedRootCertificates(EndpointId matterEndpoint, FabricIndex fabric,
+    CHIP_ERROR EncodeProvisionedRootCertificates(EndpointId matterEndpoint, FabricIndex fabric, bool largePayload,
                                                  const AttributeValueEncoder::ListEncodeHelper & encoder);
     // Encodes all provisioned client certificates
-    CHIP_ERROR EncodeProvisionedClientCertificates(EndpointId matterEndpoint, FabricIndex fabric,
+    CHIP_ERROR EncodeProvisionedClientCertificates(EndpointId matterEndpoint, FabricIndex fabric, bool largePayload,
                                                    const AttributeValueEncoder::ListEncodeHelper & encoder);
 };
 
