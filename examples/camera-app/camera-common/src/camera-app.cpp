@@ -16,7 +16,8 @@
  *    limitations under the License.
  */
 #include "camera-app.h"
-// #include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
+// TODO : Below code is dependent on #37787
+#include <app/clusters/push-av-stream-transport-server/CodegenIntegration.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -44,11 +45,9 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
     mWebRTCTransportProviderPtr =
         std::make_unique<WebRTCTransportProviderServer>(mCameraDevice->GetWebRTCProviderDelegate(), mEndpoint);
 
-    /*
-        TODO: This code is commented out as #37787 is not merged
-        BitFlags<PushAvStreamTransport::Feature> pavFeatures;
-        Clusters::PushAvStreamTransport::SetDelegate(mEndpoint, &(mCameraDevice->GetPushAVDelegate()));
-    */
+    // TODO : Below code is dependent on #37787
+    BitFlags<PushAvStreamTransport::Feature> pavFeatures;
+    Clusters::PushAvStreamTransport::SetDelegate(mEndpoint, &(mCameraDevice->GetPushAVDelegate()));
 
     // Fetch all initialization parameters for CameraAVStreamMgmt Server
     BitFlags<CameraAvStreamManagement::Feature> avsmFeatures;
