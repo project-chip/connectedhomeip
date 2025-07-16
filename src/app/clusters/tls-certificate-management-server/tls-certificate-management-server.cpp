@@ -139,18 +139,6 @@ TlsCertificateManagementServer::EncodeProvisionedClientCertificates(EndpointId m
     });
 }
 
-CHIP_ERROR TlsCertificateManagementServer::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
-{
-    VerifyOrDie(aPath.mClusterId == TlsCertificateManagement::Id);
-
-    switch (aPath.mAttributeId)
-    {
-    default:
-        // Unknown attribute
-        return CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute);
-    }
-}
-
 void TlsCertificateManagementServer::InvokeCommand(HandlerContext & ctx)
 {
     switch (ctx.mRequestPath.mCommandId)

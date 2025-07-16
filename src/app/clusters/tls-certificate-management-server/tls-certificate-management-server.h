@@ -53,7 +53,7 @@ public:
     ~TlsCertificateManagementServer();
 
     /**
-     * Initialise the TLS Certificate Management server instance.
+     * Initializes the TLS Certificate Management server instance.
      * @return Returns an error  if the CommandHandler or AttributeHandler registration fails.
      */
     CHIP_ERROR Init();
@@ -91,7 +91,6 @@ private:
 
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
