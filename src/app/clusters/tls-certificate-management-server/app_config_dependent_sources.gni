@@ -13,7 +13,4 @@
 # limitations under the License.
 import("//build_overrides/chip.gni")
 
-app_config_dependent_sources = [
-  "tls-certificate-management-server.cpp",
-  "tls-certificate-management-server.h",
-]
+app_config_dependent_sources = []

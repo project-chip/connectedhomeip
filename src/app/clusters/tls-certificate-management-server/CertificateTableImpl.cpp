@@ -32,28 +32,6 @@ using ClientSerializer = DefaultSerializer<CertificateId, CertificateTable::Clie
 
 typedef uint8_t IntermediateCertIndex;
 
-namespace chip {
-namespace app {
-namespace DataModel {
-CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag aTag, const CertificateTable::ClientCertStruct & data)
-{
-    // TLSClientCertificateDetailStruct has an array, doesn't implement Encode; copy-pasted here
-    // from TLSClientCertificateDetailStruct::Type::Encode
-
-    using chip::app::Clusters::TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::Fields;
-    TLV::TLVType container;
-    ReturnErrorOnFailure(writer.StartContainer(aTag, TLV::kTLVType_Structure, container));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kCcdid), data.ccdid));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kClientCertificate), data.clientCertificate));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(Fields::kIntermediateCertificates), data.intermediateCertificates));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kFabricIndex), data.fabricIndex));
-    return writer.EndContainer(container);
-}
-} // namespace DataModel
-} // namespace app
-} // namespace chip
-
 namespace {
 /// @brief Tags Used to serialize certificates so they can be stored in flash memory;
 /// the field IDs from TlsCertificateManagement::Structs are generally used directly
@@ -489,7 +467,20 @@ CHIP_ERROR ClientSerializer::DeserializeId(TLV::TLVReader & reader, CertificateI
 template <>
 CHIP_ERROR ClientSerializer::SerializeData(TLV::TLVWriter & writer, const CertificateTable::ClientCertWithKey & data)
 {
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(TagCertificate::kClientCertDetail), data.detail));
+    // TLSClientCertificateDetailStruct has an array, doesn't implement Encode; copy-pasted here
+    // from TLSClientCertificateDetailStruct::Type::Encode
+    using chip::app::Clusters::TlsCertificateManagement::Structs::TLSClientCertificateDetailStruct::Fields;
+    TLV::TLVType container;
+    const auto & detail = data.detail;
+    ReturnErrorOnFailure(
+        writer.StartContainer(TLV::ContextTag(TagCertificate::kClientCertDetail), TLV::kTLVType_Structure, container));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kCcdid), detail.ccdid));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kClientCertificate), detail.clientCertificate));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(Fields::kIntermediateCertificates), detail.intermediateCertificates));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(Fields::kFabricIndex), detail.fabricIndex));
+    ReturnErrorOnFailure(writer.EndContainer(container));
+
     return DataModel::Encode(writer, TLV::ContextTag(TagCertificate::kCertificatePayload), data.key.Span());
 }
 
