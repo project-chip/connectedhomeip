@@ -20,8 +20,8 @@
 
 #include "camera-device-interface.h"
 #include "pushav-clip-recorder.h"
-#include "pushav-uploader.h"
 #include "transport.h"
+#include "uploader/pushav-uploader.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-enums.h>
@@ -62,6 +62,9 @@ public:
     bool IsStreaming();
 
     bool GetBusyStatus();
+
+    uint16_t GetPreRollLength();
+
     // Set Transport status
     void setTransportStatus(TransportStatusEnum status);
 
