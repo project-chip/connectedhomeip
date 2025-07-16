@@ -1,7 +1,8 @@
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_attribute, has_cluster, run_if_endpoint_matches)
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main,
+                                         has_attribute, has_cluster, run_if_endpoint_matches)
 from mobly import asserts
 from chip.testing import decorators
 #
@@ -37,7 +38,6 @@ from chip.testing import decorators
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
-
 
 
 class TC_LUNIT_3_1(MatterBaseTest):
@@ -83,7 +83,7 @@ class TC_LUNIT_3_1(MatterBaseTest):
         ]
         return pics
 
-    @run_if_endpoint_matches(has_cluster(Clusters.UnitLocalization) and has_attribute(Clusters.UnitLocalization.Attributes.TemperatureUnit))
+    @decorators.run_if_endpoint_matches(has_cluster(Clusters.UnitLocalization) and has_attribute(Clusters.UnitLocalization.Attributes.TemperatureUnit))
     async def test_TC_LUNIT_3_1(self):
 
         endpoint = self.get_endpoint(default=0)

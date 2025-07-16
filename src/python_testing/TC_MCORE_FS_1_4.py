@@ -71,9 +71,9 @@ from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
 from chip.testing.apps import AppServerSubprocess
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, matchers
+from chip.testing import decorators
 from chip.testing.tasks import Subprocess
 from mobly import asserts
-from chip.testing import decorators
 
 
 class FabricSyncApp(Subprocess):

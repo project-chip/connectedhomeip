@@ -3,7 +3,8 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters.Types import Nullable, NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches, matchers)
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main,
+                                         has_cluster, run_if_endpoint_matches, matchers)
 from chip.tlv import uint
 from mobly import asserts
 from chip.testing import decorators
@@ -44,7 +45,6 @@ from chip.testing import decorators
 # === END CI TEST ARGUMENTS ===
 
 
-
 class TC_TLSCLIENT_1_1(MatterBaseTest):
     def desc_TC_TLSCLIENT_1_1(self) -> str:
         return "[TC-TLSCLIENT-1.1] Primary functionality with DUT as Server"
@@ -70,7 +70,7 @@ class TC_TLSCLIENT_1_1(MatterBaseTest):
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
             return e
 
-    @run_if_endpoint_matches(has_cluster(Clusters.TlsClientManagement))
+    @decorators.run_if_endpoint_matches(has_cluster(Clusters.TlsClientManagement))
     async def test_TC_TLSCLIENT_1_1(self):
 
         endpoint = self.get_endpoint(default=1)

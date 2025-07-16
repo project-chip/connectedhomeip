@@ -4,7 +4,7 @@ from typing import Any
 import chip.clusters as Clusters
 from chip.interaction_model import Status
 from chip.testing.matter_asserts import assert_valid_map8
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature
 from mobly import asserts
 from chip.testing import decorators
 #
@@ -43,7 +43,6 @@ from chip.testing import decorators
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
-
 
 
 logger = logging.getLogger(__name__)
@@ -102,7 +101,7 @@ class TC_FAN_2_4(MatterBaseTest):
     def pics_TC_FAN_2_4(self) -> list[str]:
         return ["FAN.S.F03"]
 
-    @run_if_endpoint_matches(has_feature(Clusters.FanControl, Clusters.FanControl.Bitmaps.Feature.kWind))
+    @decorators.run_if_endpoint_matches(has_feature(Clusters.FanControl, Clusters.FanControl.Bitmaps.Feature.kWind))
     async def test_TC_FAN_2_4(self):
         # Setup
         self.endpoint = self.get_endpoint(default=1)

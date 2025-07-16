@@ -3,7 +3,7 @@ import chip.clusters as Clusters
 import test_plan_support
 from chip.clusters.Types import NullValue
 from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature
 from mobly import asserts
 from chip.testing import decorators
 #
@@ -22,7 +22,6 @@ from chip.testing import decorators
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
 
 
 logger = logging.getLogger(__name__)
@@ -73,8 +72,8 @@ class TC_CNET_4_1(MatterBaseTest):
         ]
         return steps
 
-    @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning,
-                                         Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
+    @decorators.run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning,
+                                                    Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_1(self):
 
         self.step(0)

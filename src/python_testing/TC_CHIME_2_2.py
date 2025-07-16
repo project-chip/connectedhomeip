@@ -1,5 +1,5 @@
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster
 from mobly import asserts
 from TC_CHIMETestBase import CHIMETestBase
 from chip.testing import decorators
@@ -41,7 +41,6 @@ from chip.testing import decorators
 # === END CI TEST ARGUMENTS ===
 
 
-
 class TC_CHIME_2_2(MatterBaseTest, CHIMETestBase):
 
     def desc_TC_CHIME_2_2(self) -> str:
@@ -62,7 +61,7 @@ class TC_CHIME_2_2(MatterBaseTest, CHIMETestBase):
         ]
         return pics
 
-    @run_if_endpoint_matches(has_cluster(Clusters.Chime))
+    @decorators.run_if_endpoint_matches(has_cluster(Clusters.Chime))
     async def test_TC_CHIME_2_2(self):
         cluster = Clusters.Objects.Chime
         attributes = cluster.Attributes

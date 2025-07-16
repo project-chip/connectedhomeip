@@ -4,7 +4,7 @@ import chip.clusters as Clusters
 import test_plan_support
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster
 from mobly import asserts
 from chip.testing import decorators
 #
@@ -45,8 +45,6 @@ from chip.testing import decorators
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
-
-
 
 
 class TC_I_2_4(MatterBaseTest):
@@ -114,7 +112,7 @@ class TC_I_2_4(MatterBaseTest):
         ]
         return pics
 
-    @run_if_endpoint_matches(has_cluster(Clusters.Identify))
+    @decorators.run_if_endpoint_matches(has_cluster(Clusters.Identify))
     async def test_TC_I_2_4(self):
         endpoint = self.get_endpoint(default=1)
 

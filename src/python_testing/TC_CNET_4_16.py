@@ -1,6 +1,6 @@
 import logging
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature
 from matter_testing_infrastructure.chip.testing.matter_asserts import assert_valid_uint8
 from mobly import asserts
 from chip.testing import decorators
@@ -22,7 +22,6 @@ from chip.testing import decorators
 #
 
 
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
@@ -41,7 +40,7 @@ class TC_CNET_4_16(MatterBaseTest):
     def desc_TC_CNET_4_16(self):
         return '[TC-CNET-4.16] [Thread] NetworkIDNotFound returned in LastNetworkingStatus field validation [DUT-Server]'
 
-    @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
+    @decorators.run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
     async def test_TC_CNET_4_16(self):
 
         cnet = Clusters.NetworkCommissioning

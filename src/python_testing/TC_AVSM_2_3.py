@@ -1,7 +1,7 @@
 import logging
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature
 from mobly import asserts
 from TC_AVSMTestBase import AVSMTestBase
 from chip.testing import decorators
@@ -41,7 +41,6 @@ from chip.testing import decorators
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
-
 
 
 logger = logging.getLogger(__name__)
@@ -84,7 +83,7 @@ class TC_AVSM_2_3(MatterBaseTest, AVSMTestBase):
             ),
         ]
 
-    @run_if_endpoint_matches(
+    @decorators.run_if_endpoint_matches(
         has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kSnapshot)
         and (
             has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kWatermark)

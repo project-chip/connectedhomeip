@@ -10,7 +10,8 @@ import chip.clusters as Clusters
 import nest_asyncio
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, default_matter_test_main, has_command, run_if_endpoint_matches)
+from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest,
+                                         TestStep, default_matter_test_main, has_command, run_if_endpoint_matches)
 from chip.testing.pics import accepted_cmd_pics_str
 from chip.tlv import TLVReader
 from chip.utils import CommissioningBuildingBlocks
@@ -55,7 +56,6 @@ from chip.testing import decorators
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
-
 
 
 nest_asyncio.apply()
@@ -362,7 +362,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
     def pics_TC_OPCREDS_3_8(self) -> list[str]:
         return [accepted_cmd_pics_str('OPCREDS', Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement.command_id)]
 
-    @run_if_endpoint_matches(has_command(Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement))
+    @decorators.run_if_endpoint_matches(has_command(Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement))
     async def test_TC_OPCREDS_3_8(self):
         # TODO(test_plans#5046): actually make the test follow final test plan. For now
         # it functionally validates the VID Verification parts of Operational Credentials Cluster

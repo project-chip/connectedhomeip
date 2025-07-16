@@ -6,7 +6,8 @@ from time import sleep
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_cluster, has_feature, run_if_endpoint_matches)
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main,
+                                         has_cluster, has_feature, run_if_endpoint_matches)
 from chip.tlv import TLVReader
 from mobly import asserts
 from support_modules.cadmin_support import CADMINSupport
@@ -56,7 +57,6 @@ from chip.testing import decorators
 #     factory-reset: false
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
-
 
 
 opcreds = Clusters.OperationalCredentials
@@ -304,11 +304,11 @@ class TC_CADMIN(MatterBaseTest):
                      "TH_CR1 removes TH_CR2 fabric using th2_idx")
         ]
 
-    @run_if_endpoint_matches(has_cluster(Clusters.AdministratorCommissioning))
+    @decorators.run_if_endpoint_matches(has_cluster(Clusters.AdministratorCommissioning))
     async def test_TC_CADMIN_1_3(self):
         await self.combined_commission_val_steps(commission_type="ECM")
 
-    @run_if_endpoint_matches(has_feature(cluster=Clusters.AdministratorCommissioning, feature=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic))
+    @decorators.run_if_endpoint_matches(has_feature(cluster=Clusters.AdministratorCommissioning, feature=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic))
     async def test_TC_CADMIN_1_4(self):
         await self.combined_commission_val_steps(commission_type="BCM")
 

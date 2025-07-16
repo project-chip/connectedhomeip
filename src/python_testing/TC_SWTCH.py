@@ -7,7 +7,8 @@ import test_plan_support
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Attribute import EventReadResult
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from chip.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches)
+from chip.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep,
+                                         default_matter_test_main, has_feature, run_if_endpoint_matches)
 from chip.tlv import uint
 from mobly import asserts
 from chip.testing import decorators
@@ -89,7 +90,6 @@ from chip.testing import decorators
 # === END CI TEST ARGUMENTS ===
 #
 # These tests run on every endpoint regardless of whether a switch is present because they are set up to auto-select.
-
 
 
 logger = logging.getLogger(__name__)
@@ -313,7 +313,7 @@ class TC_SwitchTests(MatterBaseTest):
                          "Verify that the value is 0, and that a subscription report was received for that change."),
                 ]
 
-    @run_if_endpoint_matches(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kLatchingSwitch))
+    @decorators.run_if_endpoint_matches(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kLatchingSwitch))
     async def test_TC_SWTCH_2_2(self):
         post_prompt_settle_delay_seconds = 10.0
         cluster = Clusters.Switch
@@ -423,7 +423,7 @@ class TC_SwitchTests(MatterBaseTest):
                 TestStep(9, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0"),
                 ]
 
-    @run_if_endpoint_matches(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
+    @decorators.run_if_endpoint_matches(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
     async def test_TC_SWTCH_2_3(self):
         # Commissioning - already done
         self.step(1)
@@ -501,7 +501,7 @@ class TC_SwitchTests(MatterBaseTest):
                 """)
                 ]
 
-    @run_if_endpoint_matches(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
+    @decorators.run_if_endpoint_matches(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
     async def test_TC_SWTCH_2_4(self):
         switch_pressed_position = self._default_pressed_position
         post_prompt_settle_delay_seconds = 10.0
@@ -676,7 +676,7 @@ class TC_SwitchTests(MatterBaseTest):
         asf = has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kActionSwitch)
         return msm(wildcard, endpoint) and not asf(wildcard, endpoint)
 
-    @run_if_endpoint_matches(should_run_SWTCH_2_5)
+    @decorators.run_if_endpoint_matches(should_run_SWTCH_2_5)
     async def test_TC_SWTCH_2_5(self):
         # Commissioning - already done
         self.step(1)
@@ -855,7 +855,7 @@ class TC_SwitchTests(MatterBaseTest):
         asf = has_feature(Clusters.Switch, 0x20)
         return msm(wildcard, endpoint) and asf(wildcard, endpoint)
 
-    @run_if_endpoint_matches(should_run_SWTCH_2_6)
+    @decorators.run_if_endpoint_matches(should_run_SWTCH_2_6)
     async def test_TC_SWTCH_2_6(self):
         # Commissioning - already done
         self.step(1)

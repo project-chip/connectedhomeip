@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature
 from mobly import asserts
 from chip.testing import decorators
 #
@@ -24,7 +24,6 @@ from chip.testing import decorators
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md#defining-the-ci-test-arguments
 # for details about the block below.
 # N/A - Test will not run on CI
-
 
 
 logger = logging.getLogger(__name__)
@@ -216,7 +215,7 @@ class TC_CNET_4_12(MatterBaseTest):
         ]
         return steps
 
-    @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
+    @decorators.run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
     async def test_TC_CNET_4_12(self):
 
         # Pre-Conditions

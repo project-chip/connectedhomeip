@@ -3,7 +3,8 @@ import chip.clusters as Clusters
 import test_plan_support
 from chip.clusters.Types import NullValue
 from chip.testing.matter_asserts import is_valid_bool_value
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches, matchers)
+from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main,
+                                         has_feature, run_if_endpoint_matches, matchers)
 from mobly import asserts
 from chip.testing import decorators
 #
@@ -22,8 +23,6 @@ from chip.testing import decorators
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
-
 
 
 class TC_CNET_4_9(MatterBaseTest):
@@ -102,7 +101,7 @@ class TC_CNET_4_9(MatterBaseTest):
     def pics_TC_CNET_4_9(self):
         return ['CNET.S']
 
-    @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
+    @decorators.run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_9(self):
         ssid = self.get_wifi_ssid()
         credentials = self.get_credentials()

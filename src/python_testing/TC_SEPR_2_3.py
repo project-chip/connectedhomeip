@@ -1,7 +1,7 @@
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature
 from mobly import asserts
 from TC_SEPRTestBase import CommodityPriceTestBaseHelper
 from chip.testing import decorators
@@ -48,7 +48,6 @@ from chip.testing import decorators
 # === END CI TEST ARGUMENTS ===
 
 """Define Matter test case TC_SEPR_2_3."""
-
 
 
 cluster = Clusters.CommodityPrice
@@ -136,7 +135,7 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
 
         return steps
 
-    @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kForecasting))
+    @decorators.run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kForecasting))
     async def test_TC_SEPR_2_3(self):
         """Run the test steps."""
         endpoint = self.get_endpoint()

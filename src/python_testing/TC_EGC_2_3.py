@@ -1,5 +1,5 @@
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature
 from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
 from chip.testing import decorators
 #
@@ -74,7 +74,7 @@ class TC_EGC_2_3(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
         ]
         return steps
 
-    @run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kForecasting))
+    @decorators.run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kForecasting))
     async def test_TC_EGC_2_3(self):
         endpoint = self.get_endpoint()
         attributes = cluster.Attributes

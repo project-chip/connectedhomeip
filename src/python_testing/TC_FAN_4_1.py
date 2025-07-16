@@ -4,7 +4,8 @@ from typing import Optional
 import chip.clusters as Clusters
 from chip.interaction_model import Status
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches)
+from chip.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep,
+                                         default_matter_test_main, has_cluster, run_if_endpoint_matches)
 from mobly import asserts
 from chip.testing import decorators
 #
@@ -44,8 +45,6 @@ from chip.testing import decorators
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
-
-
 
 
 class TC_FAN_4_1(MatterBaseTest):
@@ -142,7 +141,7 @@ class TC_FAN_4_1(MatterBaseTest):
     def pics_TC_FAN_4_1(self) -> list[str]:
         return ["FAN.S", "OO.S"]
 
-    @run_if_endpoint_matches(has_cluster(Clusters.FanControl) and has_cluster(Clusters.OnOff))
+    @decorators.run_if_endpoint_matches(has_cluster(Clusters.FanControl) and has_cluster(Clusters.OnOff))
     async def test_TC_FAN_4_1(self):
         self.step(1)
         fan = Clusters.FanControl

@@ -163,7 +163,7 @@ class TC_CNET_4_10(MatterBaseTest):
             TestStep(20, "(Cleanup) TH adds the Thread network back to the DUT.")
         ]
 
-    @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
+    @decorators.run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
     async def test_TC_CNET_4_10(self):
         # Commissioning is already done
         self.step(1)
