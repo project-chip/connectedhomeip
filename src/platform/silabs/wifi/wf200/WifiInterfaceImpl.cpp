@@ -731,7 +731,8 @@ CHIP_ERROR WifiInterfaceImpl::GetAccessPointInfo(wfx_wifi_scan_result_t & info)
 CHIP_ERROR WifiInterfaceImpl::GetAccessPointExtendedInfo(wfx_wifi_scan_ext_t & info)
 {
     sl_status_t status = get_all_counters();
-    VerifyOrReturnError(status == SL_STATUS_OK, MATTER_PLATFORM_ERROR(status), ChipLogError(DeviceLayer, "Failed to get the couters : %ld", status));
+    VerifyOrReturnError(status == SL_STATUS_OK, MATTER_PLATFORM_ERROR(status),
+                        ChipLogError(DeviceLayer, "Failed to get the couters : %ld", status));
 
     info.beacon_lost_count = counters->body.count_miss_beacon;
     info.beacon_rx_count   = counters->body.count_rx_beacon;
@@ -821,8 +822,8 @@ CHIP_ERROR WifiInterfaceImpl::ConnectToAccessPoint(void)
     }
 
     sl_status_t status = sl_wfx_send_join_command(wifi_provision.ssid, wifi_provision.ssidLength, NULL, CHANNEL_0,
-                                                 connect_security_mode, PREVENT_ROAMING, DISABLE_PMF_MODE, wifi_provision.passkey,
-                                                 wifi_provision.passkeyLength, NULL, IE_DATA_LENGTH);
+                                                  connect_security_mode, PREVENT_ROAMING, DISABLE_PMF_MODE, wifi_provision.passkey,
+                                                  wifi_provision.passkeyLength, NULL, IE_DATA_LENGTH);
     VerifyOrReturnError(status == SL_STATUS_OK, MATTER_PLATFORM_ERROR(status));
 
     return CHIP_NO_ERROR;
