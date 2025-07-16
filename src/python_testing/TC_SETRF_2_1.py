@@ -165,7 +165,7 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
                      - Verify that Threshold field it is null or has type uint32;
                      - Verify that if Label field is presented it is null or has type string and max length is 128.
                      - Verify that if Predicted field is presented it has type bool;
-                     - Verify that does not contain Currency field if SETRF.S.F00(PRICE) is False;
+                     - Verify that entry does not contain Currency field if SETRF.S.F00(PRICE) is False;
                      - If SETRF.S.F00(PRICE) is True and if Currency field is presented it is null or has type currency;
                      - If SETRF.S.F00(PRICE) is True and if Currency field is presented and it is not null then Currency field of Currency struct has type uint16;
                      - If SETRF.S.F00(PRICE) is True and if Currency field is presented and it is not null then DecimalPoints field of Currency struct has type uint8;
