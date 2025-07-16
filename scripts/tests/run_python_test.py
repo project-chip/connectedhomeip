@@ -313,7 +313,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             if restart_monitor_thread and restart_monitor_thread.is_alive():
                 logging.info("Stopping app restart monitor thread")
                 restart_monitor_thread.join(2.0)
-        
+
         # Get the current app manager if it exists
         current_app_manager = None
         if app_manager_ref:
