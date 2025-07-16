@@ -212,7 +212,8 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
 
     for run in runs:
         logging.info("Executing %s %s", run.py_script_path.split('/')[-1], run.run)
-        main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern, run.app_stdin_pipe, run.py_script_path,run.script_args or "", run.script_gdb, run.reboot_dut, run.quiet)
+        main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
+                  run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, run.reboot_dut, run.quiet)
 
 
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,

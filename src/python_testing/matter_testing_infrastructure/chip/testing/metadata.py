@@ -35,6 +35,7 @@ class Metadata:
     quiet: bool = False
     reboot_dut: bool = False
 
+
 class NamedStringIO(StringIO):
     def __init__(self, content, name):
         super().__init__(content)
