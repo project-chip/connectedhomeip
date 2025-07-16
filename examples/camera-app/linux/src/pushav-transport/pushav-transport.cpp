@@ -20,8 +20,7 @@
 
 PushAVTransport::PushAVTransport(const TransportOptionsStruct & transportOptions, const uint16_t connectionID,
                                  AudioStreamStruct aAudioStreamParams, VideoStreamStruct aVideoStreamParams) :
-    audioStreamParams(aAudioStreamParams),
-    videoStreamParams(aVideoStreamParams)
+    audioStreamParams(aAudioStreamParams), videoStreamParams(aVideoStreamParams)
 {
     ConfigureRecorderSettings(transportOptions, audioStreamParams, videoStreamParams);
     mConnectionID    = connectionID;
@@ -93,7 +92,14 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
     {
         clipInfo.mUrl         = transportOptions.url.data();
         clipInfo.mTriggerType = static_cast<int>(transportOptions.triggerOptions.triggerType);
-
+        if (transportOptions.triggerOptions.maxPreRollLen.HasValue())
+        {
+            clipInfo.mPreRollLength = transportOptions.triggerOptions.maxPreRollLen.Value();
+        }
+        else
+        {
+            clipInfo.mPreRollLength = 0; // Default pre roll length is zero
+        }
         if (transportOptions.triggerOptions.motionTimeControl.HasValue())
         {
             clipInfo.mInitialDuration      = transportOptions.triggerOptions.motionTimeControl.Value().initialDuration;
@@ -114,6 +120,7 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
         clipInfo.mMaxClipDuration      = 30;
         clipInfo.mChunkDuration        = 5;
         clipInfo.mTriggerType          = 0;
+        clipInfo.mPreRollLength        = 0;
         clipInfo.mUrl                  = "https://localhost:1234/streams/1/";
     }
     mTransportTriggerType   = transportOptions.triggerOptions.triggerType;
@@ -121,7 +128,11 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
     clipInfo.mOutputPath    = "./clips/";
     clipInfo.mInputTimeBase = { 1, 1000000 };
 
-    uint8_t audioCodec  = static_cast<uint8_t>(mAudioStreamParams.audioCodec);
+    uint8_t audioCodec = static_cast<uint8_t>(mAudioStreamParams.audioCodec);
+    if (mAudioStreamParams.channelCount == 0)
+    {
+        mAudioStreamParams.channelCount = 1;
+    }
     audioInfo.mChannels = mAudioStreamParams.channelCount;
 
     if (audioCodec == 0)
@@ -139,7 +150,15 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
         ChipLogError(Camera, "Unsupported Audio codec");
     }
 
-    audioInfo.mSampleRate       = mAudioStreamParams.sampleRate;
+    if (mAudioStreamParams.sampleRate == 0)
+    {
+        mAudioStreamParams.sampleRate = 48000; // Fallback value for invalid sample rate
+    }
+    audioInfo.mSampleRate = mAudioStreamParams.sampleRate;
+    if (mAudioStreamParams.bitRate == 0)
+    {
+        mAudioStreamParams.bitRate = 96000;
+    }
     audioInfo.mBitRate          = mAudioStreamParams.bitRate;
     audioInfo.mAudioPts         = 0;
     audioInfo.mAudioDts         = 0;
@@ -159,10 +178,20 @@ void PushAVTransport::ConfigureRecorderSettings(const TransportOptionsStruct & t
     {
         ChipLogError(Camera, "Unsupported Video codec");
     }
-    videoInfo.mVideoPts  = 0;
-    videoInfo.mVideoDts  = 0;
-    videoInfo.mWidth     = mVideoStreamParams.maxResolution.width;
-    videoInfo.mHeight    = mVideoStreamParams.maxResolution.height;
+    videoInfo.mVideoPts = 0;
+    videoInfo.mVideoDts = 0;
+    if (mVideoStreamParams.maxResolution.width == 0 || mVideoStreamParams.maxResolution.height == 0)
+    {
+        mVideoStreamParams.maxResolution.width  = 640;
+        mVideoStreamParams.maxResolution.height = 320;
+    }
+    videoInfo.mWidth  = mVideoStreamParams.maxResolution.width;
+    videoInfo.mHeight = mVideoStreamParams.maxResolution.height;
+    if (mVideoStreamParams.minFrameRate == 0)
+    {
+        ChipLogError(Camera, "Invalid frame rate: 0. Using fallback 15 fps.");
+        mVideoStreamParams.minFrameRate = 15;
+    }
     videoInfo.mFrameRate = mVideoStreamParams.minFrameRate;
 
     videoInfo.mVideoFrameDuration = 900000 / videoInfo.mFrameRate;
@@ -314,6 +343,9 @@ void PushAVTransport::setTransportStatus(TransportStatusEnum status)
         mCanSendVideo = true;
         mCanSendAudio = true;
 
+        clipInfo.mHasVideo = true;
+        clipInfo.mHasAudio = true;
+
         // TODO Fetch these values from TLS Cluster
         mCertPath.mRootCert = "/tmp/pavstest/certs/server/root.pem";
         mCertPath.mDevCert  = "/tmp/pavstest/certs/device/dev.pem";
@@ -327,12 +359,31 @@ void PushAVTransport::setTransportStatus(TransportStatusEnum status)
             recorder->Start();
             mStreaming = true;
         }
-        if (mTransportTriggerType == TransportTriggerTypeEnum::kMotion)
+        else
         {
+            if (recorder->mClipInfo.activationTime == std::chrono::steady_clock::time_point())
+            {
+                ChipLogProgress(Camera, "No active trigger to start recording");
+            }
+            else
+            {
+                auto now = std::chrono::steady_clock::now();
+                auto elapsedSeconds =
+                    std::chrono::duration_cast<std::chrono::seconds>(now - recorder->mClipInfo.activationTime).count();
 
-            recorder->mClipInfo.mInitialDuration = (uint16_t) std::chrono::duration_cast<std::chrono::seconds>(
-                                                       std::chrono::steady_clock::now() - recorder->mClipInfo.activationTime)
-                                                       .count();
+                // Check if recording duration has expired
+                if (elapsedSeconds >= recorder->mClipInfo.mInitialDuration)
+                {
+                    ChipLogProgress(Camera, "No active trigger (time expired) to start recording");
+                }
+                else
+                {
+                    // Calculate remaining duration safely
+                    recorder->mClipInfo.mInitialDuration -= static_cast<uint16_t>(elapsedSeconds);
+                    ChipLogProgress(Camera, "Active trigger is present. Recording will start for [%d seconds]",
+                                    recorder->mClipInfo.mInitialDuration);
+                }
+            }
         }
     }
     else if (status == TransportStatusEnum::kInactive)
@@ -369,7 +420,6 @@ bool PushAVTransport::CanSendPacketsToRecorder()
 
 void PushAVTransport::SendVideo(const char * data, size_t size, uint16_t videoStreamID)
 {
-
     if (CanSendPacketsToRecorder())
     {
         recorder->PushPacket(data, size, 1);
@@ -378,7 +428,6 @@ void PushAVTransport::SendVideo(const char * data, size_t size, uint16_t videoSt
 
 void PushAVTransport::SendAudio(const char * data, size_t size, uint16_t audioStreamID)
 {
-
     if (CanSendPacketsToRecorder())
     {
         recorder->PushPacket(data, size, 0);
@@ -444,4 +493,9 @@ void PushAVTransport::ModifyPushTransport(const TransportOptionsStorage transpor
 bool PushAVTransport::GetBusyStatus()
 {
     return (uploader.get() != nullptr && uploader->GetUploadQueueSize() > 0);
+}
+
+uint16_t PushAVTransport::GetPreRollLength()
+{
+    return clipInfo.mPreRollLength;
 }
