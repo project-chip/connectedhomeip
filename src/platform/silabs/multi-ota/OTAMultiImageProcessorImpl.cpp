@@ -419,10 +419,12 @@ void OTAMultiImageProcessorImpl::HandleApply(intptr_t context)
 
     imageProcessor->mAccumulator.Clear();
 
-    ChipLogProgress(SoftwareUpdate, "HandleApply: Finished");
-
+    ChipLogProgress(SoftwareUpdate, "HandleApply: Finished and Soft Reset initiated");
+#if (defined(_SILICON_LABS_32B_SERIES_3) || defined(SLI_SI91X_MCU_INTERFACE)) && CHIP_PROGRESS_LOGGING
+    osDelay(500); // sl-temp: delay for uart print before reboot
+#endif
     // This reboots the device
-    CORE_CRITICAL_SECTION(bootloader_rebootAndInstall();)
+    CORE_CRITICAL_SECTION(bootloader_rebootAndInstall());
 }
 
 CHIP_ERROR OTAMultiImageProcessorImpl::ReleaseBlock()
