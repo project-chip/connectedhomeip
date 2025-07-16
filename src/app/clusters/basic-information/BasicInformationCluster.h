@@ -53,7 +53,7 @@ public:
     static BasicInformationCluster & Instance();
 
     const BitFlags<OptionalBasicInformationAttributes> & OptionalAttributes() const { return mEnabledOptionalAttributes; }
-    BitFlags<OptionalBasicInformationAttributes> OptionalAttributes() { return mEnabledOptionalAttributes; }
+    BitFlags<OptionalBasicInformationAttributes> &OptionalAttributes() { return mEnabledOptionalAttributes; }
 
     bool GetLocalConfigDisabled() { return mLocalConfigDisabled; }
 
