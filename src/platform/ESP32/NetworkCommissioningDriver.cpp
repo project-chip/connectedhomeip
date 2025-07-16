@@ -315,8 +315,7 @@ void ESPWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callbac
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
     VerifyOrExit(BackupConfiguration() == CHIP_NO_ERROR, networkingStatus = Status::kUnknownError);
     VerifyOrExit(mpConnectCallback == nullptr, networkingStatus = Status::kUnknownError);
-    ChipLogProgress(NetworkProvisioning, "ESP NetworkCommissioningDelegate: SSID: %s",
-                    NullTerminated(Uint8::to_const_char(networkId.data()), networkId.size()).AddMarkerIfNonPrintable().c_str());
+    ChipLogProgress(NetworkProvisioning, "ESP NetworkCommissioningDelegate: SSID: %s", NullTerminated(networkId).c_str());
     if (CHIP_NO_ERROR == GetConfiguredNetwork(configuredNetwork))
     {
         if (NetworkMatch(mStagingNetwork, ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)))

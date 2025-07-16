@@ -140,9 +140,8 @@ void TizenWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
 
     VerifyOrExit(NetworkMatch(mStagingNetwork, networkId), networkingStatus = Status::kNetworkIDNotFound);
 
-    ChipLogProgress(
-        NetworkProvisioning, "TizenNetworkCommissioningDelegate: SSID: %s",
-        NullTerminated(Uint8::to_const_char(mStagingNetwork.ssid), mStagingNetwork.ssidLen).AddMarkerIfNonPrintable().c_str());
+    ChipLogProgress(NetworkProvisioning, "TizenNetworkCommissioningDelegate: SSID: %s",
+                    NullTerminated(mStagingNetwork.ssid, mStagingNetwork.ssidLen).c_str());
 
     err = DeviceLayer::Internal::WiFiMgr().Connect(reinterpret_cast<char *>(mStagingNetwork.ssid),
                                                    reinterpret_cast<char *>(mStagingNetwork.credentials), callback);

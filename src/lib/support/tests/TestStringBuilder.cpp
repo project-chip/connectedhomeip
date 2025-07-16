@@ -128,8 +128,24 @@ TEST(TestStringBuilder, TestFormat)
                         "34\x02"
                         "56\x03"
                         "7890";
-        StringBuilder<14> builder(reinterpret_cast<char *>(str), strlen(reinterpret_cast<char *>(str)));
-        builder.AddMarkerIfNonPrintable();
+        StringBuilder<14> builder(str, strlen(reinterpret_cast<const char *>(str)));
+        EXPECT_TRUE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "12.34.56.7890");
+    }
+
+    {
+        uint8_t str[] = "12\x01"
+                        "34\x02"
+                        "56\x03"
+                        "7890";
+        StringBuilder<14> builder(ByteSpan(str, strlen(reinterpret_cast<const char *>(str))));
+        EXPECT_TRUE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "12.34.56.7890");
+    }
+
+    {
+        uint8_t bytes[] = { '1', '2', '\x01', '3', '4', '\x02', '5', '6', '\x00', '7', '8', '9', '0' };
+        StringBuilder<14> builder(bytes, sizeof(bytes), false);
         EXPECT_TRUE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "12.34.56.7890");
     }
@@ -199,8 +215,24 @@ TEST(TestStringBuilder, TestFormatOverflow)
                         "34\x02"
                         "56\x03"
                         "7890a";
-        StringBuilder<14> builder(reinterpret_cast<char *>(str), strlen(reinterpret_cast<char *>(str)), false);
-        builder.AddMarkerIfNonPrintable();
+        StringBuilder<14> builder(str, strlen(reinterpret_cast<const char *>(str)), false);
+        EXPECT_FALSE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "12.34.56.7890");
+    }
+
+    {
+        uint8_t str[] = "12\x01"
+                        "34\x02"
+                        "56\x03"
+                        "7890a";
+        StringBuilder<14> builder(ByteSpan(str, strlen(reinterpret_cast<const char *>(str))), false);
+        EXPECT_FALSE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "12.34.56.7890");
+    }
+
+    {
+        uint8_t bytes[] = { '1', '2', '\x01', '3', '4', '\x02', '5', '6', '\x00', '7', '8', '9', '0', 'a' };
+        StringBuilder<14> builder(bytes, sizeof(bytes), false);
         EXPECT_FALSE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "12.34.56.7890");
     }
@@ -287,8 +319,24 @@ TEST(TestStringBuilder, TestOverflowMarker)
                         "34\x02"
                         "56\x03"
                         "7890a";
-        StringBuilder<14> builder(reinterpret_cast<char *>(str), strlen(reinterpret_cast<char *>(str)));
-        builder.AddMarkerIfNonPrintable();
+        StringBuilder<14> builder(str, strlen(reinterpret_cast<const char *>(str)));
+        EXPECT_FALSE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "12.34.56.7...");
+    }
+
+    {
+        uint8_t str[] = "12\x01"
+                        "34\x02"
+                        "56\x03"
+                        "7890a";
+        StringBuilder<14> builder(ByteSpan(str, strlen(reinterpret_cast<const char *>(str))));
+        EXPECT_FALSE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "12.34.56.7...");
+    }
+
+    {
+        uint8_t bytes[] = { '1', '2', '\x01', '3', '4', '\x02', '5', '6', '\x00', '7', '8', '9', '0', 'a' };
+        StringBuilder<14> builder(bytes, sizeof(bytes));
         EXPECT_FALSE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "12.34.56.7...");
     }
