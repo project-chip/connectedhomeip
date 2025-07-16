@@ -125,7 +125,7 @@ CHIP_ERROR EstablishSessionCommand::RunCommand()
     camera::WebRTCOfferType offerType = camera::WebRTCOfferType::kProvideOffer;
     if (mOfferType.HasValue())
     {
-        offerType = mOfferType.Value() == 0 ? camera::WebRTCOfferType::kProvideOffer : camera::WebRTCOfferType::kSolicitOffer;
+        offerType = static_cast<camera::WebRTCOfferType>(mOfferType.Value());
     }
 
     return camera::DeviceManager::Instance().AllocateVideoStream(mPeerNodeId, streamUsage, offerType);
