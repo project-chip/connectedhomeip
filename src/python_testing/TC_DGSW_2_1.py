@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2024 Project CHIP Authors
+#    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,7 +37,7 @@
 
 import chip.clusters as Clusters
 from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, run_if_endpoint_matches, has_cluster
 
 
 class TC_DGSW_2_1(MatterBaseTest):
@@ -56,14 +56,18 @@ class TC_DGSW_2_1(MatterBaseTest):
     def steps_TC_DGSW_2_1(self) -> list[TestStep]:
         steps = [
             TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "Read the ThreadMetrics attribute"),
-            TestStep(3, "Read the CurrentHeapFree attribute"),
-            TestStep(4, "Read the CurrentHeapUsed attribute"),
-            TestStep(5, "Read the CurrentHeapHighWatermark attribute"),
+            TestStep(2, "Read the ThreadMetrics attribute",
+                     "The data type in each field of the struct must match the value listed in the specification(s) Table in 11.12.6.1"),
+            TestStep(3, "Read the CurrentHeapFree attribute",
+                     "The value will indicate the current amount of unutilized heap memory in bytes."),
+            TestStep(4, "Read the CurrentHeapUsed attribute",
+                     "The value will indicate the current amount of used heap memory in bytes."),
+            TestStep(5, "Read the CurrentHeapHighWatermark attribute",
+                     "The value will indicate the maximum amount of heap memory being used in bytes. This value can be reset by a node reboot."),
         ]
         return steps
 
-    @async_test_body
+    @run_if_endpoint_matches(has_cluster(Clusters.SoftwareDiagnostics))
     async def test_TC_DGSW_2_1(self):
 
         endpoint = self.get_endpoint(default=0)
@@ -72,11 +76,10 @@ class TC_DGSW_2_1(MatterBaseTest):
         self.step(1)
 
         attributes = Clusters.SoftwareDiagnostics.Attributes
-        attribute_list = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
 
         # STEP 2: TH reads from the DUT the ThreadMetrics attribute
         self.step(2)
-        if self.pics_guard(attributes.ThreadMetrics.attribute_id in attribute_list):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ThreadMetrics):
             thread_metrics_list = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.ThreadMetrics)
 
             # Validate each element in the thread_metrics_list
@@ -102,19 +105,19 @@ class TC_DGSW_2_1(MatterBaseTest):
 
         # STEP 3: TH reads from the DUT the CurrentHeapFree attribute
         self.step(3)
-        if self.pics_guard(attributes.CurrentHeapFree.attribute_id in attribute_list):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapFree):
             current_heap_free_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapFree)
             matter_asserts.assert_valid_uint64(current_heap_free_attr, "CurrentHeapFree")
 
         # STEP 4: TH reads from the DUT the CurrentHeapUsed attribute
         self.step(4)
-        if self.pics_guard(attributes.CurrentHeapUsed.attribute_id in attribute_list):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapUsed):
             current_heap_used_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
             matter_asserts.assert_valid_uint64(current_heap_used_attr, "CurrentHeapUsed")
 
         # STEP 5: TH reads from the DUT the CurrentHeapHighWatermark attribute
         self.step(5)
-        if self.pics_guard(attributes.CurrentHeapHighWatermark.attribute_id in attribute_list):
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark):
             current_heap_high_watermark_attr = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
             matter_asserts.assert_valid_uint64(current_heap_high_watermark_attr, "CurrentHeapHighWatermark")
 
