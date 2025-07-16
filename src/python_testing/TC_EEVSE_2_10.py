@@ -164,7 +164,7 @@ class TC_EEVSE_2_10(MatterBaseTest, EEVSEBaseTestHelper):
         ]
         return steps
 
-    @decorators.run_if_endpoint_matches(has_feature(cluster, cluster.Bitmaps.Feature.kV2x))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(cluster, cluster.Bitmaps.Feature.kV2x))
     async def test_TC_EEVSE_2_10(self):
         endpoint = self.get_endpoint()
 

@@ -101,7 +101,7 @@ class TC_CNET_4_9(MatterBaseTest):
     def pics_TC_CNET_4_9(self):
         return ['CNET.S']
 
-    @decorators.run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_9(self):
         ssid = self.get_wifi_ssid()
         credentials = self.get_credentials()

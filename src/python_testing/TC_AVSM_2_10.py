@@ -2,10 +2,9 @@ import logging
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, decorators
 from mobly import asserts
 from TC_AVSMTestBase import AVSMTestBase
-from chip.testing import decorators
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -109,9 +108,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             ),
         ]
 
-    @decorators.run_if_endpoint_matches(
-        has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kSnapshot)
-    )
+    @decorators.has_feature(Clusters.CameraAvStreamManagement, Clusters.CameraAvStreamManagement.Bitmaps.Feature.kSnapshot)
     async def test_TC_AVSM_2_10(self):
         endpoint = self.get_endpoint(default=1)
         cluster = Clusters.CameraAvStreamManagement

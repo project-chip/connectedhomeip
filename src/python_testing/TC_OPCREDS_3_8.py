@@ -362,7 +362,7 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
     def pics_TC_OPCREDS_3_8(self) -> list[str]:
         return [accepted_cmd_pics_str('OPCREDS', Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement.command_id)]
 
-    @decorators.run_if_endpoint_matches(has_command(Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement))
+    @decorators.run_if_endpoint_matches(decorators.has_command(Clusters.OperationalCredentials.Commands.SetVIDVerificationStatement))
     async def test_TC_OPCREDS_3_8(self):
         # TODO(test_plans#5046): actually make the test follow final test plan. For now
         # it functionally validates the VID Verification parts of Operational Credentials Cluster

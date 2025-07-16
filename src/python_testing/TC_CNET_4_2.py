@@ -92,8 +92,8 @@ class TC_CNET_4_2(MatterBaseTest):
         """Return the PICS definitions associated with this test."""
         return ["CNET.S.F01"]
 
-    @decorators.run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning,
-                                                    Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(Clusters.NetworkCommissioning,
+                                                               Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_2(self):
         # Commissioning already done
         self.step(1)

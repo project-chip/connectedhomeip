@@ -308,7 +308,7 @@ class TC_CADMIN(MatterBaseTest):
     async def test_TC_CADMIN_1_3(self):
         await self.combined_commission_val_steps(commission_type="ECM")
 
-    @decorators.run_if_endpoint_matches(has_feature(cluster=Clusters.AdministratorCommissioning, feature=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(cluster=Clusters.AdministratorCommissioning, feature=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic))
     async def test_TC_CADMIN_1_4(self):
         await self.combined_commission_val_steps(commission_type="BCM")
 

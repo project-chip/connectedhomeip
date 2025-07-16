@@ -101,7 +101,7 @@ class TC_FAN_2_3(MatterBaseTest):
     def pics_TC_FAN_2_3(self) -> list[str]:
         return ["FAN.S.F02"]
 
-    @decorators.run_if_endpoint_matches(has_feature(Clusters.FanControl, Clusters.FanControl.Bitmaps.Feature.kRocking))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(Clusters.FanControl, Clusters.FanControl.Bitmaps.Feature.kRocking))
     async def test_TC_FAN_2_3(self):
         # Setup
         self.endpoint = self.get_endpoint(default=1)

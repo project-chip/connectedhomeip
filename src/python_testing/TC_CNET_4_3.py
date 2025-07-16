@@ -3,7 +3,7 @@ import chip.clusters as Clusters
 import test_plan_support
 from chip.clusters.Types import NullValue
 from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
 from chip.testing import decorators
 #
@@ -76,8 +76,8 @@ class TC_CNET_4_3(MatterBaseTest):
         """Return the PICS definitions associated with this test."""
         return ["CNET.S.F02"]
 
-    @decorators.run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning,
-                                                    Clusters.NetworkCommissioning.Bitmaps.Feature.kEthernetNetworkInterface))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(Clusters.NetworkCommissioning,
+                                                               Clusters.NetworkCommissioning.Bitmaps.Feature.kEthernetNetworkInterface))
     async def test_TC_CNET_4_3(self):
         # Commissioning already done
         self.step(1)

@@ -86,8 +86,8 @@ class TC_AVSUM_2_4(MatterBaseTest, AVSUMTestBase):
         ]
         return pics
 
-    @decorators.run_if_endpoint_matches(has_feature(Clusters.CameraAvSettingsUserLevelManagement,
-                                                    Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kMechanicalPresets))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(Clusters.CameraAvSettingsUserLevelManagement,
+                                                               Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kMechanicalPresets))
     async def test_TC_AVSUM_2_4(self):
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         attributes = cluster.Attributes

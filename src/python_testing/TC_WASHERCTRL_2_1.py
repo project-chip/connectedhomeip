@@ -80,8 +80,7 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
 
         return steps
 
-    @decorators.run_if_endpoint_matches(has_feature(Clusters.LaundryWasherControls,
-                                                    Clusters.LaundryWasherControls.Bitmaps.Feature.kSpin))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(Clusters.LaundryWasherControls, Clusters.LaundryWasherControls.Bitmaps.Feature.kSpin))
     async def test_TC_WASHERCTRL_2_1(self):
 
         endpoint = self.get_endpoint(default=1)

@@ -1,6 +1,6 @@
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
 from TC_AVSUMTestBase import AVSUMTestBase
 from chip.testing import decorators
@@ -70,8 +70,8 @@ class TC_AVSUM_2_5(MatterBaseTest, AVSUMTestBase):
         ]
         return pics
 
-    @decorators.run_if_endpoint_matches(has_feature(Clusters.CameraAvSettingsUserLevelManagement,
-                                                    Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kMechanicalPresets))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(Clusters.CameraAvSettingsUserLevelManagement,
+                                                               Clusters.CameraAvSettingsUserLevelManagement.Bitmaps.Feature.kMechanicalPresets))
     async def test_TC_AVSUM_2_5(self):
         cluster = Clusters.Objects.CameraAvSettingsUserLevelManagement
         attributes = cluster.Attributes

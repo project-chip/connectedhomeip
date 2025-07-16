@@ -5,7 +5,7 @@ import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.testing.matter_asserts import (assert_int_in_range, assert_string_length, assert_valid_uint8, assert_valid_uint16,
                                          assert_valid_uint64)
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
 from chip.testing import decorators
 #
@@ -109,7 +109,7 @@ class TC_CNET_4_22(MatterBaseTest):
         asserts.assert_equal(breadcrumb, expected_breadcrumb,
                              f"Breadcrumb value is {breadcrumb} and it should be equal to {expected_breadcrumb}")
 
-    @decorators.run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kThreadNetworkInterface))
     async def test_TC_CNET_4_22(self):
 
         enum = Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatusEnum

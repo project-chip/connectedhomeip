@@ -313,7 +313,7 @@ class TC_SwitchTests(MatterBaseTest):
                          "Verify that the value is 0, and that a subscription report was received for that change."),
                 ]
 
-    @decorators.run_if_endpoint_matches(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kLatchingSwitch))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kLatchingSwitch))
     async def test_TC_SWTCH_2_2(self):
         post_prompt_settle_delay_seconds = 10.0
         cluster = Clusters.Switch
@@ -423,7 +423,7 @@ class TC_SwitchTests(MatterBaseTest):
                 TestStep(9, "TH reads the CurrentPosition attribute from the DUT", "Verify that the value is 0"),
                 ]
 
-    @decorators.run_if_endpoint_matches(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
     async def test_TC_SWTCH_2_3(self):
         # Commissioning - already done
         self.step(1)
@@ -501,7 +501,7 @@ class TC_SwitchTests(MatterBaseTest):
                 """)
                 ]
 
-    @decorators.run_if_endpoint_matches(has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitch))
     async def test_TC_SWTCH_2_4(self):
         switch_pressed_position = self._default_pressed_position
         post_prompt_settle_delay_seconds = 10.0
@@ -672,8 +672,8 @@ class TC_SwitchTests(MatterBaseTest):
 
     @staticmethod
     def should_run_SWTCH_2_5(wildcard, endpoint):
-        msm = has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitchMultiPress)
-        asf = has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kActionSwitch)
+        msm = decorators.has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitchMultiPress)
+        asf = decorators.has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kActionSwitch)
         return msm(wildcard, endpoint) and not asf(wildcard, endpoint)
 
     @decorators.run_if_endpoint_matches(should_run_SWTCH_2_5)
@@ -851,8 +851,8 @@ class TC_SwitchTests(MatterBaseTest):
 
     @staticmethod
     def should_run_SWTCH_2_6(wildcard, endpoint):
-        msm = has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitchMultiPress)
-        asf = has_feature(Clusters.Switch, 0x20)
+        msm = decorators.has_feature(Clusters.Switch, Clusters.Switch.Bitmaps.Feature.kMomentarySwitchMultiPress)
+        asf = decorators.has_feature(Clusters.Switch, 0x20)
         return msm(wildcard, endpoint) and asf(wildcard, endpoint)
 
     @decorators.run_if_endpoint_matches(should_run_SWTCH_2_6)
