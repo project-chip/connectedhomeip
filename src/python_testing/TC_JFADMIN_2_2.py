@@ -247,7 +247,7 @@ class TC_JFADMIN_2_2(MatterBaseTest):
         # else:
         #     asserts.assert_true(False, 'Expected InteractionModelError with InvalidICAC, but no exception occurred.')
 
-        # Shutdown the Python Controllers start at the begining
+        # Shutdown the Python Controllers started at the beginning of this script
         devCtrlEcoA.Shutdown()
 
 
