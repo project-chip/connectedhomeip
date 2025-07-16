@@ -67,6 +67,10 @@
 #include "OperationalKeystore.h"
 #endif
 
+#ifdef CONFIG_CHIP_SE05X
+#include <platform/nxp/crypto/se05x/PersistentStorageOperationalKeystore_se05x.h>
+#endif
+
 #if CONFIG_CHIP_OTA_PROVIDER
 #include <OTAProvider.h>
 #endif
@@ -187,6 +191,11 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif
 
+#ifdef CONFIG_CHIP_SE05X
+    static chip::PersistentStorageOpKeystorese05x se05xInstance;
+    initParams.operationalKeystore = &se05xInstance;
+#endif
+
 #if CONFIG_OPERATIONAL_KEYSTORE
     initParams.operationalKeystore = chip::NXP::App::OperationalKeystore::GetInstance();
 #endif
@@ -206,6 +215,8 @@ void chip::NXP::App::AppTaskBase::InitServer(intptr_t arg)
     auto * persistentStorage = &Server::GetInstance().GetPersistentStorage();
 #if CONFIG_OPERATIONAL_KEYSTORE
     chip::NXP::App::OperationalKeystore::Init(persistentStorage);
+#elif defined(CONFIG_CHIP_SE05X)
+    se05xInstance.Init(persistentStorage);
 #endif
 
 #if CONFIG_DEVICE_INFO_PROVIDER_IMPL

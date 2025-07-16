@@ -65,6 +65,10 @@ matter_add_gn_arg_list("default_configs_specs" " ")
 # Required for freeRTOS build in case default value needs to be set to "none" for optimization
 matter_add_gn_arg_string("chip_stack_lock_tracking" "${CONFIG_CHIP_STACK_LOCK_TRACKING}")
 
+if(CONFIG_CHIP_SE05X)
+    matter_add_gn_arg_string("nxp_crypto_impl" ${CONFIG_NXP_CRYPTO_IMPL})
+endif()
+
 # OT specific gn arguments
 if(CONFIG_NET_L2_OPENTHREAD)
     matter_add_gn_arg_string("openthread_root" "${CHIP_ROOT}/${CONFIG_OT_ROOT}")

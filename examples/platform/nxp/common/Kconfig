@@ -328,6 +328,7 @@ config CHIP_APP_QUEUE_TICKS_TO_WAIT
 
 config APP_TASK_STACK_SIZE
     int "App Task Stack Size"
+    default 9000 if CHIP_SE05X
     default 6144
     help
         Set the stack size for the application task in bytes.
