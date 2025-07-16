@@ -84,7 +84,7 @@ function dowithlastpipe()
 # This function returns the rules that should be cleaned based on the targets provided.
 # Based on this, ninja -t clean -r <rules> will clean the exact targets that need to be reexecuted.
 function get_rules_to_clean()
-{      
+{
     declare -A RULES
 
     # Read the rules that execute (not build) targets from the toolchain.ninja file
@@ -113,11 +113,11 @@ function get_rules_to_clean()
             done
             exit 0
         fi
-        
+
         # This will hold the results of the last query
         unset NEW_TARGETS
         declare -A NEW_TARGETS
-        
+
         # Query the targets and parse the input targets, if a rule is found, it will be added to RULES
         dowithlastpipe 'ninja -C out/coverage -t query "${!TARGETS[@]}" | grep "^  " | grep -v "|" | trim_whitespace | parse_input_targets'
 
@@ -277,7 +277,7 @@ LCOV_IGNORE_ERRORS="format,unsupported,inconsistent,inconsistent,unused,unused" 
 if [ "$skip_gn" == false ]; then
     # Ensure environment is set
     source "$CHIP_ROOT/scripts/activate.sh"
- 
+
     # Set coverage data to zero if not accumulating
     if [[ -d "$OUTPUT_ROOT/obj/src" && "$ACCUMULATE" == false ]]; then
         lcov --zerocounters --directory "$OUTPUT_ROOT/obj/src" \
@@ -412,7 +412,7 @@ if [[ "$skip_gn" == false ]]; then
     fi
 else
     cp "$OUTPUT_ROOT/coverage/lcov_unfiltered.info" "$COVERAGE_ROOT/lcov_final.info"
-fi 
+fi
 
 genhtml "$COVERAGE_ROOT/lcov_final.info" \
     --ignore-errors inconsistent,category,count \
