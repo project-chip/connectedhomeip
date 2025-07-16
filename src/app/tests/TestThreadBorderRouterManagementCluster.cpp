@@ -40,12 +40,6 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-
-namespace GeneralCommissioning {
-// Mock function
-void SetBreadcrumb(Attributes::Breadcrumb::TypeInfo::Type breadcrumb) {}
-} // namespace GeneralCommissioning
-
 namespace ThreadBorderRouterManagement {
 
 class TestDelegate : public Delegate

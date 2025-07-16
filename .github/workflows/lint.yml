@@ -36,7 +36,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build:134
+            image: ghcr.io/project-chip/chip-build:150
 
         steps:
             - name: Checkout
@@ -73,7 +73,7 @@ jobs:
                      --skip-dir platform/ASR \
                      --skip-dir platform/Beken \
                      --skip-dir platform/bouffalolab \
-                     --skip-dir platform/cc13xx_26xx \
+                     --skip-dir platform/ti/cc13xx_26xx \
                      --skip-dir platform/cc32xx \
                      --skip-dir platform/Darwin \
                      --skip-dir platform/ESP32 \
@@ -294,7 +294,7 @@ jobs:
                   type-safe getters
               if: always()
               run: |
-                  git grep -I -n 'emberAfReadAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)src/app/util/attribute-table.h' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors.cpp.zapt' ':(exclude)src/app/util/attribute-table.cpp'  && exit 1 || exit 0
+                  git grep -I -n 'emberAfReadAttribute' -- './*' ':(exclude).github/workflows/lint.yml' ':(exclude)src/app/util/attribute-table.h' ':(exclude)zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp' ':(exclude)src/app/zap-templates/templates/app/attributes/Accessors.cpp.zapt' ':(exclude)src/app/util/attribute-table.cpp' ':(exclude)src/app/dynamic_server/DynamicDispatcher.cpp' && exit 1 || exit 0
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,
@@ -309,8 +309,9 @@ jobs:
                   git grep -I -n 'emberAfWriteAttribute' -- './*'                                            \
                       ':(exclude).github/workflows/lint.yml'                                                 \
                       ':(exclude)examples/common/pigweed/rpc_services/Attributes.h'                          \
-                      ':(exclude)src/data-model-providers/codegen/CodegenDataModelProvider_Write.cpp'     \
-                      ':(exclude)src/data-model-providers/codegen/tests/EmberReadWriteOverride.cpp'       \
+                      ':(exclude)examples/common/server-cluster-shim/ServerClusterShim.cpp'                  \
+                      ':(exclude)src/data-model-providers/codegen/CodegenDataModelProvider_Write.cpp'        \
+                      ':(exclude)src/data-model-providers/codegen/tests/EmberReadWriteOverride.cpp'          \
                       ':(exclude)src/app/dynamic_server/DynamicDispatcher.cpp'                               \
                       ':(exclude)src/app/util/attribute-table.cpp'                                           \
                       ':(exclude)src/app/util/attribute-table.h'                                             \
@@ -325,6 +326,12 @@ jobs:
               if: always()
               run: |
                   ruff check
+
+            # Run ChipStackError linter
+            - name: Check for errors using ruff Python linter
+              if: always()
+              run: |
+                  python3 scripts/check_chipstack.py
 
             # git grep exits with 0 if it finds a match, but we want
             # to fail (exit nonzero) on match.  And we want to exclude this file,

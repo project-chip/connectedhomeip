@@ -116,7 +116,6 @@ the wpa_supplicant integration with the Matter SDK.
         </signal>
         <property name="State" type="s" access="read" />
         <property name="Scanning" type="b" access="read" />
-        <property name="CurrentBSS" type="o" access="read" />
         <property name="CurrentNetwork" type="o" access="read" />
         <property name="CurrentAuthMode" type="s" access="read" />
         <property name="BSSs" type="ao" access="read" />

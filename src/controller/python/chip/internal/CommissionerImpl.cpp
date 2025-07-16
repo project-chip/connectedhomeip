@@ -132,7 +132,12 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         // TODO: add option to pass in custom PAA Trust Store path to the python controller app
         const chip::Credentials::AttestationTrustStore * testingRootStore =
             GetTestFileAttestationTrustStore("./credentials/development/paa-root-certs");
-        chip::Credentials::DeviceAttestationVerifier * dacVerifier = chip::Credentials::GetDefaultDACVerifier(testingRootStore);
+        // TODO: Ensure that attestation revocation data is actually provided.
+        chip::Credentials::DeviceAttestationRevocationDelegate * kDeviceAttestationRevocationNotChecked = nullptr;
+        chip::Credentials::DeviceAttestationVerifier * dacVerifier =
+            chip::Credentials::GetDefaultDACVerifier(testingRootStore, kDeviceAttestationRevocationNotChecked);
+        VerifyOrDie(dacVerifier != nullptr);
+        dacVerifier->EnableVerboseLogs(true);
         chip::Credentials::SetDeviceAttestationVerifier(dacVerifier);
 
         factoryParams.fabricIndependentStorage = &gServerStorage;

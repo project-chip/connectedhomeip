@@ -24,9 +24,7 @@ on:
     workflow_dispatch:
 
 concurrency:
-    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name ==
-        'pull_request' && github.event.number) || (github.event_name ==
-        'workflow_dispatch' && github.run_number) || github.sha }}
+    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
     cancel-in-progress: true
 
 env:
@@ -50,8 +48,9 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:134
-            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
+            image: ghcr.io/project-chip/chip-build:150
+            options: >-
+                --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
@@ -69,8 +68,8 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: linux
-                bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  platform: linux
+                  bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
@@ -195,6 +194,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/rvc-clean-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/rvc-run-mode-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/scene.xml \
+                      src/app/zap-templates/zcl/data-model/chip/service-area-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/smoke-co-alarm-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/software-diagnostics-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/soil-measurement-cluster.xml \
@@ -215,6 +215,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/tls-client-management-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/user-label-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/unit-localization-cluster.xml \
+                      src/app/zap-templates/zcl/data-model/chip/valve-configuration-and-control-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/wake-on-lan-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/washer-controls-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/water-heater-management-cluster.xml \
@@ -230,7 +231,7 @@ jobs:
                       src/app/zap-templates/zcl/data-model/chip/electrical-energy-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/electrical-power-measurement-cluster.xml \
                       src/app/zap-templates/zcl/data-model/chip/zone-management-cluster.xml \
-                    "
+                  "
             - name: Build Apps
               run: |
                   ./scripts/run_in_build_env.sh \
@@ -251,6 +252,8 @@ jobs:
                         --target linux-x64-microwave-oven-${BUILD_VARIANT} \
                         --target linux-x64-rvc-${BUILD_VARIANT} \
                         --target linux-x64-network-manager-${BUILD_VARIANT} \
+                        --target linux-x64-energy-gateway-${BUILD_VARIANT} \
+                        --target linux-x64-energy-management-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -274,6 +277,8 @@ jobs:
                      --microwave-oven-app ./out/linux-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
                      --rvc-app ./out/linux-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
                      --network-manager-app ./out/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --energy-gateway-app ./out/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+                     --energy-management-app ./out/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
@@ -316,6 +321,8 @@ jobs:
                      --microwave-oven-app ./out/linux-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
                      --rvc-app ./out/linux-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
                      --network-manager-app ./out/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --energy-gateway-app ./out/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+                     --energy-management-app ./out/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
             - name: Run Tests using chip-repl (including slow)
               if: github.event_name == 'push'
@@ -336,6 +343,8 @@ jobs:
                      --microwave-oven-app ./out/linux-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
                      --rvc-app ./out/linux-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
                      --network-manager-app ./out/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --energy-gateway-app ./out/linux-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+                     --energy-management-app ./out/linux-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
             - name: Uploading core files
               uses: actions/upload-artifact@v4
@@ -376,8 +385,7 @@ jobs:
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install coreutils
-            - name:
-                  Try to ensure the directories for core dumping and diagnostic
+            - name: Try to ensure the directories for core dumping and diagnostic
                   log collection exist and we can write them.
               run: |
                   sudo chown ${USER} /cores || true
@@ -386,9 +394,8 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: darwin
-                bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
-
+                  platform: darwin
+                  bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
 
             - name: Build Apps
               run: |
@@ -405,6 +412,8 @@ jobs:
                         --target darwin-x64-microwave-oven-${BUILD_VARIANT} \
                         --target darwin-x64-rvc-${BUILD_VARIANT} \
                         --target darwin-x64-network-manager-${BUILD_VARIANT} \
+                        --target darwin-x64-energy-gateway-${BUILD_VARIANT} \
+                        --target darwin-x64-energy-management-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -429,6 +438,8 @@ jobs:
                      --microwave-oven-app ./out/darwin-x64-microwave-oven-${BUILD_VARIANT}/chip-microwave-oven-app \
                      --rvc-app ./out/darwin-x64-rvc-${BUILD_VARIANT}/chip-rvc-app \
                      --network-manager-app ./out/darwin-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app \
+                     --energy-gateway-app ./out/darwin-x64-energy-gateway-${BUILD_VARIANT}/chip-energy-gateway-app \
+                     --energy-management-app ./out/darwin-x64-energy-management-${BUILD_VARIANT}/chip-energy-management-app \
                   "
 
             - name: Run purposeful failure tests using the python parser sending commands to chip-tool
@@ -475,8 +486,8 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         strategy:
-          matrix:
-            build_variant: [ ipv6only-no-ble-no-wifi]
+            matrix:
+                build_variant: [ipv6only-no-ble-no-wifi]
 
         env:
             TSAN_OPTIONS: "halt_on_error=1 suppressions=scripts/tests/chiptest/tsan-linux-suppressions.txt"
@@ -485,12 +496,12 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:134
-            options:
-               --privileged
-               --sysctl net.ipv6.conf.all.disable_ipv6=0
-               --sysctl net.ipv4.conf.all.forwarding=0
-               --sysctl net.ipv6.conf.all.forwarding=0
+            image: ghcr.io/project-chip/chip-build:150
+            options: >-
+                --privileged
+                --sysctl net.ipv6.conf.all.disable_ipv6=0
+                --sysctl net.ipv4.conf.all.forwarding=0
+                --sysctl net.ipv6.conf.all.forwarding=0
 
         steps:
             - name: Checkout
@@ -498,8 +509,8 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: linux
-                bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  platform: linux
+                  bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
             - name: Try to ensure the directories for core dumping exist and we
                   can write them.
               run: |
@@ -510,57 +521,193 @@ jobs:
             - name: Set up a IPV6 known envionment
               uses: ./.github/actions/add-ipv6
 
-            - name: Build Python REPL and example apps
-              #  TODO: build variants seem to DIFFER and they should be updated to be consistent:
-              #   - camera app needs clang support
-              #   - T&C app needs variants (probably)
-              #   - determine why some apps are tsan and some are not (and does that add runtime overhead? )
-              run: |
-                  scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
-                  ./scripts/run_in_build_env.sh \
-                   "./scripts/build/build_examples.py \
-                      --target linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test \
-                      --target linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test \
-                      --target linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test \
-                      --target linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test \
-                      --target linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test \
-                      --target linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test \
-                      --target linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test \
-                      --target linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test \
-                      --target linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test \
-                      --target linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test \
-                      --target linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang \
-                      --target linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang \
-                      --target linux-x64-fabric-sync-${BUILD_VARIANT}-clang \
-                      --target linux-x64-camera \
-                      --target linux-x64-camera-controller \
-                      --target linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang \
-                      --target linux-x64-terms-and-conditions \
-                      --target linux-x64-python-bindings \
-                      build \
-                      --copy-artifacts-to objdir-clone \
-                   "
+            - name: Build python env
+              run: scripts/run_in_build_env.sh './scripts/build_python.sh --install_virtual_env out/venv'
+
+            - name: Build linux-x64-all-clusters
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test
+                  "
+            # TODO: determine why some apps are tsan and some are not (and does that add runtime overhead? )
+            - name: Build linux-x64-bridge
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: Build linux-x64-lock
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: Build linux-x64-lit-icd
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: Build linux-x64-air-purifier
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: Build linux-x64-energy-gateway
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: Build linux-x64-energy-management
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: Build linux-x64-microwave-oven
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: Build linux-x64-rvc
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: Build linux-x64-network-manager
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: Build linux-x64-fabric-admin-rpc
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang"
+
+            - name: Build linux-x64-fabric-bridge-rpc
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang"
+
+            - name: Build linux-x64-fabric-sync
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-fabric-sync-${BUILD_VARIANT}-clang
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-fabric-sync-${BUILD_VARIANT}-clang"
+
+            # TODO: camera app needs clang support
+            - name: Build linux-x64-camera
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-camera
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-camera"
+
+            - name: Build linux-x64-camera-controller
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-camera-controller
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-camera-controller"
+
+            - name: Build linux-x64-light-data-model-no-unique-id
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang"
+
+            # TODO: T&C app needs variants (probably)
+            - name: Build linux-x64-terms-and-conditions
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-terms-and-conditions
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-terms-and-conditions"
+
+            - name: Build linux-x64-python-bindings
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-python-bindings-webrtc
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-python-bindings-webrtc"
+
+            # TODO: JS admin app app needs variants (probably)
+            - name: Build linux-x64-jf-control-app
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-jf-control-app
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-jf-control-app"
+
+            # TODO: JF admin app app needs variants (probably)
+            - name: Build linux-x64-jf-admin-app
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-jf-admin-app
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-jf-admin-app"
+
+            - name: Build linux-x64-closure-app
+              run: >-
+                  ./scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --target linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test
+                  build --copy-artifacts-to objdir-clone
+                  && rm -rf out/linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test"
+
+            - name: Copy push_av_server and install dependencies
+              run: >-
+                  cp -r ./src/tools/push_av_server objdir-clone/
+                  && pip install --break-system-packages -r objdir-clone/push_av_server/requirements.txt
+
             - name: Generate an argument environment file
               run: |
                   echo -n "" >/tmp/test_env.yaml
-                  echo "ALL_CLUSTERS_APP: out/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
-                  echo "BRIDGE_APP: out/linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test/chip-bridge-app" >> /tmp/test_env.yaml
-                  echo "CHIP_LOCK_APP: out/linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test/chip-lock-app" >> /tmp/test_env.yaml
-                  echo "CAMERA_APP: out/linux-x64-camera/chip-camera-app" >> /tmp/test_env.yaml
-                  echo "CAMERA_CONTROLLER_APP: out/linux-x64-camera-controller/chip-camera-controller" >> /tmp/test_env.yaml                  
-                  echo "ENERGY_MANAGEMENT_APP: out/linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test/chip-energy-management-app" >> /tmp/test_env.yaml
-                  echo "ENERGY_GATEWAY_APP: out/linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test/chip-energy-gateway-app" >> /tmp/test_env.yaml
-                  echo "LIT_ICD_APP: out/linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test/lit-icd-app" >> /tmp/test_env.yaml
-                  echo "AIR_PURIFIER_APP: out/linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test/chip-air-purifier-app" >> /tmp/test_env.yaml
-                  echo "CHIP_MICROWAVE_OVEN_APP: out/linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test/chip-microwave-oven-app" >> /tmp/test_env.yaml
-                  echo "CHIP_RVC_APP: out/linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test/chip-rvc-app" >> /tmp/test_env.yaml
-                  echo "NETWORK_MANAGEMENT_APP: out/linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test/matter-network-manager-app" >> /tmp/test_env.yaml
-                  echo "FABRIC_ADMIN_APP: out/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang/fabric-admin" >> /tmp/test_env.yaml
-                  echo "FABRIC_BRIDGE_APP: out/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang/fabric-bridge-app" >> /tmp/test_env.yaml
-                  echo "FABRIC_SYNC_APP: out/linux-x64-fabric-sync-${BUILD_VARIANT}-clang/fabric-sync" >> /tmp/test_env.yaml
-                  echo "LIGHTING_APP_NO_UNIQUE_ID: out/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang/chip-lighting-app" >> /tmp/test_env.yaml
-                  echo "TERMS_AND_CONDITIONS_APP: out/linux-x64-terms-and-conditions/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
+                  echo "ALL_CLUSTERS_APP: objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test/chip-all-clusters-app" >> /tmp/test_env.yaml
+                  echo "BRIDGE_APP: objdir-clone/linux-x64-bridge-${BUILD_VARIANT}-tsan-clang-test/chip-bridge-app" >> /tmp/test_env.yaml
+                  echo "CHIP_LOCK_APP: objdir-clone/linux-x64-lock-${BUILD_VARIANT}-tsan-clang-test/chip-lock-app" >> /tmp/test_env.yaml
+                  echo "CAMERA_APP: objdir-clone/linux-x64-camera/chip-camera-app" >> /tmp/test_env.yaml
+                  echo "CAMERA_CONTROLLER_APP: objdir-clone/linux-x64-camera-controller/chip-camera-controller" >> /tmp/test_env.yaml
+                  echo "ENERGY_MANAGEMENT_APP: objdir-clone/linux-x64-energy-management-${BUILD_VARIANT}-tsan-clang-test/chip-energy-management-app" >> /tmp/test_env.yaml
+                  echo "ENERGY_GATEWAY_APP: objdir-clone/linux-x64-energy-gateway-${BUILD_VARIANT}-tsan-clang-test/chip-energy-gateway-app" >> /tmp/test_env.yaml
+                  echo "LIT_ICD_APP: objdir-clone/linux-x64-lit-icd-${BUILD_VARIANT}-tsan-clang-test/lit-icd-app" >> /tmp/test_env.yaml
+                  echo "AIR_PURIFIER_APP: objdir-clone/linux-x64-air-purifier-${BUILD_VARIANT}-tsan-clang-test/chip-air-purifier-app" >> /tmp/test_env.yaml
+                  echo "CHIP_MICROWAVE_OVEN_APP: objdir-clone/linux-x64-microwave-oven-${BUILD_VARIANT}-tsan-clang-test/chip-microwave-oven-app" >> /tmp/test_env.yaml
+                  echo "CHIP_RVC_APP: objdir-clone/linux-x64-rvc-${BUILD_VARIANT}-tsan-clang-test/chip-rvc-app" >> /tmp/test_env.yaml
+                  echo "NETWORK_MANAGEMENT_APP: objdir-clone/linux-x64-network-manager-${BUILD_VARIANT}-tsan-clang-test/matter-network-manager-app" >> /tmp/test_env.yaml
+                  echo "FABRIC_ADMIN_APP: objdir-clone/linux-x64-fabric-admin-rpc-${BUILD_VARIANT}-clang/fabric-admin" >> /tmp/test_env.yaml
+                  echo "FABRIC_BRIDGE_APP: objdir-clone/linux-x64-fabric-bridge-rpc-${BUILD_VARIANT}-clang/fabric-bridge-app" >> /tmp/test_env.yaml
+                  echo "FABRIC_SYNC_APP: objdir-clone/linux-x64-fabric-sync-${BUILD_VARIANT}-clang/fabric-sync" >> /tmp/test_env.yaml
+                  echo "LIGHTING_APP_NO_UNIQUE_ID: objdir-clone/linux-x64-light-data-model-no-unique-id-${BUILD_VARIANT}-clang/chip-lighting-app" >> /tmp/test_env.yaml
+                  echo "TERMS_AND_CONDITIONS_APP: objdir-clone/linux-x64-terms-and-conditions/chip-terms-and-conditions-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
+                  echo "JF_CONTROL_APP: objdir-clone/linux-x64-jf-control-app/jfc-app" >> /tmp/test_env.yaml
+                  echo "JF_ADMIN_APP: objdir-clone/linux-x64-jf-admin-app/jfa-app" >> /tmp/test_env.yaml
+                  echo "CLOSURE_APP: objdir-clone/linux-x64-closure-${BUILD_VARIANT}-tsan-clang-test/closure-app" >> /tmp/test_env.yaml
+                  echo "PUSH_AV_SERVER: objdir-clone/push_av_server/server.py" >> /tmp/test_env.yaml
+
+                  # Generic trace setups after applications
                   echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
 
@@ -588,7 +735,7 @@ jobs:
                   mkdir -p out/trace_data
                   scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/controller/python/test/test_scripts/mobile-device-test.py'
                   scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.py --env-file /tmp/test_env.yaml --search-directory src/python_testing'
-                  scripts/run_in_python_env.sh out/venv "scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py --all-clusters out/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test/chip-all-clusters-app"
+                  scripts/run_in_python_env.sh out/venv "scripts/tests/TestTimeSyncTrustedTimeSourceRunner.py --all-clusters objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}-tsan-clang-test/chip-all-clusters-app"
 
             - name: Execute Jupyter Notebooks
               run: |
@@ -645,8 +792,7 @@ jobs:
             - name: Setup Environment
               # coreutils for stdbuf
               run: brew install coreutils
-            - name:
-                  Try to ensure the directories for core dumping and diagnostic
+            - name: Try to ensure the directories for core dumping and diagnostic
                   log collection exist and we can write them.
               run: |
                   sudo chown ${USER} /cores || true
@@ -655,8 +801,8 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                platform: darwin
-                bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  platform: darwin
+                  bootstrap-log-name: bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
 
             - name: Build Python REPL and example apps
               run: |

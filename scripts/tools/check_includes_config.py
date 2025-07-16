@@ -31,6 +31,7 @@ IGNORE: Set[str] = {
     '/mock/',
     '/python/',
     '/Test',
+    '/testing/',
     '/tests/',
     '/tools/',
 
@@ -140,6 +141,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h': {'string', 'vector'},
     # Camera AV Stream Management and Camera AV Settings User Level Management clusters are expected to run on resource-capable devices
     'src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.h': {'vector'},
+    'src/app/clusters/camera-av-stream-management-server/camera-av-stream-management-server.cpp': {'set'},
     'src/app/clusters/camera-av-settings-user-level-management-server/camera-av-settings-user-level-management-server.h': {'string', 'vector'},
     'src/app/clusters/webrtc-transport-requestor-server/webrtc-transport-requestor-server.h': {'string', 'vector'},
     'src/credentials/attestation_verifier/FileAttestationTrustStore.h': {'vector'},
@@ -168,6 +170,7 @@ ALLOW: Dict[str, Set[str]] = {
     'src/controller/SetUpCodePairer.cpp': {'vector'},
 
     'src/controller/ExamplePersistentStorage.cpp': {'fstream', 'string', 'map'},
+    'src/controller/ExamplePersistentStorage.h': {'string'},
 
     # Library meant for non-embedded
     'src/tracing/json/json_tracing.cpp': {'string', 'sstream'},
@@ -202,4 +205,9 @@ ALLOW: Dict[str, Set[str]] = {
     # Not intended for embedded clients
     'src/app/server/JointFabricDatastore.cpp': {'vector'},
     'src/app/server/JointFabricDatastore.h': {'vector'},
+
+    # For webrtc python bindings
+    'src/controller/webrtc/WebRTC.h': {'string'},
+    'src/controller/webrtc/WebRTCClient.h': {'map', 'string'},
+    'src/controller/webrtc/WebRTCTransportRequestorManager.cpp': {'string', 'vector'},
 }

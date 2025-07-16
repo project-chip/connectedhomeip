@@ -1120,6 +1120,11 @@ private:
     Credentials::AttestationVerificationResult mAttestationResult;
     Platform::UniquePtr<Credentials::DeviceAttestationVerifier::AttestationDeviceInfo> mAttestationDeviceInfo;
     Credentials::DeviceAttestationVerifier * mDeviceAttestationVerifier = nullptr;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+    Optional<Crypto::P256PublicKey> mTrustedIcacPublicKeyB;
+    EndpointId mPeerAdminJFAdminClusterEndpointId = kInvalidEndpointId;
+#endif
 };
 
 } // namespace Controller

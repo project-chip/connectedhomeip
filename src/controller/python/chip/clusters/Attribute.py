@@ -24,7 +24,7 @@ import inspect
 import logging
 import sys
 from asyncio.futures import Future
-from ctypes import CFUNCTYPE, POINTER, c_size_t, c_uint8, c_uint16, c_uint32, c_uint64, c_void_p, cast, py_object
+from ctypes import CFUNCTYPE, POINTER, c_bool, c_size_t, c_uint8, c_uint16, c_uint32, c_uint64, c_void_p, cast, py_object
 from dataclasses import dataclass, field
 from enum import Enum, unique
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
@@ -813,6 +813,13 @@ class AsyncReadTransaction:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(self))
 
     def handleDone(self):
+        #
+        # At the end of the life cycle, the C++ end memory has been released,
+        # and pReadClient is set to None, otherwise it will cause a dangling pointer.
+        # For example: When a subscription calls Shutdown() after an error occurs,
+        # pReadClient will be referenced, causing a crash
+        #
+        self._pReadClient = None
         self._event_loop.call_soon_threadsafe(self._handleDone)
 
     def handleReportBegin(self):
@@ -964,7 +971,7 @@ def _OnWriteDoneCallback(closure):
 
 def WriteAttributes(future: Future, eventLoop, device,
                     attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: Union[None, int] = None,
-                    interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None) -> PyChipError:
+                    interactionTimeoutMs: Union[None, int] = None, busyWaitMs: Union[None, int] = None, forceLegacyListEncoding: bool = False) -> PyChipError:
     handle = GetLibraryHandle()
 
     numberOfAttributes = len(attributes)
@@ -1001,7 +1008,8 @@ def WriteAttributes(future: Future, eventLoop, device,
             ctypes.c_size_t(
                 0 if interactionTimeoutMs is None else interactionTimeoutMs),
             ctypes.c_size_t(0 if busyWaitMs is None else busyWaitMs),
-            pyWriteAttributes, ctypes.c_size_t(numberOfAttributes))
+            pyWriteAttributes, ctypes.c_size_t(numberOfAttributes),
+            ctypes.c_bool(forceLegacyListEncoding))
     )
     if not res.is_success:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
@@ -1187,7 +1195,7 @@ def Init():
         # time where simply specified the argtypes, because of time constraints. This solution was quicker
         # to fix the crash on ARM64 Apple platforms without a refactor.
         handle.pychip_WriteClient_WriteAttributes.argtypes = [py_object, c_void_p,
-                                                              c_size_t, c_size_t, c_size_t, POINTER(PyWriteAttributeData), c_size_t]
+                                                              c_size_t, c_size_t, c_size_t, POINTER(PyWriteAttributeData), c_size_t, c_bool]
         handle.pychip_WriteClient_WriteGroupAttributes.argtypes = [
             c_size_t, c_void_p, c_size_t, POINTER(PyWriteAttributeData), c_size_t]
 

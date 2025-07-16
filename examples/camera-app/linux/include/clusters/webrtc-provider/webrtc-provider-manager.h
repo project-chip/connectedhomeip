@@ -19,16 +19,19 @@
 #pragma once
 
 #include "camera-device-interface.h"
+#include "webrtc-abstract.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/CASESessionManager.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
 #include <media-controller.h>
-#include <rtc/rtc.hpp>
 #include <webrtc-transport.h>
 
 #include <unordered_map>
 
-namespace Camera {
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace WebRTCTransportProvider {
 
 using ICEServerDecodableStruct = chip::app::Clusters::Globals::Structs::ICEServerStruct::DecodableType;
 using WebRTCSessionStruct      = chip::app::Clusters::Globals::Structs::WebRTCSessionStruct::Type;
@@ -36,7 +39,7 @@ using ICECandidateStruct       = chip::app::Clusters::Globals::Structs::ICECandi
 using StreamUsageEnum          = chip::app::Clusters::Globals::StreamUsageEnum;
 using WebRTCEndReasonEnum      = chip::app::Clusters::Globals::WebRTCEndReasonEnum;
 
-class WebRTCProviderManager : public chip::app::Clusters::WebRTCTransportProvider::Delegate
+class WebRTCProviderManager : public Delegate
 {
 public:
     WebRTCProviderManager() :
@@ -68,6 +71,18 @@ public:
     CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage,
                                    const chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & videoStreamId,
                                    const chip::Optional<chip::app::DataModel::Nullable<uint16_t>> & audioStreamId) override;
+
+    void SetCameraDevice(CameraDeviceInterface * aCameraDevice);
+
+    CHIP_ERROR ValidateVideoStreamID(uint16_t videoStreamId) override;
+
+    CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) override;
+
+    CHIP_ERROR IsPrivacyModeActive(bool & isActive) override;
+
+    bool HasAllocatedVideoStreams() override;
+
+    bool HasAllocatedAudioStreams() override;
 
 private:
     enum class CommandType : uint8_t
@@ -103,13 +118,24 @@ private:
 
     CHIP_ERROR SendICECandidatesCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle);
 
+    CHIP_ERROR AcquireAudioVideoStreams();
+
+    CHIP_ERROR ReleaseAudioVideoStreams();
+
     static void OnDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
                                   const chip::SessionHandle & sessionHandle);
 
     static void OnDeviceConnectionFailure(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 
-    std::shared_ptr<rtc::PeerConnection> mPeerConnection;
-    std::shared_ptr<rtc::Track> mVideoTrack;
+    // WebRTC Callbacks
+    void OnLocalDescription(const std::string & sdp, SDPType type);
+    void OnICECandidate(const std::string & candidate);
+    void OnConnectionStateChanged(bool connected);
+    void OnTrack(std::shared_ptr<WebRTCTrack> track);
+
+    std::shared_ptr<WebRTCPeerConnection> mPeerConnection;
+    std::shared_ptr<WebRTCTrack> mVideoTrack;
+    std::shared_ptr<WebRTCTrack> mAudioTrack;
 
     chip::ScopedNodeId mPeerId;
     chip::EndpointId mOriginatingEndpointId;
@@ -134,6 +160,13 @@ private:
     uint16_t mAudioStreamID;
 
     MediaController * mMediaController = nullptr;
+
+    // Handle to the Camera Device interface. For accessing other
+    // clusters, if required.
+    CameraDeviceInterface * mCameraDevice = nullptr;
 };
 
-} // namespace Camera
+} // namespace WebRTCTransportProvider
+} // namespace Clusters
+} // namespace app
+} // namespace chip

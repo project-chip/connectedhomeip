@@ -41,6 +41,8 @@ enum class OptionalAttributeEnum : uint32_t
 {
     kCountdownTime = 0x1
 };
+// As per the spec, the maximum allowed CurrentErrorList size is 10.
+constexpr int kCurrentErrorListMaxSize = 10;
 
 /**
  * @brief Structure is used to configure and validate the Cluster configuration.
@@ -115,12 +117,14 @@ struct ClusterState
     };
 
     QuieterReportingAttribute<ElapsedS> mCountdownTime{ DataModel::NullNullable };
-    MainStateEnum mMainState                                 = MainStateEnum::kUnknownEnumValue;
-    DataModel::Nullable<GenericOverallState> mOverallState   = DataModel::NullNullable;
-    DataModel::Nullable<GenericOverallTarget> mOverallTarget = DataModel::NullNullable;
+    MainStateEnum mMainState                                             = MainStateEnum::kUnknownEnumValue;
+    DataModel::Nullable<GenericOverallCurrentState> mOverallCurrentState = DataModel::NullNullable;
+    DataModel::Nullable<GenericOverallTargetState> mOverallTargetState   = DataModel::NullNullable;
+    BitFlags<LatchControlModesBitmap> mLatchControlModes;
+    ClosureErrorEnum mCurrentErrorList[kCurrentErrorListMaxSize] = {};
 
-    // CurrentErrorList attribute is not stored here. When it is necessary it will be requested from the delegate to get the current
-    // active errors.
+    // The current error count is used to track the number of errors in the CurrentErrorList.
+    size_t mCurrentErrorCount = 0;
 };
 
 /**
@@ -128,8 +132,8 @@ struct ClusterState
  */
 struct ClusterInitParameters
 {
-    MainStateEnum mMainState                               = MainStateEnum::kStopped;
-    DataModel::Nullable<GenericOverallState> mOverallState = DataModel::NullNullable;
+    MainStateEnum mMainState                                             = MainStateEnum::kStopped;
+    DataModel::Nullable<GenericOverallCurrentState> mOverallCurrentState = DataModel::NullNullable;
 };
 
 /**
@@ -169,22 +173,59 @@ public:
 
     CHIP_ERROR GetCountdownTime(DataModel::Nullable<ElapsedS> & countdownTime);
     CHIP_ERROR GetMainState(MainStateEnum & mainState);
-    CHIP_ERROR GetOverallState(DataModel::Nullable<GenericOverallState> & overallState);
-    CHIP_ERROR GetOverallTarget(DataModel::Nullable<GenericOverallTarget> & overallTarget);
-    // The delegate is expected to return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED to indicate end of list
-    CHIP_ERROR GetCurrentErrorList(const AttributeValueEncoder::ListEncodeHelper & aEncoder);
+    CHIP_ERROR GetOverallCurrentState(DataModel::Nullable<GenericOverallCurrentState> & overallCurrentState);
+    CHIP_ERROR GetOverallTargetState(DataModel::Nullable<GenericOverallTargetState> & overallTarget);
+    CHIP_ERROR GetLatchControlModes(BitFlags<LatchControlModesBitmap> & latchControlModes);
+    CHIP_ERROR GetFeatureMap(BitFlags<Feature> & featureMap);
+    CHIP_ERROR GetClusterRevision(Attributes::ClusterRevision::TypeInfo::Type & clusterRevision);
 
     /**
-     * @brief Set OverallTarget.
+     * @brief Gets the current error list.
+     *        This method is used to retrieve the current error list.
+     *        The outputSpan must initially be of size kCurrentErrorListMaxSize and will be resized to the correct size for the
+     * list.
+     * @param[out] outputSpan The span to fill with the current error list.
      *
-     * @param[in] overallTarget OverallTarget Position, Latch and Speed.
+     * @return CHIP_NO_ERROR if the retrieval was successful.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     *         CHIP_ERROR_BUFFER_TOO_SMALL if the outputSpan size is not equal to kCurrentErrorListMaxSize.
+     */
+    CHIP_ERROR GetCurrentErrorList(Span<ClosureErrorEnum> & outputSpan);
+
+    /**
+     * @brief Reads the CurrentErrorList attribute.
+     *        This method is used to read the CurrentErrorList attribute and encode it using the provided encoder.
+     *
+     * @param[in] encoder The encoder to use for encoding the CurrentErrorList attribute.
+     *
+     * @return CHIP_NO_ERROR if the read was successful.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     */
+    CHIP_ERROR ReadCurrentErrorListAttribute(const AttributeValueEncoder::ListEncodeHelper & encoder);
+
+    /**
+     * @brief Set SetOverallCurrentState.
+     *
+     * @param[in] overallCurrentState SetOverallCurrentState Position, Latch and Speed.
      *
      * @return CHIP_NO_ERROR if set was successful.
      *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
      *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
      *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
      */
-    CHIP_ERROR SetOverallState(const DataModel::Nullable<GenericOverallState> & overallState);
+    CHIP_ERROR SetOverallCurrentState(const DataModel::Nullable<GenericOverallCurrentState> & overallCurrentState);
+
+    /**
+     * @brief Set OverallTargetState.
+     *
+     * @param[in] overallTarget OverallTargetState Position, Latch and Speed.
+     *
+     * @return CHIP_NO_ERROR if set was successful.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     */
+    CHIP_ERROR SetOverallTargetState(const DataModel::Nullable<GenericOverallTargetState> & overallTarget);
 
     /**
      * @brief Sets the main state of the cluster.
@@ -202,6 +243,16 @@ public:
     CHIP_ERROR SetMainState(MainStateEnum mainState);
 
     /**
+     * @brief Sets the latch control modes for the closure control cluster.
+     *        This method updates the latch control modes using the provided bit flags.
+     *
+     * @param[in] latchControlModes  Reference to a BitFlags object representing the desired latch control modes.
+     *
+     * @return CHIP_ERROR Returns CHIP_NO_ERROR on success, or an appropriate error code on failure.
+     */
+    CHIP_ERROR SetLatchControlModes(const BitFlags<LatchControlModesBitmap> & latchControlModes);
+
+    /**
      * @brief Triggers an update to report a new countdown time from application.
      *        This method should be called whenever the application needs to update the countdown time.
      *
@@ -214,6 +265,23 @@ public:
     {
         return SetCountdownTime(countdownTime, true);
     }
+
+    /**
+     * @brief Adds error to current error list.
+     *
+     * @param[in] error The error to be added to the current error list.
+     *
+     * @return CHIP_NO_ERROR if the error was added successfully.
+     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
+     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
+     */
+    CHIP_ERROR AddErrorToCurrentErrorList(ClosureErrorEnum error);
+
+    /**
+     * @brief Clears the current error list.
+     *        This method should be called whenever the current error list needs to be reset.
+     */
+    void ClearCurrentErrorList();
 
     /**
      *  @brief Calls delegate HandleStopCommand function after validating MainState, parameters and conformance.
@@ -278,14 +346,14 @@ public:
      * @param[in] EngageValue will indicate if the actuator is Engaged or Disengaged
      *
      * @return CHIP_NO_ERROR if the event is generated successfull
-     *         CHIP_NO_ERROR if hte ManuallyOperable feature is not supported.
+     *         CHIP_NO_ERROR if the ManuallyOperable feature is not supported.
      *         Returns an appropriate error code if event generation fails
      */
     CHIP_ERROR GenerateEngageStateChangedEvent(const bool engageValue);
 
     /**
      * @brief Generates EngageStateChanged event.
-     *        This method should be called whenever when the SecureState field in the OverallState attribute changes.
+     *        This method should be called whenever when the SecureState field in the OverallCurrentState attribute changes.
      *
      * @param[in] secureValue will indicate whether a closure is securing a space against possible unauthorized entry.
      *
@@ -320,18 +388,7 @@ private:
     bool IsSupportedMainState(MainStateEnum mainState) const;
 
     /**
-     * @brief Function validates if the requested mainState is a valid transition from the current state.
-     *        TODO: Add functionnal description of the state machine
-     *
-     * @param mainState requested main state to be applied
-     *
-     * @return true, transition from current to requested is valid
-     *         false, otherwise
-     */
-    bool IsValidMainStateTransition(MainStateEnum mainState) const;
-
-    /**
-     * @brief Function validates if the requested overallState positioning is supported by the closure.
+     * @brief Function validates if the requested overallCurrentState positioning is supported by the closure.
      *        Function validates against the FeatureMap conformance to validate support.
      *
      * @param positioning requested Positioning to validate
@@ -339,10 +396,10 @@ private:
      * @return true if the requested Positioning is supported
      *        false, otherwise
      */
-    bool IsSupportedOverallStatePositioning(PositioningEnum positioning) const;
+    bool IsSupportedOverallCurrentStatePositioning(CurrentPositionEnum positioning) const;
 
     /**
-     * @brief Function validates if the requested OverallTarget positioning is supported by the closure.
+     * @brief Function validates if the requested OverallTargetState positioning is supported by the closure.
      *        Function validates agaisnt the FeatureMap conformance to validate support.
      *
      * @param positioning requested Positioning to validate
@@ -350,7 +407,7 @@ private:
      * @return true if the requested Positioning is supported
      *        false, otherwise
      */
-    bool IsSupportedOverallTargetPositioning(TargetPositionEnum positioning) const;
+    bool IsSupportedOverallTargetStatePositioning(TargetPositionEnum positioning) const;
 
     /**
      * @brief Updates the countdown time based on the Quiet reporting conditions of the attribute.
@@ -374,18 +431,6 @@ private:
     {
         return SetCountdownTime(countdownTime, false);
     }
-
-    /**
-     * @brief Set OverallTarget.
-     *
-     * @param[in] overallTarget OverallTarget Position, Latch and Speed.
-     *
-     * @return CHIP_NO_ERROR if set was successful.
-     *         CHIP_ERROR_INCORRECT_STATE if the cluster has not been initialized.
-     *         CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if feature is not supported.
-     *         CHIP_ERROR_INVALID_ARGUMENT if argument are not valid
-     */
-    CHIP_ERROR SetOverallTarget(const DataModel::Nullable<GenericOverallTarget> & overallTarget);
 };
 
 } // namespace ClosureControl

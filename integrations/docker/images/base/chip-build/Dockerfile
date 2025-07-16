@@ -40,6 +40,8 @@ RUN set -x \
     clang-tidy \
     cmake \
     curl \
+    dbus-daemon \
+    ffmpeg \
     flex \
     g++ \
     generate-ninja \
@@ -54,8 +56,12 @@ RUN set -x \
     lcov \
     libavahi-client-dev \
     libavahi-common-dev \
+    libavcodec-dev \
+    libavformat-dev \
+    libavutil-dev \
     libcairo2-dev \
     libcairo-dev \
+    libcurl4-openssl-dev \
     libdbus-1-dev \
     libdbus-glib-1-dev \
     libdmalloc-dev \
