@@ -61,7 +61,7 @@ void emberAfThermostatClusterInitCallback(EndpointId endpoint)
     const auto logOnFailure = [](Protocols::InteractionModel::Status status, const char * attributeName) {
         if (status != Protocols::InteractionModel::Status::Success)
         {
-            ChipLogError(Zcl, "Failed to set DoorLock %s: %x", attributeName, to_underlying(status));
+            ChipLogError(Zcl, "Failed to set Thermostat %s: %x", attributeName, to_underlying(status));
         }
     };
 
