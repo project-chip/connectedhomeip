@@ -442,9 +442,10 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             # STEP 5c: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyOpened.
             self.step("5c")
 
-            logging.info("Waiting for OverallCurrentState.Position to be FullyOpened and OverallCurrentState.SecureState to be False")
+            logging.info("Waiting for OverallCurrentState.Position to be FullyOpened and the corresponding MovementCompleted event.")
             sub_handler.await_all_expected_report_matches(expected_matchers=[current_position_matcher(Clusters.ClosureControl.Enums.CurrentPositionEnum.kFullyOpened)],
                                                           timeout_sec=timeout)
+            event_sub_handler.wait_for_event_report(Clusters.ClosureControl.Events.MovementCompleted, timeout_sec=timeout)
 
             # STEP 5d: TH sends command MoveTo with Position = MoveToFullyClosed
             self.step("5d")
