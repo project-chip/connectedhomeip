@@ -876,7 +876,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                   # skip step 2 if condition not met
            """
         await self._populate_wildcard()
-        attr_condition = _has_attribute(wildcard=self.stored_global_wildcard, endpoint=endpoint, attribute=attribute)
+        attr_condition = decorators._has_attribute(wildcard=self.stored_global_wildcard, endpoint=endpoint, attribute=attribute)
         if not attr_condition:
             self.mark_current_step_skipped()
         return attr_condition
@@ -895,7 +895,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                   # skip step 2 if condition not met
            """
         await self._populate_wildcard()
-        cmd_condition = _has_command(wildcard=self.stored_global_wildcard, endpoint=endpoint, command=command)
+        cmd_condition = decorators._has_command(wildcard=self.stored_global_wildcard, endpoint=endpoint, command=command)
         if not cmd_condition:
             self.mark_current_step_skipped()
         return cmd_condition
@@ -914,7 +914,8 @@ class MatterBaseTest(base_test.BaseTestClass):
                   # skip step 2 if condition not met
            """
         await self._populate_wildcard()
-        feat_condition = _has_feature(wildcard=self.stored_global_wildcard, endpoint=endpoint, cluster=cluster, feature=feature_int)
+        feat_condition = decorators._has_feature(wildcard=self.stored_global_wildcard,
+                                                 endpoint=endpoint, cluster=cluster, feature=feature_int)
         if not feat_condition:
             self.mark_current_step_skipped()
         return feat_condition
