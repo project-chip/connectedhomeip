@@ -50,7 +50,7 @@ from chip.clusters import ClusterObjects, MeterIdentification
 from chip.clusters.Attribute import SubscriptionTransaction, TypedAttributePath
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
-from TC_MTRID_TestBase import MeterIdentificationTestBaseHelper
+from TC_MTRIDTestBase import MeterIdentificationTestBaseHelper
 
 logger = logging.getLogger(__name__)
 
