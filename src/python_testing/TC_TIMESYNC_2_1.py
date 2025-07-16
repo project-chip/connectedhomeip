@@ -51,7 +51,7 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
         cluster = Clusters.Objects.TimeSynchronization
         return await self.read_single_attribute_check_success(endpoint=None, cluster=cluster, attribute=attribute)
 
-    @decorators.run_if_endpoint_matches(has_cluster(Clusters.TimeSynchronization) and has_attribute(Clusters.TimeSynchronization.Attributes.TimeSource))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.TimeSynchronization) and decorators.has_attribute(Clusters.TimeSynchronization.Attributes.TimeSource))
     async def test_TC_TIMESYNC_2_1(self):
         attributes = Clusters.TimeSynchronization.Attributes
         features = await self.read_ts_attribute_expect_success(attribute=attributes.FeatureMap)

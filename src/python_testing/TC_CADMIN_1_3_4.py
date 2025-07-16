@@ -304,7 +304,7 @@ class TC_CADMIN(MatterBaseTest):
                      "TH_CR1 removes TH_CR2 fabric using th2_idx")
         ]
 
-    @decorators.run_if_endpoint_matches(has_cluster(Clusters.AdministratorCommissioning))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.AdministratorCommissioning))
     async def test_TC_CADMIN_1_3(self):
         await self.combined_commission_val_steps(commission_type="ECM")
 

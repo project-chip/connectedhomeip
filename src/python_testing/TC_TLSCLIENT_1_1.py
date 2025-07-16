@@ -70,7 +70,7 @@ class TC_TLSCLIENT_1_1(MatterBaseTest):
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
             return e
 
-    @decorators.run_if_endpoint_matches(has_cluster(Clusters.TlsClientManagement))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.TlsClientManagement))
     async def test_TC_TLSCLIENT_1_1(self):
 
         endpoint = self.get_endpoint(default=1)

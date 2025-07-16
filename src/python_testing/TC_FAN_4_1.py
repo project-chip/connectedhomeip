@@ -141,7 +141,7 @@ class TC_FAN_4_1(MatterBaseTest):
     def pics_TC_FAN_4_1(self) -> list[str]:
         return ["FAN.S", "OO.S"]
 
-    @decorators.run_if_endpoint_matches(has_cluster(Clusters.FanControl) and has_cluster(Clusters.OnOff))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.FanControl) and decorators.has_cluster(Clusters.OnOff))
     async def test_TC_FAN_4_1(self):
         self.step(1)
         fan = Clusters.FanControl

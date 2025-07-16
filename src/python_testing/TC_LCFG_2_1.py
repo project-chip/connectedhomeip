@@ -65,7 +65,7 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
             TestStep(5, "TH reads ActiveLocale")
         ]
 
-    @decorators.run_if_endpoint_matches(has_cluster(Clusters.LocalizationConfiguration))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.LocalizationConfiguration))
     async def test_TC_LCFG_2_1(self):
 
         endpoint = self.get_endpoint(default=0)
