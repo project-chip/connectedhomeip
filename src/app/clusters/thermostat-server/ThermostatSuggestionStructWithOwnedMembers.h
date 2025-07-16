@@ -29,6 +29,7 @@
 #include <clusters/Thermostat/Structs.h>
 #include <cstdint>
 #include <lib/support/Span.h>
+#include <system/SystemClock.h>
 #include <stddef.h>
 
 namespace chip {
@@ -49,13 +50,13 @@ public:
 
     void SetUniqueID(uint8_t newUniqueID);
     CHIP_ERROR SetPresetHandle(const ByteSpan & newPresetHandle);
-    void SetEffectiveTime(const uint32_t newEffectiveTime);
-    void SetExpirationTime(const uint32_t newExpirationTime);
+    void SetEffectiveTime(const System::Clock::Seconds32 newEffectiveTime);
+    void SetExpirationTime(const System::Clock::Seconds32 newExpirationTime);
 
     uint8_t GetUniqueID() const;
     const ByteSpan & GetPresetHandle() const;
-    uint32_t GetEffectiveTime() const;
-    uint32_t GetExpirationTime() const;
+    System::Clock::Seconds32 GetEffectiveTime() const;
+    System::Clock::Seconds32 GetExpirationTime() const;
 
     using Structs::ThermostatSuggestionStruct::Type::Encode;
     using Structs::ThermostatSuggestionStruct::Type::kIsFabricScoped;

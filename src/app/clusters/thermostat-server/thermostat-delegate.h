@@ -195,26 +195,29 @@ public:
      *        attribute to null.
      *        Note: The caller of this API has the responsibility to mark the relevant attributes dirty.
      *
-     * @param[in] uniqueID The UniqueID of the thermostat suggestion to remove from the list.
+     * @param[in] indexToRemove The index of the thermostat suggestion to remove from the list.
      *
      * @return CHIP_NO_ERROR if the thermostat suggestion was removed from the list successfully.
      * @return CHIP_ERROR if the thermostat suggestion was not found in the list.
      */
-    virtual CHIP_ERROR RemoveFromThermostatSuggestionsList(uint8_t uniqueID) = 0;
+    virtual CHIP_ERROR RemoveFromThermostatSuggestionsList(size_t indexToRemove) = 0;
 
     /**
      * @brief Returns an unused unique ID for a thermostat suggestion.
      *
-     * @return an unique ID starting from 0 to UINT8_MAX.
+     * @param[out] an unique ID starting from 0 to UINT8_MAX.
+     *
+     * @return CHIP_NO_ERROR if a unique ID was found
+     *         CHIP_ERROR_PROVIDER_LIST_EXHAUSTED if no uniqueID was found.
      */
-    virtual uint8_t GetUniqueID() = 0;
+    virtual CHIP_ERROR GetUniqueID(uint8_t & uniqueID) = 0;
 
     /**
      * @brief Evaluates and sets the CurrentThermostatSuggestion attribute based on whether the thermostat has any state changes
      * (like a reboot, etc) or a thermostat suggestion was added or removed. Sets the CurrentThermostatSuggestion attribute to null
      * if the server wasn't able to determine a current suggestion, sets the ThermostatSuggestionNotFollowingReason accordingly.
-     * This API should be responsible for removing expired suggestions and keeping track of ExpirationTime for the current
-     * thermostat suggestion and re-evaluating the next current suggestion when the current suggestion expires.
+     * This API should be responsible for keeping track of ExpirationTime for the current thermostat suggestion and re-evaluating
+     * the next current suggestion when the current suggestion expires.
      *
      * @return CHIP_NO_ERROR if a current thermostat suggestion was evaluated successfully.
      * @return CHIP_ERROR if there was an error evaluating the current thermostat suggestion.
