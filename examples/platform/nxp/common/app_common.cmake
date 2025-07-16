@@ -41,10 +41,6 @@ if (CONFIG_CHIP_APP_COMMON)
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/factory_data/include
         ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/icd/include
     )
-    target_compile_definitions(app
-        PRIVATE
-        APP_QUEUE_TICKS_TO_WAIT=${CONFIG_CHIP_APP_QUEUE_TICKS_TO_WAIT}
-    )
 
     if (CONFIG_APP_FREERTOS_OS)
         target_sources(app PRIVATE
