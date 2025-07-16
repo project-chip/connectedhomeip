@@ -81,7 +81,8 @@ public:
     /* Lifecycle Management:
      * The CodeDrivenDataModelProvider stores pointers to EndpointInterface, but does NOT take ownership.
      * Any EndpointInterface instance MUST outlive the CodeDrivenDataModelProvider it is registered with.
-     * Similarly, EndpointInterfaceRegistration objects passed to AddEndpoint must outlive their registration.
+     * Similarly, EndpointInterfaceRegistration objects passed to AddEndpoint must survive until either
+     * RemoveEndpoint is called on their endpoint ID or the CodeDrivenDataModelProvider is shut down.
      */
     CHIP_ERROR AddEndpoint(EndpointInterfaceRegistration & registration);
     CHIP_ERROR RemoveEndpoint(EndpointId endpointId);
