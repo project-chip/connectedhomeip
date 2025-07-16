@@ -30,7 +30,7 @@ namespace {
 using namespace chip;
 using namespace chip::app;
 
-CHIP_ERROR StartupServerClusters(EndpointInterface * endpointProvider, ServerClusterContext & serverClusterContext)
+CHIP_ERROR StartupServerClusters(EndpointInterface * endpoint ServerClusterContext & serverClusterContext)
 {
     VerifyOrReturnError(endpointProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
