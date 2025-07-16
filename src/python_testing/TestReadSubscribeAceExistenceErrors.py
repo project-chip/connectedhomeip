@@ -37,12 +37,13 @@
 
 import copy
 import logging
+from typing import Union, Type
+from mobly import asserts  # type: ignore
 
 import chip.clusters as Clusters
 from chip.exceptions import ChipStackError
 from chip.interaction_model import Status
 from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
-from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
@@ -53,15 +54,13 @@ INVALID_ACTION_ERROR_CODE = 0x580
 
 class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
 
-    async def get_dut_acl(self, ctrl, ep=ROOT_NODE_ENDPOINT_ID):
+    async def get_dut_acl(self, ctrl):
         sub = await ctrl.ReadAttribute(
             nodeid=self.dut_node_id,
-            attributes=[(ep, Clusters.AccessControl.Attributes.Acl)],
-            keepSubscriptions=False,
+            attributes=[(ROOT_NODE_ENDPOINT_ID, Clusters.AccessControl.Attributes.Acl)],
             fabricFiltered=True
         )
-
-        acl_list = sub[ep][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
+        acl_list = sub[ROOT_NODE_ENDPOINT_ID][Clusters.AccessControl][Clusters.AccessControl.Attributes.Acl]
 
         return acl_list
 
@@ -90,10 +89,19 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         await self.write_acl(self.TH1, self.dut_acl_original)
 
     @staticmethod
-    def verify_attribute_exists(res, cluster, attribute, ep=ROOT_NODE_ENDPOINT_ID):
-        attrs = res
-        if isinstance(attrs, Clusters.Attribute.SubscriptionTransaction):
-            attrs = attrs.GetAttributes()
+    def verify_attribute_exists(res: Union[Clusters.Attribute.SubscriptionTransaction, dict],
+                                cluster:  Type[Clusters.ClusterObjects.Cluster],
+                                attribute: Type[Clusters.ClusterObjects.ClusterAttributeDescriptor],
+                                ep: int = ROOT_NODE_ENDPOINT_ID):
+        '''
+        This method can be used with the Response of Read Request and Subscribe Requests.
+
+        res: the response of ReadAttribute when used with Subscription or Read Requests
+        '''
+        if isinstance(res, Clusters.Attribute.SubscriptionTransaction):
+            attrs = res.GetAttributes()
+        else:
+            attrs = res
 
         asserts.assert_true(ep in attrs, "Must have read endpoint %s data" % ep)
         asserts.assert_true(cluster in attrs[ep], "Must have read %s cluster data" % cluster.__name__)
