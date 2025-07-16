@@ -305,15 +305,20 @@ void BluezEndpoint::UpdateConnectionTable(BluezDevice1 & aDevice)
     if (conn != nullptr && !bluez_device1_get_connected(&aDevice))
     {
         ChipLogDetail(DeviceLayer, "BLE connection closed: conn=%p", conn);
+        // Notify the BLE layer that the connection was closed.
         BLEManagerImpl::HandleConnectionClosed(conn);
         mConnMap.erase(objectPath);
-        // TODO: the connection object should be released after BLEManagerImpl finishes cleaning up its resources
-        // after the disconnection. Releasing it here doesn't cause any issues, but it's error-prone.
-        chip::Platform::Delete(conn);
-        return;
+        // The BLE layer notification above is done asynchronously (it will be processed
+        // in the next event loop iteration). So, we can not delete the connection object
+        // immediately, because the BLE layer might still use it. Instead, we will also
+        // schedule the deletion of the connection object, so it will happen after the
+        // BLE layer has processed the disconnection event.
+        DeviceLayer::SystemLayer().ScheduleLambda([this, conn] {
+            ChipLogDetail(DeviceLayer, "Freeing BLE connection: conn=%p", conn);
+            chip::Platform::Delete(conn);
+        });
     }
-
-    if (conn == nullptr)
+    else if (conn == nullptr)
     {
         HandleNewDevice(aDevice);
     }
