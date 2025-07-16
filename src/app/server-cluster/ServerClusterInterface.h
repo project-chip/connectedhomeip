@@ -34,8 +34,7 @@ namespace app {
 
 /// Handles cluster interactions for a specific set of clusters.
 ///
-/// A `ServerClusterInterface` instance may be associated with multiple clusters and
-/// `endpointId/clusterId` paths.
+/// A `ServerClusterInterface` instance may be associated with multiple `endpointId/clusterId` paths.
 ///
 /// Provides metadata as well as interaction processing (attribute read/write and command handling).
 class ServerClusterInterface
