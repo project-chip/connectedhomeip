@@ -24,7 +24,7 @@ static void SetUpTestSuite()
     static void TearDownTestSuite()
     {
         Platform::MemoryShutdown();
-    }    
+    }
 protected:
     TransferSession mTransferSession{};
 };
@@ -81,7 +81,7 @@ TEST_F(TestTransferDiagnosticLog, InitsDiagnosticLog) {
 }
 
 TEST_F(TestTransferDiagnosticLog, AccpetsTransferActingAsReceiverWhileInititatorDrivesTransfer) {
-    
+
     auto proxyDiagnosticLog = BDXTransferProxyDiagnosticLog();
 
     TransferSession initiator;
@@ -99,7 +99,7 @@ TEST_F(TestTransferDiagnosticLog, AccpetsTransferActingAsReceiverWhileInititator
 
     /// Init initiator (and sender) transfer session
     auto r = initiator.StartTransfer(TransferRole::kSender, transferInitData, System::Clock::Seconds16(10));
-    
+
     EXPECT_EQ(r, CHIP_NO_ERROR);
 
     TransferSession::OutputEvent initiatorEvent;
@@ -143,7 +143,7 @@ TEST_F(TestTransferDiagnosticLog, AccpetsTransferActingAsReceiverWhileInititator
 
 
 TEST_F(TestTransferDiagnosticLog, RejectsInTheMiddleOfTransfer) {
-    
+
     auto proxyDiagnosticLog = BDXTransferProxyDiagnosticLog();
 
     TransferSession initiator;
@@ -161,7 +161,7 @@ TEST_F(TestTransferDiagnosticLog, RejectsInTheMiddleOfTransfer) {
 
     /// Init initiator (and sender) transfer session
     auto r = initiator.StartTransfer(TransferRole::kSender, transferInitData, System::Clock::Seconds16(10));
-    
+
     EXPECT_EQ(r, CHIP_NO_ERROR);
 
     TransferSession::OutputEvent initiatorEvent;
@@ -218,7 +218,7 @@ TEST_F(TestTransferDiagnosticLog, RejectsInTheMiddleOfTransfer) {
     blockData.Length       = 8;
     blockData.IsEof        = false;
     blockData.BlockCounter = 0;
-    
+
     initiator.PrepareBlock(blockData);
 
     initiator.PollOutput(initiatorEvent, System::Clock::kZero);
@@ -236,7 +236,7 @@ TEST_F(TestTransferDiagnosticLog, RejectsInTheMiddleOfTransfer) {
     mTransferSession.PollOutput(responderEvent, System::Clock::kZero);
 
     EXPECT_EQ(responderEvent.EventType, TransferSession::OutputEventType::kBlockReceived);
-    
+
     /// proxy acknowledges block
     r = proxyDiagnosticLog.Continue();
 
