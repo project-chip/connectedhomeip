@@ -56,6 +56,8 @@ async def establish_session(devCtrl: ChipDeviceCtrl.ChipDeviceControllerBase, pa
             raise ValueError("No commissionable device found")
         if isinstance(device, list):
             single_device = device[0]
+        else:
+            single_device = device
         for ip in single_device.addresses:
             if ipaddress.ip_address(ip).is_link_local:
                 # TODO(erjiaqing): To connect a device using link local address requires an interface identifier,
