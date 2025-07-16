@@ -313,12 +313,12 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             if restart_monitor_thread and restart_monitor_thread.is_alive():
                 logging.info("Stopping app restart monitor thread")
                 restart_monitor_thread.join(2.0)
+        
+        # Get the current app manager if it exists
         current_app_manager = None
         if app_manager_ref:
             with app_manager_lock:
                 current_app_manager = app_manager_ref[0]
-        else:
-            current_app_manager = app_manager
 
         if current_app_manager:
             logging.info("Stopping app with SIGTERM")
