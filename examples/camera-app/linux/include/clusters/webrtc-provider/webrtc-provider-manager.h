@@ -19,11 +19,11 @@
 #pragma once
 
 #include "camera-device-interface.h"
+#include "webrtc-abstract.h"
 #include <app-common/zap-generated/cluster-enums.h>
 #include <app/CASESessionManager.h>
 #include <app/clusters/webrtc-transport-provider-server/webrtc-transport-provider-server.h>
 #include <media-controller.h>
-#include <rtc/rtc.hpp>
 #include <webrtc-transport.h>
 
 #include <unordered_map>
@@ -127,9 +127,15 @@ private:
 
     static void OnDeviceConnectionFailure(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
 
-    std::shared_ptr<rtc::PeerConnection> mPeerConnection;
-    std::shared_ptr<rtc::Track> mVideoTrack;
-    std::shared_ptr<rtc::Track> mAudioTrack;
+    // WebRTC Callbacks
+    void OnLocalDescription(const std::string & sdp, SDPType type);
+    void OnICECandidate(const std::string & candidate);
+    void OnConnectionStateChanged(bool connected);
+    void OnTrack(std::shared_ptr<WebRTCTrack> track);
+
+    std::shared_ptr<WebRTCPeerConnection> mPeerConnection;
+    std::shared_ptr<WebRTCTrack> mVideoTrack;
+    std::shared_ptr<WebRTCTrack> mAudioTrack;
 
     chip::ScopedNodeId mPeerId;
     chip::EndpointId mOriginatingEndpointId;

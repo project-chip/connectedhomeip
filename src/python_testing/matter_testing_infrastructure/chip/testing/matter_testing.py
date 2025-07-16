@@ -32,7 +32,7 @@ import textwrap
 import typing
 from binascii import unhexlify
 from dataclasses import asdict as dataclass_asdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from enum import IntFlag
 from itertools import chain
@@ -43,6 +43,7 @@ import chip.testing.decorators as decorators
 import chip.testing.matchers as matchers
 import chip.testing.runner as runner
 import chip.testing.timeoperations as timeoperations
+from chip.testing.matter_test_config import MatterTestConfig
 
 # isort: off
 
@@ -187,77 +188,6 @@ class AttributeMatcher:
                 return self._matcher(report)
 
         return AttributeMatcherFromCallable(description, matcher)
-
-
-@dataclass
-class MatterTestConfig:
-    storage_path: pathlib.Path = pathlib.Path(".")
-    logs_path: pathlib.Path = pathlib.Path(".")
-    paa_trust_store_path: Optional[pathlib.Path] = None
-    ble_controller: Optional[int] = None
-    commission_only: bool = False
-
-    admin_vendor_id: int = _DEFAULT_ADMIN_VENDOR_ID
-    case_admin_subject: Optional[int] = None
-    global_test_params: dict = field(default_factory=dict)
-    # List of explicit tests to run by name. If empty, all tests will run
-    tests: List[str] = field(default_factory=list)
-    timeout: OptionalTimeout = None
-    endpoint: typing.Union[int, None] = 0
-    app_pid: int = 0
-    app_pipe: Optional[str] = None
-    pipe_name: typing.Union[str, None] = None
-    fail_on_skipped_tests: bool = False
-
-    commissioning_method: Optional[str] = None
-    in_test_commissioning_method: Optional[str] = None
-    discriminators: List[int] = field(default_factory=list)
-    setup_passcodes: List[int] = field(default_factory=list)
-    commissionee_ip_address_just_for_testing: Optional[str] = None
-    # By default, we start with maximized cert chains, as required for RR-1.1.
-    # This allows cert tests to be run without re-commissioning for RR-1.1.
-    maximize_cert_chains: bool = True
-
-    # By default, let's set validity to 10 years
-    certificate_validity_period = int(timedelta(days=10*365).total_seconds())
-
-    qr_code_content: List[str] = field(default_factory=list)
-    manual_code: List[str] = field(default_factory=list)
-
-    wifi_ssid: Optional[str] = None
-    wifi_passphrase: Optional[str] = None
-    thread_operational_dataset: Optional[bytes] = None
-
-    pics: dict[str, bool] = field(default_factory=dict)
-
-    # Node ID for basic DUT
-    dut_node_ids: List[int] = field(default_factory=list)
-    # Node ID to use for controller/commissioner
-    controller_node_id: int = _DEFAULT_CONTROLLER_NODE_ID
-    # CAT Tags for default controller/commissioner
-    # By default, we commission with CAT tags specified for RR-1.1
-    # so the cert tests can be run without re-commissioning the device
-    # for this one test. This can be overwritten from the command line
-    controller_cat_tags: List[int] = field(default_factory=lambda: [0x0001_0001])
-
-    # Fabric ID which to use
-    fabric_id: int = 1
-
-    # "Alpha" by default
-    root_of_trust_index: int = _DEFAULT_TRUST_ROOT_INDEX
-
-    # If this is set, we will reuse root of trust keys at that location
-    chip_tool_credentials_path: Optional[pathlib.Path] = None
-
-    trace_to: List[str] = field(default_factory=list)
-
-    # Accepted Terms and Conditions if used
-    tc_version_to_simulate: Optional[int] = None
-    tc_user_response_to_simulate: Optional[int] = None
-    # path to device attestation revocation set json file
-    dac_revocation_set_path: Optional[pathlib.Path] = None
-
-    legacy: bool = False
 
 
 @dataclass
@@ -1253,7 +1183,7 @@ def str_from_manual_code(s: str) -> str:
 
 
 def int_named_arg(s: str) -> Tuple[str, int]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<hex_value>0x[0-9a-fA-F_]+)|(?P<decimal_value>-?\d+))$"
+    regex = r"^(?P<name>[a-zA-Z_0-9_.-]+):((?P<hex_value>0x[0-9a-fA-F_]+)|(?P<decimal_value>-?\d+))$"
     match = re.match(regex, s)
     if not match:
         raise ValueError("Invalid int argument format, does not match %s" % regex)
@@ -1267,7 +1197,7 @@ def int_named_arg(s: str) -> Tuple[str, int]:
 
 
 def str_named_arg(s: str) -> Tuple[str, str]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
+    regex = r"^(?P<name>[a-zA-Z_0-9_.-]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
         raise ValueError("Invalid string argument format, does not match %s" % regex)
@@ -1276,7 +1206,7 @@ def str_named_arg(s: str) -> Tuple[str, str]:
 
 
 def float_named_arg(s: str) -> Tuple[str, float]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
+    regex = r"^(?P<name>[a-zA-Z_0-9_.-]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
         raise ValueError("Invalid float argument format, does not match %s" % regex)
@@ -1288,7 +1218,7 @@ def float_named_arg(s: str) -> Tuple[str, float]:
 
 
 def json_named_arg(s: str) -> Tuple[str, object]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>.*)$"
+    regex = r"^(?P<name>[a-zA-Z_0-9_.-]+):(?P<value>.*)$"
     match = re.match(regex, s)
     if not match:
         raise ValueError("Invalid JSON argument format, does not match %s" % regex)
@@ -1300,14 +1230,14 @@ def json_named_arg(s: str) -> Tuple[str, object]:
 
 
 def bool_named_arg(s: str) -> Tuple[str, bool]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
-    match = re.match(regex, s.lower())
+    regex = r"^(?P<name>[a-zA-Z_0-9_.-]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
+    match = re.match(regex, s, re.IGNORECASE)
     if not match:
         raise ValueError("Invalid bool argument format, does not match %s" % regex)
 
     name = match.group("name")
     if match.group("truth_value"):
-        value = True if match.group("truth_value") == "true" else False
+        value = True if match.group("truth_value").lower() == "true" else False
     else:
         value = int(match.group("decimal_value")) != 0
 
@@ -1315,7 +1245,7 @@ def bool_named_arg(s: str) -> Tuple[str, bool]:
 
 
 def bytes_as_hex_named_arg(s: str) -> Tuple[str, bytes]:
-    regex = r"^(?P<name>[a-zA-Z_0-9.]+):(?P<value>[0-9a-fA-F:]+)$"
+    regex = r"^(?P<name>[a-zA-Z_0-9_.-]+):(?P<value>[0-9a-fA-F:]+)$"
     match = re.match(regex, s)
     if not match:
         raise ValueError("Invalid bytes as hex argument format, does not match %s" % regex)

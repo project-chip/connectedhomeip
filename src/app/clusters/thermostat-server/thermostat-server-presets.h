@@ -15,19 +15,25 @@
  *    limitations under the License.
  */
 
+/****************************************************************************
+ * @file
+ * @brief APIs for the  Thermostat cluster.
+ *
+ *******************************************************************************
+ ******************************************************************************/
+
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <lib/core/DataModelTypes.h>
-#include <lib/support/CHIPMem.h>
+#include <app/clusters/thermostat-server/thermostat-delegate.h>
 
-class JointFabricAdministratorServer
-{
-public:
-    static JointFabricAdministratorServer & GetInstance(void);
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace Thermostat {
 
-private:
-    JointFabricAdministratorServer() {}
+bool IsPresetHandlePresentInPresets(Delegate * delegate, const ByteSpan & presetHandleToMatch);
 
-    static JointFabricAdministratorServer sJointFabricAdministratorServerInstance;
-};
+} // namespace Thermostat
+} // namespace Clusters
+} // namespace app
+} // namespace chip

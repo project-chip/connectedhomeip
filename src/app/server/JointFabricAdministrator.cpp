@@ -1,6 +1,6 @@
 /*
- *    Copyright (c) 2020 Project CHIP Authors
- *    All rights reserved.
+ *
+ *    Copyright (c) 2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,21 +15,8 @@
  *    limitations under the License.
  */
 
-#ifndef APP_CONFIG_H
-#define APP_CONFIG_H
+#include <app/server/JointFabricAdministrator.h>
 
-// Logging
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-int cc13xx_26xxLogInit(void);
-void cc13xx_26xxLog(const char * aFormat, ...);
-#define PLAT_LOG(...) cc13xx_26xxLog(__VA_ARGS__);
-
-#define ACTUATOR_MOVEMENT_PERIOD_MS 1000
-
-#ifdef __cplusplus
-}
-#endif
-#endif // APP_CONFIG_H
+namespace chip {
+namespace app {} // namespace app
+} // namespace chip
