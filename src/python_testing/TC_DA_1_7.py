@@ -41,9 +41,8 @@ from pathlib import Path
 from typing import List, Optional
 
 import chip.clusters as Clusters
-from chip.testing import conversions
+from chip.testing import conversions, decorators
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
-from chip.testing import decorators
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import ec

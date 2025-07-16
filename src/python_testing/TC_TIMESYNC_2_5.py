@@ -41,9 +41,8 @@ import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing import timeoperations
+from chip.testing import timeoperations, decorators
 from mobly import asserts
-from chip.testing import decorators
 
 
 class TC_TIMESYNC_2_5(MatterBaseTest):

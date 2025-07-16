@@ -1,10 +1,9 @@
 import logging
 import chip.clusters as Clusters
 import test_plan_support
-from chip.testing import matter_asserts
+from chip.testing import matter_asserts, decorators
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature
 from mobly import asserts
-from chip.testing import decorators
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.

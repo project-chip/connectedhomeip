@@ -1,7 +1,8 @@
 import logging
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, decorators
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from chip.testing import runner, decorators
 from mobly import asserts
 from TC_AVSMTestBase import AVSMTestBase
 #
@@ -135,4 +136,4 @@ class TC_AVSM_2_4(MatterBaseTest, AVSMTestBase):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

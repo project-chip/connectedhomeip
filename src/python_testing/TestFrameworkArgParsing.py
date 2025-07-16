@@ -1,9 +1,8 @@
 import json
 from typing import Any
-from chip.testing import conversions
+from chip.testing import conversions, decorators
 from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
 from mobly import asserts
-from chip.testing import decorators
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -57,8 +56,6 @@ from chip.testing import decorators
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
-
-
 
 
 class TestFrameworkArgParsing(MatterBaseTest):

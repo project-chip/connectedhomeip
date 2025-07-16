@@ -27,10 +27,9 @@ from chip.testing.pics import parse_pics, parse_pics_xml
 from chip.testing.taglist_and_topology_test import (TagProblem, create_device_type_list_for_root, create_device_type_lists,
                                                     find_tag_list_problems, find_tree_roots, flat_list_ok, get_all_children,
                                                     get_direct_children_of_root, parts_list_problems, separate_endpoint_types)
-from chip.testing import timeoperations
+from chip.testing import timeoperations, decorators
 from chip.tlv import uint
 from mobly import asserts, signals
-from chip.testing import decorators
 
 
 def get_raw_type_list():

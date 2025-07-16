@@ -4,9 +4,8 @@ import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.testing.matter_testing import (MatterBaseTest, default_matter_test_main,
                                          has_attribute, has_cluster, run_if_endpoint_matches)
-from chip.testing import timeoperations
+from chip.testing import timeoperations, decorators
 from mobly import asserts
-from chip.testing import decorators
 #
 #    Copyright (c) 2023 Project CHIP Authors
 #    All rights reserved.

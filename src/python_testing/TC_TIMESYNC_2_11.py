@@ -44,10 +44,9 @@ import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main, matchers
-from chip.testing import timeoperations
+from chip.testing.matter_testing import MatterBaseTest
+from chip.testing import runner, decorators, matchers, timeoperations
 from mobly import asserts
-from chip.testing import decorators
 
 
 class TC_TIMESYNC_2_11(MatterBaseTest):
@@ -182,4 +181,4 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

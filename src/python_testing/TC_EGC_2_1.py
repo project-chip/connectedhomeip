@@ -1,10 +1,9 @@
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing import matter_asserts
+from chip.testing import matter_asserts, decorators
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
 from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
-from chip.testing import decorators
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.

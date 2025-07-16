@@ -1,10 +1,10 @@
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature
+from chip.testing.matter_testing import MatterBaseTest, TestStep, has_feature
+from chip.testing import runner, decorators
 from mobly import asserts
 from TC_SEPRTestBase import CommodityPriceTestBaseHelper
-from chip.testing import decorators
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -226,4 +226,4 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

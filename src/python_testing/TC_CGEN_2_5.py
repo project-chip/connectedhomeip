@@ -40,9 +40,8 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters.Types import Nullable
 from chip.commissioning import ROOT_ENDPOINT_ID
-from chip.testing import matter_asserts
+from chip.testing import matter_asserts, decorators
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
-from chip.testing import decorators
 from mobly import asserts
 
 

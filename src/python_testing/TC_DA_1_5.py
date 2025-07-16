@@ -40,9 +40,8 @@ import random
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing import conversions
+from chip.testing import conversions, decorators
 from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main, matchers
-from chip.testing import decorators
 from chip.tlv import TLVReader
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes

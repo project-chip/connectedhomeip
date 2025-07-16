@@ -46,12 +46,11 @@ import chip.clusters as Clusters
 from chip import ChipUtility
 from chip.clusters.ClusterObjects import ClusterCommand, ClusterObjectDescriptor, ClusterObjectFieldDescriptor
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing import matter_asserts
+from chip.testing import matter_asserts, decorators
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from chip.tlv import uint
 from mobly import asserts
-from chip.testing import decorators
 
 logger = logging.getLogger(__name__)
 
