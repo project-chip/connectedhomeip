@@ -20,42 +20,46 @@
 
 #include <chrono>
 #include <deque>
-#include <lib/support/logging/CHIPLogging.h>
-#include <mutex>
+#include <functional>
+#include <memory>
 #include <string>
 #include <unordered_map>
-#include <vector>
+#include <unordered_set>
 
-struct RawBufferPacket
+struct BufferSink
 {
-    char * data;
-    size_t size;
-    std::chrono::steady_clock::time_point InputTime;
-    bool isVideo = false;
-    std::string streamId;
-    RawBufferPacket(const char * aData, size_t aSize, std::chrono::steady_clock::time_point iT, bool iV, std::string sI) :
-        size(aSize), InputTime(iT), isVideo(iV), streamId(sI)
-    {
-        data = (char *) std::malloc(size);
-        memcpy(data, aData, size);
-        ChipLogProgress(Camera, "Added packet of STREAM ID %s", streamId.c_str());
-    }
+    std::function<void(const char *, size_t, const std::string &)> sendAudio;
+    std::function<void(const char *, size_t, const std::string &)> sendVideo;
+    int64_t requestedPreBufferLengthMs; // 0 means live only
 };
 
-class PushAvPreRollBuffer
+struct PreRollFrame
+{
+    std::string streamKey;                        // e.g., "a123" or "v456"
+    std::unique_ptr<char[]> data;                 // raw frame data
+    size_t size;                                  // bytes size
+    int64_t ptsMs;                                // receive time
+    std::unordered_set<BufferSink *> deliveredTo; // to prevent duplicate sends
+};
+
+class PreRollBuffer
 {
 public:
-    PushAvPreRollBuffer(long long maxDurationMs, size_t maxContentBufferSize);
-    ~PushAvPreRollBuffer();
-    void AddPacket(RawBufferPacket packet);
-    RawBufferPacket FetchPacket();
-    int GetSize();
+    PreRollBuffer(int64_t maxPreBufferLengthMs, size_t maxTotalBytes);
+    void PushFrameToBuffer(const std::string & streamKey, const char * data, size_t size);
+    void RegisterTransportToBuffer(BufferSink * sink, const std::unordered_set<std::string> & streamKeys);
+    void DeregisterTransportFromBuffer(BufferSink * sink);
+    int64_t NowMs() const;
+    int64_t GetMaxPreBufferLengthMs() const { return maxPreBufferLengthMs; }
 
 private:
-    std::deque<RawBufferPacket> mBuffer;
-    long long mMaxDurationMs;                 // In milliseconds.
-    size_t mMaxContentBufferSize;             // In bytes.
-    size_t mCurrentSize;                      // Current sizes of each stream. Key is stream index
-    mutable std::mutex mPreRollBufferMutex;   // Protects mBuffer and mMaxDurationMs.
-    void RemovePackets(std::string streamId); // Removes packets from the buffer.
+    void PushBufferToTransport();
+    void TrimBuffer(std::deque<std::shared_ptr<PreRollFrame>> & buffer);
+
+    int64_t maxPreBufferLengthMs;
+    size_t maxTotalBytes;
+
+    std::unordered_map<std::string, std::deque<std::shared_ptr<PreRollFrame>>> buffers;
+    std::unordered_map<std::string, size_t> bufferSizes;
+    std::unordered_map<BufferSink *, std::unordered_set<std::string>> sinkSubscriptions;
 };
