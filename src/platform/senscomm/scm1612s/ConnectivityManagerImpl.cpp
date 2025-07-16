@@ -81,28 +81,8 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_OnPlatformEvent(event);
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-
     _OnWiFiPlatformEvent(event);
 #endif
-    OnInternetConnectivityChangeEvent(event);
-}
-
-void ConnectivityManagerImpl::OnInternetConnectivityChangeEvent(const ChipDeviceEvent * event)
-{
-    if (event->Type != DeviceEventType::kInternetConnectivityChange)
-        return;
-
-    ChipLogProgress(DeviceLayer, "%s", __func__);
-
-    // chip::app::DnssdServer::Instance().StartServer();
-
-    // if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established ||
-    //    event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
-    {
-#ifdef __no_stub__
-        mdns_update_interface();
-#endif /* __no_stub__ */
-    }
 }
 
 } // namespace DeviceLayer
