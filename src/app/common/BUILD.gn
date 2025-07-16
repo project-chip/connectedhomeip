@@ -88,7 +88,7 @@ source_set("enums") {
 }
 
 source_set("metadata") {
-  deps = [
+  public_deps = [
     "${chip_root}/zzz_generated/app-common/clusters:all-metadata",
     "${chip_root}/zzz_generated/app-common/clusters:metadata-query",
   ]
