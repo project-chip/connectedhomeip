@@ -60,11 +60,25 @@ public:
         return *this;
     }
 
-    /// did all the values fit?
+    /// Append a memory block
+    StringBuilderBase & Add(const void * data, size_t size)
+    {
+        mWriter.Put(data, size);
+        NullTerminate();
+        return *this;
+    }
+
+    /// Did all the values fit?
     bool Fit() const { return mWriter.Fit(); }
 
     /// Was nothing written yet?
     bool Empty() const { return mWriter.Needed() == 0; }
+
+    /// Number of bytes actually needed
+    size_t Needed() const { return mWriter.Needed(); }
+
+    /// Size of the output buffer
+    size_t Size() const { return mWriter.Size(); }
 
     /// Write a formatted string to the stringbuilder
     StringBuilderBase & AddFormat(const char * format, ...) ENFORCE_FORMAT(2, 3);
@@ -108,11 +122,20 @@ public:
 
     StringBuilder(const char * data, size_t size, bool add_marker_if_overflow = true) : StringBuilder()
     {
-        AddFormat("%.*s", static_cast<int>(size), data);
+        Add(data, size);
 
         if (add_marker_if_overflow)
         {
             AddMarkerIfOverflow();
+        }
+
+        size_t length = Fit() ? Needed() : Size();
+        for (size_t i = 0; i < length; ++i)
+        {
+            if (mBuffer[i] == '\0')
+            {
+                mBuffer[i] = '.';
+            }
         }
     }
 
@@ -122,14 +145,20 @@ public:
 
     StringBuilder(const uint8_t * data, size_t size, bool add_marker_if_overflow = true) : StringBuilder()
     {
-        for (size_t i = 0; i < size; ++i)
-        {
-            Add(data[i]);
-        }
+        Add(data, size);
 
         if (add_marker_if_overflow)
         {
             AddMarkerIfOverflow();
+        }
+
+        size_t length = Fit() ? Needed() : Size();
+        for (size_t i = 0; i < length; ++i)
+        {
+            if (!std::isprint(mBuffer[i]))
+            {
+                mBuffer[i] = '.';
+            }
         }
     }
 
