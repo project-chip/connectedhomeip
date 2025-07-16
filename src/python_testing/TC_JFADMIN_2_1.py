@@ -47,7 +47,7 @@ from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_bod
 from mobly import asserts
 
 
-class TC_JFDS_2_1(MatterBaseTest):
+class TC_JFADMIN_2_1(MatterBaseTest):
 
     @async_test_body
     async def setup_class(self):
@@ -113,7 +113,7 @@ class TC_JFDS_2_1(MatterBaseTest):
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
-        jfcStorage.read(self.storage_fabric_a+'/chip_tool_config.alpha.ini')
+        jfcStorage.read(os.path.join(self.storage_fabric_a, 'chip_tool_config.alpha.ini'))
         self.ecoACtrlStorage = {
             "sdk-config": {
                 "ExampleOpCredsCAKey1": jfcStorage.get("Default", "ExampleOpCredsCAKey0"),
@@ -146,20 +146,16 @@ class TC_JFDS_2_1(MatterBaseTest):
 
         super().teardown_class()
 
-    def steps_TC_JFDS_2_1(self) -> list[TestStep]:
+    def steps_TC_JFADMIN_2_1(self) -> list[TestStep]:
         return [
-            TestStep("1", "TH reads AnchorRootCA attribute from DUT",
-                     "Verify that a RootCA is returned"),
-            TestStep("2", "TH reads AnchorNodeID attribute from DUT",
-                     "Verify that the DUT NodeId is returned"),
-            TestStep("3", "TH reads AnchorVendorID attribute from DUT",
-                     "Verify that the VendorId of the DUT is returned")
-            # TestStep("4", "{PLACEHOLDER_NOT_IMPLEMENTED]TH reads FriendlyName from DUT",
-            #          "Verify that the a valid string is returned")
+            TestStep("1", "TH1 read AdministratorFabricIndex attribute.",
+                     "DUT reply contains AdministratorFabricIndex with a value in range 1..255."),
+            TestStep("2", "TH1 read Fabrics attribute from Operation Cluster on EP0.",
+                     "DUT reply FabricDescriptorStruct with FabricID equal to AdministratorFabricIndex from step 1.")
         ]
 
     @async_test_body
-    async def test_TC_JFDS_2_1(self):
+    async def test_TC_JFADMIN_2_1(self):
         # Creating a Controller for Ecosystem A
         _fabric_a_persistent_storage = PersistentStorage(jsonData=self.ecoACtrlStorage)
         _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
@@ -173,21 +169,20 @@ class TC_JFDS_2_1(MatterBaseTest):
 
         self.step("1")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorRootCA)],
+            nodeid=1, attributes=[(1, Clusters.JointFabricAdministrator.Attributes.AdministratorFabricIndex)],
             returnClusterObject=True)
-        asserts.assert_greater_equal(len(response[1][Clusters.JointFabricDatastore].anchorRootCA), 0)
+        attributeAdminFabricIndex = response[1][Clusters.JointFabricAdministrator].administratorFabricIndex
+        asserts.assert_greater_equal(attributeAdminFabricIndex, 1,
+                                     "AdministratorFabricIndex is < 1. Expected AdministratorFabricIndex >= 1")
+        asserts.assert_less_equal(attributeAdminFabricIndex, 255,
+                                  "AdministratorFabricIndex is > 255. Expected AdministratorFabricIndex <= 255")
 
         self.step("2")
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorNodeID)],
+            nodeid=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.Fabrics)],
             returnClusterObject=True)
-        asserts.assert_greater_equal(response[1][Clusters.JointFabricDatastore].anchorNodeID, 0)
-
-        self.step("3")
-        response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorVendorID)],
-            returnClusterObject=True)
-        asserts.assert_greater_equal(response[1][Clusters.JointFabricDatastore].anchorVendorID, 0)
+        asserts.assert_equal(attributeAdminFabricIndex,
+                             response[0][Clusters.OperationalCredentials].fabrics[0].fabricIndex, "AdministratorFabricIndex != fabricIndex")
 
         # Shutdown the Python Controllers started at the beginning of this script
         devCtrlEcoA.Shutdown()
