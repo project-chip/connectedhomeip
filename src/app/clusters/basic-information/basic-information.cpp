@@ -104,7 +104,8 @@ CHIP_ERROR ReadProductName(DeviceInstanceInfoProvider * deviceInfoProvider, Attr
 {
     constexpr size_t kMaxLen      = DeviceLayer::ConfigurationManager::kMaxProductNameLength;
     char productName[kMaxLen + 1] = { 0 };
-    return EncodeStringOnSuccess(deviceInfoProvider->GetProductName(productName, sizeof(productName)), aEncoder, productName, kMaxLen);
+    return EncodeStringOnSuccess(deviceInfoProvider->GetProductName(productName, sizeof(productName)), aEncoder, productName,
+                                 kMaxLen);
 }
 
 CHIP_ERROR ReadProductID(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
