@@ -47,6 +47,7 @@ import chip.testing.timeoperations as timeoperations
 # isort: off
 
 from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
+from chip.ChipDeviceCtrl import AttributeReadRequest, AttributeReadRequestList, SubscriptionTargetList
 import chip.FabricAdmin  # Needed before chip.CertificateAuthority
 import chip.CertificateAuthority
 
@@ -74,22 +75,6 @@ from mobly import asserts, base_test, signals, utils
 
 # TODO: Add utility to commission a device if needed
 # TODO: Add utilities to keep track of controllers/fabrics
-
-# Type aliases for ReadAttribute method to improve type safety
-AttributeReadRequest = Union[
-    None,  # Empty tuple, all wildcard
-    Tuple[int],  # Endpoint
-    Tuple[Type[ClusterObjects.Cluster]],  # Wildcard endpoint, Cluster id present
-    Tuple[Type[ClusterObjects.ClusterAttributeDescriptor]],  # Wildcard endpoint, Cluster + Attribute present
-    Tuple[int, Type[ClusterObjects.Cluster]],  # Wildcard attribute id
-    Tuple[int, Type[ClusterObjects.ClusterAttributeDescriptor]],  # Concrete path
-    TypedAttributePath  # Directly specified attribute path
-]
-
-AttributeList = Optional[List[AttributeReadRequest]]
-
-# Type alias for subscription target specifications
-SubscriptionTargetList = List[Tuple[int, Union[ClusterObjects.Cluster, ClusterObjects.ClusterAttributeDescriptor]]]
 
 # Type aliases for common patterns to improve readability
 StepNumber = Union[int, str]  # Test step numbers can be integers or strings
