@@ -32,7 +32,7 @@ import textwrap
 import typing
 from binascii import unhexlify
 from dataclasses import asdict as dataclass_asdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from enum import IntFlag
 from itertools import chain
@@ -43,6 +43,7 @@ import chip.testing.decorators as decorators
 import chip.testing.matchers as matchers
 import chip.testing.runner as runner
 import chip.testing.timeoperations as timeoperations
+from chip.testing.matter_test_config import MatterTestConfig
 
 # isort: off
 
@@ -85,6 +86,10 @@ _DEFAULT_LOG_PATH = "/tmp/matter_testing/logs"
 _DEFAULT_CONTROLLER_NODE_ID = 112233
 _DEFAULT_DUT_NODE_ID = 0x12344321
 _DEFAULT_TRUST_ROOT_INDEX = 1
+
+
+class TestError(Exception):
+    pass
 
 
 def default_paa_rootstore_from_root(root_path: pathlib.Path) -> Optional[pathlib.Path]:
@@ -177,76 +182,6 @@ class AttributeMatcher:
                 return self._matcher(report)
 
         return AttributeMatcherFromCallable(description, matcher)
-
-
-@dataclass
-class MatterTestConfig:
-    storage_path: pathlib.Path = pathlib.Path(".")
-    logs_path: pathlib.Path = pathlib.Path(".")
-    paa_trust_store_path: Optional[pathlib.Path] = None
-    ble_controller: Optional[int] = None
-    commission_only: bool = False
-
-    admin_vendor_id: int = _DEFAULT_ADMIN_VENDOR_ID
-    case_admin_subject: Optional[int] = None
-    global_test_params: dict = field(default_factory=dict)
-    # List of explicit tests to run by name. If empty, all tests will run
-    tests: List[str] = field(default_factory=list)
-    timeout: typing.Union[int, None] = None
-    endpoint: typing.Union[int, None] = 0
-    app_pid: int = 0
-    pipe_name: typing.Union[str, None] = None
-    fail_on_skipped_tests: bool = False
-
-    commissioning_method: Optional[str] = None
-    in_test_commissioning_method: Optional[str] = None
-    discriminators: List[int] = field(default_factory=list)
-    setup_passcodes: List[int] = field(default_factory=list)
-    commissionee_ip_address_just_for_testing: Optional[str] = None
-    # By default, we start with maximized cert chains, as required for RR-1.1.
-    # This allows cert tests to be run without re-commissioning for RR-1.1.
-    maximize_cert_chains: bool = True
-
-    # By default, let's set validity to 10 years
-    certificate_validity_period = int(timedelta(days=10*365).total_seconds())
-
-    qr_code_content: List[str] = field(default_factory=list)
-    manual_code: List[str] = field(default_factory=list)
-
-    wifi_ssid: Optional[str] = None
-    wifi_passphrase: Optional[str] = None
-    thread_operational_dataset: Optional[bytes] = None
-
-    pics: dict[bool, str] = field(default_factory=dict)
-
-    # Node ID for basic DUT
-    dut_node_ids: List[int] = field(default_factory=list)
-    # Node ID to use for controller/commissioner
-    controller_node_id: int = _DEFAULT_CONTROLLER_NODE_ID
-    # CAT Tags for default controller/commissioner
-    # By default, we commission with CAT tags specified for RR-1.1
-    # so the cert tests can be run without re-commissioning the device
-    # for this one test. This can be overwritten from the command line
-    controller_cat_tags: List[int] = field(default_factory=lambda: [0x0001_0001])
-
-    # Fabric ID which to use
-    fabric_id: int = 1
-
-    # "Alpha" by default
-    root_of_trust_index: int = _DEFAULT_TRUST_ROOT_INDEX
-
-    # If this is set, we will reuse root of trust keys at that location
-    chip_tool_credentials_path: Optional[pathlib.Path] = None
-
-    trace_to: List[str] = field(default_factory=list)
-
-    # Accepted Terms and Conditions if used
-    tc_version_to_simulate: int = None
-    tc_user_response_to_simulate: int = None
-    # path to device attestation revocation set json file
-    dac_revocation_set_path: Optional[pathlib.Path] = None
-
-    legacy: bool = False
 
 
 @dataclass
@@ -1133,8 +1068,9 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def user_verify_snap_shot(self,
                               prompt_msg: str,
-                              image: bytes) -> Optional[str]:
+                              image: bytes) -> None:
         """Show Image Verification Prompt and wait for user validation.
+           This method will be executed only when TC is running in TH.
 
         Args:
             prompt_msg (str): Message for TH UI prompt and input function.
@@ -1142,47 +1078,58 @@ class MatterBaseTest(base_test.BaseTestClass):
             image (bytes): Image data as bytes.
 
         Returns:
-            str: User input or none if input is closed.
-        """
+            Returns nothing indicating success so the test can go on.
 
-        # Convert bytes to comma separated hex string
-        hex_string = ', '.join(f'{byte:02x}' for byte in image)
-        if self.runner_hook:
+        Raises:
+            TestError: Indicating image validation step failed.
+        """
+        # Only run when TC is being executed in TH
+        if self.runner_hook and hasattr(self.runner_hook, 'show_image_prompt'):
+            # Convert bytes to comma separated hex string
+            hex_string = ', '.join(f'{byte:02x}' for byte in image)
             self.runner_hook.show_image_prompt(
                 msg=prompt_msg,
                 img_hex_str=hex_string
             )
 
-        logging.info("========= USER PROMPT for Image Verification =========")
-        logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
-        try:
-            return input()
-        except EOFError:
-            logging.info("========= EOF on STDIN =========")
-            return None
+            logging.info("========= USER PROMPT for Image Validation =========")
+
+            try:
+                result = input()
+                if result != '1':  # User did not select 'PASS'
+                    raise TestError("Image validation failed")
+            except EOFError:
+                logging.info("========= EOF on STDIN =========")
+                return None
 
     def user_verify_video_stream(self,
-                                 prompt_msg: str) -> Optional[str]:
+                                 prompt_msg: str) -> None:
         """Show Video Verification Prompt and wait for user validation.
+           This method will be executed only when TC is running in TH.
 
         Args:
             prompt_msg (str): Message for TH UI prompt and input function.
             Indicates what is expected from the user.
 
         Returns:
-            str: User input or none if input is closed.
-        """
+            Returns nothing indicating success so the test can go on.
 
-        if self.runner_hook:
+        Raises:
+            TestError: Indicating video validation step failed.
+        """
+        # Only run when TC is being executed in TH
+        if self.runner_hook and hasattr(self.runner_hook, 'show_video_prompt'):
             self.runner_hook.show_video_prompt(msg=prompt_msg)
 
-        logging.info("========= USER PROMPT for Video Stream Verification =========")
-        logging.info(f">>> {prompt_msg.rstrip()} (press enter to confirm)")
-        try:
-            return input()
-        except EOFError:
-            logging.info("========= EOF on STDIN =========")
-            return None
+            logging.info("========= USER PROMPT for Video Stream Validation =========")
+
+            try:
+                result = input()
+                if result != '1':  # User did not select 'PASS'
+                    raise TestError("Video stream validation failed")
+            except EOFError:
+                logging.info("========= EOF on STDIN =========")
+                return None
 
 
 def _find_test_class():
@@ -1276,13 +1223,13 @@ def json_named_arg(s: str) -> Tuple[str, object]:
 
 def bool_named_arg(s: str) -> Tuple[str, bool]:
     regex = r"^(?P<name>[a-zA-Z_0-9.]+):((?P<truth_value>true|false)|(?P<decimal_value>[01]))$"
-    match = re.match(regex, s.lower())
+    match = re.match(regex, s, re.IGNORECASE)
     if not match:
         raise ValueError("Invalid bool argument format, does not match %s" % regex)
 
     name = match.group("name")
     if match.group("truth_value"):
-        value = True if match.group("truth_value") == "true" else False
+        value = True if match.group("truth_value").lower() == "true" else False
     else:
         value = int(match.group("decimal_value")) != 0
 

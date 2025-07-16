@@ -43,6 +43,7 @@ RUN set -x \
     cmake \
     curl \
     flex \
+    ffmpeg \
     g++ \
     gcc \
     git \
@@ -147,7 +148,7 @@ RUN case ${TARGETPLATFORM} in \
     set -x \
     && source scripts/activate.sh \
     && scripts/build/build_examples.py \
-    --target linux-x64-chip-tool-ipv6only-platform-mdns \
+    --target linux-x64-chip-tool-ipv6only-platform-mdns-nfc-commission \
     --target linux-x64-shell-ipv6only-platform-mdns \
     --target linux-x64-chip-cert-ipv6only-platform-mdns \
     --target linux-x64-air-purifier-ipv6only \
@@ -175,7 +176,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-x64-terms-and-conditions-ipv6only \
     --target linux-x64-water-leak-detector-ipv6only \
     build \
-    && mv out/linux-x64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
+    && mv out/linux-x64-chip-tool-ipv6only-platform-mdns-nfc-commission/chip-tool out/chip-tool \
     && mv out/linux-x64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
     && mv out/linux-x64-chip-cert-ipv6only-platform-mdns/chip-cert out/chip-cert \
     && mv out/linux-x64-air-purifier-ipv6only/chip-air-purifier-app out/chip-air-purifier-app \
@@ -207,7 +208,7 @@ RUN case ${TARGETPLATFORM} in \
     set -x \
     && source scripts/activate.sh \
     && scripts/build/build_examples.py \
-    --target linux-arm64-chip-tool-ipv6only-platform-mdns \
+    --target linux-arm64-chip-tool-ipv6only-platform-mdns-nfc-commission \
     --target linux-arm64-shell-ipv6only-platform-mdns \
     --target linux-arm64-chip-cert-ipv6only-platform-mdns \
     --target linux-arm64-air-purifier-ipv6only \
@@ -235,7 +236,7 @@ RUN case ${TARGETPLATFORM} in \
     --target linux-arm64-terms-and-conditions-ipv6only \
     --target linux-arm64-water-leak-detector-ipv6only \
     build \
-    && mv out/linux-arm64-chip-tool-ipv6only-platform-mdns/chip-tool out/chip-tool \
+    && mv out/linux-arm64-chip-tool-ipv6only-platform-mdns-nfc-commission/chip-tool out/chip-tool \
     && mv out/linux-arm64-shell-ipv6only-platform-mdns/chip-shell out/chip-shell \
     && mv out/linux-arm64-chip-cert-ipv6only-platform-mdns/chip-cert out/chip-cert \
     && mv out/linux-arm64-air-purifier-ipv6only/chip-air-purifier-app out/chip-air-purifier-app \
@@ -319,6 +320,10 @@ COPY --from=chip-build-cert-bins /root/connectedhomeip/data_model python_testing
 
 COPY --from=chip-build-cert-bins /root/connectedhomeip/src/python_testing/requirements.txt /tmp/requirements.txt
 RUN pip install --break-system-packages -r /tmp/requirements.txt && rm /tmp/requirements.txt
+
+# Copy PushAV Server to apps and install dependencies
+COPY --from=chip-build-cert-bins /root/connectedhomeip/src/tools/push_av_server apps/push_av_server
+RUN pip install --break-system-packages -r apps/push_av_server/requirements.txt
 
 # Stage 3.2: Setup the Mock Server
 COPY --from=chip-build-cert-bins /root/connectedhomeip/integrations/mock_server mock_server
