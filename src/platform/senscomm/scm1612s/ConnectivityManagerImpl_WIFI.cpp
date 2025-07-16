@@ -193,8 +193,8 @@ void ConnectivityManagerImpl::_OnWiFiPlatformEvent(const ChipDeviceEvent * event
         if (mWiFiStationState == kWiFiStationState_Connecting)
         {
             ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
-            scm_wifi_dhcp_start();
         }
+        scm_wifi_dhcp_start();
         DriveStationState();
         break;
     case SYSTEM_EVENT_STA_DISCONNECTED:

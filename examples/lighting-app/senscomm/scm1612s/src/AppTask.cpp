@@ -30,6 +30,7 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
@@ -321,9 +322,24 @@ CHIP_ERROR AppTask::Init()
     sWiFiNetworkCommissioningInstance.Init();
 #endif
 
-    vTaskDelay(10000); // TODO
+    vTaskDelay(1000); // TODO
     SCM1612S_LOG("APP: Done WiFi Init");
 
+
+    // Register the callback to init the MDNS server when connectivity is available
+    PlatformMgr().AddEventHandler(
+        [](const ChipDeviceEvent * event, intptr_t arg) {
+            // Restart the server whenever an ip address is renewed
+            if (event->Type == DeviceEventType::kInternetConnectivityChange)
+            {
+                if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established ||
+                    event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
+                {
+                    chip::app::DnssdServer::Instance().StartServer();
+                }
+            }
+        },
+        0);
 
     // Init ZCL Data Model and start server
     static chip::CommonCaseDeviceServerInitParams initParams;
@@ -362,8 +378,8 @@ CHIP_ERROR AppTask::Init()
 
     ConfigurationMgr().LogDeviceConfig();
 
-    // PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
-    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kSoftAP));
+    PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kBLE));
+    //PrintOnboardingCodes(chip::RendezvousInformationFlag(chip::RendezvousInformationFlag::kSoftAP));
 
 #if defined(ENABLE_CHIP_SHELL)
     RegisterLightCommands();
