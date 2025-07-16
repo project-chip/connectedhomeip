@@ -17,7 +17,6 @@
 
 import dataclasses
 import ipaddress
-import typing
 
 from chip import ChipDeviceCtrl, commissioning, discovery
 
