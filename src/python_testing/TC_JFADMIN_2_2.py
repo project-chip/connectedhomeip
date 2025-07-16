@@ -37,17 +37,19 @@ import logging
 import os
 import random
 import tempfile
+import time
 from configparser import ConfigParser
 
 import chip.clusters as Clusters
 from chip import CertificateAuthority
+from chip.interaction_model import InteractionModelError
 from chip.storage import PersistentStorage
 from chip.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
 
-class TC_JFDS_2_1(MatterBaseTest):
+class TC_JFADMIN_2_2(MatterBaseTest):
 
     @async_test_body
     async def setup_class(self):
@@ -105,7 +107,7 @@ class TC_JFDS_2_1(MatterBaseTest):
             expected_output="CHIP task running",
             timeout=10)
 
-        # Commission JF-ADMIN app with JF-Controller on Fabric A
+        # # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork 1 {self.jfadmin_fabric_a_passcode} --anchor true",
             expected_output="[JF] Anchor Administrator commissioned with success",
@@ -113,7 +115,7 @@ class TC_JFDS_2_1(MatterBaseTest):
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
         jfcStorage = ConfigParser()
-        jfcStorage.read(self.storage_fabric_a+'/chip_tool_config.alpha.ini')
+        jfcStorage.read(os.path.join(self.storage_fabric_a, 'chip_tool_config.alpha.ini'))
         self.ecoACtrlStorage = {
             "sdk-config": {
                 "ExampleOpCredsCAKey1": jfcStorage.get("Default", "ExampleOpCredsCAKey0"),
@@ -141,25 +143,29 @@ class TC_JFDS_2_1(MatterBaseTest):
             self.fabric_a_admin.terminate()
         if self.fabric_a_ctrl is not None:
             self.fabric_a_ctrl.terminate()
-        if self.fabric_a_server_app is not None:
-            self.fabric_a_server_app.terminate()
 
         super().teardown_class()
 
-    def steps_TC_JFDS_2_1(self) -> list[TestStep]:
+    def steps_TC_JFADMIN_2_2(self) -> list[TestStep]:
         return [
-            TestStep("1", "TH reads AnchorRootCA attribute from DUT",
-                     "Verify that a RootCA is returned"),
-            TestStep("2", "TH reads AnchorNodeID attribute from DUT",
-                     "Verify that the DUT NodeId is returned"),
-            TestStep("3", "TH reads AnchorVendorID attribute from DUT",
-                     "Verify that the VendorId of the DUT is returned")
-            # TestStep("4", "{PLACEHOLDER_NOT_IMPLEMENTED]TH reads FriendlyName from DUT",
-            #          "Verify that the a valid string is returned")
+            TestStep("2", "TH sends ICACCSRRequest command to DUT.",
+                     "DUT response contains status code FAILSAFE_REQUIRED."),
+            TestStep("3", "TH sends ArmFailSafe command to DUT with ExpiryLengthSeconds set to 10 and Breadcrumb 1.",
+                     "DUT respond with ArmFailSafeResponse Command."),
+            TestStep("4", "TH sends ICACCSRRequest command to DUT.",
+                     "DUT response contains an ICACCSR."),
+            TestStep("5", "Wait for ArmFailSafe to expire."),
+            TestStep("6", "TH sends AddICAC command to DUT using icac1 as parameter.",
+                     "DUT response contains status code FAILSAFE_REQUIRED."),
+            TestStep("7", "TH sends ArmFailSafe command to DUT with ExpiryLengthSeconds set to 10 and Breadcrumb 1.",
+                     "DUT respond with ArmFailSafeResponse Command."),
+            # TestStep("8", "[SKIP Missing SDK Implementation] TH sends AddICAC command to DUT using icac1 as parameter.",
+            #          "DUT ICACResponse contains status 2 (InvalidICAC).")
         ]
 
     @async_test_body
-    async def test_TC_JFDS_2_1(self):
+    async def test_TC_JFADMIN_2_2(self):
+
         # Creating a Controller for Ecosystem A
         _fabric_a_persistent_storage = PersistentStorage(jsonData=self.ecoACtrlStorage)
         _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
@@ -171,23 +177,75 @@ class TC_JFDS_2_1(MatterBaseTest):
             paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
             catTags=[int(self.ecoACATs, 16)])
 
-        self.step("1")
-        response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorRootCA)],
-            returnClusterObject=True)
-        asserts.assert_greater_equal(len(response[1][Clusters.JointFabricDatastore].anchorRootCA), 0)
-
         self.step("2")
-        response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorNodeID)],
-            returnClusterObject=True)
-        asserts.assert_greater_equal(response[1][Clusters.JointFabricDatastore].anchorNodeID, 0)
+        try:
+            await self.send_single_cmd(
+                dev_ctrl=devCtrlEcoA,
+                node_id=1,
+                endpoint=1,
+                cmd=Clusters.JointFabricAdministrator.Commands.ICACCSRRequest())
+        except InteractionModelError as e:
+            asserts.assert_in('FailsafeRequired (0xca)',
+                              str(e), f'Expected FailsafeRequired error, but got {str(e)}')
+        else:
+            asserts.assert_true(False, 'Expected InteractionModelError with FailsafeRequired, but no exception occurred.')
 
         self.step("3")
+        await self.send_single_cmd(
+            dev_ctrl=devCtrlEcoA,
+            node_id=1,
+            cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=10, breadcrumb=1))
+
+        self.step("4")
+        response = await self.send_single_cmd(
+            dev_ctrl=devCtrlEcoA,
+            node_id=1,
+            endpoint=1,
+            cmd=Clusters.JointFabricAdministrator.Commands.ICACCSRRequest())
+        asserts.assert_not_equal(response.icaccsr, b'', "No ICACSR was returned!")
+
+        self.step("5")
+        # Wait for ArmFailSafe timer to expire
+        time.sleep(11)
+
+        self.step("6")
+        # Get the ICAC from JF-Admin
         response = await devCtrlEcoA.ReadAttribute(
-            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorVendorID)],
+            nodeid=1, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)],
             returnClusterObject=True)
-        asserts.assert_greater_equal(response[1][Clusters.JointFabricDatastore].anchorVendorID, 0)
+        _icac = response[0][Clusters.OperationalCredentials].NOCs[0].icac
+        cmd = Clusters.JointFabricAdministrator.Commands.AddICAC(_icac)
+        try:
+            await self.send_single_cmd(dev_ctrl=devCtrlEcoA, node_id=1, cmd=cmd, endpoint=1)
+        except InteractionModelError as e:
+            asserts.assert_in('FailsafeRequired (0xca)',
+                              str(e), f'Expected FailsafeRequired error, but got {str(e)}')
+        else:
+            asserts.assert_true(False, 'Expected InteractionModelError with FailsafeRequired, but no exception occurred.')
+
+        self.step("7")
+        await self.send_single_cmd(
+            dev_ctrl=devCtrlEcoA,
+            node_id=1,
+            cmd=Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=60, breadcrumb=1))
+
+        # TODO SDK Functionality is not finished. Uncomment when implementation is ready
+        # self.step("8")
+        # cmd = Clusters.OperationalCredentials.Commands.CSRRequest(CSRNonce=random.randbytes(32), isForUpdateNOC=True)
+        # csr_update = await self.send_single_cmd(dev_ctrl=devCtrlEcoA, node_id=1, cmd=cmd)
+        # new_noc_chain = await devCtrlEcoA.IssueNOCChain(csr_update, 1)
+        # cmd = Clusters.JointFabricAdministrator.Commands.AnnounceJointFabricAdministrator(1)
+        # await self.send_single_cmd(dev_ctrl=devCtrlEcoA, node_id=1, cmd=cmd, endpoint=1)
+        # cmd = Clusters.JointFabricAdministrator.Commands.ICACCSRRequest()
+        # await self.send_single_cmd(dev_ctrl=devCtrlEcoA, node_id=1, cmd=cmd, endpoint=1)
+        # cmd = Clusters.JointFabricAdministrator.Commands.AddICAC(new_noc_chain.icacBytes)
+        # try:
+        #     await self.send_single_cmd(dev_ctrl=devCtrlEcoA, node_id=1, cmd=cmd, endpoint=1)
+        # except InteractionModelError as e:
+        #     asserts.assert_in('InvalidICAC (0x02)',
+        #                       str(e), f'Expected InvalidICAC error, but got {str(e)}')
+        # else:
+        #     asserts.assert_true(False, 'Expected InteractionModelError with InvalidICAC, but no exception occurred.')
 
         # Shutdown the Python Controllers started at the beginning of this script
         devCtrlEcoA.Shutdown()
