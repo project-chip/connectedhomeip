@@ -33,7 +33,7 @@ namespace app {
  *        programmatically by aggregating EndpointInterface instances.
  *
  * This provider allows applications to define their Matter device data model (endpoints,
- * clusters, attributes, commands) using code. It manages a list of EndpointInterface
+ * clusters, attributes, commands) dynamically at runtime. It manages a list of EndpointInterface
  * objects, each representing an endpoint on the device.
  *
  * Expected Usage:
