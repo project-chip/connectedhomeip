@@ -406,8 +406,6 @@ def run_tests_no_exit(
     CommissionDeviceTest.event_loop = event_loop
     test_class.event_loop = event_loop
 
-    get_test_info(test_class, matter_test_config)
-
     # Load test config file.
     test_config = generate_mobly_test_config(matter_test_config)
 
