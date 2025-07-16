@@ -102,6 +102,7 @@ class AppProcessManager:
         self.stdin_stop_event = threading.Event()
 
     def start(self):
+        logging.info(f"Starting app with args: {self.app_args}")
         if self.app_ready_pattern and isinstance(self.app_ready_pattern, str):
             ready_pattern = re.compile(self.app_ready_pattern.encode())
         else:
@@ -150,6 +151,8 @@ class AppProcessManager:
               help='Delay test script start until given regular expression pattern is found in the application output.')
 @click.option("--app-stdin-pipe", type=str, default=None,
               help='Path for a standard input redirection named pipe to be used by the test script.')
+@click.option("--reboot-dut", is_flag=True, default=False,
+              help='Reboot the DUT when needed.')
 @click.option("--script", type=click.Path(exists=True), default=os.path.join(DEFAULT_CHIP_ROOT,
                                                                              'src',
                                                                              'controller',
@@ -167,7 +170,7 @@ class AppProcessManager:
 @click.option("--run", type=str, multiple=True, help="Run only the specified test run(s).")
 def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
          app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
-         script_gdb: bool, quiet: bool, load_from_env, run):
+         script_gdb: bool, reboot_dut: bool, quiet: bool, load_from_env, run):
     if load_from_env:
         reader = MetadataReader(load_from_env)
         runs = reader.parse_script(script)
@@ -204,24 +207,25 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
             run.script_gdb = script_gdb
         if quiet is not None:
             run.quiet = quiet
+        if reboot_dut is not None:
+            run.reboot_dut = reboot_dut
 
     for run in runs:
         logging.info("Executing %s %s", run.py_script_path.split('/')[-1], run.run)
-        main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "",
-                  run.app_ready_pattern, run.app_stdin_pipe, run.py_script_path,
-                  run.script_args or "", run.script_gdb, run.quiet)
+        main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern, run.app_stdin_pipe, run.py_script_path,run.script_args or "", run.script_gdb, run.reboot_dut, run.quiet)
 
 
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
               app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
-              script_gdb: bool, quiet: bool):
+              script_gdb: bool, reboot_dut: bool, quiet: bool):
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
 
-    # Generate unique test run ID to avoid conflicts in concurrent test runs
-    test_run_id = str(uuid.uuid4())[:8]  # Use first 8 characters for shorter paths
-    restart_flag_file = f"/tmp/chip_test_restart_app_{test_run_id}"
+    if reboot_dut:
+        # Generate unique test run ID to avoid conflicts in concurrent test runs
+        test_run_id = str(uuid.uuid4())[:8]  # Use first 8 characters for shorter paths
+        restart_flag_file = f"/tmp/chip_test_restart_app_{test_run_id}"
 
     if factory_reset or factory_reset_app_only:
         # Remove native app config
@@ -252,21 +256,23 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         app_manager = AppProcessManager(app, app_args, app_ready_pattern, stream_output, app_stdin_pipe)
         app_manager.start()
         app_manager_ref = [app_manager]
-        restart_monitor_thread = threading.Thread(
-            target=monitor_app_restart_requests,
-            args=(
-                app_manager_ref,
-                app_manager_lock,
-                app,
-                app_args,
-                app_ready_pattern,
-                stream_output,
-                app_stdin_pipe,
-                restart_flag_file),
-            daemon=True)
-        restart_monitor_thread.start()
+        if reboot_dut:
+            restart_monitor_thread = threading.Thread(
+                target=monitor_app_restart_requests,
+                args=(
+                    app_manager_ref,
+                    app_manager_lock,
+                    app,
+                    app_args,
+                    app_ready_pattern,
+                    stream_output,
+                    app_stdin_pipe,
+                    restart_flag_file),
+                daemon=True)
+            restart_monitor_thread.start()
 
-    script_args += f" --restart-flag-file {restart_flag_file}"
+    if reboot_dut:
+        script_args += f" --restart-flag-file {restart_flag_file}"
 
     script_command = [
         script,
@@ -302,9 +308,10 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             logging.error("Test script exited with returncode %d" % test_script_exit_code)
 
         # Stop the restart monitor thread if it exists
-        if restart_monitor_thread and restart_monitor_thread.is_alive():
-            logging.info("Stopping app restart monitor thread")
-            restart_monitor_thread.join(2.0)
+        if reboot_dut:
+            if restart_monitor_thread and restart_monitor_thread.is_alive():
+                logging.info("Stopping app restart monitor thread")
+                restart_monitor_thread.join(2.0)
         current_app_manager = None
         if app_manager_ref:
             with app_manager_lock:
@@ -335,18 +342,19 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
     finally:
         # Stop the restart monitor thread if it exists
-        if restart_monitor_thread and restart_monitor_thread.is_alive():
-            logging.info("Stopping app restart monitor thread")
-            restart_monitor_thread.join(2.0)
+        if reboot_dut:
+            if restart_monitor_thread and restart_monitor_thread.is_alive():
+                logging.info("Stopping app restart monitor thread")
+                restart_monitor_thread.join(2.0)
 
-        # Clean up any leftover flag files - ensure this always executes
-        logging.info("Cleaning up flag files")
-        if os.path.exists(restart_flag_file):
-            try:
-                os.unlink(restart_flag_file)
-                logging.info(f"Cleaned up flag file: {restart_flag_file}")
-            except Exception as e:
-                logging.warning(f"Failed to clean up flag file {restart_flag_file}: {e}")
+            # Clean up any leftover flag files if they exist - ensure this always executes
+            logging.info("Cleaning up flag files")
+            if os.path.exists(restart_flag_file):
+                try:
+                    os.unlink(restart_flag_file)
+                    logging.info(f"Cleaned up flag file: {restart_flag_file}")
+                except Exception as e:
+                    logging.warning(f"Failed to clean up flag file {restart_flag_file}: {e}")
 
 
 def monitor_app_restart_requests(

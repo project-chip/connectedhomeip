@@ -33,7 +33,7 @@ class Metadata:
     factory_reset_app_only: bool = False
     script_gdb: bool = False
     quiet: bool = False
-
+    reboot_dut: bool = False
 
 class NamedStringIO(StringIO):
     def __init__(self, content, name):
@@ -153,6 +153,7 @@ class MetadataReader:
                 script_args=attr.get("script-args"),
                 factory_reset=attr.get("factory-reset", False),
                 quiet=attr.get("quiet", True),
+                reboot_dut=attr.get("reboot-dut", False),
             ))
 
         return runs_metadata
