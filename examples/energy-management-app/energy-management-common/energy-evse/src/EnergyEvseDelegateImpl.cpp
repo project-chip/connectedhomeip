@@ -730,8 +730,9 @@ Status EnergyEvseDelegate::HwSetRFID(ByteSpan uid)
 Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
 {
 
-    if (!mVehicleID.IsNull() && newValue.data_equal(mVehicleID.Value()))
+    if (!mVehicleID.IsNull() && newValue.data_equal(mVehicleID.Value()) || (mVehicleID.IsNull() && newValue.empty()))
     {
+        // No change in VehicleID, nothing to do
         return Status::Success;
     }
 
