@@ -17,94 +17,122 @@
  */
 
 #include "pushav-prerollbuffer.h"
+#include <algorithm>
+#include <cstring>
+#include <lib/support/logging/CHIPLogging.h>
 
-PushAvPreRollBuffer::PushAvPreRollBuffer(long long maxDurationMs, size_t maxContentBufferSize)
+PreRollBuffer::PreRollBuffer(int64_t maxPreBufferLengthMs, size_t maxTotalBytes) :
+    maxPreBufferLengthMs(maxPreBufferLengthMs), maxTotalBytes(maxTotalBytes)
+{}
+
+void PreRollBuffer::PushFrameToBuffer(const std::string & streamKey, const char * data, size_t size)
 {
-    if (maxDurationMs <= 0)
+    auto frame       = std::make_shared<PreRollFrame>();
+    frame->streamKey = streamKey;
+    frame->data      = std::make_unique<char[]>(size);
+    memcpy(frame->data.get(), data, size);
+    frame->size  = size;
+    frame->ptsMs = NowMs();
+
+    auto & queue = buffers[streamKey]; // Get or create the queue for this stream key
+    queue.push_back(frame);
+    bufferSizes[streamKey] += size; // Track total bytes in buffer for this stream key
+
+    TrimBuffer(queue);
+    PushBufferToTransport(); // Automatically flush after each frame push
+}
+
+void PreRollBuffer::PushBufferToTransport()
+{
+    int64_t currentTime  = NowMs();
+    int64_t pushMarginMs = 500;
+    std::vector<BufferSink *> sinksToRemove;
+
+    for (const auto & [sink, streamKeys] : sinkSubscriptions)
     {
-        ChipLogError(Camera, "PushAV - PrerollBuffer initialized with invalid max duration : %lld ms", maxDurationMs);
-        maxDurationMs = 1000;
+        if (!sink->sendAudio && !sink->sendVideo)
+        {
+            sinksToRemove.push_back(sink);
+            continue;
+        }
+
+        // Calculated prerollbuffer that can be provided
+        int64_t effectiveDelay = std::min(sink->requestedPreBufferLengthMs, maxPreBufferLengthMs);
+
+        for (const std::string & streamKey : streamKeys)
+        {
+            auto it = buffers.find(streamKey);
+            if (it == buffers.end())
+            {
+                // No frames for this stream key yet
+                continue;
+            }
+
+	    int64_t targetTime = currentTime - effectiveDelay;
+            for (const auto & frame : it->second)
+            {
+                if ((frame->ptsMs >= targetTime) && (frame->ptsMs < targetTime + pushMarginMs) &&
+                    (frame->deliveredTo.find(sink) == frame->deliveredTo.end()))
+                {
+                    // Frame is not older than the requested prebuffer length and hasn't been delivered to this sink yet
+                    if (streamKey[0] == 'a' && sink->sendAudio)
+                    {
+                        sink->sendAudio(frame->data.get(), frame->size, streamKey);
+                    }
+                    else if (streamKey[0] == 'v' && sink->sendVideo)
+                    {
+                        sink->sendVideo(frame->data.get(), frame->size, streamKey);
+                    }
+                    // Mark as delivered to this sink to avoid duplicate delivery
+                    frame->deliveredTo.insert(sink);
+                }
+            }
+        }
     }
 
-    mMaxDurationMs        = maxDurationMs;
-    mMaxContentBufferSize = maxContentBufferSize;
-    mCurrentSize          = 0;
-    ChipLogProgress(Camera, "PushAV - PrerollBuffer initialized with max duration : %lld ms", mMaxDurationMs);
-}
-
-PushAvPreRollBuffer::~PushAvPreRollBuffer()
-{
-    ChipLogProgress(Camera, "PushAV - PrerollBuffer destroyed");
-    std::lock_guard<std::mutex> lock(mPreRollBufferMutex);
-    mBuffer.clear();
-}
-
-void PushAvPreRollBuffer::AddPacket(RawBufferPacket packet)
-{
-    std::lock_guard<std::mutex> lock(mPreRollBufferMutex);
-    RemovePackets(packet.streamId); // remove as per mMaxDurationMs
-
-    mCurrentSize += packet.size;
-    mBuffer.push_back(packet);
-    mBuffer.push_back(RawBufferPacket(packet));
-}
-
-RawBufferPacket PushAvPreRollBuffer::FetchPacket()
-{
-    if (GetSize() == 0)
+    // Remove sinks with no valid senders
+    for (BufferSink * sink : sinksToRemove)
     {
-        return RawBufferPacket(nullptr, // data = null
-                               0,       // size = 0
-                               {},      // default time point
-                               false,   // isVideo = false
-                               "");
+        DeregisterTransportFromBuffer(sink);
     }
-    std::lock_guard<std::mutex> lock(mPreRollBufferMutex);
-    RawBufferPacket front = mBuffer.front();
-    mBuffer.pop_front();
-    mCurrentSize -= front.size;
-    return front;
 }
 
-int PushAvPreRollBuffer::GetSize()
+void PreRollBuffer::RegisterTransportToBuffer(BufferSink * sink, const std::unordered_set<std::string> & streamKeys)
 {
-    std::lock_guard<std::mutex> lock(mPreRollBufferMutex);
-    return mBuffer.size();
+    sinkSubscriptions[sink] = streamKeys;
 }
 
-void PushAvPreRollBuffer::RemovePackets(std::string streamId)
+void PreRollBuffer::DeregisterTransportFromBuffer(BufferSink * sink)
 {
+    sinkSubscriptions.erase(sink);
+}
 
-    if (mMaxDurationMs <= 0)
+void PreRollBuffer::TrimBuffer(std::deque<std::shared_ptr<PreRollFrame>> & buffer)
+{
+    int64_t currentTime = NowMs();
+    if (buffer.empty())
+    {
         return;
-    auto now = std::chrono::steady_clock::now();
-    if (mMaxDurationMs > 0)
-    {
-        while (!mBuffer.empty()) // buffer is monotonically increasing, so we can safely pop from front without locking.
-        {
-            auto & front = mBuffer.front();
-            auto ageMs   = std::chrono::duration_cast<std::chrono::milliseconds>(now - front.InputTime).count();
-            if (ageMs > mMaxDurationMs)
-            {
-                mBuffer.pop_front();
-            }
-            else
-            {
-                break; // all packets are younger than max duration, stop here.
-            }
-        }
     }
 
-    if (mCurrentSize >= mMaxContentBufferSize)
+    size_t & size = bufferSizes[buffer.front()->streamKey];
+
+    while (!buffer.empty())
     {
-        for (auto it = mBuffer.begin(); it != mBuffer.end(); ++it)
+        auto & front = buffer.front();
+        if ((currentTime - front->ptsMs > maxPreBufferLengthMs) || (size > maxTotalBytes))
         {
-            mCurrentSize -= it->size;
-            mBuffer.erase(it);
-            if (mCurrentSize < mMaxContentBufferSize || mBuffer.empty())
-            {
-                break;
-            }
+            size -= front->size;
+            buffer.pop_front();
+        }
+        else
+        {
+            break;
         }
     }
+}
+
+int64_t PreRollBuffer::NowMs() const
+{
+    return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 }
