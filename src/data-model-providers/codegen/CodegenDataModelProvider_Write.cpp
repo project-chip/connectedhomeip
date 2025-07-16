@@ -35,7 +35,6 @@
 #include <app/util/ember-strings.h>
 #include <app/util/odd-sized-integers.h>
 #include <data-model-providers/codegen/EmberAttributeDataBuffer.h>
-#include <data-model-providers/codegen/EmberMetadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 
@@ -97,37 +96,13 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
         return cluster->WriteAttribute(request, decoder);
     }
 
-    auto metadata = Ember::FindAttributeMetadata(request.path);
+    const EmberAfAttributeMetadata * attributeMetadata =
+        emberAfLocateAttributeMetadata(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
 
-    // Explicit failure in finding a suitable metadata
-    if (const Status * status = std::get_if<Status>(&metadata))
-    {
-        VerifyOrDie((*status == Status::UnsupportedEndpoint) || //
-                    (*status == Status::UnsupportedCluster) ||  //
-                    (*status == Status::UnsupportedAttribute));
-
-        // Check if this is an attribute that ember does not know about but is valid after all and
-        // adjust the return code. All these global attributes are `read only` hence the return
-        // of unsupported write.
-        //
-        // If the cluster or endpoint does not exist, though, keep that return code.
-        if ((*status == Protocols::InteractionModel::Status::UnsupportedAttribute) &&
-            IsSupportedGlobalAttributeNotInMetadata(request.path.mAttributeId))
-        {
-            return Status::UnsupportedWrite;
-        }
-
-        return *status;
-    }
-
-    const EmberAfAttributeMetadata ** attributeMetadata = std::get_if<const EmberAfAttributeMetadata *>(&metadata);
-    VerifyOrDie(*attributeMetadata != nullptr);
-
-    // Extra check: internal requests can bypass the read only check, however global attributes
-    // have no underlying storage, so write still cannot be done
-    //
-    // I.e. if we get a `EmberAfCluster*` value from finding metadata, we fail here.
-    VerifyOrReturnError(attributeMetadata != nullptr, Status::UnsupportedWrite);
+    // WriteAttribute requirement is that request.path is a VALID path inside the provider
+    // metadata tree. Clients are supposed to validate this (and data version and other flags)
+    // This SHOULD NEVER HAPPEN hence the general return code (seemed preferable to VerifyOrDie)
+    VerifyOrReturnError(attributeMetadata != nullptr, Status::Failure);
 
     if (request.path.mDataVersion.HasValue())
     {
@@ -166,19 +141,19 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 
     MutableByteSpan dataBuffer = gEmberAttributeIOBufferSpan;
     {
-        Ember::EmberAttributeDataBuffer emberData(*attributeMetadata, dataBuffer);
+        Ember::EmberAttributeDataBuffer emberData(attributeMetadata, dataBuffer);
         ReturnErrorOnFailure(decoder.Decode(emberData));
     }
 
     Protocols::InteractionModel::Status status;
 
-    if (dataBuffer.size() > (*attributeMetadata)->size)
+    if (dataBuffer.size() > attributeMetadata->size)
     {
         ChipLogDetail(Zcl, "Data to write exceeds the attribute size claimed.");
         return Status::InvalidValue;
     }
 
-    EmberAfWriteDataInput dataInput(dataBuffer.data(), (*attributeMetadata)->attributeType);
+    EmberAfWriteDataInput dataInput(dataBuffer.data(), attributeMetadata->attributeType);
 
     dataInput.SetChangeListener(&change_listener);
     // TODO: dataInput.SetMarkDirty() should be according to `ChangesOmmited`
