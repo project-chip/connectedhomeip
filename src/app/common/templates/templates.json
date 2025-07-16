@@ -95,11 +95,6 @@
             "output": "cluster-enums.h"
         },
         {
-            "path": "../../zap-templates/templates/app/cluster-metadata.h.zapt",
-            "name": "Enum and bitmap method check header for clusters",
-            "output": "cluster-metadata.h"
-        },
-        {
             "path": "../../zap-templates/templates/app/cluster-enums-check.h.zapt",
             "name": "Enum and bitmap method check header for clusters",
             "output": "cluster-enums-check.h"
