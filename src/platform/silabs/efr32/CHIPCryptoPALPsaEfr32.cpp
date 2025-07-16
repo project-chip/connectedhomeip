@@ -389,12 +389,10 @@ CHIP_ERROR Hash_SHA256_stream::GetDigest(MutableByteSpan & out_buffer)
     size_t outLength;
 
     status = psa_hash_clone(toHashOperation(&mContext), &operation);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL,
-                 ChipLogError(Crypto, "psa_hash_clone failed: %" PRId32, status));
+    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
     status = psa_hash_finish(&operation, out_buffer.data(), out_buffer.size(), &outLength);
-    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL,
-                 ChipLogError(Crypto, "psa_hash_finish failed: %" PRId32, status));
+    VerifyOrExit(status == PSA_SUCCESS, error = CHIP_ERROR_INTERNAL);
     out_buffer.reduce_size(outLength);
 
 exit:
