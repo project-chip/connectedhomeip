@@ -87,7 +87,7 @@ source_set("enums") {
   public_configs = [ ":includes" ]
 }
 
-source_set("ids") {
+source_set("metadata") {
   deps = [
     "${chip_root}/zzz_generated/app-common/clusters:all-metadata",
     "${chip_root}/zzz_generated/app-common/clusters:metadata-query",
