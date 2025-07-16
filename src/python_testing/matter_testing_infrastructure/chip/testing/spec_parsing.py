@@ -57,12 +57,10 @@ def to_access_code(privilege: ACCESS_CONTROL_PRIVILEGE_ENUM) -> str:
 def get_access_privilege_or_unknown(access_value: Optional[ACCESS_CONTROL_PRIVILEGE_ENUM]) -> ACCESS_CONTROL_PRIVILEGE_ENUM:
     """
     Returns the given access_value if not None, otherwise returns the default unknown privilege.
-    Casts the default value to the correct enum type.
     """
     if access_value is not None:
         return access_value
-    else:
-        return typing.cast(ACCESS_CONTROL_PRIVILEGE_ENUM, ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue)
+    return ACCESS_CONTROL_PRIVILEGE_ENUM(0)  # kUnknownEnumValue
 
 
 class SpecParsingException(Exception):
@@ -354,7 +352,7 @@ class ClusterParser:
             return False
         return access_xml.attrib['write'] == 'optional'
 
-    def parse_access(self, element_xml: ElementTree.Element, access_xml: Optional[ElementTree.Element], conformance: Optional[ConformanceCallable]) -> tuple[Optional[ACCESS_CONTROL_PRIVILEGE_ENUM], Optional[ACCESS_CONTROL_PRIVILEGE_ENUM], Optional[ACCESS_CONTROL_PRIVILEGE_ENUM]]:
+    def parse_access(self, element_xml: ElementTree.Element, access_xml: Optional[ElementTree.Element], conformance: ConformanceCallable) -> tuple[Optional[ACCESS_CONTROL_PRIVILEGE_ENUM], Optional[ACCESS_CONTROL_PRIVILEGE_ENUM], Optional[ACCESS_CONTROL_PRIVILEGE_ENUM]]:
         ''' Returns a tuple of access types for read / write / invoke'''
         def str_to_access_type(privilege_str: str) -> ACCESS_CONTROL_PRIVILEGE_ENUM:
             if privilege_str == 'view':
@@ -379,7 +377,7 @@ class ClusterParser:
             # Things with deprecated conformance don't get an access element, and that is also fine.
             # If a device properly passes the conformance test, such elements are guaranteed not to appear on the device.
 
-            if self._derived is not None or (conformance is not None and is_disallowed(conformance)):
+            if self._derived is not None or is_disallowed(conformance):
                 return (None, None, None)
 
             location = get_location_from_element(element_xml, self._cluster_id)
