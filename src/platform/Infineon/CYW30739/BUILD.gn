@@ -47,6 +47,7 @@ static_library("CYW30739") {
   deps = [
     "${chip_root}/src/app:app_config",
     "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/app/common:metadata",
     "${chip_root}/src/crypto",
     "${matter_wpan_sdk_build_root}:wpan_sdk",
   ]

@@ -240,6 +240,7 @@ static_library("support") {
     "SetupDiscriminator.h",
     "SortUtils.h",
     "SpanSearchValue.h",
+    "SplitLambda.h",
     "StateMachine.h",
     "StringBuilder.cpp",
     "StringBuilder.h",
