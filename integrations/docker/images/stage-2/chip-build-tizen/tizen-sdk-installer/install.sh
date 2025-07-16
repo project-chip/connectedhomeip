@@ -23,7 +23,6 @@ TIZEN_SDK_ROOT=/opt/tizen-sdk
 TIZEN_SDK_DATA_PATH=$HOME/tizen-sdk-data
 TIZEN_VERSION=9.0
 unset SECRET_TOOL
-unset FETCH_SDK_PKGS INSTALL_SDK_PKGS
 unset PURGE_PKG_CACHE PKG_CACHE_PATH
 unset VERBOSE
 DEBUG=${DEBUG:-}
@@ -107,22 +106,22 @@ function download() {
     local url="$1"
     shift
 
-    PKGS=()
-    for PKG in "${@}"; do
-        PKGS+=("-A" "$PKG")
+    local pkg pkgs=()
+    for pkg in "${@}"; do
+        pkgs+=("-A" "$pkg")
     done
 
     # Skip downloading if no packages are specified
-    [[ ${#PKGS[@]} -eq 0 ]] && return
+    [[ ${#pkgs[@]} -eq 0 ]] && return
 
-    verbose_flag="-nv"
+    local verbose_flag="-nv"
     [ -n "$VERBOSE" ] && verbose_flag="-v"
-    wget -r "$verbose_flag" -nd --timestamping --no-parent -e robots=off --progress=dot:mega -P "$PKG_CACHE_PATH" "${PKGS[@]}" "$url"
+    wget -r "$verbose_flag" -nd --timestamping --no-parent -e robots=off --progress=dot:mega -P "$PKG_CACHE_PATH" "${pkgs[@]}" "$url"
 
     # Check if the files have been downloaded
-    for PKG in "${@:2}"; do
-        if [[ ! $(find "$PKG_CACHE_PATH" -type f -name "$PKG") ]]; then
-            error "PKG is missing: $PKG"
+    for pkg in "${@}"; do
+        if [[ ! $(find "$PKG_CACHE_PATH" -type f -name "$pkg") ]]; then
+            error "PKG is missing: $pkg"
             return 1
         fi
     done
@@ -149,11 +148,12 @@ function install_dependencies() {
 # unzip_globs function below wrt. globs matching multiple RPMs.
 function unrpm_globs() {
     local destdir="$1"
-    declare -n globs="$2"
+    local fn_glob
+    local -n globs="$2"
     for fn_glob in "${globs[@]}"; do
         info "Processing filenames matching '$fn_glob' ..."
 
-        most_recent_filename=$(find "$PKG_CACHE_PATH" -name "$fn_glob" -printf '%T@ %p\n' |
+        local most_recent_filename=$(find "$PKG_CACHE_PATH" -name "$fn_glob" -printf '%T@ %p\n' |
             sort -nr | head -n 1 | cut -d ' ' -f 2)
 
         info "Unpacking '$most_recent_filename' into '$destdir'"
@@ -173,17 +173,18 @@ function unrpm_globs() {
 # The function assumes that every glob matches at lease one filename.
 function unzip_globs() {
     local destdir="$1"
-    declare -n globs="$2"
+    local fn_glob
+    local -n globs="$2"
     for fn_glob in "${globs[@]}"; do
         info "Processing filenames matching '$fn_glob' ..."
 
-        most_recent_filename=$(find "$PKG_CACHE_PATH" -name "$fn_glob" -printf '%T@ %p\n' |
+        local most_recent_filename=$(find "$PKG_CACHE_PATH" -name "$fn_glob" -printf '%T@ %p\n' |
             sort -nr | head -n 1 | cut -d ' ' -f 2)
 
         info "Unpacking '$most_recent_filename' into '$destdir'"
 
         # Shellharden puts quotes around ${VERBOSE:+-v} which causes an empty
-        # argv item to be passed to unzip when verbose is not specified.
+        # argv item to be passed to unzip when $VERBOSE is unset.
         # unzip does not like that and bails out.
         if [ -n "$VERBOSE" ]; then
             unzip "$most_recent_filename" 'data/*' -d "$destdir"
@@ -202,12 +203,12 @@ function cleanup() {
 # Make symbolic links relative
 function fixup_symlinks() {
     while [ "$1" ]; do
-        path="$1"
+        local path="$1"
         shift
         [ -d "$path" ] || continue
 
-        find "$path" -maxdepth 1 -type l | while IFS= read -r LNK; do
-            ln -sf "$(basename "$(readlink "$LNK")")" "$LNK"
+        find "$path" -maxdepth 1 -type l | while IFS= read -r lnk; do
+            ln -sf "$(basename "$(readlink "$lnk")")" "$lnk"
         done
     done
 }
@@ -215,16 +216,17 @@ function fixup_symlinks() {
 function download_tizen_sdk_common() {
     # Get Tizen Studio CLI
     info "Downloading Tizen Studio CLI..."
+    local url
 
     # Download
-    URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
-    download "$URL" "${COMMON_TIZENSTUDIO_ZIPS[@]}" "${COMMON_TOOLCHAIN_ZIPS[@]}"
+    url="http://download.tizen.org/sdk/tizenstudio/official/binary/"
+    download "$url" "${COMMON_TIZENSTUDIO_ZIPS[@]}" "${COMMON_TOOLCHAIN_ZIPS[@]}"
 
     # Tizen Developer Platform Certificate
-    URL="http://download.tizen.org/sdk/extensions/Tizen_IoT_Headless/binary/"
+    url="http://download.tizen.org/sdk/extensions/Tizen_IoT_Headless/binary/"
     # Tizen site does not have this package available in version 8.0.
     # Certificates are the same for 7.0 and 8.0, though.
-    download "$URL" "${IOT_ZIPS[@]}"
+    download "$url" "${IOT_ZIPS[@]}"
 }
 
 # ------------------------------------------------------------------------------
@@ -340,24 +342,25 @@ done
 function download_tizen_sdk_arm() {
     # Get toolchain
     info "Downloading Tizen ARM toolchain and sysroot ..."
+    local url
 
     # Download
-    URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
-    download "$URL" "${SDK_ARM_TIZENSTUDIO_ZIPS[@]}"
+    url="http://download.tizen.org/sdk/tizenstudio/official/binary/"
+    download "$url" "${SDK_ARM_TIZENSTUDIO_ZIPS[@]}"
 
     # Base packages
-    URL="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Base/latest/repos/standard/packages/armv7l/"
-    download "$URL" "${TIZEN_SDK_ARM_BASE_RPMS[@]}"
+    url="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Base/latest/repos/standard/packages/armv7l/"
+    download "$url" "${TIZEN_SDK_ARM_BASE_RPMS[@]}"
 
     # Unified packages
-    URL="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/packages/armv7l/"
-    download "$URL" "${TIZEN_SDK_ARM_UNIFIED_RPMS[@]}"
+    url="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/packages/armv7l/"
+    download "$url" "${TIZEN_SDK_ARM_UNIFIED_RPMS[@]}"
 }
 
 # Function for installing Tizen SDK (armv7l).
 function install_tizen_sdk_arm() {
 
-    SYSROOT="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core"
+    local sysroot="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device.core"
 
     info "Installing Tizen ARM SDK..."
 
@@ -365,35 +368,36 @@ function install_tizen_sdk_arm() {
 
     info "Installing Tizen ARM sysroot..."
 
-    unrpm_globs "$SYSROOT" TIZEN_SDK_ARM_BASE_RPMS
-    unrpm_globs "$SYSROOT" TIZEN_SDK_ARM_UNIFIED_RPMS
+    unrpm_globs "$sysroot" TIZEN_SDK_ARM_BASE_RPMS
+    unrpm_globs "$sysroot" TIZEN_SDK_ARM_UNIFIED_RPMS
 
-    fixup_symlinks "$SYSROOT"/usr/{lib,lib64}
+    fixup_symlinks "$sysroot"/usr/{lib,lib64}
 
     # TODO: Is this required???
-    ln -sf openssl3.pc "$SYSROOT/usr/lib/pkgconfig/openssl.pc"
+    ln -sf openssl3.pc "$sysroot/usr/lib/pkgconfig/openssl.pc"
 }
 
 function download_tizen_sdk_arm64() {
     info "Downloading Tizen ARM64 toolchain and sysroot ..."
+    local url
 
     # Download
-    URL="http://download.tizen.org/sdk/tizenstudio/official/binary/"
-    download "$URL" "${SDK_ARM64_TIZENSTUDIO_ZIPS[@]}"
+    url="http://download.tizen.org/sdk/tizenstudio/official/binary/"
+    download "$url" "${SDK_ARM64_TIZENSTUDIO_ZIPS[@]}"
 
     # Base packages
-    URL="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Base/latest/repos/standard/packages/aarch64/"
-    download "$URL" "${TIZEN_SDK_ARM64_BASE_RPMS[@]}"
+    url="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Base/latest/repos/standard/packages/aarch64/"
+    download "$url" "${TIZEN_SDK_ARM64_BASE_RPMS[@]}"
 
     # Unified packages
-    URL="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/packages/aarch64/"
-    download "$URL" "${TIZEN_SDK_ARM64_UNIFIED_RPMS[@]}"
+    url="http://download.tizen.org/releases/milestone/TIZEN/Tizen-$TIZEN_VERSION/Tizen-$TIZEN_VERSION-Unified/latest/repos/standard/packages/aarch64/"
+    download "$url" "${TIZEN_SDK_ARM64_UNIFIED_RPMS[@]}"
 }
 
 # Function for installing Tizen SDK (arm64).
 function install_tizen_sdk_arm64() {
 
-    SYSROOT="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device64.core"
+    local sysroot="$TIZEN_SDK_ROOT/platforms/tizen-$TIZEN_VERSION/tizen/rootstraps/tizen-$TIZEN_VERSION-device64.core"
 
     info "Installing Tizen ARM64 SDK..."
 
@@ -401,13 +405,13 @@ function install_tizen_sdk_arm64() {
 
     info "Installing Tizen ARM64 sysroot..."
 
-    unrpm_globs "$SYSROOT" TIZEN_SDK_ARM64_BASE_RPMS
-    unrpm_globs "$SYSROOT" TIZEN_SDK_ARM64_UNIFIED_RPMS
+    unrpm_globs "$sysroot" TIZEN_SDK_ARM64_BASE_RPMS
+    unrpm_globs "$sysroot" TIZEN_SDK_ARM64_UNIFIED_RPMS
 
-    fixup_symlinks "$SYSROOT"/usr/{lib,lib64}
+    fixup_symlinks "$sysroot"/usr/{lib,lib64}
 
     # TODO: Is this required???
-    ln -sf openssl3.pc "$SYSROOT/usr/lib64/pkgconfig/openssl.pc"
+    ln -sf openssl3.pc "$sysroot/usr/lib64/pkgconfig/openssl.pc"
 }
 
 function install_tizen_sdk_finalize() {
@@ -461,13 +465,13 @@ while (($#)); do
             ;;
         --cpu)
             IFS=',' read -r -a array <<<"$2"
-            for CPU in "${array[@]}"; do
-                if [ "$CPU" == "arm" ]; then
+            for cpu in "${array[@]}"; do
+                if [ "$cpu" == "arm" ]; then
                     INSTALL_ARM=true
-                elif [ "$CPU" == "arm64" ]; then
+                elif [ "$cpu" == "arm64" ]; then
                     INSTALL_ARM64=true
                 else
-                    error "Invalid CPU: $CPU. Use --help"
+                    error "Invalid CPU: $cpu. Use --help"
                     exit 1
                 fi
             done

@@ -1,5 +1,5 @@
 ARG VERSION=1
-FROM ghcr.io/project-chip/chip-build:${VERSION}
+FROM ghcr.io/enkiusz/chip-build:${VERSION}
 LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
 
 # ------------------------------------------------------------------------------
@@ -31,7 +31,6 @@ RUN set -x \
     --tizen-sdk-path $TIZEN_SDK_ROOT \
     --tizen-sdk-data-path /home/ubuntu/tizen-sdk-data \
     --tizen-version $TIZEN_VERSION  \
-    --purge-pkg-cache \
     --pkg-cache-path /tmp/tizen-pkg/$TIZEN_VERSION \
     --override-secret-tool \
     && rm -rf /tmp/tizen-pkg \
