@@ -32,7 +32,7 @@
 namespace chip {
 namespace app {
 
-/// Handles cluster interactions for a specific set of clusters.
+/// Handles cluster interactions for a specific set of cluster instances
 ///
 /// A `ServerClusterInterface` instance may be associated with multiple `endpointId/clusterId` paths.
 ///
