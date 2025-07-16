@@ -30,14 +30,14 @@ namespace {
 using namespace chip;
 using namespace chip::app;
 
-CHIP_ERROR StartupServerClusters(EndpointInterface * endpoint ServerClusterContext & serverClusterContext)
+CHIP_ERROR StartupServerClusters(EndpointInterface * endpoint, ServerClusterContext & serverClusterContext)
 {
-    VerifyOrReturnError(endpointProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(endpoint != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     bool had_failure = false;
 
     ReadOnlyBufferBuilder<ServerClusterInterface *> serverClusterBuilder;
-    ReturnErrorOnFailure(endpointProvider->ServerClusters(serverClusterBuilder));
+    ReturnErrorOnFailure(endpoint->ServerClusters(serverClusterBuilder));
     auto serverClusters = serverClusterBuilder.TakeBuffer();
 
     for (auto * serverCluster : serverClusters)
@@ -62,12 +62,12 @@ CHIP_ERROR StartupServerClusters(EndpointInterface * endpoint ServerClusterConte
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ShutdownServerClusters(EndpointInterface * endpointProvider)
+CHIP_ERROR ShutdownServerClusters(EndpointInterface * endpoint)
 {
-    VerifyOrReturnError(endpointProvider != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(endpoint != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     ReadOnlyBufferBuilder<ServerClusterInterface *> serverClusterBuilder;
-    ReturnErrorOnFailure(endpointProvider->ServerClusters(serverClusterBuilder));
+    ReturnErrorOnFailure(endpoint->ServerClusters(serverClusterBuilder));
     auto serverClusters = serverClusterBuilder.TakeBuffer();
 
     for (auto * serverCluster : serverClusters)
@@ -98,9 +98,9 @@ CHIP_ERROR CodeDrivenDataModelProvider::Startup(DataModel::InteractionModelConte
 
     // Startup all server clusters across all endpoints
     bool had_failure = false;
-    for (auto * endpointProvider : mEndpointInterfaceRegistry)
+    for (auto * endpoint : mEndpointInterfaceRegistry)
     {
-        if (StartupServerClusters(endpointProvider, *mServerClusterContext) != CHIP_NO_ERROR)
+        if (StartupServerClusters(endpoint, *mServerClusterContext) != CHIP_NO_ERROR)
         {
             had_failure = true;
         }
@@ -116,9 +116,9 @@ CHIP_ERROR CodeDrivenDataModelProvider::Startup(DataModel::InteractionModelConte
 CHIP_ERROR CodeDrivenDataModelProvider::Shutdown()
 {
     // Shutdown all server clusters across all endpoints
-    for (auto * endpointProvider : mEndpointInterfaceRegistry)
+    for (auto * endpoint : mEndpointInterfaceRegistry)
     {
-        ShutdownServerClusters(endpointProvider);
+        ShutdownServerClusters(endpoint);
     }
     mServerClusterContext.reset();
     return CHIP_NO_ERROR;
@@ -166,16 +166,16 @@ CHIP_ERROR CodeDrivenDataModelProvider::Endpoints(ReadOnlyBufferBuilder<DataMode
 {
     // TODO: Add a size() method to EndpointInterfaceRegistry to avoid iterating twice.
     size_t count = 0;
-    for (const auto * endpointProvider : mEndpointInterfaceRegistry)
+    for (const auto * endpoint : mEndpointInterfaceRegistry)
     {
-        (void) endpointProvider; // Silence unused variable warning
+        (void) endpoint; // Silence unused variable warning
         count++;
     }
 
     ReturnErrorOnFailure(out.EnsureAppendCapacity(count));
-    for (const auto * endpointProvider : mEndpointInterfaceRegistry)
+    for (const auto * endpoint : mEndpointInterfaceRegistry)
     {
-        ReturnErrorOnFailure(out.Append(endpointProvider->GetEndpointEntry()));
+        ReturnErrorOnFailure(out.Append(endpoint->GetEndpointEntry()));
     }
     return CHIP_NO_ERROR;
 }
