@@ -48,7 +48,6 @@ from chip.testing.matter_test_config import MatterTestConfig
 # isort: off
 
 from chip import ChipDeviceCtrl  # Needed before chip.FabricAdmin
-from chip.ChipDeviceCtrl import AttributeReadRequest, AttributeReadRequestList, SubscriptionTargetList
 import chip.FabricAdmin  # Needed before chip.CertificateAuthority
 import chip.CertificateAuthority
 
@@ -61,7 +60,6 @@ import chip.native
 import chip.testing.global_stash as global_stash
 from chip.ChipStack import ChipStack
 from chip.clusters import Attribute, ClusterObjects
-from chip.clusters.Attribute import TypedAttributePath
 from chip.interaction_model import InteractionModelError, Status
 from chip.setup_payload import SetupPayload
 from chip.storage import PersistentStorage
@@ -386,7 +384,7 @@ class MatterBaseTest(base_test.BaseTestClass):
             raise FileNotFoundError("CANNOT FIND %r" % app_pipe)
 
         if app_pipe is None:
-            app_pipe = self.matter_test_config.app_pipe
+            app_pipe = self.matter_test_config.pipe_name
 
         if not isinstance(app_pipe, str):
             raise TypeError("The named pipe must be provided as a string value")
@@ -1392,12 +1390,12 @@ def convert_args_to_matter_config(args: argparse.Namespace) -> MatterTestConfig:
     config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default
-    config.app_pipe = args.app_pipe
-    if config.app_pipe is not None and not os.path.exists(config.app_pipe):
+    config.pipe_name = args.app_pipe
+    if config.pipe_name is not None and not os.path.exists(config.pipe_name):
         # Named pipes are unique, so we MUST have consistent paths
         # Verify from start the named pipe exists.
-        logging.error("Named pipe %r does NOT exist" % config.app_pipe)
-        raise FileNotFoundError("CANNOT FIND %r" % config.app_pipe)
+        logging.error("Named pipe %r does NOT exist" % config.pipe_name)
+        raise FileNotFoundError("CANNOT FIND %r" % config.pipe_name)
 
     config.fail_on_skipped_tests = args.fail_on_skipped
 
