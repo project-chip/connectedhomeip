@@ -108,13 +108,13 @@ class TC_JFDS_2_1(MatterBaseTest):
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork 1 {self.jfadmin_fabric_a_passcode} --anchor true",
-            expected_output="[JF] Anchor Administrator commissioned with success")
-            timeout = 10)
+            expected_output="[JF] Anchor Administrator commissioned with success",
+            timeout=10)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
-        jfcStorage=ConfigParser()
+        jfcStorage = ConfigParser()
         jfcStorage.read(self.storage_fabric_a+'/chip_tool_config.alpha.ini')
-        self.ecoACtrlStorage={
+        self.ecoACtrlStorage = {
             "sdk-config": {
                 "ExampleOpCredsCAKey1": jfcStorage.get("Default", "ExampleOpCredsCAKey0"),
                 "ExampleOpCredsICAKey1": jfcStorage.get("Default", "ExampleOpCredsICAKey0"),
@@ -158,35 +158,35 @@ class TC_JFDS_2_1(MatterBaseTest):
             #          "Verify that the a valid string is returned")
         ]
 
-    @ async_test_body
+    @async_test_body
     async def test_TC_JFDS_2_1(self):
         # Creating a Controller for Ecosystem A
         _fabric_a_persistent_storage = PersistentStorage(jsonData=self.ecoACtrlStorage)
         _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
-            chipStack = self.matter_stack._chip_stack,
-            persistentStorage = _fabric_a_persistent_storage)
+            chipStack=self.matter_stack._chip_stack,
+            persistentStorage=_fabric_a_persistent_storage)
         _certAuthorityManagerA.LoadAuthoritiesFromStorage()
-        devCtrlEcoA=_certAuthorityManagerA.activeCaList[0].adminList[0].NewController(
-            nodeId = 101,
-            paaTrustStorePath = str(self.matter_test_config.paa_trust_store_path),
-            catTags = [int(self.ecoACATs, 16)])
+        devCtrlEcoA = _certAuthorityManagerA.activeCaList[0].adminList[0].NewController(
+            nodeId=101,
+            paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
+            catTags=[int(self.ecoACATs, 16)])
 
         self.step("1")
-        response=await devCtrlEcoA.ReadAttribute(
-            nodeid = 1, attributes = [(1, Clusters.JointFabricDatastore.Attributes.AnchorRootCA)],
-            returnClusterObject = True)
+        response = await devCtrlEcoA.ReadAttribute(
+            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorRootCA)],
+            returnClusterObject=True)
         asserts.assert_greater_equal(len(response[1][Clusters.JointFabricDatastore].anchorRootCA), 0)
 
         self.step("2")
-        response=await devCtrlEcoA.ReadAttribute(
-            nodeid = 1, attributes = [(1, Clusters.JointFabricDatastore.Attributes.AnchorNodeID)],
-            returnClusterObject = True)
+        response = await devCtrlEcoA.ReadAttribute(
+            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorNodeID)],
+            returnClusterObject=True)
         asserts.assert_greater_equal(response[1][Clusters.JointFabricDatastore].anchorNodeID, 0)
 
         self.step("3")
-        response=await devCtrlEcoA.ReadAttribute(
-            nodeid = 1, attributes = [(1, Clusters.JointFabricDatastore.Attributes.AnchorVendorID)],
-            returnClusterObject = True)
+        response = await devCtrlEcoA.ReadAttribute(
+            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.AnchorVendorID)],
+            returnClusterObject=True)
         asserts.assert_greater_equal(response[1][Clusters.JointFabricDatastore].anchorVendorID, 0)
 
         # Shutdown the Python Controllers start at the begining

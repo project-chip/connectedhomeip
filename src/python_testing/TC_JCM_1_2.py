@@ -126,13 +126,13 @@ class TC_JCM_1_2(MatterBaseTest):
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork 1 {self.jfadmin_fabric_a_passcode} --anchor true",
-            expected_output="[JF] Anchor Administrator commissioned with success")
-            timeout = 10)
+            expected_output="[JF] Anchor Administrator commissioned with success",
+            timeout=10)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
-        jfcStorage=ConfigParser()
+        jfcStorage = ConfigParser()
         jfcStorage.read(self.storage_fabric_a+'/chip_tool_config.alpha.ini')
-        self.ecoACtrlStorage={
+        self.ecoACtrlStorage = {
             "sdk-config": {
                 "ExampleOpCredsCAKey1": jfcStorage.get("Default", "ExampleOpCredsCAKey0"),
                 "ExampleOpCredsICAKey1": jfcStorage.get("Default", "ExampleOpCredsICAKey0"),
@@ -165,35 +165,35 @@ class TC_JCM_1_2(MatterBaseTest):
         # Start Fabric B JF-Administrator App
         self.fabric_b_admin = AppServerSubprocess(
             jfa_server_app,
-            storage_dir = self.storage_fabric_b,
-            port = random.randint(5001, 5999),
-            discriminator = self.jfadmin_fabric_b_discriminator,
-            passcode = self.jfadmin_fabric_b_passcode,
-            extra_args = ["--capabilities", "0x04", "--rpc-server-port", "33055"])
+            storage_dir=self.storage_fabric_b,
+            port=random.randint(5001, 5999),
+            discriminator=self.jfadmin_fabric_b_discriminator,
+            passcode=self.jfadmin_fabric_b_passcode,
+            extra_args=["--capabilities", "0x04", "--rpc-server-port", "33055"])
         self.fabric_b_admin.start(
-            expected_output = "Server initialization complete",
-            timeout = 10)
+            expected_output="Server initialization complete",
+            timeout=10)
 
         # Start Fabric B JF-Administrator App
-        self.fabric_b_ctrl=JFControllerSubprocess(
+        self.fabric_b_ctrl = JFControllerSubprocess(
             jfc_server_app,
-            rpc_server_port = 33055,
-            storage_dir = self.storage_fabric_b,
-            vendor_id = self.jfctrl_fabric_b_vid)
+            rpc_server_port=33055,
+            storage_dir=self.storage_fabric_b,
+            vendor_id=self.jfctrl_fabric_b_vid)
         self.fabric_b_ctrl.start(
-            expected_output = "CHIP task running",
-            timeout = 10)
+            expected_output="CHIP task running",
+            timeout=10)
 
         # Commission JF-ADMIN app with JF-Controller on Fabric B
         self.fabric_b_ctrl.send(
-            message = f"pairing onnetwork 11 {self.jfadmin_fabric_b_passcode} --anchor true",
-            expected_output = "[JF] Anchor Administrator commissioned with success")
+            message=f"pairing onnetwork 11 {self.jfadmin_fabric_b_passcode} --anchor true",
+            expected_output="[JF] Anchor Administrator commissioned with success",
             timeout=10)
 
         # Extract the Ecosystem B certificates and inject them in the storage that will be provided to a new Python Controller later
-        jfcStorage=ConfigParser()
+        jfcStorage = ConfigParser()
         jfcStorage.read(self.storage_fabric_b+'/chip_tool_config.alpha.ini')
-        self.ecoBCtrlStorage={
+        self.ecoBCtrlStorage = {
             "sdk-config": {
                 "ExampleOpCredsCAKey1": jfcStorage.get("Default", "ExampleOpCredsCAKey0"),
                 "ExampleOpCredsICAKey1": jfcStorage.get("Default", "ExampleOpCredsICAKey0"),
@@ -247,30 +247,30 @@ class TC_JCM_1_2(MatterBaseTest):
         # Open enhanced commissioning window using Administrator Commissioning cluster of jfa-app@EcoB
         # Using devCtrlEcoB Python Controller
         # Parameters matching: pairing open-commissioning-window 11 0 400 1000 {jfa-app--discriminator@EcoB}
-        _ocw_timeout=400  # 400 seconds ~ 6.5 minutes
-        _ocw_iteration=1000
+        _ocw_timeout = 400  # 400 seconds ~ 6.5 minutes
+        _ocw_iteration = 1000
 
         try:
             # Open Enhanced Commissioning Window using Administrator Commissioning Cluster
-            params=await devCtrl.OpenCommissioningWindow(
-                nodeid= nodeid,
-                timeout= _ocw_timeout,
-                iteration= _ocw_iteration,
-                discriminator= discriminator,
-                option= 1
+            params = await devCtrl.OpenCommissioningWindow(
+                nodeid=nodeid,
+                timeout=_ocw_timeout,
+                iteration=_ocw_iteration,
+                discriminator=discriminator,
+                option=1
             )
 
             logging.info(f"Successfully opened Enhanced Commissioning Window on node {nodeid}")
             logging.info(f"Discriminator: {discriminator}, Timeout: {_ocw_timeout}s, setupPinCode: {params.setupPinCode}")
 
             # Verify commissioning window is open by reading WindowStatus attribute
-            window_status=await devCtrl.ReadAttribute(
-                nodeid= nodeid,
-                attributes= [(endpoint, Clusters.AdministratorCommissioning.Attributes.WindowStatus)]
+            window_status = await devCtrl.ReadAttribute(
+                nodeid=nodeid,
+                attributes=[(endpoint, Clusters.AdministratorCommissioning.Attributes.WindowStatus)]
             )
 
-            expected_WStatus=Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kEnhancedWindowOpen
-            actual_WStatus_value=window_status[endpoint][Clusters.AdministratorCommissioning][Clusters.AdministratorCommissioning.Attributes.WindowStatus]
+            expected_WStatus = Clusters.AdministratorCommissioning.Enums.CommissioningWindowStatusEnum.kEnhancedWindowOpen
+            actual_WStatus_value = window_status[endpoint][Clusters.AdministratorCommissioning][Clusters.AdministratorCommissioning.Attributes.WindowStatus]
 
             asserts.assert_equal(
                 expected_WStatus,
@@ -294,7 +294,7 @@ class TC_JCM_1_2(MatterBaseTest):
             logging.info(f"Starting Joint Commissioning of Ecosystem B jfa-app with node ID {nodeid}")
 
             devCtrl.send(
-                message = f"pairing onnetwork {nodeid} {passcode} --execute-jcm true")
+                message=f"pairing onnetwork {nodeid} {passcode} --execute-jcm true")
 
             logging.info(f"Joint Commissioning completed successfully for node {nodeid}")
 
@@ -304,30 +304,30 @@ class TC_JCM_1_2(MatterBaseTest):
             logging.error(f"Joint Commissioning failed: {e}")
             asserts.fail(f"Could not perform Joint Commissioning on node {nodeid}: {e}")
 
-    @ async_test_body
+    @async_test_body
     async def test_TC_JCM_1_2(self):
 
         # Creating a Controller for Ecosystem B
-        _fabric_b_persistent_storage =PersistentStorage(jsonData = self.ecoBCtrlStorage)
-        _certAuthorityManagerB=CertificateAuthority.CertificateAuthorityManager(
-            chipStack= self.matter_stack._chip_stack,
-            persistentStorage = _fabric_b_persistent_storage)
+        _fabric_b_persistent_storage = PersistentStorage(jsonData=self.ecoBCtrlStorage)
+        _certAuthorityManagerB = CertificateAuthority.CertificateAuthorityManager(
+            chipStack=self.matter_stack._chip_stack,
+            persistentStorage=_fabric_b_persistent_storage)
         _certAuthorityManagerB.LoadAuthoritiesFromStorage()
-        devCtrlEcoB=_certAuthorityManagerB.activeCaList[0].adminList[0].NewController(
-            nodeId= 201,
-            paaTrustStorePath= str(self.matter_test_config.paa_trust_store_path),
-            catTags = [int(self.ecoBCATs, 16)])
+        devCtrlEcoB = _certAuthorityManagerB.activeCaList[0].adminList[0].NewController(
+            nodeId=201,
+            paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
+            catTags=[int(self.ecoBCATs, 16)])
 
         self.step("1")
         logging.info("On Ecosystem B, use jfc-app for opening a commissioning window in jfa-app using Python Controller")
 
         # Parameters matching: pairing open-commissioning-window 11 0 400 1000 {jfa-app--discriminator@EcoB}
-        _ocw_nodeid=11     # jfa-app node ID in Ecosystem B
-        _ocw_endpoint=0
-        _ocw_discriminator=self.jfadmin_fabric_b_discriminator  # jfa-app discriminator in Ecosystem B
+        _ocw_nodeid = 11     # jfa-app node ID in Ecosystem B
+        _ocw_endpoint = 0
+        _ocw_discriminator = self.jfadmin_fabric_b_discriminator  # jfa-app discriminator in Ecosystem B
 
         # Open enhanced commissioning window using Administrator Commissioning cluster of jfa-app@EcoB
-        _ocw_params=await self._open_commissioning_window_in_EcoB(devCtrlEcoB, _ocw_nodeid, _ocw_discriminator, _ocw_endpoint)
+        _ocw_params = await self._open_commissioning_window_in_EcoB(devCtrlEcoB, _ocw_nodeid, _ocw_discriminator, _ocw_endpoint)
 
         self.step("2")
         logging.info("On Ecosystem A, use jfc-app for commissioning jfa-app at EcosystemB using Python Controller")
@@ -336,8 +336,8 @@ class TC_JCM_1_2(MatterBaseTest):
         # Using devCtrlEcoA Python Controller
 
         # Parameters matching: pairing onnetwork 15 passcode --execute-jcm true
-        _jcm_nodeid=15     # Node ID for jfa-app from Ecosystem B in Ecosystem A fabric
-        _jcm_endpoint=0
+        _jcm_nodeid = 15     # Node ID for jfa-app from Ecosystem B in Ecosystem A fabric
+        _jcm_endpoint = 0
 
         # Perform Joint Commissioning using Ecosystem A jfc-app
         await self._joint_commission_EcoB_admin(self.fabric_a_ctrl, _jcm_nodeid, _ocw_params.setupPinCode, _jcm_endpoint)
@@ -346,21 +346,21 @@ class TC_JCM_1_2(MatterBaseTest):
         logging.info("On jfc-app@EcoB used a non-filtered fabric read for reading the NOC from Fabric Index=2")
 
         # Read JF-Admin NOC on Ecoystem B using jfc-app@EcoB
-        response=await devCtrlEcoB.ReadAttribute(
-            nodeid = 11, attributes = [(0, Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered = False,
-            returnClusterObject = True)
+        response = await devCtrlEcoB.ReadAttribute(
+            nodeid=11, attributes=[(0, Clusters.OperationalCredentials.Attributes.NOCs)], fabricFiltered=False,
+            returnClusterObject=True)
 
         # Search Administrator CAT (FFFF0001) and Anchor CAT (FFFE0001) in JF-Admin NOC on Ecoystem B
-        noc_tlv_data=chip.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].noc).get()
-        _admin_cat_found=False
-        _anchor_cat_found=False
+        noc_tlv_data = chip.tlv.TLVReader(response[0][Clusters.OperationalCredentials].NOCs[0].noc).get()
+        _admin_cat_found = False
+        _anchor_cat_found = False
         for _tag, _value in noc_tlv_data['Any'][6]:
             if _tag == 22 and _value == int(self.ecoBCATs, 16):
                 # Administrator CAT present inside the Subject Field of the NOC
-                _admin_cat_found=True
+                _admin_cat_found = True
             elif _tag == 22 and _value == self.ANCHOR_CAT:
                 # Anchor CAT present inside the Subject Field of the NOC
-                _anchor_cat_found=True
+                _anchor_cat_found = True
             if _admin_cat_found and _anchor_cat_found:
                 break
         asserts.assert_true(_admin_cat_found, "Administrator CAT not found in Admin App NOC on Ecosystem B")

@@ -109,13 +109,13 @@ class TC_JFDS_2_2(MatterBaseTest):
         # Commission JF-ADMIN app with JF-Controller on Fabric A
         self.fabric_a_ctrl.send(
             message=f"pairing onnetwork 1 {self.jfadmin_fabric_a_passcode} --anchor true",
-            expected_output="[JF] Anchor Administrator commissioned with success")
-            timeout = 10)
+            expected_output="[JF] Anchor Administrator commissioned with success",
+            timeout=10)
 
         # Extract the Ecosystem A certificates and inject them in the storage that will be provided to a new Python Controller later
-        jfcStorage=ConfigParser()
+        jfcStorage = ConfigParser()
         jfcStorage.read(self.storage_fabric_a+'/chip_tool_config.alpha.ini')
-        self.ecoACtrlStorage={
+        self.ecoACtrlStorage = {
             "sdk-config": {
                 "ExampleOpCredsCAKey1": jfcStorage.get("Default", "ExampleOpCredsCAKey0"),
                 "ExampleOpCredsICAKey1": jfcStorage.get("Default", "ExampleOpCredsICAKey0"),
@@ -168,25 +168,25 @@ class TC_JFDS_2_2(MatterBaseTest):
             #          "Verify that the DUT responds with Status code CONSTRAINT_ERROR")
         ]
 
-    @ async_test_body
+    @async_test_body
     async def test_TC_JFDS_2_2(self):
         # Creating a Controller for Ecosystem A
         _fabric_a_persistent_storage = PersistentStorage(jsonData=self.ecoACtrlStorage)
         _certAuthorityManagerA = CertificateAuthority.CertificateAuthorityManager(
-            chipStack = self.matter_stack._chip_stack,
-            persistentStorage = _fabric_a_persistent_storage)
+            chipStack=self.matter_stack._chip_stack,
+            persistentStorage=_fabric_a_persistent_storage)
         _certAuthorityManagerA.LoadAuthoritiesFromStorage()
-        devCtrlEcoA=_certAuthorityManagerA.activeCaList[0].adminList[0].NewController(
-            nodeId = 101,
-            paaTrustStorePath = str(self.matter_test_config.paa_trust_store_path),
-            catTags = [int(self.ecoACATs, 16)])
+        devCtrlEcoA = _certAuthorityManagerA.activeCaList[0].adminList[0].NewController(
+            nodeId=101,
+            paaTrustStorePath=str(self.matter_test_config.paa_trust_store_path),
+            catTags=[int(self.ecoACATs, 16)])
 
         self.step("1")
-        response=await devCtrlEcoA.ReadAttribute(
-            nodeid = 1, attributes = [(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
-            returnClusterObject = True)
-        _groupKetSetList=response[1][Clusters.JointFabricDatastore].groupKeySetList
-        step1_groupKeySetListLength=len(_groupKetSetList)
+        response = await devCtrlEcoA.ReadAttribute(
+            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
+            returnClusterObject=True)
+        _groupKetSetList = response[1][Clusters.JointFabricDatastore].groupKeySetList
+        step1_groupKeySetListLength = len(_groupKetSetList)
         # TODO GroupKeySet is not populated yet. Missing SDK implementation. Uncomment this validation step when ready
         # asserts.assert_greater_equal(step1_groupKeySetListLength, 1, "GroupKeySetList must contain at least one entry!")
         # _found = False
@@ -197,29 +197,29 @@ class TC_JFDS_2_2(MatterBaseTest):
         # asserts.assert_true(_found, "No GroupKeySetID=0 entry found!")
 
         self.step("2")
-        step2_groupKeySet=Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
-            groupKeySetID = 0x000a,
-            groupKeySecurityPolicy = Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
-            epochKey0 = b'00000000000000000000000000000000',
-            epochStartTime0 = 2220000,
-            epochKey1 = b'11111111111111111111111111111111',
-            epochStartTime1 = 2220001,
-            epochKey2 = b'22222222222222222222222222222222',
-            epochStartTime2 = 2220002)
-        cmd=Clusters.JointFabricDatastore.Commands.AddKeySet(step2_groupKeySet)
-        await self.send_single_cmd(cmd = cmd, dev_ctrl = devCtrlEcoA, node_id = 1, endpoint = 1)
+        step2_groupKeySet = Clusters.JointFabricDatastore.Structs.DatastoreGroupKeySetStruct(
+            groupKeySetID=0x000a,
+            groupKeySecurityPolicy=Clusters.JointFabricDatastore.Enums.DatastoreGroupKeySecurityPolicyEnum.kTrustFirst,
+            epochKey0=b'00000000000000000000000000000000',
+            epochStartTime0=2220000,
+            epochKey1=b'11111111111111111111111111111111',
+            epochStartTime1=2220001,
+            epochKey2=b'22222222222222222222222222222222',
+            epochStartTime2=2220002)
+        cmd = Clusters.JointFabricDatastore.Commands.AddKeySet(step2_groupKeySet)
+        await self.send_single_cmd(cmd=cmd, dev_ctrl=devCtrlEcoA, node_id=1, endpoint=1)
 
         self.step("3")
-        response=await devCtrlEcoA.ReadAttribute(
-            nodeid = 1, attributes = [(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
-            returnClusterObject = True)
-        _groupKetSetList=response[1][Clusters.JointFabricDatastore].groupKeySetList
+        response = await devCtrlEcoA.ReadAttribute(
+            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
+            returnClusterObject=True)
+        _groupKetSetList = response[1][Clusters.JointFabricDatastore].groupKeySetList
         asserts.assert_greater_equal(len(_groupKetSetList), step1_groupKeySetListLength,
                                      "An new entry was not added in groupKeySetList")
-        _found=False
+        _found = False
         for _item in _groupKetSetList:
             if _item == step2_groupKeySet:
-                _found=True
+                _found = True
                 break
         asserts.assert_true(_found, "GroupKeySet from step2 was not found on DUT!")
 
@@ -251,14 +251,14 @@ class TC_JFDS_2_2(MatterBaseTest):
         # asserts.assert_true(_found, "GroupKeySet from step4 was not found on DUT!")
 
         self.step("6")
-        cmd=Clusters.JointFabricDatastore.Commands.RemoveKeySet(0x000a)
-        await self.send_single_cmd(cmd = cmd, dev_ctrl = devCtrlEcoA, node_id = 1, endpoint = 1)
+        cmd = Clusters.JointFabricDatastore.Commands.RemoveKeySet(0x000a)
+        await self.send_single_cmd(cmd=cmd, dev_ctrl=devCtrlEcoA, node_id=1, endpoint=1)
 
         self.step("7")
-        response=await devCtrlEcoA.ReadAttribute(
-            nodeid = 1, attributes = [(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
-            returnClusterObject = True)
-        _groupKetSetList=response[1][Clusters.JointFabricDatastore].groupKeySetList
+        response = await devCtrlEcoA.ReadAttribute(
+            nodeid=1, attributes=[(1, Clusters.JointFabricDatastore.Attributes.GroupKeySetList)],
+            returnClusterObject=True)
+        _groupKetSetList = response[1][Clusters.JointFabricDatastore].groupKeySetList
         for _item in _groupKetSetList:
             asserts.assert_equal(0x000a, _item.groupKeySetID)
 
