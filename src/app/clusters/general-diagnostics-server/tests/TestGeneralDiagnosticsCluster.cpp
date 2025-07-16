@@ -36,7 +36,8 @@ using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 
 template <class T>
-class ScopedDiagnosticsProvider {
+class ScopedDiagnosticsProvider
+{
 public:
     ScopedDiagnosticsProvider()
     {
@@ -75,7 +76,8 @@ TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
 
     GeneralDiagnosticsClusterTimeSnapshotPayloadTestRequest clusterWithTimeAndPayload(enabledAttributes);
-    ASSERT_EQ(clusterWithTimeAndPayload.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
+    ASSERT_EQ(clusterWithTimeAndPayload.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }),
+              BitFlags<ClusterQualityFlags>());
 }
 
 TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)

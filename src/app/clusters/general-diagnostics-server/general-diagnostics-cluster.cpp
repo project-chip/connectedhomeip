@@ -81,7 +81,6 @@ chip::TestEventTriggerDelegate * GetTriggerDelegateOnMatchingKey(chip::ByteSpan 
     return triggerDelegate;
 }
 
-
 template <typename T>
 CHIP_ERROR EncodeValue(T value, CHIP_ERROR readError, chip::app::AttributeValueEncoder & encoder)
 {
@@ -118,8 +117,7 @@ CHIP_ERROR EncodeListOfValues(T valueList, CHIP_ERROR readError, chip::app::Attr
     return readError;
 }
 
-chip::app::DataModel::ActionReturnStatus
-HandleTestEventTrigger(const Commands::TestEventTrigger::DecodableType & commandData)
+chip::app::DataModel::ActionReturnStatus HandleTestEventTrigger(const Commands::TestEventTrigger::DecodableType & commandData)
 {
     auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
     if (triggerDelegate == nullptr)
@@ -133,7 +131,7 @@ HandleTestEventTrigger(const Commands::TestEventTrigger::DecodableType & command
 
 std::optional<chip::app::DataModel::ActionReturnStatus>
 HandleTimeSnapshot(chip::app::CommandHandler & handler, const chip::app::ConcreteCommandPath & commandPath,
-                                            const Commands::TimeSnapshot::DecodableType & commandData)
+                   const Commands::TimeSnapshot::DecodableType & commandData)
 {
     ChipLogError(Zcl, "Received TimeSnapshot command!");
 
@@ -153,7 +151,7 @@ HandleTimeSnapshot(chip::app::CommandHandler & handler, const chip::app::Concret
     handler.AddResponse(commandPath, response);
     return std::nullopt;
 }
-}
+} // namespace
 
 namespace chip {
 namespace app {
@@ -174,7 +172,7 @@ CHIP_ERROR GeneralDiagnosticsCluster::Startup(ServerClusterContext & context)
 }
 
 DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
-                                                AttributeValueEncoder & encoder)
+                                                                       AttributeValueEncoder & encoder)
 {
     switch (request.path.mAttributeId)
     {
@@ -241,8 +239,8 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
 }
 
 std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsCluster::InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               chip::TLV::TLVReader & input_arguments,
-                                                               CommandHandler * handler)
+                                                                                      chip::TLV::TLVReader & input_arguments,
+                                                                                      CommandHandler * handler)
 {
     switch (request.path.mCommandId)
     {
@@ -261,7 +259,8 @@ std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsCluster::InvokeCo
     }
 }
 
-CHIP_ERROR GeneralDiagnosticsCluster::Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
+CHIP_ERROR GeneralDiagnosticsCluster::Attributes(const ConcreteClusterPath & path,
+                                                 ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
     using namespace GeneralDiagnostics::Attributes;
 
@@ -304,7 +303,8 @@ CHIP_ERROR GeneralDiagnosticsCluster::Attributes(const ConcreteClusterPath & pat
     return builder.AppendElements(DefaultServerCluster::GlobalAttributes());
 }
 
-CHIP_ERROR GeneralDiagnosticsCluster::AcceptedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
+CHIP_ERROR GeneralDiagnosticsCluster::AcceptedCommands(const ConcreteClusterPath & path,
+                                                       ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     static constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
         Commands::TestEventTrigger::kMetadataEntry,
@@ -316,7 +316,9 @@ CHIP_ERROR GeneralDiagnosticsCluster::AcceptedCommands(const ConcreteClusterPath
     return builder.ReferenceExisting(kAcceptedCommands);
 }
 
-CHIP_ERROR GeneralDiagnosticsCluster::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) {
+CHIP_ERROR GeneralDiagnosticsCluster::GeneratedCommands(const ConcreteClusterPath & path,
+                                                        ReadOnlyBufferBuilder<CommandId> & builder)
+{
     static constexpr chip::CommandId kAcceptedCommands[] = {
         GeneralDiagnostics::Commands::TimeSnapshotResponse::Id,
 #if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
@@ -337,7 +339,7 @@ void GeneralDiagnosticsCluster::OnDeviceReboot(BootReasonEnum bootReason)
 }
 
 void GeneralDiagnosticsCluster::OnHardwareFaultsDetect(const GeneralFaults<kMaxHardwareFaults> & previous,
-                                                              const GeneralFaults<kMaxHardwareFaults> & current)
+                                                       const GeneralFaults<kMaxHardwareFaults> & current)
 {
     VerifyOrReturn(mContext != nullptr);
     NotifyAttributeChanged(GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id);
@@ -353,7 +355,7 @@ void GeneralDiagnosticsCluster::OnHardwareFaultsDetect(const GeneralFaults<kMaxH
 }
 
 void GeneralDiagnosticsCluster::OnRadioFaultsDetect(const GeneralFaults<kMaxRadioFaults> & previous,
-                                                           const GeneralFaults<kMaxRadioFaults> & current)
+                                                    const GeneralFaults<kMaxRadioFaults> & current)
 {
     VerifyOrReturn(mContext != nullptr);
     NotifyAttributeChanged(GeneralDiagnostics::Attributes::ActiveRadioFaults::Id);
@@ -369,7 +371,7 @@ void GeneralDiagnosticsCluster::OnRadioFaultsDetect(const GeneralFaults<kMaxRadi
 }
 
 void GeneralDiagnosticsCluster::OnNetworkFaultsDetect(const GeneralFaults<kMaxNetworkFaults> & previous,
-                                                             const GeneralFaults<kMaxNetworkFaults> & current)
+                                                      const GeneralFaults<kMaxNetworkFaults> & current)
 {
     VerifyOrReturn(mContext != nullptr);
     NotifyAttributeChanged(GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id);
@@ -410,9 +412,8 @@ CHIP_ERROR GeneralDiagnosticsCluster::ReadNetworkInterfaces(AttributeValueEncode
     return err;
 }
 
-std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsClusterTimeSnapshotPayloadTestRequest::InvokeCommand(const DataModel::InvokeRequest & request,
-                                                               chip::TLV::TLVReader & input_arguments,
-                                                               CommandHandler * handler)
+std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsClusterTimeSnapshotPayloadTestRequest::InvokeCommand(
+    const DataModel::InvokeRequest & request, chip::TLV::TLVReader & input_arguments, CommandHandler * handler)
 {
     switch (request.path.mCommandId)
     {
@@ -437,8 +438,9 @@ std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsClusterTimeSnapsh
 }
 
 std::optional<chip::app::DataModel::ActionReturnStatus>
-GeneralDiagnosticsClusterTimeSnapshotPayloadTestRequest::HandlePayloadTestRequest(chip::app::CommandHandler & handler, const chip::app::ConcreteCommandPath & commandPath,
-                                                  const Commands::PayloadTestRequest::DecodableType & commandData)
+GeneralDiagnosticsClusterTimeSnapshotPayloadTestRequest::HandlePayloadTestRequest(
+    chip::app::CommandHandler & handler, const chip::app::ConcreteCommandPath & commandPath,
+    const Commands::PayloadTestRequest::DecodableType & commandData)
 {
     if (commandData.count > kMaxPayloadTestRequestCount)
     {
@@ -469,9 +471,9 @@ GeneralDiagnosticsClusterTimeSnapshotPayloadTestRequest::HandlePayloadTestReques
     return std::nullopt;
 }
 
-std::optional<chip::app::DataModel::ActionReturnStatus>
-GeneralDiagnosticsClusterTimeSnapshotPayloadTestRequest::HandleTimeSnapshot(chip::app::CommandHandler & handler, const chip::app::ConcreteCommandPath & commandPath,
-                                            const Commands::TimeSnapshot::DecodableType & commandData)
+std::optional<chip::app::DataModel::ActionReturnStatus> GeneralDiagnosticsClusterTimeSnapshotPayloadTestRequest::HandleTimeSnapshot(
+    chip::app::CommandHandler & handler, const chip::app::ConcreteCommandPath & commandPath,
+    const Commands::TimeSnapshot::DecodableType & commandData)
 {
     ChipLogError(Zcl, "Received TimeSnapshot command!");
 

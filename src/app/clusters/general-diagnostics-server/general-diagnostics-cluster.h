@@ -21,8 +21,8 @@
 #include <app/server/Server.h>
 #include <clusters/GeneralDiagnostics/ClusterId.h>
 #include <clusters/GeneralDiagnostics/Metadata.h>
-#include <platform/GeneralFaults.h>
 #include <platform/DiagnosticDataProvider.h>
+#include <platform/GeneralFaults.h>
 
 namespace chip {
 namespace app {
@@ -60,7 +60,6 @@ public:
 
     CHIP_ERROR GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder) override;
 
-
     /**
      * @brief
      *   Called after the current device is rebooted.
@@ -87,7 +86,10 @@ public:
     void OnNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
                                const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
 
-    CHIP_ERROR GetRebootCount(uint16_t & rebootCount) const { return DeviceLayer::GetDiagnosticDataProvider().GetRebootCount(rebootCount); }
+    CHIP_ERROR GetRebootCount(uint16_t & rebootCount) const
+    {
+        return DeviceLayer::GetDiagnosticDataProvider().GetRebootCount(rebootCount);
+    }
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) const
     {
         return DeviceLayer::GetDiagnosticDataProvider().GetTotalOperationalHours(totalOperationalHours);
@@ -131,7 +133,7 @@ public:
 
     std::optional<chip::app::DataModel::ActionReturnStatus>
     HandleTimeSnapshot(chip::app::CommandHandler & handler, const chip::app::ConcreteCommandPath & commandPath,
-                                            const GeneralDiagnostics::Commands::TimeSnapshot::DecodableType & commandData);
+                       const GeneralDiagnostics::Commands::TimeSnapshot::DecodableType & commandData);
 };
 
 } // namespace Clusters
