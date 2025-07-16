@@ -47,26 +47,6 @@ namespace {
 using namespace chip::app::Compatibility::Internal;
 using Protocols::InteractionModel::Status;
 
-bool ClusterContainsWritableAttribute(ServerClusterInterface * cluster, const ConcreteAttributePath & path)
-{
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> builder;
-
-    if (cluster->Attributes(path, builder) != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-
-    for (auto info : builder.TakeBuffer())
-    {
-        if (info.attributeId == path.mAttributeId)
-        {
-            return info.GetWritePrivilege().has_value();
-        }
-    }
-
-    return false;
-}
-
 class ContextAttributesChangeListener : public AttributesChangedListener
 {
 public:
@@ -113,12 +93,6 @@ DataModel::ActionReturnStatus CodegenDataModelProvider::WriteAttribute(const Dat
 {
     if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
     {
-        if (request.path.mDataVersion.HasValue())
-        {
-            VerifyOrReturnError(request.path.mDataVersion.Value() == cluster->GetDataVersion(request.path),
-                                Status::DataVersionMismatch);
-        }
-        VerifyOrReturnError(ClusterContainsWritableAttribute(cluster, request.path), Status::UnsupportedAttribute);
         return cluster->WriteAttribute(request, decoder);
     }
 
