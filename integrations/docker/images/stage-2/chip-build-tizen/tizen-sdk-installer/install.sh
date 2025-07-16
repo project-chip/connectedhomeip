@@ -153,8 +153,8 @@ function unrpm_globs() {
     for fn_glob in "${globs[@]}"; do
         info "Processing filenames matching '$fn_glob' ..."
 
-        local most_recent_filename=$(find "$PKG_CACHE_PATH" -name "$fn_glob" -printf '%T@ %p\n' |
-            sort -nr | head -n 1 | cut -d ' ' -f 2)
+        local most_recent_filename="$(find "$PKG_CACHE_PATH" -name "$fn_glob" -printf '%T@ %p\n' |
+            sort -nr | head -n 1 | cut -d ' ' -f 2)"
 
         info "Unpacking '$most_recent_filename' into '$destdir'"
         7z x -so "$most_recent_filename" | cpio --directory="$destdir" -idmu "${VERBOSE:+-v}"
@@ -178,8 +178,8 @@ function unzip_globs() {
     for fn_glob in "${globs[@]}"; do
         info "Processing filenames matching '$fn_glob' ..."
 
-        local most_recent_filename=$(find "$PKG_CACHE_PATH" -name "$fn_glob" -printf '%T@ %p\n' |
-            sort -nr | head -n 1 | cut -d ' ' -f 2)
+        local most_recent_filename="$(find "$PKG_CACHE_PATH" -name "$fn_glob" -printf '%T@ %p\n' |
+            sort -nr | head -n 1 | cut -d ' ' -f 2)"
 
         info "Unpacking '$most_recent_filename' into '$destdir'"
 
