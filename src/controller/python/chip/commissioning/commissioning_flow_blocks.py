@@ -210,7 +210,14 @@ class CommissioningFlowBlocks:
         self._logger.info("WiFi network commissioning finished")
 
     async def network_commissioning(self, parameter: commissioning.Parameters, node_id: int):
-        clusters = await self._devCtrl.ReadAttribute(nodeid=node_id, attributes=[(Clusters.Descriptor.Attributes.ServerList)], returnClusterObject=True)
+        # attribute argument can expect tuple ClusterObjects.ClusterAttributeDescriptor
+        # In this case is set to  Attributes.ServerList class which  is subclass of ClusterObjects.ClusterAttributeDescriptor
+        # and is not detected by mypy
+        clusters = await self._devCtrl.ReadAttribute(
+            nodeid=node_id,
+            attributes=[(Clusters.Descriptor.Attributes.ServerList)],  # type: ignore
+            returnClusterObject=True
+        )
         if Clusters.NetworkCommissioning.id not in clusters[commissioning.ROOT_ENDPOINT_ID][Clusters.Descriptor].serverList:
             self._logger.info(
                 f"Network commissioning cluster {commissioning.ROOT_ENDPOINT_ID} is not enabled on this device.")
