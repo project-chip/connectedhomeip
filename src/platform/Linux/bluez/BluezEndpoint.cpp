@@ -311,7 +311,7 @@ void BluezEndpoint::UpdateConnectionTable(BluezDevice1 & aDevice)
         // immediately, because the BLE layer might still use it. Instead, we will also
         // schedule the deletion of the connection object, so it will happen after the
         // BLE layer has processed the disconnection event.
-        DeviceLayer::SystemLayer().ScheduleLambda([this, conn] {
+        DeviceLayer::SystemLayer().ScheduleLambda([conn] {
             ChipLogDetail(DeviceLayer, "Freeing BLE connection: conn=%p", conn);
             chip::Platform::Delete(conn);
         });
