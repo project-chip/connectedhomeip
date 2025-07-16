@@ -36,6 +36,27 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 
+template <class T>
+class ScopedDiagnosticsProvider
+{
+public:
+    ScopedDiagnosticsProvider()
+    {
+        mOldProvider = &DeviceLayer::GetDiagnosticDataProvider();
+        DeviceLayer::SetDiagnosticDataProvider(&mProvider);
+    }
+    ~ScopedDiagnosticsProvider() { DeviceLayer::SetDiagnosticDataProvider(mOldProvider); }
+
+    ScopedDiagnosticsProvider(const ScopedDiagnosticsProvider &)             = delete;
+    ScopedDiagnosticsProvider & operator=(const ScopedDiagnosticsProvider &) = delete;
+    ScopedDiagnosticsProvider(ScopedDiagnosticsProvider &&)                  = delete;
+    ScopedDiagnosticsProvider & operator=(ScopedDiagnosticsProvider &&)      = delete;
+
+private:
+    DeviceLayer::DiagnosticDataProvider * mOldProvider;
+    T mProvider;
+};
+
 struct TestSoftwareDiagnosticsCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -52,7 +73,7 @@ TEST_F(TestSoftwareDiagnosticsCluster, CompileTest)
     };
 
     // The cluster should compile for any logic
-    SoftwareDiagnosticsServerCluster<DeviceLayerSoftwareDiagnosticsLogic> cluster(enabledAttributes);
+    SoftwareDiagnosticsServerCluster cluster(enabledAttributes);
 
     // Essentially say "code executes"
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, SoftwareDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
@@ -71,8 +92,8 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
             .enableCurrentHeapUsed   = false,
             .enableCurrentWatermarks = false,
         };
-        NullProvider nullProvider;
-        InjectedDiagnosticsSoftwareDiagnosticsLogic diag(nullProvider, enabledAttributes);
+        ScopedDiagnosticsProvider<NullProvider> nullProvider;
+        SoftwareDiagnosticsLogic diag(enabledAttributes);
 
         // without watermarks, no commands are accepted
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
@@ -103,8 +124,8 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
             .enableCurrentWatermarks = true,
         };
 
-        WatermarksProvider watermarksProvider;
-        InjectedDiagnosticsSoftwareDiagnosticsLogic diag(watermarksProvider, enabledAttributes);
+        ScopedDiagnosticsProvider<WatermarksProvider> watermarksProvider;
+        SoftwareDiagnosticsLogic diag(enabledAttributes);
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
         ASSERT_EQ(diag.AcceptedCommands(commandsBuilder), CHIP_NO_ERROR);
@@ -160,8 +181,8 @@ TEST_F(TestSoftwareDiagnosticsCluster, AttributesTest)
             .enableCurrentWatermarks = true,
         };
 
-        AllProvider allProvider;
-        InjectedDiagnosticsSoftwareDiagnosticsLogic diag(allProvider, enabledAttributes);
+        ScopedDiagnosticsProvider<AllProvider> allProvider;
+        SoftwareDiagnosticsLogic diag(enabledAttributes);
 
         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> commandsBuilder;
         ASSERT_EQ(diag.AcceptedCommands(commandsBuilder), CHIP_NO_ERROR);
