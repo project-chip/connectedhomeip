@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/openthread.gni")
 import("//build_overrides/ti_simplelink_sdk.gni")
+import("${chip_root}/src/lib/lib.gni")
 
 import("${build_root}/config/defaults.gni")
 
@@ -67,6 +68,10 @@ ti_sysconfig("sysconfig") {
     #"ti_devices_config.h",
   ]
 
+  if (silk_logging_enabled) {
+    outputs += [ "ti_log_config.c" ]
+  }
+
   public_configs = [ ":sdk_cc13x4_26x4_dmm_config" ]
 
   cflags = [
@@ -106,6 +111,19 @@ ti_simplelink_executable("lighting_app") {
 
   if (chip_enable_icd_server) {
     defines += [ "TI_ICD_ENABLE_SERVER" ]
+  }
+
+  if (chip_build_libshell) {
+    deps += [
+      "${chip_root}/examples/shell/shell_common:shell_common",
+      "${chip_root}/src/lib/shell:shell",
+      "${chip_root}/src/lib/shell:shell_core",
+    ]
+
+    defines += [
+      "ENABLE_CHIP_SHELL",
+      "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1",
+    ]
   }
 
   include_dirs = [
