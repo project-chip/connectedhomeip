@@ -451,7 +451,7 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128InPlaceEncryption)
 
         if (vector->ct_len > 0)
         {
-            inplace_buffer.Alloc(vector->ct_len);
+            ASSERT_TRUE(inplace_buffer.Alloc(vector->ct_len));
             inplace_buffer_ptr = inplace_buffer.Get();
 
             // Copy the PlainText Buffer so we can do inplace encryption
@@ -475,11 +475,11 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128InPlaceEncryption)
             EXPECT_TRUE(areTagsEqual);
             if (!areCTsEqual)
             {
-                printf("\n Test %d failed due to mismatching ciphertext\n", vector->tcId);
+                ADD_FAILURE() << "Test " << vector->tcId << " failed due to mismatching ciphertext.";
             }
             if (!areTagsEqual)
             {
-                printf("\n Test %d failed due to mismatching tags\n", vector->tcId);
+                ADD_FAILURE() << "Test " << vector->tcId << " failed due to mismatching tags.";
             }
         }
     }
@@ -506,7 +506,7 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128InPlaceDecryption)
 
         if (vector->pt_len > 0)
         {
-            inplace_buffer.Alloc(vector->pt_len);
+            ASSERT_TRUE(inplace_buffer.Alloc(vector->pt_len));
             inplace_buffer_ptr = inplace_buffer.Get();
 
             // Copy the Ciphertext Buffer so we can do inplace decryption
@@ -525,7 +525,7 @@ TEST_F(TestChipCryptoPAL, TestAES_CCM_128InPlaceDecryption)
             EXPECT_TRUE(arePTsEqual);
             if (!arePTsEqual)
             {
-                printf("\n Test %d failed due to mismatching plaintext\n", vector->tcId);
+                ADD_FAILURE() << "Test " << vector->tcId << " failed due to mismatching plaintext.";
             }
         }
     }
