@@ -21,7 +21,6 @@
 #include <nlassert.h>
 
 #include "BufferWriter.h"
-#include <lib/core/CHIPSafeCasts.h>
 
 namespace chip {
 
