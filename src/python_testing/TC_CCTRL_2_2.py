@@ -68,7 +68,7 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from chip.testing import decorators
 
 
@@ -165,7 +165,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
     def default_timeout(self) -> int:
         return 4*60
 
-    @decorators.run_if_endpoint_matches(has_cluster(Clusters.CommissionerControl))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.CommissionerControl))
     async def test_TC_CCTRL_2_2(self):
         self.step(1)
         th_server_fabrics = await self.read_single_attribute_check_success(cluster=Clusters.OperationalCredentials, attribute=Clusters.OperationalCredentials.Attributes.Fabrics, dev_ctrl=self.TH_server_controller, node_id=self.server_nodeid, endpoint=0, fabric_filtered=False)

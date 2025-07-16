@@ -4,7 +4,7 @@ import chip.clusters as Clusters
 import langcodes
 from chip.interaction_model import Status
 from chip.testing.matter_asserts import assert_non_empty_string
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
 from chip.testing import decorators
 #

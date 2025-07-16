@@ -1,7 +1,7 @@
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
 from TC_SEPRTestBase import CommodityPriceTestBaseHelper
 from chip.testing import decorators
@@ -134,7 +134,7 @@ class TC_SEPR_2_2(CommodityPriceTestBaseHelper, MatterBaseTest):
 
         return steps
 
-    @decorators.run_if_endpoint_matches(has_cluster(cluster))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(cluster))
     async def test_TC_SEPR_2_2(self):
         """Run the test steps."""
         endpoint = self.get_endpoint()

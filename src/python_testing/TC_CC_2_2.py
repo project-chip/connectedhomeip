@@ -3,7 +3,7 @@ import time
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
 from test_plan_support import commission_if_required, read_attribute, verify_success
 from chip.testing import decorators
@@ -133,7 +133,7 @@ class TC_CC_2_3(MatterBaseTest):
                          "The third entry in _reportedRemainingTimeValuesList_ is equal to 0")
                 ]
 
-    @decorators.run_if_endpoint_matches(has_cluster(Clusters.ColorControl))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.ColorControl))
     async def test_TC_CC_2_2(self):
         gather_time = 20
 

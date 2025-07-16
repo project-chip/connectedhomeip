@@ -2,7 +2,7 @@ import logging
 import chip.clusters as Clusters
 from chip.interaction_model import Status
 from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
 from chip.testing import decorators
 #
@@ -83,7 +83,7 @@ class TC_LTIME_3_1(MatterBaseTest):
         ]
         return steps
 
-    @decorators.run_if_endpoint_matches(has_cluster(Clusters.TimeFormatLocalization))
+    @decorators.run_if_endpoint_matches(Clusters.TimeFormatLocalization)
     async def test_TC_LTIME_3_1(self):
         self.endpoint = self.get_endpoint(default=0)
         self.cluster = Clusters.TimeFormatLocalization

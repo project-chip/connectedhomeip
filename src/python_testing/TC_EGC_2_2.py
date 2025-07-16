@@ -1,7 +1,7 @@
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from mobly import asserts
 from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
 from chip.testing import decorators
@@ -77,7 +77,7 @@ class TC_EGC_2_2(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
         ]
         return steps
 
-    @decorators.run_if_endpoint_matches(has_cluster(Clusters.ElectricalGridConditions))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.ElectricalGridConditions))
     async def test_TC_EGC_2_2(self):
         endpoint = self.get_endpoint()
         attributes = cluster.Attributes

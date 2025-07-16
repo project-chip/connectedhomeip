@@ -44,7 +44,7 @@ from chip.clusters import Attribute
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Types import NullValue
 from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, has_attribute
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
 from chip.testing import decorators
 from mobly import asserts
 
@@ -155,7 +155,7 @@ class TC_CC_2_1(MatterBaseTest):
         for primary in primary_list:
             attribute_str = primary.format(primary=primary_index)
             await self._populate_wildcard()
-            has_attr_func = has_attribute(attribute=getattr(self.attributes, attribute_str))
+            has_attr_func = decorators.has_attribute(attribute=getattr(self.attributes, attribute_str))
             has_attr_status = has_attr_func(self.stored_global_wildcard, self.endpoint)
             if attribute_str not in instance_attribute_names or not has_attr_status:
                 return False
@@ -241,7 +241,7 @@ class TC_CC_2_1(MatterBaseTest):
         logger.info(f"Num b : {bin(tmp_b)}")
         asserts.assert_equal(tmp_a, tmp_b, "Lower 4 bits of values are not equal")
 
-    @decorators.run_if_endpoint_matches(has_cluster(Clusters.ColorControl))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.ColorControl))
     @decorators.async_test_body
     async def test_TC_CC_2_1(self):
         self.cluster = Clusters.ColorControl
