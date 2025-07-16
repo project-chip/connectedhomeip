@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/attribute-storage.h>
+#include <clusters/UnitTesting/Metadata.h>
 #include <controller/InvokeInteraction.h>
 #include <controller/ReadInteraction.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
