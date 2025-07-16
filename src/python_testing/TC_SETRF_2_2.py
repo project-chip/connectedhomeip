@@ -120,7 +120,7 @@ class TC_SETRF_2_2(MatterBaseTest, CommodityTariffTestBaseHelper):
                             "Command must be of type GetTariffComponentResponse.")
         if result.label is not NullValue:
             matter_asserts.assert_is_string(result.label, "Label must be a string.")
-            matter_asserts.assert_string_length(result.label, "Label must be between 0 and 32 characters.", 0, 128)
+            matter_asserts.assert_string_length(result.label, "Label must be between 0 and 128 characters.", 0, 128)
         matter_asserts.assert_list(result.dayEntryIDs, "DayEntryIDs attribute must return a list.", 1)
         for item in result.dayEntryIDs:
             matter_asserts.assert_valid_uint32(item, "DayEntryIDs list element must have uint32 type")
