@@ -51,13 +51,13 @@ public:
         return Add(buff);
     }
 
-    /// Append a char value
-    StringBuilderBase & Add(char value)
+    /// Append an uint8_t value
+    StringBuilderBase & Add(uint8_t value)
     {
-        char buff[2];
-        snprintf(buff, sizeof(buff), "%c", value);
-        buff[sizeof(buff) - 1] = 0;
-        return Add(buff);
+        uint8_t actual = std::isprint(value) ? value : '.';
+        mWriter.Put(actual);
+        NullTerminate();
+        return *this;
     }
 
     /// did all the values fit?
@@ -124,14 +124,7 @@ public:
     {
         for (size_t i = 0; i < size; ++i)
         {
-            if (std::isprint(data[i]))
-            {
-                Add(reinterpret_cast<const char &>(data[i]));
-            }
-            else
-            {
-                Add('.');
-            }
+            Add(data[i]);
         }
 
         if (add_marker_if_overflow)

@@ -145,7 +145,14 @@ TEST(TestStringBuilder, TestFormat)
 
     {
         uint8_t bytes[] = { '1', '2', '\x01', '3', '4', '\x02', '5', '6', '\x00', '7', '8', '9', '0' };
-        StringBuilder<14> builder(bytes, sizeof(bytes), false);
+        StringBuilder<14> builder(bytes, sizeof(bytes));
+        EXPECT_TRUE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "12.34.56.7890");
+    }
+
+    {
+        uint8_t bytes[] = { '1', '2', '\x01', '3', '4', '\x02', '5', '6', '\x00', '7', '8', '9', '0' };
+        StringBuilder<14> builder(ByteSpan(bytes, sizeof(bytes)));
         EXPECT_TRUE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "12.34.56.7890");
     }
@@ -233,6 +240,13 @@ TEST(TestStringBuilder, TestFormatOverflow)
     {
         uint8_t bytes[] = { '1', '2', '\x01', '3', '4', '\x02', '5', '6', '\x00', '7', '8', '9', '0', 'a' };
         StringBuilder<14> builder(bytes, sizeof(bytes), false);
+        EXPECT_FALSE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "12.34.56.7890");
+    }
+
+    {
+        uint8_t bytes[] = { '1', '2', '\x01', '3', '4', '\x02', '5', '6', '\x00', '7', '8', '9', '0', 'a' };
+        StringBuilder<14> builder(ByteSpan(bytes, sizeof(bytes)), false);
         EXPECT_FALSE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "12.34.56.7890");
     }
@@ -337,6 +351,13 @@ TEST(TestStringBuilder, TestOverflowMarker)
     {
         uint8_t bytes[] = { '1', '2', '\x01', '3', '4', '\x02', '5', '6', '\x00', '7', '8', '9', '0', 'a' };
         StringBuilder<14> builder(bytes, sizeof(bytes));
+        EXPECT_FALSE(builder.Fit());
+        EXPECT_STREQ(builder.c_str(), "12.34.56.7...");
+    }
+
+    {
+        uint8_t bytes[] = { '1', '2', '\x01', '3', '4', '\x02', '5', '6', '\x00', '7', '8', '9', '0', 'a' };
+        StringBuilder<14> builder(ByteSpan(bytes, sizeof(bytes)));
         EXPECT_FALSE(builder.Fit());
         EXPECT_STREQ(builder.c_str(), "12.34.56.7...");
     }
