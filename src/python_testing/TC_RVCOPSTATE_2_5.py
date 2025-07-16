@@ -40,7 +40,7 @@ import enum
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing.matter_testing import (AttributeMatcher, MatterBaseTest, TestStep, async_test_body, default_matter_test_main,
                                          type_matches)
 from mobly import asserts
@@ -199,7 +199,7 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
 
             # TH establishes a subscription to the CurrentMode attribute of the RVC Run Mode cluster of the DUT
             self.step("4")
-            current_mode_accumulator = ClusterAttributeChangeAccumulator(
+            current_mode_accumulator = AttributeSubscriptionHandler(
                 Clusters.RvcRunMode,
                 Clusters.RvcRunMode.Attributes.CurrentMode)
             await current_mode_accumulator.start(
