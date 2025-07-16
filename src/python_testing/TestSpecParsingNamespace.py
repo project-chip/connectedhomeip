@@ -19,8 +19,8 @@ import xml.etree.ElementTree as ElementTree
 import zipfile
 from importlib.abc import Traversable
 
-from chip.testing.matter_testing import (MatterBaseTest, NamespacePathLocation, ProblemNotice, ProblemSeverity,
-                                         default_matter_test_main)
+from chip.testing.matter_testing import (MatterBaseTest, default_matter_test_main)
+from chip.testing.problem_notices import (NamespacePathLocation, ProblemNotice, ProblemSeverity)
 from chip.testing.spec_parsing import (DataModelLevel, PrebuiltDataModelDirectory, build_xml_namespaces, get_data_model_directory,
                                        parse_namespace)
 from jinja2 import Template
