@@ -748,7 +748,6 @@ class TC_SETRF_2_1(MatterBaseTest, CommodityTariffTestBaseHelper):
         # TH reads NextDayEntry attribute, expects a DayEntryStruct
         val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NextDayEntry)
         asserts.assert_not_equal(val, NullValue, "val must not be NullValue")
-        asserts.assert_not_equal(val, NullValue, "val must not be NullValue")
         asserts.assert_true(isinstance(val, cluster.Structs.DayEntryStruct), "val must be of type DayEntryStruct")
         await self.checkDayEntryStruct(endpoint=endpoint, cluster=cluster, struct=val)
 
