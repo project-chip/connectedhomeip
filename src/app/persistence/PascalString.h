@@ -98,11 +98,13 @@ public:
     ///
     /// Use this to serialize the data. Specifically to recover the original string from
     /// persistent storage one can do one of two things:
-    ///   - persist pascalString.ContentWithLenPrefix (will include the data WITH the size prefix)
+    ///   - persist pascalString.ContentWithLenPrefix (will include the data WITH the size prefix AND the prefix
+    ///     will correctly identify NULL strings via a kInvalidLength marker)
     ///     - read via pascalString.RawFullBuffer
-    ///   - persist pascalString.Content (will NOT include data size)
-    ///     - read into a temporary buffer and set value via pascalString.SetValue()
-    ///     - OR read into (RawFullBuffer().data() + PREFIX_LEN) and call SetContentLength()
+    ///   - persist pascalString.Content (will NOT include data size and NULL strings will be the same as
+    ///     empty strings) and consider if IsNull requires special handling
+    ///     - read into a temporary buffer and set value via pascalString.SetValue()/SetNull()
+    ///     - OR read into (RawFullBuffer().data() + PREFIX_LEN) and call SetContentLength() or SetNull if applicable
     ByteSpan ContentWithLenPrefix() const
     {
         return { reinterpret_cast<const uint8_t *>(mData), static_cast<size_t>(GetContentLength() + PREFIX_LEN) };
