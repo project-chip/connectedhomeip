@@ -58,7 +58,7 @@ target_sources(app
     ${ZEPHYR_PLATFORM_COMMON}/source/DeviceCallbacks.cpp
 )
 
-# TODO MATTER-4291
+# TODO Implement OTA support
 if(CONFIG_CHIP_OTA_REQUESTOR)
     # target_sources(app PRIVATE
     #                 ${EXAMPLE_PLATFORM_SILABS_COMMON_DIR}/ota_requestor/source/OTARequestorInitiatorCommon.cpp
