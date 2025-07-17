@@ -96,9 +96,7 @@ class TC_PAVST_2_7(MatterBaseTest):
         aSupportedFormats = []
         aAllocatedVideoStreams = []
         aAllocatedAudioStreams = []
-        aTransportStatus = ""
         aConnectionID = ""
-        aTriggerType = ""
 
         self.step(1)
         # Commission DUT - already done
@@ -217,8 +215,6 @@ class TC_PAVST_2_7(MatterBaseTest):
             asserts.assert_greater_equal(
                 len(transport_configs, 1), "TransportConfigurations must not be empty!"
             )
-            aTransportStatus = transport_configs.TransportOptions.transportStatus
-            aTriggerType = transport_configs.TransportOptions.triggerType
             aConnectionID = transport_configs.ConnectionID
 
         # TH1 sends command
