@@ -85,73 +85,73 @@ CHIP_ERROR EncodeStringOnSuccess(CHIP_ERROR status, AttributeValueEncoder & enco
     return encoder.Encode(chip::CharSpan(buf, strnlen(buf, maxBufSize)));
 }
 
-CHIP_ERROR ReadVendorName(DeviceInstanceInfoProvider & deviceInfoProvider, AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadVendorName(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
     constexpr size_t kMaxLen     = DeviceLayer::ConfigurationManager::kMaxVendorNameLength;
     char vendorName[kMaxLen + 1] = { 0 };
-    return EncodeStringOnSuccess(deviceInfoProvider.GetVendorName(vendorName, sizeof(vendorName)), aEncoder, vendorName, kMaxLen);
+    return EncodeStringOnSuccess(deviceInfoProvider->GetVendorName(vendorName, sizeof(vendorName)), aEncoder, vendorName, kMaxLen);
 }
 
-CHIP_ERROR ReadVendorID(DeviceInstanceInfoProvider & deviceInfoProvider, AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadVendorID(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
     uint16_t vendorId = 0;
-    ReturnErrorOnFailure(deviceInfoProvider.GetVendorId(vendorId));
+    ReturnErrorOnFailure(deviceInfoProvider->GetVendorId(vendorId));
     return aEncoder.Encode(vendorId);
 }
 
-CHIP_ERROR ReadProductName(DeviceInstanceInfoProvider & deviceInfoProvider, AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadProductName(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
     constexpr size_t kMaxLen      = DeviceLayer::ConfigurationManager::kMaxProductNameLength;
     char productName[kMaxLen + 1] = { 0 };
-    return EncodeStringOnSuccess(deviceInfoProvider.GetProductName(productName, sizeof(productName)), aEncoder, productName,
+    return EncodeStringOnSuccess(deviceInfoProvider->GetProductName(productName, sizeof(productName)), aEncoder, productName,
                                  kMaxLen);
 }
 
-CHIP_ERROR ReadProductID(DeviceInstanceInfoProvider & deviceInfoProvider, AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadProductID(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
     uint16_t productId = 0;
-    ReturnErrorOnFailure(deviceInfoProvider.GetProductId(productId));
+    ReturnErrorOnFailure(deviceInfoProvider->GetProductId(productId));
     return aEncoder.Encode(productId);
 }
 
-CHIP_ERROR ReadHardwareVersion(DeviceInstanceInfoProvider & deviceInfoProvider, AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadHardwareVersion(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
     uint16_t hardwareVersion = 0;
-    ReturnErrorOnFailure(deviceInfoProvider.GetHardwareVersion(hardwareVersion));
+    ReturnErrorOnFailure(deviceInfoProvider->GetHardwareVersion(hardwareVersion));
     return aEncoder.Encode(hardwareVersion);
 }
 
-CHIP_ERROR ReadHardwareVersionString(DeviceInstanceInfoProvider & deviceInfoProvider, AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadHardwareVersionString(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
     constexpr size_t kMaxLen                = DeviceLayer::ConfigurationManager::kMaxHardwareVersionStringLength;
     char hardwareVersionString[kMaxLen + 1] = { 0 };
-    return EncodeStringOnSuccess(deviceInfoProvider.GetHardwareVersionString(hardwareVersionString, sizeof(hardwareVersionString)),
+    return EncodeStringOnSuccess(deviceInfoProvider->GetHardwareVersionString(hardwareVersionString, sizeof(hardwareVersionString)),
                                  aEncoder, hardwareVersionString, kMaxLen);
 }
 
-CHIP_ERROR ReadSoftwareVersion(DeviceLayer::ConfigurationManager & configManager, AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadSoftwareVersion(DeviceLayer::ConfigurationManager & configManager, AttributeValueEncoder & aEncoder)
 {
     uint32_t softwareVersion = 0;
     ReturnErrorOnFailure(configManager.GetSoftwareVersion(softwareVersion));
     return aEncoder.Encode(softwareVersion);
 }
 
-CHIP_ERROR ReadSoftwareVersionString(DeviceInstanceInfoProvider & deviceInfoProvider, AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadSoftwareVersionString(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
     constexpr size_t kMaxLen                = DeviceLayer::ConfigurationManager::kMaxSoftwareVersionStringLength;
     char softwareVersionString[kMaxLen + 1] = { 0 };
-    return EncodeStringOnSuccess(deviceInfoProvider.GetSoftwareVersionString(softwareVersionString, sizeof(softwareVersionString)),
+    return EncodeStringOnSuccess(deviceInfoProvider->GetSoftwareVersionString(softwareVersionString, sizeof(softwareVersionString)),
                                  aEncoder, softwareVersionString, kMaxLen);
 }
 
-CHIP_ERROR ReadManufacturingDate(DeviceInstanceInfoProvider & deviceInfoProvider, AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadManufacturingDate(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
     constexpr size_t kMaxLen                  = DeviceLayer::ConfigurationManager::kMaxManufacturingDateLength;
     char manufacturingDateString[kMaxLen + 1] = { 0 };
     uint16_t manufacturingYear;
     uint8_t manufacturingMonth;
     uint8_t manufacturingDayOfMonth;
-    CHIP_ERROR status = deviceInfoProvider.GetManufacturingDate(manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
+    CHIP_ERROR status = deviceInfoProvider->GetManufacturingDate(manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
 
     // TODO: Remove defaulting once proper runtime defaulting of unimplemented factory data is done
     if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
@@ -169,47 +169,47 @@ CHIP_ERROR ReadManufacturingDate(DeviceInstanceInfoProvider & deviceInfoProvider
     return aEncoder.Encode(chip::CharSpan(manufacturingDateString, strnlen(manufacturingDateString, kMaxLen)));
 }
 
-CHIP_ERROR ReadPartNumber(DeviceInstanceInfoProvider & deviceInfoProvider, AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadPartNumber(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
     constexpr size_t kMaxLen     = DeviceLayer::ConfigurationManager::kMaxPartNumberLength;
     char partNumber[kMaxLen + 1] = { 0 };
 
-    CHIP_ERROR status = deviceInfoProvider.GetPartNumber(partNumber, sizeof(partNumber));
+    CHIP_ERROR status = deviceInfoProvider->GetPartNumber(partNumber, sizeof(partNumber));
     status            = ClearNullTerminatedStringWhenUnimplemented(status, partNumber);
     return EncodeStringOnSuccess(status, aEncoder, partNumber, kMaxLen);
 }
 
-CHIP_ERROR ReadProductURL(DeviceInstanceInfoProvider & deviceInfoProvider, AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadProductURL(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
     constexpr size_t kMaxLen     = DeviceLayer::ConfigurationManager::kMaxProductURLLength;
     char productUrl[kMaxLen + 1] = { 0 };
 
-    CHIP_ERROR status = deviceInfoProvider.GetProductURL(productUrl, sizeof(productUrl));
+    CHIP_ERROR status = deviceInfoProvider->GetProductURL(productUrl, sizeof(productUrl));
     status            = ClearNullTerminatedStringWhenUnimplemented(status, productUrl);
     return EncodeStringOnSuccess(status, aEncoder, productUrl, kMaxLen);
 }
 
-CHIP_ERROR ReadProductLabel(DeviceInstanceInfoProvider & deviceInfoProvider, AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadProductLabel(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
     constexpr size_t kMaxLen       = DeviceLayer::ConfigurationManager::kMaxProductLabelLength;
     char productLabel[kMaxLen + 1] = { 0 };
 
-    CHIP_ERROR status = deviceInfoProvider.GetProductLabel(productLabel, sizeof(productLabel));
+    CHIP_ERROR status = deviceInfoProvider->GetProductLabel(productLabel, sizeof(productLabel));
     status            = ClearNullTerminatedStringWhenUnimplemented(status, productLabel);
     return EncodeStringOnSuccess(status, aEncoder, productLabel, kMaxLen);
 }
 
-CHIP_ERROR ReadSerialNumber(DeviceInstanceInfoProvider & deviceInfoProvider, AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadSerialNumber(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
     constexpr size_t kMaxLen             = DeviceLayer::ConfigurationManager::kMaxSerialNumberLength;
     char serialNumberString[kMaxLen + 1] = { 0 };
 
-    CHIP_ERROR status = deviceInfoProvider.GetSerialNumber(serialNumberString, sizeof(serialNumberString));
+    CHIP_ERROR status = deviceInfoProvider->GetSerialNumber(serialNumberString, sizeof(serialNumberString));
     status            = ClearNullTerminatedStringWhenUnimplemented(status, serialNumberString);
     return EncodeStringOnSuccess(status, aEncoder, serialNumberString, kMaxLen);
 }
 
-CHIP_ERROR ReadUniqueID(DeviceLayer::ConfigurationManager & configManager, AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadUniqueID(DeviceLayer::ConfigurationManager & configManager, AttributeValueEncoder & aEncoder)
 {
     constexpr size_t kMaxLen   = DeviceLayer::ConfigurationManager::kMaxUniqueIDLength;
     char uniqueId[kMaxLen + 1] = { 0 };
@@ -219,7 +219,7 @@ CHIP_ERROR ReadUniqueID(DeviceLayer::ConfigurationManager & configManager, Attri
     return EncodeStringOnSuccess(status, aEncoder, uniqueId, kMaxLen);
 }
 
-CHIP_ERROR ReadCapabilityMinima(AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadCapabilityMinima(AttributeValueEncoder & aEncoder)
 {
     BasicInformation::Structs::CapabilityMinimaStruct::Type capabilityMinima;
 
@@ -232,14 +232,14 @@ CHIP_ERROR ReadCapabilityMinima(AttributeValueEncoder & aEncoder)
     return aEncoder.Encode(capabilityMinima);
 }
 
-CHIP_ERROR ReadConfigurationVersion(DeviceLayer::ConfigurationManager & configManager, AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadConfigurationVersion(DeviceLayer::ConfigurationManager & configManager, AttributeValueEncoder & aEncoder)
 {
     uint32_t configurationVersion = 0;
     ReturnErrorOnFailure(configManager.GetConfigurationVersion(configurationVersion));
     return aEncoder.Encode(configurationVersion);
 }
 
-CHIP_ERROR ReadLocation(DeviceLayer::ConfigurationManager & configManager, AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadLocation(DeviceLayer::ConfigurationManager & configManager, AttributeValueEncoder & aEncoder)
 {
     char location[kExpectedFixedLocationLength + 1] = { 0 };
     size_t codeLen                                  = 0;
@@ -258,25 +258,24 @@ CHIP_ERROR ReadLocation(DeviceLayer::ConfigurationManager & configManager, Attri
     return aEncoder.Encode(countryCodeSpan);
 }
 
-CHIP_ERROR ReadMaxPathsPerInvoke(AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadMaxPathsPerInvoke(AttributeValueEncoder & aEncoder)
 {
     uint16_t max_path_per_invoke = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;
     return aEncoder.Encode(max_path_per_invoke);
 }
 
-CHIP_ERROR ReadSpecificationVersion(AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadSpecificationVersion(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.Encode(Revision::kSpecificationVersion);
 }
 
-CHIP_ERROR ReadProductAppearance(AttributeValueEncoder & aEncoder)
+inline CHIP_ERROR ReadProductAppearance(DeviceInstanceInfoProvider *deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
-    auto * provider = GetDeviceInstanceInfoProvider();
     ProductFinishEnum finish;
-    ReturnErrorOnFailure(provider->GetProductFinish(&finish));
+    ReturnErrorOnFailure(deviceInfoProvider->GetProductFinish(&finish));
 
     ColorEnum color;
-    CHIP_ERROR colorStatus = provider->GetProductPrimaryColor(&color);
+    CHIP_ERROR colorStatus = deviceInfoProvider->GetProductPrimaryColor(&color);
     if (colorStatus != CHIP_NO_ERROR && colorStatus != CHIP_ERROR_NOT_IMPLEMENTED)
     {
         return colorStatus;
@@ -298,10 +297,10 @@ CHIP_ERROR ReadProductAppearance(AttributeValueEncoder & aEncoder)
 
 CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
+    // NOTE: this is NEVER nullptr, using pointer as we have seen converting to reference
+    //       costs some flash (even though code would be more readable that way...)
     auto * deviceInfoProvider = GetDeviceInstanceInfoProvider();
     auto & configManager      = ConfigurationMgr();
-
-    VerifyOrReturnError(deviceInfoProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     switch (aPath.mAttributeId)
     {
@@ -312,37 +311,37 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     case Location::Id:
         return ReadLocation(configManager, aEncoder);
     case VendorName::Id:
-        return ReadVendorName(*deviceInfoProvider, aEncoder);
+        return ReadVendorName(deviceInfoProvider, aEncoder);
     case VendorID::Id:
-        return ReadVendorID(*deviceInfoProvider, aEncoder);
+        return ReadVendorID(deviceInfoProvider, aEncoder);
     case ProductName::Id:
-        return ReadProductName(*deviceInfoProvider, aEncoder);
+        return ReadProductName(deviceInfoProvider, aEncoder);
     case ProductID::Id:
-        return ReadProductID(*deviceInfoProvider, aEncoder);
+        return ReadProductID(deviceInfoProvider, aEncoder);
     case HardwareVersion::Id:
-        return ReadHardwareVersion(*deviceInfoProvider, aEncoder);
+        return ReadHardwareVersion(deviceInfoProvider, aEncoder);
     case HardwareVersionString::Id:
-        return ReadHardwareVersionString(*deviceInfoProvider, aEncoder);
+        return ReadHardwareVersionString(deviceInfoProvider, aEncoder);
     case SoftwareVersion::Id:
         return ReadSoftwareVersion(configManager, aEncoder);
     case SoftwareVersionString::Id:
-        return ReadSoftwareVersionString(*deviceInfoProvider, aEncoder);
+        return ReadSoftwareVersionString(deviceInfoProvider, aEncoder);
     case ManufacturingDate::Id:
-        return ReadManufacturingDate(*deviceInfoProvider, aEncoder);
+        return ReadManufacturingDate(deviceInfoProvider, aEncoder);
     case PartNumber::Id:
-        return ReadPartNumber(*deviceInfoProvider, aEncoder);
+        return ReadPartNumber(deviceInfoProvider, aEncoder);
     case ProductURL::Id:
-        return ReadProductURL(*deviceInfoProvider, aEncoder);
+        return ReadProductURL(deviceInfoProvider, aEncoder);
     case ProductLabel::Id:
-        return ReadProductLabel(*deviceInfoProvider, aEncoder);
+        return ReadProductLabel(deviceInfoProvider, aEncoder);
     case SerialNumber::Id:
-        return ReadSerialNumber(*deviceInfoProvider, aEncoder);
+        return ReadSerialNumber(deviceInfoProvider, aEncoder);
     case UniqueID::Id:
         return ReadUniqueID(configManager, aEncoder);
     case CapabilityMinima::Id:
         return ReadCapabilityMinima(aEncoder);
     case ProductAppearance::Id:
-        return ReadProductAppearance(aEncoder);
+        return ReadProductAppearance(deviceInfoProvider, aEncoder);
     case SpecificationVersion::Id:
         return ReadSpecificationVersion(aEncoder);
     case MaxPathsPerInvoke::Id:
