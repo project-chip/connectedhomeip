@@ -340,11 +340,7 @@ template("siwx917_sdk") {
       defines += [ "ENABLE_AWS_OTA_FEAT=1" ]
     }
 
-    cflags += [
-      "-Wno-shadow",
-      "-Wno-unknown-warning-option",
-      "-Wno-unused-variable",
-    ]
+    cflags += [ "-Wno-shadow" ]
 
     foreach(include_dir, _include_dirs) {
       cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
@@ -392,6 +388,7 @@ template("siwx917_sdk") {
           "${sl_si91x_psa_crypto_path}/gcm/inc",
           "${sl_si91x_psa_crypto_path}/sha/inc",
           "${sl_si91x_psa_crypto_path}/trng/inc",
+          "${sl_si91x_psa_crypto_path}/wrap/config",
           "${sl_si91x_psa_crypto_path}/wrap/inc",
           "${sl_si91x_psa_crypto_path}/multithread/inc",
 
