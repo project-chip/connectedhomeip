@@ -3297,6 +3297,9 @@ endpoint 1 {
     ram      attribute lockType;
     ram      attribute actuatorEnabled;
     ram      attribute doorState;
+    ram      attribute doorOpenEvents;
+    ram      attribute doorClosedEvents;
+    ram      attribute openPeriod;
     ram      attribute numberOfTotalUsersSupported default = 10;
     ram      attribute numberOfPINUsersSupported default = 10;
     ram      attribute numberOfRFIDUsersSupported default = 10;
@@ -3314,8 +3317,11 @@ endpoint 1 {
     ram      attribute soundVolume default = 0x00;
     ram      attribute operatingMode default = 0x00;
     ram      attribute supportedOperatingModes default = 0xFFF6;
+    ram      attribute defaultConfigurationRegister default = 0;
     ram      attribute enableOneTouchLocking default = 0x00;
+    ram      attribute enableInsideStatusLED default = 0;
     ram      attribute enablePrivacyModeButton default = 0x00;
+    ram      attribute localProgrammingFeatures default = 0;
     ram      attribute wrongCodeEntryLimit default = 3;
     ram      attribute userCodeTemporaryDisableTime default = 10;
     ram      attribute requirePINforRemoteOperation default = 0;

@@ -1273,7 +1273,7 @@ tests:
     - label:
           "Step 30g: TH sends a write message to change any one of the bits of
           the LocalProgrammingFeatures."
-      PICS: DRLK.S.A002c
+      PICS: DRLK.S.A002c && DRLK.S.M.LocalProgrammingFeaturesAttributeWritable
       command: "writeAttribute"
       attribute: "LocalProgrammingFeatures"
       arguments:
