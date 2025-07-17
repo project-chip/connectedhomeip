@@ -265,8 +265,6 @@ if [[ ! " ${SUPPORTED_CODE[@]} " =~ " ${CODE} " ]]; then
     exit 1
 fi
 
-LCOV_IGNORE_ERRORS="format,unsupported,inconsistent,inconsistent,unused,unused" # incosistent and unused twice is needed to suppress the warnings.
-
 # ------------------------------------------------------------------------------
 # Build & Test
 # ------------------------------------------------------------------------------
@@ -277,10 +275,6 @@ if [ "$skip_gn" == false ]; then
     # Set coverage data to zero if not accumulating
     if [[ -d "$OUTPUT_ROOT/obj/src" && "$ACCUMULATE" == false ]]; then
         lcov --zerocounters --directory "$OUTPUT_ROOT/obj/src" \
-            --ignore-errors "$LCOV_IGNORE_ERRORS" \
-            --exclude="$CHIP_ROOT"/zzz_generated/* \
-            --exclude="$CHIP_ROOT"/third_party/* \
-            --exclude=/usr/include/* \
             "${QUIET_FLAG[@]}"
     fi
 
@@ -344,71 +338,62 @@ fi
 
 # ------------------------------------------------------------------------------
 # Coverage Generation
-# ------------------------------------------------------------------------------
+#
+# Exclude files we do NOT want included in coverage
+# Exclude unit test files from coverage
+# ----------------------------------------------------------------------------
+LCOV_IGNORE_ERRORS="format,unsupported,inconsistent,inconsistent,unused,unused" # incosistent and unused twice is needed to suppress the warnings.
+LCOV_EXCLUDE_INCLUDE_OPTIONS=()
+
+if [[ "$skip_gn" == false ]]; then
+    LCOV_EXCLUDE_INCLUDE_OPTIONS=(
+        --exclude "$CHIP_ROOT/zzz_generated/**"
+        --exclude "$CHIP_ROOT/third_party/**"
+        --exclude "/usr/include/**"
+        --exclude "$CHIP_ROOT/src/app/app-platform/**"
+        --exclude "$CHIP_ROOT/src/app/common/**"
+        --exclude "$CHIP_ROOT/src/app/util/mock/**"
+        --exclude "$CHIP_ROOT/src/controller/python/**"
+        --exclude "$CHIP_ROOT/src/lib/dnssd/platform/**"
+        --exclude "$CHIP_ROOT/src/lib/shell/**"
+        --exclude "$CHIP_ROOT/src/lwip/**"
+        --exclude "$CHIP_ROOT/src/platform/**"
+        --exclude "$CHIP_ROOT/src/tools/**"
+        --exclude "**/tests/**"
+    )
+
+    # Restrict coverage to 'core' or 'clusters' if specified
+    if [[ "$CODE" == "core" ]]; then
+        LCOV_EXCLUDE_INCLUDE_OPTIONS+=(
+            --exclude "$CHIP_ROOT/src/app/clusters/**"
+        )
+    elif [[ "$CODE" == "clusters" ]]; then
+        LCOV_EXCLUDE_INCLUDE_OPTIONS+=(
+            --include "$CHIP_ROOT/src/app/clusters/**"
+        )
+    fi
+fi
+
 mkdir -p "$COVERAGE_ROOT"
 
 lcov --capture --initial --directory "$OUTPUT_ROOT/obj/src" \
     --ignore-errors "$LCOV_IGNORE_ERRORS" \
-    --exclude="$CHIP_ROOT"/zzz_generated/* \
-    --exclude="$CHIP_ROOT"/third_party/* \
-    --exclude=/usr/include/* \
     --output-file "$COVERAGE_ROOT/lcov_base.info" \
+    "${LCOV_EXCLUDE_INCLUDE_OPTIONS[@]}" \
     "${QUIET_FLAG[@]}"
 
 lcov --capture --directory "$OUTPUT_ROOT/obj/src" \
     --ignore-errors "$LCOV_IGNORE_ERRORS" \
-    --exclude="$CHIP_ROOT"/zzz_generated/* \
-    --exclude="$CHIP_ROOT"/third_party/* \
-    --exclude=/usr/include/* \
     --output-file "$COVERAGE_ROOT/lcov_test.info" \
+    "${LCOV_EXCLUDE_INCLUDE_OPTIONS[@]}" \
     "${QUIET_FLAG[@]}"
 
 lcov --ignore-errors "$LCOV_IGNORE_ERRORS" \
     --add-tracefile "$COVERAGE_ROOT/lcov_base.info" \
     --add-tracefile "$COVERAGE_ROOT/lcov_test.info" \
-    --output-file "$COVERAGE_ROOT/lcov_unfiltered.info" \
+    --output-file "$COVERAGE_ROOT/lcov_final.info" \
     "${QUIET_FLAG[@]}"
 
-if [[ "$skip_gn" == false ]]; then
-
-    # ----------------------------------------------------------------------------
-    # Remove files we do NOT want included in coverage
-    # Remove unit test files from coverage
-    # ----------------------------------------------------------------------------
-    lcov --remove "$COVERAGE_ROOT/lcov_unfiltered.info" \
-        "$CHIP_ROOT/src/app/app-platform/*" \
-        "$CHIP_ROOT/src/app/common/*" \
-        "$CHIP_ROOT/src/app/util/mock/*" \
-        "$CHIP_ROOT/src/controller/python/*" \
-        "$CHIP_ROOT/src/lib/dnssd/platform/*" \
-        "$CHIP_ROOT/src/lib/shell/*" \
-        "$CHIP_ROOT/src/lwip/*" \
-        "$CHIP_ROOT/src/platform/*" \
-        "$CHIP_ROOT/src/tools/*" \
-        "*/tests/*" \
-        --ignore-errors "$LCOV_IGNORE_ERRORS" \
-        --output-file "$COVERAGE_ROOT/lcov_unrestricted.info" \
-        "${QUIET_FLAG[@]}"
-
-    # Restrict coverage to 'core' or 'clusters' if specified
-    if [[ "$CODE" == "core" ]]; then
-        lcov --remove "$COVERAGE_ROOT/lcov_unrestricted.info" \
-            "$CHIP_ROOT/src/app/clusters/*" \
-            --ignore-errors "$LCOV_IGNORE_ERRORS" \
-            --output-file "$COVERAGE_ROOT/lcov_final.info" \
-            "${QUIET_FLAG[@]}"
-    elif [[ "$CODE" == "clusters" ]]; then
-        lcov --extract "$COVERAGE_ROOT/lcov_unrestricted.info" \
-            "$CHIP_ROOT/src/app/clusters/*" \
-            --ignore-errors "$LCOV_IGNORE_ERRORS" \
-            --output-file "$COVERAGE_ROOT/lcov_final.info" \
-            "${QUIET_FLAG[@]}"
-    else
-        cp "$COVERAGE_ROOT/lcov_unrestricted.info" "$COVERAGE_ROOT/lcov_final.info"
-    fi
-else
-    cp "$OUTPUT_ROOT/coverage/lcov_unfiltered.info" "$COVERAGE_ROOT/lcov_final.info"
-fi
 
 genhtml "$COVERAGE_ROOT/lcov_final.info" \
     --ignore-errors inconsistent,category,count \
