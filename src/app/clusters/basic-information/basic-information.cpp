@@ -164,16 +164,6 @@ inline CHIP_ERROR ReadManufacturingDate(DeviceInstanceInfoProvider * deviceInfoP
     return aEncoder.Encode(chip::CharSpan(manufacturingDateString, strnlen(manufacturingDateString, kMaxLen)));
 }
 
-inline CHIP_ERROR ReadPartNumber(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
-{
-    constexpr size_t kMaxLen     = DeviceLayer::ConfigurationManager::kMaxPartNumberLength;
-    char partNumber[kMaxLen + 1] = { 0 };
-
-    CHIP_ERROR status = deviceInfoProvider->GetPartNumber(partNumber, sizeof(partNumber));
-    status            = ClearNullTerminatedStringWhenUnimplemented(status, partNumber);
-    return EncodeStringOnSuccess(status, aEncoder, partNumber, kMaxLen);
-}
-
 inline CHIP_ERROR ReadUniqueID(DeviceLayer::ConfigurationManager & configManager, AttributeValueEncoder & aEncoder)
 {
     constexpr size_t kMaxLen   = DeviceLayer::ConfigurationManager::kMaxUniqueIDLength;
