@@ -844,7 +844,10 @@ void BLEManagerImpl::RemoveConnection(const char * remoteAddr)
     // immediately, because the BLE layer might still use it. Instead, we will also
     // schedule the deletion of the connection object, so it will happen after the
     // BLE layer has processed the disconnection event.
-    DeviceLayer::SystemLayer().ScheduleLambda([conn] { chip::Platform::Delete(conn); });
+    DeviceLayer::SystemLayer().ScheduleLambda([conn] {
+        ChipLogDetail(DeviceLayer, "Freeing BLE connection");
+        chip::Platform::Delete(conn);
+    });
 }
 
 void BLEManagerImpl::HandleC1CharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
