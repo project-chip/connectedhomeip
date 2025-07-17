@@ -37,8 +37,9 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
+from chip.testing import decorators, runner
 
 
 class TC_PWRTL_2_1(MatterBaseTest):
@@ -46,7 +47,7 @@ class TC_PWRTL_2_1(MatterBaseTest):
     def pics_TC_PWRTL_2_1(self) -> list[str]:
         return ["PWRTL.S"]
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_PWRTL_2_1(self):
 
         attributes = Clusters.PowerTopology.Attributes
@@ -93,4 +94,4 @@ class TC_PWRTL_2_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

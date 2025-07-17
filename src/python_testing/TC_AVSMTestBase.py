@@ -74,7 +74,6 @@ class AVSMTestBase:
             )
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
     async def precondition_one_allocated_audio_stream(self):
         endpoint = self.get_endpoint(default=1)
@@ -123,7 +122,6 @@ class AVSMTestBase:
             )
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
     async def precondition_one_allocated_video_stream(self):
         endpoint = self.get_endpoint(default=1)
@@ -197,4 +195,3 @@ class AVSMTestBase:
             )
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass

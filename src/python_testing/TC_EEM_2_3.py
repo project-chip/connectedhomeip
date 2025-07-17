@@ -41,9 +41,10 @@
 
 import time
 
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
+from chip.testing import decorators, runner
 
 
 class TC_EEM_2_3(MatterBaseTest, EnergyReportingBaseTestHelper):
@@ -74,7 +75,7 @@ class TC_EEM_2_3(MatterBaseTest, EnergyReportingBaseTestHelper):
 
         return steps
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_EEM_2_3(self):
 
         self.step("1")
@@ -105,4 +106,4 @@ class TC_EEM_2_3(MatterBaseTest, EnergyReportingBaseTestHelper):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

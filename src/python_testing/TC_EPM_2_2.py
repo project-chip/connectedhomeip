@@ -42,9 +42,10 @@
 import logging
 import time
 
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
+from chip.testing import decorators, runner
 
 logger = logging.getLogger(__name__)
 
@@ -86,7 +87,7 @@ class TC_EPM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
 
         return steps
 
-    @async_test_body
+    @decorators.async_test_body
     async def test_TC_EPM_2_2(self):
 
         self.step("1")
@@ -147,4 +148,4 @@ class TC_EPM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

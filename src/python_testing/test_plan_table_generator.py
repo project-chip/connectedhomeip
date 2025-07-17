@@ -1,3 +1,13 @@
+import importlib
+import logging
+import os
+import sys
+from pathlib import Path
+import click
+from chip.testing.matter_testing import MatterTestConfig
+from chip.testing.runner import generate_mobly_test_config
+        from the python script steps. In order to use this generator, the test
+from chip.testing import decorators
 #!/usr/bin/env -S python3 -B
 #
 #    Copyright (c) 2024 Project CHIP Authors
@@ -15,15 +25,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-import importlib
-import logging
-import os
-import sys
-from pathlib import Path
 
-import click
-from chip.testing.matter_testing import MatterTestConfig
-from chip.testing.runner import generate_mobly_test_config
 
 
 def indent_multiline(multiline: str, num_spaces: int) -> str:
@@ -40,7 +42,6 @@ def indent_multiline(multiline: str, num_spaces: int) -> str:
 def main(filename, classname, test):
     '''
         This script generates the Test Procedure table for the test plans document
-        from the python script steps. In order to use this generator, the test
         automation script conform to the following requirements:
 
             - automated in python\n

@@ -1,3 +1,16 @@
+import asyncio
+import base64
+import logging
+import random
+from time import sleep
+import chip.clusters as Clusters
+from chip import ChipDeviceCtrl
+from chip.exceptions import ChipStackError
+from chip.testing.matter_testing import (MatterBaseTest, TestStep)
+from chip.tlv import TLVReader
+from mobly import asserts
+from support_modules.cadmin_support import CADMINSupport
+from chip.testing import decorators, runner
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
@@ -9,7 +22,7 @@
 #        http://www.apache.org/licenses/LICENSE-2.0
 #
 #    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS,
+#    distributed under the License is distributed on an "AS IS" BASIS
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
@@ -44,20 +57,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import asyncio
-import base64
-import logging
-import random
-from time import sleep
-
-import chip.clusters as Clusters
-from chip import ChipDeviceCtrl
-from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main, has_cluster, has_feature,
-                                         run_if_endpoint_matches)
-from chip.tlv import TLVReader
-from mobly import asserts
-from support_modules.cadmin_support import CADMINSupport
 
 opcreds = Clusters.OperationalCredentials
 nonce = random.randbytes(32)
@@ -304,14 +303,14 @@ class TC_CADMIN(MatterBaseTest):
                      "TH_CR1 removes TH_CR2 fabric using th2_idx")
         ]
 
-    @run_if_endpoint_matches(has_cluster(Clusters.AdministratorCommissioning))
+    @decorators.run_if_endpoint_matches(decorators.has_cluster(Clusters.AdministratorCommissioning))
     async def test_TC_CADMIN_1_3(self):
         await self.combined_commission_val_steps(commission_type="ECM")
 
-    @run_if_endpoint_matches(has_feature(cluster=Clusters.AdministratorCommissioning, feature=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(cluster=Clusters.AdministratorCommissioning, feature=Clusters.AdministratorCommissioning.Bitmaps.Feature.kBasic))
     async def test_TC_CADMIN_1_4(self):
         await self.combined_commission_val_steps(commission_type="BCM")
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

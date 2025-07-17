@@ -1,3 +1,9 @@
+import logging
+import chip.clusters as Clusters
+from chip.interaction_model import Status
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from mobly import asserts
+from chip.testing import decorators, runner
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
@@ -36,12 +42,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature, run_if_endpoint_matches
-from mobly import asserts
 
 logger = logging.getLogger(__name__)
 
@@ -80,8 +80,7 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
 
         return steps
 
-    @run_if_endpoint_matches(has_feature(Clusters.LaundryWasherControls,
-                                         Clusters.LaundryWasherControls.Bitmaps.Feature.kSpin))
+    @decorators.run_if_endpoint_matches(decorators.has_feature(Clusters.LaundryWasherControls, Clusters.LaundryWasherControls.Bitmaps.Feature.kSpin))
     async def test_TC_WASHERCTRL_2_1(self):
 
         endpoint = self.get_endpoint(default=1)
@@ -127,4 +126,4 @@ class TC_WASHERCTRL_2_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()
