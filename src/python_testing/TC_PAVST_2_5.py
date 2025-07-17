@@ -96,7 +96,6 @@ class TC_PAVST_2_5(MatterBaseTest):
         aSupportedFormats = []
         aAllocatedVideoStreams = []
         aAllocatedAudioStreams = []
-        aTransportOptions = ""
         aConnectionID = ""
 
         self.step(1)
@@ -215,7 +214,6 @@ class TC_PAVST_2_5(MatterBaseTest):
             asserts.assert_greater_equal(
                 len(transport_configs), 1, "TransportConfigurations must not be empty!"
             )
-            aTransportOptions = transport_configs.TransportOptions
             aConnectionID = transport_configs.ConnectionID
 
         # TH1 sends command
