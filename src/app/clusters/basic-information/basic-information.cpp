@@ -319,7 +319,6 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
         return ReadSpecificationVersion(aEncoder);
     case MaxPathsPerInvoke::Id:
         return aEncoder.Encode<uint16_t>(CHIP_CONFIG_MAX_PATHS_PER_INVOKE);
-        return ReadMaxPathsPerInvoke(aEncoder);
     case ConfigurationVersion::Id:
         return ReadConfigurationVersion(configManager, aEncoder);
     default:
