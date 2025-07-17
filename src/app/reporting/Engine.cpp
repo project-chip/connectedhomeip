@@ -50,6 +50,7 @@ namespace app {
 namespace reporting {
 namespace {
 
+using DataModel::ReadFlags;
 using Protocols::InteractionModel::Status;
 
 /// Returns the status of ACL validation.
@@ -148,8 +149,7 @@ std::optional<Status> ValidateAttributeIsReadable(DataModel::Provider * dataMode
 }
 
 DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const SubjectDescriptor & subjectDescriptor,
-                                                  bool isFabricFiltered, bool allowsLargePayload,
-                                                  AttributeReportIBs::Builder & reportBuilder,
+                                                  BitFlags<ReadFlags> flags, AttributeReportIBs::Builder & reportBuilder,
                                                   const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
 {
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", path.mClusterId,
@@ -159,8 +159,7 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
 
     DataModel::ReadAttributeRequest readRequest;
 
-    readRequest.readFlags.Set(DataModel::ReadFlags::kFabricFiltered, isFabricFiltered);
-    readRequest.readFlags.Set(DataModel::ReadFlags::kAllowsLargePayload, allowsLargePayload);
+    readRequest.readFlags         = flags;
     readRequest.subjectDescriptor = &subjectDescriptor;
     readRequest.path              = path;
 
@@ -180,6 +179,7 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     reportBuilder.Checkpoint(checkpoint);
 
     DataModel::ActionReturnStatus status(CHIP_NO_ERROR);
+    bool isFabricFiltered = flags.Has(ReadFlags::kFabricFiltered);
     AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
 
     // TODO: we explicitly DO NOT validate that path is a valid cluster path (even more, above serverClusterFinder
@@ -473,10 +473,13 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             attributeReportIBs.Checkpoint(attributeBackup);
             ConcreteReadAttributePath pathForRetrieval(readPath);
             // Load the saved state from previous encoding session for chunking of one single attribute (list chunking).
-            AttributeEncodeState encodeState     = apReadHandler->GetAttributeEncodeState();
-            DataModel::ActionReturnStatus status = RetrieveClusterData(
-                mpImEngine->GetDataModelProvider(), apReadHandler->GetSubjectDescriptor(), apReadHandler->IsFabricFiltered(),
-                apReadHandler->AllowsLargePayload(), attributeReportIBs, pathForRetrieval, &encodeState);
+            AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
+            BitFlags<ReadFlags> flags;
+            flags.Set(ReadFlags::kFabricFiltered, apReadHandler->IsFabricFiltered());
+            flags.Set(ReadFlags::kAllowsLargePayload, apReadHandler->AllowsLargePayload());
+            DataModel::ActionReturnStatus status =
+                RetrieveClusterData(mpImEngine->GetDataModelProvider(), apReadHandler->GetSubjectDescriptor(), flags,
+                                    attributeReportIBs, pathForRetrieval, &encodeState);
             if (status.IsError())
             {
                 // Operation error set, since this will affect early return or override on status encoding
