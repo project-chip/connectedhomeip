@@ -44,6 +44,9 @@ config("datachannel_config") {
   ]
 
   cflags_cc = [ "-Wno-shadow" ]
+  if (host_os == "mac") {
+    cflags_cc += [ "-Wno-implicit-int-conversion" ]
+  }
 
   if (is_clang) {
     # We build static libraries and srtp2 depends on openssl
