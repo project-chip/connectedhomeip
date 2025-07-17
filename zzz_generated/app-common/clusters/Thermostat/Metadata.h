@@ -339,6 +339,34 @@ inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(AtomicRequest::I
 } // namespace AtomicRequest
 
 } // namespace Commands
+
+namespace Events {
+namespace SystemModeChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace SystemModeChange
+namespace LocalTemperatureChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace LocalTemperatureChange
+namespace OccupancyChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace OccupancyChange
+namespace SetpointChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace SetpointChange
+namespace RunningStateChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace RunningStateChange
+namespace RunningModeChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace RunningModeChange
+namespace ActiveScheduleChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ActiveScheduleChange
+namespace ActivePresetChange {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace ActivePresetChange
+
+} // namespace Events
 } // namespace Thermostat
 } // namespace Clusters
 } // namespace app
