@@ -45,10 +45,10 @@ import logging
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 logger = logging.getLogger(__name__)
 
@@ -112,4 +112,4 @@ class TC_EEVSE_2_9(MatterBaseTest, EEVSEBaseTestHelper):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

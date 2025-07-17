@@ -2,7 +2,7 @@ import logging
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.matter_testing import MatterBaseTest, TestStep
-from chip.testing import runner, decorators
+from chip.testing import decorators, runner
 from mobly import asserts
 from TC_AVSMTestBase import AVSMTestBase
 #
@@ -116,7 +116,6 @@ class TC_AVSM_2_4(MatterBaseTest, AVSMTestBase):
                 Status.NotFound,
                 "Unexpected error returned when expecting NOT_FOUND due to snapshotStreamID set to aStreamIDToDelete + 1",
             )
-            pass
 
         self.step(4)
         try:
@@ -125,7 +124,6 @@ class TC_AVSM_2_4(MatterBaseTest, AVSMTestBase):
             )
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(5)
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(

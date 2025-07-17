@@ -38,9 +38,9 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from modebase_cluster_check import ModeBaseClusterChecks
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 logger = logging.getLogger(__name__)
 
@@ -136,4 +136,4 @@ class TC_DEMM_1_2(MatterBaseTest, ModeBaseClusterChecks):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

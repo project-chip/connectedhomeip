@@ -41,9 +41,9 @@ from typing import cast
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 logger = logging.getLogger(__name__)
 
@@ -113,4 +113,4 @@ class TestWriteReadOnlyAttributes(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

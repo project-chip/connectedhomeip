@@ -19,8 +19,8 @@ from dataclasses import dataclass, field
 
 from chip.testing.conformance import ConformanceDecision
 from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing import decorators
+from chip.testing.matter_testing import MatterBaseTest
+from chip.testing import decorators, runner
 from chip.tlv import uint
 from TC_DeviceConformance import DeviceConformanceTests
 
@@ -136,4 +136,4 @@ class MinimalRunner(MatterBaseTest, MinimalRepresentationChecker):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

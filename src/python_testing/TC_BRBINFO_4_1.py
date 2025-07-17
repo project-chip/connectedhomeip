@@ -54,9 +54,9 @@ from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.apps import IcdAppServerSubprocess
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 logger = logging.getLogger(__name__)
 _ROOT_ENDPOINT_ID = 0
@@ -380,4 +380,4 @@ class TC_BRBINFO_4_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

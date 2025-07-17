@@ -40,9 +40,9 @@ import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, default_matter_test_main)
+from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep)
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 triggerProtected = 0x0104000000000001
 triggerDisengaged = 0x0104000000000002
@@ -84,7 +84,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
 
     def steps_TC_CLCTRL_5_1(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True)
             TestStep("2a", "TH reads from the DUT the (0xFFFC) FeatureMap attribute."),
             TestStep("2b", "If the IS feature is supported on the cluster, skip remaining steps and end test case."),
             TestStep("2c", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster."),
@@ -271,7 +271,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                     except InteractionModelError as e:
                         asserts.assert_equal(
                             e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
-                        pass
                     self.step("3g")
                     self.skip_step("3h")
 
@@ -340,7 +339,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
-                    pass
 
                 # STEP 4d: TH sends command Stop to DUT.
                 self.step("4d")
@@ -350,7 +348,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command Stop: {e.status}")
-                    pass
 
                 # STEP 4e: If the attribute is supported on the cluster, TH reads from the DUT the OverallCurrentState attribute
                 self.step("4e")
@@ -375,7 +372,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
-                    pass
 
                 self.step("4g")
                 self.skip_step("4h")
@@ -432,7 +428,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
-                    pass
 
                 # STEP 5e: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed
                 self.step("5e")
@@ -460,7 +455,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
-                pass
 
             # STEP 6c: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
             self.step("6c")
@@ -482,7 +476,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command Stop: {e.status}")
-                pass
 
             # STEP 6e: Wait until TH receives a subscription report with MainState = Stopped
             self.step("6e")
@@ -508,7 +501,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command Calibrate: {e.status}")
-                pass
 
             # STEP 7c: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
             self.step("7c")
@@ -530,7 +522,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command Stop: {e.status}")
-                pass
 
             # STEP 7e: Wait until TH receives a subscription report with MainState = Stopped
             self.step("7e")
@@ -547,7 +538,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
-            pass
 
         # STEP 8b: TH reads from the DUT the MainState attribute
         self.step("8b")
@@ -565,7 +555,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command Stop: {e.status}")
-            pass
 
         # STEP 8d: TH reads from the DUT the MainState attribute
         self.step("8d")
@@ -592,7 +581,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
-                pass
 
             # STEP 9c: TH reads from the DUT the MainState attribute
             self.step("9c")
@@ -610,7 +598,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command Stop: {e.status}")
-                pass
 
             # STEP 9e: TH reads from the DUT the MainState attribute
             self.step("9e")
@@ -637,7 +624,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
-                pass
 
             # STEP 10c: TH reads from the DUT the MainState attribute
             self.step("10c")
@@ -655,7 +641,6 @@ class TC_CLCTRL_5_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command Stop: {e.status}")
-                pass
 
             # STEP 10e: TH reads from the DUT the MainState attribute
             self.step("10e")
@@ -673,8 +658,7 @@ class TC_CLCTRL_5_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
-            pass
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -74,7 +74,6 @@ class WEBRTCPTestBase:
             return audioStreamAllocateResponse.audioStreamID
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
     async def allocate_one_video_stream(self):
         endpoint = self.get_endpoint(default=1)
@@ -150,7 +149,6 @@ class WEBRTCPTestBase:
             return videoStreamAllocateResponse.videoStreamID
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
     async def validate_allocated_video_stream(self, videoStreamID):
         endpoint = self.get_endpoint(default=1)

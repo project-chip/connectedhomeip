@@ -1,7 +1,7 @@
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_feature
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
-from chip.testing import decorators
+from chip.testing import decorators, runner
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -101,4 +101,4 @@ class TC_EGC_2_3(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

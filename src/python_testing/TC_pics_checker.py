@@ -19,12 +19,12 @@ import math
 import chip.clusters as Clusters
 from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from chip.testing.pics import accepted_cmd_pics_str, attribute_pics_str, feature_pics_str, generated_cmd_pics_str
 from chip.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, FeaturePathLocation,
                                           UnknownProblemLocation)
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 
 class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
@@ -188,4 +188,4 @@ class TC_PICS_Checker(MatterBaseTest, BasicCompositionTests):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

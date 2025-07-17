@@ -36,6 +36,7 @@
 # pip install opencv-python requests click_option_group
 # python src/python_testing/post_certification_tests/production_device_checks.py
 
+from chip.testing import decorators, runner
 import asyncio
 import base64
 import hashlib
@@ -62,13 +63,13 @@ DEFAULT_CHIP_ROOT = os.path.abspath(
 try:
     from chip.testing.basic_composition import BasicCompositionTests
     from chip.testing.matter_test_config import MatterTestConfig
-    from chip.testing.matter_testing import MatterBaseTest, MatterStackState, TestStep, run_tests_no_exit
+    from chip.testing.matter_testing import MatterBaseTest, MatterStackState, TestStep
 except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(os.path.dirname(__file__), '..')))
     from chip.testing.basic_composition import BasicCompositionTests
     from chip.testing.matter_test_config import MatterTestConfig
-    from chip.testing.matter_testing import MatterBaseTest, MatterStackState, TestStep, run_tests_no_exit
+    from chip.testing.matter_testing import MatterBaseTest, MatterStackState, TestStep
 
 try:
     import fetch_paa_certs_from_dcl
@@ -76,7 +77,6 @@ except ImportError:
     sys.path.append(os.path.abspath(
         os.path.join(DEFAULT_CHIP_ROOT, 'credentials')))
     import fetch_paa_certs_from_dcl
-from chip.testing import decorators
 
 sys.path.append(os.path.abspath(os.path.join(DEFAULT_CHIP_ROOT, 'src', 'python_testing')))
 
@@ -101,7 +101,6 @@ class Hooks():
 
     def test_start(self, filename: str, name: str, count: int, steps: list[str] = []):
         self.current_test = name
-        pass
 
     def test_stop(self, exception: Exception, duration: int):
         # Exception is the test assertion that caused the failure
@@ -396,8 +395,8 @@ def run_test(test_class: MatterBaseTest, tests: typing.List[str], test_config: T
     stack = test_config.get_stack()
     controller = test_config.get_controller()
     matter_config = test_config.get_config(tests)
-    with asyncio.Runner() as runner:
-        if not run_tests_no_exit(test_class, matter_config, runner.get_loop(), hooks, controller, stack):
+    with asyncio.Runner() as runner_obj:
+        if not runner.run_tests_no_exit(test_class, matter_config, runner_obj.get_loop(), hooks, controller, stack):
             print(f"Test failure. Failed on step: {hooks.get_failures()}")
     return hooks.get_failures()
 

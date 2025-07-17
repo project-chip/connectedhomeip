@@ -5,10 +5,10 @@ import sys
 from multiprocessing import Process
 from multiprocessing.managers import BaseManager
 from chip.testing.matter_test_config import MatterTestConfig
-from chip.testing.matter_testing import get_test_info, run_tests
+
 from hello_test import HelloTest
-    from matter.yamltests.hooks import TestRunnerHooks
-from chip.testing import decorators
+from matter.yamltests.hooks import TestRunnerHooks
+from chip.testing import decorators, runner
 #!/usr/bin/env -S python3 -B
 #
 #    Copyright (c) 2023 Project CHIP Authors
@@ -26,7 +26,6 @@ from chip.testing import decorators
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
 
 
 try:
@@ -99,7 +98,7 @@ def run_in_process(test_name: str, config: MatterTestConfig) -> None:
     manager = BaseManager()
     manager.start()
     my_hooks = manager.TestTestRunnerHooks()
-    p = Process(target=run_tests, args=(HelloTest, config, my_hooks))
+    p = Process(target=runner.run_tests, args=(HelloTest, config, my_hooks))
     p.start()
     p.join()
     print(f'Results from test {test_name}:')
@@ -121,7 +120,7 @@ def one_test(test_name):
     config = MatterTestConfig(tests=[test_name], dut_node_ids=[0x12344321], storage_path='admin_storage.json')
 
     # TH can use get_test_info to get a list of steps and a description
-    list = get_test_info(HelloTest, config)
+    list = runner.get_test_info(HelloTest, config)
     print(f'Test info for test {test_name}')
     print(list)
 

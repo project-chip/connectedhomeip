@@ -2,27 +2,27 @@ import xml.etree.ElementTree as ElementTree
 import chip.clusters as Clusters
 import jinja2
 from chip.testing.global_attribute_ids import GlobalAttributeIds
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest
 from chip.testing.problem_notices import ProblemNotice
 from chip.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, XmlCluster,
-from mobly import asserts
-from chip.testing import decorators
-#
-#    Copyright (c) 2023 Project CHIP Authors
-#    All rights reserved.
-#
-#    Licensed under the Apache License, Version 2.0 (the "License");
-#    you may not use this file except in compliance with the License.
-#    You may obtain a copy of the License at
-#
-#        http://www.apache.org/licenses/LICENSE-2.0
-#
-#    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS,
-#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#    See the License for the specific language governing permissions and
-#    limitations under the License.
-#
+                                       from mobly import asserts
+                                       from chip.testing import runner
+                                       #
+                                       #    Copyright (c) 2023 Project CHIP Authors
+                                       #    All rights reserved.
+                                       #
+                                       #    Licensed under the Apache License, Version 2.0 (the "License");
+                                       #    you may not use this file except in compliance with the License.
+                                       #    You may obtain a copy of the License at
+                                       #
+                                       #        http://www.apache.org/licenses/LICENSE-2.0
+                                       #
+                                       #    Unless required by applicable law or agreed to in writing, software
+                                       #    distributed under the License is distributed on an "AS IS" BASIS,
+                                       #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                                       #    See the License for the specific language governing permissions and
+                                       #    limitations under the License.
+                                       #
 
 
                                        add_cluster_data_from_xml, build_xml_clusters, check_clusters_for_unknown_commands,
@@ -529,4 +529,4 @@ class TestSpecParsingSupport(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -4,10 +4,9 @@ from typing import Optional
 import chip.clusters as Clusters
 from chip.interaction_model import Status
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep,
-                                         default_matter_test_main, has_cluster, run_if_endpoint_matches)
+from chip.testing.matter_testing import (AttributeValue, MatterBaseTest, TestStep)
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -19,7 +18,7 @@ from chip.testing import decorators
 #        http://www.apache.org/licenses/LICENSE-2.0
 #
 #    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS,
+#    distributed under the License is distributed on an "AS IS" BASIS
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
@@ -327,4 +326,4 @@ class TC_FAN_4_1(MatterBaseTest):
 # Also what happens when the on/off cluster is turned off while the step is a-steppin'
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -45,9 +45,9 @@ import chip.tlv
 from chip import CertificateAuthority
 from chip.storage import PersistentStorage
 from chip.testing.apps import AppServerSubprocess, JFControllerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 
 class TC_JCM_1_1(MatterBaseTest):
@@ -400,4 +400,4 @@ class TC_JCM_1_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -39,10 +39,10 @@ import random
 from datetime import timedelta
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from chip.testing import decorators, runner
 from chip.utils import CommissioningBuildingBlocks
 from mobly import asserts
-from chip.testing import decorators
 
 
 class TC_OPCREDS_3_5(MatterBaseTest):
@@ -245,4 +245,4 @@ class TC_OPCREDS_3_5(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

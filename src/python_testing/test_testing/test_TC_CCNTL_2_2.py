@@ -10,11 +10,11 @@ from chip import ChipDeviceCtrl
 from chip.clusters import Attribute
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.runner import AsyncMock, MockTestRunner
-    from chip.testing.matter_test_config import MatterTestConfig
-    from chip.testing.matter_testing import get_default_paa_trust_store, run_tests_no_exit
-    from chip.testing.matter_test_config import MatterTestConfig
-    from chip.testing.matter_testing import get_default_paa_trust_store, run_tests_no_exit
-from chip.testing import decorators
+from chip.testing.matter_test_config import MatterTestConfig
+from chip.testing.matter_testing import get_default_paa_trust_store
+from chip.testing.matter_test_config import MatterTestConfig
+from chip.testing.matter_testing import get_default_paa_trust_store
+from chip.testing import runner
 #!/usr/bin/env -S python3 -B
 #
 #    Copyright (c) 2024 Project CHIP Authors
@@ -32,7 +32,6 @@ from chip.testing import decorators
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
-
 
 
 try:
@@ -170,9 +169,9 @@ class MyMock(MockTestRunner):
         self.default_controller.FindOrEstablishPASESession = AsyncMock(return_value=None)
         self.default_controller.ReadEvent = AsyncMock(return_value=[], side_effect=dynamic_event_return)
 
-        with asyncio.Runner() as runner:
-            return run_tests_no_exit(self.test_class, self.config, runner.get_loop(),
-                                     hooks, self.default_controller, self.stack)
+        with asyncio.Runner() as loop_runner:
+            return runner.run_tests_no_exit(self.test_class, self.config, loop_runner.get_loop(),
+                                            hooks, self.default_controller, self.stack)
 
 
 @click.command()

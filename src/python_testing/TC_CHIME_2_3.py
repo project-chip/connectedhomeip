@@ -1,9 +1,9 @@
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 from TC_CHIMETestBase import CHIMETestBase
-from chip.testing import decorators
+from chip.testing import decorators, runner
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -119,4 +119,4 @@ class TC_CHIME_2_3(MatterBaseTest, CHIMETestBase):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

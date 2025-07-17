@@ -40,8 +40,8 @@ from datetime import timedelta
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main, matchers
-from chip.testing import timeoperations, decorators
+from chip.testing.matter_testing import MatterBaseTest
+from chip.testing import decorators, runner, timeoperations, matchers
 from mobly import asserts
 
 
@@ -62,7 +62,6 @@ class TC_TIMESYNC_2_4(MatterBaseTest):
             asserts.assert_true(False, "Unexpected SetTimeZone command success")
         except InteractionModelError as e:
             asserts.assert_equal(e.status, error, "Unexpected error returned")
-            pass
 
     def pics_TC_TIMESYNC_2_4(self) -> list[str]:
         return ["TIMESYNC.S.F00"]
@@ -172,4 +171,4 @@ class TC_TIMESYNC_2_4(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

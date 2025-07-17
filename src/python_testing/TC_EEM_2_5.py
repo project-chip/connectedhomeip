@@ -41,10 +41,10 @@
 
 import time
 
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 
 class TC_EEM_2_5(MatterBaseTest, EnergyReportingBaseTestHelper):
@@ -106,4 +106,4 @@ class TC_EEM_2_5(MatterBaseTest, EnergyReportingBaseTestHelper):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -1,10 +1,10 @@
 import random
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 from TC_AVSUMTestBase import AVSUMTestBase
-from chip.testing import decorators
+from chip.testing import decorators, runner
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -287,4 +287,4 @@ class TC_AVSUM_2_2(MatterBaseTest, AVSUMTestBase):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

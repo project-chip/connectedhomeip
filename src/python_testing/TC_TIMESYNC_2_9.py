@@ -41,8 +41,8 @@ from datetime import timedelta
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing import matchers, timeoperations, decorators
+from chip.testing.matter_testing import MatterBaseTest
+from chip.testing import decorators, matchers, runner, timeoperations
 from chip.tlv import uint
 from mobly import asserts
 
@@ -159,4 +159,4 @@ class TC_TIMESYNC_2_9(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -65,9 +65,9 @@ import tempfile
 import chip.clusters as Clusters
 from chip.interaction_model import Status
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, SetupParameters, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, SetupParameters, TestStep
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 _DEVICE_TYPE_AGGREGATOR = 0x000E
 
@@ -263,4 +263,4 @@ class TC_ECOINFO_2_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

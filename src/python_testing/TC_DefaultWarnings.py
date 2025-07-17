@@ -38,10 +38,10 @@ from typing import Optional
 
 import chip.clusters as Clusters
 from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from chip.testing.problem_notices import AttributePathLocation, ClusterPathLocation, ProblemLocation, ProblemNotice, ProblemSeverity
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 FLAG_PRODUCT_NAME = "pixit_allow_test_in_product_name"
 FLAG_VENDOR_NAME = "pixit_allow_test_in_vendor_name"
@@ -220,4 +220,4 @@ class TC_DefaultChecker(MatterBaseTest, DefaultChecker):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

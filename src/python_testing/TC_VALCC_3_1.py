@@ -35,9 +35,9 @@
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import AttributeValue, MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import AttributeValue, MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 
 class TC_VALCC_3_1(MatterBaseTest):
@@ -127,4 +127,4 @@ class TC_VALCC_3_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

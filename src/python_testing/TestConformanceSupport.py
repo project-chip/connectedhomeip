@@ -1,10 +1,10 @@
 import xml.etree.ElementTree as ElementTree
 from typing import Callable
 from chip.testing.conformance import (Choice, Conformance, ConformanceDecision, ConformanceException, ConformanceParseParameters,
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest
 from chip.tlv import uint
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 #
 #    Copyright (c) 2023 Project CHIP Authors
 #    All rights reserved.
@@ -955,4 +955,4 @@ class TestConformanceSupport(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -41,9 +41,9 @@ import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, default_matter_test_main)
+from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep)
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 triggerError = 0x0104000000000000
 triggerDisengaged = 0x0104000000000002
@@ -81,7 +81,7 @@ class TC_CLCTRL_6_1(MatterBaseTest):
 
     def steps_TC_CLCTRL_6_1(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True)
             TestStep("2a", "TH reads from the DUT the (0xFFFC) FeatureMap attribute."),
             TestStep("2b", "TH reads TestEventTriggerEnabled attribute from General Diagnostics Cluster."),
             TestStep("2c", "TH reads from the DUT the (0xFFFB) AttributeList attribute."),
@@ -310,7 +310,6 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                     except InteractionModelError as e:
                         asserts.assert_equal(
                             e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
-                        pass
                     self.step("3g")
                     self.skip_step("3h")
 
@@ -368,7 +367,6 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
-                    pass
 
                 # STEP 3n: Wait until TH receives a subscription report with OverallCurrentState.Position.
                 self.step("3n")
@@ -387,7 +385,6 @@ class TC_CLCTRL_6_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
-            pass
 
         # STEP 4b: Verify that the DUT has emitted the OperationalError event
         self.step("4b")
@@ -413,7 +410,6 @@ class TC_CLCTRL_6_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
-            pass
 
         # STEP 5a: If PS feature is not supported on the cluster or IS feature is supported on the cluster, skip steps 5b to 5f
         self.step("5a")
@@ -437,7 +433,6 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
-                pass
 
             # STEP 5c: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyOpened.
             self.step("5c")
@@ -457,7 +452,6 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
-                pass
 
             # STEP 5e: Verify that the DUT has emitted the MovementCompleted event.
             self.step("5e")
@@ -496,7 +490,6 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
-                pass
 
             # STEP 6c: Verify that the DUT has emitted the EngageStateChanged event
             self.step("6c")
@@ -515,7 +508,6 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command TestEventTrigger: {e.status}")
-                pass
 
             # STEP 6e: Verify that the DUT has emitted the EngageStateChanged event
             self.step("6e")
@@ -564,7 +556,6 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
-                pass
 
             # STEP 7d: Verify that the DUT has emitted the SecureStateChanged event
             self.step("7d")
@@ -583,7 +574,6 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
-                pass
 
             # STEP 7f: Verify that the DUT has emitted the SecureStateChanged event
             self.step("7f")
@@ -636,7 +626,6 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
-                    pass
                 self.step("8d")
                 self.skip_step("8e")
 
@@ -687,7 +676,6 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
-                    pass
                 self.step("8j")
                 self.skip_step("8k")
 
@@ -740,7 +728,6 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
-                    pass
                 self.step("9d")
                 self.skip_step("9e")
 
@@ -784,7 +771,6 @@ class TC_CLCTRL_6_1(MatterBaseTest):
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
-                    pass
                 self.step("9i")
                 self.skip_step("9j")
 
@@ -799,7 +785,6 @@ class TC_CLCTRL_6_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
-                pass
 
             # STEP 9l: Verify that the DUT has emitted the SecureStateChanged event
             self.step("9l")
@@ -809,4 +794,4 @@ class TC_CLCTRL_6_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

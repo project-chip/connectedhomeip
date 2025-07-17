@@ -39,9 +39,9 @@ import time
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +76,6 @@ class TC_FAN_3_5(MatterBaseTest):
             await self.send_single_cmd(cmd=Clusters.Objects.FanControl.Commands.Step(direction=direction, wrap=wrap, lowestOff=lowestOff), endpoint=endpoint)
         except InteractionModelError as e:
             asserts.assert_equal(e.status, expected_status, "Unexpected error returned")
-            pass
 
     def pics_TC_FAN_3_5(self) -> list[str]:
         return ["FAN.S"]
@@ -226,4 +225,4 @@ class TC_FAN_3_5(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -43,9 +43,9 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 # Assumes `--enable-key 000102030405060708090a0b0c0d0e0f` on Linux app command line, or a DUT
 # that has that Enable Key
@@ -237,4 +237,4 @@ class TestEventTrigger(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

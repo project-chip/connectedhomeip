@@ -1,9 +1,9 @@
 from typing import Callable
 import chip.clusters as Clusters
 import TC_DefaultWarnings
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import runner
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -313,4 +313,4 @@ class TestDefaultChecker(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

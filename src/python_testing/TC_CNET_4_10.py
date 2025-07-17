@@ -20,10 +20,9 @@ import logging
 import chip.clusters as Clusters
 import test_plan_support
 from chip.clusters.Types import NullValue
-from chip.testing.decorators import run_if_endpoint_matches
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 # Thread TLV Type mapping for operational dataset parsing
 THREAD_TLV_TYPE_MAP = {
@@ -420,4 +419,4 @@ class TC_CNET_4_10(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

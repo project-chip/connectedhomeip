@@ -68,8 +68,8 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
-from chip.testing import decorators
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from chip.testing import decorators, runner
 
 
 class TC_CCTRL_2_2(MatterBaseTest):
@@ -352,4 +352,4 @@ class TC_CCTRL_2_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

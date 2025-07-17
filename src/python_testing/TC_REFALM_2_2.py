@@ -46,9 +46,9 @@ import chip.clusters as Clusters
 from chip import ChipUtility
 from chip.clusters.ClusterObjects import ClusterCommand, ClusterObjectDescriptor, ClusterObjectFieldDescriptor
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing import matter_asserts, decorators
+from chip.testing import decorators, matter_asserts, runner
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from chip.tlv import uint
 from mobly import asserts
 
@@ -269,4 +269,4 @@ class TC_REFALM_2_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

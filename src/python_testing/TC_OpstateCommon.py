@@ -12,7 +12,6 @@ from chip.interaction_model import InteractionModelError, Status
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
 from chip.testing.matter_testing import TestStep
 from mobly import asserts
-from chip.testing import decorators
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.

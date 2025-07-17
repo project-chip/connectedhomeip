@@ -42,7 +42,8 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main, matchers
+from chip.testing.matter_testing import MatterBaseTest
+from chip.testing import decorators, runner, matchers
 from mobly import asserts
 
 # This test requires several additional command line arguments
@@ -125,7 +126,6 @@ class TC_RVCCLEANM_2_1(MatterBaseTest):
         invalid_mode = max(modes) + 1
 
         from enum import Enum
-from chip.testing import decorators
 
         class CommonCodes(Enum):
             SUCCESS = 0x00
@@ -219,4 +219,4 @@ from chip.testing import decorators
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

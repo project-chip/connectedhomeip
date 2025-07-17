@@ -5,12 +5,11 @@ import chip.clusters as Clusters
 from chip.testing.basic_composition import arls_populated
 from chip.testing.matter_testing import MatterBaseTest
 from chip.testing.problem_notices import AttributePathLocation, CommandPathLocation, ProblemLocation
-from chip.testing.runner import default_matter_test_main
 from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types
 from fake_device_builder import create_minimal_cluster, create_minimal_dt
 from mobly import asserts
 from TC_DeviceConformance import DeviceConformanceTests
-from chip.testing import decorators
+from chip.testing import runner
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
@@ -374,4 +373,4 @@ class TestConformanceSupport(MatterBaseTest, DeviceConformanceTests):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

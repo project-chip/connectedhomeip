@@ -2,9 +2,8 @@ import ipaddress
 from datetime import timedelta
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import (MatterBaseTest, default_matter_test_main,
-                                         has_attribute, has_cluster, run_if_endpoint_matches)
-from chip.testing import timeoperations, decorators
+from chip.testing.matter_testing import (MatterBaseTest)
+from chip.testing import decorators, runner, timeoperations
 from mobly import asserts
 #
 #    Copyright (c) 2023 Project CHIP Authors
@@ -17,7 +16,7 @@ from mobly import asserts
 #        http://www.apache.org/licenses/LICENSE-2.0
 #
 #    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS,
+#    distributed under the License is distributed on an "AS IS" BASIS
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
@@ -98,7 +97,6 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
                     is_ip_addr = True
                 except ipaddress.AddressValueError:
                     is_ip_addr = False
-                    pass
                 asserts.assert_true(is_web_addr or is_ip_addr, "Returned DefaultNTP value is not a IP address or web address")
 
         self.print_step(6, "Read TimeZone")
@@ -189,4 +187,4 @@ class TC_TIMESYNC_2_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

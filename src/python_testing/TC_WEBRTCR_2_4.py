@@ -40,9 +40,9 @@ import tempfile
 
 import websockets
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 SERVER_URI = "ws://localhost:9002"
 
@@ -202,4 +202,4 @@ class TC_WebRTCRequestor_2_4(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

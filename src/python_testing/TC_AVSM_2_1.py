@@ -38,8 +38,8 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
-from chip.testing import decorators
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from chip.testing import decorators, runner
 
 logger = logging.getLogger(__name__)
 
@@ -435,4 +435,4 @@ class TC_AVSM_2_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

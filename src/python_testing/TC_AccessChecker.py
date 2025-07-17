@@ -60,11 +60,11 @@ from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import BasicCompositionTests
 from chip.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
                                                is_standard_command_id)
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from chip.testing.problem_notices import AttributePathLocation, ClusterPathLocation, CommandPathLocation
 from chip.testing.spec_parsing import XmlCluster
 from chip.tlv import uint
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 
 class AccessTestType(Enum):
@@ -442,4 +442,4 @@ class AccessChecker(MatterBaseTest, BasicCompositionTests):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

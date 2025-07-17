@@ -1,7 +1,7 @@
 import json
 from typing import Any
-from chip.testing import conversions, decorators
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from chip.testing import conversions, runner
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
 #
 #    Copyright (c) 2025 Project CHIP Authors
@@ -116,4 +116,4 @@ class TestFrameworkArgParsing(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

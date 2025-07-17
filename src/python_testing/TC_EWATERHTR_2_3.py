@@ -46,10 +46,10 @@ import logging
 
 import chip.clusters as Clusters
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 from TC_EWATERHTRBase import EWATERHTRBase
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 logger = logging.getLogger(__name__)
 
@@ -321,4 +321,4 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

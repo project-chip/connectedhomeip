@@ -41,9 +41,9 @@ import time
 
 import chip.clusters as Clusters
 from chip.testing.matter_test_config import MatterTestConfig
-from chip.testing.matter_testing import MatterBaseTest, MatterStackState, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, MatterStackState, TestStep
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 logger = logging.getLogger(__name__)
 
@@ -136,4 +136,4 @@ class TC_ICDM_3_4(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

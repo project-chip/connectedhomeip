@@ -19,7 +19,7 @@ import time
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.testing.matter_testing import MatterBaseTest
-from chip.testing import runner, decorators
+from chip.testing import decorators, runner
 from mobly import asserts
 
 # We don't have a good pipe between the c++ enums in CommissioningDelegate and python

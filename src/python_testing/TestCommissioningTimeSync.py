@@ -20,8 +20,8 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing import timeoperations, decorators
+from chip.testing.matter_testing import MatterBaseTest
+from chip.testing import decorators, runner, timeoperations
 from mobly import asserts
 
 # We don't have a good pipe between the c++ enums in CommissioningDelegate and python
@@ -286,4 +286,4 @@ class TestCommissioningTimeSync(MatterBaseTest):
 # TODO(cecille): Test - Add hooks to change the time zone response to indicate no DST is needed
 # TODO(cecille): Test - Set commissioningParameters TimeZone and DST list size to > node list size to ensure they get truncated
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

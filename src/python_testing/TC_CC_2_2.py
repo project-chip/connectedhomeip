@@ -3,10 +3,10 @@ import time
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 from test_plan_support import commission_if_required, read_attribute, verify_success
-from chip.testing import decorators
+from chip.testing import decorators, runner
 #
 #    Copyright (c) 2024 Project CHIP Authors
 #    All rights reserved.
@@ -336,4 +336,4 @@ class TC_CC_2_3(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

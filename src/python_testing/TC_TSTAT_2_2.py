@@ -38,9 +38,9 @@ import logging
 
 import chip.clusters as Clusters
 from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import runner
 
 logger = logging.getLogger(__name__)
 
@@ -100,7 +100,7 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
         return steps
 
-    @ async_test_body
+    @async_test_body
     async def test_TC_TSTAT_2_2(self):
         endpoint = self.get_endpoint()
 
@@ -794,4 +794,4 @@ class TC_TSTAT_2_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

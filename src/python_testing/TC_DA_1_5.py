@@ -40,8 +40,8 @@ import random
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing import conversions, decorators
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main, matchers
+from chip.testing import conversions, decorators, runner, matchers
+from chip.testing.matter_testing import MatterBaseTest
 from chip.tlv import TLVReader
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes
@@ -230,4 +230,4 @@ class TC_DA_1_5(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

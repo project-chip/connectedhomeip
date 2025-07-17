@@ -45,7 +45,7 @@ from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest
-from chip.testing import runner, decorators, matchers, timeoperations
+from chip.testing import decorators, matchers, runner, timeoperations
 from mobly import asserts
 
 
@@ -85,7 +85,6 @@ class TC_TIMESYNC_2_11(MatterBaseTest):
             asserts.assert_equal(ret.Data.DSTOffsetActive, expect_active, "Unexpected value for DSTOffsetActive")
         except queue.Empty:
             asserts.fail("Did not receive DSTStatus event")
-            pass
 
     def pics_TC_TIMESYNC_2_11(self) -> list[str]:
         return ["TIMESYNC.S.F00"]

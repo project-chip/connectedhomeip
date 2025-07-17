@@ -50,7 +50,7 @@ from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import arls_populated
 from chip.testing.event_attribute_reporting import EventSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, TestStep, decorators
-from chip.testing import runner
+from chip.testing import decorators, runner
 from mobly import asserts
 
 

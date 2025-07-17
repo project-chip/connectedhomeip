@@ -49,9 +49,9 @@ import signal
 import subprocess
 
 from chip import ChipDeviceCtrl
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 
 class TC_DA_1_9(MatterBaseTest):
@@ -249,4 +249,4 @@ class TC_DA_1_9(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -2,8 +2,9 @@ import logging
 import chip.clusters as Clusters
 from chip.clusters import Globals
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, decorators
+from chip.testing.matter_testing import MatterBaseTest, TestStep, decorators
 from mobly import asserts
+from chip.testing import decorators, runner
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -182,7 +183,6 @@ class TC_AVSM_2_5(MatterBaseTest):
             )
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(7)
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
@@ -214,7 +214,6 @@ class TC_AVSM_2_5(MatterBaseTest):
                 Status.InvalidInState,
                 "Unexpected status returned when expecting INVALID_IN_STATE due to unsupported StreamUsage",
             )
-            pass
 
         self.step(9)
         try:
@@ -234,7 +233,6 @@ class TC_AVSM_2_5(MatterBaseTest):
                 Status.ConstraintError,
                 "Unexpected status returned when expecting CONSTRAINT_ERROR due to ChannelCount set to 16(outside of valid range)",
             )
-            pass
 
         self.step(10)
         try:
@@ -254,7 +252,6 @@ class TC_AVSM_2_5(MatterBaseTest):
                 Status.ConstraintError,
                 "Unexpected status returned when expecting CONSTRAINT_ERROR due to BitDepth set to 48(outside of valid range)",
             )
-            pass
 
         self.step(11)
         try:
@@ -274,7 +271,6 @@ class TC_AVSM_2_5(MatterBaseTest):
                 Status.ConstraintError,
                 "Unexpected status returned when expecting CONSTRAINT_ERROR due to SampleRate set to 0(outside of valid range)",
             )
-            pass
 
         self.step(12)
         try:
@@ -294,7 +290,6 @@ class TC_AVSM_2_5(MatterBaseTest):
                 Status.ConstraintError,
                 "Unexpected status returned when expecting CONSTRAINT_ERROR due to BitRate set to 0(outside of valid range)",
             )
-            pass
 
         self.step(13)
         try:
@@ -314,8 +309,7 @@ class TC_AVSM_2_5(MatterBaseTest):
                 Status.ConstraintError,
                 "Unexpected status returned when expecting CONSTRAINT_ERROR due to AudioCodec set to 10(outside of valid range)",
             )
-            pass
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

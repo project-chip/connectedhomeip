@@ -35,9 +35,9 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest
 from drlk_2_x_common import DRLK_COMMON
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 # Configurable parameters:
 # - userIndex: userIndex to use when creating a user on the DUT for testing purposes
@@ -71,4 +71,4 @@ class TC_DRLK_2_3(MatterBaseTest, DRLK_COMMON):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

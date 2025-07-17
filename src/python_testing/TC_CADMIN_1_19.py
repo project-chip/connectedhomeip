@@ -36,10 +36,10 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import AttributeValue, MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import AttributeValue, MatterBaseTest, TestStep
 from mobly import asserts
 from support_modules.cadmin_support import CADMINSupport
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 
 class TC_CADMIN_1_19(MatterBaseTest):
@@ -182,4 +182,4 @@ class TC_CADMIN_1_19(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

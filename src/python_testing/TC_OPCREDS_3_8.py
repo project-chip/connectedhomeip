@@ -11,14 +11,14 @@ import nest_asyncio
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest,
-                                         TestStep, default_matter_test_main, has_command, run_if_endpoint_matches)
+                                         TestStep)
 from chip.testing.pics import accepted_cmd_pics_str
 from chip.tlv import TLVReader
 from chip.utils import CommissioningBuildingBlocks
 from ecdsa import NIST256p, VerifyingKey
 from ecdsa.keys import BadSignatureError
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -30,7 +30,7 @@ from chip.testing import decorators
 #        http://www.apache.org/licenses/LICENSE-2.0
 #
 #    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS,
+#    distributed under the License is distributed on an "AS IS" BASIS
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
@@ -226,7 +226,6 @@ def make_vvs_matcher(fabric_index: int, expected_vvs: bytes) -> AttributeMatcher
 class TestStepBlockPassException(Exception):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-    pass
 
 
 class test_step(object):
@@ -921,4 +920,4 @@ class TC_OPCREDS_VidVerify(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

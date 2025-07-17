@@ -42,8 +42,9 @@ import logging
 
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
+from chip.testing import decorators, runner
 
 
 class TC_SEAR_1_2(MatterBaseTest):
@@ -157,7 +158,7 @@ class TC_SEAR_1_2(MatterBaseTest):
 
     async def read_and_validate_estimated_end_time(self, step):
         import time
-from chip.testing import decorators
+
         read_time = int(time.time())
         self.print_step(step, "Read EstimatedEndTime attribute")
         estimated_end_time = await self.read_sear_attribute_expect_success(
@@ -370,4 +371,4 @@ from chip.testing import decorators
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

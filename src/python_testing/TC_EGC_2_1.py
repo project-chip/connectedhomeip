@@ -1,7 +1,7 @@
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
-from chip.testing import matter_asserts, decorators
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing import decorators, matter_asserts, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 from TC_EGCTestBase import ElectricalGridConditionsTestBaseHelper
 #
@@ -100,4 +100,4 @@ class TC_EGC_2_1(ElectricalGridConditionsTestBaseHelper, MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

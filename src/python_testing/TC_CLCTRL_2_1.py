@@ -37,10 +37,10 @@ import typing
 
 import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from chip.tlv import uint
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 
 class TC_CLCTRL_2_1(MatterBaseTest):
@@ -235,4 +235,4 @@ class TC_CLCTRL_2_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

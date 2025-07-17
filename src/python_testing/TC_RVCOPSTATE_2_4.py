@@ -40,9 +40,9 @@
 import logging
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main, matchers
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner, matchers
 
 
 # Takes an OpState or RvcOpState state enum and returns a string representation
@@ -243,4 +243,4 @@ class TC_RVCOPSTATE_2_4(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -41,9 +41,9 @@ import chip.clusters as Clusters
 from chip.clusters import Globals
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, default_matter_test_main)
+from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep)
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 
 def current_latch_matcher(latch: bool) -> AttributeMatcher:
@@ -78,7 +78,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
 
     def steps_TC_CLDIM_3_3(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done", is_commissioning=True)
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "If Limitation feature is supportes, read LimitRange attribute"),
             TestStep("2c", "If Positioning feature is supportes, read Resolution attribute"),
@@ -503,4 +503,4 @@ class TC_CLDIM_3_3(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

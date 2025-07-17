@@ -1,9 +1,9 @@
 import logging
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -173,7 +173,6 @@ class TC_AVSM_2_2(MatterBaseTest):
             )
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(7)
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
@@ -201,7 +200,6 @@ class TC_AVSM_2_2(MatterBaseTest):
                 Status.ConstraintError,
                 "Unexpected status returned when expecting CONSTRAINT_ERROR due to MaxFrameRate set to 0(outside of valid range)",
             )
-            pass
 
         self.step(9)
         try:
@@ -222,7 +220,6 @@ class TC_AVSM_2_2(MatterBaseTest):
                 Status.ConstraintError,
                 "Unexpected status returned when expecting CONSTRAINT_ERROR due to Quality set to 0 (below valid range)",
             )
-            pass
 
         self.step(10)
         try:
@@ -243,7 +240,6 @@ class TC_AVSM_2_2(MatterBaseTest):
                 Status.ConstraintError,
                 "Unexpected status returned when expecting CONSTRAINT_ERROR due to Quality set to 101(outside of valid range)",
             )
-            pass
 
         self.step(11)
         try:
@@ -264,7 +260,6 @@ class TC_AVSM_2_2(MatterBaseTest):
                 Status.ConstraintError,
                 "Unexpected status returned when expecting CONSTRAINT_ERROR due to ImageCodec set to 10(outside of valid range)",
             )
-            pass
 
         self.step(12)
         try:
@@ -287,7 +282,6 @@ class TC_AVSM_2_2(MatterBaseTest):
                 Status.ConstraintError,
                 "Unexpected status returned when expecting CONSTRAINT_ERROR due to MinResolution set to {0,0} (outside of valid range)",
             )
-            pass
 
         self.step(13)
         try:
@@ -310,8 +304,7 @@ class TC_AVSM_2_2(MatterBaseTest):
                 Status.ConstraintError,
                 "Unexpected status returned when expecting CONSTRAINT_ERROR due to MaxResolution set to {0,0} (outside of valid range)",
             )
-            pass
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

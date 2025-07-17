@@ -69,12 +69,11 @@ import time
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import (MatterBaseTest, SetupParameters, TestStep, default_matter_test_main,
-                                         matchers)
+from chip.testing.matter_testing import (MatterBaseTest, SetupParameters, TestStep)
 from ecdsa.curves import NIST256p
 from mobly import asserts
 from TC_SC_3_6 import AttributeChangeAccumulator
-from chip.testing import decorators
+from chip.testing import decorators, runner, matchers
 
 # Length of `w0s` and `w1s` elements
 WS_LENGTH = NIST256p.baselen + 8
@@ -350,4 +349,4 @@ class TC_MCORE_FS_1_5(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

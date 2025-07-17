@@ -41,11 +41,9 @@ from typing import Optional
 
 import chip.clusters as Clusters
 from chip.clusters import Attribute
-from chip.clusters import ClusterObjects as ClusterObjects
 from chip.clusters.Types import NullValue
-from chip.testing import matter_asserts
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
-from chip.testing import decorators
+from chip.testing import decorators, matter_asserts, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -403,4 +401,4 @@ class TC_CC_2_1(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

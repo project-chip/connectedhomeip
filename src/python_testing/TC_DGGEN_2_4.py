@@ -40,8 +40,8 @@ import logging
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing import decorators, timeoperations
+from chip.testing.matter_testing import MatterBaseTest
+from chip.testing import decorators, runner, timeoperations
 from mobly import asserts
 
 logger = logging.getLogger(__name__)
@@ -214,4 +214,4 @@ class TC_DGGEN_2_4(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

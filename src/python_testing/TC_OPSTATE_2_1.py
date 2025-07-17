@@ -38,9 +38,9 @@
 # === END CI TEST ARGUMENTS ===
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from TC_OpstateCommon import TC_OPSTATE_BASE, TestInfo
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 
 class TC_OPSTATE_2_1(MatterBaseTest, TC_OPSTATE_BASE):
@@ -67,4 +67,4 @@ class TC_OPSTATE_2_1(MatterBaseTest, TC_OPSTATE_BASE):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

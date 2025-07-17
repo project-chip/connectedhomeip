@@ -2,9 +2,10 @@ import logging
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, decorators
+from chip.testing.matter_testing import MatterBaseTest, TestStep, decorators
 from mobly import asserts
 from TC_AVSMTestBase import AVSMTestBase
+from chip.testing import decorators, runner
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -161,7 +162,6 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
         except InteractionModelError as e:
             # TODO: Fail the test if this is reached, once the test infrastructure supports snapshot capture
             logger.error(f"Snapshot capture is not supported: {e}")
-            pass
 
         self.step(4)
         try:
@@ -177,7 +177,6 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
                 Status.NotFound,
                 "Unexpected error returned when expecting NOT_FOUND due to snapshotStreamID set to aStreamID + 1",
             )
-            pass
 
         self.step(5)
         try:
@@ -204,7 +203,6 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
         except InteractionModelError as e:
             # TODO: Fail the test if this is reached, once the test infrastructure supports snapshot capture
             logger.error(f"Snapshot capture is not supported: {e}")
-            pass
 
         if self.privacySupport:
             self.step(6)
@@ -226,7 +224,6 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
                     Status.InvalidInState,
                     "Unexpected error returned when expecting INVALID_IN_STATE due to SoftPrivacy mode set to On",
                 )
-                pass
 
         else:
             self.skip_step(6)
@@ -237,7 +234,6 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             await self.send_single_cmd(endpoint=endpoint, cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=aStreamID))
         except InteractionModelError as e:
             asserts.fail(f"Expected SnapshotStreamDeallocate to succeed, but it failed with status: {e.status}")
-            pass
 
         self.step(9)
         aAllocatedSnapshotStreams = await self.read_single_attribute_check_success(
@@ -258,8 +254,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             asserts.assert_equal(
                 e.status, Status.NotFound, "Unexpected error returned when expecting NOT_FOUND due to 0 allocated snapshot streams"
             )
-            pass
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

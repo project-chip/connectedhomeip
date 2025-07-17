@@ -42,10 +42,10 @@ import chip.clusters as Clusters
 from chip.clusters.Types import Nullable, NullValue
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, default_matter_test_main)
+from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep)
 from chip.tlv import uint
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 
 def current_latch_matcher(latch: bool) -> AttributeMatcher:
@@ -88,7 +88,7 @@ class TC_CLCTRL_4_2(MatterBaseTest):
 
     def steps_TC_CLCTRL_4_2(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done", is_commissioning=True)
             TestStep("2a", "Read the FeatureMap attribute to determine supported features",
                      "FeatureMap of the ClosureControl cluster is returned by the DUT"),
             TestStep("2b", "If the LT feature is not supported, skip remaining steps and end test case"),
@@ -412,4 +412,4 @@ class TC_CLCTRL_4_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

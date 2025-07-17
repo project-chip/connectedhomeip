@@ -42,9 +42,9 @@
 import enum
 
 import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 # This test requires several additional command line arguments.
 # Run the test with
@@ -255,4 +255,4 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

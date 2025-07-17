@@ -42,10 +42,10 @@ from chip import ChipDeviceCtrl
 from chip.ChipDeviceCtrl import CommissioningParameters
 from chip.exceptions import ChipStackError
 from chip.native import PyChipError
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
 from support_modules.cadmin_support import CADMINSupport
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 
 class TC_CADMIN_1_11(MatterBaseTest):
@@ -218,4 +218,4 @@ class TC_CADMIN_1_11(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

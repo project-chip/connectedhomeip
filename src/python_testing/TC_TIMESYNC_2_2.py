@@ -40,8 +40,8 @@ from datetime import timedelta
 import chip.clusters as Clusters
 from chip.clusters.Types import NullValue
 from chip.interaction_model import InteractionModelError
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
-from chip.testing import timeoperations, decorators
+from chip.testing.matter_testing import MatterBaseTest
+from chip.testing import decorators, runner, timeoperations
 from mobly import asserts
 
 
@@ -78,7 +78,6 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
             # The python layer discards the cluster specific portion of the status IB, so for now we just expect a generic FAILURE error
             # see #26521
             code = e.status
-            pass
 
         if utc_dut_initial is NullValue:
             asserts.assert_equal(code, 0, "Unexpected error returned for null UTCTime")
@@ -109,4 +108,4 @@ class TC_TIMESYNC_2_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

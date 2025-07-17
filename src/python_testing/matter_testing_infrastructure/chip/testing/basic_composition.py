@@ -18,7 +18,6 @@ from chip.testing.conformance import ConformanceException
 from chip.testing.matter_testing import MatterTestConfig, ProblemNotice
 from chip.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, build_xml_device_types, dm_from_spec_version
 from mobly import asserts
-from chip.testing import decorators
 #
 #    Copyright (c) 2023 Project CHIP Authors
 #    All rights reserved.

@@ -44,8 +44,8 @@ import chip.discovery as Discovery
 from chip import ChipUtility
 from chip.exceptions import ChipStackError
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main, matchers
-from chip.testing import decorators
+from chip.testing.matter_testing import MatterBaseTest
+from chip.testing import decorators, runner, matchers
 from mobly import asserts
 
 
@@ -307,4 +307,4 @@ class TC_IDM_1_2(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

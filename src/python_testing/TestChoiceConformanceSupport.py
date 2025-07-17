@@ -2,11 +2,11 @@ import itertools
 import xml.etree.ElementTree as ElementTree
 import jinja2
 from chip.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
-from chip.testing.matter_testing import MatterBaseTest, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest
 from chip.testing.problem_notices import ProblemNotice
 from chip.testing.spec_parsing import XmlCluster, add_cluster_data_from_xml
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 #
 #    Copyright (c) 2023 Project CHIP Authors
 #    All rights reserved.
@@ -210,4 +210,4 @@ class TestConformanceSupport(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -42,9 +42,9 @@ import logging
 import chip.clusters as Clusters
 
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, MatterBaseTest, TestStep, default_matter_test_main)
+from chip.testing.matter_testing import (AttributeMatcher, MatterBaseTest, TestStep)
 from mobly import asserts
-from chip.testing import (decorators, matchers)
+from chip.testing import (decorators, matchers, runner)
 
 
 class RvcStatusEnum(enum.IntEnum):
@@ -72,7 +72,7 @@ def verify_mode_tag_in_supported_modes(supported_modes, mode_value, expected_tag
         if entry.mode == mode_value:
             tag_values = [tag.value for tag in entry.modeTags]
             logging.info(f"Matched SupportedMode entry: {entry}, ModeTags: {tag_values}")
-            asserts.assert_in(expected_tag.value, tag_values,
+            asserts.assert_in(expected_tag.value, tag_values
                               f"Expected ModeTag '{expected_tag.name}' (0x{expected_tag.value:04x}) not found in ModeTags: {tag_values}")
             return
     asserts.fail(f"No SupportedModes entry matched CurrentMode value {mode_value}")
@@ -271,4 +271,4 @@ class TC_RVCOPSTATE_2_5(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

@@ -1,9 +1,10 @@
 import logging
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, decorators
+from chip.testing.matter_testing import MatterBaseTest, TestStep, decorators
 from mobly import asserts
 from TC_AVSMTestBase import AVSMTestBase
+from chip.testing import decorators, runner
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -115,14 +116,12 @@ class TC_AVSM_2_6(MatterBaseTest, AVSMTestBase):
                 Status.NotFound,
                 "Unexpected error returned when expecting NOT_FOUND due to audioStreamID set to aStreamIDToDelete + 1",
             )
-            pass
 
         self.step(4)
         try:
             await self.send_single_cmd(endpoint=endpoint, cmd=commands.AudioStreamDeallocate(audioStreamID=(aStreamIDToDelete)))
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
-            pass
 
         self.step(5)
         aAllocatedAudioStreams = await self.read_single_attribute_check_success(
@@ -133,4 +132,4 @@ class TC_AVSM_2_6(MatterBaseTest, AVSMTestBase):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

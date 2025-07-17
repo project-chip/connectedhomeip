@@ -38,9 +38,9 @@ import logging
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, default_matter_test_main)
+from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep)
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 
 def main_state_matcher(main_state: Clusters.ClosureControl.Enums.MainStateEnum) -> AttributeMatcher:
@@ -82,7 +82,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
 
     def steps_TC_CLCTRL_3_1(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True)
             TestStep("2a", "TH reads from the DUT the (0xFFFC) FeatureMap attribute"),
             TestStep("2b", "If the CL feature is not supported on the cluster, skip remaining steps and end test case."),
             TestStep("2c", "TH establishes a wildcard subscription to all attributes on the Closure Control Cluster, with MinIntervalFloor = 0, MaxIntervalCeiling = 30 and KeepSubscriptions = false."),
@@ -184,7 +184,6 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command Calibrate: {e.status}")
-            pass
 
         # STEP 3c: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
         self.step("3c")
@@ -212,7 +211,6 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command Calibrate: {e.status}")
-            pass
 
         # STEP 4b: If the attribute is supported on the cluster, TH reads from the DUT the MainState attribute
         self.step("4b")
@@ -232,7 +230,6 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command Calibrate: {e.status}")
-            pass
 
         # STEP 4d: Wait until the TH receives a subscription report for the MainState attribute
         self.step("4d")
@@ -313,7 +310,6 @@ class TC_CLCTRL_3_1(MatterBaseTest):
                     except InteractionModelError as e:
                         asserts.assert_equal(
                             e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
-                        pass
 
                     self.step("5g")
                     self.skip_step("5h")
@@ -365,7 +361,6 @@ class TC_CLCTRL_3_1(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
-                pass
 
             # STEP 5m: Wait until TH receives a subscription report with OverallCurrentState.Position = FullyClosed
             self.step("5m")
@@ -386,7 +381,6 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
-            pass
 
         # STEP 6b: Wait until the TH receives a subscription report for the OverallCurrentState attribute
         self.step("6b")
@@ -418,7 +412,6 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.Success, f"Failed to send command MoveTo: {e.status}")
-            pass
 
         # STEP 6e: If attribute is supported on the cluster, TH reads from the DUT the MainState attribute
         self.step("6e")
@@ -437,8 +430,7 @@ class TC_CLCTRL_3_1(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(
                 e.status, Status.InvalidInState, f"The Calibrate command sent in an incorrect state: {e.status}")
-            pass
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

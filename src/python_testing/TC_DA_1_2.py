@@ -43,8 +43,8 @@ import re
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
 from chip.testing.basic_composition import BasicCompositionTests
-from chip.testing import conversions, decorators, matchers
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing import conversions, decorators, matchers, runner
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from chip.tlv import TLVReader
 from cryptography import x509
 from cryptography.exceptions import InvalidSignature
@@ -398,7 +398,6 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
                     cert = x509.load_der_x509_certificate(f.read())
                 except ValueError:
                     logging.info(f'File {filename} is not a valid certificate, skipping')
-                    pass
                 pub = cert.public_key()
                 ski = x509.SubjectKeyIdentifier.from_public_key(pub).digest
                 certs[ski] = pub
@@ -460,4 +459,4 @@ class TC_DA_1_2(MatterBaseTest, BasicCompositionTests):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

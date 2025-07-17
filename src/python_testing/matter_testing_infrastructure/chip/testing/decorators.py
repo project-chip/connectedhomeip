@@ -21,7 +21,6 @@ This module provides decorator functions for Matter testing to handle async oper
 and endpoint matching.
 """
 
-from chip.testing import decorators
 import asyncio
 import logging
 from enum import IntFlag

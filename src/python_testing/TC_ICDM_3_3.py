@@ -41,9 +41,9 @@ from dataclasses import dataclass
 
 import chip.clusters as Clusters
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main
+from chip.testing.matter_testing import MatterBaseTest, TestStep
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 
 logger = logging.getLogger(__name__)
 
@@ -197,7 +197,6 @@ class TC_ICDM_3_3(MatterBaseTest):
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status, Status.NotFound, "Unexpected error returned")
-                pass
 
             self.step("2a")
             try:
@@ -386,4 +385,4 @@ class TC_ICDM_3_3(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

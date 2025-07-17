@@ -3,10 +3,9 @@ import chip.clusters as Clusters
 import test_plan_support
 from chip.clusters.Types import NullValue
 from chip.testing.matter_asserts import is_valid_bool_value
-from chip.testing.matter_testing import (MatterBaseTest, TestStep, default_matter_test_main,
-                                         has_feature, run_if_endpoint_matches, matchers)
+from chip.testing.matter_testing import (MatterBaseTest, TestStep)
 from mobly import asserts
-from chip.testing import decorators
+from chip.testing import decorators, runner
 #
 #    Copyright (c) 2025 Project CHIP Authors
 #    All rights reserved.
@@ -18,7 +17,7 @@ from chip.testing import decorators
 #        http://www.apache.org/licenses/LICENSE-2.0
 #
 #    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS,
+#    distributed under the License is distributed on an "AS IS" BASIS
 #    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
@@ -357,4 +356,4 @@ class TC_CNET_4_9(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()

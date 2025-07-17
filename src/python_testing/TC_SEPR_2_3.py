@@ -1,8 +1,8 @@
 import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.exceptions import ChipStackError
-from chip.testing.matter_testing import MatterBaseTest, TestStep, has_feature
-from chip.testing import runner, decorators
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from chip.testing import decorators, runner
 from mobly import asserts
 from TC_SEPRTestBase import CommodityPriceTestBaseHelper
 #

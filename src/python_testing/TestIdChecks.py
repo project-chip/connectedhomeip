@@ -4,7 +4,7 @@ from chip.testing.global_attribute_ids import (AttributeIdType, ClusterIdType, C
                                                is_valid_attribute_id, is_valid_cluster_id, is_valid_command_id,
                                                is_valid_device_type_id)
 from chip.testing.matter_testing import MatterBaseTest
-from chip.testing import runner, decorators
+from chip.testing import decorators, runner
 from mobly import asserts
    #
    #    Copyright (c) 2024 Project CHIP Authors

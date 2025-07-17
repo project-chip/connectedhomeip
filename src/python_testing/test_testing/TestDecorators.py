@@ -32,8 +32,7 @@ from typing import Optional
 import chip.clusters as Clusters
 from chip.clusters import Attribute
 from chip.testing.matter_test_config import MatterTestConfig
-from chip.testing.matter_testing import (MatterBaseTest, has_attribute, has_cluster,
-                                         has_feature)
+from chip.testing.matter_testing import (MatterBaseTest)
 from chip.testing.runner import MockTestRunner
 from mobly import asserts
 from chip.testing import decorators
@@ -45,7 +44,7 @@ def get_clusters(endpoints: list[int]) -> Attribute.AsyncReadTransaction.ReadRes
     # We're JUST populating the globals here because that's all that matters for this particular test
     feature_map = c.Bitmaps.Feature.kLighting
     # Only supported attributes - globals and OnOff. This isn't a compliant device. Doesn't matter for this test.
-    attribute_list = [attr.FeatureMap.attribute_id, attr.AttributeList.attribute_id,
+    attribute_list = [attr.FeatureMap.attribute_id, attr.AttributeList.attribute_id
                       attr.AcceptedCommandList.attribute_id, attr.GeneratedCommandList.attribute_id, attr.OnOff.attribute_id]
     accepted_commands = [c.Commands.Off, c.Commands.On]
     resp = Attribute.AsyncReadTransaction.ReadResponse({}, [], {})

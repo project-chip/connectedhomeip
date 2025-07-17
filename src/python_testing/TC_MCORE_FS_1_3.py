@@ -69,8 +69,8 @@ import chip.clusters as Clusters
 from chip import ChipDeviceCtrl
 from chip.interaction_model import Status
 from chip.testing.apps import AppServerSubprocess
-from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, matchers
-from chip.testing import decorators
+from chip.testing.matter_testing import MatterBaseTest, TestStep
+from chip.testing import decorators, runner, matchers
 from mobly import asserts
 
 _DEVICE_TYPE_AGGREGATOR = 0x000E
@@ -248,4 +248,4 @@ class TC_MCORE_FS_1_3(MatterBaseTest):
 
 
 if __name__ == "__main__":
-    default_matter_test_main()
+    runner.default_matter_test_main()
