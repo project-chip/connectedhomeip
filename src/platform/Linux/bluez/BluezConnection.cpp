@@ -181,18 +181,13 @@ gboolean BluezConnection::WriteHandlerCallback(GIOChannel * aChannel, GIOConditi
     ssize_t len;
 
     len = read(g_io_channel_unix_get_fd(aChannel), buf, sizeof(buf));
-    if (len <= 0)
-    {
-        ChipLogError(DeviceLayer, "FAIL: short read in %s: %zd", __func__, len);
-    }
-    else
-    {
-        ChipLogDetail(DeviceLayer, "C1 %s received %zd bytes", __func__, len);
-        // Casting len to size_t is safe, since we ensured that it's not negative.
-        bluez_gatt_characteristic1_set_value(
-            apConn->mC1.get(), g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, buf, static_cast<size_t>(len), sizeof(uint8_t)));
-        BLEManagerImpl::HandleRXCharWrite(apConn, buf, static_cast<size_t>(len));
-    }
+    VerifyOrReturnValue(len > 0, G_SOURCE_REMOVE, ChipLogError(DeviceLayer, "FAIL: short read in %s: %zd", __func__, len));
+
+    ChipLogDetail(DeviceLayer, "C1 %s received %zd bytes", __func__, len);
+    // Casting len to size_t is safe, since we ensured that it's not negative.
+    bluez_gatt_characteristic1_set_value(
+        apConn->mC1.get(), g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, buf, static_cast<size_t>(len), sizeof(uint8_t)));
+    BLEManagerImpl::HandleRXCharWrite(apConn, buf, static_cast<size_t>(len));
 
     return G_SOURCE_CONTINUE;
 }
@@ -229,9 +224,11 @@ gboolean BluezConnection::NotifyHandlerCallback(GIOChannel * aChannel, GIOCondit
     //       opened in the "AcquireNotify" method. For versions in between, the confirmation
     //       might not work correctly at all!
     len = read(g_io_channel_unix_get_fd(aChannel), &value, sizeof(value));
+    VerifyOrReturnValue(len > 0, G_SOURCE_REMOVE, ChipLogError(DeviceLayer, "FAIL: short read in %s: %zd", __func__, len));
+
     if (value != 1)
     {
-        ChipLogError(DeviceLayer, "FAIL: Invalid indication confirmation: len=%zd value=%u", len, value);
+        ChipLogError(DeviceLayer, "FAIL: Invalid indication confirmation: value=%u", value);
     }
     else
     {
