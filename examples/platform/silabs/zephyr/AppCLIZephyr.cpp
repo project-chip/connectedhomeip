@@ -19,9 +19,10 @@
 #include "AppCLIZephyr.h"
 #include "AppTaskBase.h"
 
+#include <cstring>
+
 #include <ChipShellCollection.h>
 #include <app/server/Server.h>
-#include <cstring>
 #include <lib/shell/Engine.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -33,7 +34,6 @@ extern "C" {
 #include "addons_cli.h"
 }
 #endif
-
 
 #define MATTER_CLI_LOG(message) (chip::Shell::streamer_printf(chip::Shell::streamer_get(), message))
 
@@ -104,7 +104,6 @@ void chip::Zephyr::App::AppCLIZephyr::RegisterDefaultCommands(void)
 #endif /* CHIP_SHELL_ENABLE_CMD_SERVER */
     chip::Shell::Engine::Root().RegisterCommands(kCommands, sizeof(kCommands) / sizeof(kCommands[0]));
 }
-
 
 void chip::Zephyr::App::AppCLIZephyr::ResetCmdHandle(void)
 {

@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <lib/core/CHIPError.h>
+
 namespace chip {
 namespace Zephyr {
 namespace App {

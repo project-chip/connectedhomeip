@@ -35,7 +35,7 @@
 #include "AppCLIZephyr.h"
 #endif
 
-LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
+LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
 using namespace ::chip::app;
@@ -77,7 +77,11 @@ CHIP_ERROR chip::Zephyr::App::AppTaskZephyr::AppMatter_Register()
 void chip::Zephyr::App::AppTaskZephyr::Start()
 {
     PreInitMatterStack();
-    ReturnErrorOnFailure(Init());
+    if (CHIP_NO_ERROR != Init())
+    {
+        ChipLogError(DeviceLayer, "AppTaskZephyr::Start() failed to initialize");
+        return;
+    }
     PostInitMatterStack();
 
     AppEvent event{};
