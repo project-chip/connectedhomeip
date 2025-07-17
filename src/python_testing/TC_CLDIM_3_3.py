@@ -40,7 +40,7 @@ import logging
 import chip.clusters as Clusters
 from chip.clusters import Globals
 from chip.interaction_model import InteractionModelError, Status
-from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing.matter_testing import (AttributeMatcher, AttributeValue, MatterBaseTest, TestStep, async_test_body,
                                          default_matter_test_main)
 from mobly import asserts
@@ -165,7 +165,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
 
         # STEP 2d: Establish wildcard subscription to all attributes"
         self.step("2d")
-        sub_handler = ClusterAttributeChangeAccumulator(Clusters.ClosureDimension)
+        sub_handler = AttributeSubscriptionHandler(expected_cluster=Clusters.ClosureDimension)
         await sub_handler.start(self.default_controller, self.dut_node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
 
         # STEP 2e: Read CurrentState attribute
@@ -194,7 +194,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 try:
                     await self.send_single_cmd(
                         cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=False),
-                        endpoint=endpoint
+                        endpoint=endpoint, timedRequestTimeoutMs=1000
                     )
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -219,7 +219,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
         try:
             await self.send_single_cmd(
                 cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(),
-                endpoint=endpoint
+                endpoint=endpoint, timedRequestTimeoutMs=1000
             )
 
             asserts.fail("Expected InvalidCommand for empty SetTarget command")
@@ -239,7 +239,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=max_position),
-                    endpoint=endpoint
+                    endpoint=endpoint, timedRequestTimeoutMs=1000
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -250,7 +250,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 try:
                     await self.send_single_cmd(
                         cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=min_position - 1),
-                        endpoint=endpoint
+                        endpoint=endpoint, timedRequestTimeoutMs=1000
                     )
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -264,7 +264,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 try:
                     await self.send_single_cmd(
                         cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=max_position + 1),
-                        endpoint=endpoint
+                        endpoint=endpoint, timedRequestTimeoutMs=1000
                     )
                 except InteractionModelError as e:
                     asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -277,7 +277,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=10001),
-                    endpoint=endpoint
+                    endpoint=endpoint, timedRequestTimeoutMs=1000
                 )
 
                 asserts.fail("Expected ConstraintError for Position exceeding 100%")
@@ -297,7 +297,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=0),
-                    endpoint=endpoint
+                    endpoint=endpoint, timedRequestTimeoutMs=1000
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -322,7 +322,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=10000),
-                    endpoint=endpoint
+                    endpoint=endpoint, timedRequestTimeoutMs=1000
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -347,7 +347,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=10001),
-                    endpoint=endpoint
+                    endpoint=endpoint, timedRequestTimeoutMs=1000
                 )
                 asserts.fail("Expected ConstraintError for invalid Position")
 
@@ -373,7 +373,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=min_position + resolution - 1),
-                    endpoint=endpoint
+                    endpoint=endpoint, timedRequestTimeoutMs=1000
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -410,7 +410,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(position=(max_position - resolution) + 1),
-                    endpoint=endpoint
+                    endpoint=endpoint, timedRequestTimeoutMs=1000
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -447,7 +447,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(latch=True),
-                    endpoint=endpoint
+                    endpoint=endpoint, timedRequestTimeoutMs=1000
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -462,7 +462,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(
                         speed=Globals.Enums.ThreeLevelAutoEnum.kHigh),
-                    endpoint=endpoint
+                    endpoint=endpoint, timedRequestTimeoutMs=1000
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -476,7 +476,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(speed=4),  # Invalid speed
-                    endpoint=endpoint
+                    endpoint=endpoint, timedRequestTimeoutMs=1000
                 )
             except InteractionModelError as e:
                 asserts.assert_equal(e.status, Status.Success, "Unexpected error returned")
@@ -490,7 +490,7 @@ class TC_CLDIM_3_3(MatterBaseTest):
             try:
                 await self.send_single_cmd(
                     cmd=Clusters.Objects.ClosureDimension.Commands.SetTarget(speed=4),  # Invalid speed
-                    endpoint=endpoint
+                    endpoint=endpoint, timedRequestTimeoutMs=1000
                 )
 
                 asserts.fail("Expected ConstraintError for invalid Speed")

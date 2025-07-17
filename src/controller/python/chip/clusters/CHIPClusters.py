@@ -1789,6 +1789,12 @@ class ChipClusters:
                 "type": "int",
                 "reportable": True,
             },
+            0x0000000C: {
+                "attributeName": "IsCommissioningWithoutPower",
+                "attributeId": 0x0000000C,
+                "type": "bool",
+                "reportable": True,
+            },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
                 "attributeId": 0x0000FFF8,
@@ -14550,8 +14556,14 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000002: {
-                "attributeName": "TariffUnit",
+                "attributeName": "MeasurementType",
                 "attributeId": 0x00000002,
+                "type": "int",
+                "reportable": True,
+            },
+            0x00000003: {
+                "attributeName": "MaximumMeteredQuantities",
+                "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
             },

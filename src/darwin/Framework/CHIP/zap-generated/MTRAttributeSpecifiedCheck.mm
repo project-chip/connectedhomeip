@@ -809,6 +809,9 @@ static BOOL AttributeIsSpecifiedInGeneralCommissioningCluster(AttributeId aAttri
     case Attributes::NetworkRecoveryReason::Id: {
         return YES;
     }
+    case Attributes::IsCommissioningWithoutPower::Id: {
+        return YES;
+    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -6556,7 +6559,10 @@ static BOOL AttributeIsSpecifiedInCommodityMeteringCluster(AttributeId aAttribut
     case Attributes::MeteredQuantityTimestamp::Id: {
         return YES;
     }
-    case Attributes::TariffUnit::Id: {
+    case Attributes::MeasurementType::Id: {
+        return YES;
+    }
+    case Attributes::MaximumMeteredQuantities::Id: {
         return YES;
     }
     case Attributes::GeneratedCommandList::Id: {
