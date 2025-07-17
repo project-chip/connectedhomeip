@@ -40,11 +40,7 @@ bool IsTestEventTriggerEnabled()
         return false;
     }
     uint8_t zeroByteSpanData[chip::TestEventTriggerDelegate::kEnableKeyLength] = { 0 };
-    if (triggerDelegate->DoesEnableKeyMatch(chip::ByteSpan(zeroByteSpanData)))
-    {
-        return false;
-    }
-    return true;
+    return !triggerDelegate->DoesEnableKeyMatch(chip::ByteSpan(zeroByteSpanData));
 }
 
 bool IsByteSpanAllZeros(const chip::ByteSpan & byteSpan)
@@ -176,9 +172,8 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
 {
     switch (request.path.mAttributeId)
     {
-    case GeneralDiagnostics::Attributes::NetworkInterfaces::Id: {
+    case GeneralDiagnostics::Attributes::NetworkInterfaces::Id:
         return ReadNetworkInterfaces(encoder);
-    }
     case GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id: {
         DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> valueList;
         CHIP_ERROR err = GetActiveHardwareFaults(valueList);
@@ -221,18 +216,16 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
         // Note: Attribute ID 0x0009 was removed (#30002).
 
     case GeneralDiagnostics::Attributes::FeatureMap::Id: {
-        uint32_t features = 0;
-
+        BitFlags<GeneralDiagnostics::Feature> features;
+        
 #if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
-        features |= to_underlying(Clusters::GeneralDiagnostics::Feature::kDataModelTest);
+        features.Set(Clusters::GeneralDiagnostics::Feature::kDataModelTest);
 #endif // CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
 
         return encoder.Encode(features);
     }
-
-    case GeneralDiagnostics::Attributes::ClusterRevision::Id: {
+    case GeneralDiagnostics::Attributes::ClusterRevision::Id: 
         return encoder.Encode(GeneralDiagnostics::kRevision);
-    }
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }

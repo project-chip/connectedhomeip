@@ -110,10 +110,10 @@ public:
     {
         return DeviceLayer::GetDiagnosticDataProvider().GetActiveNetworkFaults(networkFaults);
     }
-    CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
-
+    
 private:
     const GeneralDiagnosticsEnabledAttributes mEnabledAttributes;
+    CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
 };
 
 class GeneralDiagnosticsClusterTimeSnapshotPayloadTestRequest : public GeneralDiagnosticsCluster
@@ -127,6 +127,7 @@ public:
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
 
+private:
     std::optional<DataModel::ActionReturnStatus>
     HandlePayloadTestRequest(CommandHandler & handler, const ConcreteCommandPath & commandPath,
                              const GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType & commandData);

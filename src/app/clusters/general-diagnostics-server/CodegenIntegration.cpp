@@ -97,10 +97,7 @@ void MatterGeneralDiagnosticsPluginServerInitCallback() {}
 
 void MatterGeneralDiagnosticsPluginServerShutdownCallback() {}
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace GeneralDiagnostics {
+namespace chip::app::Clusters::GeneralDiagnostics {
 void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason)
 {
     if (gServer.IsConstructed())
@@ -135,7 +132,4 @@ void GlobalNotifyNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLaye
         gServer.Cluster().OnNetworkFaultsDetect(previous, current);
     }
 }
-} // namespace GeneralDiagnostics
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::GeneralDiagnostics

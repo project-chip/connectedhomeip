@@ -17,10 +17,7 @@
 
 #include <app/clusters/general-diagnostics-server/general-diagnostics-cluster.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace GeneralDiagnostics {
+namespace chip::app::Clusters::GeneralDiagnostics {
 void GlobalNotifyDeviceReboot(GeneralDiagnostics::BootReasonEnum bootReason);
 
 void GlobalNotifyHardwareFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> & previous,
@@ -31,7 +28,4 @@ void GlobalNotifyRadioFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer:
 
 void GlobalNotifyNetworkFaultsDetect(const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & previous,
                                      const DeviceLayer::GeneralFaults<DeviceLayer::kMaxNetworkFaults> & current);
-} // namespace GeneralDiagnostics
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+} // namespace chip::app::Clusters::GeneralDiagnostics
