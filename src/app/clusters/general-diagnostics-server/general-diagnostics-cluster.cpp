@@ -148,9 +148,9 @@ HandleTimeSnapshot(chip::app::CommandHandler & handler, const chip::app::Concret
     return std::nullopt;
 }
 
-std::optional<chip::app::DataModel::ActionReturnStatus> HandleTimeSnapshotWithPosixTime(
-    chip::app::CommandHandler & handler, const chip::app::ConcreteCommandPath & commandPath,
-    const Commands::TimeSnapshot::DecodableType & commandData)
+std::optional<chip::app::DataModel::ActionReturnStatus>
+HandleTimeSnapshotWithPosixTime(chip::app::CommandHandler & handler, const chip::app::ConcreteCommandPath & commandPath,
+                                const Commands::TimeSnapshot::DecodableType & commandData)
 {
     ChipLogError(Zcl, "Received TimeSnapshot command!");
 
@@ -181,9 +181,8 @@ std::optional<chip::app::DataModel::ActionReturnStatus> HandleTimeSnapshotWithPo
 }
 
 std::optional<chip::app::DataModel::ActionReturnStatus>
-HandlePayloadTestRequest(
-    chip::app::CommandHandler & handler, const chip::app::ConcreteCommandPath & commandPath,
-    const Commands::PayloadTestRequest::DecodableType & commandData)
+HandlePayloadTestRequest(chip::app::CommandHandler & handler, const chip::app::ConcreteCommandPath & commandPath,
+                         const Commands::PayloadTestRequest::DecodableType & commandData)
 {
     if (commandData.count > kMaxPayloadTestRequestCount)
     {
