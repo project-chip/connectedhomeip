@@ -47,7 +47,7 @@ import time
 
 import chip.clusters as Clusters
 import test_plan_support
-from chip.testing.event_attribute_reporting import ClusterAttributeChangeAccumulator
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
 from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 from TC_COMMTR_TestBase import CommodityMeteringTestBaseHelper
