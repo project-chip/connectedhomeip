@@ -96,7 +96,7 @@ class TC_PAVST_2_4(MatterBaseTest):
                                                    endpoint=endpoint)
                     except InteractionModelError as e:
                         asserts.assert_true(e.status == Status.Success, "Unexpected error returned")
-                    
+
             aSupportedFormats = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats
             )
@@ -148,7 +148,7 @@ class TC_PAVST_2_4(MatterBaseTest):
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
                  }), endpoint=endpoint)
-    
+
         self.step(2)
         if self.pics_guard(self.check_pics("PAVST.S.A0001")):
             transport_configs = await self.read_single_attribute_check_success(
