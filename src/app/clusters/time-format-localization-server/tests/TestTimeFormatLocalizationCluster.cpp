@@ -38,21 +38,6 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-template<class T>
-class ScopedDeviceProvider
-{
-public:
-    ScopedDeviceProvider()
-    {
-        mOldProvider = DeviceLayer::GetDeviceInfoProvider();
-        DeviceLayer::SetDeviceInfoProvider(&mProvider);
-    }
-
-private:
-    DeviceLayer::DeviceInfoProvider * mOldProvider;
-    T mProvider;
-};
-
 struct TestTimeFormatLocalizationCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
@@ -123,7 +108,12 @@ TEST_F(TestTimeFormatLocalizationCluster, ListCalendarTest)
     BitFlags<TimeFormatLocalization::Feature> features {0};
     features.Set(TimeFormatLocalization::Feature::kCalendarFormat);
 
-    ScopedDeviceProvider<DeviceLayer::SampleDeviceProvider> sampleProvider;
+    // Save old provider
+    DeviceLayer::DeviceInfoProvider * oldProvider = DeviceLayer::GetDeviceInfoProvider();
+    // Set new SampleProvider
+    DeviceLayer::SampleDeviceProvider testProvider;
+    DeviceLayer::SetDeviceInfoProvider(&testProvider);
+
     TimeFormatLocalizationLogic clusterSim(features);
 
     EXPECT_EQ(clusterSim.GetSupportedCalendarTypes(encoder), CHIP_NO_ERROR);
@@ -170,7 +160,7 @@ TEST_F(TestTimeFormatLocalizationCluster, ListCalendarTest)
     calendarType = iter.GetValue();
     EXPECT_EQ(calendarType, TimeFormatLocalization::CalendarTypeEnum::kJapanese);
 
-    ASSERT_FALSE(false);
-
+    // Revert provider to old state
+    DeviceLayer::SetDeviceInfoProvider(oldProvider);
 }
 }

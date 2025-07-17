@@ -67,7 +67,7 @@ CHIP_ERROR TimeFormatLocalizationLogic::GetSupportedCalendarTypes(AttributeValue
     });
 }
 
-bool TimeFormatLocalizationLogic::IsCalendarSupported(TimeFormatLocalization::CalendarTypeEnum calendar)
+bool TimeFormatLocalizationLogic::IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar, TimeFormatLocalization::CalendarTypeEnum * validCalendar)
 {
     DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
     VerifyOrReturnValue(provider != nullptr, false);
@@ -76,22 +76,33 @@ bool TimeFormatLocalizationLogic::IsCalendarSupported(TimeFormatLocalization::Ca
     VerifyOrReturnValue(it.IsValid(), false);
 
     TimeFormatLocalization::CalendarTypeEnum type;
+    bool found = false;
 
-    while (it.Next(type))
+    if (it.Next(type))
     {
-        if(type == calendar) 
+        // Set the first valid calendar type as the optional validCalendar, if needed.
+        if (validCalendar != nullptr)
         {
-            return true;
+            *validCalendar = type;
         }
+        
+        do {
+            if (type == reqCalendar)
+            {
+                found = true;
+                break;
+            }
+        } while (it.Next(type));
     }
-    return false;
+    
+    return found;
 }
 
 TimeFormatLocalization::CalendarTypeEnum TimeFormatLocalizationLogic::GetActiveCalendarType() 
 {
     return mCalendarType;
 }
-// TODO: Missing persisten storage for Writable attributes, also should check here for a valid value for HourFormat and CalendarType?
+
 DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setHourFormat(TimeFormatLocalization::HourFormatEnum rHour)
 {
     mHourFormat = rHour;
@@ -106,7 +117,7 @@ DataModel::ActionReturnStatus TimeFormatLocalizationLogic::setActiveCalendarType
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
     }
 
-    if(IsCalendarSupported(rCalendar))
+    if(IsSupportedCalendarType(rCalendar))
     {
         mCalendarType = rCalendar;
         return Protocols::InteractionModel::Status::Success;

@@ -29,30 +29,25 @@ CHIP_ERROR TimeFormatLocalizationCluster::Startup(ServerClusterContext & context
 {
     ReturnErrorOnFailure(DefaultServerCluster::Startup(context));
 
+    // TODO: Consider moving the storage handling inside the Logic layer.
+    // Get the current calendar type, if any.
     TimeFormatLocalization::CalendarTypeEnum calendarType;
-
     MutableByteSpan calendarBytes(reinterpret_cast<uint8_t *>(&calendarType), sizeof(calendarType));
-
     CHIP_ERROR error = context.attributeStorage->ReadValue({kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::ActiveCalendarType::Id},
                                                             calendarBytes);
-    ChipLogError(Zcl, "Got this message: %" CHIP_ERROR_FORMAT, error.Format());
-    mLogic.setActiveCalendarType(calendarType);
+    // We could have an invalid calendar type value if an OTA update removed support for the value we were using.
+    // If initial value is not one of the allowed values, pick one valid value and write it.
+    TimeFormatLocalization::CalendarTypeEnum validCalendar = TimeFormatLocalization::CalendarTypeEnum::kBuddhist;
+    TimeFormatLocalizationLogic::IsSupportedCalendarType(calendarType, &validCalendar);
+    mLogic.setActiveCalendarType(validCalendar);
 
     TimeFormatLocalization::HourFormatEnum hourFormat;
-
     MutableByteSpan hourBytes(reinterpret_cast<uint8_t *>(&hourFormat), sizeof(hourFormat));
-
     error = context.attributeStorage->ReadValue({kRootEndpointId, TimeFormatLocalization::Id, TimeFormatLocalization::Attributes::HourFormat::Id},
                                                             hourBytes);
-    ChipLogError(Zcl, "Got this message: %" CHIP_ERROR_FORMAT, error.Format());
     mLogic.setHourFormat(hourFormat);
 
-    if(error == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteAttribute(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder)
@@ -72,7 +67,6 @@ DataModel::ActionReturnStatus TimeFormatLocalizationCluster::WriteAttribute(cons
             return Protocols::InteractionModel::Status::Success;
         }
         return Protocols::InteractionModel::Status::Failure;
-        //return mLogic.setActiveCalendarType(tCalendar);
     }
     case TimeFormatLocalization::Attributes::HourFormat::Id:
     {

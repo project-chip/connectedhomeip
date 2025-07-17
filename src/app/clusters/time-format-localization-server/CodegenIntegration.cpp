@@ -42,17 +42,21 @@ void emberAfTimeFormatLocalizationClusterServerInitCallback(EndpointId endpoint)
 
 void emberAfTimeFormatLocalizationClusterInitCallback(EndpointId endpoint) 
 {
+    // This cluster should only exist in Root endpoint.
     VerifyOrReturn(endpoint == kRootEndpointId);
 
+    // Get feature Map
     uint32_t rawFeatureMap;
     if (FeatureMap::Get(endpoint, &rawFeatureMap) != Status::Success)
     {
         ChipLogError(AppServer, "Failed to get feature map for endpoint %u", endpoint);
         rawFeatureMap = 0;
     }
+
     gServer.Create(endpoint, BitFlags<TimeFormatLocalization::Feature>(rawFeatureMap));
 
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Register(gServer.Registration());
+
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "TimeFormatLocalization cluster error registration");
@@ -61,12 +65,16 @@ void emberAfTimeFormatLocalizationClusterInitCallback(EndpointId endpoint)
 
 void emberAfTimeFormatLocalizationClusterShutdownCallback(EndpointId endpoint) 
 {
+    // This cluster should only exist in Root endpoint.
     VerifyOrReturn(endpoint == kRootEndpointId);
+
     CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&gServer.Cluster());
+
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "TimeFormatLocalization unregister error");
     }
+    
     gServer.Destroy();
 }
 

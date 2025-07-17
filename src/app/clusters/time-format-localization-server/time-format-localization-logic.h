@@ -42,25 +42,20 @@ public:
 
     // Attributes handling for cluster
     TimeFormatLocalization::HourFormatEnum GetHourFormat();
-
     TimeFormatLocalization::CalendarTypeEnum GetActiveCalendarType();
-
     DataModel::ActionReturnStatus setHourFormat(TimeFormatLocalization::HourFormatEnum rHour);
-
     DataModel::ActionReturnStatus setActiveCalendarType(TimeFormatLocalization::CalendarTypeEnum rCalendar);
-
     CHIP_ERROR GetSupportedCalendarTypes(AttributeValueEncoder & aEncoder) const;
-
     CHIP_ERROR Attributes(ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder);
+    // Method used to validate if the requested calendar is valid, optionally can return a valid calendar from the
+    // supported calendars list.
+    static bool IsSupportedCalendarType(TimeFormatLocalization::CalendarTypeEnum reqCalendar, TimeFormatLocalization::CalendarTypeEnum * validCalendar = nullptr);
 
 private:
 
     BitFlags<TimeFormatLocalization::Feature> mFeatures;
-
     TimeFormatLocalization::HourFormatEnum mHourFormat;
     TimeFormatLocalization::CalendarTypeEnum mCalendarType;
-
-    bool IsCalendarSupported(TimeFormatLocalization::CalendarTypeEnum calendarType);
 
 };
 
