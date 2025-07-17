@@ -213,17 +213,6 @@ inline CHIP_ERROR ReadLocation(DeviceLayer::ConfigurationManager & configManager
     return aEncoder.Encode(countryCodeSpan);
 }
 
-inline CHIP_ERROR ReadMaxPathsPerInvoke(AttributeValueEncoder & aEncoder)
-{
-    uint16_t max_path_per_invoke = CHIP_CONFIG_MAX_PATHS_PER_INVOKE;
-    return aEncoder.Encode(max_path_per_invoke);
-}
-
-inline CHIP_ERROR ReadSpecificationVersion(AttributeValueEncoder & aEncoder)
-{
-    return aEncoder.Encode(Revision::kSpecificationVersion);
-}
-
 inline CHIP_ERROR ReadProductAppearance(DeviceInstanceInfoProvider * deviceInfoProvider, AttributeValueEncoder & aEncoder)
 {
     ProductFinishEnum finish;
@@ -306,7 +295,7 @@ CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attrib
     case ProductAppearance::Id:
         return ReadProductAppearance(deviceInfoProvider, aEncoder);
     case SpecificationVersion::Id:
-        return ReadSpecificationVersion(aEncoder);
+        return aEncoder.Encode(Revision::kSpecificationVersion);
     case MaxPathsPerInvoke::Id:
         return aEncoder.Encode<uint16_t>(CHIP_CONFIG_MAX_PATHS_PER_INVOKE);
     case ConfigurationVersion::Id:
