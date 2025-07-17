@@ -146,8 +146,10 @@ class TC_PAVST_2_8(MatterBaseTest):
                     ),
                     minBitRate=20000,
                     maxBitRate=150000,
-                    minFragmentLen=2000,
-                    maxFragmentLen=8000,
+                    minKeyFrameInterval=4000,
+                    maxKeyFrameInterval=4000,
+                    watermarkEnabled=1,
+                    OSDEnabled=1,
                 ),
                 endpoint=endpoint,
             )
