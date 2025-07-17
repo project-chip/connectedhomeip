@@ -35,7 +35,6 @@ static_library("connectivity") {
   public_configs = [ "${chip_root}/src:includes" ]
 }
 
-
 static_library("qrcode") {
   sources = [
     "qrcode.cpp",
