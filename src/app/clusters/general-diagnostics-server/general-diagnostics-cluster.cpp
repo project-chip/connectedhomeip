@@ -147,6 +147,72 @@ HandleTimeSnapshot(chip::app::CommandHandler & handler, const chip::app::Concret
     handler.AddResponse(commandPath, response);
     return std::nullopt;
 }
+
+std::optional<chip::app::DataModel::ActionReturnStatus> HandleTimeSnapshotWithPosixTime(
+    chip::app::CommandHandler & handler, const chip::app::ConcreteCommandPath & commandPath,
+    const Commands::TimeSnapshot::DecodableType & commandData)
+{
+    ChipLogError(Zcl, "Received TimeSnapshot command!");
+
+    Commands::TimeSnapshotResponse::Type response;
+
+    chip::System::Clock::Microseconds64 posix_time_us{ 0 };
+
+    // Only consider real time if time sync cluster is actually enabled. Avoids
+    // likelihood of frequently reporting unsynced time.
+    CHIP_ERROR posix_time_err = chip::System::SystemClock().GetClock_RealTime(posix_time_us);
+    if (posix_time_err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to get POSIX real time: %" CHIP_ERROR_FORMAT, posix_time_err.Format());
+        posix_time_us = chip::System::Clock::Microseconds64{ 0 };
+    }
+
+    chip::System::Clock::Milliseconds64 system_time_ms =
+        std::chrono::duration_cast<chip::System::Clock::Milliseconds64>(chip::Server::GetInstance().TimeSinceInit());
+
+    response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
+    if (posix_time_us.count() != 0)
+    {
+        response.posixTimeMs.SetNonNull(
+            static_cast<uint64_t>(std::chrono::duration_cast<chip::System::Clock::Milliseconds64>(posix_time_us).count()));
+    }
+    handler.AddResponse(commandPath, response);
+    return std::nullopt;
+}
+
+std::optional<chip::app::DataModel::ActionReturnStatus>
+HandlePayloadTestRequest(
+    chip::app::CommandHandler & handler, const chip::app::ConcreteCommandPath & commandPath,
+    const Commands::PayloadTestRequest::DecodableType & commandData)
+{
+    if (commandData.count > kMaxPayloadTestRequestCount)
+    {
+        return chip::Protocols::InteractionModel::Status::ConstraintError;
+    }
+
+    // Ensure Test Event triggers are enabled and key matches.
+    auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
+    if (triggerDelegate == nullptr)
+    {
+        return chip::Protocols::InteractionModel::Status::ConstraintError;
+    }
+
+    Commands::PayloadTestResponse::Type response;
+    chip::Platform::ScopedMemoryBufferWithSize<uint8_t> payload;
+    if (!payload.Calloc(commandData.count))
+    {
+        return chip::Protocols::InteractionModel::Status::ResourceExhausted;
+    }
+
+    memset(payload.Get(), commandData.value, payload.AllocatedSize());
+    response.payload = chip::ByteSpan{ payload.Get(), payload.AllocatedSize() };
+
+    if (handler.AddResponseData(commandPath, response) != CHIP_NO_ERROR)
+    {
+        return chip::Protocols::InteractionModel::Status::ResourceExhausted;
+    }
+    return std::nullopt;
+}
 } // namespace
 
 namespace chip {
@@ -418,7 +484,7 @@ std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsClusterTimeSnapsh
     case GeneralDiagnostics::Commands::TimeSnapshot::Id: {
         GeneralDiagnostics::Commands::TimeSnapshot::DecodableType request_data;
         ReturnErrorOnFailure(request_data.Decode(input_arguments));
-        return HandleTimeSnapshot(*handler, request.path, request_data);
+        return HandleTimeSnapshotWithPosixTime(*handler, request.path, request_data);
     }
     case GeneralDiagnostics::Commands::PayloadTestRequest::Id: {
         GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType request_data;
@@ -428,72 +494,6 @@ std::optional<DataModel::ActionReturnStatus> GeneralDiagnosticsClusterTimeSnapsh
     default:
         return Protocols::InteractionModel::Status::UnsupportedCommand;
     }
-}
-
-std::optional<chip::app::DataModel::ActionReturnStatus>
-GeneralDiagnosticsClusterTimeSnapshotPayloadTestRequest::HandlePayloadTestRequest(
-    chip::app::CommandHandler & handler, const chip::app::ConcreteCommandPath & commandPath,
-    const Commands::PayloadTestRequest::DecodableType & commandData)
-{
-    if (commandData.count > kMaxPayloadTestRequestCount)
-    {
-        return chip::Protocols::InteractionModel::Status::ConstraintError;
-    }
-
-    // Ensure Test Event triggers are enabled and key matches.
-    auto * triggerDelegate = GetTriggerDelegateOnMatchingKey(commandData.enableKey);
-    if (triggerDelegate == nullptr)
-    {
-        return chip::Protocols::InteractionModel::Status::ConstraintError;
-    }
-
-    Commands::PayloadTestResponse::Type response;
-    chip::Platform::ScopedMemoryBufferWithSize<uint8_t> payload;
-    if (!payload.Calloc(commandData.count))
-    {
-        return chip::Protocols::InteractionModel::Status::ResourceExhausted;
-    }
-
-    memset(payload.Get(), commandData.value, payload.AllocatedSize());
-    response.payload = chip::ByteSpan{ payload.Get(), payload.AllocatedSize() };
-
-    if (handler.AddResponseData(commandPath, response) != CHIP_NO_ERROR)
-    {
-        return chip::Protocols::InteractionModel::Status::ResourceExhausted;
-    }
-    return std::nullopt;
-}
-
-std::optional<chip::app::DataModel::ActionReturnStatus> GeneralDiagnosticsClusterTimeSnapshotPayloadTestRequest::HandleTimeSnapshot(
-    chip::app::CommandHandler & handler, const chip::app::ConcreteCommandPath & commandPath,
-    const Commands::TimeSnapshot::DecodableType & commandData)
-{
-    ChipLogError(Zcl, "Received TimeSnapshot command!");
-
-    Commands::TimeSnapshotResponse::Type response;
-
-    chip::System::Clock::Microseconds64 posix_time_us{ 0 };
-
-    // Only consider real time if time sync cluster is actually enabled. Avoids
-    // likelihood of frequently reporting unsynced time.
-    CHIP_ERROR posix_time_err = chip::System::SystemClock().GetClock_RealTime(posix_time_us);
-    if (posix_time_err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Failed to get POSIX real time: %" CHIP_ERROR_FORMAT, posix_time_err.Format());
-        posix_time_us = chip::System::Clock::Microseconds64{ 0 };
-    }
-
-    chip::System::Clock::Milliseconds64 system_time_ms =
-        std::chrono::duration_cast<chip::System::Clock::Milliseconds64>(chip::Server::GetInstance().TimeSinceInit());
-
-    response.systemTimeMs = static_cast<uint64_t>(system_time_ms.count());
-    if (posix_time_us.count() != 0)
-    {
-        response.posixTimeMs.SetNonNull(
-            static_cast<uint64_t>(std::chrono::duration_cast<chip::System::Clock::Milliseconds64>(posix_time_us).count()));
-    }
-    handler.AddResponse(commandPath, response);
-    return std::nullopt;
 }
 
 } // namespace Clusters

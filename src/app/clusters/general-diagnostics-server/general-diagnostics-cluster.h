@@ -126,15 +126,6 @@ public:
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                chip::TLV::TLVReader & input_arguments,
                                                                CommandHandler * handler) override;
-
-private:
-    std::optional<DataModel::ActionReturnStatus>
-    HandlePayloadTestRequest(CommandHandler & handler, const ConcreteCommandPath & commandPath,
-                             const GeneralDiagnostics::Commands::PayloadTestRequest::DecodableType & commandData);
-
-    std::optional<chip::app::DataModel::ActionReturnStatus>
-    HandleTimeSnapshot(chip::app::CommandHandler & handler, const chip::app::ConcreteCommandPath & commandPath,
-                       const GeneralDiagnostics::Commands::TimeSnapshot::DecodableType & commandData);
 };
 
 } // namespace Clusters
