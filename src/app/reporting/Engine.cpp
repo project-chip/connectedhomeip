@@ -127,6 +127,26 @@ std::optional<CHIP_ERROR> ValidateReadAttributeACL(DataModel::Provider * dataMod
     return err == CHIP_ERROR_ACCESS_DENIED ? CHIP_IM_GLOBAL_STATUS(UnsupportedAccess) : CHIP_IM_GLOBAL_STATUS(AccessRestricted);
 }
 
+/// Checks that the given attribute path corresponds to a readable attribute. If not, it
+/// will return the corresponding failure status.
+std::optional<Status> ValidateAttributeIsReadable(DataModel::Provider * dataModel, const ConcreteReadAttributePath & path)
+{
+    DataModel::AttributeFinder finder(dataModel);
+
+    std::optional<DataModel::AttributeEntry> entry = finder.Find(path);
+    if (!entry.has_value())
+    {
+        return DataModel::ValidateClusterPath(dataModel, path, Status::UnsupportedAttribute);
+    }
+
+    if (!entry->GetReadPrivilege().has_value())
+    {
+        return Status::UnsupportedRead;
+    }
+
+    return std::nullopt;
+}
+
 DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataModel, const SubjectDescriptor & subjectDescriptor,
                                                   bool isFabricFiltered, AttributeReportIBs::Builder & reportBuilder,
                                                   const ConcreteReadAttributePath & path, AttributeEncodeState * encoderState)
@@ -161,8 +181,8 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
     AttributeValueEncoder attributeValueEncoder(reportBuilder, subjectDescriptor, path, version, isFabricFiltered, encoderState);
 
     // TODO: we explicitly DO NOT validate that path is a valid cluster path (even more, above serverClusterFinder
-    //       explicitly ignores that case). This means that global attribute reads as well as ReadAttribute
-    //       can be passed invalid paths when an invalid Read is detected and must handle them.
+    //       explicitly ignores that case).
+    //       Validation of attribute existence is done after ACL, in `ValidateAttributeIsReadable` below
     //
     //       See https://github.com/project-chip/connectedhomeip/issues/37410
 
@@ -175,6 +195,10 @@ DataModel::ActionReturnStatus RetrieveClusterData(DataModel::Provider * dataMode
         // Global attributes are NOT directly handled by data model providers, instead
         // the are routed through metadata.
         status = ReadGlobalAttributeFromMetadata(dataModel, readRequest.path, attributeValueEncoder);
+    }
+    else if (auto readable_status = ValidateAttributeIsReadable(dataModel, path); readable_status.has_value())
+    {
+        status = *readable_status;
     }
     else
     {

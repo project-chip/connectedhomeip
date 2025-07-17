@@ -138,7 +138,7 @@ class ClosureControlCluster(
     position: UByte?,
     latch: Boolean?,
     speed: UByte?,
-    timedInvokeTimeout: Duration? = null,
+    timedInvokeTimeout: Duration,
   ) {
     val commandId: UInt = 1u
 
@@ -166,7 +166,7 @@ class ClosureControlCluster(
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun calibrate(timedInvokeTimeout: Duration? = null) {
+  suspend fun calibrate(timedInvokeTimeout: Duration) {
     val commandId: UInt = 2u
 
     val tlvWriter = TlvWriter()

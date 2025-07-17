@@ -199,7 +199,7 @@
         "COLOR_CONTROL_CLUSTER": ["color-control-server"],
         "COMMISSIONER_CONTROL_CLUSTER": ["commissioner-control-server"],
         "COMMISSIONING_CLUSTER": [],
-        "COMMODITY_METERING_CLUSTER": [],
+        "COMMODITY_METERING_CLUSTER": ["commodity-metering-server"],
         "COMMODITY_PRICE_CLUSTER": ["commodity-price-server"],
         "COMMODITY_TARIFF_CLUSTER": [],
         "CONTENT_LAUNCHER_CLUSTER": ["content-launch-server"],
@@ -341,7 +341,7 @@
         "TIME_SYNCHRONIZATION_CLUSTER": ["time-synchronization-server"],
         "TIMER_CLUSTER": ["timer-server"],
         "TLS_CERTIFICATE_MANAGEMENT_CLUSTER": [],
-        "TLS_CLIENT_MANAGEMENT_CLUSTER": [],
+        "TLS_CLIENT_MANAGEMENT_CLUSTER": ["tls-client-management-server"],
         "TVOC_CONCENTRATION_MEASUREMENT_CLUSTER": [
             "concentration-measurement-server"
         ],

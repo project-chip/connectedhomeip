@@ -41,8 +41,8 @@ import time
 
 import chip.clusters as Clusters
 from chip.clusters import ClusterObjects as ClusterObjects
-from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, default_matter_test_main,
-                                         has_cluster, run_if_endpoint_matches)
+from chip.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from chip.testing.matter_testing import MatterBaseTest, TestStep, default_matter_test_main, has_cluster, run_if_endpoint_matches
 from mobly import asserts
 from test_plan_support import commission_if_required, read_attribute, verify_success
 
@@ -164,7 +164,7 @@ class TC_CC_2_3(MatterBaseTest):
             self.mark_current_step_skipped()
 
         self.step(6)
-        sub_handler = ClusterAttributeChangeAccumulator(cc)
+        sub_handler = AttributeSubscriptionHandler(expected_cluster=cc)
         await sub_handler.start(self.default_controller, self.dut_node_id, self.matter_test_config.endpoint)
 
         def accumulate_reports():

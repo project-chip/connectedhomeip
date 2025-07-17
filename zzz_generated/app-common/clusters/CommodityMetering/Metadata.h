@@ -34,6 +34,11 @@ namespace MeasurementType {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MeasurementType::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace MeasurementType
+namespace MaximumMeteredQuantities {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(MaximumMeteredQuantities::Id,
+                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
+                                                          std::nullopt);
+} // namespace MaximumMeteredQuantities
 
 } // namespace Attributes
 
