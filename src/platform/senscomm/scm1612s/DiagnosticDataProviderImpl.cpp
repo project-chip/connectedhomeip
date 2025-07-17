@@ -24,14 +24,16 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/mt793x/DiagnosticDataProviderImpl.h>
+#include <platform/senscomm/scm1612s/DiagnosticDataProviderImpl.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #endif
 #include <lwip/tcpip.h>
 
-// #include "AppConfig.h"
 #include "FreeRTOS.h"
+#include "wise_wifi_types.h"
+#include "wise_err.h"
+#include "scm_wifi.h"
 
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
@@ -231,6 +233,48 @@ void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * net
         delete del;
     }
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiBssId(MutableByteSpan & BssId)
+{
+    constexpr size_t bssIdSize = 6;
+    VerifyOrReturnError(BssId.size() >= bssIdSize, CHIP_ERROR_BUFFER_TOO_SMALL);
+
+    wifi_ap_record_t ap_info;
+    int ret = WISE_FAIL;
+
+    ret = scm_wifi_sta_get_ap_info(&ap_info);
+    if (ret != WISE_OK)
+    {
+        return CHIP_ERROR_READ_FAILED;
+    }
+
+    memcpy(BssId.data(), ap_info.bssid, bssIdSize);
+    BssId.reduce_size(bssIdSize);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiChannelNumber(uint16_t & channelNumber)
+{
+    int ret = WISE_FAIL;
+    scm_wifi_2nd_ch_loc secondary;
+    char interface[] = "wlan0";
+
+    ret = scm_wifi_get_channel(interface, reinterpret_cast<uint8_t*>(&channelNumber), &secondary);
+    if (ret != WISE_OK)
+    {
+        return CHIP_ERROR_READ_FAILED;
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetWiFiRssi(int8_t & rssi)
+{
+    rssi = scm_wifi_sta_get_ap_rssi();
+
+    return CHIP_NO_ERROR;
+}
+#endif
 
 DiagnosticDataProvider & GetDiagnosticDataProviderImpl()
 {
