@@ -231,8 +231,8 @@ TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)
         ASSERT_TRUE(Testing::EqualAttributeSets(attributesBuilder.TakeBuffer(), expectedBuilder.TakeBuffer()));
 
         // Check proper read/write of values and returns
-        uint16_t rebootCount      = 0;
-        uint32_t operationalHours = 0;
+        uint16_t rebootCount                               = 0;
+        uint32_t operationalHours                          = 0;
         GeneralDiagnostics::BootReasonEnum bootReasonValue = GeneralDiagnostics::BootReasonEnum::kUnspecified;
         DeviceLayer::GeneralFaults<DeviceLayer::kMaxHardwareFaults> hardwareFaults;
         DeviceLayer::GeneralFaults<DeviceLayer::kMaxRadioFaults> radioFaults;
