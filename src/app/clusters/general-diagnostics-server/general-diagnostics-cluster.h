@@ -110,7 +110,7 @@ public:
     {
         return DeviceLayer::GetDiagnosticDataProvider().GetActiveNetworkFaults(networkFaults);
     }
-    
+
 private:
     const GeneralDiagnosticsEnabledAttributes mEnabledAttributes;
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);

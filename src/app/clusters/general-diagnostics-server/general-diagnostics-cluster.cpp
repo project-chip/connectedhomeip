@@ -217,14 +217,14 @@ DataModel::ActionReturnStatus GeneralDiagnosticsCluster::ReadAttribute(const Dat
 
     case GeneralDiagnostics::Attributes::FeatureMap::Id: {
         BitFlags<GeneralDiagnostics::Feature> features;
-        
+
 #if CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
         features.Set(Clusters::GeneralDiagnostics::Feature::kDataModelTest);
 #endif // CHIP_CONFIG_MAX_PATHS_PER_INVOKE > 1
 
         return encoder.Encode(features);
     }
-    case GeneralDiagnostics::Attributes::ClusterRevision::Id: 
+    case GeneralDiagnostics::Attributes::ClusterRevision::Id:
         return encoder.Encode(GeneralDiagnostics::kRevision);
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;
