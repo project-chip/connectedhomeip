@@ -532,7 +532,7 @@ TEST_F(TestBleLayer, NewConnectionByDiscriminatorsEmptySpan)
     auto OnSuccess = [](void * appState, uint16_t matchedLongDiscriminator, BLE_CONNECTION_OBJECT connObj) {};
     auto OnError   = [](void * appState, CHIP_ERROR err) {};
 
-    EXPECT_NE(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_NO_ERROR);
+    EXPECT_EQ(NewBleConnectionByDiscriminators(discriminatorsSpan, this, OnSuccess, OnError), CHIP_ERROR_INVALID_ARGUMENT);
 }
 
 }; // namespace Ble
