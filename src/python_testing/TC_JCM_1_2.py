@@ -42,8 +42,8 @@ from configparser import ConfigParser
 import chip.clusters as Clusters
 import chip.tlv
 from chip import CertificateAuthority
-from chip.storage import PersistentStorage
 from chip.ChipDeviceCtrl import ChipDeviceControllerBase
+from chip.storage import PersistentStorage
 from chip.testing.apps import AppServerSubprocess, JFControllerSubprocess
 from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
