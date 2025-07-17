@@ -347,6 +347,3 @@ RUN pip install --break-system-packages --no-cache-dir \
 RUN mkdir -p credentials/test/revoked-attestation-certificates
 COPY --from=chip-build-cert-bins /root/connectedhomeip/credentials/test/revoked-attestation-certificates/dac-provider-test-vectors credentials/test/revoked-attestation-certificates/dac-provider-test-vectors
 COPY --from=chip-build-cert-bins /root/connectedhomeip/credentials/test/revoked-attestation-certificates/revocation-sets credentials/test/revoked-attestation-certificates/revocation-sets
-
-# Set default command to run pcscd with --disable-polkit
-CMD ["pcscd", "--disable-polkit"]
