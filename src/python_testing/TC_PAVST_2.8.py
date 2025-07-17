@@ -94,7 +94,7 @@ class TC_PAVST_2_8(MatterBaseTest):
                                                    endpoint=endpoint)
                     except InteractionModelError as e:
                         asserts.assert_true(e.status == Status.Success, "Unexpected error returned")
-                    
+
             aSupportedFormats = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats
             )
@@ -146,7 +146,7 @@ class TC_PAVST_2_8(MatterBaseTest):
                  "containerOptions": {"containerType": 0, "CMAFContainerOptions": {"chunkDuration": 4}},
                  "expiryTime": 5
                  }), endpoint=endpoint)
-    
+
         self.step(2)
         if self.pics_guard(self.check_pics("PAVST.S.A0001")):
             transport_configs = await self.read_single_attribute_check_success(
@@ -160,7 +160,7 @@ class TC_PAVST_2_8(MatterBaseTest):
         # TH1 sends command
         self.step(3)
         if self.pics_guard(self.check_pics("PAVST.S.A0001")):
-            status = await self.send_single_cmd(cmd=pvcluster.Commands.FindTransport (
+            status = await self.send_single_cmd(cmd=pvcluster.Commands.FindTransport(
                 {"connectionID": 10,
                 }), endpoint=endpoint)
             asserts.assert_true(status, pvattr.Status.NOT_FOUND, "DUT must responds with NOT_FOUND status code.")
