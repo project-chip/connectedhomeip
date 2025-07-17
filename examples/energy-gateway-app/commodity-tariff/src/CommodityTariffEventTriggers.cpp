@@ -18,6 +18,7 @@
 
 #include <CommodityTariffMain.h>
 #include <app/clusters/commodity-tariff-server/CommodityTariffTestEventTriggerHandler.h>
+#include <CommodityTariffSamples.h>
 
 #include <fstream>
 
@@ -36,26 +37,23 @@ static uint8_t days_ctr    = 0;
 static uint8_t entries_ctr = 0;
 bool first_start           = true;
 namespace TariffPresets {
-static constexpr const char * kTariff1 = "./tariff_sample_1.json";
-static constexpr const char * kTariff2 = "./tariff_sample_2.json";
+// Number of presets (compile-time constant)
+static constexpr size_t kCount = 2;
 
 // Array of all presets
-static constexpr std::array<const char *, 2> kAllPresets = { kTariff1, kTariff2 };
-
-// Number of presets (compile-time constant)
-static constexpr size_t kCount = kAllPresets.size();
+static constexpr std::array<const char *, kCount> kAllPresets = {
+        TariffPresets::tariff_sample_1,
+        TariffPresets::tariff_sample_2
+    };
 
 // Safe accessor function
 static constexpr const char * GetPreset(size_t index)
 {
-    if (index == kCount)
+    if (index == kCount-1)
     {
-        index = presetIndex = 0;
+        presetIndex = 0;
     }
-    else
-    {
-        presetIndex++;
-    }
+
     return kAllPresets[index];
 }
 } // namespace TariffPresets
@@ -64,9 +62,9 @@ void SetTestEventTrigger_TariffDataUpdated()
 {
     CommodityTariffDelegate * dg = GetCommodityTariffDelegate();
 
-    if (const char * preset = TariffPresets::GetPreset(presetIndex))
+    if (const char * preset = TariffPresets::GetPreset(presetIndex++))
     {
-        LoadTariffFromJSONFile(preset, dg);
+        LoadTariffFromJSONString(preset, dg);
     }
     else
     {

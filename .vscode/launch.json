@@ -64,12 +64,7 @@
             "type": "lldb",
             "request": "launch",
             "program": "${workspaceFolder}/out/darwin-arm64-energy-gateway/chip-energy-gateway-app",
-            "args": [
-                "--enable-key",
-                "00112233445566778899aabbccddeeff",
-                "--tariff-file",
-                "./tariff_sample_1.json"
-            ],
+            "args": ["--enable-key", "00112233445566778899aabbccddeeff"],
             "cwd": "${workspaceFolder}/examples/energy-gateway-app/commodity-tariff"
         },
         {

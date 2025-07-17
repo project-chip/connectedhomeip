@@ -36,8 +36,6 @@ using namespace chip::app::Clusters::CommodityTariff;
 static std::unique_ptr<CommodityTariffInstance> gCommodityTariffInstance;
 static std::unique_ptr<CommodityTariffDelegate> gCommodityTariffDelegate;
 
-static const char * TariffFile = nullptr;
-
 CommodityTariffInstance * CommodityTariff::GetCommodityTariffInstance()
 {
     return gCommodityTariffInstance.get();
@@ -53,46 +51,33 @@ CommodityTariffDelegate * CommodityTariff::GetCommodityTariffDelegate()
     return dg;
 }
 
-static bool LoadJsonFile(const char * aFname, Json::Value & jsonValue)
+static bool parseFromConstant(const char * aJsonString, Json::Value& aRoot, std::string& aErrorMsg)
 {
-    bool is_ok = false;
-    std::ifstream ifs;
     Json::CharReaderBuilder builder;
-    Json::String errs;
+    JSONCPP_STRING errs;
 
-    ifs.open(aFname);
-
-    if (!ifs.good())
-    {
-        ChipLogError(NotSpecified, "AllClusters App: Error open file %s", aFname);
-        goto exit;
+    if (aJsonString == nullptr) {
+        aErrorMsg = "Null JSON string provided";
+        return false;
     }
 
-    if (!parseFromStream(builder, ifs, &jsonValue, &errs))
-    {
-        ChipLogError(NotSpecified, "AllClusters App: Error parsing JSON file %s with error %s:", aFname, errs.c_str());
-        goto exit;
+
+    std::istringstream jsonStream(aJsonString);
+    bool success = Json::parseFromStream(builder, jsonStream, &aRoot, &errs);
+    if (!success) {
+        aErrorMsg = "Failed to parse JSON: " + errs;
     }
 
-    if (jsonValue.empty() || !jsonValue.isObject())
-    {
-        ChipLogError(NotSpecified, "Invalid file format %s", aFname);
-        goto exit;
-    }
-
-    is_ok = true;
-
-exit:
-    return is_ok;
+    return success;
 }
 
-void LoadTariffFromJSONFile(const char * aFname, CommodityTariffDelegate * dg)
+void LoadTariffFromJSONString(const char * aJsonStringPreset, CommodityTariffDelegate * dg)
 {
     Json::Value json_root;
-    ChipLogProgress(NotSpecified, "Tariff preset file %s", aFname);
-    if (LoadJsonFile(aFname, json_root))
+    std::string errs;
+    if (parseFromConstant(aJsonStringPreset, json_root, errs))
     {
-        ChipLogProgress(NotSpecified, "The tariff file opened successfully");
+        ChipLogProgress(NotSpecified, "The tariff data loaded successfully. Tariff name: %s", json_root["TariffInfo"]["TariffLabel"].asString().c_str());
         if (CHIP_NO_ERROR == dg->LoadTariffData(json_root))
         {
             dg->TariffDataUpdate();
@@ -100,13 +85,8 @@ void LoadTariffFromJSONFile(const char * aFname, CommodityTariffDelegate * dg)
     }
     else
     {
-        ChipLogError(NotSpecified, "Unable to load tariff file");
+        ChipLogError(NotSpecified, "Unable to load tariff data, err: %s", errs.c_str() );
     }
-}
-
-void CommodityTariffSetDefaultTariffFile(const char * aFile)
-{
-    TariffFile = aFile;
 }
 
 CHIP_ERROR CommodityTariffInit(EndpointId endpointId)
@@ -148,11 +128,6 @@ CHIP_ERROR CommodityTariffInit(EndpointId endpointId)
         gCommodityTariffInstance.reset();
         gCommodityTariffDelegate.reset();
         return err;
-    }
-
-    if (TariffFile != nullptr)
-    {
-        LoadTariffFromJSONFile(TariffFile, gCommodityTariffDelegate.get());
     }
 
     return CHIP_NO_ERROR;
