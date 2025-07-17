@@ -187,6 +187,8 @@ if (wifi_soc != true) {  # CCP board
           "${openthread_root}/src/cli/cli_mac_filter.hpp",
           "${openthread_root}/src/cli/cli_mdns.cpp",
           "${openthread_root}/src/cli/cli_mdns.hpp",
+          "${openthread_root}/src/cli/cli_mesh_diag.cpp",
+          "${openthread_root}/src/cli/cli_mesh_diag.hpp",
           "${openthread_root}/src/cli/cli_network_data.cpp",
           "${openthread_root}/src/cli/cli_network_data.hpp",
           "${openthread_root}/src/cli/cli_ping.cpp",

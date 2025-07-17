@@ -352,6 +352,8 @@ source_set("required-privileges") {
     "${chip_root}/examples/*",
     "${chip_root}/src/app/util/*",
     "${chip_root}/src/controller/data_model",
+    "${chip_root}/src/controller/java:jni",
+    "${chip_root}/src/controller/python:ChipDeviceCtrl",
     "${chip_root}/src/data-model-providers/codegen/*",
   ]
 

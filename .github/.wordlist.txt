@@ -446,6 +446,7 @@ DL
 DM
 DMG
 DMM
+DMTT
 DNS
 Dnsmasq
 dnsmasqd
@@ -573,6 +574,7 @@ FFF
 FFFFFFFFFFFF0102
 fffe
 fffff
+FFmpeg
 Fi
 filepath
 fini
@@ -1138,6 +1140,7 @@ PowerProfile
 PowerSource
 PowerSourceConfiguration
 pre
+PrebuiltDataModelDirectory
 preprocessor
 Presetup
 PressureMeasurement
